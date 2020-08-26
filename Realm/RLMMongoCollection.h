@@ -18,11 +18,34 @@
 
 #import <Foundation/Foundation.h>
 #import <Realm/RLMObjectId.h>
+#import <Realm/RLMNetworkTransport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 @protocol RLMBSON;
 
-@class RLMApp, RLMFindOptions, RLMFindOneAndModifyOptions, RLMUpdateResult;
+@class RLMApp, RLMFindOptions, RLMFindOneAndModifyOptions, RLMUpdateResult, RLMChangeStream;
+
+/// Delegate which is used for subscribing to changes on a `[RLMMongoCollection watch]` stream.
+@protocol RLMChangeEventDelegate
+/// The stream was opened.
+/// @param changeStream The RLMChangeStream subscribing to the stream changes.
+- (void)changeStreamDidOpen:(RLMChangeStream *)changeStream;
+/// The stream has been closed.
+/// @param error If an error occured when closing the stream, an error will be passed.
+- (void)changeStreamDidCloseWithError:(nullable NSError *)error;
+/// A error has occured while streaming.
+/// @param error The streaming error.
+- (void)changeStreamDidReceiveError:(NSError *)error;
+/// Invoked when a change event has been received.
+/// @param changeEvent The change event in BSON format.
+- (void)changeStreamDidReceiveChangeEvent:(id<RLMBSON>)changeEvent;
+@end
+
+/// Acts as a middleman and processes events with WatchStream
+@interface RLMChangeStream : NSObject<RLMEventDelegate>
+/// Stops a watch streaming session.
+- (void)close;
+@end
 
 /// The `RLMMongoCollection` represents a MongoDB collection.
 ///
@@ -256,6 +279,39 @@ typedef void(^RLMMongoDeleteBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Null
 /// @param completion The result of the attempt to delete a document.
 - (void)findOneAndDeleteWhere:(NSDictionary<NSString *, id<RLMBSON>> *)filterDocument
                    completion:(RLMMongoDeleteBlock)completion NS_REFINED_FOR_SWIFT;
+
+/// Opens a MongoDB change stream against the collection to watch for changes. The resulting stream will be notified
+/// of all events on this collection that the active user is authorized to see based on the configured MongoDB
+/// rules.
+/// @param delegate The delegate that will react to events and errors from the resulting change stream.
+/// @param delegateQueue Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
+- (RLMChangeStream *)watchWithDelegate:(id<RLMChangeEventDelegate>)delegate
+                         delegateQueue:(nullable dispatch_queue_t)delegateQueue NS_REFINED_FOR_SWIFT;
+
+/// Opens a MongoDB change stream against the collection to watch for changes
+/// made to specific documents. The documents to watch must be explicitly
+/// specified by their _id.
+/// @param filterIds The list of _ids in the collection to watch.
+/// @param delegate The delegate that will react to events and errors from the resulting change stream.
+/// @param delegateQueue Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
+- (RLMChangeStream *)watchWithFilterIds:(NSArray<RLMObjectId *> *)filterIds
+                               delegate:(id<RLMChangeEventDelegate>)delegate
+                          delegateQueue:(nullable dispatch_queue_t)delegateQueue NS_REFINED_FOR_SWIFT;
+
+/// Opens a MongoDB change stream against the collection to watch for changes. The provided BSON document will be
+/// used as a match expression filter on the change events coming from the stream.
+///
+/// See https://docs.mongodb.com/manual/reference/operator/aggregation/match/ for documentation around how to define
+/// a match filter.
+///
+/// Defining the match expression to filter ChangeEvents is similar to defining the match expression for triggers:
+/// https://docs.mongodb.com/realm/triggers/database-triggers/
+/// @param matchFilter The $match filter to apply to incoming change events
+/// @param delegate The delegate that will react to events and errors from the resulting change stream.
+/// @param delegateQueue Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
+- (RLMChangeStream *)watchWithMatchFilter:(NSDictionary<NSString *, id<RLMBSON>> *)matchFilter
+                                 delegate:(id<RLMChangeEventDelegate>)delegate
+                            delegateQueue:(nullable dispatch_queue_t)delegateQueue NS_REFINED_FOR_SWIFT;
 
 @end
 

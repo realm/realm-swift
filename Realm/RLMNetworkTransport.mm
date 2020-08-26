@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMNetworkTransport.h"
+#import "RLMNetworkTransport_Private.hpp"
 
 #import "RLMApp.h"
 #import "RLMJSONModels.h"
@@ -59,6 +59,10 @@ NSString * const RLMHTTPMethodToNSString[] = {
 @implementation RLMResponse
 @end
 
+@interface RLMEventSessionDelegate <NSURLSessionDelegate> : NSObject
++ (instancetype)delegateWithEventSubscriber:(RLMEventSubscriber *)subscriber;
+@end;
+
 @implementation RLMNetworkTransport
 
 - (void)sendRequestToServer:(RLMRequest *) request
@@ -83,6 +87,40 @@ NSString * const RLMHTTPMethodToNSString[] = {
     [[session dataTaskWithRequest:urlRequest] resume];
     // Tell the session to destroy itself once it's done with the request
     [session finishTasksAndInvalidate];
+}
+
+- (NSURLSession *)doStreamRequest:(nonnull RLMRequest *)request
+                  eventSubscriber:(nonnull id<RLMEventDelegate>)subscriber {
+    NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
+    sessionConfig.timeoutIntervalForRequest = 30;
+    sessionConfig.timeoutIntervalForResource = INT_MAX;
+    sessionConfig.HTTPAdditionalHeaders = @{
+        @"Content-Type": @"text/event-stream",
+        @"Cache": @"no-cache",
+        @"Accept": @"text/event-stream"
+    };
+    id delegate = [RLMEventSessionDelegate delegateWithEventSubscriber:subscriber];
+    auto session = [NSURLSession sessionWithConfiguration:sessionConfig
+                                                 delegate:delegate
+                                            delegateQueue:nil];
+    NSURL *url = [[NSURL alloc] initWithString:request.url];
+    [[session dataTaskWithURL:url] resume];
+    [subscriber didOpen];
+    return session;
+}
+
+- (RLMRequest *)RLMRequestFromRequest:(const realm::app::Request)request {
+    RLMRequest *rlmRequest = [RLMRequest new];
+    NSMutableDictionary<NSString *, NSString*> *headersDict = [NSMutableDictionary new];
+    for(auto &[key, value] : request.headers) {
+        [headersDict setValue:@(value.c_str()) forKey:@(key.c_str())];
+    }
+    rlmRequest.headers = headersDict;
+    rlmRequest.method = static_cast<RLMHTTPMethod>(request.method);
+    rlmRequest.timeout = request.timeout_ms;
+    rlmRequest.url = @(request.url.c_str());
+    rlmRequest.body = @(request.body.c_str());
+    return rlmRequest;
 }
 
 @end
@@ -143,6 +181,60 @@ didCompleteWithError:(NSError *)error
         return nil;
     }
     return [[RLMSyncErrorResponseModel alloc] initWithDictionary:json];
+}
+
+@end
+
+@implementation RLMEventSessionDelegate {
+    RLMEventSubscriber *_subscriber;
+}
+
++ (instancetype)delegateWithEventSubscriber:(RLMEventSubscriber *)subscriber {
+    RLMEventSessionDelegate *delegate = [RLMEventSessionDelegate new];
+    delegate->_subscriber = subscriber;
+    return delegate;
+}
+
+- (void)URLSession:(__unused NSURLSession *)session
+          dataTask:(__unused NSURLSessionDataTask *)dataTask
+    didReceiveData:(NSData *)data {
+    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) dataTask.response;
+    if (httpResponse.statusCode != 200) {
+        NSString *errorStatus = [NSString stringWithFormat:@"URLSession HTTP error code: %ld",
+                                 (long)httpResponse.statusCode];
+        NSError *error = [NSError errorWithDomain:RLMErrorDomain
+                                             code:0
+                                         userInfo:@{NSLocalizedDescriptionKey: errorStatus}];
+        return [_subscriber didCloseWithError:error];
+    }
+    [_subscriber didReceiveEvent:data];
+}
+
+- (void)URLSession:(__unused NSURLSession *)session
+              task:(NSURLSessionTask *)task
+didCompleteWithError:(NSError *)error
+{
+    RLMResponse *response = [RLMResponse new];
+    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) task.response;
+    response.headers = httpResponse.allHeaderFields;
+    response.httpStatusCode = httpResponse.statusCode;
+
+    // -999 indicates that the session was cancelled.
+    if (error && (error.code != -999)) {
+        response.body = [error localizedDescription];
+        return [_subscriber didCloseWithError:error];
+    } else if (error && (error.code == -999)) {
+        return [_subscriber didCloseWithError:nil];
+    }
+
+    if (response.httpStatusCode != 200) {
+        NSString *errorStatus = [NSString stringWithFormat:@"URLSession HTTP error code: %ld",
+                                 (long)httpResponse.statusCode];
+        NSError *error = [NSError errorWithDomain:RLMErrorDomain
+                                             code:0
+                                         userInfo:@{NSLocalizedDescriptionKey: errorStatus}];
+        return [_subscriber didCloseWithError:error];
+    }
 }
 
 @end

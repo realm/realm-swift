@@ -72,6 +72,22 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMHTTPMethod) {
 
 @end
 
+/// Delegate which is used for subscribing to changes.
+@protocol RLMEventDelegate <NSObject>
+/// Invoked when a change event has been received.
+/// @param event The change event encoded as NSData
+- (void)didReceiveEvent:(NSData *)event;
+/// A error has occured while subscribing to changes.
+/// @param error The error that has occured.
+- (void)didReceiveError:(NSError *)error;
+/// The stream was opened.
+- (void)didOpen;
+/// The stream has been closed.
+/// @param error The error that has occured.
+- (void)didCloseWithError:(NSError *)error;
+
+@end
+
 /// A block for receiving an `RLMResponse` from the `RLMNetworkTransport`.
 typedef void(^RLMNetworkTransportCompletionBlock)(RLMResponse *);
 
@@ -85,8 +101,14 @@ typedef void(^RLMNetworkTransportCompletionBlock)(RLMResponse *);
  @param request The request to send.
  @param completionBlock A callback invoked on completion of the request.
 */
-- (void)sendRequestToServer:(RLMRequest *) request
+- (void)sendRequestToServer:(RLMRequest *)request
                  completion:(RLMNetworkTransportCompletionBlock)completionBlock;
+
+/// Starts an event stream request.
+/// @param request The RLMRequest to start.
+/// @param subscriber The RLMEventDelegate which will subscribe to changes from the server.
+- (NSURLSession *)doStreamRequest:(RLMRequest *)request
+                  eventSubscriber:(id<RLMEventDelegate>)subscriber;
 
 @end
 

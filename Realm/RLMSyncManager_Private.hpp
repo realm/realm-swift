@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
                            rootDirectory:(NSURL *)rootDirectory;
 
 - (void)configureWithRootDirectory:(nullable NSURL *)rootDirectory
-                  appConfiguration:(nullable RLMAppConfiguration *)appConfiguration;
+                  appConfiguration:(nonnull RLMAppConfiguration *)appConfiguration;
 
 - (void)_fireError:(NSError *)error;
 

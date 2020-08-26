@@ -172,6 +172,25 @@ public typealias MongoDeleteBlock = RLMMongoDeleteBlock
  */
 public typealias MongoCollection = RLMMongoCollection
 
+/// Acts as a middleman and processes events with WatchStream
+public typealias ChangeStream = RLMChangeStream
+
+/// Delegate which is used for subscribing to changes on a `MongoCollection.watch()` stream.
+public protocol ChangeEventDelegate: AnyObject {
+    /// The stream was opened.
+    /// - Parameter changeStream: The `ChangeStream` subscribing to the stream changes.
+    func changeStreamDidOpen(_ changeStream: ChangeStream )
+    /// The stream has been closed.
+    /// - Parameter error: If an error occured when closing the stream, an error will be passed.
+    func changeStreamDidClose(with error: Error?)
+    /// A error has occured while streaming.
+    /// - Parameter error: The streaming error.
+    func changeStreamDidReceive(error: Error)
+    /// Invoked when a change event has been received.
+    /// - Parameter changeEvent:The change event in BSON format.
+    func changeStreamDidReceive(changeEvent: AnyBSON?)
+}
+
 extension MongoCollection {
 
     /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
@@ -483,4 +502,207 @@ extension MongoCollection {
         self.__findOneAndDeleteWhere(filterBSON as! [String: RLMBSON],
                                      completion: completion)
     }
+
+    /// Opens a MongoDB change stream against the collection to watch for changes. The resulting stream will be notified
+    /// of all events on this collection that the active user is authorized to see based on the configured MongoDB
+    /// rules.
+    /// - Parameters:
+    ///   - delegate: delegate The delegate that will react to events and errors from the resulting change stream.
+    ///   - queue: Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
+    /// - Returns: A ChangeStream which will manage the streaming events.
+    public func watch(delegate: ChangeEventDelegate, queue: DispatchQueue = .main) -> ChangeStream {
+        return self.__watch(with: ChangeEventDelegateProxy(delegate),
+                            delegateQueue: queue)
+    }
+
+    /// Opens a MongoDB change stream against the collection to watch for changes. The provided BSON document will be
+    /// used as a match expression filter on the change events coming from the stream.
+    ///
+    /// See https://docs.mongodb.com/manual/reference/operator/aggregation/match/ for documentation around how to define
+    /// a match filter.
+    ///
+    /// Defining the match expression to filter ChangeEvents is similar to defining the match expression for triggers:
+    /// https://docs.mongodb.com/realm/triggers/database-triggers/
+    /// - Parameters:
+    ///   - matchFilter: The $match filter to apply to incoming change events
+    ///   - delegate: The delegate that will react to events and errors from the resulting change stream.
+    ///   - queue: Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
+    /// - Returns: A ChangeStream which will manage the streaming events.
+    public func watch(matchFilter: Document, delegate: ChangeEventDelegate, queue: DispatchQueue = .main) -> ChangeStream {
+        let filterBSON = ObjectiveCSupport.convert(object: .document(matchFilter)) as! [String: RLMBSON]
+        return self.__watch(withMatchFilter: filterBSON,
+                            delegate: ChangeEventDelegateProxy(delegate),
+                            delegateQueue: queue)
+    }
+
+    /// Opens a MongoDB change stream against the collection to watch for changes
+    /// made to specific documents. The documents to watch must be explicitly
+    /// specified by their _id.
+    /// - Parameters:
+    ///   - filterIds: The list of _ids in the collection to watch.
+    ///   - delegate: The delegate that will react to events and errors from the resulting change stream.
+    ///   - queue: Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
+    /// - Returns: A ChangeStream which will manage the streaming events.
+    public func watch(filterIds: [ObjectId], delegate: ChangeEventDelegate, queue: DispatchQueue = .main) -> ChangeStream {
+        let filterBSON = ObjectiveCSupport.convert(object: .array(filterIds.map {AnyBSON($0)})) as! [RLMObjectId]
+        return self.__watch(withFilterIds: filterBSON,
+                            delegate: ChangeEventDelegateProxy(delegate),
+                            delegateQueue: queue)
+    }
 }
+
+private class ChangeEventDelegateProxy: RLMChangeEventDelegate {
+
+    private weak var proxyDelegate: ChangeEventDelegate?
+
+    init(_ proxyDelegate: ChangeEventDelegate) {
+        self.proxyDelegate = proxyDelegate
+    }
+
+    func changeStreamDidOpen(_ changeStream: RLMChangeStream) {
+        proxyDelegate?.changeStreamDidOpen(changeStream)
+    }
+
+    func changeStreamDidCloseWithError(_ error: Error?) {
+        proxyDelegate?.changeStreamDidClose(with: error)
+    }
+
+    func changeStreamDidReceiveError(_ error: Error) {
+        proxyDelegate?.changeStreamDidReceive(error: error)
+    }
+
+    func changeStreamDidReceiveChangeEvent(_ changeEvent: RLMBSON) {
+        let bson = ObjectiveCSupport.convert(object: changeEvent)
+        proxyDelegate?.changeStreamDidReceive(changeEvent: bson)
+    }
+}
+
+#if canImport(Combine)
+import Combine
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension Publishers {
+
+    class WatchSubscription<S: Subscriber>: ChangeEventDelegate, Subscription where S.Input == AnyBSON, S.Failure == Error {
+        private let collection: MongoCollection
+        private var changeStream: ChangeStream?
+        private var subscriber: S?
+
+        init(collection: MongoCollection,
+             subscriber: S,
+             queue: DispatchQueue = .main,
+             filterIds: [ObjectId]? = nil,
+             matchFilter: Document? = nil) {
+            self.collection = collection
+            self.subscriber = subscriber
+
+            if let matchFilter = matchFilter {
+                changeStream = collection.watch(matchFilter: matchFilter,
+                                                delegate: self,
+                                                queue: queue)
+            } else if let filterIds = filterIds {
+                changeStream = collection.watch(filterIds: filterIds,
+                                                delegate: self,
+                                                queue: queue)
+            } else {
+                changeStream = collection.watch(delegate: self,
+                                                queue: queue)
+            }
+        }
+
+        func request(_ demand: Subscribers.Demand) { }
+
+        func cancel() {
+            changeStream?.close()
+        }
+
+        func changeStreamDidOpen(_ changeStream: RLMChangeStream) { }
+
+        func changeStreamDidClose(with error: Error?) {
+            guard let error = error else {
+                subscriber?.receive(completion: .finished)
+                return
+            }
+            subscriber?.receive(completion: .failure(error))
+        }
+
+        func changeStreamDidReceive(error: Error) {
+            subscriber?.receive(completion: .failure(error))
+        }
+
+        func changeStreamDidReceive(changeEvent: AnyBSON?) {
+            guard let changeEvent = changeEvent else {
+                return
+            }
+            _ = subscriber?.receive(changeEvent)
+        }
+    }
+
+    /// A publisher that emits a change event each time the remote MongoDB collection changes.
+    public struct WatchPublisher: Publisher {
+        public typealias Output = AnyBSON
+        public typealias Failure = Error
+
+        private let collection: MongoCollection
+        private let queue: DispatchQueue
+        private let filterIds: [ObjectId]?
+        private let matchFilter: Document?
+
+        init(collection: MongoCollection, queue: DispatchQueue, filterIds: [ObjectId]? = nil, matchFilter: Document? = nil) {
+            self.collection = collection
+            self.queue = queue
+            self.filterIds = filterIds
+            self.matchFilter = matchFilter
+        }
+
+        /// :nodoc:
+        public func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, Output == S.Input {
+            let subscription = WatchSubscription(collection: collection,
+                                                 subscriber: subscriber,
+                                                 queue: queue,
+                                                 filterIds: filterIds,
+                                                 matchFilter: matchFilter)
+            subscriber.receive(subscription: subscription)
+        }
+
+        /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
+        ///
+        /// - parameter scheduler: The dispatch queue to perform the subscription on.
+        /// - returns: A publisher which subscribes on the given scheduler.
+        public func subscribe<S: Scheduler>(on scheduler: S) -> WatchPublisher {
+            guard let queue = scheduler as? DispatchQueue else {
+                fatalError("Cannot subscribe on scheduler \(scheduler): only dispatch queues are currently implemented.")
+            }
+            return Self(collection: collection,
+                        queue: queue,
+                        filterIds: filterIds,
+                        matchFilter: matchFilter)
+        }
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension MongoCollection {
+    /// Creates a publisher that emits a AnyBSON change event each time the MongoDB collection changes.
+    ///
+    /// - returns: A publisher that emits the AnyBSON change event each time the collection changes.
+    public func watch() -> Publishers.WatchPublisher {
+        return Publishers.WatchPublisher(collection: self, queue: .main)
+    }
+    /// Creates a publisher that emits a AnyBSON change event each time the MongoDB collection changes.
+    ///
+    /// - Parameter filterIds: The list of _ids in the collection to watch.
+    /// - Returns: A publisher that emits the AnyBSON change event each time the collection changes.
+    public func watch(filterIds: [ObjectId]) -> Publishers.WatchPublisher {
+        return Publishers.WatchPublisher(collection: self, queue: .main, filterIds: filterIds)
+    }
+    /// Creates a publisher that emits a AnyBSON change event each time the MongoDB collection changes.
+    ///
+    /// - Parameter matchFilter: The $match filter to apply to incoming change events.
+    /// - Returns: A publisher that emits the AnyBSON change event each time the collection changes.
+    public func watch(matchFilter: Document) -> Publishers.WatchPublisher {
+        return Publishers.WatchPublisher(collection: self, queue: .main, matchFilter: matchFilter)
+    }
+}
+
+#endif // canImport(Combine)

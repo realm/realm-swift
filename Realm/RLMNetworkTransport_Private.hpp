@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2020 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,26 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncTestCase.h"
-#import "RLMUser+ObjectServerTests.h"
-#import "RLMWatchTestUtility.h"
+#import "RLMNetworkTransport.h"
+#import "sync/generic_network_transport.hpp"
+
+namespace realm {
+namespace app {
+struct GenericEventSubscriber;
+}
+}
+
+@interface RLMEventSubscriber : NSObject<RLMEventDelegate>
+- (void)didReceiveEvent:(NSData *)event;
+- (void)didReceiveError:(NSError *)error;
+- (void)didOpen;
+- (void)didCloseWithError:(NSError *)error;
+
+@end
+
+@interface RLMNetworkTransport()
+
+- (RLMRequest *)RLMRequestFromRequest:(realm::app::Request)request;
+
+@end
+

@@ -2,6 +2,9 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add support for the 64-bit watchOS simulator added in Xcode 12.
+* Add ability to stream change events on a remote MongoDB collection with `[RLMMongoCollection watch:delegate:delegateQueue]`, `MongoCollection.watch(delegate)`. When calling `watch(delegate)` you will be given a `RLMChangeStream` (`ChangeStream`), this will be used to invalidate and stop the streaming session by calling `[RLMChangeStream close]` (`ChangeStream.close()`) when needed.
+* Add `MongoCollection.watch`, which is a Combine publisher that will stream
+  change events each time the remote MongoDB collection is updated.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
@@ -17,8 +20,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.6.
 
 ### Internal
-* Upgraded realm-core from v6.0.12 to v6.0.13
-* Upgraded realm-sync from v5.0.12 to v5.0.13
+* Upgraded realm-core from ? to ?
+* Upgraded realm-sync from ? to ?
 
 10.0.0-beta.3 Release notes (2020-08-17)
 =============================================================
@@ -293,6 +296,8 @@ later will be able to open the new file format.
 5.2.0 Release notes (2020-06-30)
 =============================================================
 
+### Fixed
+* Opening a SyncSession with LOCAL app deployments would not use the correct endpoints.
 This release also contains all changes from 5.0.3 and 5.1.0.
 
 ### Breaking Changes
@@ -341,12 +346,14 @@ This release also contains all changes from 5.0.3 and 5.1.0.
 * This release introduces breaking changes w.r.t some sync classes and MongoDB Realm Cloud functionality.
   (See the breaking changes section for the full list)
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* MongoDB Realm: 84893c5 or later.
+* APIs are backwards compatible with all previous releases in the 10.0.0-alpha series.
 * Realm Studio: 10.0.0 or later.
 * Carthage release for Swift is built with Xcode 11.5.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* Upgraded realm-core from v6.0.3 to v10.0.0-beta.1
+* Upgraded realm-sync from v5.0.1 to v10.0.0-beta.2
 
 10.0.0-beta.2 Release notes (2020-06-09)
 =============================================================

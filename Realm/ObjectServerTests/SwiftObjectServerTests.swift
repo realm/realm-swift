@@ -1531,4 +1531,434 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [countEx2], timeout: 4.0)
     }
+
+    func testWatch() {
+        performWatchTest(nil)
+    }
+
+    func testWatchAsync() {
+        let queue = DispatchQueue.init(label: "io.realm.watchQueue", attributes: .concurrent)
+        performWatchTest(queue)
+    }
+
+    func performWatchTest(_ queue: DispatchQueue?) {
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+
+        var watchEx = expectation(description: "Watch 3 document events")
+        let watchTestUtility = WatchTestUtility(targetEventCount: 3, expectation: &watchEx)
+
+        let changeStream: ChangeStream?
+        if let queue = queue {
+            changeStream = collection.watch(delegate: watchTestUtility, queue: queue)
+        } else {
+            changeStream = collection.watch(delegate: watchTestUtility)
+        }
+
+        DispatchQueue.global().async {
+            for _ in 0..<3 {
+                collection.insertOne(document) { (_, error) in
+                    XCTAssertNil(error)
+                }
+                watchTestUtility.semaphore.wait()
+            }
+            changeStream?.close()
+        }
+        wait(for: [watchEx], timeout: 60.0)
+    }
+
+    func testWatchWithMatchFilter() {
+        performWatchWithMatchFilterTest(nil)
+    }
+
+    func testWatchWithMatchFilterAsync() {
+        let queue = DispatchQueue.init(label: "io.realm.watchQueue", attributes: .concurrent)
+        performWatchWithMatchFilterTest(queue)
+    }
+
+    func performWatchWithMatchFilterTest(_ queue: DispatchQueue?) {
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+        let document4: Document = ["name": "ted", "breed": "bullmastiff"]
+        var objectIds = [ObjectId]()
+        let insertManyEx = expectation(description: "Insert many documents")
+        collection.insertMany([document, document2, document3, document4]) { (objIds, error) in
+            XCTAssertNotNil(objectIds)
+            XCTAssertEqual(objIds?.count, 4)
+            XCTAssertNil(error)
+            objectIds = objIds!.map {try! ObjectId(string: $0.stringValue)}
+            insertManyEx.fulfill()
+        }
+        wait(for: [insertManyEx], timeout: 4.0)
+
+        var watchEx = expectation(description: "Watch 3 document events")
+        let watchTestUtility = WatchTestUtility(targetEventCount: 3, matchingObjectId: objectIds.first!, expectation: &watchEx)
+
+        let changeStream: ChangeStream?
+        if let queue = queue {
+            changeStream = collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[0])],
+                                            delegate: watchTestUtility,
+                                            queue: queue)
+        } else {
+            changeStream = collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[0])],
+                                            delegate: watchTestUtility)
+        }
+
+        DispatchQueue.global().async {
+            for i in 0..<3 {
+                let name: AnyBSON = .string("fido-\(i)")
+                collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
+                                             update: ["name": name, "breed": "king charles"]) { (_, error) in
+                    XCTAssertNil(error)
+                }
+                collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
+                                             update: ["name": name, "breed": "king charles"]) { (_, error) in
+                    XCTAssertNil(error)
+                }
+                watchTestUtility.semaphore.wait()
+            }
+            changeStream?.close()
+        }
+        wait(for: [watchEx], timeout: 60.0)
+    }
+
+    func testWatchWithFilterIds() {
+        performWatchWithFilterIdsTest(nil)
+    }
+
+    func testWatchWithFilterIdsAsync() {
+        let queue = DispatchQueue.init(label: "io.realm.watchQueue", attributes: .concurrent)
+        performWatchWithFilterIdsTest(queue)
+    }
+
+    func performWatchWithFilterIdsTest(_ queue: DispatchQueue?) {
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+        let document4: Document = ["name": "ted", "breed": "bullmastiff"]
+        var objectIds = [ObjectId]()
+
+        let insertManyEx = expectation(description: "Insert many documents")
+        collection.insertMany([document, document2, document3, document4]) { (objIds, error) in
+            XCTAssertNotNil(objectIds)
+            XCTAssertEqual(objIds?.count, 4)
+            XCTAssertNil(error)
+            objectIds = objIds!.map {try! ObjectId(string: $0.stringValue)}
+            insertManyEx.fulfill()
+        }
+        wait(for: [insertManyEx], timeout: 4.0)
+
+        var watchEx = expectation(description: "Watch 3 document events")
+        let watchTestUtility = WatchTestUtility(targetEventCount: 3,
+                                                matchingObjectId: objectIds.first!,
+                                                expectation: &watchEx)
+        let changeStream: ChangeStream?
+        if let queue = queue {
+            changeStream = collection.watch(filterIds: [objectIds[0]], delegate: watchTestUtility, queue: queue)
+        } else {
+            changeStream = collection.watch(filterIds: [objectIds[0]], delegate: watchTestUtility)
+        }
+
+        DispatchQueue.global().async {
+            for i in 0..<3 {
+                let name: AnyBSON = .string("fido-\(i)")
+                collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
+                                             update: ["name": name, "breed": "king charles"]) { (_, error) in
+                    XCTAssertNil(error)
+                }
+                collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
+                                             update: ["name": name, "breed": "king charles"]) { (_, error) in
+                    XCTAssertNil(error)
+                }
+                watchTestUtility.semaphore.wait()
+            }
+            changeStream?.close()
+        }
+        wait(for: [watchEx], timeout: 60.0)
+    }
+
+    func testWatchMultipleFilterStreams() {
+        performMultipleWatchStreamsTest(nil)
+    }
+
+    func testWatchMultipleFilterStreamsAsync() {
+        let queue = DispatchQueue.init(label: "io.realm.watchQueue", attributes: .concurrent)
+        performMultipleWatchStreamsTest(queue)
+    }
+
+    func performMultipleWatchStreamsTest(_ queue: DispatchQueue?) {
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+        let document4: Document = ["name": "ted", "breed": "bullmastiff"]
+        var objectIds = [ObjectId]()
+
+        let insertManyEx = expectation(description: "Insert many documents")
+        collection.insertMany([document, document2, document3, document4]) { (objIds, error) in
+            XCTAssertNotNil(objectIds)
+            XCTAssertEqual(objIds?.count, 4)
+            XCTAssertNil(error)
+            objectIds = objIds!.map {try! ObjectId(string: $0.stringValue)}
+            insertManyEx.fulfill()
+        }
+        wait(for: [insertManyEx], timeout: 4.0)
+
+        var watchEx = expectation(description: "Watch 5 document events")
+        watchEx.expectedFulfillmentCount = 2
+
+        let watchTestUtility1 = WatchTestUtility(targetEventCount: 3,
+                                                 matchingObjectId: objectIds[0],
+                                                 expectation: &watchEx)
+
+        let watchTestUtility2 = WatchTestUtility(targetEventCount: 3,
+                                                 matchingObjectId: objectIds[1],
+                                                 expectation: &watchEx)
+
+        let changeStream1: ChangeStream?
+        let changeStream2: ChangeStream?
+
+        if let queue = queue {
+            changeStream1 = collection.watch(filterIds: [objectIds[0]], delegate: watchTestUtility1, queue: queue)
+            changeStream2 = collection.watch(filterIds: [objectIds[1]], delegate: watchTestUtility2, queue: queue)
+        } else {
+            changeStream1 = collection.watch(filterIds: [objectIds[0]], delegate: watchTestUtility1)
+            changeStream2 = collection.watch(filterIds: [objectIds[1]], delegate: watchTestUtility2)
+        }
+
+        DispatchQueue.global().async {
+            for i in 0..<5 {
+                let name: AnyBSON = .string("fido-\(i)")
+                collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
+                                             update: ["name": name, "breed": "king charles"]) { (_, error) in
+                    XCTAssertNil(error)
+                }
+                collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
+                                             update: ["name": name, "breed": "king charles"]) { (_, error) in
+                    XCTAssertNil(error)
+                }
+                watchTestUtility1.semaphore.wait()
+                watchTestUtility2.semaphore.wait()
+                if i == 2 {
+                    changeStream1?.close()
+                    changeStream2?.close()
+                }
+            }
+        }
+        wait(for: [watchEx], timeout: 60.0)
+    }
 }
+
+#if canImport(Combine)
+import Combine
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension SwiftObjectServerTests {
+
+    // swiftlint:disable multiple_closures_with_trailing_closure
+    func testWatchCombine() {
+        let sema = DispatchSemaphore(value: 0)
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+
+        let watchEx1 = expectation(description: "Watch 3 document events")
+        watchEx1.expectedFulfillmentCount = 3
+        let watchEx2 = expectation(description: "Watch 3 document events")
+        watchEx2.expectedFulfillmentCount = 3
+
+        var subscriptions: Set<AnyCancellable> = []
+
+        collection.watch()
+            .subscribe(on: DispatchQueue.global())
+            .receive(on: DispatchQueue.global())
+            .sink(receiveCompletion: { _ in }) { _ in
+                watchEx1.fulfill()
+                XCTAssertFalse(Thread.isMainThread)
+                sema.signal()
+        }.store(in: &subscriptions)
+
+        collection.watch()
+            .subscribe(on: DispatchQueue.main)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { _ in }) { _ in
+                watchEx2.fulfill()
+                XCTAssertTrue(Thread.isMainThread)
+        }.store(in: &subscriptions)
+
+        DispatchQueue.global().async {
+            for i in 0..<3 {
+                collection.insertOne(document) { (_, error) in
+                    XCTAssertNil(error)
+                }
+                sema.wait()
+                if i == 2 {
+                    subscriptions.forEach { $0.cancel() }
+                }
+            }
+        }
+        wait(for: [watchEx1, watchEx2], timeout: 60.0)
+    }
+
+    func testWatchCombineWithFilterIds() {
+        let sema1 = DispatchSemaphore(value: 0)
+        let sema2 = DispatchSemaphore(value: 0)
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+        let document4: Document = ["name": "ted", "breed": "bullmastiff"]
+        var objectIds = [ObjectId]()
+
+        let insertManyEx = expectation(description: "Insert many documents")
+        collection.insertMany([document, document2, document3, document4]) { (objIds, error) in
+            XCTAssertNotNil(objectIds)
+            XCTAssertEqual(objIds?.count, 4)
+            XCTAssertNil(error)
+            objectIds = objIds!.map {try! ObjectId(string: $0.stringValue)}
+            insertManyEx.fulfill()
+        }
+        wait(for: [insertManyEx], timeout: 4.0)
+
+        let watchEx1 = expectation(description: "Watch 3 document events")
+        watchEx1.expectedFulfillmentCount = 3
+        let watchEx2 = expectation(description: "Watch 3 document events")
+        watchEx2.expectedFulfillmentCount = 3
+        var subscriptions: Set<AnyCancellable> = []
+
+        collection.watch(filterIds: [objectIds[0]])
+            .subscribe(on: DispatchQueue.main)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { _ in }) { changeEvent in
+                XCTAssertTrue(Thread.isMainThread)
+                guard let doc = changeEvent.documentValue else {
+                    return
+                }
+
+                let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
+                if objectId == objectIds[0] {
+                    watchEx1.fulfill()
+                    sema1.signal()
+                }
+        }.store(in: &subscriptions)
+
+        collection.watch(filterIds: [objectIds[1]])
+            .subscribe(on: DispatchQueue.global())
+            .receive(on: DispatchQueue.global())
+            .sink(receiveCompletion: { _ in }) { (changeEvent) in
+                XCTAssertFalse(Thread.isMainThread)
+                guard let doc = changeEvent.documentValue else {
+                    return
+                }
+
+                let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
+                if objectId == objectIds[1] {
+                    watchEx2.fulfill()
+                    sema2.signal()
+                }
+        }.store(in: &subscriptions)
+
+        DispatchQueue.global().async {
+            for i in 0..<3 {
+                let name: AnyBSON = .string("fido-\(i)")
+                collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
+                                             update: ["name": name, "breed": "king charles"]) { (_, error) in
+                    XCTAssertNil(error)
+                }
+                collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
+                                             update: ["name": name, "breed": "king charles"]) { (_, error) in
+                    XCTAssertNil(error)
+                }
+                sema1.wait()
+                sema2.wait()
+                if i == 2 {
+                    subscriptions.forEach { $0.cancel() }
+                }
+            }
+        }
+        wait(for: [watchEx1, watchEx2], timeout: 60.0)
+    }
+
+    func testWatchCombineWithMatchFilter() {
+        let sema1 = DispatchSemaphore(value: 0)
+        let sema2 = DispatchSemaphore(value: 0)
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+        let document4: Document = ["name": "ted", "breed": "bullmastiff"]
+        var objectIds = [ObjectId]()
+
+        let insertManyEx = expectation(description: "Insert many documents")
+        collection.insertMany([document, document2, document3, document4]) { (objIds, error) in
+            XCTAssertNotNil(objectIds)
+            XCTAssertEqual(objIds?.count, 4)
+            XCTAssertNil(error)
+            objectIds = objIds!.map {try! ObjectId(string: $0.stringValue)}
+            insertManyEx.fulfill()
+        }
+        wait(for: [insertManyEx], timeout: 4.0)
+
+        let watchEx1 = expectation(description: "Watch 3 document events")
+        watchEx1.expectedFulfillmentCount = 3
+        let watchEx2 = expectation(description: "Watch 3 document events")
+        watchEx2.expectedFulfillmentCount = 3
+        var subscriptions: Set<AnyCancellable> = []
+
+        collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[0])])
+            .subscribe(on: DispatchQueue.main)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { _ in }) { changeEvent in
+                XCTAssertTrue(Thread.isMainThread)
+                guard let doc = changeEvent.documentValue else {
+                    return
+                }
+
+                let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
+                if objectId == objectIds[0] {
+                    watchEx1.fulfill()
+                    sema1.signal()
+                }
+        }.store(in: &subscriptions)
+
+        collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[1])])
+            .subscribe(on: DispatchQueue.global())
+            .receive(on: DispatchQueue.global())
+            .sink(receiveCompletion: { _ in }) { changeEvent in
+                XCTAssertFalse(Thread.isMainThread)
+                guard let doc = changeEvent.documentValue else {
+                    return
+                }
+
+                let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
+                if objectId == objectIds[1] {
+                    watchEx2.fulfill()
+                    sema2.signal()
+                }
+        }.store(in: &subscriptions)
+
+        DispatchQueue.global().async {
+            for i in 0..<3 {
+                let name: AnyBSON = .string("fido-\(i)")
+                collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
+                                             update: ["name": name, "breed": "king charles"]) { (_, error) in
+                    XCTAssertNil(error)
+                }
+                collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
+                                             update: ["name": name, "breed": "king charles"]) { (_, error) in
+                    XCTAssertNil(error)
+                }
+                sema1.wait()
+                sema2.wait()
+                if i == 2 {
+                    subscriptions.forEach { $0.cancel() }
+                }
+            }
+        }
+        wait(for: [watchEx1, watchEx2], timeout: 60.0)
+    }
+}
+
+#endif //canImport(Combine)

@@ -17,11 +17,18 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMMongoClient.h>
+#import "RLMNetworkTransport_Private.hpp"
 #import "sync/remote_mongo_client.hpp"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class RLMApp;
+
+@interface RLMChangeStream()
+- (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
+- (void)attachURLSession:(NSURLSession *)urlSession;
+@end
 
 @interface RLMMongoCollection ()
 
