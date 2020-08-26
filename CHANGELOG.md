@@ -3,6 +3,8 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * Add support for the 64-bit watchOS simulator added in Xcode 12.
 * Add ability to stream change events on a remote MongoDB collection with `[RLMMongoCollection watch:delegate:delegateQueue]`, `MongoCollection.watch(delegate)`. When calling `watch(delegate)` you will be given a `RLMChangeStream` (`ChangeStream`), this will be used to invalidate and stop the streaming session by calling `[RLMChangeStream close]` (`ChangeStream.close()`) when needed.
+* Add `MongoCollection.watch`, which is a Combine publisher that will stream
+  change events each time the remote MongoDB collection is updated.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
