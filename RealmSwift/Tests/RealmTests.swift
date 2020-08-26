@@ -189,10 +189,15 @@ class RealmTests: TestCase {
 
     func testInitCustomClassList() {
         let configuration = Realm.Configuration(fileURL: Realm.Configuration.defaultConfiguration.fileURL,
-            objectTypes: [SwiftStringObject.self])
-        XCTAssert(configuration.objectTypes! is [SwiftStringObject.Type])
+                                                objectTypes: [EmbeddedTreeObject.self, EmbeddedParentObject.self, SwiftStringObject.self])
+        XCTAssert(configuration.objectTypes![0] is SwiftStringObject.Type)
+        XCTAssert(configuration.objectTypes![1] is EmbeddedParentObject.Type)
+        XCTAssertFalse(configuration.objectTypes!.contains(where: { type -> Bool in
+            type == EmbeddedTreeObject.self
+        }))
+
         let realm = try! Realm(configuration: configuration)
-        XCTAssertEqual(["SwiftStringObject"], realm.schema.objectSchema.map { $0.className })
+        XCTAssertEqual(["SwiftStringObject", "EmbeddedParentObject", "EmbeddedTreeObject"], realm.schema.objectSchema.map { $0.className })
     }
 
     func testWrite() {

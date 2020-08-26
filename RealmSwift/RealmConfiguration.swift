@@ -72,7 +72,7 @@ extension Realm {
 
                                             Return `true ` to indicate that an attempt to compact the file should be made.
                                             The compaction will be skipped if another process is accessing it.
-         - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
+         - parameter objectTypes:        The subset of `Object` and `EmbeddedObject` subclasses persisted in the Realm. 
         */
         public init(fileURL: URL? = URL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
                     inMemoryIdentifier: String? = nil,
@@ -83,7 +83,7 @@ extension Realm {
                     migrationBlock: MigrationBlock? = nil,
                     deleteRealmIfMigrationNeeded: Bool = false,
                     shouldCompactOnLaunch: ((Int, Int) -> Bool)? = nil,
-                    objectTypes: [Object.Type]? = nil) {
+                    objectTypes: [ObjectBase.Type]? = nil) {
                 self.fileURL = fileURL
                 if let inMemoryIdentifier = inMemoryIdentifier {
                     self.inMemoryIdentifier = inMemoryIdentifier
@@ -107,12 +107,12 @@ extension Realm {
          exclusive with `inMemoryIdentifier`.
          */
         public var syncConfiguration: SyncConfiguration? {
+            get {
+                return _syncConfiguration
+            }
             set {
                 _inMemoryIdentifier = nil
                 _syncConfiguration = newValue
-            }
-            get {
-                return _syncConfiguration
             }
         }
 
@@ -120,12 +120,12 @@ extension Realm {
 
         /// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier`.
         public var fileURL: URL? {
+            get {
+                return _path.map { URL(fileURLWithPath: $0) }
+            }
             set {
                 _inMemoryIdentifier = nil
                 _path = newValue?.path
-            }
-            get {
-                return _path.map { URL(fileURLWithPath: $0) }
             }
         }
 
@@ -134,13 +134,13 @@ extension Realm {
         /// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL` and
         /// `syncConfiguration`.
         public var inMemoryIdentifier: String? {
+            get {
+                return _inMemoryIdentifier
+            }
             set {
                 _path = nil
                 _syncConfiguration = nil
                 _inMemoryIdentifier = newValue
-            }
-            get {
-                return _inMemoryIdentifier
             }
         }
 
@@ -198,12 +198,12 @@ extension Realm {
         public var shouldCompactOnLaunch: ((Int, Int) -> Bool)?
 
         /// The classes managed by the Realm.
-        public var objectTypes: [Object.Type]? {
-            set {
-                self.customSchema = newValue.map { RLMSchema(objectClasses: $0) }
-            }
+        public var objectTypes: [ObjectBase.Type]? {
             get {
                 return self.customSchema.map { $0.objectSchema.compactMap { $0.objectClass as? Object.Type } }
+            }
+            set {
+                self.customSchema = newValue.map { RLMSchema(objectClasses: $0) }
             }
         }
         /**
