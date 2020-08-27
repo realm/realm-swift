@@ -119,7 +119,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 }
 
 - (instancetype)initWithUser:(RLMUser *)user
-              partitionValue:(id<RLMBSON>)partitionValue {
+              partitionValue:(nullable id<RLMBSON>)partitionValue {
     return [self initWithUser:user
                partitionValue:partitionValue
                 customFileURL:nil
@@ -127,7 +127,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 }
 
 - (instancetype)initWithUser:(RLMUser *)user
-              partitionValue:(id<RLMBSON>)partitionValue
+              partitionValue:(nullable id<RLMBSON>)partitionValue
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy{
     auto config = [self initWithUser:user
                       partitionValue:partitionValue

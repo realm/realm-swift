@@ -225,7 +225,7 @@ static NSURL *syncDirectoryForChildProcess() {
     return [self openRealmForPartitionValue:partitionValue user:user immediatelyBlock:nil];
 }
 
-- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMUser *)user immediatelyBlock:(void(^)(void))block {
+- (RLMRealm *)openRealmForPartitionValue:(nullable NSString *)partitionValue user:(RLMUser *)user immediatelyBlock:(void(^)(void))block {
     return [self openRealmForPartitionValue:partitionValue
                                        user:user
                               encryptionKey:nil
@@ -233,7 +233,7 @@ static NSURL *syncDirectoryForChildProcess() {
                            immediatelyBlock:block];
 }
 
-- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue
+- (RLMRealm *)openRealmForPartitionValue:(nullable NSString *)partitionValue
                                     user:(RLMUser *)user
                            encryptionKey:(nullable NSData *)encryptionKey
                               stopPolicy:(RLMSyncStopPolicy)stopPolicy

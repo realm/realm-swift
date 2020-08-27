@@ -105,7 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param partitionValue FIXME
  @return A default configuration object with the sync configuration set to use the given partition value.
  */
-- (RLMRealmConfiguration *)configurationWithPartitionValue:(id<RLMBSON>)partitionValue NS_REFINED_FOR_SWIFT;
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue NS_REFINED_FOR_SWIFT;
 
 #pragma mark - Sessions
 
