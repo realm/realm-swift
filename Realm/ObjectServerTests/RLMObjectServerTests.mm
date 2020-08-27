@@ -582,11 +582,38 @@
     XCTAssertTrue(realm.isEmpty);
 }
 
+- (void)testOpenRealmWithNilPartitionValue {
+    RLMUser *user = [self userForTest:_cmd];
+    RLMRealm *realm = [self openRealmForPartitionValue:nil user:user];
+    XCTAssertTrue(realm.isEmpty);
+}
+
 /// If client B adds objects to a synced Realm, client A should see those objects.
 - (void)testAddObjects {
     RLMUser *user = [self userForTest:_cmd];
     NSString *realmId = self.appId;
     RLMRealm *realm = [self openRealmForPartitionValue:realmId
+                                                  user:user];
+    if (self.isParent) {
+        CHECK_COUNT(0, Person, realm);
+        RLMRunChildAndWait();
+        [self waitForDownloadsForRealm:realm];
+        CHECK_COUNT(4, Person, realm);
+    } else {
+        // Add objects.
+        [self addPersonsToRealm:realm
+                        persons:@[[Person john],
+                                  [Person paul],
+                                  [Person ringo],
+                                  [Person george]]];
+        [self waitForUploadsForRealm:realm];
+        CHECK_COUNT(4, Person, realm);
+    }
+}
+
+- (void)testAddObjectsWithNilPartitionValue {
+    RLMUser *user = [self userForTest:_cmd];
+    RLMRealm *realm = [self openRealmForPartitionValue:nil
                                                   user:user];
     if (self.isParent) {
         CHECK_COUNT(0, Person, realm);
