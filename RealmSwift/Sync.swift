@@ -324,7 +324,7 @@ public extension User {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    func configuration<T: BSON>(partitionValue: T = NSNull() as! T,
+    func configuration<T: BSON>(partitionValue: T,
                                 cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
         let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
         let syncConfig = config.syncConfiguration!
