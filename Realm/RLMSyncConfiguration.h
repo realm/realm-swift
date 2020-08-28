@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// :nodoc:
 - (instancetype)initWithUser:(RLMUser *)user
-              partitionValue:(id<RLMBSON>)partitionValue __attribute__((unavailable("Use [RLMUser configurationWithPartitionValue:] instead")));
+              partitionValue:(nullable id<RLMBSON>)partitionValue __attribute__((unavailable("Use [RLMUser configurationWithPartitionValue:] instead")));
 
 /// :nodoc:
 + (RLMRealmConfiguration *)automaticConfiguration __attribute__((unavailable("Use [RLMUser configuration] instead")));
