@@ -565,6 +565,37 @@
     XCTAssertEqualObjects(obj[column], val, @"%@", column);
 }
 
+- (void)testEmbeddedObjectQuery
+{
+    RLMRealm *realm = [self realm];
+    [realm beginWriteTransaction];
+    EmbeddedIntParentObject *obj0 = [EmbeddedIntParentObject createInRealm:realm withValue:@[@1, @[@2], @[@[@3]]]];
+    EmbeddedIntParentObject *obj1 = [EmbeddedIntParentObject createInRealm:realm withValue:@[@4, @[@5], @[@[@6]]]];
+    EmbeddedIntParentObject *obj2 = [EmbeddedIntParentObject createInRealm:realm withValue:@[@7, @[@8], @[@[@9]]]];
+
+    [realm commitWriteTransaction];
+    
+    NSArray *(^asArray)(RLMResults *) = ^(RLMResults *results) {
+        return [[self evaluate:results] valueForKeyPath:@"self"];
+    };
+    
+    // Query parent objects based on property of embedded object
+    RLMResults *r0 = [EmbeddedIntParentObject objectsWhere:@"object.intCol = 2"];
+    XCTAssertEqualObjects(asArray(r0), (@[ obj0 ]));
+
+    // Query parent objects based on array of embedded objects
+    RLMResults *r1 = [EmbeddedIntParentObject objectsWhere:@"ANY array.intCol > 4"];
+    XCTAssertEqualObjects(asArray(r1), (@[ obj1, obj2 ]));
+
+    // Compound query using two different embedded object properties
+    RLMResults *r2 = [EmbeddedIntParentObject objectsWhere:@"ANY array.intCol > 4 and object.intCol = 5"];
+    XCTAssertEqualObjects(asArray(r2), (@[ obj1 ]));
+
+    // Aggregate query on embedded object array, sort using embedded object key path
+    RLMResults *r3 = [[EmbeddedIntParentObject objectsWhere:@"array.@max.intCol < 9"] sortedResultsUsingKeyPath:@"object.intCol" ascending:NO];
+    XCTAssertEqualObjects(asArray(r3), (@[ obj1, obj0 ]));
+}
+
 - (void)testQuerySorting
 {
     RLMRealm *realm = [self realm];
