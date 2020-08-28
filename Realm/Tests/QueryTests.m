@@ -572,7 +572,6 @@
     EmbeddedIntParentObject *obj0 = [EmbeddedIntParentObject createInRealm:realm withValue:@[@1, @[@2], @[@[@3]]]];
     EmbeddedIntParentObject *obj1 = [EmbeddedIntParentObject createInRealm:realm withValue:@[@4, @[@5], @[@[@6]]]];
     EmbeddedIntParentObject *obj2 = [EmbeddedIntParentObject createInRealm:realm withValue:@[@7, @[@8], @[@[@9]]]];
-
     [realm commitWriteTransaction];
     
     NSArray *(^asArray)(RLMResults *) = ^(RLMResults *results) {
