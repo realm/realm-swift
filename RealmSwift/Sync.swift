@@ -524,3 +524,27 @@ extension Realm {
         return SyncSession(for: rlmRealm)
     }
 }
+
+#if canImport(Combine)
+import Combine
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+extension App {
+
+    enum UserError: Error {
+        case uncertainState
+    }
+
+    public func login(credentials: Credentials) -> Future<User, Error> {
+        return Future { promise in
+            self.login(credentials: credentials) { user, error in
+                if let user = user {
+                    promise(.success(user))
+                } else {
+                    promise(.failure(error ?? UserError.uncertainState))
+                }
+            }
+        }
+    }
+}
+#endif

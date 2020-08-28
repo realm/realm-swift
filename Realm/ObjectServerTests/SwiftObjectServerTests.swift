@@ -1959,6 +1959,28 @@ extension SwiftObjectServerTests {
         }
         wait(for: [watchEx1, watchEx2], timeout: 60.0)
     }
+    
+    // MARK: - Combine promises
+    
+    func testLoginInvalidCredentials() {
+        let credentials = Credentials(username: "test_user", password: "invalid_password")
+        let ex = expectation(description: "Should log in the user properly")
+
+        var cancellable = Set<AnyCancellable>()
+        
+        app.login(credentials: credentials)
+            .sink(receiveCompletion: { completion in
+                if case Subscribers.Completion.failure(_) = completion {
+                    ex.fulfill()
+                } else {
+                    XCTFail("Should fail with invalid credential")
+                }
+            }, receiveValue: { _ in
+                XCTFail("Should not login user with invalid credential")
+            }).store(in: &cancellable)
+        
+        waitForExpectations(timeout: 2.0, handler: nil)
+    }
 }
 
 #endif //canImport(Combine)
