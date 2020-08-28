@@ -5,24 +5,24 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add ability to stream change events on a remote MongoDB collection with `[RLMMongoCollection watch:delegate:delegateQueue]`, `MongoCollection.watch(delegate)`. When calling `watch(delegate)` you will be given a `RLMChangeStream` (`ChangeStream`), this will be used to invalidate and stop the streaming session by calling `[RLMChangeStream close]` (`ChangeStream.close()`) when needed.
 * Add `MongoCollection.watch`, which is a Combine publisher that will stream
   change events each time the remote MongoDB collection is updated.
-* None.
+* Add ability to open a synced Realm with a `nil` partition value.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * Realm.Configuration.objectTypes now accepts embedded objects
+* Ports fixes from 5.3.5 
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
-* Realm Object Server: 3.21.0 or later.
 * Realm Studio: 3.11 or later.
-* APIs are backwards compatible with all previous releases in the 5.x.y series.
-* Carthage release for Swift is built with Xcode 11.6.
+* APIs are backwards compatible with all previous releases in the v10.0.0-beta.x series.
+* Carthage release for Swift is built with Xcode 11.5.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* Upgraded realm-core from v10.0.0-beta.1 to v10.0.0-beta.5
+* Upgraded realm-sync from v10.0.0-beta.2 to v10.0.0-beta.8
 
 10.0.0-beta.3 Release notes (2020-08-17)
 =============================================================
