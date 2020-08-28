@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.0.0-beta.4 Release notes (2020-08-28)
 =============================================================
 ### Enhancements
 * Add support for the 64-bit watchOS simulator added in Xcode 12.
