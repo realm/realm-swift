@@ -8,13 +8,9 @@ BASE_DIR = Dir.pwd
 BUILD_DIR = "#{BASE_DIR}/build"
 PID_FILE = "#{BUILD_DIR}/pid.txt"
 
-DEPENDENCIES = {}
-File.open("#{BASE_DIR}/dependencies.list") do |fp|
-  fp.each do |line|
-    key, value = line.chomp.split("=")
-    DEPENDENCIES[key] = value
-  end
-end
+DEPENDENCIES = File.open("#{BASE_DIR}/dependencies.list").map { |line|
+  line.chomp.split("=")
+}.to_h
 
 MONGODB_VERSION='4.4.0-rc5'
 GO_VERSION='1.14.2'
