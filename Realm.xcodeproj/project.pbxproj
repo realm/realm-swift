@@ -3520,6 +3520,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					Realm/ObjectStore/src,
+					"core/**",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(inherited)",
@@ -3544,6 +3545,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					Realm/ObjectStore/src,
+					"core/**",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(inherited)",
