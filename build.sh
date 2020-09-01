@@ -358,7 +358,7 @@ download_common() {
             echo "Switching from version $(cat core/version.txt) to ${version}"
         fi
     else
-        if [ "$(find core -name librealm.a)" ]; then
+        if [ "$(find core -name librealm-sync.a)" ]; then
             echo 'Using existing custom core build without checking version'
             exit 0
         fi
@@ -1210,10 +1210,10 @@ EOM
 
           if [ ! -f core/version.txt ]; then
             sh build.sh download-sync
-            mv core/librealm-ios.a core/librealmcore-ios.a
-            mv core/librealm-macosx.a core/librealmcore-macosx.a
-            mv core/librealm-tvos.a core/librealmcore-tvos.a
-            mv core/librealm-watchos.a core/librealmcore-watchos.a
+            mv core/librealm-sync-ios.a core/librealmcore-ios.a
+            mv core/librealm-sync-macosx.a core/librealmcore-macosx.a
+            mv core/librealm-sync-tvos.a core/librealmcore-tvos.a
+            mv core/librealm-sync-watchos.a core/librealmcore-watchos.a
             rm core/librealm*-dbg.a
           fi
 
