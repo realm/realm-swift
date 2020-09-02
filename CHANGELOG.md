@@ -1,10 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.3.6 Release notes (2020-09-02)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+
 * Work around iOS 14 no longer allowing the use of file locks in shared
   containers, which resulted in the OS killing an app which entered the
   background while a Realm was open ([#6671](https://github.com/realm/realm-cocoa/issues/6671)).
@@ -15,9 +13,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fix deadlocks when writing to a Realm file on an exFAT partition from macOS.
   ([#6691](https://github.com/realm/realm-cocoa/issues/6691)).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 3.11 or later.
@@ -25,6 +22,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.6.
 
 ### Internal
+
 * Upgraded realm-core from v6.0.19 to v6.0.23
 * Upgraded realm-sync from v5.0.16 to v5.0.20
 
