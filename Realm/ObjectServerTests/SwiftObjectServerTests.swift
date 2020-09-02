@@ -745,7 +745,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         wait(for: [loginEx], timeout: 4.0)
 
-        XCTAssertEqual(syncUser?.identity, app.currentUser()?.identity)
+        XCTAssertEqual(syncUser?.id, app.currentUser()?.id)
         XCTAssertEqual(app.allUsers().count, 1)
     }
 
@@ -795,10 +795,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         XCTAssertEqual(app.allUsers().count, 2)
 
-        XCTAssertEqual(syncUser2!.identity, app.currentUser()!.identity)
+        XCTAssertEqual(syncUser2!.id, app.currentUser()!.id)
 
         app.switch(to: syncUser1!)
-        XCTAssertTrue(syncUser1!.identity == app.currentUser()?.identity)
+        XCTAssertTrue(syncUser1!.id == app.currentUser()?.id)
 
         let removeEx = expectation(description: "Remove user 1")
 
@@ -809,7 +809,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         wait(for: [removeEx], timeout: 4.0)
 
-        XCTAssertEqual(syncUser2!.identity, app.currentUser()!.identity)
+        XCTAssertEqual(syncUser2!.id, app.currentUser()!.id)
         XCTAssertEqual(app.allUsers().count, 1)
     }
 
@@ -849,7 +849,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         wait(for: [linkEx], timeout: 4.0)
 
-        XCTAssertEqual(syncUser?.identity, app.currentUser()?.identity)
+        XCTAssertEqual(syncUser?.id, app.currentUser()?.id)
         XCTAssertEqual(syncUser?.identities().count, 2)
     }
 

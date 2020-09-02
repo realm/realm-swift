@@ -101,7 +101,7 @@
     RLMUser *syncUser = self.anonymousUser;
 
     RLMUser *currentUser = [app currentUser];
-    XCTAssert([currentUser.identity isEqualToString:syncUser.identity]);
+    XCTAssert([currentUser.identifier isEqualToString:syncUser.identifier]);
     XCTAssert([currentUser.refreshToken isEqualToString:syncUser.refreshToken]);
     XCTAssert([currentUser.accessToken isEqualToString:syncUser.accessToken]);
 }
@@ -148,10 +148,10 @@
     RLMUser *syncUserA = [self anonymousUser];
     RLMUser *syncUserB = [self userForTest:_cmd];
 
-    XCTAssertNotEqualObjects(syncUserA.identity, syncUserB.identity);
-    XCTAssertEqualObjects(app.currentUser.identity, syncUserB.identity);
+    XCTAssertNotEqualObjects(syncUserA.identifier, syncUserB.identifier);
+    XCTAssertEqualObjects(app.currentUser.identifier, syncUserB.identifier);
 
-    XCTAssertEqualObjects([app switchToUser:syncUserA].identity, syncUserA.identity);
+    XCTAssertEqualObjects([app switchToUser:syncUserA].identifier, syncUserA.identifier);
 }
 
 - (void)testRemoveUser {
@@ -162,14 +162,14 @@
     RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test@10gen.com"
                                                                               register:YES]];
 
-    XCTAssert([[app currentUser].identity isEqualToString:secondUser.identity]);
+    XCTAssert([[app currentUser].identifier isEqualToString:secondUser.identifier]);
 
     XCTestExpectation *removeUserExpectation = [self expectationWithDescription:@"should remove user"];
 
     [secondUser removeWithCompletion:^(NSError *error) {
         XCTAssert(!error);
         XCTAssert([app allUsers].count == 1);
-        XCTAssert([[app currentUser].identity isEqualToString:firstUser.identity]);
+        XCTAssert([[app currentUser].identifier isEqualToString:firstUser.identifier]);
         [removeUserExpectation fulfill];
     }];
 
@@ -493,7 +493,7 @@
     RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                               register:NO]];
     // Two users created with the same credential should resolve to the same actual user.
-    XCTAssertTrue([firstUser.identity isEqualToString:secondUser.identity]);
+    XCTAssertTrue([firstUser.identifier isEqualToString:secondUser.identifier]);
 }
 
 /// An invalid username/password credential should not be able to log in a user and a corresponding error should be generated.

@@ -245,7 +245,7 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
             static_cast<int>(self.state),
             static_cast<int>(self.connectionState),
             self.realmURL,
-            self.parentUser.identity];
+            self.parentUser.identifier];
 }
 
 @end

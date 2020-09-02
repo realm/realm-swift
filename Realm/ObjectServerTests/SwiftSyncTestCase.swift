@@ -91,6 +91,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                         + "\(theError != nil ? String(describing: theError!) : "n/a"))",
                        file: file,
                        line: line)
+        XCTAssertTrue(theUser!.isLoggedIn)
         return theUser!
     }
 
@@ -111,6 +112,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                         + "\(theError?.localizedDescription ?? "nil"))",
             file: file,
             line: line)
+        XCTAssertFalse(user.isLoggedIn)
     }
 
     func waitForUploads(for realm: Realm) {
