@@ -43,6 +43,7 @@
 
 using namespace realm;
 
+// !!!: Old appendage of legacy cloud. Delete then test to see need.
 @interface RLMUserInfo ()
 
 @property (nonatomic, readwrite) NSArray *accounts;
@@ -97,6 +98,10 @@ using namespace realm;
     _user->log_out();
 }
 
+- (BOOL)isLoggedIn {
+    return _user->is_logged_in();
+}
+
 - (void)invalidate {
     if (!_user) {
         return;
@@ -108,7 +113,7 @@ using namespace realm;
     std::stringstream s;
     s << RLMConvertRLMBSONToBson(partitionValue);
     NSString *encodedPartitionValue = [@(s.str().c_str()) stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
-    return [[NSString alloc] initWithFormat:@"%@/%@", [self identity], encodedPartitionValue];
+    return [[NSString alloc] initWithFormat:@"%@/%@", [self identifier], encodedPartitionValue];
 }
 
 - (nullable RLMSyncSession *)sessionForPartitionValue:(id<RLMBSON>)partitionValue {
@@ -135,10 +140,11 @@ using namespace realm;
     return [buffer copy];
 }
 
-- (NSString *)identity {
+- (NSString *)identifier {
     if (!_user) {
         return nil;
     }
+    // ???: Can't do anything about the cpp. Organize with sync team.
     return @(_user->identity().c_str());
 }
 
@@ -150,7 +156,7 @@ using namespace realm;
     auto identities = _user->identities();
     for (auto& identity : identities) {
         [buffer addObject: [[RLMUserIdentity alloc] initUserIdentityWithProviderType:@(identity.provider_type.c_str())
-                                                                            identity:@(identity.id.c_str())]];
+                                                                            identifier:@(identity.id.c_str())]];
     }
 
     return [buffer copy];
@@ -301,10 +307,10 @@ using namespace realm;
 @implementation RLMUserIdentity
 
 - (instancetype)initUserIdentityWithProviderType:(NSString *)providerType
-                                        identity:(NSString *)identity {
+                                        identifier:(NSString *)identifier {
     if (self = [super init]) {
         _providerType = providerType;
-        _identity = identity;
+        _identifier = identifier;
     }
     return self;
 }
