@@ -529,19 +529,97 @@ extension Realm {
 import Combine
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
-extension App {
+public extension App {
 
     enum UserError: Error {
         case uncertainState
     }
 
-    public func login(credentials: Credentials) -> Future<User, Error> {
+    func login(credentials: Credentials) -> Future<User, Error> {
         return Future { promise in
             self.login(credentials: credentials) { user, error in
                 if let user = user {
                     promise(.success(user))
                 } else {
                     promise(.failure(error ?? UserError.uncertainState))
+                }
+            }
+        }
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+public extension User {
+
+     /**
+     Refresh a user's custom data. This will, in effect, refresh the user's auth session.
+     */
+    func refreshCustomData() -> Future<[AnyHashable : Any], Error> {
+        return Future { promise in
+            self.refreshCustomData { customData, error in
+                if let customData = customData {
+                    promise(.success(customData))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+
+    /**
+     Links the currently authenticated user with a new identity, where the identity is defined by the credential
+     specified as a parameter. This will only be successful if this `RLMUser` is the currently authenticated
+     with the client from which it was created. On success a new user will be returned with the new linked credentials.
+
+     @param credentials The `RLMCredentials` used to link the user to a new identity.
+    */
+    func linkUser(with credentials: Credentials) -> Future<User, Error> {
+        return Future { promise in
+            self.linkUser(with: credentials) { user, error in
+                if let user = user {
+                    promise(.success(user))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+
+    /**
+     Removes the user
+
+     This logs out and destroys the session related to this user. The completion block will return an error
+     if the user is not found or is already removed.
+
+     @param completion A callback invoked on completion
+    */
+    func remove() -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.remove { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    /**
+     Logs out the current user
+
+     The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by a username / password or third party auth clients
+     If the logout request fails, this method will still clear local authentication state.
+
+     @param completion A callback invoked on completion
+    */
+    func logOut() -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.logOut { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
                 }
             }
         }

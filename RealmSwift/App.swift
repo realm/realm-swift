@@ -109,3 +109,124 @@ extension App {
         self.__setASAuthorizationControllerDelegateFor(controller)
     }
 }
+
+#if canImport(Combine)
+import Combine
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+extension EmailPasswordAuth {
+    
+    /**
+     Registers a new email identity with the username/password provider,
+     and sends a confirmation email to the provided address.
+
+     @param email The email address of the user to register.
+     @param password The password that the user created for the new username/password identity.
+    */
+    public func registerEmail(_ email: String, password: String) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.registerEmail(email, password: password) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    /**
+     Confirms an email identity with the username/password provider.
+
+     @param token The confirmation token that was emailed to the user.
+     @param tokenId The confirmation token id that was emailed to the user.
+     @param completionHandler A callback to be invoked once the call is complete.
+    */
+    public func confirmUser(_ token: String, tokenId: String) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.confirmUser(token, tokenId: tokenId) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    /**
+     Re-sends a confirmation email to a user that has registered but
+     not yet confirmed their email address.
+
+     @param email The email address of the user to re-send a confirmation for.
+    */
+    public func resendConfirmationEmail(email: String) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.resendConfirmationEmail(email) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    /**
+     Sends a password reset email to the given email address.
+
+     @param email The email address of the user to send a password reset email for.
+    */
+    public func sendResetPasswordEmail(email: String) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.sendResetPasswordEmail(email) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    /**
+     Resets the password of an email identity using the
+     password reset token emailed to a user.
+
+     @param password The new password.
+     @param token The password reset token that was emailed to the user.
+     @param tokenId The password reset token id that was emailed to the user.
+    */
+    public func resetPassword(to: String, token: String, tokenId: String) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.resetPassword(to: to, token: token, tokenId: tokenId) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    /**
+     Resets the password of an email identity using the
+     password reset function set up in the application.
+
+     @param email  The email address of the user.
+     @param password The desired new password.
+     @param args A list of arguments passed in as a BSON array.
+    */
+    public func callResetPasswordFunction(email: String, password: String, args: [AnyBSON]) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.callResetPasswordFunction(email: email, password: password, args: args) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+}
+#endif // canImport(Combine)

@@ -1962,24 +1962,173 @@ extension SwiftObjectServerTests {
     
     // MARK: - Combine promises
     
-    func testLoginInvalidCredentials() {
-        let credentials = Credentials(username: "test_user", password: "invalid_password")
-        let ex = expectation(description: "Should log in the user properly")
-
+    func testEmailPasswordAuthentication() {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
         var cancellable = Set<AnyCancellable>()
-        
-        app.login(credentials: credentials)
-            .sink(receiveCompletion: { completion in
-                if case Subscribers.Completion.failure(_) = completion {
-                    ex.fulfill()
-                } else {
-                    XCTFail("Should fail with invalid credential")
+
+        let registerUserEx = expectation(description: "Register user")
+        app.emailPasswordAuth().registerEmail(email, password: password)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should register")
                 }
             }, receiveValue: { _ in
-                XCTFail("Should not login user with invalid credential")
-            }).store(in: &cancellable)
+                registerUserEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [registerUserEx], timeout: 4.0)
         
-        waitForExpectations(timeout: 2.0, handler: nil)
+        let confirmUserEx = expectation(description: "Confirm user")
+        app.emailPasswordAuth().confirmUser("atoken", tokenId: "atokenid")
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    confirmUserEx.fulfill()
+                }
+            }, receiveValue: { _ in
+                XCTFail("Should auto confirm")
+            })
+            .store(in: &cancellable)
+        wait(for: [confirmUserEx], timeout: 4.0)
+
+        let resendEmailEx = expectation(description: "Resend email confirmation")
+        app.emailPasswordAuth().resendConfirmationEmail(email: "atoken")
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    resendEmailEx.fulfill()
+                }
+            }, receiveValue: { _ in
+                XCTFail("Should auto confirm")
+            })
+            .store(in: &cancellable)
+        wait(for: [resendEmailEx], timeout: 4.0)
+
+        let sendResetPasswordEx = expectation(description: "Send reset password email")
+        app.emailPasswordAuth().sendResetPasswordEmail(email: "atoken")
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    sendResetPasswordEx.fulfill()
+                }
+            }, receiveValue: { _ in
+                XCTFail("Should not send reset password")
+            })
+            .store(in: &cancellable)
+        wait(for: [sendResetPasswordEx], timeout: 4.0)
+
+        let resetPasswordEx = expectation(description: "Reset password email")
+        app.emailPasswordAuth().resetPassword(to: "password", token: "atoken", tokenId: "tokenId")
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    resetPasswordEx.fulfill()
+                }
+            }, receiveValue: { _ in
+                XCTFail("Should not reset password")
+            })
+            .store(in: &cancellable)
+        wait(for: [resetPasswordEx], timeout: 4.0)
+
+        let callResetFunctionEx = expectation(description: "Reset password function")
+        app.emailPasswordAuth().callResetPasswordFunction(email: email, password: randomString(10), args: [[:]])
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    callResetFunctionEx.fulfill()
+                }
+            }, receiveValue: { _ in
+                XCTFail("Should not call reset password")
+            })
+            .store(in: &cancellable)
+        wait(for: [callResetFunctionEx], timeout: 4.0)
+    }
+
+    func testAppLoginFuture() {
+        var cancellable = Set<AnyCancellable>()
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let registerUserEx = expectation(description: "Register user")
+        app.emailPasswordAuth().registerEmail(email, password: password)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should register")
+                }
+            }, receiveValue: { _ in
+                registerUserEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let loginEx = expectation(description: "Login user")
+        app.login(credentials: Credentials(username: email, password: password))
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should login")
+                }
+            }, receiveValue: { user in
+                loginEx.fulfill()
+                XCTAssertEqual(user.identity, self.app.currentUser()?.identity)
+            })
+            .store(in: &cancellable)
+        wait(for: [loginEx], timeout: 4.0)
+        
+        XCTAssertEqual(self.app.allUsers().count, 1)
+    }
+
+    
+    func testRefreshCustomData() {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+        var cancellable = Set<AnyCancellable>()
+
+        let registerUserEx = expectation(description: "Register user")
+        app.emailPasswordAuth().registerEmail(email, password: password)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should register")
+                }
+            }, receiveValue: { _ in
+                registerUserEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let credentials = Credentials(username: email, password: password)
+        var syncUser: User!
+        let loginEx = expectation(description: "Login user")
+        app.login(credentials: credentials)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should login")
+                }
+            }, receiveValue: { user in
+                syncUser = user
+                loginEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [loginEx], timeout: 4.0)
+        
+        let userDataEx = expectation(description: "Update user data")
+        syncUser.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
+            XCTAssertNil(error)
+            userDataEx.fulfill()
+        }
+        wait(for: [userDataEx], timeout: 4.0)
+
+        let refreshDataEx = expectation(description: "Refresh user data")
+        syncUser.refreshCustomData()
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should refresh")
+                }
+            }, receiveValue: { customData in
+                XCTAssertEqual(customData["apples"] as! Int, 10)
+                XCTAssertEqual(customData["favourite_colour"] as! String, "green")
+                refreshDataEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [refreshDataEx], timeout: 4.0)
+
+        XCTAssertEqual(app.currentUser()?.customData?["favourite_colour"], .string("green"))
+        XCTAssertEqual(app.currentUser()?.customData?["apples"], .int64(10))
     }
 }
 
