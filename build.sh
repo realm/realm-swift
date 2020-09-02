@@ -358,7 +358,7 @@ download_common() {
             echo "Switching from version $(cat core/version.txt) to ${version}"
         fi
     else
-        if [ "$(find core -name librealm.a)" ]; then
+        if [ "$(find core -name librealm-sync.a)" ]; then
             echo 'Using existing custom core build without checking version'
             exit 0
         fi
@@ -398,11 +398,26 @@ download_common() {
 
     (
         cd "$temp_dir"
-        rm -rf "$download_type"
+        rm -rf core
         tar xf "$tar_path" --xz
         if [ ! -f core/version.txt ]; then
             printf %s "${version}" > core/version.txt
         fi
+
+        # Xcode 11 dsymutil crashes when given debugging symbols created by
+        # Xcode 12. Check if this breaks, and strip them if so.
+        local test_lib=core/realm-sync-dbg.xcframework/ios-*-simulator/librealm-sync-dbg.a
+        if ! [ -f $test_lib ]; then
+            test_lib="core/librealm-sync-ios-dbg.a"
+        fi
+        clang++ -Wl,-all_load -g -arch x86_64 -shared -target ios13.0 \
+          -isysroot $(xcrun --sdk iphonesimulator --show-sdk-path) -o tmp.dylib \
+          $test_lib -lz -framework Security
+        if ! dsymutil tmp.dylib -o tmp.dSYM 2> /dev/null; then
+            find core -name '*.a' -exec strip -x "{}" \; 2> /dev/null
+        fi
+        rm -r tmp.dylib tmp.dSYM
+
         mv core "${versioned_dir}"
     )
 
@@ -1210,10 +1225,10 @@ EOM
 
           if [ ! -f core/version.txt ]; then
             sh build.sh download-sync
-            mv core/librealm-ios.a core/librealmcore-ios.a
-            mv core/librealm-macosx.a core/librealmcore-macosx.a
-            mv core/librealm-tvos.a core/librealmcore-tvos.a
-            mv core/librealm-watchos.a core/librealmcore-watchos.a
+            mv core/librealm-sync-ios.a core/librealmcore-ios.a
+            mv core/librealm-sync-macosx.a core/librealmcore-macosx.a
+            mv core/librealm-sync-tvos.a core/librealmcore-tvos.a
+            mv core/librealm-sync-watchos.a core/librealmcore-watchos.a
             rm core/librealm*-dbg.a
           fi
 
