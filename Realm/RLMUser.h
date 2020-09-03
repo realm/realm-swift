@@ -275,7 +275,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param identifier the identifier of the identity
  */
 - (instancetype)initUserIdentityWithProviderType:(NSString *)providerType
-                                        identifier:(NSString *)identity;
+                                        identifier:(NSString *)identifier;
 
 @end
 
