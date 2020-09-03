@@ -2034,9 +2034,9 @@
     XCTAssertEqualObjects([testObjects.firstObject stringCol], @"b", @"Expecting column to be 'b'");
 }
 
-
-- (void)testInvalidLockFile
-{
+// iOS uses a different locking scheme which breaks how we stop core from reinitializing the lock file
+#if !TARGET_OS_IPHONE
+- (void)testInvalidLockFile {
     // Create the realm file and lock file
     @autoreleasepool { [RLMRealm defaultRealm]; }
 
@@ -2060,6 +2060,7 @@
     flock(fd, LOCK_UN);
     close(fd);
 }
+#endif
 
 - (void)testCannotMigrateRealmWhenRealmIsOpen {
     RLMRealm *realm = [self realmWithTestPath];

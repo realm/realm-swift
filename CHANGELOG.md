@@ -195,6 +195,34 @@ later will be able to open the new file format.
 * Upgraded realm-sync from v5.0.1 to v10.0.0-beta.2
 * Upgraded realm-core from v6.0.6 to v6.0.7
 * Upgraded realm-sync from v5.0.5 to v5.0.6
+5.3.6 Release notes (2020-09-02)
+=============================================================
+
+### Fixed
+
+* Work around iOS 14 no longer allowing the use of file locks in shared
+  containers, which resulted in the OS killing an app which entered the
+  background while a Realm was open ([#6671](https://github.com/realm/realm-cocoa/issues/6671)).
+* If an attempt to upgrade a realm has ended with a crash with "migrate_links()"
+  in the call stack, the realm was left in an invalid state. The migration
+  logic now handles this state and can complete upgrading files which were
+  incompletely upgraded by pre-5.3.4 versions.
+* Fix deadlocks when writing to a Realm file on an exFAT partition from macOS.
+  ([#6691](https://github.com/realm/realm-cocoa/issues/6691)).
+
+### Compatibility
+
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 3.11 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 11.6.
+
+### Internal
+
+* Upgraded realm-core from v6.0.19 to v6.0.23
+* Upgraded realm-sync from v5.0.16 to v5.0.20
+
 5.3.5 Release notes (2020-08-20)
 =============================================================
 
