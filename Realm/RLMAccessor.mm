@@ -611,7 +611,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj,
     realm::Object o(obj->_info->realm->_realm, *obj->_info->objectSchema, obj->_row);
     RLMAccessorContext c(obj);
     translateError([&] {
-        o.set_property_value(c, get_property(obj, prop), val ?: NSNull.null);
+        o.set_property_value(c, get_property(obj, prop).name, val ?: NSNull.null);
     });
 }
 
