@@ -1,3 +1,24 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* None.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 11.6.
+
+### Internal
+* Upgraded realm-core from ? to ?
+* Upgraded realm-sync from ? to ?
+
 10.0.0-beta.4 Release notes (2020-08-28)
 =============================================================
 ### Enhancements
