@@ -127,16 +127,16 @@ Pod::Spec.new do |s|
   s.preserve_paths          = %w(build.sh include)
 
   s.ios.deployment_target   = '9.0'
-  s.ios.vendored_library    = 'core/librealm-sync-ios.a'
+  s.ios.vendored_library    = 'core/librealmcore-ios.a'
 
   s.osx.deployment_target   = '10.9'
-  s.osx.vendored_library    = 'core/librealm-sync--macosx.a'
+  s.osx.vendored_library    = 'core/librealmcore-macosx.a'
 
   s.watchos.deployment_target = '2.0'
-  s.watchos.vendored_library  = 'core/librealm-sync-watchos.a'
+  s.watchos.vendored_library  = 'core/librealmcore-watchos.a'
 
   s.tvos.deployment_target = '9.0'
-  s.tvos.vendored_library  = 'core/librealm-sync-tvos.a'
+  s.tvos.vendored_library  = 'core/librealmcore-tvos.a'
 
   s.subspec 'Headers' do |s|
     s.source_files          = public_header_files
