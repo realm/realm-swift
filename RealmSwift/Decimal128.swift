@@ -121,7 +121,6 @@ extension Decimal128: ExpressibleByStringLiteral {
 }
 
 extension Decimal128: Comparable {
-
     /// Returns a Boolean value indicating whether two decimal128 values are equal.
     ///
     /// - Parameters:
@@ -148,7 +147,7 @@ extension Decimal128: Comparable {
     ///   - lhs: A Decimal128 value to compare.
     ///   - rhs: Another Decimal128 value to compare.
     public static func <= (lhs: Decimal128, rhs: Decimal128) -> Bool {
-        lhs.isLessThanOrEqual(rhs)
+        lhs.isLessThanOrEqual(to: rhs)
     }
 
     /// Returns a Boolean value indicating whether the decimal128 value of the first
@@ -158,7 +157,7 @@ extension Decimal128: Comparable {
     ///   - lhs: A Decimal128 value to compare.
     ///   - rhs: Another Decimal128 value to compare.
     public static func >= (lhs: Decimal128, rhs: Decimal128) -> Bool {
-        lhs.isGreaterThanOrEqual(rhs)
+        lhs.isGreaterThanOrEqual(to: rhs)
     }
 
     /// Returns a Boolean value indicating whether the decimal128 value of the first
@@ -174,7 +173,6 @@ extension Decimal128: Comparable {
 }
 
 extension Decimal128 : SignedNumeric {
-
     /// Creates a new instance from the given integer, if it can be represented
     /// exactly.
     ///
@@ -255,7 +253,7 @@ extension Decimal128 : SignedNumeric {
     ///   - lhs: The Decimal128 value to divide.
     ///   - rhs: The Decimal128 value to divide `lhs` by. `rhs` must not be zero.
     public static func / (lhs: Decimal128, rhs: Decimal128) -> Decimal128 {
-        lhs.decimalNumberByDividing(by: rhs) as! Decimal128
+        lhs.decimalNumberFromDividing(by: rhs) as! Decimal128
     }
     
     /// Divides the first Decimal128 value by the second and stores the quotient in the

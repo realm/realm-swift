@@ -151,7 +151,7 @@
     _value+=rhs;
 }
 
-- (RLMDecimal128 *)decimalNumberByDividingBy:(RLMDecimal128 *)decimalNumber {
+- (RLMDecimal128 *)decimalNumberFromDividingBy:(RLMDecimal128 *)decimalNumber {
     auto rhs = RLMObjcToDecimal128(decimalNumber);
     return [self initWithDecimal128:_value/rhs];
 }
@@ -161,7 +161,7 @@
     return _value > rhs;
 }
 
-- (BOOL)isGreaterThanOrEqual:(RLMDecimal128 *)decimalNumber {
+- (BOOL)isGreaterThanOrEqualTo:(RLMDecimal128 *)decimalNumber {
     auto rhs = RLMObjcToDecimal128(decimalNumber);
     return _value >= rhs;
 }
@@ -171,7 +171,7 @@
     return _value < rhs;
 }
 
-- (BOOL)isLessThanOrEqual:(RLMDecimal128 *)decimalNumber {
+- (BOOL)isLessThanOrEqualTo:(RLMDecimal128 *)decimalNumber {
     auto rhs = RLMObjcToDecimal128(decimalNumber);
     return _value <= rhs;
 }
