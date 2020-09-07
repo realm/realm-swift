@@ -67,6 +67,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Gets if this Decimal128 represents a NaN value.
 @property (nonatomic, readonly) BOOL isNaN;
+
+/// Adds the right hand side to the current value and returns the result.
+- (RLMDecimal128 *)decimalNumberByAdding:(RLMDecimal128 *)decimalNumber;
+/// Adds two values and stores the result in the left-hand-side variable.
+- (void)additionAssignmentWith:(RLMDecimal128 *)decimalNumber;
+/// Divides the right hand side to the current value and returns the result.
+- (RLMDecimal128 *)decimalNumberByDividingBy:(RLMDecimal128 *)decimalNumber;
+/// Comparision operator to check if the right hand side is greater than the current value.
+- (BOOL)isGreaterThan:(RLMDecimal128 *)decimalNumber;
+/// Comparision operator to check if the right hand side is greater than or equal to the current value.
+- (BOOL)isGreaterThanOrEqual:(RLMDecimal128 *)decimalNumber;
+/// Comparision operator to check if the right hand side is less than the current value.
+- (BOOL)isLessThan:(RLMDecimal128 *)decimalNumber;
+/// Comparision operator to check if the right hand side is less than or equal to the current value.
+- (BOOL)isLessThanOrEqual:(RLMDecimal128 *)decimalNumber;
+
 @end
 
 NS_ASSUME_NONNULL_END

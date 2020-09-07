@@ -83,9 +83,6 @@ public final class Decimal128: RLMDecimal128, Decodable {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Cannot convert value to Decimal128")
         }
     }
-}
-
-extension Decimal128 {
 
 }
 
@@ -120,5 +117,229 @@ extension Decimal128: ExpressibleByStringLiteral {
     /// Aborts if the string cannot be parsed as a Decimal128.
     public convenience init(stringLiteral value: String) {
         try! self.init(string: value)
+    }
+}
+
+extension Decimal128: Comparable {
+
+    /// Returns a Boolean value indicating whether two decimal128 values are equal.
+    ///
+    /// - Parameters:
+    ///   - lhs: A Decimal128 value to compare.
+    ///   - rhs: Another Decimal128 value to compare.
+    public static func == (lhs: Decimal128, rhs: Decimal128) -> Bool {
+        lhs.isEqual(to: rhs)
+    }
+
+    /// Returns a Boolean value indicating whether the decimal128 value of the first
+    /// argument is less than that of the second argument.
+    ///
+    /// - Parameters:
+    ///   - lhs: A Decimal128 value to compare.
+    ///   - rhs: Another Decimal128 value to compare.
+    public static func < (lhs: Decimal128, rhs: Decimal128) -> Bool {
+        lhs.isLessThan(rhs)
+    }
+
+    /// Returns a Boolean value indicating whether the decimal128 value of the first
+    /// argument is less than or equal to that of the second argument.
+    ///
+    /// - Parameters:
+    ///   - lhs: A Decimal128 value to compare.
+    ///   - rhs: Another Decimal128 value to compare.
+    public static func <= (lhs: Decimal128, rhs: Decimal128) -> Bool {
+        lhs.isLessThanOrEqual(rhs)
+    }
+
+    /// Returns a Boolean value indicating whether the decimal128 value of the first
+    /// argument is greater than or equal to that of the second argument.
+    ///
+    /// - Parameters:
+    ///   - lhs: A Decimal128 value to compare.
+    ///   - rhs: Another Decimal128 value to compare.
+    public static func >= (lhs: Decimal128, rhs: Decimal128) -> Bool {
+        lhs.isGreaterThanOrEqual(rhs)
+    }
+
+    /// Returns a Boolean value indicating whether the decimal128 value of the first
+    /// argument is greater than that of the second argument.
+    ///
+    /// - Parameters:
+    ///   - lhs: A Decimal128 value to compare.
+    ///   - rhs: Another Decimal128 value to compare.
+    public static func > (lhs: Decimal128, rhs: Decimal128) -> Bool {
+        lhs.isGreaterThan(rhs)
+    }
+
+}
+
+extension Decimal128 : SignedNumeric {
+
+    /// Creates a new instance from the given integer, if it can be represented
+    /// exactly.
+    ///
+    /// If the value passed as `source` is not representable exactly, the result
+    /// is `nil`. In the following example, the constant `x` is successfully
+    /// created from a value of `100`, while the attempt to initialize the
+    /// constant `y` from `1_000` fails because the `Int8` type can represent
+    /// `127` at maximum:
+    ///
+    /// - Parameter source: A value to convert to this type of integer.
+    public convenience init?<T>(exactly source: T) where T : BinaryInteger {
+        self.init(value: source)
+    }
+
+    /// A type that can represent the absolute value of Decimal128
+    public typealias Magnitude = Decimal128
+
+    /// The magnitude of this Decimal128.
+    public var magnitude: Magnitude {
+        fatalError("Magnitude not available")
+    }
+
+    /// Replaces this Decimal128 value with its additive inverse.
+    public func negate() {
+        fatalError("Negate not available")
+    }
+
+    /// Adds two decimal128 values and produces their sum.
+    ///
+    /// - Parameters:
+    ///   - lhs: The first Decimal128 value to add.
+    ///   - rhs: The second Decimal128 value to add.
+    public static func + (lhs: Decimal128, rhs: Decimal128) -> Decimal128 {
+        lhs.decimalNumber(byAdding: rhs) as! Decimal128
+    }
+
+    /// Adds two decimal128 values and stores the result in the left-hand-side variable.
+    ///
+    /// - Parameters:
+    ///   - lhs: The first Decimal128 value to add.
+    ///   - rhs: The second Decimal128 value to add.
+    public static func += (lhs: inout Decimal128, rhs: Decimal128) {
+        lhs.additionAssignment(with: rhs)
+    }
+
+    /// Subtracts one Decimal128 value from another and produces their difference.
+    ///
+    /// - Parameters:
+    ///   - lhs: A Decimal128 value.
+    ///   - rhs: The Decimal128 value to subtract from `lhs`.
+    public static func - (lhs: Decimal128, rhs: Decimal128) -> Decimal128 {
+        fatalError("Operator not available")
+    }
+
+    /// Subtracts the second Decimal128 value from the first and stores the difference in the
+    /// left-hand-side variable.
+    ///
+    /// - Parameters:
+    ///   - lhs: A Decimal128 value.
+    ///   - rhs: The Decimal128 value to subtract from `lhs`.
+    public static func -= (lhs: inout Decimal128, rhs: Decimal128) {
+        fatalError("Operator not available")
+    }
+
+    /// Multiplies two Decimal128 values and stores the result in the left-hand-side
+    /// variable.
+    ///
+    /// - Parameters:
+    ///   - lhs: The first Decimal128 value to multiply.
+    ///   - rhs: The second Decimal128 value to multiply.
+    public static func *= (lhs: inout Decimal128, rhs: Decimal128) {
+        fatalError("Operator not available")
+    }
+
+    /// Returns the quotient of dividing the first Decimal128 value by the second.
+    ///
+    /// - Parameters:
+    ///   - lhs: The Decimal128 value to divide.
+    ///   - rhs: The Decimal128 value to divide `lhs` by. `rhs` must not be zero.
+    public static func / (lhs: Decimal128, rhs: Decimal128) -> Decimal128 {
+        lhs.decimalNumberByDividing(by: rhs) as! Decimal128
+    }
+    
+    /// Divides the first Decimal128 value by the second and stores the quotient in the
+    /// left-hand-side variable.
+    ///
+    /// - Parameters:
+    ///   - lhs: The Decimal128 value to divide.
+    ///   - rhs: The Decimal128 value to divide `lhs` by. `rhs` must not be zero.
+    public static func /= (lhs: inout Decimal128, rhs: Decimal128) {
+        fatalError("Operator not available")
+    }
+
+    /// Multiplies two Decimal128 values and produces their product.
+    ///
+    /// - Parameters:
+    ///   - lhs: The first Decimal128 value to multiply.
+    ///   - rhs: The second Decimal128 value to multiply.
+    public static func * (lhs: Decimal128, rhs: Decimal128) -> Decimal128 {
+        fatalError("Operator not available")
+    }
+}
+
+/*
+ TODO: Decide wheter to impl from core level or cocoa level
+extension Decimal128 : Strideable {
+
+    /// Returns the distance from this value to the given value, expressed as a
+    /// stride.
+    ///
+    /// If this type's `Stride` type conforms to `BinaryInteger`, then for two
+    /// values `x` and `y`, and a distance `n = x.distance(to: y)`,
+    /// `x.advanced(by: n) == y`. Using this method with types that have a
+    /// noninteger `Stride` may result in an approximation.
+    ///
+    /// - Parameter other: The value to calculate the distance to.
+    /// - Returns: The distance from this value to `other`.
+    ///
+    /// - Complexity: O(1)
+    public func distance(to other: Decimal128) -> Decimal128 {
+        0.0
+    }
+
+    /// Returns a value that is offset the specified distance from this value.
+    ///
+    /// Use the `advanced(by:)` method in generic code to offset a value by a
+    /// specified distance. If you're working directly with numeric values, use
+    /// the addition operator (`+`) instead of this method.
+    ///
+    ///     func addOne<T: Strideable>(to x: T) -> T
+    ///         where T.Stride: ExpressibleByIntegerLiteral
+    ///     {
+    ///         return x.advanced(by: 1)
+    ///     }
+    ///
+    ///     let x = addOne(to: 5)
+    ///     // x == 6
+    ///     let y = addOne(to: 3.5)
+    ///     // y = 4.5
+    ///
+    /// If this type's `Stride` type conforms to `BinaryInteger`, then for a
+    /// value `x`, a distance `n`, and a value `y = x.advanced(by: n)`,
+    /// `x.distance(to: y) == n`. Using this method with types that have a
+    /// noninteger `Stride` may result in an approximation.
+    ///
+    /// - Parameter n: The distance to advance this value.
+    /// - Returns: A value that is offset from this value by `n`.
+    ///
+    /// - Complexity: O(1)
+    public func advanced(by n: Decimal128) -> Decimal128 {
+        0.0
+    }
+
+    /// A type that represents the distance between two values.
+    public typealias Stride = Decimal128
+}*/
+
+extension Decimal128 {
+    /// `true` if `self` is a signaling NaN, `false` otherwise.
+    public var isSignaling: Bool {
+        self.isNaN
+    }
+
+    /// `true` if `self` is a signaling NaN, `false` otherwise.
+    public var isSignalingNaN: Bool {
+        self.isSignaling
     }
 }

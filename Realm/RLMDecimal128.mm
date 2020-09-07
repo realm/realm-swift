@@ -139,4 +139,41 @@
 - (BOOL)isNaN {
     return _value.is_nan();
 }
+
+- (RLMDecimal128 *)decimalNumberByAdding:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    auto result = _value+rhs;
+    return [[RLMDecimal128 alloc] initWithDecimal128:result];
+}
+
+- (void)additionAssignmentWith:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    _value+=rhs;
+}
+
+- (RLMDecimal128 *)decimalNumberByDividingBy:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return [self initWithDecimal128:_value/rhs];
+}
+
+- (BOOL)isGreaterThan:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return _value > rhs;
+}
+
+- (BOOL)isGreaterThanOrEqual:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return _value >= rhs;
+}
+
+- (BOOL)isLessThan:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return _value < rhs;
+}
+
+- (BOOL)isLessThanOrEqual:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return _value <= rhs;
+}
+
 @end
