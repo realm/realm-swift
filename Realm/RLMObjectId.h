@@ -50,6 +50,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable instancetype)initWithString:(NSString *)string
                                   error:(NSError **)error;
 
+/// Creates a new ObjectId using the given date, machine identifier, process identifier.
+///
+/// @param timestamp A timestamp as NSDate.
+/// @param machineIdentifier The machine identifier.
+/// @param processIdentifier The process identifier.
 - (nullable instancetype)initWithTimestamp:(NSDate *)timestamp
                          machineIdentifier:(int)machineIdentifier
                          processIdentifier:(int)processIdentifier;
