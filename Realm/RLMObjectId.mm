@@ -66,6 +66,15 @@
     return self;
 }
 
+- (instancetype)initWithTimestamp:(NSDate *)timestamp
+                machineIdentifier:(int)machineIdentifier
+                processIdentifier:(int)processIdentifier {
+    if ((self = [self init])) {
+        _value = realm::ObjectId(RLMTimestampForNSDate(timestamp), machineIdentifier, processIdentifier);
+    }
+    return self;
+}
+
 - (instancetype)initWithValue:(realm::ObjectId)value {
     if ((self = [self init])) {
         _value = value;
@@ -84,6 +93,22 @@
     return NO;
 }
 
+- (BOOL)isGreaterThan:(nullable RLMObjectId *)objectId {
+    return _value > objectId.value;
+}
+
+- (BOOL)isGreaterThanOrEqualTo:(nullable RLMObjectId *)objectId {
+    return _value >= objectId.value;
+}
+
+- (BOOL)isLessThan:(nullable RLMObjectId *)objectId {
+    return _value < objectId.value;
+}
+
+- (BOOL)isLessThanOrEqualTo:(nullable RLMObjectId *)objectId {
+    return _value <= objectId.value;
+}
+
 - (NSUInteger)hash {
     return _value.hash();
 }
@@ -95,4 +120,9 @@
 - (NSString *)stringValue {
     return @(_value.to_string().c_str());
 }
+
+- (NSDate *)timestamp {
+    return RLMTimestampToNSDate(_value.get_timestamp());
+}
+
 @end

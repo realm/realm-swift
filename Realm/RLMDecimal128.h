@@ -75,13 +75,13 @@ NS_ASSUME_NONNULL_BEGIN
 /// Divides the right hand side to the current value and returns the result.
 - (RLMDecimal128 *)decimalNumberFromDividingBy:(RLMDecimal128 *)decimalNumber;
 /// Comparision operator to check if the right hand side is greater than the current value.
-- (BOOL)isGreaterThan:(RLMDecimal128 *)decimalNumber;
+- (BOOL)isGreaterThan:(nullable RLMDecimal128 *)decimalNumber;
 /// Comparision operator to check if the right hand side is greater than or equal to the current value.
-- (BOOL)isGreaterThanOrEqualTo:(RLMDecimal128 *)decimalNumber;
+- (BOOL)isGreaterThanOrEqualTo:(nullable RLMDecimal128 *)decimalNumber;
 /// Comparision operator to check if the right hand side is less than the current value.
-- (BOOL)isLessThan:(RLMDecimal128 *)decimalNumber;
+- (BOOL)isLessThan:(nullable RLMDecimal128 *)decimalNumber;
 /// Comparision operator to check if the right hand side is less than or equal to the current value.
-- (BOOL)isLessThanOrEqualTo:(RLMDecimal128 *)decimalNumber;
+- (BOOL)isLessThanOrEqualTo:(nullable RLMDecimal128 *)decimalNumber;
 
 @end
 

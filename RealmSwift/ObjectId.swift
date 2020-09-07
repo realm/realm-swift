@@ -81,3 +81,55 @@ extension ObjectId: Encodable {
         try self.stringValue.encode(to: encoder)
     }
 }
+
+extension ObjectId: Comparable {
+    /// Returns a Boolean value indicating whether the value of the first
+    /// argument is less than that of the second argument.
+    ///
+    /// - Parameters:
+    ///   - lhs: An ObjectId value to compare.
+    ///   - rhs: Another ObjectId value to compare.
+    public static func < (lhs: ObjectId, rhs: ObjectId) -> Bool {
+        lhs.isLessThan(rhs)
+    }
+
+    /// Returns a Boolean value indicating whether the ObjectId of the first
+    /// argument is less than or equal to that of the second argument.
+    ///
+    /// - Parameters:
+    ///   - lhs: An ObjectId value to compare.
+    ///   - rhs: Another ObjectId value to compare.
+    public static func <= (lhs: ObjectId, rhs: ObjectId) -> Bool {
+        lhs.isLessThanOrEqual(to: rhs)
+    }
+
+    /// Returns a Boolean value indicating whether the ObjectId of the first
+    /// argument is greater than or equal to that of the second argument.
+    ///
+    /// - Parameters:
+    ///   - lhs: An ObjectId value to compare.
+    ///   - rhs: Another ObjectId value to compare.
+    public static func >= (lhs: ObjectId, rhs: ObjectId) -> Bool {
+        lhs.isGreaterThanOrEqual(to: rhs)
+    }
+
+    /// Returns a Boolean value indicating whether the ObjectId of the first
+    /// argument is greater than that of the second argument.
+    ///
+    /// - Parameters:
+    ///   - lhs: An ObjectId value to compare.
+    ///   - rhs: Another ObjectId value to compare.
+    public static func > (lhs: ObjectId, rhs: ObjectId) -> Bool {
+        lhs.isGreaterThan(rhs)
+    }
+
+    /// Returns a Boolean values indicating whether two ObjectId values are equal.
+    ///
+    /// - Parameters:
+    ///   - lhs: An ObjectId value to compare.
+    ///   - rhs: Another ObjectId value to compare.
+    public static func == (lhs: ObjectId, rhs: ObjectId) -> Bool {
+        lhs.isEqual(to: rhs)
+    }
+
+}
