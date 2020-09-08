@@ -303,6 +303,18 @@ public extension User {
         return ObjectiveCSupport.convert(object: config)
     }
 
+    /**
+     Create a sync configuration instance.
+
+     - parameter partitionValue: Takes `nil` as a partition value.
+     - parameter cancelAsyncOpenOnNonFatalErrors: By default, Realm.asyncOpen()
+     swallows non-fatal connection errors such as a connection attempt timing
+     out and simply retries until it succeeds. If this is set to `true`, instead
+     the error will be reported to the callback and the async open will be
+     cancelled.
+
+     - warning: NEVER disable SSL validation for a system running in production.
+     */
     func configuration(partitionValue: ExpressibleByNilLiteral?,
                        cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
         let config = self.__configuration(withPartitionValue: nil)

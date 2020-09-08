@@ -17,7 +17,6 @@ FRAMEWORK_VERSION = A;
 
 APPLICATION_EXTENSION_API_ONLY = YES;
 HEADER_SEARCH_PATHS = $(inherited) $(DERIVED_FILE_DIR);
-LIBRARY_SEARCH_PATHS = core;
 
 ENABLE_BITCODE[sdk=iphone*] = YES;
 ENABLE_BITCODE[sdk=watch*] = YES;
@@ -27,16 +26,3 @@ LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = $(inherited) @executable_path/../Framewor
 LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
 LD_RUNPATH_SEARCH_PATHS[sdk=watch*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
 LD_RUNPATH_SEARCH_PATHS[sdk=appletv*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
-
-REALM_PLATFORM_SUFFIX_ = $(PLATFORM_NAME); // Xcode 10 does not define SDK_VARIANT
-REALM_PLATFORM_SUFFIX_macos = macosx;
-REALM_PLATFORM_SUFFIX_iosmac = maccatalyst;
-REALM_PLATFORM_SUFFIX = $(REALM_PLATFORM_SUFFIX_$(SDK_VARIANT));
-OTHER_LDFLAGS[sdk=macosx*] = -lrealm-$(REALM_PLATFORM_SUFFIX)$(REALM_LIBRARY_SUFFIX) $(REALM_CATALYST_FLAGS);
-OTHER_LIBTOOLFLAGS[sdk=macosx*] = -lrealm-$(REALM_PLATFORM_SUFFIX)$(REALM_LIBRARY_SUFFIX);
-OTHER_LDFLAGS[sdk=iphone*] = -lrealm-ios$(REALM_LIBRARY_SUFFIX);
-OTHER_LIBTOOLFLAGS[sdk=iphone*] = -lrealm-ios$(REALM_LIBRARY_SUFFIX);
-OTHER_LDFLAGS[sdk=watch*] = -lrealm-watchos$(REALM_LIBRARY_SUFFIX);
-OTHER_LIBTOOLFLAGS[sdk=watch*] = -lrealm-watchos$(REALM_LIBRARY_SUFFIX);
-OTHER_LDFLAGS[sdk=appletv*] = -lrealm-tvos$(REALM_LIBRARY_SUFFIX);
-OTHER_LIBTOOLFLAGS[sdk=appletv*] = -lrealm-tvos$(REALM_LIBRARY_SUFFIX);
