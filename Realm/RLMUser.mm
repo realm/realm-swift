@@ -210,7 +210,7 @@ using namespace realm;
     });
 }
 
-- (RLMAPIKeyAuth *)apiKeyAuth {
+- (RLMAPIKeyAuth *)apiKeysAuth {
     return [[RLMAPIKeyAuth alloc] initWithApp: _app];
 }
 

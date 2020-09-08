@@ -242,7 +242,7 @@
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
     NSString *randomPassword = [self generateRandomString:10];
 
-    [[app emailPasswordAuth] registerEmail:randomEmail password:randomPassword completion:^(NSError *error) {
+    [[app emailPasswordAuth] registerUser:randomEmail password:randomPassword completion:^(NSError *error) {
         XCTAssert(!error);
         [expectation fulfill];
     }];
@@ -326,7 +326,7 @@
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
     NSString *randomPassword = [self generateRandomString:10];
 
-    [[app emailPasswordAuth] registerEmail:randomEmail password:randomPassword completion:^(NSError *error) {
+    [[app emailPasswordAuth] registerUser:randomEmail password:randomPassword completion:^(NSError *error) {
         XCTAssert(!error);
         [registerExpectation fulfill];
     }];
@@ -343,14 +343,14 @@
 
     [self waitForExpectations:@[loginExpectation] timeout:60.0];
 
-    [[syncUser apiKeyAuth] createApiKeyWithName:@"apiKeyName1" completion:^(RLMUserAPIKey *userAPIKey, NSError *error) {
+    [[syncUser apiKeysAuth] createApiKeyWithName:@"apiKeyName1" completion:^(RLMUserAPIKey *userAPIKey, NSError *error) {
         XCTAssert(!error);
         XCTAssert([userAPIKey.name isEqualToString:@"apiKeyName1"]);
         userAPIKeyA = userAPIKey;
         [createAPIKeyExpectationA fulfill];
     }];
 
-    [[syncUser apiKeyAuth] createApiKeyWithName:@"apiKeyName2" completion:^(RLMUserAPIKey *userAPIKey, NSError *error) {
+    [[syncUser apiKeysAuth] createApiKeyWithName:@"apiKeyName2" completion:^(RLMUserAPIKey *userAPIKey, NSError *error) {
         XCTAssert(!error);
         XCTAssert([userAPIKey.name isEqualToString:@"apiKeyName2"]);
         userAPIKeyB = userAPIKey;
@@ -362,7 +362,7 @@
     // sleep for 2 seconds as there seems to be an issue fetching the keys straight after they are created.
     [NSThread sleepForTimeInterval:2];
 
-    [[syncUser apiKeyAuth] fetchApiKeysWithCompletion:^(NSArray<RLMUserAPIKey *> * _Nonnull apiKeys, NSError *error) {
+    [[syncUser apiKeysAuth] fetchApiKeysWithCompletion:^(NSArray<RLMUserAPIKey *> * _Nonnull apiKeys, NSError *error) {
         XCTAssert(!error);
         XCTAssert(apiKeys.count == 2);
         [fetchAPIKeysExpectation fulfill];
@@ -370,21 +370,21 @@
 
     [self waitForExpectations:@[fetchAPIKeysExpectation] timeout:60.0];
 
-    [[syncUser apiKeyAuth] disableApiKey:userAPIKeyA.objectId completion:^(NSError *error) {
+    [[syncUser apiKeysAuth] disableApiKey:userAPIKeyA.objectId completion:^(NSError *error) {
         XCTAssert(!error);
         [disableAPIKeyExpectation fulfill];
     }];
 
     [self waitForExpectations:@[disableAPIKeyExpectation] timeout:60.0];
 
-    [[syncUser apiKeyAuth] enableApiKey:userAPIKeyA.objectId completion:^(NSError *error) {
+    [[syncUser apiKeysAuth] enableApiKey:userAPIKeyA.objectId completion:^(NSError *error) {
         XCTAssert(!error);
         [enableAPIKeyExpectation fulfill];
     }];
 
     [self waitForExpectations:@[enableAPIKeyExpectation] timeout:60.0];
 
-    [[syncUser apiKeyAuth] deleteApiKey:userAPIKeyA.objectId completion:^(NSError *error) {
+    [[syncUser apiKeysAuth] deleteApiKey:userAPIKeyA.objectId completion:^(NSError *error) {
         XCTAssert(!error);
         [deleteAPIKeyExpectation fulfill];
     }];
@@ -406,7 +406,7 @@
     NSString *randomEmail = [NSString stringWithFormat:@"%@@10gen.com", [self generateRandomString:10]];
     NSString *randomPassword = [self generateRandomString:10];
 
-    [[app emailPasswordAuth] registerEmail:randomEmail password:randomPassword completion:^(NSError *error) {
+    [[app emailPasswordAuth] registerUser:randomEmail password:randomPassword completion:^(NSError *error) {
         XCTAssert(!error);
         [registerExpectation fulfill];
     }];
@@ -533,7 +533,7 @@
 /// Registering a user with existing username should return corresponding error.
 - (void)testExistingUsernameRegistration {
     XCTestExpectation *expectationA = [self expectationWithDescription:@"registration should succeed"];
-    [[self.app emailPasswordAuth] registerEmail:NSStringFromSelector(_cmd)
+    [[self.app emailPasswordAuth] registerUser:NSStringFromSelector(_cmd)
                                        password:@"password"
                                      completion:^(NSError * error) {
         XCTAssertNil(error);
@@ -542,7 +542,7 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     XCTestExpectation *expectationB = [self expectationWithDescription:@"registration should fail"];
-    [[self.app emailPasswordAuth] registerEmail:NSStringFromSelector(_cmd)
+    [[self.app emailPasswordAuth] registerUser:NSStringFromSelector(_cmd)
                                        password:@"password"
                                      completion:^(NSError * error) {
         XCTAssertNotNil(error);

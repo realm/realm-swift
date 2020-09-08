@@ -178,7 +178,7 @@ NS_ASSUME_NONNULL_BEGIN
 
   This client should only be used by an authenticated user.
 */
-- (RLMAPIKeyAuth *)apiKeyAuth;
+- (RLMAPIKeyAuth *)apiKeysAuth;
 
 /// A client for interacting with a remote MongoDB instance
 /// @param serviceName The name of the MongoDB service

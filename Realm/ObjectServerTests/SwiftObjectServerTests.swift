@@ -728,7 +728,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -759,12 +759,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let registerUser1Ex = expectation(description: "Register user 1")
         let registerUser2Ex = expectation(description: "Register user 2")
 
-        app.emailPasswordAuth().registerEmail(email1, password: password1) { (error) in
+        app.emailPasswordAuth().registerUser(email1, password: password1) { (error) in
             XCTAssertNil(error)
             registerUser1Ex.fulfill()
         }
 
-        app.emailPasswordAuth().registerEmail(email2, password: password2) { (error) in
+        app.emailPasswordAuth().registerUser(email2, password: password2) { (error) in
             XCTAssertNil(error)
             registerUser2Ex.fulfill()
         }
@@ -820,7 +820,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -862,7 +862,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -917,7 +917,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -938,7 +938,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let createAPIKeyEx = expectation(description: "Create user api key")
 
         var apiKey: UserAPIKey?
-        syncUser?.apiKeyAuth().createApiKey(named: "my-api-key") { (key, error) in
+        syncUser?.apiKeysAuth().createApiKey(named: "my-api-key") { (key, error) in
             XCTAssertNotNil(key)
             XCTAssertNil(error)
             apiKey = key
@@ -947,7 +947,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [createAPIKeyEx], timeout: 4.0)
 
         let fetchAPIKeyEx = expectation(description: "Fetch user api key")
-        syncUser?.apiKeyAuth().fetchApiKey(apiKey!.objectId) { (key, error) in
+        syncUser?.apiKeysAuth().fetchApiKey(apiKey!.objectId) { (key, error) in
             XCTAssertNotNil(key)
             XCTAssertNil(error)
             fetchAPIKeyEx.fulfill()
@@ -955,7 +955,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [fetchAPIKeyEx], timeout: 4.0)
 
         let fetchAPIKeysEx = expectation(description: "Fetch user api keys")
-        syncUser?.apiKeyAuth().fetchApiKeys(completion: { (keys, error) in
+        syncUser?.apiKeysAuth().fetchApiKeys(completion: { (keys, error) in
             XCTAssertNotNil(keys)
             XCTAssertEqual(keys!.count, 1)
             XCTAssertNil(error)
@@ -964,21 +964,21 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [fetchAPIKeysEx], timeout: 4.0)
 
         let disableKeyEx = expectation(description: "Disable API key")
-        syncUser?.apiKeyAuth().disableApiKey(apiKey!.objectId) { (error) in
+        syncUser?.apiKeysAuth().disableApiKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             disableKeyEx.fulfill()
         }
         wait(for: [disableKeyEx], timeout: 4.0)
 
         let enableKeyEx = expectation(description: "Enable API key")
-        syncUser?.apiKeyAuth().enableApiKey(apiKey!.objectId) { (error) in
+        syncUser?.apiKeysAuth().enableApiKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             enableKeyEx.fulfill()
         }
         wait(for: [enableKeyEx], timeout: 4.0)
 
         let deleteKeyEx = expectation(description: "Delete API key")
-        syncUser?.apiKeyAuth().deleteApiKey(apiKey!.objectId) { (error) in
+        syncUser?.apiKeysAuth().deleteApiKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             deleteKeyEx.fulfill()
         }
@@ -991,7 +991,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -1033,7 +1033,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -1070,7 +1070,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }

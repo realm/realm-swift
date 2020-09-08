@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param completionHandler A callback to be invoked once the call is complete.
 */
 
-- (void)registerEmail:(NSString *)email
+- (void)registerUser:(NSString *)email
              password:(NSString *)password
            completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
