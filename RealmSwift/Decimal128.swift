@@ -84,6 +84,15 @@ public final class Decimal128: RLMDecimal128, Decodable {
         }
     }
 
+    /// The mininum value for Decimal128
+    public static var min: Self {
+        minimumDecimalNumber as! Self
+    }
+
+    /// The maximum value for Decimal128
+    public static var max: Self {
+        maximumDecimalNumber as! Self
+    }
 }
 
 extension Decimal128: Encodable {
@@ -224,7 +233,7 @@ extension Decimal128 : SignedNumeric {
     ///   - lhs: A Decimal128 value.
     ///   - rhs: The Decimal128 value to subtract from `lhs`.
     public static func - (lhs: Decimal128, rhs: Decimal128) -> Decimal128 {
-        fatalError("Operator not available")
+        lhs.decimalNumber(bySubtracting: rhs) as! Decimal128
     }
 
     /// Subtracts the second Decimal128 value from the first and stores the difference in the
@@ -234,7 +243,16 @@ extension Decimal128 : SignedNumeric {
     ///   - lhs: A Decimal128 value.
     ///   - rhs: The Decimal128 value to subtract from `lhs`.
     public static func -= (lhs: inout Decimal128, rhs: Decimal128) {
-        fatalError("Operator not available")
+        lhs.subtractionAssignment(with: rhs)
+    }
+
+    /// Multiplies two Decimal128 values and produces their product.
+    ///
+    /// - Parameters:
+    ///   - lhs: The first value to multiply.
+    ///   - rhs: The second value to multiply.
+    public static func * (lhs: Decimal128, rhs: Decimal128) -> Decimal128 {
+        lhs.decimalNumberByMultiplying(by: rhs) as! Decimal128
     }
 
     /// Multiplies two Decimal128 values and stores the result in the left-hand-side
@@ -244,7 +262,7 @@ extension Decimal128 : SignedNumeric {
     ///   - lhs: The first Decimal128 value to multiply.
     ///   - rhs: The second Decimal128 value to multiply.
     public static func *= (lhs: inout Decimal128, rhs: Decimal128) {
-        fatalError("Operator not available")
+        lhs.multiplicationAssignment(with: rhs)
     }
 
     /// Returns the quotient of dividing the first Decimal128 value by the second.
@@ -253,7 +271,7 @@ extension Decimal128 : SignedNumeric {
     ///   - lhs: The Decimal128 value to divide.
     ///   - rhs: The Decimal128 value to divide `lhs` by. `rhs` must not be zero.
     public static func / (lhs: Decimal128, rhs: Decimal128) -> Decimal128 {
-        lhs.decimalNumberFromDividing(by: rhs) as! Decimal128
+        lhs.decimalNumberByDividing(by: rhs) as! Decimal128
     }
     
     /// Divides the first Decimal128 value by the second and stores the quotient in the
@@ -263,16 +281,7 @@ extension Decimal128 : SignedNumeric {
     ///   - lhs: The Decimal128 value to divide.
     ///   - rhs: The Decimal128 value to divide `lhs` by. `rhs` must not be zero.
     public static func /= (lhs: inout Decimal128, rhs: Decimal128) {
-        fatalError("Operator not available")
-    }
-
-    /// Multiplies two Decimal128 values and produces their product.
-    ///
-    /// - Parameters:
-    ///   - lhs: The first Decimal128 value to multiply.
-    ///   - rhs: The second Decimal128 value to multiply.
-    public static func * (lhs: Decimal128, rhs: Decimal128) -> Decimal128 {
-        fatalError("Operator not available")
+        lhs.dividingAssignment(with: rhs)
     }
 }
 

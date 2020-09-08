@@ -140,10 +140,17 @@
     return _value.is_nan();
 }
 
++ (RLMDecimal128 *)minimumDecimalNumber {
+    return [[RLMDecimal128 alloc] initWithDecimal128:std::numeric_limits<realm::Decimal128>::lowest()];
+}
+
++ (RLMDecimal128 *)maximumDecimalNumber {
+    return [[RLMDecimal128 alloc] initWithDecimal128:std::numeric_limits<realm::Decimal128>::max()];
+}
+
 - (RLMDecimal128 *)decimalNumberByAdding:(RLMDecimal128 *)decimalNumber {
     auto rhs = RLMObjcToDecimal128(decimalNumber);
-    auto result = _value+rhs;
-    return [[RLMDecimal128 alloc] initWithDecimal128:result];
+    return [[RLMDecimal128 alloc] initWithDecimal128:_value+rhs];
 }
 
 - (void)additionAssignmentWith:(RLMDecimal128 *)decimalNumber {
@@ -151,9 +158,36 @@
     _value+=rhs;
 }
 
-- (RLMDecimal128 *)decimalNumberFromDividingBy:(RLMDecimal128 *)decimalNumber {
+- (RLMDecimal128 *)decimalNumberByDividingBy:(RLMDecimal128 *)decimalNumber {
     auto rhs = RLMObjcToDecimal128(decimalNumber);
-    return [self initWithDecimal128:_value/rhs];
+    return [[RLMDecimal128 alloc] initWithDecimal128:_value/rhs];
+}
+
+- (void)dividingAssignmentWith:(RLMDecimal128 *)decimalNumber {
+//    auto rhs = RLMObjcToDecimal128(decimalNumber);
+//    _value/=rhs;
+}
+
+- (RLMDecimal128 *)decimalNumberBySubtracting:(RLMDecimal128 *)decimalNumber {
+//    auto rhs = RLMObjcToDecimal128(decimalNumber);
+//    return [[RLMDecimal128 alloc] initWithDecimal128:_value-rhs];
+    return decimalNumber;
+}
+
+- (void)subtractionAssignmentWith:(RLMDecimal128 *)decimalNumber {
+    //    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    //    _value-=rhs;
+}
+
+- (RLMDecimal128 *)decimalNumberByMultiplyingBy:(RLMDecimal128 *)decimalNumber {
+    //    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    //    return [[RLMDecimal128 alloc] initWithDecimal128:_value*rhs];
+        return decimalNumber;
+}
+
+- (void)multiplicationAssignmentWith:(RLMDecimal128 *)decimalNumber {
+    //    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    //    _value*=rhs;
 }
 
 - (BOOL)isGreaterThan:(RLMDecimal128 *)decimalNumber {

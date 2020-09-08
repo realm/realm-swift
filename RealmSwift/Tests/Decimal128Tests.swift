@@ -181,4 +181,11 @@ class Decimal128Tests: TestCase {
         XCTAssertTrue(d1.isSignaling)
         XCTAssertTrue(d1.isSignalingNaN)
     }
+
+    func testMinMax() {
+        let min: Decimal128 = .min
+        let max: Decimal128 = .max
+        XCTAssertGreaterThan(max, min)
+        XCTAssertLessThan(min, max)
+    }
 }
