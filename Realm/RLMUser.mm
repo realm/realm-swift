@@ -43,7 +43,6 @@
 
 using namespace realm;
 
-// !!!: Old appendage of legacy cloud. Delete then test to see need.
 @interface RLMUserInfo ()
 
 @property (nonatomic, readwrite) NSArray *accounts;
@@ -144,7 +143,6 @@ using namespace realm;
     if (!_user) {
         return nil;
     }
-    // ???: Can't do anything about the cpp. Organize with sync team.
     return @(_user->identity().c_str());
 }
 
