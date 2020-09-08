@@ -52,6 +52,18 @@ public final class ObjectId: RLMObjectId, Decodable {
         try super.init(string: string)
     }
 
+    /// Creates a new ObjectId using the given date, machine identifier, process identifier.
+    ///
+    /// - Parameters:
+    ///   - timestamp: A timestamp as NSDate.
+    ///   - machineId: The machine identifier.
+    ///   - processId: The process identifier.
+    public required init(timestamp: Date, machineId: Int, processId: Int) {
+        super.init(timestamp: timestamp,
+                   machineIdentifier: Int32(machineId),
+                   processIdentifier: Int32(processId))
+    }
+
     /// Creates a new ObjectId from the given 24-byte hexadecimal static string.
     ///
     /// Aborts if the string is not 24 characters or contains any characters other than 0-9a-fA-F. Use the initializer which takes a String to handle invalid strings at runtime.
@@ -121,15 +133,6 @@ extension ObjectId: Comparable {
     ///   - rhs: Another ObjectId value to compare.
     public static func > (lhs: ObjectId, rhs: ObjectId) -> Bool {
         lhs.isGreaterThan(rhs)
-    }
-
-    /// Returns a Boolean values indicating whether two ObjectId values are equal.
-    ///
-    /// - Parameters:
-    ///   - lhs: An ObjectId value to compare.
-    ///   - rhs: Another ObjectId value to compare.
-    public static func == (lhs: ObjectId, rhs: ObjectId) -> Bool {
-        lhs.isEqual(to: rhs)
     }
 
 }

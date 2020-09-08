@@ -529,6 +529,7 @@
 		CFFECBAE250667B20010F585 /* Decimal128Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = CFFECBAB250667A90010F585 /* Decimal128Tests.m */; };
 		CFFECBB0250690EA0010F585 /* ObjectIdTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CFFECBAF250690EA0010F585 /* ObjectIdTests.m */; };
 		CFFECBB1250690EA0010F585 /* ObjectIdTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CFFECBAF250690EA0010F585 /* ObjectIdTests.m */; };
+		CFFECBB525078EC40010F585 /* ObjectIdTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFECBB225078D100010F585 /* ObjectIdTests.swift */; };
 		E81A1FD51955FE0100FDED82 /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
 		E81A1FDB1955FE0100FDED82 /* EnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBB1955FE0100FDED82 /* EnumeratorTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
 		E81A1FDD1955FE0100FDED82 /* LinkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBC1955FE0100FDED82 /* LinkTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
@@ -1104,6 +1105,7 @@
 		CFFECBA8250646750010F585 /* Decimal128Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Decimal128Tests.swift; sourceTree = "<group>"; };
 		CFFECBAB250667A90010F585 /* Decimal128Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Decimal128Tests.m; sourceTree = "<group>"; };
 		CFFECBAF250690EA0010F585 /* ObjectIdTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ObjectIdTests.m; sourceTree = "<group>"; };
+		CFFECBB225078D100010F585 /* ObjectIdTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectIdTests.swift; sourceTree = "<group>"; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		E81A1F631955FC9300FDED82 /* RLMAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAccessor.h; sourceTree = "<group>"; };
 		E81A1F641955FC9300FDED82 /* RLMAccessor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAccessor.mm; sourceTree = "<group>"; };
@@ -1642,6 +1644,7 @@
 				5D6610121BE98D880021E04F /* TestCase.swift */,
 				3F73BC841E3A870F00FE80B6 /* ThreadSafeReferenceTests.swift */,
 				CFFECBA8250646750010F585 /* Decimal128Tests.swift */,
+				CFFECBB225078D100010F585 /* ObjectIdTests.swift */,
 			);
 			name = "RealmSwift Tests";
 			path = RealmSwift/Tests;
@@ -2867,6 +2870,7 @@
 				E8AE7C261EA436F800CDFF9A /* CompactionTests.swift in Sources */,
 				3FF3FFAF1F0D6D6400B84599 /* KVOTests.swift in Sources */,
 				5D6610161BE98D880021E04F /* ListTests.swift in Sources */,
+				CFFECBB525078EC40010F585 /* ObjectIdTests.swift in Sources */,
 				3F8824FD1E5E335000586B35 /* MigrationTests.swift in Sources */,
 				3F8824FE1E5E335000586B35 /* ObjectAccessorTests.swift in Sources */,
 				3F8824FF1E5E335000586B35 /* ObjectCreationTests.swift in Sources */,

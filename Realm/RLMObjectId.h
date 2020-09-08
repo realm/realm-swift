@@ -55,9 +55,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param timestamp A timestamp as NSDate.
 /// @param machineIdentifier The machine identifier.
 /// @param processIdentifier The process identifier.
-- (nullable instancetype)initWithTimestamp:(NSDate *)timestamp
-                         machineIdentifier:(int)machineIdentifier
-                         processIdentifier:(int)processIdentifier;
+- (instancetype)initWithTimestamp:(NSDate *)timestamp
+                machineIdentifier:(int)machineIdentifier
+                processIdentifier:(int)processIdentifier;
 
 /// Comparision operator to check if the right hand side is greater than the current value.
 - (BOOL)isGreaterThan:(nullable RLMObjectId *)objectId;
