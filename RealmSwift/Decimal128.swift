@@ -285,12 +285,15 @@ extension Decimal128: SignedNumeric {
 }
 
 extension Decimal128: Strideable {
+    /// A type that represents the distance between two values.
+    public typealias Stride = Decimal128
+
     /// Returns the distance from this Decimal128 to the given value, expressed as a
     /// stride.
     ///
     /// - Parameter other: The Decimal128 value to calculate the distance to.
     /// - Returns: The distance from this value to `other`.
-    public func distance(to other: Decimal128) -> Decimal128 {
+    public func distance(to other: Decimal128) -> Stride {
         self-other
     }
 
@@ -305,9 +308,6 @@ extension Decimal128: Strideable {
     public func advanced(by n: Decimal128) -> Decimal128 {
         self+n
     }
-
-    /// A type that represents the distance between two values.
-    public typealias Stride = Decimal128
 }
 
 extension Decimal128 {

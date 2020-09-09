@@ -70,7 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Get the ObjectId as a 24-character hexadecimal string.
 @property (nonatomic, readonly) NSString *stringValue;
-/// Get the timestamp for the ObjectId
+/// Get the timestamp for the RLMObjectId
 @property (nonatomic, readonly) NSDate *timestamp;
 
 @end
