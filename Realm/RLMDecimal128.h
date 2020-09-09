@@ -74,6 +74,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// Gets if this Decimal128 represents a NaN value.
 @property (nonatomic, readonly) BOOL isNaN;
 
+/// The magnitude of this RLMDecimal128.
+@property (nonatomic, readonly) RLMDecimal128 *magnitude NS_REFINED_FOR_SWIFT;
+
+/// Replaces this RLMDecimal128 value with its additive inverse.
+- (void)negate NS_REFINED_FOR_SWIFT;
+
 /// Adds the right hand side to the current value and returns the result.
 - (RLMDecimal128 *)decimalNumberByAdding:(RLMDecimal128 *)decimalNumber;
 

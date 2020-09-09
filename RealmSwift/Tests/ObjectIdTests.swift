@@ -22,83 +22,83 @@ import RealmSwift
 class ObjectIdTests: TestCase {
 
     func testObjectIdInitialization() {
-        let strValue = "000123450000ffbeef91906c";
+        let strValue = "000123450000ffbeef91906c"
         let objectId = try! ObjectId(string: strValue)
-        XCTAssertEqual(objectId.stringValue, strValue);
-        XCTAssertEqual(strValue, objectId.stringValue);
+        XCTAssertEqual(objectId.stringValue, strValue)
+        XCTAssertEqual(strValue, objectId.stringValue)
 
         let now = Date()
         let objectId2 = ObjectId(timestamp: now, machineId: 10, processId: 20)
-        XCTAssertEqual(Int(now.timeIntervalSince1970), Int(objectId2.timestamp.timeIntervalSince1970));
+        XCTAssertEqual(Int(now.timeIntervalSince1970), Int(objectId2.timestamp.timeIntervalSince1970))
     }
 
     func testObjectIdComparision() {
-        let strValue = "000123450000ffbeef91906c";
+        let strValue = "000123450000ffbeef91906c"
         let objectId = try! ObjectId(string: strValue)
 
-        let strValue2 = "000123450000ffbeef91906d";
+        let strValue2 = "000123450000ffbeef91906d"
         let objectId2 = try! ObjectId(string: strValue2)
 
-        let strValue3 = "000123450000ffbeef91906c";
+        let strValue3 = "000123450000ffbeef91906c"
         let objectId3 = try! ObjectId(string: strValue3)
 
-        XCTAssertTrue(objectId != objectId2);
-        XCTAssertTrue(objectId == objectId3);
+        XCTAssertTrue(objectId != objectId2)
+        XCTAssertTrue(objectId == objectId3)
     }
 
     func testObjectIdGreaterThan() {
-        let strValue = "000123450000ffbeef91906c";
+        let strValue = "000123450000ffbeef91906c"
         let objectId = try! ObjectId(string: strValue)
 
-        let strValue2 = "000123450000ffbeef91906d";
+        let strValue2 = "000123450000ffbeef91906d"
         let objectId2 = try! ObjectId(string: strValue2)
 
-        let strValue3 = "000123450000ffbeef91906c";
+        let strValue3 = "000123450000ffbeef91906c"
         let objectId3 = try! ObjectId(string: strValue3)
 
-        XCTAssertTrue(objectId2 > objectId);
-        XCTAssertFalse(objectId > objectId3);
+        XCTAssertTrue(objectId2 > objectId)
+        XCTAssertFalse(objectId > objectId3)
     }
 
     func testObjectIdGreaterThanOrEqualTo() {
-        let strValue = "000123450000ffbeef91906c";
+        let strValue = "000123450000ffbeef91906c"
         let objectId = try! ObjectId(string: strValue)
 
-        let strValue2 = "000123450000ffbeef91906d";
+        let strValue2 = "000123450000ffbeef91906d"
         let objectId2 = try! ObjectId(string: strValue2)
 
-        let strValue3 = "000123450000ffbeef91906c";
+        let strValue3 = "000123450000ffbeef91906c"
         let objectId3 = try! ObjectId(string: strValue3)
 
-        XCTAssertTrue(objectId2 >= objectId);
-        XCTAssertTrue(objectId >= objectId3);
+        XCTAssertTrue(objectId2 >= objectId)
+        XCTAssertTrue(objectId >= objectId3)
     }
 
     func testObjectIdLessThan() {
-        let strValue = "000123450000ffbeef91906c";
+        let strValue = "000123450000ffbeef91906c"
         let objectId = try! ObjectId(string: strValue)
 
-        let strValue2 = "000123450000ffbeef91906d";
+        let strValue2 = "000123450000ffbeef91906d"
         let objectId2 = try! ObjectId(string: strValue2)
 
-        let strValue3 = "000123450000ffbeef91906c";
+        let strValue3 = "000123450000ffbeef91906c"
         let objectId3 = try! ObjectId(string: strValue3)
 
-        XCTAssertTrue(objectId < objectId2);
-        XCTAssertFalse(objectId < objectId3);
+        XCTAssertTrue(objectId < objectId2)
+        XCTAssertFalse(objectId < objectId3)
     }
 
     func testObjectIdLessThanOrEqualTo() {
-        let strValue = "000123450000ffbeef91906c";
+        let strValue = "000123450000ffbeef91906c"
         let objectId = try! ObjectId(string: strValue)
 
-        let strValue2 = "000123450000ffbeef91906d";
+        let strValue2 = "000123450000ffbeef91906d"
         let objectId2 = try! ObjectId(string: strValue2)
 
-        let strValue3 = "000123450000ffbeef91906c";
+        let strValue3 = "000123450000ffbeef91906c"
         let objectId3 = try! ObjectId(string: strValue3)
 
-        XCTAssertTrue(objectId <= objectId2);
-        XCTAssertTrue(objectId <= objectId3);
+        XCTAssertTrue(objectId <= objectId2)
+        XCTAssertTrue(objectId <= objectId3)
     }
 }

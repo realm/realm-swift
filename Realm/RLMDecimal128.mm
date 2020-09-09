@@ -140,6 +140,15 @@
     return _value.is_nan();
 }
 
+- (RLMDecimal128 *)magnitude {
+    auto result = realm::Decimal128(abs(self.doubleValue));
+    return [[RLMDecimal128 alloc] initWithDecimal128:result];
+}
+
+- (void)negate {
+    _value = realm::Decimal128(-self.doubleValue);
+}
+
 + (RLMDecimal128 *)minimumDecimalNumber {
     return [[RLMDecimal128 alloc] initWithDecimal128:std::numeric_limits<realm::Decimal128>::lowest()];
 }

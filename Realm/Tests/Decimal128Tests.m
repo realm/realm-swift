@@ -143,6 +143,11 @@
 
 #pragma mark - Miscellaneous
 
+- (void)testNaN {
+    RLMDecimal128 *nan = [[RLMDecimal128 alloc] initWithString:@"not a number" error:nil];
+    XCTAssertTrue(nan.isNaN);
+}
+
 - (void)testMininumMaximumValue {
     RLMDecimal128 *min = RLMDecimal128.minimumDecimalNumber;
     RLMDecimal128 *max = RLMDecimal128.maximumDecimalNumber;
@@ -150,5 +155,24 @@
     XCTAssertTrue([max isGreaterThan:min]);
 }
 
+- (void)testMagnitude {
+    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@-123.321];
+    RLMDecimal128 *exp1 = [RLMDecimal128 decimalWithNumber:@123.321];
+    RLMDecimal128 *d2 = [[RLMDecimal128 alloc] initWithNumber:@456.321];
+    RLMDecimal128 *exp2 = [RLMDecimal128 decimalWithNumber:@456.321];
+    XCTAssertTrue([d1.magnitude isEqual:exp1]);
+    XCTAssertTrue([d2.magnitude isEqual:exp2]);
+}
+
+- (void)testNegate {
+    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@-123.321];
+    RLMDecimal128 *exp1 = [RLMDecimal128 decimalWithNumber:@123.321];
+    RLMDecimal128 *d2 = [[RLMDecimal128 alloc] initWithNumber:@456.321];
+    RLMDecimal128 *exp2 = [RLMDecimal128 decimalWithNumber:@-456.321];
+    [d1 negate];
+    [d2 negate];
+    XCTAssertTrue([d1 isEqual:exp1]);
+    XCTAssertTrue([d2 isEqual:exp2]);
+}
 
 @end

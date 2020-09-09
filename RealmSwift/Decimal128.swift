@@ -178,10 +178,9 @@ extension Decimal128: Comparable {
     public static func > (lhs: Decimal128, rhs: Decimal128) -> Bool {
         lhs.isGreaterThan(rhs)
     }
-
 }
 
-extension Decimal128 : SignedNumeric {
+extension Decimal128: SignedNumeric {
     /// Creates a new instance from the given integer, if it can be represented
     /// exactly.
     ///
@@ -192,7 +191,7 @@ extension Decimal128 : SignedNumeric {
     /// `127` at maximum:
     ///
     /// - Parameter source: A value to convert to this type of integer.
-    public convenience init?<T>(exactly source: T) where T : BinaryInteger {
+    public convenience init?<T>(exactly source: T) where T: BinaryInteger {
         self.init(value: source)
     }
 
@@ -201,12 +200,12 @@ extension Decimal128 : SignedNumeric {
 
     /// The magnitude of this Decimal128.
     public var magnitude: Magnitude {
-        fatalError("Magnitude not available")
+        self.__magnitude as! Magnitude
     }
 
     /// Replaces this Decimal128 value with its additive inverse.
     public func negate() {
-        fatalError("Negate not available")
+        self.__negate()
     }
 
     /// Adds two decimal128 values and produces their sum.
@@ -273,7 +272,7 @@ extension Decimal128 : SignedNumeric {
     public static func / (lhs: Decimal128, rhs: Decimal128) -> Decimal128 {
         lhs.decimalNumberByDividing(by: rhs) as! Decimal128
     }
-    
+
     /// Divides the first Decimal128 value by the second and stores the quotient in the
     /// left-hand-side variable.
     ///
@@ -285,59 +284,31 @@ extension Decimal128 : SignedNumeric {
     }
 }
 
-/*
- TODO: Decide wheter to impl from core level or cocoa level
-extension Decimal128 : Strideable {
-
-    /// Returns the distance from this value to the given value, expressed as a
+extension Decimal128: Strideable {
+    /// Returns the distance from this Decimal128 to the given value, expressed as a
     /// stride.
     ///
-    /// If this type's `Stride` type conforms to `BinaryInteger`, then for two
-    /// values `x` and `y`, and a distance `n = x.distance(to: y)`,
-    /// `x.advanced(by: n) == y`. Using this method with types that have a
-    /// noninteger `Stride` may result in an approximation.
-    ///
-    /// - Parameter other: The value to calculate the distance to.
+    /// - Parameter other: The Decimal128 value to calculate the distance to.
     /// - Returns: The distance from this value to `other`.
-    ///
-    /// - Complexity: O(1)
     public func distance(to other: Decimal128) -> Decimal128 {
-        0.0
+        self-other
     }
 
-    /// Returns a value that is offset the specified distance from this value.
+    /// Returns a Decimal128 that is offset the specified distance from this value.
     ///
     /// Use the `advanced(by:)` method in generic code to offset a value by a
     /// specified distance. If you're working directly with numeric values, use
     /// the addition operator (`+`) instead of this method.
     ///
-    ///     func addOne<T: Strideable>(to x: T) -> T
-    ///         where T.Stride: ExpressibleByIntegerLiteral
-    ///     {
-    ///         return x.advanced(by: 1)
-    ///     }
-    ///
-    ///     let x = addOne(to: 5)
-    ///     // x == 6
-    ///     let y = addOne(to: 3.5)
-    ///     // y = 4.5
-    ///
-    /// If this type's `Stride` type conforms to `BinaryInteger`, then for a
-    /// value `x`, a distance `n`, and a value `y = x.advanced(by: n)`,
-    /// `x.distance(to: y) == n`. Using this method with types that have a
-    /// noninteger `Stride` may result in an approximation.
-    ///
-    /// - Parameter n: The distance to advance this value.
-    /// - Returns: A value that is offset from this value by `n`.
-    ///
-    /// - Complexity: O(1)
+    /// - Parameter n: The distance to advance this Decimal128.
+    /// - Returns: A Decimal128 that is offset from this value by `n`.
     public func advanced(by n: Decimal128) -> Decimal128 {
-        0.0
+        self+n
     }
 
     /// A type that represents the distance between two values.
     public typealias Stride = Decimal128
-}*/
+}
 
 extension Decimal128 {
     /// `true` if `self` is a signaling NaN, `false` otherwise.
