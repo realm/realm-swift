@@ -1321,6 +1321,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         // FIXME: It seems there is a possible server bug that does not handle
         // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
         // "expected pre-image to match projection matcher"
+        // https://jira.mongodb.org/browse/REALMC-6878
         /*
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], false, false)
         let findOneDeleteEx2 = expectation(description: "Find one document and delete")
@@ -1336,6 +1337,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         // FIXME: It seems there is a possible server bug that does not handle
         // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
         // "expected pre-image to match projection matcher"
+        // https://jira.mongodb.org/browse/REALMC-6878
         /*
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
         let findOneDeleteEx3 = expectation(description: "Find one document and delete")
@@ -2073,7 +2075,6 @@ extension SwiftObjectServerTests {
         XCTAssertEqual(self.app.allUsers().count, 1)
     }
 
-    
     func testRefreshCustomData() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
@@ -2129,6 +2130,548 @@ extension SwiftObjectServerTests {
 
         XCTAssertEqual(app.currentUser()?.customData?["favourite_colour"], .string("green"))
         XCTAssertEqual(app.currentUser()?.customData?["apples"], .int64(10))
+    }
+
+    func testMongoCollectionInsert() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
+
+        let insertOneEx1 = expectation(description: "Insert one document")
+        collection.insertOne(document)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should insert")
+                }
+            }, receiveValue: { objectId in
+                insertOneEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [insertOneEx1], timeout: 4.0)
+
+        let insertManyEx1 = expectation(description: "Insert many documents")
+        collection.insertMany([document, document2])
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should insert")
+                }
+            }, receiveValue: { objectIds in
+                XCTAssertEqual(objectIds.count, 2)
+                insertManyEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [insertManyEx1], timeout: 4.0)
+
+        let findEx1 = expectation(description: "Find documents")
+        collection.find(filter: [:])
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should find")
+                }
+            }, receiveValue: { findResult in
+                XCTAssertEqual(findResult.map({ $0["name"] as! String }), ["fido", "fido", "rex"])
+                findEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findEx1], timeout: 4.0)
+    }
+    
+    func testMongoCollectionFind() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
+        let document3: Document = ["name": "rex", "breed": "tibetan mastiff", "coat": ["fawn", "brown", "white"]]
+        let findOptions = FindOptions(1, nil, nil)
+
+        let notFoundEx1 = expectation(description: "Find documents")
+        collection.find(filter: [:], options: findOptions)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should try to find")
+                }
+            }, receiveValue: { findResult in
+                XCTAssertEqual(findResult.count, 0)
+                notFoundEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [notFoundEx1], timeout: 4.0)
+
+        collection.insertMany([document, document2, document3])
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &cancellable)
+
+        let findEx1 = expectation(description: "Find documents")
+        collection.find(filter: [:])
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should find")
+                }
+            }, receiveValue: { findResult in
+                XCTAssertEqual(findResult.map({ $0["name"] as! String }), ["fido", "rex", "rex"])
+                findEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findEx1], timeout: 4.0)
+
+        let findEx2 = expectation(description: "Find documents")
+        collection.find(filter: [:], options: findOptions)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should find")
+                }
+            }, receiveValue: { findResult in
+                XCTAssertEqual(findResult.count, 1)
+                XCTAssertEqual(findResult[0]["name"] as! String, "fido")
+                findEx2.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findEx2], timeout: 4.0)
+
+        let findEx3 = expectation(description: "Find documents")
+        collection.find(filter: document3, options: findOptions)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should find")
+                }
+            }, receiveValue: { findResult in
+                XCTAssertEqual(findResult.count, 1)
+                findEx3.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findEx3], timeout: 4.0)
+        
+        let findOneEx1 = expectation(description: "Find one document")
+        collection.findOneDocument(filter: document)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should find")
+                }
+            }, receiveValue: { findResult in
+                findOneEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneEx1], timeout: 4.0)
+        
+        let findOneEx2 = expectation(description: "Find one document")
+        collection.findOneDocument(filter: document, options: findOptions)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should find")
+                }
+            }, receiveValue: { findResult in
+                findOneEx2.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneEx2], timeout: 4.0)
+    }
+
+    func testMongoCollectionCountAndAggregate() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+
+        collection.insertMany([document])
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &cancellable)
+
+        collection.aggregate(pipeline: [["$match": ["name": "fido"]], ["$group": ["_id": "$name"]]])
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &cancellable)
+
+        let countEx1 = expectation(description: "Count documents")
+        collection.count(filter: document)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should count")
+                }
+            }, receiveValue: { count in
+                countEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [countEx1], timeout: 4.0)
+
+        let countEx2 = expectation(description: "Count documents")
+        collection.count(filter: document, limit: 1)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should count")
+                }
+            }, receiveValue: { count in
+                XCTAssertEqual(count, 1)
+                countEx2.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [countEx2], timeout: 4.0)
+    }
+
+    func testMongoCollectionDeleteOne() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+
+        let deleteEx1 = expectation(description: "Delete 0 documents")
+        collection.deleteOneDocument(filter: document)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should count")
+                }
+            }, receiveValue: { count in
+                XCTAssertEqual(count, 0)
+                deleteEx1.fulfill()
+            })
+        .store(in: &cancellable)
+        wait(for: [deleteEx1], timeout: 4.0)
+
+        collection.insertMany([document, document2])
+        .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+        .store(in: &cancellable)
+
+        let deleteEx2 = expectation(description: "Delete one document")
+        collection.deleteOneDocument(filter: document)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should count")
+                }
+            }, receiveValue: { count in
+                XCTAssertEqual(count, 1)
+                deleteEx2.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [deleteEx2], timeout: 4.0)
+    }
+
+    func testMongoCollectionDeleteMany() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+
+        let deleteEx1 = expectation(description: "Delete 0 documents")
+        collection.deleteManyDocuments(filter: document)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should try to delete")
+                }
+            }, receiveValue: { count in
+                XCTAssertEqual(count, 0)
+                deleteEx1.fulfill()
+            })
+        .store(in: &cancellable)
+        wait(for: [deleteEx1], timeout: 4.0)
+
+        collection.insertMany([document, document2])
+        .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+        .store(in: &cancellable)
+
+        let deleteEx2 = expectation(description: "Delete one document")
+        collection.deleteManyDocuments(filter: ["breed": "cane corso"])
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should delete")
+                }
+            }, receiveValue: { count in
+                XCTAssertEqual(count, 2)
+                deleteEx2.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [deleteEx2], timeout: 4.0)
+    }
+
+    func testMongoCollectionUpdateOne() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+        let document4: Document = ["name": "ted", "breed": "bullmastiff"]
+        let document5: Document = ["name": "bill", "breed": "great dane"]
+
+        collection.insertMany([document, document2, document3, document4])
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &cancellable)
+
+        let updateEx1 = expectation(description: "Update one document")
+        collection.updateOneDocument(filter: document, update: document2)
+        .sink(receiveCompletion: { result in
+            if case .failure(_) = result {
+                XCTFail("Should update")
+            }
+        }, receiveValue: { updateResult in
+            XCTAssertEqual(updateResult.matchedCount, 1)
+            XCTAssertEqual(updateResult.modifiedCount, 1)
+            XCTAssertNil(updateResult.objectId)
+            updateEx1.fulfill()
+        })
+        .store(in: &cancellable)
+        wait(for: [updateEx1], timeout: 4.0)
+
+        let updateEx2 = expectation(description: "Update one document")
+        collection.updateOneDocument(filter: document5, update: document2, upsert: true)
+        .sink(receiveCompletion: { result in
+            if case .failure(_) = result {
+                XCTFail("Should try to update")
+            }
+        }, receiveValue: { updateResult in
+            XCTAssertEqual(updateResult.matchedCount, 0)
+            XCTAssertEqual(updateResult.modifiedCount, 0)
+            XCTAssertNotNil(updateResult.objectId)
+            updateEx2.fulfill()
+        })
+        .store(in: &cancellable)
+        wait(for: [updateEx2], timeout: 4.0)
+    }
+
+    func testMongoCollectionUpdateMany() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+        let document4: Document = ["name": "ted", "breed": "bullmastiff"]
+        let document5: Document = ["name": "bill", "breed": "great dane"]
+
+        collection.insertMany([document, document2, document3, document4])
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &cancellable)
+
+        let updateEx1 = expectation(description: "Update one document")
+        collection.updateManyDocuments(filter: document, update: document2)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should update")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertEqual(updateResult.matchedCount, 1)
+                XCTAssertEqual(updateResult.modifiedCount, 1)
+                XCTAssertNil(updateResult.objectId)
+                updateEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [updateEx1], timeout: 4.0)
+
+        let updateEx2 = expectation(description: "Update one document")
+        collection.updateManyDocuments(filter: document5, update: document2, upsert: true)
+        .sink(receiveCompletion: { result in
+            if case .failure(_) = result {
+                XCTFail("Should try to update")
+            }
+        }, receiveValue: { updateResult in
+            XCTAssertEqual(updateResult.matchedCount, 0)
+            XCTAssertEqual(updateResult.modifiedCount, 0)
+            XCTAssertNotNil(updateResult.objectId)
+            updateEx2.fulfill()
+        })
+        .store(in: &cancellable)
+        wait(for: [updateEx2], timeout: 4.0)
+    }
+
+    func testMongoCollectionFindAndUpdate() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+
+        let findOneUpdateEx1 = expectation(description: "Find one document and update")
+        collection.findOneAndUpdate(filter: document, update: document2)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should try to update")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertNil(updateResult)
+                findOneUpdateEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneUpdateEx1], timeout: 4.0)
+
+        let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
+        let findOneUpdateEx2 = expectation(description: "Find one document and update")
+        collection.findOneAndUpdate(filter: document2, update: document3, options: options1)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should update")
+                }
+            }, receiveValue: { updateResult in
+                guard let updateResult = updateResult else {
+                    XCTFail("Should find")
+                    return
+                }
+                XCTAssertEqual(updateResult["name"] as! String, "john")
+                findOneUpdateEx2.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneUpdateEx2], timeout: 4.0)
+
+        let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
+        let findOneUpdateEx3 = expectation(description: "Find one document and update")
+        collection.findOneAndUpdate(filter: document, update: document2, options: options2)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should update")
+                }
+            }, receiveValue: { updateResult in
+                guard let updateResult = updateResult else {
+                    XCTFail("Should find")
+                    return
+                }
+                XCTAssertEqual(updateResult["name"] as! String, "rex")
+                findOneUpdateEx3.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneUpdateEx3], timeout: 4.0)
+    }
+
+    func testMongoCollectionFindAndReplace() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+
+        let findOneReplaceEx1 = expectation(description: "Find one document and replace")
+        collection.findOneAndReplace(filter: document, replacement: document2)
+        .sink(receiveCompletion: { result in
+            if case .failure(_) = result {
+                XCTFail("Should try to replace")
+            }
+        }, receiveValue: { updateResult in
+            XCTAssertNil(updateResult)
+            findOneReplaceEx1.fulfill()
+        })
+        .store(in: &cancellable)
+        wait(for: [findOneReplaceEx1], timeout: 4.0)
+
+        let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
+        let findOneReplaceEx2 = expectation(description: "Find one document and replace")
+        collection.findOneAndReplace(filter: document2, replacement: document3, options: options1)
+        .sink(receiveCompletion: { result in
+            if case .failure(_) = result {
+                XCTFail("Should replace")
+            }
+        }, receiveValue: { updateResult in
+            guard let updateResult = updateResult else {
+                XCTFail("Should find")
+                return
+            }
+            XCTAssertEqual(updateResult["name"] as! String, "john")
+            findOneReplaceEx2.fulfill()
+        })
+        .store(in: &cancellable)
+        wait(for: [findOneReplaceEx2], timeout: 4.0)
+
+        let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, false)
+        let findOneReplaceEx3 = expectation(description: "Find one document and replace")
+        collection.findOneAndReplace(filter: document, replacement: document2, options: options2)
+        .sink(receiveCompletion: { result in
+            if case .failure(_) = result {
+                XCTFail("Should try to replace")
+            }
+        }, receiveValue: { updateResult in
+            XCTAssertNil(updateResult)
+            findOneReplaceEx3.fulfill()
+        })
+        .store(in: &cancellable)
+        wait(for: [findOneReplaceEx3], timeout: 4.0)
+    }
+
+    func testMongoCollectionFindAndDelete() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        
+        collection.insertMany([document])
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &cancellable)
+        
+        let findOneDeleteEx1 = expectation(description: "Find one document and delete")
+        collection.findOneAndDelete(filter: document)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should try to delete")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertNotNil(updateResult)
+                findOneDeleteEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneDeleteEx1], timeout: 4.0)
+        
+        let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], false, false)
+        let findOneDeleteEx2 = expectation(description: "Find one document and delete")
+        collection.findOneAndDelete(filter: document, options: options1)
+            .sink(receiveCompletion: { result in
+                if case .failure(let error) = result {
+                    // FIXME: It seems there is a possible server bug that does not handle
+                    // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
+                    // "expected pre-image to match projection matcher"
+                    // https://jira.mongodb.org/browse/REALMC-6878
+                    XCTAssertEqual(error.localizedDescription, "expected pre-image to match projection matcher")
+                    findOneDeleteEx2.fulfill()
+                } else {
+                    XCTFail("Please review test cases for findOneAndDelete.")
+                }
+            }, receiveValue: { deleteResult in
+                XCTFail("Please review test cases for findOneAndDelete.")
+            })
+//            .sink(receiveCompletion: { result in
+//                if case .failure(let error) = result {
+//                    XCTFail("Should try to find instead of \(error)")
+//                }
+//            }, receiveValue: { deleteResult in
+//                XCTAssertNil(deleteResult)
+//                findOneDeleteEx2.fulfill()
+//            })
+        .store(in: &cancellable)
+        wait(for: [findOneDeleteEx2], timeout: 4.0)
+
+        let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
+        let findOneDeleteEx3 = expectation(description: "Find one document and delete")
+        collection.findOneAndDelete(filter: document, options: options2)
+            .sink(receiveCompletion: { result in
+                if case .failure(let error) = result {
+                    // FIXME: It seems there is a possible server bug that does not handle
+                    // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
+                    // "expected pre-image to match projection matcher"
+                    // https://jira.mongodb.org/browse/REALMC-6878
+                    XCTAssertEqual(error.localizedDescription, "expected pre-image to match projection matcher")
+                    findOneDeleteEx2.fulfill()
+                } else {
+                    XCTFail("Please review test cases for findOneAndDelete.")
+                }
+            }, receiveValue: { deleteResult in
+                XCTFail("Please review test cases for findOneAndDelete.")
+            })
+//            .sink(receiveCompletion: { result in
+//                if case .failure(let error) = result {
+//                    XCTFail("Should try to find instead of \(error)")
+//                }
+//            }, receiveValue: { deleteResult in
+//                guard let deleteResult = deleteResult else {
+//                    XCTFail("Should delete")
+//                    return
+//                }
+//                XCTAssertEqual(deleteResult["name"] as! String, "fido")
+//                findOneDeleteEx3.fulfill()
+//            })
+            .store(in: &cancellable)
+        wait(for: [findOneDeleteEx3], timeout: 4.0)
+        
+        let findEx = expectation(description: "Find documents")
+        collection.find(filter: [:])
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should try to update")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertEqual(updateResult.count, 0)
+                findEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findEx], timeout: 4.0)
     }
 }
 

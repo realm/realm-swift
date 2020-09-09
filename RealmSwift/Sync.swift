@@ -625,4 +625,378 @@ public extension User {
         }
     }
 }
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+public extension MongoCollection {
+    
+    /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
+    /// generated for it.
+    /// - Parameters:
+    ///   - document: document  A `Document` value to insert.
+    func insertOne(_ document: Document) -> Future<RLMObjectId, Error> {
+        return Future { promise in
+            self.insertOne(document) { objectId, error in
+                if let objectId = objectId {
+                    promise(.success(objectId))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+    
+    /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
+    /// they will be generated.
+    /// - Parameters:
+    ///   - documents: The `Document` values in a bson array to insert.
+    func insertMany(_ documents: [Document]) -> Future<[RLMObjectId], Error> {
+        return Future { promise in
+            self.insertMany(documents) { objectIds, error in
+                if let objectIds = objectIds {
+                    promise(.success(objectIds))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+    
+    /// Finds the documents in this collection which match the provided filter.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - options: `FindOptions` to use when executing the command.
+    func find(filter: Document, options: FindOptions) -> Future<[[String: RLMBSON]], Error> {
+        return Future { promise in
+            self.find(filter: filter, options: options) { documents, error in
+                if let documents = documents {
+                    promise(.success(documents))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+    
+    /// Finds the documents in this collection which match the provided filter.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    func find(filter: Document) -> Future<[[String: RLMBSON]], Error> {
+        return Future { promise in
+            self.find(filter: filter) { documents, error in
+                if let documents = documents {
+                    promise(.success(documents))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+    
+    /// Returns one document from a collection or view which matches the
+    /// provided filter. If multiple documents satisfy the query, this method
+    /// returns the first document according to the query's sort order or natural
+    /// order.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - options: `FindOptions` to use when executing the command.
+    func findOneDocument(filter: Document, options: FindOptions) -> Future<[[String: RLMBSON]], Error> {
+        return Future { promise in
+            self.find(filter: filter) { documents, error in
+                if let documents = documents {
+                    promise(.success(documents))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+
+    /// Returns one document from a collection or view which matches the
+    /// provided filter. If multiple documents satisfy the query, this method
+    /// returns the first document according to the query's sort order or natural
+    /// order.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    func findOneDocument(filter: Document) -> Future<[String: RLMBSON], Error> {
+        return Future { promise in
+            self.findOneDocument(filter: filter) { document, error in
+                if let document = document {
+                    promise(.success(document))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+    
+    /// Runs an aggregation framework pipeline against this collection.
+    /// - Parameters:
+    ///   - pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
+    func aggregate(pipeline: [Document]) -> Future<[[String: RLMBSON]], Error> {
+        return Future { promise in
+            self.aggregate(pipeline: pipeline) { documents, error in
+                if let documents = documents {
+                    promise(.success(documents))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+    
+    /// Counts the number of documents in this collection matching the provided filter.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - limit: The max amount of documents to count
+    func count(filter: Document, limit: Int) -> Future<Int, Error> {
+        return Future { promise in
+            self.count(filter: filter, limit: limit) { count, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(count))
+                }
+            }
+        }
+    }
+    
+    /// Counts the number of documents in this collection matching the provided filter.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    func count(filter: Document) -> Future<Int, Error> {
+        return Future { promise in
+            self.count(filter: filter) { count, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(count))
+                }
+            }
+        }
+    }
+    
+    /// Deletes a single matching document from the collection.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    func deleteOneDocument(filter: Document) -> Future<Int, Error> {
+        return Future { promise in
+            self.deleteOneDocument(filter: filter) { count, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(count))
+                }
+            }
+        }
+    }
+    
+    /// Deletes multiple documents
+    /// - Parameters:
+    ///   - filter: Document representing the match criteria
+    func deleteManyDocuments(filter: Document) -> Future<Int, Error> {
+        return Future { promise in
+            self.deleteManyDocuments(filter: filter) { count, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(count))
+                }
+            }
+        }
+    }
+    
+    /// Updates a single document matching the provided filter in this collection.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    ///   - upsert: When true, creates a new document if no document matches the query.
+    func updateOneDocument(filter: Document, update: Document, upsert: Bool) -> Future<UpdateResult, Error> {
+        return Future { promise in
+            self.updateOneDocument(filter: filter, update: update, upsert: upsert) { updateResult, error in
+                if let updateResult = updateResult {
+                    promise(.success(updateResult))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+    
+    /// Updates a single document matching the provided filter in this collection.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    func updateOneDocument(filter: Document, update: Document) -> Future<UpdateResult, Error> {
+        return Future { promise in
+            self.updateOneDocument(filter: filter, update: update) { updateResult, error in
+                if let updateResult = updateResult {
+                    promise(.success(updateResult))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+    
+    /// Updates multiple documents matching the provided filter in this collection.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    ///   - upsert: When true, creates a new document if no document matches the query.
+    func updateManyDocuments(filter: Document, update: Document, upsert: Bool) -> Future<UpdateResult, Error> {
+        return Future { promise in
+            self.updateManyDocuments(filter: filter, update: update, upsert: upsert) { updateResult, error in
+                if let updateResult = updateResult {
+                    promise(.success(updateResult))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+    
+    /// Updates multiple documents matching the provided filter in this collection.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    func updateManyDocuments(filter: Document, update: Document) -> Future<UpdateResult, Error> {
+        return Future { promise in
+            self.updateManyDocuments(filter: filter, update: update) { updateResult, error in
+                if let updateResult = updateResult {
+                    promise(.success(updateResult))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+    
+    /// Updates a single document in a collection based on a query filter and
+    /// returns the document in either its pre-update or post-update form. Unlike
+    /// `updateOneDocument`, this action allows you to atomically find, update, and
+    /// return a document with the same command. This avoids the risk of other
+    /// update operations changing the document between separate find and update
+    /// operations.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    ///   - options: `RemoteFindOneAndModifyOptions` to use when executing the command.
+    func findOneAndUpdate(filter: Document, update: Document, options: FindOneAndModifyOptions) -> Future<[String: RLMBSON]?, Error> {
+        return Future { promise in
+            self.findOneAndUpdate(filter: filter, update: update, options: options) { updateResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(updateResult))
+                }
+            }
+        }
+    }
+    
+    /// Updates a single document in a collection based on a query filter and
+    /// returns the document in either its pre-update or post-update form. Unlike
+    /// `updateOneDocument`, this action allows you to atomically find, update, and
+    /// return a document with the same command. This avoids the risk of other
+    /// update operations changing the document between separate find and update
+    /// operations.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    func findOneAndUpdate(filter: Document, update: Document) -> Future<[String: RLMBSON]?, Error> {
+        return Future { promise in
+            self.findOneAndUpdate(filter: filter, update: update) { updateResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(updateResult))
+                }
+            }
+        }
+    }
+
+    /// Overwrites a single document in a collection based on a query filter and
+    /// returns the document in either its pre-replacement or post-replacement
+    /// form. Unlike `updateOneDocument`, this action allows you to atomically find,
+    /// replace, and return a document with the same command. This avoids the
+    /// risk of other update operations changing the document between separate
+    /// find and update operations.
+    /// - Parameters:
+    ///   - filter: A `Document` that should match the query.
+    ///   - replacement: A `Document` describing the replacement.
+    ///   - options: `FindOneAndModifyOptions` to use when executing the command.
+    func findOneAndReplace(filter: Document, replacement: Document, options: FindOneAndModifyOptions) -> Future<[String: RLMBSON]?, Error> {
+        return Future { promise in
+            self.findOneAndReplace(filter: filter, replacement: replacement, options: options) { updateResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(updateResult))
+                }
+            }
+        }
+    }
+    
+    /// Overwrites a single document in a collection based on a query filter and
+    /// returns the document in either its pre-replacement or post-replacement
+    /// form. Unlike `updateOneDocument`, this action allows you to atomically find,
+    /// replace, and return a document with the same command. This avoids the
+    /// risk of other update operations changing the document between separate
+    /// find and update operations.
+    /// - Parameters:
+    ///   - filter: A `Document` that should match the query.
+    ///   - replacement: A `Document` describing the replacement.
+    ///   - options: `RLMFindOneAndModifyOptions` to use when executing the command.
+    func findOneAndReplace(filter: Document, replacement: Document) -> Future<[String: RLMBSON]?, Error> {
+        return Future { promise in
+            self.findOneAndReplace(filter: filter, replacement: replacement) { updateResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(updateResult))
+                }
+            }
+        }
+    }
+    
+    /// Removes a single document from a collection based on a query filter and
+    /// returns a document with the same form as the document immediately before
+    /// it was deleted. Unlike `deleteOneDocument`, this action allows you to atomically
+    /// find and delete a document with the same command. This avoids the risk of
+    /// other update operations changing the document between separate find and
+    /// delete operations.
+    /// - Parameters:
+    ///   - filter: A `Document` that should match the query.
+    ///   - options: `FindOneAndModifyOptions` to use when executing the command.
+    func findOneAndDelete(filter: Document, options: FindOneAndModifyOptions) -> Future<[String: RLMBSON]?, Error> {
+        return Future { promise in
+            self.findOneAndDelete(filter: filter, options: options) { deleteResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(deleteResult))
+                }
+            }
+        }
+    }
+    
+    /// Removes a single document from a collection based on a query filter and
+    /// returns a document with the same form as the document immediately before
+    /// it was deleted. Unlike `deleteOneDocument`, this action allows you to atomically
+    /// find and delete a document with the same command. This avoids the risk of
+    /// other update operations changing the document between separate find and
+    /// delete operations.
+    /// - Parameters:
+    ///   - filter: A `Document` that should match the query.
+    func findOneAndDelete(filter: Document) -> Future<[String: RLMBSON]?, Error> {
+        return Future { promise in
+            self.findOneAndDelete(filter: filter) { deleteResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(deleteResult))
+                }
+            }
+        }
+    }
+}
 #endif
