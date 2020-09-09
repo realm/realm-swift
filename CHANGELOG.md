@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.4.0 Release notes (2020-09-09)
 =============================================================
 
 This version bumps the Realm file format version. This means that older
@@ -7,11 +7,8 @@ and a new version of Realm Studio will be required. There are no actual format
 changes and the version bump is just to force a re-migration of incorrectly
 upgraded Realms.
 
-### Enhancements
-* None.
-
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+
 * Upgrading pre-5.x files with string primary keys would result in a file where
   `realm.object(ofType:forPrimaryKey:)` would fail to find the object.
   ([#6716](https://github.com/realm/realm-cocoa/issues/6716), since 5.2.0)
@@ -21,9 +18,8 @@ upgraded Realms.
 * Objects with more than 32 properties could corrupt the Realm file and result
   in a variety of crashes. ([Java #7057](https://github.com/realm/realm-java/issues/7057), since 5.0.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 3.12 or later.
@@ -31,6 +27,7 @@ upgraded Realms.
 * Carthage release for Swift is built with Xcode 11.6.
 
 ### Internal
+
 * Upgraded realm-core from v6.0.23 to v6.0.25
 * Upgraded realm-sync from v5.0.20 to v5.0.22
 
