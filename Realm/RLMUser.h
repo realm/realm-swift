@@ -165,7 +165,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Logs out the current user
 
- The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by a username / password or third party auth clients
+ The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by an email / password or third party auth clients
  If the logout request fails, this method will still clear local authentication state.
 
  @param completion A callback invoked on completion

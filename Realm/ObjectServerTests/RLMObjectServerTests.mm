@@ -333,7 +333,7 @@
 
     [self waitForExpectations:@[registerExpectation] timeout:60.0];
 
-    [app loginWithCredential:[RLMCredentials credentialsWithUsername:randomEmail password:randomPassword]
+    [app loginWithCredential:[RLMCredentials credentialsWithEmail:randomEmail password:randomPassword]
                   completion:^(RLMUser *user, NSError *error) {
         XCTAssert(!error);
         XCTAssert(user);
@@ -413,7 +413,7 @@
 
     [self waitForExpectations:@[registerExpectation] timeout:60.0];
 
-    [app loginWithCredential:[RLMCredentials credentialsWithUsername:randomEmail password:randomPassword]
+    [app loginWithCredential:[RLMCredentials credentialsWithEmail:randomEmail password:randomPassword]
                   completion:^(RLMUser *user, NSError *error) {
         XCTAssert(!error);
         XCTAssert(user);
@@ -435,9 +435,9 @@
 
 #pragma mark - Auth Credentials -
 
-- (void)testUsernamePasswordCredential {
-    RLMCredentials *usernamePasswordCredential = [RLMCredentials credentialsWithUsername:@"test@mongodb.com" password:@"apassword"];
-    XCTAssertEqualObjects(usernamePasswordCredential.provider, @"local-userpass");
+- (void)testEmailPasswordCredential {
+    RLMCredentials *emailPasswordCredential = [RLMCredentials credentialsWithEmail:@"test@mongodb.com" password:@"apassword"];
+    XCTAssertEqualObjects(emailPasswordCredential.provider, @"local-userpass");
 }
 
 - (void)testJWTCredential {
@@ -485,9 +485,9 @@
 
 #pragma mark - Username Password
 
-/// Valid username/password credentials should be able to log in a user. Using the same credentials should return the
+/// Valid email/password credentials should be able to log in a user. Using the same credentials should return the
 /// same user object.
-- (void)testUsernamePasswordAuthentication {
+- (void)testEmailPasswordAuthentication {
     RLMUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                              register:YES]];
     RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
@@ -496,11 +496,11 @@
     XCTAssertTrue([firstUser.identifier isEqualToString:secondUser.identifier]);
 }
 
-/// An invalid username/password credential should not be able to log in a user and a corresponding error should be generated.
+/// An invalid email/password credential should not be able to log in a user and a corresponding error should be generated.
 - (void)testInvalidPasswordAuthentication {
     (void)[self userForTest:_cmd];
 
-    RLMCredentials *credentials = [RLMCredentials credentialsWithUsername:NSStringFromSelector(_cmd)
+    RLMCredentials *credentials = [RLMCredentials credentialsWithEmail:NSStringFromSelector(_cmd)
                                                                  password:@"INVALID_PASSWORD"];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"login should fail"];
@@ -515,8 +515,8 @@
 }
 
 /// A non-existsing user should not be able to log in and a corresponding error should be generated.
-- (void)testNonExistingUsernameAuthentication {
-    RLMCredentials *credentials = [RLMCredentials credentialsWithUsername:@"INVALID_USERNAME"
+- (void)testNonExistingEmailAuthentication {
+    RLMCredentials *credentials = [RLMCredentials credentialsWithEmail:@"INVALID_USERNAME"
                                                                        password:@"INVALID_PASSWORD"];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"login should fail"];
@@ -530,8 +530,8 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-/// Registering a user with existing username should return corresponding error.
-- (void)testExistingUsernameRegistration {
+/// Registering a user with existing email should return corresponding error.
+- (void)testExistingEmailRegistration {
     XCTestExpectation *expectationA = [self expectationWithDescription:@"registration should succeed"];
     [[self.app emailPasswordAuth] registerUserWithEmail:NSStringFromSelector(_cmd)
                                        password:@"password"

@@ -46,8 +46,8 @@ using namespace realm;
     return [[self alloc] initWithAppCredentials:app::AppCredentials::apple(token.UTF8String)];
 }
 
-+ (instancetype)credentialsWithUsername:(NSString *)username
-                               password:(NSString *)password {
++ (instancetype)credentialsWithEmail:(NSString *)username
+                            password:(NSString *)password {
     return [[self alloc] initWithAppCredentials:app::AppCredentials::username_password(username.UTF8String,
                                                                                        password.UTF8String)];
 }

@@ -186,7 +186,7 @@ static NSURL *syncDirectoryForChildProcess() {
         }];
         [self waitForExpectationsWithTimeout:4.0 handler:nil];
     }
-    return [RLMCredentials credentialsWithUsername:name
+    return [RLMCredentials credentialsWithEmail:name
                                           password:@"password"];
 }
 

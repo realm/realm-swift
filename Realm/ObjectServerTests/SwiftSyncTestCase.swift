@@ -34,7 +34,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                           line: UInt = #line) -> Credentials {
         let username = "\(randomString(10))\(usernameSuffix)"
         let password = "abcdef"
-        let credentials = Credentials(username: username, password: password)
+        let credentials = Credentials(email: username, password: password)
         let ex = expectation(description: "Should register in the user properly")
         app.emailPasswordAuth().registerUser(email: username, password: password, completion: { error in
             XCTAssertNil(error)
