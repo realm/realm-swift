@@ -154,7 +154,7 @@ using namespace realm;
     auto identities = _user->identities();
     for (auto& identity : identities) {
         [buffer addObject: [[RLMUserIdentity alloc] initUserIdentityWithProviderType:@(identity.provider_type.c_str())
-                                                                            identifier:@(identity.id.c_str())]];
+                                                                          identifier:@(identity.id.c_str())]];
     }
 
     return [buffer copy];
@@ -305,7 +305,7 @@ using namespace realm;
 @implementation RLMUserIdentity
 
 - (instancetype)initUserIdentityWithProviderType:(NSString *)providerType
-                                        identifier:(NSString *)identifier {
+                                      identifier:(NSString *)identifier {
     if (self = [super init]) {
         _providerType = providerType;
         _identifier = identifier;

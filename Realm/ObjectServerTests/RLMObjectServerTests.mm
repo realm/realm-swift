@@ -242,7 +242,7 @@
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
     NSString *randomPassword = [self generateRandomString:10];
 
-    [[app emailPasswordAuth] registerUser:randomEmail password:randomPassword completion:^(NSError *error) {
+    [[app emailPasswordAuth] registerUserWithEmail:randomEmail password:randomPassword completion:^(NSError *error) {
         XCTAssert(!error);
         [expectation fulfill];
     }];
@@ -326,7 +326,7 @@
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
     NSString *randomPassword = [self generateRandomString:10];
 
-    [[app emailPasswordAuth] registerUser:randomEmail password:randomPassword completion:^(NSError *error) {
+    [[app emailPasswordAuth] registerUserWithEmail:randomEmail password:randomPassword completion:^(NSError *error) {
         XCTAssert(!error);
         [registerExpectation fulfill];
     }];
@@ -406,7 +406,7 @@
     NSString *randomEmail = [NSString stringWithFormat:@"%@@10gen.com", [self generateRandomString:10]];
     NSString *randomPassword = [self generateRandomString:10];
 
-    [[app emailPasswordAuth] registerUser:randomEmail password:randomPassword completion:^(NSError *error) {
+    [[app emailPasswordAuth] registerUserWithEmail:randomEmail password:randomPassword completion:^(NSError *error) {
         XCTAssert(!error);
         [registerExpectation fulfill];
     }];
@@ -533,7 +533,7 @@
 /// Registering a user with existing username should return corresponding error.
 - (void)testExistingUsernameRegistration {
     XCTestExpectation *expectationA = [self expectationWithDescription:@"registration should succeed"];
-    [[self.app emailPasswordAuth] registerUser:NSStringFromSelector(_cmd)
+    [[self.app emailPasswordAuth] registerUserWithEmail:NSStringFromSelector(_cmd)
                                        password:@"password"
                                      completion:^(NSError * error) {
         XCTAssertNil(error);
@@ -542,7 +542,7 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     XCTestExpectation *expectationB = [self expectationWithDescription:@"registration should fail"];
-    [[self.app emailPasswordAuth] registerUser:NSStringFromSelector(_cmd)
+    [[self.app emailPasswordAuth] registerUserWithEmail:NSStringFromSelector(_cmd)
                                        password:@"password"
                                      completion:^(NSError * error) {
         XCTAssertNotNil(error);

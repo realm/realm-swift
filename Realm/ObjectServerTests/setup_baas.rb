@@ -102,7 +102,7 @@ def setup_stitch
     assisted_agg_filepath = "#{stitch_dir}/assisted_agg"
     if !File.exists?(assisted_agg_filepath)
         puts "downloading assisted_agg"
-        puts `cd '#{stitch_dir}' && curl --silent -O "https://s3.amazonaws.com//stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_b1c679a26ecb975372de41238ea44e4719b8fbf0_5f3d91c10ae6066889184912_20_08_19_20_57_17/assisted_agg"`
+        puts `cd '#{stitch_dir}' && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_b1c679a26ecb975372de41238ea44e4719b8fbf0_5f3d91c10ae6066889184912_20_08_19_20_57_17/assisted_agg"`
         puts `chmod +x '#{assisted_agg_filepath}'`
     end
 
