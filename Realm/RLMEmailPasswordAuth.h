@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)registerUserWithEmail:(NSString *)email
                      password:(NSString *)password
-                   completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
+                   completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler NS_SWIFT_NAME(registerUser(email:password:completion:));
 
 /**
  Confirms an email identity with the username/password provider.

@@ -728,7 +728,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerUser(withEmail: email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -759,12 +759,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let registerUser1Ex = expectation(description: "Register user 1")
         let registerUser2Ex = expectation(description: "Register user 2")
 
-        app.emailPasswordAuth().registerUser(withEmail: email1, password: password1) { (error) in
+        app.emailPasswordAuth().registerUser(email: email1, password: password1) { (error) in
             XCTAssertNil(error)
             registerUser1Ex.fulfill()
         }
 
-        app.emailPasswordAuth().registerUser(withEmail: email2, password: password2) { (error) in
+        app.emailPasswordAuth().registerUser(email: email2, password: password2) { (error) in
             XCTAssertNil(error)
             registerUser2Ex.fulfill()
         }
@@ -820,7 +820,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerUser(withEmail: email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -862,7 +862,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerUser(withEmail: email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -917,7 +917,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerUser(withEmail: email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -991,7 +991,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerUser(withEmail: email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -1033,7 +1033,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerUser(withEmail: email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -1070,7 +1070,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerUser(withEmail: email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
