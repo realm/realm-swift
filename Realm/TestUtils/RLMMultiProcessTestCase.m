@@ -111,13 +111,17 @@
 }
 
 #if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
-- (NSTask *)childTask {
+- (NSTask *)childTaskWithAppIds:(NSArray *)appIds {
     NSString *testName = [NSString stringWithFormat:@"%@/%@", self.className, self.testName];
     NSMutableDictionary *env = [NSProcessInfo.processInfo.environment mutableCopy];
     env[@"RLMProcessIsChild"] = @"true";
     env[@"RLMParentProcessBundleID"] = [NSBundle mainBundle].bundleIdentifier;
     if ([self respondsToSelector:@selector(appId)]) {
         env[@"RLMParentAppId"] = self.appId;
+    }
+
+    if (appIds.count) {
+        env[@"RLMParentAppIds"] = [appIds componentsJoinedByString:@","];
     }
 
     // If we're running with address sanitizer or thread sanitizer we need to
@@ -144,7 +148,11 @@
     return task;
 }
 
-- (int)runChildAndWait {
+- (NSTask *)childTask {
+    return [self childTaskWithAppIds:@[]];
+}
+
+- (int)runChildAndWaitWithAppIds:(NSArray *)appIds {
     NSPipe *pipe = [NSPipe pipe];
     NSMutableData *buffer = [[NSMutableData alloc] init];
 
@@ -156,7 +164,7 @@
         const char *end = start + buffer.length;
         while ((newline = memchr(start, '\n', end - start))) {
             if (newline < start + 17 ||
-                (memcmp(start, "Test Suite", 10) && memcmp(start, "Test Case", 9) && memcmp(start, "	 Executed 1 test", 17))) {
+                (memcmp(start, "Test Suite", 10) && memcmp(start, "Test Case", 9) && memcmp(start, "     Executed 1 test", 17))) {
                 fwrite(start, newline - start + 1, 1, stderr);
             }
             start = newline + 1;
@@ -166,12 +174,17 @@
         [buffer replaceBytesInRange:NSMakeRange(0, start - (char *)buffer.bytes) withBytes:0 length:0];
     };
 
-    NSTask *task = [self childTask];
+    NSTask *task = [self childTaskWithAppIds:appIds];
     task.standardError = pipe;
     [task launch];
     [task waitUntilExit];
     return task.terminationStatus;
 }
+
+- (int)runChildAndWait {
+    return [self runChildAndWaitWithAppIds:@[]];
+}
+
 #else
 - (NSTask *)childTask {
     return nil;

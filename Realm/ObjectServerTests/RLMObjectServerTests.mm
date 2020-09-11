@@ -24,6 +24,7 @@
 #import <RealmSwift/RealmSwift-Swift.h>
 #import "ObjectServerTests-Swift.h"
 
+#import "RLMApp_Private.hpp"
 #import "RLMCredentials.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm+Sync.h"
@@ -630,6 +631,82 @@
                                   [Person george]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(4, Person, realm);
+    }
+}
+
+/// If client B adds objects to a synced Realm, client A should see those objects.
+- (void)testAddObjectsMultipleApps {
+    NSString *appId1;
+    NSString *appId2;
+    RLMApp *app1;
+    RLMApp *app2;
+
+    if (self.isParent) {
+        appId1 = [RealmServer.shared createAppAndReturnError:nil];
+        appId2 = [RealmServer.shared createAppAndReturnError:nil];
+        app1 = [RLMApp appWithId:appId1
+                   configuration:[self defaultAppConfiguration]
+                   rootDirectory:[self clientDataRoot]];
+        app2 = [RLMApp appWithId:appId2
+                   configuration:[self defaultAppConfiguration]
+                   rootDirectory:[self clientDataRoot]];
+    } else {
+        app1 = [RLMApp appWithId:self.appIds[0]
+                   configuration:[self defaultAppConfiguration]
+                   rootDirectory:[self clientDataRoot]];
+        app2 = [RLMApp appWithId:self.appIds[1]
+                   configuration:[self defaultAppConfiguration]
+                   rootDirectory:[self clientDataRoot]];
+    }
+
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@""];
+    [app1 loginWithCredential:[RLMCredentials anonymousCredentials]
+                   completion:^(RLMUser * _Nullable, NSError * _Nullable) {
+        [expectation1 fulfill];
+    }];
+
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@""];
+    [app2 loginWithCredential:[RLMCredentials anonymousCredentials]
+                   completion:^(RLMUser * _Nullable, NSError * _Nullable) {
+        [expectation2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    RLMRealm *realm1 = [self openRealmForPartitionValue:appId1
+                                                   user:[app1 currentUser]];
+    RLMRealm *realm2 = [self openRealmForPartitionValue:appId2
+                                                   user:[app2 currentUser]];
+
+    if (self.isParent) {
+        CHECK_COUNT(0, Person, realm1);
+        CHECK_COUNT(0, Person, realm2);
+        int code = [self runChildAndWaitWithAppIds:@[appId1, appId2]];
+        XCTAssertEqual(0, code);
+        [self waitForDownloadsForRealm:realm1];
+        [self waitForDownloadsForRealm:realm2];
+        CHECK_COUNT(2, Person, realm1);
+        CHECK_COUNT(2, Person, realm2);
+        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'john'"].count, 1UL);
+        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'paul'"].count, 1UL);
+        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'ringo'"].count, 0UL);
+        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'george'"].count, 0UL);
+
+        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'john'"].count, 0UL);
+        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'paul'"].count, 0UL);
+        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'ringo'"].count, 1UL);
+        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'george'"].count, 1UL);
+    } else {
+        // Add objects.
+        [self addPersonsToRealm:realm1
+                        persons:@[[Person john],
+                                  [Person paul]]];
+        [self addPersonsToRealm:realm2
+                        persons:@[[Person ringo],
+                                  [Person george]]];
+
+        [self waitForUploadsForRealm:realm1];
+        [self waitForUploadsForRealm:realm2];
+        CHECK_COUNT(2, Person, realm1);
+        CHECK_COUNT(2, Person, realm2);
     }
 }
 
