@@ -261,7 +261,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertTrue(theError!.code == SyncError.Code.clientResetError)
             let resetInfo = theError!.clientResetInfo()
             XCTAssertNotNil(resetInfo)
-            XCTAssertTrue(resetInfo!.0.contains("io.realm.object-server-recovered-realms/recovered_realm"))
+            XCTAssertTrue(resetInfo!.0.contains("mongodb-realm/recovered-realms/recovered_realm"))
             XCTAssertNotNil(realm)
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
@@ -291,7 +291,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
             let (path, errorToken) = theError!.clientResetInfo()!
             XCTAssertFalse(FileManager.default.fileExists(atPath: path))
-            SyncSession.immediatelyHandleError(errorToken)
+            SyncSession.immediatelyHandleError(errorToken, syncManager: self.app.syncManager)
             XCTAssertTrue(FileManager.default.fileExists(atPath: path))
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
