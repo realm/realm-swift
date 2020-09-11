@@ -21,7 +21,7 @@
 #import <Realm/RLMCredentials.h>
 #import <Realm/RLMRealmConfiguration.h>
 
-@class RLMUser, RLMUserInfo, RLMSyncSession, RLMRealm, RLMUserIdentity, RLMAPIKeyAuth, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection;
+@class RLMUser, RLMSyncSession, RLMRealm, RLMUserIdentity, RLMAPIKeyAuth, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection;
 @protocol RLMBSON;
 
 /**
@@ -37,7 +37,7 @@ typedef NS_ENUM(NSUInteger, RLMUserState) {
 };
 
 /// A block type used to report an error related to a specific user.
-typedef void(^RLMUserErrorReportingBlock)(RLMUser * _Nonnull, NSError * _Nonnull);
+//typedef void(^RLMUserErrorReportingBlock)(RLMUser * _Nonnull, NSError * _Nonnull);
 
 /// A block type used to report an error related to a specific user.
 typedef void(^RLMOptionalUserBlock)(RLMUser * _Nullable, NSError * _Nullable);
@@ -198,53 +198,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 #pragma mark - User info classes
-
-/**
- A data object representing a user account associated with a user.
-
- @see `RLMUserInfo`
- */
-@interface RLMUserAccountInfo : NSObject
-
-/// The authentication provider which manages this user account.
-@property (nonatomic, readonly) RLMIdentityProvider provider;
-
-/// The username or identity of this user account.
-@property (nonatomic, readonly) NSString *providerUserIdentity;
-
-/// :nodoc:
-- (instancetype)init __attribute__((unavailable("RLMUserAccountInfo cannot be created directly")));
-/// :nodoc:
-+ (instancetype)new __attribute__((unavailable("RLMUserAccountInfo cannot be created directly")));
-
-@end
-
-/**
- A data object representing information about a user that was retrieved from a user lookup call.
- */
-@interface RLMUserInfo : NSObject
-
-/**
- An array of all the user accounts associated with this user.
- */
-@property (nonatomic, readonly) NSArray<RLMUserAccountInfo *> *accounts;
-
-/**
- The identity issued to this user by MongoDB Realm.
- */
-@property (nonatomic, readonly) NSString *identity;
-
-/**
- Metadata about this user stored on MongoDB Realm.
- */
-@property (nonatomic, readonly) NSDictionary<NSString *, NSString *> *metadata;
-
-/// :nodoc:
-- (instancetype)init __attribute__((unavailable("RLMUserInfo cannot be created directly")));
-/// :nodoc:
-+ (instancetype)new __attribute__((unavailable("RLMUserInfo cannot be created directly")));
-
-@end
 
 /// An identity of a user. A user can have multiple identities, usually associated with multiple providers.
 @interface RLMUserIdentity : NSObject

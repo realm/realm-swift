@@ -19,7 +19,6 @@
 #import "RLMNetworkTransport_Private.hpp"
 
 #import "RLMApp.h"
-#import "RLMJSONModels.h"
 #import "RLMRealmConfiguration.h"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
@@ -168,19 +167,6 @@ didCompleteWithError:(NSError *)error
     response.body = [[NSString alloc] initWithData:_data encoding:NSUTF8StringEncoding];
 
     _completionBlock(response);
-}
-
-- (RLMSyncErrorResponseModel *)responseModelFromData:(NSData *)data {
-    if (data.length == 0) {
-        return nil;
-    }
-    id json = [NSJSONSerialization JSONObjectWithData:data
-                                              options:(NSJSONReadingOptions)0
-                                                error:nil];
-    if (!json || ![json isKindOfClass:[NSDictionary class]]) {
-        return nil;
-    }
-    return [[RLMSyncErrorResponseModel alloc] initWithDictionary:json];
 }
 
 @end

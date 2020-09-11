@@ -27,21 +27,6 @@ import Realm.Private
 public typealias User = RLMUser
 
 /**
- An immutable data object representing information retrieved from MongoDB
- Realm about a particular user.
-
- - see: `RLMUserInfo`
- */
-public typealias UserInfo = RLMUserInfo
-
-/**
- An immutable data object representing an account belonging to a particular user.
-
- - see: `UserInfo`, `RLMUserAccountInfo`
- */
-public typealias UserAccountInfo = RLMUserAccountInfo
-
-/**
  A singleton which configures and manages MongoDB Realm synchronization-related
  functionality.
 
