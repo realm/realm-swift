@@ -1293,7 +1293,7 @@
     NSString *pathValue = [theError rlmSync_clientResetBackedUpRealmPath];
     XCTAssertNotNil(pathValue);
     // Sanity check the recovery path.
-    NSString *recoveryPath = @"io.realm.object-server-recovered-realms/recovered_realm";
+    NSString *recoveryPath = @"mongodb-realm/recovered-realm";
     XCTAssertTrue([pathValue rangeOfString:recoveryPath].location != NSNotFound);
     XCTAssertNotNil([theError rlmSync_errorActionToken]);
 }
@@ -1317,7 +1317,7 @@
     // At this point the Realm should be invalidated and client reset should be possible.
     NSString *pathValue = [theError rlmSync_clientResetBackedUpRealmPath];
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:pathValue]);
-    [RLMSyncSession immediatelyHandleError:[theError rlmSync_errorActionToken]];
+    [RLMSyncSession immediatelyHandleError:[theError rlmSync_errorActionToken] syncManager:[self.app syncManager]];
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:pathValue]);
 }
 

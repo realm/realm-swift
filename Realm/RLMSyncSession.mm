@@ -140,8 +140,11 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
 
 - (RLMUser *)parentUser {
     if (auto session = _session.lock()) {
-//        return [[RLMUser alloc] initWithUser:session->user()
-//                                         app:[RLMApp appWithId:@(SyncManager::shared().app()->config().app_id.data())]];
+        if (auto app = session->user()->sync_manager()->app().lock()) {
+            return [[RLMUser alloc] initWithUser:session->user()
+                                             app:[RLMApp appWithId:[NSString stringWithCString:app->config().app_id.data()
+                                                                                      encoding:NSUTF8StringEncoding]]];
+        }
     }
     return nil;
 }

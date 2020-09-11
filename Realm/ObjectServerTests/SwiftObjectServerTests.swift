@@ -696,7 +696,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     private func realmURLForFile(_ fileName: String) -> URL {
-        let testDir = RLMRealmPathForFile("realm-object-server")
+        let testDir = RLMRealmPathForFile("mongodb-realm")
         let directory = URL(fileURLWithPath: testDir, isDirectory: true)
         return directory.appendingPathComponent(fileName, isDirectory: false)
     }
