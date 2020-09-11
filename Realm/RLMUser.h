@@ -33,7 +33,7 @@ typedef NS_ENUM(NSUInteger, RLMUserState) {
     /// The user is logged in, and any Realms associated with it are syncing with MongoDB Realm.
     RLMUserStateLoggedIn,
     /// The user has been removed, and cannot be used.
-    RLMUserStateRemoved,
+    RLMUserStateRemoved
 };
 
 /// A block type used to report an error related to a specific user.
