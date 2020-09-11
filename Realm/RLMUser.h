@@ -37,9 +37,6 @@ typedef NS_ENUM(NSUInteger, RLMUserState) {
 };
 
 /// A block type used to report an error related to a specific user.
-//typedef void(^RLMUserErrorReportingBlock)(RLMUser * _Nonnull, NSError * _Nonnull);
-
-/// A block type used to report an error related to a specific user.
 typedef void(^RLMOptionalUserBlock)(RLMUser * _Nullable, NSError * _Nullable);
 
 /// A block type used to report an error on a network request from the user.
