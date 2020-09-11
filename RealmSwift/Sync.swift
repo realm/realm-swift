@@ -246,6 +246,10 @@ public struct SyncConfiguration {
     }
 }
 
+#if canImport(Combine)
+import Combine
+#endif
+
 /// Structure providing an interface to call a MongoDB Realm function with the provided name and arguments.
 ///
 ///     user.functions.sum([1, 2, 3, 4, 5]) { sum, error in
@@ -283,6 +287,24 @@ public struct Functions {
             }
         }
     }
+    
+    #if canImport(Combine)
+    @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+    public subscript(dynamicMember string: String) -> ([AnyBSON]) -> Future<AnyBSON, Error> {
+        return { (arguments: [AnyBSON]) in
+            return Future { promise in
+                let objcArgs = arguments.map(ObjectiveCSupport.convert) as! [RLMBSON]
+                self.user?.__callFunctionNamed(string, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
+                    if let bson = ObjectiveCSupport.convert(object: bson) {
+                        promise(.success(bson))
+                    } else {
+                        promise(.failure(error ?? App.UserError.uncertainState))
+                    }
+                }
+            }
+        }
+    }
+    #endif
 }
 
 public extension User {

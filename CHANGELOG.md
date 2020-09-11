@@ -29,6 +29,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add App login implementation with Combine's Future
 * Add EmailPasswordAuth flow implementation with Combine's Future
 * Add MongoCollection methods implementation with Combine's Future
+* Add support for User dynamicMemberLookup with Future result
 * Add ability to open a synced Realm with a `nil` partition value.
 
 ### Fixed

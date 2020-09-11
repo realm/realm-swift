@@ -2708,6 +2708,74 @@ extension SwiftObjectServerTests {
             .store(in: &cancellable)
         wait(for: [findEx], timeout: 4.0)
     }
+
+    func testPromiseCallFunction() {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+        var cancellable = Set<AnyCancellable>()
+
+        let regEx = expectation(description: "Should register")
+        app.emailPasswordAuth().registerEmail(email, password: password)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should register")
+                }
+            }, receiveValue: { _ in
+                regEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [regEx], timeout: 4.0)
+        
+        let credentials = Credentials(username: email, password: password)
+        var syncUser: User!
+        let loginEx = expectation(description: "Should login")
+        app.login(credentials: credentials)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should login")
+                }
+            }, receiveValue: { user in
+                syncUser = user
+                loginEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [loginEx], timeout: 4.0)
+        
+        let sumEx = expectation(description: "Should calc sum")
+        syncUser.functions.sum([1, 2, 3, 4, 5])
+            .sink(receiveCompletion: { (result) in
+                if case .failure(_) = result {
+                    XCTFail("Should calc sum 15")
+                }
+            }, receiveValue: { bson in
+                guard case let .int64(sum) = bson else {
+                    XCTFail("Should be int64")
+                    return
+                }
+                XCTAssertEqual(sum, 15)
+                sumEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [sumEx], timeout: 4.0)
+        
+        let userDataEx = expectation(description: "Should update user data")
+        syncUser.functions.updateUserData([["favourite_colour": "green", "apples": 10]])
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should update user data")
+                }
+            }, receiveValue: { bson in
+                guard case let .bool(upd) = bson else {
+                    XCTFail("Should be bool")
+                    return
+                }
+                XCTAssertTrue(upd)
+                userDataEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [userDataEx], timeout: 4.0)
+
+    }
 }
 
 #endif //canImport(Combine)
