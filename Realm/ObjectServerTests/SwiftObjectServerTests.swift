@@ -52,11 +52,46 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    func testBasicSwiftSyncWithNilPartitionValue() {
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let realm = try synchronouslyOpenRealm(partitionValue: nil, user: user)
+            XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
+        } catch {
+            XCTFail("Got an error: \(error)")
+        }
+    }
+
     /// If client B adds objects to a Realm, client A should see those new objects.
     func testSwiftAddObjects() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
             let realm = try synchronouslyOpenRealm(partitionValue: self.appId, user: user)
+            if isParent {
+                waitForDownloads(for: realm)
+                checkCount(expected: 0, realm, SwiftPerson.self)
+                executeChild()
+                waitForDownloads(for: realm)
+                checkCount(expected: 3, realm, SwiftPerson.self)
+            } else {
+                // Add objects
+                try realm.write {
+                    realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
+                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+                    realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                }
+                waitForUploads(for: realm)
+                checkCount(expected: 3, realm, SwiftPerson.self)
+            }
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    func testSwiftAddObjectsWithNilPartitionValue() {
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let realm = try synchronouslyOpenRealm(partitionValue: nil, user: user)
             if isParent {
                 waitForDownloads(for: realm)
                 checkCount(expected: 0, realm, SwiftPerson.self)

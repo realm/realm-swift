@@ -533,6 +533,7 @@ public class RealmServer: NSObject {
                     "partition": [
                         "key": "realm_id",
                         "type": "string",
+                        "required": false,
                         "permissions": [
                             "read": true,
                             "write": true

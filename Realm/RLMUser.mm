@@ -80,7 +80,7 @@ using namespace realm;
     return _user == ((RLMUser *)object)->_user;
 }
 
-- (RLMRealmConfiguration *)configurationWithPartitionValue:(id<RLMBSON>)partitionValue {
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
                                                   partitionValue:partitionValue
                                                    customFileURL:nil

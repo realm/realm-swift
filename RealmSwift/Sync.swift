@@ -214,7 +214,7 @@ public struct SyncConfiguration {
      MongoDB Realm. All classes with a property with this value will be synchronized to the
      Realm.
      */
-    public let partitionValue: AnyBSON
+    public let partitionValue: AnyBSON?
 
     /**
      A policy that determines what should happen when all references to Realms opened by this
@@ -233,13 +233,13 @@ public struct SyncConfiguration {
     internal init(config: RLMSyncConfiguration) {
         self.user = config.user
         self.stopPolicy = config.stopPolicy
-        self.partitionValue = ObjectiveCSupport.convert(object: config.partitionValue)!
+        self.partitionValue = ObjectiveCSupport.convert(object: config.partitionValue)
         self.cancelAsyncOpenOnNonFatalErrors = config.cancelAsyncOpenOnNonFatalErrors
     }
 
     func asConfig() -> RLMSyncConfiguration {
         let c = RLMSyncConfiguration(user: user,
-                                     partitionValue: ObjectiveCSupport.convert(object: partitionValue)!,
+                                     partitionValue: ObjectiveCSupport.convert(object: partitionValue),
                                      stopPolicy: stopPolicy)
         c.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
         return c
@@ -300,6 +300,27 @@ public extension User {
      */
     func configuration<T: BSON>(partitionValue: T) -> Realm.Configuration {
         let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
+        return ObjectiveCSupport.convert(object: config)
+    }
+
+    /**
+     Create a sync configuration instance.
+
+     - parameter partitionValue: Takes `nil` as a partition value.
+     - parameter cancelAsyncOpenOnNonFatalErrors: By default, Realm.asyncOpen()
+     swallows non-fatal connection errors such as a connection attempt timing
+     out and simply retries until it succeeds. If this is set to `true`, instead
+     the error will be reported to the callback and the async open will be
+     cancelled.
+
+     - warning: NEVER disable SSL validation for a system running in production.
+     */
+    func configuration(partitionValue: ExpressibleByNilLiteral?,
+                       cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
+        let config = self.__configuration(withPartitionValue: nil)
+        let syncConfig = config.syncConfiguration!
+        syncConfig.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
+        config.syncConfiguration = syncConfig
         return ObjectiveCSupport.convert(object: config)
     }
 

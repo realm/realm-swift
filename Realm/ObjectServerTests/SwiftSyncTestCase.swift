@@ -44,10 +44,18 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return credentials
     }
 
-    func synchronouslyOpenRealm(partitionValue: String,
+    func synchronouslyOpenRealm(partitionValue: ExpressibleByNilLiteral?,
                                 user: User,
                                 file: StaticString = #file,
                                 line: UInt = #line) throws -> Realm {
+        let config = user.configuration(partitionValue: partitionValue)
+        return try synchronouslyOpenRealm(configuration: config)
+    }
+
+    func synchronouslyOpenRealm<T: BSON>(partitionValue: T,
+                                         user: User,
+                                         file: StaticString = #file,
+                                         line: UInt = #line) throws -> Realm {
         let config = user.configuration(partitionValue: partitionValue)
         return try synchronouslyOpenRealm(configuration: config)
     }

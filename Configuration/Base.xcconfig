@@ -46,13 +46,11 @@ GCC_WARN_UNUSED_VARIABLE = YES;
 SWIFT_COMPILATION_MODE = wholemodule;
 SWIFT_OPTIMIZATION_LEVEL = -Owholemodule;
 WARNING_CFLAGS = -Wmismatched-tags -Wunused-private-field -Wpartial-availability;
-OTHER_CFLAGS = -fvisibility-inlines-hidden $(REALM_CATALYST_FLAGS);
-OTHER_CFLAGS[arch=armv7] = -fvisibility-inlines-hidden -fno-aligned-new $(REALM_CATALYST_FLAGS);
-OTHER_LDFLAGS = $(REALM_CATALYST_FLAGS);
-OTHER_SWIFT_FLAGS = $(REALM_CATALYST_FLAGS);
+OTHER_CFLAGS = -fvisibility-inlines-hidden;
+OTHER_CFLAGS[arch=armv7] = -fvisibility-inlines-hidden -fno-aligned-new;
 
-OTHER_CPLUSPLUSFLAGS = $(inherited) -isystem core/include -isystem Realm/ObjectStore/external/json;
 HEADER_SEARCH_PATHS = $(inherited) Realm/ObjectStore/src;
+REALM_CORE_FRAMEWORK = core/realm-sync$(REALM_LIBRARY_SUFFIX).xcframework;
 
 CODE_SIGN_IDENTITY[sdk=iphone*] = iPhone Developer;
 CODE_SIGNING_REQUIRED[sdk=macosx] = NO;

@@ -4,14 +4,18 @@ require 'net/http'
 require 'fileutils'
 require 'pathname'
 
-MONGODB_VERSION='4.4.0-rc5'
-GO_VERSION='1.14.2'
-NODE_VERSION='8.11.2'
-STITCH_VERSION='8322b26c33396ec3de1c0d8d7f8061e94a57b9ba'
-
 BASE_DIR = Dir.pwd
 BUILD_DIR = "#{BASE_DIR}/build"
 PID_FILE = "#{BUILD_DIR}/pid.txt"
+
+DEPENDENCIES = File.open("#{BASE_DIR}/dependencies.list").map { |line|
+  line.chomp.split("=")
+}.to_h
+
+MONGODB_VERSION='4.4.0-rc5'
+GO_VERSION='1.14.2'
+NODE_VERSION='8.11.2'
+STITCH_VERSION=DEPENDENCIES["STITCH_VERSION"]
 
 MONGODB_URL="https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-#{MONGODB_VERSION}.tgz"
 TRANSPILER_TARGET='node8-macos'
