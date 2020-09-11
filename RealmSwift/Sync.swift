@@ -312,7 +312,7 @@ public extension User {
     /**
      Create a sync configuration instance.
 
-     - parameter partitionValue: FIXME
+     - parameter partitionValue: The `BSON` value the Realm is partitioned on.
      - parameter cancelAsyncOpenOnNonFatalErrors: By default, Realm.asyncOpen()
      swallows non-fatal connection errors such as a connection attempt timing
      out and simply retries until it succeeds. If this is set to `true`, instead

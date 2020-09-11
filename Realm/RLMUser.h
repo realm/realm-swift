@@ -99,7 +99,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Create a query-based configuration instance for the given url.
 
- @param partitionValue FIXME
+ @param partitionValue The `RLMBSON` value the Realm is partitioned on.
  @return A default configuration object with the sync configuration set to use the given partition value.
  */
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue NS_REFINED_FOR_SWIFT;
