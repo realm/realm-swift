@@ -82,6 +82,15 @@ namespace {
     realm::app::App::Config _config;
 }
 
+- (instancetype)initWithConfig:(const realm::app::App::Config &)config {
+    if (self = [super init]) {
+        _config = config;
+        return self;
+    }
+
+    return nil;
+}
+
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
                    localAppName:(nullable NSString *)localAppName
@@ -211,6 +220,17 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 @implementation RLMApp : NSObject
 
+- (instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app {
+    if (self = [super init]) {
+        _configuration = [[RLMAppConfiguration alloc] initWithConfig:app->config()];
+        _app = app;
+        _syncManager = [[RLMSyncManager alloc] initWithSyncManager:_app->sync_manager()];
+        return self;
+    }
+
+    return nil;
+}
+
 - (instancetype)initWithId:(NSString *)appId
              configuration:(RLMAppConfiguration *)configuration
              rootDirectory:(NSURL *)rootDirectory {
@@ -236,17 +256,11 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 + (instancetype)appWithId:(NSString *)appId
             configuration:(RLMAppConfiguration *)configuration
             rootDirectory:(NSURL *)rootDirectory {
-    static NSMutableDictionary *s_apps = [NSMutableDictionary new];
-    // protects the app cache
-    static std::mutex& initLock = *new std::mutex();
-    std::lock_guard<std::mutex> lock(initLock);
-
-    if (RLMApp *app = s_apps[appId]) {
-        return app;
+    if (auto app = app::App::get_cached_app([appId UTF8String])) {
+        return [[RLMApp alloc] initWithApp:app];
     }
 
     RLMApp *app = [[RLMApp alloc] initWithId:appId configuration:configuration rootDirectory:rootDirectory];
-    s_apps[appId] = app;
     return app;
 }
 
