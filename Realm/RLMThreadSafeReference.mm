@@ -19,16 +19,6 @@
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
 
-template<typename Function>
-static auto translateErrors(Function&& f) {
-    try {
-        return f();
-    }
-    catch (std::exception const& e) {
-        @throw RLMException(e);
-    }
-}
-
 @implementation RLMThreadSafeReference {
     realm::ThreadSafeReference _reference;
     id _metadata;
@@ -50,7 +40,7 @@ static auto translateErrors(Function&& f) {
                             "which can be passed across threads directly");
     }
 
-    translateErrors([&] {
+    RLMTranslateError([&] {
         _reference = [(id<RLMThreadConfined_Private>)threadConfined makeThreadSafeReference];
         _metadata = ((id<RLMThreadConfined_Private>)threadConfined).objectiveCMetadata;
     });
@@ -67,7 +57,7 @@ static auto translateErrors(Function&& f) {
     if (!_reference) {
         @throw RLMException(@"Can only resolve a thread safe reference once.");
     }
-    return translateErrors([&] {
+    return RLMTranslateError([&] {
         return [_type objectWithThreadSafeReference:std::move(_reference) metadata:_metadata realm:realm];
     });
 }

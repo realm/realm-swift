@@ -99,26 +99,16 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key, T val) {
     obj->_row.set(key, val);
 }
 
-template<typename Fn>
-auto translateError(Fn&& fn) {
-    try {
-        return fn();
-    }
-    catch (std::exception const& e) {
-        @throw RLMException(e);
-    }
-}
-
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSString *const val) {
-    translateError([&] {
+    RLMTranslateError([&] {
         obj->_row.set(key, RLMStringDataWithNSString(val));
     });
 }
 
 [[gnu::noinline]]
 void setNull(realm::Obj& row, ColKey key) {
-    translateError([&] { row.set_null(key); });
+    RLMTranslateError([&] { row.set_null(key); });
 }
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj,
@@ -133,7 +123,7 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj,
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSData *const data) {
-    translateError([&] {
+    RLMTranslateError([&] {
         obj->_row.set(key, RLMBinaryDataForNSData(data));
     });
 }
@@ -182,7 +172,7 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
         info = &obj->_info->linkTargetType(prop.index);
     }
     RLMAccessorContext ctx(*info);
-    translateError([&] {
+    RLMTranslateError([&] {
         list.assign(ctx, value, realm::CreatePolicy::ForceCreate);
     });
 }
@@ -610,7 +600,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj,
     REALM_ASSERT_DEBUG(!prop.isPrimary);
     realm::Object o(obj->_info->realm->_realm, *obj->_info->objectSchema, obj->_row);
     RLMAccessorContext c(obj);
-    translateError([&] {
+    RLMTranslateError([&] {
         o.set_property_value(c, get_property(obj, prop).name, val ?: NSNull.null);
     });
 }
@@ -619,7 +609,7 @@ id RLMDynamicGet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretain
     realm::Object o(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
     RLMAccessorContext c(obj);
     c.currentProperty = prop;
-    return translateError([&] {
+    return RLMTranslateError([&] {
         return RLMCoerceToNil(o.get_property_value<id>(c, get_property(obj, prop)));
     });
 }
