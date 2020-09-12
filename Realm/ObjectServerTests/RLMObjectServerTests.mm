@@ -2577,13 +2577,13 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     __block RLMChangeStream *changeStream1 = [collection watchWithFilterIds:@[objectIds[0]]
                                                                    delegate:testUtility1
-                                                              delegateQueue:nil];
+                                                              delegateQueue:delegateQueue];
 
     __block RLMChangeStream *changeStream2 = [collection watchWithFilterIds:@[objectIds[1]]
                                                                    delegate:testUtility2
-                                                              delegateQueue:nil];
+                                                              delegateQueue:delegateQueue];
 
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         dispatch_semaphore_wait(testUtility1.isOpenSemaphore, DISPATCH_TIME_FOREVER);
         dispatch_semaphore_wait(testUtility2.isOpenSemaphore, DISPATCH_TIME_FOREVER);
         for (int i = 0; i < 3; i++) {
