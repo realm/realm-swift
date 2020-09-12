@@ -514,7 +514,6 @@
 		CF76F7FD24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF76F7DB24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm */; };
 		CF76F7FE24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF76F7DB24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm */; };
 		CF76F80224816B3800890DD2 /* MongoClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF76F80124816B3800890DD2 /* MongoClient.swift */; };
-		CFAE926B24A0A7F40033CB31 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFAE926A24A0A7F40033CB31 /* AuthenticationServices.framework */; };
 		CFAEF761242B5F9A00EAF721 /* RLMAPIKeyAuth.h in Headers */ = {isa = PBXBuildFile; fileRef = CFAEF75F242B5F9A00EAF721 /* RLMAPIKeyAuth.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFAEF762242B5F9A00EAF721 /* RLMAPIKeyAuth.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFAEF760242B5F9A00EAF721 /* RLMAPIKeyAuth.mm */; };
 		CFAEF765242B672700EAF721 /* RLMUserAPIKey.h in Headers */ = {isa = PBXBuildFile; fileRef = CFAEF763242B672700EAF721 /* RLMUserAPIKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1167,7 +1166,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CFCC19A424F923EA004602E9 /* realm-sync-dbg.xcframework in Frameworks */,
-				CFAE926B24A0A7F40033CB31 /* AuthenticationServices.framework in Frameworks */,
 				1A7B823A1D51259F00750296 /* libz.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
