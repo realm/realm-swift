@@ -16,8 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import XCTest
+import Combine
 import RealmSwift
+import XCTest
 
 // Used by testOfflineClientReset
 // The naming here is nonstandard as the sync-1.x.realm test file comes from the .NET unit tests.
@@ -1796,11 +1797,44 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 }
 
-#if canImport(Combine)
-import Combine
+// XCTest doesn't care about the @available on the class and will try to run
+// the tests even on older versions. Putting this check inside `defaultTestSuite`
+// results in a warning about it being redundant due to the enclosing check, so
+// it needs to be out of line.
+func hasCombine() -> Bool {
+    if #available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *) {
+        return true
+    }
+    return false
+}
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension SwiftObjectServerTests {
+class CombineObjectServerTests: SwiftSyncTestCase {
+    override class var defaultTestSuite: XCTestSuite {
+        if hasCombine() {
+            return super.defaultTestSuite
+        }
+        return XCTestSuite(name: "\(type(of: self))")
+    }
+
+    func setupMongoCollection() -> MongoCollection {
+        let user = try! synchronouslyLogInUser(for: basicCredentials())
+        let mongoClient = user.mongoClient("mongodb1")
+        let database = mongoClient.database(named: "test_data")
+        let collection = database.collection(withName: "Dog")
+        removeAllFromCollection(collection)
+        return collection
+    }
+
+    func removeAllFromCollection(_ collection: MongoCollection) {
+        let deleteEx = expectation(description: "Delete all from Mongo collection")
+        collection.deleteManyDocuments(filter: [:]) { (count, error) in
+            XCTAssertNotNil(count)
+            XCTAssertNil(error)
+            deleteEx.fulfill()
+        }
+        wait(for: [deleteEx], timeout: 4.0)
+    }
 
     // swiftlint:disable multiple_closures_with_trailing_closure
     func testWatchCombine() {
@@ -2004,5 +2038,3 @@ extension SwiftObjectServerTests {
         wait(for: [watchEx1, watchEx2], timeout: 60.0)
     }
 }
-
-#endif //canImport(Combine)
