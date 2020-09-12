@@ -651,10 +651,12 @@
                    configuration:[self defaultAppConfiguration]
                    rootDirectory:[self clientDataRoot]];
     } else {
-        app1 = [RLMApp appWithId:self.appIds[0]
+        appId1 = self.appIds[0];
+        appId2 = self.appIds[1];
+        app1 = [RLMApp appWithId:appId1
                    configuration:[self defaultAppConfiguration]
                    rootDirectory:[self clientDataRoot]];
-        app2 = [RLMApp appWithId:self.appIds[1]
+        app2 = [RLMApp appWithId:appId2
                    configuration:[self defaultAppConfiguration]
                    rootDirectory:[self clientDataRoot]];
     }
@@ -685,15 +687,15 @@
         [self waitForDownloadsForRealm:realm2];
         CHECK_COUNT(2, Person, realm1);
         CHECK_COUNT(2, Person, realm2);
-        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'john'"].count, 1UL);
-        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'paul'"].count, 1UL);
-        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'ringo'"].count, 0UL);
-        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'george'"].count, 0UL);
+        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'John'"].count, 1UL);
+        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'Paul'"].count, 1UL);
+        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'Ringo'"].count, 0UL);
+        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'George'"].count, 0UL);
 
-        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'john'"].count, 0UL);
-        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'paul'"].count, 0UL);
-        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'ringo'"].count, 1UL);
-        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'george'"].count, 1UL);
+        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'John'"].count, 0UL);
+        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'Paul'"].count, 0UL);
+        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'Ringo'"].count, 1UL);
+        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'George'"].count, 1UL);
     } else {
         // Add objects.
         [self addPersonsToRealm:realm1
