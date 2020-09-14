@@ -21,7 +21,6 @@
 #import "RLMCredentials_Private.hpp"
 #import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
-#import "RLMJSONModels.h"
 #import "RLMNetworkTransport.h"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
@@ -42,17 +41,6 @@
 #import "sync/sync_user.hpp"
 
 using namespace realm;
-
-@interface RLMUserInfo ()
-
-@property (nonatomic, readwrite) NSArray *accounts;
-@property (nonatomic, readwrite) NSDictionary *metadata;
-@property (nonatomic, readwrite) NSString *identity;
-@property (nonatomic, readwrite) BOOL isAdmin;
-
-+ (instancetype)userInfoWithModel:(RLMUserResponseModel *)model;
-
-@end
 
 @interface RLMUser () {
     std::shared_ptr<SyncUser> _user;
@@ -273,25 +261,6 @@ using namespace realm;
 
 - (std::shared_ptr<SyncUser>)_syncUser {
     return _user;
-}
-
-@end
-
-#pragma mark - RLMUserInfo
-
-@implementation RLMUserInfo
-
-- (instancetype)initPrivate {
-    return [super init];
-}
-
-+ (instancetype)userInfoWithModel:(RLMUserResponseModel *)model {
-    RLMUserInfo *info = [[RLMUserInfo alloc] initPrivate];
-    info.accounts = model.accounts;
-    info.metadata = model.metadata;
-    info.isAdmin = model.isAdmin;
-    info.identity = model.identity;
-    return info;
 }
 
 @end
