@@ -343,14 +343,14 @@
 
     [self waitForExpectations:@[loginExpectation] timeout:60.0];
 
-    [[syncUser apiKeysAuth] createApiKeyWithName:@"apiKeyName1" completion:^(RLMUserAPIKey *userAPIKey, NSError *error) {
+    [[syncUser apiKeysAuth] createAPIKeyWithName:@"apiKeyName1" completion:^(RLMUserAPIKey *userAPIKey, NSError *error) {
         XCTAssert(!error);
         XCTAssert([userAPIKey.name isEqualToString:@"apiKeyName1"]);
         userAPIKeyA = userAPIKey;
         [createAPIKeyExpectationA fulfill];
     }];
 
-    [[syncUser apiKeysAuth] createApiKeyWithName:@"apiKeyName2" completion:^(RLMUserAPIKey *userAPIKey, NSError *error) {
+    [[syncUser apiKeysAuth] createAPIKeyWithName:@"apiKeyName2" completion:^(RLMUserAPIKey *userAPIKey, NSError *error) {
         XCTAssert(!error);
         XCTAssert([userAPIKey.name isEqualToString:@"apiKeyName2"]);
         userAPIKeyB = userAPIKey;
@@ -362,7 +362,7 @@
     // sleep for 2 seconds as there seems to be an issue fetching the keys straight after they are created.
     [NSThread sleepForTimeInterval:2];
 
-    [[syncUser apiKeysAuth] fetchApiKeysWithCompletion:^(NSArray<RLMUserAPIKey *> * _Nonnull apiKeys, NSError *error) {
+    [[syncUser apiKeysAuth] fetchAPIKeysWithCompletion:^(NSArray<RLMUserAPIKey *> * _Nonnull apiKeys, NSError *error) {
         XCTAssert(!error);
         XCTAssert(apiKeys.count == 2);
         [fetchAPIKeysExpectation fulfill];
@@ -370,21 +370,21 @@
 
     [self waitForExpectations:@[fetchAPIKeysExpectation] timeout:60.0];
 
-    [[syncUser apiKeysAuth] disableApiKey:userAPIKeyA.objectId completion:^(NSError *error) {
+    [[syncUser apiKeysAuth] disableAPIKey:userAPIKeyA.objectId completion:^(NSError *error) {
         XCTAssert(!error);
         [disableAPIKeyExpectation fulfill];
     }];
 
     [self waitForExpectations:@[disableAPIKeyExpectation] timeout:60.0];
 
-    [[syncUser apiKeysAuth] enableApiKey:userAPIKeyA.objectId completion:^(NSError *error) {
+    [[syncUser apiKeysAuth] enableAPIKey:userAPIKeyA.objectId completion:^(NSError *error) {
         XCTAssert(!error);
         [enableAPIKeyExpectation fulfill];
     }];
 
     [self waitForExpectations:@[enableAPIKeyExpectation] timeout:60.0];
 
-    [[syncUser apiKeysAuth] deleteApiKey:userAPIKeyA.objectId completion:^(NSError *error) {
+    [[syncUser apiKeysAuth] deleteAPIKey:userAPIKeyA.objectId completion:^(NSError *error) {
         XCTAssert(!error);
         [deleteAPIKeyExpectation fulfill];
     }];

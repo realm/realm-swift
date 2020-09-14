@@ -21,7 +21,7 @@
 #import <Realm/RLMCredentials.h>
 #import <Realm/RLMRealmConfiguration.h>
 
-@class RLMUser, RLMUserInfo, RLMSyncSession, RLMRealm, RLMUserIdentity, RLMAPIKeyAuth, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection;
+@class RLMUser, RLMSyncSession, RLMRealm, RLMUserIdentity, RLMAPIKeyAuth, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection;
 @protocol RLMBSON;
 
 /**
@@ -33,11 +33,8 @@ typedef NS_ENUM(NSUInteger, RLMUserState) {
     /// The user is logged in, and any Realms associated with it are syncing with MongoDB Realm.
     RLMUserStateLoggedIn,
     /// The user has been removed, and cannot be used.
-    RLMUserStateRemoved,
+    RLMUserStateRemoved
 };
-
-/// A block type used to report an error related to a specific user.
-typedef void(^RLMUserErrorReportingBlock)(RLMUser * _Nonnull, NSError * _Nonnull);
 
 /// A block type used to report an error related to a specific user.
 typedef void(^RLMOptionalUserBlock)(RLMUser * _Nullable, NSError * _Nullable);
@@ -108,7 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Create a query-based configuration instance for the given url.
 
- @param partitionValue FIXME
+ @param partitionValue The `RLMBSON` value the Realm is partitioned on.
  @return A default configuration object with the sync configuration set to use the given partition value.
  */
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue NS_REFINED_FOR_SWIFT;

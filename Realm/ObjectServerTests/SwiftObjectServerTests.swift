@@ -938,7 +938,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let createAPIKeyEx = expectation(description: "Create user api key")
 
         var apiKey: UserAPIKey?
-        syncUser?.apiKeysAuth().createApiKey(named: "my-api-key") { (key, error) in
+        syncUser?.apiKeysAuth().createAPIKey(named: "my-api-key") { (key, error) in
             XCTAssertNotNil(key)
             XCTAssertNil(error)
             apiKey = key
@@ -947,7 +947,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [createAPIKeyEx], timeout: 4.0)
 
         let fetchAPIKeyEx = expectation(description: "Fetch user api key")
-        syncUser?.apiKeysAuth().fetchApiKey(apiKey!.objectId) { (key, error) in
+        syncUser?.apiKeysAuth().fetchAPIKey(apiKey!.objectId) { (key, error) in
             XCTAssertNotNil(key)
             XCTAssertNil(error)
             fetchAPIKeyEx.fulfill()
@@ -955,7 +955,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [fetchAPIKeyEx], timeout: 4.0)
 
         let fetchAPIKeysEx = expectation(description: "Fetch user api keys")
-        syncUser?.apiKeysAuth().fetchApiKeys(completion: { (keys, error) in
+        syncUser?.apiKeysAuth().fetchAPIKeys(completion: { (keys, error) in
             XCTAssertNotNil(keys)
             XCTAssertEqual(keys!.count, 1)
             XCTAssertNil(error)
@@ -964,21 +964,21 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [fetchAPIKeysEx], timeout: 4.0)
 
         let disableKeyEx = expectation(description: "Disable API key")
-        syncUser?.apiKeysAuth().disableApiKey(apiKey!.objectId) { (error) in
+        syncUser?.apiKeysAuth().disableAPIKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             disableKeyEx.fulfill()
         }
         wait(for: [disableKeyEx], timeout: 4.0)
 
         let enableKeyEx = expectation(description: "Enable API key")
-        syncUser?.apiKeysAuth().enableApiKey(apiKey!.objectId) { (error) in
+        syncUser?.apiKeysAuth().enableAPIKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             enableKeyEx.fulfill()
         }
         wait(for: [enableKeyEx], timeout: 4.0)
 
         let deleteKeyEx = expectation(description: "Delete API key")
-        syncUser?.apiKeysAuth().deleteApiKey(apiKey!.objectId) { (error) in
+        syncUser?.apiKeysAuth().deleteAPIKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             deleteKeyEx.fulfill()
         }

@@ -11,7 +11,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+* `RLMSyncManager.pinnedCertificatePaths` has been removed.
+* Classes `RLMUserAccountInfo` & `RLMUserInfo` (swift: `UserInfo`, `UserAccountInfo`) have been removed.
 
 ### Compatibility
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)

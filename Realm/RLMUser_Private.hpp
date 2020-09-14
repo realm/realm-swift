@@ -29,8 +29,6 @@
 
 using namespace realm;
 
-typedef void(^RLMFetchedRealmCompletionBlock)(NSError * _Nullable, RLMRealm * _Nullable, BOOL * _Nonnull);
-
 NS_ASSUME_NONNULL_BEGIN
 
 class CocoaSyncUserContext : public SyncUserContext {
