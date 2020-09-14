@@ -501,7 +501,7 @@
     (void)[self userForTest:_cmd];
 
     RLMCredentials *credentials = [RLMCredentials credentialsWithEmail:NSStringFromSelector(_cmd)
-                                                                 password:@"INVALID_PASSWORD"];
+                                                              password:@"INVALID_PASSWORD"];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"login should fail"];
 
@@ -517,7 +517,7 @@
 /// A non-existsing user should not be able to log in and a corresponding error should be generated.
 - (void)testNonExistingEmailAuthentication {
     RLMCredentials *credentials = [RLMCredentials credentialsWithEmail:@"INVALID_USERNAME"
-                                                                       password:@"INVALID_PASSWORD"];
+                                                              password:@"INVALID_PASSWORD"];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"login should fail"];
 
@@ -543,8 +543,8 @@
 
     XCTestExpectation *expectationB = [self expectationWithDescription:@"registration should fail"];
     [[self.app emailPasswordAuth] registerUserWithEmail:NSStringFromSelector(_cmd)
-                                       password:@"password"
-                                     completion:^(NSError * error) {
+                                               password:@"password"
+                                             completion:^(NSError * error) {
         XCTAssertNotNil(error);
         [expectationB fulfill];
     }];
