@@ -508,7 +508,7 @@ static NSURL *syncDirectoryForChildProcess() {
     } else {
         clientDataRoot = syncDirectoryForChildProcess();
     }
-    [NSFileManager.defaultManager removeItemAtURL:clientDataRoot error:&error];
+//    [NSFileManager.defaultManager removeItemAtURL:clientDataRoot error:&error];
     [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
                            withIntermediateDirectories:YES attributes:nil error:&error];
     return clientDataRoot;

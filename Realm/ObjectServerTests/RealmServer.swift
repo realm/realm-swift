@@ -280,8 +280,15 @@ class Admin {
  */
 @objc(RealmServer)
 public class RealmServer: NSObject {
+    public enum LogLevel {
+        case none, info, warn, error
+    }
+
     /// Shared RealmServer. This class only needs to be initialized and torn down once per test suite run.
     @objc static var shared = RealmServer()
+
+    /// Log level for the server and mongo processes.
+    public var logLevel = LogLevel.info
 
     /// Process that runs the local mongo server. Should be terminated on exit.
     private let mongoProcess = Process()
@@ -422,9 +429,9 @@ public class RealmServer: NSObject {
             // prettify server output
             let available = String(data: file.availableData, encoding: .utf8)?.split(separator: "\t")
             print(available!.map { part -> String in
-                if part.contains("INFO") {
+                if self.logLevel == .info && part.contains("INFO") {
                     return "🔵"
-                } else if part.contains("DEBUG") {
+                } else if (self.logLevel == .info || self.logLevel == .warn) && part.contains("DEBUG") {
                     return "🟡"
                 } else if part.contains("ERROR") {
                     return "🔴"
@@ -440,7 +447,12 @@ public class RealmServer: NSObject {
             }.joined(separator: "\t"))
         }
 
-        serverProcess.standardOutput = pipe
+        if logLevel != .none {
+            serverProcess.standardOutput = pipe
+        } else {
+            serverProcess.standardOutput = nil
+        }
+
         try serverProcess.run()
         waitForServerToStart()
     }

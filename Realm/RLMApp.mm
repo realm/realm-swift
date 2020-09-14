@@ -256,11 +256,17 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 + (instancetype)appWithId:(NSString *)appId
             configuration:(RLMAppConfiguration *)configuration
             rootDirectory:(NSURL *)rootDirectory {
-    if (auto app = app::App::get_cached_app([appId UTF8String])) {
-        return [[RLMApp alloc] initWithApp:app];
+    static NSMutableDictionary *s_apps = [NSMutableDictionary new];
+    // protects the app cache
+    static std::mutex& initLock = *new std::mutex();
+    std::lock_guard<std::mutex> lock(initLock);
+
+    if (RLMApp *app = s_apps[appId]) {
+        return app;
     }
 
     RLMApp *app = [[RLMApp alloc] initWithId:appId configuration:configuration rootDirectory:rootDirectory];
+    s_apps[appId] = app;
     return app;
 }
 

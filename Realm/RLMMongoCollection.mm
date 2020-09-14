@@ -369,10 +369,9 @@
 }
 
 - (RLMChangeStream *)watchWithMatchFilter:(nullable id<RLMBSON>)matchFilter
-                    idFilter:(nullable id<RLMBSON>)idFilter
-                    delegate:(id<RLMChangeEventDelegate>)delegate
-               delegateQueue:(nullable dispatch_queue_t)delegateQueue {
-
+                                 idFilter:(nullable id<RLMBSON>)idFilter
+                                 delegate:(id<RLMChangeEventDelegate>)delegate
+                            delegateQueue:(nullable dispatch_queue_t)delegateQueue {
     realm::bson::BsonDocument baseArgs = {
         {"database", self.databaseName.UTF8String},
         {"collection", self.name.UTF8String}
