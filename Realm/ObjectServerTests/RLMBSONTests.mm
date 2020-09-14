@@ -98,17 +98,6 @@ using namespace realm::bson;
     XCTAssertEqual(RLMConvertRLMBSONToBson(rlm), bson);
 }
 
-- (void)testNilField {
-    realm::bson::BsonArray array = BsonArray({
-        BsonDocument {
-            {"string", "test string"},
-            {"nil", Bson()}
-        }
-    });
-
-    RLMConvertBsonToRLMBSON(array);
-}
-
 - (void)testDocumentRoundTrip {
     NSDictionary<NSString *, id<RLMBSON>> *document = @{
         @"nil": [NSNull null],
