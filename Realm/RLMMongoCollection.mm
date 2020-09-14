@@ -33,6 +33,7 @@
     id<RLMChangeEventDelegate> _subscriber;
     __weak NSURLSession *_session;
 }
+
 - (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber {
     if (self = [super init]) {
         _subscriber = subscriber;
@@ -55,19 +56,16 @@
 
 - (void)didReceiveEvent:(nonnull NSData *)event {
     std::string_view str = [[NSString alloc] initWithData:event encoding:NSUTF8StringEncoding].UTF8String;
-    switch (_watchStream.state()) {
-        case realm::app::WatchStream::State::NEED_DATA:
-            _watchStream.feed_buffer(str);
-            break;
-        case realm::app::WatchStream::State::HAVE_EVENT:
-            while (_watchStream.state() == realm::app::WatchStream::State::HAVE_EVENT) {
-                [_subscriber changeStreamDidReceiveChangeEvent:RLMConvertBsonToRLMBSON(_watchStream.next_event())];
-            }
-            _watchStream.feed_buffer(str);
-            break;
-        case realm::app::WatchStream::State::HAVE_ERROR:
-            [self didReceiveError:RLMAppErrorToNSError(_watchStream.error())];
-            break;
+    if (!str.empty() && _watchStream.state() == realm::app::WatchStream::State::NEED_DATA) {
+        _watchStream.feed_buffer(str);
+    }
+
+    while (_watchStream.state() == realm::app::WatchStream::State::HAVE_EVENT) {
+        [_subscriber changeStreamDidReceiveChangeEvent:RLMConvertBsonToRLMBSON(_watchStream.next_event())];
+    }
+
+    if (_watchStream.state() == realm::app::WatchStream::State::HAVE_ERROR) {
+        [self didReceiveError:RLMAppErrorToNSError(_watchStream.error())];
     }
 }
 
