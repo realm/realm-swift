@@ -124,7 +124,7 @@ using namespace realm::bson;
     
     auto bsonDocument = static_cast<BsonDocument>(bson);
 
-    XCTAssertTrue([document[@"nil"] isEqual:[NSNull null]]);
+    XCTAssertEqual(document[@"nil"], [NSNull null]);
     XCTAssertEqualObjects(RLMConvertBsonToRLMBSON(bsonDocument["nil"]), document[@"nil"]);
     XCTAssertEqualObjects(RLMConvertBsonToRLMBSON(bsonDocument["string"]), document[@"string"]);
     XCTAssertEqual(RLMConvertBsonToRLMBSON(bsonDocument["true"]), document[@"true"]);

@@ -1998,65 +1998,65 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 }
 
-/// FIXME: Re-enable once we understand why the server is not setup correctly
-//- (void)testMongoAggregateAndCount {
-//    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
-//    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-//    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-//
-//    [self cleanupRemoteDocuments:collection];
-//
-//    XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
-//    [collection insertManyDocuments:@[
-//        @{@"name": @"fido", @"breed": @"cane corso"},
-//        @{@"name": @"fido", @"breed": @"cane corso"},
-//        @{@"name": @"rex", @"breed": @"tibetan mastiff"}]
-//                         completion:^(NSArray<RLMObjectId *> * objectIds, NSError * error) {
-//        XCTAssertTrue(objectIds.count == 3);
-//        XCTAssertNil(error);
-//        [insertManyExpectation fulfill];
-//    }];
-//    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-//
-//    XCTestExpectation *aggregateExpectation1 = [self expectationWithDescription:@"should aggregate documents"];
-//    [collection aggregateWithPipeline:@[@{@"name" : @"fido"}]
-//                           completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
-//        XCTAssertNotNil(error);
-//        XCTAssertTrue([error.domain.description isEqualToString:@"realm::app::ServiceError"]);
-//        XCTAssertNil(documents);
-//        [aggregateExpectation1 fulfill];
-//    }];
-//    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-//
-//    XCTestExpectation *aggregateExpectation2 = [self expectationWithDescription:@"should aggregate documents"];
-//    [collection aggregateWithPipeline:@[@{@"$match" : @{@"name" : @"fido"}}, @{@"$group" : @{@"_id" : @"$name"}}]
-//                           completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
-//        XCTAssertNil(error);
-//        XCTAssertNotNil(documents);
-//        XCTAssertTrue(documents.count > 0);
-//        [aggregateExpectation2 fulfill];
-//    }];
-//    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-//
-//    XCTestExpectation *countExpectation1 = [self expectationWithDescription:@"should aggregate documents"];
-//    [collection countWhere:@{@"name" : @"fido"}
-//                completion:^(NSInteger count, NSError * error) {
-//        XCTAssertTrue(count > 0);
-//        XCTAssertNil(error);
-//        [countExpectation1 fulfill];
-//    }];
-//    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-//
-//    XCTestExpectation *countExpectation2 = [self expectationWithDescription:@"should aggregate documents"];
-//    [collection countWhere:@{@"name" : @"fido"}
-//                     limit:1
-//                completion:^(NSInteger count, NSError * error) {
-//        XCTAssertEqual(count, 1);
-//        XCTAssertNil(error);
-//        [countExpectation2 fulfill];
-//    }];
-//    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-//}
+// FIXME: Re-enable once we understand why the server is not setup correctly
+- (void)fixme_testMongoAggregateAndCount {
+    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
+    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
+    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
+
+    [self cleanupRemoteDocuments:collection];
+
+    XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
+    [collection insertManyDocuments:@[
+        @{@"name": @"fido", @"breed": @"cane corso"},
+        @{@"name": @"fido", @"breed": @"cane corso"},
+        @{@"name": @"rex", @"breed": @"tibetan mastiff"}]
+                         completion:^(NSArray<RLMObjectId *> * objectIds, NSError * error) {
+        XCTAssertTrue(objectIds.count == 3);
+        XCTAssertNil(error);
+        [insertManyExpectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+
+    XCTestExpectation *aggregateExpectation1 = [self expectationWithDescription:@"should aggregate documents"];
+    [collection aggregateWithPipeline:@[@{@"name" : @"fido"}]
+                           completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
+        XCTAssertNotNil(error);
+        XCTAssertTrue([error.domain.description isEqualToString:@"realm::app::ServiceError"]);
+        XCTAssertNil(documents);
+        [aggregateExpectation1 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+
+    XCTestExpectation *aggregateExpectation2 = [self expectationWithDescription:@"should aggregate documents"];
+    [collection aggregateWithPipeline:@[@{@"$match" : @{@"name" : @"fido"}}, @{@"$group" : @{@"_id" : @"$name"}}]
+                           completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(documents);
+        XCTAssertTrue(documents.count > 0);
+        [aggregateExpectation2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+
+    XCTestExpectation *countExpectation1 = [self expectationWithDescription:@"should aggregate documents"];
+    [collection countWhere:@{@"name" : @"fido"}
+                completion:^(NSInteger count, NSError * error) {
+        XCTAssertTrue(count > 0);
+        XCTAssertNil(error);
+        [countExpectation1 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+
+    XCTestExpectation *countExpectation2 = [self expectationWithDescription:@"should aggregate documents"];
+    [collection countWhere:@{@"name" : @"fido"}
+                     limit:1
+                completion:^(NSInteger count, NSError * error) {
+        XCTAssertEqual(count, 1);
+        XCTAssertNil(error);
+        [countExpectation2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
 
 - (void)testMongoUpdate {
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
@@ -2394,7 +2394,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         dispatch_semaphore_wait(testUtility.isOpenSemaphore, DISPATCH_TIME_FOREVER);
         for (int i = 0; i < 3; i++) {
             [collection insertOneDocument:@{@"name": @"fido"} completion:^(RLMObjectId * objectId, NSError * error) {
-                NSLog(@"!!!!!!!!trigger number %d", i);
                 XCTAssertNil(error);
                 XCTAssertNotNil(objectId);
             }];

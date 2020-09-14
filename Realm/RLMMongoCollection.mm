@@ -32,33 +32,33 @@
     realm::app::WatchStream _watchStream;
     id<RLMChangeEventDelegate> _subscriber;
     __weak NSURLSession *_session;
-    dispatch_queue_t _queue;
+    _Nonnull dispatch_queue_t _queue;
 }
 
 - (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber
                                 delegateQueue:(nullable dispatch_queue_t)queue {
     if (self = [super init]) {
         _subscriber = subscriber;
-        _queue = queue;
+        _queue = queue ?: dispatch_get_main_queue();
         return self;
     }
     return nil;
 }
 
 - (void)didCloseWithError:(NSError *)error {
-    dispatch_async(_queue == nil ? dispatch_get_main_queue() : _queue, ^{
+    dispatch_async(_queue, ^{
         [_subscriber changeStreamDidCloseWithError:error];
     });
 }
 
 - (void)didOpen {
-    dispatch_async(_queue == nil ? dispatch_get_main_queue() : _queue, ^{
+    dispatch_async(_queue, ^{
         [_subscriber changeStreamDidOpen:self];
     });
 }
 
 - (void)didReceiveError:(nonnull NSError *)error {
-    dispatch_async(_queue == nil ? dispatch_get_main_queue() : _queue, ^{
+    dispatch_async(_queue, ^{
         [_subscriber changeStreamDidReceiveError:error];
     });
 }
@@ -71,7 +71,7 @@
 
     while (_watchStream.state() == realm::app::WatchStream::State::HAVE_EVENT) {
         id<RLMBSON> event = RLMConvertBsonToRLMBSON(_watchStream.next_event());
-        dispatch_async(_queue == nil ? dispatch_get_main_queue() : _queue, ^{
+        dispatch_async(_queue, ^{
             [_subscriber changeStreamDidReceiveChangeEvent:event];
         });
     }
