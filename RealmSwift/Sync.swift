@@ -609,10 +609,10 @@ public extension User {
 
     /**
      Links the currently authenticated user with a new identity, where the identity is defined by the credential
-     specified as a parameter. This will only be successful if this `RLMUser` is the currently authenticated
+     specified as a parameter. This will only be successful if this `User` is the currently authenticated
      with the client from which it was created. On success a new user will be returned with the new linked credentials.
 
-     @param credentials The `RLMCredentials` used to link the user to a new identity.
+     @param credentials The `Credentials` used to link the user to a new identity.
     */
     func linkUser(with credentials: Credentials) -> Future<User, Error> {
         return Future { promise in
@@ -673,11 +673,11 @@ public extension MongoCollection {
     /// generated for it.
     /// - Parameters:
     ///   - document: document  A `Document` value to insert.
-    func insertOne(_ document: Document) -> Future<RLMObjectId, Error> {
+    func insertOne(_ document: Document) -> Future<ObjectId, Error> {
         return Future { promise in
             self.insertOne(document) { objectId, error in
                 if let objectId = objectId {
-                    promise(.success(objectId))
+                    promise(.success(try! ObjectId(string: objectId.stringValue)))
                 } else {
                     promise(.failure(error ?? App.UserError.uncertainState))
                 }
@@ -689,10 +689,10 @@ public extension MongoCollection {
     /// they will be generated.
     /// - Parameters:
     ///   - documents: The `Document` values in a bson array to insert.
-    func insertMany(_ documents: [Document]) -> Future<[RLMObjectId], Error> {
+    func insertMany(_ documents: [Document]) -> Future<[ObjectId], Error> {
         return Future { promise in
             self.insertMany(documents) { objectIds, error in
-                if let objectIds = objectIds {
+                if let objectIds = objectIds?.map({ try! ObjectId(string: $0.stringValue) }) {
                     promise(.success(objectIds))
                 } else {
                     promise(.failure(error ?? App.UserError.uncertainState))
@@ -993,7 +993,6 @@ public extension MongoCollection {
     /// - Parameters:
     ///   - filter: A `Document` that should match the query.
     ///   - replacement: A `Document` describing the replacement.
-    ///   - options: `RLMFindOneAndModifyOptions` to use when executing the command.
     func findOneAndReplace(filter: Document, replacement: Document) -> Future<Document?, Error> {
         return Future { promise in
             self.findOneAndReplace(filter: filter, replacement: replacement) { updateResult, error in

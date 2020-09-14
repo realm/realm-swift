@@ -2633,9 +2633,11 @@ extension SwiftObjectServerTests {
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
+        let insEx1 = expectation(description: "Insert document")
         collection.insertMany([document])
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
             .store(in: &cancellable)
+        wait(for: [insEx1], timeout: 4.0)
 
         let findOneDeleteEx1 = expectation(description: "Find one document and delete")
         collection.findOneAndDelete(filter: document)
@@ -2654,12 +2656,12 @@ extension SwiftObjectServerTests {
         let findOneDeleteEx2 = expectation(description: "Find one document and delete")
         collection.findOneAndDelete(filter: document, options: options1)
             .sink(receiveCompletion: { result in
-                if case .failure(let error) = result {
+                if case .failure(let error) = result,
+                    error.localizedDescription == "expected pre-image to match projection matcher" {
                     // FIXME: It seems there is a possible server bug that does not handle
                     // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
                     // "expected pre-image to match projection matcher"
                     // https://jira.mongodb.org/browse/REALMC-6878
-                    XCTAssertEqual(error.localizedDescription, "expected pre-image to match projection matcher")
                     findOneDeleteEx2.fulfill()
                 } else {
                     XCTFail("Please review test cases for findOneAndDelete.")
@@ -2682,13 +2684,13 @@ extension SwiftObjectServerTests {
         let findOneDeleteEx3 = expectation(description: "Find one document and delete")
         collection.findOneAndDelete(filter: document, options: options2)
             .sink(receiveCompletion: { result in
-                if case .failure(let error) = result {
+                if case .failure(let error) = result,
+                    error.localizedDescription == "expected pre-image to match projection matcher" {
                     // FIXME: It seems there is a possible server bug that does not handle
                     // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
                     // "expected pre-image to match projection matcher"
                     // https://jira.mongodb.org/browse/REALMC-6878
-                    XCTAssertEqual(error.localizedDescription, "expected pre-image to match projection matcher")
-                    findOneDeleteEx2.fulfill()
+                    findOneDeleteEx3.fulfill()
                 } else {
                     XCTFail("Please review test cases for findOneAndDelete.")
                 }
@@ -2830,7 +2832,8 @@ extension SwiftObjectServerTests {
         wait(for: [createAPIKeyEx], timeout: 4.0)
 
         let fetchAPIKeyEx = expectation(description: "Fetch user api key")
-        syncUser?.apiKeyAuth().fetchApiKey(apiKey!.objectId)
+        var objId: ObjectId? = try? ObjectId(string: apiKey!.objectId.stringValue)
+        syncUser?.apiKeyAuth().fetchApiKey(objId!)
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should fetch user api key")
@@ -2856,7 +2859,8 @@ extension SwiftObjectServerTests {
         wait(for: [fetchAPIKeysEx], timeout: 4.0)
 
         let disableKeyEx = expectation(description: "Disable API key")
-        syncUser?.apiKeyAuth().disableApiKey(apiKey!.objectId)
+        objId = try? ObjectId(string: apiKey!.objectId.stringValue)
+        syncUser?.apiKeyAuth().disableApiKey(objId!)
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should disable user api key")
@@ -2868,7 +2872,7 @@ extension SwiftObjectServerTests {
         wait(for: [disableKeyEx], timeout: 4.0)
 
         let enableKeyEx = expectation(description: "Enable API key")
-        syncUser?.apiKeyAuth().enableApiKey(apiKey!.objectId)
+        syncUser?.apiKeyAuth().enableApiKey(objId!)
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should enable user api key")
@@ -2880,7 +2884,7 @@ extension SwiftObjectServerTests {
         wait(for: [enableKeyEx], timeout: 4.0)
 
         let deleteKeyEx = expectation(description: "Delete API key")
-        syncUser?.apiKeyAuth().deleteApiKey(apiKey!.objectId)
+        syncUser?.apiKeyAuth().deleteApiKey(objId!)
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should delete user api key")
