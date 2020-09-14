@@ -2390,11 +2390,11 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                   expectation:expectation];
 
     __block RLMChangeStream *changeStream = [collection watchWithDelegate:testUtility delegateQueue:delegateQueue];
-
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        dispatch_semaphore_wait(testUtility.isOpenSemaphore, DISPATCH_TIME_FOREVER);
         for (int i = 0; i < 3; i++) {
-//            [self expectationWithDescription:<#(nonnull NSString *)#>]
             [collection insertOneDocument:@{@"name": @"fido"} completion:^(RLMObjectId * objectId, NSError * error) {
+                NSLog(@"!!!!!!!!trigger number %d", i);
                 XCTAssertNil(error);
                 XCTAssertNotNil(objectId);
             }];
@@ -2446,6 +2446,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                                delegateQueue:delegateQueue];
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        dispatch_semaphore_wait(testUtility.isOpenSemaphore, DISPATCH_TIME_FOREVER);
         for (int i = 0; i < 3; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
@@ -2505,6 +2506,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                              delegateQueue:delegateQueue];
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        dispatch_semaphore_wait(testUtility.isOpenSemaphore, DISPATCH_TIME_FOREVER);
         for (int i = 0; i < 3; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
@@ -2567,14 +2569,16 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                   expectation:expectation];
 
     __block RLMChangeStream *changeStream1 = [collection watchWithFilterIds:@[objectIds[0]]
-                          delegate:testUtility1
-                     delegateQueue:nil];
+                                                                   delegate:testUtility1
+                                                              delegateQueue:nil];
 
     __block RLMChangeStream *changeStream2 = [collection watchWithFilterIds:@[objectIds[1]]
-                          delegate:testUtility2
-                     delegateQueue:nil];
+                                                                   delegate:testUtility2
+                                                              delegateQueue:nil];
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        dispatch_semaphore_wait(testUtility1.isOpenSemaphore, DISPATCH_TIME_FOREVER);
+        dispatch_semaphore_wait(testUtility2.isOpenSemaphore, DISPATCH_TIME_FOREVER);
         for (int i = 0; i < 3; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}

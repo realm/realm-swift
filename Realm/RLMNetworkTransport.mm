@@ -105,7 +105,6 @@ NSString * const RLMHTTPMethodToNSString[] = {
                                             delegateQueue:nil];
     NSURL *url = [[NSURL alloc] initWithString:request.url];
     [[session dataTaskWithURL:url] resume];
-    [subscriber didOpen];
     return session;
 }
 
@@ -187,6 +186,8 @@ didCompleteWithError:(NSError *)error
 
 @implementation RLMEventSessionDelegate {
     RLMEventSubscriber *_subscriber;
+    bool _hasOpened;
+    std::mutex _eventMutex;
 }
 
 + (instancetype)delegateWithEventSubscriber:(RLMEventSubscriber *)subscriber {
@@ -198,6 +199,13 @@ didCompleteWithError:(NSError *)error
 - (void)URLSession:(__unused NSURLSession *)session
           dataTask:(__unused NSURLSessionDataTask *)dataTask
     didReceiveData:(NSData *)data {
+    {
+        std::lock_guard<std::mutex> lock(_eventMutex);
+        if (!_hasOpened) {
+            _hasOpened = true;
+            [_subscriber didOpen];
+        }
+    }
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) dataTask.response;
     if (httpResponse.statusCode != 200) {
         NSString *errorStatus = [NSString stringWithFormat:@"URLSession HTTP error code: %ld",
