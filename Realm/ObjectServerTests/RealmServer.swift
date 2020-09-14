@@ -424,27 +424,35 @@ public class RealmServer: NSObject {
 
         let pipe = Pipe()
         pipe.fileHandleForReading.readabilityHandler = { file in
-            guard file.availableData.count > 0 else { return }
+            guard file.availableData.count > 0,
+                  let available = String(data: file.availableData, encoding: .utf8)?.split(separator: "\t") else {
+                return
+            }
 
             // prettify server output
-            let available = String(data: file.availableData, encoding: .utf8)?.split(separator: "\t")
-            print(available!.map { part -> String in
-                if self.logLevel == .info && part.contains("INFO") {
-                    return "🔵"
-                } else if (self.logLevel == .info || self.logLevel == .warn) && part.contains("DEBUG") {
-                    return "🟡"
+            var parts = [String]()
+            for part in available {
+                if part.contains("INFO") {
+                    guard self.logLevel == .info else {
+                        return
+                    }
+                    parts.append("🔵")
+                } else if part.contains("DEBUG") {
+                    guard self.logLevel == .info || self.logLevel == .warn else {
+                        return
+                    }
+                    parts.append("🟡")
                 } else if part.contains("ERROR") {
-                    return "🔴"
+                    parts.append("🔴")
                 } else if let json = try? JSONSerialization.jsonObject(with: part.data(using: .utf8)!) {
-                    return String(data: try! JSONSerialization.data(withJSONObject: json,
-                                                                    options: .prettyPrinted),
-                                  encoding: .utf8)!
+                    parts.append(String(data: try! JSONSerialization.data(withJSONObject: json,
+                                                                       options: .prettyPrinted),
+                                  encoding: .utf8)!)
                 } else if !part.isEmpty {
-                    return String(part)
-                } else {
-                    return ""
+                    parts.append(String(part))
                 }
-            }.joined(separator: "\t"))
+            }
+            print(parts.joined(separator: "\t"))
         }
 
         if logLevel != .none {

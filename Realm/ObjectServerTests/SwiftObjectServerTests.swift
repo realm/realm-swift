@@ -1591,6 +1591,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
+            watchTestUtility.isOpenSemaphore.wait()
             for _ in 0..<3 {
                 collection.insertOne(document) { (_, error) in
                     XCTAssertNil(error)
@@ -1642,6 +1643,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
+            watchTestUtility.isOpenSemaphore.wait()
             for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
@@ -1698,6 +1700,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
+            watchTestUtility.isOpenSemaphore.wait()
             for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
@@ -1765,6 +1768,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
+            watchTestUtility1.isOpenSemaphore.wait()
+            watchTestUtility2.isOpenSemaphore.wait()
             for i in 0..<5 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
