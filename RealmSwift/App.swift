@@ -115,7 +115,6 @@ import Combine
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 extension EmailPasswordAuth {
-    
     /**
      Registers a new email identity with the username/password provider,
      and sends a confirmation email to the provided address.
@@ -140,7 +139,6 @@ extension EmailPasswordAuth {
 
      @param token The confirmation token that was emailed to the user.
      @param tokenId The confirmation token id that was emailed to the user.
-     @param completionHandler A callback to be invoked once the call is complete.
     */
     public func confirmUser(_ token: String, tokenId: String) -> Future<Void, Error> {
         return Future<Void, Error> { promise in

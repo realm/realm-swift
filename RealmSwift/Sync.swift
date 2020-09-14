@@ -287,7 +287,7 @@ public struct Functions {
             }
         }
     }
-    
+
     #if canImport(Combine)
     @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
     public subscript(dynamicMember string: String) -> ([AnyBSON]) -> Future<AnyBSON, Error> {
@@ -573,7 +573,6 @@ import Combine
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension App {
-
     enum UserError: Error {
         case uncertainState
     }
@@ -593,11 +592,10 @@ public extension App {
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension User {
-
      /**
      Refresh a user's custom data. This will, in effect, refresh the user's auth session.
      */
-    func refreshCustomData() -> Future<[AnyHashable : Any], Error> {
+    func refreshCustomData() -> Future<[AnyHashable: Any], Error> {
         return Future { promise in
             self.refreshCustomData { customData, error in
                 if let customData = customData {
@@ -671,7 +669,6 @@ public extension User {
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension MongoCollection {
-    
     /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
     /// generated for it.
     /// - Parameters:
@@ -687,7 +684,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
     /// they will be generated.
     /// - Parameters:
@@ -703,7 +700,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Finds the documents in this collection which match the provided filter.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
@@ -719,7 +716,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Finds the documents in this collection which match the provided filter.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
@@ -734,7 +731,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Returns one document from a collection or view which matches the
     /// provided filter. If multiple documents satisfy the query, this method
     /// returns the first document according to the query's sort order or natural
@@ -771,7 +768,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Runs an aggregation framework pipeline against this collection.
     /// - Parameters:
     ///   - pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
@@ -786,7 +783,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Counts the number of documents in this collection matching the provided filter.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
@@ -802,7 +799,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Counts the number of documents in this collection matching the provided filter.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
@@ -817,7 +814,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Deletes a single matching document from the collection.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
@@ -832,7 +829,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Deletes multiple documents
     /// - Parameters:
     ///   - filter: Document representing the match criteria
@@ -847,7 +844,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Updates a single document matching the provided filter in this collection.
     /// - Parameters:
     ///   - filter: A bson `Document` representing the match criteria.
@@ -864,7 +861,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Updates a single document matching the provided filter in this collection.
     /// - Parameters:
     ///   - filter: A bson `Document` representing the match criteria.
@@ -880,7 +877,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Updates multiple documents matching the provided filter in this collection.
     /// - Parameters:
     ///   - filter: A bson `Document` representing the match criteria.
@@ -897,7 +894,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Updates multiple documents matching the provided filter in this collection.
     /// - Parameters:
     ///   - filter: A bson `Document` representing the match criteria.
@@ -913,7 +910,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Updates a single document in a collection based on a query filter and
     /// returns the document in either its pre-update or post-update form. Unlike
     /// `updateOneDocument`, this action allows you to atomically find, update, and
@@ -935,7 +932,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Updates a single document in a collection based on a query filter and
     /// returns the document in either its pre-update or post-update form. Unlike
     /// `updateOneDocument`, this action allows you to atomically find, update, and
@@ -978,7 +975,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Overwrites a single document in a collection based on a query filter and
     /// returns the document in either its pre-replacement or post-replacement
     /// form. Unlike `updateOneDocument`, this action allows you to atomically find,
@@ -1000,7 +997,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Removes a single document from a collection based on a query filter and
     /// returns a document with the same form as the document immediately before
     /// it was deleted. Unlike `deleteOneDocument`, this action allows you to atomically
@@ -1021,7 +1018,7 @@ public extension MongoCollection {
             }
         }
     }
-    
+
     /// Removes a single document from a collection based on a query filter and
     /// returns a document with the same form as the document immediately before
     /// it was deleted. Unlike `deleteOneDocument`, this action allows you to atomically

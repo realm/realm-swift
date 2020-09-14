@@ -1996,9 +1996,9 @@ extension SwiftObjectServerTests {
         }
         wait(for: [watchEx1, watchEx2], timeout: 60.0)
     }
-    
+
     // MARK: - Combine promises
-    
+
     func testEmailPasswordAuthentication() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
@@ -2015,7 +2015,7 @@ extension SwiftObjectServerTests {
             })
             .store(in: &cancellable)
         wait(for: [registerUserEx], timeout: 4.0)
-        
+
         let confirmUserEx = expectation(description: "Confirm user")
         app.emailPasswordAuth().confirmUser("atoken", tokenId: "atokenid")
             .sink(receiveCompletion: { result in
@@ -2106,7 +2106,6 @@ extension SwiftObjectServerTests {
             })
             .store(in: &cancellable)
         wait(for: [loginEx], timeout: 4.0)
-        
         XCTAssertEqual(self.app.allUsers().count, 1)
     }
 
@@ -2141,7 +2140,7 @@ extension SwiftObjectServerTests {
             })
             .store(in: &cancellable)
         wait(for: [loginEx], timeout: 4.0)
-        
+
         let userDataEx = expectation(description: "Update user data")
         syncUser.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
             XCTAssertNil(error)
@@ -2179,7 +2178,7 @@ extension SwiftObjectServerTests {
                 if case .failure(_) = result {
                     XCTFail("Should insert")
                 }
-            }, receiveValue: { objectId in
+            }, receiveValue: { _ in
                 insertOneEx1.fulfill()
             })
             .store(in: &cancellable)
@@ -2211,7 +2210,7 @@ extension SwiftObjectServerTests {
             .store(in: &cancellable)
         wait(for: [findEx1], timeout: 4.0)
     }
-    
+
     func testMongoCollectionFind() {
         var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
@@ -2276,26 +2275,26 @@ extension SwiftObjectServerTests {
             })
             .store(in: &cancellable)
         wait(for: [findEx3], timeout: 4.0)
-        
+
         let findOneEx1 = expectation(description: "Find one document")
         collection.findOneDocument(filter: document)
             .sink(receiveCompletion: { result in
                 if case .failure(_) = result {
                     XCTFail("Should find")
                 }
-            }, receiveValue: { findResult in
+            }, receiveValue: { _ in
                 findOneEx1.fulfill()
             })
             .store(in: &cancellable)
         wait(for: [findOneEx1], timeout: 4.0)
-        
+
         let findOneEx2 = expectation(description: "Find one document")
         collection.findOneDocument(filter: document, options: findOptions)
             .sink(receiveCompletion: { result in
                 if case .failure(_) = result {
                     XCTFail("Should find")
                 }
-            }, receiveValue: { findResult in
+            }, receiveValue: { _ in
                 findOneEx2.fulfill()
             })
             .store(in: &cancellable)
@@ -2321,7 +2320,7 @@ extension SwiftObjectServerTests {
                 if case .failure(_) = result {
                     XCTFail("Should count")
                 }
-            }, receiveValue: { count in
+            }, receiveValue: { _ in
                 countEx1.fulfill()
             })
             .store(in: &cancellable)
@@ -2617,11 +2616,11 @@ extension SwiftObjectServerTests {
         var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
-        
+
         collection.insertMany([document])
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &cancellable)
-        
+
         let findOneDeleteEx1 = expectation(description: "Find one document and delete")
         collection.findOneAndDelete(filter: document)
             .sink(receiveCompletion: { result in
@@ -2634,7 +2633,7 @@ extension SwiftObjectServerTests {
             })
             .store(in: &cancellable)
         wait(for: [findOneDeleteEx1], timeout: 4.0)
-        
+
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], false, false)
         let findOneDeleteEx2 = expectation(description: "Find one document and delete")
         collection.findOneAndDelete(filter: document, options: options1)
@@ -2649,7 +2648,7 @@ extension SwiftObjectServerTests {
                 } else {
                     XCTFail("Please review test cases for findOneAndDelete.")
                 }
-            }, receiveValue: { deleteResult in
+            }, receiveValue: { _ in
                 XCTFail("Please review test cases for findOneAndDelete.")
             })
 //            .sink(receiveCompletion: { result in
@@ -2677,7 +2676,7 @@ extension SwiftObjectServerTests {
                 } else {
                     XCTFail("Please review test cases for findOneAndDelete.")
                 }
-            }, receiveValue: { deleteResult in
+            }, receiveValue: { _ in
                 XCTFail("Please review test cases for findOneAndDelete.")
             })
 //            .sink(receiveCompletion: { result in
@@ -2694,7 +2693,7 @@ extension SwiftObjectServerTests {
 //            })
             .store(in: &cancellable)
         wait(for: [findOneDeleteEx3], timeout: 4.0)
-        
+
         let findEx = expectation(description: "Find documents")
         collection.find(filter: [:])
             .sink(receiveCompletion: { result in
@@ -2725,7 +2724,7 @@ extension SwiftObjectServerTests {
             })
             .store(in: &cancellable)
         wait(for: [regEx], timeout: 4.0)
-        
+
         let credentials = Credentials(username: email, password: password)
         var syncUser: User!
         let loginEx = expectation(description: "Should login")
@@ -2740,7 +2739,7 @@ extension SwiftObjectServerTests {
             })
             .store(in: &cancellable)
         wait(for: [loginEx], timeout: 4.0)
-        
+
         let sumEx = expectation(description: "Should calc sum")
         syncUser.functions.sum([1, 2, 3, 4, 5])
             .sink(receiveCompletion: { (result) in
@@ -2757,7 +2756,7 @@ extension SwiftObjectServerTests {
             })
             .store(in: &cancellable)
         wait(for: [sumEx], timeout: 4.0)
-        
+
         let userDataEx = expectation(description: "Should update user data")
         syncUser.functions.updateUserData([["favourite_colour": "green", "apples": 10]])
             .sink(receiveCompletion: { result in
@@ -2813,7 +2812,7 @@ extension SwiftObjectServerTests {
             })
             .store(in: &cancellable)
         wait(for: [createAPIKeyEx], timeout: 4.0)
-        
+
         let fetchAPIKeyEx = expectation(description: "Fetch user api key")
         syncUser?.apiKeyAuth().fetchApiKey(apiKey!.objectId)
             .sink(receiveCompletion: { (result) in

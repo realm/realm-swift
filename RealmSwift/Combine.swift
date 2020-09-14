@@ -1003,7 +1003,6 @@ public enum Publishers {
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension APIKeyAuth {
-    
     /**
      Creates a user API key that can be used to authenticate as the current user.
      
@@ -1020,7 +1019,7 @@ public extension APIKeyAuth {
             }
         }
     }
-    
+
     /**
      Fetches a user API key associated with the current user.
      
@@ -1037,7 +1036,7 @@ public extension APIKeyAuth {
             }
         }
     }
-    
+
     /**
      Fetches the user API keys associated with the current user.
      */
@@ -1052,7 +1051,7 @@ public extension APIKeyAuth {
             }
         }
     }
-    
+
     /**
      Deletes a user API key associated with the current user.
      
@@ -1069,7 +1068,7 @@ public extension APIKeyAuth {
             }
         }
     }
-    
+
     /**
      Enables a user API key associated with the current user.
      
@@ -1107,7 +1106,6 @@ public extension APIKeyAuth {
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension PushClient {
-
     /// Request to register device token to the server
     func registerDevice(token: String, user: RLMUser) -> Future<Void, Error> {
         return Future { promise in
