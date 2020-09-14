@@ -1001,4 +1001,137 @@ public enum Publishers {
     }
 }
 
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+public extension APIKeyAuth {
+    
+    /**
+     Creates a user API key that can be used to authenticate as the current user.
+     
+     @param name The name of the API key to be created.
+     */
+    func createApiKey(named: String) -> Future<UserAPIKey, Error> {
+        return Future { promise in
+            self.createApiKey(named: named) { (userApiKey, error) in
+                if let userApiKey = userApiKey {
+                    promise(.success(userApiKey))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+    
+    /**
+     Fetches a user API key associated with the current user.
+     
+     @param objectId The ObjectId of the API key to fetch.
+     */
+    func fetchApiKey(_ objectId: RLMObjectId) -> Future<UserAPIKey, Error> {
+        return Future { promise in
+            self.fetchApiKey(objectId) { (userApiKey, error) in
+                if let userApiKey = userApiKey {
+                    promise(.success(userApiKey))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+    
+    /**
+     Fetches the user API keys associated with the current user.
+     */
+    func fetchApiKeys() -> Future<[UserAPIKey], Error> {
+        return Future { promise in
+            self.fetchApiKeys { (userApiKeys, error) in
+                if let userApiKeys = userApiKeys {
+                    promise(.success(userApiKeys))
+                } else {
+                    promise(.failure(error ?? App.UserError.uncertainState))
+                }
+            }
+        }
+    }
+    
+    /**
+     Deletes a user API key associated with the current user.
+     
+     @param objectId The ObjectId of the API key to delete.
+     */
+    func deleteApiKey(_ objectId: RLMObjectId) -> Future<Void, Error> {
+        return Future { promise in
+            self.deleteApiKey(objectId) { (error) in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(Void()))
+                }
+            }
+        }
+    }
+    
+    /**
+     Enables a user API key associated with the current user.
+     
+     @param objectId The ObjectId of the  API key to enable.
+     */
+    func enableApiKey(_ objectId: RLMObjectId) -> Future<Void, Error> {
+        return Future { promise in
+            self.enableApiKey(objectId) { (error) in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(Void()))
+                }
+            }
+        }
+    }
+
+    /**
+     Disables a user API key associated with the current user.
+     
+     @param objectId The ObjectId of the API key to disable.
+     */
+    func disableApiKey(_ objectId: RLMObjectId) -> Future<Void, Error> {
+        return Future { promise in
+            self.disableApiKey(objectId) { (error) in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(Void()))
+                }
+            }
+        }
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+public extension PushClient {
+
+    /// Request to register device token to the server
+    func registerDevice(token: String, user: RLMUser) -> Future<Void, Error> {
+        return Future { promise in
+            self.registerDevice(token: token, user: user) { (error) in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(Void()))
+                }
+            }
+        }
+    }
+
+    /// Request to deregister a device for a user
+    func deregisterDevice(user: RLMUser) -> Future<Void, Error> {
+        return Future { promise in
+            self.deregisterDevice(user: user) { (error) in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(Void()))
+                }
+            }
+        }
+    }
+}
 #endif // canImport(Combine)

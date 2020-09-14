@@ -2776,6 +2776,151 @@ extension SwiftObjectServerTests {
         wait(for: [userDataEx], timeout: 4.0)
 
     }
+
+    func testPromiseAPIKeyAuth() {
+        var cancellable = Set<AnyCancellable>()
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let registerUserEx = expectation(description: "Register user")
+        app.emailPasswordAuth().registerEmail(email, password: password)
+            .sink(receiveCompletion: { _ in },
+                  receiveValue: { _ in registerUserEx.fulfill() })
+            .store(in: &cancellable)
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let loginEx = expectation(description: "Login user")
+        var syncUser: User?
+        app.login(credentials: Credentials(username: email, password: password))
+            .sink(receiveCompletion: { _ in },
+                  receiveValue: { (user) in
+                syncUser = user
+                loginEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [loginEx], timeout: 4.0)
+
+        let createAPIKeyEx = expectation(description: "Create user api key")
+        var apiKey: UserAPIKey?
+        syncUser?.apiKeyAuth().createApiKey(named: "my-api-key")
+            .sink(receiveCompletion: { (result) in
+                if case .failure(_) = result {
+                    XCTFail("Should create user api key")
+                }
+            }, receiveValue: { (userApiKey) in
+                apiKey = userApiKey
+                createAPIKeyEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [createAPIKeyEx], timeout: 4.0)
+        
+        let fetchAPIKeyEx = expectation(description: "Fetch user api key")
+        syncUser?.apiKeyAuth().fetchApiKey(apiKey!.objectId)
+            .sink(receiveCompletion: { (result) in
+                if case .failure(_) = result {
+                    XCTFail("Should fetch user api key")
+                }
+            }, receiveValue: { (userApiKey) in
+                apiKey = userApiKey
+                fetchAPIKeyEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [fetchAPIKeyEx], timeout: 4.0)
+
+        let fetchAPIKeysEx = expectation(description: "Fetch user api keys")
+        syncUser?.apiKeyAuth().fetchApiKeys()
+            .sink(receiveCompletion: { (result) in
+                if case .failure(_) = result {
+                    XCTFail("Should fetch user api keys")
+                }
+            }, receiveValue: { (userApiKeys) in
+                XCTAssertEqual(userApiKeys.count, 1)
+                fetchAPIKeysEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [fetchAPIKeysEx], timeout: 4.0)
+
+        let disableKeyEx = expectation(description: "Disable API key")
+        syncUser?.apiKeyAuth().disableApiKey(apiKey!.objectId)
+            .sink(receiveCompletion: { (result) in
+                if case .failure(_) = result {
+                    XCTFail("Should disable user api key")
+                }
+            }, receiveValue: { _ in
+                disableKeyEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [disableKeyEx], timeout: 4.0)
+
+        let enableKeyEx = expectation(description: "Enable API key")
+        syncUser?.apiKeyAuth().enableApiKey(apiKey!.objectId)
+            .sink(receiveCompletion: { (result) in
+                if case .failure(_) = result {
+                    XCTFail("Should enable user api key")
+                }
+            }, receiveValue: { _ in
+                enableKeyEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [enableKeyEx], timeout: 4.0)
+
+        let deleteKeyEx = expectation(description: "Delete API key")
+        syncUser?.apiKeyAuth().deleteApiKey(apiKey!.objectId)
+            .sink(receiveCompletion: { (result) in
+                if case .failure(_) = result {
+                    XCTFail("Should delete user api key")
+                }
+            }, receiveValue: { _ in
+                deleteKeyEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [deleteKeyEx], timeout: 4.0)
+    }
+
+    func testPromisePushRegistration() {
+        var cancellable = Set<AnyCancellable>()
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let registerUserEx = expectation(description: "Register user")
+        app.emailPasswordAuth().registerEmail(email, password: password)
+            .sink(receiveCompletion: { _ in },
+                  receiveValue: { _ in registerUserEx.fulfill() })
+            .store(in: &cancellable)
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let loginEx = expectation(description: "Login user")
+        app.login(credentials: Credentials(username: email, password: password))
+            .sink(receiveCompletion: { _ in },
+                  receiveValue: { _ in loginEx.fulfill() })
+            .store(in: &cancellable)
+        wait(for: [loginEx], timeout: 4.0)
+
+        let registerDeviceExpectation = expectation(description: "Register Device")
+        let client = app.pushClient(serviceName: "gcm")
+        client.registerDevice(token: "some-token", user: app.currentUser()!)
+            .sink(receiveCompletion: { (result) in
+                if case .failure(_) = result {
+                    XCTFail("Should register device")
+                }
+            }, receiveValue: { _ in
+                registerDeviceExpectation.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [registerDeviceExpectation], timeout: 4.0)
+
+        let dergisterDeviceExpectation = expectation(description: "Deregister Device")
+        client.deregisterDevice(user: app.currentUser()!)
+            .sink(receiveCompletion: { (result) in
+                if case .failure(_) = result {
+                    XCTFail("Should deregister device")
+                }
+            }, receiveValue: { _ in
+                dergisterDeviceExpectation.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [dergisterDeviceExpectation], timeout: 4.0)
+    }
 }
 
 #endif //canImport(Combine)
