@@ -1,11 +1,11 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Breaking Changes
-* `Credential(username:password:)` is renamed to `Credential(email:password:)`
+* `Credentials(username:password:)` is renamed to `Credentials(email:password:)`
 
 ### Enhancements
 * Add `User.loggedIn`.
-* Refactor `Credential` and `User` methods for MongoDB Realm consistency.
+* Refactor `Credentials` and `User` methods for MongoDB Realm consistency.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
