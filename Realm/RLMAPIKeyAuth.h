@@ -41,7 +41,7 @@ typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSErro
   @param completion A callback to be invoked once the call is complete.
 */
 - (void)createAPIKeyWithName:(NSString *)name
-                  completion:(RLMOptionalUserAPIKeyBlock)completion NS_SWIFT_NAME(createApiKey(named:completion:));
+                  completion:(RLMOptionalUserAPIKeyBlock)completion NS_SWIFT_NAME(createAPIKey(named:completion:));
 
 /**
   Fetches a user API key associated with the current user.
