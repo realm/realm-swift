@@ -1008,9 +1008,9 @@ public extension APIKeyAuth {
      
      @param name The name of the API key to be created.
      */
-    func createApiKey(named: String) -> Future<UserAPIKey, Error> {
+    func createAPIKey(named: String) -> Future<UserAPIKey, Error> {
         return Future { promise in
-            self.createApiKey(named: named) { (userApiKey, error) in
+            self.createAPIKey(named: named) { (userApiKey, error) in
                 if let userApiKey = userApiKey {
                     promise(.success(userApiKey))
                 } else {
@@ -1025,9 +1025,9 @@ public extension APIKeyAuth {
      
      @param objectId The ObjectId of the API key to fetch.
      */
-    func fetchApiKey(_ objectId: ObjectId) -> Future<UserAPIKey, Error> {
+    func fetchAPIKey(_ objectId: ObjectId) -> Future<UserAPIKey, Error> {
         return Future { promise in
-            self.fetchApiKey(objectId) { (userApiKey, error) in
+            self.fetchAPIKey(objectId) { (userApiKey, error) in
                 if let userApiKey = userApiKey {
                     promise(.success(userApiKey))
                 } else {
@@ -1040,9 +1040,9 @@ public extension APIKeyAuth {
     /**
      Fetches the user API keys associated with the current user.
      */
-    func fetchApiKeys() -> Future<[UserAPIKey], Error> {
+    func fetchAPIKeys() -> Future<[UserAPIKey], Error> {
         return Future { promise in
-            self.fetchApiKeys { (userApiKeys, error) in
+            self.fetchAPIKeys { (userApiKeys, error) in
                 if let userApiKeys = userApiKeys {
                     promise(.success(userApiKeys))
                 } else {
@@ -1057,9 +1057,9 @@ public extension APIKeyAuth {
      
      @param objectId The ObjectId of the API key to delete.
      */
-    func deleteApiKey(_ objectId: ObjectId) -> Future<Void, Error> {
+    func deleteAPIKey(_ objectId: ObjectId) -> Future<Void, Error> {
         return Future { promise in
-            self.deleteApiKey(objectId) { (error) in
+            self.deleteAPIKey(objectId) { (error) in
                 if let error = error {
                     promise(.failure(error))
                 } else {
@@ -1074,9 +1074,9 @@ public extension APIKeyAuth {
      
      @param objectId The ObjectId of the  API key to enable.
      */
-    func enableApiKey(_ objectId: ObjectId) -> Future<Void, Error> {
+    func enableAPIKey(_ objectId: ObjectId) -> Future<Void, Error> {
         return Future { promise in
-            self.enableApiKey(objectId) { (error) in
+            self.enableAPIKey(objectId) { (error) in
                 if let error = error {
                     promise(.failure(error))
                 } else {
@@ -1091,9 +1091,9 @@ public extension APIKeyAuth {
      
      @param objectId The ObjectId of the API key to disable.
      */
-    func disableApiKey(_ objectId: ObjectId) -> Future<Void, Error> {
+    func disableAPIKey(_ objectId: ObjectId) -> Future<Void, Error> {
         return Future { promise in
-            self.disableApiKey(objectId) { (error) in
+            self.disableAPIKey(objectId) { (error) in
                 if let error = error {
                     promise(.failure(error))
                 } else {

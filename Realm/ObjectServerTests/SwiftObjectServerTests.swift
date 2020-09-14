@@ -2819,7 +2819,7 @@ extension SwiftObjectServerTests {
 
         let createAPIKeyEx = expectation(description: "Create user api key")
         var apiKey: UserAPIKey?
-        syncUser?.apiKeyAuth().createApiKey(named: "my-api-key")
+        syncUser?.apiKeyAuth().createAPIKey(named: "my-api-key")
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should create user api key")
@@ -2833,7 +2833,7 @@ extension SwiftObjectServerTests {
 
         let fetchAPIKeyEx = expectation(description: "Fetch user api key")
         var objId: ObjectId? = try? ObjectId(string: apiKey!.objectId.stringValue)
-        syncUser?.apiKeyAuth().fetchApiKey(objId!)
+        syncUser?.apiKeyAuth().fetchAPIKey(objId!)
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should fetch user api key")
@@ -2846,7 +2846,7 @@ extension SwiftObjectServerTests {
         wait(for: [fetchAPIKeyEx], timeout: 4.0)
 
         let fetchAPIKeysEx = expectation(description: "Fetch user api keys")
-        syncUser?.apiKeyAuth().fetchApiKeys()
+        syncUser?.apiKeyAuth().fetchAPIKeys()
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should fetch user api keys")
@@ -2860,7 +2860,7 @@ extension SwiftObjectServerTests {
 
         let disableKeyEx = expectation(description: "Disable API key")
         objId = try? ObjectId(string: apiKey!.objectId.stringValue)
-        syncUser?.apiKeyAuth().disableApiKey(objId!)
+        syncUser?.apiKeyAuth().disableAPIKey(objId!)
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should disable user api key")
@@ -2872,7 +2872,7 @@ extension SwiftObjectServerTests {
         wait(for: [disableKeyEx], timeout: 4.0)
 
         let enableKeyEx = expectation(description: "Enable API key")
-        syncUser?.apiKeyAuth().enableApiKey(objId!)
+        syncUser?.apiKeyAuth().enableAPIKey(objId!)
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should enable user api key")
@@ -2884,7 +2884,7 @@ extension SwiftObjectServerTests {
         wait(for: [enableKeyEx], timeout: 4.0)
 
         let deleteKeyEx = expectation(description: "Delete API key")
-        syncUser?.apiKeyAuth().deleteApiKey(objId!)
+        syncUser?.apiKeyAuth().deleteAPIKey(objId!)
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should delete user api key")
