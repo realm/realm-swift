@@ -2204,7 +2204,7 @@ extension SwiftObjectServerTests {
                     XCTFail("Should find")
                 }
             }, receiveValue: { findResult in
-                XCTAssertEqual(findResult.map({ $0["name"] as! String }), ["fido", "fido", "rex"])
+                XCTAssertEqual(findResult.map({ $0["name"]??.stringValue }), ["fido", "fido", "rex"])
                 findEx1.fulfill()
             })
             .store(in: &cancellable)
@@ -2232,9 +2232,11 @@ extension SwiftObjectServerTests {
             .store(in: &cancellable)
         wait(for: [notFoundEx1], timeout: 4.0)
 
+        let insEx1 = expectation(description: "Insert document")
         collection.insertMany([document, document2, document3])
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
             .store(in: &cancellable)
+        wait(for: [insEx1], timeout: 4.0)
 
         let findEx1 = expectation(description: "Find documents")
         collection.find(filter: [:])
@@ -2243,7 +2245,7 @@ extension SwiftObjectServerTests {
                     XCTFail("Should find")
                 }
             }, receiveValue: { findResult in
-                XCTAssertEqual(findResult.map({ $0["name"] as! String }), ["fido", "rex", "rex"])
+                XCTAssertEqual(findResult.map({ $0["name"]??.stringValue }), ["fido", "rex", "rex"])
                 findEx1.fulfill()
             })
             .store(in: &cancellable)
@@ -2257,7 +2259,7 @@ extension SwiftObjectServerTests {
                 }
             }, receiveValue: { findResult in
                 XCTAssertEqual(findResult.count, 1)
-                XCTAssertEqual(findResult[0]["name"] as! String, "fido")
+                XCTAssertEqual(findResult[0]["name"]??.stringValue, "fido")
                 findEx2.fulfill()
             })
             .store(in: &cancellable)
@@ -2306,13 +2308,17 @@ extension SwiftObjectServerTests {
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
+        let insEx1 = expectation(description: "Insert document")
         collection.insertMany([document])
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
             .store(in: &cancellable)
+        wait(for: [insEx1], timeout: 4.0)
 
+        let agrEx1 = expectation(description: "Insert document")
         collection.aggregate(pipeline: [["$match": ["name": "fido"]], ["$group": ["_id": "$name"]]])
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in agrEx1.fulfill() })
             .store(in: &cancellable)
+        wait(for: [agrEx1], timeout: 4.0)
 
         let countEx1 = expectation(description: "Count documents")
         collection.count(filter: document)
@@ -2359,9 +2365,11 @@ extension SwiftObjectServerTests {
         .store(in: &cancellable)
         wait(for: [deleteEx1], timeout: 4.0)
 
+        let insEx1 = expectation(description: "Insert document")
         collection.insertMany([document, document2])
-        .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-        .store(in: &cancellable)
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill()})
+            .store(in: &cancellable)
+        wait(for: [insEx1], timeout: 4.0)
 
         let deleteEx2 = expectation(description: "Delete one document")
         collection.deleteOneDocument(filter: document)
@@ -2393,12 +2401,14 @@ extension SwiftObjectServerTests {
                 XCTAssertEqual(count, 0)
                 deleteEx1.fulfill()
             })
-        .store(in: &cancellable)
+            .store(in: &cancellable)
         wait(for: [deleteEx1], timeout: 4.0)
 
+        let insEx1 = expectation(description: "Insert document")
         collection.insertMany([document, document2])
-        .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-        .store(in: &cancellable)
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
+            .store(in: &cancellable)
+        wait(for: [insEx1], timeout: 4.0)
 
         let deleteEx2 = expectation(description: "Delete one document")
         collection.deleteManyDocuments(filter: ["breed": "cane corso"])
@@ -2423,23 +2433,25 @@ extension SwiftObjectServerTests {
         let document4: Document = ["name": "ted", "breed": "bullmastiff"]
         let document5: Document = ["name": "bill", "breed": "great dane"]
 
+        let insEx1 = expectation(description: "Insert document")
         collection.insertMany([document, document2, document3, document4])
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
             .store(in: &cancellable)
+        wait(for: [insEx1], timeout: 4.0)
 
         let updateEx1 = expectation(description: "Update one document")
         collection.updateOneDocument(filter: document, update: document2)
-        .sink(receiveCompletion: { result in
-            if case .failure(_) = result {
-                XCTFail("Should update")
-            }
-        }, receiveValue: { updateResult in
-            XCTAssertEqual(updateResult.matchedCount, 1)
-            XCTAssertEqual(updateResult.modifiedCount, 1)
-            XCTAssertNil(updateResult.objectId)
-            updateEx1.fulfill()
-        })
-        .store(in: &cancellable)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should update")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertEqual(updateResult.matchedCount, 1)
+                XCTAssertEqual(updateResult.modifiedCount, 1)
+                XCTAssertNil(updateResult.objectId)
+                updateEx1.fulfill()
+            })
+            .store(in: &cancellable)
         wait(for: [updateEx1], timeout: 4.0)
 
         let updateEx2 = expectation(description: "Update one document")
@@ -2467,9 +2479,13 @@ extension SwiftObjectServerTests {
         let document4: Document = ["name": "ted", "breed": "bullmastiff"]
         let document5: Document = ["name": "bill", "breed": "great dane"]
 
+        let insEx1 = expectation(description: "Insert document")
         collection.insertMany([document, document2, document3, document4])
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in
+                insEx1.fulfill()
+            })
             .store(in: &cancellable)
+        wait(for: [insEx1], timeout: 4.0)
 
         let updateEx1 = expectation(description: "Update one document")
         collection.updateManyDocuments(filter: document, update: document2)
@@ -2488,17 +2504,17 @@ extension SwiftObjectServerTests {
 
         let updateEx2 = expectation(description: "Update one document")
         collection.updateManyDocuments(filter: document5, update: document2, upsert: true)
-        .sink(receiveCompletion: { result in
-            if case .failure(_) = result {
-                XCTFail("Should try to update")
-            }
-        }, receiveValue: { updateResult in
-            XCTAssertEqual(updateResult.matchedCount, 0)
-            XCTAssertEqual(updateResult.modifiedCount, 0)
-            XCTAssertNotNil(updateResult.objectId)
-            updateEx2.fulfill()
-        })
-        .store(in: &cancellable)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should try to update")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertEqual(updateResult.matchedCount, 0)
+                XCTAssertEqual(updateResult.modifiedCount, 0)
+                XCTAssertNotNil(updateResult.objectId)
+                updateEx2.fulfill()
+            })
+            .store(in: &cancellable)
         wait(for: [updateEx2], timeout: 4.0)
     }
 
@@ -2534,7 +2550,7 @@ extension SwiftObjectServerTests {
                     XCTFail("Should find")
                     return
                 }
-                XCTAssertEqual(updateResult["name"] as! String, "john")
+                XCTAssertEqual(updateResult["name"]??.stringValue, "john")
                 findOneUpdateEx2.fulfill()
             })
             .store(in: &cancellable)
@@ -2552,7 +2568,7 @@ extension SwiftObjectServerTests {
                     XCTFail("Should find")
                     return
                 }
-                XCTAssertEqual(updateResult["name"] as! String, "rex")
+                XCTAssertEqual(updateResult["name"]??.stringValue, "rex")
                 findOneUpdateEx3.fulfill()
             })
             .store(in: &cancellable)
@@ -2568,47 +2584,47 @@ extension SwiftObjectServerTests {
 
         let findOneReplaceEx1 = expectation(description: "Find one document and replace")
         collection.findOneAndReplace(filter: document, replacement: document2)
-        .sink(receiveCompletion: { result in
-            if case .failure(_) = result {
-                XCTFail("Should try to replace")
-            }
-        }, receiveValue: { updateResult in
-            XCTAssertNil(updateResult)
-            findOneReplaceEx1.fulfill()
-        })
-        .store(in: &cancellable)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should try to replace")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertNil(updateResult)
+                findOneReplaceEx1.fulfill()
+            })
+            .store(in: &cancellable)
         wait(for: [findOneReplaceEx1], timeout: 4.0)
 
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
         let findOneReplaceEx2 = expectation(description: "Find one document and replace")
         collection.findOneAndReplace(filter: document2, replacement: document3, options: options1)
-        .sink(receiveCompletion: { result in
-            if case .failure(_) = result {
-                XCTFail("Should replace")
-            }
-        }, receiveValue: { updateResult in
-            guard let updateResult = updateResult else {
-                XCTFail("Should find")
-                return
-            }
-            XCTAssertEqual(updateResult["name"] as! String, "john")
-            findOneReplaceEx2.fulfill()
-        })
-        .store(in: &cancellable)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should replace")
+                }
+            }, receiveValue: { updateResult in
+                guard let updateResult = updateResult else {
+                    XCTFail("Should find")
+                    return
+                }
+                XCTAssertEqual(updateResult["name"]??.stringValue, "john")
+                findOneReplaceEx2.fulfill()
+            })
+            .store(in: &cancellable)
         wait(for: [findOneReplaceEx2], timeout: 4.0)
 
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, false)
         let findOneReplaceEx3 = expectation(description: "Find one document and replace")
         collection.findOneAndReplace(filter: document, replacement: document2, options: options2)
-        .sink(receiveCompletion: { result in
-            if case .failure(_) = result {
-                XCTFail("Should try to replace")
-            }
-        }, receiveValue: { updateResult in
-            XCTAssertNil(updateResult)
-            findOneReplaceEx3.fulfill()
-        })
-        .store(in: &cancellable)
+            .sink(receiveCompletion: { result in
+                if case .failure(_) = result {
+                    XCTFail("Should try to replace")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertNil(updateResult)
+                findOneReplaceEx3.fulfill()
+            })
+            .store(in: &cancellable)
         wait(for: [findOneReplaceEx3], timeout: 4.0)
     }
 

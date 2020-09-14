@@ -705,11 +705,12 @@ public extension MongoCollection {
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
     ///   - options: `FindOptions` to use when executing the command.
-    func find(filter: Document, options: FindOptions) -> Future<[[String: RLMBSON]], Error> {
+    func find(filter: Document, options: FindOptions) -> Future<[Document], Error> {
         return Future { promise in
             self.find(filter: filter, options: options) { documents, error in
-                if let documents = documents {
-                    promise(.success(documents))
+                let bson: [Document]? = documents?.map { $0.map { ($0, ObjectiveCSupport.convert(object: $1)) } }
+                if let bson = bson {
+                    promise(.success(bson))
                 } else {
                     promise(.failure(error ?? App.UserError.uncertainState))
                 }
@@ -720,11 +721,12 @@ public extension MongoCollection {
     /// Finds the documents in this collection which match the provided filter.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
-    func find(filter: Document) -> Future<[[String: RLMBSON]], Error> {
+    func find(filter: Document) -> Future<[Document], Error> {
         return Future { promise in
             self.find(filter: filter) { documents, error in
-                if let documents = documents {
-                    promise(.success(documents))
+                let bson: [Document]? = documents?.map { $0.map { ($0, ObjectiveCSupport.convert(object: $1)) } }
+                if let bson = bson {
+                    promise(.success(bson))
                 } else {
                     promise(.failure(error ?? App.UserError.uncertainState))
                 }
@@ -739,11 +741,12 @@ public extension MongoCollection {
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
     ///   - options: `FindOptions` to use when executing the command.
-    func findOneDocument(filter: Document, options: FindOptions) -> Future<[[String: RLMBSON]], Error> {
+    func findOneDocument(filter: Document, options: FindOptions) -> Future<[Document], Error> {
         return Future { promise in
             self.find(filter: filter) { documents, error in
-                if let documents = documents {
-                    promise(.success(documents))
+                let bson: [Document]? = documents?.map { $0.map { ($0, ObjectiveCSupport.convert(object: $1)) } }
+                if let bson = bson {
+                    promise(.success(bson))
                 } else {
                     promise(.failure(error ?? App.UserError.uncertainState))
                 }
@@ -757,11 +760,12 @@ public extension MongoCollection {
     /// order.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
-    func findOneDocument(filter: Document) -> Future<[String: RLMBSON], Error> {
+    func findOneDocument(filter: Document) -> Future<Document, Error> {
         return Future { promise in
             self.findOneDocument(filter: filter) { document, error in
-                if let document = document {
-                    promise(.success(document))
+                let bson: Document? = document?.map { ($0, ObjectiveCSupport.convert(object: $1)) }
+                if let bson = bson {
+                    promise(.success(bson))
                 } else {
                     promise(.failure(error ?? App.UserError.uncertainState))
                 }
@@ -772,11 +776,12 @@ public extension MongoCollection {
     /// Runs an aggregation framework pipeline against this collection.
     /// - Parameters:
     ///   - pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
-    func aggregate(pipeline: [Document]) -> Future<[[String: RLMBSON]], Error> {
+    func aggregate(pipeline: [Document]) -> Future<[Document], Error> {
         return Future { promise in
             self.aggregate(pipeline: pipeline) { documents, error in
-                if let documents = documents {
-                    promise(.success(documents))
+                let bson: [Document]? = documents?.map { $0.map { ($0, ObjectiveCSupport.convert(object: $1)) } }
+                if let bson = bson {
+                    promise(.success(bson))
                 } else {
                     promise(.failure(error ?? App.UserError.uncertainState))
                 }
@@ -921,13 +926,14 @@ public extension MongoCollection {
     ///   - filter: A bson `Document` representing the match criteria.
     ///   - update: A bson `Document` representing the update to be applied to a matching document.
     ///   - options: `RemoteFindOneAndModifyOptions` to use when executing the command.
-    func findOneAndUpdate(filter: Document, update: Document, options: FindOneAndModifyOptions) -> Future<[String: RLMBSON]?, Error> {
+    func findOneAndUpdate(filter: Document, update: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
         return Future { promise in
             self.findOneAndUpdate(filter: filter, update: update, options: options) { updateResult, error in
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    promise(.success(updateResult))
+                    let bson: Document? = updateResult?.map { ($0, ObjectiveCSupport.convert(object: $1)) }
+                    promise(.success(bson))
                 }
             }
         }
@@ -942,13 +948,14 @@ public extension MongoCollection {
     /// - Parameters:
     ///   - filter: A bson `Document` representing the match criteria.
     ///   - update: A bson `Document` representing the update to be applied to a matching document.
-    func findOneAndUpdate(filter: Document, update: Document) -> Future<[String: RLMBSON]?, Error> {
+    func findOneAndUpdate(filter: Document, update: Document) -> Future<Document?, Error> {
         return Future { promise in
             self.findOneAndUpdate(filter: filter, update: update) { updateResult, error in
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    promise(.success(updateResult))
+                    let bson: Document? = updateResult?.map { ($0, ObjectiveCSupport.convert(object: $1)) }
+                    promise(.success(bson))
                 }
             }
         }
@@ -964,13 +971,14 @@ public extension MongoCollection {
     ///   - filter: A `Document` that should match the query.
     ///   - replacement: A `Document` describing the replacement.
     ///   - options: `FindOneAndModifyOptions` to use when executing the command.
-    func findOneAndReplace(filter: Document, replacement: Document, options: FindOneAndModifyOptions) -> Future<[String: RLMBSON]?, Error> {
+    func findOneAndReplace(filter: Document, replacement: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
         return Future { promise in
             self.findOneAndReplace(filter: filter, replacement: replacement, options: options) { updateResult, error in
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    promise(.success(updateResult))
+                    let bson: Document? = updateResult?.map { ($0, ObjectiveCSupport.convert(object: $1)) }
+                    promise(.success(bson))
                 }
             }
         }
@@ -986,13 +994,14 @@ public extension MongoCollection {
     ///   - filter: A `Document` that should match the query.
     ///   - replacement: A `Document` describing the replacement.
     ///   - options: `RLMFindOneAndModifyOptions` to use when executing the command.
-    func findOneAndReplace(filter: Document, replacement: Document) -> Future<[String: RLMBSON]?, Error> {
+    func findOneAndReplace(filter: Document, replacement: Document) -> Future<Document?, Error> {
         return Future { promise in
             self.findOneAndReplace(filter: filter, replacement: replacement) { updateResult, error in
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    promise(.success(updateResult))
+                    let bson: Document? = updateResult?.map { ($0, ObjectiveCSupport.convert(object: $1)) }
+                    promise(.success(bson))
                 }
             }
         }
@@ -1007,13 +1016,14 @@ public extension MongoCollection {
     /// - Parameters:
     ///   - filter: A `Document` that should match the query.
     ///   - options: `FindOneAndModifyOptions` to use when executing the command.
-    func findOneAndDelete(filter: Document, options: FindOneAndModifyOptions) -> Future<[String: RLMBSON]?, Error> {
+    func findOneAndDelete(filter: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
         return Future { promise in
             self.findOneAndDelete(filter: filter, options: options) { deleteResult, error in
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    promise(.success(deleteResult))
+                    let bson: Document? = deleteResult?.map { ($0, ObjectiveCSupport.convert(object: $1)) }
+                    promise(.success(bson))
                 }
             }
         }
@@ -1027,13 +1037,14 @@ public extension MongoCollection {
     /// delete operations.
     /// - Parameters:
     ///   - filter: A `Document` that should match the query.
-    func findOneAndDelete(filter: Document) -> Future<[String: RLMBSON]?, Error> {
+    func findOneAndDelete(filter: Document) -> Future<Document?, Error> {
         return Future { promise in
             self.findOneAndDelete(filter: filter) { deleteResult, error in
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    promise(.success(deleteResult))
+                    let bson: Document? = deleteResult?.map { ($0, ObjectiveCSupport.convert(object: $1)) }
+                    promise(.success(bson))
                 }
             }
         }
