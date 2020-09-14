@@ -40,7 +40,7 @@ typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSErro
   @param name The name of the API key to be created.
   @param completion A callback to be invoked once the call is complete.
 */
-- (void)createApiKeyWithName:(NSString *)name
+- (void)createAPIKeyWithName:(NSString *)name
                   completion:(RLMOptionalUserAPIKeyBlock)completion NS_SWIFT_NAME(createApiKey(named:completion:));
 
 /**
@@ -49,7 +49,7 @@ typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSErro
   @param objectId The ObjectId of the API key to fetch.
   @param completion A callback to be invoked once the call is complete.
  */
-- (void)fetchApiKey:(RLMObjectId *)objectId
+- (void)fetchAPIKey:(RLMObjectId *)objectId
          completion:(RLMOptionalUserAPIKeyBlock)completion;
 
 /**
@@ -57,7 +57,7 @@ typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSErro
  
   @param completion A callback to be invoked once the call is complete.
  */
-- (void)fetchApiKeysWithCompletion:(RLMUserAPIKeysBlock)completion;
+- (void)fetchAPIKeysWithCompletion:(RLMUserAPIKeysBlock)completion;
 
 /**
   Deletes a user API key associated with the current user.
@@ -65,7 +65,7 @@ typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSErro
   @param objectId The ObjectId of the API key to delete.
   @param completion A callback to be invoked once the call is complete.
  */
-- (void)deleteApiKey:(RLMObjectId *)objectId
+- (void)deleteAPIKey:(RLMObjectId *)objectId
           completion:(RLMAPIKeyAuthOptionalErrorBlock)completion;
 
 /**
@@ -74,7 +74,7 @@ typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSErro
   @param objectId The ObjectId of the  API key to enable.
   @param completion A callback to be invoked once the call is complete.
  */
-- (void)enableApiKey:(RLMObjectId *)objectId
+- (void)enableAPIKey:(RLMObjectId *)objectId
           completion:(RLMAPIKeyAuthOptionalErrorBlock)completion;
 
 /**
@@ -83,7 +83,7 @@ typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSErro
   @param objectId The ObjectId of the API key to disable.
   @param completion A callback to be invoked once the call is complete.
  */
-- (void)disableApiKey:(RLMObjectId *)objectId
+- (void)disableAPIKey:(RLMObjectId *)objectId
            completion:(RLMAPIKeyAuthOptionalErrorBlock)completion;
 
 @end
