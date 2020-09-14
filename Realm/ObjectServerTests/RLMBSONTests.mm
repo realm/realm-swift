@@ -33,7 +33,7 @@ using namespace realm::bson;
 - (void)testNilRoundTrip {
     auto bson = Bson();
     id<RLMBSON> rlm = RLMConvertBsonToRLMBSON(bson);
-    XCTAssertEqual(rlm, nil);
+    XCTAssertTrue([rlm isEqual:[NSNull null]]);
     XCTAssertEqual(RLMConvertRLMBSONToBson(rlm), bson);
 }
 

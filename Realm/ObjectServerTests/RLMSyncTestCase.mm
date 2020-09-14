@@ -444,6 +444,11 @@ static NSURL *syncDirectoryForChildProcess() {
         _appIds = [ids componentsSeparatedByString:@","];   //take the one array for split the string
     }
 
+    if (self.isParent) {
+        [NSFileManager.defaultManager removeItemAtURL:[self clientDataRoot] error:&error];
+        [NSFileManager.defaultManager removeItemAtURL:syncDirectoryForChildProcess() error:&error];
+    }
+
     _app = [RLMApp appWithId:_appId configuration:self.defaultAppConfiguration rootDirectory:[self clientDataRoot]];
 
     RLMSyncManager *syncManager = [[self app] syncManager];
@@ -508,7 +513,7 @@ static NSURL *syncDirectoryForChildProcess() {
     } else {
         clientDataRoot = syncDirectoryForChildProcess();
     }
-//    [NSFileManager.defaultManager removeItemAtURL:clientDataRoot error:&error];
+
     [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
                            withIntermediateDirectories:YES attributes:nil error:&error];
     return clientDataRoot;
