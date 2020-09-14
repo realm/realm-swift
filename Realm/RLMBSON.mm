@@ -346,7 +346,7 @@ Bson RLMConvertRLMBSONToBson(id<RLMBSON> b) {
 id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
     switch (b.type()) {
         case realm::bson::Bson::Type::Null:
-            return nil;
+            return [NSNull null];
         case realm::bson::Bson::Type::Int32:
             return @(static_cast<int32_t>(b));
         case realm::bson::Bson::Type::Int64:
