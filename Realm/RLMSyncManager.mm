@@ -226,7 +226,6 @@ static RLMSyncManager *s_sharedManager = nil;
     _logger = nil;
     _authorizationHeaderName = nil;
     _customRequestHeaders = nil;
-    _pinnedCertificatePaths = nil;
     _timeoutOptions = nil;
     SyncManager::shared().reset_for_testing();
 }
