@@ -2048,7 +2048,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         var cancellable = Set<AnyCancellable>()
 
         let registerUserEx = expectation(description: "Register user")
-        app.emailPasswordAuth().registerEmail(email, password: password)
+        app.emailPasswordAuth().registerUser(email: email, password: password)
             .sink(receiveCompletion: { result in
                 if case .failure(_) = result {
                     XCTFail("Should register")
@@ -2126,7 +2126,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let password = randomString(10)
 
         let registerUserEx = expectation(description: "Register user")
-        app.emailPasswordAuth().registerEmail(email, password: password)
+        app.emailPasswordAuth().registerUser(email: email, password: password)
             .sink(receiveCompletion: { result in
                 if case .failure(_) = result {
                     XCTFail("Should register")
@@ -2158,7 +2158,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         var cancellable = Set<AnyCancellable>()
 
         let registerUserEx = expectation(description: "Register user")
-        app.emailPasswordAuth().registerEmail(email, password: password)
+        app.emailPasswordAuth().registerUser(email: email, password: password)
             .sink(receiveCompletion: { result in
                 if case .failure(_) = result {
                     XCTFail("Should register")
@@ -2775,7 +2775,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         var cancellable = Set<AnyCancellable>()
 
         let regEx = expectation(description: "Should register")
-        app.emailPasswordAuth().registerEmail(email, password: password)
+        app.emailPasswordAuth().registerUser(email: email, password: password)
             .sink(receiveCompletion: { result in
                 if case .failure(_) = result {
                     XCTFail("Should register")
@@ -2843,7 +2843,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let password = randomString(10)
 
         let registerUserEx = expectation(description: "Register user")
-        app.emailPasswordAuth().registerEmail(email, password: password)
+        app.emailPasswordAuth().registerUser(email: email, password: password)
             .sink(receiveCompletion: { _ in },
                   receiveValue: { _ in registerUserEx.fulfill() })
             .store(in: &cancellable)
@@ -2945,7 +2945,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let password = randomString(10)
 
         let registerUserEx = expectation(description: "Register user")
-        app.emailPasswordAuth().registerEmail(email, password: password)
+        app.emailPasswordAuth().registerUser(email: email, password: password)
             .sink(receiveCompletion: { _ in },
                   receiveValue: { _ in registerUserEx.fulfill() })
             .store(in: &cancellable)

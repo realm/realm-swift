@@ -85,12 +85,12 @@ public final class Decimal128: RLMDecimal128, Decodable {
     }
 
     /// The mininum value for Decimal128
-    public static var min: Self {
+    public static var min: Decimal128 {
         __minimumDecimalNumber as! Self
     }
 
     /// The maximum value for Decimal128
-    public static var max: Self {
+    public static var max: Decimal128 {
         __maximumDecimalNumber as! Self
     }
 }

@@ -123,9 +123,9 @@ public extension EmailPasswordAuth {
      @param password The password that the user created for the new username/password identity.
      @returns A publisher that eventually return `Result.success` or `Error`.
     */
-    func registerEmail(_ email: String, password: String) -> Future<Void, Error> {
+    func registerUser(email: String, password: String) -> Future<Void, Error> {
         return Future<Void, Error> { promise in
-            self.registerEmail(email, password: password) { error in
+            self.registerUser(email: email, password: password) { error in
                 if let error = error {
                     promise(.failure(error))
                 } else {
