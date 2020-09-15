@@ -35,7 +35,6 @@ x.y.z Release notes (yyyy-MM-dd)
     * MongoCollection
     * EmailPasswordAuth
     * App.login
-* Add Combine support for: PushClient, APIKeyAuth, User, MongoCollection, EmailPasswordAuth, App.login
 * Add ability to open a synced Realm with a `nil` partition value.
 
 ### Fixed
