@@ -274,6 +274,7 @@ public struct Functions {
     }
 
     #if canImport(Combine)
+    /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls.
     @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
     public subscript(dynamicMember string: String) -> ([AnyBSON]) -> Future<AnyBSON, Error> {
         return { (arguments: [AnyBSON]) in
@@ -556,10 +557,16 @@ extension Realm {
 #if canImport(Combine)
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension App {
+    /// :nodoc:
     enum UserError: Error {
+        /// UserError.uncertainState - Fallback for optional errors  in Future calls. Should never happened while it's still a technically possible case.
         case uncertainState
     }
 
+    /**
+    Login to a user for the Realm app.
+    @param credentials The credentials identifying the user.
+    */
     func login(credentials: Credentials) -> Future<User, Error> {
         return Future { promise in
             self.login(credentials: credentials) { user, error in
