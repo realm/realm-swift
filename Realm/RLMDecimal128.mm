@@ -75,17 +75,15 @@
 
 - (instancetype)initWithString:(NSString *)string error:(NSError **)error {
     if ((self = [self init])) {
-        const char *str = string.UTF8String;
-        if (!realm::Decimal128::is_valid_str(str)) {
+        try {
+            _value = realm::Decimal128(string.UTF8String);
+        }
+        catch (std::exception const& e) {
             if (error) {
-                NSString *msg = [NSString stringWithFormat:@"String '%@' is not a valid Decimal128", string];
-                *error = [NSError errorWithDomain:RLMErrorDomain
-                                             code:RLMErrorInvalidInput
-                                         userInfo:@{NSLocalizedDescriptionKey: msg}];
+                *error = RLMMakeError(RLMErrorInvalidInput, e);
             }
             return nil;
         }
-        _value = realm::Decimal128(str);
     }
     return self;
 }

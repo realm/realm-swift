@@ -30,7 +30,7 @@
     RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@3.14159];
     RLMDecimal128 *d2 = [[RLMDecimal128 alloc] initWithString:@"3.14159" error:nil];
     NSError *error;
-    RLMDecimal128 *d3 = [[RLMDecimal128 alloc] initWithString:@"not a number" error:&error];
+    RLMDecimal128 *d3 = [[RLMDecimal128 alloc] initWithString:@"123456789123456789123.0" error:&error];
     XCTAssertNotNil(error);
     RLMDecimal128 *d4 = [[RLMDecimal128 alloc] initWithValue:@3.14159];
     RLMDecimal128 *d5 = [[RLMDecimal128 alloc] initWithValue:@"123.456"];
