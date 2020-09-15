@@ -1,42 +1,57 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.0.0-beta.5 Release notes (2020-09-15)
 =============================================================
 
 ### Enhancements
+
 * Add `User.loggedIn`.
-* Add support for multiple Realm Apps
-* Remove `[RLMSyncManager shared]`. This is now instatiated as a property on the app itself.
+* Add support for multiple Realm Apps.
+* Remove `[RLMSyncManager shared]`. This is now instatiated as a property on
+  the app itself.
+* Add Combine support for:
+    * PushClient
+    * APIKeyAuth
+    * User
+    * MongoCollection
+    * EmailPasswordAuth
+    * App.login
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* Fix `MongoCollection.watch` to consistently deliver events on a given queue
-* Fix `[RLMUser logOutWithCompletion]` and `User.logOut` to now log out the correct user
+
+* Fix `MongoCollection.watch` to consistently deliver events on a given queue.
+* Fix `[RLMUser logOutWithCompletion]` and `User.logOut` to now log out the
+  correct user.
 * Fix crash on startup on iOS versions older than 13 (since v10.0.0-beta.3).
 
 ### Breaking Changes
-* `RLMSyncManager.pinnedCertificatePaths` has been removed.
-* Classes `RLMUserAccountInfo` & `RLMUserInfo` (swift: `UserInfo`, `UserAccountInfo`) have been removed.
-* The following functionality has been renamed to align Cocoa with the other Realm SDKs:
 
-| Old API                                                     | New API                                                        |
-|:------------------------------------------------------------|:---------------------------------------------------------------|
-| `RLMUser.identity`                                               | `RLMUser.identifier`                                                      |
-| `User.identity`                                                  | `User.id`                                                         |
-| `-[RLMCredentials credentialsWithUsername:password:]`                                          | `-[RLMCredentials credentialsWithEmail:password:]`                                                |
-| `Credentials(username:password:)`                                             | `Credentials(email:password:)`                                                   |
-| -`[RLMUser apiKeyAuth]`                                                  | `-[RLMUser apiKeysAuth]`                                                          |
-| `User.apiKeyAuth()`                               | `User.apiKeysAuth()`                                                |
-| `-[RLMEmailPasswordAuth registerEmail:password:completion:]`                         | `-[RLMEmailPasswordAuth registerUserWithEmail:password:completion:]`                                         |
-| `App.emailPasswordAuth().registerEmail(email:password:)`                            | `App.emailPasswordAuth().registerUser(email:password:)`                                            |
+* `RLMSyncManager.pinnedCertificatePaths` has been removed.
+* Classes `RLMUserAccountInfo` & `RLMUserInfo` (swift: `UserInfo`,
+  `UserAccountInfo`) have been removed.
+* The following functionality has been renamed to align Cocoa with the other
+  Realm SDKs:
+
+| Old API                                                      | New API                                                        |
+|:-------------------------------------------------------------|:---------------------------------------------------------------|
+| `RLMUser.identity`                                           | `RLMUser.identifier`                                           |
+| `User.identity`                                              | `User.id`                                                      |
+| `-[RLMCredentials credentialsWithUsername:password:]`        | `-[RLMCredentials credentialsWithEmail:password:]`             |
+| `Credentials(username:password:)`                            | `Credentials(email:password:)`                                 |
+| -`[RLMUser apiKeyAuth]`                                      | `-[RLMUser apiKeysAuth]`                                       |
+| `User.apiKeyAuth()`                                          | `User.apiKeysAuth()`                                           |
+| `-[RLMEmailPasswordAuth registerEmail:password:completion:]` | `-[RLMEmailPasswordAuth registerUserWithEmail:password:completion:]` |
+| `App.emailPasswordAuth().registerEmail(email:password:)`     | `App.emailPasswordAuth().registerUser(email:password:)`        |
 
 ### Compatibility
-* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+
+* File format: Generates Realms with format v12 (Reads and upgrades all previous formats)
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
 * Carthage release for Swift is built with Xcode 11.6.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+
+* Upgraded realm-core from v10.0.0-beta.6 to v10.0.0-beta.7
+* Upgraded realm-sync from v10.0.0-beta.10 to v10.0.0-beta.11
 
 10.0.0-beta.4 Release notes (2020-08-28)
 =============================================================
@@ -45,31 +60,24 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add ability to stream change events on a remote MongoDB collection with `[RLMMongoCollection watch:delegate:delegateQueue]`, `MongoCollection.watch(delegate)`. When calling `watch(delegate)` you will be given a `RLMChangeStream` (`ChangeStream`), this will be used to invalidate and stop the streaming session by calling `[RLMChangeStream close]` (`ChangeStream.close()`) when needed.
 * Add `MongoCollection.watch`, which is a Combine publisher that will stream
   change events each time the remote MongoDB collection is updated.
-* Add Combine support for: 
-    * PushClient
-    * APIKeyAuth
-    * User
-    * MongoCollection
-    * EmailPasswordAuth
-    * App.login
 * Add ability to open a synced Realm with a `nil` partition value.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* Realm.Configuration.objectTypes now accepts embedded objects
-* Ports fixes from 5.3.5 
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Realm.Configuration.objectTypes now accepts embedded objects
+* Ports fixes from 5.3.5
 
 ### Compatibility
+
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
 * Realm Studio: 3.11 or later.
 * APIs are backwards compatible with all previous releases in the v10.0.0-beta.x series.
 * Carthage release for Swift is built with Xcode 11.5.
 
 ### Internal
-* Upgraded realm-core from v10.0.0-beta.1 to v10.0.0-beta.5
-* Upgraded realm-sync from v10.0.0-beta.2 to v10.0.0-beta.8
+
+* Upgraded realm-core from v10.0.0-beta.1 to v10.0.0-beta.6
+* Upgraded realm-sync from v10.0.0-beta.2 to v10.0.0-beta.10
 
 10.0.0-beta.3 Release notes (2020-08-17)
 =============================================================
