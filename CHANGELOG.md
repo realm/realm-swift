@@ -7,6 +7,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * Fix `MongoCollection.watch` to consistently deliver events on a given queue
+* Fix `[RLMUser logOutWithCompletion]` and `User.logOut` to now log out the correct user
 
 ### Breaking Changes
 * `RLMSyncManager.pinnedCertificatePaths` has been removed.
