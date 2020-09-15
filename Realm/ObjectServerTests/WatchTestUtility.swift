@@ -21,6 +21,7 @@ import RealmSwift
 
 class WatchTestUtility: ChangeEventDelegate {
     var semaphore: DispatchSemaphore
+    var isOpenSemaphore: DispatchSemaphore
     private var targetEventCount: Int
     private var changeEventCount = 0
     private var didOpenWasCalled = false
@@ -32,10 +33,12 @@ class WatchTestUtility: ChangeEventDelegate {
         self.matchingObjectId = matchingObjectId
         self.expectation = expectation
         semaphore = DispatchSemaphore(value: 0)
+        isOpenSemaphore = DispatchSemaphore(value: 0)
     }
 
     func changeStreamDidOpen(_ changeStream: ChangeStream) {
         didOpenWasCalled = true
+        isOpenSemaphore.signal()
     }
 
     func changeStreamDidClose(with error: Error?) {

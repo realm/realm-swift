@@ -280,8 +280,15 @@ class Admin {
  */
 @objc(RealmServer)
 public class RealmServer: NSObject {
+    public enum LogLevel {
+        case none, info, warn, error
+    }
+
     /// Shared RealmServer. This class only needs to be initialized and torn down once per test suite run.
     @objc static var shared = RealmServer()
+
+    /// Log level for the server and mongo processes.
+    public var logLevel = LogLevel.none
 
     /// Process that runs the local mongo server. Should be terminated on exit.
     private let mongoProcess = Process()
@@ -417,30 +424,43 @@ public class RealmServer: NSObject {
 
         let pipe = Pipe()
         pipe.fileHandleForReading.readabilityHandler = { file in
-            guard file.availableData.count > 0 else { return }
+            guard file.availableData.count > 0,
+                  let available = String(data: file.availableData, encoding: .utf8)?.split(separator: "\t") else {
+                return
+            }
 
             // prettify server output
-            let available = String(data: file.availableData, encoding: .utf8)?.split(separator: "\t")
-            print(available!.map { part -> String in
+            var parts = [String]()
+            for part in available {
                 if part.contains("INFO") {
-                    return "🔵"
+                    guard self.logLevel == .info else {
+                        return
+                    }
+                    parts.append("🔵")
                 } else if part.contains("DEBUG") {
-                    return "🟡"
+                    guard self.logLevel == .info || self.logLevel == .warn else {
+                        return
+                    }
+                    parts.append("🟡")
                 } else if part.contains("ERROR") {
-                    return "🔴"
+                    parts.append("🔴")
                 } else if let json = try? JSONSerialization.jsonObject(with: part.data(using: .utf8)!) {
-                    return String(data: try! JSONSerialization.data(withJSONObject: json,
-                                                                    options: .prettyPrinted),
-                                  encoding: .utf8)!
+                    parts.append(String(data: try! JSONSerialization.data(withJSONObject: json,
+                                                                       options: .prettyPrinted),
+                                  encoding: .utf8)!)
                 } else if !part.isEmpty {
-                    return String(part)
-                } else {
-                    return ""
+                    parts.append(String(part))
                 }
-            }.joined(separator: "\t"))
+            }
+            print(parts.joined(separator: "\t"))
         }
 
-        serverProcess.standardOutput = pipe
+        if logLevel != .none {
+            serverProcess.standardOutput = pipe
+        } else {
+            serverProcess.standardOutput = nil
+        }
+
         try serverProcess.run()
         waitForServerToStart()
     }

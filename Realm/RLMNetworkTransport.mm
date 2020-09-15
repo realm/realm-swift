@@ -19,7 +19,6 @@
 #import "RLMNetworkTransport_Private.hpp"
 
 #import "RLMApp.h"
-#import "RLMJSONModels.h"
 #import "RLMRealmConfiguration.h"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
@@ -105,7 +104,6 @@ NSString * const RLMHTTPMethodToNSString[] = {
                                             delegateQueue:nil];
     NSURL *url = [[NSURL alloc] initWithString:request.url];
     [[session dataTaskWithURL:url] resume];
-    [subscriber didOpen];
     return session;
 }
 
@@ -170,23 +168,11 @@ didCompleteWithError:(NSError *)error
     _completionBlock(response);
 }
 
-- (RLMSyncErrorResponseModel *)responseModelFromData:(NSData *)data {
-    if (data.length == 0) {
-        return nil;
-    }
-    id json = [NSJSONSerialization JSONObjectWithData:data
-                                              options:(NSJSONReadingOptions)0
-                                                error:nil];
-    if (!json || ![json isKindOfClass:[NSDictionary class]]) {
-        return nil;
-    }
-    return [[RLMSyncErrorResponseModel alloc] initWithDictionary:json];
-}
-
 @end
 
 @implementation RLMEventSessionDelegate {
     RLMEventSubscriber *_subscriber;
+    bool _hasOpened;
 }
 
 + (instancetype)delegateWithEventSubscriber:(RLMEventSubscriber *)subscriber {
@@ -198,6 +184,11 @@ didCompleteWithError:(NSError *)error
 - (void)URLSession:(__unused NSURLSession *)session
           dataTask:(__unused NSURLSessionDataTask *)dataTask
     didReceiveData:(NSData *)data {
+    if (!_hasOpened) {
+        _hasOpened = true;
+        [_subscriber didOpen];
+    }
+
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) dataTask.response;
     if (httpResponse.statusCode != 200) {
         NSString *errorStatus = [NSString stringWithFormat:@"URLSession HTTP error code: %ld",

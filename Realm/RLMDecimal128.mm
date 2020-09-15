@@ -173,30 +173,28 @@
 }
 
 - (void)dividingAssignmentWith:(RLMDecimal128 *)decimalNumber {
-//    auto rhs = RLMObjcToDecimal128(decimalNumber);
-//    _value/=rhs;
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    _value/=rhs;
 }
 
 - (RLMDecimal128 *)decimalNumberBySubtracting:(RLMDecimal128 *)decimalNumber {
-//    auto rhs = RLMObjcToDecimal128(decimalNumber);
-//    return [[RLMDecimal128 alloc] initWithDecimal128:_value-rhs];
-    return decimalNumber;
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return [[RLMDecimal128 alloc] initWithDecimal128:_value-rhs];
 }
 
 - (void)subtractionAssignmentWith:(RLMDecimal128 *)decimalNumber {
-    //    auto rhs = RLMObjcToDecimal128(decimalNumber);
-    //    _value-=rhs;
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    _value-=rhs;
 }
 
 - (RLMDecimal128 *)decimalNumberByMultiplyingBy:(RLMDecimal128 *)decimalNumber {
-    //    auto rhs = RLMObjcToDecimal128(decimalNumber);
-    //    return [[RLMDecimal128 alloc] initWithDecimal128:_value*rhs];
-        return decimalNumber;
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return [[RLMDecimal128 alloc] initWithDecimal128:_value*rhs];
 }
 
 - (void)multiplicationAssignmentWith:(RLMDecimal128 *)decimalNumber {
-    //    auto rhs = RLMObjcToDecimal128(decimalNumber);
-    //    _value*=rhs;
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    _value*=rhs;
 }
 
 - (BOOL)isGreaterThan:(RLMDecimal128 *)decimalNumber {

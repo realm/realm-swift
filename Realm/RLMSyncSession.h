@@ -90,7 +90,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgressMode) {
     RLMSyncProgressModeForCurrentlyOutstandingWork,
 };
 
-@class RLMUser, RLMSyncConfiguration, RLMSyncErrorActionToken;
+@class RLMUser, RLMSyncConfiguration, RLMSyncErrorActionToken, RLMSyncManager;
 
 /**
  The type of a progress notification block intended for reporting a session's network
@@ -200,7 +200,7 @@ NS_REFINED_FOR_SWIFT;
  
  @see `RLMSyncErrorClientResetError`, `RLMSyncErrorPermissionDeniedError`
  */
-+ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token;
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token syncManager:(RLMSyncManager *)syncManager;
 
 /**
  Get the sync session for the given Realm if it is a synchronized Realm, or `nil`

@@ -78,7 +78,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) RLMDecimal128 *magnitude NS_REFINED_FOR_SWIFT;
 
 /// Replaces this RLMDecimal128 value with its additive inverse.
-- (void)negate NS_REFINED_FOR_SWIFT;
+- (void)negate;
 
 /// Adds the right hand side to the current value and returns the result.
 - (RLMDecimal128 *)decimalNumberByAdding:(RLMDecimal128 *)decimalNumber;

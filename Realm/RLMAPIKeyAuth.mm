@@ -33,7 +33,7 @@
     return self.app._realmApp->current_user();
 }
 
-- (void)createApiKeyWithName:(NSString *)name
+- (void)createAPIKeyWithName:(NSString *)name
                   completion:(RLMOptionalUserAPIKeyBlock)completion {
     
     self.client.create_api_key(name.UTF8String, self.currentUser,
@@ -51,7 +51,7 @@
     });
 }
 
-- (void)fetchApiKey:(RLMObjectId *)objectId
+- (void)fetchAPIKey:(RLMObjectId *)objectId
          completion:(RLMOptionalUserAPIKeyBlock)completion {
     self.client.fetch_api_key(objectId.value,
                               self.currentUser,
@@ -69,7 +69,7 @@
     });
 }
 
-- (void)fetchApiKeysWithCompletion:(RLMUserAPIKeysBlock)completion {
+- (void)fetchAPIKeysWithCompletion:(RLMUserAPIKeysBlock)completion {
     self.client.fetch_api_keys(self.currentUser,
                                ^(const std::vector<realm::app::App::UserAPIKey>& userAPIKeys,
                                  realm::util::Optional<realm::app::AppError> error) {
@@ -86,7 +86,7 @@
     });
 }
 
-- (void)deleteApiKey:(RLMObjectId *)objectId
+- (void)deleteAPIKey:(RLMObjectId *)objectId
           completion:(RLMAPIKeyAuthOptionalErrorBlock)completion {
     self.client.delete_api_key(objectId.value,
                                self.currentUser,
@@ -95,7 +95,7 @@
     });
 }
 
-- (void)enableApiKey:(RLMObjectId *)objectId
+- (void)enableAPIKey:(RLMObjectId *)objectId
           completion:(RLMAPIKeyAuthOptionalErrorBlock)completion {
     self.client.enable_api_key(objectId.value,
                                self.currentUser,
@@ -104,7 +104,7 @@
     });
 }
 
-- (void)disableApiKey:(RLMObjectId *)objectId
+- (void)disableAPIKey:(RLMObjectId *)objectId
            completion:(RLMAPIKeyAuthOptionalErrorBlock)completion {
     self.client.disable_api_key(objectId.value,
                                 self.currentUser,

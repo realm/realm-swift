@@ -203,11 +203,6 @@ extension Decimal128: SignedNumeric {
         self.__magnitude as! Magnitude
     }
 
-    /// Replaces this Decimal128 value with its additive inverse.
-    public func negate() {
-        self.__negate()
-    }
-
     /// Adds two decimal128 values and produces their sum.
     ///
     /// - Parameters:
@@ -294,7 +289,7 @@ extension Decimal128: Strideable {
     /// - Parameter other: The Decimal128 value to calculate the distance to.
     /// - Returns: The distance from this value to `other`.
     public func distance(to other: Decimal128) -> Stride {
-        self-other
+        other-self
     }
 
     /// Returns a Decimal128 that is offset the specified distance from this value.

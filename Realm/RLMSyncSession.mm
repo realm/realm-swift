@@ -22,6 +22,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMUser_Private.hpp"
+#import "RLMSyncManager_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 
 #import "sync/async_open_task.hpp"
@@ -139,8 +140,11 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
 
 - (RLMUser *)parentUser {
     if (auto session = _session.lock()) {
-        return [[RLMUser alloc] initWithUser:session->user()
-                                         app:[RLMApp appWithId:@(SyncManager::shared().app()->config().app_id.data())]];
+        if (auto app = session->user()->sync_manager()->app().lock()) {
+            return [[RLMUser alloc] initWithUser:session->user()
+                                             app:[RLMApp appWithId:[NSString stringWithCString:app->config().app_id.data()
+                                                                                      encoding:NSUTF8StringEncoding]]];
+        }
     }
     return nil;
 }
@@ -214,12 +218,13 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
     return nil;
 }
 
-+ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token {
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token syncManager:(RLMSyncManager *)syncManager {
     if (!token->_isValid) {
         return;
     }
     token->_isValid = NO;
-    SyncManager::shared().immediately_run_file_actions(std::move(token->_originalPath));
+
+    [syncManager syncManager]->immediately_run_file_actions(std::move(token->_originalPath));
 }
 
 + (nullable RLMSyncSession *)sessionForRealm:(RLMRealm *)realm {
