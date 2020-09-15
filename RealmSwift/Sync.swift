@@ -278,15 +278,14 @@ public struct Functions {
     @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
     public subscript(dynamicMember string: String) -> ([AnyBSON]) -> Future<AnyBSON, Error> {
         return { (arguments: [AnyBSON]) in
-            return Future { promise in
-                let objcArgs = arguments.map(ObjectiveCSupport.convert) as! [RLMBSON]
-                self.user?.__callFunctionNamed(string, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
-                    if let bson = ObjectiveCSupport.convert(object: bson) {
+            return Future<AnyBSON, Error> { promise in
+                self[dynamicMember: string](arguments, { bson, error in
+                    if let bson = bson {
                         promise(.success(bson))
                     } else {
-                        promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                        promise(.failure(error ?? Realm.Error.failedPromise))
                     }
-                }
+                })
             }
         }
     }
@@ -566,7 +565,7 @@ public extension App {
                 if let user = user {
                 promise(.success(user))
                 } else {
-                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                    promise(.failure(error ?? Realm.Error.failedPromise))
                 }
             }
         }
@@ -583,7 +582,7 @@ public extension User {
                 if let customData = customData {
                     promise(.success(customData))
                 } else {
-                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                    promise(.failure(error ?? Realm.Error.failedPromise))
                 }
             }
         }
@@ -600,7 +599,7 @@ public extension User {
                 if let user = user {
                     promise(.success(user))
                 } else {
-                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                    promise(.failure(error ?? Realm.Error.failedPromise))
                 }
             }
         }
@@ -651,7 +650,7 @@ public extension MongoCollection {
                 if let objectId = objectId {
                     promise(.success(try! ObjectId(string: objectId.stringValue)))
                 } else {
-                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                    promise(.failure(error ?? Realm.Error.failedPromise))
                 }
             }
         }
@@ -667,7 +666,7 @@ public extension MongoCollection {
                 if let objectIds = objectIds?.map({ try! ObjectId(string: $0.stringValue) }) {
                     promise(.success(objectIds))
                 } else {
-                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                    promise(.failure(error ?? Realm.Error.failedPromise))
                 }
             }
         }
@@ -680,11 +679,11 @@ public extension MongoCollection {
     func find(filter: Document, options: FindOptions) -> Future<[Document], Error> {
         return Future { promise in
             self.find(filter: filter, options: options) { documents, error in
-                let bson: [Document]? = documents?.map { $0.map { ($0, ObjectiveCSupport.convert(object: $1)) } }
+                let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                    promise(.failure(error ?? Realm.Error.failedPromise))
                 }
             }
         }
@@ -696,11 +695,11 @@ public extension MongoCollection {
     func find(filter: Document) -> Future<[Document], Error> {
         return Future { promise in
             self.find(filter: filter) { documents, error in
-                let bson: [Document]? = documents?.map { $0.map { ($0, ObjectiveCSupport.convert(object: $1)) } }
+                let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                    promise(.failure(error ?? Realm.Error.failedPromise))
                 }
             }
         }
@@ -716,11 +715,11 @@ public extension MongoCollection {
     func findOneDocument(filter: Document, options: FindOptions) -> Future<[Document], Error> {
         return Future { promise in
             self.find(filter: filter) { documents, error in
-                let bson: [Document]? = documents?.map { $0.map { ($0, ObjectiveCSupport.convert(object: $1)) } }
+                let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                    promise(.failure(error ?? Realm.Error.failedPromise))
                 }
             }
         }
@@ -735,11 +734,11 @@ public extension MongoCollection {
     func findOneDocument(filter: Document) -> Future<Document, Error> {
         return Future { promise in
             self.findOneDocument(filter: filter) { document, error in
-                let bson: Document? = document?.map { ($0, ObjectiveCSupport.convert(object: $1)) }
+                let bson: Document? = document?.mapValues({ ObjectiveCSupport.convert(object: $0) })
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                    promise(.failure(error ?? Realm.Error.failedPromise))
                 }
             }
         }
@@ -751,11 +750,11 @@ public extension MongoCollection {
     func aggregate(pipeline: [Document]) -> Future<[Document], Error> {
         return Future { promise in
             self.aggregate(pipeline: pipeline) { documents, error in
-                let bson: [Document]? = documents?.map { $0.map { ($0, ObjectiveCSupport.convert(object: $1)) } }
+                let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                    promise(.failure(error ?? Realm.Error.failedPromise))
                 }
             }
         }
@@ -833,7 +832,7 @@ public extension MongoCollection {
                 if let updateResult = updateResult {
                     promise(.success(updateResult))
                 } else {
-                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                    promise(.failure(error ?? Realm.Error.failedPromise))
                 }
             }
         }
@@ -849,7 +848,7 @@ public extension MongoCollection {
                 if let updateResult = updateResult {
                     promise(.success(updateResult))
                 } else {
-                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                    promise(.failure(error ?? Realm.Error.failedPromise))
                 }
             }
         }
@@ -866,7 +865,7 @@ public extension MongoCollection {
                 if let updateResult = updateResult {
                     promise(.success(updateResult))
                 } else {
-                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                    promise(.failure(error ?? Realm.Error.failedPromise))
                 }
             }
         }
@@ -882,7 +881,7 @@ public extension MongoCollection {
                 if let updateResult = updateResult {
                     promise(.success(updateResult))
                 } else {
-                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
+                    promise(.failure(error ?? Realm.Error.failedPromise))
                 }
             }
         }
@@ -904,7 +903,7 @@ public extension MongoCollection {
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    let bson: Document? = updateResult?.map { ($0, ObjectiveCSupport.convert(object: $1)) }
+                    let bson: Document? = updateResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
                     promise(.success(bson))
                 }
             }
@@ -926,7 +925,7 @@ public extension MongoCollection {
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    let bson: Document? = updateResult?.map { ($0, ObjectiveCSupport.convert(object: $1)) }
+                    let bson: Document? = updateResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
                     promise(.success(bson))
                 }
             }
@@ -949,7 +948,7 @@ public extension MongoCollection {
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    let bson: Document? = updateResult?.map { ($0, ObjectiveCSupport.convert(object: $1)) }
+                    let bson: Document? = updateResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
                     promise(.success(bson))
                 }
             }
@@ -971,7 +970,7 @@ public extension MongoCollection {
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    let bson: Document? = updateResult?.map { ($0, ObjectiveCSupport.convert(object: $1)) }
+                    let bson: Document? = updateResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
                     promise(.success(bson))
                 }
             }
@@ -993,7 +992,7 @@ public extension MongoCollection {
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    let bson: Document? = deleteResult?.map { ($0, ObjectiveCSupport.convert(object: $1)) }
+                    let bson: Document? = deleteResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
                     promise(.success(bson))
                 }
             }
@@ -1014,26 +1013,11 @@ public extension MongoCollection {
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    let bson: Document? = deleteResult?.map { ($0, ObjectiveCSupport.convert(object: $1)) }
+                    let bson: Document? = deleteResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
                     promise(.success(bson))
                 }
             }
         }
-    }
-}
-
-// MARK: Dictionary
-fileprivate extension Dictionary {
-    /// map Dictionary to dictionary
-    /// Used to map [String: RLMBSON] to [String: AnyBSON]
-    /// let dict: [String: Int] = ["a": "1", "b": "2"].map { ($0, Int($1)!) }
-    func map<U, V>(_ closure: (Key, Value) -> (U, V)) -> [U: V] {
-        var ret = [U: V]()
-        for (k0, v0) in self {
-            let (k1, v1) = closure(k0, v0)
-            ret[k1] = v1
-        }
-        return ret
     }
 }
 #endif

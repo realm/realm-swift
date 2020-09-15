@@ -88,6 +88,8 @@ extension Realm {
             let configuration = userInfo[RLMBackupRealmConfigurationErrorKey] as! RLMRealmConfiguration?
             return configuration.map(Realm.Configuration.fromRLMRealmConfiguration)
         }
+
+        public static let failedPromise = Error(.fail, userInfo: [NSLocalizedDescriptionKey: "Promise failed"])
     }
 }
 
@@ -118,11 +120,4 @@ public func == (lhs: Error, rhs: Error) -> Bool {
 */
 public func ~= (lhs: Realm.Error, rhs: Error) -> Bool {
     return lhs == rhs
-}
-
-extension NSError {
-    /// Implementation of init to consume Realm.Error
-    convenience init(_ code: Realm.Error.Code, message: String) {
-        self.init(domain: Realm.Error.errorDomain, code: code.rawValue, userInfo: [NSLocalizedDescriptionKey: message])
-    }
 }
