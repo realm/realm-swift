@@ -88,6 +88,8 @@ extension Realm {
             let configuration = userInfo[RLMBackupRealmConfigurationErrorKey] as! RLMRealmConfiguration?
             return configuration.map(Realm.Configuration.fromRLMRealmConfiguration)
         }
+
+        public static let promiseFailed = Error(.fail, userInfo: [NSLocalizedDescriptionKey: "Promise failed"])
     }
 }
 

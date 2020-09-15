@@ -45,6 +45,13 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add ability to stream change events on a remote MongoDB collection with `[RLMMongoCollection watch:delegate:delegateQueue]`, `MongoCollection.watch(delegate)`. When calling `watch(delegate)` you will be given a `RLMChangeStream` (`ChangeStream`), this will be used to invalidate and stop the streaming session by calling `[RLMChangeStream close]` (`ChangeStream.close()`) when needed.
 * Add `MongoCollection.watch`, which is a Combine publisher that will stream
   change events each time the remote MongoDB collection is updated.
+* Add Combine support for: 
+    * PushClient
+    * APIKeyAuth
+    * User
+    * MongoCollection
+    * EmailPasswordAuth
+    * App.login
 * Add ability to open a synced Realm with a `nil` partition value.
 
 ### Fixed
