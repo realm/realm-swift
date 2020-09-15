@@ -136,7 +136,7 @@ extension Decimal128: Comparable {
     ///   - lhs: A Decimal128 value to compare.
     ///   - rhs: Another Decimal128 value to compare.
     public static func == (lhs: Decimal128, rhs: Decimal128) -> Bool {
-        lhs.isEqual(to: rhs)
+        lhs.isEqual(rhs)
     }
 
     /// Returns a Boolean value indicating whether the decimal128 value of the first
