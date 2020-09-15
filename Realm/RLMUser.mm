@@ -187,7 +187,7 @@ using namespace realm;
 }
 
 - (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
-    _app._realmApp->log_out(^(realm::util::Optional<app::AppError> error) {
+    _app._realmApp->log_out(_user, ^(realm::util::Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }

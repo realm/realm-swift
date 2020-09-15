@@ -133,15 +133,23 @@
 }
 
 - (void)testLogoutSpecificUser {
-    RLMUser *syncUser = self.anonymousUser;
+    RLMUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                             register:YES]];
+    RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test@10gen.com"
+                                                                              register:YES]];
+
+    XCTAssertTrue([[self.app currentUser].identity isEqualTo:secondUser.identity]);
+    // `[app currentUser]` will now be `secondUser`, so let's logout firstUser and ensure
+    // the state is correct
     XCTestExpectation *expectation = [self expectationWithDescription:@"should log out current user"];
-    [syncUser logOutWithCompletion:^(NSError *error) {
+    [firstUser logOutWithCompletion:^(NSError *error) {
         XCTAssertNil(error);
-        XCTAssertEqual(syncUser.state, RLMUserStateRemoved);
+        XCTAssertEqual(firstUser.state, RLMUserStateLoggedOut);
+        XCTAssertEqual(secondUser.state, RLMUserStateLoggedIn);
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
 }
 
 - (void)testSwitchUser {
