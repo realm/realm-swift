@@ -19,11 +19,11 @@ x.y.z Release notes (yyyy-MM-dd)
 |:------------------------------------------------------------|:---------------------------------------------------------------|
 | `RLMUser.identity`                                               | `RLMUser.identifier`                                                      |
 | `User.identity`                                                  | `User.id`                                                         |
-| `-[RLMCredentials credentialsWithUsername:password]`                                          | `-[RLMCredentials credentialsWithEmail:password]`                                                |
+| `-[RLMCredentials credentialsWithUsername:password:]`                                          | `-[RLMCredentials credentialsWithEmail:password:]`                                                |
 | `Credentials(username:password:)`                                             | `Credentials(email:password:)`                                                   |
 | -`[RLMUser apiKeyAuth]`                                                  | `-[RLMUser apiKeysAuth]`                                                          |
 | `User.apiKeyAuth()`                               | `User.apiKeysAuth()`                                                |
-| `-[RLMEmailPasswordAuth registerEmail:password:completion:]`                         | `-[RLMEmailPasswordAuth registerUserWithEmail:password:completion]`                                         |
+| `-[RLMEmailPasswordAuth registerEmail:password:completion:]`                         | `-[RLMEmailPasswordAuth registerUserWithEmail:password:completion:]`                                         |
 | `App.emailPasswordAuth().registerEmail(email:password:)`                            | `App.emailPasswordAuth().registerUser(email:password:)`                                            |
 
 ### Compatibility
