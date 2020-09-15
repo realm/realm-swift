@@ -83,26 +83,14 @@ NS_ASSUME_NONNULL_BEGIN
 /// Adds the right hand side to the current value and returns the result.
 - (RLMDecimal128 *)decimalNumberByAdding:(RLMDecimal128 *)decimalNumber;
 
-/// Adds two values and stores the result in the left-hand-side variable.
-- (void)additionAssignmentWith:(RLMDecimal128 *)decimalNumber;
-
 /// Divides the right hand side to the current value and returns the result.
 - (RLMDecimal128 *)decimalNumberByDividingBy:(RLMDecimal128 *)decimalNumber;
-
-/// Divides the right hand side to the current value and stores the result in the lhs.
-- (void)dividingAssignmentWith:(RLMDecimal128 *)decimalNumber;
 
 /// Subtracts the right hand side to the current value and returns the result.
 - (RLMDecimal128 *)decimalNumberBySubtracting:(RLMDecimal128 *)decimalNumber;
 
-/// Adds two values and stores the result in the left-hand-side variable.
-- (void)subtractionAssignmentWith:(RLMDecimal128 *)decimalNumber;
-
 /// Multiply the right hand side to the current value and returns the result.
 - (RLMDecimal128 *)decimalNumberByMultiplyingBy:(RLMDecimal128 *)decimalNumber;
-
-/// Multiply two values and stores the result in the left-hand-side variable.
-- (void)multiplicationAssignmentWith:(RLMDecimal128 *)decimalNumber;
 
 /// Comparision operator to check if the right hand side is greater than the current value.
 - (BOOL)isGreaterThan:(nullable RLMDecimal128 *)decimalNumber;

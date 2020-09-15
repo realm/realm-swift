@@ -60,24 +60,6 @@ class Decimal128Tests: TestCase {
         XCTAssertEqual(d6, 1.0)
     }
 
-    func testDecimal128AdditionAssignment() {
-        var d1: Decimal128 = 3.144444
-        let d2: Decimal128 = 3.144444
-        var d3: Decimal128 = "1.234567"
-        var d4: Decimal128 = "9.876543"
-        var d5 = Decimal128.init(exactly: 0b00000010)
-
-        d1+=d2
-        d3+="1.234567"
-        d4+=2.0000000013456546123
-        d5!+=0b00000010
-
-        XCTAssertEqual(d1, 6.28888)
-        XCTAssertEqual(d3, "2.469134")
-        XCTAssertEqual(d4.doubleValue, 11.876543000000002)
-        XCTAssertEqual(d5, 4.0)
-    }
-
     func testDecimal128Subtraction() {
         let d1: Decimal128 = 2.5
         let d2: Decimal128 = 3.5
@@ -101,24 +83,6 @@ class Decimal128Tests: TestCase {
         XCTAssertEqual(d6, 1.0)
     }
 
-    func testDecimal128SubtractionAssignment() {
-        var d1: Decimal128 = 2.5
-        let d2: Decimal128 = 3.5
-        var d3: Decimal128 = "2.5"
-        var d4: Decimal128 = "3.5"
-        var d5 = Decimal128.init(exactly: 0b00000010)
-
-        d1-=d2
-        d3-="3.5"
-        d4-=1.5
-        d5!-=0b00000001
-
-        XCTAssertEqual(d1, -1)
-        XCTAssertEqual(d3, "-1.0")
-        XCTAssertEqual(d4.doubleValue, 2.0)
-        XCTAssertEqual(d5, 1)
-    }
-
     func testDecimal128Division() {
         let d1: Decimal128 = 7
         let d2: Decimal128 = 3.5
@@ -136,24 +100,6 @@ class Decimal128Tests: TestCase {
         XCTAssertEqual(division3, 2)
     }
 
-    func testDecimal128DivisionAssignment() {
-        var d1: Decimal128 = 10.0
-        let d2: Decimal128 = 5.0
-        var d3: Decimal128 = "1.234567"
-        var d4: Decimal128 = "9.876543"
-        var d5 = Decimal128.init(exactly: 0b00000010)
-
-        d1/=d2
-        d3/="1.234567"
-        d4/=2.0000000013456546123
-        d5!/=0b00000010
-
-        XCTAssertEqual(d1, 2)
-        XCTAssertEqual(d3, "1.0")
-        XCTAssertEqual(d4.doubleValue, 4.938271500000001)
-        XCTAssertEqual(d5, 1.0)
-    }
-
     func testDecimal128Multiplication() {
         let d1: Decimal128 = 7
         let d2: Decimal128 = 3.5
@@ -168,24 +114,6 @@ class Decimal128Tests: TestCase {
         XCTAssertEqual(multiplication1, 24.5)
         XCTAssertEqual(multiplication2, 0.147)
         XCTAssertEqual(multiplication3, 4)
-    }
-
-    func testDecimal128MultiplicationAssignment() {
-        var d1: Decimal128 = 7
-        let d2: Decimal128 = 3.5
-        var d3: Decimal128 = "0.21"
-        var d4: Decimal128 = "0.7"
-        var d5 = Decimal128.init(exactly: 0b00000010)
-
-        d1*=d2
-        d3*=d4
-        d4*=0.5
-        d5!*=0b00000010
-
-        XCTAssertEqual(d1, 24.5)
-        XCTAssertEqual(d3, "0.147")
-        XCTAssertEqual(d4.doubleValue, 0.35)
-        XCTAssertEqual(d5, 4.0)
     }
 
     // MARK: Comparison

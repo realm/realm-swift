@@ -68,26 +68,11 @@
     XCTAssertEqual(d2.doubleValue, 6.28318);
 }
 
-- (void)testDecimal128AdditionAssignment {
-    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@3.14159];
-    [d1 additionAssignmentWith:[RLMDecimal128 decimalWithNumber:@3.14159]];
-    XCTAssertEqual(d1.doubleValue, 6.28318);
-    XCTAssertTrue([d1.stringValue isEqualToString:@"6.28318"]);
-    XCTAssertEqual(d1.doubleValue, 6.28318);
-}
-
 - (void)testDecimal128Subtraction {
     RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@2.5];
     RLMDecimal128 *d2 = [d1 decimalNumberBySubtracting:[[RLMDecimal128 alloc] initWithString:@"5.5" error:nil]];
     XCTAssertEqual(d2.doubleValue, -3.0);
     XCTAssertTrue([d2.stringValue isEqualToString:@"-3.0"]);
-}
-
-- (void)testDecimal128SubtractionAssignment {
-    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@2.5];
-    [d1 subtractionAssignmentWith:[RLMDecimal128 decimalWithNumber:@10.5]];
-    XCTAssertEqual(d1.doubleValue, -8.0);
-    XCTAssertTrue([d1.stringValue isEqualToString:@"-8.0"]);
 }
 
 - (void)testDecimal128Division {
@@ -98,26 +83,12 @@
     XCTAssertTrue([result.stringValue isEqualToString:@"3E-1"]);
 }
 
-- (void)testDecimal128DivisionAssignment {
-    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@10.];
-    [d1 dividingAssignmentWith:[RLMDecimal128 decimalWithNumber:@2.5]];
-    XCTAssertEqual(d1.doubleValue, 4.0);
-    XCTAssertTrue([d1.stringValue isEqualToString:@"4"]);
-}
-
 - (void)testDecimal128Multiplication {
     RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@1.5];
     RLMDecimal128 *d2 = [[RLMDecimal128 alloc] initWithString:@"2.5" error:nil];
     RLMDecimal128 *result = [d1 decimalNumberByMultiplyingBy:d2];
     XCTAssertEqual(result.doubleValue, 3.75);
     XCTAssertTrue([result.stringValue isEqualToString:@"3.75"]);
-}
-
-- (void)testDecimal128MultiplicationAssignment {
-    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@0.5];
-    [d1 multiplicationAssignmentWith:[RLMDecimal128 decimalWithNumber:@2.5]];
-    XCTAssertEqual(d1.doubleValue, 1.25);
-    XCTAssertTrue([d1.stringValue isEqualToString:@"1.25"]);
 }
 
 #pragma mark - Comparison

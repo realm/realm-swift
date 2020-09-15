@@ -180,7 +180,7 @@ extension Decimal128: Comparable {
     }
 }
 
-extension Decimal128: SignedNumeric {
+extension Decimal128 {
     /// Creates a new instance from the given integer, if it can be represented
     /// exactly.
     ///
@@ -212,15 +212,6 @@ extension Decimal128: SignedNumeric {
         lhs.decimalNumber(byAdding: rhs) as! Decimal128
     }
 
-    /// Adds two decimal128 values and stores the result in the left-hand-side variable.
-    ///
-    /// - Parameters:
-    ///   - lhs: The first Decimal128 value to add.
-    ///   - rhs: The second Decimal128 value to add.
-    public static func += (lhs: inout Decimal128, rhs: Decimal128) {
-        lhs.additionAssignment(with: rhs)
-    }
-
     /// Subtracts one Decimal128 value from another and produces their difference.
     ///
     /// - Parameters:
@@ -228,16 +219,6 @@ extension Decimal128: SignedNumeric {
     ///   - rhs: The Decimal128 value to subtract from `lhs`.
     public static func - (lhs: Decimal128, rhs: Decimal128) -> Decimal128 {
         lhs.decimalNumber(bySubtracting: rhs) as! Decimal128
-    }
-
-    /// Subtracts the second Decimal128 value from the first and stores the difference in the
-    /// left-hand-side variable.
-    ///
-    /// - Parameters:
-    ///   - lhs: A Decimal128 value.
-    ///   - rhs: The Decimal128 value to subtract from `lhs`.
-    public static func -= (lhs: inout Decimal128, rhs: Decimal128) {
-        lhs.subtractionAssignment(with: rhs)
     }
 
     /// Multiplies two Decimal128 values and produces their product.
@@ -249,16 +230,6 @@ extension Decimal128: SignedNumeric {
         lhs.decimalNumberByMultiplying(by: rhs) as! Decimal128
     }
 
-    /// Multiplies two Decimal128 values and stores the result in the left-hand-side
-    /// variable.
-    ///
-    /// - Parameters:
-    ///   - lhs: The first Decimal128 value to multiply.
-    ///   - rhs: The second Decimal128 value to multiply.
-    public static func *= (lhs: inout Decimal128, rhs: Decimal128) {
-        lhs.multiplicationAssignment(with: rhs)
-    }
-
     /// Returns the quotient of dividing the first Decimal128 value by the second.
     ///
     /// - Parameters:
@@ -267,19 +238,9 @@ extension Decimal128: SignedNumeric {
     public static func / (lhs: Decimal128, rhs: Decimal128) -> Decimal128 {
         lhs.decimalNumberByDividing(by: rhs) as! Decimal128
     }
-
-    /// Divides the first Decimal128 value by the second and stores the quotient in the
-    /// left-hand-side variable.
-    ///
-    /// - Parameters:
-    ///   - lhs: The Decimal128 value to divide.
-    ///   - rhs: The Decimal128 value to divide `lhs` by. `rhs` must not be zero.
-    public static func /= (lhs: inout Decimal128, rhs: Decimal128) {
-        lhs.dividingAssignment(with: rhs)
-    }
 }
 
-extension Decimal128: Strideable {
+extension Decimal128 {
     /// A type that represents the distance between two values.
     public typealias Stride = Decimal128
 
