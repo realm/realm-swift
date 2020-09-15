@@ -438,19 +438,18 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)setupSyncManager {
-    NSURL *clientDataRoot;
     NSError *error;
-    if (self.isParent) {
-        clientDataRoot = [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
-    } else {
-        clientDataRoot = syncDirectoryForChildProcess();
-    }
-    [NSFileManager.defaultManager removeItemAtURL:clientDataRoot error:&error];
-    [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
-                           withIntermediateDirectories:YES attributes:nil error:&error];
-
     _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmServer.shared createAppAndReturnError:&error];
-    _app = [RLMApp appWithId:_appId configuration:self.defaultAppConfiguration rootDirectory:clientDataRoot];
+    if (auto ids = NSProcessInfo.processInfo.environment[@"RLMParentAppIds"]) {
+        _appIds = [ids componentsSeparatedByString:@","];   //take the one array for split the string
+    }
+
+    if (self.isParent) {
+        [NSFileManager.defaultManager removeItemAtURL:[self clientDataRoot] error:&error];
+        [NSFileManager.defaultManager removeItemAtURL:syncDirectoryForChildProcess() error:&error];
+    }
+
+    _app = [RLMApp appWithId:_appId configuration:self.defaultAppConfiguration rootDirectory:[self clientDataRoot]];
 
     RLMSyncManager *syncManager = [[self app] syncManager];
     syncManager.logLevel = RLMSyncLogLevelTrace;
@@ -504,6 +503,20 @@ static NSURL *syncDirectoryForChildProcess() {
         [deleteManyExpectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
+
+- (NSURL *)clientDataRoot {
+    NSError *error;
+    NSURL *clientDataRoot;
+    if (self.isParent) {
+        clientDataRoot = [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
+    } else {
+        clientDataRoot = syncDirectoryForChildProcess();
+    }
+
+    [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
+                           withIntermediateDirectories:YES attributes:nil error:&error];
+    return clientDataRoot;
 }
 
 @end

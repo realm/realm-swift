@@ -13,13 +13,13 @@ DEPENDENCIES = File.open("#{BASE_DIR}/dependencies.list").map { |line|
 }.to_h
 
 MONGODB_VERSION='4.4.0-rc5'
-GO_VERSION='1.14.2'
+GO_VERSION='1.15.2'
 NODE_VERSION='8.11.2'
 STITCH_VERSION=DEPENDENCIES["STITCH_VERSION"]
 
 MONGODB_URL="https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-#{MONGODB_VERSION}.tgz"
 TRANSPILER_TARGET='node8-macos'
-SERVER_STITCH_LIB_URL="https://s3.amazonaws.com/mciuploads/mongodb-mongo-master/stitch-support/macos-debug/e791a2ea966bb302ff180dd4538d87c078e74747/stitch-support-4.3.2-721-ge791a2e-patch-5e2a6ad2a4cf473ae2e67b09.tgz"
+SERVER_STITCH_LIB_URL="https://s3.amazonaws.com/stitch-artifacts/stitch-support/stitch-support-macos-debug-4.3.2-721-ge791a2e-patch-5e2a6ad2a4cf473ae2e67b09.tgz"
 MONGO_DIR="'#{BUILD_DIR}'/mongodb-macos-x86_64-#{MONGODB_VERSION}"
 
 def setup_mongod

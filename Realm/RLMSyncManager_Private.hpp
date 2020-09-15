@@ -23,6 +23,8 @@
 #import <memory>
 
 namespace realm {
+struct SyncClientConfig;
+class SyncManager;
 namespace app {
 class App;
 }
@@ -39,13 +41,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable, nonatomic, copy) RLMSyncBasicErrorReportingBlock sessionCompletionNotifier;
 
-- (std::shared_ptr<realm::app::App>)app;
+- (std::weak_ptr<realm::app::App>)app;
+- (std::shared_ptr<realm::SyncManager>)syncManager;
+- (instancetype)initWithSyncManager:(std::shared_ptr<realm::SyncManager>)syncManager;
 
-- (instancetype)initWithAppConfiguration:(RLMAppConfiguration *)appConfiguration
-                           rootDirectory:(NSURL *)rootDirectory;
-
-- (void)configureWithRootDirectory:(nullable NSURL *)rootDirectory
-                  appConfiguration:(nonnull RLMAppConfiguration *)appConfiguration;
++ (realm::SyncClientConfig)configurationWithRootDirectory:(nullable NSURL *)rootDirectory
+                                                    appId:(nonnull NSString *)appId;
 
 - (void)_fireError:(NSError *)error;
 

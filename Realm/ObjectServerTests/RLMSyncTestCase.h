@@ -67,6 +67,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) RLMApp *app;
 
+/// Any stray app ids passed between processes
+@property (nonatomic, readonly) NSArray<NSString *> *appIds;
+
 - (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm;
@@ -155,6 +158,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)badAccessToken;
 
 - (void)cleanupRemoteDocuments:(RLMMongoCollection *)collection;
+
+- (nonnull NSURL *)clientDataRoot;
 
 @end
 

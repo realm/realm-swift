@@ -82,6 +82,15 @@ namespace {
     realm::app::App::Config _config;
 }
 
+- (instancetype)initWithConfig:(const realm::app::App::Config &)config {
+    if (self = [super init]) {
+        _config = config;
+        return self;
+    }
+
+    return nil;
+}
+
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
                    localAppName:(nullable NSString *)localAppName
@@ -211,6 +220,17 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 @implementation RLMApp : NSObject
 
+- (instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app {
+    if (self = [super init]) {
+        _configuration = [[RLMAppConfiguration alloc] initWithConfig:app->config()];
+        _app = app;
+        _syncManager = [[RLMSyncManager alloc] initWithSyncManager:_app->sync_manager()];
+        return self;
+    }
+
+    return nil;
+}
+
 - (instancetype)initWithId:(NSString *)appId
              configuration:(RLMAppConfiguration *)configuration
              rootDirectory:(NSURL *)rootDirectory {
@@ -224,10 +244,10 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
         _configuration = configuration;
         [_configuration setAppId:appId];
 
-        _syncManager = [[RLMSyncManager alloc] initWithAppConfiguration:configuration
-                                                          rootDirectory:rootDirectory];
-        _app = [_syncManager app];
+        _app = app::App::get_shared_app([configuration config],
+                                        [RLMSyncManager configurationWithRootDirectory:rootDirectory appId:appId]);
 
+        _syncManager = [[RLMSyncManager alloc] initWithSyncManager:_app->sync_manager()];
         return self;
     }
     return nil;
@@ -264,7 +284,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 - (NSDictionary<NSString *, RLMUser *> *)allUsers {
     NSMutableDictionary *buffer = [NSMutableDictionary new];
-    for (auto user : SyncManager::shared().all_users()) {
+    for (auto user : _app->sync_manager()->all_users()) {
         std::string identity(user->identity());
         buffer[@(identity.c_str())] = [[RLMUser alloc] initWithUser:std::move(user) app:self];
     }
@@ -272,7 +292,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 }
 
 - (RLMUser *)currentUser {
-    if (auto user = SyncManager::shared().get_current_user()) {
+    if (auto user = _app->sync_manager()->get_current_user()) {
         return [[RLMUser alloc] initWithUser:user app:self];
     }
     return nil;

@@ -90,9 +90,8 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 }
 
 - (RLMUser *)user {
-    auto app = realm::SyncManager::shared().app();
     return [[RLMUser alloc] initWithUser:_config->user
-                                     app:[RLMApp appWithId:@(app->config().app_id.data())]];
+                                     app:[RLMApp appWithId:@(_config->user->sync_manager()->app().lock()->config().app_id.data())]];
 }
 
 - (RLMSyncStopPolicy)stopPolicy {

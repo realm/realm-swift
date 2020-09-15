@@ -261,7 +261,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertTrue(theError!.code == SyncError.Code.clientResetError)
             let resetInfo = theError!.clientResetInfo()
             XCTAssertNotNil(resetInfo)
-            XCTAssertTrue(resetInfo!.0.contains("io.realm.object-server-recovered-realms/recovered_realm"))
+            XCTAssertTrue(resetInfo!.0.contains("mongodb-realm/\(self.appId)/recovered-realms/recovered_realm"))
             XCTAssertNotNil(realm)
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
@@ -291,7 +291,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
             let (path, errorToken) = theError!.clientResetInfo()!
             XCTAssertFalse(FileManager.default.fileExists(atPath: path))
-            SyncSession.immediatelyHandleError(errorToken)
+            SyncSession.immediatelyHandleError(errorToken, syncManager: self.app.syncManager)
             XCTAssertTrue(FileManager.default.fileExists(atPath: path))
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
@@ -696,7 +696,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     private func realmURLForFile(_ fileName: String) -> URL {
-        let testDir = RLMRealmPathForFile("realm-object-server")
+        let testDir = RLMRealmPathForFile("mongodb-realm")
         let directory = URL(fileURLWithPath: testDir, isDirectory: true)
         return directory.appendingPathComponent(fileName, isDirectory: false)
     }
@@ -1591,6 +1591,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
+            watchTestUtility.isOpenSemaphore.wait()
             for _ in 0..<3 {
                 collection.insertOne(document) { (_, error) in
                     XCTAssertNil(error)
@@ -1642,6 +1643,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
+            watchTestUtility.isOpenSemaphore.wait()
             for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
@@ -1698,6 +1700,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
+            watchTestUtility.isOpenSemaphore.wait()
             for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
@@ -1765,6 +1768,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
+            watchTestUtility1.isOpenSemaphore.wait()
+            watchTestUtility2.isOpenSemaphore.wait()
             for i in 0..<5 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
