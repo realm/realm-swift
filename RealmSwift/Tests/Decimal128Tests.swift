@@ -197,7 +197,7 @@ class Decimal128Tests: TestCase {
 
     // MARK: Miscellaneous
     func testIsNaN() {
-        let d1: Decimal128 = "not a number"
+        let d1: Decimal128 = .init(value: NSNull.init())
         XCTAssertTrue(d1.isNaN)
         XCTAssertTrue(d1.isSignaling)
         XCTAssertTrue(d1.isSignalingNaN)

@@ -130,7 +130,7 @@
 #pragma mark - Miscellaneous
 
 - (void)testNaN {
-    RLMDecimal128 *nan = [[RLMDecimal128 alloc] initWithString:@"not a number" error:nil];
+    RLMDecimal128 *nan = [[RLMDecimal128 alloc] initWithValue:[NSNull null]];
     XCTAssertTrue(nan.isNaN);
 }
 
