@@ -440,6 +440,10 @@ static NSURL *syncDirectoryForChildProcess() {
 - (void)setupSyncManager {
     NSError *error;
     _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmServer.shared createAppAndReturnError:&error];
+    if (error) {
+        NSLog(@"Failed to create app: %@", error);
+        abort();
+    }
     if (auto ids = NSProcessInfo.processInfo.environment[@"RLMParentAppIds"]) {
         _appIds = [ids componentsSeparatedByString:@","];   //take the one array for split the string
     }

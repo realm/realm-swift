@@ -189,6 +189,9 @@
 - (NSTask *)childTask {
     return nil;
 }
+- (NSTask *)childTaskWithAppIds:(__unused NSArray *)appIds {
+    return nil;
+}
 
 - (int)runChildAndWait {
     return 1;
