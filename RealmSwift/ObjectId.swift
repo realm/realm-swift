@@ -134,5 +134,4 @@ extension ObjectId: Comparable {
     public static func > (lhs: ObjectId, rhs: ObjectId) -> Bool {
         lhs.isGreaterThan(rhs)
     }
-
 }
