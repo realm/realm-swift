@@ -180,14 +180,14 @@ static NSURL *syncDirectoryForChildProcess() {
 - (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
     if (shouldRegister) {
         XCTestExpectation *expectation = [self expectationWithDescription:@""];
-        [[[self app] emailPasswordAuth] registerEmail:name password:@"password" completion:^(NSError * _Nullable error) {
+        [[[self app] emailPasswordAuth] registerUserWithEmail:name password:@"password" completion:^(NSError * _Nullable error) {
             XCTAssertNil(error);
             [expectation fulfill];
         }];
         [self waitForExpectationsWithTimeout:4.0 handler:nil];
     }
-    return [RLMCredentials credentialsWithUsername:name
-                                          password:@"password"];
+    return [RLMCredentials credentialsWithEmail:name
+                                       password:@"password"];
 }
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm {

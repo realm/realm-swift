@@ -1,6 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
 ### Enhancements
+* Add `User.loggedIn`.
 * Add support for multiple Realm Apps
 * Remove `[RLMSyncManager shared]`. This is now instatiated as a property on the app itself.
 
@@ -12,6 +14,18 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Breaking Changes
 * `RLMSyncManager.pinnedCertificatePaths` has been removed.
 * Classes `RLMUserAccountInfo` & `RLMUserInfo` (swift: `UserInfo`, `UserAccountInfo`) have been removed.
+* The following functionality has been renamed to align Cocoa with the other Realm SDKs:
+
+| Old API                                                     | New API                                                        |
+|:------------------------------------------------------------|:---------------------------------------------------------------|
+| `RLMUser.identity`                                               | `RLMUser.identifier`                                                      |
+| `User.identity`                                                  | `User.id`                                                         |
+| `-[RLMCredentials credentialsWithUsername:password:]`                                          | `-[RLMCredentials credentialsWithEmail:password:]`                                                |
+| `Credentials(username:password:)`                                             | `Credentials(email:password:)`                                                   |
+| -`[RLMUser apiKeyAuth]`                                                  | `-[RLMUser apiKeysAuth]`                                                          |
+| `User.apiKeyAuth()`                               | `User.apiKeysAuth()`                                                |
+| `-[RLMEmailPasswordAuth registerEmail:password:completion:]`                         | `-[RLMEmailPasswordAuth registerUserWithEmail:password:completion:]`                                         |
+| `App.emailPasswordAuth().registerEmail(email:password:)`                            | `App.emailPasswordAuth().registerUser(email:password:)`                                            |
 
 ### Compatibility
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)

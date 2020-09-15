@@ -597,9 +597,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - App Credentials
 
-    func testUsernamePasswordCredential() {
-        let usernamePasswordCredential = Credentials(username: "username", password: "password")
-        XCTAssertEqual(usernamePasswordCredential.provider.rawValue, "local-userpass")
+    func testEmailPasswordCredential() {
+        let EmailPasswordCredential = Credentials(email: "email", password: "password")
+        XCTAssertEqual(EmailPasswordCredential.provider.rawValue, "local-userpass")
     }
 
     func testJWTCredentials() {
@@ -647,12 +647,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testInvalidCredentials() {
         do {
-            let username = "testInvalidCredentialsUsername"
+            let email = "testInvalidCredentialsEmail"
             let credentials = basicCredentials()
             let user = try synchronouslyLogInUser(for: credentials)
             XCTAssertEqual(user.state, .loggedIn)
 
-            let credentials2 = Credentials(username: username, password: "NOT_A_VALID_PASSWORD")
+            let credentials2 = Credentials(email: email, password: "NOT_A_VALID_PASSWORD")
             let ex = expectation(description: "Should log in the user properly")
 
             self.app.login(credentials: credentials2, completion: { user2, error in
@@ -728,7 +728,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -737,7 +737,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let loginEx = expectation(description: "Login user")
         var syncUser: User?
 
-        app.login(credentials: Credentials(username: email, password: password)) { (user, error) in
+        app.login(credentials: Credentials(email: email, password: password)) { (user, error) in
             XCTAssertNil(error)
             syncUser = user
             loginEx.fulfill()
@@ -745,7 +745,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         wait(for: [loginEx], timeout: 4.0)
 
-        XCTAssertEqual(syncUser?.identity, app.currentUser()?.identity)
+        XCTAssertEqual(syncUser?.id, app.currentUser()?.id)
         XCTAssertEqual(app.allUsers().count, 1)
     }
 
@@ -759,12 +759,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let registerUser1Ex = expectation(description: "Register user 1")
         let registerUser2Ex = expectation(description: "Register user 2")
 
-        app.emailPasswordAuth().registerEmail(email1, password: password1) { (error) in
+        app.emailPasswordAuth().registerUser(email: email1, password: password1) { (error) in
             XCTAssertNil(error)
             registerUser1Ex.fulfill()
         }
 
-        app.emailPasswordAuth().registerEmail(email2, password: password2) { (error) in
+        app.emailPasswordAuth().registerUser(email: email2, password: password2) { (error) in
             XCTAssertNil(error)
             registerUser2Ex.fulfill()
         }
@@ -777,7 +777,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         var syncUser1: User?
         var syncUser2: User?
 
-        app.login(credentials: Credentials(username: email1, password: password1)) { (user, error) in
+        app.login(credentials: Credentials(email: email1, password: password1)) { (user, error) in
             XCTAssertNil(error)
             syncUser1 = user
             login1Ex.fulfill()
@@ -785,7 +785,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         wait(for: [login1Ex], timeout: 4.0)
 
-        app.login(credentials: Credentials(username: email2, password: password2)) { (user, error) in
+        app.login(credentials: Credentials(email: email2, password: password2)) { (user, error) in
             XCTAssertNil(error)
             syncUser2 = user
             login2Ex.fulfill()
@@ -795,10 +795,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         XCTAssertEqual(app.allUsers().count, 2)
 
-        XCTAssertEqual(syncUser2!.identity, app.currentUser()!.identity)
+        XCTAssertEqual(syncUser2!.id, app.currentUser()!.id)
 
         app.switch(to: syncUser1!)
-        XCTAssertTrue(syncUser1!.identity == app.currentUser()?.identity)
+        XCTAssertTrue(syncUser1!.id == app.currentUser()?.id)
 
         let removeEx = expectation(description: "Remove user 1")
 
@@ -809,7 +809,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         wait(for: [removeEx], timeout: 4.0)
 
-        XCTAssertEqual(syncUser2!.identity, app.currentUser()!.identity)
+        XCTAssertEqual(syncUser2!.id, app.currentUser()!.id)
         XCTAssertEqual(app.allUsers().count, 1)
     }
 
@@ -820,7 +820,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -829,7 +829,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let loginEx = expectation(description: "Login user")
         var syncUser: User?
 
-        let credentials = Credentials(username: email, password: password)
+        let credentials = Credentials(email: email, password: password)
 
         app.login(credentials: Credentials.anonymous()) { (user, error) in
             XCTAssertNil(error)
@@ -849,20 +849,20 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         wait(for: [linkEx], timeout: 4.0)
 
-        XCTAssertEqual(syncUser?.identity, app.currentUser()?.identity)
+        XCTAssertEqual(syncUser?.id, app.currentUser()?.id)
         XCTAssertEqual(syncUser?.identities().count, 2)
     }
 
     // MARK: - Provider Clients
 
-    func testUsernamePasswordProviderClient() {
+    func testEmailPasswordProviderClient() {
 
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -917,14 +917,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
         wait(for: [registerUserEx], timeout: 4.0)
 
         let loginEx = expectation(description: "Login user")
-        let credentials = Credentials(username: email, password: password)
+        let credentials = Credentials(email: email, password: password)
 
         var syncUser: User?
         app.login(credentials: credentials) { (user, error) in
@@ -938,7 +938,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let createAPIKeyEx = expectation(description: "Create user api key")
 
         var apiKey: UserAPIKey?
-        syncUser?.apiKeyAuth().createAPIKey(named: "my-api-key") { (key, error) in
+        syncUser?.apiKeysAuth().createAPIKey(named: "my-api-key") { (key, error) in
             XCTAssertNotNil(key)
             XCTAssertNil(error)
             apiKey = key
@@ -947,7 +947,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [createAPIKeyEx], timeout: 4.0)
 
         let fetchAPIKeyEx = expectation(description: "Fetch user api key")
-        syncUser?.apiKeyAuth().fetchAPIKey(apiKey!.objectId) { (key, error) in
+        syncUser?.apiKeysAuth().fetchAPIKey(apiKey!.objectId) { (key, error) in
             XCTAssertNotNil(key)
             XCTAssertNil(error)
             fetchAPIKeyEx.fulfill()
@@ -955,7 +955,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [fetchAPIKeyEx], timeout: 4.0)
 
         let fetchAPIKeysEx = expectation(description: "Fetch user api keys")
-        syncUser?.apiKeyAuth().fetchAPIKeys(completion: { (keys, error) in
+        syncUser?.apiKeysAuth().fetchAPIKeys(completion: { (keys, error) in
             XCTAssertNotNil(keys)
             XCTAssertEqual(keys!.count, 1)
             XCTAssertNil(error)
@@ -964,21 +964,21 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [fetchAPIKeysEx], timeout: 4.0)
 
         let disableKeyEx = expectation(description: "Disable API key")
-        syncUser?.apiKeyAuth().disableAPIKey(apiKey!.objectId) { (error) in
+        syncUser?.apiKeysAuth().disableAPIKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             disableKeyEx.fulfill()
         }
         wait(for: [disableKeyEx], timeout: 4.0)
 
         let enableKeyEx = expectation(description: "Enable API key")
-        syncUser?.apiKeyAuth().enableAPIKey(apiKey!.objectId) { (error) in
+        syncUser?.apiKeysAuth().enableAPIKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             enableKeyEx.fulfill()
         }
         wait(for: [enableKeyEx], timeout: 4.0)
 
         let deleteKeyEx = expectation(description: "Delete API key")
-        syncUser?.apiKeyAuth().deleteAPIKey(apiKey!.objectId) { (error) in
+        syncUser?.apiKeysAuth().deleteAPIKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             deleteKeyEx.fulfill()
         }
@@ -991,7 +991,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -999,7 +999,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let loginEx = expectation(description: "Login user")
 
-        let credentials = Credentials(username: email, password: password)
+        let credentials = Credentials(email: email, password: password)
         var syncUser: User?
         app.login(credentials: credentials) { (user, error) in
             syncUser = user
@@ -1033,7 +1033,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -1041,7 +1041,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let loginExpectation = expectation(description: "Login user")
 
-        let credentials = Credentials(username: email, password: password)
+        let credentials = Credentials(email: email, password: password)
         app.login(credentials: credentials) { (_, error) in
             XCTAssertNil(error)
             loginExpectation.fulfill()
@@ -1070,14 +1070,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth().registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
         wait(for: [registerUserEx], timeout: 4.0)
 
         let loginEx = expectation(description: "Login user")
-        let credentials = Credentials(username: email, password: password)
+        let credentials = Credentials(email: email, password: password)
         var syncUser: User?
         app.login(credentials: credentials) { (user, error) in
             syncUser = user

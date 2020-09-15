@@ -63,12 +63,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMUser : NSObject
 
 /**
- The unique MongoDB Realm user ID string identifying this user.
+ The unique MongoDB Realm string identifying this user.
+ Note this is different from an identitiy: A user may have multiple identities but has a single indentifier. See RLMUserIdentity.
  */
-@property (nullable, nonatomic, readonly) NSString *identity;
+@property (nullable, nonatomic, readonly) NSString *identifier NS_SWIFT_NAME(id);
 
 /**
-    Returns an array of identities currently linked to a user.
+ Returns an array of identities currently linked to a user.
 */
 - (NSArray<RLMUserIdentity *> *)identities;
 
@@ -93,6 +94,11 @@ NS_ASSUME_NONNULL_BEGIN
  The current state of the user.
  */
 @property (nonatomic, readonly) RLMUserState state;
+
+/**
+ Indicates if the user is logged in or not. Returns true if the access token and refresh token are not empty.
+ */
+@property (nonatomic, readonly) BOOL isLoggedIn;
 
 #pragma mark - Lifecycle
 
@@ -156,7 +162,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Logs out the current user
 
- The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by a username / password or third party auth clients
+ The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by an email / password or third party auth clients
  If the logout request fails, this method will still clear local authentication state.
 
  @param completion A callback invoked on completion
@@ -169,7 +175,7 @@ NS_ASSUME_NONNULL_BEGIN
 
   This client should only be used by an authenticated user.
 */
-- (RLMAPIKeyAuth *)apiKeyAuth;
+- (RLMAPIKeyAuth *)apiKeysAuth;
 
 /// A client for interacting with a remote MongoDB instance
 /// @param serviceName The name of the MongoDB service
@@ -196,26 +202,30 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - User info classes
 
-/// An identity of a user. A user can have multiple identities, usually associated with multiple providers.
+/**
+ An identity of a user. A user can have multiple identities, usually associated with multiple providers.
+ Note this is different from a user's unique identifier string.
+ @seeAlso `RLMUser.identifier`
+ */
 @interface RLMUserIdentity : NSObject
 
 /**
- The associated provider type of the identity
+ The associated provider type
  */
 @property (nonatomic, readonly) NSString *providerType;
 
 /**
- The id of the identity
+ The string which identifies the RLMUserIdentity
  */
-@property (nonatomic, readonly) NSString *identity;
+@property (nonatomic, readonly) NSString *identifier;
 
 /**
- Initialize a sync user for the given identity and provider type.
- @param providerType the provider type of the user
- @param identity the identity of the user
+ Initialize an RLMUserIdentity for the given identifier and provider type.
+ @param providerType the associated provider type
+ @param identifier the identifier of the identity
  */
 - (instancetype)initUserIdentityWithProviderType:(NSString *)providerType
-                                        identity:(NSString *)identity;
+                                      identifier:(NSString *)identifier;
 
 @end
 

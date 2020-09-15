@@ -103,7 +103,7 @@
     RLMUser *syncUser = self.anonymousUser;
 
     RLMUser *currentUser = [app currentUser];
-    XCTAssert([currentUser.identity isEqualToString:syncUser.identity]);
+    XCTAssert([currentUser.identifier isEqualToString:syncUser.identifier]);
     XCTAssert([currentUser.refreshToken isEqualToString:syncUser.refreshToken]);
     XCTAssert([currentUser.accessToken isEqualToString:syncUser.accessToken]);
 }
@@ -158,10 +158,10 @@
     RLMUser *syncUserA = [self anonymousUser];
     RLMUser *syncUserB = [self userForTest:_cmd];
 
-    XCTAssertNotEqualObjects(syncUserA.identity, syncUserB.identity);
-    XCTAssertEqualObjects(app.currentUser.identity, syncUserB.identity);
+    XCTAssertNotEqualObjects(syncUserA.identifier, syncUserB.identifier);
+    XCTAssertEqualObjects(app.currentUser.identifier, syncUserB.identifier);
 
-    XCTAssertEqualObjects([app switchToUser:syncUserA].identity, syncUserA.identity);
+    XCTAssertEqualObjects([app switchToUser:syncUserA].identifier, syncUserA.identifier);
 }
 
 - (void)testRemoveUser {
@@ -172,14 +172,14 @@
     RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test@10gen.com"
                                                                               register:YES]];
 
-    XCTAssert([[app currentUser].identity isEqualToString:secondUser.identity]);
+    XCTAssert([[app currentUser].identifier isEqualToString:secondUser.identifier]);
 
     XCTestExpectation *removeUserExpectation = [self expectationWithDescription:@"should remove user"];
 
     [secondUser removeWithCompletion:^(NSError *error) {
         XCTAssert(!error);
         XCTAssert([app allUsers].count == 1);
-        XCTAssert([[app currentUser].identity isEqualToString:firstUser.identity]);
+        XCTAssert([[app currentUser].identifier isEqualToString:firstUser.identifier]);
         [removeUserExpectation fulfill];
     }];
 
@@ -252,7 +252,7 @@
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
     NSString *randomPassword = [self generateRandomString:10];
 
-    [[app emailPasswordAuth] registerEmail:randomEmail password:randomPassword completion:^(NSError *error) {
+    [[app emailPasswordAuth] registerUserWithEmail:randomEmail password:randomPassword completion:^(NSError *error) {
         XCTAssert(!error);
         [expectation fulfill];
     }];
@@ -336,14 +336,14 @@
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
     NSString *randomPassword = [self generateRandomString:10];
 
-    [[app emailPasswordAuth] registerEmail:randomEmail password:randomPassword completion:^(NSError *error) {
+    [[app emailPasswordAuth] registerUserWithEmail:randomEmail password:randomPassword completion:^(NSError *error) {
         XCTAssert(!error);
         [registerExpectation fulfill];
     }];
 
     [self waitForExpectations:@[registerExpectation] timeout:60.0];
 
-    [app loginWithCredential:[RLMCredentials credentialsWithUsername:randomEmail password:randomPassword]
+    [app loginWithCredential:[RLMCredentials credentialsWithEmail:randomEmail password:randomPassword]
                   completion:^(RLMUser *user, NSError *error) {
         XCTAssert(!error);
         XCTAssert(user);
@@ -353,14 +353,14 @@
 
     [self waitForExpectations:@[loginExpectation] timeout:60.0];
 
-    [[syncUser apiKeyAuth] createAPIKeyWithName:@"apiKeyName1" completion:^(RLMUserAPIKey *userAPIKey, NSError *error) {
+    [[syncUser apiKeysAuth] createAPIKeyWithName:@"apiKeyName1" completion:^(RLMUserAPIKey *userAPIKey, NSError *error) {
         XCTAssert(!error);
         XCTAssert([userAPIKey.name isEqualToString:@"apiKeyName1"]);
         userAPIKeyA = userAPIKey;
         [createAPIKeyExpectationA fulfill];
     }];
 
-    [[syncUser apiKeyAuth] createAPIKeyWithName:@"apiKeyName2" completion:^(RLMUserAPIKey *userAPIKey, NSError *error) {
+    [[syncUser apiKeysAuth] createAPIKeyWithName:@"apiKeyName2" completion:^(RLMUserAPIKey *userAPIKey, NSError *error) {
         XCTAssert(!error);
         XCTAssert([userAPIKey.name isEqualToString:@"apiKeyName2"]);
         userAPIKeyB = userAPIKey;
@@ -372,7 +372,7 @@
     // sleep for 2 seconds as there seems to be an issue fetching the keys straight after they are created.
     [NSThread sleepForTimeInterval:2];
 
-    [[syncUser apiKeyAuth] fetchAPIKeysWithCompletion:^(NSArray<RLMUserAPIKey *> * _Nonnull apiKeys, NSError *error) {
+    [[syncUser apiKeysAuth] fetchAPIKeysWithCompletion:^(NSArray<RLMUserAPIKey *> * _Nonnull apiKeys, NSError *error) {
         XCTAssert(!error);
         XCTAssert(apiKeys.count == 2);
         [fetchAPIKeysExpectation fulfill];
@@ -380,21 +380,21 @@
 
     [self waitForExpectations:@[fetchAPIKeysExpectation] timeout:60.0];
 
-    [[syncUser apiKeyAuth] disableAPIKey:userAPIKeyA.objectId completion:^(NSError *error) {
+    [[syncUser apiKeysAuth] disableAPIKey:userAPIKeyA.objectId completion:^(NSError *error) {
         XCTAssert(!error);
         [disableAPIKeyExpectation fulfill];
     }];
 
     [self waitForExpectations:@[disableAPIKeyExpectation] timeout:60.0];
 
-    [[syncUser apiKeyAuth] enableAPIKey:userAPIKeyA.objectId completion:^(NSError *error) {
+    [[syncUser apiKeysAuth] enableAPIKey:userAPIKeyA.objectId completion:^(NSError *error) {
         XCTAssert(!error);
         [enableAPIKeyExpectation fulfill];
     }];
 
     [self waitForExpectations:@[enableAPIKeyExpectation] timeout:60.0];
 
-    [[syncUser apiKeyAuth] deleteAPIKey:userAPIKeyA.objectId completion:^(NSError *error) {
+    [[syncUser apiKeysAuth] deleteAPIKey:userAPIKeyA.objectId completion:^(NSError *error) {
         XCTAssert(!error);
         [deleteAPIKeyExpectation fulfill];
     }];
@@ -416,14 +416,14 @@
     NSString *randomEmail = [NSString stringWithFormat:@"%@@10gen.com", [self generateRandomString:10]];
     NSString *randomPassword = [self generateRandomString:10];
 
-    [[app emailPasswordAuth] registerEmail:randomEmail password:randomPassword completion:^(NSError *error) {
+    [[app emailPasswordAuth] registerUserWithEmail:randomEmail password:randomPassword completion:^(NSError *error) {
         XCTAssert(!error);
         [registerExpectation fulfill];
     }];
 
     [self waitForExpectations:@[registerExpectation] timeout:60.0];
 
-    [app loginWithCredential:[RLMCredentials credentialsWithUsername:randomEmail password:randomPassword]
+    [app loginWithCredential:[RLMCredentials credentialsWithEmail:randomEmail password:randomPassword]
                   completion:^(RLMUser *user, NSError *error) {
         XCTAssert(!error);
         XCTAssert(user);
@@ -445,9 +445,9 @@
 
 #pragma mark - Auth Credentials -
 
-- (void)testUsernamePasswordCredential {
-    RLMCredentials *usernamePasswordCredential = [RLMCredentials credentialsWithUsername:@"test@mongodb.com" password:@"apassword"];
-    XCTAssertEqualObjects(usernamePasswordCredential.provider, @"local-userpass");
+- (void)testEmailPasswordCredential {
+    RLMCredentials *emailPasswordCredential = [RLMCredentials credentialsWithEmail:@"test@mongodb.com" password:@"apassword"];
+    XCTAssertEqualObjects(emailPasswordCredential.provider, @"local-userpass");
 }
 
 - (void)testJWTCredential {
@@ -495,23 +495,23 @@
 
 #pragma mark - Username Password
 
-/// Valid username/password credentials should be able to log in a user. Using the same credentials should return the
+/// Valid email/password credentials should be able to log in a user. Using the same credentials should return the
 /// same user object.
-- (void)testUsernamePasswordAuthentication {
+- (void)testEmailPasswordAuthentication {
     RLMUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                              register:YES]];
     RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                               register:NO]];
     // Two users created with the same credential should resolve to the same actual user.
-    XCTAssertTrue([firstUser.identity isEqualToString:secondUser.identity]);
+    XCTAssertTrue([firstUser.identifier isEqualToString:secondUser.identifier]);
 }
 
-/// An invalid username/password credential should not be able to log in a user and a corresponding error should be generated.
+/// An invalid email/password credential should not be able to log in a user and a corresponding error should be generated.
 - (void)testInvalidPasswordAuthentication {
     (void)[self userForTest:_cmd];
 
-    RLMCredentials *credentials = [RLMCredentials credentialsWithUsername:NSStringFromSelector(_cmd)
-                                                                 password:@"INVALID_PASSWORD"];
+    RLMCredentials *credentials = [RLMCredentials credentialsWithEmail:NSStringFromSelector(_cmd)
+                                                              password:@"INVALID_PASSWORD"];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"login should fail"];
 
@@ -525,9 +525,9 @@
 }
 
 /// A non-existsing user should not be able to log in and a corresponding error should be generated.
-- (void)testNonExistingUsernameAuthentication {
-    RLMCredentials *credentials = [RLMCredentials credentialsWithUsername:@"INVALID_USERNAME"
-                                                                       password:@"INVALID_PASSWORD"];
+- (void)testNonExistingEmailAuthentication {
+    RLMCredentials *credentials = [RLMCredentials credentialsWithEmail:@"INVALID_USERNAME"
+                                                              password:@"INVALID_PASSWORD"];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"login should fail"];
 
@@ -540,21 +540,21 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-/// Registering a user with existing username should return corresponding error.
-- (void)testExistingUsernameRegistration {
+/// Registering a user with existing email should return corresponding error.
+- (void)testExistingEmailRegistration {
     XCTestExpectation *expectationA = [self expectationWithDescription:@"registration should succeed"];
-    [[self.app emailPasswordAuth] registerEmail:NSStringFromSelector(_cmd)
-                                       password:@"password"
-                                     completion:^(NSError * error) {
+    [[self.app emailPasswordAuth] registerUserWithEmail:NSStringFromSelector(_cmd)
+                                               password:@"password"
+                                             completion:^(NSError * error) {
         XCTAssertNil(error);
         [expectationA fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     XCTestExpectation *expectationB = [self expectationWithDescription:@"registration should fail"];
-    [[self.app emailPasswordAuth] registerEmail:NSStringFromSelector(_cmd)
-                                       password:@"password"
-                                     completion:^(NSError * error) {
+    [[self.app emailPasswordAuth] registerUserWithEmail:NSStringFromSelector(_cmd)
+                                               password:@"password"
+                                             completion:^(NSError * error) {
         XCTAssertNotNil(error);
         [expectationB fulfill];
     }];

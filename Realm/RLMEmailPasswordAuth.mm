@@ -29,9 +29,9 @@
     return self.app._realmApp->provider_client<realm::app::App::UsernamePasswordProviderClient>();
 }
 
-- (void)registerEmail:(NSString *)email
-             password:(NSString *)password
-           completion:(RLMEmailPasswordAuthOptionalErrorBlock)completion {
+- (void)registerUserWithEmail:(NSString *)email
+                     password:(NSString *)password
+                   completion:(RLMEmailPasswordAuthOptionalErrorBlock)completion {
     self.client.register_email(email.UTF8String, password.UTF8String, ^(realm::util::Optional<realm::app::AppError> error) {
         [self handleResponse:error completion:completion];
     });

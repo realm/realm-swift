@@ -125,10 +125,10 @@ Create a new Realm App configuration.
 - (nullable RLMUser *)currentUser;
 
 /**
-  A client for the username/password authentication provider which
+  A client for the email/password authentication provider which
   can be used to obtain a credential for logging in.
 
-  Used to perform requests specifically related to the username/password provider.
+  Used to perform requests specifically related to the email/password provider.
 */
 - (RLMEmailPasswordAuth *)emailPasswordAuth;
 

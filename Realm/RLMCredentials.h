@@ -95,10 +95,10 @@ extern RLMIdentityProvider const RLMIdentityProviderServerAPIKey;
 + (instancetype)credentialsWithServerAPIKey:(NSString *)apiKey;
 
 /**
- Construct and return credentials from a MongoDB Realm username and password.
+ Construct and return MongoDB Realm credentials from an email and password.
  */
-+ (instancetype)credentialsWithUsername:(NSString *)username
-                               password:(NSString *)password;
++ (instancetype)credentialsWithEmail:(NSString *)email
+                            password:(NSString *)password;
 
 /**
  Construct and return credentials from a JSON Web Token.
