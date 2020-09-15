@@ -56,6 +56,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// Converts the given number to a RLMDecimal128.
 + (instancetype)decimalWithNumber:(NSNumber *)number;
 
+/// The minimum value for RLMDecimal128.
+@property (class, readonly, copy) RLMDecimal128 *minimumDecimalNumber NS_REFINED_FOR_SWIFT;
+
+/// The maximum value for RLMDecimal128.
+@property (class, readonly, copy) RLMDecimal128 *maximumDecimalNumber NS_REFINED_FOR_SWIFT;
+
 /// Convert this value to a double. This is a lossy conversion.
 @property (nonatomic, readonly) double doubleValue;
 
@@ -67,6 +73,37 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Gets if this Decimal128 represents a NaN value.
 @property (nonatomic, readonly) BOOL isNaN;
+
+/// The magnitude of this RLMDecimal128.
+@property (nonatomic, readonly) RLMDecimal128 *magnitude NS_REFINED_FOR_SWIFT;
+
+/// Replaces this RLMDecimal128 value with its additive inverse.
+- (void)negate;
+
+/// Adds the right hand side to the current value and returns the result.
+- (RLMDecimal128 *)decimalNumberByAdding:(RLMDecimal128 *)decimalNumber;
+
+/// Divides the right hand side to the current value and returns the result.
+- (RLMDecimal128 *)decimalNumberByDividingBy:(RLMDecimal128 *)decimalNumber;
+
+/// Subtracts the right hand side to the current value and returns the result.
+- (RLMDecimal128 *)decimalNumberBySubtracting:(RLMDecimal128 *)decimalNumber;
+
+/// Multiply the right hand side to the current value and returns the result.
+- (RLMDecimal128 *)decimalNumberByMultiplyingBy:(RLMDecimal128 *)decimalNumber;
+
+/// Comparision operator to check if the right hand side is greater than the current value.
+- (BOOL)isGreaterThan:(nullable RLMDecimal128 *)decimalNumber;
+
+/// Comparision operator to check if the right hand side is greater than or equal to the current value.
+- (BOOL)isGreaterThanOrEqualTo:(nullable RLMDecimal128 *)decimalNumber;
+
+/// Comparision operator to check if the right hand side is less than the current value.
+- (BOOL)isLessThan:(nullable RLMDecimal128 *)decimalNumber;
+
+/// Comparision operator to check if the right hand side is less than or equal to the current value.
+- (BOOL)isLessThanOrEqualTo:(nullable RLMDecimal128 *)decimalNumber;
+
 @end
 
 NS_ASSUME_NONNULL_END
