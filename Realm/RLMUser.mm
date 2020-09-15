@@ -104,7 +104,7 @@ using namespace realm;
         return nil;
     }
 
-    auto path = SyncManager::shared().path_for_realm(*_user, [[self pathForPartitionValue:partitionValue] UTF8String]);
+    auto path = _user->sync_manager()->path_for_realm(*_user, [[self pathForPartitionValue:partitionValue] UTF8String]);
     if (auto session = _user->session_for_on_disk_path(path)) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }

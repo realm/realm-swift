@@ -118,20 +118,19 @@ struct CallbackLoggerFactory : public realm::SyncLoggerFactory {
 
 @implementation RLMSyncManager {
     std::unique_ptr<CallbackLoggerFactory> _loggerFactory;
+    std::shared_ptr<SyncManager> _syncManager;
 }
 
-static RLMSyncManager *s_sharedManager = nil;
-
-- (instancetype)initWithAppConfiguration:(RLMAppConfiguration *)appConfiguration
-                           rootDirectory:(NSURL *)rootDirectory {
+- (instancetype)initWithSyncManager:(std::shared_ptr<realm::SyncManager>)syncManager {
     if (self = [super init]) {
         [RLMUser _setUpBindingContextFactory];
-        [self configureWithRootDirectory:rootDirectory appConfiguration:appConfiguration];
+        _syncManager = syncManager;
+        return self;
     }
-    return self = [super init];
+    return nil;
 }
 
-- (void)configureWithRootDirectory:(NSURL *)rootDirectory appConfiguration:(RLMAppConfiguration *)appConfiguration {
++ (SyncClientConfig)configurationWithRootDirectory:(NSURL *)rootDirectory appId:(NSString *)appId {
     SyncClientConfig config;
     bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
     config.logger_factory = &s_syncLoggerFactory;
@@ -145,14 +144,14 @@ static RLMSyncManager *s_sharedManager = nil;
         config.user_agent_binding_info =
             util::format("Realm%1/%2", isSwift ? "Swift" : "ObjectiveC",
                          RLMStringDataWithNSString(REALM_COCOA_VERSION));
-        config.user_agent_application_info = RLMStringDataWithNSString(self.appID);
+        config.user_agent_application_info = RLMStringDataWithNSString(appId);
     }
 
-    SyncManager::shared().configure(config, [appConfiguration config]);
+    return config;
 }
 
-- (std::shared_ptr<realm::app::App>)app {
-    return SyncManager::shared().app();
+- (std::weak_ptr<realm::app::App>)app {
+    return _syncManager->app();
 }
 
 - (NSString *)appID {
@@ -163,14 +162,14 @@ static RLMSyncManager *s_sharedManager = nil;
 }
 
 - (void)setUserAgent:(NSString *)userAgent {
-    SyncManager::shared().set_user_agent(RLMStringDataWithNSString(userAgent));
+    _syncManager->set_user_agent(RLMStringDataWithNSString(userAgent));
     _userAgent = userAgent;
 }
 
 - (void)setCustomRequestHeaders:(NSDictionary<NSString *,NSString *> *)customRequestHeaders {
     _customRequestHeaders = customRequestHeaders.copy;
 
-    for (auto&& user : SyncManager::shared().all_users()) {
+    for (auto&& user : _syncManager->all_users()) {
         for (auto&& session : user->all_sessions()) {
             auto config = session->config();
             config.custom_http_headers.clear();;
@@ -186,27 +185,27 @@ static RLMSyncManager *s_sharedManager = nil;
     _logger = logFn;
     if (_logger) {
         _loggerFactory = std::make_unique<CallbackLoggerFactory>(logFn);
-        SyncManager::shared().set_logger_factory(*_loggerFactory);
+        _syncManager->set_logger_factory(*_loggerFactory);
     }
     else {
         _loggerFactory = nullptr;
-        SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
+        _syncManager->set_logger_factory(s_syncLoggerFactory);
     }
 }
 
 - (void)setTimeoutOptions:(RLMSyncTimeoutOptions *)timeoutOptions {
     _timeoutOptions = timeoutOptions;
-    SyncManager::shared().set_timeouts(timeoutOptions->_options);
+    _syncManager->set_timeouts(timeoutOptions->_options);
 }
 
 #pragma mark - Passthrough properties
 
 - (RLMSyncLogLevel)logLevel {
-    return logLevelForLevel(realm::SyncManager::shared().log_level());
+    return logLevelForLevel(_syncManager->log_level());
 }
 
 - (void)setLogLevel:(RLMSyncLogLevel)logLevel {
-    realm::SyncManager::shared().set_log_level(levelForSyncLogLevel(logLevel));
+    _syncManager->set_log_level(levelForSyncLogLevel(logLevel));
 }
 
 #pragma mark - Private API
@@ -227,9 +226,12 @@ static RLMSyncManager *s_sharedManager = nil;
     _authorizationHeaderName = nil;
     _customRequestHeaders = nil;
     _timeoutOptions = nil;
-    SyncManager::shared().reset_for_testing();
+    _syncManager->reset_for_testing();
 }
 
+- (std::shared_ptr<realm::SyncManager>)syncManager {
+    return _syncManager;
+}
 @end
 
 #pragma mark - RLMSyncTimeoutOptions

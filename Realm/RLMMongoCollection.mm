@@ -32,42 +32,52 @@
     realm::app::WatchStream _watchStream;
     id<RLMChangeEventDelegate> _subscriber;
     __weak NSURLSession *_session;
+    _Nonnull dispatch_queue_t _queue;
 }
-- (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber {
+
+- (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber
+                                delegateQueue:(nullable dispatch_queue_t)queue {
     if (self = [super init]) {
         _subscriber = subscriber;
+        _queue = queue ?: dispatch_get_main_queue();
         return self;
     }
     return nil;
 }
 
 - (void)didCloseWithError:(NSError *)error {
-    [_subscriber changeStreamDidCloseWithError:error];
+    dispatch_async(_queue, ^{
+        [_subscriber changeStreamDidCloseWithError:error];
+    });
 }
 
 - (void)didOpen {
-    [_subscriber changeStreamDidOpen:self];
+    dispatch_async(_queue, ^{
+        [_subscriber changeStreamDidOpen:self];
+    });
 }
 
 - (void)didReceiveError:(nonnull NSError *)error {
-    [_subscriber changeStreamDidReceiveError:error];
+    dispatch_async(_queue, ^{
+        [_subscriber changeStreamDidReceiveError:error];
+    });
 }
 
 - (void)didReceiveEvent:(nonnull NSData *)event {
     std::string_view str = [[NSString alloc] initWithData:event encoding:NSUTF8StringEncoding].UTF8String;
-    switch (_watchStream.state()) {
-        case realm::app::WatchStream::State::NEED_DATA:
-            _watchStream.feed_buffer(str);
-            break;
-        case realm::app::WatchStream::State::HAVE_EVENT:
-            while (_watchStream.state() == realm::app::WatchStream::State::HAVE_EVENT) {
-                [_subscriber changeStreamDidReceiveChangeEvent:RLMConvertBsonToRLMBSON(_watchStream.next_event())];
-            }
-            _watchStream.feed_buffer(str);
-            break;
-        case realm::app::WatchStream::State::HAVE_ERROR:
-            [self didReceiveError:RLMAppErrorToNSError(_watchStream.error())];
-            break;
+    if (!str.empty() && _watchStream.state() == realm::app::WatchStream::State::NEED_DATA) {
+        _watchStream.feed_buffer(str);
+    }
+
+    while (_watchStream.state() == realm::app::WatchStream::State::HAVE_EVENT) {
+        id<RLMBSON> event = RLMConvertBsonToRLMBSON(_watchStream.next_event());
+        dispatch_async(_queue, ^{
+            [_subscriber changeStreamDidReceiveChangeEvent:event];
+        });
+    }
+
+    if (_watchStream.state() == realm::app::WatchStream::State::HAVE_ERROR) {
+        [self didReceiveError:RLMAppErrorToNSError(_watchStream.error())];
     }
 }
 
@@ -369,10 +379,9 @@
 }
 
 - (RLMChangeStream *)watchWithMatchFilter:(nullable id<RLMBSON>)matchFilter
-                    idFilter:(nullable id<RLMBSON>)idFilter
-                    delegate:(id<RLMChangeEventDelegate>)delegate
-               delegateQueue:(nullable dispatch_queue_t)delegateQueue {
-
+                                 idFilter:(nullable id<RLMBSON>)idFilter
+                                 delegate:(id<RLMChangeEventDelegate>)delegate
+                            delegateQueue:(nullable dispatch_queue_t)queue {
     realm::bson::BsonDocument baseArgs = {
         {"database", self.databaseName.UTF8String},
         {"collection", self.name.UTF8String}
@@ -392,14 +401,12 @@
                                                               "watch",
                                                               args,
                                                               realm::util::Optional<std::string>(self.serviceName.UTF8String));
-    RLMChangeStream *changeStream = [[RLMChangeStream alloc] initWithChangeEventSubscriber:delegate];
-    dispatch_async(delegateQueue == nil ? dispatch_get_main_queue() : delegateQueue, ^{
-        RLMNetworkTransport *transport = self.app.configuration.transport;
-        RLMRequest *rlmRequest = [transport RLMRequestFromRequest:request];
-        NSURLSession *watchSession = [transport doStreamRequest:rlmRequest
-                                                eventSubscriber:changeStream];
-        [changeStream attachURLSession:watchSession];
-    });
+    RLMChangeStream *changeStream = [[RLMChangeStream alloc] initWithChangeEventSubscriber:delegate delegateQueue:queue];
+    RLMNetworkTransport *transport = self.app.configuration.transport;
+    RLMRequest *rlmRequest = [transport RLMRequestFromRequest:request];
+    NSURLSession *watchSession = [transport doStreamRequest:rlmRequest
+                                            eventSubscriber:changeStream];
+    [changeStream attachURLSession:watchSession];
     return changeStream;
 }
 

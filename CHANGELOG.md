@@ -1,11 +1,12 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add support for multiple Realm Apps
+* Remove `[RLMSyncManager shared]`. This is now instatiated as a property on the app itself.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Fix `MongoCollection.watch` to consistently deliver events on a given queue
 
 ### Breaking Changes
 * `RLMSyncManager.pinnedCertificatePaths` has been removed.

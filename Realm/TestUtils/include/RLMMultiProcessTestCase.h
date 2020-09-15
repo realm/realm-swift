@@ -27,9 +27,15 @@
 // spawn a child process running the current test and wait for it complete
 // returns the return code of the process
 - (int)runChildAndWait;
+- (int)runChildAndWaitWithAppIds:(NSArray *)appIds;
 
 - (NSTask *)childTask;
+- (NSTask *)childTaskWithAppIds:(NSArray *)appIds;
+
 @end
 
 #define RLMRunChildAndWait() \
     XCTAssertEqual(0, [self runChildAndWait], @"Tests in child process failed")
+
+#define RLMRunChildAndWaitWithAppIds(appIds) \
+    XCTAssertEqual(0, [self runChildAndWaitWithAppIds:appIds], @"Tests in child process failed")
