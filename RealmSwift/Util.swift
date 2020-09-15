@@ -191,18 +191,3 @@ internal protocol AssistedObjectiveCBridgeable {
     static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self
     var bridged: (objectiveCValue: Any, metadata: Any?) { get }
 }
-
-// MARK: Dictionary
-
-extension Dictionary {
-    // map [K0: V0] to [K1: V1] using closure
-    // let dict: [String: Int] = ["a": "1", "b": "2"].map { ($0, Int($1)!) }
-    func map<U, V>(_ closure: (Key, Value) -> (U, V)) -> [U: V] {
-        var ret = [U: V]()
-        for (k0, v0) in self {
-            let (k1, v1) = closure(k0, v0)
-            ret[k1] = v1
-        }
-        return ret
-    }
-}

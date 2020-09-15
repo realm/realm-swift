@@ -284,7 +284,7 @@ public struct Functions {
                     if let bson = ObjectiveCSupport.convert(object: bson) {
                         promise(.success(bson))
                     } else {
-                        promise(.failure(error ?? App.UserError.uncertainState))
+                        promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                     }
                 }
             }
@@ -557,23 +557,16 @@ extension Realm {
 #if canImport(Combine)
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension App {
-    /// :nodoc:
-    enum UserError: Error {
-        /// UserError.uncertainState - Fallback for optional errors  in Future calls. Should never happened while it's still a technically possible case.
-        case uncertainState
-    }
-
-    /**
-    Login to a user for the Realm app.
-    @param credentials The credentials identifying the user.
-    */
+    /// Login to a user for the Realm app.
+    /// @param credentials The credentials identifying the user.
+    /// @returns A publisher that eventually return `User` or `Error`.
     func login(credentials: Credentials) -> Future<User, Error> {
         return Future { promise in
             self.login(credentials: credentials) { user, error in
                 if let user = user {
-                    promise(.success(user))
+                promise(.success(user))
                 } else {
-                    promise(.failure(error ?? UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
@@ -582,48 +575,41 @@ public extension App {
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension User {
-     /**
-     Refresh a user's custom data. This will, in effect, refresh the user's auth session.
-     */
+    /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.
+    /// @returns A publisher that eventually return `Dictionary` with user's data or `Error`.
     func refreshCustomData() -> Future<[AnyHashable: Any], Error> {
         return Future { promise in
             self.refreshCustomData { customData, error in
                 if let customData = customData {
                     promise(.success(customData))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
     }
 
-    /**
-     Links the currently authenticated user with a new identity, where the identity is defined by the credential
-     specified as a parameter. This will only be successful if this `User` is the currently authenticated
-     with the client from which it was created. On success a new user will be returned with the new linked credentials.
-
-     @param credentials The `Credentials` used to link the user to a new identity.
-    */
+    /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
+    /// specified as a parameter. This will only be successful if this `User` is the currently authenticated
+    /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
+    /// @param credentials The `Credentials` used to link the user to a new identity.
+    /// @returns A publisher that eventually return `Result.success` or `Error`.
     func linkUser(with credentials: Credentials) -> Future<User, Error> {
         return Future { promise in
             self.linkUser(with: credentials) { user, error in
                 if let user = user {
                     promise(.success(user))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
     }
 
-    /**
-     Removes the user
-
-     This logs out and destroys the session related to this user. The completion block will return an error
-     if the user is not found or is already removed.
-
-     @param completion A callback invoked on completion
-    */
+    /// Removes the user
+    /// This logs out and destroys the session related to this user. The completion block will return an error
+    /// if the user is not found or is already removed.
+    /// @returns A publisher that eventually return `Result.success` or `Error`.
     func remove() -> Future<Void, Error> {
         return Future<Void, Error> { promise in
             self.remove { error in
@@ -636,14 +622,10 @@ public extension User {
         }
     }
 
-    /**
-     Logs out the current user
-
-     The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by a username / password or third party auth clients
-     If the logout request fails, this method will still clear local authentication state.
-
-     @param completion A callback invoked on completion
-    */
+    /// Logs out the current user
+    /// The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by a username / password or third party auth clients
+    //// If the logout request fails, this method will still clear local authentication state.
+    /// @returns A publisher that eventually return `Result.success` or `Error`.
     func logOut() -> Future<Void, Error> {
         return Future<Void, Error> { promise in
             self.logOut { error in
@@ -661,15 +643,15 @@ public extension User {
 public extension MongoCollection {
     /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
     /// generated for it.
-    /// - Parameters:
-    ///   - document: document  A `Document` value to insert.
+    /// @param document:  A `Document` value to insert.
+    /// @returns A publisher that eventually return `ObjectId` of inserted document or `Error`.
     func insertOne(_ document: Document) -> Future<ObjectId, Error> {
         return Future { promise in
             self.insertOne(document) { objectId, error in
                 if let objectId = objectId {
                     promise(.success(try! ObjectId(string: objectId.stringValue)))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
@@ -677,24 +659,24 @@ public extension MongoCollection {
 
     /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
     /// they will be generated.
-    /// - Parameters:
-    ///   - documents: The `Document` values in a bson array to insert.
+    /// @param documents: The `Document` values in a bson array to insert.
+    /// @returns A publisher that eventually return `[ObjectId]` of inserted documents or `Error`.
     func insertMany(_ documents: [Document]) -> Future<[ObjectId], Error> {
         return Future { promise in
             self.insertMany(documents) { objectIds, error in
                 if let objectIds = objectIds?.map({ try! ObjectId(string: $0.stringValue) }) {
                     promise(.success(objectIds))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
     }
 
     /// Finds the documents in this collection which match the provided filter.
-    /// - Parameters:
-    ///   - filter: A `Document` as bson that should match the query.
-    ///   - options: `FindOptions` to use when executing the command.
+    /// @param filter: A `Document` as bson that should match the query.
+    /// @param options: `FindOptions` to use when executing the command.
+    /// @returns A publisher that eventually return `[ObjectId]` of documents or `Error`.
     func find(filter: Document, options: FindOptions) -> Future<[Document], Error> {
         return Future { promise in
             self.find(filter: filter, options: options) { documents, error in
@@ -702,15 +684,15 @@ public extension MongoCollection {
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
     }
 
     /// Finds the documents in this collection which match the provided filter.
-    /// - Parameters:
-    ///   - filter: A `Document` as bson that should match the query.
+    /// @param filter: A `Document` as bson that should match the query.
+    /// @returns A publisher that eventually return `[ObjectId]` of documents or `Error`.
     func find(filter: Document) -> Future<[Document], Error> {
         return Future { promise in
             self.find(filter: filter) { documents, error in
@@ -718,7 +700,7 @@ public extension MongoCollection {
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
@@ -728,9 +710,9 @@ public extension MongoCollection {
     /// provided filter. If multiple documents satisfy the query, this method
     /// returns the first document according to the query's sort order or natural
     /// order.
-    /// - Parameters:
-    ///   - filter: A `Document` as bson that should match the query.
-    ///   - options: `FindOptions` to use when executing the command.
+    /// @param filter: A `Document` as bson that should match the query.
+    /// @param options: `FindOptions` to use when executing the command.
+    /// @returns A publisher that eventually return `Document` or `Error`.
     func findOneDocument(filter: Document, options: FindOptions) -> Future<[Document], Error> {
         return Future { promise in
             self.find(filter: filter) { documents, error in
@@ -738,7 +720,7 @@ public extension MongoCollection {
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
@@ -748,8 +730,8 @@ public extension MongoCollection {
     /// provided filter. If multiple documents satisfy the query, this method
     /// returns the first document according to the query's sort order or natural
     /// order.
-    /// - Parameters:
-    ///   - filter: A `Document` as bson that should match the query.
+    /// @param filter: A `Document` as bson that should match the query.
+    /// @returns A publisher that eventually return `Document` or `Error`.
     func findOneDocument(filter: Document) -> Future<Document, Error> {
         return Future { promise in
             self.findOneDocument(filter: filter) { document, error in
@@ -757,15 +739,15 @@ public extension MongoCollection {
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
     }
 
     /// Runs an aggregation framework pipeline against this collection.
-    /// - Parameters:
-    ///   - pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
+    /// @param pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
+    /// @returns A publisher that eventually return `Document` or `Error`.
     func aggregate(pipeline: [Document]) -> Future<[Document], Error> {
         return Future { promise in
             self.aggregate(pipeline: pipeline) { documents, error in
@@ -773,16 +755,16 @@ public extension MongoCollection {
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
     }
 
     /// Counts the number of documents in this collection matching the provided filter.
-    /// - Parameters:
-    ///   - filter: A `Document` as bson that should match the query.
-    ///   - limit: The max amount of documents to count
+    /// @param filter: A `Document` as bson that should match the query.
+    /// @param limit: The max amount of documents to count
+    /// @returns A publisher that eventually return `Int` count of documents or `Error`.
     func count(filter: Document, limit: Int) -> Future<Int, Error> {
         return Future { promise in
             self.count(filter: filter, limit: limit) { count, error in
@@ -796,8 +778,8 @@ public extension MongoCollection {
     }
 
     /// Counts the number of documents in this collection matching the provided filter.
-    /// - Parameters:
-    ///   - filter: A `Document` as bson that should match the query.
+    /// @param filter: A `Document` as bson that should match the query.
+    /// @returns A publisher that eventually return `Int` count of documents or `Error`.
     func count(filter: Document) -> Future<Int, Error> {
         return Future { promise in
             self.count(filter: filter) { count, error in
@@ -811,8 +793,8 @@ public extension MongoCollection {
     }
 
     /// Deletes a single matching document from the collection.
-    /// - Parameters:
-    ///   - filter: A `Document` as bson that should match the query.
+    /// @param filter: A `Document` as bson that should match the query.
+    /// @returns A publisher that eventually return `Int` count of deleted documents or `Error`.
     func deleteOneDocument(filter: Document) -> Future<Int, Error> {
         return Future { promise in
             self.deleteOneDocument(filter: filter) { count, error in
@@ -826,8 +808,8 @@ public extension MongoCollection {
     }
 
     /// Deletes multiple documents
-    /// - Parameters:
-    ///   - filter: Document representing the match criteria
+    /// @param filter: Document representing the match criteria
+    /// @returns A publisher that eventually return `Int` count of deleted documents or `Error`.
     func deleteManyDocuments(filter: Document) -> Future<Int, Error> {
         return Future { promise in
             self.deleteManyDocuments(filter: filter) { count, error in
@@ -841,66 +823,66 @@ public extension MongoCollection {
     }
 
     /// Updates a single document matching the provided filter in this collection.
-    /// - Parameters:
-    ///   - filter: A bson `Document` representing the match criteria.
-    ///   - update: A bson `Document` representing the update to be applied to a matching document.
-    ///   - upsert: When true, creates a new document if no document matches the query.
+    /// @param filter: A bson `Document` representing the match criteria.
+    /// @param update: A bson `Document` representing the update to be applied to a matching document.
+    /// @param upsert: When true, creates a new document if no document matches the query.
+    /// @returns A publisher that eventually return `UpdateResult` or `Error`.
     func updateOneDocument(filter: Document, update: Document, upsert: Bool) -> Future<UpdateResult, Error> {
         return Future { promise in
             self.updateOneDocument(filter: filter, update: update, upsert: upsert) { updateResult, error in
                 if let updateResult = updateResult {
                     promise(.success(updateResult))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
     }
 
     /// Updates a single document matching the provided filter in this collection.
-    /// - Parameters:
-    ///   - filter: A bson `Document` representing the match criteria.
-    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    /// @param filter: A bson `Document` representing the match criteria.
+    /// @param update: A bson `Document` representing the update to be applied to a matching document.
+    /// @returns A publisher that eventually return `UpdateResult` or `Error`.
     func updateOneDocument(filter: Document, update: Document) -> Future<UpdateResult, Error> {
         return Future { promise in
             self.updateOneDocument(filter: filter, update: update) { updateResult, error in
                 if let updateResult = updateResult {
                     promise(.success(updateResult))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
     }
 
     /// Updates multiple documents matching the provided filter in this collection.
-    /// - Parameters:
-    ///   - filter: A bson `Document` representing the match criteria.
-    ///   - update: A bson `Document` representing the update to be applied to a matching document.
-    ///   - upsert: When true, creates a new document if no document matches the query.
+    /// @param filter: A bson `Document` representing the match criteria.
+    /// @param update: A bson `Document` representing the update to be applied to a matching document.
+    /// @param upsert: When true, creates a new document if no document matches the query.
+    /// @returns A publisher that eventually return `UpdateResult` or `Error`.
     func updateManyDocuments(filter: Document, update: Document, upsert: Bool) -> Future<UpdateResult, Error> {
         return Future { promise in
             self.updateManyDocuments(filter: filter, update: update, upsert: upsert) { updateResult, error in
                 if let updateResult = updateResult {
                     promise(.success(updateResult))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
     }
 
     /// Updates multiple documents matching the provided filter in this collection.
-    /// - Parameters:
-    ///   - filter: A bson `Document` representing the match criteria.
-    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    /// @param filter: A bson `Document` representing the match criteria.
+    /// @param update: A bson `Document` representing the update to be applied to a matching document.
+    /// @returns A publisher that eventually return `UpdateResult` or `Error`.
     func updateManyDocuments(filter: Document, update: Document) -> Future<UpdateResult, Error> {
         return Future { promise in
             self.updateManyDocuments(filter: filter, update: update) { updateResult, error in
                 if let updateResult = updateResult {
                     promise(.success(updateResult))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
@@ -912,10 +894,10 @@ public extension MongoCollection {
     /// return a document with the same command. This avoids the risk of other
     /// update operations changing the document between separate find and update
     /// operations.
-    /// - Parameters:
-    ///   - filter: A bson `Document` representing the match criteria.
-    ///   - update: A bson `Document` representing the update to be applied to a matching document.
-    ///   - options: `RemoteFindOneAndModifyOptions` to use when executing the command.
+    /// @param filter: A bson `Document` representing the match criteria.
+    /// @param update: A bson `Document` representing the update to be applied to a matching document.
+    /// @param options: `RemoteFindOneAndModifyOptions` to use when executing the command.
+    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndUpdate(filter: Document, update: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
         return Future { promise in
             self.findOneAndUpdate(filter: filter, update: update, options: options) { updateResult, error in
@@ -935,9 +917,9 @@ public extension MongoCollection {
     /// return a document with the same command. This avoids the risk of other
     /// update operations changing the document between separate find and update
     /// operations.
-    /// - Parameters:
-    ///   - filter: A bson `Document` representing the match criteria.
-    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    /// @param filter: A bson `Document` representing the match criteria.
+    /// @param update: A bson `Document` representing the update to be applied to a matching document.
+    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndUpdate(filter: Document, update: Document) -> Future<Document?, Error> {
         return Future { promise in
             self.findOneAndUpdate(filter: filter, update: update) { updateResult, error in
@@ -957,10 +939,10 @@ public extension MongoCollection {
     /// replace, and return a document with the same command. This avoids the
     /// risk of other update operations changing the document between separate
     /// find and update operations.
-    /// - Parameters:
-    ///   - filter: A `Document` that should match the query.
-    ///   - replacement: A `Document` describing the replacement.
-    ///   - options: `FindOneAndModifyOptions` to use when executing the command.
+    /// @param filter: A `Document` that should match the query.
+    /// @param replacement: A `Document` describing the replacement.
+    /// @param options: `FindOneAndModifyOptions` to use when executing the command.
+    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndReplace(filter: Document, replacement: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
         return Future { promise in
             self.findOneAndReplace(filter: filter, replacement: replacement, options: options) { updateResult, error in
@@ -980,9 +962,9 @@ public extension MongoCollection {
     /// replace, and return a document with the same command. This avoids the
     /// risk of other update operations changing the document between separate
     /// find and update operations.
-    /// - Parameters:
-    ///   - filter: A `Document` that should match the query.
-    ///   - replacement: A `Document` describing the replacement.
+    /// @param filter: A `Document` that should match the query.
+    /// @param replacement: A `Document` describing the replacement.
+    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndReplace(filter: Document, replacement: Document) -> Future<Document?, Error> {
         return Future { promise in
             self.findOneAndReplace(filter: filter, replacement: replacement) { updateResult, error in
@@ -1002,9 +984,9 @@ public extension MongoCollection {
     /// find and delete a document with the same command. This avoids the risk of
     /// other update operations changing the document between separate find and
     /// delete operations.
-    /// - Parameters:
-    ///   - filter: A `Document` that should match the query.
-    ///   - options: `FindOneAndModifyOptions` to use when executing the command.
+    /// @param filter: A `Document` that should match the query.
+    /// @param options: `FindOneAndModifyOptions` to use when executing the command.
+    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndDelete(filter: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
         return Future { promise in
             self.findOneAndDelete(filter: filter, options: options) { deleteResult, error in
@@ -1024,8 +1006,8 @@ public extension MongoCollection {
     /// find and delete a document with the same command. This avoids the risk of
     /// other update operations changing the document between separate find and
     /// delete operations.
-    /// - Parameters:
-    ///   - filter: A `Document` that should match the query.
+    /// @param filter: A `Document` that should match the query.
+    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndDelete(filter: Document) -> Future<Document?, Error> {
         return Future { promise in
             self.findOneAndDelete(filter: filter) { deleteResult, error in
@@ -1037,6 +1019,21 @@ public extension MongoCollection {
                 }
             }
         }
+    }
+}
+
+// MARK: Dictionary
+fileprivate extension Dictionary {
+    /// map Dictionary to dictionary
+    /// Used to map [String: RLMBSON] to [String: AnyBSON]
+    /// let dict: [String: Int] = ["a": "1", "b": "2"].map { ($0, Int($1)!) }
+    func map<U, V>(_ closure: (Key, Value) -> (U, V)) -> [U: V] {
+        var ret = [U: V]()
+        for (k0, v0) in self {
+            let (k1, v1) = closure(k0, v0)
+            ret[k1] = v1
+        }
+        return ret
     }
 }
 #endif

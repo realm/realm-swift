@@ -1999,7 +1999,7 @@ extension SwiftObjectServerTests {
 
     // MARK: - Combine promises
 
-    func testEmailPasswordAuthentication() {
+    func testCombineEmailPasswordAuthentication() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
         var cancellable = Set<AnyCancellable>()
@@ -2077,7 +2077,7 @@ extension SwiftObjectServerTests {
         wait(for: [callResetFunctionEx], timeout: 4.0)
     }
 
-    func testAppLoginFuture() {
+    func testCombineAppLogin() {
         var cancellable = Set<AnyCancellable>()
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
@@ -2109,7 +2109,7 @@ extension SwiftObjectServerTests {
         XCTAssertEqual(self.app.allUsers().count, 1)
     }
 
-    func testRefreshCustomData() {
+    func testCombineRefreshCustomData() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
         var cancellable = Set<AnyCancellable>()
@@ -2166,7 +2166,7 @@ extension SwiftObjectServerTests {
         XCTAssertEqual(app.currentUser()?.customData?["apples"], .int64(10))
     }
 
-    func testMongoCollectionInsert() {
+    func testCombineMongoCollectionInsert() {
         var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
@@ -2211,7 +2211,7 @@ extension SwiftObjectServerTests {
         wait(for: [findEx1], timeout: 4.0)
     }
 
-    func testMongoCollectionFind() {
+    func testCombineMongoCollectionFind() {
         var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
@@ -2303,7 +2303,7 @@ extension SwiftObjectServerTests {
         wait(for: [findOneEx2], timeout: 4.0)
     }
 
-    func testMongoCollectionCountAndAggregate() {
+    func testCombineMongoCollectionCountAndAggregate() {
         var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
@@ -2346,7 +2346,7 @@ extension SwiftObjectServerTests {
         wait(for: [countEx2], timeout: 4.0)
     }
 
-    func testMongoCollectionDeleteOne() {
+    func testCombineMongoCollectionDeleteOne() {
         var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
@@ -2385,7 +2385,7 @@ extension SwiftObjectServerTests {
         wait(for: [deleteEx2], timeout: 4.0)
     }
 
-    func testMongoCollectionDeleteMany() {
+    func testCombineMongoCollectionDeleteMany() {
         var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
@@ -2424,7 +2424,7 @@ extension SwiftObjectServerTests {
         wait(for: [deleteEx2], timeout: 4.0)
     }
 
-    func testMongoCollectionUpdateOne() {
+    func testCombineMongoCollectionUpdateOne() {
         var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
@@ -2470,7 +2470,7 @@ extension SwiftObjectServerTests {
         wait(for: [updateEx2], timeout: 4.0)
     }
 
-    func testMongoCollectionUpdateMany() {
+    func testCombineMongoCollectionUpdateMany() {
         var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
@@ -2518,7 +2518,7 @@ extension SwiftObjectServerTests {
         wait(for: [updateEx2], timeout: 4.0)
     }
 
-    func testMongoCollectionFindAndUpdate() {
+    func testCombineMongoCollectionFindAndUpdate() {
         var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
@@ -2575,7 +2575,7 @@ extension SwiftObjectServerTests {
         wait(for: [findOneUpdateEx3], timeout: 4.0)
     }
 
-    func testMongoCollectionFindAndReplace() {
+    func testCombineMongoCollectionFindAndReplace() {
         var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
@@ -2628,7 +2628,7 @@ extension SwiftObjectServerTests {
         wait(for: [findOneReplaceEx3], timeout: 4.0)
     }
 
-    func testMongoCollectionFindAndDelete() {
+    func testCombineMongoCollectionFindAndDelete() {
         var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
@@ -2726,7 +2726,7 @@ extension SwiftObjectServerTests {
         wait(for: [findEx], timeout: 4.0)
     }
 
-    func testPromiseCallFunction() {
+    func testCombineCallFunction() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
         var cancellable = Set<AnyCancellable>()
@@ -2794,7 +2794,7 @@ extension SwiftObjectServerTests {
 
     }
 
-    func testPromiseAPIKeyAuth() {
+    func testCombineAPIKeyAuth() {
         var cancellable = Set<AnyCancellable>()
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
@@ -2896,7 +2896,7 @@ extension SwiftObjectServerTests {
         wait(for: [deleteKeyEx], timeout: 4.0)
     }
 
-    func testPromisePushRegistration() {
+    func testCombinePushRegistration() {
         var cancellable = Set<AnyCancellable>()
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)

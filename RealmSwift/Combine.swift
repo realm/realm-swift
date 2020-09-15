@@ -1005,8 +1005,8 @@ public enum Publishers {
 public extension APIKeyAuth {
     /**
      Creates a user API key that can be used to authenticate as the current user.
-     
      @param name The name of the API key to be created.
+     @returns A publisher that eventually return `UserAPIKey` or `Error`.
      */
     func createAPIKey(named: String) -> Future<UserAPIKey, Error> {
         return Future { promise in
@@ -1014,7 +1014,7 @@ public extension APIKeyAuth {
                 if let userApiKey = userApiKey {
                     promise(.success(userApiKey))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
@@ -1022,8 +1022,8 @@ public extension APIKeyAuth {
 
     /**
      Fetches a user API key associated with the current user.
-     
      @param objectId The ObjectId of the API key to fetch.
+     @returns A publisher that eventually return `UserAPIKey` or `Error`.
      */
     func fetchAPIKey(_ objectId: ObjectId) -> Future<UserAPIKey, Error> {
         return Future { promise in
@@ -1031,7 +1031,7 @@ public extension APIKeyAuth {
                 if let userApiKey = userApiKey {
                     promise(.success(userApiKey))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
@@ -1039,6 +1039,7 @@ public extension APIKeyAuth {
 
     /**
      Fetches the user API keys associated with the current user.
+     @returns A publisher that eventually return `[UserAPIKey]` or `Error`.
      */
     func fetchAPIKeys() -> Future<[UserAPIKey], Error> {
         return Future { promise in
@@ -1046,7 +1047,7 @@ public extension APIKeyAuth {
                 if let userApiKeys = userApiKeys {
                     promise(.success(userApiKeys))
                 } else {
-                    promise(.failure(error ?? App.UserError.uncertainState))
+                    promise(.failure(error ?? NSError(.fail, message: "Promise failed")))
                 }
             }
         }
@@ -1054,8 +1055,8 @@ public extension APIKeyAuth {
 
     /**
      Deletes a user API key associated with the current user.
-     
      @param objectId The ObjectId of the API key to delete.
+     @returns A publisher that eventually return `Result.success` or `Error`.
      */
     func deleteAPIKey(_ objectId: ObjectId) -> Future<Void, Error> {
         return Future { promise in
@@ -1071,8 +1072,8 @@ public extension APIKeyAuth {
 
     /**
      Enables a user API key associated with the current user.
-     
      @param objectId The ObjectId of the  API key to enable.
+     @returns A publisher that eventually return `Result.success` or `Error`.
      */
     func enableAPIKey(_ objectId: ObjectId) -> Future<Void, Error> {
         return Future { promise in
@@ -1088,8 +1089,8 @@ public extension APIKeyAuth {
 
     /**
      Disables a user API key associated with the current user.
-     
      @param objectId The ObjectId of the API key to disable.
+     @returns A publisher that eventually return `Result.success` or `Error`.
      */
     func disableAPIKey(_ objectId: ObjectId) -> Future<Void, Error> {
         return Future { promise in
@@ -1107,6 +1108,9 @@ public extension APIKeyAuth {
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension PushClient {
     /// Request to register device token to the server
+    /// @param token device token
+    /// @param user - device's user
+    /// @returns A publisher that eventually return `Result.success` or `Error`.
     func registerDevice(token: String, user: User) -> Future<Void, Error> {
         return Future { promise in
             self.registerDevice(token: token, user: user) { (error) in
@@ -1120,6 +1124,8 @@ public extension PushClient {
     }
 
     /// Request to deregister a device for a user
+    /// @param user - devoce's user
+    /// @returns A publisher that eventually return `Result.success` or `Error`.
     func deregisterDevice(user: User) -> Future<Void, Error> {
         return Future { promise in
             self.deregisterDevice(user: user) { (error) in
