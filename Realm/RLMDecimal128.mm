@@ -75,15 +75,17 @@
 
 - (instancetype)initWithString:(NSString *)string error:(NSError **)error {
     if ((self = [self init])) {
-        try {
-            _value = realm::Decimal128(string.UTF8String);
-        }
-        catch (std::exception const& e) {
+        const char *str = string.UTF8String;
+        if (!realm::Decimal128::is_valid_str(str)) {
             if (error) {
-                *error = RLMMakeError(RLMErrorInvalidInput, e);
+                NSString *msg = [NSString stringWithFormat:@"String '%@' is not a valid Decimal128", string];
+                *error = [NSError errorWithDomain:RLMErrorDomain
+                                             code:RLMErrorInvalidInput
+                                         userInfo:@{NSLocalizedDescriptionKey: msg}];
             }
             return nil;
         }
+        _value = realm::Decimal128(str);
     }
     return self;
 }
@@ -174,7 +176,7 @@
 
 - (void)dividingAssignmentWith:(RLMDecimal128 *)decimalNumber {
     auto rhs = RLMObjcToDecimal128(decimalNumber);
-    _value/=rhs;
+    _value /= rhs;
 }
 
 - (RLMDecimal128 *)decimalNumberBySubtracting:(RLMDecimal128 *)decimalNumber {
@@ -184,7 +186,7 @@
 
 - (void)subtractionAssignmentWith:(RLMDecimal128 *)decimalNumber {
     auto rhs = RLMObjcToDecimal128(decimalNumber);
-    _value-=rhs;
+    _value -= rhs;
 }
 
 - (RLMDecimal128 *)decimalNumberByMultiplyingBy:(RLMDecimal128 *)decimalNumber {
@@ -194,7 +196,7 @@
 
 - (void)multiplicationAssignmentWith:(RLMDecimal128 *)decimalNumber {
     auto rhs = RLMObjcToDecimal128(decimalNumber);
-    _value*=rhs;
+    _value *= rhs;
 }
 
 - (BOOL)isGreaterThan:(RLMDecimal128 *)decimalNumber {

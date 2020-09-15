@@ -3358,7 +3358,6 @@
 					Realm/ObjectStore/external/json,
 				);
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -3477,7 +3476,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E01BE05C19002800DA /* Tests.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = "Realm/ObjectServerTests/ObjectServerTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";

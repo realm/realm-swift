@@ -86,12 +86,12 @@ public final class Decimal128: RLMDecimal128, Decodable {
 
     /// The mininum value for Decimal128
     public static var min: Self {
-        minimumDecimalNumber as! Self
+        __minimumDecimalNumber as! Self
     }
 
     /// The maximum value for Decimal128
     public static var max: Self {
-        maximumDecimalNumber as! Self
+        __maximumDecimalNumber as! Self
     }
 }
 
@@ -289,7 +289,7 @@ extension Decimal128: Strideable {
     /// - Parameter other: The Decimal128 value to calculate the distance to.
     /// - Returns: The distance from this value to `other`.
     public func distance(to other: Decimal128) -> Stride {
-        other-self
+        other - self
     }
 
     /// Returns a Decimal128 that is offset the specified distance from this value.
@@ -301,7 +301,7 @@ extension Decimal128: Strideable {
     /// - Parameter n: The distance to advance this Decimal128.
     /// - Returns: A Decimal128 that is offset from this value by `n`.
     public func advanced(by n: Decimal128) -> Decimal128 {
-        self+n
+        self + n
     }
 }
 

@@ -57,10 +57,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)decimalWithNumber:(NSNumber *)number;
 
 /// The minimum value for RLMDecimal128.
-@property (class, readonly, copy) RLMDecimal128 *minimumDecimalNumber;
+@property (class, readonly, copy) RLMDecimal128 *minimumDecimalNumber NS_REFINED_FOR_SWIFT;
 
 /// The maximum value for RLMDecimal128.
-@property (class, readonly, copy) RLMDecimal128 *maximumDecimalNumber;
+@property (class, readonly, copy) RLMDecimal128 *maximumDecimalNumber NS_REFINED_FOR_SWIFT;
 
 /// Convert this value to a double. This is a lossy conversion.
 @property (nonatomic, readonly) double doubleValue;

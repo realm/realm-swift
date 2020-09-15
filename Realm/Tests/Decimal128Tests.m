@@ -29,14 +29,33 @@
 - (void)testDecimal128Initialization {
     RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@3.14159];
     RLMDecimal128 *d2 = [[RLMDecimal128 alloc] initWithString:@"3.14159" error:nil];
-    RLMDecimal128 *d3 = [[RLMDecimal128 alloc] initWithString:@"not a number" error:nil];
+    NSError *error;
+    RLMDecimal128 *d3 = [[RLMDecimal128 alloc] initWithString:@"not a number" error:&error];
+    XCTAssertNotNil(error);
     RLMDecimal128 *d4 = [[RLMDecimal128 alloc] initWithValue:@3.14159];
+    RLMDecimal128 *d5 = [[RLMDecimal128 alloc] initWithValue:@"123.456"];
+    RLMDecimal128 *d6 = [[RLMDecimal128 alloc] initWithNumber:@123456789];
+    RLMDecimal128 *d7 = [[RLMDecimal128 alloc] init];
     XCTAssertEqual(d1.doubleValue, 3.14159);
     XCTAssertTrue([d1.stringValue isEqualToString:@"3.14159"]);
     XCTAssertEqual(d2.doubleValue, 3.14159);
     XCTAssertTrue([d2.stringValue isEqualToString:@"3.14159"]);
-    XCTAssertTrue(d3.isNaN);
+    XCTAssertNil(d3);
     XCTAssertEqual(d4.doubleValue, 3.14159);
+    XCTAssertTrue([d5.stringValue isEqualToString:@"123.456"]);
+    XCTAssertTrue([d6.stringValue isEqualToString:@"123456789"]);
+    XCTAssertEqual(d7.doubleValue, 0);
+}
+
+- (void)testDecimal128Decimal {
+    NSNumber *n1 = @3.14159;
+    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithString:@"3.14159" error:nil];
+    XCTAssertEqual(n1.decimalValue._exponent, d1.decimalValue._exponent);
+    XCTAssertEqual(n1.decimalValue._isCompact, d1.decimalValue._isCompact);
+    XCTAssertEqual(n1.decimalValue._isNegative, d1.decimalValue._isNegative);
+    XCTAssertEqual(n1.decimalValue._length, d1.decimalValue._length);
+    XCTAssertEqual(n1.decimalValue._mantissa[0], d1.decimalValue._mantissa[0]);
+    XCTAssertEqual(n1.decimalValue._reserved, d1.decimalValue._reserved);
 }
 
 #pragma mark - Arithmetic
@@ -58,19 +77,17 @@
 }
 
 - (void)testDecimal128Subtraction {
-    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@3.14159];
-    RLMDecimal128 *d2 = [d1 decimalNumberBySubtracting:[[RLMDecimal128 alloc] initWithString:@"3.14159" error:nil]];
-    XCTAssertEqual(d2.doubleValue, 6.28318);
-    XCTAssertTrue([d2.stringValue isEqualToString:@"6.28318"]);
-    XCTAssertEqual(d2.doubleValue, 6.28318);
+    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@2.5];
+    RLMDecimal128 *d2 = [d1 decimalNumberBySubtracting:[[RLMDecimal128 alloc] initWithString:@"5.5" error:nil]];
+    XCTAssertEqual(d2.doubleValue, -3.0);
+    XCTAssertTrue([d2.stringValue isEqualToString:@"-3.0"]);
 }
 
 - (void)testDecimal128SubtractionAssignment {
-    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@3.14159];
-    [d1 subtractionAssignmentWith:[RLMDecimal128 decimalWithNumber:@3.14159]];
-    XCTAssertEqual(d1.doubleValue, 6.28318);
-    XCTAssertTrue([d1.stringValue isEqualToString:@"6.28318"]);
-    XCTAssertEqual(d1.doubleValue, 6.28318);
+    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@2.5];
+    [d1 subtractionAssignmentWith:[RLMDecimal128 decimalWithNumber:@10.5]];
+    XCTAssertEqual(d1.doubleValue, -8.0);
+    XCTAssertTrue([d1.stringValue isEqualToString:@"-8.0"]);
 }
 
 - (void)testDecimal128Division {
@@ -82,27 +99,25 @@
 }
 
 - (void)testDecimal128DivisionAssignment {
-    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@3.14159];
-    [d1 dividingAssignmentWith:[RLMDecimal128 decimalWithNumber:@3.14159]];
-    XCTAssertEqual(d1.doubleValue, 6.28318);
-    XCTAssertTrue([d1.stringValue isEqualToString:@"6.28318"]);
-    XCTAssertEqual(d1.doubleValue, 6.28318);
+    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@10.];
+    [d1 dividingAssignmentWith:[RLMDecimal128 decimalWithNumber:@2.5]];
+    XCTAssertEqual(d1.doubleValue, 4.0);
+    XCTAssertTrue([d1.stringValue isEqualToString:@"4"]);
 }
 
 - (void)testDecimal128Multiplication {
-    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@0.21];
-    RLMDecimal128 *d2 = [[RLMDecimal128 alloc] initWithString:@"0.7" error:nil];
+    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@1.5];
+    RLMDecimal128 *d2 = [[RLMDecimal128 alloc] initWithString:@"2.5" error:nil];
     RLMDecimal128 *result = [d1 decimalNumberByMultiplyingBy:d2];
-    XCTAssertEqual(result.doubleValue, 0.3);
-    XCTAssertTrue([result.stringValue isEqualToString:@"3E-1"]);
+    XCTAssertEqual(result.doubleValue, 3.75);
+    XCTAssertTrue([result.stringValue isEqualToString:@"3.75"]);
 }
 
 - (void)testDecimal128MultiplicationAssignment {
-    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@3.14159];
-    [d1 multiplicationAssignmentWith:[RLMDecimal128 decimalWithNumber:@3.14159]];
-    XCTAssertEqual(d1.doubleValue, 6.28318);
-    XCTAssertTrue([d1.stringValue isEqualToString:@"6.28318"]);
-    XCTAssertEqual(d1.doubleValue, 6.28318);
+    RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@0.5];
+    [d1 multiplicationAssignmentWith:[RLMDecimal128 decimalWithNumber:@2.5]];
+    XCTAssertEqual(d1.doubleValue, 1.25);
+    XCTAssertTrue([d1.stringValue isEqualToString:@"1.25"]);
 }
 
 #pragma mark - Comparison
