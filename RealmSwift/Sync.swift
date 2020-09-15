@@ -283,7 +283,7 @@ public struct Functions {
                     if let bson = bson {
                         promise(.success(bson))
                     } else {
-                        promise(.failure(error ?? Realm.Error.failedPromise))
+                        promise(.failure(error ?? Realm.Error.promiseFailed))
                     }
                 })
             }
@@ -565,7 +565,7 @@ public extension App {
                 if let user = user {
                 promise(.success(user))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -582,7 +582,7 @@ public extension User {
                 if let customData = customData {
                     promise(.success(customData))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -599,7 +599,7 @@ public extension User {
                 if let user = user {
                     promise(.success(user))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -650,7 +650,7 @@ public extension MongoCollection {
                 if let objectId = objectId {
                     promise(.success(try! ObjectId(string: objectId.stringValue)))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -666,7 +666,7 @@ public extension MongoCollection {
                 if let objectIds = objectIds?.map({ try! ObjectId(string: $0.stringValue) }) {
                     promise(.success(objectIds))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -683,7 +683,7 @@ public extension MongoCollection {
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -699,7 +699,7 @@ public extension MongoCollection {
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -719,7 +719,7 @@ public extension MongoCollection {
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -738,7 +738,7 @@ public extension MongoCollection {
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -754,7 +754,7 @@ public extension MongoCollection {
                 if let bson = bson {
                     promise(.success(bson))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -832,7 +832,7 @@ public extension MongoCollection {
                 if let updateResult = updateResult {
                     promise(.success(updateResult))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -848,7 +848,7 @@ public extension MongoCollection {
                 if let updateResult = updateResult {
                     promise(.success(updateResult))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -865,7 +865,7 @@ public extension MongoCollection {
                 if let updateResult = updateResult {
                     promise(.success(updateResult))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -881,7 +881,7 @@ public extension MongoCollection {
                 if let updateResult = updateResult {
                     promise(.success(updateResult))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }

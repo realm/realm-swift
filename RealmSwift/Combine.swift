@@ -1014,7 +1014,7 @@ public extension APIKeyAuth {
                 if let userApiKey = userApiKey {
                     promise(.success(userApiKey))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -1031,7 +1031,7 @@ public extension APIKeyAuth {
                 if let userApiKey = userApiKey {
                     promise(.success(userApiKey))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }
@@ -1047,7 +1047,7 @@ public extension APIKeyAuth {
                 if let userApiKeys = userApiKeys {
                     promise(.success(userApiKeys))
                 } else {
-                    promise(.failure(error ?? Realm.Error.failedPromise))
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
             }
         }

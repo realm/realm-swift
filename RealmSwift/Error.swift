@@ -89,7 +89,7 @@ extension Realm {
             return configuration.map(Realm.Configuration.fromRLMRealmConfiguration)
         }
 
-        public static let failedPromise = Error(.fail, userInfo: [NSLocalizedDescriptionKey: "Promise failed"])
+        public static let promiseFailed = Error(.fail, userInfo: [NSLocalizedDescriptionKey: "Promise failed"])
     }
 }
 
