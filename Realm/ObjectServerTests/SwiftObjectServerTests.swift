@@ -2138,14 +2138,14 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         wait(for: [registerUserEx], timeout: 4.0)
 
         let loginEx = expectation(description: "Login user")
-        app.login(credentials: Credentials(username: email, password: password))
+        app.login(credentials: Credentials(email: email, password: password))
             .sink(receiveCompletion: { result in
                 if case .failure(_) = result {
                     XCTFail("Should login")
                 }
             }, receiveValue: { user in
                 loginEx.fulfill()
-                XCTAssertEqual(user.identity, self.app.currentUser()?.identity)
+                XCTAssertEqual(user.id, self.app.currentUser()?.id)
             })
             .store(in: &cancellable)
         wait(for: [loginEx], timeout: 4.0)
@@ -2169,7 +2169,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             .store(in: &cancellable)
         wait(for: [registerUserEx], timeout: 4.0)
 
-        let credentials = Credentials(username: email, password: password)
+        let credentials = Credentials(email: email, password: password)
         var syncUser: User!
         let loginEx = expectation(description: "Login user")
         app.login(credentials: credentials)
@@ -2786,7 +2786,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             .store(in: &cancellable)
         wait(for: [regEx], timeout: 4.0)
 
-        let credentials = Credentials(username: email, password: password)
+        let credentials = Credentials(email: email, password: password)
         var syncUser: User!
         let loginEx = expectation(description: "Should login")
         app.login(credentials: credentials)
@@ -2851,7 +2851,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
         let loginEx = expectation(description: "Login user")
         var syncUser: User?
-        app.login(credentials: Credentials(username: email, password: password))
+        app.login(credentials: Credentials(email: email, password: password))
             .sink(receiveCompletion: { _ in },
                   receiveValue: { (user) in
                 syncUser = user
@@ -2862,7 +2862,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
         let createAPIKeyEx = expectation(description: "Create user api key")
         var apiKey: UserAPIKey?
-        syncUser?.apiKeyAuth().createAPIKey(named: "my-api-key")
+        syncUser?.apiKeysAuth().createAPIKey(named: "my-api-key")
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should create user api key")
@@ -2876,7 +2876,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
         let fetchAPIKeyEx = expectation(description: "Fetch user api key")
         var objId: ObjectId? = try? ObjectId(string: apiKey!.objectId.stringValue)
-        syncUser?.apiKeyAuth().fetchAPIKey(objId!)
+        syncUser?.apiKeysAuth().fetchAPIKey(objId!)
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should fetch user api key")
@@ -2889,7 +2889,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         wait(for: [fetchAPIKeyEx], timeout: 4.0)
 
         let fetchAPIKeysEx = expectation(description: "Fetch user api keys")
-        syncUser?.apiKeyAuth().fetchAPIKeys()
+        syncUser?.apiKeysAuth().fetchAPIKeys()
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should fetch user api keys")
@@ -2903,7 +2903,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
         let disableKeyEx = expectation(description: "Disable API key")
         objId = try? ObjectId(string: apiKey!.objectId.stringValue)
-        syncUser?.apiKeyAuth().disableAPIKey(objId!)
+        syncUser?.apiKeysAuth().disableAPIKey(objId!)
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should disable user api key")
@@ -2915,7 +2915,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         wait(for: [disableKeyEx], timeout: 4.0)
 
         let enableKeyEx = expectation(description: "Enable API key")
-        syncUser?.apiKeyAuth().enableAPIKey(objId!)
+        syncUser?.apiKeysAuth().enableAPIKey(objId!)
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should enable user api key")
@@ -2927,7 +2927,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         wait(for: [enableKeyEx], timeout: 4.0)
 
         let deleteKeyEx = expectation(description: "Delete API key")
-        syncUser?.apiKeyAuth().deleteAPIKey(objId!)
+        syncUser?.apiKeysAuth().deleteAPIKey(objId!)
             .sink(receiveCompletion: { (result) in
                 if case .failure(_) = result {
                     XCTFail("Should delete user api key")
@@ -2952,7 +2952,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         wait(for: [registerUserEx], timeout: 4.0)
 
         let loginEx = expectation(description: "Login user")
-        app.login(credentials: Credentials(username: email, password: password))
+        app.login(credentials: Credentials(email: email, password: password))
             .sink(receiveCompletion: { _ in },
                   receiveValue: { _ in loginEx.fulfill() })
             .store(in: &cancellable)
