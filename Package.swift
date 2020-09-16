@@ -3,7 +3,7 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "6.0.25"
+let coreVersionStr = "6.0.26"
 let cocoaVersionStr = "5.4.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
