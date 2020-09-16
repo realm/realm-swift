@@ -65,8 +65,8 @@ static RLMApp *app;
 
     // Creating a debug credential since this demo is just using the generated access token
     // produced when running the Realm Object Server via the `start-object-server.command`
-    RLMCredentials *credential = [RLMCredentials credentialsWithUsername:@"demo@realm.io"
-                                                                password:@"password"];
+    RLMCredentials *credential = [RLMCredentials credentialsWithEmail:@"demo@realm.io"
+                                                             password:@"password"];
 
     // Log the user in (async, the Realm will start syncing once the user is logged in automatically)
     [app loginWithCredential:credential
