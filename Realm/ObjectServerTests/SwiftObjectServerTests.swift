@@ -2050,7 +2050,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let registerUserEx = expectation(description: "Register user")
         app.emailPasswordAuth().registerUser(email: email, password: password)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should register")
                 }
             }, receiveValue: { _ in
@@ -2062,7 +2062,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let confirmUserEx = expectation(description: "Confirm user")
         app.emailPasswordAuth().confirmUser("atoken", tokenId: "atokenid")
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     confirmUserEx.fulfill()
                 }
             }, receiveValue: { _ in
@@ -2074,7 +2074,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let resendEmailEx = expectation(description: "Resend email confirmation")
         app.emailPasswordAuth().resendConfirmationEmail(email: "atoken")
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     resendEmailEx.fulfill()
                 }
             }, receiveValue: { _ in
@@ -2086,7 +2086,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let sendResetPasswordEx = expectation(description: "Send reset password email")
         app.emailPasswordAuth().sendResetPasswordEmail(email: "atoken")
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     sendResetPasswordEx.fulfill()
                 }
             }, receiveValue: { _ in
@@ -2098,7 +2098,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let resetPasswordEx = expectation(description: "Reset password email")
         app.emailPasswordAuth().resetPassword(to: "password", token: "atoken", tokenId: "tokenId")
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     resetPasswordEx.fulfill()
                 }
             }, receiveValue: { _ in
@@ -2110,7 +2110,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let callResetFunctionEx = expectation(description: "Reset password function")
         app.emailPasswordAuth().callResetPasswordFunction(email: email, password: randomString(10), args: [[:]])
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     callResetFunctionEx.fulfill()
                 }
             }, receiveValue: { _ in
@@ -2128,7 +2128,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let registerUserEx = expectation(description: "Register user")
         app.emailPasswordAuth().registerUser(email: email, password: password)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should register")
                 }
             }, receiveValue: { _ in
@@ -2140,7 +2140,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let loginEx = expectation(description: "Login user")
         app.login(credentials: Credentials(email: email, password: password))
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should login")
                 }
             }, receiveValue: { user in
@@ -2160,7 +2160,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let registerUserEx = expectation(description: "Register user")
         app.emailPasswordAuth().registerUser(email: email, password: password)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should register")
                 }
             }, receiveValue: { _ in
@@ -2174,7 +2174,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let loginEx = expectation(description: "Login user")
         app.login(credentials: credentials)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should login")
                 }
             }, receiveValue: { user in
@@ -2194,7 +2194,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let refreshDataEx = expectation(description: "Refresh user data")
         syncUser.refreshCustomData()
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should refresh")
                 }
             }, receiveValue: { customData in
@@ -2218,7 +2218,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let insertOneEx1 = expectation(description: "Insert one document")
         collection.insertOne(document)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should insert")
                 }
             }, receiveValue: { _ in
@@ -2230,7 +2230,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let insertManyEx1 = expectation(description: "Insert many documents")
         collection.insertMany([document, document2])
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should insert")
                 }
             }, receiveValue: { objectIds in
@@ -2243,7 +2243,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let findEx1 = expectation(description: "Find documents")
         collection.find(filter: [:])
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should find")
                 }
             }, receiveValue: { findResult in
@@ -2265,7 +2265,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let notFoundEx1 = expectation(description: "Find documents")
         collection.find(filter: [:], options: findOptions)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should try to find")
                 }
             }, receiveValue: { findResult in
@@ -2284,7 +2284,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let findEx1 = expectation(description: "Find documents")
         collection.find(filter: [:])
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should find")
                 }
             }, receiveValue: { findResult in
@@ -2297,7 +2297,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let findEx2 = expectation(description: "Find documents")
         collection.find(filter: [:], options: findOptions)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should find")
                 }
             }, receiveValue: { findResult in
@@ -2311,7 +2311,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let findEx3 = expectation(description: "Find documents")
         collection.find(filter: document3, options: findOptions)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should find")
                 }
             }, receiveValue: { findResult in
@@ -2324,7 +2324,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let findOneEx1 = expectation(description: "Find one document")
         collection.findOneDocument(filter: document)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should find")
                 }
             }, receiveValue: { _ in
@@ -2336,7 +2336,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let findOneEx2 = expectation(description: "Find one document")
         collection.findOneDocument(filter: document, options: findOptions)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should find")
                 }
             }, receiveValue: { _ in
@@ -2366,7 +2366,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let countEx1 = expectation(description: "Count documents")
         collection.count(filter: document)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should count")
                 }
             }, receiveValue: { _ in
@@ -2378,7 +2378,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let countEx2 = expectation(description: "Count documents")
         collection.count(filter: document, limit: 1)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should count")
                 }
             }, receiveValue: { count in
@@ -2398,7 +2398,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let deleteEx1 = expectation(description: "Delete 0 documents")
         collection.deleteOneDocument(filter: document)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should count")
                 }
             }, receiveValue: { count in
@@ -2417,7 +2417,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let deleteEx2 = expectation(description: "Delete one document")
         collection.deleteOneDocument(filter: document)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should count")
                 }
             }, receiveValue: { count in
@@ -2437,7 +2437,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let deleteEx1 = expectation(description: "Delete 0 documents")
         collection.deleteManyDocuments(filter: document)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should try to delete")
                 }
             }, receiveValue: { count in
@@ -2456,7 +2456,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let deleteEx2 = expectation(description: "Delete one document")
         collection.deleteManyDocuments(filter: ["breed": "cane corso"])
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should delete")
                 }
             }, receiveValue: { count in
@@ -2485,7 +2485,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let updateEx1 = expectation(description: "Update one document")
         collection.updateOneDocument(filter: document, update: document2)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should update")
                 }
             }, receiveValue: { updateResult in
@@ -2500,7 +2500,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let updateEx2 = expectation(description: "Update one document")
         collection.updateOneDocument(filter: document5, update: document2, upsert: true)
         .sink(receiveCompletion: { result in
-            if case .failure(_) = result {
+            if case .failure = result {
                 XCTFail("Should try to update")
             }
         }, receiveValue: { updateResult in
@@ -2533,7 +2533,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let updateEx1 = expectation(description: "Update one document")
         collection.updateManyDocuments(filter: document, update: document2)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should update")
                 }
             }, receiveValue: { updateResult in
@@ -2548,7 +2548,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let updateEx2 = expectation(description: "Update one document")
         collection.updateManyDocuments(filter: document5, update: document2, upsert: true)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should try to update")
                 }
             }, receiveValue: { updateResult in
@@ -2571,7 +2571,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let findOneUpdateEx1 = expectation(description: "Find one document and update")
         collection.findOneAndUpdate(filter: document, update: document2)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should try to update")
                 }
             }, receiveValue: { updateResult in
@@ -2585,7 +2585,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let findOneUpdateEx2 = expectation(description: "Find one document and update")
         collection.findOneAndUpdate(filter: document2, update: document3, options: options1)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should update")
                 }
             }, receiveValue: { updateResult in
@@ -2603,7 +2603,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let findOneUpdateEx3 = expectation(description: "Find one document and update")
         collection.findOneAndUpdate(filter: document, update: document2, options: options2)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should update")
                 }
             }, receiveValue: { updateResult in
@@ -2628,7 +2628,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let findOneReplaceEx1 = expectation(description: "Find one document and replace")
         collection.findOneAndReplace(filter: document, replacement: document2)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should try to replace")
                 }
             }, receiveValue: { updateResult in
@@ -2642,7 +2642,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let findOneReplaceEx2 = expectation(description: "Find one document and replace")
         collection.findOneAndReplace(filter: document2, replacement: document3, options: options1)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should replace")
                 }
             }, receiveValue: { updateResult in
@@ -2660,7 +2660,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let findOneReplaceEx3 = expectation(description: "Find one document and replace")
         collection.findOneAndReplace(filter: document, replacement: document2, options: options2)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should try to replace")
                 }
             }, receiveValue: { updateResult in
@@ -2685,7 +2685,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let findOneDeleteEx1 = expectation(description: "Find one document and delete")
         collection.findOneAndDelete(filter: document)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should try to delete")
                 }
             }, receiveValue: { updateResult in
@@ -2758,7 +2758,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let findEx = expectation(description: "Find documents")
         collection.find(filter: [:])
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should try to update")
                 }
             }, receiveValue: { updateResult in
@@ -2777,7 +2777,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let regEx = expectation(description: "Should register")
         app.emailPasswordAuth().registerUser(email: email, password: password)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should register")
                 }
             }, receiveValue: { _ in
@@ -2791,7 +2791,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let loginEx = expectation(description: "Should login")
         app.login(credentials: credentials)
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should login")
                 }
             }, receiveValue: { user in
@@ -2804,7 +2804,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let sumEx = expectation(description: "Should calc sum")
         syncUser.functions.sum([1, 2, 3, 4, 5])
             .sink(receiveCompletion: { (result) in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should calc sum 15")
                 }
             }, receiveValue: { bson in
@@ -2821,7 +2821,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let userDataEx = expectation(description: "Should update user data")
         syncUser.functions.updateUserData([["favourite_colour": "green", "apples": 10]])
             .sink(receiveCompletion: { result in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should update user data")
                 }
             }, receiveValue: { bson in
@@ -2864,7 +2864,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         var apiKey: UserAPIKey?
         syncUser?.apiKeysAuth().createAPIKey(named: "my-api-key")
             .sink(receiveCompletion: { (result) in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should create user api key")
                 }
             }, receiveValue: { (userApiKey) in
@@ -2878,7 +2878,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         var objId: ObjectId? = try? ObjectId(string: apiKey!.objectId.stringValue)
         syncUser?.apiKeysAuth().fetchAPIKey(objId!)
             .sink(receiveCompletion: { (result) in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should fetch user api key")
                 }
             }, receiveValue: { (userApiKey) in
@@ -2891,7 +2891,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let fetchAPIKeysEx = expectation(description: "Fetch user api keys")
         syncUser?.apiKeysAuth().fetchAPIKeys()
             .sink(receiveCompletion: { (result) in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should fetch user api keys")
                 }
             }, receiveValue: { (userApiKeys) in
@@ -2905,7 +2905,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         objId = try? ObjectId(string: apiKey!.objectId.stringValue)
         syncUser?.apiKeysAuth().disableAPIKey(objId!)
             .sink(receiveCompletion: { (result) in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should disable user api key")
                 }
             }, receiveValue: { _ in
@@ -2917,7 +2917,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let enableKeyEx = expectation(description: "Enable API key")
         syncUser?.apiKeysAuth().enableAPIKey(objId!)
             .sink(receiveCompletion: { (result) in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should enable user api key")
                 }
             }, receiveValue: { _ in
@@ -2929,7 +2929,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let deleteKeyEx = expectation(description: "Delete API key")
         syncUser?.apiKeysAuth().deleteAPIKey(objId!)
             .sink(receiveCompletion: { (result) in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should delete user api key")
                 }
             }, receiveValue: { _ in
@@ -2962,7 +2962,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let client = app.pushClient(serviceName: "gcm")
         client.registerDevice(token: "some-token", user: app.currentUser()!)
             .sink(receiveCompletion: { (result) in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should register device")
                 }
             }, receiveValue: { _ in
@@ -2974,7 +2974,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let dergisterDeviceExpectation = expectation(description: "Deregister Device")
         client.deregisterDevice(user: app.currentUser()!)
             .sink(receiveCompletion: { (result) in
-                if case .failure(_) = result {
+                if case .failure = result {
                     XCTFail("Should deregister device")
                 }
             }, receiveValue: { _ in
