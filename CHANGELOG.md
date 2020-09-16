@@ -1,9 +1,12 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.4.1 Release notes (2020-09-16)
 =============================================================
+
 ### Enhancements
+
 * Add prebuilt binary for Xcode 11.7 to the release package.
 
 ### Fixed
+
 * Fix deadlocks when opening a Realm file in both the iOS simulator and Realm
   Studio ([#6743](https://github.com/realm/realm-cocoa/issues/6743), since 5.3.6).
 * Fix Springboard deadlocking when an app is unsuspended while it has an open
@@ -20,9 +23,8 @@ x.y.z Release notes (yyyy-MM-dd)
   of a pre-existing Results object.
   ([#6721](https://github.com/realm/realm-cocoa/issues/6721), since 5.0.0)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 3.12 or later.
@@ -30,6 +32,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.7.
 
 ### Internal
+
 * Upgraded realm-core from v6.0.25 to v6.0.26
 * Upgraded realm-sync from v5.0.22 to v5.0.23
 
