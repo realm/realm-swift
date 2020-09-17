@@ -358,7 +358,7 @@ download_common() {
             echo "Switching from version $(cat core/version.txt) to ${version}"
         fi
     else
-        if [ "$(find core -name librealm.a)" ]; then
+        if [ "$(find core -name librealm-sync.a)" ]; then
             echo 'Using existing custom core build without checking version'
             exit 0
         fi
@@ -398,11 +398,26 @@ download_common() {
 
     (
         cd "$temp_dir"
-        rm -rf "$download_type"
+        rm -rf core
         tar xf "$tar_path" --xz
         if [ ! -f core/version.txt ]; then
             printf %s "${version}" > core/version.txt
         fi
+
+        # Xcode 11 dsymutil crashes when given debugging symbols created by
+        # Xcode 12. Check if this breaks, and strip them if so.
+        local test_lib=core/realm-sync-dbg.xcframework/ios-*-simulator/librealm-sync-dbg.a
+        if ! [ -f $test_lib ]; then
+            test_lib="core/librealm-sync-ios-dbg.a"
+        fi
+        clang++ -Wl,-all_load -g -arch x86_64 -shared -target ios13.0 \
+          -isysroot $(xcrun --sdk iphonesimulator --show-sdk-path) -o tmp.dylib \
+          $test_lib -lz -framework Security
+        if ! dsymutil tmp.dylib -o tmp.dSYM 2> /dev/null; then
+            find core -name '*.a' -exec strip -x "{}" \; 2> /dev/null
+        fi
+        rm -r tmp.dylib tmp.dSYM
+
         mv core "${versioned_dir}"
     )
 
@@ -551,8 +566,7 @@ case "$COMMAND" in
         xc "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
         destination="build/osx/swift-$REALM_XCODE_VERSION"
         clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
-        rm -rf "$destination/Realm.framework"
-        cp -R build/osx/Realm.framework "$destination"
+        clean_retrieve "build/osx/Realm.framework" "$destination" "Realm.framework"
         exit 0
         ;;
 
@@ -568,6 +582,7 @@ case "$COMMAND" in
         xc "-scheme 'RealmSwift' -configuration $CONFIGURATION -destination variant='Mac Catalyst' build"
         destination="build/catalyst/swift-$REALM_XCODE_VERSION"
         clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION-maccatalyst/RealmSwift.framework" "$destination" "RealmSwift.framework"
+        clean_retrieve "build/catalyst/Realm.framework" "$destination" "Realm.framework"
         ;;
 
     "xcframework")
@@ -1514,11 +1529,11 @@ x.y.z Release notes (yyyy-MM-dd)
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
-* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* Realm Studio: 3.11 or later.
+* Realm Studio: 3.12 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
-* Carthage release for Swift is built with Xcode 11.6.
+* Carthage release for Swift is built with Xcode 11.7.
 
 ### Internal
 * Upgraded realm-core from ? to ?
