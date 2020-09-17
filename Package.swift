@@ -32,7 +32,7 @@ let package = Package(
     name: "Realm",
     platforms: [
         .macOS(.v10_10),
-        .iOS(.v11),
+        .iOS(.v9),
         .tvOS(.v9),
         .watchOS(.v2)
     ],
