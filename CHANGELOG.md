@@ -5,7 +5,8 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Fix Archiving the Realm and RealmSwift frameworks with Xcode 12.
+  ([#6774](https://github.com/realm/realm-cocoa/issues/6774))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

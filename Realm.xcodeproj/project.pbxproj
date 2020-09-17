@@ -846,7 +846,6 @@
 		3FE5818322C2B4B900BA10E7 /* Nonsync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Nonsync.swift; sourceTree = "<group>"; };
 		3FE5818422C2B4B900BA10E7 /* ObjectiveCSupport+Sync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ObjectiveCSupport+Sync.swift"; sourceTree = "<group>"; };
 		3FE5819122C2CA2E00BA10E7 /* RealmTestSupport.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RealmTestSupport.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		3FE5B4D324CF3F06004D4EF3 /* realm-sync.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "realm-sync.xcframework"; path = "$(REALM_CORE_FRAMEWORK)"; sourceTree = "<group>"; };
 		3FE5B4D424CF3F06004D4EF3 /* realm-sync-dbg.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "realm-sync-dbg.xcframework"; path = "$(REALM_CORE_FRAMEWORK)"; sourceTree = "<group>"; };
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
 		3FEB383C1E70AC6900F22712 /* ObjectCreationTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ObjectCreationTests.mm; sourceTree = "<group>"; };
@@ -1174,7 +1173,6 @@
 				3F9816292317763000C3543D /* libc++.tbd */,
 				1A7B82391D51259F00750296 /* libz.tbd */,
 				3FE5B4D424CF3F06004D4EF3 /* realm-sync-dbg.xcframework */,
-				3FE5B4D324CF3F06004D4EF3 /* realm-sync.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
