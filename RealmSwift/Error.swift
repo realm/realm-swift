@@ -83,12 +83,13 @@ extension Realm {
 
         /// Realm configuration that can be used to open the backup copy of a Realm file
         ///
-        //// Only applicable to `incompatibleSyncedFile`. Will be `nil` for all other errors.
+        /// Only applicable to `incompatibleSyncedFile`. Will be `nil` for all other errors.
         public var backupConfiguration: Realm.Configuration? {
             let configuration = userInfo[RLMBackupRealmConfigurationErrorKey] as! RLMRealmConfiguration?
             return configuration.map(Realm.Configuration.fromRLMRealmConfiguration)
         }
 
+        /// This error could be returned by Future promise when .success or .failed state cannot be determined
         public static let promiseFailed = Error(.fail, userInfo: [NSLocalizedDescriptionKey: "Promise failed"])
     }
 }

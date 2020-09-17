@@ -138,7 +138,7 @@
     RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test@10gen.com"
                                                                               register:YES]];
 
-    XCTAssertTrue([[self.app currentUser].identity isEqualTo:secondUser.identity]);
+    XCTAssertTrue([[self.app currentUser].identifier isEqualTo:secondUser.identifier]);
     // `[app currentUser]` will now be `secondUser`, so let's logout firstUser and ensure
     // the state is correct
     XCTestExpectation *expectation = [self expectationWithDescription:@"should log out current user"];
