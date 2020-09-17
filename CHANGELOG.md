@@ -1,25 +1,22 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.4.2 Release notes (2020-09-17)
 =============================================================
+
 ### Enhancements
+
 * Add prebuilt binary for Xcode 12 to the release package.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+
 * Fix Archiving the Realm and RealmSwift frameworks with Xcode 12.
   ([#6774](https://github.com/realm/realm-cocoa/issues/6774))
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 3.12 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
 * Carthage release for Swift is built with Xcode 12.
-
-### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
 
 5.4.1 Release notes (2020-09-16)
 =============================================================
