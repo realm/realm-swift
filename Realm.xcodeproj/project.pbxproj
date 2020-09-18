@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -1916,6 +1916,7 @@
 				5D659E9F1BE04556006515A0 /* Headers */,
 				1A7B82351D51235600750296 /* Frameworks */,
 				5D659ECE1BE04556006515A0 /* Resources */,
+				3F1DDB5825155E33007A9630 /* Carthage post-build workaround */,
 			);
 			buildRules = (
 			);
@@ -2217,6 +2218,26 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		3F1DDB5825155E33007A9630 /* Carthage post-build workaround */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Carthage post-build workaround";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Something that Carthage does results in Xcode skipping the ProcessXCFramework build step in some cases, which results in compilation failing. To work around this, ensure that the modified date on the XCFramework files are always newer than the built files, so that it happens on every build. This breaks incremental compilation, so we only want to do it when building for Carthage.\nif [ -n \"$CARTHAGE\" ]; then\n    find \"${SRCROOT}/core\" -type f -exec touch {} \\;\nfi\n";
+			showEnvVarsInLog = 0;
+		};
 		5D304A2E1BE9AEFB0082C1A6 /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
