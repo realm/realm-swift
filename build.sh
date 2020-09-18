@@ -369,7 +369,7 @@ download_common() {
     local versioned_dir="${download_type}-${version}${suffix}"
     if [ -e "$versioned_dir/version.txt" ]; then
         echo "Setting ${version} as the active version"
-        copy_core "$versioned_dir${suffix}"
+        copy_core "$versioned_dir"
         exit 0
     fi
 

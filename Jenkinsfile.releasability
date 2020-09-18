@@ -122,21 +122,10 @@ def doBuild() {
           # for each platform.
           ./scripts/reset-simulators.rb -firstOnly
 
-          # Building the Realm scheme before the RealmSwift scheme causes
-          # mysertious problems with Xcode 12. Carthage doesn't provide any way
-          # to customize what schemes are built, so just delete all of them
-          # except for the one we want to build.
-          mv Realm.xcodeproj/xcshareddata/xcschemes/Realm.xcscheme .
-          find Realm.xcodeproj -name '*.xcscheme' -and -not -name RealmSwift.xcscheme -delete
-          carthage build --no-skip-current --platform ${platform} --derived-data DerivedData
-          rm -r DerivedData
+          # Building the iOS static scheme just wastes time, so delete it
+          rm 'Realm.xcodeproj/xcshareddata/xcschemes/Realm iOS static.xcscheme'
 
-          mv Realm.xcscheme Realm.xcodeproj/xcshareddata/xcschemes/
-          mv Realm.xcodeproj/xcshareddata/xcschemes/RealmSwift.xcscheme .
           carthage build --no-skip-current --platform ${platform} --derived-data DerivedData
-          rm -r DerivedData
-          mv RealmSwift.xcscheme Realm.xcodeproj/xcshareddata/xcschemes
-
           carthage archive --output Carthage-${platform}.framework.zip
           """
           stash includes: "Carthage-${platform}.framework.zip",
