@@ -222,6 +222,18 @@ static NSDictionary *RLMAnalyticsPayload() {
                      // Host OS version being built on
                      @"Host OS Type": @"osx",
                      @"Host OS Version": RLMOSVersion() ?: kUnknownString,
+
+#ifdef SWIFT_PACKAGE
+                    @"Installation Method": @"Swift Package Manager",
+#elif defined(COCOAPODS)
+                    @"Installation Method": @"CocoaPods",
+#elif defined(CARTHAGE)
+                    @"Installation Method": @"Carthage",
+#elif defined(REALM_IOS_STATIC)
+                    @"Installation Method": @"Static Framework",
+#else
+                    @"Installation Method": @"Other",
+#endif
                  }
           };
 }
