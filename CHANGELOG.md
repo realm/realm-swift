@@ -24,7 +24,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Breaking Changes
 
-* Remove Realm.Publishers in favour of extending Combine.Publishers
+* Rename Realm.Publishers to RealmPublishers to avoid confusion with Combine.Publishers
 
 ### Enhancements
 

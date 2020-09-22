@@ -190,8 +190,8 @@ extension Publisher where Output: ThreadConfined {
     /// objects is unneccesary but is allowed.
     ///
     /// - returns: A publisher that supports `receive(on:)` for thread-confined objects.
-    public func threadSafeReference() -> Publishers.MakeThreadSafe<Self> {
-        Publishers.MakeThreadSafe(self)
+    public func threadSafeReference() -> RealmPublishers.MakeThreadSafe<Self> {
+        RealmPublishers.MakeThreadSafe(self)
     }
 }
 
@@ -220,8 +220,8 @@ extension Publisher {
     ///
     /// - returns: A publisher that supports `receive(on:)` for thread-confined objects.
     public func threadSafeReference<T: Object>()
-        -> Publishers.MakeThreadSafeObjectChangeset<Self, T> where Output == ObjectChange<T> {
-            Publishers.MakeThreadSafeObjectChangeset(self)
+        -> RealmPublishers.MakeThreadSafeObjectChangeset<Self, T> where Output == ObjectChange<T> {
+        RealmPublishers.MakeThreadSafeObjectChangeset(self)
     }
     /// Enables passing Realm collection changesets to a different dispatch queue.
     ///
@@ -246,8 +246,8 @@ extension Publisher {
     ///
     /// - returns: A publisher that supports `receive(on:)` for thread-confined objects.
     public func threadSafeReference<T: RealmCollection>()
-        -> Publishers.MakeThreadSafeCollectionChangeset<Self, T> where Output == RealmCollectionChange<T> {
-            Publishers.MakeThreadSafeCollectionChangeset(self)
+        -> RealmPublishers.MakeThreadSafeCollectionChangeset<Self, T> where Output == RealmCollectionChange<T> {
+        RealmPublishers.MakeThreadSafeCollectionChangeset(self)
     }
 }
 
@@ -256,24 +256,24 @@ extension RealmCollection where Self: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<Self> {
-        Publishers.WillChange(self)
+    public var objectWillChange: RealmPublishers.WillChange<Self> {
+        RealmPublishers.WillChange(self)
     }
 
     /// :nodoc:
     @available(*, deprecated, renamed: "collectionPublisher")
-    public var publisher: Publishers.Value<Self> {
-        Publishers.Value(self)
+    public var publisher: RealmPublishers.Value<Self> {
+        RealmPublishers.Value(self)
     }
 
     /// A publisher that emits the collection each time the collection changes.
-    public var collectionPublisher: Publishers.Value<Self> {
-        Publishers.Value(self)
+    public var collectionPublisher: RealmPublishers.Value<Self> {
+        RealmPublishers.Value(self)
     }
 
     /// A publisher that emits a collection changeset each time the collection changes.
-    public var changesetPublisher: Publishers.CollectionChangeset<Self> {
-        Publishers.CollectionChangeset(self)
+    public var changesetPublisher: RealmPublishers.CollectionChangeset<Self> {
+        RealmPublishers.CollectionChangeset(self)
     }
 }
 
@@ -283,8 +283,8 @@ extension RealmCollection where Self: RealmSubscribable {
 /// - parameter object: A managed object to observe.
 /// - returns: A publisher that emits the object each time it changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func valuePublisher<T: Object>(_ object: T) -> Publishers.Value<T> {
-    Publishers.Value<T>(object)
+public func valuePublisher<T: Object>(_ object: T) -> RealmPublishers.Value<T> {
+    RealmPublishers.Value<T>(object)
 }
 
 /// Creates a publisher that emits the collection each time the collection changes.
@@ -293,8 +293,8 @@ public func valuePublisher<T: Object>(_ object: T) -> Publishers.Value<T> {
 /// - parameter object: A managed collection to observe.
 /// - returns: A publisher that emits the collection each time it changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func valuePublisher<T: RealmCollection>(_ collection: T) -> Publishers.Value<T> {
-    Publishers.Value<T>(collection)
+public func valuePublisher<T: RealmCollection>(_ collection: T) -> RealmPublishers.Value<T> {
+    RealmPublishers.Value<T>(collection)
 }
 
 /// Creates a publisher that emits an object changeset each time the object changes.
@@ -303,8 +303,8 @@ public func valuePublisher<T: RealmCollection>(_ collection: T) -> Publishers.Va
 /// - parameter object: A managed object to observe.
 /// - returns: A publisher that emits an object changeset each time the object changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func changesetPublisher<T: Object>(_ object: T) -> Publishers.ObjectChangeset<T> {
-    Publishers.ObjectChangeset<T>(object)
+public func changesetPublisher<T: Object>(_ object: T) -> RealmPublishers.ObjectChangeset<T> {
+    RealmPublishers.ObjectChangeset<T>(object)
 }
 
 /// Creates a publisher that emits a collection changeset each time the collection changes.
@@ -313,8 +313,8 @@ public func changesetPublisher<T: Object>(_ object: T) -> Publishers.ObjectChang
 /// - parameter object: A managed collection to observe.
 /// - returns: A publisher that emits a collection changeset each time the collection changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func changesetPublisher<T: RealmCollection>(_ collection: T) -> Publishers.CollectionChangeset<T> {
-    Publishers.CollectionChangeset<T>(collection)
+public func changesetPublisher<T: RealmCollection>(_ collection: T) -> RealmPublishers.CollectionChangeset<T> {
+    RealmPublishers.CollectionChangeset<T>(collection)
 }
 
 // MARK: - Realm
@@ -324,8 +324,8 @@ extension Realm {
     /// A publisher that emits Void each time the object changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.RealmWillChange {
-        return Publishers.RealmWillChange(self)
+    public var objectWillChange: RealmPublishers.RealmWillChange {
+        return RealmPublishers.RealmWillChange(self)
     }
 }
 
@@ -336,8 +336,8 @@ extension Object: ObservableObject {
     /// A publisher that emits Void each time the object changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<Object> {
-        return Publishers.WillChange(self)
+    public var objectWillChange: RealmPublishers.WillChange<Object> {
+        return RealmPublishers.WillChange(self)
     }
 }
 
@@ -372,8 +372,8 @@ extension List: ObservableObject, RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<List> {
-        Publishers.WillChange(self)
+    public var objectWillChange: RealmPublishers.WillChange<List> {
+        RealmPublishers.WillChange(self)
     }
 }
 
@@ -384,8 +384,8 @@ extension LinkingObjects: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<LinkingObjects> {
-        Publishers.WillChange(self)
+    public var objectWillChange: RealmPublishers.WillChange<LinkingObjects> {
+        RealmPublishers.WillChange(self)
     }
 }
 
@@ -396,8 +396,8 @@ extension Results: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<Results> {
-        Publishers.WillChange(self)
+    public var objectWillChange: RealmPublishers.WillChange<Results> {
+        RealmPublishers.WillChange(self)
     }
 }
 
@@ -466,7 +466,7 @@ public struct ObservationSubscription: Subscription {
 /// You normally should not create any of these types directly, and should
 /// instead use the extension methods which create them.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension Publishers {
+public enum RealmPublishers {
     static private func realm<S: Scheduler>(_ config: RLMRealmConfiguration, _ scheduler: S) -> Realm? {
         try? Realm(RLMRealm(configuration: config, queue: scheduler as? DispatchQueue))
     }
@@ -568,8 +568,8 @@ extension Publishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to receive values on.
         /// - returns: A publisher which delivers values to the given scheduler.
-        public func receive<S: Scheduler>(on scheduler: S) -> Publishers.Handover<Self, S> {
-            return Publishers.Handover(self, scheduler, self.object.realm!)
+        public func receive<S: Scheduler>(on scheduler: S) -> RealmPublishers.Handover<Self, S> {
+            return RealmPublishers.Handover(self, scheduler, self.object.realm!)
         }
     }
 
