@@ -32,7 +32,7 @@ let package = Package(
     name: "Realm",
     platforms: [
         .macOS(.v10_10),
-        .iOS(.v11),
+        .iOS(.v9),
         .tvOS(.v9),
         .watchOS(.v2)
     ],
@@ -107,7 +107,9 @@ let package = Package(
                 "Realm/RLMUtil.mm"
             ],
             publicHeadersPath: "include",
-            cxxSettings: cxxSettings
+            cxxSettings: cxxSettings + [
+                .unsafeFlags(["-fno-aligned-new"])
+            ]
         ),
         .target(
             name: "RealmSwift",
