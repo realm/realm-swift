@@ -1,13 +1,16 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Improve the asymtotic performance of NOT IN queries on indexed properties. It
+  is now O(Number of Rows) rather than O(Number of Rows \* Number of values in IN clause.)
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Fix a crash inside `realm::Array(Type)::init_from_mem()` which would
+  sometimes occur when running a query over links immediately after creating
+  objects of the queried type.
+  ([#6789](https://github.com/realm/realm-cocoa/issues/6789) and possibly others, since 5.0.0).
+* Possibly fix problems when changing the type of the primary key of an object
+  from optional to non-optional.
 
 ### Compatibility
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
@@ -17,8 +20,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 12.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+
+* Upgraded realm-core from v6.0.26 to v6.1.1
+* Upgraded realm-sync from v5.0.23 to v5.0.24
 
 5.4.3 Release notes (2020-09-21)
 =============================================================
