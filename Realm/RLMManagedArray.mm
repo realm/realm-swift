@@ -30,11 +30,11 @@
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
 
-#import "list.hpp"
-#import "results.hpp"
-#import "shared_realm.hpp"
-
+#import <realm/object-store/list.hpp>
+#import <realm/object-store/results.hpp>
+#import <realm/object-store/shared_realm.hpp>
 #import <realm/table_view.hpp>
+
 #import <objc/runtime.h>
 
 @interface RLMManagedArrayHandoverMetadata : NSObject

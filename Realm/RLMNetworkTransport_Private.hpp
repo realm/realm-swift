@@ -17,11 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMNetworkTransport.h"
-#import "sync/generic_network_transport.hpp"
 
 namespace realm {
 namespace app {
 struct GenericEventSubscriber;
+struct Request;
 }
 }
 
