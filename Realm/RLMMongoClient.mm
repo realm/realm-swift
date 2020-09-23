@@ -17,13 +17,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMMongoClient_Private.hpp"
+
 #import "RLMMongoDatabase_Private.hpp"
 #import "RLMMongoCollection_Private.hpp"
 #import "RLMApp_Private.hpp"
 
-#import "sync/mongo_client.hpp"
-#import "sync/mongo_database.hpp"
-
+#import <realm/object-store/sync/mongo_client.hpp>
+#import <realm/object-store/sync/mongo_database.hpp>
 #import <realm/util/optional.hpp>
 
 @implementation RLMMongoClient

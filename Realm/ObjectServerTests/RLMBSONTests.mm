@@ -20,7 +20,7 @@
 #import <XCTest/XCTest.h>
 
 #import "RLMBSON_Private.hpp"
-#import "bson.hpp"
+#import <realm/object-store/bson.hpp>
 
 using namespace realm::bson;
 

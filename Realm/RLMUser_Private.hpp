@@ -18,7 +18,11 @@
 
 #import "RLMUser.h"
 
-#import "sync/sync_user.hpp"
+#import "RLMSyncConfiguration.h"
+#import "RLMSyncUtil_Private.h"
+
+#import <realm/object-store/sync/sync_user.hpp>
+#import <realm/sync/config.hpp>
 
 @class RLMSyncConfiguration, RLMSyncSessionRefreshHandle, RLMApp;
 
