@@ -18,16 +18,16 @@
 
 #import "RLMApp_Private.hpp"
 
-#import "RLMCredentials_Private.hpp"
 #import "RLMBSON_Private.hpp"
-#import "RLMPushClient_Private.hpp"
-#import "RLMUser_Private.hpp"
-#import "RLMSyncManager_Private.hpp"
-#import "RLMUtil.hpp"
+#import "RLMCredentials_Private.hpp"
 #import "RLMEmailPasswordAuth.h"
+#import "RLMPushClient_Private.hpp"
+#import "RLMSyncManager_Private.hpp"
+#import "RLMUser_Private.hpp"
+#import "RLMUtil.hpp"
 
-#include "sync/sync_config.hpp"
-#include "sync/sync_manager.hpp"
+#import <realm/object-store/sync/sync_manager.hpp>
+#import <realm/sync/config.hpp>
 
 #if !defined(REALM_COCOA_VERSION)
 #import "RLMVersion.h"

@@ -32,11 +32,11 @@
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
 
-#import "results.hpp"
-#import "shared_realm.hpp"
+#import <realm/object-store/results.hpp>
+#import <realm/object-store/shared_realm.hpp>
+#import <realm/table_view.hpp>
 
 #import <objc/message.h>
-#import <realm/table_view.hpp>
 
 using namespace realm;
 
