@@ -27,7 +27,7 @@
 #import "RLMUtil.hpp"
 
 #import "util/bson/bson.hpp"
-#import "sync/sync_config.hpp"
+#import <realm/sync/config.hpp>
 #import "sync/sync_manager.hpp"
 
 @implementation RLMRealmConfiguration (Sync)

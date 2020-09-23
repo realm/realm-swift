@@ -29,10 +29,11 @@
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 
-#import "shared_realm.hpp"
+#import <realm/object-store/shared_realm.hpp>
 
 #if REALM_ENABLE_SYNC
 #import "RLMSyncUtil.h"
+#import <realm/sync/client.hpp>
 #endif
 
 #import <realm/mixed.hpp>
@@ -426,7 +427,7 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
             return [[RLMObjectId alloc] initWithValue:mixed.get<realm::ObjectId>()];
         case realm::type_Link:
         case realm::type_LinkList:
-        case realm::type_OldMixed:
+        // case realm::type_OldMixed:
         case realm::type_OldTable:
         case realm::type_OldDateTime:
             REALM_UNREACHABLE();

@@ -18,7 +18,7 @@
 
 #import "RLMAccessor.h"
 
-#import "object_accessor.hpp"
+#import <realm/object-store/object_accessor.hpp>
 
 #import "RLMDecimal128_Private.hpp"
 #import "RLMObjectId_Private.hpp"

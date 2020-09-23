@@ -23,11 +23,11 @@
 #import "RLMSchema_Private.hpp"
 #import "RLMUtil.hpp"
 
-#import "schema.hpp"
-#import "shared_realm.hpp"
+#import <realm/object-store/schema.hpp>
+#import <realm/object-store/shared_realm.hpp>
 
 #if REALM_ENABLE_SYNC
-#import "sync/sync_config.hpp"
+#import <realm/sync/config.hpp>
 #else
 @class RLMSyncConfiguration;
 #endif

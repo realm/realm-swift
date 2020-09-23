@@ -26,9 +26,11 @@
 #import <Realm/RLMConstants.h>
 #import <Realm/RLMSchema.h>
 
-#import "binding_context.hpp"
-#import "shared_realm.hpp"
+#import <realm/object-store/binding_context.hpp>
+#import <realm/object-store/shared_realm.hpp>
 #import "util/scheduler.hpp"
+
+#import <realm/obj.hpp>
 
 #import <map>
 #import <mutex>

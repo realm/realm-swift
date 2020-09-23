@@ -30,8 +30,8 @@
 #import "RLMUtil.hpp"
 #import "RLMRealmUtil.hpp"
 
-#import "object_store.hpp"
-#import "shared_realm.hpp"
+#import <realm/object-store/object_store.hpp>
+#import <realm/object-store/shared_realm.hpp>
 
 #import <realm/table.hpp>
 #import <realm/version.hpp>

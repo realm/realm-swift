@@ -27,9 +27,9 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
-#import "object_schema.hpp"
-#import "object_store.hpp"
-#import "schema.hpp"
+#import <realm/object-store/object_schema.hpp>
+#import <realm/object-store/object_store.hpp>
+#import <realm/object-store/schema.hpp>
 
 #import <realm/group.hpp>
 

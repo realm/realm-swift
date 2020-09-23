@@ -28,8 +28,8 @@
 #import "RLMSchema.h"
 #import "RLMUtil.hpp"
 
-#import "object_store.hpp"
-#import "results.hpp"
+#import <realm/object-store/object_store.hpp>
+#import <realm/object-store/results.hpp>
 
 #include <realm/query_engine.hpp>
 #include <realm/query_expression.hpp>
@@ -113,12 +113,12 @@ struct Equal {
     using CaseSensitive = Equal<options & ~kCFCompareCaseInsensitive>;
     using CaseInsensitive = Equal<options | kCFCompareCaseInsensitive>;
 
-    bool operator()(StringData v1, StringData v2, bool v1_null, bool v2_null) const
+    bool operator()(Mixed v1, Mixed v2, bool v1_null, bool v2_null) const
     {
         REALM_ASSERT_DEBUG(v1_null == v1.is_null());
         REALM_ASSERT_DEBUG(v2_null == v2.is_null());
 
-        return equal(options, v1, v2);
+        return equal(options, v1.get_string(), v2.get_string());
     }
 
     static const char* description() { return options & kCFCompareCaseInsensitive ? "==[cd]" : "==[d]"; }
@@ -154,12 +154,12 @@ struct ContainsSubstring {
     using CaseSensitive = ContainsSubstring<options & ~kCFCompareCaseInsensitive>;
     using CaseInsensitive = ContainsSubstring<options | kCFCompareCaseInsensitive>;
 
-    bool operator()(StringData v1, StringData v2, bool v1_null, bool v2_null) const
+    bool operator()(Mixed v1, Mixed v2, bool v1_null, bool v2_null) const
     {
         REALM_ASSERT_DEBUG(v1_null == v1.is_null());
         REALM_ASSERT_DEBUG(v2_null == v2.is_null());
 
-        return contains_substring(options, v1, v2);
+        return contains_substring(options, v1.get_string(), v2.get_string());
     }
 
     static const char* description() { return options & kCFCompareCaseInsensitive ? "CONTAINS[cd]" : "CONTAINS[d]"; }
@@ -624,8 +624,8 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
 
     auto make_constraint = [&](auto comparator) {
         using Comparator = decltype(comparator);
-        using CompareCS = Compare<typename Comparator::CaseSensitive, StringData>;
-        using CompareCI = Compare<typename Comparator::CaseInsensitive, StringData>;
+        using CompareCS = Compare<typename Comparator::CaseSensitive>;
+        using CompareCI = Compare<typename Comparator::CaseInsensitive>;
         if (caseSensitive) {
             return make_expression<CompareCS>(std::move(left), std::move(right));
         }
@@ -782,14 +782,19 @@ void QueryBuilder::add_binary_constraint(NSPredicateOperatorType, const ColumnRe
 void QueryBuilder::add_link_constraint(NSPredicateOperatorType operatorType,
                                        const ColumnReference& column, RLMObjectBase *obj) {
     if (!obj->_row.is_valid()) {
-        // Unmanaged or deleted objects, so compare it to an object that doesn't
-        // exist from the target table
-        struct FakeObj : public ConstObj {
-            FakeObj(ColumnReference const& column) {
-                m_table = TableRef::unsafe_create(&::get_table(column.group(), column.link_target_object_schema()));
-            }
-        } fake(column);
-        add_bool_constraint(RLMPropertyTypeObject, operatorType, column.resolve<Link>(), fake);
+        // Unmanaged or deleted objects are not equal to any managed objects.
+        // For arrays this effectively checks if there are any objects in the
+        // array, while for links it's just always constant true or false
+        // (for != and = respectively).
+        if (column.property().array) {
+            add_bool_constraint(RLMPropertyTypeObject, operatorType, column.resolve<Link>(), null());
+        }
+        else if (operatorType == NSEqualToPredicateOperatorType) {
+            m_query.and_query(std::unique_ptr<Expression>(new FalseExpression));
+        }
+        else {
+            m_query.and_query(std::unique_ptr<Expression>(new TrueExpression));
+        }
     }
     else {
         add_bool_constraint(RLMPropertyTypeObject, operatorType, column.resolve<Link>(), obj->_row);

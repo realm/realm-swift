@@ -26,7 +26,7 @@
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 
-#import "sync/sync_config.hpp"
+#import <realm/sync/config.hpp>
 #import "sync/sync_manager.hpp"
 #import "sync/sync_session.hpp"
 

@@ -29,7 +29,7 @@
 #import "RLMBSON_Private.hpp"
 
 #import "sync/sync_manager.hpp"
-#import "sync/sync_config.hpp"
+#import <realm/sync/config.hpp>
 #import "sync/sync_session.hpp"
 
 #import <realm/sync/protocol.hpp>

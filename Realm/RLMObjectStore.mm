@@ -32,9 +32,9 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
-#import "object_store.hpp"
-#import "results.hpp"
-#import "shared_realm.hpp"
+#import <realm/object-store/object_store.hpp>
+#import <realm/object-store/results.hpp>
+#import <realm/object-store/shared_realm.hpp>
 
 #import <realm/group.hpp>
 

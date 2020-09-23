@@ -27,7 +27,7 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
-#import "property.hpp"
+#import <realm/object-store/property.hpp>
 
 static_assert((int)RLMPropertyTypeInt        == (int)realm::PropertyType::Int);
 static_assert((int)RLMPropertyTypeBool       == (int)realm::PropertyType::Bool);

@@ -38,8 +38,7 @@
 #import "RLMUser_Private.hpp"
 #import "RLMWatchTestUtility.h"
 
-#import "shared_realm.hpp"
-#import "sync/sync_manager.hpp"
+#import <realm/object-store/shared_realm.hpp>
 
 #pragma mark - Test objects
 

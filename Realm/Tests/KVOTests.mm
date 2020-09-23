@@ -25,7 +25,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 
-#import "shared_realm.hpp"
+#import <realm/object-store/shared_realm.hpp>
 
 #import <realm/group.hpp>
 
