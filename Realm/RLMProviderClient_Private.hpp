@@ -18,7 +18,7 @@
 
 #import <Realm/RLMProviderClient.h>
 
-#import "sync/app.hpp"
+#import <realm/object-store/sync/app.hpp>
 
 @interface RLMProviderClient ()
 

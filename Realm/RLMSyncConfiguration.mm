@@ -16,22 +16,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-
+#import "RLMSyncConfiguration_Private.hpp"
 
 #import "RLMApp_Private.hpp"
+#import "RLMBSON_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
-#import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
-#import "RLMUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
+#import "RLMUser_Private.hpp"
 #import "RLMUtil.hpp"
-#import "RLMBSON_Private.hpp"
 
-#import "sync/sync_manager.hpp"
-#import "sync/sync_config.hpp"
-#import "sync/sync_session.hpp"
-
+#import <realm/object-store/sync/sync_manager.hpp>
+#import <realm/object-store/sync/sync_session.hpp>
+#import <realm/sync/config.hpp>
 #import <realm/sync/protocol.hpp>
 
 using namespace realm;

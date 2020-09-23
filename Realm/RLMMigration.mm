@@ -30,10 +30,9 @@
 #import "RLMSchema_Private.hpp"
 #import "RLMUtil.hpp"
 
-#import "object_store.hpp"
-#import "shared_realm.hpp"
-#import "schema.hpp"
-
+#import <realm/object-store/object_store.hpp>
+#import <realm/object-store/shared_realm.hpp>
+#import <realm/object-store/schema.hpp>
 #import <realm/table.hpp>
 
 using namespace realm;

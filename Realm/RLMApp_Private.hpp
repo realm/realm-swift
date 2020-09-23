@@ -17,8 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMApp_Private.h>
+
+#import <realm/object-store/sync/app.hpp>
+
 #import <memory>
-#import "sync/app.hpp"
 
 @interface RLMAppConfiguration()
 

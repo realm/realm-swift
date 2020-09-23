@@ -18,7 +18,7 @@
 
 #import "RLMResults_Private.h"
 
-#import "results.hpp"
+#import <realm/object-store/results.hpp>
 
 class RLMClassInfo;
 
