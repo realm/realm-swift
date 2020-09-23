@@ -18,9 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
-#import "binding_context.hpp"
-
 #import <realm/obj.hpp>
+#import <realm/object-store/binding_context.hpp>
 #import <realm/table.hpp>
 
 @class RLMObjectBase, RLMRealm, RLMSchema, RLMProperty, RLMObjectSchema;
@@ -51,7 +50,7 @@ public:
     RLMObservationInfo(RLMClassInfo &objectSchema, realm::ObjKey row, id object);
     ~RLMObservationInfo();
 
-    realm::ConstObj const& getRow() const {
+    realm::Obj const& getRow() const {
         return row;
     }
 
@@ -92,7 +91,7 @@ private:
     RLMObservationInfo *prev = nullptr;
 
     // Row being observed
-    realm::ConstObj row;
+    realm::Obj row;
     RLMClassInfo *objectSchema = nullptr;
 
     // Object doing the observing

@@ -24,9 +24,8 @@
 #import "RLMSyncManager_Private.hpp"
 #import "RLMUtil.hpp"
 
+#import <realm/object-store/sync/generic_network_transport.hpp>
 #import <realm/util/scope_exit.hpp>
-
-#import "sync/generic_network_transport.hpp"
 
 using namespace realm;
 

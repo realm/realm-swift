@@ -17,7 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMCredentials.h"
-#import "sync/app_credentials.hpp"
+
+#import <realm/object-store/sync/app_credentials.hpp>
 
 @interface RLMCredentials()
 

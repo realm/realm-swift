@@ -29,8 +29,8 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.hpp"
 #import "RLMUtil.hpp"
-#import "schema.hpp"
 
+#import <realm/object-store/schema.hpp>
 #import <realm/table.hpp>
 
 #import <algorithm>

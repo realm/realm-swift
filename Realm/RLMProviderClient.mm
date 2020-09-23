@@ -19,8 +19,8 @@
 #import "RLMProviderClient_Private.hpp"
 
 #import "RLMApp_Private.hpp"
-#import "sync/app.hpp"
 
+#import <realm/object-store/sync/app.hpp>
 #import <realm/util/optional.hpp>
 
 @implementation RLMProviderClient

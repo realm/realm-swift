@@ -17,11 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMEmailPasswordAuth.h"
+
+#import "RLMApp_Private.hpp"
+#import "RLMBSON_Private.hpp"
 #import "RLMProviderClient_Private.hpp"
 
-#import "RLMBSON_Private.hpp"
-#import "RLMApp_Private.hpp"
-#import "sync/app.hpp"
+#import <realm/object-store/sync/app.hpp>
 
 @implementation RLMEmailPasswordAuth
 

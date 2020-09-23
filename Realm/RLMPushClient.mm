@@ -21,7 +21,7 @@
 #import "RLMApp_Private.hpp"
 #import "RLMUser_Private.hpp"
 
-#import "sync/push_client.hpp"
+#import <realm/object-store/sync/push_client.hpp>
 
 using realm::util::Optional;
 
