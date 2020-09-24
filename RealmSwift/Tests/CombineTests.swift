@@ -72,14 +72,23 @@ class CombineTestCase: TestCase {
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class CombineRealmTests: CombineTestCase {
+    var cancellable = Set<AnyCancellable>()
+    var notificationToken: NotificationToken?
+
     func testWillChangeLocalWrite() {
         var called = false
-        token = realm.objectWillChange.sink {
+
+        token = realm
+            .objectWillChange
+            .saveToken(on: self, for: \.notificationToken)
+            .sink {
             called = true
         }
+
         try! realm.write {
             realm.create(SwiftIntObject.self, value: [])
         }
+        XCTAssertNotNil(notificationToken)
         XCTAssertTrue(called)
     }
 

@@ -256,7 +256,7 @@ extension RealmCollection where Self: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<Self> {
+    public var objectWillChange: Publishers.WillChange<Self, Void> {
         Publishers.WillChange(self)
     }
 
@@ -324,7 +324,7 @@ extension Realm {
     /// A publisher that emits Void each time the object changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.RealmWillChange {
+    public var objectWillChange: Publishers.RealmWillChange<Void> { // Maybe use `Never`?
         return Publishers.RealmWillChange(self)
     }
 }
@@ -336,7 +336,7 @@ extension Object: Combine.ObservableObject {
     /// A publisher that emits Void each time the object changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<Object> {
+    public var objectWillChange: Publishers.WillChange<Object, Void> {
         return Publishers.WillChange(self)
     }
 }
@@ -372,7 +372,7 @@ extension List: ObservableObject, RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<List> {
+    public var objectWillChange: Publishers.WillChange<List, Void> {
         Publishers.WillChange(self)
     }
 }
@@ -384,7 +384,7 @@ extension LinkingObjects: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<LinkingObjects> {
+    public var objectWillChange: Publishers.WillChange<LinkingObjects, Void> {
         Publishers.WillChange(self)
     }
 }
@@ -396,7 +396,7 @@ extension Results: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<Results> {
+    public var objectWillChange: Publishers.WillChange<Results, Void> {
         Publishers.WillChange(self)
     }
 }
@@ -437,7 +437,7 @@ extension AnyRealmCollection: RealmSubscribable {
 /// A subscription which wraps a Realm notification.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public struct ObservationSubscription: Subscription {
-    private var token: NotificationToken
+    public var token: NotificationToken
     internal init(token: NotificationToken) {
         self.token = token
     }
@@ -459,6 +459,128 @@ public struct ObservationSubscription: Subscription {
     }
 }
 
+@available(OSXApplicationExtension 10.15, *)
+extension Subscribers {
+    public final class RealmObservable<Input, Failure> : Subscriber, NotificationCancellable, CustomStringConvertible, CustomReflectable, CustomPlaygroundDisplayConvertible, Hashable where Failure : Error {
+
+        enum SubscriptionStatus {
+            case awaitingSubscription
+            case subscribed(Subscription)
+            case terminal
+        }
+
+        public var token: NotificationToken?
+        private var receiveCompletion: (Subscribers.Completion<Failure>) -> Void
+        private var receiveValue: ((Input) -> Void)
+        private var status = SubscriptionStatus.awaitingSubscription
+
+        public init(receiveCompletion: @escaping (Subscribers.Completion<Failure>) -> Void,
+                    receiveValue: @escaping ((Input) -> Void)) {
+            self.receiveCompletion = receiveCompletion
+            self.receiveValue = receiveValue
+        }
+
+        public func receive(subscription: Subscription) {
+            guard let subscription = subscription as? ObservationSubscription else {
+                fatalError("sozzzz")
+            }
+
+            token = subscription.token
+        }
+
+        public func receive(_ input: Input) -> Subscribers.Demand {
+            .unlimited
+        }
+
+        public func receive(completion: Subscribers.Completion<Failure>) {
+
+        }
+
+        public func cancel() {
+
+        }
+
+        public var description: String {
+            String(describing: self)
+        }
+
+        public var customMirror: Mirror {
+            Mirror(reflecting: self)
+        }
+
+        public var playgroundDescription: Any {
+            description
+        }
+
+        public static func == (lhs: RealmObservable, rhs: RealmObservable) -> Bool {
+            return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+        }
+        
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(ObjectIdentifier(self))
+        }
+
+        public func store<Cancellables: RangeReplaceableCollection>(
+            in collection: inout Cancellables
+        ) where Cancellables.Element == RealmObservable {
+            collection.append(self)
+        }
+
+        public func store(in set: inout Set<RealmObservable>) {
+            set.insert(self)
+        }
+    }
+}
+
+extension NotificationToken: Cancellable {
+    public func cancel() {
+        invalidate()
+    }
+
+    public func store<Cancellables: RangeReplaceableCollection>(
+        in collection: inout Cancellables
+    ) where Cancellables.Element == NotificationToken {
+        collection.append(self)
+    }
+
+    public func store(in set: inout Set<NotificationToken>) {
+        set.insert(self)
+    }
+}
+
+public protocol NotificationCancellable: Cancellable {
+    var token: NotificationToken? { get }
+}
+
+@available(OSXApplicationExtension 10.15, *)
+public final class RealmCancellable: NotificationCancellable, Hashable {
+
+    public internal(set) var token: NotificationToken?
+    private var _cancel: (() -> Void)?
+
+    public init<OtherCancellable: NotificationCancellable>(_ canceller: OtherCancellable) {
+        _cancel = canceller.cancel
+    }
+
+    public func cancel() {
+        token?.invalidate()
+        _cancel?()
+        _cancel = nil
+    }
+
+    public static func == (lhs: RealmCancellable, rhs: RealmCancellable) -> Bool {
+        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(self))
+    }
+
+    deinit {
+        token?.invalidate()
+        _cancel?()
+    }
+}
 // MARK: Publishers
 
 /// Combine publishers for Realm types.
@@ -474,21 +596,37 @@ public enum Publishers {
     /// A publisher which emits Void each time the Realm is refreshed.
     ///
     /// Despite the name, this actually emits *after* the Realm is refreshed.
-    public struct RealmWillChange: Publisher {
+    public class RealmWillChange<T>: Publisher {
         /// This publisher cannot fail.
         public typealias Failure = Never
         /// This publisher emits Void.
         public typealias Output = Void
 
+        public typealias TokenParent = T
+        public typealias TokenKeyPath = WritableKeyPath<T, NotificationToken?>
+
         private let realm: Realm
-        internal init(_ realm: Realm) {
+        private var tokenParent: TokenParent?
+        private var tokenKeyPath: TokenKeyPath?
+
+        internal init(_ realm: Realm,
+                      _ tokenParent: TokenParent?=nil,
+                      _ tokenKeyPath: TokenKeyPath?=nil) {
             self.realm = realm
+            self.tokenParent = tokenParent
+            self.tokenKeyPath = tokenKeyPath
         }
 
-        /// :nodoc:
+        public func saveToken<T>(on object: T, for keyPath: WritableKeyPath<T, NotificationToken?>) -> RealmWillChange<T> {
+              return RealmWillChange<T>(realm, object, keyPath)
+        }
+
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
             let token = self.realm.observe { _, _ in
                 _ = subscriber.receive()
+            }
+            if var tp = tokenParent, let tkp = tokenKeyPath {
+                tp[keyPath: tkp] = token
             }
             subscriber.receive(subscription: ObservationSubscription(token: token))
         }
@@ -497,20 +635,35 @@ public enum Publishers {
     /// A publisher which emits Void each time the object is mutated.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public struct WillChange<Collection: RealmSubscribable>: Publisher where Collection: ThreadConfined {
+    public struct WillChange<Collection: RealmSubscribable, T>: Publisher where Collection: ThreadConfined {
         /// This publisher cannot fail.
         public typealias Failure = Never
         /// This publisher emits Void.
         public typealias Output = Void
 
+        public typealias TokenParent = T
+        public typealias TokenKeyPath = WritableKeyPath<T, NotificationToken?>
+
         private let object: Collection
-        internal init(_ object: Collection) {
+        private var tokenParent: TokenParent?
+        private var tokenKeyPath: TokenKeyPath?
+
+        internal init(_ object: Collection,
+                      _ tokenParent: TokenParent?=nil,
+                      _ tokenKeyPath: TokenKeyPath?=nil) {
             self.object = object
+            self.tokenParent = tokenParent
+            self.tokenKeyPath = tokenKeyPath
+        }
+
+        public func saveToken<T>(on parentObject: T, for keyPath: WritableKeyPath<T, NotificationToken?>) -> WillChange<Collection, T> {
+              return WillChange<Collection, T>(object, parentObject, keyPath)
         }
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            subscriber.receive(subscription: ObservationSubscription(token: self.object._observe(subscriber)))
+            let token =  self.object._observe(subscriber)
+            subscriber.receive(subscription: ObservationSubscription(token: token))
         }
     }
 
