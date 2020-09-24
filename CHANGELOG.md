@@ -23,6 +23,10 @@ x.y.z Release notes (yyyy-MM-dd)
 5.4.3 Release notes (2020-09-21)
 =============================================================
 
+### Breaking Changes
+
+* Rename Realm.Publishers to RealmPublishers to avoid confusion with Combine.Publishers
+
 ### Fixed
 
 * Fix compilation via Carthage when using Xcode 12 ([#6717](https://github.com/realm/realm-cocoa/issues/6717)).
