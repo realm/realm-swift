@@ -1,19 +1,21 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.4.5 Release notes (2020-09-28)
 =============================================================
+
 ### Enhancements
+
 * Slightly (<5%) improve the performance of most operations which involve
   reading from a Realm file.
 
 ### Fixed
+
 * Rerunning a equality query on an indexed string property would give incorrect
   results if a previous run of the query matched multiple objects and it now
   matches one object. This could manifest as either finding a non-matching
   object or a "key not found" exception being thrown.
   ([#6536](https://github.com/realm/realm-cocoa/issues/6536), since 5.0.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 5.0.0 or later.
@@ -21,6 +23,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 12.
 
 ### Internal
+
 * Upgraded realm-core from v6.1.1 to v6.1.2
 * Upgraded realm-sync from v5.0.25 to v5.0.25
 
