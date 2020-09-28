@@ -1,11 +1,15 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Slightly (<5%) improve the performance of most operations which involve
+  reading from a Realm file.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Rerunning a equality query on an indexed string property would give incorrect
+  results if a previous run of the query matched multiple objects and it now
+  matches one object. This could manifest as either finding a non-matching
+  object or a "key not found" exception being thrown.
+  ([#6536](https://github.com/realm/realm-cocoa/issues/6536), since 5.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -17,8 +21,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 12.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* Upgraded realm-core from v6.1.1 to v6.1.2
+* Upgraded realm-sync from v5.0.25 to v5.0.25
 
 5.4.4 Release notes (2020-09-25)
 =============================================================
@@ -47,7 +51,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Internal
 
 * Upgraded realm-core from v6.0.26 to v6.1.1
-* Upgraded realm-sync from v5.0.23 to v5.0.24
+* Upgraded realm-sync from v5.0.23 to v5.0.25
 
 5.4.3 Release notes (2020-09-21)
 =============================================================
