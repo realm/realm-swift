@@ -633,7 +633,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testGoogleCredentials() {
-        let googleCredential = Credentials(googleToken: "token")
+        let googleCredential = Credentials(googleAuthCode: "token")
         XCTAssertEqual(googleCredential.provider.rawValue, "oauth2-google")
     }
 
