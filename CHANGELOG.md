@@ -12,13 +12,106 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* Realm Studio: 3.12 or later.
+* Realm Studio: 5.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
-* Carthage release for Swift is built with Xcode 11.7.
+* Carthage release for Swift is built with Xcode 12.
 
 ### Internal
 * Upgraded realm-core from ? to ?
 * Upgraded realm-sync from ? to ?
+
+5.4.5 Release notes (2020-09-28)
+=============================================================
+
+### Enhancements
+
+* Slightly (<5%) improve the performance of most operations which involve
+  reading from a Realm file.
+
+### Fixed
+
+* Rerunning a equality query on an indexed string property would give incorrect
+  results if a previous run of the query matched multiple objects and it now
+  matches one object. This could manifest as either finding a non-matching
+  object or a "key not found" exception being thrown.
+  ([#6536](https://github.com/realm/realm-cocoa/issues/6536), since 5.0.0).
+
+### Compatibility
+
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 5.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 12.
+
+### Internal
+
+* Upgraded realm-core from v6.1.1 to v6.1.2
+* Upgraded realm-sync from v5.0.25 to v5.0.25
+
+5.4.4 Release notes (2020-09-25)
+=============================================================
+
+### Enhancements
+* Improve the asymtotic performance of NOT IN queries on indexed properties. It
+  is now O(Number of Rows) rather than O(Number of Rows \* Number of values in IN clause.)
+
+### Fixed
+
+* Fix a crash inside `realm::Array(Type)::init_from_mem()` which would
+  sometimes occur when running a query over links immediately after creating
+  objects of the queried type.
+  ([#6789](https://github.com/realm/realm-cocoa/issues/6789) and possibly others, since 5.0.0).
+* Possibly fix problems when changing the type of the primary key of an object
+  from optional to non-optional.
+
+### Compatibility
+
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 5.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 12.
+
+### Internal
+
+* Upgraded realm-core from v6.0.26 to v6.1.1
+* Upgraded realm-sync from v5.0.23 to v5.0.25
+
+5.4.3 Release notes (2020-09-21)
+=============================================================
+
+### Fixed
+
+* Fix compilation via Carthage when using Xcode 12 ([#6717](https://github.com/realm/realm-cocoa/issues/6717)).
+
+### Compatibility
+
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 3.12 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 12.
+
+5.4.2 Release notes (2020-09-17)
+=============================================================
+
+### Enhancements
+
+* Add prebuilt binary for Xcode 12 to the release package.
+
+### Fixed
+
+* Fix Archiving the Realm and RealmSwift frameworks with Xcode 12.
+  ([#6774](https://github.com/realm/realm-cocoa/issues/6774))
+
+### Compatibility
+
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 3.12 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 12.
 
 5.4.1 Release notes (2020-09-16)
 =============================================================
