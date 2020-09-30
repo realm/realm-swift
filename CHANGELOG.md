@@ -1,16 +1,15 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.0.0-beta.6 Release notes (2020-09-30)
 =============================================================
 
 ### Breaking Changes
+
 * Change Google Credential parameter names to better reflect the required auth code:
     - `Credentials(googleToken:)` => `Credentials(googleAuthCode:)`
     - `[RLMCredentials credentialsWithGoogleToken:]` => `[RLMCredentials credentialsWithGoogleAuthCode:]`
 * Rename Realm.Publishers to RealmPublishers to avoid confusion with Combine.Publishers
 
-### Enhancements
-* None.
-
 ### Fixed
+
 * Deleting objects could sometimes change the ObjectId remaining objects from
   null to ObjectId("deaddeaddeaddeaddeaddead") when there are more than 1000
   objects. (Since v10.0.0-alpha.1)
@@ -69,12 +68,13 @@ This release also contains the following changes from 5.4.0 - 5.4.6:
   ([#6536](https://github.com/realm/realm-cocoa/issues/6536), since 5.0.0).
 
 ### Compatibility
-* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+
+* File format: Generates Realms with format v12 (Reads and upgrades all previous formats)
 * Realm Studio: 10.0.0 or later.
-* APIs are backwards compatible with all previous releases in the 5.x.y series.
-* Carthage release for Swift is built with Xcode 11.6.
+* Carthage release for Swift is built with Xcode 12.
 
 ### Internal
+
 * Upgraded realm-core from v10.0.0-beta.7 to v10.0.0-beta.9
 * Upgraded realm-sync from v10.0.0-beta.11 to v10.0.0-beta.14
 
