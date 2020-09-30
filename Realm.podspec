@@ -96,7 +96,10 @@ Pod::Spec.new do |s|
                                 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
                                 'EXCLUDED_ARCHS[sdk=watchsimulator*]' => 'arm64',
                                 'EXCLUDED_ARCHS[sdk=macosx*]' => 'arm64',
-                                'VALID_ARCHS[sdk=*simulator*]' => 'x86_64 i386', # Required for Xcode 11.3
+                                'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64 i386', # Required for Xcode 11.3
+                                'VALID_ARCHS[sdk=watchsimulator*]' => 'x86_64 i386', # Required for Xcode 11.3
+                                'VALID_ARCHS[sdk=appletvsimulator*]' => 'x86_64 i386', # Required for Xcode 11.3
+                                'VALID_ARCHS[sdk=macosx*]' => 'x86_64 i386', # Required for Xcode 11.3
                               }
   s.preserve_paths          = %w(build.sh include)
 
