@@ -8,12 +8,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Breaking Changes
-* The following functionality has been renamed for clarity:
-
-| Old API                                                      | New API                                                        |
-|:-------------------------------------------------------------|:---------------------------------------------------------------|
-| `Credentials(googleToken:)`                                           | `Credentials(googleAuthCode:)`                             |
-|`[RLMCredentials credentialsWithGoogleToken:]`| `[RLMCredentials credentialsWithGoogleAuthCode:]` |
+* Change Google Credential parameter names to better reflect the required auth code:
+    * `Credentials(googleToken:)` => `Credentials(googleAuthCode:)`
+    * `[RLMCredentials credentialsWithGoogleToken:]` => `[RLMCredentials credentialsWithGoogleAuthCode:]`
 
 ### Compatibility
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
