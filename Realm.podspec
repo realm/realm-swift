@@ -97,6 +97,12 @@ Pod::Spec.new do |s|
                                 'EXCLUDED_ARCHS[sdk=watchsimulator*]' => 'arm64',
                                 'EXCLUDED_ARCHS[sdk=macosx*]' => 'arm64',
                               }
+s.user_target_xcconfig      = {
+                                'EXCLUDED_ARCHS[sdk=appletvsimulator*]' => 'arm64',
+                                'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
+                                'EXCLUDED_ARCHS[sdk=watchsimulator*]' => 'arm64',
+                                'EXCLUDED_ARCHS[sdk=macosx*]' => 'arm64',
+                              }
   s.preserve_paths          = %w(build.sh include)
 
   s.ios.deployment_target   = '9.0'
