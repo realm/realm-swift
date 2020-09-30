@@ -74,8 +74,24 @@ public typealias PushClient = RLMPushClient
 /// An object which is used within UserAPIKeyProviderClient
 public typealias UserAPIKey = RLMUserAPIKey
 
+// !!!: Remove
 /// A `Credentials` represents data that uniquely identifies a Realm Object Server user.
-public typealias Credentials = RLMCredentials
+//public typealias Credentials = RLMCredentials
+
+// !!!: Add comments
+public enum Credentials {
+
+    case facebook(accessToken: String)
+    case google(serverAuthCode: String)
+    case apple(idToken: String)
+    case emailPassword(email: String, password: String)
+    case JWT(token: String)
+    // !!!: Should be NSError??
+    case function(payload: Dictionary<String, String>, error: NSErrorPointer)
+    case userAPIKey(APIKey: String)
+    case serverAPIKey(serverAPIKey: String)
+    case anonymous
+}
 
 /// The `App` has the fundamental set of methods for communicating with a Realm
 /// application backend.
@@ -343,7 +359,8 @@ public extension App {
     /// @returns A publisher that eventually return `User` or `Error`.
     func login(credentials: Credentials) -> Future<User, Error> {
         return Future { promise in
-            self.login(credentials: credentials) { user, error in
+//            self.login(credentials: credentials) { user, error in
+            self.login(credentials: ObjectiveCSupport.convert(object: credentials)) { user, error in
                 if let user = user {
                 promise(.success(user))
                 } else {
