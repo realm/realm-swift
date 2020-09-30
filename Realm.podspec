@@ -96,6 +96,7 @@ Pod::Spec.new do |s|
                                 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
                                 'EXCLUDED_ARCHS[sdk=watchsimulator*]' => 'arm64',
                                 'EXCLUDED_ARCHS[sdk=macosx*]' => 'arm64'
+                                
                               }
   s.preserve_paths          = %w(build.sh include)
 
