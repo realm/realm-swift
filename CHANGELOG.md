@@ -22,6 +22,10 @@ x.y.z Release notes (yyyy-MM-dd)
 10.0.0-beta.5 Release notes (2020-09-15)
 =============================================================
 
+### Breaking Changes
+
+* Rename Realm.Publishers to RealmPublishers to avoid confusion with Combine.Publishers
+
 ### Enhancements
 
 * Add `User.loggedIn`.

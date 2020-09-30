@@ -23,7 +23,7 @@ import RealmSwift
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Publisher {
-    public func signal(_ semaphore: DispatchSemaphore) -> Combine.Publishers.HandleEvents<Self> {
+    public func signal(_ semaphore: DispatchSemaphore) -> Publishers.HandleEvents<Self> {
         self.handleEvents(receiveOutput: { _ in semaphore.signal() })
     }
 }
