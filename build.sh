@@ -1536,10 +1536,10 @@ x.y.z Release notes (yyyy-MM-dd)
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
-* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* File format: Generates Realms with format v12 (Reads and upgrades all previous formats)
 * Realm Studio: 10.0.0 or later.
-* APIs are backwards compatible with all previous releases in the 5.x.y series.
-* Carthage release for Swift is built with Xcode 11.6.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.
 
 ### Internal
 * Upgraded realm-core from ? to ?

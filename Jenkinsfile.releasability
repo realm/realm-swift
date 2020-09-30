@@ -1,10 +1,10 @@
-xcodeVersions = ['11.3', '11.4.1', '11.5', '11.6']
+xcodeVersions = ['11.3', '11.4.1', '11.7', '12.0']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
-carthageXcodeVersion = '11.5'
+carthageXcodeVersion = '12.0'
 objcXcodeVersion = '11.3'
-docsSwiftVersion = '5.2.4'
+docsSwiftVersion = '5.3'
 
 def installationTest(platform, test, language) {
   return {
@@ -122,7 +122,10 @@ def doBuild() {
           # for each platform.
           ./scripts/reset-simulators.rb -firstOnly
 
-          carthage build --no-skip-current --platform ${platform}
+          # Building the iOS static scheme just wastes time, so delete it
+          rm 'Realm.xcodeproj/xcshareddata/xcschemes/Realm iOS static.xcscheme'
+
+          carthage build --no-skip-current --platform ${platform} --derived-data DerivedData
           carthage archive --output Carthage-${platform}.framework.zip
           """
           stash includes: "Carthage-${platform}.framework.zip",
