@@ -8,7 +8,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Breaking Changes
-* The following functionality has changed for accuracy:
+* The following functionality has been renamed for clarity:
 
 | Old API                                                      | New API                                                        |
 |:-------------------------------------------------------------|:---------------------------------------------------------------|
