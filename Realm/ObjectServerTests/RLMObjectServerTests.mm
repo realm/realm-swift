@@ -476,7 +476,7 @@
 }
 
 - (void)testGoogleCredential {
-    RLMCredentials *googleCredential = [RLMCredentials credentialsWithGoogleToken:@"google token"];
+    RLMCredentials *googleCredential = [RLMCredentials credentialsWithGoogleAuthCode:@"google token"];
     XCTAssertEqualObjects(googleCredential.provider, @"oauth2-google");
 }
 

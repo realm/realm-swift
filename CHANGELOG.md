@@ -7,7 +7,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+* Change Google Credential parameter names to better reflect the required auth code:
+    * `Credentials(googleToken:)` => `Credentials(googleAuthCode:)`
+    * `[RLMCredentials credentialsWithGoogleToken:]` => `[RLMCredentials credentialsWithGoogleAuthCode:]`
 
 ### Compatibility
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)

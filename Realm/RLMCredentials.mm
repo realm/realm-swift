@@ -38,7 +38,7 @@ using namespace realm;
     return [[self alloc] initWithAppCredentials:app::AppCredentials::facebook(token.UTF8String)];
 }
 
-+ (instancetype)credentialsWithGoogleToken:(RLMCredentialsToken)token {
++ (instancetype)credentialsWithGoogleAuthCode:(RLMCredentialsToken)token {
     return [[self alloc] initWithAppCredentials:app::AppCredentials::google(token.UTF8String)];
 }
 

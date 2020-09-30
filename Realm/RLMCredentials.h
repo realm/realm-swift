@@ -70,7 +70,7 @@ extern RLMIdentityProvider const RLMIdentityProviderServerAPIKey;
 /**
  Construct and return credentials from a Google account token.
  */
-+ (instancetype)credentialsWithGoogleToken:(RLMCredentialsToken)token;
++ (instancetype)credentialsWithGoogleAuthCode:(RLMCredentialsToken)token;
 
 /**
  Construct and return credentials from an Apple account token.
