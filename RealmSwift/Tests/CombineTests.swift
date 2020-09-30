@@ -713,21 +713,21 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         }
     }
 
-//    func testBasicWithoutNotifying() {
-//        var calls = 0
-//        cancellable = collection
-//            .collectionPublisher
-//            .saveToken(on: self, for: \.notificationToken)
-//            .assertNoFailure()
-//            .sink { _ in
-//                calls += 1
-//            }
-//        XCTAssertNotNil(notificationToken)
-//        for _ in 0..<10 {
-//            try! realm.write(withoutNotifying: [notificationToken!]) { collection.appendObject() }
-//            XCTAssertEqual(calls, 0) // 1 for the initial notification
-//        }
-//    }
+    func testBasicWithoutNotifying() {
+        var calls = 0
+        cancellable = collection
+            .collectionPublisher
+            .saveToken(on: self, for: \.notificationToken)
+            .assertNoFailure()
+            .sink { _ in
+                calls += 1
+            }
+        XCTAssertNotNil(notificationToken)
+        for _ in 0..<10 {
+            try! realm.write(withoutNotifying: [notificationToken!]) { collection.appendObject() }
+            XCTAssertEqual(calls, 1) // 1 for the initial notification
+        }
+    }
 
     func checkChangeset(_ change: RealmCollectionChange<Collection>, calls: Int, frozen: Bool = false) {
         switch change {
@@ -844,23 +844,6 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         }
     }
 
-//    func testSubscribeOnWithoutNotifying() {
-//        var calls = 0
-//        cancellable = collection
-//            .changesetPublisher
-//            .subscribe(on: subscribeOnQueue)
-//            .saveToken(on: self, for: \.notificationToken)
-//            .sink { change in
-//                calls += 1
-//            }
-//        XCTAssertNotNil(notificationToken)
-//
-//        for _ in 0..<10 {
-//            try! realm.write(withoutNotifying: [notificationToken!]) { collection.appendObject() }
-//            XCTAssertEqual(calls, 0)
-//        }
-//    }
-
     func testReceiveOn() {
         var calls = 0
         var exp = XCTestExpectation(description: "initial")
@@ -903,23 +886,6 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             wait(for: [exp], timeout: 10)
         }
     }
-
-//    func testReceiveOnWithoutNotifying() {
-//        var calls = 0
-//        cancellable = collection
-//            .changesetPublisher
-//            .saveToken(on: self, for: \.notificationToken)
-//            .receive(on: receiveOnQueue)
-//            .sink { _ in
-//                calls += 1
-//            }
-//        XCTAssertNotNil(notificationToken)
-//
-//        for _ in 0..<10 {
-//            try! realm.write(withoutNotifying: [notificationToken!]) { collection.appendObject() }
-//            XCTAssertEqual(calls, 0)
-//        }
-//    }
 
     func testChangeSetSubscribeOn() {
         var calls = 0
