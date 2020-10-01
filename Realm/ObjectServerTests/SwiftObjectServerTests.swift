@@ -1108,8 +1108,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [refreshDataEx], timeout: 4.0)
 
-        XCTAssertEqual(app.currentUser?.customData?["favourite_colour"], .string("green"))
-        XCTAssertEqual(app.currentUser?.customData?["apples"], .int64(10))
+        XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))
+        XCTAssertEqual(app.currentUser?.customData["apples"], .int64(10))
     }
 
     // MARK: - Mongo Client
@@ -2205,8 +2205,8 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             .store(in: &cancellable)
         wait(for: [refreshDataEx], timeout: 4.0)
 
-        XCTAssertEqual(app.currentUser?.customData?["favourite_colour"], .string("green"))
-        XCTAssertEqual(app.currentUser?.customData?["apples"], .int64(10))
+        XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))
+        XCTAssertEqual(app.currentUser?.customData["apples"], .int64(10))
     }
 
     func testMongoCollectionInsertCombine() {

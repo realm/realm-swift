@@ -66,7 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
  The unique MongoDB Realm string identifying this user.
  Note this is different from an identitiy: A user may have multiple identities but has a single indentifier. See RLMUserIdentity.
  */
-@property (nullable, nonatomic, readonly) NSString *identifier NS_SWIFT_NAME(id);
+@property (nonatomic, readonly) NSString *identifier NS_SWIFT_NAME(id);
 
 /// Returns an array of identities currently linked to a user.
 @property (nonatomic, strong, readonly) NSArray<RLMUserIdentity *> *identities;
@@ -77,8 +77,7 @@ NS_ASSUME_NONNULL_BEGIN
  This is required to make HTTP requests to the Realm App's REST API
  for functionality not exposed natively. It should be treated as sensitive data.
  */
-@property (nullable, nonatomic, readonly) NSString *refreshToken;
-
+@property (nonatomic, readonly) NSString *refreshToken;
 
 /**
  The user's refresh token used to access the Realm Application.
@@ -86,7 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
  This is required to make HTTP requests to MongoDB Realm's REST API
  for functionality not exposed natively. It should be treated as sensitive data.
  */
-@property (nullable, nonatomic, readonly) NSString *accessToken;
+@property (nonatomic, readonly) NSString *accessToken;
 
 /**
  The current state of the user.
@@ -125,7 +124,7 @@ NS_ASSUME_NONNULL_BEGIN
  The custom data of the user.
  This is configured in your MongoDB Realm App.
  */
-@property (nullable, nonatomic, readonly) NSDictionary *customData NS_REFINED_FOR_SWIFT;
+@property (nonatomic, readonly) NSDictionary *customData NS_REFINED_FOR_SWIFT;
 
 /**
  Refresh a user's custom data. This will, in effect, refresh the user's auth session.
