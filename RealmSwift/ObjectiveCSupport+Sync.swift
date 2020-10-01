@@ -43,7 +43,7 @@ public extension ObjectiveCSupport {
             return RLMCredentials(appleToken: idToken)
         case .emailPassword(let email,let password):
             return RLMCredentials(email: email, password: password)
-        case .JWT(let token):
+        case .jwt(let token):
             return RLMCredentials(jwt: token)
         case .function(let payload):
             return RLMCredentials(functionPayload: ObjectiveCSupport.convert(object: AnyBSON(payload))! as! [String : RLMBSON])

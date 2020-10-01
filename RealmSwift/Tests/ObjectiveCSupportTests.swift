@@ -106,7 +106,7 @@ class ObjectiveCSupportTests: TestCase {
 
         XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.emailPassword(email: "email", password: "password")), RLMCredentials(email: "email", password: "password"))
 
-        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.JWT(token: "token")), RLMCredentials(jwt: "token"))
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.jwt(token: "token")), RLMCredentials(jwt: "token"))
 
         XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.function(payload: ["dog": ["name": "fido"]])),
                        RLMCredentials(functionPayload: ["dog": ["name" as NSString: "fido" as NSString] as NSDictionary]))

@@ -91,7 +91,7 @@ public enum Credentials {
     /// Credentials from an email and password.
     case emailPassword(email: String, password: String)
     /// Credentials from a JSON Web Token
-    case JWT(token: String)
+    case jwt(token: String)
     /// Credentials for a MongoDB Realm function using a mongodb document as a json payload.
     /// If the json can not be successfully serialised and error will be produced and the object will be nil.
     case function(payload: Document)
