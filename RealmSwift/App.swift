@@ -74,36 +74,32 @@ public typealias PushClient = RLMPushClient
 /// An object which is used within UserAPIKeyProviderClient
 public typealias UserAPIKey = RLMUserAPIKey
 
-// !!!: Remove
-/// A `Credentials` represents data that uniquely identifies a Realm Object Server user.
-//public typealias Credentials = RLMCredentials
-
-// !!!: Add comments
-// !!!: Make it look nice
 /**
-`Credentials`is an enum representing supported authentication types for MongoDB Realm
+`Credentials`is an enum representing supported authentication types for MongoDB Realm.
+Example Usage:
 ```
 let credentials = Credentials.JWT(token: myToken)
 ```
 */
 public enum Credentials {
-    // !!!: Confirm correct wording. This is pulled from sync code.
     /// Credentials from a Facebook access token.
     case facebook(accessToken: String)
     /// Credentials from a Google serverAuthCode.
     case google(serverAuthCode: String)
     /// Credentials from an Apple id token.
     case apple(idToken: String)
-    /// Credentials from an email and password
+    /// Credentials from an email and password.
     case emailPassword(email: String, password: String)
-    /// Credentials from a JWT
+    /// Credentials from a JSON Web Token
     case JWT(token: String)
-    // !!!: Should be NSError?? NSErrorPointer will be weird user experience?
     /// Credentials for a MongoDB Realm function using a mongodb document as a json payload.
     /// If the json can not be successfully serialised and error will be produced and the object will be nil.
     case function(payload: Dictionary<String, String>, error: NSErrorPointer)
+    /// Credentials from a user api key.
     case userAPIKey(String)
+    /// Credentials from a sever api key.
     case serverAPIKey(String)
+    /// Represents anonymous credentials
     case anonymous
 }
 
