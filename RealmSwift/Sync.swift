@@ -26,6 +26,12 @@ import Realm.Private
  */
 public typealias User = RLMUser
 
+extension User {
+    public func linkUser(credentials: Credentials, completion: @escaping RLMOptionalUserBlock) {
+        self.__linkUser(with: ObjectiveCSupport.convert(object: credentials), completion: completion)
+    }
+}
+
 /**
  A singleton which configures and manages MongoDB Realm synchronization-related
  functionality.
@@ -575,9 +581,12 @@ public extension User {
     /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
     /// @param credentials The `Credentials` used to link the user to a new identity.
     /// @returns A publisher that eventually return `Result.success` or `Error`.
-    func linkUser(with credentials: Credentials) -> Future<User, Error> {
+    func linkUser(credentials: Credentials) -> Future<User, Error> {
         return Future { promise in
-            self.linkUser(with: credentials) { user, error in
+            // ObjectiveCSupport.convert(object: credentials)
+//            self.linkUser(with: credentials) { user, error in
+
+            self.linkUser(credentials: credentials) { user, error in
                 if let user = user {
                     promise(.success(user))
                 } else {
