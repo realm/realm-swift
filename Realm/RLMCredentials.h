@@ -19,6 +19,7 @@
 #import <Realm/RLMSyncUtil.h>
 
 NS_ASSUME_NONNULL_BEGIN
+@protocol RLMBSON;
 
 /// A token representing an identity provider's credentials.
 typedef NSString *RLMCredentialsToken;
@@ -79,10 +80,8 @@ extern RLMIdentityProvider const RLMIdentityProviderServerAPIKey;
 
 /**
  Construct and return credentials for a MongoDB Realm function using a mongodb document as a json payload.
- If the json can not be successfully serialised and error will be produced and the object will be nil.
 */
-+ (instancetype)credentialsWithFunctionPayload:(NSDictionary *)payload
-                                         error:(NSError **)error;
++ (instancetype)credentialsWithFunctionPayload:(NSDictionary<NSString *, id<RLMBSON>> *)payload;
 
 /**
  Construct and return credentials from a user api key.
