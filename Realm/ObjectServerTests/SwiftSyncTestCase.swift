@@ -36,7 +36,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         let password = "abcdef"
         let credentials = Credentials.emailPassword(email: email, password: password)
         let ex = expectation(description: "Should register in the user properly")
-        app.emailPasswordAuth().registerUser(email: email, password: password, completion: { error in
+        app.emailPasswordAuth.registerUser(email: email, password: password, completion: { error in
             XCTAssertNil(error)
             ex.fulfill()
         })

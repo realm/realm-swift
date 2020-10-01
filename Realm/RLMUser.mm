@@ -129,7 +129,7 @@ using namespace realm;
 
 - (NSString *)identifier {
     if (!_user) {
-        return nil;
+        return @"";
     }
     return @(_user->identity().c_str());
 }
@@ -242,14 +242,14 @@ using namespace realm;
 }
 
 - (NSString *)refreshToken {
-    if (!_user) {
+    if (!_user || _user->refresh_token().empty()) {
         return nil;
     }
     return @(_user->refresh_token().c_str());
 }
 
 - (NSString *)accessToken {
-    if (!_user) {
+    if (!_user || _user->access_token().empty()) {
         return nil;
     }
     return @(_user->access_token().c_str());
@@ -257,7 +257,7 @@ using namespace realm;
 
 - (NSDictionary *)customData {
     if (!_user || !_user->custom_data()) {
-        return nil;
+        return @{};
     }
 
     return (NSDictionary *)RLMConvertBsonToRLMBSON(*_user->custom_data());

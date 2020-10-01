@@ -98,6 +98,20 @@ Create a new Realm App configuration.
 /// The `RLMSyncManager` for this Realm app.
 @property (nonatomic, readonly) RLMSyncManager *syncManager;
 
+/// Get a dictionary containing all users keyed on id.
+@property (nonatomic, readonly) NSDictionary<NSString *, RLMUser *> *allUsers;
+
+/// Get the current user logged into the Realm app.
+@property (nonatomic, readonly, nullable) RLMUser *currentUser;
+
+/**
+  A client for the email/password authentication provider which
+  can be used to obtain a credential for logging in.
+
+  Used to perform requests specifically related to the email/password provider.
+*/
+@property (nonatomic, readonly) RLMEmailPasswordAuth *emailPasswordAuth;
+
 /**
  Get an application with a given appId and configuration.
 
@@ -113,24 +127,6 @@ Create a new Realm App configuration.
  */
 + (instancetype)appWithId:(NSString *)appId
             configuration:(nullable RLMAppConfiguration *)configuration;
-
-/**
- Get a dictionary containing all users keyed on id.
- */
-- (NSDictionary<NSString *, RLMUser *> *)allUsers;
-
-/**
- Get the current user logged into the Realm app.
- */
-- (nullable RLMUser *)currentUser;
-
-/**
-  A client for the email/password authentication provider which
-  can be used to obtain a credential for logging in.
-
-  Used to perform requests specifically related to the email/password provider.
-*/
-- (RLMEmailPasswordAuth *)emailPasswordAuth;
 
 /**
  Login to a user for the Realm app.

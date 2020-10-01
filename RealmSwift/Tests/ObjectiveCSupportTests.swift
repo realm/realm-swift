@@ -100,7 +100,7 @@ class ObjectiveCSupportTests: TestCase {
 
         XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.facebook(accessToken: "accessToken")), RLMCredentials(facebookToken: "accessToken"))
 
-        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.google(serverAuthCode: "serverAuthCode")), RLMCredentials(googleToken: "serverAuthCode"))
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.google(serverAuthCode: "serverAuthCode")), RLMCredentials(googleAuthCode: "serverAuthCode"))
 
         XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.apple(idToken: "idToken")), RLMCredentials(appleToken: "idToken"))
 

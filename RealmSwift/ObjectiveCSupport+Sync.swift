@@ -38,7 +38,7 @@ public extension ObjectiveCSupport {
         case .facebook(let accessToken):
             return RLMCredentials(facebookToken: accessToken)
         case .google(let serverAuthCode):
-            return RLMCredentials(googleToken: serverAuthCode)
+            return RLMCredentials(googleAuthCode: serverAuthCode)
         case .apple(let idToken):
             return RLMCredentials(appleToken: idToken)
         case .emailPassword(let email,let password):
