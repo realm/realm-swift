@@ -141,7 +141,6 @@ Create a new Realm App configuration.
 - (void)loginWithCredential:(RLMCredentials *)credentials
                  completion:(RLMUserCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
-
 /**
  Switches the active user to the specified user.
 

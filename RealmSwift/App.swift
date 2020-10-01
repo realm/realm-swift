@@ -375,7 +375,6 @@ public extension App {
     /// @returns A publisher that eventually return `User` or `Error`.
     func login(credentials: Credentials) -> Future<User, Error> {
         return Future { promise in
-//            self.login(credentials: credentials) { user, error in
             self.login(credentials: credentials) { user, error in
                 if let user = user {
                 promise(.success(user))

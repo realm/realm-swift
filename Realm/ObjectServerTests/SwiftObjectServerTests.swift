@@ -600,10 +600,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
     #endif
 
-    // MARK: - App Credentials
-
-    // !!!: Need to test ObjectiveCSupport.convert(object: RLMCredentials)
-    
     // MARK: - Authentication
 
     func testInvalidCredentials() {
