@@ -108,7 +108,6 @@ class CombineRealmTests: CombineTestCase {
 
     func testWillChangeLocalWriteWithoutNotifying() {
         var called = false
-
         cancellable = realm
             .objectWillChange
             .saveToken(on: self, for: \.notificationToken)
@@ -117,10 +116,12 @@ class CombineRealmTests: CombineTestCase {
         }
 
         XCTAssertNotNil(notificationToken)
-        try! realm.write(withoutNotifying: [notificationToken!]) {
-            realm.create(SwiftIntObject.self, value: [])
+        for _ in 0..<10 {
+            try! realm.write(withoutNotifying: [notificationToken!]) {
+                realm.create(SwiftIntObject.self, value: [])
+            }
+            XCTAssertFalse(called)
         }
-        XCTAssertFalse(called)
     }
 
     func testWillChangeRemoteWrite() {
