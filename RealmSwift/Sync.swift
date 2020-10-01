@@ -583,9 +583,6 @@ public extension User {
     /// @returns A publisher that eventually return `Result.success` or `Error`.
     func linkUser(credentials: Credentials) -> Future<User, Error> {
         return Future { promise in
-            // ObjectiveCSupport.convert(object: credentials)
-//            self.linkUser(with: credentials) { user, error in
-
             self.linkUser(credentials: credentials) { user, error in
                 if let user = user {
                     promise(.success(user))

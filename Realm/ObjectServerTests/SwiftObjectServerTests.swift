@@ -693,7 +693,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let loginEx = expectation(description: "Login user")
         var syncUser: User?
-        
+
         app.login(credentials: Credentials.emailPassword(email: email, password: password)) { (user, error) in
             XCTAssertNil(error)
             syncUser = user
