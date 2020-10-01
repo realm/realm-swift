@@ -7,7 +7,11 @@ x.y.z Release notes (yyyy-MM-dd)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+* Define `RealmSwift.Credentials` as an enumerable instead of a `typealias`. Example usage has changed from `Credentials(googleAuthCode: "token")` to `Credentials.google(serverAuthCode: "serverAuthCode")`, and `Credentials(facebookToken: "token")` to `Credentials.facebook(accessToken: "accessToken")`, etc.
+* Remove error parameter and redefine payload in `+ (instancetype)credentialsWithFunctionPayload:(NSDictionary *)payload
+error:(NSError **)error;`. It is now defined as `+ (instancetype)credentialsWithFunctionPayload:(NSDictionary<NSString *, id<RLMBSON>> *)payload;`
+
 
 ### Compatibility
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
