@@ -3,6 +3,22 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * None.
 
+### Breaking Changes
+* Change the following methods on RLMUser to properties:
+  - `[RLMUser emailPasswordAuth]` => `RLMUser.emailPasswordAuth`
+  - `[RLMUser identities]` => `RLMUser.identities`
+  - `[RLMUser allSessions]` => `RLMUser.allSessions`
+  - `[RLMUser apiKeysAuth]` => `RLMUser.apiKeysAuth`
+
+* Other changes to RLMUser:
+  - `nullable` has been removed from `RLMUser.identifier`
+  - `nullable` has been removed from `RLMUser.customData`
+
+* Change the following methods on RLMApp to properties:
+  - `[RLMApp allUsers]` => `RLMApp.allUsers`
+  - `[RLMApp currentUser]` => `RLMApp.currentUser`
+  - `[RLMApp emailPasswordAuth]` => `RLMApp.emailPasswordAuth`
+
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * None.

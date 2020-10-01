@@ -77,7 +77,7 @@ NS_ASSUME_NONNULL_BEGIN
  This is required to make HTTP requests to the Realm App's REST API
  for functionality not exposed natively. It should be treated as sensitive data.
  */
-@property (nonatomic, readonly) NSString *refreshToken;
+@property (nullable, nonatomic, readonly) NSString *refreshToken;
 
 /**
  The user's refresh token used to access the Realm Application.
@@ -85,7 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
  This is required to make HTTP requests to MongoDB Realm's REST API
  for functionality not exposed natively. It should be treated as sensitive data.
  */
-@property (nonatomic, readonly) NSString *accessToken;
+@property (nullable, nonatomic, readonly) NSString *accessToken;
 
 /**
  The current state of the user.

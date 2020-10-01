@@ -242,15 +242,15 @@ using namespace realm;
 }
 
 - (NSString *)refreshToken {
-    if (!_user) {
-        return @"";
+    if (!_user || _user->refresh_token().empty()) {
+        return nil;
     }
     return @(_user->refresh_token().c_str());
 }
 
 - (NSString *)accessToken {
-    if (!_user) {
-        return @"";
+    if (!_user || _user->access_token().empty()) {
+        return nil;
     }
     return @(_user->access_token().c_str());
 }
