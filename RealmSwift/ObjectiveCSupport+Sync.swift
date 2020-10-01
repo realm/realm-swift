@@ -32,8 +32,6 @@ public extension ObjectiveCSupport {
         return SyncConfiguration(config: object)
     }
     
-    // !!!: shorten case params
-    // !!!: Change objc api
     /// Convert a `Credentials` to a `RLMCredentials`
     static func convert(object: Credentials) -> RLMCredentials {
         switch object {
@@ -45,14 +43,13 @@ public extension ObjectiveCSupport {
             return RLMCredentials(appleToken: idToken)
         case .emailPassword(let email,let password):
             return RLMCredentials(email: email, password: password)
-            // !!!: rename param
         case .JWT(let token):
             return RLMCredentials(jwt: token)
-        case .function(payload: let payload, let error):
-            return RLMCredentials(functionPayload: payload, error: error)
-        case .userAPIKey(APIKey: let APIKey):
+        case .function(let payload):
+            return RLMCredentials(functionPayload: ObjectiveCSupport.convert(object: AnyBSON(payload))! as! [String : RLMBSON])
+        case .userAPIKey(let APIKey):
             return RLMCredentials(userAPIKey: APIKey)
-        case .serverAPIKey(serverAPIKey: let serverAPIKey):
+        case .serverAPIKey(let serverAPIKey):
             return RLMCredentials(serverAPIKey: serverAPIKey)
         case .anonymous:
             return RLMCredentials.anonymous()

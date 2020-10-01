@@ -94,7 +94,7 @@ public enum Credentials {
     case JWT(token: String)
     /// Credentials for a MongoDB Realm function using a mongodb document as a json payload.
     /// If the json can not be successfully serialised and error will be produced and the object will be nil.
-    case function(payload: Dictionary<String, String>, error: NSErrorPointer)
+    case function(payload: Document)
     /// Credentials from a user api key.
     case userAPIKey(String)
     /// Credentials from a sever api key.
@@ -109,7 +109,6 @@ public enum Credentials {
 public typealias App = RLMApp
 
 extension App {
-    // !!!: Do I create another extension App {} that isn't gated by OS?
     public func login(credentials: Credentials, completion: @escaping RLMUserCompletionBlock) {
         self.__login(withCredential: ObjectiveCSupport.convert(object: credentials), completion: completion)
     }
