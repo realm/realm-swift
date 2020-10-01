@@ -68,10 +68,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nullable, nonatomic, readonly) NSString *identifier NS_SWIFT_NAME(id);
 
-/**
- Returns an array of identities currently linked to a user.
-*/
-- (NSArray<RLMUserIdentity *> *)identities;
+/// Returns an array of identities currently linked to a user.
+@property (nonatomic, strong, readonly) NSArray<RLMUserIdentity *> *identities;
 
 /**
  The user's refresh token used to access the Realm Applcation.
@@ -118,10 +116,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable RLMSyncSession *)sessionForPartitionValue:(id<RLMBSON>)partitionValue;
 
-/**
- Retrieve all the valid sessions belonging to this user.
- */
-- (NSArray<RLMSyncSession *> *)allSessions;
+/// Retrieve all the valid sessions belonging to this user.
+@property (nonatomic, strong, readonly) NSArray<RLMSyncSession *> *allSessions;
 
 #pragma mark - Custom Data
 
@@ -175,7 +171,7 @@ NS_ASSUME_NONNULL_BEGIN
 
   This client should only be used by an authenticated user.
 */
-- (RLMAPIKeyAuth *)apiKeysAuth;
+@property (nonatomic, strong, readonly) RLMAPIKeyAuth *apiKeysAuth;
 
 /// A client for interacting with a remote MongoDB instance
 /// @param serviceName The name of the MongoDB service

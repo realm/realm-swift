@@ -99,10 +99,10 @@ Create a new Realm App configuration.
 @property (nonatomic, readonly) RLMSyncManager *syncManager;
 
 /// Get a dictionary containing all users keyed on id.
-@property (nonatomic, strong) NSDictionary<NSString *, RLMUser *> *allUsers;
+@property (nonatomic, strong, readonly) NSDictionary<NSString *, RLMUser *> *allUsers;
 
 /// Get the current user logged into the Realm app.
-@property (nonatomic, strong, nullable) RLMUser *currentUser;
+@property (nonatomic, strong, readonly, nullable) RLMUser *currentUser;
 
 /**
   A client for the email/password authentication provider which
@@ -110,7 +110,7 @@ Create a new Realm App configuration.
 
   Used to perform requests specifically related to the email/password provider.
 */
-@property (nonatomic, strong) RLMEmailPasswordAuth *emailPasswordAuth;
+@property (nonatomic, strong, readonly) RLMEmailPasswordAuth *emailPasswordAuth;
 
 /**
  Get an application with a given appId and configuration.
