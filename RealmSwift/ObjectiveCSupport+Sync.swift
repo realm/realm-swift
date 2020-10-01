@@ -31,7 +31,7 @@ public extension ObjectiveCSupport {
     static func convert(object: RLMSyncConfiguration) -> SyncConfiguration {
         return SyncConfiguration(config: object)
     }
-    
+
     /// Convert a `Credentials` to a `RLMCredentials`
     static func convert(object: Credentials) -> RLMCredentials {
         switch object {
@@ -41,12 +41,12 @@ public extension ObjectiveCSupport {
             return RLMCredentials(googleAuthCode: serverAuthCode)
         case .apple(let idToken):
             return RLMCredentials(appleToken: idToken)
-        case .emailPassword(let email,let password):
+        case .emailPassword(let email, let password):
             return RLMCredentials(email: email, password: password)
         case .jwt(let token):
             return RLMCredentials(jwt: token)
         case .function(let payload):
-            return RLMCredentials(functionPayload: ObjectiveCSupport.convert(object: AnyBSON(payload))! as! [String : RLMBSON])
+            return RLMCredentials(functionPayload: ObjectiveCSupport.convert(object: AnyBSON(payload))! as! [String: RLMBSON])
         case .userAPIKey(let APIKey):
             return RLMCredentials(userAPIKey: APIKey)
         case .serverAPIKey(let serverAPIKey):
