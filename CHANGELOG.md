@@ -8,7 +8,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Breaking Changes
-* Define `RealmSwift.Credentials` as an enumerable instead of a `typealias`. Example usage has changed from `Credentials(googleAuthCode: "token")` to `Credentials.google(serverAuthCode: "serverAuthCode")`, and `Credentials(facebookToken: "token")` to `Credentials.facebook(accessToken: "accessToken")`, etc.
+* Define `RealmSwift.Credentials` as an enum instead of a `typealias`. Example usage has changed from `Credentials(googleAuthCode: "token")` to `Credentials.google(serverAuthCode: "serverAuthCode")`, and `Credentials(facebookToken: "token")` to `Credentials.facebook(accessToken: "accessToken")`, etc.
 * Remove error parameter and redefine payload in `+ (instancetype)credentialsWithFunctionPayload:(NSDictionary *)payload
 error:(NSError **)error;`. It is now defined as `+ (instancetype)credentialsWithFunctionPayload:(NSDictionary<NSString *, id<RLMBSON>> *)payload;`
 
