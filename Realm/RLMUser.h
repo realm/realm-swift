@@ -66,12 +66,10 @@ NS_ASSUME_NONNULL_BEGIN
  The unique MongoDB Realm string identifying this user.
  Note this is different from an identitiy: A user may have multiple identities but has a single indentifier. See RLMUserIdentity.
  */
-@property (nullable, nonatomic, readonly) NSString *identifier NS_SWIFT_NAME(id);
+@property (nonatomic, readonly) NSString *identifier NS_SWIFT_NAME(id);
 
-/**
- Returns an array of identities currently linked to a user.
-*/
-- (NSArray<RLMUserIdentity *> *)identities;
+/// Returns an array of identities currently linked to a user.
+@property (nonatomic, readonly) NSArray<RLMUserIdentity *> *identities;
 
 /**
  The user's refresh token used to access the Realm Applcation.
@@ -80,7 +78,6 @@ NS_ASSUME_NONNULL_BEGIN
  for functionality not exposed natively. It should be treated as sensitive data.
  */
 @property (nullable, nonatomic, readonly) NSString *refreshToken;
-
 
 /**
  The user's refresh token used to access the Realm Application.
@@ -118,10 +115,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable RLMSyncSession *)sessionForPartitionValue:(id<RLMBSON>)partitionValue;
 
-/**
- Retrieve all the valid sessions belonging to this user.
- */
-- (NSArray<RLMSyncSession *> *)allSessions;
+/// Retrieve all the valid sessions belonging to this user.
+@property (nonatomic, readonly) NSArray<RLMSyncSession *> *allSessions;
 
 #pragma mark - Custom Data
 
@@ -129,7 +124,7 @@ NS_ASSUME_NONNULL_BEGIN
  The custom data of the user.
  This is configured in your MongoDB Realm App.
  */
-@property (nullable, nonatomic, readonly) NSDictionary *customData NS_REFINED_FOR_SWIFT;
+@property (nonatomic, readonly) NSDictionary *customData NS_REFINED_FOR_SWIFT;
 
 /**
  Refresh a user's custom data. This will, in effect, refresh the user's auth session.
@@ -175,7 +170,7 @@ NS_ASSUME_NONNULL_BEGIN
 
   This client should only be used by an authenticated user.
 */
-- (RLMAPIKeyAuth *)apiKeysAuth;
+@property (nonatomic, readonly) RLMAPIKeyAuth *apiKeysAuth;
 
 /// A client for interacting with a remote MongoDB instance
 /// @param serviceName The name of the MongoDB service
