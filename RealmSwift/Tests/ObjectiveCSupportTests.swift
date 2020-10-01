@@ -95,4 +95,26 @@ class ObjectiveCSupportTests: TestCase {
                        ObjectiveCSupport.convert(object: realm.configuration).deleteRealmIfMigrationNeeded,
                        "Configuration.deleteRealmIfMigrationNeeded must be equal to RLMConfiguration.deleteRealmIfMigrationNeeded")
     }
+    
+    func testAppCredentialSupport() {
+
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.facebook(accessToken: "accessToken")), RLMCredentials.init(facebookToken: "accessToken"))
+
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.google(serverAuthCode: "serverAuthCode")), RLMCredentials.init(googleToken: "serverAuthCode"))
+
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.apple(idToken: "idToken")), RLMCredentials.init(appleToken: "idToken"))
+
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.emailPassword(email: "email", password: "password")), RLMCredentials.init(email: "email", password: "password"))
+
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.JWT(token: "token")), RLMCredentials.init(jwt: "token"))
+
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.function(payload: ["dog": ["name": "fido"]])),
+                       RLMCredentials.init(functionPayload: ["dog": ["name" as NSString: "fido" as NSString] as NSDictionary]))
+
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.userAPIKey("key")), RLMCredentials.init(userAPIKey: "key"))
+
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.serverAPIKey("key")), RLMCredentials.init(serverAPIKey: "key"))
+
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.anonymous), RLMCredentials.anonymous())
+    }
 }
