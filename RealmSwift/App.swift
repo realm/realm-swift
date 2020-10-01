@@ -79,17 +79,31 @@ public typealias UserAPIKey = RLMUserAPIKey
 //public typealias Credentials = RLMCredentials
 
 // !!!: Add comments
+// !!!: Make it look nice
+/**
+`Credentials`is an enum representing supported authentication types for MongoDB Realm
+```
+let credentials = Credentials.JWT(token: myToken)
+```
+*/
 public enum Credentials {
-
+    // !!!: Confirm correct wording. This is pulled from sync code.
+    /// Credentials from a Facebook access token.
     case facebook(accessToken: String)
+    /// Credentials from a Google serverAuthCode.
     case google(serverAuthCode: String)
+    /// Credentials from an Apple id token.
     case apple(idToken: String)
+    /// Credentials from an email and password
     case emailPassword(email: String, password: String)
+    /// Credentials from a JWT
     case JWT(token: String)
-    // !!!: Should be NSError??
+    // !!!: Should be NSError?? NSErrorPointer will be weird user experience?
+    /// Credentials for a MongoDB Realm function using a mongodb document as a json payload.
+    /// If the json can not be successfully serialised and error will be produced and the object will be nil.
     case function(payload: Dictionary<String, String>, error: NSErrorPointer)
-    case userAPIKey(APIKey: String)
-    case serverAPIKey(serverAPIKey: String)
+    case userAPIKey(String)
+    case serverAPIKey(String)
     case anonymous
 }
 
@@ -97,6 +111,13 @@ public enum Credentials {
 /// application backend.
 /// This interface provides access to login and authentication.
 public typealias App = RLMApp
+
+extension App {
+    // !!!: Do I create another extension App {} that isn't gated by OS?
+    public func login(credentials: Credentials, completion: @escaping RLMUserCompletionBlock) {
+        self.__login(withCredential: ObjectiveCSupport.convert(object: credentials), completion: completion)
+    }
+}
 
 /// Use this delegate to be provided a callback once authentication has succeed or failed
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
@@ -360,7 +381,7 @@ public extension App {
     func login(credentials: Credentials) -> Future<User, Error> {
         return Future { promise in
 //            self.login(credentials: credentials) { user, error in
-            self.login(credentials: ObjectiveCSupport.convert(object: credentials)) { user, error in
+            self.login(credentials: credentials) { user, error in
                 if let user = user {
                 promise(.success(user))
                 } else {

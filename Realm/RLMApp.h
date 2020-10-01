@@ -139,7 +139,8 @@ Create a new Realm App configuration.
  @param completion A callback invoked after completion.
  */
 - (void)loginWithCredential:(RLMCredentials *)credentials
-                 completion:(RLMUserCompletionBlock)completion NS_SWIFT_NAME(login(credentials:completion:));
+                 completion:(RLMUserCompletionBlock)completion NS_REFINED_FOR_SWIFT;
+
 
 /**
  Switches the active user to the specified user.
