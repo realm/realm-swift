@@ -1,10 +1,33 @@
+5.4.7 Release notes (2020-09-30)
+=============================================================
+
+### Fixed
+
+* Equality queries on indexed string properties would sometimes throw "key not
+  found" exceptions if the hash of the string happened to have bit 62 set.
+  ([.NET #2025](https://github.com/realm/realm-dotnet/issues/2025), since v5.0.0).
+* Queries comparing non-optional int properties to nil would behave as if they
+  were comparing against zero instead (since v5.0.0).
+
+### Compatibility
+
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 5.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 12.
+
+### Internal
+
+* Upgraded realm-core from v6.1.2 to v6.1.3
+* Upgraded realm-sync from v5.0.27 to v5.0.28
+
 5.4.6 Release notes (2020-09-29)
 =============================================================
 
 5.4.5 failed to actually update the core version for installation methods other
 than SPM. All changes listed there actually happened in this version for
 non-SPM installation methods.
-
 
 ### Compatibility
 
