@@ -324,7 +324,7 @@ extension Realm {
     /// A publisher that emits Void each time the object changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.RealmWillChange { // Maybe use `Never`? Would using Never confuse users?
+    public var objectWillChange: Publishers.RealmWillChange {
         return Publishers.RealmWillChange(self)
     }
 }
@@ -424,9 +424,7 @@ extension RealmCollection {
 
     /// :nodoc:
     public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
-        return observe(on: nil) { _ in
-            _ = subscriber.receive()
-        }
+        return observe(on: nil) { _ in _ = subscriber.receive() }
     }
 }
 
@@ -439,7 +437,7 @@ extension AnyRealmCollection: RealmSubscribable {
 /// A subscription which wraps a Realm notification.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public struct ObservationSubscription: Subscription {
-    public var cancellable: NotificationToken
+    private var cancellable: NotificationToken
     internal init(cancellable: NotificationToken) {
         self.cancellable = cancellable
     }
