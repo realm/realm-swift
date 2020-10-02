@@ -161,7 +161,7 @@ class CombineObjectPublisherTests: CombineTestCase {
         let exp = XCTestExpectation()
         cancellable = obj
             .objectWillChange
-            .saveToken(on: self, for: \.notificationToken)
+            .saveToken(on: self, at: \.notificationToken)
             .sink {
             exp.fulfill()
         }
@@ -699,7 +699,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         var exp = XCTestExpectation()
         var calls = 0
         cancellable = collection.collectionPublisher
-            .saveToken(on: self, for: \.notificationToken)
+            .saveToken(on: self, at: \.notificationToken)
             .assertNoFailure()
             .sink { c in
                 XCTAssertEqual(c.count, calls)
@@ -718,7 +718,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         var calls = 0
         cancellable = collection
             .collectionPublisher
-            .saveToken(on: self, for: \.notificationToken)
+            .saveToken(on: self, at: \.notificationToken)
             .assertNoFailure()
             .sink { _ in
                 calls += 1
@@ -771,7 +771,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         var calls = 0
         cancellable = collection
             .changesetPublisher
-            .saveToken(on: self, for: \.notificationToken)
+            .saveToken(on: self, at: \.notificationToken)
             .sink { change in
                 self.checkChangeset(change, calls: calls)
                 calls += 1
@@ -791,7 +791,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         var calls = 0
         cancellable = collection
             .changesetPublisher
-            .saveToken(on: self, for: \.notificationToken)
+            .saveToken(on: self, at: \.notificationToken)
             .sink { _ in
                 calls += 1
             }
@@ -828,7 +828,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         var calls = 0
         cancellable = collection
             .collectionPublisher
-            .saveToken(on: self, for: \.notificationToken)
+            .saveToken(on: self, at: \.notificationToken)
             .subscribe(on: subscribeOnQueue)
             .assertNoFailure()
             .sink { r in
@@ -870,7 +870,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         var exp = XCTestExpectation(description: "initial")
         cancellable = collection
             .collectionPublisher
-            .saveToken(on: self, for: \.notificationToken)
+            .saveToken(on: self, at: \.notificationToken)
             .receive(on: receiveOnQueue)
             .assertNoFailure()
             .sink { r in
@@ -912,7 +912,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         cancellable = collection
             .changesetPublisher
             .subscribe(on: subscribeOnQueue)
-            .saveToken(on: self, for: \.notificationToken)
+            .saveToken(on: self, at: \.notificationToken)
             .sink { change in
                 self.checkChangeset(change, calls: calls)
                 calls += 1
@@ -951,7 +951,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         var calls = 0
         cancellable = collection
             .changesetPublisher
-            .saveToken(on: self, for: \.notificationToken)
+            .saveToken(on: self, at: \.notificationToken)
             .receive(on: receiveOnQueue)
             .sink { change in
                 self.checkChangeset(change, calls: calls)
@@ -1016,7 +1016,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         var exp = XCTestExpectation(description: "initial")
         cancellable = collection
             .changesetPublisher
-            .saveToken(on: self, for: \.notificationToken)
+            .saveToken(on: self, at: \.notificationToken)
             .map { $0 }
             .threadSafeReference()
             .receive(on: receiveOnQueue)

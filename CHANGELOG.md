@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add ability to save a NotificationToken when using Combine for observing an Object or Collection by using `saveToken(on:for:)` before `sink` in a chain.
+* Add the ability to capture a NotificationToken when using a Combine publisher that observes a Realm Object or Collection. The user will call `saveToken(on:at:)` directly after invoking the publisher to use the feature.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)

@@ -550,12 +550,14 @@ public enum Publishers {
             self.collection = collection
         }
 
-        /// Allows you to capture the `NotificationToken` produced by observing a Realm Collection.
+        /// Captures the `NotificationToken` produced by observing a Realm Collection. This allows you to do notification skipping
+        /// when performing a `Realm.write(withoutNotifying:)` You should use this call if you require to write to the Realm database and ignore
+        /// this specific observation chain. The `NotificationToken` will be saved on the specified `KeyPath`from the observation block set up in `receive(subscriber:)`.
         /// - Parameters:
-        ///   - object: The object which owns the `NotificationToken`.
-        ///   - keyPath: The KeyPath of the `NotificationToken`.
+        ///   - object: The object which the `NotificationToken` is written to.
+        ///   - keyPath: The KeyPath which the `NotificationToken` is written to
         /// - Returns: A `WillChangeWithToken` Publisher.
-        public func saveToken<T>(on object: T, for keyPath: WritableKeyPath<T, NotificationToken?>) -> WillChangeWithToken<Collection, T> {
+        public func saveToken<T>(on object: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> WillChangeWithToken<Collection, T> {
               return WillChangeWithToken<Collection, T>(collection, object, keyPath)
         }
 
@@ -614,12 +616,14 @@ public enum Publishers {
             self.queue = queue
         }
 
-        /// Allows you to capture the `NotificationToken` produced by observing a Realm Object.
+        /// Captures the `NotificationToken` produced by observing a Realm Collection. This allows you to do notification skipping
+        /// when performing a `Realm.write(withoutNotifying:)` You should use this call if you require to write to the Realm database and ignore
+        /// this specific observation chain. The `NotificationToken` will be saved on the specified `KeyPath`from the observation block set up in `receive(subscriber:)`.
         /// - Parameters:
-        ///   - object: The object which owns the `NotificationToken`.
-        ///   - keyPath: The KeyPath of the `NotificationToken`.
+        ///   - object: The object which the `NotificationToken` is written to.
+        ///   - keyPath: The KeyPath which the `NotificationToken` is written to
         /// - Returns: A `ValueWithToken` Publisher.
-        public func saveToken<T>(on object: T, for keyPath: WritableKeyPath<T, NotificationToken?>) -> ValueWithToken<Subscribable, T> {
+        public func saveToken<T>(on object: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> ValueWithToken<Subscribable, T> {
               return ValueWithToken<Subscribable, T>(subscribable, queue, object, keyPath)
         }
 
@@ -868,12 +872,14 @@ public enum Publishers {
             self.queue = queue
         }
 
-        /// Allows you to capture the `NotificationToken` produced by observing a Realm Object.
+        /// Captures the `NotificationToken` produced by observing a Realm Collection. This allows you to do notification skipping
+        /// when performing a `Realm.write(withoutNotifying:)` You should use this call if you require to write to the Realm database and ignore
+        /// this specific observation chain. The `NotificationToken` will be saved on the specified `KeyPath`from the observation block set up in `receive(subscriber:)`.
         /// - Parameters:
-        ///   - tokenParent: The object which owns the `NotificationToken`.
-        ///   - keyPath: The KeyPath of the `NotificationToken`.
+        ///   - object: The object which the `NotificationToken` is written to.
+        ///   - keyPath: The KeyPath which the `NotificationToken` is written to
         /// - Returns: A `ObjectChangesetWithToken` Publisher.
-        public func saveToken<T>(on tokenParent: T, for keyPath: WritableKeyPath<T, NotificationToken?>) -> ObjectChangesetWithToken<O, T> {
+        public func saveToken<T>(on tokenParent: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> ObjectChangesetWithToken<O, T> {
               return ObjectChangesetWithToken<O, T>(object, queue, tokenParent, keyPath)
         }
 
@@ -1127,12 +1133,14 @@ public enum Publishers {
             self.queue = queue
         }
 
-        /// Allows you to capture the `NotificationToken` produced by observing a Realm Collection.
+        /// Captures the `NotificationToken` produced by observing a Realm Collection. This allows you to do notification skipping
+        /// when performing a `Realm.write(withoutNotifying:)` You should use this call if you require to write to the Realm database and ignore
+        /// this specific observation chain. The `NotificationToken` will be saved on the specified `KeyPath`from the observation block set up in `receive(subscriber:)`.
         /// - Parameters:
-        ///   - object: The object which owns the `NotificationToken`.
-        ///   - keyPath: The KeyPath of the `NotificationToken`.
+        ///   - object: The object which the `NotificationToken` is written to.
+        ///   - keyPath: The KeyPath which the `NotificationToken` is written to
         /// - Returns: A `CollectionChangesetWithToken` Publisher.
-        public func saveToken<T>(on object: T, for keyPath: WritableKeyPath<T, NotificationToken?>) -> CollectionChangesetWithToken<Collection, T> {
+        public func saveToken<T>(on object: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> CollectionChangesetWithToken<Collection, T> {
               return CollectionChangesetWithToken<Collection, T>(collection, queue, object, keyPath)
         }
 
