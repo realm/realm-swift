@@ -437,14 +437,14 @@ extension AnyRealmCollection: RealmSubscribable {
 /// A subscription which wraps a Realm notification.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public struct ObservationSubscription: Subscription {
-    private var cancellable: NotificationToken
-    internal init(cancellable: NotificationToken) {
-        self.cancellable = cancellable
+    private var token: NotificationToken
+    internal init(token: NotificationToken) {
+        self.token = token
     }
 
     /// A unique identifier for identifying publisher streams.
     public var combineIdentifier: CombineIdentifier {
-        return CombineIdentifier(cancellable)
+        return CombineIdentifier(token)
     }
 
     /// This function is not implemented.
@@ -455,7 +455,7 @@ public struct ObservationSubscription: Subscription {
 
     /// Stop emitting values on this subscription.
     public func cancel() {
-        cancellable.invalidate()
+        token.invalidate()
     }
 }
 
@@ -497,10 +497,10 @@ public enum Publishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let cancellable = self.realm.observe { _, _ in
+            let token = self.realm.observe { _, _ in
                 _ = subscriber.receive()
             }
-            subscriber.receive(subscription: ObservationSubscription(cancellable: cancellable))
+            subscriber.receive(subscription: ObservationSubscription(token: token))
         }
     }
 
@@ -528,11 +528,11 @@ public enum Publishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let cancellable = self.realm.observe { _, _ in
+            let token = self.realm.observe { _, _ in
                 _ = subscriber.receive()
             }
-            tokenParent[keyPath: tokenKeyPath] = cancellable
-            subscriber.receive(subscription: ObservationSubscription(cancellable: cancellable))
+            tokenParent[keyPath: tokenKeyPath] = token
+            subscriber.receive(subscription: ObservationSubscription(token: token))
         }
     }
     /// A publisher which emits Void each time the object is mutated.
@@ -561,8 +561,8 @@ public enum Publishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let cancellable =  self.collection._observe(subscriber)
-            subscriber.receive(subscription: ObservationSubscription(cancellable: cancellable))
+            let token =  self.collection._observe(subscriber)
+            subscriber.receive(subscription: ObservationSubscription(token: token))
         }
     }
 
@@ -592,9 +592,9 @@ public enum Publishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let cancellable =  self.object._observe(subscriber)
-            tokenParent[keyPath: tokenKeyPath] = cancellable
-            subscriber.receive(subscription: ObservationSubscription(cancellable: cancellable))
+            let token =  self.object._observe(subscriber)
+            tokenParent[keyPath: tokenKeyPath] = token
+            subscriber.receive(subscription: ObservationSubscription(token: token))
         }
     }
 
@@ -625,7 +625,7 @@ public enum Publishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Failure, Output == S.Input {
-            subscriber.receive(subscription: ObservationSubscription(cancellable: self.subscribable._observe(on: queue, subscriber)))
+            subscriber.receive(subscription: ObservationSubscription(token: self.subscribable._observe(on: queue, subscriber)))
         }
 
         /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
@@ -695,9 +695,9 @@ public enum Publishers {
         }
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Failure, Output == S.Input {
-            let cancellable = self.object._observe(on: queue, subscriber)
-            tokenParent[keyPath: tokenKeyPath] = cancellable
-            subscriber.receive(subscription: ObservationSubscription(cancellable: cancellable))
+            let token = self.object._observe(on: queue, subscriber)
+            tokenParent[keyPath: tokenKeyPath] = token
+            subscriber.receive(subscription: ObservationSubscription(token: token))
         }
 
         /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
@@ -879,7 +879,7 @@ public enum Publishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let cancellable = self.object.observe(on: self.queue) { change in
+            let token = self.object.observe(on: self.queue) { change in
                 switch change {
                 case .change(let o, let properties):
                     _ = subscriber.receive(.change(o as! O, properties))
@@ -889,7 +889,7 @@ public enum Publishers {
                     subscriber.receive(completion: .finished)
                 }
             }
-            subscriber.receive(subscription: ObservationSubscription(cancellable: cancellable))
+            subscriber.receive(subscription: ObservationSubscription(token: token))
         }
 
         /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
@@ -969,7 +969,7 @@ public enum Publishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let cancellable = self.object.observe(on: self.queue) { change in
+            let token = self.object.observe(on: self.queue) { change in
                 switch change {
                 case .change(let o, let properties):
                     _ = subscriber.receive(.change(o as! O, properties))
@@ -979,8 +979,8 @@ public enum Publishers {
                     subscriber.receive(completion: .finished)
                 }
             }
-            tokenParent[keyPath: tokenKeyPath] = cancellable
-            subscriber.receive(subscription: ObservationSubscription(cancellable: cancellable))
+            tokenParent[keyPath: tokenKeyPath] = token
+            subscriber.receive(subscription: ObservationSubscription(token: token))
         }
 
         /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
@@ -1138,10 +1138,10 @@ public enum Publishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let cancellable = self.collection.observe(on: self.queue) { change in
+            let token = self.collection.observe(on: self.queue) { change in
                 _ = subscriber.receive(change)
             }
-            subscriber.receive(subscription: ObservationSubscription(cancellable: cancellable))
+            subscriber.receive(subscription: ObservationSubscription(token: token))
         }
 
         /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
@@ -1216,11 +1216,11 @@ public enum Publishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let cancellable = self.collection.observe(on: self.queue) { change in
+            let token = self.collection.observe(on: self.queue) { change in
                 _ = subscriber.receive(change)
             }
-            tokenParent[keyPath: tokenKeyPath] = cancellable
-            subscriber.receive(subscription: ObservationSubscription(cancellable: cancellable))
+            tokenParent[keyPath: tokenKeyPath] = token
+            subscriber.receive(subscription: ObservationSubscription(token: token))
         }
 
         /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
