@@ -256,23 +256,23 @@ extension RealmCollection where Self: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<Self, Void> {
+    public var objectWillChange: Publishers.WillChange<Self> {
         Publishers.WillChange(self)
     }
 
     /// :nodoc:
     @available(*, deprecated, renamed: "collectionPublisher")
-    public var publisher: Publishers.Value<Self, Never> {
+    public var publisher: Publishers.Value<Self> {
         Publishers.Value(self)
     }
 
     /// A publisher that emits the collection each time the collection changes.
-    public var collectionPublisher: Publishers.Value<Self, Never> {
+    public var collectionPublisher: Publishers.Value<Self> {
         Publishers.Value(self)
     }
 
     /// A publisher that emits a collection changeset each time the collection changes.
-    public var changesetPublisher: Publishers.CollectionChangeset<Self, Never> {
+    public var changesetPublisher: Publishers.CollectionChangeset<Self> {
         Publishers.CollectionChangeset(self)
     }
 }
@@ -283,8 +283,8 @@ extension RealmCollection where Self: RealmSubscribable {
 /// - parameter object: A managed object to observe.
 /// - returns: A publisher that emits the object each time it changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func valuePublisher<T: Object>(_ object: T) -> Publishers.Value<T, Never> {
-    Publishers.Value<T, Never>(object)
+public func valuePublisher<T: Object>(_ object: T) -> Publishers.Value<T> {
+    Publishers.Value<T>(object)
 }
 
 /// Creates a publisher that emits the collection each time the collection changes.
@@ -293,8 +293,8 @@ public func valuePublisher<T: Object>(_ object: T) -> Publishers.Value<T, Never>
 /// - parameter object: A managed collection to observe.
 /// - returns: A publisher that emits the collection each time it changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func valuePublisher<T: RealmCollection>(_ collection: T) -> Publishers.Value<T, Never> {
-    Publishers.Value<T, Never>(collection)
+public func valuePublisher<T: RealmCollection>(_ collection: T) -> Publishers.Value<T> {
+    Publishers.Value<T>(collection)
 }
 
 /// Creates a publisher that emits an object changeset each time the object changes.
@@ -303,8 +303,8 @@ public func valuePublisher<T: RealmCollection>(_ collection: T) -> Publishers.Va
 /// - parameter object: A managed object to observe.
 /// - returns: A publisher that emits an object changeset each time the object changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func changesetPublisher<T: Object>(_ object: T) -> Publishers.ObjectChangeset<T, Never> {
-    Publishers.ObjectChangeset<T, Never>(object)
+public func changesetPublisher<T: Object>(_ object: T) -> Publishers.ObjectChangeset<T> {
+    Publishers.ObjectChangeset<T>(object)
 }
 
 /// Creates a publisher that emits a collection changeset each time the collection changes.
@@ -313,8 +313,8 @@ public func changesetPublisher<T: Object>(_ object: T) -> Publishers.ObjectChang
 /// - parameter object: A managed collection to observe.
 /// - returns: A publisher that emits a collection changeset each time the collection changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func changesetPublisher<T: RealmCollection>(_ collection: T) -> Publishers.CollectionChangeset<T, Never> {
-    Publishers.CollectionChangeset<T, Never>(collection)
+public func changesetPublisher<T: RealmCollection>(_ collection: T) -> Publishers.CollectionChangeset<T> {
+    Publishers.CollectionChangeset<T>(collection)
 }
 
 // MARK: - Realm
@@ -324,7 +324,7 @@ extension Realm {
     /// A publisher that emits Void each time the object changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.RealmWillChange<Void> { // Maybe use `Never`? Would using Never confuse users?
+    public var objectWillChange: Publishers.RealmWillChange { // Maybe use `Never`? Would using Never confuse users?
         return Publishers.RealmWillChange(self)
     }
 }
@@ -336,7 +336,7 @@ extension Object: Combine.ObservableObject {
     /// A publisher that emits Void each time the object changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<Object, Void> {
+    public var objectWillChange: Publishers.WillChange<Object> {
         return Publishers.WillChange(self)
     }
 }
@@ -372,7 +372,7 @@ extension List: ObservableObject, RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<List, Void> {
+    public var objectWillChange: Publishers.WillChange<List> {
         Publishers.WillChange(self)
     }
 }
@@ -384,7 +384,7 @@ extension LinkingObjects: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<LinkingObjects, Void> {
+    public var objectWillChange: Publishers.WillChange<LinkingObjects> {
         Publishers.WillChange(self)
     }
 }
@@ -396,7 +396,7 @@ extension Results: RealmSubscribable {
     /// A publisher that emits Void each time the collection changes.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public var objectWillChange: Publishers.WillChange<Results, Void> {
+    public var objectWillChange: Publishers.WillChange<Results> {
         Publishers.WillChange(self)
     }
 }
@@ -476,7 +476,7 @@ public enum Publishers {
     /// A publisher which emits Void each time the Realm is refreshed.
     ///
     /// Despite the name, this actually emits *after* the Realm is refreshed.
-    public struct RealmWillChange<T>: Publisher {
+    public struct RealmWillChange: Publisher {
         /// This publisher cannot fail.
         public typealias Failure = Never
         /// This publisher emits Void.
@@ -540,7 +540,7 @@ public enum Publishers {
     /// A publisher which emits Void each time the object is mutated.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public struct WillChange<Collection: RealmSubscribable, T>: Publisher where Collection: ThreadConfined {
+    public struct WillChange<Collection: RealmSubscribable>: Publisher where Collection: ThreadConfined {
         /// This publisher cannot fail.
         public typealias Failure = Never
         /// This publisher emits Void.
@@ -601,7 +601,7 @@ public enum Publishers {
     }
 
     /// A publisher which emits an object or collection each time that object is mutated.
-    public struct Value<Subscribable: RealmSubscribable, T>: Publisher where Subscribable: ThreadConfined {
+    public struct Value<Subscribable: RealmSubscribable>: Publisher where Subscribable: ThreadConfined {
         /// This publisher can only fail due to resource exhaustion when
         /// creating the worker thread used for change notifications.
         public typealias Failure = Error
@@ -641,7 +641,7 @@ public enum Publishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to perform the subscription on.
         /// - returns: A publisher which subscribes on the given scheduler.
-        public func subscribe<S: Scheduler>(on scheduler: S) -> Value<Subscribable, T> {
+        public func subscribe<S: Scheduler>(on scheduler: S) -> Value<Subscribable> {
             guard let queue = scheduler as? DispatchQueue else {
                 fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
             }
@@ -852,7 +852,7 @@ public enum Publishers {
     /// should always be the first operation in the pipeline.
     ///
     /// Create this publisher using the `objectChangeset()` function.
-    public struct ObjectChangeset<O: Object, T>: Publisher {
+    public struct ObjectChangeset<O: Object>: Publisher {
         /// This publisher emits a ObjectChange<T> indicating which object and
         /// which properties of that object have changed each time a Realm is
         /// refreshed after a write transaction which modifies the observed
@@ -905,7 +905,7 @@ public enum Publishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to perform the subscription on.
         /// - returns: A publisher which subscribes on the given scheduler.
-        public func subscribe<S: Scheduler>(on scheduler: S) -> ObjectChangeset<O, T> {
+        public func subscribe<S: Scheduler>(on scheduler: S) -> ObjectChangeset<O> {
             guard let queue = scheduler as? DispatchQueue else {
                 fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
             }
@@ -1116,7 +1116,7 @@ public enum Publishers {
     /// should always be the first operation in the pipeline.
     ///
     /// Create this publisher using the `changesetPublisher` property on RealmCollection..
-    public struct CollectionChangeset<Collection: RealmCollection, T>: Publisher {
+    public struct CollectionChangeset<Collection: RealmCollection>: Publisher {
         public typealias Output = RealmCollectionChange<Collection>
         /// This publisher reports error via the `.error` case of RealmCollectionChange..
         public typealias Failure = Never
@@ -1157,7 +1157,7 @@ public enum Publishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to perform the subscription on.
         /// - returns: A publisher which subscribes on the given scheduler.
-        public func subscribe<S: Scheduler>(on scheduler: S) -> CollectionChangeset<Collection, T> {
+        public func subscribe<S: Scheduler>(on scheduler: S) -> CollectionChangeset<Collection> {
             guard let queue = scheduler as? DispatchQueue else {
                 fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
             }
