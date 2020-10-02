@@ -1,43 +1,34 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.0.0-rc.1 Release notes (2020-10-01)
 =============================================================
-### Enhancements
-* None.
 
 ### Breaking Changes
+
 * Change the following methods on RLMUser to properties:
   - `[RLMUser emailPasswordAuth]` => `RLMUser.emailPasswordAuth`
   - `[RLMUser identities]` => `RLMUser.identities`
   - `[RLMUser allSessions]` => `RLMUser.allSessions`
   - `[RLMUser apiKeysAuth]` => `RLMUser.apiKeysAuth`
-
 * Other changes to RLMUser:
   - `nullable` has been removed from `RLMUser.identifier`
   - `nullable` has been removed from `RLMUser.customData`
-
 * Change the following methods on RLMApp to properties:
   - `[RLMApp allUsers]` => `RLMApp.allUsers`
   - `[RLMApp currentUser]` => `RLMApp.currentUser`
   - `[RLMApp emailPasswordAuth]` => `RLMApp.emailPasswordAuth`
-
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
-
-### Breaking Changes
-* Define `RealmSwift.Credentials` as an enum instead of a `typealias`. Example usage has changed from `Credentials(googleAuthCode: "token")` to `Credentials.google(serverAuthCode: "serverAuthCode")`, and `Credentials(facebookToken: "token")` to `Credentials.facebook(accessToken: "accessToken")`, etc.
-* Remove error parameter and redefine payload in `+ (instancetype)credentialsWithFunctionPayload:(NSDictionary *)payload
-error:(NSError **)error;`. It is now defined as `+ (instancetype)credentialsWithFunctionPayload:(NSDictionary<NSString *, id<RLMBSON>> *)payload;`
-
+* Define `RealmSwift.Credentials` as an enum instead of a `typealias`. Example
+  usage has changed from `Credentials(googleAuthCode: "token")` to
+  `Credentials.google(serverAuthCode: "serverAuthCode")`, and
+  `Credentials(facebookToken: "token")` to `Credentials.facebook(accessToken: "accessToken")`, etc.
+* Remove error parameter and redefine payload in
+  `+ (instancetype)credentialsWithFunctionPayload:(NSDictionary *)payload error:(NSError **)error;`.
+  It is now defined as `+ (instancetype)credentialsWithFunctionPayload:(NSDictionary<NSString *, id<RLMBSON>> *)payload;`
 
 ### Compatibility
+
 * File format: Generates Realms with format v12 (Reads and upgrades all previous formats)
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.
-
-### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
 
 10.0.0-beta.6 Release notes (2020-09-30)
 =============================================================
