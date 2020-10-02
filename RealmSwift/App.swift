@@ -74,13 +74,51 @@ public typealias PushClient = RLMPushClient
 /// An object which is used within UserAPIKeyProviderClient
 public typealias UserAPIKey = RLMUserAPIKey
 
-/// A `Credentials` represents data that uniquely identifies a Realm Object Server user.
-public typealias Credentials = RLMCredentials
+/**
+`Credentials`is an enum representing supported authentication types for MongoDB Realm.
+Example Usage:
+```
+let credentials = Credentials.JWT(token: myToken)
+```
+*/
+public enum Credentials {
+    /// Credentials from a Facebook access token.
+    case facebook(accessToken: String)
+    /// Credentials from a Google serverAuthCode.
+    case google(serverAuthCode: String)
+    /// Credentials from an Apple id token.
+    case apple(idToken: String)
+    /// Credentials from an email and password.
+    case emailPassword(email: String, password: String)
+    /// Credentials from a JSON Web Token
+    case jwt(token: String)
+    /// Credentials for a MongoDB Realm function using a mongodb document as a json payload.
+    /// If the json can not be successfully serialised and error will be produced and the object will be nil.
+    case function(payload: Document)
+    /// Credentials from a user api key.
+    case userAPIKey(String)
+    /// Credentials from a sever api key.
+    case serverAPIKey(String)
+    /// Represents anonymous credentials
+    case anonymous
+}
 
 /// The `App` has the fundamental set of methods for communicating with a Realm
 /// application backend.
 /// This interface provides access to login and authentication.
 public typealias App = RLMApp
+
+extension App {
+    /**
+     Login to a user for the Realm app.
+     
+     @param credentials The credentials identifying the user.
+     @param completion A callback invoked after completion.
+     */
+    public func login(credentials: Credentials, completion: @escaping RLMUserCompletionBlock) {
+        self.__login(withCredential: ObjectiveCSupport.convert(object: credentials), completion: completion)
+    }
+}
 
 /// Use this delegate to be provided a callback once authentication has succeed or failed
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)

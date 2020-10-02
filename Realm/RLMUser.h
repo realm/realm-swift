@@ -142,7 +142,7 @@ NS_ASSUME_NONNULL_BEGIN
                    `RLMUser` object representing the currently logged in user.
 */
 - (void)linkUserWithCredentials:(RLMCredentials *)credentials
-                     completion:(RLMOptionalUserBlock)completion;
+                     completion:(RLMOptionalUserBlock)completion NS_REFINED_FOR_SWIFT;
 
 /**
  Removes the user

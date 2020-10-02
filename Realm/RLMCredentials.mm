@@ -18,6 +18,7 @@
 
 #import "RLMCredentials_Private.hpp"
 
+#import "RLMBSON_Private.hpp"
 #import "RLMSyncUtil_Private.h"
 #import "RLMUtil.hpp"
 #import "util/bson/bson.hpp"
@@ -56,17 +57,8 @@ using namespace realm;
     return [[self alloc] initWithAppCredentials:app::AppCredentials::custom(token.UTF8String)];
 }
 
-+ (instancetype)credentialsWithFunctionPayload:(NSDictionary *)payload
-                                         error:(NSError **)error {
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:payload
-                                                       options:NSJSONWritingPrettyPrinted
-                                                         error:error];
-    if (!jsonData) {
-        return nil;
-    }
-    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-
-    return [[self alloc] initWithAppCredentials:app::AppCredentials::function((realm::bson::BsonDocument)realm::bson::parse(jsonString.UTF8String))];
++ (instancetype)credentialsWithFunctionPayload:(NSDictionary<NSString *, id<RLMBSON>> *)payload {
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::function(static_cast<bson::BsonDocument>(RLMConvertRLMBSONToBson(payload)))];
 }
 
 + (instancetype)credentialsWithUserAPIKey:(NSString *)apiKey {

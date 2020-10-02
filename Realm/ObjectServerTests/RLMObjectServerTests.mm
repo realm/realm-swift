@@ -487,8 +487,7 @@
 
 - (void)testFunctionCredential {
     NSError *error;
-    RLMCredentials *functionCredential = [RLMCredentials credentialsWithFunctionPayload:@{ @"dog" : @{ @"name" : @"fido" } }
-                                                                                        error:&error];
+    RLMCredentials *functionCredential = [RLMCredentials credentialsWithFunctionPayload:@{@"dog": @{@"name": @"fido"}}];
     XCTAssertEqualObjects(functionCredential.provider, @"custom-function");
     XCTAssertEqualObjects(error, nil);
 }
