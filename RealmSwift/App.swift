@@ -109,6 +109,12 @@ public enum Credentials {
 public typealias App = RLMApp
 
 extension App {
+    /**
+     Login to a user for the Realm app.
+     
+     @param credentials The credentials identifying the user.
+     @param completion A callback invoked after completion.
+     */
     public func login(credentials: Credentials, completion: @escaping RLMUserCompletionBlock) {
         self.__login(withCredential: ObjectiveCSupport.convert(object: credentials), completion: completion)
     }
