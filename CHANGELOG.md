@@ -1,3 +1,26 @@
+5.4.8 Release notes (2020-10-05)
+=============================================================
+
+### Fixed
+
+* Case-insensitive equality queries on indexed string properties failed to
+  clear some internal state when rerunning the query. This could manifest as
+  duplicate results or "key not found" errors.
+  ([#6830](https://github.com/realm/realm-cocoa/issues/6830), [#6694](https://github.com/realm/realm-cocoa/issues/6694), since 5.0.0).
+
+### Compatibility
+
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 5.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 12.
+
+### Internal
+
+* Upgraded realm-core from v6.1.3 to v6.1.4
+* Upgraded realm-sync from v5.0.28 to v5.0.29
+
 5.4.7 Release notes (2020-09-30)
 =============================================================
 
