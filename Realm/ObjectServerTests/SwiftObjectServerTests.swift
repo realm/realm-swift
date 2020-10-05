@@ -1814,6 +1814,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     // swiftlint:disable multiple_closures_with_trailing_closure
     func testWatchCombine() {
         let sema = DispatchSemaphore(value: 0)
+        let openSema = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
@@ -1825,6 +1826,9 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         var subscriptions: Set<AnyCancellable> = []
 
         collection.watch()
+            .onOpen {
+                openSema.signal()
+            }
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.global())
             .sink(receiveCompletion: { _ in }) { _ in
@@ -1842,6 +1846,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         }.store(in: &subscriptions)
 
         DispatchQueue.global().async {
+            openSema.wait()
             for i in 0..<3 {
                 collection.insertOne(document) { (_, error) in
                     XCTAssertNil(error)
@@ -1858,6 +1863,8 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     func testWatchCombineWithFilterIds() {
         let sema1 = DispatchSemaphore(value: 0)
         let sema2 = DispatchSemaphore(value: 0)
+        let openSema1 = DispatchSemaphore(value: 0)
+        let openSema2 = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
@@ -1882,6 +1889,9 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         var subscriptions: Set<AnyCancellable> = []
 
         collection.watch(filterIds: [objectIds[0]])
+            .onOpen {
+                openSema1.signal()
+            }
             .subscribe(on: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }) { changeEvent in
@@ -1898,6 +1908,9 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         }.store(in: &subscriptions)
 
         collection.watch(filterIds: [objectIds[1]])
+            .onOpen {
+                openSema2.signal()
+            }
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.global())
             .sink(receiveCompletion: { _ in }) { (changeEvent) in
@@ -1914,6 +1927,8 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         }.store(in: &subscriptions)
 
         DispatchQueue.global().async {
+            openSema1.wait()
+            openSema2.wait()
             for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
@@ -1937,6 +1952,8 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     func testWatchCombineWithMatchFilter() {
         let sema1 = DispatchSemaphore(value: 0)
         let sema2 = DispatchSemaphore(value: 0)
+        let openSema1 = DispatchSemaphore(value: 0)
+        let openSema2 = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
@@ -1961,6 +1978,9 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         var subscriptions: Set<AnyCancellable> = []
 
         collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[0])])
+            .onOpen {
+                openSema1.signal()
+            }
             .subscribe(on: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }) { changeEvent in
@@ -1977,6 +1997,9 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         }.store(in: &subscriptions)
 
         collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[1])])
+            .onOpen {
+                openSema2.signal()
+            }
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.global())
             .sink(receiveCompletion: { _ in }) { changeEvent in
@@ -1993,6 +2016,8 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         }.store(in: &subscriptions)
 
         DispatchQueue.global().async {
+            openSema1.wait()
+            openSema2.wait()
             for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
