@@ -4,8 +4,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add the ability to capture a NotificationToken when using a Combine publisher that observes a Realm Object or Collection. The user will call `saveToken(on:at:)` directly after invoking the publisher to use the feature.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* When using `Realm.write(withoutNotifying:)` there was a chance that the 
+  supplied observation blocks would not be skipped when in a write transaction.
+  ([Object Store #1103](https://github.com/realm/realm-object-store/pull/1103))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
