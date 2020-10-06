@@ -36,8 +36,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 12.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
 
 * Upgraded realm-core from v6.1.3 to v6.1.4
 * Upgraded realm-sync from v5.0.28 to v5.0.29
