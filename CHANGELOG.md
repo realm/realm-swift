@@ -1,3 +1,24 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* Add ability to listen for when a Watch Change Stream is opened when using Combine. Use `onOpen(event:)` directly after opening a `WatchPublisher`, this will allow a callback to be invoked once the change stream is opened.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* File format: Generates Realms with format v12 (Reads and upgrades all previous formats)
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.
+
+### Internal
+* Upgraded realm-core from ? to ?
+* Upgraded realm-sync from ? to ?
+
 10.0.0-rc.1 Release notes (2020-10-01)
 =============================================================
 

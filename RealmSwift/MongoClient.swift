@@ -665,6 +665,13 @@ extension Publishers {
             self.openEvent = onOpen
         }
 
+        /// Triggers an event when the watch change stream is opened.
+        ///
+        /// Use this function when you require a change stream to be open before you perform any work.
+        /// This should be called directly after invoking the publisher.
+        ///
+        /// - Parameter event: Callback which will be invoked once the change stream is open.
+        /// - Returns: A publisher that emits a change event each time the remote MongoDB collection changes.
         public func onOpen(_ event: @escaping (() -> Void)) -> Self {
             Self(collection: collection,
                  queue: queue,
