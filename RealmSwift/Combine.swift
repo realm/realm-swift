@@ -413,10 +413,13 @@ extension RealmCollection {
             return observe(on: queue) { change in
                 switch change {
                 case .initial(let collection):
+                    print("CI debug: initial collection")
                     _ = subscriber.receive(collection)
                 case .update(let collection, deletions: _, insertions: _, modifications: _):
+                    print("CI debug: update collection")
                     _ = subscriber.receive(collection)
                 case .error(let error):
+                    print("CI debug: error")
                     subscriber.receive(completion: .failure(error))
                 }
             }

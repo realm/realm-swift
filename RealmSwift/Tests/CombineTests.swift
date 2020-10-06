@@ -719,10 +719,13 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         cancellable = collection
             .collectionPublisher
             .saveToken(on: self, at: \.notificationToken)
-            .assertNoFailure()
-            .sink { _ in
+            .sink(receiveCompletion: { completion in
+                print("testBasicWithoutNotifying completion: \(completion)")
+            }, receiveValue: { collection in
+                print("testBasicWithoutNotifying collection: \(collection)")
                 calls += 1
-            }
+            })
+
         XCTAssertNotNil(notificationToken)
         for _ in 0..<10 {
             try! realm.write(withoutNotifying: [notificationToken!]) { collection.appendObject() }
