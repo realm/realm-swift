@@ -486,8 +486,9 @@ public enum Publishers {
             self.realm = realm
         }
 
-        /// Captures the `NotificationToken` produced by observing a Realm Collection. This allows you to do notification skipping
-        /// when performing a `Realm.write(withoutNotifying:)` You should use this call if you require to write to the Realm database and ignore
+        /// Captures the `NotificationToken` produced by observing a Realm Collection.
+        ///
+        /// This allows you to do notification skipping when performing a `Realm.write(withoutNotifying:)`. You should use this call if you require to write to the Realm database and ignore
         /// this specific observation chain. The `NotificationToken` will be saved on the specified `KeyPath`from the observation block set up in `receive(subscriber:)`.
         /// - Parameters:
         ///   - object: The object which the `NotificationToken` is written to.
