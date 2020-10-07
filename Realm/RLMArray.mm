@@ -515,7 +515,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
 }
 
 - (BOOL)isEqual:(id)object {
-    if (![object isKindOfClass:[RLMArray class]]) {
+    if (![object isKindOfClass:RLMArray.class]) {
         return NO;
     }
     return [_backingArray isEqual:((RLMArray *)object)->_backingArray];

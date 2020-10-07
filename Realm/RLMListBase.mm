@@ -83,7 +83,7 @@
 }
 
 - (BOOL)isEqual:(id)object {
-    if (![object isKindOfClass:[RLMListBase class]]) {
+    if (![object isKindOfClass:RLMListBase.class]) {
         return NO;
     }
     return [((RLMListBase *)object)._rlmArray isEqual:self._rlmArray];
