@@ -74,13 +74,51 @@ public typealias PushClient = RLMPushClient
 /// An object which is used within UserAPIKeyProviderClient
 public typealias UserAPIKey = RLMUserAPIKey
 
-/// A `Credentials` represents data that uniquely identifies a Realm Object Server user.
-public typealias Credentials = RLMCredentials
+/**
+`Credentials`is an enum representing supported authentication types for MongoDB Realm.
+Example Usage:
+```
+let credentials = Credentials.JWT(token: myToken)
+```
+*/
+public enum Credentials {
+    /// Credentials from a Facebook access token.
+    case facebook(accessToken: String)
+    /// Credentials from a Google serverAuthCode.
+    case google(serverAuthCode: String)
+    /// Credentials from an Apple id token.
+    case apple(idToken: String)
+    /// Credentials from an email and password.
+    case emailPassword(email: String, password: String)
+    /// Credentials from a JSON Web Token
+    case jwt(token: String)
+    /// Credentials for a MongoDB Realm function using a mongodb document as a json payload.
+    /// If the json can not be successfully serialised and error will be produced and the object will be nil.
+    case function(payload: Document)
+    /// Credentials from a user api key.
+    case userAPIKey(String)
+    /// Credentials from a sever api key.
+    case serverAPIKey(String)
+    /// Represents anonymous credentials
+    case anonymous
+}
 
 /// The `App` has the fundamental set of methods for communicating with a Realm
 /// application backend.
 /// This interface provides access to login and authentication.
 public typealias App = RLMApp
+
+extension App {
+    /**
+     Login to a user for the Realm app.
+     
+     @param credentials The credentials identifying the user.
+     @param completion A callback invoked after completion.
+     */
+    public func login(credentials: Credentials, completion: @escaping RLMUserCompletionBlock) {
+        self.__login(withCredential: ObjectiveCSupport.convert(object: credentials), completion: completion)
+    }
+}
 
 /// Use this delegate to be provided a callback once authentication has succeed or failed
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
@@ -109,3 +147,282 @@ extension App {
         self.__setASAuthorizationControllerDelegateFor(controller)
     }
 }
+
+#if canImport(Combine)
+import Combine
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+public extension EmailPasswordAuth {
+    /**
+     Registers a new email identity with the username/password provider,
+     and sends a confirmation email to the provided address.
+
+     @param email The email address of the user to register.
+     @param password The password that the user created for the new username/password identity.
+     @returns A publisher that eventually return `Result.success` or `Error`.
+    */
+    func registerUser(email: String, password: String) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.registerUser(email: email, password: password) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    /**
+     Confirms an email identity with the username/password provider.
+
+     @param token The confirmation token that was emailed to the user.
+     @param tokenId The confirmation token id that was emailed to the user.
+     @returns A publisher that eventually return `Result.success` or `Error`.
+    */
+    func confirmUser(_ token: String, tokenId: String) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.confirmUser(token, tokenId: tokenId) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    /**
+     Re-sends a confirmation email to a user that has registered but
+     not yet confirmed their email address.
+     @param email The email address of the user to re-send a confirmation for.
+     @returns A publisher that eventually return `Result.success` or `Error`.
+    */
+    func resendConfirmationEmail(email: String) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.resendConfirmationEmail(email) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    /**
+     Sends a password reset email to the given email address.
+     @param email The email address of the user to send a password reset email for.
+     @returns A publisher that eventually return `Result.success` or `Error`.
+    */
+    func sendResetPasswordEmail(email: String) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.sendResetPasswordEmail(email) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    /**
+     Resets the password of an email identity using the
+     password reset token emailed to a user.
+
+     @param password The new password.
+     @param token The password reset token that was emailed to the user.
+     @param tokenId The password reset token id that was emailed to the user.
+     @returns A publisher that eventually return `Result.success` or `Error`.
+    */
+    func resetPassword(to: String, token: String, tokenId: String) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.resetPassword(to: to, token: token, tokenId: tokenId) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    /**
+     Resets the password of an email identity using the
+     password reset function set up in the application.
+
+     @param email  The email address of the user.
+     @param password The desired new password.
+     @param args A list of arguments passed in as a BSON array.
+     @returns A publisher that eventually return `Result.success` or `Error`.
+    */
+    func callResetPasswordFunction(email: String, password: String, args: [AnyBSON]) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.callResetPasswordFunction(email: email, password: password, args: args) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+public extension APIKeyAuth {
+    /**
+     Creates a user API key that can be used to authenticate as the current user.
+     @param name The name of the API key to be created.
+     @returns A publisher that eventually return `UserAPIKey` or `Error`.
+     */
+    func createAPIKey(named: String) -> Future<UserAPIKey, Error> {
+        return Future { promise in
+            self.createAPIKey(named: named) { (userApiKey, error) in
+                if let userApiKey = userApiKey {
+                    promise(.success(userApiKey))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /**
+     Fetches a user API key associated with the current user.
+     @param objectId The ObjectId of the API key to fetch.
+     @returns A publisher that eventually return `UserAPIKey` or `Error`.
+     */
+    func fetchAPIKey(_ objectId: ObjectId) -> Future<UserAPIKey, Error> {
+        return Future { promise in
+            self.fetchAPIKey(objectId) { (userApiKey, error) in
+                if let userApiKey = userApiKey {
+                    promise(.success(userApiKey))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /**
+     Fetches the user API keys associated with the current user.
+     @returns A publisher that eventually return `[UserAPIKey]` or `Error`.
+     */
+    func fetchAPIKeys() -> Future<[UserAPIKey], Error> {
+        return Future { promise in
+            self.fetchAPIKeys { (userApiKeys, error) in
+                if let userApiKeys = userApiKeys {
+                    promise(.success(userApiKeys))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /**
+     Deletes a user API key associated with the current user.
+     @param objectId The ObjectId of the API key to delete.
+     @returns A publisher that eventually return `Result.success` or `Error`.
+     */
+    func deleteAPIKey(_ objectId: ObjectId) -> Future<Void, Error> {
+        return Future { promise in
+            self.deleteAPIKey(objectId) { (error) in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(Void()))
+                }
+            }
+        }
+    }
+
+    /**
+     Enables a user API key associated with the current user.
+     @param objectId The ObjectId of the  API key to enable.
+     @returns A publisher that eventually return `Result.success` or `Error`.
+     */
+    func enableAPIKey(_ objectId: ObjectId) -> Future<Void, Error> {
+        return Future { promise in
+            self.enableAPIKey(objectId) { (error) in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(Void()))
+                }
+            }
+        }
+    }
+
+    /**
+     Disables a user API key associated with the current user.
+     @param objectId The ObjectId of the API key to disable.
+     @returns A publisher that eventually return `Result.success` or `Error`.
+     */
+    func disableAPIKey(_ objectId: ObjectId) -> Future<Void, Error> {
+        return Future { promise in
+            self.disableAPIKey(objectId) { (error) in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(Void()))
+                }
+            }
+        }
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+public extension App {
+    /// Login to a user for the Realm app.
+    /// @param credentials The credentials identifying the user.
+    /// @returns A publisher that eventually return `User` or `Error`.
+    func login(credentials: Credentials) -> Future<User, Error> {
+        return Future { promise in
+            self.login(credentials: credentials) { user, error in
+                if let user = user {
+                promise(.success(user))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+public extension PushClient {
+    /// Request to register device token to the server
+    /// @param token device token
+    /// @param user - device's user
+    /// @returns A publisher that eventually return `Result.success` or `Error`.
+    func registerDevice(token: String, user: User) -> Future<Void, Error> {
+        return Future { promise in
+            self.registerDevice(token: token, user: user) { (error) in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(Void()))
+                }
+            }
+        }
+    }
+
+    /// Request to deregister a device for a user
+    /// @param user - devoce's user
+    /// @returns A publisher that eventually return `Result.success` or `Error`.
+    func deregisterDevice(user: User) -> Future<Void, Error> {
+        return Future { promise in
+            self.deregisterDevice(user: user) { (error) in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(Void()))
+                }
+            }
+        }
+    }
+}
+#endif // canImport(Combine)

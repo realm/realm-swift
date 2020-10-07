@@ -33,20 +33,20 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMEmailPasswordAuth : RLMProviderClient
 
 /**
- Registers a new email identity with the username/password provider,
+ Registers a new email identity with the email/password provider,
  and sends a confirmation email to the provided address.
 
  @param email The email address of the user to register.
- @param password The password that the user created for the new username/password identity.
+ @param password The password that the user created for the new email/password identity.
  @param completionHandler A callback to be invoked once the call is complete.
 */
 
-- (void)registerEmail:(NSString *)email
-             password:(NSString *)password
-           completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
+- (void)registerUserWithEmail:(NSString *)email
+                     password:(NSString *)password
+                   completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler NS_SWIFT_NAME(registerUser(email:password:completion:));
 
 /**
- Confirms an email identity with the username/password provider.
+ Confirms an email identity with the email/password provider.
 
  @param token The confirmation token that was emailed to the user.
  @param tokenId The confirmation token id that was emailed to the user.

@@ -52,6 +52,18 @@ public final class ObjectId: RLMObjectId, Decodable {
         try super.init(string: string)
     }
 
+    /// Creates a new ObjectId using the given date, machine identifier, process identifier.
+    ///
+    /// - Parameters:
+    ///   - timestamp: A timestamp as NSDate.
+    ///   - machineId: The machine identifier.
+    ///   - processId: The process identifier.
+    public required init(timestamp: Date, machineId: Int, processId: Int) {
+        super.init(timestamp: timestamp,
+                   machineIdentifier: Int32(machineId),
+                   processIdentifier: Int32(processId))
+    }
+
     /// Creates a new ObjectId from the given 24-byte hexadecimal static string.
     ///
     /// Aborts if the string is not 24 characters or contains any characters other than 0-9a-fA-F. Use the initializer which takes a String to handle invalid strings at runtime.
@@ -79,5 +91,47 @@ extension ObjectId: Encodable {
     /// - Parameter encoder: The encoder to write data to.
     public func encode(to encoder: Encoder) throws {
         try self.stringValue.encode(to: encoder)
+    }
+}
+
+extension ObjectId: Comparable {
+    /// Returns a Boolean value indicating whether the value of the first
+    /// argument is less than that of the second argument.
+    ///
+    /// - Parameters:
+    ///   - lhs: An ObjectId value to compare.
+    ///   - rhs: Another ObjectId value to compare.
+    public static func < (lhs: ObjectId, rhs: ObjectId) -> Bool {
+        lhs.isLessThan(rhs)
+    }
+
+    /// Returns a Boolean value indicating whether the ObjectId of the first
+    /// argument is less than or equal to that of the second argument.
+    ///
+    /// - Parameters:
+    ///   - lhs: An ObjectId value to compare.
+    ///   - rhs: Another ObjectId value to compare.
+    public static func <= (lhs: ObjectId, rhs: ObjectId) -> Bool {
+        lhs.isLessThanOrEqual(to: rhs)
+    }
+
+    /// Returns a Boolean value indicating whether the ObjectId of the first
+    /// argument is greater than or equal to that of the second argument.
+    ///
+    /// - Parameters:
+    ///   - lhs: An ObjectId value to compare.
+    ///   - rhs: Another ObjectId value to compare.
+    public static func >= (lhs: ObjectId, rhs: ObjectId) -> Bool {
+        lhs.isGreaterThanOrEqual(to: rhs)
+    }
+
+    /// Returns a Boolean value indicating whether the ObjectId of the first
+    /// argument is greater than that of the second argument.
+    ///
+    /// - Parameters:
+    ///   - lhs: An ObjectId value to compare.
+    ///   - rhs: Another ObjectId value to compare.
+    public static func > (lhs: ObjectId, rhs: ObjectId) -> Bool {
+        lhs.isGreaterThan(rhs)
     }
 }

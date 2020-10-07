@@ -69,7 +69,7 @@ namespace {
                 });
             }];
         }
-        
+
         id<RLMNetworkTransport> transport() const {
             return m_transport;
         }
@@ -80,6 +80,15 @@ namespace {
 
 @implementation RLMAppConfiguration {
     realm::app::App::Config _config;
+}
+
+- (instancetype)initWithConfig:(const realm::app::App::Config &)config {
+    if (self = [super init]) {
+        _config = config;
+        return self;
+    }
+
+    return nil;
 }
 
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
@@ -104,7 +113,7 @@ namespace {
         self.localAppName = localAppName;
         self.localAppVersion = localAppVersion;
         self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
-        
+
         _config.platform = "Realm Cocoa";
 
         RLMNSStringToStdString(_config.platform_version, [[NSProcessInfo processInfo] operatingSystemVersionString]);
@@ -170,7 +179,7 @@ namespace {
 
 - (NSString *)localAppVersion {
     if (_config.local_app_version) {
-        return @((_config.base_url)->c_str());
+        return @(_config.base_url->c_str());
     }
 
     return nil;
@@ -211,6 +220,17 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 @implementation RLMApp : NSObject
 
+- (instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app {
+    if (self = [super init]) {
+        _configuration = [[RLMAppConfiguration alloc] initWithConfig:app->config()];
+        _app = app;
+        _syncManager = [[RLMSyncManager alloc] initWithSyncManager:_app->sync_manager()];
+        return self;
+    }
+
+    return nil;
+}
+
 - (instancetype)initWithId:(NSString *)appId
              configuration:(RLMAppConfiguration *)configuration
              rootDirectory:(NSURL *)rootDirectory {
@@ -224,10 +244,12 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
         _configuration = configuration;
         [_configuration setAppId:appId];
 
-        _syncManager = [[RLMSyncManager alloc] initWithAppConfiguration:configuration
-                                                          rootDirectory:rootDirectory];
-        _app = [_syncManager app];
+        _app = RLMTranslateError([&] {
+            return app::App::get_shared_app(configuration.config,
+                                            [RLMSyncManager configurationWithRootDirectory:rootDirectory appId:appId]);
+        });
 
+        _syncManager = [[RLMSyncManager alloc] initWithSyncManager:_app->sync_manager()];
         return self;
     }
     return nil;
@@ -264,15 +286,15 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 - (NSDictionary<NSString *, RLMUser *> *)allUsers {
     NSMutableDictionary *buffer = [NSMutableDictionary new];
-    for (auto user : SyncManager::shared().all_users()) {
-        std::string identity(user->identity());
-        buffer[@(identity.c_str())] = [[RLMUser alloc] initWithUser:std::move(user) app:self];
+    for (auto&& user : _app->sync_manager()->all_users()) {
+        NSString *identity = @(user->identity().c_str());
+        buffer[identity] = [[RLMUser alloc] initWithUser:std::move(user) app:self];
     }
     return buffer;
 }
 
 - (RLMUser *)currentUser {
-    if (auto user = SyncManager::shared().get_current_user()) {
+    if (auto user = _app->sync_manager()->get_current_user()) {
         return [[RLMUser alloc] initWithUser:user app:self];
     }
     return nil;
@@ -284,21 +306,28 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 - (void)loginWithCredential:(RLMCredentials *)credentials
                  completion:(RLMUserCompletionBlock)completionHandler {
-    _app->log_in_with_credentials(credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
+    auto completion = ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
         if (error && error->error_code) {
             return completionHandler(nil, RLMAppErrorToNSError(*error));
         }
 
         completionHandler([[RLMUser alloc] initWithUser:user app:self], nil);
+    };
+    return RLMTranslateError([&] {
+        return _app->log_in_with_credentials(credentials.appCredentials, completion);
     });
 }
 
 - (RLMUser *)switchToUser:(RLMUser *)syncUser {
-    return [[RLMUser alloc] initWithUser:_app->switch_user(syncUser._syncUser) app:self];
+    return RLMTranslateError([&] {
+        return [[RLMUser alloc] initWithUser:_app->switch_user(syncUser._syncUser) app:self];
+    });
 }
 
 - (RLMPushClient *)pushClientWithServiceName:(NSString *)serviceName {
-    return [[RLMPushClient alloc] initWithPushClient:_app->push_notification_client(serviceName.UTF8String)];
+    return RLMTranslateError([&] {
+        return [[RLMPushClient alloc] initWithPushClient:_app->push_notification_client(serviceName.UTF8String)];
+    });
 }
 
 #pragma mark - Sign In With Apple Extension
@@ -315,7 +344,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     controller.delegate = self;
 }
 
-- (void)authorizationController:(ASAuthorizationController *)controller
+- (void)authorizationController:(__unused ASAuthorizationController *)controller
    didCompleteWithAuthorization:(ASAuthorization *)authorization API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
     NSString *jwt = [[NSString alloc] initWithData:((ASAuthorizationAppleIDCredential *)authorization.credential).identityToken
                                              encoding:NSUTF8StringEncoding];
@@ -329,7 +358,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
        }];
 }
 
-- (void)authorizationController:(ASAuthorizationController *)controller
+- (void)authorizationController:(__unused ASAuthorizationController *)controller
            didCompleteWithError:(NSError *)error API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
     [self.authorizationDelegate authenticationDidCompleteWithError:error];
 }

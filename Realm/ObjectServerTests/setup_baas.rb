@@ -13,13 +13,13 @@ DEPENDENCIES = File.open("#{BASE_DIR}/dependencies.list").map { |line|
 }.to_h
 
 MONGODB_VERSION='4.4.0-rc5'
-GO_VERSION='1.14.2'
+GO_VERSION='1.15.2'
 NODE_VERSION='8.11.2'
 STITCH_VERSION=DEPENDENCIES["STITCH_VERSION"]
 
 MONGODB_URL="https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-#{MONGODB_VERSION}.tgz"
 TRANSPILER_TARGET='node8-macos'
-SERVER_STITCH_LIB_URL="https://s3.amazonaws.com/mciuploads/mongodb-mongo-master/stitch-support/macos-debug/e791a2ea966bb302ff180dd4538d87c078e74747/stitch-support-4.3.2-721-ge791a2e-patch-5e2a6ad2a4cf473ae2e67b09.tgz"
+SERVER_STITCH_LIB_URL="https://s3.amazonaws.com/stitch-artifacts/stitch-support/stitch-support-macos-debug-4.3.2-721-ge791a2e-patch-5e2a6ad2a4cf473ae2e67b09.tgz"
 MONGO_DIR="'#{BUILD_DIR}'/mongodb-macos-x86_64-#{MONGODB_VERSION}"
 
 def setup_mongod
@@ -102,7 +102,7 @@ def setup_stitch
     assisted_agg_filepath = "#{stitch_dir}/assisted_agg"
     if !File.exists?(assisted_agg_filepath)
         puts "downloading assisted_agg"
-        puts `cd '#{stitch_dir}' && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7ab2a60ed5647001827_17_10_15_01_19_39/assisted_agg"`
+        puts `cd '#{stitch_dir}' && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_b1c679a26ecb975372de41238ea44e4719b8fbf0_5f3d91c10ae6066889184912_20_08_19_20_57_17/assisted_agg"`
         puts `chmod +x '#{assisted_agg_filepath}'`
     end
 

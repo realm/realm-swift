@@ -26,14 +26,20 @@
 
 - (void)setAppId:(nonnull NSString *)appId;
 
+- (nonnull instancetype)initWithConfig:(const realm::app::App::Config&)config;
+
 @end
 
 @interface RLMApp ()
+
 - (std::shared_ptr<realm::app::App>)_realmApp;
 
 + (nonnull instancetype)appWithId:(nonnull NSString *)appId
                     configuration:(nonnull RLMAppConfiguration *)configuration
                     rootDirectory:(nullable NSURL *)rootDirectory;
+
+- (nonnull instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app;
+
 @end
 
 NSError * _Nonnull RLMAppErrorToNSError(realm::app::AppError const& appError);

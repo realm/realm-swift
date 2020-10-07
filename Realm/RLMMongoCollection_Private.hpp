@@ -25,7 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMApp;
 
 @interface RLMChangeStream()
-- (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber
+                                delegateQueue:(nullable dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 - (void)attachURLSession:(NSURLSession *)urlSession;
 @end

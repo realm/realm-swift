@@ -139,4 +139,62 @@
 - (BOOL)isNaN {
     return _value.is_nan();
 }
+
+- (RLMDecimal128 *)magnitude {
+    auto result = realm::Decimal128(abs(self.doubleValue));
+    return [[RLMDecimal128 alloc] initWithDecimal128:result];
+}
+
+- (void)negate {
+    _value = realm::Decimal128(-self.doubleValue);
+}
+
++ (RLMDecimal128 *)minimumDecimalNumber {
+    return [[RLMDecimal128 alloc] initWithDecimal128:std::numeric_limits<realm::Decimal128>::lowest()];
+}
+
++ (RLMDecimal128 *)maximumDecimalNumber {
+    return [[RLMDecimal128 alloc] initWithDecimal128:std::numeric_limits<realm::Decimal128>::max()];
+}
+
+- (RLMDecimal128 *)decimalNumberByAdding:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return [[RLMDecimal128 alloc] initWithDecimal128:_value+rhs];
+}
+
+- (RLMDecimal128 *)decimalNumberByDividingBy:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return [[RLMDecimal128 alloc] initWithDecimal128:_value/rhs];
+}
+
+- (RLMDecimal128 *)decimalNumberBySubtracting:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return [[RLMDecimal128 alloc] initWithDecimal128:_value-rhs];
+}
+
+- (RLMDecimal128 *)decimalNumberByMultiplyingBy:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return [[RLMDecimal128 alloc] initWithDecimal128:_value*rhs];
+}
+
+- (BOOL)isGreaterThan:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return _value > rhs;
+}
+
+- (BOOL)isGreaterThanOrEqualTo:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return _value >= rhs;
+}
+
+- (BOOL)isLessThan:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return _value < rhs;
+}
+
+- (BOOL)isLessThanOrEqualTo:(RLMDecimal128 *)decimalNumber {
+    auto rhs = RLMObjcToDecimal128(decimalNumber);
+    return _value <= rhs;
+}
+
 @end

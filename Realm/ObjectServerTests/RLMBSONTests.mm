@@ -33,7 +33,7 @@ using namespace realm::bson;
 - (void)testNilRoundTrip {
     auto bson = Bson();
     id<RLMBSON> rlm = RLMConvertBsonToRLMBSON(bson);
-    XCTAssertEqual(rlm, nil);
+    XCTAssertEqual(rlm, [NSNull null]);
     XCTAssertEqual(RLMConvertRLMBSONToBson(rlm), bson);
 }
 
@@ -100,6 +100,7 @@ using namespace realm::bson;
 
 - (void)testDocumentRoundTrip {
     NSDictionary<NSString *, id<RLMBSON>> *document = @{
+        @"nil": [NSNull null],
         @"string": @"test string",
         @"true": @YES,
         @"false": @NO,
@@ -122,7 +123,9 @@ using namespace realm::bson;
     auto bson = RLMConvertRLMBSONToBson(document);
     
     auto bsonDocument = static_cast<BsonDocument>(bson);
-    
+
+    XCTAssertEqual(document[@"nil"], [NSNull null]);
+    XCTAssertEqualObjects(RLMConvertBsonToRLMBSON(bsonDocument["nil"]), document[@"nil"]);
     XCTAssertEqualObjects(RLMConvertBsonToRLMBSON(bsonDocument["string"]), document[@"string"]);
     XCTAssertEqual(RLMConvertBsonToRLMBSON(bsonDocument["true"]), document[@"true"]);
     XCTAssertEqual(RLMConvertBsonToRLMBSON(bsonDocument["false"]), document[@"false"]);

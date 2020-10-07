@@ -32,11 +32,11 @@ class SwiftSyncTestCase: RLMSyncTestCase {
     func basicCredentials(usernameSuffix: String = "",
                           file: StaticString = #file,
                           line: UInt = #line) -> Credentials {
-        let username = "\(randomString(10))\(usernameSuffix)"
+        let email = "\(randomString(10))\(usernameSuffix)"
         let password = "abcdef"
-        let credentials = Credentials(username: username, password: password)
+        let credentials = Credentials.emailPassword(email: email, password: password)
         let ex = expectation(description: "Should register in the user properly")
-        app.emailPasswordAuth().registerEmail(username, password: password, completion: { error in
+        app.emailPasswordAuth.registerUser(email: email, password: password, completion: { error in
             XCTAssertNil(error)
             ex.fulfill()
         })
@@ -91,6 +91,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                         + "\(theError != nil ? String(describing: theError!) : "n/a"))",
                        file: file,
                        line: line)
+        XCTAssertTrue(theUser!.isLoggedIn)
         return theUser!
     }
 
@@ -111,6 +112,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                         + "\(theError?.localizedDescription ?? "nil"))",
             file: file,
             line: line)
+        XCTAssertFalse(user.isLoggedIn)
     }
 
     func waitForUploads(for realm: Realm) {

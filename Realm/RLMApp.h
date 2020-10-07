@@ -98,6 +98,20 @@ Create a new Realm App configuration.
 /// The `RLMSyncManager` for this Realm app.
 @property (nonatomic, readonly) RLMSyncManager *syncManager;
 
+/// Get a dictionary containing all users keyed on id.
+@property (nonatomic, readonly) NSDictionary<NSString *, RLMUser *> *allUsers;
+
+/// Get the current user logged into the Realm app.
+@property (nonatomic, readonly, nullable) RLMUser *currentUser;
+
+/**
+  A client for the email/password authentication provider which
+  can be used to obtain a credential for logging in.
+
+  Used to perform requests specifically related to the email/password provider.
+*/
+@property (nonatomic, readonly) RLMEmailPasswordAuth *emailPasswordAuth;
+
 /**
  Get an application with a given appId and configuration.
 
@@ -115,31 +129,13 @@ Create a new Realm App configuration.
             configuration:(nullable RLMAppConfiguration *)configuration;
 
 /**
- Get a dictionary containing all users keyed on id.
- */
-- (NSDictionary<NSString *, RLMUser *> *)allUsers;
-
-/**
- Get the current user logged into the Realm app.
- */
-- (nullable RLMUser *)currentUser;
-
-/**
-  A client for the username/password authentication provider which
-  can be used to obtain a credential for logging in.
-
-  Used to perform requests specifically related to the username/password provider.
-*/
-- (RLMEmailPasswordAuth *)emailPasswordAuth;
-
-/**
  Login to a user for the Realm app.
 
  @param credentials The credentials identifying the user.
  @param completion A callback invoked after completion.
  */
 - (void)loginWithCredential:(RLMCredentials *)credentials
-                 completion:(RLMUserCompletionBlock)completion NS_SWIFT_NAME(login(credentials:completion:));
+                 completion:(RLMUserCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
 /**
  Switches the active user to the specified user.

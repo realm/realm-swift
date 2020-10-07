@@ -32,6 +32,7 @@
     if (self = [super init]) {
         _targetChangeEventCount = changeEventCount;
         _semaphore = dispatch_semaphore_create(0);
+        _isOpenSemaphore = dispatch_semaphore_create(0);
         _expectation = expectation;
         return self;
     }
@@ -44,6 +45,7 @@
     if (self = [super init]) {
         _targetChangeEventCount = changeEventCount;
         _semaphore = dispatch_semaphore_create(0);
+        _isOpenSemaphore = dispatch_semaphore_create(0);
         _matchingObjectId = matchingObjectId;
         _expectation = expectation;
         return self;
@@ -60,6 +62,7 @@
 
 - (void)changeStreamDidOpen:(nonnull __unused RLMChangeStream *)changeStream {
     _didOpenWasCalled = YES;
+    dispatch_semaphore_signal(self.isOpenSemaphore);
 }
 
 - (void)changeStreamDidReceiveChangeEvent:(nonnull id<RLMBSON>)changeEvent {

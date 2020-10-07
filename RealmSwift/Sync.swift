@@ -26,20 +26,21 @@ import Realm.Private
  */
 public typealias User = RLMUser
 
-/**
- An immutable data object representing information retrieved from MongoDB
- Realm about a particular user.
+extension User {
+    /**
+     Links the currently authenticated user with a new identity, where the identity is defined by the credential
+     specified as a parameter. This will only be successful if this `User` is the currently authenticated
+     with the client from which it was created. On success a new user will be returned with the new linked credentials.
 
- - see: `RLMUserInfo`
- */
-public typealias UserInfo = RLMUserInfo
-
-/**
- An immutable data object representing an account belonging to a particular user.
-
- - see: `UserInfo`, `RLMUserAccountInfo`
- */
-public typealias UserAccountInfo = RLMUserAccountInfo
+     @param credentials The credentials used to link the user to a new identity.
+     @param completion The completion handler to call when the linking is complete.
+                       If the operation is  successful, the result will contain a new
+                       `User` object representing the currently logged in user.
+    */
+    public func linkUser(credentials: Credentials, completion: @escaping RLMOptionalUserBlock) {
+        self.__linkUser(with: ObjectiveCSupport.convert(object: credentials), completion: completion)
+    }
+}
 
 /**
  A singleton which configures and manages MongoDB Realm synchronization-related
@@ -246,6 +247,10 @@ public struct SyncConfiguration {
     }
 }
 
+#if canImport(Combine)
+import Combine
+#endif
+
 /// Structure providing an interface to call a MongoDB Realm function with the provided name and arguments.
 ///
 ///     user.functions.sum([1, 2, 3, 4, 5]) { sum, error in
@@ -283,6 +288,24 @@ public struct Functions {
             }
         }
     }
+
+    #if canImport(Combine)
+    /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls.
+    @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+    public subscript(dynamicMember string: String) -> ([AnyBSON]) -> Future<AnyBSON, Error> {
+        return { (arguments: [AnyBSON]) in
+            return Future<AnyBSON, Error> { promise in
+                self[dynamicMember: string](arguments, { bson, error in
+                    if let bson = bson {
+                        promise(.success(bson))
+                    } else {
+                        promise(.failure(error ?? Realm.Error.promiseFailed))
+                    }
+                })
+            }
+        }
+    }
+    #endif
 }
 
 public extension User {
@@ -303,6 +326,18 @@ public extension User {
         return ObjectiveCSupport.convert(object: config)
     }
 
+    /**
+     Create a sync configuration instance.
+
+     - parameter partitionValue: Takes `nil` as a partition value.
+     - parameter cancelAsyncOpenOnNonFatalErrors: By default, Realm.asyncOpen()
+     swallows non-fatal connection errors such as a connection attempt timing
+     out and simply retries until it succeeds. If this is set to `true`, instead
+     the error will be reported to the callback and the async open will be
+     cancelled.
+
+     - warning: NEVER disable SSL validation for a system running in production.
+     */
     func configuration(partitionValue: ExpressibleByNilLiteral?,
                        cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
         let config = self.__configuration(withPartitionValue: nil)
@@ -315,7 +350,7 @@ public extension User {
     /**
      Create a sync configuration instance.
 
-     - parameter partitionValue: FIXME
+     - parameter partitionValue: The `BSON` value the Realm is partitioned on.
      - parameter cancelAsyncOpenOnNonFatalErrors: By default, Realm.asyncOpen()
      swallows non-fatal connection errors such as a connection attempt timing
      out and simply retries until it succeeds. If this is set to `true`, instead
@@ -337,11 +372,11 @@ public extension User {
      The custom data of the user.
      This is configured in your MongoDB Realm App.
     */
-    var customData: Document? {
+    var customData: Document {
         guard let rlmCustomData = self.__customData as RLMBSON?,
             let anyBSON = ObjectiveCSupport.convert(object: rlmCustomData),
             case let .document(customData) = anyBSON else {
-            return nil
+            return [:]
         }
 
         return customData
@@ -533,3 +568,71 @@ extension Realm {
         return SyncSession(for: rlmRealm)
     }
 }
+
+#if canImport(Combine)
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+public extension User {
+    /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.
+    /// @returns A publisher that eventually return `Dictionary` with user's data or `Error`.
+    func refreshCustomData() -> Future<[AnyHashable: Any], Error> {
+        return Future { promise in
+            self.refreshCustomData { customData, error in
+                if let customData = customData {
+                    promise(.success(customData))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
+    /// specified as a parameter. This will only be successful if this `User` is the currently authenticated
+    /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
+    /// @param credentials The `Credentials` used to link the user to a new identity.
+    /// @returns A publisher that eventually return `Result.success` or `Error`.
+    func linkUser(credentials: Credentials) -> Future<User, Error> {
+        return Future { promise in
+            self.linkUser(credentials: credentials) { user, error in
+                if let user = user {
+                    promise(.success(user))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /// Removes the user
+    /// This logs out and destroys the session related to this user. The completion block will return an error
+    /// if the user is not found or is already removed.
+    /// @returns A publisher that eventually return `Result.success` or `Error`.
+    func remove() -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.remove { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    /// Logs out the current user
+    /// The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by a username / password or third party auth clients
+    //// If the logout request fails, this method will still clear local authentication state.
+    /// @returns A publisher that eventually return `Result.success` or `Error`.
+    func logOut() -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.logOut { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+}
+#endif

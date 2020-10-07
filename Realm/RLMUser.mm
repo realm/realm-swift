@@ -21,7 +21,6 @@
 #import "RLMCredentials_Private.hpp"
 #import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
-#import "RLMJSONModels.h"
 #import "RLMNetworkTransport.h"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
@@ -42,17 +41,6 @@
 #import "sync/sync_user.hpp"
 
 using namespace realm;
-
-@interface RLMUserInfo ()
-
-@property (nonatomic, readwrite) NSArray *accounts;
-@property (nonatomic, readwrite) NSDictionary *metadata;
-@property (nonatomic, readwrite) NSString *identity;
-@property (nonatomic, readwrite) BOOL isAdmin;
-
-+ (instancetype)userInfoWithModel:(RLMUserResponseModel *)model;
-
-@end
 
 @interface RLMUser () {
     std::shared_ptr<SyncUser> _user;
@@ -97,6 +85,10 @@ using namespace realm;
     _user->log_out();
 }
 
+- (BOOL)isLoggedIn {
+    return _user->is_logged_in();
+}
+
 - (void)invalidate {
     if (!_user) {
         return;
@@ -108,7 +100,7 @@ using namespace realm;
     std::stringstream s;
     s << RLMConvertRLMBSONToBson(partitionValue);
     NSString *encodedPartitionValue = [@(s.str().c_str()) stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
-    return [[NSString alloc] initWithFormat:@"%@/%@", [self identity], encodedPartitionValue];
+    return [[NSString alloc] initWithFormat:@"%@/%@", [self identifier], encodedPartitionValue];
 }
 
 - (nullable RLMSyncSession *)sessionForPartitionValue:(id<RLMBSON>)partitionValue {
@@ -116,7 +108,7 @@ using namespace realm;
         return nil;
     }
 
-    auto path = SyncManager::shared().path_for_realm(*_user, [[self pathForPartitionValue:partitionValue] UTF8String]);
+    auto path = _user->sync_manager()->path_for_realm(*_user, [[self pathForPartitionValue:partitionValue] UTF8String]);
     if (auto session = _user->session_for_on_disk_path(path)) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }
@@ -135,9 +127,9 @@ using namespace realm;
     return [buffer copy];
 }
 
-- (NSString *)identity {
+- (NSString *)identifier {
     if (!_user) {
-        return nil;
+        return @"";
     }
     return @(_user->identity().c_str());
 }
@@ -150,7 +142,7 @@ using namespace realm;
     auto identities = _user->identities();
     for (auto& identity : identities) {
         [buffer addObject: [[RLMUserIdentity alloc] initUserIdentityWithProviderType:@(identity.provider_type.c_str())
-                                                                            identity:@(identity.id.c_str())]];
+                                                                          identifier:@(identity.id.c_str())]];
     }
 
     return [buffer copy];
@@ -199,12 +191,12 @@ using namespace realm;
 }
 
 - (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
-    _app._realmApp->log_out(^(realm::util::Optional<app::AppError> error) {
+    _app._realmApp->log_out(_user, ^(realm::util::Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
 
-- (RLMAPIKeyAuth *)apiKeyAuth {
+- (RLMAPIKeyAuth *)apiKeysAuth {
     return [[RLMAPIKeyAuth alloc] initWithApp: _app];
 }
 
@@ -250,14 +242,14 @@ using namespace realm;
 }
 
 - (NSString *)refreshToken {
-    if (!_user) {
+    if (!_user || _user->refresh_token().empty()) {
         return nil;
     }
     return @(_user->refresh_token().c_str());
 }
 
 - (NSString *)accessToken {
-    if (!_user) {
+    if (!_user || _user->access_token().empty()) {
         return nil;
     }
     return @(_user->access_token().c_str());
@@ -265,7 +257,7 @@ using namespace realm;
 
 - (NSDictionary *)customData {
     if (!_user || !_user->custom_data()) {
-        return nil;
+        return @{};
     }
 
     return (NSDictionary *)RLMConvertBsonToRLMBSON(*_user->custom_data());
@@ -277,34 +269,15 @@ using namespace realm;
 
 @end
 
-#pragma mark - RLMUserInfo
-
-@implementation RLMUserInfo
-
-- (instancetype)initPrivate {
-    return [super init];
-}
-
-+ (instancetype)userInfoWithModel:(RLMUserResponseModel *)model {
-    RLMUserInfo *info = [[RLMUserInfo alloc] initPrivate];
-    info.accounts = model.accounts;
-    info.metadata = model.metadata;
-    info.isAdmin = model.isAdmin;
-    info.identity = model.identity;
-    return info;
-}
-
-@end
-
 #pragma mark - RLMUserIdentity
 
 @implementation RLMUserIdentity
 
 - (instancetype)initUserIdentityWithProviderType:(NSString *)providerType
-                                        identity:(NSString *)identity {
+                                      identifier:(NSString *)identifier {
     if (self = [super init]) {
         _providerType = providerType;
-        _identity = identity;
+        _identifier = identifier;
     }
     return self;
 }

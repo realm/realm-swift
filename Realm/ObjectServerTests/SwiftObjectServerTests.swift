@@ -16,8 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import XCTest
+import Combine
 import RealmSwift
+import XCTest
 
 // Used by testOfflineClientReset
 // The naming here is nonstandard as the sync-1.x.realm test file comes from the .NET unit tests.
@@ -258,10 +259,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             user.simulateClientResetError(forSession: self.appId)
             waitForExpectations(timeout: 10, handler: nil)
             XCTAssertNotNil(theError)
-            XCTAssertTrue(theError!.code == SyncError.Code.clientResetError)
-            let resetInfo = theError!.clientResetInfo()
-            XCTAssertNotNil(resetInfo)
-            XCTAssertTrue(resetInfo!.0.contains("io.realm.object-server-recovered-realms/recovered_realm"))
+            guard let error = theError else { return }
+            XCTAssertTrue(error.code == SyncError.Code.clientResetError)
+            guard let resetInfo = error.clientResetInfo() else {
+                XCTAssertNotNil(error.clientResetInfo())
+                return
+            }
+            XCTAssertTrue(resetInfo.0.contains("mongodb-realm/\(self.appId)/recovered-realms/recovered_realm"))
             XCTAssertNotNil(realm)
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
@@ -289,9 +293,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertNotNil(theError)
                 XCTAssertNotNil(realm)
             }
-            let (path, errorToken) = theError!.clientResetInfo()!
+            guard let error = theError else { return }
+            let (path, errorToken) = error.clientResetInfo()!
             XCTAssertFalse(FileManager.default.fileExists(atPath: path))
-            SyncSession.immediatelyHandleError(errorToken)
+            SyncSession.immediatelyHandleError(errorToken, syncManager: self.app.syncManager)
             XCTAssertTrue(FileManager.default.fileExists(atPath: path))
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
@@ -595,64 +600,37 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
     #endif
 
-    // MARK: - App Credentials
+    func testAppCredentialSupport() {
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.facebook(accessToken: "accessToken")), RLMCredentials(facebookToken: "accessToken"))
 
-    func testUsernamePasswordCredential() {
-        let usernamePasswordCredential = Credentials(username: "username", password: "password")
-        XCTAssertEqual(usernamePasswordCredential.provider.rawValue, "local-userpass")
-    }
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.google(serverAuthCode: "serverAuthCode")), RLMCredentials(googleAuthCode: "serverAuthCode"))
 
-    func testJWTCredentials() {
-        let jwtCredential = Credentials(jwt: "token")
-        XCTAssertEqual(jwtCredential.provider.rawValue, "custom-token")
-    }
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.apple(idToken: "idToken")), RLMCredentials(appleToken: "idToken"))
 
-    func testAnonymousCredentials() {
-        let anonymousCredential = Credentials.anonymous()
-        XCTAssertEqual(anonymousCredential.provider.rawValue, "anon-user")
-    }
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.emailPassword(email: "email", password: "password")), RLMCredentials(email: "email", password: "password"))
 
-    func testUserAPIKeyCredentials() {
-        let userAPIKeyCredential = Credentials(userAPIKey: "apikey")
-        XCTAssertEqual(userAPIKeyCredential.provider.rawValue, "api-key")
-    }
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.jwt(token: "token")), RLMCredentials(jwt: "token"))
 
-    func testServerAPIKeyCredentials() {
-        let serverAPIKeyCredential = Credentials(serverAPIKey: "apikey")
-        XCTAssertEqual(serverAPIKeyCredential.provider.rawValue, "api-key")
-    }
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.function(payload: ["dog": ["name": "fido"]])),
+                       RLMCredentials(functionPayload: ["dog": ["name" as NSString: "fido" as NSString] as NSDictionary]))
 
-    func testFacebookCredentials() {
-        let facebookCredential = Credentials(facebookToken: "token")
-        XCTAssertEqual(facebookCredential.provider.rawValue, "oauth2-facebook")
-    }
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.userAPIKey("key")), RLMCredentials(userAPIKey: "key"))
 
-    func testGoogleCredentials() {
-        let googleCredential = Credentials(googleToken: "token")
-        XCTAssertEqual(googleCredential.provider.rawValue, "oauth2-google")
-    }
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.serverAPIKey("key")), RLMCredentials(serverAPIKey: "key"))
 
-    func testAppleCredentials() {
-        let appleCredential = Credentials(appleToken: "token")
-        XCTAssertEqual(appleCredential.provider.rawValue, "oauth2-apple")
-    }
-
-    func testFunctionCredentials() {
-        var error: NSError!
-        let functionCredential = Credentials.init(functionPayload: ["dog": ["name": "fido"]], error: &error)
-        XCTAssertEqual(functionCredential.provider.rawValue, "custom-function")
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.anonymous), RLMCredentials.anonymous())
     }
 
     // MARK: - Authentication
 
     func testInvalidCredentials() {
         do {
-            let username = "testInvalidCredentialsUsername"
+            let email = "testInvalidCredentialsEmail"
             let credentials = basicCredentials()
             let user = try synchronouslyLogInUser(for: credentials)
             XCTAssertEqual(user.state, .loggedIn)
 
-            let credentials2 = Credentials(username: username, password: "NOT_A_VALID_PASSWORD")
+            let credentials2 = Credentials.emailPassword(email: email, password: "NOT_A_VALID_PASSWORD")
             let ex = expectation(description: "Should log in the user properly")
 
             self.app.login(credentials: credentials2, completion: { user2, error in
@@ -696,7 +674,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     private func realmURLForFile(_ fileName: String) -> URL {
-        let testDir = RLMRealmPathForFile("realm-object-server")
+        let testDir = RLMRealmPathForFile("mongodb-realm")
         let directory = URL(fileURLWithPath: testDir, isDirectory: true)
         return directory.appendingPathComponent(fileName, isDirectory: false)
     }
@@ -715,10 +693,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testAppInit() {
         let appWithNoConfig = App(id: appName)
-        XCTAssertEqual(appWithNoConfig.allUsers().count, 0)
+        XCTAssertEqual(appWithNoConfig.allUsers.count, 0)
 
         let appWithConfig = App(id: appName, configuration: appConfig())
-        XCTAssertEqual(appWithConfig.allUsers().count, 0)
+        XCTAssertEqual(appWithConfig.allUsers.count, 0)
     }
 
     func testAppLogin() {
@@ -728,7 +706,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth.registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -737,7 +715,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let loginEx = expectation(description: "Login user")
         var syncUser: User?
 
-        app.login(credentials: Credentials(username: email, password: password)) { (user, error) in
+        app.login(credentials: Credentials.emailPassword(email: email, password: password)) { (user, error) in
             XCTAssertNil(error)
             syncUser = user
             loginEx.fulfill()
@@ -745,8 +723,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         wait(for: [loginEx], timeout: 4.0)
 
-        XCTAssertEqual(syncUser?.identity, app.currentUser()?.identity)
-        XCTAssertEqual(app.allUsers().count, 1)
+        XCTAssertEqual(syncUser?.id, app.currentUser?.id)
+        XCTAssertEqual(app.allUsers.count, 1)
     }
 
     func testAppSwitchAndRemove() {
@@ -759,12 +737,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let registerUser1Ex = expectation(description: "Register user 1")
         let registerUser2Ex = expectation(description: "Register user 2")
 
-        app.emailPasswordAuth().registerEmail(email1, password: password1) { (error) in
+        app.emailPasswordAuth.registerUser(email: email1, password: password1) { (error) in
             XCTAssertNil(error)
             registerUser1Ex.fulfill()
         }
 
-        app.emailPasswordAuth().registerEmail(email2, password: password2) { (error) in
+        app.emailPasswordAuth.registerUser(email: email2, password: password2) { (error) in
             XCTAssertNil(error)
             registerUser2Ex.fulfill()
         }
@@ -777,7 +755,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         var syncUser1: User?
         var syncUser2: User?
 
-        app.login(credentials: Credentials(username: email1, password: password1)) { (user, error) in
+        app.login(credentials: Credentials.emailPassword(email: email1, password: password1)) { (user, error) in
             XCTAssertNil(error)
             syncUser1 = user
             login1Ex.fulfill()
@@ -785,7 +763,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         wait(for: [login1Ex], timeout: 4.0)
 
-        app.login(credentials: Credentials(username: email2, password: password2)) { (user, error) in
+        app.login(credentials: Credentials.emailPassword(email: email2, password: password2)) { (user, error) in
             XCTAssertNil(error)
             syncUser2 = user
             login2Ex.fulfill()
@@ -793,12 +771,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         wait(for: [login2Ex], timeout: 4.0)
 
-        XCTAssertEqual(app.allUsers().count, 2)
+        XCTAssertEqual(app.allUsers.count, 2)
 
-        XCTAssertEqual(syncUser2!.identity, app.currentUser()!.identity)
+        XCTAssertEqual(syncUser2!.id, app.currentUser!.id)
 
         app.switch(to: syncUser1!)
-        XCTAssertTrue(syncUser1!.identity == app.currentUser()?.identity)
+        XCTAssertTrue(syncUser1!.id == app.currentUser?.id)
 
         let removeEx = expectation(description: "Remove user 1")
 
@@ -809,8 +787,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         wait(for: [removeEx], timeout: 4.0)
 
-        XCTAssertEqual(syncUser2!.identity, app.currentUser()!.identity)
-        XCTAssertEqual(app.allUsers().count, 1)
+        XCTAssertEqual(syncUser2!.id, app.currentUser!.id)
+        XCTAssertEqual(app.allUsers.count, 1)
     }
 
     func testAppLinkUser() {
@@ -820,7 +798,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth.registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -829,9 +807,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let loginEx = expectation(description: "Login user")
         var syncUser: User?
 
-        let credentials = Credentials(username: email, password: password)
+        let credentials = Credentials.emailPassword(email: email, password: password)
 
-        app.login(credentials: Credentials.anonymous()) { (user, error) in
+        app.login(credentials: Credentials.anonymous) { (user, error) in
             XCTAssertNil(error)
             syncUser = user
             loginEx.fulfill()
@@ -841,7 +819,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let linkEx = expectation(description: "Link user")
 
-        syncUser?.linkUser(with: credentials) { (user, error) in
+        syncUser?.linkUser(credentials: credentials) { (user, error) in
             XCTAssertNil(error)
             syncUser = user
             linkEx.fulfill()
@@ -849,20 +827,20 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         wait(for: [linkEx], timeout: 4.0)
 
-        XCTAssertEqual(syncUser?.identity, app.currentUser()?.identity)
-        XCTAssertEqual(syncUser?.identities().count, 2)
+        XCTAssertEqual(syncUser?.id, app.currentUser?.id)
+        XCTAssertEqual(syncUser?.identities.count, 2)
     }
 
     // MARK: - Provider Clients
 
-    func testUsernamePasswordProviderClient() {
+    func testEmailPasswordProviderClient() {
 
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth.registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -870,7 +848,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let confirmUserEx = expectation(description: "Confirm user")
 
-        app.emailPasswordAuth().confirmUser("atoken", tokenId: "atokenid") { (error) in
+        app.emailPasswordAuth.confirmUser("atoken", tokenId: "atokenid") { (error) in
             XCTAssertNotNil(error)
             confirmUserEx.fulfill()
         }
@@ -878,7 +856,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let resendEmailEx = expectation(description: "Resend email confirmation")
 
-        app.emailPasswordAuth().resendConfirmationEmail("atoken") { (error) in
+        app.emailPasswordAuth.resendConfirmationEmail("atoken") { (error) in
             XCTAssertNotNil(error)
             resendEmailEx.fulfill()
         }
@@ -886,7 +864,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let resendResetPasswordEx = expectation(description: "Resend reset password email")
 
-        app.emailPasswordAuth().sendResetPasswordEmail("atoken") { (error) in
+        app.emailPasswordAuth.sendResetPasswordEmail("atoken") { (error) in
             XCTAssertNotNil(error)
             resendResetPasswordEx.fulfill()
         }
@@ -894,14 +872,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let resetPasswordEx = expectation(description: "Reset password email")
 
-        app.emailPasswordAuth().resetPassword(to: "password", token: "atoken", tokenId: "tokenId") { (error) in
+        app.emailPasswordAuth.resetPassword(to: "password", token: "atoken", tokenId: "tokenId") { (error) in
             XCTAssertNotNil(error)
             resetPasswordEx.fulfill()
         }
         wait(for: [resetPasswordEx], timeout: 4.0)
 
         let callResetFunctionEx = expectation(description: "Reset password function")
-        app.emailPasswordAuth().callResetPasswordFunction(email: email,
+        app.emailPasswordAuth.callResetPasswordFunction(email: email,
                                                                        password: randomString(10),
                                                                        args: [[:]]) { (error) in
             XCTAssertNotNil(error)
@@ -917,14 +895,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth.registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
         wait(for: [registerUserEx], timeout: 4.0)
 
         let loginEx = expectation(description: "Login user")
-        let credentials = Credentials(username: email, password: password)
+        let credentials = Credentials.emailPassword(email: email, password: password)
 
         var syncUser: User?
         app.login(credentials: credentials) { (user, error) in
@@ -938,7 +916,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let createAPIKeyEx = expectation(description: "Create user api key")
 
         var apiKey: UserAPIKey?
-        syncUser?.apiKeyAuth().createApiKey(named: "my-api-key") { (key, error) in
+        syncUser?.apiKeysAuth.createAPIKey(named: "my-api-key") { (key, error) in
             XCTAssertNotNil(key)
             XCTAssertNil(error)
             apiKey = key
@@ -947,7 +925,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [createAPIKeyEx], timeout: 4.0)
 
         let fetchAPIKeyEx = expectation(description: "Fetch user api key")
-        syncUser?.apiKeyAuth().fetchApiKey(apiKey!.objectId) { (key, error) in
+        syncUser?.apiKeysAuth.fetchAPIKey(apiKey!.objectId) { (key, error) in
             XCTAssertNotNil(key)
             XCTAssertNil(error)
             fetchAPIKeyEx.fulfill()
@@ -955,7 +933,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [fetchAPIKeyEx], timeout: 4.0)
 
         let fetchAPIKeysEx = expectation(description: "Fetch user api keys")
-        syncUser?.apiKeyAuth().fetchApiKeys(completion: { (keys, error) in
+        syncUser?.apiKeysAuth.fetchAPIKeys(completion: { (keys, error) in
             XCTAssertNotNil(keys)
             XCTAssertEqual(keys!.count, 1)
             XCTAssertNil(error)
@@ -964,21 +942,21 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [fetchAPIKeysEx], timeout: 4.0)
 
         let disableKeyEx = expectation(description: "Disable API key")
-        syncUser?.apiKeyAuth().disableApiKey(apiKey!.objectId) { (error) in
+        syncUser?.apiKeysAuth.disableAPIKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             disableKeyEx.fulfill()
         }
         wait(for: [disableKeyEx], timeout: 4.0)
 
         let enableKeyEx = expectation(description: "Enable API key")
-        syncUser?.apiKeyAuth().enableApiKey(apiKey!.objectId) { (error) in
+        syncUser?.apiKeysAuth.enableAPIKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             enableKeyEx.fulfill()
         }
         wait(for: [enableKeyEx], timeout: 4.0)
 
         let deleteKeyEx = expectation(description: "Delete API key")
-        syncUser?.apiKeyAuth().deleteApiKey(apiKey!.objectId) { (error) in
+        syncUser?.apiKeysAuth.deleteAPIKey(apiKey!.objectId) { (error) in
             XCTAssertNil(error)
             deleteKeyEx.fulfill()
         }
@@ -991,7 +969,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth.registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -999,7 +977,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let loginEx = expectation(description: "Login user")
 
-        let credentials = Credentials(username: email, password: password)
+        let credentials = Credentials.emailPassword(email: email, password: password)
         var syncUser: User?
         app.login(credentials: credentials) { (user, error) in
             syncUser = user
@@ -1033,7 +1011,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth.registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
@@ -1041,7 +1019,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let loginExpectation = expectation(description: "Login user")
 
-        let credentials = Credentials(username: email, password: password)
+        let credentials = Credentials.emailPassword(email: email, password: password)
         app.login(credentials: credentials) { (_, error) in
             XCTAssertNil(error)
             loginExpectation.fulfill()
@@ -1050,14 +1028,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerDeviceExpectation = expectation(description: "Register Device")
         let client = app.pushClient(serviceName: "gcm")
-        client.registerDevice(token: "some-token", user: app.currentUser()!) { error in
+        client.registerDevice(token: "some-token", user: app.currentUser!) { error in
             XCTAssertNil(error)
             registerDeviceExpectation.fulfill()
         }
         wait(for: [registerDeviceExpectation], timeout: 4.0)
 
         let dergisterDeviceExpectation = expectation(description: "Deregister Device")
-        client.deregisterDevice(user: app.currentUser()!, completion: { error in
+        client.deregisterDevice(user: app.currentUser!, completion: { error in
             XCTAssertNil(error)
             dergisterDeviceExpectation.fulfill()
         })
@@ -1070,14 +1048,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+        app.emailPasswordAuth.registerUser(email: email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
         }
         wait(for: [registerUserEx], timeout: 4.0)
 
         let loginEx = expectation(description: "Login user")
-        let credentials = Credentials(username: email, password: password)
+        let credentials = Credentials.emailPassword(email: email, password: password)
         var syncUser: User?
         app.login(credentials: credentials) { (user, error) in
             syncUser = user
@@ -1103,14 +1081,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [refreshDataEx], timeout: 4.0)
 
-        XCTAssertEqual(app.currentUser()?.customData?["favourite_colour"], .string("green"))
-        XCTAssertEqual(app.currentUser()?.customData?["apples"], .int64(10))
+        XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))
+        XCTAssertEqual(app.currentUser?.customData["apples"], .int64(10))
     }
 
     // MARK: - Mongo Client
 
     func testMongoClient() {
-        let user = try! synchronouslyLogInUser(for: Credentials.anonymous())
+        let user = try! synchronouslyLogInUser(for: Credentials.anonymous)
         let mongoClient = user.mongoClient("mongodb1")
         XCTAssertEqual(mongoClient.name, "mongodb1")
         let database = mongoClient.database(named: "test_data")
@@ -1356,6 +1334,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         // FIXME: It seems there is a possible server bug that does not handle
         // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
         // "expected pre-image to match projection matcher"
+        // https://jira.mongodb.org/browse/REALMC-6878
         /*
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], false, false)
         let findOneDeleteEx2 = expectation(description: "Find one document and delete")
@@ -1371,6 +1350,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         // FIXME: It seems there is a possible server bug that does not handle
         // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
         // "expected pre-image to match projection matcher"
+        // https://jira.mongodb.org/browse/REALMC-6878
         /*
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
         let findOneDeleteEx3 = expectation(description: "Find one document and delete")
@@ -1591,6 +1571,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
+            watchTestUtility.isOpenSemaphore.wait()
             for _ in 0..<3 {
                 collection.insertOne(document) { (_, error) in
                     XCTAssertNil(error)
@@ -1642,6 +1623,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
+            watchTestUtility.isOpenSemaphore.wait()
             for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
@@ -1698,6 +1680,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
+            watchTestUtility.isOpenSemaphore.wait()
             for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
@@ -1765,6 +1748,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
+            watchTestUtility1.isOpenSemaphore.wait()
+            watchTestUtility2.isOpenSemaphore.wait()
             for i in 0..<5 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
@@ -1787,15 +1772,49 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 }
 
-#if canImport(Combine)
-import Combine
+// XCTest doesn't care about the @available on the class and will try to run
+// the tests even on older versions. Putting this check inside `defaultTestSuite`
+// results in a warning about it being redundant due to the enclosing check, so
+// it needs to be out of line.
+func hasCombine() -> Bool {
+    if #available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *) {
+        return true
+    }
+    return false
+}
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension SwiftObjectServerTests {
+class CombineObjectServerTests: SwiftSyncTestCase {
+    override class var defaultTestSuite: XCTestSuite {
+        if hasCombine() {
+            return super.defaultTestSuite
+        }
+        return XCTestSuite(name: "\(type(of: self))")
+    }
+
+    func setupMongoCollection() -> MongoCollection {
+        let user = try! synchronouslyLogInUser(for: basicCredentials())
+        let mongoClient = user.mongoClient("mongodb1")
+        let database = mongoClient.database(named: "test_data")
+        let collection = database.collection(withName: "Dog")
+        removeAllFromCollection(collection)
+        return collection
+    }
+
+    func removeAllFromCollection(_ collection: MongoCollection) {
+        let deleteEx = expectation(description: "Delete all from Mongo collection")
+        collection.deleteManyDocuments(filter: [:]) { (count, error) in
+            XCTAssertNotNil(count)
+            XCTAssertNil(error)
+            deleteEx.fulfill()
+        }
+        wait(for: [deleteEx], timeout: 4.0)
+    }
 
     // swiftlint:disable multiple_closures_with_trailing_closure
     func testWatchCombine() {
         let sema = DispatchSemaphore(value: 0)
+        let openSema = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
@@ -1807,6 +1826,9 @@ extension SwiftObjectServerTests {
         var subscriptions: Set<AnyCancellable> = []
 
         collection.watch()
+            .onOpen {
+                openSema.signal()
+            }
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.global())
             .sink(receiveCompletion: { _ in }) { _ in
@@ -1824,6 +1846,7 @@ extension SwiftObjectServerTests {
         }.store(in: &subscriptions)
 
         DispatchQueue.global().async {
+            openSema.wait()
             for i in 0..<3 {
                 collection.insertOne(document) { (_, error) in
                     XCTAssertNil(error)
@@ -1840,6 +1863,8 @@ extension SwiftObjectServerTests {
     func testWatchCombineWithFilterIds() {
         let sema1 = DispatchSemaphore(value: 0)
         let sema2 = DispatchSemaphore(value: 0)
+        let openSema1 = DispatchSemaphore(value: 0)
+        let openSema2 = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
@@ -1864,6 +1889,9 @@ extension SwiftObjectServerTests {
         var subscriptions: Set<AnyCancellable> = []
 
         collection.watch(filterIds: [objectIds[0]])
+            .onOpen {
+                openSema1.signal()
+            }
             .subscribe(on: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }) { changeEvent in
@@ -1880,6 +1908,9 @@ extension SwiftObjectServerTests {
         }.store(in: &subscriptions)
 
         collection.watch(filterIds: [objectIds[1]])
+            .onOpen {
+                openSema2.signal()
+            }
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.global())
             .sink(receiveCompletion: { _ in }) { (changeEvent) in
@@ -1896,6 +1927,8 @@ extension SwiftObjectServerTests {
         }.store(in: &subscriptions)
 
         DispatchQueue.global().async {
+            openSema1.wait()
+            openSema2.wait()
             for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
@@ -1919,6 +1952,8 @@ extension SwiftObjectServerTests {
     func testWatchCombineWithMatchFilter() {
         let sema1 = DispatchSemaphore(value: 0)
         let sema2 = DispatchSemaphore(value: 0)
+        let openSema1 = DispatchSemaphore(value: 0)
+        let openSema2 = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
@@ -1943,6 +1978,9 @@ extension SwiftObjectServerTests {
         var subscriptions: Set<AnyCancellable> = []
 
         collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[0])])
+            .onOpen {
+                openSema1.signal()
+            }
             .subscribe(on: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }) { changeEvent in
@@ -1959,6 +1997,9 @@ extension SwiftObjectServerTests {
         }.store(in: &subscriptions)
 
         collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[1])])
+            .onOpen {
+                openSema2.signal()
+            }
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.global())
             .sink(receiveCompletion: { _ in }) { changeEvent in
@@ -1975,6 +2016,8 @@ extension SwiftObjectServerTests {
         }.store(in: &subscriptions)
 
         DispatchQueue.global().async {
+            openSema1.wait()
+            openSema2.wait()
             for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
@@ -1994,6 +2037,948 @@ extension SwiftObjectServerTests {
         }
         wait(for: [watchEx1, watchEx2], timeout: 60.0)
     }
-}
 
-#endif //canImport(Combine)
+    // MARK: - Combine promises
+
+    func testEmailPasswordAuthenticationCombine() {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+        var cancellable = Set<AnyCancellable>()
+
+        let registerUserEx = expectation(description: "Register user")
+        app.emailPasswordAuth.registerUser(email: email, password: password)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should register")
+                }
+            }, receiveValue: { _ in
+                registerUserEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let confirmUserEx = expectation(description: "Confirm user")
+        app.emailPasswordAuth.confirmUser("atoken", tokenId: "atokenid")
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    confirmUserEx.fulfill()
+                }
+            }, receiveValue: { _ in
+                XCTFail("Should auto confirm")
+            })
+            .store(in: &cancellable)
+        wait(for: [confirmUserEx], timeout: 4.0)
+
+        let resendEmailEx = expectation(description: "Resend email confirmation")
+        app.emailPasswordAuth.resendConfirmationEmail(email: "atoken")
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    resendEmailEx.fulfill()
+                }
+            }, receiveValue: { _ in
+                XCTFail("Should auto confirm")
+            })
+            .store(in: &cancellable)
+        wait(for: [resendEmailEx], timeout: 4.0)
+
+        let sendResetPasswordEx = expectation(description: "Send reset password email")
+        app.emailPasswordAuth.sendResetPasswordEmail(email: "atoken")
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    sendResetPasswordEx.fulfill()
+                }
+            }, receiveValue: { _ in
+                XCTFail("Should not send reset password")
+            })
+            .store(in: &cancellable)
+        wait(for: [sendResetPasswordEx], timeout: 4.0)
+
+        let resetPasswordEx = expectation(description: "Reset password email")
+        app.emailPasswordAuth.resetPassword(to: "password", token: "atoken", tokenId: "tokenId")
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    resetPasswordEx.fulfill()
+                }
+            }, receiveValue: { _ in
+                XCTFail("Should not reset password")
+            })
+            .store(in: &cancellable)
+        wait(for: [resetPasswordEx], timeout: 4.0)
+
+        let callResetFunctionEx = expectation(description: "Reset password function")
+        app.emailPasswordAuth.callResetPasswordFunction(email: email, password: randomString(10), args: [[:]])
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    callResetFunctionEx.fulfill()
+                }
+            }, receiveValue: { _ in
+                XCTFail("Should not call reset password")
+            })
+            .store(in: &cancellable)
+        wait(for: [callResetFunctionEx], timeout: 4.0)
+    }
+
+    func testAppLoginCombine() {
+        var cancellable = Set<AnyCancellable>()
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let registerUserEx = expectation(description: "Register user")
+        app.emailPasswordAuth.registerUser(email: email, password: password)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should register")
+                }
+            }, receiveValue: { _ in
+                registerUserEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let loginEx = expectation(description: "Login user")
+        app.login(credentials: Credentials.emailPassword(email: email, password: password))
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should login")
+                }
+            }, receiveValue: { user in
+                loginEx.fulfill()
+                XCTAssertEqual(user.id, self.app.currentUser?.id)
+            })
+            .store(in: &cancellable)
+        wait(for: [loginEx], timeout: 4.0)
+        XCTAssertEqual(self.app.allUsers.count, 1)
+    }
+
+    func testRefreshCustomDataCombine() {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+        var cancellable = Set<AnyCancellable>()
+
+        let registerUserEx = expectation(description: "Register user")
+        app.emailPasswordAuth.registerUser(email: email, password: password)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should register")
+                }
+            }, receiveValue: { _ in
+                registerUserEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let credentials = Credentials.emailPassword(email: email, password: password)
+        var syncUser: User!
+        let loginEx = expectation(description: "Login user")
+        app.login(credentials: credentials)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should login")
+                }
+            }, receiveValue: { user in
+                syncUser = user
+                loginEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [loginEx], timeout: 4.0)
+
+        let userDataEx = expectation(description: "Update user data")
+        syncUser.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
+            XCTAssertNil(error)
+            userDataEx.fulfill()
+        }
+        wait(for: [userDataEx], timeout: 4.0)
+
+        let refreshDataEx = expectation(description: "Refresh user data")
+        syncUser.refreshCustomData()
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should refresh")
+                }
+            }, receiveValue: { customData in
+                XCTAssertEqual(customData["apples"] as! Int, 10)
+                XCTAssertEqual(customData["favourite_colour"] as! String, "green")
+                refreshDataEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [refreshDataEx], timeout: 4.0)
+
+        XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))
+        XCTAssertEqual(app.currentUser?.customData["apples"], .int64(10))
+    }
+
+    func testMongoCollectionInsertCombine() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
+
+        let insertOneEx1 = expectation(description: "Insert one document")
+        collection.insertOne(document)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should insert")
+                }
+            }, receiveValue: { _ in
+                insertOneEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [insertOneEx1], timeout: 4.0)
+
+        let insertManyEx1 = expectation(description: "Insert many documents")
+        collection.insertMany([document, document2])
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should insert")
+                }
+            }, receiveValue: { objectIds in
+                XCTAssertEqual(objectIds.count, 2)
+                insertManyEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [insertManyEx1], timeout: 4.0)
+
+        let findEx1 = expectation(description: "Find documents")
+        collection.find(filter: [:])
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should find")
+                }
+            }, receiveValue: { findResult in
+                XCTAssertEqual(findResult.map({ $0["name"]??.stringValue }), ["fido", "fido", "rex"])
+                findEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findEx1], timeout: 4.0)
+    }
+
+    func testMongoCollectionFindCombine() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
+        let document3: Document = ["name": "rex", "breed": "tibetan mastiff", "coat": ["fawn", "brown", "white"]]
+        let findOptions = FindOptions(1, nil, nil)
+
+        let notFoundEx1 = expectation(description: "Find documents")
+        collection.find(filter: [:], options: findOptions)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should try to find")
+                }
+            }, receiveValue: { findResult in
+                XCTAssertEqual(findResult.count, 0)
+                notFoundEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [notFoundEx1], timeout: 4.0)
+
+        let insEx1 = expectation(description: "Insert document")
+        collection.insertMany([document, document2, document3])
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
+            .store(in: &cancellable)
+        wait(for: [insEx1], timeout: 4.0)
+
+        let findEx1 = expectation(description: "Find documents")
+        collection.find(filter: [:])
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should find")
+                }
+            }, receiveValue: { findResult in
+                XCTAssertEqual(findResult.map({ $0["name"]??.stringValue }), ["fido", "rex", "rex"])
+                findEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findEx1], timeout: 4.0)
+
+        let findEx2 = expectation(description: "Find documents")
+        collection.find(filter: [:], options: findOptions)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should find")
+                }
+            }, receiveValue: { findResult in
+                XCTAssertEqual(findResult.count, 1)
+                XCTAssertEqual(findResult[0]["name"]??.stringValue, "fido")
+                findEx2.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findEx2], timeout: 4.0)
+
+        let findEx3 = expectation(description: "Find documents")
+        collection.find(filter: document3, options: findOptions)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should find")
+                }
+            }, receiveValue: { findResult in
+                XCTAssertEqual(findResult.count, 1)
+                findEx3.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findEx3], timeout: 4.0)
+
+        let findOneEx1 = expectation(description: "Find one document")
+        collection.findOneDocument(filter: document)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should find")
+                }
+            }, receiveValue: { _ in
+                findOneEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneEx1], timeout: 4.0)
+
+        let findOneEx2 = expectation(description: "Find one document")
+        collection.findOneDocument(filter: document, options: findOptions)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should find")
+                }
+            }, receiveValue: { _ in
+                findOneEx2.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneEx2], timeout: 4.0)
+    }
+
+    func testMongoCollectionCountAndAggregateCombine() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+
+        let insEx1 = expectation(description: "Insert document")
+        collection.insertMany([document])
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
+            .store(in: &cancellable)
+        wait(for: [insEx1], timeout: 4.0)
+
+        let agrEx1 = expectation(description: "Insert document")
+        collection.aggregate(pipeline: [["$match": ["name": "fido"]], ["$group": ["_id": "$name"]]])
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in agrEx1.fulfill() })
+            .store(in: &cancellable)
+        wait(for: [agrEx1], timeout: 4.0)
+
+        let countEx1 = expectation(description: "Count documents")
+        collection.count(filter: document)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should count")
+                }
+            }, receiveValue: { _ in
+                countEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [countEx1], timeout: 4.0)
+
+        let countEx2 = expectation(description: "Count documents")
+        collection.count(filter: document, limit: 1)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should count")
+                }
+            }, receiveValue: { count in
+                XCTAssertEqual(count, 1)
+                countEx2.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [countEx2], timeout: 4.0)
+    }
+
+    func testMongoCollectionDeleteOneCombine() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+
+        let deleteEx1 = expectation(description: "Delete 0 documents")
+        collection.deleteOneDocument(filter: document)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should count")
+                }
+            }, receiveValue: { count in
+                XCTAssertEqual(count, 0)
+                deleteEx1.fulfill()
+            })
+        .store(in: &cancellable)
+        wait(for: [deleteEx1], timeout: 4.0)
+
+        let insEx1 = expectation(description: "Insert document")
+        collection.insertMany([document, document2])
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill()})
+            .store(in: &cancellable)
+        wait(for: [insEx1], timeout: 4.0)
+
+        let deleteEx2 = expectation(description: "Delete one document")
+        collection.deleteOneDocument(filter: document)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should count")
+                }
+            }, receiveValue: { count in
+                XCTAssertEqual(count, 1)
+                deleteEx2.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [deleteEx2], timeout: 4.0)
+    }
+
+    func testMongoCollectionDeleteManyCombine() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+
+        let deleteEx1 = expectation(description: "Delete 0 documents")
+        collection.deleteManyDocuments(filter: document)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should try to delete")
+                }
+            }, receiveValue: { count in
+                XCTAssertEqual(count, 0)
+                deleteEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [deleteEx1], timeout: 4.0)
+
+        let insEx1 = expectation(description: "Insert document")
+        collection.insertMany([document, document2])
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
+            .store(in: &cancellable)
+        wait(for: [insEx1], timeout: 4.0)
+
+        let deleteEx2 = expectation(description: "Delete one document")
+        collection.deleteManyDocuments(filter: ["breed": "cane corso"])
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should delete")
+                }
+            }, receiveValue: { count in
+                XCTAssertEqual(count, 2)
+                deleteEx2.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [deleteEx2], timeout: 4.0)
+    }
+
+    func testMongoCollectionUpdateOneCombine() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+        let document4: Document = ["name": "ted", "breed": "bullmastiff"]
+        let document5: Document = ["name": "bill", "breed": "great dane"]
+
+        let insEx1 = expectation(description: "Insert document")
+        collection.insertMany([document, document2, document3, document4])
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
+            .store(in: &cancellable)
+        wait(for: [insEx1], timeout: 4.0)
+
+        let updateEx1 = expectation(description: "Update one document")
+        collection.updateOneDocument(filter: document, update: document2)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should update")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertEqual(updateResult.matchedCount, 1)
+                XCTAssertEqual(updateResult.modifiedCount, 1)
+                XCTAssertNil(updateResult.objectId)
+                updateEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [updateEx1], timeout: 4.0)
+
+        let updateEx2 = expectation(description: "Update one document")
+        collection.updateOneDocument(filter: document5, update: document2, upsert: true)
+        .sink(receiveCompletion: { result in
+            if case .failure = result {
+                XCTFail("Should try to update")
+            }
+        }, receiveValue: { updateResult in
+            XCTAssertEqual(updateResult.matchedCount, 0)
+            XCTAssertEqual(updateResult.modifiedCount, 0)
+            XCTAssertNotNil(updateResult.objectId)
+            updateEx2.fulfill()
+        })
+        .store(in: &cancellable)
+        wait(for: [updateEx2], timeout: 4.0)
+    }
+
+    func testMongoCollectionUpdateManyCombine() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+        let document4: Document = ["name": "ted", "breed": "bullmastiff"]
+        let document5: Document = ["name": "bill", "breed": "great dane"]
+
+        let insEx1 = expectation(description: "Insert document")
+        collection.insertMany([document, document2, document3, document4])
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in
+                insEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [insEx1], timeout: 4.0)
+
+        let updateEx1 = expectation(description: "Update one document")
+        collection.updateManyDocuments(filter: document, update: document2)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should update")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertEqual(updateResult.matchedCount, 1)
+                XCTAssertEqual(updateResult.modifiedCount, 1)
+                XCTAssertNil(updateResult.objectId)
+                updateEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [updateEx1], timeout: 4.0)
+
+        let updateEx2 = expectation(description: "Update one document")
+        collection.updateManyDocuments(filter: document5, update: document2, upsert: true)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should try to update")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertEqual(updateResult.matchedCount, 0)
+                XCTAssertEqual(updateResult.modifiedCount, 0)
+                XCTAssertNotNil(updateResult.objectId)
+                updateEx2.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [updateEx2], timeout: 4.0)
+    }
+
+    func testMongoCollectionFindAndUpdateCombine() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+
+        let findOneUpdateEx1 = expectation(description: "Find one document and update")
+        collection.findOneAndUpdate(filter: document, update: document2)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should try to update")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertNil(updateResult)
+                findOneUpdateEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneUpdateEx1], timeout: 4.0)
+
+        let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
+        let findOneUpdateEx2 = expectation(description: "Find one document and update")
+        collection.findOneAndUpdate(filter: document2, update: document3, options: options1)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should update")
+                }
+            }, receiveValue: { updateResult in
+                guard let updateResult = updateResult else {
+                    XCTFail("Should find")
+                    return
+                }
+                XCTAssertEqual(updateResult["name"]??.stringValue, "john")
+                findOneUpdateEx2.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneUpdateEx2], timeout: 4.0)
+
+        let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
+        let findOneUpdateEx3 = expectation(description: "Find one document and update")
+        collection.findOneAndUpdate(filter: document, update: document2, options: options2)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should update")
+                }
+            }, receiveValue: { updateResult in
+                guard let updateResult = updateResult else {
+                    XCTFail("Should find")
+                    return
+                }
+                XCTAssertEqual(updateResult["name"]??.stringValue, "rex")
+                findOneUpdateEx3.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneUpdateEx3], timeout: 4.0)
+    }
+
+    func testMongoCollectionFindAndReplaceCombine() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+
+        let findOneReplaceEx1 = expectation(description: "Find one document and replace")
+        collection.findOneAndReplace(filter: document, replacement: document2)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should try to replace")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertNil(updateResult)
+                findOneReplaceEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneReplaceEx1], timeout: 4.0)
+
+        let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
+        let findOneReplaceEx2 = expectation(description: "Find one document and replace")
+        collection.findOneAndReplace(filter: document2, replacement: document3, options: options1)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should replace")
+                }
+            }, receiveValue: { updateResult in
+                guard let updateResult = updateResult else {
+                    XCTFail("Should find")
+                    return
+                }
+                XCTAssertEqual(updateResult["name"]??.stringValue, "john")
+                findOneReplaceEx2.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneReplaceEx2], timeout: 4.0)
+
+        let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, false)
+        let findOneReplaceEx3 = expectation(description: "Find one document and replace")
+        collection.findOneAndReplace(filter: document, replacement: document2, options: options2)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should try to replace")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertNil(updateResult)
+                findOneReplaceEx3.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneReplaceEx3], timeout: 4.0)
+    }
+
+    func testMongoCollectionFindAndDeleteCombine() {
+        var cancellable = Set<AnyCancellable>()
+        let collection = setupMongoCollection()
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+
+        let insEx1 = expectation(description: "Insert document")
+        collection.insertMany([document])
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
+            .store(in: &cancellable)
+        wait(for: [insEx1], timeout: 4.0)
+
+        let findOneDeleteEx1 = expectation(description: "Find one document and delete")
+        collection.findOneAndDelete(filter: document)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should try to delete")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertNotNil(updateResult)
+                findOneDeleteEx1.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findOneDeleteEx1], timeout: 4.0)
+
+        let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], false, false)
+        let findOneDeleteEx2 = expectation(description: "Find one document and delete")
+        collection.findOneAndDelete(filter: document, options: options1)
+            .sink(receiveCompletion: { result in
+                if case .failure(let error) = result,
+                    error.localizedDescription == "expected pre-image to match projection matcher" {
+                    // FIXME: It seems there is a possible server bug that does not handle
+                    // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
+                    // "expected pre-image to match projection matcher"
+                    // https://jira.mongodb.org/browse/REALMC-6878
+                    findOneDeleteEx2.fulfill()
+                } else {
+                    XCTFail("Please review test cases for findOneAndDelete.")
+                }
+            }, receiveValue: { _ in
+                XCTFail("Please review test cases for findOneAndDelete.")
+            })
+//            .sink(receiveCompletion: { result in
+//                if case .failure(let error) = result {
+//                    XCTFail("Should try to find instead of \(error)")
+//                }
+//            }, receiveValue: { deleteResult in
+//                XCTAssertNil(deleteResult)
+//                findOneDeleteEx2.fulfill()
+//            })
+        .store(in: &cancellable)
+        wait(for: [findOneDeleteEx2], timeout: 4.0)
+
+        let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
+        let findOneDeleteEx3 = expectation(description: "Find one document and delete")
+        collection.findOneAndDelete(filter: document, options: options2)
+            .sink(receiveCompletion: { result in
+                if case .failure(let error) = result,
+                    error.localizedDescription == "expected pre-image to match projection matcher" {
+                    // FIXME: It seems there is a possible server bug that does not handle
+                    // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
+                    // "expected pre-image to match projection matcher"
+                    // https://jira.mongodb.org/browse/REALMC-6878
+                    findOneDeleteEx3.fulfill()
+                } else {
+                    XCTFail("Please review test cases for findOneAndDelete.")
+                }
+            }, receiveValue: { _ in
+                XCTFail("Please review test cases for findOneAndDelete.")
+            })
+//            .sink(receiveCompletion: { result in
+//                if case .failure(let error) = result {
+//                    XCTFail("Should try to find instead of \(error)")
+//                }
+//            }, receiveValue: { deleteResult in
+//                guard let deleteResult = deleteResult else {
+//                    XCTFail("Should delete")
+//                    return
+//                }
+//                XCTAssertEqual(deleteResult["name"] as! String, "fido")
+//                findOneDeleteEx3.fulfill()
+//            })
+            .store(in: &cancellable)
+        wait(for: [findOneDeleteEx3], timeout: 4.0)
+
+        let findEx = expectation(description: "Find documents")
+        collection.find(filter: [:])
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should try to update")
+                }
+            }, receiveValue: { updateResult in
+                XCTAssertEqual(updateResult.count, 0)
+                findEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [findEx], timeout: 4.0)
+    }
+
+    func testCallFunctionCombine() {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+        var cancellable = Set<AnyCancellable>()
+
+        let regEx = expectation(description: "Should register")
+        app.emailPasswordAuth.registerUser(email: email, password: password)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should register")
+                }
+            }, receiveValue: { _ in
+                regEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [regEx], timeout: 4.0)
+
+        let credentials = Credentials.emailPassword(email: email, password: password)
+        var syncUser: User!
+        let loginEx = expectation(description: "Should login")
+        app.login(credentials: credentials)
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should login")
+                }
+            }, receiveValue: { user in
+                syncUser = user
+                loginEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [loginEx], timeout: 4.0)
+
+        let sumEx = expectation(description: "Should calc sum")
+        syncUser.functions.sum([1, 2, 3, 4, 5])
+            .sink(receiveCompletion: { (result) in
+                if case .failure = result {
+                    XCTFail("Should calc sum 15")
+                }
+            }, receiveValue: { bson in
+                guard case let .int64(sum) = bson else {
+                    XCTFail("Should be int64")
+                    return
+                }
+                XCTAssertEqual(sum, 15)
+                sumEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [sumEx], timeout: 4.0)
+
+        let userDataEx = expectation(description: "Should update user data")
+        syncUser.functions.updateUserData([["favourite_colour": "green", "apples": 10]])
+            .sink(receiveCompletion: { result in
+                if case .failure = result {
+                    XCTFail("Should update user data")
+                }
+            }, receiveValue: { bson in
+                guard case let .bool(upd) = bson else {
+                    XCTFail("Should be bool")
+                    return
+                }
+                XCTAssertTrue(upd)
+                userDataEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [userDataEx], timeout: 4.0)
+
+    }
+
+    func testAPIKeyAuthCombine() {
+        var cancellable = Set<AnyCancellable>()
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let registerUserEx = expectation(description: "Register user")
+        app.emailPasswordAuth.registerUser(email: email, password: password)
+            .sink(receiveCompletion: { _ in },
+                  receiveValue: { _ in registerUserEx.fulfill() })
+            .store(in: &cancellable)
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let loginEx = expectation(description: "Login user")
+        var syncUser: User?
+        app.login(credentials: Credentials.emailPassword(email: email, password: password))
+            .sink(receiveCompletion: { _ in },
+                  receiveValue: { (user) in
+                syncUser = user
+                loginEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [loginEx], timeout: 4.0)
+
+        let createAPIKeyEx = expectation(description: "Create user api key")
+        var apiKey: UserAPIKey?
+        syncUser?.apiKeysAuth.createAPIKey(named: "my-api-key")
+            .sink(receiveCompletion: { (result) in
+                if case .failure = result {
+                    XCTFail("Should create user api key")
+                }
+            }, receiveValue: { (userApiKey) in
+                apiKey = userApiKey
+                createAPIKeyEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [createAPIKeyEx], timeout: 4.0)
+
+        let fetchAPIKeyEx = expectation(description: "Fetch user api key")
+        var objId: ObjectId? = try? ObjectId(string: apiKey!.objectId.stringValue)
+        syncUser?.apiKeysAuth.fetchAPIKey(objId!)
+            .sink(receiveCompletion: { (result) in
+                if case .failure = result {
+                    XCTFail("Should fetch user api key")
+                }
+            }, receiveValue: { (userApiKey) in
+                apiKey = userApiKey
+                fetchAPIKeyEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [fetchAPIKeyEx], timeout: 4.0)
+
+        let fetchAPIKeysEx = expectation(description: "Fetch user api keys")
+        syncUser?.apiKeysAuth.fetchAPIKeys()
+            .sink(receiveCompletion: { (result) in
+                if case .failure = result {
+                    XCTFail("Should fetch user api keys")
+                }
+            }, receiveValue: { (userApiKeys) in
+                XCTAssertEqual(userApiKeys.count, 1)
+                fetchAPIKeysEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [fetchAPIKeysEx], timeout: 4.0)
+
+        let disableKeyEx = expectation(description: "Disable API key")
+        objId = try? ObjectId(string: apiKey!.objectId.stringValue)
+        syncUser?.apiKeysAuth.disableAPIKey(objId!)
+            .sink(receiveCompletion: { (result) in
+                if case .failure = result {
+                    XCTFail("Should disable user api key")
+                }
+            }, receiveValue: { _ in
+                disableKeyEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [disableKeyEx], timeout: 4.0)
+
+        let enableKeyEx = expectation(description: "Enable API key")
+        syncUser?.apiKeysAuth.enableAPIKey(objId!)
+            .sink(receiveCompletion: { (result) in
+                if case .failure = result {
+                    XCTFail("Should enable user api key")
+                }
+            }, receiveValue: { _ in
+                enableKeyEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [enableKeyEx], timeout: 4.0)
+
+        let deleteKeyEx = expectation(description: "Delete API key")
+        syncUser?.apiKeysAuth.deleteAPIKey(objId!)
+            .sink(receiveCompletion: { (result) in
+                if case .failure = result {
+                    XCTFail("Should delete user api key")
+                }
+            }, receiveValue: { _ in
+                deleteKeyEx.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [deleteKeyEx], timeout: 4.0)
+    }
+
+    func testPushRegistrationCombine() {
+        var cancellable = Set<AnyCancellable>()
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let registerUserEx = expectation(description: "Register user")
+        app.emailPasswordAuth.registerUser(email: email, password: password)
+            .sink(receiveCompletion: { _ in },
+                  receiveValue: { _ in registerUserEx.fulfill() })
+            .store(in: &cancellable)
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let loginEx = expectation(description: "Login user")
+        app.login(credentials: Credentials.emailPassword(email: email, password: password))
+            .sink(receiveCompletion: { _ in },
+                  receiveValue: { _ in loginEx.fulfill() })
+            .store(in: &cancellable)
+        wait(for: [loginEx], timeout: 4.0)
+
+        let registerDeviceExpectation = expectation(description: "Register Device")
+        let client = app.pushClient(serviceName: "gcm")
+        client.registerDevice(token: "some-token", user: app.currentUser!)
+            .sink(receiveCompletion: { (result) in
+                if case .failure = result {
+                    XCTFail("Should register device")
+                }
+            }, receiveValue: { _ in
+                registerDeviceExpectation.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [registerDeviceExpectation], timeout: 4.0)
+
+        let dergisterDeviceExpectation = expectation(description: "Deregister Device")
+        client.deregisterDevice(user: app.currentUser!)
+            .sink(receiveCompletion: { (result) in
+                if case .failure = result {
+                    XCTFail("Should deregister device")
+                }
+            }, receiveValue: { _ in
+                dergisterDeviceExpectation.fulfill()
+            })
+            .store(in: &cancellable)
+        wait(for: [dergisterDeviceExpectation], timeout: 4.0)
+    }
+}

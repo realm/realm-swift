@@ -507,7 +507,7 @@ extension MongoCollection {
     /// of all events on this collection that the active user is authorized to see based on the configured MongoDB
     /// rules.
     /// - Parameters:
-    ///   - delegate: delegate The delegate that will react to events and errors from the resulting change stream.
+    ///   - delegate: The delegate that will react to events and errors from the resulting change stream.
     ///   - queue: Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
     /// - Returns: A ChangeStream which will manage the streaming events.
     public func watch(delegate: ChangeEventDelegate, queue: DispatchQueue = .main) -> ChangeStream {
@@ -582,19 +582,21 @@ import Combine
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Publishers {
-
     class WatchSubscription<S: Subscriber>: ChangeEventDelegate, Subscription where S.Input == AnyBSON, S.Failure == Error {
         private let collection: MongoCollection
         private var changeStream: ChangeStream?
         private var subscriber: S?
+        private var onOpen: (() -> Void)?
 
         init(collection: MongoCollection,
              subscriber: S,
              queue: DispatchQueue = .main,
              filterIds: [ObjectId]? = nil,
-             matchFilter: Document? = nil) {
+             matchFilter: Document? = nil,
+             onOpen: (() -> Void)? = nil) {
             self.collection = collection
             self.subscriber = subscriber
+            self.onOpen = onOpen
 
             if let matchFilter = matchFilter {
                 changeStream = collection.watch(matchFilter: matchFilter,
@@ -616,7 +618,9 @@ extension Publishers {
             changeStream?.close()
         }
 
-        func changeStreamDidOpen(_ changeStream: RLMChangeStream) { }
+        func changeStreamDidOpen(_ changeStream: RLMChangeStream) {
+            onOpen?()
+        }
 
         func changeStreamDidClose(with error: Error?) {
             guard let error = error else {
@@ -647,12 +651,33 @@ extension Publishers {
         private let queue: DispatchQueue
         private let filterIds: [ObjectId]?
         private let matchFilter: Document?
+        private let openEvent: (() -> Void)?
 
-        init(collection: MongoCollection, queue: DispatchQueue, filterIds: [ObjectId]? = nil, matchFilter: Document? = nil) {
+        init(collection: MongoCollection,
+             queue: DispatchQueue,
+             filterIds: [ObjectId]? = nil,
+             matchFilter: Document? = nil,
+             onOpen: (() -> Void)? = nil) {
             self.collection = collection
             self.queue = queue
             self.filterIds = filterIds
             self.matchFilter = matchFilter
+            self.openEvent = onOpen
+        }
+
+        /// Triggers an event when the watch change stream is opened.
+        ///
+        /// Use this function when you require a change stream to be open before you perform any work.
+        /// This should be called directly after invoking the publisher.
+        ///
+        /// - Parameter event: Callback which will be invoked once the change stream is open.
+        /// - Returns: A publisher that emits a change event each time the remote MongoDB collection changes.
+        public func onOpen(_ event: @escaping (() -> Void)) -> Self {
+            Self(collection: collection,
+                 queue: queue,
+                 filterIds: filterIds,
+                 matchFilter: matchFilter,
+                 onOpen: event)
         }
 
         /// :nodoc:
@@ -661,7 +686,8 @@ extension Publishers {
                                                  subscriber: subscriber,
                                                  queue: queue,
                                                  filterIds: filterIds,
-                                                 matchFilter: matchFilter)
+                                                 matchFilter: matchFilter,
+                                                 onOpen: openEvent)
             subscriber.receive(subscription: subscription)
         }
 
@@ -676,7 +702,8 @@ extension Publishers {
             return Self(collection: collection,
                         queue: queue,
                         filterIds: filterIds,
-                        matchFilter: matchFilter)
+                        matchFilter: matchFilter,
+                        onOpen: openEvent)
         }
     }
 }
@@ -702,6 +729,389 @@ extension MongoCollection {
     /// - Returns: A publisher that emits the AnyBSON change event each time the collection changes.
     public func watch(matchFilter: Document) -> Publishers.WatchPublisher {
         return Publishers.WatchPublisher(collection: self, queue: .main, matchFilter: matchFilter)
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+public extension MongoCollection {
+    /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
+    /// generated for it.
+    /// @param document:  A `Document` value to insert.
+    /// @returns A publisher that eventually return `ObjectId` of inserted document or `Error`.
+    func insertOne(_ document: Document) -> Future<ObjectId, Error> {
+        return Future { promise in
+            self.insertOne(document) { objectId, error in
+                if let objectId = objectId {
+                    promise(.success(try! ObjectId(string: objectId.stringValue)))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
+    /// they will be generated.
+    /// @param documents: The `Document` values in a bson array to insert.
+    /// @returns A publisher that eventually return `[ObjectId]` of inserted documents or `Error`.
+    func insertMany(_ documents: [Document]) -> Future<[ObjectId], Error> {
+        return Future { promise in
+            self.insertMany(documents) { objectIds, error in
+                if let objectIds = objectIds?.map({ try! ObjectId(string: $0.stringValue) }) {
+                    promise(.success(objectIds))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /// Finds the documents in this collection which match the provided filter.
+    /// @param filter: A `Document` as bson that should match the query.
+    /// @param options: `FindOptions` to use when executing the command.
+    /// @returns A publisher that eventually return `[ObjectId]` of documents or `Error`.
+    func find(filter: Document, options: FindOptions) -> Future<[Document], Error> {
+        return Future { promise in
+            self.find(filter: filter, options: options) { documents, error in
+                let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
+                if let bson = bson {
+                    promise(.success(bson))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /// Finds the documents in this collection which match the provided filter.
+    /// @param filter: A `Document` as bson that should match the query.
+    /// @returns A publisher that eventually return `[ObjectId]` of documents or `Error`.
+    func find(filter: Document) -> Future<[Document], Error> {
+        return Future { promise in
+            self.find(filter: filter) { documents, error in
+                let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
+                if let bson = bson {
+                    promise(.success(bson))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /// Returns one document from a collection or view which matches the
+    /// provided filter. If multiple documents satisfy the query, this method
+    /// returns the first document according to the query's sort order or natural
+    /// order.
+    /// @param filter: A `Document` as bson that should match the query.
+    /// @param options: `FindOptions` to use when executing the command.
+    /// @returns A publisher that eventually return `Document` or `Error`.
+    func findOneDocument(filter: Document, options: FindOptions) -> Future<[Document], Error> {
+        return Future { promise in
+            self.find(filter: filter) { documents, error in
+                let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
+                if let bson = bson {
+                    promise(.success(bson))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /// Returns one document from a collection or view which matches the
+    /// provided filter. If multiple documents satisfy the query, this method
+    /// returns the first document according to the query's sort order or natural
+    /// order.
+    /// @param filter: A `Document` as bson that should match the query.
+    /// @returns A publisher that eventually return `Document` or `Error`.
+    func findOneDocument(filter: Document) -> Future<Document, Error> {
+        return Future { promise in
+            self.findOneDocument(filter: filter) { document, error in
+                let bson: Document? = document?.mapValues({ ObjectiveCSupport.convert(object: $0) })
+                if let bson = bson {
+                    promise(.success(bson))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /// Runs an aggregation framework pipeline against this collection.
+    /// @param pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
+    /// @returns A publisher that eventually return `Document` or `Error`.
+    func aggregate(pipeline: [Document]) -> Future<[Document], Error> {
+        return Future { promise in
+            self.aggregate(pipeline: pipeline) { documents, error in
+                let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
+                if let bson = bson {
+                    promise(.success(bson))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /// Counts the number of documents in this collection matching the provided filter.
+    /// @param filter: A `Document` as bson that should match the query.
+    /// @param limit: The max amount of documents to count
+    /// @returns A publisher that eventually return `Int` count of documents or `Error`.
+    func count(filter: Document, limit: Int) -> Future<Int, Error> {
+        return Future { promise in
+            self.count(filter: filter, limit: limit) { count, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(count))
+                }
+            }
+        }
+    }
+
+    /// Counts the number of documents in this collection matching the provided filter.
+    /// @param filter: A `Document` as bson that should match the query.
+    /// @returns A publisher that eventually return `Int` count of documents or `Error`.
+    func count(filter: Document) -> Future<Int, Error> {
+        return Future { promise in
+            self.count(filter: filter) { count, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(count))
+                }
+            }
+        }
+    }
+
+    /// Deletes a single matching document from the collection.
+    /// @param filter: A `Document` as bson that should match the query.
+    /// @returns A publisher that eventually return `Int` count of deleted documents or `Error`.
+    func deleteOneDocument(filter: Document) -> Future<Int, Error> {
+        return Future { promise in
+            self.deleteOneDocument(filter: filter) { count, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(count))
+                }
+            }
+        }
+    }
+
+    /// Deletes multiple documents
+    /// @param filter: Document representing the match criteria
+    /// @returns A publisher that eventually return `Int` count of deleted documents or `Error`.
+    func deleteManyDocuments(filter: Document) -> Future<Int, Error> {
+        return Future { promise in
+            self.deleteManyDocuments(filter: filter) { count, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(count))
+                }
+            }
+        }
+    }
+
+    /// Updates a single document matching the provided filter in this collection.
+    /// @param filter: A bson `Document` representing the match criteria.
+    /// @param update: A bson `Document` representing the update to be applied to a matching document.
+    /// @param upsert: When true, creates a new document if no document matches the query.
+    /// @returns A publisher that eventually return `UpdateResult` or `Error`.
+    func updateOneDocument(filter: Document, update: Document, upsert: Bool) -> Future<UpdateResult, Error> {
+        return Future { promise in
+            self.updateOneDocument(filter: filter, update: update, upsert: upsert) { updateResult, error in
+                if let updateResult = updateResult {
+                    promise(.success(updateResult))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /// Updates a single document matching the provided filter in this collection.
+    /// @param filter: A bson `Document` representing the match criteria.
+    /// @param update: A bson `Document` representing the update to be applied to a matching document.
+    /// @returns A publisher that eventually return `UpdateResult` or `Error`.
+    func updateOneDocument(filter: Document, update: Document) -> Future<UpdateResult, Error> {
+        return Future { promise in
+            self.updateOneDocument(filter: filter, update: update) { updateResult, error in
+                if let updateResult = updateResult {
+                    promise(.success(updateResult))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /// Updates multiple documents matching the provided filter in this collection.
+    /// @param filter: A bson `Document` representing the match criteria.
+    /// @param update: A bson `Document` representing the update to be applied to a matching document.
+    /// @param upsert: When true, creates a new document if no document matches the query.
+    /// @returns A publisher that eventually return `UpdateResult` or `Error`.
+    func updateManyDocuments(filter: Document, update: Document, upsert: Bool) -> Future<UpdateResult, Error> {
+        return Future { promise in
+            self.updateManyDocuments(filter: filter, update: update, upsert: upsert) { updateResult, error in
+                if let updateResult = updateResult {
+                    promise(.success(updateResult))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /// Updates multiple documents matching the provided filter in this collection.
+    /// @param filter: A bson `Document` representing the match criteria.
+    /// @param update: A bson `Document` representing the update to be applied to a matching document.
+    /// @returns A publisher that eventually return `UpdateResult` or `Error`.
+    func updateManyDocuments(filter: Document, update: Document) -> Future<UpdateResult, Error> {
+        return Future { promise in
+            self.updateManyDocuments(filter: filter, update: update) { updateResult, error in
+                if let updateResult = updateResult {
+                    promise(.success(updateResult))
+                } else {
+                    promise(.failure(error ?? Realm.Error.promiseFailed))
+                }
+            }
+        }
+    }
+
+    /// Updates a single document in a collection based on a query filter and
+    /// returns the document in either its pre-update or post-update form. Unlike
+    /// `updateOneDocument`, this action allows you to atomically find, update, and
+    /// return a document with the same command. This avoids the risk of other
+    /// update operations changing the document between separate find and update
+    /// operations.
+    /// @param filter: A bson `Document` representing the match criteria.
+    /// @param update: A bson `Document` representing the update to be applied to a matching document.
+    /// @param options: `RemoteFindOneAndModifyOptions` to use when executing the command.
+    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
+    func findOneAndUpdate(filter: Document, update: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
+        return Future { promise in
+            self.findOneAndUpdate(filter: filter, update: update, options: options) { updateResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    let bson: Document? = updateResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
+                    promise(.success(bson))
+                }
+            }
+        }
+    }
+
+    /// Updates a single document in a collection based on a query filter and
+    /// returns the document in either its pre-update or post-update form. Unlike
+    /// `updateOneDocument`, this action allows you to atomically find, update, and
+    /// return a document with the same command. This avoids the risk of other
+    /// update operations changing the document between separate find and update
+    /// operations.
+    /// @param filter: A bson `Document` representing the match criteria.
+    /// @param update: A bson `Document` representing the update to be applied to a matching document.
+    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
+    func findOneAndUpdate(filter: Document, update: Document) -> Future<Document?, Error> {
+        return Future { promise in
+            self.findOneAndUpdate(filter: filter, update: update) { updateResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    let bson: Document? = updateResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
+                    promise(.success(bson))
+                }
+            }
+        }
+    }
+
+    /// Overwrites a single document in a collection based on a query filter and
+    /// returns the document in either its pre-replacement or post-replacement
+    /// form. Unlike `updateOneDocument`, this action allows you to atomically find,
+    /// replace, and return a document with the same command. This avoids the
+    /// risk of other update operations changing the document between separate
+    /// find and update operations.
+    /// @param filter: A `Document` that should match the query.
+    /// @param replacement: A `Document` describing the replacement.
+    /// @param options: `FindOneAndModifyOptions` to use when executing the command.
+    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
+    func findOneAndReplace(filter: Document, replacement: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
+        return Future { promise in
+            self.findOneAndReplace(filter: filter, replacement: replacement, options: options) { updateResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    let bson: Document? = updateResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
+                    promise(.success(bson))
+                }
+            }
+        }
+    }
+
+    /// Overwrites a single document in a collection based on a query filter and
+    /// returns the document in either its pre-replacement or post-replacement
+    /// form. Unlike `updateOneDocument`, this action allows you to atomically find,
+    /// replace, and return a document with the same command. This avoids the
+    /// risk of other update operations changing the document between separate
+    /// find and update operations.
+    /// @param filter: A `Document` that should match the query.
+    /// @param replacement: A `Document` describing the replacement.
+    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
+    func findOneAndReplace(filter: Document, replacement: Document) -> Future<Document?, Error> {
+        return Future { promise in
+            self.findOneAndReplace(filter: filter, replacement: replacement) { updateResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    let bson: Document? = updateResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
+                    promise(.success(bson))
+                }
+            }
+        }
+    }
+
+    /// Removes a single document from a collection based on a query filter and
+    /// returns a document with the same form as the document immediately before
+    /// it was deleted. Unlike `deleteOneDocument`, this action allows you to atomically
+    /// find and delete a document with the same command. This avoids the risk of
+    /// other update operations changing the document between separate find and
+    /// delete operations.
+    /// @param filter: A `Document` that should match the query.
+    /// @param options: `FindOneAndModifyOptions` to use when executing the command.
+    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
+    func findOneAndDelete(filter: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
+        return Future { promise in
+            self.findOneAndDelete(filter: filter, options: options) { deleteResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    let bson: Document? = deleteResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
+                    promise(.success(bson))
+                }
+            }
+        }
+    }
+
+    /// Removes a single document from a collection based on a query filter and
+    /// returns a document with the same form as the document immediately before
+    /// it was deleted. Unlike `deleteOneDocument`, this action allows you to atomically
+    /// find and delete a document with the same command. This avoids the risk of
+    /// other update operations changing the document between separate find and
+    /// delete operations.
+    /// @param filter: A `Document` that should match the query.
+    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
+    func findOneAndDelete(filter: Document) -> Future<Document?, Error> {
+        return Future { promise in
+            self.findOneAndDelete(filter: filter) { deleteResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    let bson: Document? = deleteResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
+                    promise(.success(bson))
+                }
+            }
+        }
     }
 }
 

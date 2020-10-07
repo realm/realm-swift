@@ -47,10 +47,32 @@ NS_ASSUME_NONNULL_BEGIN
 /// contains any characters other than 0-9a-fA-F.
 ///
 /// @param string The string to parse.
-- (nullable instancetype)initWithString:(NSString *)string error:(NSError **)error;
+- (nullable instancetype)initWithString:(NSString *)string
+                                  error:(NSError **)error;
+
+/// Creates a new ObjectId using the given date, machine identifier, process identifier.
+///
+/// @param timestamp A timestamp as NSDate.
+/// @param machineIdentifier The machine identifier.
+/// @param processIdentifier The process identifier.
+- (instancetype)initWithTimestamp:(NSDate *)timestamp
+                machineIdentifier:(int)machineIdentifier
+                processIdentifier:(int)processIdentifier;
+
+/// Comparision operator to check if the right hand side is greater than the current value.
+- (BOOL)isGreaterThan:(nullable RLMObjectId *)objectId;
+/// Comparision operator to check if the right hand side is greater than or equal to the current value.
+- (BOOL)isGreaterThanOrEqualTo:(nullable RLMObjectId *)objectId;
+/// Comparision operator to check if the right hand side is less than the current value.
+- (BOOL)isLessThan:(nullable RLMObjectId *)objectId;
+/// Comparision operator to check if the right hand side is less than or equal to the current value.
+- (BOOL)isLessThanOrEqualTo:(nullable RLMObjectId *)objectId;
 
 /// Get the ObjectId as a 24-character hexadecimal string.
 @property (nonatomic, readonly) NSString *stringValue;
+/// Get the timestamp for the RLMObjectId
+@property (nonatomic, readonly) NSDate *timestamp;
+
 @end
 
 NS_ASSUME_NONNULL_END

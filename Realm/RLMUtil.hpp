@@ -199,3 +199,13 @@ NSString *RLMDefaultDirectoryForBundleIdentifier(NSString *bundleIdentifier);
 
 // Get a NSDateFormatter for ISO8601-formatted strings
 NSDateFormatter *RLMISO8601Formatter();
+
+template<typename Fn>
+static auto RLMTranslateError(Fn&& fn) {
+    try {
+        return fn();
+    }
+    catch (std::exception const& e) {
+        @throw RLMException(e);
+    }
+}

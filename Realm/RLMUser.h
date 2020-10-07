@@ -21,7 +21,7 @@
 #import <Realm/RLMCredentials.h>
 #import <Realm/RLMRealmConfiguration.h>
 
-@class RLMUser, RLMUserInfo, RLMSyncSession, RLMRealm, RLMUserIdentity, RLMAPIKeyAuth, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection;
+@class RLMUser, RLMSyncSession, RLMRealm, RLMUserIdentity, RLMAPIKeyAuth, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection;
 @protocol RLMBSON;
 
 /**
@@ -33,11 +33,8 @@ typedef NS_ENUM(NSUInteger, RLMUserState) {
     /// The user is logged in, and any Realms associated with it are syncing with MongoDB Realm.
     RLMUserStateLoggedIn,
     /// The user has been removed, and cannot be used.
-    RLMUserStateRemoved,
+    RLMUserStateRemoved
 };
-
-/// A block type used to report an error related to a specific user.
-typedef void(^RLMUserErrorReportingBlock)(RLMUser * _Nonnull, NSError * _Nonnull);
 
 /// A block type used to report an error related to a specific user.
 typedef void(^RLMOptionalUserBlock)(RLMUser * _Nullable, NSError * _Nullable);
@@ -66,14 +63,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMUser : NSObject
 
 /**
- The unique MongoDB Realm user ID string identifying this user.
+ The unique MongoDB Realm string identifying this user.
+ Note this is different from an identitiy: A user may have multiple identities but has a single indentifier. See RLMUserIdentity.
  */
-@property (nullable, nonatomic, readonly) NSString *identity;
+@property (nonatomic, readonly) NSString *identifier NS_SWIFT_NAME(id);
 
-/**
-    Returns an array of identities currently linked to a user.
-*/
-- (NSArray<RLMUserIdentity *> *)identities;
+/// Returns an array of identities currently linked to a user.
+@property (nonatomic, readonly) NSArray<RLMUserIdentity *> *identities;
 
 /**
  The user's refresh token used to access the Realm Applcation.
@@ -82,7 +78,6 @@ NS_ASSUME_NONNULL_BEGIN
  for functionality not exposed natively. It should be treated as sensitive data.
  */
 @property (nullable, nonatomic, readonly) NSString *refreshToken;
-
 
 /**
  The user's refresh token used to access the Realm Application.
@@ -97,12 +92,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMUserState state;
 
+/**
+ Indicates if the user is logged in or not. Returns true if the access token and refresh token are not empty.
+ */
+@property (nonatomic, readonly) BOOL isLoggedIn;
+
 #pragma mark - Lifecycle
 
 /**
  Create a query-based configuration instance for the given url.
 
- @param partitionValue FIXME
+ @param partitionValue The `RLMBSON` value the Realm is partitioned on.
  @return A default configuration object with the sync configuration set to use the given partition value.
  */
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue NS_REFINED_FOR_SWIFT;
@@ -115,10 +115,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable RLMSyncSession *)sessionForPartitionValue:(id<RLMBSON>)partitionValue;
 
-/**
- Retrieve all the valid sessions belonging to this user.
- */
-- (NSArray<RLMSyncSession *> *)allSessions;
+/// Retrieve all the valid sessions belonging to this user.
+@property (nonatomic, readonly) NSArray<RLMSyncSession *> *allSessions;
 
 #pragma mark - Custom Data
 
@@ -126,7 +124,7 @@ NS_ASSUME_NONNULL_BEGIN
  The custom data of the user.
  This is configured in your MongoDB Realm App.
  */
-@property (nullable, nonatomic, readonly) NSDictionary *customData NS_REFINED_FOR_SWIFT;
+@property (nonatomic, readonly) NSDictionary *customData NS_REFINED_FOR_SWIFT;
 
 /**
  Refresh a user's custom data. This will, in effect, refresh the user's auth session.
@@ -144,7 +142,7 @@ NS_ASSUME_NONNULL_BEGIN
                    `RLMUser` object representing the currently logged in user.
 */
 - (void)linkUserWithCredentials:(RLMCredentials *)credentials
-                     completion:(RLMOptionalUserBlock)completion;
+                     completion:(RLMOptionalUserBlock)completion NS_REFINED_FOR_SWIFT;
 
 /**
  Removes the user
@@ -159,7 +157,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Logs out the current user
 
- The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by a username / password or third party auth clients
+ The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by an email / password or third party auth clients
  If the logout request fails, this method will still clear local authentication state.
 
  @param completion A callback invoked on completion
@@ -172,7 +170,7 @@ NS_ASSUME_NONNULL_BEGIN
 
   This client should only be used by an authenticated user.
 */
-- (RLMAPIKeyAuth *)apiKeyAuth;
+@property (nonatomic, readonly) RLMAPIKeyAuth *apiKeysAuth;
 
 /// A client for interacting with a remote MongoDB instance
 /// @param serviceName The name of the MongoDB service
@@ -200,72 +198,29 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - User info classes
 
 /**
- A data object representing a user account associated with a user.
-
- @see `RLMUserInfo`
+ An identity of a user. A user can have multiple identities, usually associated with multiple providers.
+ Note this is different from a user's unique identifier string.
+ @seeAlso `RLMUser.identifier`
  */
-@interface RLMUserAccountInfo : NSObject
-
-/// The authentication provider which manages this user account.
-@property (nonatomic, readonly) RLMIdentityProvider provider;
-
-/// The username or identity of this user account.
-@property (nonatomic, readonly) NSString *providerUserIdentity;
-
-/// :nodoc:
-- (instancetype)init __attribute__((unavailable("RLMUserAccountInfo cannot be created directly")));
-/// :nodoc:
-+ (instancetype)new __attribute__((unavailable("RLMUserAccountInfo cannot be created directly")));
-
-@end
-
-/**
- A data object representing information about a user that was retrieved from a user lookup call.
- */
-@interface RLMUserInfo : NSObject
-
-/**
- An array of all the user accounts associated with this user.
- */
-@property (nonatomic, readonly) NSArray<RLMUserAccountInfo *> *accounts;
-
-/**
- The identity issued to this user by MongoDB Realm.
- */
-@property (nonatomic, readonly) NSString *identity;
-
-/**
- Metadata about this user stored on MongoDB Realm.
- */
-@property (nonatomic, readonly) NSDictionary<NSString *, NSString *> *metadata;
-
-/// :nodoc:
-- (instancetype)init __attribute__((unavailable("RLMUserInfo cannot be created directly")));
-/// :nodoc:
-+ (instancetype)new __attribute__((unavailable("RLMUserInfo cannot be created directly")));
-
-@end
-
-/// An identity of a user. A user can have multiple identities, usually associated with multiple providers.
 @interface RLMUserIdentity : NSObject
 
 /**
- The associated provider type of the identity
+ The associated provider type
  */
 @property (nonatomic, readonly) NSString *providerType;
 
 /**
- The id of the identity
+ The string which identifies the RLMUserIdentity
  */
-@property (nonatomic, readonly) NSString *identity;
+@property (nonatomic, readonly) NSString *identifier;
 
 /**
- Initialize a sync user for the given identity and provider type.
- @param providerType the provider type of the user
- @param identity the identity of the user
+ Initialize an RLMUserIdentity for the given identifier and provider type.
+ @param providerType the associated provider type
+ @param identifier the identifier of the identity
  */
 - (instancetype)initUserIdentityWithProviderType:(NSString *)providerType
-                                        identity:(NSString *)identity;
+                                      identifier:(NSString *)identifier;
 
 @end
 

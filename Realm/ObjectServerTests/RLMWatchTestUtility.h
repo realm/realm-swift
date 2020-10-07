@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMWatchTestUtility : XCTestCase <RLMChangeEventDelegate>
 
 @property (nonatomic, strong) dispatch_semaphore_t semaphore;
+@property (nonatomic, strong) dispatch_semaphore_t isOpenSemaphore;
 
 /// Sets up an object that subscribes to the RLMChangeEventDelegate
 /// @param changeEventCount The target amount of change events for the test to succeed

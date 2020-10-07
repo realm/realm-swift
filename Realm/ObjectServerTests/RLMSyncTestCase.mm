@@ -180,14 +180,14 @@ static NSURL *syncDirectoryForChildProcess() {
 - (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
     if (shouldRegister) {
         XCTestExpectation *expectation = [self expectationWithDescription:@""];
-        [[[self app] emailPasswordAuth] registerEmail:name password:@"password" completion:^(NSError * _Nullable error) {
+        [[[self app] emailPasswordAuth] registerUserWithEmail:name password:@"password" completion:^(NSError * _Nullable error) {
             XCTAssertNil(error);
             [expectation fulfill];
         }];
         [self waitForExpectationsWithTimeout:4.0 handler:nil];
     }
-    return [RLMCredentials credentialsWithUsername:name
-                                          password:@"password"];
+    return [RLMCredentials credentialsWithEmail:name
+                                       password:@"password"];
 }
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm {
@@ -438,19 +438,22 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)setupSyncManager {
-    NSURL *clientDataRoot;
     NSError *error;
-    if (self.isParent) {
-        clientDataRoot = [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
-    } else {
-        clientDataRoot = syncDirectoryForChildProcess();
-    }
-    [NSFileManager.defaultManager removeItemAtURL:clientDataRoot error:&error];
-    [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
-                           withIntermediateDirectories:YES attributes:nil error:&error];
-
     _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmServer.shared createAppAndReturnError:&error];
-    _app = [RLMApp appWithId:_appId configuration:self.defaultAppConfiguration rootDirectory:clientDataRoot];
+    if (error) {
+        NSLog(@"Failed to create app: %@", error);
+        abort();
+    }
+    if (auto ids = NSProcessInfo.processInfo.environment[@"RLMParentAppIds"]) {
+        _appIds = [ids componentsSeparatedByString:@","];   //take the one array for split the string
+    }
+
+    if (self.isParent) {
+        [NSFileManager.defaultManager removeItemAtURL:[self clientDataRoot] error:&error];
+        [NSFileManager.defaultManager removeItemAtURL:syncDirectoryForChildProcess() error:&error];
+    }
+
+    _app = [RLMApp appWithId:_appId configuration:self.defaultAppConfiguration rootDirectory:[self clientDataRoot]];
 
     RLMSyncManager *syncManager = [[self app] syncManager];
     syncManager.logLevel = RLMSyncLogLevelTrace;
@@ -504,6 +507,20 @@ static NSURL *syncDirectoryForChildProcess() {
         [deleteManyExpectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
+
+- (NSURL *)clientDataRoot {
+    NSError *error;
+    NSURL *clientDataRoot;
+    if (self.isParent) {
+        clientDataRoot = [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
+    } else {
+        clientDataRoot = syncDirectoryForChildProcess();
+    }
+
+    [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
+                           withIntermediateDirectories:YES attributes:nil error:&error];
+    return clientDataRoot;
 }
 
 @end
