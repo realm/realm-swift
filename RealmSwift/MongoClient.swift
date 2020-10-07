@@ -507,7 +507,7 @@ extension MongoCollection {
     /// of all events on this collection that the active user is authorized to see based on the configured MongoDB
     /// rules.
     /// - Parameters:
-    ///   - delegate: delegate The delegate that will react to events and errors from the resulting change stream.
+    ///   - delegate: The delegate that will react to events and errors from the resulting change stream.
     ///   - queue: Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
     /// - Returns: A ChangeStream which will manage the streaming events.
     public func watch(delegate: ChangeEventDelegate, queue: DispatchQueue = .main) -> ChangeStream {
@@ -582,19 +582,21 @@ import Combine
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Publishers {
-
     class WatchSubscription<S: Subscriber>: ChangeEventDelegate, Subscription where S.Input == AnyBSON, S.Failure == Error {
         private let collection: MongoCollection
         private var changeStream: ChangeStream?
         private var subscriber: S?
+        private var onOpen: (() -> Void)?
 
         init(collection: MongoCollection,
              subscriber: S,
              queue: DispatchQueue = .main,
              filterIds: [ObjectId]? = nil,
-             matchFilter: Document? = nil) {
+             matchFilter: Document? = nil,
+             onOpen: (() -> Void)? = nil) {
             self.collection = collection
             self.subscriber = subscriber
+            self.onOpen = onOpen
 
             if let matchFilter = matchFilter {
                 changeStream = collection.watch(matchFilter: matchFilter,
@@ -616,7 +618,9 @@ extension Publishers {
             changeStream?.close()
         }
 
-        func changeStreamDidOpen(_ changeStream: RLMChangeStream) { }
+        func changeStreamDidOpen(_ changeStream: RLMChangeStream) {
+            onOpen?()
+        }
 
         func changeStreamDidClose(with error: Error?) {
             guard let error = error else {
@@ -647,12 +651,33 @@ extension Publishers {
         private let queue: DispatchQueue
         private let filterIds: [ObjectId]?
         private let matchFilter: Document?
+        private let openEvent: (() -> Void)?
 
-        init(collection: MongoCollection, queue: DispatchQueue, filterIds: [ObjectId]? = nil, matchFilter: Document? = nil) {
+        init(collection: MongoCollection,
+             queue: DispatchQueue,
+             filterIds: [ObjectId]? = nil,
+             matchFilter: Document? = nil,
+             onOpen: (() -> Void)? = nil) {
             self.collection = collection
             self.queue = queue
             self.filterIds = filterIds
             self.matchFilter = matchFilter
+            self.openEvent = onOpen
+        }
+
+        /// Triggers an event when the watch change stream is opened.
+        ///
+        /// Use this function when you require a change stream to be open before you perform any work.
+        /// This should be called directly after invoking the publisher.
+        ///
+        /// - Parameter event: Callback which will be invoked once the change stream is open.
+        /// - Returns: A publisher that emits a change event each time the remote MongoDB collection changes.
+        public func onOpen(_ event: @escaping (() -> Void)) -> Self {
+            Self(collection: collection,
+                 queue: queue,
+                 filterIds: filterIds,
+                 matchFilter: matchFilter,
+                 onOpen: event)
         }
 
         /// :nodoc:
@@ -661,7 +686,8 @@ extension Publishers {
                                                  subscriber: subscriber,
                                                  queue: queue,
                                                  filterIds: filterIds,
-                                                 matchFilter: matchFilter)
+                                                 matchFilter: matchFilter,
+                                                 onOpen: openEvent)
             subscriber.receive(subscription: subscription)
         }
 
@@ -676,7 +702,8 @@ extension Publishers {
             return Self(collection: collection,
                         queue: queue,
                         filterIds: filterIds,
-                        matchFilter: matchFilter)
+                        matchFilter: matchFilter,
+                        onOpen: openEvent)
         }
     }
 }
