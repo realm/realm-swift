@@ -598,8 +598,10 @@ class ListTests: TestCase {
         let objects2 = [obj, obj2]
 
         let list1 = List<SwiftIntObject>()
-        list1.append(objectsIn: objects)
         let list2 = List<SwiftIntObject>()
+        XCTAssertEqual(list1, list2, "Empty instances should be equal by `==` operator")
+
+        list1.append(objectsIn: objects)
         list2.append(objectsIn: objects)
 
         let list3 = List<SwiftIntObject>()

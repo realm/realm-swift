@@ -297,6 +297,7 @@
     array2.name = @"name2";
     XCTAssertNotNil(array.array, @"RLMArray property should get created on access");
     XCTAssertNotNil(array2.array, @"RLMArray property should get created on access");
+    XCTAssertTrue([array.array isEqual:array2.array], @"Empty arrays should be equal");
 
     XCTAssertNil(array.array.firstObject, @"No objects added yet");
     XCTAssertNil(array2.array.lastObject, @"No objects added yet");

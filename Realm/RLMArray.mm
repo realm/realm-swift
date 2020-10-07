@@ -515,10 +515,12 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
 }
 
 - (BOOL)isEqual:(id)object {
-    if (![object isKindOfClass:RLMArray.class]) {
-        return NO;
+    if (auto array = RLMDynamicCast<RLMArray>(object)) {
+        return !array.realm
+        && ((_backingArray.count == 0 && array->_backingArray.count == 0)
+            || [_backingArray isEqual:array->_backingArray]);
     }
-    return [_backingArray isEqual:((RLMArray *)object)->_backingArray];
+    return NO;
 }
 
 - (void)addObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath
