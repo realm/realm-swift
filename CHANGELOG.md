@@ -1,3 +1,23 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* Add the ability to capture a NotificationToken when using a Combine publisher that observes a Realm Object or Collection. The user will call `saveToken(on:at:)` directly after invoking the publisher to use the feature.
+
+### Fixed
+* When using `Realm.write(withoutNotifying:)` there was a chance that the 
+  supplied observation blocks would not be skipped when in a write transaction.
+  ([Object Store #1103](https://github.com/realm/realm-object-store/pull/1103))
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 5.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 12.
+
 5.4.8 Release notes (2020-10-05)
 =============================================================
 

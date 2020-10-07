@@ -481,8 +481,23 @@ public enum Publishers {
         public typealias Output = Void
 
         private let realm: Realm
+
         internal init(_ realm: Realm) {
             self.realm = realm
+        }
+
+        /// Captures the `NotificationToken` produced by observing a Realm Collection.
+        ///
+        /// This allows you to do notification skipping when performing a `Realm.write(withoutNotifying:)`. You should use this call if you
+        /// require to write to the Realm database and ignore this specific observation chain.
+        /// The `NotificationToken` will be saved on the specified `KeyPath`from the observation block set up in `receive(subscriber:)`.
+        ///
+        /// - Parameters:
+        ///   - object: The object which the `NotificationToken` is written to.
+        ///   - keyPath: The KeyPath which the `NotificationToken` is written to.
+        /// - Returns: A `RealmWillChangeWithToken` Publisher.
+        public func saveToken<T>(on object: T, for keyPath: WritableKeyPath<T, NotificationToken?>) -> RealmWillChangeWithToken<T> {
+              return RealmWillChangeWithToken<T>(realm, object, keyPath)
         }
 
         /// :nodoc:
@@ -494,6 +509,37 @@ public enum Publishers {
         }
     }
 
+    /// :nodoc:
+    public class RealmWillChangeWithToken<T>: Publisher {
+        /// This publisher cannot fail.
+        public typealias Failure = Never
+        /// This publisher emits Void.
+        public typealias Output = Void
+
+        internal typealias TokenParent = T
+        internal typealias TokenKeyPath = WritableKeyPath<T, NotificationToken?>
+
+        private let realm: Realm
+        private var tokenParent: TokenParent
+        private var tokenKeyPath: TokenKeyPath
+
+        internal init(_ realm: Realm,
+                      _ tokenParent: TokenParent,
+                      _ tokenKeyPath: TokenKeyPath) {
+            self.realm = realm
+            self.tokenParent = tokenParent
+            self.tokenKeyPath = tokenKeyPath
+        }
+
+        /// :nodoc:
+        public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
+            let token = self.realm.observe { _, _ in
+                _ = subscriber.receive()
+            }
+            tokenParent[keyPath: tokenKeyPath] = token
+            subscriber.receive(subscription: ObservationSubscription(token: token))
+        }
+    }
     /// A publisher which emits Void each time the object is mutated.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
@@ -503,14 +549,62 @@ public enum Publishers {
         /// This publisher emits Void.
         public typealias Output = Void
 
-        private let object: Collection
-        internal init(_ object: Collection) {
-            self.object = object
+        private let collection: Collection
+
+        internal init(_ collection: Collection) {
+            self.collection = collection
+        }
+
+        /// Captures the `NotificationToken` produced by observing a Realm Collection.
+        ///
+        /// This allows you to do notification skipping when performing a `Realm.write(withoutNotifying:)`. You should use this call if you
+        /// require to write to the Realm database and ignore this specific observation chain.
+        /// The `NotificationToken` will be saved on the specified `KeyPath`from the observation block set up in `receive(subscriber:)`.
+        ///
+        /// - Parameters:
+        ///   - object: The object which the `NotificationToken` is written to.
+        ///   - keyPath: The KeyPath which the `NotificationToken` is written to.
+        /// - Returns: A `WillChangeWithToken` Publisher.
+        public func saveToken<T>(on object: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> WillChangeWithToken<Collection, T> {
+              return WillChangeWithToken<Collection, T>(collection, object, keyPath)
         }
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            subscriber.receive(subscription: ObservationSubscription(token: self.object._observe(subscriber)))
+            let token =  self.collection._observe(subscriber)
+            subscriber.receive(subscription: ObservationSubscription(token: token))
+        }
+    }
+
+    /// A publisher which emits Void each time the object is mutated.
+    ///
+    /// Despite the name, this actually emits *after* the collection has changed.
+    public class WillChangeWithToken<Collection: RealmSubscribable, T>: Publisher where Collection: ThreadConfined {
+        /// This publisher cannot fail.
+        public typealias Failure = Never
+        /// This publisher emits Void.
+        public typealias Output = Void
+
+        internal typealias TokenParent = T
+        internal typealias TokenKeyPath = WritableKeyPath<T, NotificationToken?>
+
+        private let object: Collection
+        private var tokenParent: TokenParent
+        private var tokenKeyPath: TokenKeyPath
+
+        internal init(_ object: Collection,
+                      _ tokenParent: TokenParent,
+                      _ tokenKeyPath: TokenKeyPath) {
+            self.object = object
+            self.tokenParent = tokenParent
+            self.tokenKeyPath = tokenKeyPath
+        }
+
+        /// :nodoc:
+        public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
+            let token =  self.object._observe(subscriber)
+            tokenParent[keyPath: tokenKeyPath] = token
+            subscriber.receive(subscription: ObservationSubscription(token: token))
         }
     }
 
@@ -522,17 +616,31 @@ public enum Publishers {
         /// This publisher emits the object or collection which it is publishing.
         public typealias Output = Subscribable
 
-        private let object: Subscribable
+        private let subscribable: Subscribable
         private let queue: DispatchQueue?
-        internal init(_ object: Subscribable, queue: DispatchQueue? = nil) {
-            precondition(object.realm != nil, "Only managed objects can be published")
-            self.object = object
+        internal init(_ subscribable: Subscribable, queue: DispatchQueue? = nil) {
+            precondition(subscribable.realm != nil, "Only managed objects can be published")
+            self.subscribable = subscribable
             self.queue = queue
+        }
+
+        /// Captures the `NotificationToken` produced by observing a Realm Collection.
+        ///
+        /// This allows you to do notification skipping when performing a `Realm.write(withoutNotifying:)`. You should use this call if you
+        /// require to write to the Realm database and ignore this specific observation chain.
+        /// The `NotificationToken` will be saved on the specified `KeyPath`from the observation block set up in `receive(subscriber:)`.
+        ///
+        /// - Parameters:
+        ///   - object: The object which the `NotificationToken` is written to.
+        ///   - keyPath: The KeyPath which the `NotificationToken` is written to.
+        /// - Returns: A `ValueWithToken` Publisher.
+        public func saveToken<T>(on object: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> ValueWithToken<Subscribable, T> {
+              return ValueWithToken<Subscribable, T>(subscribable, queue, object, keyPath)
         }
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Failure, Output == S.Input {
-            subscriber.receive(subscription: ObservationSubscription(token: self.object._observe(on: queue, subscriber)))
+            subscriber.receive(subscription: ObservationSubscription(token: self.subscribable._observe(on: queue, subscriber)))
         }
 
         /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
@@ -550,7 +658,7 @@ public enum Publishers {
             guard let queue = scheduler as? DispatchQueue else {
                 fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
             }
-            return Value(object, queue: queue)
+            return Value(subscribable, queue: queue)
         }
 
         /// Specifies the scheduler on which to perform downstream operations.
@@ -569,6 +677,78 @@ public enum Publishers {
         /// - parameter scheduler: The serial dispatch queue to receive values on.
         /// - returns: A publisher which delivers values to the given scheduler.
         public func receive<S: Scheduler>(on scheduler: S) -> Publishers.Handover<Self, S> {
+            return Publishers.Handover(self, scheduler, self.subscribable.realm!)
+        }
+    }
+
+    /// A publisher which emits an object or collection each time that object is mutated.
+    public class ValueWithToken<Subscribable: RealmSubscribable, T>: Publisher where Subscribable: ThreadConfined {
+        /// This publisher can only fail due to resource exhaustion when
+        /// creating the worker thread used for change notifications.
+        public typealias Failure = Error
+        /// This publisher emits the object or collection which it is publishing.
+        public typealias Output = Subscribable
+
+        internal typealias TokenParent = T
+        internal typealias TokenKeyPath = WritableKeyPath<T, NotificationToken?>
+
+        private let object: Subscribable
+        private let queue: DispatchQueue?
+
+        private var tokenParent: TokenParent
+        private var tokenKeyPath: TokenKeyPath
+
+        internal init(_ object: Subscribable,
+                      _ queue: DispatchQueue? = nil,
+                      _ tokenParent: TokenParent,
+                      _ tokenKeyPath: TokenKeyPath) {
+            precondition(object.realm != nil, "Only managed objects can be published")
+            self.object = object
+            self.queue = queue
+            self.tokenParent = tokenParent
+            self.tokenKeyPath = tokenKeyPath
+        }
+        /// :nodoc:
+        public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Failure, Output == S.Input {
+            let token = self.object._observe(on: queue, subscriber)
+            tokenParent[keyPath: tokenKeyPath] = token
+            subscriber.receive(subscription: ObservationSubscription(token: token))
+        }
+
+        /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
+        ///
+        /// For Realm Publishers, this determines which queue the underlying
+        /// change notifications are sent to. If `receive(on:)` is not used
+        /// subsequently, it also will determine which queue elements received
+        /// from the publisher are evaluated on. Currently only serial dispatch
+        /// queues are supported, and the `options:` parameter is not
+        /// supported.
+        ///
+        /// - parameter scheduler: The serial dispatch queue to perform the subscription on.
+        /// - returns: A publisher which subscribes on the given scheduler.
+        public func subscribe<S: Scheduler>(on scheduler: S) -> ValueWithToken<Subscribable, T> {
+            guard let queue = scheduler as? DispatchQueue else {
+                fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
+            }
+            return ValueWithToken(object, queue, tokenParent, tokenKeyPath)
+        }
+
+        /// Specifies the scheduler on which to perform downstream operations.
+        ///
+        /// This differs from `subscribe(on:)` in how it is integrated with the
+        /// autorefresh cycle. When using `subscribe(on:)`, the subscription is
+        /// performed on the target scheduler and the publisher will emit the
+        /// collection during the refresh. When using `receive(on:)`, the
+        /// collection is then converted to a `ThreadSafeReference` and
+        /// delivered to the target scheduler with no integration into the
+        /// autorefresh cycle, meaning it may arrive some time after the
+        /// refresh occurs.
+        ///
+        /// When in doubt, you probably want `subscribe(on:)`.
+        ///
+        /// - parameter scheduler: The serial dispatch queue to receive values on.
+        /// - returns: A publisher which delivers values to the given scheduler.
+        public func receive<S: Scheduler>(on scheduler: S) -> Publishers.Handover<ValueWithToken, S> {
             return Publishers.Handover(self, scheduler, self.object.realm!)
         }
     }
@@ -685,22 +865,36 @@ public enum Publishers {
     /// should always be the first operation in the pipeline.
     ///
     /// Create this publisher using the `objectChangeset()` function.
-    public struct ObjectChangeset<T: Object>: Publisher {
+    public struct ObjectChangeset<O: Object>: Publisher {
         /// This publisher emits a ObjectChange<T> indicating which object and
         /// which properties of that object have changed each time a Realm is
         /// refreshed after a write transaction which modifies the observed
         /// object.
-        public typealias Output = ObjectChange<T>
+        public typealias Output = ObjectChange<O>
         /// This publisher reports error via the `.error` case of ObjectChange.
         public typealias Failure = Never
 
-        private let object: T
+        private let object: O
         private let queue: DispatchQueue?
-        internal init(_ object: T, queue: DispatchQueue? = nil) {
+        internal init(_ object: O, queue: DispatchQueue? = nil) {
             precondition(object.realm != nil, "Only managed objects can be published")
             precondition(!object.isInvalidated, "Object is invalidated or deleted")
             self.object = object
             self.queue = queue
+        }
+
+        /// Captures the `NotificationToken` produced by observing a Realm Collection.
+        ///
+        /// This allows you to do notification skipping when performing a `Realm.write(withoutNotifying:)`. You should use this call if you
+        /// require to write to the Realm database and ignore this specific observation chain.
+        /// The `NotificationToken` will be saved on the specified `KeyPath`from the observation block set up in `receive(subscriber:)`.
+        ///
+        /// - Parameters:
+        ///   - object: The object which the `NotificationToken` is written to.
+        ///   - keyPath: The KeyPath which the `NotificationToken` is written to.
+        /// - Returns: A `ObjectChangesetWithToken` Publisher.
+        public func saveToken<T>(on tokenParent: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> ObjectChangesetWithToken<O, T> {
+              return ObjectChangesetWithToken<O, T>(object, queue, tokenParent, keyPath)
         }
 
         /// :nodoc:
@@ -708,7 +902,7 @@ public enum Publishers {
             let token = self.object.observe(on: self.queue) { change in
                 switch change {
                 case .change(let o, let properties):
-                    _ = subscriber.receive(.change(o as! T, properties))
+                    _ = subscriber.receive(.change(o as! O, properties))
                 case .error(let error):
                     _ = subscriber.receive(.error(error))
                 case .deleted:
@@ -729,7 +923,7 @@ public enum Publishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to perform the subscription on.
         /// - returns: A publisher which subscribes on the given scheduler.
-        public func subscribe<S: Scheduler>(on scheduler: S) -> ObjectChangeset<T> {
+        public func subscribe<S: Scheduler>(on scheduler: S) -> ObjectChangeset<O> {
             guard let queue = scheduler as? DispatchQueue else {
                 fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
             }
@@ -751,7 +945,98 @@ public enum Publishers {
         ///
         /// - parameter scheduler: The serial dispatch queue to receive values on.
         /// - returns: A publisher which delivers values to the given scheduler.
-        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverObjectChangeset<Self, T, S> {
+        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverObjectChangeset<Self, O, S> {
+            DeferredHandoverObjectChangeset(self, scheduler)
+        }
+    }
+
+    /// A publisher which emits ObjectChange<T> each time the observed object is modified
+    ///
+    /// `receive(on:)` and `subscribe(on:)` can be called directly on this
+    /// publisher, and calling `.threadSafeReference()` is only required if
+    /// there is an intermediate transform. If `subscribe(on:)` is used, it
+    /// should always be the first operation in the pipeline.
+    ///
+    /// Create this publisher using the `objectChangeset()` function.
+    public class ObjectChangesetWithToken<O: Object, T>: Publisher {
+        /// This publisher emits a ObjectChange<T> indicating which object and
+        /// which properties of that object have changed each time a Realm is
+        /// refreshed after a write transaction which modifies the observed
+        /// object.
+        public typealias Output = ObjectChange<O>
+        /// This publisher reports error via the `.error` case of ObjectChange.
+        public typealias Failure = Never
+
+        internal typealias TokenParent = T
+        internal typealias TokenKeyPath = WritableKeyPath<T, NotificationToken?>
+
+        private var tokenParent: TokenParent
+        private var tokenKeyPath: TokenKeyPath
+
+        private let object: O
+        private let queue: DispatchQueue?
+        internal init(_ object: O,
+                      _ queue: DispatchQueue? = nil,
+                      _ tokenParent: TokenParent,
+                      _ tokenKeyPath: TokenKeyPath) {
+            precondition(object.realm != nil, "Only managed objects can be published")
+            precondition(!object.isInvalidated, "Object is invalidated or deleted")
+            self.object = object
+            self.queue = queue
+            self.tokenParent = tokenParent
+            self.tokenKeyPath = tokenKeyPath
+        }
+
+        /// :nodoc:
+        public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
+            let token = self.object.observe(on: self.queue) { change in
+                switch change {
+                case .change(let o, let properties):
+                    _ = subscriber.receive(.change(o as! O, properties))
+                case .error(let error):
+                    _ = subscriber.receive(.error(error))
+                case .deleted:
+                    subscriber.receive(completion: .finished)
+                }
+            }
+            tokenParent[keyPath: tokenKeyPath] = token
+            subscriber.receive(subscription: ObservationSubscription(token: token))
+        }
+
+        /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
+        ///
+        /// For Realm Publishers, this determines which queue the underlying
+        /// change notifications are sent to. If `receive(on:)` is not used
+        /// subsequently, it also will determine which queue elements received
+        /// from the publisher are evaluated on. Currently only serial dispatch
+        /// queues are supported, and the `options:` parameter is not
+        /// supported.
+        ///
+        /// - parameter scheduler: The serial dispatch queue to perform the subscription on.
+        /// - returns: A publisher which subscribes on the given scheduler.
+        public func subscribe<S: Scheduler>(on scheduler: S) -> ObjectChangesetWithToken<O, T> {
+            guard let queue = scheduler as? DispatchQueue else {
+                fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
+            }
+            return ObjectChangesetWithToken(object, queue, tokenParent, tokenKeyPath)
+        }
+
+        /// Specifies the scheduler on which to perform downstream operations.
+        ///
+        /// This differs from `subscribe(on:)` in how it is integrated with the
+        /// autorefresh cycle. When using `subscribe(on:)`, the subscription is
+        /// performed on the target scheduler and the publisher will emit the
+        /// collection during the refresh. When using `receive(on:)`, the
+        /// collection is then converted to a `ThreadSafeReference` and
+        /// delivered to the target scheduler with no integration into the
+        /// autorefresh cycle, meaning it may arrive some time after the
+        /// refresh occurs.
+        ///
+        /// When in doubt, you probably want `subscribe(on:)`
+        ///
+        /// - parameter scheduler: The serial dispatch queue to receive values on.
+        /// - returns: A publisher which delivers values to the given scheduler.
+        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverObjectChangeset<ObjectChangesetWithToken, T, S> {
             DeferredHandoverObjectChangeset(self, scheduler)
         }
     }
@@ -862,6 +1147,20 @@ public enum Publishers {
             self.queue = queue
         }
 
+        /// Captures the `NotificationToken` produced by observing a Realm Collection.
+        ///
+        /// This allows you to do notification skipping when performing a `Realm.write(withoutNotifying:)`. You should use this call if you
+        /// require to write to the Realm database and ignore this specific observation chain.
+        /// The `NotificationToken` will be saved on the specified `KeyPath`from the observation block set up in `receive(subscriber:)`.
+        ///
+        /// - Parameters:
+        ///   - object: The object which the `NotificationToken` is written to.
+        ///   - keyPath: The KeyPath which the `NotificationToken` is written to.
+        /// - Returns: A `CollectionChangesetWithToken` Publisher.
+        public func saveToken<T>(on object: T, at keyPath: WritableKeyPath<T, NotificationToken?>) -> CollectionChangesetWithToken<Collection, T> {
+              return CollectionChangesetWithToken<Collection, T>(collection, queue, object, keyPath)
+        }
+
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
             let token = self.collection.observe(on: self.queue) { change in
@@ -904,6 +1203,85 @@ public enum Publishers {
         /// - parameter scheduler: The serial dispatch queue to receive values on.
         /// - returns: A publisher which delivers values to the given scheduler.
         public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverCollectionChangeset<Self, Collection, S> {
+            DeferredHandoverCollectionChangeset(self, scheduler)
+        }
+    }
+
+    /// A publisher which emits RealmCollectionChange<T> each time the observed object is modified
+    ///
+    /// `receive(on:)` and `subscribe(on:)` can be called directly on this
+    /// publisher, and calling `.threadSafeReference()` is only required if
+    /// there is an intermediate transform. If `subscribe(on:)` is used, it
+    /// should always be the first operation in the pipeline.
+    ///
+    /// Create this publisher using the `changesetPublisher` property on RealmCollection..
+    public class CollectionChangesetWithToken<Collection: RealmCollection, T>: Publisher {
+        public typealias Output = RealmCollectionChange<Collection>
+        /// This publisher reports error via the `.error` case of RealmCollectionChange..
+        public typealias Failure = Never
+
+        internal typealias TokenParent = T
+        internal typealias TokenKeyPath = WritableKeyPath<T, NotificationToken?>
+
+        private var tokenParent: TokenParent
+        private var tokenKeyPath: TokenKeyPath
+
+        private let collection: Collection
+        private let queue: DispatchQueue?
+        internal init(_ collection: Collection,
+                      _ queue: DispatchQueue? = nil,
+                      _ tokenParent: TokenParent,
+                      _ tokenKeyPath: TokenKeyPath) {
+            precondition(collection.realm != nil, "Only managed collections can be published")
+            self.collection = collection
+            self.queue = queue
+            self.tokenParent = tokenParent
+            self.tokenKeyPath = tokenKeyPath
+        }
+
+        /// :nodoc:
+        public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
+            let token = self.collection.observe(on: self.queue) { change in
+                _ = subscriber.receive(change)
+            }
+            tokenParent[keyPath: tokenKeyPath] = token
+            subscriber.receive(subscription: ObservationSubscription(token: token))
+        }
+
+        /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
+        ///
+        /// For Realm Publishers, this determines which queue the underlying
+        /// change notifications are sent to. If `receive(on:)` is not used
+        /// subsequently, it also will determine which queue elements received
+        /// from the publisher are evaluated on. Currently only serial dispatch
+        /// queues are supported, and the `options:` parameter is not
+        /// supported.
+        ///
+        /// - parameter scheduler: The serial dispatch queue to perform the subscription on.
+        /// - returns: A publisher which subscribes on the given scheduler.
+        public func subscribe<S: Scheduler>(on scheduler: S) -> CollectionChangesetWithToken<Collection, T> {
+            guard let queue = scheduler as? DispatchQueue else {
+                fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
+            }
+            return CollectionChangesetWithToken(collection, queue, tokenParent, tokenKeyPath)
+        }
+
+        /// Specifies the scheduler on which to perform downstream operations.
+        ///
+        /// This differs from `subscribe(on:)` in how it is integrated with the
+        /// autorefresh cycle. When using `subscribe(on:)`, the subscription is
+        /// performed on the target scheduler and the publisher will emit the
+        /// collection during the refresh. When using `receive(on:)`, the
+        /// collection is then converted to a `ThreadSafeReference` and
+        /// delivered to the target scheduler with no integration into the
+        /// autorefresh cycle, meaning it may arrive some time after the
+        /// refresh occurs.
+        ///
+        /// When in doubt, you probably want `subscribe(on:)`
+        ///
+        /// - parameter scheduler: The serial dispatch queue to receive values on.
+        /// - returns: A publisher which delivers values to the given scheduler.
+        public func receive<S: Scheduler>(on scheduler: S) -> DeferredHandoverCollectionChangeset<CollectionChangesetWithToken, Collection, S> {
             DeferredHandoverCollectionChangeset(self, scheduler)
         }
     }
