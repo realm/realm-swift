@@ -82,6 +82,13 @@
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
+- (BOOL)isEqual:(id)object {
+    if (![object isKindOfClass:[RLMListBase class]]) {
+        return NO;
+    }
+    return [((RLMListBase *)object)._rlmArray isEqual:self._rlmArray];
+}
+
 @end
 
 @implementation RLMLinkingObjectsHandle {
@@ -144,4 +151,5 @@
     _realm = nil;
     return _results;
 }
+
 @end

@@ -514,6 +514,13 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     return [_backingArray objectsAtIndexes:indexes];
 }
 
+- (BOOL)isEqual:(id)object {
+    if (![object isKindOfClass:[RLMArray class]]) {
+        return NO;
+    }
+    return [_backingArray isEqual:((RLMArray *)object)->_backingArray];
+}
+
 - (void)addObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath
             options:(NSKeyValueObservingOptions)options context:(void *)context {
     RLMValidateArrayObservationKey(keyPath, self);
