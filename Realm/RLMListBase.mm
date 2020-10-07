@@ -83,10 +83,12 @@
 }
 
 - (BOOL)isEqual:(id)object {
-    if (![object isKindOfClass:RLMListBase.class]) {
-        return NO;
+    if (auto array = RLMDynamicCast<RLMListBase>(object)) {
+        return !array._rlmArray.realm
+        && ((self._rlmArray.count == 0 && array._rlmArray.count == 0) ||
+            [self._rlmArray isEqual:array._rlmArray]);
     }
-    return [((RLMListBase *)object)._rlmArray isEqual:self._rlmArray];
+    return NO;
 }
 
 @end
