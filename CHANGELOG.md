@@ -10,6 +10,9 @@ x.y.z Release notes (yyyy-MM-dd)
   type A can no longer have an object property of type A, or an object property
   of type B if type B links to type A. This was always rejected by the server,
   but previously was allowed in non-synchronized Realms.
+* Primary key properties are once again marked as being indexed. This reflects
+  an internal change to how primary keys are handled that should not have any
+  other visible effects.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)

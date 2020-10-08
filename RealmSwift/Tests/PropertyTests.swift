@@ -51,7 +51,7 @@ class PropertyTests: TestCase {
     func testIndexed() {
         XCTAssertFalse(primitiveProperty.isIndexed)
         XCTAssertFalse(linkProperty.isIndexed)
-        XCTAssertFalse(primaryProperty.isIndexed)
+        XCTAssertTrue(primaryProperty.isIndexed)
     }
 
     func testOptional() {

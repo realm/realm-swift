@@ -102,7 +102,7 @@ static RLMProperty *makeProperty(NSString *name, RLMPropertyType type, NSString 
                                                                      type:RLMPropertyTypeString
                                                           objectClassName:nil
                                                    linkOriginPropertyName:nil
-                                                                  indexed:NO
+                                                                  indexed:YES
                                                                  optional:NO];
         expectedProperty.isPrimary = YES;
         XCTAssertEqualObjects(stringProperty, expectedProperty);
