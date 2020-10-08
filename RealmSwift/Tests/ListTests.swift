@@ -612,8 +612,8 @@ class ListTests: TestCase {
         XCTAssertEqual(list1, list2, "instances should be equal by `==` operator")
         XCTAssertNotEqual(list1, list3, "instances should be equal by `==` operator")
 
-        XCTAssertTrue(list1.isEqual(to: list2), "instances should be equal by `isEqual` method")
-        XCTAssertTrue(!list1.isEqual(to: list3), "instances should be equal by `isEqual` method")
+        XCTAssertTrue(list1.isEqual(list2), "instances should be equal by `isEqual` method")
+        XCTAssertTrue(!list1.isEqual(list3), "instances should be equal by `isEqual` method")
 
         XCTAssertEqual(Array(list1), Array(list2), "instances converted to Swift.Array should be equal")
         XCTAssertNotEqual(Array(list1), Array(list3), "instances converted to Swift.Array should be equal")
