@@ -20,7 +20,7 @@
 
 #import "RLMConstants.h"
 
-#if !TARGET_OS_MACCATALYST
+#if TARGET_OS_OSX && !TARGET_OS_MACCATALYST
 
 @interface InterprocessTest : RLMMultiProcessTestCase
 @end
