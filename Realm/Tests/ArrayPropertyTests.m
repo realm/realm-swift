@@ -287,6 +287,49 @@
     __unused ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithValue:@[@"n", @[], @[[[IntObject alloc] initWithValue:@[@1]]]]];
 }
 
+- (void)testUnmanagedComparision {
+    RLMRealm *realm = [self realmWithTestPath];
+
+    ArrayPropertyObject *array = [[ArrayPropertyObject alloc] init];
+    ArrayPropertyObject *array2 = [[ArrayPropertyObject alloc] init];
+
+    array.name = @"name";
+    array2.name = @"name2";
+    XCTAssertNotNil(array.array, @"RLMArray property should get created on access");
+    XCTAssertNotNil(array2.array, @"RLMArray property should get created on access");
+    XCTAssertTrue([array.array isEqual:array2.array], @"Empty arrays should be equal");
+
+    XCTAssertNil(array.array.firstObject, @"No objects added yet");
+    XCTAssertNil(array2.array.lastObject, @"No objects added yet");
+
+    StringObject *obj1 = [[StringObject alloc] init];
+    obj1.stringCol = @"a";
+    StringObject *obj2 = [[StringObject alloc] init];
+    obj2.stringCol = @"b";
+    StringObject *obj3 = [[StringObject alloc] init];
+    obj3.stringCol = @"c";
+    [array.array addObject:obj1];
+    [array.array addObject:obj2];
+    [array.array addObject:obj3];
+
+    [array2.array addObject:obj1];
+    [array2.array addObject:obj2];
+    [array2.array addObject:obj3];
+
+    XCTAssertTrue([array.array isEqual:array2.array], @"Arrays should be equal");
+    [array2.array removeLastObject];
+    XCTAssertFalse([array.array isEqual:array2.array], @"Arrays should not be equal");
+    [array2.array addObject:obj3];
+    XCTAssertTrue([array.array isEqual:array2.array], @"Arrays should be equal");
+
+    [realm beginWriteTransaction];
+    [realm addObject:array];
+    [realm commitWriteTransaction];
+
+    XCTAssertFalse([array.array isEqual:array2.array], @"Comparing a managed array to an unmanaged one should fail");
+    XCTAssertFalse([array2.array isEqual:array.array], @"Comparing a managed array to an unmanaged one should fail");
+}
+
 - (void)testUnmanagedPrimitive {
     AllPrimitiveArrays *obj = [[AllPrimitiveArrays alloc] init];
     XCTAssertTrue([obj.intObj isKindOfClass:[RLMArray class]]);

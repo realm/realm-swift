@@ -585,6 +585,41 @@ class ListTests: TestCase {
             }
         }
     }
+
+    func testUnmanagedListComparison() {
+        let obj = SwiftIntObject()
+        obj.intCol = 5
+        let obj2 = SwiftIntObject()
+        obj2.intCol = 6
+        let obj3 = SwiftIntObject()
+        obj3.intCol = 8
+
+        let objects = [obj, obj2, obj3]
+        let objects2 = [obj, obj2]
+
+        let list1 = List<SwiftIntObject>()
+        let list2 = List<SwiftIntObject>()
+        XCTAssertEqual(list1, list2, "Empty instances should be equal by `==` operator")
+
+        list1.append(objectsIn: objects)
+        list2.append(objectsIn: objects)
+
+        let list3 = List<SwiftIntObject>()
+        list3.append(objectsIn: objects2)
+
+        XCTAssertTrue(list1 !== list2, "instances should not be identical")
+
+        XCTAssertEqual(list1, list2, "instances should be equal by `==` operator")
+        XCTAssertNotEqual(list1, list3, "instances should be equal by `==` operator")
+
+        XCTAssertTrue(list1.isEqual(list2), "instances should be equal by `isEqual` method")
+        XCTAssertTrue(!list1.isEqual(list3), "instances should be equal by `isEqual` method")
+
+        XCTAssertEqual(Array(list1), Array(list2), "instances converted to Swift.Array should be equal")
+        XCTAssertNotEqual(Array(list1), Array(list3), "instances converted to Swift.Array should be equal")
+        list3.append(obj3)
+        XCTAssertEqual(list1, list3, "instances should be equal by `==` operator")
+    }
 }
 
 class ListStandaloneTests: ListTests {
