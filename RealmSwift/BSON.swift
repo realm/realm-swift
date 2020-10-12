@@ -82,7 +82,7 @@ extension MinKey: BSON {
 
 /// Enum representing a BSON value.
 /// - SeeAlso: bsonspec.org
-public enum AnyBSON: BSON {
+@frozen public enum AnyBSON: BSON {
     /// A BSON double.
     case double(Double)
 

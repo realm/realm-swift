@@ -179,7 +179,7 @@ public typealias Provider = RLMIdentityProvider
  * attacks and similar vulnerabilities, you can pin a certificate or public key,
  * and reject all others, even if they are signed by a trusted CA.
  */
-public enum ServerValidationPolicy {
+@frozen public enum ServerValidationPolicy {
     /// Perform no validation and accept potentially invalid certificates.
     ///
     /// - warning: DO NOT USE THIS OPTION IN PRODUCTION.
@@ -206,7 +206,7 @@ public enum ServerValidationPolicy {
  A `SyncConfiguration` represents configuration parameters for Realms intended to sync with
  MongoDB Realm.
  */
-public struct SyncConfiguration {
+@frozen public struct SyncConfiguration {
     /// The `SyncUser` who owns the Realm that this configuration should open.
     public let user: User
 
@@ -266,7 +266,7 @@ import Combine
 /// The second and final argument is the completion handler to call when the function call is complete.
 /// This handler is executed on a non-main global `DispatchQueue`.
 @dynamicMemberLookup
-public struct Functions {
+@frozen public struct Functions {
     weak var user: User?
 
     fileprivate init(user: User) {
