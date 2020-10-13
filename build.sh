@@ -965,6 +965,12 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "verify-osx-swift-evolution")
+        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
+        sh build.sh test-osx-swift
+        exit 0
+        ;;
+
     "verify-ios-static")
         REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/ios/objc/RealmExamples.xcworkspace" \
             sh build.sh test-ios-static
@@ -979,6 +985,12 @@ case "$COMMAND" in
         REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/ios/swift/RealmExamples.xcworkspace" \
             sh build.sh test-ios-swift
         sh build.sh examples-ios-swift
+        ;;
+
+    "verify-ios-swift-evolution")
+        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
+        sh build.sh test-ios-swift
+        exit 0
         ;;
 
     "verify-ios-device-objc")
@@ -1020,6 +1032,12 @@ case "$COMMAND" in
         REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/tvos/swift/RealmExamples.xcworkspace" \
             sh build.sh test-tvos-swift
         sh build.sh examples-tvos-swift
+        exit 0
+        ;;
+
+    "verify-tvos-swift-evolution")
+        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
+        sh build.sh test-tvos-swift
         exit 0
         ;;
 
