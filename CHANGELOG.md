@@ -7,15 +7,40 @@ x.y.z Release notes (yyyy-MM-dd)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+This release also contains the following changes from 5.4.7 - 5.5.0
+
+### Enhancements
+
+* Add the ability to capture a NotificationToken when using a Combine publisher
+  that observes a Realm Object or Collection. The user will call
+  `saveToken(on:at:)` directly after invoking the publisher to use the feature.
+
+### Fixed
+
+* When using `Realm.write(withoutNotifying:)` there was a chance that the
+  supplied observation blocks would not be skipped when in a write transaction.
+  ([Object Store #1103](https://github.com/realm/realm-object-store/pull/1103))
+* Comparing two identical unmanaged `List<>`/`RLMArray` objects would fail.
+  ([#5665](https://github.com/realm/realm-cocoa/issues/5665)).
+* Case-insensitive equality queries on indexed string properties failed to
+  clear some internal state when rerunning the query. This could manifest as
+  duplicate results or "key not found" errors.
+  ([#6830](https://github.com/realm/realm-cocoa/issues/6830), [#6694](https://github.com/realm/realm-cocoa/issues/6694), since 5.0.0).
+* Equality queries on indexed string properties would sometimes throw "key not
+  found" exceptions if the hash of the string happened to have bit 62 set.
+  ([.NET #2025](https://github.com/realm/realm-dotnet/issues/2025), since v5.0.0).
+* Queries comparing non-optional int properties to nil would behave as if they
+  were comparing against zero instead (since v5.0.0).
 
 ### Compatibility
+
 * File format: Generates Realms with format v12 (Reads and upgrades all previous formats)
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.
 
 ### Internal
+
 * Upgraded realm-core from ? to ?
 * Upgraded realm-sync from ? to ?
 
@@ -389,6 +414,97 @@ later will be able to open the new file format.
 * Upgraded realm-core from v6.0.3 to v10.0.0-beta.1
 * Upgraded realm-sync from v5.0.1 to v10.0.0-beta.2
 
+5.5.0 Release notes (2020-10-12)
+=============================================================
+
+### Enhancements
+
+* Add the ability to capture a NotificationToken when using a Combine publisher
+  that observes a Realm Object or Collection. The user will call
+  `saveToken(on:at:)` directly after invoking the publisher to use the feature.
+
+### Fixed
+
+* When using `Realm.write(withoutNotifying:)` there was a chance that the
+  supplied observation blocks would not be skipped when in a write transaction.
+  ([Object Store #1103](https://github.com/realm/realm-object-store/pull/1103))
+* Comparing two identical unmanaged `List<>`/`RLMArray` objects would fail.
+  ([#5665](https://github.com/realm/realm-cocoa/issues/5665)).
+
+### Compatibility
+
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 5.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 12.
+
+5.4.8 Release notes (2020-10-05)
+=============================================================
+
+### Fixed
+
+* Case-insensitive equality queries on indexed string properties failed to
+  clear some internal state when rerunning the query. This could manifest as
+  duplicate results or "key not found" errors.
+  ([#6830](https://github.com/realm/realm-cocoa/issues/6830), [#6694](https://github.com/realm/realm-cocoa/issues/6694), since 5.0.0).
+
+### Compatibility
+
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 5.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 12.
+
+### Internal
+
+* Upgraded realm-core from v6.1.3 to v6.1.4
+* Upgraded realm-sync from v5.0.28 to v5.0.29
+
+5.4.7 Release notes (2020-09-30)
+=============================================================
+
+### Fixed
+
+* Equality queries on indexed string properties would sometimes throw "key not
+  found" exceptions if the hash of the string happened to have bit 62 set.
+  ([.NET #2025](https://github.com/realm/realm-dotnet/issues/2025), since v5.0.0).
+* Queries comparing non-optional int properties to nil would behave as if they
+  were comparing against zero instead (since v5.0.0).
+
+### Compatibility
+
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 5.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 12.
+
+### Internal
+
+* Upgraded realm-core from v6.1.2 to v6.1.3
+* Upgraded realm-sync from v5.0.27 to v5.0.28
+
+5.4.6 Release notes (2020-09-29)
+=============================================================
+
+5.4.5 failed to actually update the core version for installation methods other
+than SPM. All changes listed there actually happened in this version for
+non-SPM installation methods.
+
+### Compatibility
+
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 5.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 12.
+
+### Internal
+
+* Upgraded realm-sync from v5.0.26 to v5.0.27
+
 5.4.5 Release notes (2020-09-28)
 =============================================================
 
@@ -416,7 +532,7 @@ later will be able to open the new file format.
 ### Internal
 
 * Upgraded realm-core from v6.1.1 to v6.1.2
-* Upgraded realm-sync from v5.0.25 to v5.0.25
+* Upgraded realm-sync from v5.0.25 to v5.0.26
 
 5.4.4 Release notes (2020-09-25)
 =============================================================
