@@ -237,7 +237,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     if ([appId length] == 0) {
         @throw RLMException(@"AppId cannot be an empty string");
     }
-    
+
     if (self = [super init]) {
         if (!configuration) {
             configuration = [[RLMAppConfiguration alloc] initWithBaseURL:nil
