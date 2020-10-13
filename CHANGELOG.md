@@ -1,3 +1,106 @@
+10.0.0 Release notes (yyyy-MM-dd)
+=============================================================
+
+This release is functionally identical to v10.0.0-rc.2.
+
+NOTE: This version upgrades the Realm file format to version 20. Realm files
+opened will be automatically upgraded and cannot be read by versions older than
+v10.
+
+### Breaking Changes
+
+* Rename Realm.Publishers to RealmPublishers to avoid confusion with Combine.Publishers.
+* Remove `[RLMSyncManager shared]`. This is now instatiated as a property on App/RLMApp.
+* `RLMSyncManager.pinnedCertificatePaths` has been removed.
+* Classes `RLMUserAccountInfo` & `RLMUserInfo` (swift: `UserInfo`, `UserAccountInfo`) have been removed.
+* `RLMSyncUser`/`SyncUser` has been renamed to `RLMUser`/`User`.
+* We no longer support Realm Cloud (legacy), but instead the new "MongoDB
+  Realm" Cloud. MongoDB Realm is a serverless platform that enables developers
+  to quickly build applications without having to set up server infrastructure.
+  MongoDB Realm is built on top of MongoDB Atlas, automatically integrating the
+  connection to your database.
+* Remove support for Query-based sync, including the configuration parameters
+  and the `RLMSyncSubscription` and `SyncSubscription` types ([#6437](https://github.com/realm/realm-cocoa/pull/6437)).
+* Primary key properties are no longer marked as being indexed. This reflects
+  an internal change to how primary keys are handled that should not have any
+  other visible effects. ([#6440](https://github.com/realm/realm-cocoa/pull/6440)).
+* Remove everything related to sync permissions, including both the path-based
+  permission system and the object-level privileges for query-based sync.
+  Permissions are now configured via MongoDB Atlas.
+  ([#6445](https://github.com/realm/realm-cocoa/pulls/6445))
+* Remove support for Realm Object Server.
+* Non-embedded objects in synchronized Realms must always have a primary key
+  named "_id".
+
+### Enhancements
+
+* Add support for next generation sync. Support for syncing to MongoDB instead
+  of Realm Object Server. Applications must be created at realm.mongodb.com
+* The memory mapping scheme for Realm files has changed to better support
+  opening very large files.
+* Add support for the ObjectId data type. This is an automatically-generated
+  unique identifier similar to a GUID or a UUID.
+  ([PR #6450](https://github.com/realm/realm-cocoa/pull/6450)).
+* Add support for the Decimal128 data type. This is a 128-bit IEEE 754 decimal
+  floating point number similar to NSDecimalNumber.
+  ([PR #6450](https://github.com/realm/realm-cocoa/pull/6450)).
+* Add support for embedded objects. Embedded objects are objects which are
+  owned by a single parent object, and are deleted when that parent object is
+  deleted. They are defined by subclassing `EmbeddedObject` /
+  `RLMEmbeddedObject` rather than `Object` / `RLMObject`.
+* Add `-[RLMUser customData]`/`User.customData`.  Custom data is
+  configured in your MongoDB Realm App.
+* Add `-[RLMApp callFunctionNamed:arguments]`/`RealmApp.functions`. This is the
+  entry point for calling Remote MongoDB Realm functions. Functions allow you
+  to define and execute server-side logic for your application. Functions are
+  written in modern JavaScript (ES6+) and execute in a serverless manner. When
+  you call a function, you can dynamically access components of the current
+  application as well as information about the request to execute the function
+  and the logged in user that sent the request.
+* Add `-[RLMApp mongoClientWithServiceName]`/`RealmApp.mongoClient`. This is
+  the entry point for calling your Remote MongoDB Service. The read operations
+  are `-[RLMMongoCollection findWhere:completion:]`, `-[RLMMongoCollection
+  countWhere:completion:]`and `-[RLMMongoCollection
+  aggregateWithPipeline:completion:]`. The write operations are
+  `-[RLMMongoCollection insertOneDocument:completion:]`, `-[RLMMongoCollection
+  insertManyDocuments:completion:]`, `-[RLMMongoCollection
+  updateOneDocument:completion:]`, `-[RLMMongoCollection
+  updateManyDocuments:completion:]`, `-[RLMMongoCollection
+  deleteOneDocument:completion:]`, and `-[RLMMongoCollection
+  deleteManyDocuments:completion:]`. If you are already familiar with MongoDB
+  drivers, it is important to understand that the remote MongoCollection only
+  provides access to the operations available in MongoDB Realm.
+* Change `[RLMUser
+  configurationWithPartitionValue:]`/`User.configuration(with:)` to accept
+  all BSON types. Partition values can currently be of types `String`, `Int`,
+  or `ObjectId`. Opening a realm by partition value is the equivalent of
+  previously opening a realm by URL. In this case, partitions are meant to be
+  more closely associated with your data. E.g., if you are running a `Dog`
+  kennel, and have a field `breed` that acts as your partition key, you could
+  open up realms based on the breed of the dogs.
+* Add ability to stream change events on a remote MongoDB collection with
+  `[RLMMongoCollection watch:delegate:delegateQueue]`,
+  `MongoCollection.watch(delegate)`. When calling `watch(delegate)` you will be
+  given a `RLMChangeStream` (`ChangeStream`), this will be used to invalidate
+  and stop the streaming session by calling `[RLMChangeStream close]`
+  (`ChangeStream.close()`) when needed.
+* Add `MongoCollection.watch`, which is a Combine publisher that will stream
+  change events each time the remote MongoDB collection is updated.
+* Add the ability to listen for when a Watch Change Stream is opened when using
+  Combine. Use `onOpen(event:)` directly after opening a `WatchPublisher` to
+  register a callback to be invoked once the change stream is opened.
+
+### Compatibility
+
+* File format: Generates Realms with format v20 (Reads and upgrades all previous formats)
+* Realm Studio: 10.0.0 or later.
+* Carthage release for Swift is built with Xcode 12
+
+### Internal
+
+* Upgraded realm-core from v6.1.4 to v10.0.0
+* Upgraded realm-sync from v5.0.29 to v10.0.0
+
 10.0.0-rc.2 Release notes (2020-10-15)
 =============================================================
 
