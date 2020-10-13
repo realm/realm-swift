@@ -20,7 +20,7 @@
 #import "RLMBSON_Private.hpp"
 
 @interface RLMFindOneAndModifyOptions() {
-    realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions _options;
+    realm::app::MongoCollection::FindOneAndModifyOptions _options;
 };
 @end
 
@@ -39,7 +39,7 @@
     return self;
 }
 
-- (realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions)_findOneAndModifyOptions {
+- (realm::app::MongoCollection::FindOneAndModifyOptions)_findOneAndModifyOptions {
     return _options;
 }
 

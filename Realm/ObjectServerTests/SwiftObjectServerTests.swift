@@ -1602,9 +1602,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let insertManyEx = expectation(description: "Insert many documents")
         collection.insertMany([document, document2, document3, document4]) { (objIds, error) in
             XCTAssertNotNil(objectIds)
-            XCTAssertEqual(objIds?.count, 4)
+            XCTAssertEqual(objIds!.count, 4)
             XCTAssertNil(error)
-            objectIds = objIds!.map {try! ObjectId(string: $0.stringValue)}
+            objectIds = objIds!.map { $0!.objectIdValue! }
             insertManyEx.fulfill()
         }
         wait(for: [insertManyEx], timeout: 4.0)
@@ -1663,7 +1663,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotNil(objectIds)
             XCTAssertEqual(objIds?.count, 4)
             XCTAssertNil(error)
-            objectIds = objIds!.map {try! ObjectId(string: $0.stringValue)}
+            objectIds = objIds!.map { $0!.objectIdValue! }
             insertManyEx.fulfill()
         }
         wait(for: [insertManyEx], timeout: 4.0)
@@ -1720,7 +1720,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotNil(objectIds)
             XCTAssertEqual(objIds?.count, 4)
             XCTAssertNil(error)
-            objectIds = objIds!.map {try! ObjectId(string: $0.stringValue)}
+            objectIds = objIds!.map { $0!.objectIdValue! }
             insertManyEx.fulfill()
         }
         wait(for: [insertManyEx], timeout: 4.0)
@@ -1885,7 +1885,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotNil(objectIds)
             XCTAssertEqual(objIds?.count, 4)
             XCTAssertNil(error)
-            objectIds = objIds!.map {try! ObjectId(string: $0.stringValue)}
+            objectIds = objIds!.map { $0!.objectIdValue! }
             insertManyEx.fulfill()
         }
         wait(for: [insertManyEx], timeout: 4.0)
@@ -1974,7 +1974,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotNil(objectIds)
             XCTAssertEqual(objIds?.count, 4)
             XCTAssertNil(error)
-            objectIds = objIds!.map {try! ObjectId(string: $0.stringValue)}
+            objectIds = objIds!.map { $0!.objectIdValue! }
             insertManyEx.fulfill()
         }
         wait(for: [insertManyEx], timeout: 4.0)

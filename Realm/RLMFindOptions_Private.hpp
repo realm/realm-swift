@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMFindOptions ()
 
-- (realm::app::RemoteMongoCollection::RemoteFindOptions)_findOptions;
+- (realm::app::MongoCollection::FindOptions)_findOptions;
 
 @end
 

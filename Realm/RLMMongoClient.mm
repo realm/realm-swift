@@ -28,16 +28,16 @@
 
 @implementation RLMMongoClient
 
-- (instancetype)initWithApp:(RLMApp *)app serviceName:(NSString *)serviceName {
+- (instancetype)initWithUser:(RLMUser *)user serviceName:(NSString *)serviceName {
     if (self = [super init]) {
-        _app = app;
+        _user = user;
         _name = serviceName;
     }
     return self;
 }
 
 - (RLMMongoDatabase *)databaseWithName:(NSString *)name {
-    return [[RLMMongoDatabase alloc] initWithApp:self.app
+    return [[RLMMongoDatabase alloc] initWithUser:self.user
                                      serviceName:self.name
                                     databaseName:name];
 }
@@ -46,11 +46,11 @@
 
 @implementation RLMMongoDatabase
 
-- (instancetype)initWithApp:(RLMApp *)app
+- (instancetype)initWithUser:(RLMUser *)user
                 serviceName:(NSString *)serviceName
                databaseName:(NSString *)databaseName {
     if (self = [super init]) {
-        _app = app;
+        _user = user;
         _serviceName = serviceName;
         _name = databaseName;
     }
@@ -58,7 +58,7 @@
 }
 
 - (RLMMongoCollection *)collectionWithName:(NSString *)name {
-    return [[RLMMongoCollection alloc] initWithApp:self.app
+    return [[RLMMongoCollection alloc] initWithUser:self.user
                                        serviceName:self.serviceName
                                       databaseName:self.name
                                     collectionName:name];

@@ -17,17 +17,16 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMMongoClient.h>
-#import "sync/remote_mongo_client.hpp"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMApp;
+@class RLMUser;
 
 @interface RLMMongoClient ()
 
-@property (nonatomic, strong) RLMApp *app;
+@property (nonatomic, strong) RLMUser *user;
 
-- (instancetype)initWithApp:(RLMApp *)app serviceName:(NSString *)serviceName;
+- (instancetype)initWithUser:(RLMUser *)user serviceName:(NSString *)serviceName;
 
 @end
 

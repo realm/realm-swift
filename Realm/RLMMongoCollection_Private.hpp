@@ -16,15 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMMongoClient.h>
-#import "RLMNetworkTransport_Private.hpp"
-#import "sync/remote_mongo_client.hpp"
+#import <Realm/RLMMongoCollection.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMApp;
+@class RLMUser;
+@protocol RLMChangeEventDelegate;
 
-@interface RLMChangeStream()
+@interface RLMChangeStream ()
 - (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber
                                 delegateQueue:(nullable dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
@@ -33,14 +32,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMMongoCollection ()
 
-@property (nonatomic, strong) RLMApp *app;
+@property (nonatomic, strong) RLMUser *user;
 @property (nonatomic, strong) NSString *serviceName;
 @property (nonatomic, strong) NSString *databaseName;
 
-- (instancetype)initWithApp:(RLMApp *)app
-                serviceName:(NSString *)serviceName
-               databaseName:(NSString *)databaseName
-             collectionName:(NSString *)collectionName;
+- (instancetype)initWithUser:(RLMUser *)user
+                 serviceName:(NSString *)serviceName
+                databaseName:(NSString *)databaseName
+              collectionName:(NSString *)collectionName;
 
 @end
 

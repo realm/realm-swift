@@ -21,12 +21,12 @@
 
 @implementation RLMUpdateResult
 
-- (instancetype)initWithRemoteUpdateResult:(realm::app::RemoteMongoCollection::RemoteUpdateResult)remoteUpdateResult {
+- (instancetype)initWithUpdateResult:(realm::app::MongoCollection::UpdateResult)UpdateResult {
     if (self = [super init]) {
-        _matchedCount = remoteUpdateResult.matched_count;
-        _modifiedCount = remoteUpdateResult.modified_count;
-        if (remoteUpdateResult.upserted_id) {
-            _objectId = [[RLMObjectId alloc] initWithValue:*remoteUpdateResult.upserted_id];
+        _matchedCount = UpdateResult.matched_count;
+        _modifiedCount = UpdateResult.modified_count;
+        if (UpdateResult.upserted_id) {
+            _objectId = [[RLMObjectId alloc] initWithValue:*UpdateResult.upserted_id];
         }
     }
     return self;

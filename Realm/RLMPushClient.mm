@@ -16,26 +16,29 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
 #import "RLMPushClient_Private.hpp"
-#import "RLMUser_Private.hpp"
+
 #import "RLMApp_Private.hpp"
+#import "RLMUser_Private.hpp"
+
 #import "sync/push_client.hpp"
 
+using realm::util::Optional;
+
 @implementation RLMPushClient {
-    std::unique_ptr<realm::app::PushClient> _pushClient;
+    Optional<realm::app::PushClient> _pushClient;
 }
 
 - (instancetype)initWithPushClient:(realm::app::PushClient&&)pushClient {
     if (self = [super init]) {
-        _pushClient = std::make_unique<realm::app::PushClient>(std::move(pushClient));
+        _pushClient = std::move(pushClient);
         return self;
     }
     return nil;
 }
 
 - (void)registerDeviceWithToken:(NSString *)token user:(RLMUser *)user completion:(RLMOptionalErrorBlock)completion {
-    self->_pushClient->register_device(token.UTF8String, user._syncUser, ^(util::Optional<app::AppError> error) {
+    _pushClient->register_device(token.UTF8String, user._syncUser, ^(Optional<realm::app::AppError> error) {
         if (error && error->error_code) {
             return completion(RLMAppErrorToNSError(*error));
         }
@@ -45,7 +48,7 @@
 
 
 - (void)deregisterDeviceForUser:(RLMUser *)user completion:(RLMOptionalErrorBlock)completion {
-    self->_pushClient->deregister_device(user._syncUser, ^(util::Optional<app::AppError> error) {
+    _pushClient->deregister_device(user._syncUser, ^(Optional<realm::app::AppError> error) {
         if (error && error->error_code) {
             return completion(RLMAppErrorToNSError(*error));
         }

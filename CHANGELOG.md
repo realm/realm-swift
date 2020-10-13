@@ -3,9 +3,25 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * Add the ability to listen for when a Watch Change Stream is opened when using Combine. Use `onOpen(event:)` directly after opening a `WatchPublisher` to register a callback to be invoked once the change stream is opened.
 
+### Breaking Changes
+* The insert operations on Mongo collections now report the inserted documents'
+  IDs as BSON rather than ObjectId.
+* Embedded objects can no longer form cycles at the schema level. For example,
+  type A can no longer have an object property of type A, or an object property
+  of type B if type B links to type A. This was always rejected by the server,
+  but previously was allowed in non-synchronized Realms.
+
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Set the precision correctly when serializing doubles in extended json.
+* Reading the `objectTypes` array from a Realm Configuration would not include
+  the embedded object types which were set in the array.
+* Reject loops in embedded objects as part of local schema validation rather
+  than as a server error.
+* Although MongoClient is obtained from a User, it was actually using the
+  User's App's current user rather than the User it was obtained from to make
+  requests.
+
 
 This release also contains the following changes from 5.4.7 - 5.5.0
 
@@ -41,8 +57,8 @@ This release also contains the following changes from 5.4.7 - 5.5.0
 
 ### Internal
 
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* Upgraded realm-core from v10.0.0-beta.9 to v10.0.0
+* Upgraded realm-sync from v10.0.0-beta.14 to v10.0.0
 
 10.0.0-rc.1 Release notes (2020-10-01)
 =============================================================

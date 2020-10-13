@@ -18,20 +18,13 @@
 
 #import "RLMUser.h"
 
-#import "RLMSyncConfiguration.h"
-#import "RLMSyncUtil_Private.h"
-
-#import "sync/sync_config.hpp"
 #import "sync/sync_user.hpp"
-#import "sync/impl/sync_metadata.hpp"
 
-@class RLMSyncConfiguration, RLMSyncSessionRefreshHandle;
-
-using namespace realm;
+@class RLMSyncConfiguration, RLMSyncSessionRefreshHandle, RLMApp;
 
 NS_ASSUME_NONNULL_BEGIN
 
-class CocoaSyncUserContext : public SyncUserContext {
+class CocoaSyncUserContext : public realm::SyncUserContext {
 public:
 
 private:
@@ -47,11 +40,11 @@ private:
 };
 
 @interface RLMUser ()
-- (instancetype)initWithUser:(std::shared_ptr<SyncUser>)user app:(RLMApp *)app;
+- (instancetype)initWithUser:(std::shared_ptr<realm::SyncUser>)user app:(RLMApp *)app;
 - (NSString *)pathForPartitionValue:(id<RLMBSON>)partitionValue;
-- (std::shared_ptr<SyncUser>)_syncUser;
+- (std::shared_ptr<realm::SyncUser>)_syncUser;
 + (void)_setUpBindingContextFactory;
-@property (weak, readonly) RLMApp* app;
+@property (weak, readonly) RLMApp *app;
 
 @end
 

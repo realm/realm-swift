@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMUpdateResult ()
 
-- (instancetype)initWithRemoteUpdateResult:(realm::app::RemoteMongoCollection::RemoteUpdateResult)remoteUpdateResult;
+- (instancetype)initWithUpdateResult:(realm::app::MongoCollection::UpdateResult)UpdateResult;
 
 @end
 
