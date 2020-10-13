@@ -214,7 +214,8 @@
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
 }
 
-- (void)testMultipleRegisterDevice {
+// FIXME: Reenable once possible underlying race condition is understood
+- (void)fixme_testMultipleRegisterDevice {
     RLMApp *app = [RLMApp appWithId:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *loginExpectation = [self expectationWithDescription:@"should login anonymously"];
     XCTestExpectation *registerExpectation = [self expectationWithDescription:@"should register device"];
