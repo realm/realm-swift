@@ -1814,7 +1814,9 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     // swiftlint:disable multiple_closures_with_trailing_closure
     func testWatchCombine() {
         let sema = DispatchSemaphore(value: 0)
+        let sema2 = DispatchSemaphore(value: 0)
         let openSema = DispatchSemaphore(value: 0)
+        let openSema2 = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
@@ -1835,23 +1837,29 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 watchEx1.fulfill()
                 XCTAssertFalse(Thread.isMainThread)
                 sema.signal()
-        }.store(in: &subscriptions)
+            }.store(in: &subscriptions)
 
         collection.watch()
+            .onOpen {
+                openSema2.signal()
+            }
             .subscribe(on: DispatchQueue.main)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { _ in }) { _ in
                 watchEx2.fulfill()
                 XCTAssertTrue(Thread.isMainThread)
-        }.store(in: &subscriptions)
+                sema2.signal()
+            }.store(in: &subscriptions)
 
         DispatchQueue.global().async {
             openSema.wait()
+            openSema2.wait()
             for i in 0..<3 {
                 collection.insertOne(document) { (_, error) in
                     XCTAssertNil(error)
                 }
                 sema.wait()
+                sema2.wait()
                 if i == 2 {
                     subscriptions.forEach { $0.cancel() }
                 }
