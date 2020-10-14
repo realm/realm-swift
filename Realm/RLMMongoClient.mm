@@ -38,8 +38,8 @@
 
 - (RLMMongoDatabase *)databaseWithName:(NSString *)name {
     return [[RLMMongoDatabase alloc] initWithUser:self.user
-                                     serviceName:self.name
-                                    databaseName:name];
+                                      serviceName:self.name
+                                     databaseName:name];
 }
 
 @end
@@ -47,8 +47,8 @@
 @implementation RLMMongoDatabase
 
 - (instancetype)initWithUser:(RLMUser *)user
-                serviceName:(NSString *)serviceName
-               databaseName:(NSString *)databaseName {
+                 serviceName:(NSString *)serviceName
+                databaseName:(NSString *)databaseName {
     if (self = [super init]) {
         _user = user;
         _serviceName = serviceName;

@@ -198,14 +198,14 @@
 
     RLMPushClient *client = [app pushClientWithServiceName:@"gcm"];
     expectation = [self expectationWithDescription:@"should register device"];
-    [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
+    [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError *_Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
 
     expectation = [self expectationWithDescription:@"should deregister device"];
-    [client deregisterDeviceForUser:[app currentUser] completion:^(NSError * _Nullable error) {
+    [client deregisterDeviceForUser:[app currentUser] completion:^(NSError *_Nullable error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
@@ -229,13 +229,13 @@
     [self waitForExpectations:@[loginExpectation] timeout:10.0];
 
     RLMPushClient *client = [app pushClientWithServiceName:@"gcm"];
-    [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
+    [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError *_Nullable error) {
         XCTAssertNil(error);
         [registerExpectation fulfill];
     }];
     [self waitForExpectations:@[registerExpectation] timeout:10.0];
 
-    [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
+    [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError *_Nullable error) {
         XCTAssertNil(error);
         [secondRegisterExpectation fulfill];
     }];
@@ -371,7 +371,7 @@
     // sleep for 2 seconds as there seems to be an issue fetching the keys straight after they are created.
     [NSThread sleepForTimeInterval:2];
 
-    [[syncUser apiKeysAuth] fetchAPIKeysWithCompletion:^(NSArray<RLMUserAPIKey *> * _Nonnull apiKeys, NSError *error) {
+    [[syncUser apiKeysAuth] fetchAPIKeysWithCompletion:^(NSArray<RLMUserAPIKey *> *_Nonnull apiKeys, NSError *error) {
         XCTAssert(!error);
         XCTAssert(apiKeys.count == 2);
         [fetchAPIKeysExpectation fulfill];
@@ -513,7 +513,7 @@
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"login should fail"];
 
-    [self.app loginWithCredential:credentials completion:^(RLMUser * user, NSError *error) {
+    [self.app loginWithCredential:credentials completion:^(RLMUser *user, NSError *error) {
         XCTAssertNil(user);
         XCTAssertNotNil(error);
         [expectation fulfill];
@@ -529,7 +529,7 @@
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"login should fail"];
 
-    [self.app loginWithCredential:credentials completion:^(RLMUser * user, NSError *error) {
+    [self.app loginWithCredential:credentials completion:^(RLMUser *user, NSError *error) {
         XCTAssertNil(user);
         XCTAssertNotNil(error);
         [expectation fulfill];
@@ -665,13 +665,13 @@
 
     XCTestExpectation *expectation1 = [self expectationWithDescription:@""];
     [app1 loginWithCredential:[RLMCredentials anonymousCredentials]
-                   completion:^(RLMUser * _Nullable, NSError * _Nullable) {
+                   completion:^(RLMUser *, NSError *) {
         [expectation1 fulfill];
     }];
 
     XCTestExpectation *expectation2 = [self expectationWithDescription:@""];
     [app2 loginWithCredential:[RLMCredentials anonymousCredentials]
-                   completion:^(RLMUser * _Nullable, NSError * _Nullable) {
+                   completion:^(RLMUser *, NSError *) {
         [expectation2 fulfill];
     }];
     [self waitForExpectationsWithTimeout:5.0 handler:nil];
@@ -1490,7 +1490,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         transferred = xfr;
         transferrable = xfb;
         callCount++;
-        if (transferred > 0 && transferred >= transferrable && transferrable > 1000000 * NUMBER_OF_BIG_OBJECTS) {
+        if (transferred > 0 && transferred >= transferrable && transferrable > 1000000 *NUMBER_OF_BIG_OBJECTS) {
             [ex fulfill];
         }
     }];
@@ -1918,7 +1918,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:0 projection:nil sort:nil];
     [collection findWhere:@{@"name": @"fido", @"breed": @"cane corso"}
                   options:options
-               completion:^(NSArray<NSDictionary *> * documents, NSError *error) {
+               completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
         XCTAssertEqual(documents.count, 3U);
         XCTAssertNil(error);
         [findExpectation fulfill];
@@ -1958,7 +1958,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *findExpectation2 = [self expectationWithDescription:@"should find documents"];
     [collection findWhere:@{@"name": @"fido", @"breed": @"cane corso"}
-               completion:^(NSArray<NSDictionary *> * documents, NSError *error) {
+               completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
         XCTAssertEqual(documents.count, 2U);
         XCTAssertNil(error);
         [findExpectation2 fulfill];
@@ -1967,7 +1967,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *findExpectation3 = [self expectationWithDescription:@"should not find documents"];
     [collection findWhere:@{@"name": @"should not exist", @"breed": @"should not exist"}
-               completion:^(NSArray<NSDictionary *> * documents, NSError *error) {
+               completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
         XCTAssertEqual(documents.count, NSUInteger(0));
         XCTAssertNil(error);
         [findExpectation3 fulfill];
@@ -1976,7 +1976,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *findExpectation4 = [self expectationWithDescription:@"should not find documents"];
     [collection findWhere:@{}
-               completion:^(NSArray<NSDictionary *> * documents, NSError *error) {
+               completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
         XCTAssertGreaterThan(documents.count, 0U);
         XCTAssertNil(error);
         [findExpectation4 fulfill];
@@ -1985,7 +1985,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *findOneExpectation1 = [self expectationWithDescription:@"should find documents"];
     [collection findOneDocumentWhere:@{@"name": @"fido", @"breed": @"cane corso"}
-                          completion:^(NSDictionary * document, NSError *error) {
+                          completion:^(NSDictionary *document, NSError *error) {
         XCTAssertTrue([document[@"name"] isEqualToString:@"fido"]);
         XCTAssertTrue([document[@"breed"] isEqualToString:@"cane corso"]);
         XCTAssertNil(error);
@@ -1996,7 +1996,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTestExpectation *findOneExpectation2 = [self expectationWithDescription:@"should find documents"];
     [collection findOneDocumentWhere:@{@"name": @"fido", @"breed": @"cane corso"}
                              options:options
-                          completion:^(NSDictionary * document, NSError *error) {
+                          completion:^(NSDictionary *document, NSError *error) {
         XCTAssertTrue([document[@"name"] isEqualToString:@"fido"]);
         XCTAssertTrue([document[@"breed"] isEqualToString:@"cane corso"]);
         XCTAssertNil(error);
@@ -2027,7 +2027,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *aggregateExpectation1 = [self expectationWithDescription:@"should aggregate documents"];
     [collection aggregateWithPipeline:@[@{@"name" : @"fido"}]
-                           completion:^(NSArray<NSDictionary *> * documents, NSError *error) {
+                           completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
         XCTAssertNotNil(error);
         XCTAssertTrue([error.domain.description isEqualToString:@"realm::app::ServiceError"]);
         XCTAssertNil(documents);
@@ -2037,7 +2037,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *aggregateExpectation2 = [self expectationWithDescription:@"should aggregate documents"];
     [collection aggregateWithPipeline:@[@{@"$match" : @{@"name" : @"fido"}}, @{@"$group" : @{@"_id" : @"$name"}}]
-                           completion:^(NSArray<NSDictionary *> * documents, NSError *error) {
+                           completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
         XCTAssertNil(error);
         XCTAssertNotNil(documents);
         XCTAssertGreaterThan(documents.count, 0U);
@@ -2076,7 +2076,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [collection updateOneDocumentWhere:@{@"name" : @"scrabby doo"}
                         updateDocument:@{@"name" : @"scooby"}
                                 upsert:YES
-                            completion:^(RLMUpdateResult * result, NSError *error) {
+                            completion:^(RLMUpdateResult *result, NSError *error) {
         XCTAssertNotNil(result);
         XCTAssertNotNil(result.objectId);
         XCTAssertEqual(result.modifiedCount, (NSUInteger)0);
@@ -2090,7 +2090,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [collection updateOneDocumentWhere:@{@"name" : @"scooby"}
                         updateDocument:@{@"name" : @"fred"}
                                 upsert:NO
-                            completion:^(RLMUpdateResult * result, NSError *error) {
+                            completion:^(RLMUpdateResult *result, NSError *error) {
         XCTAssertNotNil(result);
         XCTAssertNil(result.objectId);
         XCTAssertEqual(result.modifiedCount, (NSUInteger)1);
@@ -2103,7 +2103,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTestExpectation *updateExpectation3 = [self expectationWithDescription:@"should update document"];
     [collection updateOneDocumentWhere:@{@"name" : @"fred"}
                         updateDocument:@{@"name" : @"scrabby"}
-                            completion:^(RLMUpdateResult * result, NSError *error) {
+                            completion:^(RLMUpdateResult *result, NSError *error) {
         XCTAssertNotNil(result);
         XCTAssertNil(result.objectId);
         XCTAssertEqual(result.modifiedCount, (NSUInteger)1);
@@ -2116,7 +2116,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTestExpectation *updateManyExpectation1 = [self expectationWithDescription:@"should update many documents"];
     [collection updateManyDocumentsWhere:@{@"name" : @"scrabby"}
                           updateDocument:@{@"name" : @"fred"}
-                              completion:^(RLMUpdateResult * result, NSError *error) {
+                              completion:^(RLMUpdateResult *result, NSError *error) {
         XCTAssertNotNil(result);
         XCTAssertNil(result.objectId);
         XCTAssertEqual(result.modifiedCount, (NSUInteger)1);
@@ -2130,7 +2130,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [collection updateManyDocumentsWhere:@{@"name" : @"john"}
                           updateDocument:@{@"name" : @"alex"}
                                   upsert:YES
-                              completion:^(RLMUpdateResult * result, NSError *error) {
+                              completion:^(RLMUpdateResult *result, NSError *error) {
         XCTAssertNotNil(result);
         XCTAssertNotNil(result.objectId);
         XCTAssertEqual(result.modifiedCount, (NSUInteger)0);
@@ -2157,7 +2157,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [collection findOneAndUpdateWhere:@{@"name" : @"alex"}
                        updateDocument:@{@"name" : @"max"}
                               options:findAndModifyOptions
-                           completion:^(NSDictionary * document, NSError *error) {
+                           completion:^(NSDictionary *document, NSError *error) {
         XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
         XCTAssertNil(error);
         [findOneAndUpdateExpectation1 fulfill];
@@ -2167,7 +2167,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTestExpectation *findOneAndUpdateExpectation2 = [self expectationWithDescription:@"should find one document and update"];
     [collection findOneAndUpdateWhere:@{@"name" : @"max"}
                        updateDocument:@{@"name" : @"john"}
-                           completion:^(NSDictionary * document, NSError *error) {
+                           completion:^(NSDictionary *document, NSError *error) {
         XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
         XCTAssertNil(error);
         [findOneAndUpdateExpectation2 fulfill];
@@ -2178,7 +2178,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [collection findOneAndReplaceWhere:@{@"name" : @"alex"}
                    replacementDocument:@{@"name" : @"max"}
                                options:findAndModifyOptions
-                            completion:^(NSDictionary * document, NSError *error) {
+                            completion:^(NSDictionary *document, NSError *error) {
         XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
         XCTAssertNil(error);
         [findOneAndReplaceExpectation1 fulfill];
@@ -2188,7 +2188,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTestExpectation *findOneAndReplaceExpectation2 = [self expectationWithDescription:@"should find one document and replace"];
     [collection findOneAndReplaceWhere:@{@"name" : @"max"}
                    replacementDocument:@{@"name" : @"john"}
-                            completion:^(NSDictionary * document, NSError *error) {
+                            completion:^(NSDictionary *document, NSError *error) {
         XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
         XCTAssertNil(error);
         [findOneAndReplaceExpectation2 fulfill];
@@ -2216,7 +2216,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *findExpectation1 = [self expectationWithDescription:@"should find documents"];
     [collection findWhere:@{}
-               completion:^(NSArray<NSDictionary *> * documents, NSError *error) {
+               completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
         XCTAssertEqual(documents.count, 2U);
         XCTAssertTrue([documents[0][@"name"] isEqualToString:@"fido"]);
         XCTAssertNil(error);
@@ -2244,7 +2244,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *findOneAndDeleteExpectation1 = [self expectationWithDescription:@"should find one and delete"];
     [collection findOneAndDeleteWhere:@{@"name": @"john"}
-                           completion:^(NSDictionary<NSString *, id<RLMBSON>> * document, NSError *error) {
+                           completion:^(NSDictionary<NSString *, id<RLMBSON>> *document, NSError *error) {
         XCTAssertNotNil(document);
         NSString *name = (NSString *)document[@"name"];
         XCTAssertTrue([name isEqualToString:@"john"]);
@@ -2268,7 +2268,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     [collection findOneAndDeleteWhere:@{@"name": @"john"}
                               options:findOneAndModifyOptions
-                           completion:^(NSDictionary<NSString *, id<RLMBSON>> * document, NSError *error) {
+                           completion:^(NSDictionary<NSString *, id<RLMBSON>> *document, NSError *error) {
         XCTAssertNil(document);
         XCTAssertNil(error);
         [findOneAndDeleteExpectation2 fulfill];
@@ -2449,13 +2449,13 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         for (int i = 0; i < 3; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
-                                    completion:^(RLMUpdateResult * _Nullable, NSError *error) {
+                                    completion:^(RLMUpdateResult *, NSError *error) {
                 XCTAssertNil(error);
             }];
 
             [collection updateOneDocumentWhere:@{@"_id": objectIds[1]}
                                 updateDocument:@{@"breed": @"french bulldog", @"name": [NSString stringWithFormat:@"fido-%d", i]}
-                                    completion:^(RLMUpdateResult * _Nullable, NSError *error) {
+                                    completion:^(RLMUpdateResult *, NSError *error) {
                 XCTAssertNil(error);
             }];
             dispatch_semaphore_wait(testUtility.semaphore, DISPATCH_TIME_FOREVER);
@@ -2496,13 +2496,13 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         for (int i = 0; i < 3; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
-                                    completion:^(RLMUpdateResult * _Nullable, NSError *error) {
+                                    completion:^(RLMUpdateResult *, NSError *error) {
                 XCTAssertNil(error);
             }];
 
             [collection updateOneDocumentWhere:@{@"_id": objectIds[1]}
                                 updateDocument:@{@"breed": @"french bulldog", @"name": [NSString stringWithFormat:@"fido-%d", i]}
-                                    completion:^(RLMUpdateResult * _Nullable, NSError *error) {
+                                    completion:^(RLMUpdateResult *, NSError *error) {
                 XCTAssertNil(error);
             }];
             dispatch_semaphore_wait(testUtility.semaphore, DISPATCH_TIME_FOREVER);
@@ -2555,19 +2555,19 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         for (int i = 0; i < 3; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
-                                    completion:^(RLMUpdateResult * _Nullable, NSError *error) {
+                                    completion:^(RLMUpdateResult *, NSError *error) {
                 XCTAssertNil(error);
             }];
 
             [collection updateOneDocumentWhere:@{@"_id": objectIds[1]}
                                 updateDocument:@{@"breed": @"french bulldog", @"name": [NSString stringWithFormat:@"fido-%d", i]}
-                                    completion:^(RLMUpdateResult * _Nullable, NSError *error) {
+                                    completion:^(RLMUpdateResult *, NSError *error) {
                 XCTAssertNil(error);
             }];
 
             [collection updateOneDocumentWhere:@{@"_id": objectIds[2]}
                                 updateDocument:@{@"breed": @"german shepard", @"name": [NSString stringWithFormat:@"fido-%d", i]}
-                                    completion:^(RLMUpdateResult * _Nullable, NSError *error) {
+                                    completion:^(RLMUpdateResult *, NSError *error) {
                 XCTAssertNil(error);
             }];
             dispatch_semaphore_wait(testUtility1.semaphore, DISPATCH_TIME_FOREVER);

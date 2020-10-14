@@ -28,8 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString *serviceName;
 
 - (instancetype)initWithUser:(RLMUser *)user
-                serviceName:(NSString *)serviceName
-               databaseName:(NSString *)databaseName;
+                 serviceName:(NSString *)serviceName
+                databaseName:(NSString *)databaseName;
 
 @end
 
