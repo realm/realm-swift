@@ -26,6 +26,9 @@
 #import "RLMUtil.hpp"
 #import "RLMEmailPasswordAuth.h"
 
+#include "sync/sync_config.hpp"
+#include "sync/sync_manager.hpp"
+
 #if !defined(REALM_COCOA_VERSION)
 #import "RLMVersion.h"
 #endif

@@ -189,15 +189,23 @@ class RealmTests: TestCase {
 
     func testInitCustomClassList() {
         let configuration = Realm.Configuration(fileURL: Realm.Configuration.defaultConfiguration.fileURL,
-                                                objectTypes: [EmbeddedTreeObject.self, EmbeddedParentObject.self, SwiftStringObject.self])
-        XCTAssert(configuration.objectTypes![0] is SwiftStringObject.Type)
-        XCTAssert(configuration.objectTypes![1] is EmbeddedParentObject.Type)
-        XCTAssertFalse(configuration.objectTypes!.contains(where: { type -> Bool in
-            type == EmbeddedTreeObject.self
-        }))
+                                                objectTypes: [
+                                                    EmbeddedTreeObject1.self,
+                                                    EmbeddedTreeObject2.self,
+                                                    EmbeddedTreeObject3.self,
+                                                    EmbeddedParentObject.self,
+                                                    SwiftStringObject.self
+        ])
+        let sorted = configuration.objectTypes!.sorted { $0.className() < $1.className() }
+        XCTAssertTrue(sorted[0] is EmbeddedParentObject.Type)
+        XCTAssertTrue(sorted[1] is EmbeddedTreeObject1.Type)
+        XCTAssertTrue(sorted[2] is EmbeddedTreeObject2.Type)
+        XCTAssertTrue(sorted[3] is EmbeddedTreeObject3.Type)
+        XCTAssertTrue(sorted[4] is SwiftStringObject.Type)
 
         let realm = try! Realm(configuration: configuration)
-        XCTAssertEqual(["SwiftStringObject", "EmbeddedParentObject", "EmbeddedTreeObject"], realm.schema.objectSchema.map { $0.className })
+        XCTAssertEqual(["EmbeddedParentObject", "EmbeddedTreeObject1", "EmbeddedTreeObject2", "EmbeddedTreeObject3", "SwiftStringObject"],
+                       realm.schema.objectSchema.map { $0.className }.sorted())
     }
 
     func testWrite() {

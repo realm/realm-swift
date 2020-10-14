@@ -28,6 +28,7 @@
 
 #import "shared_realm.hpp"
 
+#import "sync/sync_config.hpp"
 #import "sync/sync_user.hpp"
 
 NSString *const RLMSyncErrorDomain = @"io.realm.sync";
@@ -41,6 +42,8 @@ NSString *const kRLMSyncErrorStatusCodeKey      = @"statusCode";
 NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
 
 #pragma mark - C++ APIs
+
+using namespace realm;
 
 SyncSessionStopPolicy translateStopPolicy(RLMSyncStopPolicy stopPolicy) {
     switch (stopPolicy) {

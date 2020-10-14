@@ -59,7 +59,7 @@
     XCTAssertEqualObjects(objectSchema.description, @"PrimaryStringObject {\n"
                                                     @"\tstringCol {\n"
                                                     @"\t\ttype = string;\n"
-                                                    @"\t\tindexed = NO;\n"
+                                                    @"\t\tindexed = YES;\n"
                                                     @"\t\tisPrimary = YES;\n"
                                                     @"\t\tarray = NO;\n"
                                                     @"\t\toptional = NO;\n"

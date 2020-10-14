@@ -17,13 +17,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <Realm/RLMObjectId.h>
+
 #import <Realm/RLMNetworkTransport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 @protocol RLMBSON;
 
-@class RLMApp, RLMFindOptions, RLMFindOneAndModifyOptions, RLMUpdateResult, RLMChangeStream;
+@class RLMFindOptions, RLMFindOneAndModifyOptions, RLMUpdateResult, RLMChangeStream, RLMObjectId;
 
 /// Delegate which is used for subscribing to changes on a `[RLMMongoCollection watch]` stream.
 @protocol RLMChangeEventDelegate
@@ -45,7 +45,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMChangeStream : NSObject<RLMEventDelegate>
 /// Stops a watch streaming session.
 - (void)close;
-
 @end
 
 /// The `RLMMongoCollection` represents a MongoDB collection.
@@ -67,10 +66,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// - SeeAlso:
 /// `RLMMongoClient`, `RLMMongoDatabase`
 @interface RLMMongoCollection : NSObject
-/// Block which returns an RLMObjectId on a successful insert, or an error should one occur.
-typedef void(^RLMMongoInsertBlock)(RLMObjectId * _Nullable, NSError * _Nullable);
-/// Block which returns an array of RLMObjectId's on a successful insertMany, or an error should one occur.
-typedef void(^RLMMongoInsertManyBlock)(NSArray<RLMObjectId *> * _Nullable, NSError * _Nullable);
+/// Block which returns an object id on a successful insert, or an error should one occur.
+typedef void(^RLMMongoInsertBlock)(id<RLMBSON> _Nullable, NSError * _Nullable);
+/// Block which returns an array of object ids on a successful insertMany, or an error should one occur.
+typedef void(^RLMMongoInsertManyBlock)(NSArray<id<RLMBSON>> * _Nullable, NSError * _Nullable);
 /// Block which returns an array of Documents on a successful find operation, or an error should one occur.
 typedef void(^RLMMongoFindBlock)(NSArray<NSDictionary<NSString *, id<RLMBSON>> *> * _Nullable, NSError * _Nullable);
 /// Block which returns a Document on a successful findOne operation, or an error should one occur.

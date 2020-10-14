@@ -21,6 +21,6 @@
 
 @interface RLMFindOneAndModifyOptions ()
 
-- (realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions)_findOneAndModifyOptions;
+- (realm::app::MongoCollection::FindOneAndModifyOptions)_findOneAndModifyOptions;
 
 @end

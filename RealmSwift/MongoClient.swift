@@ -140,10 +140,10 @@ extension FindOneAndModifyOptions {
 /// The result of an `updateOne` or `updateMany` operation a `MongoCollection`.
 public typealias UpdateResult = RLMUpdateResult
 
-/// Block which returns an RLMObjectId on a successful insert, or an error should one occur.
-public typealias MongoInsertBlock = RLMMongoInsertBlock
-/// Block which returns an array of RLMObjectId's on a successful insertMany, or an error should one occur.
-public typealias MongoInsertManyBlock = RLMMongoInsertManyBlock
+/// Block which returns a document id on a successful insert, or an error should one occur.
+public typealias MongoInsertBlock = (AnyBSON?, Error?) -> Void
+/// Block which returns an array of document ids on a successful insertMany, or an error should one occur.
+public typealias MongoInsertManyBlock = ([AnyBSON?]?, Error?) -> Void
 /// Block which returns an array of Documents on a successful find operation, or an error should one occur.
 public typealias MongoFindBlock = RLMMongoFindBlock
 /// Block which returns a Document on a successful findOne operation, or an error should one occur.
@@ -200,7 +200,9 @@ extension MongoCollection {
     ///   - completion: The result of attempting to perform the insert. An Id will be returned for the inserted object on sucess
     public func insertOne(_ document: Document, _ completion: @escaping MongoInsertBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(document))
-        self.__insertOneDocument(bson as! [String: RLMBSON], completion: completion)
+        self.__insertOneDocument(bson as! [String: RLMBSON]) { id, error in
+            completion(ObjectiveCSupport.convert(object: id), error)
+        }
     }
 
     /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
@@ -210,7 +212,9 @@ extension MongoCollection {
     ///   - completion: The result of the insert, returns an array inserted document ids in order.
     public func insertMany(_ documents: [Document], _ completion: @escaping MongoInsertManyBlock) {
         let bson = ObjectiveCSupport.convert(object: .array(documents.map {.document($0)}))
-        self.__insertManyDocuments(bson as! [[String: RLMBSON]], completion: completion)
+        self.__insertManyDocuments(bson as! [[String: RLMBSON]]) { ids, error in
+            completion(ids?.map(ObjectiveCSupport.convert), error)
+        }
     }
 
     /// Finds the documents in this collection which match the provided filter.
@@ -737,12 +741,12 @@ public extension MongoCollection {
     /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
     /// generated for it.
     /// @param document:  A `Document` value to insert.
-    /// @returns A publisher that eventually return `ObjectId` of inserted document or `Error`.
-    func insertOne(_ document: Document) -> Future<ObjectId, Error> {
+    /// @returns A publisher that eventually return the object id of the inserted document or `Error`.
+    func insertOne(_ document: Document) -> Future<AnyBSON?, Error> {
         return Future { promise in
             self.insertOne(document) { objectId, error in
                 if let objectId = objectId {
-                    promise(.success(try! ObjectId(string: objectId.stringValue)))
+                    promise(.success(objectId))
                 } else {
                     promise(.failure(error ?? Realm.Error.promiseFailed))
                 }
@@ -753,11 +757,11 @@ public extension MongoCollection {
     /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
     /// they will be generated.
     /// @param documents: The `Document` values in a bson array to insert.
-    /// @returns A publisher that eventually return `[ObjectId]` of inserted documents or `Error`.
-    func insertMany(_ documents: [Document]) -> Future<[ObjectId], Error> {
+    /// @returns A publisher that eventually return the object ids of inserted documents or `Error`.
+    func insertMany(_ documents: [Document]) -> Future<[AnyBSON?], Error> {
         return Future { promise in
             self.insertMany(documents) { objectIds, error in
-                if let objectIds = objectIds?.map({ try! ObjectId(string: $0.stringValue) }) {
+                if let objectIds = objectIds {
                     promise(.success(objectIds))
                 } else {
                     promise(.failure(error ?? Realm.Error.promiseFailed))

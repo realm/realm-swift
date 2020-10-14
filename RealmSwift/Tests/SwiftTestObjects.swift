@@ -612,27 +612,45 @@ class LinkToSwiftRenamedProperties2: Object {
 }
 
 class EmbeddedParentObject: Object {
-    @objc dynamic var object: EmbeddedTreeObject?
-    let array = List<EmbeddedTreeObject>()
+    @objc dynamic var object: EmbeddedTreeObject1?
+    let array = List<EmbeddedTreeObject1>()
 }
 
 class EmbeddedPrimaryParentObject: Object {
     @objc dynamic var pk: Int = 0
-    @objc dynamic var object: EmbeddedTreeObject?
-    let array = List<EmbeddedTreeObject>()
+    @objc dynamic var object: EmbeddedTreeObject1?
+    let array = List<EmbeddedTreeObject1>()
 
     override class func primaryKey() -> String? {
         return "pk"
     }
 }
 
-class EmbeddedTreeObject: EmbeddedObject {
+protocol EmbeddedTreeObject: EmbeddedObject {
+    var value: Int { get set }
+}
+
+class EmbeddedTreeObject1: EmbeddedObject, EmbeddedTreeObject {
     @objc dynamic var value = 0
-    @objc dynamic var child: EmbeddedTreeObject?
-    let children = List<EmbeddedTreeObject>()
+    @objc dynamic var child: EmbeddedTreeObject2?
+    let children = List<EmbeddedTreeObject2>()
 
     let parent1 = LinkingObjects(fromType: EmbeddedParentObject.self, property: "object")
     let parent2 = LinkingObjects(fromType: EmbeddedParentObject.self, property: "array")
-    let parent3 = LinkingObjects(fromType: EmbeddedTreeObject.self, property: "child")
-    let parent4 = LinkingObjects(fromType: EmbeddedTreeObject.self, property: "children")
+}
+
+class EmbeddedTreeObject2: EmbeddedObject, EmbeddedTreeObject {
+    @objc dynamic var value = 0
+    @objc dynamic var child: EmbeddedTreeObject3?
+    let children = List<EmbeddedTreeObject3>()
+
+    let parent3 = LinkingObjects(fromType: EmbeddedTreeObject1.self, property: "child")
+    let parent4 = LinkingObjects(fromType: EmbeddedTreeObject1.self, property: "children")
+}
+
+class EmbeddedTreeObject3: EmbeddedObject, EmbeddedTreeObject {
+    @objc dynamic var value = 0
+
+    let parent3 = LinkingObjects(fromType: EmbeddedTreeObject2.self, property: "child")
+    let parent4 = LinkingObjects(fromType: EmbeddedTreeObject2.self, property: "children")
 }

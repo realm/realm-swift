@@ -200,7 +200,7 @@ extension Realm {
         /// The classes managed by the Realm.
         public var objectTypes: [ObjectBase.Type]? {
             get {
-                return self.customSchema.map { $0.objectSchema.compactMap { $0.objectClass as? Object.Type } }
+                return self.customSchema.map { $0.objectSchema.compactMap { $0.objectClass as? ObjectBase.Type } }
             }
             set {
                 self.customSchema = newValue.map { RLMSchema(objectClasses: $0) }

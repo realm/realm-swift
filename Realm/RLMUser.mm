@@ -201,7 +201,7 @@ using namespace realm;
 }
 
 - (RLMMongoClient *)mongoClientWithServiceName:(NSString *)serviceName {
-    return [[RLMMongoClient alloc] initWithApp:_app serviceName:serviceName];
+    return [[RLMMongoClient alloc] initWithUser:self serviceName:serviceName];
 }
 
 - (void)callFunctionNamed:(NSString *)name

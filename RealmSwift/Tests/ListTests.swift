@@ -33,7 +33,7 @@ class ListTests: TestCase {
         fatalError("abstract")
     }
 
-    func createEmbeddedArray() -> List<EmbeddedTreeObject> {
+    func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
         fatalError("abstract")
     }
 
@@ -512,7 +512,7 @@ class ListTests: TestCase {
 
         list.realm?.beginWrite()
         for i in 0..<10 {
-            list.append(EmbeddedTreeObject(value: [i]))
+            list.append(EmbeddedTreeObject1(value: [i]))
         }
         XCTAssertEqual(10, list.count)
 
@@ -533,10 +533,10 @@ class ListTests: TestCase {
         let list = createEmbeddedArray()
 
         list.realm?.beginWrite()
-        list.append(EmbeddedTreeObject(value: [0]))
+        list.append(EmbeddedTreeObject1(value: [0]))
 
         let oldObj = list[0]
-        let obj = EmbeddedTreeObject(value: [1])
+        let obj = EmbeddedTreeObject1(value: [1])
         list[0] = obj
         XCTAssertTrue(list[0].isSameObject(as: obj))
         XCTAssertEqual(obj.value, 1)
@@ -549,6 +549,41 @@ class ListTests: TestCase {
         }
 
         list.realm?.cancelWrite()
+    }
+
+    func testUnmanagedListComparison() {
+        let obj = SwiftIntObject()
+        obj.intCol = 5
+        let obj2 = SwiftIntObject()
+        obj2.intCol = 6
+        let obj3 = SwiftIntObject()
+        obj3.intCol = 8
+
+        let objects = [obj, obj2, obj3]
+        let objects2 = [obj, obj2]
+
+        let list1 = List<SwiftIntObject>()
+        let list2 = List<SwiftIntObject>()
+        XCTAssertEqual(list1, list2, "Empty instances should be equal by `==` operator")
+
+        list1.append(objectsIn: objects)
+        list2.append(objectsIn: objects)
+
+        let list3 = List<SwiftIntObject>()
+        list3.append(objectsIn: objects2)
+
+        XCTAssertTrue(list1 !== list2, "instances should not be identical")
+
+        XCTAssertEqual(list1, list2, "instances should be equal by `==` operator")
+        XCTAssertNotEqual(list1, list3, "instances should be equal by `==` operator")
+
+        XCTAssertTrue(list1.isEqual(list2), "instances should be equal by `isEqual` method")
+        XCTAssertTrue(!list1.isEqual(list3), "instances should be equal by `isEqual` method")
+
+        XCTAssertEqual(Array(list1), Array(list2), "instances converted to Swift.Array should be equal")
+        XCTAssertNotEqual(Array(list1), Array(list3), "instances converted to Swift.Array should be equal")
+        list3.append(obj3)
+        XCTAssertEqual(list1, list3, "instances should be equal by `==` operator")
     }
 }
 
@@ -565,8 +600,8 @@ class ListStandaloneTests: ListTests {
         return array
     }
 
-    override func createEmbeddedArray() -> List<EmbeddedTreeObject> {
-        return List<EmbeddedTreeObject>()
+    override func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
+        return List<EmbeddedTreeObject1>()
     }
 }
 
@@ -590,7 +625,7 @@ class ListNewlyAddedTests: ListTests {
         return array
     }
 
-    override func createEmbeddedArray() -> List<EmbeddedTreeObject> {
+    override func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
         let parent = EmbeddedParentObject()
         let list = parent.array
         let realm = try! Realm()
@@ -620,7 +655,7 @@ class ListNewlyCreatedTests: ListTests {
         return array
     }
 
-    override func createEmbeddedArray() -> List<EmbeddedTreeObject> {
+    override func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
         let realm = try! Realm()
         return try! realm.write {
             realm.create(EmbeddedParentObject.self, value: []).array
@@ -651,7 +686,7 @@ class ListRetrievedTests: ListTests {
         return array
     }
 
-    override func createEmbeddedArray() -> List<EmbeddedTreeObject> {
+    override func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
         let realm = try! Realm()
         try! realm.write {
             realm.create(EmbeddedParentObject.self, value: [])
