@@ -6,6 +6,7 @@
 * Add the ability to capture a NotificationToken when using a Combine publisher
   that observes a Realm Object or Collection. The user will call
   `saveToken(on:at:)` directly after invoking the publisher to use the feature.
+* Throw an exception for Objects that have none of its properties marked with @objc.
 
 ### Fixed
 

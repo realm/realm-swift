@@ -19,7 +19,9 @@
 import Cocoa
 import RealmSwift
 
-open class MyModel: Object {}
+open class MyModel: Object {
+    @objc dynamic var requiredProperty: String?
+}
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {}
