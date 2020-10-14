@@ -628,9 +628,9 @@ case "$COMMAND" in
         sed -i '' 's/Realm.framework/RealmObjc.framework/' RealmObjc.xcframework/Info.plist
 
         find RealmSwift.xcframework -name '*.swiftinterface' \
-            -exec sed -i '' 's/import Realm/import RealmObjc/' {} \;
-        find RealmSwift.xcframework -name '*.swiftinterface' \
-            -exec sed -i '' 's/Realm.RLM/RealmObjc.RLM/g' {} \;
+            -exec sed -i '' 's/import Realm/import RealmObjc/' {} \; \
+            -exec sed -i '' 's/Realm.RLM/RealmObjc.RLM/g' {} \; \
+            -exec sed -i '' 's/Realm.RealmSwift/RealmObjc.RealmSwift/g' {} \; \
 
         # Realm is statically linked into RealmSwift so we no longer actually
         # need the obj-c static library, and just need the framework shell.
