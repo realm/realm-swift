@@ -484,17 +484,17 @@ class ObjectAccessorTests: TestCase {
         let parent = EmbeddedParentObject()
         realm.add(parent)
 
-        let child1 = EmbeddedTreeObject()
+        let child1 = EmbeddedTreeObject1()
         parent.object = child1
         XCTAssertEqual(child1.realm, realm)
         XCTAssertNoThrow(parent.object = child1)
 
-        let child2 = EmbeddedTreeObject()
+        let child2 = EmbeddedTreeObject1()
         parent.object = child2
         XCTAssertEqual(child1.realm, realm)
         XCTAssertTrue(child1.isInvalidated)
 
-        let child3 = EmbeddedTreeObject()
+        let child3 = EmbeddedTreeObject1()
         parent.array.append(child3)
         assertThrows(parent.object = child3,
                      reason: "Can't set link to existing managed embedded object")

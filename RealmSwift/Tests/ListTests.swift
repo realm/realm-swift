@@ -33,7 +33,7 @@ class ListTests: TestCase {
         fatalError("abstract")
     }
 
-    func createEmbeddedArray() -> List<EmbeddedTreeObject> {
+    func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
         fatalError("abstract")
     }
 
@@ -512,7 +512,7 @@ class ListTests: TestCase {
 
         list.realm?.beginWrite()
         for i in 0..<10 {
-            list.append(EmbeddedTreeObject(value: [i]))
+            list.append(EmbeddedTreeObject1(value: [i]))
         }
         XCTAssertEqual(10, list.count)
 
@@ -533,10 +533,10 @@ class ListTests: TestCase {
         let list = createEmbeddedArray()
 
         list.realm?.beginWrite()
-        list.append(EmbeddedTreeObject(value: [0]))
+        list.append(EmbeddedTreeObject1(value: [0]))
 
         let oldObj = list[0]
-        let obj = EmbeddedTreeObject(value: [1])
+        let obj = EmbeddedTreeObject1(value: [1])
         list[0] = obj
         XCTAssertTrue(list[0].isSameObject(as: obj))
         XCTAssertEqual(obj.value, 1)
@@ -600,8 +600,8 @@ class ListStandaloneTests: ListTests {
         return array
     }
 
-    override func createEmbeddedArray() -> List<EmbeddedTreeObject> {
-        return List<EmbeddedTreeObject>()
+    override func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
+        return List<EmbeddedTreeObject1>()
     }
 }
 
@@ -625,7 +625,7 @@ class ListNewlyAddedTests: ListTests {
         return array
     }
 
-    override func createEmbeddedArray() -> List<EmbeddedTreeObject> {
+    override func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
         let parent = EmbeddedParentObject()
         let list = parent.array
         let realm = try! Realm()
@@ -655,7 +655,7 @@ class ListNewlyCreatedTests: ListTests {
         return array
     }
 
-    override func createEmbeddedArray() -> List<EmbeddedTreeObject> {
+    override func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
         let realm = try! Realm()
         return try! realm.write {
             realm.create(EmbeddedParentObject.self, value: []).array
@@ -686,7 +686,7 @@ class ListRetrievedTests: ListTests {
         return array
     }
 
-    override func createEmbeddedArray() -> List<EmbeddedTreeObject> {
+    override func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
         let realm = try! Realm()
         try! realm.write {
             realm.create(EmbeddedParentObject.self, value: [])

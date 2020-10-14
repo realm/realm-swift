@@ -741,7 +741,7 @@ class ObjectCreationTests: TestCase {
     func testDynamicCreateEmbeddedDirectly() {
         let realm = try! Realm()
         realm.beginWrite()
-        assertThrows(realm.dynamicCreate("EmbeddedTreeObject", value: []),
+        assertThrows(realm.dynamicCreate("EmbeddedTreeObject1", value: []),
                      reasonMatching: "Embedded objects cannot be created directly")
         realm.cancelWrite()
     }
@@ -774,12 +774,12 @@ class ObjectCreationTests: TestCase {
 
     func testCreateEmbeddedWithUnmanagedObjects() {
         let sourceObject = EmbeddedParentObject()
-        sourceObject.object = EmbeddedTreeObject(value: [5])
-        sourceObject.object!.child = EmbeddedTreeObject(value: [6])
-        sourceObject.object!.children.append(EmbeddedTreeObject(value: [7]))
-        sourceObject.object!.children.append(EmbeddedTreeObject(value: [8]))
-        sourceObject.array.append(EmbeddedTreeObject(value: [9]))
-        sourceObject.array.append(EmbeddedTreeObject(value: [10]))
+        sourceObject.object = .init(value: [5])
+        sourceObject.object!.child = .init(value: [6])
+        sourceObject.object!.children.append(.init(value: [7]))
+        sourceObject.object!.children.append(.init(value: [8]))
+        sourceObject.array.append(.init(value: [9]))
+        sourceObject.array.append(.init(value: [10]))
 
         let realm = try! Realm()
         realm.beginWrite()
@@ -859,22 +859,35 @@ class ObjectCreationTests: TestCase {
         assertEqual(object.objectCol, existingObject)
     }
 
+    class EmbeddedObjectFactory {
+        private var value = 0
+        var objects = [EmbeddedObject]()
+
+        func create<T: EmbeddedTreeObject>() -> T {
+            let obj = T()
+            obj.value = value
+            value += 1
+            objects.append(obj)
+            return obj
+        }
+    }
+
     func testAddEmbedded() {
-        let objects = (0..<6).map { EmbeddedTreeObject(value: [$0]) }
+        let objectFactory = EmbeddedObjectFactory()
         let parent = EmbeddedParentObject()
-        parent.object = objects[0]
-        parent.object!.child = objects[1]
-        parent.object!.children.append(objects[2])
-        parent.object!.children.append(objects[3])
-        parent.array.append(objects[4])
-        parent.array.append(objects[5])
+        parent.object = objectFactory.create()
+        parent.object!.child = objectFactory.create()
+        parent.object!.children.append(objectFactory.create())
+        parent.object!.children.append(objectFactory.create())
+        parent.array.append(objectFactory.create())
+        parent.array.append(objectFactory.create())
 
         let realm = try! Realm()
         realm.beginWrite()
         realm.add(parent)
-        for (i, object) in objects.enumerated() {
+        for (i, object) in objectFactory.objects.enumerated() {
             XCTAssertEqual(object.realm, realm)
-            XCTAssertEqual(object.value, i)
+            XCTAssertEqual((object as! EmbeddedTreeObject).value, i)
         }
         XCTAssertEqual(parent.object!.value, 0)
         XCTAssertEqual(parent.object!.child!.value, 1)
@@ -903,22 +916,22 @@ class ObjectCreationTests: TestCase {
     }
 
     func testAddAndUpdateEmbedded() {
-        let objects = (0..<12).map { EmbeddedTreeObject(value: [$0]) }
+        let objectFactory = EmbeddedObjectFactory()
         let parent = EmbeddedPrimaryParentObject()
-        parent.object = objects[0]
-        parent.object!.child = objects[1]
-        parent.object!.children.append(objects[2])
-        parent.object!.children.append(objects[3])
-        parent.array.append(objects[4])
-        parent.array.append(objects[5])
+        parent.object = objectFactory.create()
+        parent.object!.child = objectFactory.create()
+        parent.object!.children.append(objectFactory.create())
+        parent.object!.children.append(objectFactory.create())
+        parent.array.append(objectFactory.create())
+        parent.array.append(objectFactory.create())
 
         let parent2 = EmbeddedPrimaryParentObject()
-        parent2.object = objects[6]
-        parent2.object!.child = objects[7]
-        parent2.object!.children.append(objects[8])
-        parent2.object!.children.append(objects[9])
-        parent2.array.append(objects[10])
-        parent2.array.append(objects[11])
+        parent2.object = objectFactory.create()
+        parent2.object!.child = objectFactory.create()
+        parent2.object!.children.append(objectFactory.create())
+        parent2.object!.children.append(objectFactory.create())
+        parent2.array.append(objectFactory.create())
+        parent2.array.append(objectFactory.create())
 
         let realm = try! Realm()
         realm.beginWrite()
@@ -926,12 +939,12 @@ class ObjectCreationTests: TestCase {
         realm.add(parent2, update: .all)
 
         // update all deletes the old embedded objects and creates new ones
-        for (i, object) in objects.enumerated() {
+        for (i, object) in objectFactory.objects.enumerated() {
             XCTAssertEqual(object.realm, realm)
             if i < 6 {
                 XCTAssertTrue(object.isInvalidated)
             } else {
-                XCTAssertEqual(object.value, i)
+                XCTAssertEqual((object as! EmbeddedTreeObject).value, i)
             }
         }
         XCTAssertTrue(parent.isSameObject(as: parent2))
@@ -962,22 +975,22 @@ class ObjectCreationTests: TestCase {
     }
 
     func testAddAndUpdateChangedEmbedded() {
-        let objects = (0..<12).map { EmbeddedTreeObject(value: [$0]) }
+        let objectFactory = EmbeddedObjectFactory()
         let parent = EmbeddedPrimaryParentObject()
-        parent.object = objects[0]
-        parent.object!.child = objects[1]
-        parent.object!.children.append(objects[2])
-        parent.object!.children.append(objects[3])
-        parent.array.append(objects[4])
-        parent.array.append(objects[5])
+        parent.object = objectFactory.create()
+        parent.object!.child = objectFactory.create()
+        parent.object!.children.append(objectFactory.create())
+        parent.object!.children.append(objectFactory.create())
+        parent.array.append(objectFactory.create())
+        parent.array.append(objectFactory.create())
 
         let parent2 = EmbeddedPrimaryParentObject()
-        parent2.object = objects[6]
-        parent2.object!.child = objects[7]
-        parent2.object!.children.append(objects[8])
-        parent2.object!.children.append(objects[9])
-        parent2.array.append(objects[10])
-        parent2.array.append(objects[11])
+        parent2.object = objectFactory.create()
+        parent2.object!.child = objectFactory.create()
+        parent2.object!.children.append(objectFactory.create())
+        parent2.object!.children.append(objectFactory.create())
+        parent2.array.append(objectFactory.create())
+        parent2.array.append(objectFactory.create())
 
         let realm = try! Realm()
         realm.beginWrite()
@@ -985,9 +998,9 @@ class ObjectCreationTests: TestCase {
         realm.add(parent2, update: .modified)
 
         // update modified modifies the existing embedded objects
-        for (i, object) in objects.enumerated() {
+        for (i, object) in objectFactory.objects.enumerated() {
             XCTAssertEqual(object.realm, realm)
-            XCTAssertEqual(object.value, i < 6 ? i + 6 : i)
+            XCTAssertEqual((object as! EmbeddedTreeObject).value, i < 6 ? i + 6 : i)
         }
         XCTAssertTrue(parent.isSameObject(as: parent2))
         XCTAssertEqual(parent.object!.value, 6)
@@ -1024,16 +1037,6 @@ class ObjectCreationTests: TestCase {
 
         XCTAssertNil(weakObj1)
         XCTAssertNil(weakObj2)
-    }
-
-    func testAddEmbeddedObjectCycle() {
-        let parent = EmbeddedPrimaryParentObject()
-        parent.object = EmbeddedTreeObject()
-        parent.object!.child = parent.object
-        let realm = try! Realm()
-        realm.beginWrite()
-        assertThrows(realm.add(parent), "Cannot set a link to an existing managed embedded object")
-        realm.cancelWrite()
     }
 
     func testAddOrUpdateNil() {
