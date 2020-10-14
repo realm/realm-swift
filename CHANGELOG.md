@@ -21,9 +21,6 @@ read by versions older than v10.0.0.
   connection to your database.
 * Remove support for Query-based sync, including the configuration parameters
   and the `RLMSyncSubscription` and `SyncSubscription` types ([#6437](https://github.com/realm/realm-cocoa/pull/6437)).
-* Primary key properties are no longer marked as being indexed. This reflects
-  an internal change to how primary keys are handled that should not have any
-  other visible effects. ([#6440](https://github.com/realm/realm-cocoa/pull/6440)).
 * Remove everything related to sync permissions, including both the path-based
   permission system and the object-level privileges for query-based sync.
   Permissions are now configured via MongoDB Atlas.
@@ -48,16 +45,16 @@ read by versions older than v10.0.0.
   owned by a single parent object, and are deleted when that parent object is
   deleted. They are defined by subclassing `EmbeddedObject` /
   `RLMEmbeddedObject` rather than `Object` / `RLMObject`.
-* Add `-[RLMUser customData]`/`User.customData`.  Custom data is
+* Add `-[RLMUser customData]`/`User.customData`. Custom data is
   configured in your MongoDB Realm App.
-* Add `-[RLMApp callFunctionNamed:arguments]`/`RealmApp.functions`. This is the
-  entry point for calling Remote MongoDB Realm functions. Functions allow you
-  to define and execute server-side logic for your application. Functions are
-  written in modern JavaScript (ES6+) and execute in a serverless manner. When
-  you call a function, you can dynamically access components of the current
-  application as well as information about the request to execute the function
-  and the logged in user that sent the request.
-* Add `-[RLMApp mongoClientWithServiceName]`/`RealmApp.mongoClient`. This is
+* Add `-[RLMUser callFunctionNamed:arguments:completion:]`/`User.functions`.
+  This is the entry point for calling Remote MongoDB Realm functions. Functions
+  allow you to define and execute server-side logic for your application.
+  Functions are written in modern JavaScript (ES6+) and execute in a serverless
+  manner. When you call a function, you can dynamically access components of
+  the current application as well as information about the request to execute
+  the function and the logged in user that sent the request.
+* Add `-[RLMUser mongoClientWithServiceName:]`/`User.mongoClient`. This is
   the entry point for calling your Remote MongoDB Service. The read operations
   are `-[RLMMongoCollection findWhere:completion:]`, `-[RLMMongoCollection
   countWhere:completion:]`and `-[RLMMongoCollection
@@ -70,22 +67,21 @@ read by versions older than v10.0.0.
   deleteManyDocuments:completion:]`. If you are already familiar with MongoDB
   drivers, it is important to understand that the remote MongoCollection only
   provides access to the operations available in MongoDB Realm.
-* Change `[RLMUser
-  configurationWithPartitionValue:]`/`User.configuration(with:)` to accept
-  all BSON types. Partition values can currently be of types `String`, `Int`,
-  or `ObjectId`. Opening a realm by partition value is the equivalent of
-  previously opening a realm by URL. In this case, partitions are meant to be
-  more closely associated with your data. E.g., if you are running a `Dog`
-  kennel, and have a field `breed` that acts as your partition key, you could
-  open up realms based on the breed of the dogs.
+* Obtaining a Realm configuration from a user is now done with `[RLMUser
+  configurationWithPartitionValue:]`/`User.configuration(partitionValue:)`.
+  Partition values can currently be of types `String`, `Int`, or `ObjectId`,
+  and fill a similar role to Realm URLs did with Realm Cloud.  The main
+  difference is that partitions are meant to be more closely associated with
+  your data.  For example, if you are running a `Dog` kennel, and have a field
+  `breed` that acts as your partition key, you could open up realms based on
+  the breed of the dogs.
 * Add ability to stream change events on a remote MongoDB collection with
-  `[RLMMongoCollection watch:delegate:delegateQueue]`,
-  `MongoCollection.watch(delegate)`. When calling `watch(delegate)` you will be
-  given a `RLMChangeStream` (`ChangeStream`), this will be used to invalidate
-  and stop the streaming session by calling `[RLMChangeStream close]`
-  (`ChangeStream.close()`) when needed.
-* Add `MongoCollection.watch`, which is a Combine publisher that will stream
-  change events each time the remote MongoDB collection is updated.
+  `[RLMMongoCollection watch:delegate:delegateQueue:]`,
+  `MongoCollection.watch(delegate:)`. When calling `watch(delegate:)` you will be
+  given a `RLMChangeStream` (`ChangeStream`) which can be used to end watching
+  by calling `close()`. Change events can also be streamed using the
+  `MongoCollection.watch` Combine publisher that will stream change events each
+  time the remote MongoDB collection is updated.
 * Add the ability to listen for when a Watch Change Stream is opened when using
   Combine. Use `onOpen(event:)` directly after opening a `WatchPublisher` to
   register a callback to be invoked once the change stream is opened.
