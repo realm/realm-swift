@@ -3,9 +3,9 @@
 
 This release is functionally identical to v10.0.0-rc.2.
 
-NOTE: This version upgrades the Realm file format to version 20. Realm files
-opened will be automatically upgraded and cannot be read by versions older than
-v10.
+NOTE: This version upgrades the Realm file format version to add support for
+new data types. Realm files opened will be automatically upgraded and cannot be
+read by versions older than v10.0.0.
 
 ### Breaking Changes
 
@@ -92,7 +92,6 @@ v10.
 
 ### Compatibility
 
-* File format: Generates Realms with format v20 (Reads and upgrades all previous formats)
 * Realm Studio: 10.0.0 or later.
 * Carthage release for Swift is built with Xcode 12
 
