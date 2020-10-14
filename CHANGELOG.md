@@ -22,6 +22,11 @@ x.y.z Release notes (yyyy-MM-dd)
   User's App's current user rather than the User it was obtained from to make
   requests.
 
+* Reading the `objectTypes` array from a Realm Configuration would not include
+  the embedded object types which were set in the array.
+* Reject loops in embedded objects as part of local schema validation rather
+  than as a server error.
+
 
 This release also contains the following changes from 5.4.7 - 5.5.0
 
