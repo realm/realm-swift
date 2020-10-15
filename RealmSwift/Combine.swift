@@ -436,7 +436,7 @@ extension AnyRealmCollection: RealmSubscribable {
 
 /// A subscription which wraps a Realm notification.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public struct ObservationSubscription: Subscription {
+@frozen public struct ObservationSubscription: Subscription {
     private var token: NotificationToken
     internal init(token: NotificationToken) {
         self.token = token
@@ -474,7 +474,7 @@ public enum RealmPublishers {
     /// A publisher which emits Void each time the Realm is refreshed.
     ///
     /// Despite the name, this actually emits *after* the Realm is refreshed.
-    public struct RealmWillChange: Publisher {
+    @frozen public struct RealmWillChange: Publisher {
         /// This publisher cannot fail.
         public typealias Failure = Never
         /// This publisher emits Void.
@@ -543,7 +543,7 @@ public enum RealmPublishers {
     /// A publisher which emits Void each time the object is mutated.
     ///
     /// Despite the name, this actually emits *after* the collection has changed.
-    public struct WillChange<Collection: RealmSubscribable>: Publisher where Collection: ThreadConfined {
+    @frozen public struct WillChange<Collection: RealmSubscribable>: Publisher where Collection: ThreadConfined {
         /// This publisher cannot fail.
         public typealias Failure = Never
         /// This publisher emits Void.
@@ -609,7 +609,7 @@ public enum RealmPublishers {
     }
 
     /// A publisher which emits an object or collection each time that object is mutated.
-    public struct Value<Subscribable: RealmSubscribable>: Publisher where Subscribable: ThreadConfined {
+    @frozen public struct Value<Subscribable: RealmSubscribable>: Publisher where Subscribable: ThreadConfined {
         /// This publisher can only fail due to resource exhaustion when
         /// creating the worker thread used for change notifications.
         public typealias Failure = Error
@@ -754,7 +754,7 @@ public enum RealmPublishers {
     }
 
     /// A helper publisher used to support `receive(on:)` on Realm publishers.
-    public struct Handover<Upstream: Publisher, S: Scheduler>: Publisher where Upstream.Output: ThreadConfined {
+    @frozen public struct Handover<Upstream: Publisher, S: Scheduler>: Publisher where Upstream.Output: ThreadConfined {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -785,7 +785,7 @@ public enum RealmPublishers {
     /// A publisher which makes `receive(on:)` work for streams of thread-confined objects
     ///
     /// Create using .threadSafeReference()
-    public struct MakeThreadSafe<Upstream: Publisher>: Publisher where Upstream.Output: ThreadConfined {
+    @frozen public struct MakeThreadSafe<Upstream: Publisher>: Publisher where Upstream.Output: ThreadConfined {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -818,7 +818,7 @@ public enum RealmPublishers {
     ///
     /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
     /// that emits thread-confined objects.
-    public struct DeferredHandover<Upstream: Publisher, S: Scheduler>: Publisher where Upstream.Output: ThreadConfined {
+    @frozen public struct DeferredHandover<Upstream: Publisher, S: Scheduler>: Publisher where Upstream.Output: ThreadConfined {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -865,7 +865,7 @@ public enum RealmPublishers {
     /// should always be the first operation in the pipeline.
     ///
     /// Create this publisher using the `objectChangeset()` function.
-    public struct ObjectChangeset<O: Object>: Publisher {
+    @frozen public struct ObjectChangeset<O: Object>: Publisher {
         /// This publisher emits a ObjectChange<T> indicating which object and
         /// which properties of that object have changed each time a Realm is
         /// refreshed after a write transaction which modifies the observed
@@ -1042,7 +1042,7 @@ public enum RealmPublishers {
     }
 
     /// A helper publisher created by calling `.threadSafeReference()` on a publisher which emits thread-confined values.
-    public struct MakeThreadSafeObjectChangeset<Upstream: Publisher, T: Object>: Publisher where Upstream.Output == ObjectChange<T> {
+    @frozen public struct MakeThreadSafeObjectChangeset<Upstream: Publisher, T: Object>: Publisher where Upstream.Output == ObjectChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -1082,7 +1082,7 @@ public enum RealmPublishers {
     ///
     /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
     /// that emits `ObjectChange`.
-    public struct DeferredHandoverObjectChangeset<Upstream: Publisher, T: Object, S: Scheduler>: Publisher where Upstream.Output == ObjectChange<T> {
+    @frozen public struct DeferredHandoverObjectChangeset<Upstream: Publisher, T: Object, S: Scheduler>: Publisher where Upstream.Output == ObjectChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -1134,7 +1134,7 @@ public enum RealmPublishers {
     /// should always be the first operation in the pipeline.
     ///
     /// Create this publisher using the `changesetPublisher` property on RealmCollection..
-    public struct CollectionChangeset<Collection: RealmCollection>: Publisher {
+    @frozen public struct CollectionChangeset<Collection: RealmCollection>: Publisher {
         public typealias Output = RealmCollectionChange<Collection>
         /// This publisher reports error via the `.error` case of RealmCollectionChange..
         public typealias Failure = Never
@@ -1288,7 +1288,7 @@ public enum RealmPublishers {
 
     /// A helper publisher created by calling `.threadSafeReference()` on a
     /// publisher which emits `RealmCollectionChange`.
-    public struct MakeThreadSafeCollectionChangeset<Upstream: Publisher, T: RealmCollection>: Publisher where Upstream.Output == RealmCollectionChange<T> {
+    @frozen public struct MakeThreadSafeCollectionChangeset<Upstream: Publisher, T: RealmCollection>: Publisher where Upstream.Output == RealmCollectionChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -1322,7 +1322,7 @@ public enum RealmPublishers {
     ///
     /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
     /// that emits `RealmCollectionChange`.
-    public struct DeferredHandoverCollectionChangeset<Upstream: Publisher, T: RealmCollection, S: Scheduler>: Publisher where Upstream.Output == RealmCollectionChange<T> {
+    @frozen public struct DeferredHandoverCollectionChangeset<Upstream: Publisher, T: RealmCollection, S: Scheduler>: Publisher where Upstream.Output == RealmCollectionChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:

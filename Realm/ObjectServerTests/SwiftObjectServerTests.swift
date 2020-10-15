@@ -56,7 +56,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testBasicSwiftSyncWithNilPartitionValue() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
-            let realm = try synchronouslyOpenRealm(partitionValue: nil, user: user)
+            let realm = try synchronouslyOpenRealm(partitionValue: .null, user: user)
             XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
         } catch {
             XCTFail("Got an error: \(error)")
@@ -92,7 +92,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testSwiftAddObjectsWithNilPartitionValue() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
-            let realm = try synchronouslyOpenRealm(partitionValue: nil, user: user)
+            let realm = try synchronouslyOpenRealm(partitionValue: .null, user: user)
             if isParent {
                 waitForDownloads(for: realm)
                 checkCount(expected: 0, realm, SwiftPerson.self)

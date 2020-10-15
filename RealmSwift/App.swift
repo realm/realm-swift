@@ -81,7 +81,7 @@ Example Usage:
 let credentials = Credentials.JWT(token: myToken)
 ```
 */
-public enum Credentials {
+@frozen public enum Credentials {
     /// Credentials from a Facebook access token.
     case facebook(accessToken: String)
     /// Credentials from a Google serverAuthCode.

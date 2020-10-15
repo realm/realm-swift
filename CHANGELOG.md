@@ -13,7 +13,12 @@ x.y.z Release notes (yyyy-MM-dd)
 * Primary key properties are once again marked as being indexed. This reflects
   an internal change to how primary keys are handled that should not have any
   other visible effects.
-* Change paired return types from Swift completion handlers to return `Result<Value, Error>`
+* Change paired return types from Swift completion handlers to return `Result<Value, Error>`.
+* Adjust how RealmSwift.Object is defined to add support for Swift Library
+  Evolution mode. This should normally not have any effect, but you may need to
+  add `override` to initializers of object subclasses.
+* Add `.null` type to AnyBSON. This creates a distinction between null values
+  and properly absent BSON types.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
@@ -25,11 +30,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * Although MongoClient is obtained from a User, it was actually using the
   User's App's current user rather than the User it was obtained from to make
   requests.
-
-* Reading the `objectTypes` array from a Realm Configuration would not include
-  the embedded object types which were set in the array.
-* Reject loops in embedded objects as part of local schema validation rather
-  than as a server error.
 
 
 This release also contains the following changes from 5.4.7 - 5.5.0

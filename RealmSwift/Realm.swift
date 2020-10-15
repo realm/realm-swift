@@ -42,7 +42,7 @@ import Realm.Private
  done, trying to use the same instance in multiple blocks dispatch to the same
  queue may fail as queues are not always run on the same thread.
  */
-public struct Realm {
+@frozen public struct Realm {
 
     // MARK: Properties
 
@@ -147,7 +147,7 @@ public struct Realm {
      download via the sync session as the sync session itself is created
      asynchronously, and may not exist yet when Realm.asyncOpen() returns.
      */
-    public struct AsyncOpenTask {
+    @frozen public struct AsyncOpenTask {
         fileprivate let rlmTask: RLMAsyncOpenTask
 
         /**
@@ -343,7 +343,7 @@ public struct Realm {
     /**
      What to do when an object being added to or created in a Realm has a primary key that already exists.
      */
-    public enum UpdatePolicy: Int {
+    @frozen public enum UpdatePolicy: Int {
         /**
          Throw an exception. This is the default when no policy is specified for `add()` or `create()`.
 
@@ -913,7 +913,7 @@ extension Realm: Equatable {
 
 extension Realm {
     /// A notification indicating that changes were made to a Realm.
-    public enum Notification: String {
+    @frozen public enum Notification: String {
         /**
          This notification is posted when the data in a Realm has changed.
 

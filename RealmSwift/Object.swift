@@ -71,25 +71,14 @@ import Realm.Private
 
  See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
  */
-@objc(RealmSwiftObject)
-open class Object: RLMObjectBase, RealmCollectionValue {
+public typealias Object = RealmSwiftObject
+extension Object: RealmCollectionValue {
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectClassName: className())
     }
 
     // MARK: Initializers
-
-    /**
-     Creates an unmanaged instance of a Realm object.
-
-     Call `add(_:)` on a `Realm` instance to add an unmanaged object into that Realm.
-
-     - see: `Realm().add(_:)`
-     */
-    public override required init() {
-        super.init()
-    }
 
     /**
      Creates an unmanaged instance of a Realm object.
@@ -283,6 +272,9 @@ open class Object: RLMObjectBase, RealmCollectionValue {
      :nodoc:
      */
     public func dynamicList(_ propertyName: String) -> List<DynamicObject> {
+        if let dynamic = self as? DynamicObject {
+            return dynamic[propertyName] as! List<DynamicObject>
+        }
         return noWarnUnsafeBitCast(dynamicGet(key: propertyName) as! RLMListBase,
                                    to: List<DynamicObject>.self)
     }
@@ -306,8 +298,6 @@ open class Object: RLMObjectBase, RealmCollectionValue {
     public func isSameObject(as object: Object?) -> Bool {
         return RLMObjectBaseAreEqual(self, object)
     }
-
-
 }
 
 extension Object: ThreadConfined {
@@ -340,7 +330,7 @@ extension Object: ThreadConfined {
 /**
  Information about a specific property which changed in an `Object` change notification.
  */
-public struct PropertyChange {
+@frozen public struct PropertyChange {
     /**
      The name of the property which changed.
     */
@@ -370,7 +360,7 @@ public struct PropertyChange {
  Information about the changes made to an object which is passed to `Object`'s
  notification blocks.
  */
-public enum ObjectChange<T: Object> {
+@frozen public enum ObjectChange<T: Object> {
     /**
      If an error occurs, notification blocks are called one time with a `.error`
      result and an `NSError` containing details about the error. Currently the
@@ -401,11 +391,6 @@ public final class DynamicObject: Object {
         set(value) {
             RLMDynamicValidatedSet(self, key, value)
         }
-    }
-
-    /// :nodoc:
-    public override func dynamicList(_ propertyName: String) -> List<DynamicObject> {
-        return self[propertyName] as! List<DynamicObject>
     }
 
     /// :nodoc:

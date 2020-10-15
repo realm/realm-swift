@@ -721,3 +721,9 @@ uint64_t RLMObjectBaseGetCombineId(__unsafe_unretained RLMObjectBase *const obj)
     }
     return reinterpret_cast<uint64_t>((__bridge void *)obj);
 }
+
+@implementation RealmSwiftObject
+@end
+
+@implementation RealmSwiftEmbeddedObject
+@end
