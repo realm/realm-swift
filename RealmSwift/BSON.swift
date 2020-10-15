@@ -289,6 +289,7 @@ extension MinKey: BSON {
         return t
     }
 
+    /// If this `BSON` is a `.null` return true. Otherwise, false.
     public var isNull: Bool {
         return self == .null
     }
