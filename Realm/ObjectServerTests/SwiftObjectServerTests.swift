@@ -2195,7 +2195,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let objIds):
                 XCTAssertEqual(objIds.count, 4)
-            objectIds = objIds.map { $0!.objectIdValue! }
+                objectIds = objIds.map { $0!.objectIdValue! }
             case .failure(_):
                 XCTFail()
             }
