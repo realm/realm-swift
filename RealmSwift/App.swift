@@ -278,15 +278,7 @@ public extension APIKeyAuth {
      @returns A publisher that eventually return `UserAPIKey` or `Error`.
      */
     func createAPIKey(named: String) -> Future<UserAPIKey, Error> {
-        return Future { promise in
-            self.createAPIKey(named: named) { (userApiKey, error) in
-                if let userApiKey = userApiKey {
-                    promise(.success(userApiKey))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.createAPIKey(named: named, completion: $0) }
     }
 
     /**
@@ -295,15 +287,7 @@ public extension APIKeyAuth {
      @returns A publisher that eventually return `UserAPIKey` or `Error`.
      */
     func fetchAPIKey(_ objectId: ObjectId) -> Future<UserAPIKey, Error> {
-        return Future { promise in
-            self.fetchAPIKey(objectId) { (userApiKey, error) in
-                if let userApiKey = userApiKey {
-                    promise(.success(userApiKey))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.fetchAPIKey(objectId, completion: $0) }
     }
 
     /**
@@ -311,15 +295,7 @@ public extension APIKeyAuth {
      @returns A publisher that eventually return `[UserAPIKey]` or `Error`.
      */
     func fetchAPIKeys() -> Future<[UserAPIKey], Error> {
-        return Future { promise in
-            self.fetchAPIKeys { (userApiKeys, error) in
-                if let userApiKeys = userApiKeys {
-                    promise(.success(userApiKeys))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.fetchAPIKeys($0) }
     }
 
     /**
@@ -380,15 +356,7 @@ public extension App {
     /// @param credentials The credentials identifying the user.
     /// @returns A publisher that eventually return `User` or `Error`.
     func login(credentials: Credentials) -> Future<User, Error> {
-        return Future { promise in
-            self.login(credentials: credentials) { user, error in
-                if let user = user {
-                promise(.success(user))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.login(credentials: credentials, completion: $0) }
     }
 }
 
@@ -426,3 +394,64 @@ public extension PushClient {
     }
 }
 #endif // canImport(Combine)
+
+public extension APIKeyAuth {
+    /**
+     Creates a user API key that can be used to authenticate as the current user.
+     @param name The name of the API key to be created.
+     @completion A completion that eventually return `Result.success(UserAPIKey)` or `Result.failure(Error)`.
+     */
+    func createAPIKey(named: String, completion: @escaping (Result<UserAPIKey, Error>)->()) {
+        createAPIKey(named: named) { (userApiKey, error) in
+            if let userApiKey = userApiKey {
+                completion(.success(userApiKey))
+            } else {
+                completion(.failure(error ?? Realm.Error.callFailed))
+            }
+        }
+    }
+
+    /**
+     Fetches a user API key associated with the current user.
+     @param objectId The ObjectId of the API key to fetch.
+     @completion A completion that eventually return `Result.success(UserAPIKey)` or `Result.failure(Error)`.
+     */
+    func fetchAPIKey(_ objectId: ObjectId, completion: @escaping (Result<UserAPIKey, Error>)->()) {
+        fetchAPIKey(objectId) { (userApiKey, error) in
+            if let userApiKey = userApiKey {
+                completion(.success(userApiKey))
+            } else {
+                completion(.failure(error ?? Realm.Error.callFailed))
+            }
+        }
+    }
+    
+    /**
+     Fetches the user API keys associated with the current user.
+     @completion A completion that eventually return `Result.success([UserAPIKey])` or `Result.failure(Error)`.
+     */
+    func fetchAPIKeys(_ completion: @escaping (Result<[UserAPIKey], Error>)->()) {
+        fetchAPIKeys { (userApiKeys, error) in
+            if let userApiKeys = userApiKeys {
+                completion(.success(userApiKeys))
+            } else {
+                completion(.failure(error ?? Realm.Error.callFailed))
+            }
+        }
+    }
+}
+
+public extension App {
+    /// Login to a user for the Realm app.
+    /// @param credentials The credentials identifying the user.
+    /// @completion A completion that eventually return `Result.success(User)` or `Result.failure(Error)`.
+    func login(credentials: Credentials, completion: @escaping (Result<User, Error>)->()) {
+        login(credentials: credentials) { user, error in
+            if let user = user {
+                completion(.success(user))
+            } else {
+                completion(.failure(error ?? Realm.Error.callFailed))
+            }
+        }
+    }
+}
