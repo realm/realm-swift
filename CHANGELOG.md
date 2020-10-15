@@ -16,6 +16,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Adjust how RealmSwift.Object is defined to add support for Swift Library
   Evolution mode. This should normally not have any effect, but you may need to
   add `override` to initializers of object subclasses.
+* Add `.null` type to AnyBSON. This creates a distinction between null values
+  and properly absent BSON types.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
