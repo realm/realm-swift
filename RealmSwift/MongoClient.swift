@@ -156,19 +156,19 @@ public typealias MongoUpdateBlock = (UpdateResult?, Error?) -> Void
 public typealias MongoDeleteBlock = RLMMongoDeleteBlock
 
 /// Block which returns Result.success(DocumentId) on a successful insert or Result.failure(error)
-public typealias MongoInsertResultBlock = (Result<AnyBSON?, Error>)->()
+public typealias MongoInsertResultBlock = (Result<AnyBSON?, Error>) -> Void
 /// Block which returns Result.success([ObjectId]) on a successful insertMany or Result.failure(error)
-public typealias MongoInsertManyResultBlock = (Result<[AnyBSON?], Error>)->()
+public typealias MongoInsertManyResultBlock = (Result<[AnyBSON?], Error>) -> Void
 /// Block which returns Result.success([Document]) on a successful find operation or Result.failure(error)
-public typealias MongoFindResultBlock = (Result<[Document], Error>)->()
+public typealias MongoFindResultBlock = (Result<[Document], Error>) -> Void
 /// Block which returns Result.success(Document?) on a successful findOne operation or Result.failure(error)
-public typealias MongoFindOneResultBlock = (Result<Document?, Error>)->()
+public typealias MongoFindOneResultBlock = (Result<Document?, Error>) -> Void
 /// Block which returns Result.success(Int) on a successful count operation or Result.failure(error)
-public typealias MongoCountResultBlock = (Result<Int, Error>)->()
+public typealias MongoCountResultBlock = (Result<Int, Error>) -> Void
 /// Block which returns Result.success(UpdateResult) on a successful update operation or Result.failure(error)
-public typealias MongoUpdateResultBlock = (Result<UpdateResult, Error>)->()
+public typealias MongoUpdateResultBlock = (Result<UpdateResult, Error>) -> Void
 /// Block which returns Result.success(Document) on a successful delete operation or Result.failure(error)
-public typealias MongoDeleteResultBlock = (Result<Document?, Error>)->()
+public typealias MongoDeleteResultBlock = (Result<Document?, Error>) -> Void
 
 /**
  * The `MongoCollection` represents a MongoDB collection.
@@ -599,7 +599,7 @@ extension MongoCollection {
             if let objectIds = objectIds?.map(ObjectiveCSupport.convert) {
                 completion(.success(objectIds))
             } else {
-                completion(.failure(error ?? Realm.Error.promiseFailed))
+                completion(.failure(error ?? Realm.Error.callFailed))
             }
         }
     }
@@ -783,7 +783,7 @@ extension MongoCollection {
             if let updateResult = updateResult {
                 completion(.success(updateResult))
             } else {
-                completion(.failure(error ?? Realm.Error.promiseFailed))
+                completion(.failure(error ?? Realm.Error.callFailed))
             }
         }
     }
@@ -803,7 +803,7 @@ extension MongoCollection {
             if let updateResult = updateResult {
                 completion(.success(updateResult))
             } else {
-                completion(.failure(error ?? Realm.Error.promiseFailed))
+                completion(.failure(error ?? Realm.Error.callFailed))
             }
         }
     }
@@ -826,7 +826,7 @@ extension MongoCollection {
             if let updateResult = updateResult {
                 completion(.success(updateResult))
             } else {
-                completion(.failure(error ?? Realm.Error.promiseFailed))
+                completion(.failure(error ?? Realm.Error.callFailed))
             }
         }
     }
@@ -846,7 +846,7 @@ extension MongoCollection {
             if let updateResult = updateResult {
                 completion(.success(updateResult))
             } else {
-                completion(.failure(error ?? Realm.Error.promiseFailed))
+                completion(.failure(error ?? Realm.Error.callFailed))
             }
         }
     }

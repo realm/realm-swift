@@ -981,8 +981,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let user):
                 syncUser = user
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should login")
             }
             loginEx.fulfill()
         }
@@ -994,8 +994,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let userAPIKey):
                 apiKey = userAPIKey
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should create api key")
             }
             createAPIKeyEx.fulfill()
         }
@@ -1004,7 +1004,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let fetchAPIKeyEx = expectation(description: "Fetch user api key")
         syncUser?.apiKeysAuth.fetchAPIKey(apiKey!.objectId as! ObjectId, { result in
             if case .failure = result {
-                XCTFail()
+                XCTFail("Should fetch api key")
             }
             fetchAPIKeyEx.fulfill()
         })
@@ -1015,14 +1015,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let userAPIKeys):
                 XCTAssertEqual(userAPIKeys.count, 1)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should fetch api key")
             }
             fetchAPIKeysEx.fulfill()
         }
         wait(for: [fetchAPIKeysEx], timeout: 4.0)
     }
-    
+
     func testCallFunction() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
@@ -1161,7 +1161,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let deleteEx = expectation(description: "Delete all from Mongo collection")
         collection.deleteManyDocuments(filter: [:]) { result in
             if case .failure = result {
-                XCTFail()
+                XCTFail("Should delete")
             }
             deleteEx.fulfill()
         }
@@ -1616,7 +1616,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let insertOneEx1 = expectation(description: "Insert one document")
         collection.insertOne(document) { result in
             if case .failure = result {
-                XCTFail()
+                XCTFail("Should insert")
             }
             insertOneEx1.fulfill()
         }
@@ -1627,8 +1627,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let objectIds):
                 XCTAssertEqual(objectIds.count, 2)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should insert")
             }
             insertManyEx1.fulfill()
         }
@@ -1642,8 +1642,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertEqual(documents[0]["name"]??.stringValue, "fido")
                 XCTAssertEqual(documents[1]["name"]??.stringValue, "fido")
                 XCTAssertEqual(documents[2]["name"]??.stringValue, "rex")
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should find")
             }
             findEx1.fulfill()
         }
@@ -1663,8 +1663,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let objectIds):
                 XCTAssertEqual(objectIds.count, 3)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should insert")
             }
             insertManyEx1.fulfill()
         }
@@ -1678,8 +1678,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     XCTAssertEqual(documents[0]["name"]??.stringValue, "fido")
                     XCTAssertEqual(documents[1]["name"]??.stringValue, "rex")
                     XCTAssertEqual(documents[2]["name"]??.stringValue, "rex")
-                case .failure(_):
-                    XCTFail()
+                case .failure:
+                    XCTFail("Should find")
                 }
             findEx1.fulfill()
         }
@@ -1691,8 +1691,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             case .success(let document):
                 XCTAssertEqual(document.count, 1)
                 XCTAssertEqual(document[0]["name"]??.stringValue, "fido")
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should find")
             }
             findEx2.fulfill()
         }
@@ -1703,8 +1703,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let documents):
                 XCTAssertEqual(documents.count, 1)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should find")
             }
             findEx3.fulfill()
         }
@@ -1715,8 +1715,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let document):
                 XCTAssertNotNil(document)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should find")
             }
             findOneEx1.fulfill()
         }
@@ -1727,8 +1727,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let document):
                 XCTAssertNotNil(document)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should find")
             }
             findOneEx2.fulfill()
         }
@@ -1747,8 +1747,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             case .success(let document):
                 // no doc found, both should be nil
                 XCTAssertNil(document)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should find")
             }
             findOneReplaceEx1.fulfill()
         }
@@ -1760,8 +1760,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let document):
                 XCTAssertEqual(document!["name"]??.stringValue, "john")
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should find")
             }
             findOneReplaceEx2.fulfill()
         }
@@ -1774,8 +1774,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             case .success(let document):
                 // upsert but do not return document
                 XCTAssertNil(document)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should find")
             }
             findOneReplaceEx3.fulfill()
         }
@@ -1794,8 +1794,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             case .success(let document):
                 // no doc found, both should be nil
                 XCTAssertNil(document)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should find")
             }
             findOneUpdateEx1.fulfill()
         }
@@ -1808,8 +1808,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             case .success(let document):
                 XCTAssertNotNil(document)
                 XCTAssertEqual(document!["name"]??.stringValue, "john")
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should find")
             }
             findOneUpdateEx2.fulfill()
         }
@@ -1822,8 +1822,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             case .success(let document):
                 XCTAssertNotNil(document)
                 XCTAssertEqual(document!["name"]??.stringValue, "rex")
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should find")
             }
             findOneUpdateEx3.fulfill()
         }
@@ -1839,8 +1839,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let objectIds):
                 XCTAssertEqual(objectIds.count, 1)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should insert")
             }
             insertManyEx.fulfill()
         }
@@ -1852,8 +1852,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             case .success(let document):
                 // Document does not exist, but should not return an error because of that
                 XCTAssertNotNil(document)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should find")
             }
             findOneDeleteEx1.fulfill()
         }
@@ -1896,8 +1896,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let documents):
                 XCTAssertEqual(documents.count, 0)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should find")
             }
             findEx.fulfill()
         }
@@ -1917,8 +1917,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let objectIds):
                 XCTAssertEqual(objectIds.count, 4)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should insert")
             }
             insertManyEx.fulfill()
         }
@@ -1931,8 +1931,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertEqual(updateResult.matchedCount, 1)
                 XCTAssertEqual(updateResult.modifiedCount, 1)
                 XCTAssertNil(updateResult.objectId)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should update")
             }
             updateEx1.fulfill()
         }
@@ -1945,8 +1945,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertEqual(updateResult.matchedCount, 0)
                 XCTAssertEqual(updateResult.modifiedCount, 0)
                 XCTAssertNotNil(updateResult.objectId)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should update")
             }
             updateEx2.fulfill()
         }
@@ -1966,8 +1966,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let objectIds):
                 XCTAssertEqual(objectIds.count, 4)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should insert")
             }
             insertManyEx.fulfill()
         }
@@ -1980,8 +1980,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertEqual(updateResult.matchedCount, 1)
                 XCTAssertEqual(updateResult.modifiedCount, 1)
                 XCTAssertNil(updateResult.objectId)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should update")
             }
             updateEx1.fulfill()
         }
@@ -1994,8 +1994,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertEqual(updateResult.matchedCount, 0)
                 XCTAssertEqual(updateResult.modifiedCount, 0)
                 XCTAssertNotNil(updateResult.objectId)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should update")
             }
             updateEx2.fulfill()
         }
@@ -2012,8 +2012,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let count):
                 XCTAssertEqual(count, 0)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should delete")
             }
             deleteEx1.fulfill()
         }
@@ -2024,8 +2024,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let objectIds):
                 XCTAssertEqual(objectIds.count, 2)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should insert")
             }
             insertManyEx.fulfill()
         }
@@ -2036,8 +2036,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let count):
                 XCTAssertEqual(count, 1)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should delete")
             }
             deleteEx2.fulfill()
         }
@@ -2054,8 +2054,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let count):
                 XCTAssertEqual(count, 0)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should delete")
             }
             deleteEx1.fulfill()
         }
@@ -2066,8 +2066,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let objectIds):
                 XCTAssertEqual(objectIds.count, 2)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should insert")
             }
             insertManyEx.fulfill()
         }
@@ -2078,8 +2078,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let count):
                 XCTAssertEqual(count, 2)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should selete")
             }
             deleteEx2.fulfill()
         }
@@ -2095,8 +2095,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let objectIds):
                 XCTAssertEqual(objectIds.count, 1)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should insert")
             }
             insertManyEx1.fulfill()
         }
@@ -2106,8 +2106,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let documents):
                 XCTAssertNotNil(documents)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should aggregate")
             }
         }
 
@@ -2116,8 +2116,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let count):
                 XCTAssertNotNil(count)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should count")
             }
             countEx1.fulfill()
         }
@@ -2128,8 +2128,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             switch result {
             case .success(let count):
                 XCTAssertEqual(count, 1)
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should count")
             }
             countEx2.fulfill()
         }
@@ -2164,7 +2164,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             for _ in 0..<3 {
                 collection.insertOne(document) { result in
                     if case .failure = result {
-                        XCTFail()
+                        XCTFail("Should insert")
                     }
                 }
                 watchTestUtility.semaphore.wait()
@@ -2196,8 +2196,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             case .success(let objIds):
                 XCTAssertEqual(objIds.count, 4)
                 objectIds = objIds.map { $0!.objectIdValue! }
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should insert")
             }
             insertManyEx.fulfill()
         }
@@ -2223,13 +2223,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
                                              update: ["name": name, "breed": "king charles"]) { result in
                     if case .failure = result {
-                        XCTFail()
+                        XCTFail("Should update")
                     }
                 }
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
                                              update: ["name": name, "breed": "king charles"]) { result in
                     if case .failure = result {
-                        XCTFail()
+                        XCTFail("Should update")
                     }
                 }
                 watchTestUtility.semaphore.wait()
@@ -2262,8 +2262,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             case .success(let objIds):
                 XCTAssertEqual(objIds.count, 4)
                 objectIds = objIds.map { $0!.objectIdValue! }
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should insert")
             }
             insertManyEx.fulfill()
         }
@@ -2287,13 +2287,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
                                              update: ["name": name, "breed": "king charles"]) { result in
                     if case .failure = result {
-                        XCTFail()
+                        XCTFail("Should update")
                     }
                 }
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
                                              update: ["name": name, "breed": "king charles"]) { result in
                     if case .failure = result {
-                        XCTFail()
+                        XCTFail("Should update")
                     }
                 }
                 watchTestUtility.semaphore.wait()
@@ -2326,8 +2326,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             case .success(let objIds):
                 XCTAssertEqual(objIds.count, 4)
                 objectIds = objIds.map { $0!.objectIdValue! }
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should insert")
             }
             insertManyEx.fulfill()
         }
@@ -2363,13 +2363,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
                                              update: ["name": name, "breed": "king charles"]) { result in
                     if case .failure = result {
-                        XCTFail()
+                        XCTFail("Should update")
                     }
                 }
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
                                              update: ["name": name, "breed": "king charles"]) { result in
                     if case .failure = result {
-                        XCTFail()
+                        XCTFail("Should update")
                     }
                 }
                 watchTestUtility1.semaphore.wait()
@@ -2417,7 +2417,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let deleteEx = expectation(description: "Delete all from Mongo collection")
         collection.deleteManyDocuments(filter: [:]) { result in
             if case .failure = result {
-                XCTFail()
+                XCTFail("Should delete")
             }
             deleteEx.fulfill()
         }
@@ -2470,7 +2470,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             for i in 0..<3 {
                 collection.insertOne(document) { result in
                     if case .failure = result {
-                        XCTFail()
+                        XCTFail("Should insert")
                     }
                 }
                 sema.wait()
@@ -2501,8 +2501,8 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             case .success(let objIds):
                 XCTAssertEqual(objIds.count, 4)
                 objectIds = objIds.map { $0!.objectIdValue! }
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should insert")
             }
             insertManyEx.fulfill()
         }
@@ -2560,13 +2560,13 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
                                              update: ["name": name, "breed": "king charles"]) { result in
                     if case .failure = result {
-                        XCTFail()
+                        XCTFail("Should update")
                     }
                 }
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
                                              update: ["name": name, "breed": "king charles"]) { result in
                     if case .failure = result {
-                        XCTFail()
+                        XCTFail("Should update")
                     }
                 }
                 sema1.wait()
@@ -2597,8 +2597,8 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             case .success(let objIds):
                 XCTAssertEqual(objIds.count, 4)
                 objectIds = objIds.map { $0!.objectIdValue! }
-            case .failure(_):
-                XCTFail()
+            case .failure:
+                XCTFail("Should insert")
             }
             insertManyEx.fulfill()
         }
@@ -2656,13 +2656,13 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
                                              update: ["name": name, "breed": "king charles"]) { result in
                     if case .failure = result {
-                        XCTFail()
+                        XCTFail("Should update")
                     }
                 }
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
                                              update: ["name": name, "breed": "king charles"]) { result in
                     if case .failure = result {
-                        XCTFail()
+                        XCTFail("Should update")
                     }
                 }
                 sema1.wait()

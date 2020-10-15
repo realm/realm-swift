@@ -401,7 +401,7 @@ public extension APIKeyAuth {
      @param name The name of the API key to be created.
      @completion A completion that eventually return `Result.success(UserAPIKey)` or `Result.failure(Error)`.
      */
-    func createAPIKey(named: String, completion: @escaping (Result<UserAPIKey, Error>)->()) {
+    func createAPIKey(named: String, completion: @escaping (Result<UserAPIKey, Error>) -> Void) {
         createAPIKey(named: named) { (userApiKey, error) in
             if let userApiKey = userApiKey {
                 completion(.success(userApiKey))
@@ -416,7 +416,7 @@ public extension APIKeyAuth {
      @param objectId The ObjectId of the API key to fetch.
      @completion A completion that eventually return `Result.success(UserAPIKey)` or `Result.failure(Error)`.
      */
-    func fetchAPIKey(_ objectId: ObjectId, _ completion: @escaping (Result<UserAPIKey, Error>)->()) {
+    func fetchAPIKey(_ objectId: ObjectId, _ completion: @escaping (Result<UserAPIKey, Error>) -> Void) {
         fetchAPIKey(objectId) { (userApiKey, error) in
             if let userApiKey = userApiKey {
                 completion(.success(userApiKey))
@@ -425,12 +425,12 @@ public extension APIKeyAuth {
             }
         }
     }
-    
+
     /**
      Fetches the user API keys associated with the current user.
      @completion A completion that eventually return `Result.success([UserAPIKey])` or `Result.failure(Error)`.
      */
-    func fetchAPIKeys(_ completion: @escaping (Result<[UserAPIKey], Error>)->()) {
+    func fetchAPIKeys(_ completion: @escaping (Result<[UserAPIKey], Error>) -> Void) {
         fetchAPIKeys { (userApiKeys, error) in
             if let userApiKeys = userApiKeys {
                 completion(.success(userApiKeys))
@@ -445,7 +445,7 @@ public extension App {
     /// Login to a user for the Realm app.
     /// @param credentials The credentials identifying the user.
     /// @completion A completion that eventually return `Result.success(User)` or `Result.failure(Error)`.
-    func login(credentials: Credentials, _ completion: @escaping (Result<User, Error>)->()) {
+    func login(credentials: Credentials, _ completion: @escaping (Result<User, Error>) -> Void) {
         login(credentials: credentials) { user, error in
             if let user = user {
                 completion(.success(user))

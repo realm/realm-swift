@@ -636,7 +636,7 @@ public extension User {
 public extension User {
     /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.
     /// @completion A completion that eventually return `Result.success(Dictionary)` with user's data or `Result.failure(Error)`.
-    func refreshCustomData(_ completion: @escaping (Result<[AnyHashable: Any], Error>)->()) {
+    func refreshCustomData(_ completion: @escaping (Result<[AnyHashable: Any], Error>) -> Void) {
         self.refreshCustomData { customData, error in
             if let customData = customData {
                 completion(.success(customData))
@@ -651,7 +651,7 @@ public extension User {
     /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
     /// @param credentials The `Credentials` used to link the user to a new identity.
     /// @completion A completion that eventually return `Result.success(User)` with user's data or `Result.failure(Error)`.
-    func linkUser(credentials: Credentials, _ completion: @escaping (Result<User, Error>)->()) {
+    func linkUser(credentials: Credentials, _ completion: @escaping (Result<User, Error>) -> Void) {
         self.linkUser(credentials: credentials) { user, error in
             if let user = user {
                 completion(.success(user))
