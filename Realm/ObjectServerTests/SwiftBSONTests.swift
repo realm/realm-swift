@@ -32,8 +32,13 @@ class SwiftBSONTests: XCTestCase {
     }
 
     func testNilRoundTrip() {
-        let anyBSONNil: AnyBSON? = nil
-        let rlmBSONNil: RLMBSON? = nil
+        var anyBSONNil: AnyBSON?
+        var rlmBSONNil: RLMBSON?
+        XCTAssertNil(ObjectiveCSupport.convert(object: anyBSONNil))
+        XCTAssertNil(ObjectiveCSupport.convert(object: rlmBSONNil))
+
+        anyBSONNil = .null
+        rlmBSONNil = NSNull()
         XCTAssertNil(ObjectiveCSupport.convert(object: anyBSONNil))
         XCTAssertNil(ObjectiveCSupport.convert(object: rlmBSONNil))
     }

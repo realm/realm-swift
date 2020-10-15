@@ -133,6 +133,9 @@ extension MinKey: BSON {
     /// A BSON maxKey.
     case maxKey
 
+    /// A BSON null type.
+    case null
+
     /// Initialize a `BSON` from an integer. On 64-bit systems, this will result in an `.int64`. On 32-bit systems,
     /// this will result in an `.int32`.
     public init(_ int: Int) {
@@ -145,7 +148,7 @@ extension MinKey: BSON {
 
     /// Initialize a `BSON` from a type `T`. If this is not a valid `BSON` type,
     /// if will be considered `BSON` null type and will return `nil`.
-    public init?<T: BSON>(_ bson: T) {
+    public init<T: BSON>(_ bson: T) {
         switch bson {
         case let val as Int:
             self = .int64(Int64(val))
@@ -178,7 +181,7 @@ extension MinKey: BSON {
         case let val as NSRegularExpression:
             self = .regex(val)
         default:
-            return nil
+            self = .null
         }
     }
 
@@ -284,6 +287,11 @@ extension MinKey: BSON {
             return nil
         }
         return t
+    }
+
+    /// If this `BSON` is a `.null` return true. Otherwise, false.
+    public var isNull: Bool {
+        return self == .null
     }
 
     /// Return this BSON as an `Int` if possible.
