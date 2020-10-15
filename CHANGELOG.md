@@ -1,9 +1,14 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.0.0-rc.2 Release notes (2020-10-15)
 =============================================================
+
 ### Enhancements
-* Add the ability to listen for when a Watch Change Stream is opened when using Combine. Use `onOpen(event:)` directly after opening a `WatchPublisher` to register a callback to be invoked once the change stream is opened.
+
+* Add the ability to listen for when a Watch Change Stream is opened when using
+  Combine. Use `onOpen(event:)` directly after opening a `WatchPublisher` to
+  register a callback to be invoked once the change stream is opened.
 
 ### Breaking Changes
+
 * The insert operations on Mongo collections now report the inserted documents'
   IDs as BSON rather than ObjectId.
 * Embedded objects can no longer form cycles at the schema level. For example,
@@ -21,7 +26,7 @@ x.y.z Release notes (yyyy-MM-dd)
   and properly absent BSON types.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+
 * Set the precision correctly when serializing doubles in extended json.
 * Reading the `objectTypes` array from a Realm Configuration would not include
   the embedded object types which were set in the array.
