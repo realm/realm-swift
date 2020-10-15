@@ -817,6 +817,12 @@ NS_REFINED_FOR_SWIFT;
 
 #pragma mark - Utilities
 
+/**
+ Returns the current active number of versions of a Realm instance.
+
+ There will always be at least 2 active versions of the Realm
+ because the previous version won't be cleaned up until the next commit.
+*/
 @property (nonatomic, readonly) NSUInteger numberOfActiveVersions;
 
 #pragma mark - Unavailable Methods

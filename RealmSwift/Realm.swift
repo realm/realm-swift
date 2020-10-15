@@ -891,9 +891,16 @@ public struct Realm {
         return try RLMRealm.deleteFiles(for: config.rlmConfiguration)
     }
 
-    // MARK: Utility
+    // MARK: Utilities
 
-    public var numberOfActiveVersions
+    /// Returns the current active number of versions of a Realm instance.
+    ///
+    /// - Note:
+    /// There will always be at least 2 active versions of the Realm
+    /// because the previous version won't be cleaned up until the next commit.
+    public var numberOfActiveVersions: UInt {
+        rlmRealm.numberOfActiveVersions
+    }
 
     // MARK: Internal
 

@@ -862,4 +862,17 @@ class RealmTests: TestCase {
         XCTAssertTrue(try! Realm.deleteFiles(for: config))
         XCTAssertFalse(Realm.fileExists(for: config))
     }
+
+    func testNumberOfActiveVersions() {
+        let realm = try! Realm()
+        // There will always be at least 2 active versions of the Realm
+        // because the previous version won't be cleaned up until the next commit.
+        XCTAssertEqual(realm.numberOfActiveVersions, 2)
+        let frozen = realm.freeze() // pin this version
+        try! realm.write { realm.add(SwiftObject()) }
+        try! realm.write { realm.add(SwiftObject()) }
+        try! realm.write { realm.add(SwiftObject()) }
+        XCTAssertEqual(frozen.numberOfActiveVersions, 4)
+        XCTAssertEqual(realm.numberOfActiveVersions, 4)
+    }
 }
