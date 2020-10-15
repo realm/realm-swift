@@ -2,7 +2,6 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add the ability to listen for when a Watch Change Stream is opened when using Combine. Use `onOpen(event:)` directly after opening a `WatchPublisher` to register a callback to be invoked once the change stream is opened.
-* For paired return from completion handlers add return Result<Value, Error>
 
 ### Breaking Changes
 * The insert operations on Mongo collections now report the inserted documents'
@@ -14,6 +13,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Primary key properties are once again marked as being indexed. This reflects
   an internal change to how primary keys are handled that should not have any
   other visible effects.
+* Change paired return types from Swift completion handlers to return `Result<Value, Error>`
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
