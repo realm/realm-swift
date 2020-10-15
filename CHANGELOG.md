@@ -2,6 +2,7 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add the ability to listen for when a Watch Change Stream is opened when using Combine. Use `onOpen(event:)` directly after opening a `WatchPublisher` to register a callback to be invoked once the change stream is opened.
+* For paired return from completion handlers add return Result<Value, Error>
 
 ### Breaking Changes
 * The insert operations on Mongo collections now report the inserted documents'

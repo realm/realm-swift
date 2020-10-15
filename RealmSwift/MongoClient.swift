@@ -155,6 +155,21 @@ public typealias MongoUpdateBlock = (UpdateResult?, Error?) -> Void
 /// Block which returns the deleted Document on a successful delete operation, or an error should one occur.
 public typealias MongoDeleteBlock = RLMMongoDeleteBlock
 
+/// Block which returns Result.success(DocumentId) on a successful insert or Result.failure(error)
+public typealias MongoInsertResultBlock = (Result<AnyBSON?, Error>)->()
+/// Block which returns Result.success([ObjectId]) on a successful insertMany or Result.failure(error)
+public typealias MongoInsertManyResultBlock = (Result<[AnyBSON?], Error>)->()
+/// Block which returns Result.success([Document]) on a successful find operation or Result.failure(error)
+public typealias MongoFindResultBlock = (Result<[Document], Error>)->()
+/// Block which returns Result.success(Document?) on a successful findOne operation or Result.failure(error)
+public typealias MongoFindOneResultBlock = (Result<Document?, Error>)->()
+/// Block which returns Result.success(Int) on a successful count operation or Result.failure(error)
+public typealias MongoCountResultBlock = (Result<Int, Error>)->()
+/// Block which returns Result.success(UpdateResult) on a successful update operation or Result.failure(error)
+public typealias MongoUpdateResultBlock = (Result<UpdateResult, Error>)->()
+/// Block which returns Result.success(Document) on a successful delete operation or Result.failure(error)
+public typealias MongoDeleteResultBlock = (Result<Document?, Error>)->()
+
 /**
  * The `MongoCollection` represents a MongoDB collection.
  *
@@ -555,6 +570,446 @@ extension MongoCollection {
     }
 }
 
+// MongoCollection methods with result type completions
+extension MongoCollection {
+    /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
+    /// generated for it.
+    /// - Parameters:
+    ///   - document: document  A `Document` value to insert.
+    ///   - completion: The result of attempting to perform the insert. An Id will be returned for the inserted object on sucess
+    public func insertOne(_ document: Document, _ completion: @escaping MongoInsertResultBlock) {
+        let bson = ObjectiveCSupport.convert(object: .document(document))
+        self.__insertOneDocument(bson as! [String: RLMBSON]) { objectId, error in
+            if let objectId = ObjectiveCSupport.convert(object: objectId) {
+                completion(.success(objectId))
+            } else {
+                completion(.failure(error ?? Realm.Error.callFailed))
+            }
+        }
+    }
+
+    /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
+    /// they will be generated.
+    /// - Parameters:
+    ///   - documents: The `Document` values in a bson array to insert.
+    ///   - completion: The result of the insert, returns an array inserted document ids in order.
+    public func insertMany(_ documents: [Document], _ completion: @escaping MongoInsertManyResultBlock) {
+        let bson = ObjectiveCSupport.convert(object: .array(documents.map {.document($0)}))
+        self.__insertManyDocuments(bson as! [[String: RLMBSON]]) { objectIds, error in
+            if let objectIds = objectIds?.map(ObjectiveCSupport.convert) {
+                completion(.success(objectIds))
+            } else {
+                completion(.failure(error ?? Realm.Error.promiseFailed))
+            }
+        }
+    }
+
+    /// Finds the documents in this collection which match the provided filter.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - options: `FindOptions` to use when executing the command.
+    ///   - completion: The resulting bson array of documents or error if one occurs
+    public func find(filter: Document,
+                     options: FindOptions,
+                     _ completion: @escaping MongoFindResultBlock) {
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__findWhere(bson as! [String: RLMBSON], options: options) { documents, error in
+            let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
+            if let bson = bson {
+                completion(.success(bson))
+            } else {
+                completion(.failure(error ?? Realm.Error.callFailed))
+            }
+        }
+    }
+
+    /// Finds the documents in this collection which match the provided filter.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - completion: The resulting bson array of documents or error if one occurs
+    public func find(filter: Document,
+                     _ completion: @escaping MongoFindResultBlock) {
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__findWhere(bson as! [String: RLMBSON]) { documents, error in
+            let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
+            if let bson = bson {
+                completion(.success(bson))
+            } else {
+                completion(.failure(error ?? Realm.Error.callFailed))
+            }
+        }
+    }
+
+    /// Returns one document from a collection or view which matches the
+    /// provided filter. If multiple documents satisfy the query, this method
+    /// returns the first document according to the query's sort order or natural
+    /// order.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - options: `FindOptions` to use when executing the command.
+    ///   - completion: The resulting bson or error if one occurs
+    public func findOneDocument(filter: Document,
+                                options: FindOptions,
+                                _ completion: @escaping MongoFindOneResultBlock) {
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__findOneDocumentWhere(bson as! [String: RLMBSON], options: options) { document, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                let bson: Document? = document?.mapValues { ObjectiveCSupport.convert(object: $0) }
+                completion(.success(bson))
+            }
+        }
+    }
+
+    /// Returns one document from a collection or view which matches the
+    /// provided filter. If multiple documents satisfy the query, this method
+    /// returns the first document according to the query's sort order or natural
+    /// order.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - completion: The resulting bson or error if one occurs
+    public func findOneDocument(filter: Document,
+                                _ completion: @escaping MongoFindOneResultBlock) {
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__findOneDocumentWhere(bson as! [String: RLMBSON]) { document, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                let bson: Document? = document?.mapValues { ObjectiveCSupport.convert(object: $0) }
+                completion(.success(bson))
+            }
+        }
+    }
+
+    /// Runs an aggregation framework pipeline against this collection.
+    /// - Parameters:
+    ///   - pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
+    ///   - completion: The resulting bson array of documents or error if one occurs
+    public func aggregate(pipeline: [Document],
+                          _ completion: @escaping MongoFindResultBlock) {
+        let bson = ObjectiveCSupport.convert(object: .array(pipeline.map {.document($0)}))
+        self.__aggregate(withPipeline: bson as! [[String: RLMBSON]]) { documents, error in
+            let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
+            if let bson = bson {
+                completion(.success(bson))
+            } else {
+                completion(.failure(error ?? Realm.Error.callFailed))
+            }
+        }
+    }
+
+    /// Counts the number of documents in this collection matching the provided filter.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - limit: The max amount of documents to count
+    ///   - completion: Returns the count of the documents that matched the filter.
+    public func count(filter: Document,
+                      limit: Int,
+                      _ completion: @escaping MongoCountResultBlock) {
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__countWhere(bson as! [String: RLMBSON], limit: limit) { count, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(count))
+            }
+        }
+    }
+
+    /// Counts the number of documents in this collection matching the provided filter.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - completion: Returns the count of the documents that matched the filter.
+    public func count(filter: Document,
+                      _ completion: @escaping MongoCountResultBlock) {
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__countWhere(bson as! [String: RLMBSON]) { count, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(count))
+            }
+        }
+    }
+
+    /// Deletes a single matching document from the collection.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - completion: The result of performing the deletion. Returns the count of deleted objects
+    public func deleteOneDocument(filter: Document,
+                                  _ completion: @escaping MongoCountResultBlock) {
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__deleteOneDocumentWhere(bson as! [String: RLMBSON]) { count, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(count))
+            }
+        }
+    }
+
+    /// Deletes multiple documents
+    /// - Parameters:
+    ///   - filter: Document representing the match criteria
+    ///   - completion: The result of performing the deletion. Returns the count of the deletion
+    public func deleteManyDocuments(filter: Document,
+                                    _ completion: @escaping MongoCountResultBlock) {
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__deleteManyDocumentsWhere(bson as! [String: RLMBSON]) { count, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(count))
+            }
+        }
+    }
+
+    /// Updates a single document matching the provided filter in this collection.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    ///   - upsert: When true, creates a new document if no document matches the query.
+    ///   - completion: The result of the attempt to update a document.
+    public func updateOneDocument(filter: Document,
+                                  update: Document,
+                                  upsert: Bool,
+                                  _ completion: @escaping MongoUpdateResultBlock) {
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
+        self.__updateOneDocumentWhere(filterBSON as! [String: RLMBSON],
+                                      updateDocument: updateBSON as! [String: RLMBSON],
+                                      upsert: upsert) { updateResult, error in
+            if let updateResult = updateResult {
+                completion(.success(updateResult))
+            } else {
+                completion(.failure(error ?? Realm.Error.promiseFailed))
+            }
+        }
+    }
+
+    /// Updates a single document matching the provided filter in this collection.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    ///   - completion: The result of the attempt to update a document.
+    public func updateOneDocument(filter: Document,
+                                  update: Document,
+                                  _ completion: @escaping MongoUpdateResultBlock) {
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
+        self.__updateOneDocumentWhere(filterBSON as! [String: RLMBSON],
+                                      updateDocument: updateBSON as! [String: RLMBSON]) { updateResult, error in
+            if let updateResult = updateResult {
+                completion(.success(updateResult))
+            } else {
+                completion(.failure(error ?? Realm.Error.promiseFailed))
+            }
+        }
+    }
+
+    /// Updates multiple documents matching the provided filter in this collection.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    ///   - upsert: When true, creates a new document if no document matches the query.
+    ///   - completion: The result of the attempt to update a document.
+    public func updateManyDocuments(filter: Document,
+                                    update: Document,
+                                    upsert: Bool,
+                                    _ completion: @escaping MongoUpdateResultBlock) {
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
+        self.__updateManyDocumentsWhere(filterBSON as! [String: RLMBSON],
+                                        updateDocument: updateBSON as! [String: RLMBSON],
+                                        upsert: upsert) { updateResult, error in
+            if let updateResult = updateResult {
+                completion(.success(updateResult))
+            } else {
+                completion(.failure(error ?? Realm.Error.promiseFailed))
+            }
+        }
+    }
+
+    /// Updates multiple documents matching the provided filter in this collection.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    ///   - completion: The result of the attempt to update a document.
+    public func updateManyDocuments(filter: Document,
+                                    update: Document,
+                                    _ completion: @escaping MongoUpdateResultBlock) {
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
+        self.__updateManyDocumentsWhere(filterBSON as! [String: RLMBSON],
+                                        updateDocument: updateBSON as! [String: RLMBSON]) { updateResult, error in
+            if let updateResult = updateResult {
+                completion(.success(updateResult))
+            } else {
+                completion(.failure(error ?? Realm.Error.promiseFailed))
+            }
+        }
+    }
+
+    /// Updates a single document in a collection based on a query filter and
+    /// returns the document in either its pre-update or post-update form. Unlike
+    /// `updateOneDocument`, this action allows you to atomically find, update, and
+    /// return a document with the same command. This avoids the risk of other
+    /// update operations changing the document between separate find and update
+    /// operations.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    ///   - options: `RemoteFindOneAndModifyOptions` to use when executing the command.
+    ///   - completion: The result of the attempt to update a document.
+    public func findOneAndUpdate(filter: Document,
+                                 update: Document,
+                                 options: FindOneAndModifyOptions,
+                                 _ completion: @escaping MongoFindOneResultBlock) {
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
+        self.__findOneAndUpdateWhere(filterBSON as! [String: RLMBSON],
+                                     updateDocument: updateBSON as! [String: RLMBSON],
+                                     options: options) { document, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                let bson: Document? = document?.mapValues { ObjectiveCSupport.convert(object: $0) }
+                completion(.success(bson))
+            }
+        }
+    }
+
+    /// Updates a single document in a collection based on a query filter and
+    /// returns the document in either its pre-update or post-update form. Unlike
+    /// `updateOneDocument`, this action allows you to atomically find, update, and
+    /// return a document with the same command. This avoids the risk of other
+    /// update operations changing the document between separate find and update
+    /// operations.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    ///   - completion: The result of the attempt to update a document.
+    public func findOneAndUpdate(filter: Document,
+                                 update: Document,
+                                 _ completion: @escaping MongoFindOneResultBlock) {
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
+        self.__findOneAndUpdateWhere(filterBSON as! [String: RLMBSON],
+                                     updateDocument: updateBSON as! [String: RLMBSON]) { document, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                let bson: Document? = document?.mapValues { ObjectiveCSupport.convert(object: $0) }
+                completion(.success(bson))
+            }
+        }
+    }
+
+    /// Overwrites a single document in a collection based on a query filter and
+    /// returns the document in either its pre-replacement or post-replacement
+    /// form. Unlike `updateOneDocument`, this action allows you to atomically find,
+    /// replace, and return a document with the same command. This avoids the
+    /// risk of other update operations changing the document between separate
+    /// find and update operations.
+    /// - Parameters:
+    ///   - filter: A `Document` that should match the query.
+    ///   - replacement: A `Document` describing the replacement.
+    ///   - options: `FindOneAndModifyOptions` to use when executing the command.
+    ///   - completion: The result of the attempt to replace a document.
+    public func findOneAndReplace(filter: Document,
+                                  replacement: Document,
+                                  options: FindOneAndModifyOptions,
+                                  _ completion: @escaping MongoFindOneResultBlock) {
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let replacementBSON = ObjectiveCSupport.convert(object: .document(replacement))
+        self.__findOneAndReplaceWhere(filterBSON as! [String: RLMBSON],
+                                      replacementDocument: replacementBSON as! [String: RLMBSON],
+                                      options: options) { document, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                let bson: Document? = document?.mapValues { ObjectiveCSupport.convert(object: $0) }
+                completion(.success(bson))
+            }
+        }
+    }
+
+    /// Overwrites a single document in a collection based on a query filter and
+    /// returns the document in either its pre-replacement or post-replacement
+    /// form. Unlike `updateOneDocument`, this action allows you to atomically find,
+    /// replace, and return a document with the same command. This avoids the
+    /// risk of other update operations changing the document between separate
+    /// find and update operations.
+    /// - Parameters:
+    ///   - filter: A `Document` that should match the query.
+    ///   - replacement: A `Document` describing the replacement.
+    ///   - options: `RLMFindOneAndModifyOptions` to use when executing the command.
+    ///   - completion: The result of the attempt to replace a document.
+    public func findOneAndReplace(filter: Document,
+                                  replacement: Document,
+                                  _ completion: @escaping MongoFindOneResultBlock) {
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let replacementBSON = ObjectiveCSupport.convert(object: .document(replacement))
+        self.__findOneAndReplaceWhere(filterBSON as! [String: RLMBSON],
+                                      replacementDocument: replacementBSON as! [String: RLMBSON]) { document, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                let bson: Document? = document?.mapValues { ObjectiveCSupport.convert(object: $0) }
+                completion(.success(bson))
+            }
+        }
+    }
+
+    /// Removes a single document from a collection based on a query filter and
+    /// returns a document with the same form as the document immediately before
+    /// it was deleted. Unlike `deleteOneDocument`, this action allows you to atomically
+    /// find and delete a document with the same command. This avoids the risk of
+    /// other update operations changing the document between separate find and
+    /// delete operations.
+    /// - Parameters:
+    ///   - filter: A `Document` that should match the query.
+    ///   - options: `FindOneAndModifyOptions` to use when executing the command.
+    ///   - completion: The result of the attempt to delete a document.
+    public func findOneAndDelete(filter: Document,
+                                 options: FindOneAndModifyOptions,
+                                 _ completion: @escaping MongoDeleteResultBlock) {
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        self.__findOneAndDeleteWhere(filterBSON as! [String: RLMBSON],
+                                     options: options) { deleteResult, error in
+            let bson: Document? = deleteResult?.mapValues { ObjectiveCSupport.convert(object: $0) }
+            if let bson = bson {
+                completion(.success(bson))
+            } else {
+                completion(.failure(error ?? Realm.Error.callFailed))
+            }
+        }
+    }
+
+    /// Removes a single document from a collection based on a query filter and
+    /// returns a document with the same form as the document immediately before
+    /// it was deleted. Unlike `deleteOneDocument`, this action allows you to atomically
+    /// find and delete a document with the same command. This avoids the risk of
+    /// other update operations changing the document between separate find and
+    /// delete operations.
+    /// - Parameters:
+    ///   - filter: A `Document` that should match the query.
+    ///   - completion: The result of the attempt to delete a document.
+    public func findOneAndDelete(filter: Document,
+                                 _ completion: @escaping MongoDeleteResultBlock) {
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        self.__findOneAndDeleteWhere(filterBSON as! [String: RLMBSON]) { deleteResult, error in
+            let bson: Document? = deleteResult?.mapValues { ObjectiveCSupport.convert(object: $0) }
+            if let bson = bson {
+                completion(.success(bson))
+            } else {
+                completion(.failure(error ?? Realm.Error.callFailed))
+            }
+        }
+    }
+}
+
 private class ChangeEventDelegateProxy: RLMChangeEventDelegate {
 
     private weak var proxyDelegate: ChangeEventDelegate?
@@ -743,15 +1198,7 @@ public extension MongoCollection {
     /// @param document:  A `Document` value to insert.
     /// @returns A publisher that eventually return the object id of the inserted document or `Error`.
     func insertOne(_ document: Document) -> Future<AnyBSON?, Error> {
-        return Future { promise in
-            self.insertOne(document) { objectId, error in
-                if let objectId = objectId {
-                    promise(.success(objectId))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.insertOne(document, $0) }
     }
 
     /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
@@ -759,15 +1206,7 @@ public extension MongoCollection {
     /// @param documents: The `Document` values in a bson array to insert.
     /// @returns A publisher that eventually return the object ids of inserted documents or `Error`.
     func insertMany(_ documents: [Document]) -> Future<[AnyBSON?], Error> {
-        return Future { promise in
-            self.insertMany(documents) { objectIds, error in
-                if let objectIds = objectIds {
-                    promise(.success(objectIds))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.insertMany(documents, $0) }
     }
 
     /// Finds the documents in this collection which match the provided filter.
@@ -775,32 +1214,14 @@ public extension MongoCollection {
     /// @param options: `FindOptions` to use when executing the command.
     /// @returns A publisher that eventually return `[ObjectId]` of documents or `Error`.
     func find(filter: Document, options: FindOptions) -> Future<[Document], Error> {
-        return Future { promise in
-            self.find(filter: filter, options: options) { documents, error in
-                let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
-                if let bson = bson {
-                    promise(.success(bson))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.find(filter: filter, options: options, $0) }
     }
 
     /// Finds the documents in this collection which match the provided filter.
     /// @param filter: A `Document` as bson that should match the query.
     /// @returns A publisher that eventually return `[ObjectId]` of documents or `Error`.
     func find(filter: Document) -> Future<[Document], Error> {
-        return Future { promise in
-            self.find(filter: filter) { documents, error in
-                let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
-                if let bson = bson {
-                    promise(.success(bson))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.find(filter: filter, $0) }
     }
 
     /// Returns one document from a collection or view which matches the
@@ -811,16 +1232,7 @@ public extension MongoCollection {
     /// @param options: `FindOptions` to use when executing the command.
     /// @returns A publisher that eventually return `Document` or `Error`.
     func findOneDocument(filter: Document, options: FindOptions) -> Future<[Document], Error> {
-        return Future { promise in
-            self.find(filter: filter) { documents, error in
-                let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
-                if let bson = bson {
-                    promise(.success(bson))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.find(filter: filter, $0) }
     }
 
     /// Returns one document from a collection or view which matches the
@@ -828,34 +1240,16 @@ public extension MongoCollection {
     /// returns the first document according to the query's sort order or natural
     /// order.
     /// @param filter: A `Document` as bson that should match the query.
-    /// @returns A publisher that eventually return `Document` or `Error`.
-    func findOneDocument(filter: Document) -> Future<Document, Error> {
-        return Future { promise in
-            self.findOneDocument(filter: filter) { document, error in
-                let bson: Document? = document?.mapValues({ ObjectiveCSupport.convert(object: $0) })
-                if let bson = bson {
-                    promise(.success(bson))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+    /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
+    func findOneDocument(filter: Document) -> Future<Document?, Error> {
+        return Future { self.findOneDocument(filter: filter, $0) }
     }
 
     /// Runs an aggregation framework pipeline against this collection.
     /// @param pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
     /// @returns A publisher that eventually return `Document` or `Error`.
     func aggregate(pipeline: [Document]) -> Future<[Document], Error> {
-        return Future { promise in
-            self.aggregate(pipeline: pipeline) { documents, error in
-                let bson: [Document]? = documents?.map { $0.mapValues { ObjectiveCSupport.convert(object: $0) } }
-                if let bson = bson {
-                    promise(.success(bson))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.aggregate(pipeline: pipeline, $0) }
     }
 
     /// Counts the number of documents in this collection matching the provided filter.
@@ -863,60 +1257,28 @@ public extension MongoCollection {
     /// @param limit: The max amount of documents to count
     /// @returns A publisher that eventually return `Int` count of documents or `Error`.
     func count(filter: Document, limit: Int) -> Future<Int, Error> {
-        return Future { promise in
-            self.count(filter: filter, limit: limit) { count, error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(count))
-                }
-            }
-        }
+        return Future { self.count(filter: filter, limit: limit, $0) }
     }
 
     /// Counts the number of documents in this collection matching the provided filter.
     /// @param filter: A `Document` as bson that should match the query.
     /// @returns A publisher that eventually return `Int` count of documents or `Error`.
     func count(filter: Document) -> Future<Int, Error> {
-        return Future { promise in
-            self.count(filter: filter) { count, error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(count))
-                }
-            }
-        }
+        return Future { self.count(filter: filter, $0) }
     }
 
     /// Deletes a single matching document from the collection.
     /// @param filter: A `Document` as bson that should match the query.
     /// @returns A publisher that eventually return `Int` count of deleted documents or `Error`.
     func deleteOneDocument(filter: Document) -> Future<Int, Error> {
-        return Future { promise in
-            self.deleteOneDocument(filter: filter) { count, error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(count))
-                }
-            }
-        }
+        return Future { self.deleteOneDocument(filter: filter, $0) }
     }
 
     /// Deletes multiple documents
     /// @param filter: Document representing the match criteria
     /// @returns A publisher that eventually return `Int` count of deleted documents or `Error`.
     func deleteManyDocuments(filter: Document) -> Future<Int, Error> {
-        return Future { promise in
-            self.deleteManyDocuments(filter: filter) { count, error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(count))
-                }
-            }
-        }
+        return Future { self.deleteManyDocuments(filter: filter, $0) }
     }
 
     /// Updates a single document matching the provided filter in this collection.
@@ -925,15 +1287,7 @@ public extension MongoCollection {
     /// @param upsert: When true, creates a new document if no document matches the query.
     /// @returns A publisher that eventually return `UpdateResult` or `Error`.
     func updateOneDocument(filter: Document, update: Document, upsert: Bool) -> Future<UpdateResult, Error> {
-        return Future { promise in
-            self.updateOneDocument(filter: filter, update: update, upsert: upsert) { updateResult, error in
-                if let updateResult = updateResult {
-                    promise(.success(updateResult))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.updateOneDocument(filter: filter, update: update, upsert: upsert, $0) }
     }
 
     /// Updates a single document matching the provided filter in this collection.
@@ -941,15 +1295,7 @@ public extension MongoCollection {
     /// @param update: A bson `Document` representing the update to be applied to a matching document.
     /// @returns A publisher that eventually return `UpdateResult` or `Error`.
     func updateOneDocument(filter: Document, update: Document) -> Future<UpdateResult, Error> {
-        return Future { promise in
-            self.updateOneDocument(filter: filter, update: update) { updateResult, error in
-                if let updateResult = updateResult {
-                    promise(.success(updateResult))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.updateOneDocument(filter: filter, update: update, $0) }
     }
 
     /// Updates multiple documents matching the provided filter in this collection.
@@ -958,15 +1304,7 @@ public extension MongoCollection {
     /// @param upsert: When true, creates a new document if no document matches the query.
     /// @returns A publisher that eventually return `UpdateResult` or `Error`.
     func updateManyDocuments(filter: Document, update: Document, upsert: Bool) -> Future<UpdateResult, Error> {
-        return Future { promise in
-            self.updateManyDocuments(filter: filter, update: update, upsert: upsert) { updateResult, error in
-                if let updateResult = updateResult {
-                    promise(.success(updateResult))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.updateManyDocuments(filter: filter, update: update, upsert: upsert, $0) }
     }
 
     /// Updates multiple documents matching the provided filter in this collection.
@@ -974,15 +1312,7 @@ public extension MongoCollection {
     /// @param update: A bson `Document` representing the update to be applied to a matching document.
     /// @returns A publisher that eventually return `UpdateResult` or `Error`.
     func updateManyDocuments(filter: Document, update: Document) -> Future<UpdateResult, Error> {
-        return Future { promise in
-            self.updateManyDocuments(filter: filter, update: update) { updateResult, error in
-                if let updateResult = updateResult {
-                    promise(.success(updateResult))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.updateManyDocuments(filter: filter, update: update, $0) }
     }
 
     /// Updates a single document in a collection based on a query filter and
@@ -996,16 +1326,7 @@ public extension MongoCollection {
     /// @param options: `RemoteFindOneAndModifyOptions` to use when executing the command.
     /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndUpdate(filter: Document, update: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
-        return Future { promise in
-            self.findOneAndUpdate(filter: filter, update: update, options: options) { updateResult, error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    let bson: Document? = updateResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
-                    promise(.success(bson))
-                }
-            }
-        }
+        return Future { self.findOneAndUpdate(filter: filter, update: update, options: options, $0) }
     }
 
     /// Updates a single document in a collection based on a query filter and
@@ -1018,16 +1339,7 @@ public extension MongoCollection {
     /// @param update: A bson `Document` representing the update to be applied to a matching document.
     /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndUpdate(filter: Document, update: Document) -> Future<Document?, Error> {
-        return Future { promise in
-            self.findOneAndUpdate(filter: filter, update: update) { updateResult, error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    let bson: Document? = updateResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
-                    promise(.success(bson))
-                }
-            }
-        }
+        return Future { self.findOneAndUpdate(filter: filter, update: update, $0) }
     }
 
     /// Overwrites a single document in a collection based on a query filter and
@@ -1041,16 +1353,7 @@ public extension MongoCollection {
     /// @param options: `FindOneAndModifyOptions` to use when executing the command.
     /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndReplace(filter: Document, replacement: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
-        return Future { promise in
-            self.findOneAndReplace(filter: filter, replacement: replacement, options: options) { updateResult, error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    let bson: Document? = updateResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
-                    promise(.success(bson))
-                }
-            }
-        }
+        return Future { self.findOneAndReplace(filter: filter, replacement: replacement, options: options, $0) }
     }
 
     /// Overwrites a single document in a collection based on a query filter and
@@ -1063,16 +1366,7 @@ public extension MongoCollection {
     /// @param replacement: A `Document` describing the replacement.
     /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndReplace(filter: Document, replacement: Document) -> Future<Document?, Error> {
-        return Future { promise in
-            self.findOneAndReplace(filter: filter, replacement: replacement) { updateResult, error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    let bson: Document? = updateResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
-                    promise(.success(bson))
-                }
-            }
-        }
+        return Future { self.findOneAndReplace(filter: filter, replacement: replacement, $0) }
     }
 
     /// Removes a single document from a collection based on a query filter and
@@ -1085,16 +1379,7 @@ public extension MongoCollection {
     /// @param options: `FindOneAndModifyOptions` to use when executing the command.
     /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndDelete(filter: Document, options: FindOneAndModifyOptions) -> Future<Document?, Error> {
-        return Future { promise in
-            self.findOneAndDelete(filter: filter, options: options) { deleteResult, error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    let bson: Document? = deleteResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
-                    promise(.success(bson))
-                }
-            }
-        }
+        return Future { self.findOneAndDelete(filter: filter, options: options, $0) }
     }
 
     /// Removes a single document from a collection based on a query filter and
@@ -1106,16 +1391,7 @@ public extension MongoCollection {
     /// @param filter: A `Document` that should match the query.
     /// @returns A publisher that eventually return `Document` or `nil` if document wasn't found or `Error`.
     func findOneAndDelete(filter: Document) -> Future<Document?, Error> {
-        return Future { promise in
-            self.findOneAndDelete(filter: filter) { deleteResult, error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    let bson: Document? = deleteResult?.mapValues({ ObjectiveCSupport.convert(object: $0) })
-                    promise(.success(bson))
-                }
-            }
-        }
+        return Future { self.findOneAndDelete(filter: filter, $0) }
     }
 }
 

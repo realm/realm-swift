@@ -91,6 +91,7 @@ extension Realm {
 
         /// This error could be returned by Future promise when .success or .failed state cannot be determined
         public static let promiseFailed = Error(.fail, userInfo: [NSLocalizedDescriptionKey: "Promise failed"])
+        public static let callFailed = Error(.fail, userInfo: [NSLocalizedDescriptionKey: "Call failed"])
     }
 }
 
