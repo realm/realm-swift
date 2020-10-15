@@ -1437,6 +1437,23 @@
     XCTAssertNotNil(error);
 }
 
+- (void)testActiveVersionCount {
+    RLMRealmConfiguration *config = RLMRealmConfiguration.defaultConfiguration;
+    config.maximumNumberOfActiveVersions = 3;
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+
+    // Pin this version
+    __attribute((objc_precise_lifetime)) RLMRealm *frozen = [realm freeze];
+
+    // There will always be at least 2 active versions of the Realm
+    // because the previous version won't be cleaned up until the next commit.
+    XCTAssertEqual(realm.numberOfActiveVersions, (uint64_t)2);
+    [realm transactionWithBlock:^{ }];
+    [realm transactionWithBlock:^{ }];
+    [realm transactionWithBlock:^{ }];
+    XCTAssertEqual(realm.numberOfActiveVersions, (uint64_t)4);
+}
+
 #pragma mark - Threads
 
 - (void)testCrossThreadAccess

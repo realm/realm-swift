@@ -891,6 +891,10 @@ public struct Realm {
         return try RLMRealm.deleteFiles(for: config.rlmConfiguration)
     }
 
+    // MARK: Utility
+
+    public var numberOfActiveVersions
+
     // MARK: Internal
 
     internal var rlmRealm: RLMRealm

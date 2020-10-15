@@ -1034,6 +1034,10 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
     }
 }
 
+- (NSUInteger)numberOfActiveVersions {
+    return _realm->get_number_of_versions();
+}
+
 #if REALM_ENABLE_SYNC
 using Privilege = realm::ComputedPrivileges;
 static bool hasPrivilege(realm::ComputedPrivileges actual, realm::ComputedPrivileges expected) {

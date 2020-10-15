@@ -815,6 +815,10 @@ NS_REFINED_FOR_SWIFT;
  */
 - (struct RLMClassPrivileges)privilegesForClassNamed:(NSString *)className;
 
+#pragma mark - Utilities
+
+@property (nonatomic, readonly) NSUInteger numberOfActiveVersions;
+
 #pragma mark - Unavailable Methods
 
 /**
