@@ -22,7 +22,7 @@ import Realm
 /**
  An iterator for a `RealmCollection` instance.
  */
-public struct RLMIterator<Element: RealmCollectionValue>: IteratorProtocol {
+@frozen public struct RLMIterator<Element: RealmCollectionValue>: IteratorProtocol {
     private var generatorBase: NSFastEnumerationIterator
 
     init(collection: RLMCollection) {
@@ -84,7 +84,7 @@ public struct RLMIterator<Element: RealmCollectionValue>: IteratorProtocol {
  }
  ```
  */
-public enum RealmCollectionChange<CollectionType> {
+@frozen public enum RealmCollectionChange<CollectionType> {
     /**
      `.initial` indicates that the initial run of the query has completed (if
      applicable), and the collection can now be used without performing any

@@ -28,6 +28,10 @@ targets = {
   'ios-swift' => oldest_and_latest,
   'tvos-swift' => oldest_and_latest,
 
+  'osx-swift-evolution' => latest_only,
+  'ios-swift-evolution' => latest_only,
+  'tvos-swift-evolution' => latest_only,
+
   'catalyst' => oldest_and_latest,
   'catalyst-swift' => oldest_and_latest,
 

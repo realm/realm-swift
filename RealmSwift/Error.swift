@@ -33,7 +33,7 @@ extension Realm {
      }
      ```
     */
-    public struct Error {
+    @frozen public struct Error {
         public typealias Code = RLMError.Code
 
         /// Error thrown by Realm if no other specific error is returned when a realm is opened.

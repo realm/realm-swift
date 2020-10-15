@@ -628,9 +628,9 @@ case "$COMMAND" in
         sed -i '' 's/Realm.framework/RealmObjc.framework/' RealmObjc.xcframework/Info.plist
 
         find RealmSwift.xcframework -name '*.swiftinterface' \
-            -exec sed -i '' 's/import Realm/import RealmObjc/' {} \;
-        find RealmSwift.xcframework -name '*.swiftinterface' \
-            -exec sed -i '' 's/Realm.RLM/RealmObjc.RLM/g' {} \;
+            -exec sed -i '' 's/import Realm/import RealmObjc/' {} \; \
+            -exec sed -i '' 's/Realm.RLM/RealmObjc.RLM/g' {} \; \
+            -exec sed -i '' 's/Realm.RealmSwift/RealmObjc.RealmSwift/g' {} \; \
 
         # Realm is statically linked into RealmSwift so we no longer actually
         # need the obj-c static library, and just need the framework shell.
@@ -965,6 +965,12 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "verify-osx-swift-evolution")
+        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
+        sh build.sh test-osx-swift
+        exit 0
+        ;;
+
     "verify-ios-static")
         REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/ios/objc/RealmExamples.xcworkspace" \
             sh build.sh test-ios-static
@@ -979,6 +985,12 @@ case "$COMMAND" in
         REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/ios/swift/RealmExamples.xcworkspace" \
             sh build.sh test-ios-swift
         sh build.sh examples-ios-swift
+        ;;
+
+    "verify-ios-swift-evolution")
+        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
+        sh build.sh test-ios-swift
+        exit 0
         ;;
 
     "verify-ios-device-objc")
@@ -1020,6 +1032,12 @@ case "$COMMAND" in
         REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/tvos/swift/RealmExamples.xcworkspace" \
             sh build.sh test-tvos-swift
         sh build.sh examples-tvos-swift
+        exit 0
+        ;;
+
+    "verify-tvos-swift-evolution")
+        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
+        sh build.sh test-tvos-swift
         exit 0
         ;;
 

@@ -460,7 +460,7 @@ class SwiftCustomInitializerObject: Object {
         super.init()
     }
 
-    required init() {
+    required override init() {
         stringCol = ""
         super.init()
     }

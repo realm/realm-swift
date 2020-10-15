@@ -55,8 +55,8 @@ import Realm.Private
  }
  ```
  */
-@objc(RealmSwiftEmbeddedObject)
-open class EmbeddedObject: RLMObjectBase, RealmCollectionValue {
+public typealias EmbeddedObject = RealmSwiftEmbeddedObject
+extension EmbeddedObject: RealmCollectionValue {
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectClassName: className())
@@ -67,15 +67,6 @@ open class EmbeddedObject: RLMObjectBase, RealmCollectionValue {
     }
 
     // MARK: Initializers
-
-    /**
-     Creates an unmanaged instance of a Realm object.
-
-     An unmanaged embedded object can be added to a Realm by assigning it to a property of a managed object or by adding it to a managed List.
-     */
-    public override required init() {
-        super.init()
-    }
 
     /**
      Creates an unmanaged instance of a Realm object.
