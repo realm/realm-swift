@@ -13,6 +13,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Primary key properties are once again marked as being indexed. This reflects
   an internal change to how primary keys are handled that should not have any
   other visible effects.
+* Change paired return types from Swift completion handlers to return `Result<Value, Error>`.
 * Adjust how RealmSwift.Object is defined to add support for Swift Library
   Evolution mode. This should normally not have any effect, but you may need to
   add `override` to initializers of object subclasses.

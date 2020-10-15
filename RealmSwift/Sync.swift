@@ -289,20 +289,32 @@ import Combine
         }
     }
 
+    /// A closure type for receiving the completion result of a remote function call.
+    public typealias ResultFunctionCompletionHandler = (Result<AnyBSON, Error>) -> Void
+
+    /// A closure type for the dynamic remote function type.
+    public typealias ResultFunction = ([AnyBSON], @escaping ResultFunctionCompletionHandler) -> Void
+
+    /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls.
+    public subscript(dynamicMember string: String) -> ResultFunction {
+        return { (arguments: [AnyBSON], completionHandler: @escaping ResultFunctionCompletionHandler) in
+            let objcArgs = arguments.map(ObjectiveCSupport.convert) as! [RLMBSON]
+            self.user?.__callFunctionNamed(string, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
+                if let bson = ObjectiveCSupport.convert(object: bson) {
+                    completionHandler(.success(bson))
+                } else {
+                    completionHandler(.failure(error ?? Realm.Error.callFailed))
+                }
+            }
+        }
+    }
+
     #if canImport(Combine)
     /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls.
     @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
     public subscript(dynamicMember string: String) -> ([AnyBSON]) -> Future<AnyBSON, Error> {
         return { (arguments: [AnyBSON]) in
-            return Future<AnyBSON, Error> { promise in
-                self[dynamicMember: string](arguments, { bson, error in
-                    if let bson = bson {
-                        promise(.success(bson))
-                    } else {
-                        promise(.failure(error ?? Realm.Error.promiseFailed))
-                    }
-                })
-            }
+            return Future<AnyBSON, Error> { self[dynamicMember: string](arguments, $0) }
         }
     }
     #endif
@@ -575,15 +587,7 @@ public extension User {
     /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.
     /// @returns A publisher that eventually return `Dictionary` with user's data or `Error`.
     func refreshCustomData() -> Future<[AnyHashable: Any], Error> {
-        return Future { promise in
-            self.refreshCustomData { customData, error in
-                if let customData = customData {
-                    promise(.success(customData))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.refreshCustomData($0) }
     }
 
     /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
@@ -592,15 +596,7 @@ public extension User {
     /// @param credentials The `Credentials` used to link the user to a new identity.
     /// @returns A publisher that eventually return `Result.success` or `Error`.
     func linkUser(credentials: Credentials) -> Future<User, Error> {
-        return Future { promise in
-            self.linkUser(credentials: credentials) { user, error in
-                if let user = user {
-                    promise(.success(user))
-                } else {
-                    promise(.failure(error ?? Realm.Error.promiseFailed))
-                }
-            }
-        }
+        return Future { self.linkUser(credentials: credentials, $0) }
     }
 
     /// Removes the user
@@ -636,3 +632,32 @@ public extension User {
     }
 }
 #endif
+
+public extension User {
+    /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.
+    /// @completion A completion that eventually return `Result.success(Dictionary)` with user's data or `Result.failure(Error)`.
+    func refreshCustomData(_ completion: @escaping (Result<[AnyHashable: Any], Error>) -> Void) {
+        self.refreshCustomData { customData, error in
+            if let customData = customData {
+                completion(.success(customData))
+            } else {
+                completion(.failure(error ?? Realm.Error.callFailed))
+            }
+        }
+    }
+
+    /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
+    /// specified as a parameter. This will only be successful if this `User` is the currently authenticated
+    /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
+    /// @param credentials The `Credentials` used to link the user to a new identity.
+    /// @completion A completion that eventually return `Result.success(User)` with user's data or `Result.failure(Error)`.
+    func linkUser(credentials: Credentials, _ completion: @escaping (Result<User, Error>) -> Void) {
+        self.linkUser(credentials: credentials) { user, error in
+            if let user = user {
+                completion(.success(user))
+            } else {
+                completion(.failure(error ?? Realm.Error.callFailed))
+            }
+        }
+    }
+}
