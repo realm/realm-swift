@@ -340,7 +340,7 @@ public extension User {
      */
     func configuration(partitionValue: AnyBSON,
                        cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
-        let config = self.__configuration(withPartitionValue: nil)
+        let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue)))
         let syncConfig = config.syncConfiguration!
         syncConfig.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
         config.syncConfiguration = syncConfig
