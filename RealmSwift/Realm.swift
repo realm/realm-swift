@@ -893,7 +893,7 @@ public struct Realm {
 
     // MARK: Utilities
 
-    /// Returns the current active number of versions of a Realm instance.
+    /// Returns the number of active versions of this Realm.
     ///
     /// - Note:
     /// There will always be at least 2 active versions of the Realm
