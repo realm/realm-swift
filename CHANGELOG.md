@@ -1,4 +1,4 @@
-10.0.0 Release notes (yyyy-MM-dd)
+10.0.0 Release notes (2020-10-16)
 =============================================================
 
 This release is functionally identical to v10.0.0-rc.2.
@@ -28,6 +28,9 @@ read by versions older than v10.0.0.
 * Remove support for Realm Object Server.
 * Non-embedded objects in synchronized Realms must always have a primary key
   named "_id".
+* All Swift callbacks for asynchronous operations which can fail are now passed
+  a `Result<Value, Error>` parameter instead of two separate `Value?` and
+  `Error?` parameters.
 
 ### Enhancements
 
@@ -85,6 +88,9 @@ read by versions older than v10.0.0.
 * Add the ability to listen for when a Watch Change Stream is opened when using
   Combine. Use `onOpen(event:)` directly after opening a `WatchPublisher` to
   register a callback to be invoked once the change stream is opened.
+* Objects with integer primary keys no longer require a separate index for the
+* primary key column, improving insert performance and slightly reducing file
+  size.
 
 ### Compatibility
 
