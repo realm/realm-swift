@@ -106,6 +106,10 @@ class InitAppendsToArrayValue : RLMObject {
     @objc dynamic var value: Int = 0
 }
 
+class NoProps: FakeObject {
+    // no @objc properties
+}
+
 class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
     func testWorksAtAll() {
         if isParent {
@@ -113,6 +117,11 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
         }
     }
 
+    func testShouldRaiseObjectWithoutProperties() {
+        assertThrowsWithReasonMatching(RLMObjectSchema(forObjectClass: NoProps.self),
+                                       "No properties are defined for 'NoProps'. Did you remember to mark them with '@objc' in your model?")
+    }
+    
     func testSchemaInitWithLinkedToObjectUsingInitWithValue() {
         if isParent {
             XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
