@@ -132,15 +132,13 @@ import Realm.Private
     public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration,
                                  callbackQueue: DispatchQueue = .main,
                                  callback: @escaping (Result<Realm, Swift.Error>) -> Void) -> AsyncOpenTask {
-        return AsyncOpenTask(rlmTask: RLMRealm.asyncOpen(with: configuration.rlmConfiguration,
-                                                         callbackQueue: callbackQueue,
-                                                         callback: { rlmRealm, error in
-                                                            if let realm = rlmRealm.flatMap(Realm.init) {
-                                                                callback(.success(realm))
-                                                            } else {
-                                                                callback(.failure(error ?? Realm.Error.callFailed))
-                                                            }
-                                                         }))
+        return AsyncOpenTask(rlmTask: RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: callbackQueue, callback: { rlmRealm, error in
+            if let realm = rlmRealm.flatMap(Realm.init) {
+                callback(.success(realm))
+            } else {
+                callback(.failure(error ?? Realm.Error.callFailed))
+            }
+        }))
     }
 
     /**
