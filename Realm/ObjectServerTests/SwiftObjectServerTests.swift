@@ -505,8 +505,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let ex = expectation(description: "async open")
             let config = user.configuration(partitionValue: self.appId)
             Realm.asyncOpen(configuration: config) { result in
-                if case .failure = result {
-                    XCTFail("No realm on async open")
+                guard case .failure = result else {
+                    XCTFail("No error on cancelled async open")
+                    return ex.fulfill()
                 }
                 ex.fulfill()
             }
@@ -636,11 +637,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(user.state, .loggedIn)
 
             let credentials2 = Credentials.emailPassword(email: email, password: "NOT_A_VALID_PASSWORD")
-            let ex = expectation(description: "Should log in the user properly")
+            let ex = expectation(description: "Should fail to log in the user")
 
             self.app.login(credentials: credentials2) { result in
-                if case .failure = result {
-                    XCTFail("Should login user")
+                guard case .failure = result else {
+                    XCTFail("Login should not have been successful")
+                    return ex.fulfill()
                 }
                 ex.fulfill()
             }
