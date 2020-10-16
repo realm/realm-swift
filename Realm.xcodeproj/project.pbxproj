@@ -300,7 +300,7 @@
 		536B7C1024A509AC006B535D /* setup_baas.rb in Resources */ = {isa = PBXBuildFile; fileRef = 49D9DFC4246C8E48003AD31D /* setup_baas.rb */; };
 		537130C824A9E417001FDBBC /* RealmServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537130C724A9E417001FDBBC /* RealmServer.swift */; };
 		53C4E952253A34DE0004835F /* app_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C4E950253A34DE0004835F /* app_utils.cpp */; };
-		53C4E953253A34DE0004835F /* app_utils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 53C4E951253A34DE0004835F /* app_utils.hpp */; };
+		53C4E96A253A3B460004835F /* app_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C4E950253A34DE0004835F /* app_utils.cpp */; };
 		53ECFDAC24AA0C0D00A4CB89 /* assisted_agg in Resources */ = {isa = PBXBuildFile; fileRef = 53ECFDAB24AA0C0D00A4CB89 /* assisted_agg */; };
 		53ECFDAE24AA0C1100A4CB89 /* create_user in Resources */ = {isa = PBXBuildFile; fileRef = 53ECFDAD24AA0C1100A4CB89 /* create_user */; };
 		53ECFDB024AA0C1700A4CB89 /* stitch_server in Resources */ = {isa = PBXBuildFile; fileRef = 53ECFDAF24AA0C1700A4CB89 /* stitch_server */; };
@@ -1997,7 +1997,6 @@
 				5D659EA51BE04556006515A0 /* Realm.h in Headers */,
 				5D659EA71BE04556006515A0 /* RLMAccessor.h in Headers */,
 				CFAEF761242B5F9A00EAF721 /* RLMAPIKeyAuth.h in Headers */,
-				53C4E953253A34DE0004835F /* app_utils.hpp in Headers */,
 				4993221224129DCE00A0EC8E /* RLMApp.h in Headers */,
 				5D659EA91BE04556006515A0 /* RLMArray.h in Headers */,
 				5D659EAA1BE04556006515A0 /* RLMArray_Private.h in Headers */,
@@ -2740,6 +2739,7 @@
 			files = (
 				499321FE24129CFD00A0EC8E /* app.cpp in Sources */,
 				499321FC24129CFD00A0EC8E /* app_credentials.cpp in Sources */,
+				53C4E952253A34DE0004835F /* app_utils.cpp in Sources */,
 				3F558C7922BC023A002F0F30 /* async_open_task.cpp in Sources */,
 				3F5B5D301E84230B00953B33 /* binding_callback_thread_observer.cpp in Sources */,
 				534402D2247FCCA300866F32 /* bson.cpp in Sources */,
@@ -2789,7 +2789,6 @@
 				CF76F7E924816AAB00890DD2 /* RLMMongoCollection.mm in Sources */,
 				4993221624129E6600A0EC8E /* RLMNetworkTransport.mm in Sources */,
 				5D659E8C1BE04556006515A0 /* RLMObject.mm in Sources */,
-				53C4E952253A34DE0004835F /* app_utils.cpp in Sources */,
 				5D659E8D1BE04556006515A0 /* RLMObjectBase.mm in Sources */,
 				3F4F3ADB23F71C790048DB43 /* RLMObjectId.mm in Sources */,
 				5D659E8E1BE04556006515A0 /* RLMObjectSchema.mm in Sources */,
@@ -2916,6 +2915,7 @@
 			files = (
 				499321FF24129CFE00A0EC8E /* app.cpp in Sources */,
 				499321FD24129CFD00A0EC8E /* app_credentials.cpp in Sources */,
+				53C4E96A253A3B460004835F /* app_utils.cpp in Sources */,
 				3F558C7A22BC023B002F0F30 /* async_open_task.cpp in Sources */,
 				3F5B5D321E84230E00953B33 /* binding_callback_thread_observer.cpp in Sources */,
 				492F5CB3244F48D800ACEBC0 /* bson.cpp in Sources */,
