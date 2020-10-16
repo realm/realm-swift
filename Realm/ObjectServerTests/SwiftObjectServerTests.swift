@@ -505,9 +505,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let ex = expectation(description: "async open")
             let config = user.configuration(partitionValue: self.appId)
             Realm.asyncOpen(configuration: config) { result in
-                switch result {
-                case .failure: XCTFail("No realm on async open")
-                default: break
+                if case .failure = result {
+                    XCTFail("No realm on async open")
                 }
                 ex.fulfill()
             }
