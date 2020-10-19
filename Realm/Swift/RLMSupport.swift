@@ -79,6 +79,23 @@ extension RLMCollection {
     }
 }
 
+// TODO:
+//RLMMongoCollection.h
+// RLMEmailPasswordAuth.h
+// RLMApp.h
+// RLMBSON.h?
+// RLMSyncSession.h?
+// RLMUser.h
+// RLMDecimal128.h?
+// RLMRealm.h
+
+extension RLMApp {
+    public func login(withCredential credentials: RLMCredentials,
+                      completion: @escaping RLMUserCompletionBlock) {
+        return self.__login(withCredential: credentials, completion: completion)
+    }
+}
+
 // MARK: - Sync-related
 
 #if REALM_ENABLE_SYNC
