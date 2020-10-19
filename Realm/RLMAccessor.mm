@@ -19,6 +19,7 @@
 #import "RLMAccessor.hpp"
 
 #import "RLMArray_Private.hpp"
+#import "RLMSet_Private.hpp"
 #import "RLMListBase.h"
 #import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
@@ -420,14 +421,18 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
     if (prop.type == RLMPropertyTypeLinkingObjects) {
         return ^(RLMObjectBase *) { return [RLMResults emptyDetachedResults]; };
     }
-    if (prop.array) {
+    if (prop.array || prop.set) {
         NSString *propName = prop.name;
         if (prop.type == RLMPropertyTypeObject) {
             NSString *objectClassName = prop.objectClassName;
             return ^(RLMObjectBase *obj) {
                 id val = superGet(obj, propName);
                 if (!val) {
-                    val = [[RLMArray alloc] initWithObjectClassName:objectClassName];
+                    if (prop.array) {
+                        val = [[RLMArray alloc] initWithObjectClassName:objectClassName];
+                    } else {
+                        val = [[RLMSet alloc] initWithObjectClassName:objectClassName];
+                    }
                     superSet(obj, propName, val);
                 }
                 return val;
@@ -438,7 +443,11 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
         return ^(RLMObjectBase *obj) {
             id val = superGet(obj, propName);
             if (!val) {
-                val = [[RLMArray alloc] initWithObjectType:type optional:optional];
+                if (prop.array) {
+                    val = [[RLMArray alloc] initWithObjectType:type optional:optional];
+                } else {
+                    val = [[RLMSet alloc] initWithObjectType:type optional:optional];
+                }
                 superSet(obj, propName, val);
             }
             return val;
