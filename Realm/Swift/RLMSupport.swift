@@ -190,7 +190,7 @@ extension RLMMongoCollection {
         return self.__findOneAndDeleteWhere(filterDocument, completion: completion)
     }
 
-    public func watch(withDelegate delegate: RLMChangeEventDelegate, queue: DispatchQueue?) -> RLMChangeStream {
+    public func watch(with delegate: RLMChangeEventDelegate, queue: DispatchQueue?) -> RLMChangeStream {
         return self.__watch(with: delegate, delegateQueue: queue)
     }
 
@@ -204,7 +204,7 @@ extension RLMMongoCollection {
 }
 
 extension RLMEmailPasswordAuth {
-    public func callResetPasswordFunction(email: String,
+    public func callResetPasswordFunction(_ email: String,
                                           password: String,
                                           args: [RLMBSON],
                                           completion: @escaping RLMEmailPasswordAuthOptionalErrorBlock) {
@@ -220,6 +220,28 @@ extension RLMSyncSession {
                                         mode: RLMSyncProgressMode,
                                         block: @escaping RLMProgressNotificationBlock) -> RLMProgressNotificationToken? {
         return self.__addProgressNotification(for: direction, mode: mode, block: block)
+    }
+}
+
+extension RLMUser {
+    public func configuration(withPartitionValue partitionValue: RLMBSON?) -> RLMRealmConfiguration {
+        return self.__configuration(withPartitionValue: partitionValue)
+    }
+
+    public var customData: NSDictionary {
+        return self.__customData as NSDictionary
+    }
+
+    public func linkUser(with credentials: RLMCredentials, completion: @escaping RLMOptionalUserBlock) {
+        return self.__linkUser(with: credentials, completion: completion)
+    }
+
+    public func mongoClient(withServiceName serviceName: String) -> RLMMongoClient {
+        return self.__mongoClient(withServiceName: serviceName)
+    }
+
+    public func callFunctionNamed(_ name: String, arguments: [RLMBSON], completion: @escaping RLMCallFunctionCompletionBlock) {
+        return self.__callFunctionNamed(name, arguments: arguments, completionBlock: completion)
     }
 }
 
