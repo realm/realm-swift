@@ -88,7 +88,7 @@ extension RLMCollection {
 //     /// Convert a `RLMBSON` to an `AnyBSON`.
 // static func convert(object: RLMBSON?) -> AnyBSON? {
 // ~RLMSyncSession.h~
-// RLMUser.h
+// ~RLMUser.h~
 // RLMDecimal128.h?
 // RLMRealm.h
 
@@ -224,12 +224,12 @@ extension RLMSyncSession {
 }
 
 extension RLMUser {
-    public func configuration(withPartitionValue partitionValue: RLMBSON?) -> RLMRealmConfiguration {
-        return self.__configuration(withPartitionValue: partitionValue)
+    @nonobjc public var customData: NSDictionary {
+        return self.__customData as NSDictionary
     }
 
-    public var customData: NSDictionary {
-        return self.__customData as NSDictionary
+    public func configuration(withPartitionValue partitionValue: RLMBSON?) -> RLMRealmConfiguration {
+        return self.__configuration(withPartitionValue: partitionValue)
     }
 
     public func linkUser(with credentials: RLMCredentials, completion: @escaping RLMOptionalUserBlock) {
@@ -242,6 +242,20 @@ extension RLMUser {
 
     public func callFunctionNamed(_ name: String, arguments: [RLMBSON], completion: @escaping RLMCallFunctionCompletionBlock) {
         return self.__callFunctionNamed(name, arguments: arguments, completionBlock: completion)
+    }
+}
+
+extension RLMDecimal128 {
+    public static var minimumDecimalNumber: RLMDecimal128 {
+        return __minimumDecimalNumber
+    }
+    
+    public static var maximumDecimalNumber: RLMDecimal128 {
+        return __maximumDecimalNumber
+    }
+    
+    public var magnitude: RLMDecimal128 {
+        return self.__magnitude
     }
 }
 
