@@ -81,13 +81,13 @@ extension RLMCollection {
 
 // TODO:
 // ~RLMMongoCollection.h~
-// RLMEmailPasswordAuth.h
-// RLMApp.h
-// RLMBSON.h?
+// ~RLMEmailPasswordAuth.h~
+// ~RLMApp.h~
+// ~RLMBSON.h~
 // Did not wrap @property (readonly) RLMBSONType bsonType NS_REFINED_FOR_SWIFT; since it's internally used by
 //     /// Convert a `RLMBSON` to an `AnyBSON`.
 // static func convert(object: RLMBSON?) -> AnyBSON? {
-// RLMSyncSession.h?
+// ~RLMSyncSession.h~
 // RLMUser.h
 // RLMDecimal128.h?
 // RLMRealm.h
@@ -212,6 +212,14 @@ extension RLMEmailPasswordAuth {
                                          password: password,
                                          args: args,
                                          completion: completion)
+    }
+}
+
+extension RLMSyncSession {
+    public func addProgressNotification(for direction: RLMSyncProgressDirection,
+                                        mode: RLMSyncProgressMode,
+                                        block: @escaping RLMProgressNotificationBlock) -> RLMProgressNotificationToken? {
+        return self.__addProgressNotification(for: direction, mode: mode, block: block)
     }
 }
 
