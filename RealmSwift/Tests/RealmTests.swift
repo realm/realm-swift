@@ -189,10 +189,23 @@ class RealmTests: TestCase {
 
     func testInitCustomClassList() {
         let configuration = Realm.Configuration(fileURL: Realm.Configuration.defaultConfiguration.fileURL,
-            objectTypes: [SwiftStringObject.self])
-        XCTAssert(configuration.objectTypes! is [SwiftStringObject.Type])
+                                                objectTypes: [
+                                                    EmbeddedTreeObject1.self,
+                                                    EmbeddedTreeObject2.self,
+                                                    EmbeddedTreeObject3.self,
+                                                    EmbeddedParentObject.self,
+                                                    SwiftStringObject.self
+        ])
+        let sorted = configuration.objectTypes!.sorted { $0.className() < $1.className() }
+        XCTAssertTrue(sorted[0] is EmbeddedParentObject.Type)
+        XCTAssertTrue(sorted[1] is EmbeddedTreeObject1.Type)
+        XCTAssertTrue(sorted[2] is EmbeddedTreeObject2.Type)
+        XCTAssertTrue(sorted[3] is EmbeddedTreeObject3.Type)
+        XCTAssertTrue(sorted[4] is SwiftStringObject.Type)
+
         let realm = try! Realm(configuration: configuration)
-        XCTAssertEqual(["SwiftStringObject"], realm.schema.objectSchema.map { $0.className })
+        XCTAssertEqual(["EmbeddedParentObject", "EmbeddedTreeObject1", "EmbeddedTreeObject2", "EmbeddedTreeObject3", "SwiftStringObject"],
+                       realm.schema.objectSchema.map { $0.className }.sorted())
     }
 
     func testWrite() {
@@ -532,6 +545,8 @@ class RealmTests: TestCase {
         XCTAssertEqual(object["optNSStringCol"] as! String?, dictionary["optNSStringCol"] as! String?)
         XCTAssertEqual(object["optBinaryCol"] as! NSData?, dictionary["optBinaryCol"] as! NSData?)
         XCTAssertEqual(object["optDateCol"] as! Date?, dictionary["optDateCol"] as! Date?)
+        XCTAssertEqual(object["optDecimalCol"] as! Decimal128?, dictionary["optDecimalCol"] as! Decimal128?)
+        XCTAssertEqual(object["optObjectIdCol"] as! ObjectId?, dictionary["optObjectIdCol"] as! ObjectId?)
         XCTAssertEqual((object["optObjectCol"] as? SwiftBoolObject)?.boolCol, true)
     }
 

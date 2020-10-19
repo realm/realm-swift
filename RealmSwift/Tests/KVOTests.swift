@@ -39,6 +39,8 @@ class SwiftKVOObject: Object {
     @objc dynamic var stringCol: String = ""
     @objc dynamic var binaryCol: Data = Data()
     @objc dynamic var dateCol: Date = Date(timeIntervalSince1970: 0)
+    @objc dynamic var decimalCol: Decimal128 = Decimal128(number: 1)
+    @objc dynamic var objectIdCol = ObjectId()
     @objc dynamic var objectCol: SwiftKVOObject?
     let arrayCol = List<SwiftKVOObject>()
     let optIntCol = RealmOptional<Int>()
@@ -48,6 +50,8 @@ class SwiftKVOObject: Object {
     @objc dynamic var optStringCol: String?
     @objc dynamic var optBinaryCol: Data?
     @objc dynamic var optDateCol: Date?
+    @objc dynamic var optDecimalCol: Decimal128?
+    @objc dynamic var optObjectIdCol: ObjectId?
 
     let arrayBool = List<Bool>()
     let arrayInt8 = List<Int8>()
@@ -59,6 +63,8 @@ class SwiftKVOObject: Object {
     let arrayString = List<String>()
     let arrayBinary = List<Data>()
     let arrayDate = List<Date>()
+    let arrayDecimal = List<Decimal128>()
+    let arrayObjectId = List<ObjectId>()
 
     let arrayOptBool = List<Bool?>()
     let arrayOptInt8 = List<Int8?>()
@@ -70,6 +76,8 @@ class SwiftKVOObject: Object {
     let arrayOptString = List<String?>()
     let arrayOptBinary = List<Data?>()
     let arrayOptDate = List<Date?>()
+    let arrayOptDecimal = List<Decimal128?>()
+    let arrayOptObjectId = List<ObjectId?>()
 
     override class func primaryKey() -> String { return "pk" }
     override class func ignoredProperties() -> [String] { return ["ignored"] }
@@ -206,6 +214,13 @@ class KVOTests: TestCase {
         let date = Date(timeIntervalSince1970: 1)
         observeChange(obs, "dateCol", Date(timeIntervalSince1970: 0), date) { obj.dateCol = date }
 
+        let decimal = Decimal128(number: 2)
+        observeChange(obs, "decimalCol", Decimal128(number: 1), decimal) { obj.decimalCol = decimal }
+
+        let oldObjectId = obj.objectIdCol
+        let objectId = ObjectId()
+        observeChange(obs, "objectIdCol", oldObjectId, objectId) { obj.objectIdCol = objectId }
+
         observeListChange(obs, "arrayCol", .insertion) { obj.arrayCol.append(obj) }
         observeListChange(obs, "arrayCol", .removal) { obj.arrayCol.removeAll() }
 
@@ -216,6 +231,8 @@ class KVOTests: TestCase {
         observeChange(obs, "optStringCol", nil, "abc") { obj.optStringCol = "abc" }
         observeChange(obs, "optBinaryCol", nil, data) { obj.optBinaryCol = data }
         observeChange(obs, "optDateCol", nil, date) { obj.optDateCol = date }
+        observeChange(obs, "optDecimalCol", nil, decimal) { obj.optDecimalCol = decimal }
+        observeChange(obs, "optObjectIdCol", nil, objectId) { obj.optObjectIdCol = objectId }
 
         observeChange(obs, "optIntCol", 10, nil) { obj.optIntCol.value = nil }
         observeChange(obs, "optFloatCol", 10.0, nil) { obj.optFloatCol.value = nil }
@@ -224,37 +241,45 @@ class KVOTests: TestCase {
         observeChange(obs, "optStringCol", "abc", nil) { obj.optStringCol = nil }
         observeChange(obs, "optBinaryCol", data, nil) { obj.optBinaryCol = nil }
         observeChange(obs, "optDateCol", date, nil) { obj.optDateCol = nil }
+        observeChange(obs, "optDecimalCol", decimal, nil) { obj.optDecimalCol = nil }
+        observeChange(obs, "optObjectIdCol", objectId, nil) { obj.optObjectIdCol = nil }
 
-        observeListChange(obs, "arrayBool", .insertion) { obj.arrayBool.append(true); }
-        observeListChange(obs, "arrayInt8", .insertion) { obj.arrayInt8.append(10); }
-        observeListChange(obs, "arrayInt16", .insertion) { obj.arrayInt16.append(10); }
-        observeListChange(obs, "arrayInt32", .insertion) { obj.arrayInt32.append(10); }
-        observeListChange(obs, "arrayInt64", .insertion) { obj.arrayInt64.append(10); }
-        observeListChange(obs, "arrayFloat", .insertion) { obj.arrayFloat.append(10); }
-        observeListChange(obs, "arrayDouble", .insertion) { obj.arrayDouble.append(10); }
-        observeListChange(obs, "arrayString", .insertion) { obj.arrayString.append("abc"); }
+        observeListChange(obs, "arrayBool", .insertion) { obj.arrayBool.append(true) }
+        observeListChange(obs, "arrayInt8", .insertion) { obj.arrayInt8.append(10) }
+        observeListChange(obs, "arrayInt16", .insertion) { obj.arrayInt16.append(10) }
+        observeListChange(obs, "arrayInt32", .insertion) { obj.arrayInt32.append(10) }
+        observeListChange(obs, "arrayInt64", .insertion) { obj.arrayInt64.append(10) }
+        observeListChange(obs, "arrayFloat", .insertion) { obj.arrayFloat.append(10) }
+        observeListChange(obs, "arrayDouble", .insertion) { obj.arrayDouble.append(10) }
+        observeListChange(obs, "arrayString", .insertion) { obj.arrayString.append("abc") }
+        observeListChange(obs, "arrayDecimal", .insertion) { obj.arrayDecimal.append(decimal) }
+        observeListChange(obs, "arrayObjectId", .insertion) { obj.arrayObjectId.append(objectId) }
 
-        observeListChange(obs, "arrayOptBool", .insertion) { obj.arrayOptBool.append(true); }
-        observeListChange(obs, "arrayOptInt8", .insertion) { obj.arrayOptInt8.append(10); }
-        observeListChange(obs, "arrayOptInt16", .insertion) { obj.arrayOptInt16.append(10); }
-        observeListChange(obs, "arrayOptInt32", .insertion) { obj.arrayOptInt32.append(10); }
-        observeListChange(obs, "arrayOptInt64", .insertion) { obj.arrayOptInt64.append(10); }
-        observeListChange(obs, "arrayOptFloat", .insertion) { obj.arrayOptFloat.append(10); }
-        observeListChange(obs, "arrayOptDouble", .insertion) { obj.arrayOptDouble.append(10); }
-        observeListChange(obs, "arrayOptString", .insertion) { obj.arrayOptString.append("abc"); }
-        observeListChange(obs, "arrayOptBinary", .insertion) { obj.arrayOptBinary.append(data); }
-        observeListChange(obs, "arrayOptDate", .insertion) { obj.arrayOptDate.append(date); }
+        observeListChange(obs, "arrayOptBool", .insertion) { obj.arrayOptBool.append(true) }
+        observeListChange(obs, "arrayOptInt8", .insertion) { obj.arrayOptInt8.append(10) }
+        observeListChange(obs, "arrayOptInt16", .insertion) { obj.arrayOptInt16.append(10) }
+        observeListChange(obs, "arrayOptInt32", .insertion) { obj.arrayOptInt32.append(10) }
+        observeListChange(obs, "arrayOptInt64", .insertion) { obj.arrayOptInt64.append(10) }
+        observeListChange(obs, "arrayOptFloat", .insertion) { obj.arrayOptFloat.append(10) }
+        observeListChange(obs, "arrayOptDouble", .insertion) { obj.arrayOptDouble.append(10) }
+        observeListChange(obs, "arrayOptString", .insertion) { obj.arrayOptString.append("abc") }
+        observeListChange(obs, "arrayOptBinary", .insertion) { obj.arrayOptBinary.append(data) }
+        observeListChange(obs, "arrayOptDate", .insertion) { obj.arrayOptDate.append(date) }
+        observeListChange(obs, "arrayOptDecimal", .insertion) { obj.arrayOptDecimal.append(decimal) }
+        observeListChange(obs, "arrayOptObjectId", .insertion) { obj.arrayOptObjectId.append(objectId) }
 
-        observeListChange(obs, "arrayOptBool", .insertion) { obj.arrayOptBool.insert(nil, at: 0); }
-        observeListChange(obs, "arrayOptInt8", .insertion) { obj.arrayOptInt8.insert(nil, at: 0); }
-        observeListChange(obs, "arrayOptInt16", .insertion) { obj.arrayOptInt16.insert(nil, at: 0); }
-        observeListChange(obs, "arrayOptInt32", .insertion) { obj.arrayOptInt32.insert(nil, at: 0); }
-        observeListChange(obs, "arrayOptInt64", .insertion) { obj.arrayOptInt64.insert(nil, at: 0); }
-        observeListChange(obs, "arrayOptFloat", .insertion) { obj.arrayOptFloat.insert(nil, at: 0); }
-        observeListChange(obs, "arrayOptDouble", .insertion) { obj.arrayOptDouble.insert(nil, at: 0); }
-        observeListChange(obs, "arrayOptString", .insertion) { obj.arrayOptString.insert(nil, at: 0); }
-        observeListChange(obs, "arrayOptDate", .insertion) { obj.arrayOptDate.insert(nil, at: 0); }
-        observeListChange(obs, "arrayOptBinary", .insertion) { obj.arrayOptBinary.insert(nil, at: 0); }
+        observeListChange(obs, "arrayOptBool", .insertion) { obj.arrayOptBool.insert(nil, at: 0) }
+        observeListChange(obs, "arrayOptInt8", .insertion) { obj.arrayOptInt8.insert(nil, at: 0) }
+        observeListChange(obs, "arrayOptInt16", .insertion) { obj.arrayOptInt16.insert(nil, at: 0) }
+        observeListChange(obs, "arrayOptInt32", .insertion) { obj.arrayOptInt32.insert(nil, at: 0) }
+        observeListChange(obs, "arrayOptInt64", .insertion) { obj.arrayOptInt64.insert(nil, at: 0) }
+        observeListChange(obs, "arrayOptFloat", .insertion) { obj.arrayOptFloat.insert(nil, at: 0) }
+        observeListChange(obs, "arrayOptDouble", .insertion) { obj.arrayOptDouble.insert(nil, at: 0) }
+        observeListChange(obs, "arrayOptString", .insertion) { obj.arrayOptString.insert(nil, at: 0) }
+        observeListChange(obs, "arrayOptDate", .insertion) { obj.arrayOptDate.insert(nil, at: 0) }
+        observeListChange(obs, "arrayOptBinary", .insertion) { obj.arrayOptBinary.insert(nil, at: 0) }
+        observeListChange(obs, "arrayOptDecimal", .insertion) { obj.arrayOptDecimal.insert(nil, at: 0) }
+        observeListChange(obs, "arrayOptObjectId", .insertion) { obj.arrayOptObjectId.insert(nil, at: 0) }
 
         if obs.realm == nil {
             return
@@ -312,15 +337,26 @@ class KVOTests: TestCase {
         let date = Date(timeIntervalSince1970: 1)
         observeChange(obs, \.dateCol, Date(timeIntervalSince1970: 0), date) { obj.dateCol = date }
 
+        let decimal = Decimal128(number: 2)
+        observeChange(obs, \.decimalCol, Decimal128(number: 1), decimal) { obj.decimalCol = decimal }
+
+        let oldObjectId = obj.objectIdCol
+        let objectId = ObjectId()
+        observeChange(obs, \.objectIdCol, oldObjectId, objectId) { obj.objectIdCol = objectId }
+
         observeChange(obs, \.objectCol, nil, obj) { obj.objectCol = obj }
 
         observeChange(obs, \.optStringCol, nil, "abc") { obj.optStringCol = "abc" }
         observeChange(obs, \.optBinaryCol, nil, data) { obj.optBinaryCol = data }
         observeChange(obs, \.optDateCol, nil, date) { obj.optDateCol = date }
+        observeChange(obs, \.optDecimalCol, nil, decimal) { obj.optDecimalCol = decimal }
+        observeChange(obs, \.optObjectIdCol, nil, objectId) { obj.optObjectIdCol = objectId }
 
         observeChange(obs, \.optStringCol, "abc", nil) { obj.optStringCol = nil }
         observeChange(obs, \.optBinaryCol, data, nil) { obj.optBinaryCol = nil }
         observeChange(obs, \.optDateCol, date, nil) { obj.optDateCol = nil }
+        observeChange(obs, \.optDecimalCol, decimal, nil) { obj.optDecimalCol = nil }
+        observeChange(obs, \.optObjectIdCol, objectId, nil) { obj.optObjectIdCol = nil }
 
         if obs.realm == nil {
             return

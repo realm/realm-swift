@@ -42,7 +42,7 @@ import Realm.Private
  done, trying to use the same instance in multiple blocks dispatch to the same
  queue may fail as queues are not always run on the same thread.
  */
-public struct Realm {
+@frozen public struct Realm {
 
     // MARK: Properties
 
@@ -131,10 +131,14 @@ public struct Realm {
     @discardableResult
     public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration,
                                  callbackQueue: DispatchQueue = .main,
-                                 callback: @escaping (Realm?, Swift.Error?) -> Void) -> AsyncOpenTask {
-        return AsyncOpenTask(rlmTask: RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: callbackQueue) { rlmRealm, error in
-            callback(rlmRealm.flatMap(Realm.init), error)
-        })
+                                 callback: @escaping (Result<Realm, Swift.Error>) -> Void) -> AsyncOpenTask {
+        return AsyncOpenTask(rlmTask: RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: callbackQueue, callback: { rlmRealm, error in
+            if let realm = rlmRealm.flatMap(Realm.init) {
+                callback(.success(realm))
+            } else {
+                callback(.failure(error ?? Realm.Error.callFailed))
+            }
+        }))
     }
 
     /**
@@ -147,7 +151,7 @@ public struct Realm {
      download via the sync session as the sync session itself is created
      asynchronously, and may not exist yet when Realm.asyncOpen() returns.
      */
-    public struct AsyncOpenTask {
+    @frozen public struct AsyncOpenTask {
         fileprivate let rlmTask: RLMAsyncOpenTask
 
         /**
@@ -343,7 +347,7 @@ public struct Realm {
     /**
      What to do when an object being added to or created in a Realm has a primary key that already exists.
      */
-    public enum UpdatePolicy: Int {
+    @frozen public enum UpdatePolicy: Int {
         /**
          Throw an exception. This is the default when no policy is specified for `add()` or `create()`.
 
@@ -540,7 +544,7 @@ public struct Realm {
 
      - parameter object: The object to be deleted.
      */
-    public func delete(_ object: Object) {
+    public func delete(_ object: ObjectBase) {
         RLMDeleteObjectFromRealm(object, rlmRealm)
     }
 
@@ -559,7 +563,7 @@ public struct Realm {
                             `Results<Object>`, or any other Swift `Sequence` whose
                             elements are `Object`s (subject to the caveats above).
      */
-    public func delete<S: Sequence>(_ objects: S) where S.Iterator.Element: Object {
+    public func delete<S: Sequence>(_ objects: S) where S.Iterator.Element: ObjectBase {
         for obj in objects {
             delete(obj)
         }
@@ -574,7 +578,7 @@ public struct Realm {
 
      :nodoc:
      */
-    public func delete<Element: Object>(_ objects: List<Element>) {
+    public func delete<Element: ObjectBase>(_ objects: List<Element>) {
         rlmRealm.deleteObjects(objects._rlmArray)
     }
 
@@ -587,7 +591,7 @@ public struct Realm {
 
      :nodoc:
      */
-    public func delete<Element: Object>(_ objects: Results<Element>) {
+    public func delete<Element: ObjectBase>(_ objects: Results<Element>) {
         rlmRealm.deleteObjects(objects.rlmResults)
     }
 
@@ -790,7 +794,7 @@ public struct Realm {
      transaction on the Realm may result in the Realm file growing to large sizes. See
      `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
      */
-    public func freeze<T: Object>(_ obj: T) -> T {
+    public func freeze<T: ObjectBase>(_ obj: T) -> T {
         return RLMObjectFreeze(obj) as! T
     }
 
@@ -913,7 +917,7 @@ extension Realm: Equatable {
 
 extension Realm {
     /// A notification indicating that changes were made to a Realm.
-    public enum Notification: String {
+    @frozen public enum Notification: String {
         /**
          This notification is posted when the data in a Realm has changed.
 

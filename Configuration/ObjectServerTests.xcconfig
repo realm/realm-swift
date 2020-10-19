@@ -1,0 +1,5 @@
+#include "Realm/Tests.xcconfig"
+
+OTHER_LDFLAGS = -weak_framework Combine;
+SDKROOT = macosx;
+SUPPORTED_PLATFORMS = macosx;

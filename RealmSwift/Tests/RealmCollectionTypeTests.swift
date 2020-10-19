@@ -399,7 +399,7 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(1.8333, collection.average(ofProperty: "floatCol")!, accuracy: 0.001)
         XCTAssertEqual(1.85, collection.average(ofProperty: "doubleCol")!, accuracy: 0.001)
 
-        assertThrows(collection.average(ofProperty: "noSuchCol"), named: "Invalid property name")
+        assertThrows(collection.average(ofProperty: "noSuchCol") as Double?, named: "Invalid property name")
     }
 
     func testFastEnumeration() {

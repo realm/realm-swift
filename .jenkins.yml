@@ -21,6 +21,9 @@ target:
  - osx-swift
  - ios-swift
  - tvos-swift
+ - osx-swift-evolution
+ - ios-swift-evolution
+ - tvos-swift-evolution
  - catalyst
  - catalyst-swift
  - xcframework
@@ -284,6 +287,90 @@ exclude:
 
   - xcode_version: 12.0
     target: tvos-swift
+    configuration: Debug
+
+  - xcode_version: 11.3
+    target: osx-swift-evolution
+    configuration: Debug
+
+  - xcode_version: 11.3
+    target: osx-swift-evolution
+    configuration: Release
+
+  - xcode_version: 11.4.1
+    target: osx-swift-evolution
+    configuration: Debug
+
+  - xcode_version: 11.4.1
+    target: osx-swift-evolution
+    configuration: Release
+
+  - xcode_version: 11.7
+    target: osx-swift-evolution
+    configuration: Debug
+
+  - xcode_version: 11.7
+    target: osx-swift-evolution
+    configuration: Release
+
+  - xcode_version: 12.0
+    target: osx-swift-evolution
+    configuration: Debug
+
+  - xcode_version: 11.3
+    target: ios-swift-evolution
+    configuration: Debug
+
+  - xcode_version: 11.3
+    target: ios-swift-evolution
+    configuration: Release
+
+  - xcode_version: 11.4.1
+    target: ios-swift-evolution
+    configuration: Debug
+
+  - xcode_version: 11.4.1
+    target: ios-swift-evolution
+    configuration: Release
+
+  - xcode_version: 11.7
+    target: ios-swift-evolution
+    configuration: Debug
+
+  - xcode_version: 11.7
+    target: ios-swift-evolution
+    configuration: Release
+
+  - xcode_version: 12.0
+    target: ios-swift-evolution
+    configuration: Debug
+
+  - xcode_version: 11.3
+    target: tvos-swift-evolution
+    configuration: Debug
+
+  - xcode_version: 11.3
+    target: tvos-swift-evolution
+    configuration: Release
+
+  - xcode_version: 11.4.1
+    target: tvos-swift-evolution
+    configuration: Debug
+
+  - xcode_version: 11.4.1
+    target: tvos-swift-evolution
+    configuration: Release
+
+  - xcode_version: 11.7
+    target: tvos-swift-evolution
+    configuration: Debug
+
+  - xcode_version: 11.7
+    target: tvos-swift-evolution
+    configuration: Release
+
+  - xcode_version: 12.0
+    target: tvos-swift-evolution
     configuration: Debug
 
   - xcode_version: 11.3

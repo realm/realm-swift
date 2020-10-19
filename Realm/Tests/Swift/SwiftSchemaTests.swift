@@ -121,7 +121,7 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
         assertThrowsWithReasonMatching(RLMObjectSchema(forObjectClass: NoProps.self),
                                        "No properties are defined for 'NoProps'. Did you remember to mark them with '@objc' in your model?")
     }
-    
+
     func testSchemaInitWithLinkedToObjectUsingInitWithValue() {
         if isParent {
             XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")

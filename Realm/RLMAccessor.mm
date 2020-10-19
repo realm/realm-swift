@@ -20,6 +20,7 @@
 
 #import "RLMArray_Private.hpp"
 #import "RLMListBase.h"
+#import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
@@ -29,6 +30,7 @@
 #import "RLMResults_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
+
 #import "results.hpp"
 #import "property.hpp"
 
@@ -48,6 +50,18 @@ Obj ConstObj::get<Obj>(ColKey col) const {
 namespace {
 using realm::ColKey;
 
+realm::Property const& get_property(__unsafe_unretained RLMObjectBase *const obj, NSUInteger index) {
+    return obj->_info->objectSchema->persisted_properties[index];
+}
+
+realm::Property const& get_property(__unsafe_unretained RLMObjectBase *const obj,
+                                    __unsafe_unretained RLMProperty *const prop) {
+    if (prop.linkOriginPropertyName) {
+        return obj->_info->objectSchema->computed_properties[prop.index];
+    }
+    return obj->_info->objectSchema->persisted_properties[prop.index];
+}
+
 template<typename T>
 bool is_null(T const& v) {
     return !v;
@@ -56,17 +70,25 @@ template<>
 bool is_null(realm::Timestamp const& v) {
     return v.is_null();
 }
+template<>
+bool is_null(realm::ObjectId const&) {
+    return false;
+}
+template<>
+bool is_null(realm::Decimal128 const& v) {
+    return v.is_null();
+}
 
 template<typename T>
 T get(__unsafe_unretained RLMObjectBase *const obj, NSUInteger index) {
     RLMVerifyAttached(obj);
-    return obj->_row.get<T>(obj->_info->objectSchema->persisted_properties[index].column_key);
+    return obj->_row.get<T>(get_property(obj, index).column_key);
 }
 
 template<typename T>
 id getBoxed(__unsafe_unretained RLMObjectBase *const obj, NSUInteger index) {
     RLMVerifyAttached(obj);
-    auto& prop = obj->_info->objectSchema->persisted_properties[index];
+    auto& prop = get_property(obj, index);
     RLMAccessorContext ctx(obj, &prop);
     auto value = obj->_row.get<T>(prop.column_key);
     return is_null(value) ? nil : ctx.box(std::move(value));
@@ -74,36 +96,23 @@ id getBoxed(__unsafe_unretained RLMObjectBase *const obj, NSUInteger index) {
 
 template<typename T>
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key, T val) {
-    RLMVerifyInWriteTransaction(obj);
     obj->_row.set(key, val);
-}
-
-template<typename Fn>
-auto translateError(Fn&& fn) {
-    try {
-        return fn();
-    }
-    catch (std::exception const& e) {
-        @throw RLMException(e);
-    }
 }
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSString *const val) {
-    RLMVerifyInWriteTransaction(obj);
-    translateError([&] {
+    RLMTranslateError([&] {
         obj->_row.set(key, RLMStringDataWithNSString(val));
     });
 }
 
 [[gnu::noinline]]
 void setNull(realm::Obj& row, ColKey key) {
-    translateError([&] { row.set_null(key); });
+    RLMTranslateError([&] { row.set_null(key); });
 }
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj,
               ColKey key, __unsafe_unretained NSDate *const date) {
-    RLMVerifyInWriteTransaction(obj);
     if (date) {
         obj->_row.set(key, RLMTimestampForNSDate(date));
     }
@@ -114,29 +123,35 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj,
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSData *const data) {
-    RLMVerifyInWriteTransaction(obj);
-    translateError([&] {
+    RLMTranslateError([&] {
         obj->_row.set(key, RLMBinaryDataForNSData(data));
     });
 }
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained RLMObjectBase *const val) {
-    RLMVerifyInWriteTransaction(obj);
     if (!val) {
         obj->_row.set(key, realm::null());
         return;
     }
 
-    RLMAddObjectToRealm(val, obj->_realm, RLMUpdatePolicyError);
+    if (!val->_row) {
+        RLMAccessorContext{obj, key}.createObject(val, {.create = true}, false, {});
+    }
 
     // make sure it is the correct type
-    if (val->_row.get_table() != obj->_row.get_table()->get_link_target(key)) {
+    auto table = val->_row.get_table();
+    if (table != obj->_row.get_table()->get_link_target(key)) {
         @throw RLMException(@"Can't set object of type '%@' to property of type '%@'",
                             val->_objectSchema.className,
                             obj->_info->propertyForTableColumn(key).objectClassName);
     }
-    obj->_row.set(key, val->_row.get_key());
+    if (!table->is_embedded()) {
+        obj->_row.set(key, val->_row.get_key());
+    }
+    else if (obj->_row.get_linked_object(key).get_key() != val->_row.get_key()) {
+        @throw RLMException(@"Can't set link to existing managed embedded object");
+    }
 }
 
 // array getter/setter
@@ -148,7 +163,6 @@ RLMArray *getArray(__unsafe_unretained RLMObjectBase *const obj, NSUInteger prop
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained id<NSFastEnumeration> const value) {
-    RLMVerifyInWriteTransaction(obj);
     auto prop = obj->_info->propertyForTableColumn(key);
     RLMValidateValueForProperty(value, obj->_info->rlmObjectSchema, prop, true);
 
@@ -158,15 +172,13 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
         info = &obj->_info->linkTargetType(prop.index);
     }
     RLMAccessorContext ctx(*info);
-    translateError([&] {
+    RLMTranslateError([&] {
         list.assign(ctx, value, realm::CreatePolicy::ForceCreate);
     });
 }
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSNumber<RLMInt> *const intObject) {
-    RLMVerifyInWriteTransaction(obj);
-
     if (intObject) {
         obj->_row.set(key, intObject.longLongValue);
     }
@@ -177,8 +189,6 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSNumber<RLMFloat> *const floatObject) {
-    RLMVerifyInWriteTransaction(obj);
-
     if (floatObject) {
         obj->_row.set(key, floatObject.floatValue);
     }
@@ -189,8 +199,6 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSNumber<RLMDouble> *const doubleObject) {
-    RLMVerifyInWriteTransaction(obj);
-
     if (doubleObject) {
         obj->_row.set(key, doubleObject.doubleValue);
     }
@@ -201,10 +209,28 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSNumber<RLMBool> *const boolObject) {
-    RLMVerifyInWriteTransaction(obj);
-
     if (boolObject) {
         obj->_row.set(key, (bool)boolObject.boolValue);
+    }
+    else {
+        setNull(obj->_row, key);
+    }
+}
+
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
+              __unsafe_unretained RLMDecimal128 *const value) {
+    if (value) {
+        obj->_row.set(key, value.decimal128Value);
+    }
+    else {
+        setNull(obj->_row, key);
+    }
+}
+
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
+              __unsafe_unretained RLMObjectId *const value) {
+    if (value) {
+        obj->_row.set(key, value.value);
     }
     else {
         setNull(obj->_row, key);
@@ -252,6 +278,13 @@ id makeNumberGetter(NSUInteger index, bool boxed, bool optional) {
     }
     return makeGetter<Type>(index);
 }
+template<typename Type>
+id makeWrapperGetter(NSUInteger index, bool optional) {
+    if (optional) {
+        return makeOptionalGetter<Type>(index);
+    }
+    return makeBoxedGetter<Type>(index);
+}
 
 // dynamic getter with column closure
 id managedGetter(RLMProperty *prop, const char *type) {
@@ -291,6 +324,10 @@ id managedGetter(RLMProperty *prop, const char *type) {
             return makeBoxedGetter<realm::BinaryData>(index);
         case RLMPropertyTypeObject:
             return makeBoxedGetter<realm::Obj>(index);
+        case RLMPropertyTypeDecimal128:
+            return makeBoxedGetter<realm::Decimal128>(index);
+        case RLMPropertyTypeObjectId:
+            return makeWrapperGetter<realm::ObjectId>(index, prop.optional);
         case RLMPropertyTypeAny:
             @throw RLMException(@"Cannot create accessor class for schema with Mixed properties");
         case RLMPropertyTypeLinkingObjects:
@@ -311,19 +348,13 @@ id makeSetter(__unsafe_unretained RLMProperty *const prop) {
     }
 
     return ^(__unsafe_unretained RLMObjectBase *const obj, ArgType val) {
-        auto set = [&] {
-            setValue(obj, obj->_info->objectSchema->persisted_properties[index].column_key,
-                     static_cast<StorageType>(val));
-        };
-        if (RLMObservationInfo *info = RLMGetObservationInfo(obj->_observationInfo,
-                                                             obj->_row.get_key(), *obj->_info)) {
-            info->willChange(name);
-            set();
-            info->didChange(name);
+        RLMVerifyInWriteTransaction(obj);
+        RLMObservationTracker tracker(obj->_realm);
+        tracker.willChange(RLMGetObservationInfo(obj->_observationInfo, obj->_row.get_key(), *obj->_info), name);
+        if constexpr (std::is_same_v<ArgType, RLMObjectBase *>) {
+            tracker.trackDeletions();
         }
-        else {
-            set();
-        }
+        setValue(obj, get_property(obj, index).column_key, static_cast<StorageType>(val));
     };
 }
 
@@ -360,6 +391,8 @@ id managedSetter(RLMProperty *prop, const char *type) {
         case RLMPropertyTypeAny:            return nil;
         case RLMPropertyTypeLinkingObjects: return nil;
         case RLMPropertyTypeObject:         return makeSetter<RLMObjectBase *>(prop);
+        case RLMPropertyTypeObjectId:       return makeSetter<RLMObjectId *>(prop);
+        case RLMPropertyTypeDecimal128:     return makeSetter<RLMDecimal128 *>(prop);
     }
 }
 
@@ -552,7 +585,11 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
     if (prop.isPrimary) {
         @throw RLMException(@"Primary key can't be changed to '%@' after an object is inserted.", val);
     }
-    RLMValidateValueForProperty(val, schema, prop, true);
+
+    // Because embedded objects cannot be created directly, we accept anything
+    // that can be converted to an embedded object for dynamic link set operations.
+    bool is_embedded = prop.type == RLMPropertyTypeObject && obj->_info->linkTargetType(prop.index).objectSchema->is_embedded;
+    RLMValidateValueForProperty(val, schema, prop, !is_embedded);
     RLMDynamicSet(obj, prop, RLMCoerceToNil(val));
 }
 
@@ -563,8 +600,8 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj,
     REALM_ASSERT_DEBUG(!prop.isPrimary);
     realm::Object o(obj->_info->realm->_realm, *obj->_info->objectSchema, obj->_row);
     RLMAccessorContext c(obj);
-    translateError([&] {
-        o.set_property_value(c, prop.columnName.UTF8String, val ?: NSNull.null);
+    RLMTranslateError([&] {
+        o.set_property_value(c, get_property(obj, prop).name, val ?: NSNull.null);
     });
 }
 
@@ -572,8 +609,8 @@ id RLMDynamicGet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretain
     realm::Object o(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
     RLMAccessorContext c(obj);
     c.currentProperty = prop;
-    return translateError([&] {
-        return RLMCoerceToNil(o.get_property_value<id>(c, prop.columnName.UTF8String));
+    return RLMTranslateError([&] {
+        return RLMCoerceToNil(o.get_property_value<id>(c, get_property(obj, prop)));
     });
 }
 
@@ -587,15 +624,20 @@ id RLMDynamicGetByName(__unsafe_unretained RLMObjectBase *const obj,
     return RLMDynamicGet(obj, prop);
 }
 
-RLMAccessorContext::RLMAccessorContext(RLMAccessorContext& parent, realm::Property const& property)
+RLMAccessorContext::~RLMAccessorContext() = default;
+
+RLMAccessorContext::RLMAccessorContext(RLMAccessorContext& parent, realm::Obj const& obj,
+                                       realm::Property const& property)
 : _realm(parent._realm)
 , _info(property.type == realm::PropertyType::Object ? parent._info.linkTargetType(property) : parent._info)
-, _promote_existing(parent._promote_existing)
+, _parentObject(obj)
+, _parentObjectInfo(&parent._info)
+, _colKey(property.column_key)
 {
 }
 
-RLMAccessorContext::RLMAccessorContext(RLMClassInfo& info, bool promote)
-: _realm(info.realm), _info(info), _promote_existing(promote)
+RLMAccessorContext::RLMAccessorContext(RLMClassInfo& info)
+: _realm(info.realm), _info(info)
 {
 }
 
@@ -604,7 +646,17 @@ RLMAccessorContext::RLMAccessorContext(__unsafe_unretained RLMObjectBase *const 
 : _realm(parent->_realm)
 , _info(prop && prop->type == realm::PropertyType::Object ? parent->_info->linkTargetType(*prop)
                                                           : *parent->_info)
-, _parentObject(parent)
+, _parentObjectInfo(parent->_info)
+{
+}
+
+RLMAccessorContext::RLMAccessorContext(__unsafe_unretained RLMObjectBase *const parent,
+                                       realm::ColKey col)
+: _realm(parent->_realm)
+, _info(_realm->_info[parent->_info->propertyForTableColumn(col).objectClassName])
+, _parentObject(parent->_row)
+, _parentObjectInfo(parent->_info)
+, _colKey(col)
 {
 }
 
@@ -645,11 +697,18 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
     return value ?: NSNull.null;
 }
 
+realm::Obj RLMAccessorContext::create_embedded_object() {
+    if (!_parentObject) {
+        @throw RLMException(@"Embedded objects cannot be created directly");
+    }
+    return _parentObject.create_and_set_linked_object(_colKey);
+}
+
 id RLMAccessorContext::box(realm::List&& l) {
-    REALM_ASSERT(_parentObject);
+    REALM_ASSERT(_parentObjectInfo);
     REALM_ASSERT(currentProperty);
     return [[RLMManagedArray alloc] initWithList:std::move(l)
-                                      parentInfo:_parentObject->_info
+                                      parentInfo:_parentObjectInfo
                                         property:currentProperty];
 }
 
@@ -703,6 +762,14 @@ realm::StringData RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
     v = RLMCoerceToNil(v);
     return RLMStringDataWithNSString(v);
 }
+template<>
+realm::Decimal128 RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+    return RLMObjcToDecimal128(v);
+}
+template<>
+realm::ObjectId RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+    return static_cast<RLMObjectId *>(v).value;
+}
 
 template<typename Fn>
 static auto to_optional(__unsafe_unretained id const value, Fn&& fn) {
@@ -726,61 +793,125 @@ template<>
 realm::util::Optional<int64_t> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v longLongValue]; });
 }
-
 template<>
-realm::Obj RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy createPolicy, ObjKey) {
-    bool create = createPolicy != CreatePolicy::Skip;
-    auto policy = static_cast<RLMUpdatePolicy>(createPolicy);
-    RLMObjectBase *link = RLMDynamicCast<RLMObjectBase>(v);
-    if (!link) {
-        if (!create)
-            return realm::Obj();
-        return RLMCreateObjectInRealmWithValue(_realm, _info.rlmObjectSchema.className, v, policy)->_row;
+realm::util::Optional<realm::ObjectId> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+    return to_optional(v, [&](__unsafe_unretained RLMObjectId *v) { return v.value; });
+}
+
+std::pair<realm::Obj, bool>
+RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
+                                 bool forceCreate, ObjKey existingKey) {
+    if (!value || value == NSNull.null) {
+        @throw RLMException(@"Must provide a non-nil value.");
     }
 
-    if (link.isInvalidated) {
-        if (create) {
-            @throw RLMException(@"Adding a deleted or invalidated object to a Realm is not permitted");
+    if ([value isKindOfClass:[NSArray class]] && [value count] > _info.objectSchema->persisted_properties.size()) {
+        @throw RLMException(@"Invalid array input: more values (%llu) than properties (%llu).",
+                            (unsigned long long)[value count],
+                            (unsigned long long)_info.objectSchema->persisted_properties.size());
+    }
+
+    RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(value);
+    realm::Obj obj, *outObj = nullptr;
+    if (objBase) {
+        if (objBase.isInvalidated) {
+            if (policy.create && !policy.copy) {
+                @throw RLMException(@"Adding a deleted or invalidated object to a Realm is not permitted");
+            }
+            else {
+                @throw RLMException(@"Object has been deleted or invalidated.");
+            }
+        }
+        if (policy.copy) {
+            if (policy.update || !forceCreate) {
+                // create(update: true) is a no-op when given an object already in
+                // the Realm which is of the correct type
+                if (objBase->_realm == _realm && objBase->_row.get_table() == _info.table() && !_info.table()->is_embedded()) {
+                    return {objBase->_row, true};
+                }
+            }
+            // Otherwise we copy the object
+            objBase = nil;
         }
         else {
-            @throw RLMException(@"Object has been invalidated");
+            outObj = &objBase->_row;
+            // add() on an object already managed by this Realm is a no-op
+            if (objBase->_realm == _realm) {
+                return {objBase->_row, true};
+            }
+            if (!policy.create) {
+                return {realm::Obj(), false};
+            }
+            if (objBase->_realm) {
+                @throw RLMException(@"Object is already managed by another Realm. Use create instead to copy it into this Realm.");
+            }
+            if (objBase->_observationInfo && objBase->_observationInfo->hasObservers()) {
+                @throw RLMException(@"Cannot add an object with observers to a Realm");
+            }
+
+            REALM_ASSERT([objBase->_objectSchema.className isEqualToString:_info.rlmObjectSchema.className]);
+            REALM_ASSERT([objBase isKindOfClass:_info.rlmObjectSchema.unmanagedClass]);
+
+            objBase->_info = &_info;
+            objBase->_realm = _realm;
         }
     }
-
-    if (![link->_objectSchema.className isEqualToString:_info.rlmObjectSchema.className]) {
-        if (create && !_promote_existing)
-            return RLMCreateObjectInRealmWithValue(_realm, _info.rlmObjectSchema.className, link, policy)->_row;
-        return link->_row;
+    if (!policy.create) {
+        return {realm::Obj(), false};
+    }
+    if (!outObj) {
+        outObj = &obj;
     }
 
-    if (!link->_realm) {
-        if (!create)
-            return realm::Obj();
-        if (!_promote_existing)
-            return RLMCreateObjectInRealmWithValue(_realm, _info.rlmObjectSchema.className, link, policy)->_row;
-        RLMAddObjectToRealm(link, _realm, policy);
+    try {
+        realm::Object::create(*this, _realm->_realm, *_info.objectSchema,
+                              (id)value, policy, existingKey, outObj).obj();
     }
-    else if (link->_realm != _realm) {
-        if (_promote_existing)
-            @throw RLMException(@"Object is already managed by another Realm. Use create instead to copy it into this Realm.");
-        return RLMCreateObjectInRealmWithValue(_realm, _info.rlmObjectSchema.className, v, policy)->_row;
+    catch (std::exception const& e) {
+        @throw RLMException(e);
     }
-    return link->_row;
+
+    if (objBase) {
+        for (RLMProperty *prop in _info.rlmObjectSchema.properties) {
+            // set the ivars for object and array properties to nil as otherwise the
+            // accessors retain objects that are no longer accessible via the properties
+            // this is mainly an issue when the object graph being added has cycles,
+            // as it's not obvious that the user has to set the *ivars* to nil to
+            // avoid leaking memory
+            if (prop.type == RLMPropertyTypeObject && !prop.swiftIvar) {
+                ((void(*)(id, SEL, id))objc_msgSend)(objBase, prop.setterSel, nil);
+            }
+        }
+
+        object_setClass(objBase, _info.rlmObjectSchema.accessorClass);
+        RLMInitializeSwiftAccessorGenerics(objBase);
+    }
+    return {*outObj, false};
+}
+
+template<>
+realm::Obj RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy policy, ObjKey key) {
+    return createObject(v, policy, false, key).first;
 }
 
 void RLMAccessorContext::will_change(realm::Obj const& row, realm::Property const& prop) {
-    _observationInfo = RLMGetObservationInfo(nullptr, row.get_key(), _info);
-    if (_observationInfo) {
-        _kvoPropertyName = _info.propertyForTableColumn(prop.column_key).name;
-        _observationInfo->willChange(_kvoPropertyName);
+    auto obsInfo = RLMGetObservationInfo(nullptr, row.get_key(), _info);
+    if (!_observationHelper) {
+        if (obsInfo || prop.type == realm::PropertyType::Object) {
+            _observationHelper = std::make_unique<RLMObservationTracker>(_info.realm);
+        }
+    }
+    if (_observationHelper) {
+        _observationHelper->willChange(obsInfo, _info.propertyForTableColumn(prop.column_key).name);
+        if (prop.type == realm::PropertyType::Object) {
+            _observationHelper->trackDeletions();
+        }
     }
 }
 
 void RLMAccessorContext::did_change() {
-    if (_observationInfo) {
-        _observationInfo->didChange(_kvoPropertyName);
-        _kvoPropertyName = nil;
-        _observationInfo = nullptr;
+    if (_observationHelper) {
+        _observationHelper->didChange();
     }
 }
 
@@ -790,17 +921,6 @@ RLMOptionalId RLMAccessorContext::value_for_property(__unsafe_unretained id cons
     id value = propertyValue(obj, propIndex, prop);
     if (value) {
         RLMValidateValueForProperty(value, _info.rlmObjectSchema, prop);
-    }
-
-    if (_promote_existing && [obj isKindOfClass:_info.rlmObjectSchema.objectClass] && !prop.swiftIvar) {
-        // set the ivars for object and array properties to nil as otherwise the
-        // accessors retain objects that are no longer accessible via the properties
-        // this is mainly an issue when the object graph being added has cycles,
-        // as it's not obvious that the user has to set the *ivars* to nil to
-        // avoid leaking memory
-        if (prop.type == RLMPropertyTypeObject) {
-            ((void(*)(id, SEL, id))objc_msgSend)(obj, prop.setterSel, nil);
-        }
     }
 
     return RLMOptionalId{value};

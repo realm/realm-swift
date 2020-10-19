@@ -130,6 +130,18 @@ void (RLMAssertMatches)(XCTestCase *self, __attribute__((noescape)) NSString *(^
     }
 }
 
+void (RLMAssertExceptionReason)(XCTestCase *self,
+                                NSException *exception, NSString *expected, NSString *expression,
+                                NSString *fileName, NSUInteger lineNumber) {
+    if (!exception) {
+        return;
+    }
+    if ([exception.reason rangeOfString:(expected)].location == NSNotFound) {
+        NSString *desc = [NSString stringWithFormat:@"The expression %@ threw an exception with reason '%@', but expected to contain '%@'", expression, exception.reason ?: @"<nil>", expected];
+        [self recordFailureWithDescription:desc inFile:fileName atLine:lineNumber expected:NO];
+    }
+}
+
 bool RLMHasCachedRealmForPath(NSString *path) {
     return RLMGetAnyCachedRealmForPath(path.UTF8String);
 }

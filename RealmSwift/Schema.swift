@@ -26,7 +26,7 @@ import Realm
 
  Schemas map to collections of tables in the core database.
  */
-public struct Schema: CustomStringConvertible {
+@frozen public struct Schema: CustomStringConvertible {
 
     // MARK: Properties
 

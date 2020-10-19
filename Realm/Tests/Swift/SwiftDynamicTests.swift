@@ -115,17 +115,8 @@ class SwiftRLMDynamicTests: RLMTestCase {
     }
 
     func testDynamicTypes_objc() {
-        let date = Date(timeIntervalSince1970: 100000)
-        let data = "a".data(using: String.Encoding.utf8)!
-        let obj1: [Any] = [true, 1, 1.1 as Float, 1.11, "string",
-            data, date, true, 11, NSNull()]
-
-        let obj = StringObject()
-        obj.stringCol = "string"
-
-        let data2 = "b".data(using: String.Encoding.utf8)!
-        let obj2: [Any] = [false, 2, 2.2 as Float, 2.22, "string2",
-            data2, date, false, 22, obj]
+        let obj1 = AllTypesObject.values(1, stringObject: nil)!
+        let obj2 = AllTypesObject.values(2, stringObject: StringObject(value: ["string"]))!
 
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
@@ -144,14 +135,13 @@ class SwiftRLMDynamicTests: RLMTestCase {
         let robj2 = results[1]
 
         let schema = dyrealm.schema[AllTypesObject.className()]
-        for idx in 0..<obj1.count - 1 {
-            let prop = schema.properties[idx]
-            XCTAssertTrue((obj1[idx] as AnyObject).isEqual(robj1[prop.name]))
-            XCTAssertTrue((obj2[idx] as AnyObject).isEqual(robj2[prop.name]))
+        for prop in schema.properties.dropLast() {
+            XCTAssertTrue((obj1[prop.name] as AnyObject).isEqual(robj1[prop.name]))
+            XCTAssertTrue((obj2[prop.name] as AnyObject).isEqual(robj2[prop.name]))
         }
 
         // check sub object type
-        XCTAssertTrue(schema.properties[9].objectClassName! == "StringObject")
+        XCTAssertTrue(schema.properties[11].objectClassName! == "StringObject")
 
         // check object equality
         XCTAssertNil(robj1["objectCol"], "object should be nil")

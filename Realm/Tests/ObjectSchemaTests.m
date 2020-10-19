@@ -59,8 +59,6 @@
     XCTAssertEqualObjects(objectSchema.description, @"PrimaryStringObject {\n"
                                                     @"\tstringCol {\n"
                                                     @"\t\ttype = string;\n"
-                                                    @"\t\tobjectClassName = (null);\n"
-                                                    @"\t\tlinkOriginPropertyName = (null);\n"
                                                     @"\t\tindexed = YES;\n"
                                                     @"\t\tisPrimary = YES;\n"
                                                     @"\t\tarray = NO;\n"
@@ -68,14 +66,23 @@
                                                     @"\t}\n"
                                                     @"\tintCol {\n"
                                                     @"\t\ttype = int;\n"
-                                                    @"\t\tobjectClassName = (null);\n"
-                                                    @"\t\tlinkOriginPropertyName = (null);\n"
                                                     @"\t\tindexed = NO;\n"
                                                     @"\t\tisPrimary = NO;\n"
                                                     @"\t\tarray = NO;\n"
                                                     @"\t\toptional = NO;\n"
                                                     @"\t}\n"
                                                     @"}");
+    objectSchema = [RLMObjectSchema schemaForObjectClass:[EmbeddedIntObject class]];
+    XCTAssertEqualObjects(objectSchema.description,
+                          @"EmbeddedIntObject (embedded) {\n"
+                          @"\tintCol {\n"
+                          @"\t\ttype = int;\n"
+                          @"\t\tindexed = NO;\n"
+                          @"\t\tisPrimary = NO;\n"
+                          @"\t\tarray = NO;\n"
+                          @"\t\toptional = NO;\n"
+                          @"\t}\n"
+                          @"}");
 }
 
 - (void)testObjectForKeyedSubscript {

@@ -22,7 +22,7 @@ source_root="$(dirname "$0")"
 
 : ${REALM_SYNC_VERSION:=$(sed -n 's/^REALM_SYNC_VERSION=\(.*\)$/\1/p' ${source_root}/dependencies.list)}
 
-: ${REALM_OBJECT_SERVER_VERSION:=$(sed -n 's/^REALM_OBJECT_SERVER_VERSION=\(.*\)$/\1/p' ${source_root}/dependencies.list)}
+: ${REALM_OBJECT_SERVER_VERSION:=$(sed -n 's/^MONGODB_STITCH_ADMIN_SDK_VERSION=\(.*\)$/\1/p' ${source_root}/dependencies.list)}
 
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
@@ -628,9 +628,9 @@ case "$COMMAND" in
         sed -i '' 's/Realm.framework/RealmObjc.framework/' RealmObjc.xcframework/Info.plist
 
         find RealmSwift.xcframework -name '*.swiftinterface' \
-            -exec sed -i '' 's/import Realm/import RealmObjc/' {} \;
-        find RealmSwift.xcframework -name '*.swiftinterface' \
-            -exec sed -i '' 's/Realm.RLM/RealmObjc.RLM/g' {} \;
+            -exec sed -i '' 's/import Realm/import RealmObjc/' {} \; \
+            -exec sed -i '' 's/Realm.RLM/RealmObjc.RLM/g' {} \; \
+            -exec sed -i '' 's/Realm.RealmSwift/RealmObjc.RealmSwift/g' {} \; \
 
         # Realm is statically linked into RealmSwift so we no longer actually
         # need the obj-c static library, and just need the framework shell.
@@ -965,6 +965,12 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "verify-osx-swift-evolution")
+        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
+        sh build.sh test-osx-swift
+        exit 0
+        ;;
+
     "verify-ios-static")
         REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/ios/objc/RealmExamples.xcworkspace" \
             sh build.sh test-ios-static
@@ -979,6 +985,12 @@ case "$COMMAND" in
         REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/ios/swift/RealmExamples.xcworkspace" \
             sh build.sh test-ios-swift
         sh build.sh examples-ios-swift
+        ;;
+
+    "verify-ios-swift-evolution")
+        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
+        sh build.sh test-ios-swift
+        exit 0
         ;;
 
     "verify-ios-device-objc")
@@ -1020,6 +1032,12 @@ case "$COMMAND" in
         REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/tvos/swift/RealmExamples.xcworkspace" \
             sh build.sh test-tvos-swift
         sh build.sh examples-tvos-swift
+        exit 0
+        ;;
+
+    "verify-tvos-swift-evolution")
+        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
+        sh build.sh test-tvos-swift
         exit 0
         ;;
 
@@ -1235,17 +1253,19 @@ EOM
           rm -rf include
           mkdir -p include
           mv core/include include/core
+          cp Realm/ObjectStore/external/json/json.hpp include/core
 
-          mkdir -p include/impl/apple include/util/apple include/sync/impl/apple
+          mkdir -p include/impl/apple include/util/apple include/sync/impl/apple include/util/bson
           cp Realm/*.hpp include
           cp Realm/ObjectStore/src/*.hpp include
+          cp Realm/ObjectStore/src/impl/*.hpp include/impl
+          cp Realm/ObjectStore/src/impl/apple/*.hpp include/impl/apple
           cp Realm/ObjectStore/src/sync/*.hpp include/sync
           cp Realm/ObjectStore/src/sync/impl/*.hpp include/sync/impl
           cp Realm/ObjectStore/src/sync/impl/apple/*.hpp include/sync/impl/apple
-          cp Realm/ObjectStore/src/impl/*.hpp include/impl
-          cp Realm/ObjectStore/src/impl/apple/*.hpp include/impl/apple
           cp Realm/ObjectStore/src/util/*.hpp include/util
           cp Realm/ObjectStore/src/util/apple/*.hpp include/util/apple
+	  cp Realm/ObjectStore/src/util/bson/*.hpp include/util/bson
 
           echo '' > Realm/RLMPlatform.h
           cp Realm/*.h include
@@ -1534,10 +1554,8 @@ x.y.z Release notes (yyyy-MM-dd)
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
-* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
-* Realm Object Server: 3.21.0 or later.
-* Realm Studio: 5.0.0 or later.
-* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.
 
 ### Internal

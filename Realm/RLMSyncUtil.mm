@@ -18,59 +18,32 @@
 
 #import "RLMSyncUtil_Private.hpp"
 
-#import "RLMJSONModels.h"
 #import "RLMObject_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncUser_Private.hpp"
+#import "RLMUser_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import "shared_realm.hpp"
 
+#import "sync/sync_config.hpp"
 #import "sync/sync_user.hpp"
-
-RLMIdentityProvider const RLMIdentityProviderAccessToken = @"_access_token";
 
 NSString *const RLMSyncErrorDomain = @"io.realm.sync";
 NSString *const RLMSyncAuthErrorDomain = @"io.realm.sync.auth";
-NSString *const RLMSyncPermissionErrorDomain = @"io.realm.sync.permission";
+NSString *const RLMAppErrorDomain = @"io.realm.app";
 
 NSString *const kRLMSyncPathOfRealmBackupCopyKey            = @"recovered_realm_location_path";
 NSString *const kRLMSyncErrorActionTokenKey                 = @"error_action_token";
 
-NSString *const kRLMSyncAppIDKey                = @"app_id";
-NSString *const kRLMSyncDataKey                 = @"data";
-NSString *const kRLMSyncErrorJSONKey            = @"json";
 NSString *const kRLMSyncErrorStatusCodeKey      = @"statusCode";
-NSString *const kRLMSyncIdentityKey             = @"identity";
-NSString *const kRLMSyncIsAdminKey              = @"is_admin";
-NSString *const kRLMSyncNewPasswordKey          = @"new_password";
-NSString *const kRLMSyncPasswordKey             = @"password";
-NSString *const kRLMSyncPathKey                 = @"path";
-NSString *const kRLMSyncProviderKey             = @"provider";
-NSString *const kRLMSyncProviderIDKey           = @"provider_id";
-NSString *const kRLMSyncRegisterKey             = @"register";
-NSString *const kRLMSyncTokenKey                = @"token";
 NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
-NSString *const kRLMSyncUserIDKey               = @"user_id";
-
-uint8_t RLMGetComputedPermissions(RLMRealm *realm, id _Nullable object) {
-    if (!object) {
-        return static_cast<unsigned char>(realm->_realm->get_privileges());
-    }
-    if ([object isKindOfClass:[NSString class]]) {
-        return static_cast<unsigned char>(realm->_realm->get_privileges([object UTF8String]));
-    }
-    if (auto obj = RLMDynamicCast<RLMObjectBase>(object)) {
-        RLMVerifyAttached(obj);
-        return static_cast<unsigned char>(realm->_realm->get_privileges(obj->_row));
-    }
-    return 0;
-}
 
 #pragma mark - C++ APIs
+
+using namespace realm;
 
 SyncSessionStopPolicy translateStopPolicy(RLMSyncStopPolicy stopPolicy) {
     switch (stopPolicy) {
@@ -94,7 +67,7 @@ std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm) {
     Realm::Config realmConfig = realm.configuration.config;
     if (auto config = realmConfig.sync_config) {
         std::shared_ptr<SyncUser> user = config->user;
-        if (user && user->state() != SyncUser::State::Error) {
+        if (user && user->state() != SyncUser::State::Removed) {
             return user->session_for_on_disk_path(realmConfig.path);
         }
     }
@@ -104,35 +77,6 @@ std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm) {
 CocoaSyncUserContext& context_for(const std::shared_ptr<realm::SyncUser>& user)
 {
     return *std::static_pointer_cast<CocoaSyncUserContext>(user->binding_context());
-}
-
-NSError *make_auth_error_bad_response(NSDictionary *json) {
-    return [NSError errorWithDomain:RLMSyncAuthErrorDomain
-                               code:RLMSyncAuthErrorBadResponse
-                           userInfo:json ? @{kRLMSyncErrorJSONKey: json} : nil];
-}
-
-NSError *make_auth_error_http_status(NSInteger status) {
-    return [NSError errorWithDomain:RLMSyncAuthErrorDomain
-                               code:RLMSyncAuthErrorHTTPStatusCodeError
-                           userInfo:@{kRLMSyncErrorStatusCodeKey: @(status)}];
-}
-
-NSError *make_auth_error_client_issue() {
-    return [NSError errorWithDomain:RLMSyncAuthErrorDomain
-                               code:RLMSyncAuthErrorClientSessionError
-                           userInfo:nil];
-}
-
-NSError *make_auth_error(RLMSyncErrorResponseModel *model) {
-    NSMutableDictionary<NSString *, NSString *> *userInfo = [NSMutableDictionary dictionaryWithCapacity:2];
-    if (NSString *description = model.title) {
-        [userInfo setObject:description forKey:NSLocalizedDescriptionKey];
-    }
-    if (NSString *hint = model.hint) {
-        [userInfo setObject:hint forKey:NSLocalizedRecoverySuggestionErrorKey];
-    }
-    return [NSError errorWithDomain:RLMSyncAuthErrorDomain code:model.code userInfo:userInfo];
 }
 
 NSError *make_sync_error(RLMSyncSystemErrorKind kind, NSString *description, NSInteger code, NSDictionary *custom) {

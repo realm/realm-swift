@@ -130,21 +130,6 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     return [string stringByAppendingString:@"}"];
 }
 
-static void RLMNSStringToStdString(std::string &out, NSString *in) {
-    out.resize([in maximumLengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
-    if (out.empty()) {
-        return;
-    }
-
-    NSUInteger size = out.size();
-    [in getBytes:&out[0]
-       maxLength:size
-      usedLength:&size
-        encoding:NSUTF8StringEncoding
-         options:0 range:{0, in.length} remainingRange:nullptr];
-    out.resize(size);
-}
-
 - (NSURL *)fileURL {
     if (_config.in_memory) {
         return nil;
@@ -222,11 +207,6 @@ static bool isSync(realm::Realm::Config const& config) {
         } else if (self.shouldCompactOnLaunch) {
             @throw RLMException(@"Cannot set `readOnly` when `shouldCompactOnLaunch` is set.");
         }
-#if REALM_ENABLE_SYNC
-        if (_config.sync_config && _config.sync_config->is_partial) {
-            @throw RLMException(@"Read-only mode is not supported for query-based sync.");
-        }
-#endif
         _config.schema_mode = isSync(_config) ? realm::SchemaMode::ReadOnlyAlternative : realm::SchemaMode::Immutable;
     }
     else if (self.readOnly) {

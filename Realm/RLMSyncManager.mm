@@ -16,12 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 
+#import "RLMApp_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
-#import "RLMSyncUser_Private.hpp"
+#import "RLMUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 
@@ -34,6 +35,7 @@
 #endif
 
 using namespace realm;
+
 using Level = realm::util::Logger::Level;
 
 namespace {
@@ -116,30 +118,19 @@ struct CallbackLoggerFactory : public realm::SyncLoggerFactory {
 
 @implementation RLMSyncManager {
     std::unique_ptr<CallbackLoggerFactory> _loggerFactory;
+    std::shared_ptr<SyncManager> _syncManager;
 }
 
-static RLMSyncManager *s_sharedManager = nil;
-
-- (instancetype)initPrivate {
-    return self = [super init];
+- (instancetype)initWithSyncManager:(std::shared_ptr<realm::SyncManager>)syncManager {
+    if (self = [super init]) {
+        [RLMUser _setUpBindingContextFactory];
+        _syncManager = syncManager;
+        return self;
+    }
+    return nil;
 }
 
-+ (instancetype)sharedManager {
-    static std::once_flag flag;
-    std::call_once(flag, [] {
-        try {
-            [RLMSyncUser _setUpBindingContextFactory];
-            s_sharedManager = [[RLMSyncManager alloc] initPrivate];
-            [s_sharedManager configureWithRootDirectory:nil];
-        }
-        catch (std::exception const& e) {
-            @throw RLMException(e);
-        }
-    });
-    return s_sharedManager;
-}
-
-- (void)configureWithRootDirectory:(NSURL *)rootDirectory {
++ (SyncClientConfig)configurationWithRootDirectory:(NSURL *)rootDirectory appId:(NSString *)appId {
     SyncClientConfig config;
     bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
     config.logger_factory = &s_syncLoggerFactory;
@@ -153,9 +144,14 @@ static RLMSyncManager *s_sharedManager = nil;
         config.user_agent_binding_info =
             util::format("Realm%1/%2", isSwift ? "Swift" : "ObjectiveC",
                          RLMStringDataWithNSString(REALM_COCOA_VERSION));
-        config.user_agent_application_info = RLMStringDataWithNSString(self.appID);
+        config.user_agent_application_info = RLMStringDataWithNSString(appId);
     }
-    SyncManager::shared().configure(config);
+
+    return config;
+}
+
+- (std::weak_ptr<realm::app::App>)app {
+    return _syncManager->app();
 }
 
 - (NSString *)appID {
@@ -166,14 +162,14 @@ static RLMSyncManager *s_sharedManager = nil;
 }
 
 - (void)setUserAgent:(NSString *)userAgent {
-    SyncManager::shared().set_user_agent(RLMStringDataWithNSString(userAgent));
+    _syncManager->set_user_agent(RLMStringDataWithNSString(userAgent));
     _userAgent = userAgent;
 }
 
 - (void)setCustomRequestHeaders:(NSDictionary<NSString *,NSString *> *)customRequestHeaders {
     _customRequestHeaders = customRequestHeaders.copy;
 
-    for (auto&& user : SyncManager::shared().all_logged_in_users()) {
+    for (auto&& user : _syncManager->all_users()) {
         for (auto&& session : user->all_sessions()) {
             auto config = session->config();
             config.custom_http_headers.clear();;
@@ -189,27 +185,27 @@ static RLMSyncManager *s_sharedManager = nil;
     _logger = logFn;
     if (_logger) {
         _loggerFactory = std::make_unique<CallbackLoggerFactory>(logFn);
-        SyncManager::shared().set_logger_factory(*_loggerFactory);
+        _syncManager->set_logger_factory(*_loggerFactory);
     }
     else {
         _loggerFactory = nullptr;
-        SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
+        _syncManager->set_logger_factory(s_syncLoggerFactory);
     }
 }
 
 - (void)setTimeoutOptions:(RLMSyncTimeoutOptions *)timeoutOptions {
     _timeoutOptions = timeoutOptions;
-    SyncManager::shared().set_timeouts(timeoutOptions->_options);
+    _syncManager->set_timeouts(timeoutOptions->_options);
 }
 
 #pragma mark - Passthrough properties
 
 - (RLMSyncLogLevel)logLevel {
-    return logLevelForLevel(realm::SyncManager::shared().log_level());
+    return logLevelForLevel(_syncManager->log_level());
 }
 
 - (void)setLogLevel:(RLMSyncLogLevel)logLevel {
-    realm::SyncManager::shared().set_log_level(levelForSyncLogLevel(logLevel));
+    _syncManager->set_log_level(levelForSyncLogLevel(logLevel));
 }
 
 #pragma mark - Private API
@@ -222,71 +218,55 @@ static RLMSyncManager *s_sharedManager = nil;
     });
 }
 
-- (NSArray<RLMSyncUser *> *)_allUsers {
-    NSMutableArray<RLMSyncUser *> *buffer = [NSMutableArray array];
-    for (auto user : SyncManager::shared().all_logged_in_users()) {
-        [buffer addObject:[[RLMSyncUser alloc] initWithSyncUser:std::move(user)]];
-    }
-    return buffer;
+- (void)resetForTesting {
+    _errorHandler = nil;
+    _appID = nil;
+    _userAgent = nil;
+    _logger = nil;
+    _authorizationHeaderName = nil;
+    _customRequestHeaders = nil;
+    _timeoutOptions = nil;
+    _syncManager->reset_for_testing();
 }
 
-+ (void)resetForTesting {
-    RLMSyncManager *manager = self.sharedManager;
-    manager->_errorHandler = nil;
-    manager->_appID = nil;
-    manager->_userAgent = nil;
-    manager->_logger = nil;
-    manager->_authorizationHeaderName = nil;
-    manager->_customRequestHeaders = nil;
-    manager->_pinnedCertificatePaths = nil;
-    manager->_timeoutOptions = nil;
-
-    SyncManager::shared().reset_for_testing();
+- (std::shared_ptr<realm::SyncManager>)syncManager {
+    return _syncManager;
 }
-
-- (RLMNetworkRequestOptions *)networkRequestOptions {
-    RLMNetworkRequestOptions *options = [[RLMNetworkRequestOptions alloc] init];
-    options.authorizationHeaderName = self.authorizationHeaderName;
-    options.customHeaders = self.customRequestHeaders;
-    options.pinnedCertificatePaths = self.pinnedCertificatePaths;
-    return options;
-}
-
 @end
 
 #pragma mark - RLMSyncTimeoutOptions
 
 @implementation RLMSyncTimeoutOptions
 - (NSUInteger)connectTimeout {
-    return _options.connect_timeout;
+    return static_cast<NSUInteger>(_options.connect_timeout);
 }
 - (void)setConnectTimeout:(NSUInteger)connectTimeout {
     _options.connect_timeout = connectTimeout;
 }
 
 - (NSUInteger)connectLingerTime {
-    return _options.connection_linger_time;
+    return static_cast<NSUInteger>(_options.connection_linger_time);
 }
 - (void)setConnectionLingerTime:(NSUInteger)connectionLingerTime {
     _options.connection_linger_time = connectionLingerTime;
 }
 
 - (NSUInteger)pingKeepalivePeriod {
-    return _options.ping_keepalive_period;
+    return static_cast<NSUInteger>(_options.ping_keepalive_period);
 }
 - (void)setPingKeepalivePeriod:(NSUInteger)pingKeepalivePeriod {
     _options.ping_keepalive_period = pingKeepalivePeriod;
 }
 
 - (NSUInteger)pongKeepaliveTimeout {
-    return _options.pong_keepalive_timeout;
+    return static_cast<NSUInteger>(_options.pong_keepalive_timeout);
 }
 - (void)setPongKeepaliveTimeout:(NSUInteger)pongKeepaliveTimeout {
     _options.pong_keepalive_timeout = pongKeepaliveTimeout;
 }
 
 - (NSUInteger)fastReconnectLimit {
-    return _options.fast_reconnect_limit;
+    return static_cast<NSUInteger>(_options.fast_reconnect_limit);
 }
 - (void)setFastReconnectLimit:(NSUInteger)fastReconnectLimit {
     _options.fast_reconnect_limit = fastReconnectLimit;
