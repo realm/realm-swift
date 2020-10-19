@@ -105,101 +105,113 @@ extension RLMApp {
 }
 
 extension RLMMongoCollection {
-    
+
     public func insertOne(document: [String : RLMBSON], completion: @escaping RLMMongoInsertBlock) {
         return self.__insertOneDocument(document, completion: completion)
     }
-    
+
     public func insertMany(documents: Array<[String : RLMBSON]>, completion: @escaping RLMMongoInsertManyBlock) {
         return self.__insertManyDocuments(documents, completion: completion)
     }
-    
+
     public func find(filterDocument: [String : RLMBSON], completion: @escaping RLMMongoFindBlock) {
         return self.__findWhere(filterDocument, completion: completion)
     }
-    
+
     public func find(filterDocument: [String: RLMBSON], options: RLMFindOptions,completion: @escaping RLMMongoFindBlock) {
         return self.__findWhere(filterDocument, options: options, completion: completion)
     }
-    
+
     public func findOne(filterDocument: [String : RLMBSON], completion: @escaping RLMMongoFindOneBlock) {
         return self.__findOneDocumentWhere(filterDocument, completion: completion)
     }
-    
+
     public func findOne(filterDocument: [String : RLMBSON], options: RLMFindOptions, completion: @escaping RLMMongoFindOneBlock) {
         return self.__findOneDocumentWhere(filterDocument, options: options, completion: completion)
     }
-    
+
     public func aggregate(withPipeline pipeline: [[String : RLMBSON]], completion: @escaping RLMMongoFindBlock) {
         return self.__aggregate(withPipeline: pipeline, completion: completion)
     }
-    
+
     public func count(filterDocument: [String : RLMBSON], completion: @escaping RLMMongoCountBlock) {
         return self.__countWhere(filterDocument, completion: completion)
     }
-    
-    public func count(filterDocument: [String : RLMBSON], limit: Integer, completion: @escaping RLMMongoCountBlock) {
+
+    public func count(filterDocument: [String : RLMBSON], limit: Int, completion: @escaping RLMMongoCountBlock) {
         return self.__countWhere(filterDocument, limit: limit, completion: completion)
     }
-    
+
     public func deleteOneDocument(filterDocument: [String : RLMBSON], completion: @escaping RLMMongoCountBlock) {
         return self.__deleteOneDocumentWhere(filterDocument, completion: completion)
     }
-    
+
     public func deleteManyDocuments(filterDocument: [String : RLMBSON], completion: @escaping RLMMongoCountBlock) {
         return self.__deleteManyDocumentsWhere(filterDocument, completion: completion)
     }
-    
+
     public func updateOneDocument(filterDocument: [String : RLMBSON], updateDocument: [String : RLMBSON], completion: @escaping RLMMongoUpdateBlock) {
         return self.__updateOneDocumentWhere(filterDocument, updateDocument: updateDocument, completion: completion)
     }
-    
+
     public func updateOneDocument(filterDocument: [String : RLMBSON], updateDocument: [String : RLMBSON], upsert: Bool, completion: @escaping RLMMongoUpdateBlock) {
         return self.__updateOneDocumentWhere(filterDocument, updateDocument: updateDocument, upsert: upsert, completion: completion)
     }
-    
+
     public func updateManyDocuments(filterDocument: [String : RLMBSON], updateDocument: [String : RLMBSON], upsert: Bool, completion: @escaping RLMMongoUpdateBlock) {
         return self.__updateManyDocumentsWhere(filterDocument, updateDocument: updateDocument, upsert: upsert, completion: completion)
     }
-    
+
     public func updateManyDocuments(filterDocument: [String : RLMBSON], updateDocument: [String : RLMBSON], completion: @escaping RLMMongoUpdateBlock) {
         return self.__updateManyDocumentsWhere(filterDocument, updateDocument: updateDocument, completion: completion)
     }
-    
+
     public func findOneAndUpdate(filterDocument: [String : RLMBSON], updateDocument: [String : RLMBSON], options: RLMFindOneAndModifyOptions, completion: @escaping RLMMongoFindOneBlock) {
         return self.__findOneAndUpdateWhere(filterDocument, updateDocument: updateDocument, completion: completion)
     }
-    
+
     public func findOneAndUpdate(filterDocument: [String : RLMBSON], updateDocument: [String : RLMBSON], completion: @escaping RLMMongoFindOneBlock) {
         return self.__findOneAndUpdateWhere(filterDocument, updateDocument: updateDocument, completion: completion)
     }
-    
+
     public func findOneAndReplace(filterDocument: [String : RLMBSON], replacementDocument: [String : RLMBSON], options: RLMFindOneAndModifyOptions, completion: @escaping RLMMongoFindOneBlock) {
         return self.__findOneAndReplaceWhere(filterDocument, replacementDocument: replacementDocument, options: options, completion: completion)
     }
-    
+
     public func findOneAndReplace(filterDocument: [String : RLMBSON], replacementDocument: [String : RLMBSON], completion: @escaping RLMMongoFindOneBlock) {
         return self.__findOneAndReplaceWhere(filterDocument, replacementDocument: replacementDocument, completion: completion)
     }
-    
+
     public func findOneAndDelete(filterDocument: [String : RLMBSON], options: RLMFindOneAndModifyOptions, completion: @escaping RLMMongoDeleteBlock) {
         return self.__findOneAndDeleteWhere(filterDocument, options: options, completion: completion)
     }
-    
+
     public func findOneAndDelete(filterDocument: [String : RLMBSON], completion: @escaping RLMMongoDeleteBlock) {
         return self.__findOneAndDeleteWhere(filterDocument, completion: completion)
     }
-    
+
     public func watch(withDelegate delegate: RLMChangeEventDelegate, queue: DispatchQueue?) -> RLMChangeStream {
         return self.__watch(with: delegate, delegateQueue: queue)
     }
-    
+
     public func watch(withFilterIds filterIds: [RLMObjectId], delegate: RLMChangeEventDelegate, queue: DispatchQueue?) -> RLMChangeStream {
         return self.__watch(withFilterIds: filterIds, delegate: delegate, delegateQueue: queue)
     }
 
     public func watch(withMatchFilter matchFilter: [String : RLMBSON], delegate: RLMChangeEventDelegate, queue: DispatchQueue?) -> RLMChangeStream {
         return self.__watch(withMatchFilter: matchFilter, delegate: delegate, delegateQueue: queue)
+    }
+}
+
+extension RLMEmailPasswordAuth {
+    public func callResetPasswordFunction(email: String,
+                                          password: String,
+                                          args: [RLMBSON],
+                                          completion: @escaping RLMEmailPasswordAuthOptionalErrorBlock) {
+        self.__callResetPasswordFunction(email,
+                                         password: password,
+                                         args: args,
+                                         completion: completion)
     }
 }
 
