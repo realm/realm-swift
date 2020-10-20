@@ -83,14 +83,14 @@ extension RLMCollection {
 // ~RLMMongoCollection.h~
 // ~RLMEmailPasswordAuth.h~
 // ~RLMApp.h~
-// ~RLMBSON.h~
-// Did not wrap @property (readonly) RLMBSONType bsonType NS_REFINED_FOR_SWIFT; since it's internally used by
-//     /// Convert a `RLMBSON` to an `AnyBSON`.
-// static func convert(object: RLMBSON?) -> AnyBSON? {
+// ~RLMBSON.h~ Did not wrap @property (readonly) RLMBSONType bsonType NS_REFINED_FOR_SWIFT; since it's internally used by
 // ~RLMSyncSession.h~
 // ~RLMUser.h~
-// RLMDecimal128.h?
-// RLMRealm.h
+// ~RLMDecimal128.h?~
+// ~RLMRealm.h~
+// RLMFindOneAndModifyOptions
+// RLMFindOptions
+// NSError
 
 extension RLMApp {
     public func login(withCredential credentials: RLMCredentials,
@@ -224,7 +224,7 @@ extension RLMSyncSession {
 }
 
 extension RLMUser {
-    @nonobjc public var customData: NSDictionary {
+    public var customData: NSDictionary {
         return self.__customData as NSDictionary
     }
 
