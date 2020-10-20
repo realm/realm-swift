@@ -73,26 +73,22 @@ class SwiftSyncTestCase: RLMSyncTestCase {
     func synchronouslyLogInUser(for credentials: Credentials,
                                 file: StaticString = #file,
                                 line: UInt = #line) throws -> User {
-        let process = isParent ? "parent" : "child"
-        var theUser: User?
-        var theError: Error?
+        var theUser: User!
         let ex = expectation(description: "Should log in the user properly")
 
-        self.app.login(credentials: credentials, completion: { user, error in
-            theUser = user
-            theError = error
+        self.app.login(credentials: credentials) { result in
+            switch result {
+            case .success(let user):
+                theUser = user
+                XCTAssertTrue(theUser.isLoggedIn)
+            case .failure:
+                XCTFail("Should login user")
+            }
             ex.fulfill()
-        })
+        }
 
         waitForExpectations(timeout: 10, handler: nil)
-        XCTAssertNotNil(theUser, file: file, line: line)
-        XCTAssertEqual(theUser?.state, .loggedIn,
-                       "User should have been valid, but wasn't. (process: \(process), error: "
-                        + "\(theError != nil ? String(describing: theError!) : "n/a"))",
-                       file: file,
-                       line: line)
-        XCTAssertTrue(theUser!.isLoggedIn)
-        return theUser!
+        return theUser
     }
 
     func synchronouslyLogOutUser(_ user: User,

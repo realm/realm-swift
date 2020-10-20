@@ -108,15 +108,21 @@ let credentials = Credentials.JWT(token: myToken)
 /// This interface provides access to login and authentication.
 public typealias App = RLMApp
 
-extension App {
+public extension App {
     /**
      Login to a user for the Realm app.
      
      @param credentials The credentials identifying the user.
-     @param completion A callback invoked after completion.
+     @param completion A callback invoked after completion. Will return `Result.success(User)` or `Result.failure(Error)`.
      */
-    public func login(credentials: Credentials, completion: @escaping RLMUserCompletionBlock) {
-        self.__login(withCredential: ObjectiveCSupport.convert(object: credentials), completion: completion)
+    func login(credentials: Credentials, _ completion: @escaping (Result<User, Error>) -> Void) {
+        self.__login(withCredential: ObjectiveCSupport.convert(object: credentials)) { user, error in
+            if let user = user {
+                completion(.success(user))
+            } else {
+                completion(.failure(error ?? Realm.Error.callFailed))
+            }
+        }
     }
 }
 
@@ -434,21 +440,6 @@ public extension APIKeyAuth {
         fetchAPIKeys { (userApiKeys, error) in
             if let userApiKeys = userApiKeys {
                 completion(.success(userApiKeys))
-            } else {
-                completion(.failure(error ?? Realm.Error.callFailed))
-            }
-        }
-    }
-}
-
-public extension App {
-    /// Login to a user for the Realm app.
-    /// @param credentials The credentials identifying the user.
-    /// @completion A completion that eventually return `Result.success(User)` or `Result.failure(Error)`.
-    func login(credentials: Credentials, _ completion: @escaping (Result<User, Error>) -> Void) {
-        login(credentials: credentials) { user, error in
-            if let user = user {
-                completion(.success(user))
             } else {
                 completion(.failure(error ?? Realm.Error.callFailed))
             }

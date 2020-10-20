@@ -26,19 +26,20 @@ import Realm.Private
  */
 public typealias User = RLMUser
 
-extension User {
-    /**
-     Links the currently authenticated user with a new identity, where the identity is defined by the credential
-     specified as a parameter. This will only be successful if this `User` is the currently authenticated
-     with the client from which it was created. On success a new user will be returned with the new linked credentials.
-
-     @param credentials The credentials used to link the user to a new identity.
-     @param completion The completion handler to call when the linking is complete.
-                       If the operation is  successful, the result will contain a new
-                       `User` object representing the currently logged in user.
-    */
-    public func linkUser(credentials: Credentials, completion: @escaping RLMOptionalUserBlock) {
-        self.__linkUser(with: ObjectiveCSupport.convert(object: credentials), completion: completion)
+public extension User {
+    /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
+    /// specified as a parameter. This will only be successful if this `User` is the currently authenticated
+    /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
+    /// @param credentials The `Credentials` used to link the user to a new identity.
+    /// @completion A completion that eventually return `Result.success(User)` with user's data or `Result.failure(Error)`.
+    func linkUser(credentials: Credentials, _ completion: @escaping (Result<User, Error>) -> Void) {
+        self.__linkUser(with: ObjectiveCSupport.convert(object: credentials)) { user, error in
+            if let user = user {
+                completion(.success(user))
+            } else {
+                completion(.failure(error ?? Realm.Error.callFailed))
+            }
+        }
     }
 }
 
@@ -640,21 +641,6 @@ public extension User {
         self.refreshCustomData { customData, error in
             if let customData = customData {
                 completion(.success(customData))
-            } else {
-                completion(.failure(error ?? Realm.Error.callFailed))
-            }
-        }
-    }
-
-    /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
-    /// specified as a parameter. This will only be successful if this `User` is the currently authenticated
-    /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
-    /// @param credentials The `Credentials` used to link the user to a new identity.
-    /// @completion A completion that eventually return `Result.success(User)` with user's data or `Result.failure(Error)`.
-    func linkUser(credentials: Credentials, _ completion: @escaping (Result<User, Error>) -> Void) {
-        self.linkUser(credentials: credentials) { user, error in
-            if let user = user {
-                completion(.success(user))
             } else {
                 completion(.failure(error ?? Realm.Error.callFailed))
             }

@@ -131,10 +131,14 @@ import Realm.Private
     @discardableResult
     public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration,
                                  callbackQueue: DispatchQueue = .main,
-                                 callback: @escaping (Realm?, Swift.Error?) -> Void) -> AsyncOpenTask {
-        return AsyncOpenTask(rlmTask: RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: callbackQueue) { rlmRealm, error in
-            callback(rlmRealm.flatMap(Realm.init), error)
-        })
+                                 callback: @escaping (Result<Realm, Swift.Error>) -> Void) -> AsyncOpenTask {
+        return AsyncOpenTask(rlmTask: RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: callbackQueue, callback: { rlmRealm, error in
+            if let realm = rlmRealm.flatMap(Realm.init) {
+                callback(.success(realm))
+            } else {
+                callback(.failure(error ?? Realm.Error.callFailed))
+            }
+        }))
     }
 
     /**

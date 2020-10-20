@@ -421,14 +421,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let config = user.configuration(partitionValue: self.appId)
             let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
             XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
-            Realm.asyncOpen(configuration: config) { realm, error in
-                XCTAssertNil(error)
-                guard let realm = realm else {
+            Realm.asyncOpen(configuration: config) { result in
+                switch result {
+                case .success(let realm):
+                    self.checkCount(expected: self.bigObjectCount, realm, SwiftPerson.self)
+                case .failure:
                     XCTFail("No realm on async open")
-                    ex.fulfill()
-                    return
                 }
-                self.checkCount(expected: self.bigObjectCount, realm, SwiftPerson.self)
                 ex.fulfill()
             }
             func fileSize(path: String) -> Int {
@@ -464,9 +463,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
             XCTAssertEqual(pathOnDisk, customFileURL.path)
             XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
-            Realm.asyncOpen(configuration: config) { realm, error in
-                XCTAssertNil(error)
-                self.checkCount(expected: self.bigObjectCount, realm!, SwiftPerson.self)
+            Realm.asyncOpen(configuration: config) { result in
+                switch result {
+                case .success(let realm):
+                    self.checkCount(expected: self.bigObjectCount, realm, SwiftPerson.self)
+                case .failure:
+                    XCTFail("No realm on async open")
+                }
                 ex.fulfill()
             }
             func fileSize(path: String) -> Int {
@@ -501,11 +504,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             let ex = expectation(description: "async open")
             let config = user.configuration(partitionValue: self.appId)
-            Realm.asyncOpen(configuration: config) { _, error in
-                XCTAssertNotNil(error)
+            Realm.asyncOpen(configuration: config) { result in
+                guard case .failure = result else {
+                    XCTFail("No error on cancelled async open")
+                    return ex.fulfill()
+                }
                 ex.fulfill()
             }
-            let task = Realm.asyncOpen(configuration: config) { _, _ in
+            let task = Realm.asyncOpen(configuration: config) { _ in
                 XCTFail("Cancelled completion handler was called")
             }
             task.cancel()
@@ -631,13 +637,15 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(user.state, .loggedIn)
 
             let credentials2 = Credentials.emailPassword(email: email, password: "NOT_A_VALID_PASSWORD")
-            let ex = expectation(description: "Should log in the user properly")
+            let ex = expectation(description: "Should fail to log in the user")
 
-            self.app.login(credentials: credentials2, completion: { user2, error in
-                XCTAssertNil(user2)
-                XCTAssertNotNil(error)
+            self.app.login(credentials: credentials2) { result in
+                guard case .failure = result else {
+                    XCTFail("Login should not have been successful")
+                    return ex.fulfill()
+                }
                 ex.fulfill()
-            })
+            }
 
             waitForExpectations(timeout: 10, handler: nil)
         } catch {
@@ -715,9 +723,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let loginEx = expectation(description: "Login user")
         var syncUser: User?
 
-        app.login(credentials: Credentials.emailPassword(email: email, password: password)) { (user, error) in
-            XCTAssertNil(error)
-            syncUser = user
+        app.login(credentials: Credentials.emailPassword(email: email, password: password)) { result in
+            switch result {
+            case .success(let user):
+                syncUser = user
+            case .failure:
+                XCTFail("Should login user")
+            }
             loginEx.fulfill()
         }
 
@@ -755,17 +767,23 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         var syncUser1: User?
         var syncUser2: User?
 
-        app.login(credentials: Credentials.emailPassword(email: email1, password: password1)) { (user, error) in
-            XCTAssertNil(error)
-            syncUser1 = user
+        app.login(credentials: Credentials.emailPassword(email: email1, password: password1)) { result in
+            if case .success(let user) = result {
+                syncUser1 = user
+            } else {
+                XCTFail("Should login user 1")
+            }
             login1Ex.fulfill()
         }
 
         wait(for: [login1Ex], timeout: 4.0)
 
-        app.login(credentials: Credentials.emailPassword(email: email2, password: password2)) { (user, error) in
-            XCTAssertNil(error)
-            syncUser2 = user
+        app.login(credentials: Credentials.emailPassword(email: email2, password: password2)) { result in
+            if case .success(let user) = result {
+                syncUser2 = user
+            } else {
+                XCTFail("Should login user 2")
+            }
             login2Ex.fulfill()
         }
 
@@ -805,23 +823,28 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [registerUserEx], timeout: 4.0)
 
         let loginEx = expectation(description: "Login user")
-        var syncUser: User?
+        var syncUser: User!
 
         let credentials = Credentials.emailPassword(email: email, password: password)
 
-        app.login(credentials: Credentials.anonymous) { (user, error) in
-            XCTAssertNil(error)
-            syncUser = user
+        app.login(credentials: Credentials.anonymous) { result in
+            if case .success(let user) = result {
+                syncUser = user
+            } else {
+                XCTFail("Should login user")
+            }
             loginEx.fulfill()
         }
-
         wait(for: [loginEx], timeout: 4.0)
 
         let linkEx = expectation(description: "Link user")
-
-        syncUser?.linkUser(credentials: credentials) { (user, error) in
-            XCTAssertNil(error)
-            syncUser = user
+        syncUser.linkUser(credentials: credentials) { result in
+            switch result {
+            case .success(let user):
+                syncUser = user
+            case .failure:
+                XCTFail("Should link user")
+            }
             linkEx.fulfill()
         }
 
@@ -905,9 +928,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let credentials = Credentials.emailPassword(email: email, password: password)
 
         var syncUser: User?
-        app.login(credentials: credentials) { (user, error) in
-            XCTAssertNil(error)
-            syncUser = user
+        app.login(credentials: credentials) { result in
+            switch result {
+            case .success(let user):
+                syncUser = user
+            case .failure:
+                XCTFail("Should link user")
+            }
             loginEx.fulfill()
         }
 
@@ -1039,9 +1066,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let credentials = Credentials.emailPassword(email: email, password: password)
         var syncUser: User?
-        app.login(credentials: credentials) { (user, error) in
-            syncUser = user
-            XCTAssertNil(error)
+        app.login(credentials: credentials) { result in
+            switch result {
+            case .success(let user):
+                syncUser = user
+            case .failure:
+                XCTFail("Should link user")
+            }
             loginEx.fulfill()
         }
         wait(for: [loginEx], timeout: 4.0)
@@ -1080,8 +1111,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let loginExpectation = expectation(description: "Login user")
 
         let credentials = Credentials.emailPassword(email: email, password: password)
-        app.login(credentials: credentials) { (_, error) in
-            XCTAssertNil(error)
+        app.login(credentials: credentials) { result in
+            if case .failure = result {
+                XCTFail("Should link user")
+            }
             loginExpectation.fulfill()
         }
         wait(for: [loginExpectation], timeout: 4.0)
@@ -1117,9 +1150,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let loginEx = expectation(description: "Login user")
         let credentials = Credentials.emailPassword(email: email, password: password)
         var syncUser: User?
-        app.login(credentials: credentials) { (user, error) in
-            syncUser = user
-            XCTAssertNil(error)
+        app.login(credentials: credentials) { result in
+            switch result {
+            case .success(let user):
+                syncUser = user
+            case .failure:
+                XCTFail("Should link user")
+            }
             loginEx.fulfill()
         }
         wait(for: [loginEx], timeout: 4.0)
