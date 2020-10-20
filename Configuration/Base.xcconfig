@@ -48,6 +48,7 @@ SWIFT_OPTIMIZATION_LEVEL = -Owholemodule;
 WARNING_CFLAGS = -Wmismatched-tags -Wunused-private-field -Wpartial-availability;
 OTHER_CFLAGS = -fvisibility-inlines-hidden;
 OTHER_CFLAGS[arch=armv7] = -fvisibility-inlines-hidden -fno-aligned-new;
+SUPPORTS_MACCATALYST = YES;
 
 HEADER_SEARCH_PATHS = $(inherited) Realm/ObjectStore/src;
 REALM_CORE_FRAMEWORK = core/realm-sync$(REALM_LIBRARY_SUFFIX).xcframework;
