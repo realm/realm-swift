@@ -2406,7 +2406,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     func testAsyncOpenCombine() {
         var cancellable = Set<AnyCancellable>()
 
-        if (isParent) {
+        if isParent {
             let chainEx = expectation(description: "Should chain realm register => login => realm upload")
             let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
             let password = randomString(10)
@@ -2423,7 +2423,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                     }
                     let progressEx = self.expectation(description: "Should upload")
                     let token = realm.syncSession!.addProgressNotification(for: .upload, mode: .forCurrentlyOutstandingWork) {
-                        if ($0.isTransferComplete) {
+                        if $0.isTransferComplete {
                             progressEx.fulfill()
                         }
                     }

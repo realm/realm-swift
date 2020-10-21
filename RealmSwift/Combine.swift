@@ -502,7 +502,7 @@ public enum RealmPublishers {
 
     /// A publisher which emits an asynchronously opened Realm.
     @frozen public struct AsyncOpenPublisher: Publisher {
-        /// This publisher can fail if there is an error opening the Realm..
+        /// This publisher can fail if there is an error opening the Realm.
         public typealias Failure = Error
         /// This publisher emits an opened Realm.
         public typealias Output = Realm
@@ -1219,10 +1219,10 @@ public enum RealmPublishers {
     /// there is an intermediate transform. If `subscribe(on:)` is used, it
     /// should always be the first operation in the pipeline.
     ///
-    /// Create this publisher using the `changesetPublisher` property on RealmCollection..
+    /// Create this publisher using the `changesetPublisher` property on RealmCollection.
     @frozen public struct CollectionChangeset<Collection: RealmCollection>: Publisher {
         public typealias Output = RealmCollectionChange<Collection>
-        /// This publisher reports error via the `.error` case of RealmCollectionChange..
+        /// This publisher reports error via the `.error` case of RealmCollectionChange.
         public typealias Failure = Never
 
         private let collection: Collection
@@ -1300,10 +1300,10 @@ public enum RealmPublishers {
     /// there is an intermediate transform. If `subscribe(on:)` is used, it
     /// should always be the first operation in the pipeline.
     ///
-    /// Create this publisher using the `changesetPublisher` property on RealmCollection..
+    /// Create this publisher using the `changesetPublisher` property on RealmCollection.
     public class CollectionChangesetWithToken<Collection: RealmCollection, T>: Publisher {
         public typealias Output = RealmCollectionChange<Collection>
-        /// This publisher reports error via the `.error` case of RealmCollectionChange..
+        /// This publisher reports error via the `.error` case of RealmCollectionChange.
         public typealias Failure = Never
 
         internal typealias TokenParent = T
