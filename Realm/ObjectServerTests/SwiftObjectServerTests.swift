@@ -2387,31 +2387,97 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
 
-        let registerUserEx = expectation(description: "Register user")
-        app.emailPasswordAuth.registerUser(email: email, password: password)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should register")
-                }
-            }, receiveValue: { _ in
-                registerUserEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [registerUserEx], timeout: 4.0)
-
         let loginEx = expectation(description: "Login user")
-        app.login(credentials: Credentials.emailPassword(email: email, password: password))
+        app.emailPasswordAuth.registerUser(email: email, password: password)
+            .flatMap { self.app.login(credentials: .emailPassword(email: email, password: password)) }
             .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should login")
+                if case let .failure(error) = result {
+                    XCTFail("Should have completed login chain: \(error.localizedDescription)")
                 }
             }, receiveValue: { user in
-                loginEx.fulfill()
                 XCTAssertEqual(user.id, self.app.currentUser?.id)
+                loginEx.fulfill()
             })
             .store(in: &cancellable)
         wait(for: [loginEx], timeout: 4.0)
         XCTAssertEqual(self.app.allUsers.count, 1)
+    }
+
+    func testAsyncOpenCombine() {
+        var cancellable = Set<AnyCancellable>()
+
+        if (isParent) {
+            let chainEx = expectation(description: "Should chain realm register => login => realm upload")
+            let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+            let password = randomString(10)
+            app.emailPasswordAuth.registerUser(email: email, password: password)
+                .flatMap { self.app.login(credentials: .emailPassword(email: email, password: password)) }
+                .flatMap { user in Realm.asyncOpen(configuration: user.configuration(partitionValue: self.appId)) }
+                .sink(receiveCompletion: { result in
+                    if case .failure = result {
+                        XCTFail("Should register")
+                    }
+                }, receiveValue: { realm in
+                    try! realm.write {
+                        (0..<10000).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket"))}
+                    }
+                    let progressEx = self.expectation(description: "Should upload")
+                    let token = realm.syncSession!.addProgressNotification(for: .upload, mode: .forCurrentlyOutstandingWork) {
+                        if ($0.isTransferComplete) {
+                            progressEx.fulfill()
+                        }
+                    }
+                    self.wait(for: [progressEx], timeout: 30.0)
+                    token?.invalidate()
+                    chainEx.fulfill()
+                }).store(in: &cancellable)
+            wait(for: [chainEx], timeout: 30.0)
+            executeChild()
+        } else {
+            let chainEx = expectation(description: "Should chain realm login => realm async open")
+            let progressEx = expectation(description: "Should receive progress notification")
+            app.login(credentials: .anonymous)
+                .flatMap {
+                    Realm.asyncOpen(configuration: $0.configuration(partitionValue: self.appId)).onProgressNotification {
+                        if $0.isTransferComplete {
+                            progressEx.fulfill()
+                        }
+                    }
+                }
+                .sink(receiveCompletion: { result in
+                    if case .failure = result {
+                        XCTFail("Should register")
+                    }
+                }, receiveValue: { realm in
+                    XCTAssertEqual(realm.objects(SwiftPerson.self).count, 10000)
+                    chainEx.fulfill()
+                }).store(in: &cancellable)
+            wait(for: [chainEx, progressEx], timeout: 30.0)
+        }
+    }
+
+    func testAsyncOpenStandaloneCombine() {
+        var cancellable = Set<AnyCancellable>()
+
+        let asyncOpenEx = expectation(description: "Should open realm")
+
+        autoreleasepool {
+            let realm = try! Realm()
+            try! realm.write {
+                (0..<10000).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket")) }
+            }
+        }
+
+        Realm.asyncOpen().sink { result in
+            if case .failure = result {
+                XCTFail("Should open realm")
+            }
+        } receiveValue: { (realm) in
+            XCTAssertEqual(realm.objects(SwiftPerson.self).count, 10000)
+            asyncOpenEx.fulfill()
+        }.store(in: &cancellable)
+
+        wait(for: [asyncOpenEx], timeout: 4.0)
     }
 
     func testRefreshCustomDataCombine() {
