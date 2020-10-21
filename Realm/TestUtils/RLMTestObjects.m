@@ -132,6 +132,10 @@
              @"dateObj", @"dataObj", @"decimalObj", @"objectIdObj"];
 }
 @end
+
+@implementation AllPrimitiveSets
+@end
+
 @implementation AllOptionalPrimitiveArrays
 @end
 
@@ -229,6 +233,11 @@
 
 @implementation ArrayPropertyObject
 @end
+
+#pragma mark SetPropertyObject
+
+//@implementation SetPropertyObject
+//@end
 
 #pragma mark DynamicTestObject
 

@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObject, RLMResults<RLMObjectType>;
 
-@interface RLMSet<__covariant RLMObjectType> : NSObject<RLMCollection, NSFastEnumeration>
+@interface RLMSet<RLMObjectType> : NSObject<RLMCollection, NSFastEnumeration>
 
 #pragma mark - Properties
 
@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
  The number of objects in the set.
  */
 @property (nonatomic, readonly, assign) NSUInteger count;
+
+@property (nonatomic, readonly) NSArray<RLMObjectType> *array;
 
 /**
  The type of the objects in the set.
@@ -221,6 +223,10 @@ __attribute((unavailable("replaceObjectAtIndex:withObject: is not available with
 - (void)minusSet:(RLMSet<RLMObjectType> *)set;
 
 - (void)unionSet:(RLMSet<RLMObjectType> *)set;
+
+- (BOOL)intersectsSet:(RLMSet<id> *)set;
+
+- (BOOL)isSubsetOfSet:(RLMSet<id> *)set;
 
 #pragma mark - Notifications
 

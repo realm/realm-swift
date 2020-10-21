@@ -95,20 +95,38 @@
 }
 
 - (void)intersectSet:(RLMSet<id> *)set {
-
+    for (id obj in set) {
+        RLMSetValidateMatchingObjectType(self, obj);
+    }
+    [_backingSet intersectOrderedSet:set->_backingSet];
 }
 
 - (void)minusSet:(RLMSet<id> *)set {
-
+    for (id obj in set) {
+        RLMSetValidateMatchingObjectType(self, obj);
+    }
+    [_backingSet minusOrderedSet:set->_backingSet];
 }
 
 - (void)unionSet:(RLMSet<id> *)set {
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-//    changeSet(self, NSKeyValueChangeInsertion, index, ^{
-////        [_backingSet insertObject:anObject atIndex:index];
-//    });
+    [_backingSet unionOrderedSet:set->_backingSet];
+}
+
+- (BOOL)intersectsSet:(RLMSet<id> *)set {
+    for (id obj in set) {
+        RLMSetValidateMatchingObjectType(self, obj);
+    }
+    return [_backingSet intersectsSet:set->_backingSet.set];
+}
+
+- (BOOL)isSubsetOfSet:(RLMSet<id> *)set {
+    for (id obj in set) {
+        RLMSetValidateMatchingObjectType(self, obj);
+    }
+    return [_backingSet isSubsetOfSet:set->_backingSet.set];
 }
 
 - (RLMResults *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending {
@@ -156,6 +174,10 @@
 
 - (NSUInteger)count {
     return _backingSet.count;
+}
+
+- (NSArray<id> *)array {
+    return _backingSet.array;
 }
 
 - (BOOL)isInvalidated {

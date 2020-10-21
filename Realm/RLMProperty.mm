@@ -205,10 +205,6 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
             return NO;
     }
 
-    if ([self.name isEqualToString:@"stringSetArray"]) {
-        NSLog(@"");
-    }
-
     _optional = true;
     static const char arrayPrefix[] = "@\"RLMArray<";
     static const int arrayPrefixLen = sizeof(arrayPrefix) - 1;
