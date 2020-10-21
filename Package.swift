@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "6.1.4"
-let cocoaVersionStr = "5.5.0"
+let coreVersionStr = "10.0.0"
+let cocoaVersionStr = "10.0.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -78,17 +78,21 @@ let package = Package(
                 "Realm/ObjectStore/src/thread_safe_reference.cpp",
                 "Realm/ObjectStore/src/util/scheduler.cpp",
                 "Realm/ObjectStore/src/util/uuid.cpp",
+                "Realm/ObjectStore/src/util/scheduler.cpp",
                 "Realm/RLMAccessor.mm",
                 "Realm/RLMAnalytics.mm",
                 "Realm/RLMArray.mm",
                 "Realm/RLMClassInfo.mm",
                 "Realm/RLMCollection.mm",
                 "Realm/RLMConstants.m",
+                "Realm/RLMDecimal128.mm",
+                "Realm/RLMEmbeddedObject.mm",
                 "Realm/RLMListBase.mm",
                 "Realm/RLMManagedArray.mm",
                 "Realm/RLMMigration.mm",
                 "Realm/RLMObject.mm",
                 "Realm/RLMObjectBase.mm",
+                "Realm/RLMObjectId.mm",
                 "Realm/RLMObjectSchema.mm",
                 "Realm/RLMObjectStore.mm",
                 "Realm/RLMObservation.mm",
@@ -115,7 +119,11 @@ let package = Package(
             path: "RealmSwift",
             exclude: [
                 "Sync.swift",
+                "BSON.swift",
+                "App.swift",
+                "MongoClient.swift",
                 "ObjectiveCSupport+Sync.swift",
+                "ObjectiveCSupport+BSON.swift",
                 "Tests",
             ]
         ),

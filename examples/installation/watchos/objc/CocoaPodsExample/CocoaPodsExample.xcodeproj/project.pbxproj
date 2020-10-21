@@ -326,7 +326,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -335,7 +335,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

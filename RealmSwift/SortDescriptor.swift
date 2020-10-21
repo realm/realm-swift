@@ -23,7 +23,7 @@ import Realm
  A `SortDescriptor` stores a key path and a sort order for use with `sorted(sortDescriptors:)`. It is similar to
  `NSSortDescriptor`, but supports only the subset of functionality which can be efficiently run by Realm's query engine.
  */
-public struct SortDescriptor {
+@frozen public struct SortDescriptor {
 
     // MARK: Properties
 

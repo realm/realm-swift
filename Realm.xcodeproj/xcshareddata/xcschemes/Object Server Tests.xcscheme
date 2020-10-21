@@ -41,15 +41,13 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E8267FB11D90B79000E001C7"
-            BuildableName = "ObjectServerTests.xctest"
-            BlueprintName = "ObjectServerTests"
-            ReferencedContainer = "container:Realm.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "REALM_NODE_PATH"
+            value = "/Users/jason.flax/Documents/realm-cocoa/stitch/node-v8.11.2-darwin-x64/bin/node"
+            isEnabled = "NO">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
       <Testables>
          <TestableReference
             skipped = "NO">

@@ -177,24 +177,17 @@ template<typename IndexSetFactory>
 static void changeArray(__unsafe_unretained RLMManagedArray *const ar,
                         NSKeyValueChange kind, dispatch_block_t f, IndexSetFactory&& is) {
     translateErrors([&] { ar->_backingList.verify_in_transaction(); });
-    RLMObservationInfo *info = RLMGetObservationInfo(ar->_observationInfo.get(),
-                                                     ar->_backingList.get_parent_object_key(),
-                                                     *ar->_ownerInfo);
-    if (info) {
-        NSIndexSet *indexes = is();
-        info->willChange(ar->_key, kind, indexes);
-        try {
-            f();
-        }
-        catch (...) {
-            info->didChange(ar->_key, kind, indexes);
-            throwError(ar, nil);
-        }
-        info->didChange(ar->_key, kind, indexes);
+
+    RLMObservationTracker tracker(ar->_realm);
+    tracker.trackDeletions();
+    auto obsInfo = RLMGetObservationInfo(ar->_observationInfo.get(),
+                                         ar->_backingList.get_parent_object_key(),
+                                         *ar->_ownerInfo);
+    if (obsInfo) {
+        tracker.willChange(obsInfo, ar->_key, kind, is());
     }
-    else {
-        translateErrors([&] { f(); });
-    }
+
+    translateErrors(f);
 }
 
 static void changeArray(__unsafe_unretained RLMManagedArray *const ar, NSKeyValueChange kind, NSUInteger index, dispatch_block_t f) {
@@ -430,7 +423,7 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
 - (id)averageOfProperty:(NSString *)property {
     auto column = [self columnForProperty:property];
     auto value = translateErrors(self, [&] { return _backingList.average(column); }, @"averageOfProperty");
-    return value ? @(*value) : nil;
+    return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (void)deleteObjectsFromRealm {
@@ -438,9 +431,8 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
         @throw RLMException(@"Cannot delete objects from RLMArray<%@>: only RLMObjects can be deleted.", RLMTypeToString(_type));
     }
     // delete all target rows from the realm
-    RLMTrackDeletions(_realm, ^{
-        translateErrors([&] { _backingList.delete_all(); });
-    });
+    RLMObservationTracker tracker(_realm, true);
+    translateErrors([&] { _backingList.delete_all(); });
 }
 
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties {

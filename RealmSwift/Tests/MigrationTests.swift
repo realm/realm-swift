@@ -223,6 +223,8 @@ class MigrationTests: TestCase {
                 soo.optInt64Col.value = 5
                 soo.optFloatCol.value = 6.1
                 soo.optDoubleCol.value = 7.2
+                soo.optDecimalCol = 8.3
+                soo.optObjectIdCol = ObjectId("1234567890bc1234567890bc")
                 soo.optBoolCol.value = true
                 try! Realm().add(soo)
             }
@@ -256,6 +258,10 @@ class MigrationTests: TestCase {
                 XCTAssertTrue(newObject!["optDoubleCol"]! is Double)
                 XCTAssertTrue(oldObject!["optBoolCol"]! is Bool)
                 XCTAssertTrue(newObject!["optBoolCol"]! is Bool)
+                XCTAssertTrue(oldObject!["optDecimalCol"]! is Decimal128)
+                XCTAssertTrue(newObject!["optDecimalCol"]! is Decimal128)
+                XCTAssertTrue(oldObject!["optObjectIdCol"]! is ObjectId)
+                XCTAssertTrue(newObject!["optObjectIdCol"]! is ObjectId)
             }
         }
     }
@@ -517,6 +523,8 @@ class MigrationTests: TestCase {
                 XCTAssertEqual((newObj!["floatCol"] as! Float), 1.23 as Float)
                 XCTAssertEqual((oldObj!["doubleCol"] as! Double), 12.3 as Double)
                 XCTAssertEqual((newObj!["doubleCol"] as! Double), 12.3 as Double)
+                XCTAssertEqual((oldObj!["decimalCol"] as! Decimal128), 123e4 as Decimal128)
+                XCTAssertEqual((newObj!["decimalCol"] as! Decimal128), 123e4 as Decimal128)
 
                 let binaryCol = "a".data(using: String.Encoding.utf8)!
                 XCTAssertEqual((oldObj!["binaryCol"] as! Data), binaryCol)
@@ -525,6 +533,10 @@ class MigrationTests: TestCase {
                 let dateCol = Date(timeIntervalSince1970: 1)
                 XCTAssertEqual((oldObj!["dateCol"] as! Date), dateCol)
                 XCTAssertEqual((newObj!["dateCol"] as! Date), dateCol)
+
+                let objectIdCol = ObjectId("1234567890ab1234567890ab")
+                XCTAssertEqual((oldObj!["objectIdCol"] as! ObjectId), objectIdCol)
+                XCTAssertEqual((newObj!["objectIdCol"] as! ObjectId), objectIdCol)
 
                 // FIXME - test that casting to SwiftBoolObject throws
                 XCTAssertEqual(((oldObj!["objectCol"] as! MigrationObject)["boolCol"] as! Bool), true)
@@ -543,6 +555,8 @@ class MigrationTests: TestCase {
                 newObj!["doubleCol"] = 10.0
                 newObj!["binaryCol"] = Data(bytes: "b", count: 1)
                 newObj!["dateCol"] = Date(timeIntervalSince1970: 2)
+                newObj!["decimalCol"] = Decimal128(number: 567e8)
+                newObj!["objectIdCol"] = ObjectId("abcdef123456abcdef123456")
 
                 let falseObj = SwiftBoolObject(value: [false])
                 newObj!["objectCol"] = falseObj
@@ -578,7 +592,7 @@ class MigrationTests: TestCase {
                 XCTAssertEqual(list.count, 1)
                 XCTAssertEqual((list[0]["boolCol"] as! Bool), false)
 
-                self.assertMatches(newObj!.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 1;\n\tintEnumCol = 3;\n\tfloatCol = 1;\n\tdoubleCol = 10;\n\tstringCol = a;\n\tbinaryCol = <.*62.*>;\n\tdateCol = 1970-01-01 00:00:02 \\+0000;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftBoolObject \\{\n\t\t\tboolCol = 0;\n\t\t\\}\n\t\\);\n\\}")
+                self.assertMatches(newObj!.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 1;\n\tintEnumCol = 3;\n\tfloatCol = 1;\n\tdoubleCol = 10;\n\tstringCol = a;\n\tbinaryCol = <.*62.*>;\n\tdateCol = 1970-01-01 00:00:02 \\+0000;\n\tdecimalCol = 5.67E10;\n\tobjectIdCol = abcdef123456abcdef123456;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftBoolObject \\{\n\t\t\tboolCol = 0;\n\t\t\\}\n\t\\);\n\\}")
 
                 enumerated = true
             })
@@ -586,7 +600,7 @@ class MigrationTests: TestCase {
 
             let newObj = migration.create(SwiftObject.className())
             // swiftlint:next:disable line_length
-            self.assertMatches(newObj.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <.*61.*>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
+            self.assertMatches(newObj.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <.*61.*>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tdecimalCol = 1.23E6;\n\tobjectIdCol = 1234567890ab1234567890ab;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
         }
 
         // refresh to update realm

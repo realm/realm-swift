@@ -116,7 +116,7 @@ class ObjectSchemaInitializationTests: TestCase {
     func testInvalidObjects() {
         // Should be able to get a schema for a non-RLMObjectBase subclass
         let schema = RLMObjectSchema(forObjectClass: SwiftFakeObjectSubclass.self)
-        XCTAssertEqual(schema.properties.count, 1)
+        XCTAssertEqual(schema.properties.count, 2)
 
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithAnyObject.self),
                      "Should throw when not ignoring a property of a type we can't persist")
@@ -180,7 +180,8 @@ class ObjectSchemaInitializationTests: TestCase {
         }
 
         let types = Set(schema.properties.map { $0.type })
-        XCTAssertEqual(types, Set([.string, .string, .data, .date, .object, .int, .float, .double, .bool]))
+        XCTAssertEqual(types, Set([.string, .string, .data, .date, .object, .int,
+                                   .float, .double, .bool, .decimal128, .objectId]))
     }
 
     func testImplicitlyUnwrappedOptionalsAreParsedAsOptionals() {
@@ -190,6 +191,8 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertTrue(schema["optStringCol"]!.isOptional)
         XCTAssertTrue(schema["optBinaryCol"]!.isOptional)
         XCTAssertTrue(schema["optDateCol"]!.isOptional)
+        XCTAssertTrue(schema["optDecimalCol"]!.isOptional)
+        XCTAssertTrue(schema["optObjectIdCol"]!.isOptional)
     }
 
     func testNonRealmOptionalTypesDeclaredAsRealmOptional() {
@@ -206,6 +209,7 @@ class ObjectSchemaInitializationTests: TestCase {
 
 class SwiftFakeObject: Object {
     override class func _realmIgnoreClass() -> Bool { return true }
+    @objc dynamic var requiredProp: String?
 }
 
 class SwiftObjectWithNSURL: SwiftFakeObject {

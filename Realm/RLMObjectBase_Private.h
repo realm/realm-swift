@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 // RLMObjectBase private
 @interface RLMObjectBase ()
 + (void)initializeLinkedObjectSchemas;
++ (bool)isEmbedded;
 @end
 
 NS_ASSUME_NONNULL_END

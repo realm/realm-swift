@@ -37,6 +37,7 @@ extension Int32: MinMaxType {}
 extension Int64: MinMaxType {}
 extension Date: MinMaxType {}
 extension NSDate: MinMaxType {}
+extension Decimal128: MinMaxType {}
 
 // MARK: AddableType
 
@@ -57,6 +58,7 @@ extension Int8: AddableType {}
 extension Int16: AddableType {}
 extension Int32: AddableType {}
 extension Int64: AddableType {}
+extension Decimal128: AddableType {}
 
 /**
  `Results` is an auto-updating container type in Realm returned from object queries.
@@ -78,7 +80,7 @@ extension Int64: AddableType {}
 
  Results instances cannot be directly instantiated.
  */
-public struct Results<Element: RealmCollectionValue>: Equatable {
+@frozen public struct Results<Element: RealmCollectionValue>: Equatable {
 
     internal let rlmResults: RLMResults<AnyObject>
 

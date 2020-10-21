@@ -20,3 +20,5 @@ TEST_HOST[sdk=macosx*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/Contents/MacOS/TestH
 EXCLUDED_SOURCE_FILE_NAMES[sdk=iphone*] = InterprocessTests.m SwiftSchemaTests.swift;
 EXCLUDED_SOURCE_FILE_NAMES[sdk=appletv*] = EncryptionTests.mm InterprocessTests.m SwiftSchemaTests.swift;
 EXCLUDED_SOURCE_FILE_NAMES[sdk=watch*] = *;
+
+MACOSX_DEPLOYMENT_TARGET = 10.14;

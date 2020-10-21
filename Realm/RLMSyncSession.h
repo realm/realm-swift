@@ -25,12 +25,12 @@
  */
 typedef NS_ENUM(NSUInteger, RLMSyncSessionState) {
     /// The sync session is actively communicating or attempting to communicate
-    /// with the Realm Object Server. A session is considered Active even if
+    /// with MongoDB Realm. A session is considered Active even if
     /// it is not currently connected. Check the connection state instead if you
     /// wish to know if the connection is currently online.
     RLMSyncSessionStateActive,
-    /// The sync session is not attempting to communicate with the Realm Object
-    /// Server, due to the user logging out or synchronization being paused.
+    /// The sync session is not attempting to communicate with MongoDB
+    /// Realm due to the user logging out or synchronization being paused.
     RLMSyncSessionStateInactive,
     /// The sync session encountered a fatal error and is permanently invalid; it should be discarded.
     RLMSyncSessionStateInvalid
@@ -45,9 +45,9 @@ typedef NS_ENUM(NSUInteger, RLMSyncConnectionState) {
     /// to connect, either because the session is inactive or because it is
     /// waiting to retry after a failed connection.
     RLMSyncConnectionStateDisconnected,
-    /// The sync session is attempting to connect to the Realm Object Server.
+    /// The sync session is attempting to connect to MongoDB Realm.
     RLMSyncConnectionStateConnecting,
-    /// The sync session is currently connected to the Realm Object Server.
+    /// The sync session is currently connected to MongoDB Realm.
     RLMSyncConnectionStateConnected,
 };
 
@@ -90,7 +90,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgressMode) {
     RLMSyncProgressModeForCurrentlyOutstandingWork,
 };
 
-@class RLMSyncUser, RLMSyncConfiguration, RLMSyncErrorActionToken;
+@class RLMUser, RLMSyncConfiguration, RLMSyncErrorActionToken, RLMSyncManager;
 
 /**
  The type of a progress notification block intended for reporting a session's network
@@ -113,9 +113,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- An object encapsulating a Realm Object Server "session". Sessions represent the
+ An object encapsulating a MongoDB Realm "session". Sessions represent the
  communication between the client (and a local Realm file on disk), and the server
- (and a remote Realm at a given URL stored on a Realm Object Server).
+ (and a remote Realm with a given partition value stored on MongoDB Realm).
 
  Sessions are always created by the SDK and vended out through various APIs. The
  lifespans of sessions associated with Realms are managed automatically. Session
@@ -135,11 +135,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// thread.
 @property (atomic, readonly) RLMSyncConnectionState connectionState;
 
-/// The Realm Object Server URL of the remote Realm this session corresponds to.
-@property (nullable, nonatomic, readonly) NSURL *realmURL;
-
 /// The user that owns this session.
-- (nullable RLMSyncUser *)parentUser;
+- (nullable RLMUser *)parentUser;
 
 /**
  If the session is valid, return a sync configuration that can be used to open the Realm
@@ -150,13 +147,13 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Temporarily suspend syncronization and disconnect from the server.
 
- The session will not attempt to connect to Realm Object Server until `resume`
+ The session will not attempt to connect to MongoDB Realm until `resume`
  is called or the Realm file is closed and re-opened.
  */
 - (void)suspend;
 
 /**
- Resume syncronization and reconnect to Realm Object Server after suspending.
+ Resume syncronization and reconnect to MongoDB Realm after suspending.
 
  This is a no-op if the session was already active or if the session is invalid.
  Newly created sessions begin in the Active state and do not need to be resumed.
@@ -203,7 +200,7 @@ NS_REFINED_FOR_SWIFT;
  
  @see `RLMSyncErrorClientResetError`, `RLMSyncErrorPermissionDeniedError`
  */
-+ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token;
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token syncManager:(RLMSyncManager *)syncManager;
 
 /**
  Get the sync session for the given Realm if it is a synchronized Realm, or `nil`

@@ -22,16 +22,6 @@ import Realm
  :nodoc:
  **/
 public extension ObjectiveCSupport {
-    /// Convert a `SyncCredentials` to a `RLMSyncCredentials`.
-    static func convert(object: SyncCredentials) -> RLMSyncCredentials {
-        return RLMSyncCredentials(object)
-    }
-
-    /// Convert a `RLMSyncCredentials` to a `SyncCredentials`.
-    static func convert(object: RLMSyncCredentials) -> SyncCredentials {
-        return SyncCredentials(object)
-    }
-
     /// Convert a `SyncConfiguration` to a `RLMSyncConfiguration`.
     static func convert(object: SyncConfiguration) -> RLMSyncConfiguration {
         return object.asConfig()
@@ -42,8 +32,27 @@ public extension ObjectiveCSupport {
         return SyncConfiguration(config: object)
     }
 
-    /// Convert a `RLMSyncSubscription` to a `SyncSubscription`.
-    static func convert(object: RLMSyncSubscription) -> SyncSubscription {
-        return SyncSubscription(object)
+    /// Convert a `Credentials` to a `RLMCredentials`
+    static func convert(object: Credentials) -> RLMCredentials {
+        switch object {
+        case .facebook(let accessToken):
+            return RLMCredentials(facebookToken: accessToken)
+        case .google(let serverAuthCode):
+            return RLMCredentials(googleAuthCode: serverAuthCode)
+        case .apple(let idToken):
+            return RLMCredentials(appleToken: idToken)
+        case .emailPassword(let email, let password):
+            return RLMCredentials(email: email, password: password)
+        case .jwt(let token):
+            return RLMCredentials(jwt: token)
+        case .function(let payload):
+            return RLMCredentials(functionPayload: ObjectiveCSupport.convert(object: AnyBSON(payload))! as! [String: RLMBSON])
+        case .userAPIKey(let APIKey):
+            return RLMCredentials(userAPIKey: APIKey)
+        case .serverAPIKey(let serverAPIKey):
+            return RLMCredentials(serverAPIKey: serverAPIKey)
+        case .anonymous:
+            return RLMCredentials.anonymous()
+        }
     }
 }

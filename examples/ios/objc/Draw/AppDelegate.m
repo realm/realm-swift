@@ -27,6 +27,8 @@
 
 @implementation AppDelegate
 
+static RLMApp *app;
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     application.applicationSupportsShakeToEdit = YES;
@@ -35,14 +37,16 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.rootViewController = [[UIViewController alloc] init];
 
-    // Setup Global Error Handler
-    [RLMSyncManager sharedManager].errorHandler = ^(NSError *error, RLMSyncSession *session) {
+
+    app = [RLMApp appWithId:@"realm-draw"];
+
+    // Setup Error Handler
+    [app syncManager].errorHandler = ^(NSError *error, RLMSyncSession *session) {
         NSLog(@"A global error has occurred! %@", error);
     };
 
-    if ([RLMSyncUser currentUser]) {
-        NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", kIPAddress]];
-        RLMRealmConfiguration.defaultConfiguration = [RLMSyncUser.currentUser configurationWithURL:syncURL fullSynchronization:YES];
+    if (app.currentUser) {
+        RLMRealmConfiguration.defaultConfiguration = [app.currentUser configurationWithPartitionValue:@"foo"];
         self.window.rootViewController.view = [DrawView new];
     }
     else {
@@ -58,37 +62,30 @@
 {
     // The base server path
     // Set to connect to local or online host
-    NSURL *authURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:9080", kIPAddress]];
 
     // Creating a debug credential since this demo is just using the generated access token
     // produced when running the Realm Object Server via the `start-object-server.command`
-    RLMSyncCredentials *credential = [RLMSyncCredentials credentialsWithUsername:@"demo@realm.io"
-                                                                        password:@"password"
-                                                                        register:NO];
+    RLMCredentials *credential = [RLMCredentials credentialsWithEmail:@"demo@realm.io"
+                                                             password:@"password"];
 
     // Log the user in (async, the Realm will start syncing once the user is logged in automatically)
-    [RLMSyncUser logInWithCredentials:credential
-                        authServerURL:authURL
-                         onCompletion:^(RLMSyncUser *user, NSError *error) {
-                             if (error) {
-                                 self.activityIndicatorView.hidden = YES;
-                                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Login Failed" message:error.localizedDescription preferredStyle:UIAlertControllerStyleAlert];
-                                 [alertController addAction:[UIAlertAction actionWithTitle:@"Retry" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                                     [self logIn];
-                                     self.activityIndicatorView.hidden = NO;
-                                 }]];
-                                 [self.window.rootViewController presentViewController:alertController animated:YES completion:nil];
-                             }
-                             else { // Logged in setup the default Realm
-                                    // The Realm virtual path on the server.
-                                    // The `~` represents the Realm user ID. Since the user ID is not known until you
-                                    // log in, the ~ is used as short-hand to represent this.
-                                 NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", kIPAddress]];
-                                 RLMRealmConfiguration.defaultConfiguration = [RLMSyncUser.currentUser configurationWithURL:syncURL fullSynchronization:YES];
-                                 
-                                 self.window.rootViewController.view = [DrawView new];
-                             }
-                         }];
+    [app loginWithCredential:credential
+                  completion:^(RLMUser *user, NSError *error) {
+        if (error) {
+            self.activityIndicatorView.hidden = YES;
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Login Failed" message:error.localizedDescription preferredStyle:UIAlertControllerStyleAlert];
+            [alertController addAction:[UIAlertAction actionWithTitle:@"Retry" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                [self logIn];
+                self.activityIndicatorView.hidden = NO;
+            }]];
+            [self.window.rootViewController presentViewController:alertController animated:YES completion:nil];
+        }
+        else { // Logged in setup the default Realm
+            RLMRealmConfiguration.defaultConfiguration = [app.currentUser configurationWithPartitionValue:@"foo"];
+
+            self.window.rootViewController.view = [DrawView new];
+        }
+    }];
 }
 
 - (void)showActivityIndicator

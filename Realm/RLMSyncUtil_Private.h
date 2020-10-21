@@ -20,7 +20,7 @@
 
 #import <Realm/RLMProperty.h>
 #import <Realm/RLMRealmConfiguration.h>
-#import <Realm/RLMSyncCredentials.h>
+#import <Realm/RLMCredentials.h>
 
 typedef NS_ENUM(NSUInteger, RLMSyncSystemErrorKind) {
     // Specific
@@ -34,7 +34,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncSystemErrorKind) {
     RLMSyncSystemErrorKindUnknown,
 };
 
-@class RLMSyncUser;
+@class RLMUser;
 
 typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
 typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
@@ -43,94 +43,11 @@ typedef NSString* RLMServerPath;
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern RLMIdentityProvider const RLMIdentityProviderAccessToken;
-extern RLMIdentityProvider const RLMIdentityProviderRealm;
-extern RLMIdentityProvider const RLMIdentityProviderCustomRefreshToken;
-
-extern NSString *const kRLMSyncAppIDKey;
-extern NSString *const kRLMSyncDataKey;
-extern NSString *const kRLMSyncErrorJSONKey;
 extern NSString *const kRLMSyncErrorStatusCodeKey;
-extern NSString *const kRLMSyncIdentityKey;
-extern NSString *const kRLMSyncIsAdminKey;
-extern NSString *const kRLMSyncNewPasswordKey;
-extern NSString *const kRLMSyncPasswordKey;
-extern NSString *const kRLMSyncPathKey;
-extern NSString *const kRLMSyncTokenKey;
-extern NSString *const kRLMSyncProviderKey;
-extern NSString *const kRLMSyncProviderIDKey;
-extern NSString *const kRLMSyncRegisterKey;
 extern NSString *const kRLMSyncUnderlyingErrorKey;
-extern NSString *const kRLMSyncUserIDKey;
-
-FOUNDATION_EXTERN uint8_t RLMGetComputedPermissions(RLMRealm *realm, id _Nullable object);
 
 #define RLM_SYNC_UNINITIALIZABLE \
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly"))); \
 + (instancetype)new __attribute__((unavailable("This type cannot be created directly")));
 
 NS_ASSUME_NONNULL_END
-
-/// A macro to parse a string out of a JSON dictionary, or return nil.
-#define RLM_SYNC_PARSE_STRING_OR_ABORT(json_macro_val, key_macro_val, prop_macro_val) \
-{ \
-id data = json_macro_val[key_macro_val]; \
-if (![data isKindOfClass:[NSString class]]) { return nil; } \
-self.prop_macro_val = data; \
-} \
-
-#define RLM_SYNC_PARSE_OPTIONAL_STRING(json_macro_val, key_macro_val, prop_macro_val) \
-{ \
-id data = json_macro_val[key_macro_val]; \
-if (![data isKindOfClass:[NSString class]]) { data = nil; } \
-self.prop_macro_val = data; \
-} \
-
-#define RLM_SYNC_PARSE_OPTIONAL_BOOL(json_macro_val, key_macro_val, prop_macro_val) \
-{ \
-id data = json_macro_val[key_macro_val]; \
-if (![data isKindOfClass:[NSNumber class]]) { data = @NO; } \
-self.prop_macro_val = [data boolValue]; \
-} \
-
-/// A macro to parse a double out of a JSON dictionary, or return nil.
-#define RLM_SYNC_PARSE_DOUBLE_OR_ABORT(json_macro_val, key_macro_val, prop_macro_val) \
-{ \
-id data = json_macro_val[key_macro_val]; \
-if (![data isKindOfClass:[NSNumber class]]) { return nil; } \
-self.prop_macro_val = [data doubleValue]; \
-} \
-
-/// A macro to build a sub-model out of a JSON dictionary, or return nil.
-#define RLM_SYNC_PARSE_MODEL_OR_ABORT(json_macro_val, key_macro_val, class_macro_val, prop_macro_val) \
-{ \
-id raw = json_macro_val[key_macro_val]; \
-if (![raw isKindOfClass:[NSDictionary class]]) { return nil; } \
-id model = [[class_macro_val alloc] initWithDictionary:raw]; \
-if (!model) { return nil; } \
-self.prop_macro_val = model; \
-} \
-
-/// A macro to build an array of sub-models out of a JSON dictionary, or return nil.
-#define RLM_SYNC_PARSE_MODEL_ARRAY_OR_ABORT(json_macro_val, key_macro_val, class_macro_val, prop_macro_val) \
-{ \
-NSArray *jsonArray = json_macro_val[key_macro_val]; \
-if (![jsonArray isKindOfClass:[NSArray class]]) { return nil; } \
-NSMutableArray *buffer = [NSMutableArray array]; \
-for (id value in jsonArray) { \
-id next = nil; \
-if ([value isKindOfClass:[NSDictionary class]]) { next = [[class_macro_val alloc] initWithDictionary:value]; } \
-if (!next) { return nil; } \
-[buffer addObject:next]; \
-} \
-self.prop_macro_val = [buffer copy]; \
-} \
-
-#define RLM_SYNC_PARSE_OPTIONAL_MODEL(json_macro_val, key_macro_val, class_macro_val, prop_macro_val) \
-{ \
-id model; \
-id raw = json_macro_val[key_macro_val]; \
-if (![raw isKindOfClass:[NSDictionary class]]) { model = nil; } \
-else { model = [[class_macro_val alloc] initWithDictionary:raw]; } \
-self.prop_macro_val = model; \
-} \

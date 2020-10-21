@@ -32,8 +32,8 @@ class ObjectWithPrivateOptionals: Object {
 }
 
 class ObjectCreationTests: TestCase {
+    // MARK: - Init tests
 
-    // MARK: Init tests
     func testInitWithDefaults() {
         // test all properties are defaults
         let object = SwiftObject()
@@ -77,6 +77,8 @@ class ObjectCreationTests: TestCase {
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
             "dateCol": Date(timeIntervalSince1970: 2),
+            "decimalCol": 3 as Decimal128,
+            "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
            ]
@@ -117,8 +119,8 @@ class ObjectCreationTests: TestCase {
         // array with all values specified
         let baselineValues: [Any] = [true, 1, IntEnum.value1.rawValue, 1.1 as Float,
                                      11.1, "b", "b".data(using: String.Encoding.utf8)!,
-                                     Date(timeIntervalSince1970: 2), ["boolCol": true],
-                                     [[true], [false]]]
+                                     Date(timeIntervalSince1970: 2), Decimal128(number: 123),
+                                     ObjectId.generate(), ["boolCol": true], [[true], [false]]]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
@@ -169,7 +171,7 @@ class ObjectCreationTests: TestCase {
         _ = SwiftObjcArbitrarilyRenamedObject()
     }
 
-    // MARK: Creation tests
+    // MARK: - Creation tests
 
     func testCreateWithDefaults() {
         let realm = try! Realm()
@@ -231,6 +233,8 @@ class ObjectCreationTests: TestCase {
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
             "dateCol": Date(timeIntervalSince1970: 2),
+            "decimalCol": 3 as Decimal128,
+            "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
         ]
@@ -279,8 +283,10 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithArray() {
         // array with all values specified
-        let baselineValues: [Any] = [true, 1, IntEnum.value1.rawValue, 1.1 as Float, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
-            Date(timeIntervalSince1970: 2), ["boolCol": true], [[true], [false]]]
+        let baselineValues: [Any] = [true, 1, IntEnum.value1.rawValue, 1.1 as Float,
+                                     11.1, "b", "b".data(using: String.Encoding.utf8)!,
+                                     Date(timeIntervalSince1970: 2), Decimal128(number: 123),
+                                     ObjectId.generate(), ["boolCol": true], [[true], [false]]]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
@@ -397,6 +403,8 @@ class ObjectCreationTests: TestCase {
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
             "dateCol": Date(timeIntervalSince1970: 2),
+            "decimalCol": 3 as Decimal128,
+            "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
         ]
@@ -423,6 +431,8 @@ class ObjectCreationTests: TestCase {
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
             "dateCol": Date(timeIntervalSince1970: 2),
+            "decimalCol": 3 as Decimal128,
+            "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
         ]
@@ -490,6 +500,8 @@ class ObjectCreationTests: TestCase {
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
             "dateCol": Date(timeIntervalSince1970: 2),
+            "decimalCol": 3 as Decimal128,
+            "objectIdCol": ObjectId.generate(),
             "objectCol": NSNull(),
             "arrayCol": NSNull()
         ]
@@ -726,10 +738,112 @@ class ObjectCreationTests: TestCase {
         }
     }
 
+    func testDynamicCreateEmbeddedDirectly() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        assertThrows(realm.dynamicCreate("EmbeddedTreeObject1", value: []),
+                     reasonMatching: "Embedded objects cannot be created directly")
+        realm.cancelWrite()
+    }
+
+    func testCreateEmbeddedWithDictionary() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let parent = realm.create(EmbeddedParentObject.self, value: [
+            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]],
+            "array": [[9], [10]]
+        ])
+        XCTAssertEqual(parent.object!.value, 5)
+        XCTAssertEqual(parent.object!.child!.value, 6)
+        XCTAssertEqual(parent.object!.children.count, 2)
+        XCTAssertEqual(parent.object!.children[0].value, 7)
+        XCTAssertEqual(parent.object!.children[1].value, 8)
+        XCTAssertEqual(parent.array.count, 2)
+        XCTAssertEqual(parent.array[0].value, 9)
+        XCTAssertEqual(parent.array[1].value, 10)
+
+        XCTAssertTrue(parent.isSameObject(as: parent.object!.parent1.first!))
+        XCTAssertTrue(parent.isSameObject(as: parent.array[0].parent2.first!))
+        XCTAssertTrue(parent.isSameObject(as: parent.array[1].parent2.first!))
+        XCTAssertTrue(parent.object!.isSameObject(as: parent.object!.child!.parent3.first!))
+        XCTAssertTrue(parent.object!.isSameObject(as: parent.object!.children[0].parent4.first!))
+        XCTAssertTrue(parent.object!.isSameObject(as: parent.object!.children[1].parent4.first!))
+
+        realm.cancelWrite()
+    }
+
+    func testCreateEmbeddedWithUnmanagedObjects() {
+        let sourceObject = EmbeddedParentObject()
+        sourceObject.object = .init(value: [5])
+        sourceObject.object!.child = .init(value: [6])
+        sourceObject.object!.children.append(.init(value: [7]))
+        sourceObject.object!.children.append(.init(value: [8]))
+        sourceObject.array.append(.init(value: [9]))
+        sourceObject.array.append(.init(value: [10]))
+
+        let realm = try! Realm()
+        realm.beginWrite()
+        let parent = realm.create(EmbeddedParentObject.self, value: sourceObject)
+        XCTAssertNil(sourceObject.realm)
+        XCTAssertEqual(parent.object!.value, 5)
+        XCTAssertEqual(parent.object!.child!.value, 6)
+        XCTAssertEqual(parent.object!.children.count, 2)
+        XCTAssertEqual(parent.object!.children[0].value, 7)
+        XCTAssertEqual(parent.object!.children[1].value, 8)
+        XCTAssertEqual(parent.array.count, 2)
+        XCTAssertEqual(parent.array[0].value, 9)
+        XCTAssertEqual(parent.array[1].value, 10)
+        realm.cancelWrite()
+    }
+
+    func testCreateEmbeddedFromManagedObjectInSameRealm() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let parent = realm.create(EmbeddedParentObject.self, value: [
+            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]],
+            "array": [[9], [10]]
+        ])
+        let copy = realm.create(EmbeddedParentObject.self, value: parent)
+        XCTAssertNotEqual(parent, copy)
+        XCTAssertEqual(copy.object!.value, 5)
+        XCTAssertEqual(copy.object!.child!.value, 6)
+        XCTAssertEqual(copy.object!.children.count, 2)
+        XCTAssertEqual(copy.object!.children[0].value, 7)
+        XCTAssertEqual(copy.object!.children[1].value, 8)
+        XCTAssertEqual(copy.array.count, 2)
+        XCTAssertEqual(copy.array[0].value, 9)
+        XCTAssertEqual(copy.array[1].value, 10)
+        realm.cancelWrite()
+    }
+
+    func testCreateEmbeddedFromManagedObjectInDifferentRealm() {
+        let realmA = realmWithTestPath()
+        let realmB = try! Realm()
+        realmA.beginWrite()
+        let parent = realmA.create(EmbeddedParentObject.self, value: [
+            "object": ["value": 5, "child": ["value": 6], "children": [[7], [8]]],
+            "array": [[9], [10]]
+        ])
+        try! realmA.commitWrite()
+
+        realmB.beginWrite()
+        let copy = realmB.create(EmbeddedParentObject.self, value: parent)
+        XCTAssertNotEqual(parent, copy)
+        XCTAssertEqual(copy.object!.value, 5)
+        XCTAssertEqual(copy.object!.child!.value, 6)
+        XCTAssertEqual(copy.object!.children.count, 2)
+        XCTAssertEqual(copy.object!.children[0].value, 7)
+        XCTAssertEqual(copy.object!.children[1].value, 8)
+        XCTAssertEqual(copy.array.count, 2)
+        XCTAssertEqual(copy.array[0].value, 9)
+        XCTAssertEqual(copy.array[1].value, 10)
+        realmB.cancelWrite()
+    }
+
     // test null object
     // test null list
 
-    // MARK: Add tests
+    // MARK: - Add tests
     func testAddWithExisingNestedObjects() {
         try! Realm().beginWrite()
         let existingObject = try! Realm().create(SwiftBoolObject.self)
@@ -743,6 +857,47 @@ class ObjectCreationTests: TestCase {
         XCTAssertNotNil(object.realm)
 
         assertEqual(object.objectCol, existingObject)
+    }
+
+    class EmbeddedObjectFactory {
+        private var value = 0
+        var objects = [EmbeddedObject]()
+
+        func create<T: EmbeddedTreeObject>() -> T {
+            let obj = T()
+            obj.value = value
+            value += 1
+            objects.append(obj)
+            return obj
+        }
+    }
+
+    func testAddEmbedded() {
+        let objectFactory = EmbeddedObjectFactory()
+        let parent = EmbeddedParentObject()
+        parent.object = objectFactory.create()
+        parent.object!.child = objectFactory.create()
+        parent.object!.children.append(objectFactory.create())
+        parent.object!.children.append(objectFactory.create())
+        parent.array.append(objectFactory.create())
+        parent.array.append(objectFactory.create())
+
+        let realm = try! Realm()
+        realm.beginWrite()
+        realm.add(parent)
+        for (i, object) in objectFactory.objects.enumerated() {
+            XCTAssertEqual(object.realm, realm)
+            XCTAssertEqual((object as! EmbeddedTreeObject).value, i)
+        }
+        XCTAssertEqual(parent.object!.value, 0)
+        XCTAssertEqual(parent.object!.child!.value, 1)
+        XCTAssertEqual(parent.object!.children.count, 2)
+        XCTAssertEqual(parent.object!.children[0].value, 2)
+        XCTAssertEqual(parent.object!.children[1].value, 3)
+        XCTAssertEqual(parent.array.count, 2)
+        XCTAssertEqual(parent.array[0].value, 4)
+        XCTAssertEqual(parent.array[1].value, 5)
+        realm.cancelWrite()
     }
 
     func testAddAndUpdateWithExisingNestedObjects() {
@@ -760,6 +915,50 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(existingObject.intCol, 2)
     }
 
+    func testAddAndUpdateEmbedded() {
+        let objectFactory = EmbeddedObjectFactory()
+        let parent = EmbeddedPrimaryParentObject()
+        parent.object = objectFactory.create()
+        parent.object!.child = objectFactory.create()
+        parent.object!.children.append(objectFactory.create())
+        parent.object!.children.append(objectFactory.create())
+        parent.array.append(objectFactory.create())
+        parent.array.append(objectFactory.create())
+
+        let parent2 = EmbeddedPrimaryParentObject()
+        parent2.object = objectFactory.create()
+        parent2.object!.child = objectFactory.create()
+        parent2.object!.children.append(objectFactory.create())
+        parent2.object!.children.append(objectFactory.create())
+        parent2.array.append(objectFactory.create())
+        parent2.array.append(objectFactory.create())
+
+        let realm = try! Realm()
+        realm.beginWrite()
+        realm.add(parent)
+        realm.add(parent2, update: .all)
+
+        // update all deletes the old embedded objects and creates new ones
+        for (i, object) in objectFactory.objects.enumerated() {
+            XCTAssertEqual(object.realm, realm)
+            if i < 6 {
+                XCTAssertTrue(object.isInvalidated)
+            } else {
+                XCTAssertEqual((object as! EmbeddedTreeObject).value, i)
+            }
+        }
+        XCTAssertTrue(parent.isSameObject(as: parent2))
+        XCTAssertEqual(parent.object!.value, 6)
+        XCTAssertEqual(parent.object!.child!.value, 7)
+        XCTAssertEqual(parent.object!.children.count, 2)
+        XCTAssertEqual(parent.object!.children[0].value, 8)
+        XCTAssertEqual(parent.object!.children[1].value, 9)
+        XCTAssertEqual(parent.array.count, 2)
+        XCTAssertEqual(parent.array[0].value, 10)
+        XCTAssertEqual(parent.array[1].value, 11)
+        realm.cancelWrite()
+    }
+
     func testAddAndUpdateChangedWithExisingNestedObjects() {
         try! Realm().beginWrite()
         let existingObject = try! Realm().create(SwiftPrimaryStringObject.self, value: ["primary", 1])
@@ -773,6 +972,46 @@ class ObjectCreationTests: TestCase {
         XCTAssertNotNil(object.realm)
         XCTAssertEqual(object.object!, existingObject) // the existing object should be updated
         XCTAssertEqual(existingObject.intCol, 2)
+    }
+
+    func testAddAndUpdateChangedEmbedded() {
+        let objectFactory = EmbeddedObjectFactory()
+        let parent = EmbeddedPrimaryParentObject()
+        parent.object = objectFactory.create()
+        parent.object!.child = objectFactory.create()
+        parent.object!.children.append(objectFactory.create())
+        parent.object!.children.append(objectFactory.create())
+        parent.array.append(objectFactory.create())
+        parent.array.append(objectFactory.create())
+
+        let parent2 = EmbeddedPrimaryParentObject()
+        parent2.object = objectFactory.create()
+        parent2.object!.child = objectFactory.create()
+        parent2.object!.children.append(objectFactory.create())
+        parent2.object!.children.append(objectFactory.create())
+        parent2.array.append(objectFactory.create())
+        parent2.array.append(objectFactory.create())
+
+        let realm = try! Realm()
+        realm.beginWrite()
+        realm.add(parent)
+        realm.add(parent2, update: .modified)
+
+        // update modified modifies the existing embedded objects
+        for (i, object) in objectFactory.objects.enumerated() {
+            XCTAssertEqual(object.realm, realm)
+            XCTAssertEqual((object as! EmbeddedTreeObject).value, i < 6 ? i + 6 : i)
+        }
+        XCTAssertTrue(parent.isSameObject(as: parent2))
+        XCTAssertEqual(parent.object!.value, 6)
+        XCTAssertEqual(parent.object!.child!.value, 7)
+        XCTAssertEqual(parent.object!.children.count, 2)
+        XCTAssertEqual(parent.object!.children[0].value, 8)
+        XCTAssertEqual(parent.object!.children[1].value, 9)
+        XCTAssertEqual(parent.array.count, 2)
+        XCTAssertEqual(parent.array[0].value, 10)
+        XCTAssertEqual(parent.array[1].value, 11)
+        realm.cancelWrite()
     }
 
     func testAddObjectCycle() {
@@ -1002,7 +1241,7 @@ class ObjectCreationTests: TestCase {
         }
     }
 
-    // MARK: Private utilities
+    // MARK: - Private utilities
     private func verifySwiftObjectWithArrayLiteral(_ object: SwiftObject, array: [Any], boolObjectValue: Bool,
                                                    boolObjectListValues: [Bool]) {
         XCTAssertEqual(object.boolCol, (array[0] as! Bool))
@@ -1013,6 +1252,8 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.stringCol, (array[5] as! String))
         XCTAssertEqual(object.binaryCol, (array[6] as! Data))
         XCTAssertEqual(object.dateCol, (array[7] as! Date))
+        XCTAssertEqual(object.decimalCol, Decimal128(value: array[8]))
+        XCTAssertEqual(object.objectIdCol, (array[9] as! ObjectId))
         XCTAssertEqual(object.objectCol!.boolCol, boolObjectValue)
         XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
         for i in 0..<boolObjectListValues.count {
@@ -1024,11 +1265,13 @@ class ObjectCreationTests: TestCase {
                                                         boolObjectValue: Bool, boolObjectListValues: [Bool]) {
         XCTAssertEqual(object.boolCol, (dictionary["boolCol"] as! Bool))
         XCTAssertEqual(object.intCol, (dictionary["intCol"] as! Int))
-        //XCTAssertEqual(object.floatCol, (dictionary["floatCol"] as! Float)) // FIXME: crashes with swift 3.2
+        XCTAssertEqual(object.floatCol, (dictionary["floatCol"] as! NSNumber).floatValue)
         XCTAssertEqual(object.doubleCol, (dictionary["doubleCol"] as! Double))
         XCTAssertEqual(object.stringCol, (dictionary["stringCol"] as! String))
         XCTAssertEqual(object.binaryCol, (dictionary["binaryCol"] as! Data))
         XCTAssertEqual(object.dateCol, (dictionary["dateCol"] as! Date))
+        XCTAssertEqual(object.decimalCol, Decimal128(value: dictionary["decimalCol"]!))
+        XCTAssertEqual(object.objectIdCol, (dictionary["objectIdCol"] as! ObjectId))
         XCTAssertEqual(object.objectCol!.boolCol, boolObjectValue)
         XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
         for i in 0..<boolObjectListValues.count {
@@ -1054,6 +1297,8 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.optNSStringCol, (dictionary["optNSStringCol"] as! NSString))
         XCTAssertEqual(object.optBinaryCol, (dictionary["optBinaryCol"] as! Data?))
         XCTAssertEqual(object.optDateCol, (dictionary["optDateCol"] as! Date?))
+        XCTAssertEqual(object.optDecimalCol, (dictionary["optDecimalCol"] as! Decimal128?))
+        XCTAssertEqual(object.optObjectIdCol, (dictionary["optObjectIdCol"] as! ObjectId?))
         XCTAssertEqual(object.optObjectCol?.boolCol, boolObjectValue)
     }
 
@@ -1066,7 +1311,6 @@ class ObjectCreationTests: TestCase {
     }
 
     // return an array of valid values that can be used to initialize each type
-    // swiftlint:disable:next cyclomatic_complexity
     private func validValuesForSwiftObjectType(_ type: PropertyType, _ array: Bool) -> [Any] {
         try! Realm().beginWrite()
         let persistedObject = try! Realm().create(SwiftBoolObject.self, value: [true])
@@ -1088,13 +1332,13 @@ class ObjectCreationTests: TestCase {
         case .data:     return ["b".data(using: String.Encoding.utf8, allowLossyConversion: false)!]
         case .date:     return [Date(timeIntervalSince1970: 2)]
         case .object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
-        case .any: XCTFail("not supported")
-        case .linkingObjects: XCTFail("not supported")
+        case .objectId: return [ObjectId("1234567890ab1234567890ab")]
+        case .decimal128: return [1, "2", Decimal128(number: 3)]
+        case .any: fatalError("not supported")
+        case .linkingObjects: fatalError("not supported")
         }
-        return []
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func invalidValuesForSwiftObjectType(_ type: PropertyType, _ array: Bool) -> [Any] {
         try! Realm().beginWrite()
         let persistedObject = try! Realm().create(SwiftIntObject.self)
@@ -1111,9 +1355,10 @@ class ObjectCreationTests: TestCase {
         case .data:     return ["invalid"]
         case .date:     return ["invalid"]
         case .object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
-        case .any: XCTFail("not supported")
-        case .linkingObjects: XCTFail("not supported")
+        case .objectId: return ["invalid", 123]
+        case .decimal128: return ["invalid"]
+        case .any: fatalError("not supported")
+        case .linkingObjects: fatalError("not supported")
         }
-        return []
     }
 }

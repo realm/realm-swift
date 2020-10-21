@@ -31,7 +31,7 @@ extension Realm {
      of this, you will normally want to cache and reuse a single configuration value for each distinct configuration
      rather than creating a new value each time you open a Realm.
      */
-    public struct Configuration {
+    @frozen public struct Configuration {
 
         // MARK: Default Configuration
 
@@ -58,7 +58,7 @@ extension Realm {
 
          - parameter fileURL:            The local URL to the Realm file.
          - parameter inMemoryIdentifier: A string used to identify a particular in-memory Realm.
-         - parameter syncConfiguration:  For Realms intended to sync with the Realm Object Server, a sync configuration.
+         - parameter syncConfiguration:  For Realms intended to sync with MongoDB Realm, a sync configuration.
          - parameter encryptionKey:      An optional 64-byte key to use to encrypt the data.
          - parameter readOnly:           Whether the Realm is read-only (must be true for read-only files).
          - parameter schemaVersion:      The current schema version.
@@ -72,7 +72,7 @@ extension Realm {
 
                                             Return `true ` to indicate that an attempt to compact the file should be made.
                                             The compaction will be skipped if another process is accessing it.
-         - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
+         - parameter objectTypes:        The subset of `Object` and `EmbeddedObject` subclasses persisted in the Realm. 
         */
         public init(fileURL: URL? = URL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
                     inMemoryIdentifier: String? = nil,
@@ -83,7 +83,7 @@ extension Realm {
                     migrationBlock: MigrationBlock? = nil,
                     deleteRealmIfMigrationNeeded: Bool = false,
                     shouldCompactOnLaunch: ((Int, Int) -> Bool)? = nil,
-                    objectTypes: [Object.Type]? = nil) {
+                    objectTypes: [ObjectBase.Type]? = nil) {
                 self.fileURL = fileURL
                 if let inMemoryIdentifier = inMemoryIdentifier {
                     self.inMemoryIdentifier = inMemoryIdentifier
@@ -103,7 +103,7 @@ extension Realm {
         // MARK: Configuration Properties
 
         /**
-         A configuration value used to configure a Realm for synchronization with the Realm Object Server. Mutually
+         A configuration value used to configure a Realm for synchronization with MongoDB Realm. Mutually
          exclusive with `inMemoryIdentifier`.
          */
         public var syncConfiguration: SyncConfiguration? {
@@ -198,9 +198,9 @@ extension Realm {
         public var shouldCompactOnLaunch: ((Int, Int) -> Bool)?
 
         /// The classes managed by the Realm.
-        public var objectTypes: [Object.Type]? {
+        public var objectTypes: [ObjectBase.Type]? {
             get {
-                return self.customSchema.map { $0.objectSchema.compactMap { $0.objectClass as? Object.Type } }
+                return self.customSchema.map { $0.objectSchema.compactMap { $0.objectClass as? ObjectBase.Type } }
             }
             set {
                 self.customSchema = newValue.map { RLMSchema(objectClasses: $0) }

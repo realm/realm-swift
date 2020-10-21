@@ -105,7 +105,7 @@ using namespace realm;
             try {
                 newObj = info.table()->get_object(oldObject->_row.get_key());
             }
-            catch (InvalidKey const&) {
+            catch (KeyNotFound const&) {
                 continue;
             }
             block(oldObject, (id)RLMCreateObjectAccessor(info, std::move(newObj)));

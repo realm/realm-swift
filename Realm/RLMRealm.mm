@@ -49,7 +49,7 @@
 #include <realm/version.hpp>
 
 #if REALM_ENABLE_SYNC
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 
@@ -218,52 +218,10 @@ void RLMSetAsyncOpenQueue(dispatch_queue_t queue) {
     s_async_open_queue = queue;
 }
 
-// The server doesn't send us the subscriptions for permission types until the
-// first subscription is created. This is fine for synchronous opens (if we're
-// creating a new Realm we create the permission objects ourselves), but it
-// causes issues for asyncOpen because it means that when our download completes
-// we don't actually have the full Realm state yet.
-static void waitForPartialSyncSubscriptions(dispatch_queue_t queue, Realm::Config config, void (^completion)()) {
-#if REALM_ENABLE_SYNC
-    config.scheduler = realm::util::Scheduler::make_dispatch((__bridge void *)queue);
-    auto realm = Realm::get_shared_realm(std::move(config));
-    auto table = ObjectStore::table_for_object_type(realm->read_group(), "__ResultSets");
-
-    realm->begin_transaction();
-    auto row = realm::sync::create_object(static_cast<Transaction&>(realm->read_group()), *table);
-
-    // Set expires_at to time 0 so that this object will be cleaned up the first
-    // time the user creates a subscription
-    auto expires_at_col = table->get_column_key("expires_at");
-    if (!expires_at_col) {
-        expires_at_col = table->add_column(type_Timestamp, "expires_at", true);
-    }
-    row.set(expires_at_col, Timestamp(0, 0));
-    realm->commit_transaction();
-
-    struct State {
-        std::shared_ptr<Realm> realm;
-        Results results;
-        NotificationToken token;
-    };
-    auto state = std::make_shared<State>(State{realm, Results(realm, table), {}});
-    state->token = state->results.add_notification_callback([=](CollectionChangeSet const&, std::exception_ptr) {
-        if (table->size() > 1) {
-            state->token = {};
-            completion();
-        }
-    });
-#else
-    static_cast<void>(queue);
-    static_cast<void>(config);
-    static_cast<void>(completion);
-#endif
-}
-
 + (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                                    callbackQueue:(dispatch_queue_t)callbackQueue
                                         callback:(RLMAsyncOpenRealmCallback)callback {
-    auto openCompletion = [=](ThreadSafeReference ref, std::exception_ptr err) {
+    auto openCompletion = [=](ThreadSafeReference, std::exception_ptr err) {
         @autoreleasepool {
             if (err) {
                 try {
@@ -279,32 +237,15 @@ static void waitForPartialSyncSubscriptions(dispatch_queue_t queue, Realm::Confi
                 return;
             }
 
-            auto realm = Realm::get_shared_realm(std::move(ref));
-            auto complete = [=] {
-                dispatch_async(callbackQueue, [=]() mutable {
-                    @autoreleasepool {
-                        NSError *error;
-                        RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration
-                                                                          queue:callbackQueue
-                                                                          error:&error];
-                        realm.reset();
-                        callback(localRealm, error);
-                    }
-                });
-            };
-
-            bool needsSubscriptions = realm->is_partial() && ObjectStore::table_for_object_type(realm->read_group(), "__ResultSets")->size() == 0;
-            if (needsSubscriptions) {
-                auto queue = dispatch_queue_create("io.realm.asyncOpenWaitForPartialSync", DISPATCH_QUEUE_SERIAL);
-                dispatch_sync(queue, ^{
-                    @autoreleasepool {
-                        waitForPartialSyncSubscriptions(queue, realm->config(), complete);
-                    }
-                });
-            }
-            else {
-                complete();
-            }
+            dispatch_async(callbackQueue, ^{
+                @autoreleasepool {
+                    NSError *error;
+                    RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration
+                                                                      queue:callbackQueue
+                                                                      error:&error];
+                    callback(localRealm, error);
+                }
+            });
         }
     };
 
@@ -1033,52 +974,6 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
         @throw RLMException(e);
     }
 }
-
-#if REALM_ENABLE_SYNC
-using Privilege = realm::ComputedPrivileges;
-static bool hasPrivilege(realm::ComputedPrivileges actual, realm::ComputedPrivileges expected) {
-    return (static_cast<int>(actual) & static_cast<int>(expected)) == static_cast<int>(expected);
-}
-
-- (RLMRealmPrivileges)privilegesForRealm {
-    auto p = _realm->get_privileges();
-    return {
-        .read = hasPrivilege(p, Privilege::Read),
-        .update = hasPrivilege(p, Privilege::Update),
-        .setPermissions = hasPrivilege(p, Privilege::SetPermissions),
-        .modifySchema = hasPrivilege(p, Privilege::ModifySchema),
-    };
-}
-
-- (RLMObjectPrivileges)privilegesForObject:(RLMObject *)object {
-    RLMVerifyAttached(object);
-    auto p = _realm->get_privileges(object->_row);
-    return {
-        .read = hasPrivilege(p, Privilege::Read),
-        .update = hasPrivilege(p, Privilege::Update),
-        .del = hasPrivilege(p, Privilege::Delete),
-        .setPermissions = hasPrivilege(p, Privilege::Delete),
-    };
-}
-
-- (RLMClassPrivileges)privilegesForClass:(Class)cls {
-    if (![cls respondsToSelector:@selector(_realmObjectName)]) {
-        @throw RLMException(@"Cannot get privileges for non-RLMObject class %@", cls);
-    }
-    return [self privilegesForClassNamed:[cls _realmObjectName] ?: [cls className]];
-}
-
-- (RLMClassPrivileges)privilegesForClassNamed:(NSString *)className {
-    auto p = _realm->get_privileges(className.UTF8String);
-    return {
-        .read = hasPrivilege(p, Privilege::Read),
-        .update = hasPrivilege(p, Privilege::Update),
-        .setPermissions = hasPrivilege(p, Privilege::SetPermissions),
-        .subscribe = hasPrivilege(p, Privilege::Query),
-        .create = hasPrivilege(p, Privilege::Create),
-    };
-}
-#endif
 
 - (void)registerEnumerator:(RLMFastEnumerator *)enumerator {
     if (!_collectionEnumerators) {

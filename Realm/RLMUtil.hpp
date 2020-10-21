@@ -27,15 +27,13 @@
 #import <realm/util/file.hpp>
 
 namespace realm {
-    class Mixed;
+class Decimal128;
+class Mixed;
+class RealmFileException;
 }
 
 @class RLMObjectSchema;
 @class RLMProperty;
-
-namespace realm {
-    class RealmFileException;
-}
 
 __attribute__((format(NSString, 1, 2)))
 NSException *RLMException(NSString *fmt, ...);
@@ -98,6 +96,8 @@ static inline T RLMCoerceToNil(__unsafe_unretained T obj) {
 }
 
 id<NSFastEnumeration> RLMAsFastEnumeration(id obj);
+
+bool RLMIsSwiftObjectClass(Class cls);
 
 // String conversion utilities
 static inline NSString * RLMStringDataToNSString(realm::StringData stringData) {
@@ -172,7 +172,26 @@ static inline NSUInteger RLMConvertNotFound(size_t index) {
     return index == realm::not_found ? NSNotFound : index;
 }
 
+static inline void RLMNSStringToStdString(std::string &out, NSString *in) {
+    if (!in)
+        return;
+    
+    out.resize([in maximumLengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+    if (out.empty()) {
+        return;
+    }
+
+    NSUInteger size = out.size();
+    [in getBytes:&out[0]
+       maxLength:size
+      usedLength:&size
+        encoding:NSUTF8StringEncoding
+         options:0 range:{0, in.length} remainingRange:nullptr];
+    out.resize(size);
+}
+
 id RLMMixedToObjc(realm::Mixed const& value);
+realm::Decimal128 RLMObjcToDecimal128(id value);
 
 // Given a bundle identifier, return the base directory on the disk within which Realm database and support files should
 // be stored.
@@ -180,3 +199,13 @@ NSString *RLMDefaultDirectoryForBundleIdentifier(NSString *bundleIdentifier);
 
 // Get a NSDateFormatter for ISO8601-formatted strings
 NSDateFormatter *RLMISO8601Formatter();
+
+template<typename Fn>
+static auto RLMTranslateError(Fn&& fn) {
+    try {
+        return fn();
+    }
+    catch (std::exception const& e) {
+        @throw RLMException(e);
+    }
+}

@@ -30,8 +30,9 @@ class ObjectSchemaTests: TestCase {
         let objectSchema = swiftObjectSchema
         let propertyNames = objectSchema.properties.map { $0.name }
         XCTAssertEqual(propertyNames,
-            ["boolCol", "intCol", "intEnumCol", "floatCol", "doubleCol",
-             "stringCol", "binaryCol", "dateCol", "objectCol", "arrayCol"]
+                       ["boolCol", "intCol", "intEnumCol", "floatCol", "doubleCol",
+                        "stringCol", "binaryCol", "dateCol", "decimalCol",
+                        "objectIdCol", "objectCol", "arrayCol"]
         )
     }
 
@@ -58,8 +59,6 @@ class ObjectSchemaTests: TestCase {
             "SwiftObject {\n" +
             "    boolCol {\n" +
             "        type = bool;\n" +
-            "        objectClassName = (null);\n" +
-            "        linkOriginPropertyName = (null);\n" +
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
@@ -67,8 +66,6 @@ class ObjectSchemaTests: TestCase {
             "    }\n" +
             "    intCol {\n" +
             "        type = int;\n" +
-            "        objectClassName = (null);\n" +
-            "        linkOriginPropertyName = (null);\n" +
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
@@ -76,8 +73,6 @@ class ObjectSchemaTests: TestCase {
             "    }\n" +
             "    intEnumCol {\n" +
             "        type = int;\n" +
-            "        objectClassName = (null);\n" +
-            "        linkOriginPropertyName = (null);\n" +
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
@@ -85,8 +80,6 @@ class ObjectSchemaTests: TestCase {
             "    }\n" +
             "    floatCol {\n" +
             "        type = float;\n" +
-            "        objectClassName = (null);\n" +
-            "        linkOriginPropertyName = (null);\n" +
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
@@ -94,8 +87,6 @@ class ObjectSchemaTests: TestCase {
             "    }\n" +
             "    doubleCol {\n" +
             "        type = double;\n" +
-            "        objectClassName = (null);\n" +
-            "        linkOriginPropertyName = (null);\n" +
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
@@ -103,8 +94,6 @@ class ObjectSchemaTests: TestCase {
             "    }\n" +
             "    stringCol {\n" +
             "        type = string;\n" +
-            "        objectClassName = (null);\n" +
-            "        linkOriginPropertyName = (null);\n" +
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
@@ -112,8 +101,6 @@ class ObjectSchemaTests: TestCase {
             "    }\n" +
             "    binaryCol {\n" +
             "        type = data;\n" +
-            "        objectClassName = (null);\n" +
-            "        linkOriginPropertyName = (null);\n" +
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
@@ -121,8 +108,20 @@ class ObjectSchemaTests: TestCase {
             "    }\n" +
             "    dateCol {\n" +
             "        type = date;\n" +
-            "        objectClassName = (null);\n" +
-            "        linkOriginPropertyName = (null);\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "    decimalCol {\n" +
+            "        type = decimal128;\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "    objectIdCol {\n" +
+            "        type = object id;\n" +
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
