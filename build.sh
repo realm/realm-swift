@@ -325,6 +325,10 @@ copy_core() {
         mkdir core
     fi
     ditto "$src" core
+
+    # XCFramework processing only copies the "realm" headers, so put the third-party ones in a known location
+    mkdir -p core/include
+    find "$src" -name external -exec ditto "{}" core/include/external \; -quit
 }
 
 download_common() {
@@ -1260,7 +1264,7 @@ EOM
           cp Realm/ObjectStore/src/sync/impl/apple/*.hpp include/sync/impl/apple
           cp Realm/ObjectStore/src/util/*.hpp include/util
           cp Realm/ObjectStore/src/util/apple/*.hpp include/util/apple
-	  cp Realm/ObjectStore/src/util/bson/*.hpp include/util/bson
+          cp Realm/ObjectStore/src/util/bson/*.hpp include/util/bson
 
           echo '' > Realm/RLMPlatform.h
           cp Realm/*.h include
