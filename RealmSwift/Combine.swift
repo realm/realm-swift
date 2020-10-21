@@ -468,7 +468,9 @@ extension AnyRealmCollection: RealmSubscribable {
                   callbackQueue: DispatchQueue,
                   onProgressNotificationCallback: ((SyncSession.Progress) -> Void)?) {
         self.task = task
-        self.task.addProgressNotification(queue: callbackQueue, block: onProgressNotificationCallback ?? { _ in })
+        if let onProgressNotificationCallback = onProgressNotificationCallback {
+            self.task.addProgressNotification(queue: callbackQueue, block: onProgressNotificationCallback)
+        }
     }
 
     /// A unique identifier for identifying publisher streams.
