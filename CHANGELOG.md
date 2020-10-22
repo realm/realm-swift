@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add ability to view the active number of a versions of a Realm by using `RLMRealm.numberOfActiveVersions`. The purpose of this is to
+* Add `RLMRealm.numberOfActiveVersions` which returns the number of versions of a Realm that's currently in use. The purpose of this is to
   help remedy a situation where a Realm is growing in size and the user can not figure out where in their codebase the Realm may be getting pinned.
 
 ### Fixed
