@@ -141,6 +141,7 @@ import Realm.Private
         }))
     }
 
+    #if canImport(Combine)
     /**
      Asynchronously open a Realm and deliver it to a block on the given queue.
 
@@ -162,6 +163,7 @@ import Realm.Private
     public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration) -> RealmPublishers.AsyncOpenPublisher {
         return RealmPublishers.AsyncOpenPublisher(configuration: configuration)
     }
+    #endif
 
     /**
      A task object which can be used to observe or cancel an async open.
