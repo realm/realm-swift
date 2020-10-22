@@ -325,6 +325,10 @@ copy_core() {
         mkdir core
     fi
     ditto "$src" core
+
+    # XCFramework processing only copies the "realm" headers, so put the third-party ones in a known location
+    mkdir -p core/include
+    find "$src" -name external -exec ditto "{}" core/include/external \; -quit
 }
 
 download_common() {
@@ -1242,17 +1246,12 @@ EOM
           fi
 
           if [ ! -f core/version.txt ]; then
-            sh build.sh download-sync
-            mv core/librealm-sync-ios.a core/librealmcore-ios.a
-            mv core/librealm-sync-macosx.a core/librealmcore-macosx.a
-            mv core/librealm-sync-tvos.a core/librealmcore-tvos.a
-            mv core/librealm-sync-watchos.a core/librealmcore-watchos.a
-            rm core/librealm*-dbg.a
+            sh build.sh download-sync xcframework
           fi
 
           rm -rf include
           mkdir -p include
-          mv core/include include/core
+          cp -R core/realm-sync.xcframework/ios-armv7_arm64/Headers include/core
           cp Realm/ObjectStore/external/json/json.hpp include/core
 
           mkdir -p include/impl/apple include/util/apple include/sync/impl/apple include/util/bson
@@ -1265,7 +1264,7 @@ EOM
           cp Realm/ObjectStore/src/sync/impl/apple/*.hpp include/sync/impl/apple
           cp Realm/ObjectStore/src/util/*.hpp include/util
           cp Realm/ObjectStore/src/util/apple/*.hpp include/util/apple
-	  cp Realm/ObjectStore/src/util/bson/*.hpp include/util/bson
+          cp Realm/ObjectStore/src/util/bson/*.hpp include/util/bson
 
           echo '' > Realm/RLMPlatform.h
           cp Realm/*.h include
@@ -1556,7 +1555,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 12.
+* Carthage release for Swift is built with Xcode 12.1.
 
 ### Internal
 * Upgraded realm-core from ? to ?
