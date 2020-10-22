@@ -3368,21 +3368,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E761BE03E0D006515A0 /* Realm.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				DEFINES_MODULE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(inherited)",
-					"-isystem",
-					core/include,
-					"-isystem",
-					Realm/ObjectStore/external/json,
-				);
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -3390,20 +3375,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E761BE03E0D006515A0 /* Realm.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				DEFINES_MODULE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(inherited)",
-					"-isystem",
-					core/include,
-					"-isystem",
-					Realm/ObjectStore/external/json,
-				);
 			};
 			name = Release;
 		};
@@ -3426,14 +3397,12 @@
 			baseConfigurationReference = 5D660FC01BE98BEF0021E04F /* Tests.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CLANG_ENABLE_MODULES = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
 				OTHER_SWIFT_FLAGS = "-D BUILDING_REALM_SWIFT_TESTS";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -3442,7 +3411,6 @@
 			baseConfigurationReference = 5D660FC01BE98BEF0021E04F /* Tests.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CLANG_ENABLE_MODULES = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3544,24 +3512,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E6E1BE0398E006515A0 /* Debug.xcconfig */;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					Realm/ObjectStore/src,
-					"core/**",
-				);
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(inherited)",
-					"-isystem",
-					core/include,
-					"-isystem",
-					Realm/ObjectStore/external/json,
-				);
-				WARNING_CFLAGS = (
-					"-Wmismatched-tags",
-					"-Wunused-private-field",
-					"-Wpartial-availability",
-					"-Wno-c++11-narrowing",
-				);
 			};
 			name = Debug;
 		};
@@ -3569,24 +3519,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E6F1BE0398E006515A0 /* Release.xcconfig */;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					Realm/ObjectStore/src,
-					"core/**",
-				);
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(inherited)",
-					"-isystem",
-					core/include,
-					"-isystem",
-					Realm/ObjectStore/external/json,
-				);
-				WARNING_CFLAGS = (
-					"-Wmismatched-tags",
-					"-Wunused-private-field",
-					"-Wpartial-availability",
-					"-Wno-c++11-narrowing",
-				);
 			};
 			name = Release;
 		};
@@ -3594,7 +3526,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E01BE05C19002800DA /* Tests.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -3603,7 +3534,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E01BE05C19002800DA /* Tests.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

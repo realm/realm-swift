@@ -196,7 +196,7 @@ namespace {
 }
 
 - (NSUInteger)defaultRequestTimeoutMS {
-    return _config.default_request_timeout_ms.value_or(6000);
+    return _config.default_request_timeout_ms.value_or(6000U);
 }
 
 - (void)setDefaultRequestTimeoutMS:(NSUInteger)defaultRequestTimeoutMS {
