@@ -141,6 +141,30 @@ import Realm.Private
         }))
     }
 
+    #if canImport(Combine)
+    /**
+     Asynchronously open a Realm and deliver it to a block on the given queue.
+
+     Opening a Realm asynchronously will perform all work needed to get the Realm to
+     a usable state (such as running potentially time-consuming migrations) on a
+     background thread before dispatching to the given queue. In addition,
+     synchronized Realms wait for all remote content available at the time the
+     operation began to be downloaded and available locally.
+
+     The Realm passed to the publisher is confined to the callback
+     queue as if `Realm(configuration:queue:)` was used.
+
+     - parameter configuration: A configuration object to use when opening the Realm.
+     - parameter callbackQueue: The dispatch queue on which the AsyncOpenTask should be run.
+     - returns: A publisher. If the Realm was successfully opened, it will be received by the subscribers.
+                Otherwise, a `Swift.Error` describing what went wrong will be passed upstream instead.
+     */
+    @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+    public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration) -> RealmPublishers.AsyncOpenPublisher {
+        return RealmPublishers.AsyncOpenPublisher(configuration: configuration)
+    }
+    #endif
+
     /**
      A task object which can be used to observe or cancel an async open.
 
@@ -152,7 +176,7 @@ import Realm.Private
      asynchronously, and may not exist yet when Realm.asyncOpen() returns.
      */
     @frozen public struct AsyncOpenTask {
-        fileprivate let rlmTask: RLMAsyncOpenTask
+        internal let rlmTask: RLMAsyncOpenTask
 
         /**
          Cancel the asynchronous open.

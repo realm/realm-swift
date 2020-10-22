@@ -459,6 +459,37 @@ extension AnyRealmCollection: RealmSubscribable {
     }
 }
 
+/// A subscription which wraps a Realm AsyncOpenTask.
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@frozen public struct AsyncOpenSubscription: Subscription {
+    private let task: Realm.AsyncOpenTask
+
+    internal init(task: Realm.AsyncOpenTask,
+                  callbackQueue: DispatchQueue,
+                  onProgressNotificationCallback: ((SyncSession.Progress) -> Void)?) {
+        self.task = task
+        if let onProgressNotificationCallback = onProgressNotificationCallback {
+            self.task.addProgressNotification(queue: callbackQueue, block: onProgressNotificationCallback)
+        }
+    }
+
+    /// A unique identifier for identifying publisher streams.
+    public var combineIdentifier: CombineIdentifier {
+        return CombineIdentifier(task.rlmTask)
+    }
+
+    /// This function is not implemented.
+    ///
+    /// Realm publishers do not support backpressure and so this function does nothing.
+    public func request(_ demand: Subscribers.Demand) {
+    }
+
+    /// Stop emitting values on this subscription.
+    public func cancel() {
+        task.cancel()
+    }
+}
+
 // MARK: Publishers
 
 /// Combine publishers for Realm types.
@@ -469,6 +500,63 @@ extension AnyRealmCollection: RealmSubscribable {
 public enum RealmPublishers {
     static private func realm<S: Scheduler>(_ config: RLMRealmConfiguration, _ scheduler: S) -> Realm? {
         try? Realm(RLMRealm(configuration: config, queue: scheduler as? DispatchQueue))
+    }
+
+    /// A publisher which emits an asynchronously opened Realm.
+    @frozen public struct AsyncOpenPublisher: Publisher {
+        /// This publisher can fail if there is an error opening the Realm.
+        public typealias Failure = Error
+        /// This publisher emits an opened Realm.
+        public typealias Output = Realm
+
+        private let configuration: Realm.Configuration
+        private let callbackQueue: DispatchQueue
+        private let onProgressNotificationCallback: ((SyncSession.Progress) -> Void)?
+
+        internal init(configuration: Realm.Configuration,
+                      callbackQueue: DispatchQueue = .main,
+                      onProgressNotificationCallback: ((SyncSession.Progress) -> Void)? = nil) {
+            self.configuration = configuration
+            self.callbackQueue = callbackQueue
+            self.onProgressNotificationCallback = onProgressNotificationCallback
+        }
+
+        /// Triggers an event when there is a notification on the async open progress.
+        ///
+        /// This should be called directly after invoking the publisher.
+        ///
+        /// - Parameter onProgressNotificationCallback: Callback which will be invoked when there is an update on progress.
+        /// - Returns: A publisher that emits an asynchronously opened Realm.
+        public func onProgressNotification(_ onProgressNotificationCallback: @escaping ((SyncSession.Progress) -> Void)) -> Self {
+            Self(configuration: configuration,
+                 callbackQueue: callbackQueue,
+                 onProgressNotificationCallback: onProgressNotificationCallback)
+        }
+
+        /// :nodoc:
+        public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Failure, Output == S.Input {
+            subscriber.receive(subscription: AsyncOpenSubscription(task: Realm.AsyncOpenTask(rlmTask: RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: callbackQueue, callback: { rlmRealm, error in
+                if let realm = rlmRealm.flatMap(Realm.init) {
+                    _ = subscriber.receive(realm)
+                } else {
+                    subscriber.receive(completion: .failure(error ?? Realm.Error.callFailed))
+                }
+            })), callbackQueue: callbackQueue, onProgressNotificationCallback: onProgressNotificationCallback))
+        }
+
+        /// Specifies the scheduler on which to perform the async open task.
+        ///
+        /// - parameter scheduler: The serial dispatch queue to receive values on.
+        /// - returns: A publisher which delivers values to the given scheduler.
+        public func receive<S: Scheduler>(on scheduler: S) -> Self {
+            guard let queue = scheduler as? DispatchQueue else {
+                fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
+            }
+
+            return Self(configuration: configuration,
+                        callbackQueue: queue,
+                        onProgressNotificationCallback: onProgressNotificationCallback)
+        }
     }
 
     /// A publisher which emits Void each time the Realm is refreshed.
@@ -1133,10 +1221,10 @@ public enum RealmPublishers {
     /// there is an intermediate transform. If `subscribe(on:)` is used, it
     /// should always be the first operation in the pipeline.
     ///
-    /// Create this publisher using the `changesetPublisher` property on RealmCollection..
+    /// Create this publisher using the `changesetPublisher` property on RealmCollection.
     @frozen public struct CollectionChangeset<Collection: RealmCollection>: Publisher {
         public typealias Output = RealmCollectionChange<Collection>
-        /// This publisher reports error via the `.error` case of RealmCollectionChange..
+        /// This publisher reports error via the `.error` case of RealmCollectionChange.
         public typealias Failure = Never
 
         private let collection: Collection
@@ -1214,10 +1302,10 @@ public enum RealmPublishers {
     /// there is an intermediate transform. If `subscribe(on:)` is used, it
     /// should always be the first operation in the pipeline.
     ///
-    /// Create this publisher using the `changesetPublisher` property on RealmCollection..
+    /// Create this publisher using the `changesetPublisher` property on RealmCollection.
     public class CollectionChangesetWithToken<Collection: RealmCollection, T>: Publisher {
         public typealias Output = RealmCollectionChange<Collection>
-        /// This publisher reports error via the `.error` case of RealmCollectionChange..
+        /// This publisher reports error via the `.error` case of RealmCollectionChange.
         public typealias Failure = Never
 
         internal typealias TokenParent = T
