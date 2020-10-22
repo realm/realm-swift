@@ -231,63 +231,63 @@ extension RLMMongoCollection {
 
     public func insertOne(document: Document, completion: @escaping RLMMongoInsertBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(document))
-        return self.__insertOneDocument(bson as! [String : RLMBSON], completion: completion)
+        return self.__insertOneDocument(bson as! [String: RLMBSON], completion: completion)
     }
 
     public func insertMany(documents: [Document], completion: @escaping RLMMongoInsertManyBlock) {
         let bson = ObjectiveCSupport.convert(object: .array(documents.map {.document($0)}))
-        return self.__insertManyDocuments(bson as! [[String : RLMBSON]], completion: completion)
+        return self.__insertManyDocuments(bson as! [[String: RLMBSON]], completion: completion)
     }
 
     public func find(filter: Document, completion: @escaping RLMMongoFindBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
-        return self.__findWhere(bson as! [String : RLMBSON], completion: completion)
+        return self.__findWhere(bson as! [String: RLMBSON], completion: completion)
     }
 
     public func find(filter: Document,
                      options: FindOptions,
                      completion: @escaping RLMMongoFindBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
-        return self.__findWhere(bson as! [String : RLMBSON], options: options, completion: completion)
+        return self.__findWhere(bson as! [String: RLMBSON], options: options, completion: completion)
     }
 
     public func findOneDocument(filter: Document, completion: @escaping RLMMongoFindOneBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
-        return self.__findOneDocumentWhere(bson as! [String : RLMBSON], completion: completion)
+        return self.__findOneDocumentWhere(bson as! [String: RLMBSON], completion: completion)
     }
 
     public func findOneDocument(filter: Document,
                                 options: FindOptions,
                                 completion: @escaping RLMMongoFindOneBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
-        return self.__findOneDocumentWhere(bson as! [String : RLMBSON],
+        return self.__findOneDocumentWhere(bson as! [String: RLMBSON],
                                            options: options,
                                            completion: completion)
     }
 
     public func aggregate(pipeline: [Document], completion: @escaping RLMMongoFindBlock) {
         let bson = ObjectiveCSupport.convert(object: .array(pipeline.map {.document($0)}))
-        return self.__aggregate(withPipeline: bson as! [[String : RLMBSON]], completion: completion)
+        return self.__aggregate(withPipeline: bson as! [[String: RLMBSON]], completion: completion)
     }
 
     public func count(filter: Document, completion: @escaping RLMMongoCountBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
-        return self.__countWhere(bson as! [String : RLMBSON], completion: completion)
+        return self.__countWhere(bson as! [String: RLMBSON], completion: completion)
     }
 
     public func count(filter: Document, limit: Int, completion: @escaping RLMMongoCountBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
-        return self.__countWhere(bson as! [String : RLMBSON], limit: limit, completion: completion)
+        return self.__countWhere(bson as! [String: RLMBSON], limit: limit, completion: completion)
     }
 
     public func deleteOneDocument(filter: Document, completion: @escaping RLMMongoCountBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
-        return self.__deleteOneDocumentWhere(bson as! [String : RLMBSON], completion: completion)
+        return self.__deleteOneDocumentWhere(bson as! [String: RLMBSON], completion: completion)
     }
 
     public func deleteManyDocuments(filter: Document, completion: @escaping RLMMongoCountBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
-        return self.__deleteManyDocumentsWhere(bson as! [String : RLMBSON], completion: completion)
+        return self.__deleteManyDocumentsWhere(bson as! [String: RLMBSON], completion: completion)
     }
 
     public func updateOneDocument(filter: Document,
@@ -295,9 +295,9 @@ extension RLMMongoCollection {
                                   completion: @escaping RLMMongoUpdateBlock) {
         let filterBson = ObjectiveCSupport.convert(object: .document(filter))
         let updateBson = ObjectiveCSupport.convert(object: .document(update))
-        
-        return self.__updateOneDocumentWhere(filterBson as! [String : RLMBSON],
-                                             updateDocument: updateBson as! [String : RLMBSON],
+
+        return self.__updateOneDocumentWhere(filterBson as! [String: RLMBSON],
+                                             updateDocument: updateBson as! [String: RLMBSON],
                                              completion: completion)
     }
 
@@ -307,9 +307,9 @@ extension RLMMongoCollection {
                                   completion: @escaping RLMMongoUpdateBlock) {
         let filterBson = ObjectiveCSupport.convert(object: .document(filter))
         let updateBson = ObjectiveCSupport.convert(object: .document(update))
-        
-        return self.__updateOneDocumentWhere(filterBson as! [String : RLMBSON],
-                                             updateDocument: updateBson as! [String : RLMBSON],
+
+        return self.__updateOneDocumentWhere(filterBson as! [String: RLMBSON],
+                                             updateDocument: updateBson as! [String: RLMBSON],
                                              upsert: upsert,
                                              completion: completion)
     }
@@ -320,9 +320,9 @@ extension RLMMongoCollection {
                                     completion: @escaping RLMMongoUpdateBlock) {
         let filterBson = ObjectiveCSupport.convert(object: .document(filter))
         let updateBson = ObjectiveCSupport.convert(object: .document(update))
-        
-        return self.__updateManyDocumentsWhere(filterBson as! [String : RLMBSON],
-                                               updateDocument: updateBson as! [String : RLMBSON],
+
+        return self.__updateManyDocumentsWhere(filterBson as! [String: RLMBSON],
+                                               updateDocument: updateBson as! [String: RLMBSON],
                                                upsert: upsert,
                                                completion: completion)
     }
@@ -332,9 +332,9 @@ extension RLMMongoCollection {
                                     completion: @escaping RLMMongoUpdateBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
         let updateBson = ObjectiveCSupport.convert(object: .document(update))
-        
-        return self.__updateManyDocumentsWhere(bson as! [String : RLMBSON],
-                                               updateDocument: updateBson as! [String : RLMBSON],
+
+        return self.__updateManyDocumentsWhere(bson as! [String: RLMBSON],
+                                               updateDocument: updateBson as! [String: RLMBSON],
                                                completion: completion)
     }
 
@@ -344,9 +344,9 @@ extension RLMMongoCollection {
                                  completion: @escaping RLMMongoFindOneBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
         let updateBson = ObjectiveCSupport.convert(object: .document(update))
-        
-        return self.__findOneAndUpdateWhere(bson as! [String : RLMBSON],
-                                            updateDocument: updateBson as! [String : RLMBSON],
+
+        return self.__findOneAndUpdateWhere(bson as! [String: RLMBSON],
+                                            updateDocument: updateBson as! [String: RLMBSON],
                                             options: options,
                                             completion: completion)
     }
@@ -356,9 +356,9 @@ extension RLMMongoCollection {
                                  completion: @escaping RLMMongoFindOneBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
         let updateBson = ObjectiveCSupport.convert(object: .document(update))
-        
-        return self.__findOneAndUpdateWhere(bson as! [String : RLMBSON],
-                                            updateDocument: updateBson as! [String : RLMBSON],
+
+        return self.__findOneAndUpdateWhere(bson as! [String: RLMBSON],
+                                            updateDocument: updateBson as! [String: RLMBSON],
                                             completion: completion)
     }
 
@@ -368,8 +368,8 @@ extension RLMMongoCollection {
                                   completion: @escaping RLMMongoFindOneBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
         let replacementBson = ObjectiveCSupport.convert(object: .document(replacement))
-        return self.__findOneAndReplaceWhere(bson as! [String : RLMBSON],
-                                             replacementDocument: replacementBson as! [String : RLMBSON],
+        return self.__findOneAndReplaceWhere(bson as! [String: RLMBSON],
+                                             replacementDocument: replacementBson as! [String: RLMBSON],
                                              options: options,
                                              completion: completion)
     }
@@ -379,8 +379,8 @@ extension RLMMongoCollection {
                                   completion: @escaping RLMMongoFindOneBlock) {
         let filterBson = ObjectiveCSupport.convert(object: .document(filter))
         let replacementBson = ObjectiveCSupport.convert(object: .document(replacement))
-        return self.__findOneAndReplaceWhere(filterBson as! [String : RLMBSON],
-                                             replacementDocument: replacementBson as! [String : RLMBSON],
+        return self.__findOneAndReplaceWhere(filterBson as! [String: RLMBSON],
+                                             replacementDocument: replacementBson as! [String: RLMBSON],
                                              completion: completion)
     }
 
@@ -388,14 +388,14 @@ extension RLMMongoCollection {
                                  options: FindOneAndModifyOptions,
                                  completion: @escaping RLMMongoDeleteBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
-        return self.__findOneAndDeleteWhere(bson as! [String : RLMBSON],
+        return self.__findOneAndDeleteWhere(bson as! [String: RLMBSON],
                                             options: options,
                                             completion: completion)
     }
 
     public func findOneAndDelete(filter: Document, completion: @escaping RLMMongoDeleteBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(filter))
-        return self.__findOneAndDeleteWhere(bson as! [String : RLMBSON], completion: completion)
+        return self.__findOneAndDeleteWhere(bson as! [String: RLMBSON], completion: completion)
     }
 
     public func watch(delegate: RLMChangeEventDelegate, queue: DispatchQueue?) -> RLMChangeStream {
@@ -410,7 +410,7 @@ extension RLMMongoCollection {
                             delegateQueue: queue)
     }
 
-    public func watch(matchFilter: [String : RLMBSON],
+    public func watch(matchFilter: [String: RLMBSON],
                       delegate: RLMChangeEventDelegate,
                       queue: DispatchQueue?) -> RLMChangeStream {
         return self.__watch(withMatchFilter: matchFilter,
@@ -423,11 +423,11 @@ extension RLMDecimal128 {
     public static var minimumDecimalNumber: RLMDecimal128 {
         return __minimumDecimalNumber
     }
-    
+
     public static var maximumDecimalNumber: RLMDecimal128 {
         return __maximumDecimalNumber
     }
-    
+
     public var magnitude: RLMDecimal128 {
         return self.__magnitude
     }
