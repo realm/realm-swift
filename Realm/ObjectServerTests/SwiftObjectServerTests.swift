@@ -2468,14 +2468,14 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             }
         }
 
-        Realm.asyncOpen().sink { result in
+        Realm.asyncOpen().sink(receiveCompletion: { result in
             if case .failure = result {
                 XCTFail("Should open realm")
             }
-        } receiveValue: { (realm) in
+        }, receiveValue: { realm in
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 10000)
             asyncOpenEx.fulfill()
-        }.store(in: &cancellable)
+        }).store(in: &cancellable)
 
         wait(for: [asyncOpenEx], timeout: 4.0)
     }
