@@ -44,7 +44,7 @@ extension RLMObject {
     }
 }
 
-public struct RLMIterator<T>: IteratorProtocol {
+public struct RLMCollectionIterator<T>: IteratorProtocol {
     private var iteratorBase: NSFastEnumerationIterator
 
     internal init(collection: RLMCollection) {
@@ -63,8 +63,8 @@ extension RLMResults: Sequence {}
 
 extension RLMCollection {
     // Support Sequence-style enumeration
-    public func makeIterator() -> RLMIterator<RLMObject> {
-        return RLMIterator(collection: self)
+    public func makeIterator() -> RLMCollectionIterator<RLMObject> {
+        return RLMCollectionIterator(collection: self)
     }
 }
 
