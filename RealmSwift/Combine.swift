@@ -35,7 +35,7 @@ import Realm.Private
 ///
 /// You can also manually conform to `Identifiable` if you wish, but note that
 /// using the object's memory address does *not* work for managed objects.
-public protocol ObjectKeyIdentifiable: Identifiable, Object {
+public protocol ObjectKeyIdentifiable: Identifiable, ObjectBase {
     /// The stable identity of the entity associated with `self`.
     var id: UInt64 { get }
 }

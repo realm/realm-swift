@@ -21,6 +21,14 @@ import XCTest
 import Combine
 import RealmSwift
 
+class CombineIdentifiableObject: Object, ObjectKeyIdentifiable {
+    @objc dynamic var value = 0
+    @objc dynamic var child: CombineIdentifiableEmbeddedObject?
+}
+class CombineIdentifiableEmbeddedObject: EmbeddedObject, ObjectKeyIdentifiable {
+    @objc dynamic var value = 0
+}
+
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Publisher {
     public func signal(_ semaphore: DispatchSemaphore) -> Publishers.HandleEvents<Self> {
@@ -39,8 +47,53 @@ func hasCombine() -> Bool {
     return false
 }
 
+class ObjectIdentifiableTests: TestCase {
+    override class var defaultTestSuite: XCTestSuite {
+        if hasCombine() {
+            return super.defaultTestSuite
+        }
+        return XCTestSuite(name: "\(type(of: self))")
+    }
+
+    func testUnmanaged() {
+        let obj1 = CombineIdentifiableObject(value: [1])
+        let obj2 = CombineIdentifiableObject(value: [1])
+        let obj3 = CombineIdentifiableObject(value: [2])
+        XCTAssertEqual(obj1.id, obj1.id)
+        XCTAssertNotEqual(obj1.id, obj2.id)
+        XCTAssertNotEqual(obj2.id, obj3.id)
+        XCTAssertNotEqual(obj1.id, obj3.id)
+    }
+
+    func testManagedTopLevel() {
+        let realm = try! Realm()
+        let (obj1, obj2) = try! realm.write {
+            return (
+                realm.create(CombineIdentifiableObject.self, value: [1]),
+                realm.create(CombineIdentifiableObject.self, value: [2])
+            )
+        }
+        XCTAssertEqual(obj1.id, obj1.id)
+        XCTAssertNotEqual(obj1.id, obj2.id)
+        XCTAssertEqual(obj1.id, realm.objects(CombineIdentifiableObject.self).first!.id)
+        XCTAssertEqual(obj2.id, realm.objects(CombineIdentifiableObject.self).last!.id)
+    }
+
+    func testManagedEmbedded() {
+        let realm = try! Realm()
+        let (obj1, obj2) = try! realm.write {
+            return (
+                realm.create(CombineIdentifiableObject.self, value: [1, [1]]),
+                realm.create(CombineIdentifiableObject.self, value: [2, [2]])
+            )
+        }
+        XCTAssertEqual(obj1.child!.id, obj1.child!.id)
+        XCTAssertNotEqual(obj1.child!.id, obj2.child!.id)
+    }
+}
+
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-class CombineTestCase: TestCase {
+class CombinePublisherTestCase: TestCase {
     var realm: Realm!
     var cancellable: AnyCancellable?
     var notificationToken: NotificationToken?
@@ -73,8 +126,7 @@ class CombineTestCase: TestCase {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-class CombineRealmTests: CombineTestCase {
-
+class CombineRealmTests: CombinePublisherTestCase {
     func testWillChangeLocalWrite() {
         var called = false
         cancellable = realm
@@ -140,7 +192,7 @@ class CombineRealmTests: CombineTestCase {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-class CombineObjectPublisherTests: CombineTestCase {
+class CombineObjectPublisherTests: CombinePublisherTestCase {
     var obj: SwiftIntObject!
 
     override func setUp() {
@@ -646,7 +698,7 @@ private protocol CombineTestCollection {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-private class CombineCollectionPublisherTests<Collection: RealmCollection>: CombineTestCase
+private class CombineCollectionPublisherTests<Collection: RealmCollection>: CombinePublisherTestCase
         where Collection: CombineTestCollection, Collection: RealmSubscribable {
     var collection: Collection!
 
