@@ -1,23 +1,22 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.1.1 Release notes (2020-10-27)
 =============================================================
+
 ### Enhancements
-* None.
+
+* Set the minimum CocoaPods version in the podspec so that trying to install
+  with older versions gives a more useful error ([PR #6892](https://github.com/realm/realm-cocoa/pull/6892)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+
 * Embedded objects could not be marked as `ObjectKeyIdentifable`
   ([PR #6890](https://github.com/realm/realm-cocoa/pull/6890), since v10.0.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.1.
-
-### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* CocoaPods: 1.10 or later.
 
 10.1.0 Release notes (2020-10-22)
 =============================================================

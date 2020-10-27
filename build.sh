@@ -1556,6 +1556,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.1.
+* CocoaPods: 1.10 or later.
 
 ### Internal
 * Upgraded realm-core from ? to ?
