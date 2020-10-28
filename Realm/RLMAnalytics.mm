@@ -242,14 +242,16 @@ void RLMSendAnalytics() {
     if (getenv("REALM_DISABLE_ANALYTICS") || !RLMIsDebuggerAttached() || RLMIsRunningInPlayground()) {
         return;
     }
-
-
+    NSArray *urlStrings = @[@"https://webhooks.mongodb-realm.com/api/client/v2.0/app/realmsdkmetrics-zmhtm/service/metric_webhook/incoming_webhook/metric?data=%@",
+                            @"https://api.mixpanel.com/track/?data=%@&ip=1"];
     NSData *payload = [NSJSONSerialization dataWithJSONObject:RLMAnalyticsPayload() options:0 error:nil];
-    NSString *url = [NSString stringWithFormat:@"https://api.mixpanel.com/track/?data=%@&ip=1", [payload base64EncodedStringWithOptions:0]];
 
-    // No error handling or anything because logging errors annoyed people for no
-    // real benefit, and it's not clear what else we could do
-    [[NSURLSession.sharedSession dataTaskWithURL:[NSURL URLWithString:url]] resume];
+    for (NSString *urlString in urlStrings) {
+        NSString *formatted = [NSString stringWithFormat:urlString, [payload base64EncodedStringWithOptions:0]];
+        // No error handling or anything because logging errors annoyed people for no
+        // real benefit, and it's not clear what else we could do
+        [[NSURLSession.sharedSession dataTaskWithURL:[NSURL URLWithString:formatted]] resume];
+    }
 }
 
 #else
