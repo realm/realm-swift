@@ -44,7 +44,6 @@ Usage: sh $0 command [argument]
 command:
   clean:                clean up/remove all generated files
   download-core:        downloads core library (binary version)
-  download-sync:        downloads sync library (binary version, core+sync)
   build:                builds all iOS and macOS frameworks
   ios-static:           builds fat iOS static framework
   ios-dynamic:          builds iOS dynamic frameworks
@@ -332,26 +331,12 @@ copy_core() {
 }
 
 download_common() {
-    local download_type="$1" tries_left=3 version url error kind suffix
+    local tries_left=3 version url error kind suffix
+    kind='-xcframework'
+    suffix='-xcframework'
 
-    if [ "$2" = xcframework ]; then
-        kind='-xcframework'
-        suffix='-xcframework'
-    else
-        kind='-cocoa'
-        suffix=''
-    fi
-
-    if [ "$download_type" == "core" ]; then
-        version=$REALM_CORE_VERSION
-        url="${REALM_BASE_URL}/core/realm-core${kind}-${version}.tar.xz"
-    elif [ "$download_type" == "sync" ]; then
-        version=$REALM_SYNC_VERSION
-        url="${REALM_BASE_URL}/sync/realm-sync${kind}-${version}.tar.xz"
-    else
-        echo "Unknown dowload_type: $download_type"
-        exit 1
-    fi
+    version=$REALM_CORE_VERSION
+    url="${REALM_BASE_URL}/core/realm-monorepo-xcframework-${version}.tar.xz"
 
     # First check if we need to do anything
     if [ -e core/version.txt ]; then
@@ -362,7 +347,7 @@ download_common() {
             echo "Switching from version $(cat core/version.txt) to ${version}"
         fi
     else
-        if [ "$(find core -name librealm-sync.a)" ]; then
+        if [ "$(find core -name librealm-monorepo.a)" ]; then
             echo 'Using existing custom core build without checking version'
             exit 0
         fi
@@ -370,19 +355,19 @@ download_common() {
 
     # We may already have this version downloaded and just need to set it as
     # the active one
-    local versioned_dir="${download_type}-${version}${suffix}"
+    local versioned_dir="${core}-${version}${suffix}"
     if [ -e "$versioned_dir/version.txt" ]; then
         echo "Setting ${version} as the active version"
         copy_core "$versioned_dir"
         exit 0
     fi
 
-    echo "Downloading dependency: ${download_type} ${version} from ${url}"
+    echo "Downloading dependency: ${version} from ${url}"
 
     if [ -z "$TMPDIR" ]; then
         TMPDIR='/tmp'
     fi
-    local temp_dir=$(dirname "$TMPDIR/waste")/realm-${download_type}-tmp
+    local temp_dir=$(dirname "$TMPDIR/waste")/realm-core-tmp
     mkdir -p "$temp_dir"
     local tar_path="${temp_dir}/${versioned_dir}.tar.xz"
     local temp_path="${tar_path}.tmp"
@@ -396,7 +381,7 @@ download_common() {
     done
 
     if [ ! -f "$tar_path" ]; then
-        printf "Downloading ${download_type} failed:\n\t$url\n\t$error\n"
+        printf "Downloading core failed:\n\t$url\n\t$error\n"
         exit 1
     fi
 
@@ -410,10 +395,7 @@ download_common() {
 
         # Xcode 11 dsymutil crashes when given debugging symbols created by
         # Xcode 12. Check if this breaks, and strip them if so.
-        local test_lib=core/realm-sync-dbg.xcframework/ios-*-simulator/librealm-sync-dbg.a
-        if ! [ -f $test_lib ]; then
-            test_lib="core/librealm-sync-ios-dbg.a"
-        fi
+        local test_lib=core/realm-monorepo-dbg.xcframework/ios-*-simulator/librealm-monorepo-dbg.a
         clang++ -Wl,-all_load -g -arch x86_64 -shared -target ios13.0 \
           -isysroot $(xcrun --sdk iphonesimulator --show-sdk-path) -o tmp.dylib \
           $test_lib -lz -framework Security
@@ -469,15 +451,7 @@ case "$COMMAND" in
     # Core
     ######################################
     "download-core")
-        download_common "core" "$2"
-        exit 0
-        ;;
-
-    ######################################
-    # Sync
-    ######################################
-    "download-sync")
-        download_common "sync" "$2"
+        download_common
         exit 0
         ;;
 
