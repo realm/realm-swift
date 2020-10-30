@@ -50,7 +50,7 @@ OTHER_CFLAGS = -fvisibility-inlines-hidden;
 OTHER_CFLAGS[arch=armv7] = -fvisibility-inlines-hidden -fno-aligned-new;
 
 HEADER_SEARCH_PATHS = $(inherited) core/include;
-REALM_CORE_FRAMEWORK = core/realm-sync$(REALM_LIBRARY_SUFFIX).xcframework;
+REALM_CORE_FRAMEWORK = core/realm-monorepo$(REALM_LIBRARY_SUFFIX).xcframework;
 
 CODE_SIGN_IDENTITY[sdk=iphone*] = iPhone Developer;
 CODE_SIGNING_REQUIRED[sdk=macosx] = NO;
