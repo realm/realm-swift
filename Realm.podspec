@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
                               The Realm Mobile Database is a fast, easy-to-use replacement for Core Data & SQLite. Use it with the Realm Mobile Platform for realtime, automatic data sync. Works on iOS, macOS, tvOS & watchOS. Learn more and get help at https://realm.io.
                               DESC
   s.homepage                = "https://realm.io"
-  s.source                  = { :git => 'https://github.com/realm/realm-cocoa.git', :tag => "v#{s.version}", :submodules => true }
+  s.source                  = { :git => 'https://github.com/realm/realm-cocoa.git', :tag => "v#{s.version}" }
   s.author                  = { 'Realm' => 'help@realm.io' }
   s.library                 = 'c++', 'z'
   s.requires_arc            = true
@@ -100,22 +100,11 @@ Pod::Spec.new do |s|
                               'include/**/RLMProviderClient_Private.h'
 
 
-  source_files              = 'Realm/*.{m,mm}',
-                              'Realm/ObjectStore/src/*.cpp',
-                              'Realm/ObjectStore/src/sync/*.cpp',
-                              'Realm/ObjectStore/src/sync/impl/*.cpp',
-                              'Realm/ObjectStore/src/sync/impl/apple/*.cpp',
-                              'Realm/ObjectStore/src/impl/*.cpp',
-                              'Realm/ObjectStore/src/impl/apple/*.cpp',
-                              'Realm/ObjectStore/src/util/*.cpp',
-                              'Realm/ObjectStore/src/util/apple/*.cpp',
-                              'Realm/ObjectStore/src/util/bson/*.cpp'
-
   s.frameworks              = 'Security'
   s.module_map              = 'Realm/Realm.modulemap'
   s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__ -DREALM_ENABLE_SYNC"
   s.prepare_command         = 'sh build.sh cocoapods-setup'
-  s.source_files            = source_files + private_header_files
+  s.source_files            = private_header_files + ['Realm/*.{m,mm}']
   s.private_header_files    = private_header_files
   s.header_mappings_dir     = 'include'
   s.pod_target_xcconfig     = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES',
@@ -132,7 +121,7 @@ Pod::Spec.new do |s|
   s.watchos.deployment_target = '2.0'
   s.tvos.deployment_target = '9.0'
 
-  s.vendored_frameworks  = 'core/realm-sync.xcframework'
+  s.vendored_frameworks  = 'core/realm-monorepo.xcframework'
 
   s.subspec 'Headers' do |s|
     s.source_files          = public_header_files

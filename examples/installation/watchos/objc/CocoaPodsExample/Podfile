@@ -3,7 +3,7 @@ branch = ENV['sha']
 
 target 'CocoaPodsExample WatchKit Extension' do
   platform :watchos, '2.0'
-  pod 'Realm', git: 'https://github.com/realm/realm-cocoa.git', branch: branch, submodules: true
+  pod 'Realm', git: 'https://github.com/realm/realm-cocoa.git', branch: branch
 end
 
 post_install do |installer|
