@@ -20,8 +20,9 @@ import Realm
 
 extension RLMRealm {
     /**
-     Swift wrapper for `+ [RLMRealm schemaVersionAtURL:`.
-     - see `+ [RLMRealm schemaVersionAtURL:]`
+     Returns the schema version for a Realm at a given local URL.
+
+     - see: `+ [RLMRealm schemaVersionAtURL:encryptionKey:error:]`
      */
     @nonobjc public class func schemaVersion(at url: URL, usingEncryptionKey key: Data? = nil) throws -> UInt64 {
         var error: NSError?
@@ -31,8 +32,11 @@ extension RLMRealm {
     }
 
     /**
-     Swift wrapper for ` - [RLMRealm resolveThreadSafeReference:]`.
-     - see `- (nullable id)resolveThreadSafeReference:`
+     Returns the same object as the one referenced when the `RLMThreadSafeReference` was first created,
+     but resolved for the current Realm for this thread. Returns `nil` if this object was deleted after
+     the reference was created.
+
+     - see `- [RLMRealm resolveThreadSafeReference:]`
      */
     @nonobjc public func resolve<Confined>(reference: RLMThreadSafeReference<Confined>) -> Confined? {
         return __resolve(reference as! RLMThreadSafeReference<RLMThreadConfined>) as! Confined?
@@ -41,16 +45,18 @@ extension RLMRealm {
 
 extension RLMObject {
     /**
-     Swift convenience wrapper for `+ [RLMObject objectsWithPredicate:]`.
-     - see `+ (RLMResults *)objectsWithPredicate:`
+     Returns all objects of this object type matching the given predicate from the default Realm.
+
+     - see `+ [RLMObject objectsWithPredicate:]`
      */
     public class func objects(where predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObject> {
         return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args))) as! RLMResults<RLMObject>
     }
 
     /**
-     Swift convenience wrapper for `+ [RLMObject objectsInRealm:withPredicate:]`.
-     - see `+ (RLMResults *)objectsInRealm:withPredicate:`
+     Returns all objects of this object type matching the given predicate from the specified Realm.
+
+     - see `+ [RLMObject objectsInRealm:withPredicate:]`
      */
     public class func objects(in realm: RLMRealm,
                               where predicateFormat: String,
