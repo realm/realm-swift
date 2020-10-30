@@ -1231,43 +1231,17 @@ case "$COMMAND" in
     ######################################
     "cocoapods-setup")
         if [[ "$2" != "swift" ]]; then
-          if [ ! -d Realm/ObjectStore/src ]; then
-            cat >&2 <<EOM
-
-
-ERROR: One of Realm's submodules is missing!
-
-If you're using Realm and/or RealmSwift from a git branch, please add 'submodules: true' to
-their entries in your Podfile.
-
-
-EOM
-            exit 1
-          fi
-
           if [ ! -f core/version.txt ]; then
             sh build.sh download-sync xcframework
           fi
 
           rm -rf include
           mkdir -p include
-          cp -R core/realm-sync.xcframework/ios-armv7_arm64/Headers include/core
-          cp Realm/ObjectStore/external/json/json.hpp include/core
+          cp -R core/realm-monorepo.xcframework/ios-armv7_arm64/Headers include/core
 
-          mkdir -p include/impl/apple include/util/apple include/sync/impl/apple include/util/bson
-          cp Realm/*.hpp include
-          cp Realm/ObjectStore/src/*.hpp include
-          cp Realm/ObjectStore/src/impl/*.hpp include/impl
-          cp Realm/ObjectStore/src/impl/apple/*.hpp include/impl/apple
-          cp Realm/ObjectStore/src/sync/*.hpp include/sync
-          cp Realm/ObjectStore/src/sync/impl/*.hpp include/sync/impl
-          cp Realm/ObjectStore/src/sync/impl/apple/*.hpp include/sync/impl/apple
-          cp Realm/ObjectStore/src/util/*.hpp include/util
-          cp Realm/ObjectStore/src/util/apple/*.hpp include/util/apple
-          cp Realm/ObjectStore/src/util/bson/*.hpp include/util/bson
-
+          mkdir -p include
           echo '' > Realm/RLMPlatform.h
-          cp Realm/*.h include
+          cp Realm/*.h Realm/*.hpp include
         else
           sh build.sh set-swift-version
         fi
