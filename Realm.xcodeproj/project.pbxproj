@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -482,6 +482,13 @@
 		C281E9301E8BC7AC0015BA4A /* network_reachability_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C281E9241E8A9C930015BA4A /* network_reachability_observer.cpp */; };
 		C2CAAE771E9BB5760025454C /* system_configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2CAAE751E9BB5760025454C /* system_configuration.cpp */; };
 		C2CAAE781E9BB5760025454C /* system_configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2CAAE751E9BB5760025454C /* system_configuration.cpp */; };
+		CF3187182539D0560001B226 /* RLMSet.h in Headers */ = {isa = PBXBuildFile; fileRef = CF3187162539D0560001B226 /* RLMSet.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CF3187192539D0560001B226 /* RLMSet.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF3187172539D0560001B226 /* RLMSet.mm */; };
+		CF318754253D87350001B226 /* SetTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CF318753253D87350001B226 /* SetTests.m */; };
+		CF31876B253D89EA0001B226 /* SetTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CF318753253D87350001B226 /* SetTests.m */; };
+		CF31878D253D928D0001B226 /* RLMSet.h in Headers */ = {isa = PBXBuildFile; fileRef = CF3187162539D0560001B226 /* RLMSet.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CF3187A4253D92A10001B226 /* RLMSet_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CF31873B2539EE400001B226 /* RLMSet_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		CF3187BB253D92AE0001B226 /* RLMSet_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CF31873B2539EE400001B226 /* RLMSet_Private.h */; };
 		CF330BBE24E57D5F00F07EE2 /* RLMWatchTestUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = CF330BBD24E57D5F00F07EE2 /* RLMWatchTestUtility.m */; };
 		CF56B09B24894E7F0001251D /* remote_mongo_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3D24479905009DE80A /* remote_mongo_client.cpp */; };
 		CF56B09C24894E7F0001251D /* remote_mongo_collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3B24479905009DE80A /* remote_mongo_collection.cpp */; };
@@ -1066,6 +1073,11 @@
 		C2CAAE721E9642FF0025454C /* network_reachability.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = network_reachability.hpp; path = sync/impl/network_reachability.hpp; sourceTree = "<group>"; };
 		C2CAAE751E9BB5760025454C /* system_configuration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = system_configuration.cpp; sourceTree = "<group>"; };
 		C2CAAE761E9BB5760025454C /* system_configuration.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = system_configuration.hpp; sourceTree = "<group>"; };
+		CF3187162539D0560001B226 /* RLMSet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMSet.h; sourceTree = "<group>"; };
+		CF3187172539D0560001B226 /* RLMSet.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSet.mm; sourceTree = "<group>"; };
+		CF31873B2539EE400001B226 /* RLMSet_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMSet_Private.h; sourceTree = "<group>"; };
+		CF3187472539EEA40001B226 /* RLMSet_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSet_Private.hpp; sourceTree = "<group>"; };
+		CF318753253D87350001B226 /* SetTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SetTests.m; sourceTree = "<group>"; };
 		CF330BBB24E56E3A00F07EE2 /* RLMNetworkTransport_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMNetworkTransport_Private.hpp; sourceTree = "<group>"; };
 		CF330BBC24E57D5F00F07EE2 /* RLMWatchTestUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMWatchTestUtility.h; path = Realm/ObjectServerTests/RLMWatchTestUtility.h; sourceTree = "<group>"; };
 		CF330BBD24E57D5F00F07EE2 /* RLMWatchTestUtility.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RLMWatchTestUtility.m; path = Realm/ObjectServerTests/RLMWatchTestUtility.m; sourceTree = "<group>"; };
@@ -1740,6 +1752,7 @@
 		E81A20061955FE1600FDED82 /* Objective-C */ = {
 			isa = PBXGroup;
 			children = (
+				CF318753253D87350001B226 /* SetTests.m */,
 				E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */,
 				3F7556731BE95A050058BC7E /* AsyncTests.mm */,
 				E8DA16F71E81210D0055141C /* CompactionTests.m */,
@@ -1856,6 +1869,10 @@
 				E81A1F671955FC9300FDED82 /* RLMArray.mm */,
 				0237B5421A856F06004ACD57 /* RLMArray_Private.h */,
 				E81A1F651955FC9300FDED82 /* RLMArray_Private.hpp */,
+				CF3187162539D0560001B226 /* RLMSet.h */,
+				CF3187172539D0560001B226 /* RLMSet.mm */,
+				CF31873B2539EE400001B226 /* RLMSet_Private.h */,
+				CF3187472539EEA40001B226 /* RLMSet_Private.hpp */,
 				3F9863BA1D36876B00641C98 /* RLMClassInfo.hpp */,
 				3F9863B91D36876B00641C98 /* RLMClassInfo.mm */,
 				02B8EF5B19E7048D0045A93D /* RLMCollection.h */,
@@ -2035,6 +2052,7 @@
 				6807E64F2487F9210096066F /* RLMPushClient_Private.hpp in Headers */,
 				1AD397CF1F72FFC7002AA897 /* RLMRealm+Sync.h in Headers */,
 				5D659EBF1BE04556006515A0 /* RLMRealm.h in Headers */,
+				CF3187182539D0560001B226 /* RLMSet.h in Headers */,
 				5D659EC01BE04556006515A0 /* RLMRealm_Dynamic.h in Headers */,
 				5D659EC11BE04556006515A0 /* RLMRealm_Private.h in Headers */,
 				1ABF256F1D52AB6200BAC441 /* RLMRealmConfiguration+Sync.h in Headers */,
@@ -2054,6 +2072,7 @@
 				3F67DB3C1E26D69C0024533D /* RLMThreadSafeReference.h in Headers */,
 				CF76F7DF24816AAB00890DD2 /* RLMUpdateResult.h in Headers */,
 				1ABDCDAE1D792FEB003489E3 /* RLMUser.h in Headers */,
+				CF3187BB253D92AE0001B226 /* RLMSet_Private.h in Headers */,
 				CFAEF765242B672700EAF721 /* RLMUserAPIKey.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2112,8 +2131,10 @@
 				6807E6502487F9210096066F /* RLMPushClient_Private.hpp in Headers */,
 				1AD397D01F72FFCC002AA897 /* RLMRealm+Sync.h in Headers */,
 				5DD755BD1BE056DE002800DA /* RLMRealm.h in Headers */,
+				CF31878D253D928D0001B226 /* RLMSet.h in Headers */,
 				5DD755BE1BE056DE002800DA /* RLMRealm_Dynamic.h in Headers */,
 				5DD755BF1BE056DE002800DA /* RLMRealm_Private.h in Headers */,
+				CF3187A4253D92A10001B226 /* RLMSet_Private.h in Headers */,
 				1AFEF8421D52CD8F00495005 /* RLMRealmConfiguration+Sync.h in Headers */,
 				5DD755C01BE056DE002800DA /* RLMRealmConfiguration.h in Headers */,
 				5DD755C11BE056DE002800DA /* RLMRealmConfiguration_Private.h in Headers */,
@@ -2768,6 +2789,7 @@
 				3F75566B1BE94CCC0058BC7E /* results.cpp in Sources */,
 				3F9801B01C90FD2D000A8B07 /* results_notifier.cpp in Sources */,
 				5D659E851BE04556006515A0 /* RLMAccessor.mm in Sources */,
+				CF3187192539D0560001B226 /* RLMSet.mm in Sources */,
 				5D659E861BE04556006515A0 /* RLMAnalytics.mm in Sources */,
 				CFAEF762242B5F9A00EAF721 /* RLMAPIKeyAuth.mm in Sources */,
 				4993220E24129DCE00A0EC8E /* RLMApp.mm in Sources */,
@@ -3036,6 +3058,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF31876B253D89EA0001B226 /* SetTests.m in Sources */,
 				E856D214195615A900FB2FCF /* ArrayPropertyTests.m in Sources */,
 				3F7556761BE95A0D0058BC7E /* AsyncTests.mm in Sources */,
 				E8DA16F91E81210D0055141C /* CompactionTests.m in Sources */,
@@ -3124,6 +3147,7 @@
 				3FB4FA1A19F5D2740020D53B /* SwiftDynamicTests.swift in Sources */,
 				3FB4FA1B19F5D2740020D53B /* SwiftLinkTests.swift in Sources */,
 				3FB4FA1D19F5D2740020D53B /* SwiftObjectInterfaceTests.swift in Sources */,
+				CF318754253D87350001B226 /* SetTests.m in Sources */,
 				3FB4FA1E19F5D2740020D53B /* SwiftPropertyTypeTest.swift in Sources */,
 				3FB4FA1F19F5D2740020D53B /* SwiftRealmTests.swift in Sources */,
 				3FEC4A3F1BBB18D400F009C3 /* SwiftSchemaTests.swift in Sources */,

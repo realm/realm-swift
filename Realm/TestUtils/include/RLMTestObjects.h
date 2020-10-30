@@ -20,8 +20,10 @@
 
 #if __has_extension(objc_generics)
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS *><CLASS>
+#define RLM_GENERIC_SET(CLASS) RLMSet<CLASS *><CLASS>
 #else
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS>
+#define RLM_GENERIC_SET(CLASS) RLMSet<CLASS>
 #endif
 
 #pragma mark - Abstract Objects
@@ -195,6 +197,18 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLMArray<RLMObjectId> *objectIdObj;
 @end
 
+@interface AllPrimitiveSets : RLMObject
+@property RLMSet<RLMInt> *intObj;
+@property RLMSet<RLMFloat> *floatObj;
+@property RLMSet<RLMDouble> *doubleObj;
+@property RLMSet<RLMBool> *boolObj;
+@property RLMSet<RLMString> *stringObj;
+@property RLMSet<RLMDate> *dateObj;
+@property RLMSet<RLMData> *dataObj;
+@property RLMSet<RLMDecimal128> *decimalObj;
+@property RLMSet<RLMObjectId> *objectIdObj;
+@end
+
 @interface AllOptionalPrimitiveArrays : RLMObject
 @property RLMArray<RLMInt> *intObj;
 @property RLMArray<RLMFloat> *floatObj;
@@ -315,6 +329,16 @@ RLM_ARRAY_TYPE(CircleObject);
 @property RLM_GENERIC_ARRAY(IntObject) *intArray;
 
 @end
+
+#pragma mark SetPropertyObject
+
+//@interface SetPropertyObject : RLMObject
+//
+//@property NSString *name;
+//@property RLM_GENERIC_SET(StringObject) *array;
+//@property RLM_GENERIC_SET(IntObject) *intArray;
+//
+//@end
 
 #pragma mark DynamicObject
 

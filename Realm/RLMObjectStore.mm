@@ -101,6 +101,12 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
             RLMArray *array = [[RLMManagedArray alloc] initWithParent:object property:prop];
             [ivar set_rlmArray:array];
         }
+        else if (prop.set) {
+            id ivar = object_getIvar(object, prop.swiftIvar);
+            // TODO: RLMSet
+//            RLMSet *array = [[RLMManagedArray alloc] initWithParent:object property:prop];
+//            [ivar set_rlmSet:array];
+        }
         else {
             id ivar = object_getIvar(object, prop.swiftIvar);
             RLMInitializeManagedOptional(ivar, object, prop);

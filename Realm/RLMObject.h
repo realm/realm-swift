@@ -709,4 +709,17 @@ typedef void (^RLMObjectChangeBlock)(BOOL deleted,
 @protocol RLM_OBJECT_SUBCLASS <NSObject>   \
 @end
 
+/**
+ Properties on `RLMObject`s of type `RLMSet` must have an associated type. A type is associated
+ with an `RLMSet` property by defining a protocol for the object type that the array should contain.
+ To define the protocol for an object, you can use the macro RLM_SET_TYPE:
+
+     RLM_SET_TYPE(ObjectType)
+     ...
+     @property RLMSet<ObjectType *><ObjectType> *setOfObjectTypes;
+  */
+#define RLM_SET_TYPE(RLM_OBJECT_SUBCLASS)\
+@protocol RLM_OBJECT_SUBCLASS <NSObject>   \
+@end
+
 NS_ASSUME_NONNULL_END

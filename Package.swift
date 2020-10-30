@@ -46,7 +46,7 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core", .branch("monorepo"))
+        .package(url: "https://github.com/realm/realm-core", .branch("lm/os-set"))
     ],
     targets: [
       .target(
@@ -57,6 +57,7 @@ let package = Package(
                 "Realm/RLMAccessor.mm",
                 "Realm/RLMAnalytics.mm",
                 "Realm/RLMArray.mm",
+                "Realm/RLMArray.mm",
                 "Realm/RLMClassInfo.mm",
                 "Realm/RLMCollection.mm",
                 "Realm/RLMConstants.m",
@@ -64,6 +65,7 @@ let package = Package(
                 "Realm/RLMEmbeddedObject.mm",
                 "Realm/RLMListBase.mm",
                 "Realm/RLMManagedArray.mm",
+                "Realm/RLMManagedSet.mm",
                 "Realm/RLMMigration.mm",
                 "Realm/RLMObject.mm",
                 "Realm/RLMObjectBase.mm",

@@ -237,7 +237,7 @@ using namespace realm;
     }
 
     for (RLMProperty *property in propArray) {
-        if (!property.optional && property.type == RLMPropertyTypeObject && !property.array) {
+        if (!property.optional && property.type == RLMPropertyTypeObject && !(property.array || property.set)) {
             @throw RLMException(@"The `%@.%@` property must be marked as being optional.",
                                 [objectClass className], property.name);
         }

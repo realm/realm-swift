@@ -19,6 +19,7 @@
 #import "RLMAccessor.hpp"
 
 #import "RLMArray_Private.hpp"
+#import "RLMSet_Private.hpp"
 #import "RLMListBase.h"
 #import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
@@ -152,6 +153,14 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
     else if (obj->_row.get_linked_object(key).get_key() != val->_row.get_key()) {
         @throw RLMException(@"Can't set link to existing managed embedded object");
     }
+}
+
+// set getter/setter
+RLMSet *getSet(__unsafe_unretained RLMObjectBase *const obj, NSUInteger propIndex) {
+    RLMVerifyAttached(obj);
+    auto prop = obj->_info->rlmObjectSchema.properties[propIndex];
+    return [[RLMManagedSet alloc] initWithParent:obj property:prop];
+    return nil;
 }
 
 // array getter/setter
@@ -295,6 +304,12 @@ id managedGetter(RLMProperty *prop, const char *type) {
         };
     }
 
+    if (prop.set && prop.type != RLMPropertyTypeLinkingObjects) {
+        return ^id(__unsafe_unretained RLMObjectBase *const obj) {
+            return getSet(obj, index);
+        };
+    }
+
     bool boxed = *type == '@';
     switch (prop.type) {
         case RLMPropertyTypeInt:
@@ -420,14 +435,18 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
     if (prop.type == RLMPropertyTypeLinkingObjects) {
         return ^(RLMObjectBase *) { return [RLMResults emptyDetachedResults]; };
     }
-    if (prop.array) {
+    if (prop.array || prop.set) {
         NSString *propName = prop.name;
         if (prop.type == RLMPropertyTypeObject) {
             NSString *objectClassName = prop.objectClassName;
             return ^(RLMObjectBase *obj) {
                 id val = superGet(obj, propName);
                 if (!val) {
-                    val = [[RLMArray alloc] initWithObjectClassName:objectClassName];
+                    if (prop.array) {
+                        val = [[RLMArray alloc] initWithObjectClassName:objectClassName];
+                    } else {
+                        val = [[RLMSet alloc] initWithObjectClassName:objectClassName];
+                    }
                     superSet(obj, propName, val);
                 }
                 return val;
@@ -438,7 +457,11 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
         return ^(RLMObjectBase *obj) {
             id val = superGet(obj, propName);
             if (!val) {
-                val = [[RLMArray alloc] initWithObjectType:type optional:optional];
+                if (prop.array) {
+                    val = [[RLMArray alloc] initWithObjectType:type optional:optional];
+                } else {
+                    val = [[RLMSet alloc] initWithObjectType:type optional:optional];
+                }
                 superSet(obj, propName, val);
             }
             return val;

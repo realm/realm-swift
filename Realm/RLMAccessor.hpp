@@ -51,6 +51,9 @@ public:
     id box(realm::Object&&);
     id box(realm::Obj&&);
 
+    template<typename T>
+    id box(realm::Set<T>&&);
+
     id box(bool v) { return @(v); }
     id box(double v) { return @(v); }
     id box(float v) { return @(v); }
