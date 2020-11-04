@@ -10,6 +10,7 @@ module Realm {
         header "Realm/RLMAccessor.h"
         header "Realm/RLMArray_Private.h"
         header "Realm/RLMCollection_Private.h"
+        header "Realm/RLMSet_Private.h"
         header "Realm/RLMListBase.h"
         header "Realm/RLMObject_Private.h"
         header "Realm/RLMObjectBase_Dynamic.h"

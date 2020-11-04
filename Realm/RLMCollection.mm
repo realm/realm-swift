@@ -20,6 +20,7 @@
 
 #import "RLMAccessor.hpp"
 #import "RLMArray_Private.hpp"
+#import "RLMSet_Private.hpp"
 #import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
@@ -28,6 +29,7 @@
 
 #import <realm/object-store/collection_notifications.hpp>
 #import <realm/object-store/list.hpp>
+#import <realm/object-store/set.hpp>
 #import <realm/object-store/results.hpp>
 
 static const int RLMEnumerationBufferSize = 16;
@@ -65,6 +67,27 @@ static const int RLMEnumerationBufferSize = 16;
         }
         else {
             _snapshot = list.as_results();
+            _collection = collection;
+            [_realm registerEnumerator:self];
+        }
+        _results = &_snapshot;
+    }
+    return self;
+}
+
+- (instancetype)initWithSet:(realm::object_store::Set&)set
+                 collection:(id)collection
+                  classInfo:(RLMClassInfo&)info
+{
+    self = [super init];
+    if (self) {
+        _info = &info;
+        _realm = _info->realm;
+        if (_realm.inWriteTransaction) {
+            _snapshot = set.snapshot();
+        }
+        else {
+            _snapshot = set.as_results();
             _collection = collection;
             [_realm registerEnumerator:self];
         }
@@ -171,7 +194,7 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
     if (count == 0) {
         return @[];
     }
-
+/*
     NSMutableArray *array = [NSMutableArray arrayWithCapacity:count];
     if ([key isEqualToString:@"self"]) {
         RLMAccessorContext context(info);
@@ -219,11 +242,20 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
         RLMInitializeSwiftAccessorGenerics(accessor);
         [array addObject:[accessor valueForKey:key] ?: NSNull.null];
     }
-    return array;
+    return array;*/
+}
+
+template<typename Collection>
+NSSet *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClassInfo& info) {
+    return [NSSet new];
 }
 
 template NSArray *RLMCollectionValueForKey(realm::Results&, NSString *, RLMClassInfo&);
 template NSArray *RLMCollectionValueForKey(realm::List&, NSString *, RLMClassInfo&);
+template NSArray *RLMCollectionValueForKey(realm::object_store::Set&, NSString *, RLMClassInfo&);
+
+//template NSSet *RLMCollectionValueForKey(realm::object_store::Set&, NSString *, RLMClassInfo&);
+//template NSSet *RLMCollectionValueForKey(realm::Results&, NSString *, RLMClassInfo&);
 
 void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id value) {
     realm::TableView tv = [collection tableView];
@@ -457,4 +489,5 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
 
 // Explicitly instantiate the templated function for the two types we'll use it on
 template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedArray *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
+template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedSet *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
 template RLMNotificationToken *RLMAddNotificationBlock<>(RLMResults *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);

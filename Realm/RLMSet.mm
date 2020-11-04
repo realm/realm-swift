@@ -249,35 +249,6 @@ static void changeSet(__weak RLMSet *const set, NSKeyValueChange kind,
     changeSet(set, kind, f, [=] { return is; });
 }
 
-void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
-                                      __unsafe_unretained id const value) {
-    if (!value && !set->_optional) {
-        @throw RLMException(@"Invalid nil value for set of '%@'.",
-                            set->_objectClassName ?: RLMTypeToString(set->_type));
-    }
-    if (set->_type != RLMPropertyTypeObject) {
-        if (!RLMValidateValue(value, set->_type, set->_optional, false, nil)) {
-            @throw RLMException(@"Invalid value '%@' of type '%@' for expected type '%@%s'.",
-                                value, [value class], RLMTypeToString(set->_type),
-                                set->_optional ? "?" : "");
-        }
-        return;
-    }
-
-    auto object = RLMDynamicCast<RLMObjectBase>(value);
-    if (!object) {
-        return;
-    }
-    if (!object->_objectSchema) {
-        @throw RLMException(@"Object cannot be inserted unless the schema is initialized. "
-                            "This can happen if you try to insert objects into a RLMSet from a default value or from an overriden unmanaged initializer (`init()`).");
-    }
-    if (![set->_objectClassName isEqualToString:object->_objectSchema.className]) {
-        @throw RLMException(@"Object of type '%@' does not match RLMArray type '%@'.",
-                            object->_objectSchema.className, set->_objectClassName);
-    }
-}
-
 static void validateSetBounds(__unsafe_unretained RLMSet *const set,
                               NSUInteger index,
                               bool allowOnePastEnd=false) {
@@ -571,13 +542,35 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
-//TODO: Implement in RLMManagedSet
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-void RLMValidateSetObservationKey(NSString *const a, RLMSet *const b) {
+void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
+                                      __unsafe_unretained id const value) {
+    if (!value && !set->_optional) {
+        @throw RLMException(@"Invalid nil value for set of '%@'.",
+                            set->_objectClassName ?: RLMTypeToString(set->_type));
+    }
+    if (set->_type != RLMPropertyTypeObject) {
+        if (!RLMValidateValue(value, set->_type, set->_optional, false, nil)) {
+            @throw RLMException(@"Invalid value '%@' of type '%@' for expected type '%@%s'.",
+                                value, [value class], RLMTypeToString(set->_type),
+                                set->_optional ? "?" : "");
+        }
+        return;
+    }
 
+    auto object = RLMDynamicCast<RLMObjectBase>(value);
+    if (!object) {
+        return;
+    }
+    if (!object->_objectSchema) {
+        @throw RLMException(@"Object cannot be inserted unless the schema is initialized. "
+                            "This can happen if you try to insert objects into a RLMSet / Set from a default value or from an overriden unmanaged initializer (`init()`).");
+    }
+    if (![set->_objectClassName isEqualToString:object->_objectSchema.className]) {
+        @throw RLMException(@"Object of type '%@' does not match RLMSet type '%@'.",
+                            object->_objectSchema.className, set->_objectClassName);
+    }
 }
-#pragma clang diagnostic pop
+
 
 #pragma mark - Methods unsupported on unmanaged RLMSet instances
 

@@ -26,9 +26,12 @@ namespace realm {
     class TableView;
     struct CollectionChangeSet;
     struct NotificationToken;
+    namespace object_store {
+        class Set;
+    }
 }
 class RLMClassInfo;
-@class RLMFastEnumerator, RLMManagedArray;
+@class RLMFastEnumerator, RLMManagedArray, RLMManagedSet;
 
 @protocol RLMFastEnumerable
 @property (nonatomic, readonly) RLMRealm *realm;
@@ -46,6 +49,9 @@ class RLMClassInfo;
 - (instancetype)initWithList:(realm::List&)list
                   collection:(id)collection
                    classInfo:(RLMClassInfo&)info;
+- (instancetype)initWithSet:(realm::object_store::Set&)set
+                 collection:(id)collection
+                  classInfo:(RLMClassInfo&)info;
 - (instancetype)initWithResults:(realm::Results&)results
                      collection:(id)collection
                       classInfo:(RLMClassInfo&)info;
@@ -68,6 +74,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state, NSUInteger len, id<RL
 - (instancetype)initWithChanges:(realm::CollectionChangeSet)indices;
 @end
 
+realm::object_store::Set& RLMGetBackingCollection(RLMManagedSet *);
 realm::List& RLMGetBackingCollection(RLMManagedArray *);
 realm::Results& RLMGetBackingCollection(RLMResults *);
 
@@ -78,5 +85,8 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
 
 template<typename Collection>
 NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClassInfo& info);
+
+//template<typename Collection>
+//NSSet *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClassInfo& info);
 
 std::vector<std::pair<std::string, bool>> RLMSortDescriptorsToKeypathArray(NSArray<RLMSortDescriptor *> *properties);

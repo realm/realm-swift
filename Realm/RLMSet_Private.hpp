@@ -20,15 +20,14 @@
 #import "RLMCollection_Private.hpp"
 #import "RLMResults_Private.hpp"
 
-//#import <realm/object-store/set.hpp>
-
 namespace realm {
+class SetBase;
+class CollectionBase;
 
-namespace object_store {
-class Set;
+    namespace object_store {
+        class Set;
+    }
 }
-}
-
 
 @class RLMObjectBase, RLMObjectSchema, RLMProperty;
 class RLMClassInfo;
@@ -50,7 +49,7 @@ class RLMObservationInfo;
 
 - (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 
-- (RLMManagedSet *)initWithSet:(realm::object_store::Set &)set
+- (RLMManagedSet *)initWithSet:(realm::object_store::Set)set
                     parentInfo:(RLMClassInfo *)parentInfo
                       property:(__unsafe_unretained RLMProperty *const)property;
 

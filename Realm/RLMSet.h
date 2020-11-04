@@ -119,11 +119,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)addObjects:(id<NSFastEnumeration>)objects;
 
-- (void)insertObject:(RLMObjectType)anObject atIndex:(NSUInteger)index;
+//TODO: Remove
+//- (void)insertObject:(RLMObjectType)anObject atIndex:(NSUInteger)index;
 
-- (void)removeObjectAtIndex:(NSUInteger)index;
+//- (void)removeObjectAtIndex:(NSUInteger)index;
 
-- (void)removeLastObject;
+//- (void)removeLastObject;
+
+//TODO: Should be
+- (void)removeObject:(RLMObjectType)object;
 
 /**
  Removes all objects from the set.
@@ -132,36 +136,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)removeAllObjects;
 
-/// :nodoc:
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObjectType)anObject;
-
-
-/**
- Moves the object at the given source index to the given destination index.
-
- Throws an exception if the index exceeds the bounds of the array.
-
- @warning This method may only be called during a write transaction.
-
- @param sourceIndex      The index of the object to be moved.
- @param destinationIndex The index to which the object at `sourceIndex` should be moved.
- */
-- (void)moveObjectAtIndex:(NSUInteger)sourceIndex toIndex:(NSUInteger)destinationIndex
-__attribute((unavailable("replaceObjectAtIndex:withObject: is not available with RLMSet.")));
-
-/**
- Exchanges the objects in the array at given indices.
-
- Throws an exception if either index exceeds the bounds of the array.
-
- @warning This method may only be called during a write transaction.
-
- @param index1 The index of the object which should replace the object at index `index2`.
- @param index2 The index of the object which should replace the object at index `index1`.
- */
-- (void)exchangeObjectAtIndex:(NSUInteger)index1 withObjectAtIndex:(NSUInteger)index2;
-
-#pragma mark - Querying an Array
+#pragma mark - Querying a Set
 
 /**
  Returns the index of an object in the set.

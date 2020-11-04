@@ -68,7 +68,7 @@
     NSSet *aSet = [NSSet setWithArray:@[@"string1", @"string4"]];
     [setObj.stringSet addObjects:aSet];
     XCTAssertEqual(setObj.stringSet.count, 4U);
-
+/*
     [setObj.stringSet insertObject:@"meFirst" atIndex:0];
     XCTAssertTrue([setObj.stringSet[0] isEqualToString:@"meFirst"]);
     XCTAssertEqual(setObj.stringSet.count, 5U);
@@ -82,7 +82,7 @@
     [setObj.stringSet removeObjectAtIndex:0];
     XCTAssertEqual(setObj.stringSet.count, 3U);
     XCTAssertTrue([setObj.stringSet[0] isEqualToString:@"string1"]);
-
+*/
     [setObj.stringSet removeAllObjects];
     XCTAssertEqual(setObj.stringSet.count, 0U);
 }
@@ -232,7 +232,7 @@
 
     StringObject *stringObj4 = [[StringObject alloc] init];
     stringObj4.stringCol = @"d";
-
+/*
     [set.stringSet replaceObjectAtIndex:0 withObject:stringObj4];
     XCTAssertTrue([[set.stringSet objectAtIndex:0] isEqualToObject:stringObj4], @"Objects should be replaced");
     XCTAssertEqual(set.stringSet.count, 3U, @"Should have 3 elements in int array");
@@ -247,7 +247,7 @@
     RLMAssertThrowsWithReasonMatching([set.stringSet replaceObjectAtIndex:0 withObject:(id)intObj4],
                                       @"IntObject.*StringObject");
     RLMAssertThrowsWithReasonMatching([set.intSet replaceObjectAtIndex:1 withObject:(id)stringObj4],
-                                      @"StringObject.*IntObject");
+                                      @"StringObject.*IntObject");*/
 }
 
 - (void)testDeleteObjectInUnmanagedArray {
@@ -283,7 +283,7 @@
     XCTAssertEqualObjects(set.intSet[1], intObj2, @"Objects should be equal");
     XCTAssertEqualObjects(set.intSet[2], intObj3, @"Objects should be equal");
     XCTAssertEqual(set.intSet.count, 3U, @"Should have 3 elements in int array");
-
+/*
     [set.stringSet removeLastObject];
 
     XCTAssertEqualObjects(set.stringSet[0], stringObj1, @"Objects should be equal");
@@ -296,7 +296,7 @@
     XCTAssertEqual(set.stringSet.count, 1U, @"Should have 1 elements in string array");
 
     [set.stringSet removeLastObject];
-
+*/
     XCTAssertEqual(set.stringSet.count, 0U, @"Should have 0 elements in string array");
 
     [set.intSet removeAllObjects];

@@ -316,7 +316,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     assertKeyPathIsNotNested(keyPath);
     return [self averageOfProperty:keyPath];
 }
-
+//TODO: what is the purpose of this? Doesn't seem to have a code path
 - (NSArray *)_unionOfObjectsForKeyPath:(NSString *)keyPath {
     assertKeyPathIsNotNested(keyPath);
     return translateRLMResultsErrors([&] {
