@@ -16,13 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUUID.h"
+#import "RLMUUID_Private.hpp"
 
 @implementation NSUUID (RLMUUIDSupport)
 
-- (instancetype)initWithRealmUuid:(realm::UUID)rUuid {
+- (instancetype)initWithRealmUUID:(realm::UUID)rUuid {
     if (self = [self initWithUUIDBytes: rUuid.to_bytes().data()]) {
-//    if (self = [self initWithUUIDString:rUuid.to_string()]) {
         return self;
     }
     return nil;
