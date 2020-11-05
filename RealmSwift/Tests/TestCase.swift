@@ -19,9 +19,12 @@
 import Foundation
 import Realm
 import Realm.Dynamic
-import RealmTestSupport
 import RealmSwift
 import XCTest
+
+#if canImport(RealmTestSupport)
+import RealmTestSupport
+#endif
 
 func inMemoryRealm(_ inMememoryIdentifier: String) -> Realm {
     return try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: inMememoryIdentifier))

@@ -21,7 +21,8 @@
 #import "RLMSyncSession_Private.hpp"
 #import "RLMRealmUtil.hpp"
 
-#import "sync/sync_session.hpp"
+#import <realm/object-store/sync/sync_session.hpp>
+#import <realm/sync/protocol.hpp>
 
 using namespace realm;
 

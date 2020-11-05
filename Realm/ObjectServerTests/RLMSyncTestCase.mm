@@ -20,9 +20,6 @@
 
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
-#import "RLMListBase.h"
-#import <RealmSwift/RealmSwift-Swift.h>
-#import "ObjectServerTests-Swift.h"
 
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
@@ -32,9 +29,15 @@
 #import "RLMUtil.hpp"
 #import "RLMApp_Private.hpp"
 
-#import "sync/sync_manager.hpp"
-#import "sync/sync_session.hpp"
-#import "sync/sync_user.hpp"
+#import <realm/object-store/sync/sync_manager.hpp>
+#import <realm/object-store/sync/sync_session.hpp>
+#import <realm/object-store/sync/sync_user.hpp>
+
+@interface RealmServer : NSObject
++ (RealmServer *)shared;
++ (bool)haveServer;
+- (NSString *)createAppAndReturnError:(NSError **)error;
+@end
 
 // Set this to 1 if you want the test ROS instance to log its debug messages to console.
 #define LOG_ROS_OUTPUT 0
@@ -307,6 +310,7 @@ static NSURL *syncDirectoryForChildProcess() {
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     auto c = [user configurationWithPartitionValue:partitionValue];
     c.encryptionKey = encryptionKey;
+    c.objectClasses = @[Dog.self, Person.self, HugeSyncObject.self];
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.stopPolicy = stopPolicy;
     c.syncConfiguration = syncConfig;
@@ -418,6 +422,15 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 #pragma mark - XCUnitTest Lifecycle
+
++ (XCTestSuite *)defaultTestSuite {
+    if ([RealmServer haveServer]) {
+        return [super defaultTestSuite];
+
+    }
+    NSLog(@"Skipping sync tests: server is not present. Run `build.sh setup-bass` to install it.");
+    return [[XCTestSuite alloc] initWithName:[super defaultTestSuite].name];
+}
 
 - (void)setUp {
     [super setUp];

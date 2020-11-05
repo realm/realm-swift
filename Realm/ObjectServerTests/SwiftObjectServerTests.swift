@@ -17,25 +17,15 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Combine
+import Realm
 import RealmSwift
 import XCTest
 
-class SwiftPerson: Object {
-    @objc dynamic var _id: ObjectId? = ObjectId.generate()
-    @objc dynamic var firstName: String = ""
-    @objc dynamic var lastName: String = ""
-    @objc dynamic var age: Int = 30
-
-    convenience init(firstName: String, lastName: String) {
-        self.init()
-        self.firstName = firstName
-        self.lastName = lastName
-    }
-
-    override class func primaryKey() -> String? {
-        return "_id"
-    }
-}
+#if canImport(RealmTestSupport)
+import RealmSwiftSyncTestSupport
+import RealmSyncTestSupport
+import RealmTestSupport
+#endif
 
 class SwiftHugeSyncObject: Object {
     @objc dynamic var _id = ObjectId.generate()
@@ -51,12 +41,21 @@ class SwiftHugeSyncObject: Object {
     }
 }
 
+extension User {
+    func configuration(testName: String) -> Realm.Configuration {
+        var config = self.configuration(partitionValue: testName)
+        config.objectTypes = [SwiftPerson.self, SwiftHugeSyncObject.self]
+        return config
+    }
+}
+
+@available(OSX 10.14, *)
 class SwiftObjectServerTests: SwiftSyncTestCase {
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
-            let realm = try synchronouslyOpenRealm(partitionValue: #function, user: user)
+            let realm = try openRealm(partitionValue: #function, user: user)
             XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
         } catch {
             XCTFail("Got an error: \(error)")
@@ -66,8 +65,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testBasicSwiftSyncWithNilPartitionValue() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
-            let realm = try synchronouslyOpenRealm(partitionValue: .null, user: user)
-            waitForDownloads(for: realm)
+            let realm = try openRealm(partitionValue: .null, user: user)
             XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
         } catch {
             XCTFail("Got an error: \(error)")
@@ -78,9 +76,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testSwiftAddObjects() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
-            let realm = try synchronouslyOpenRealm(partitionValue: #function, user: user)
+            let realm = try openRealm(partitionValue: #function, user: user)
             if isParent {
-                waitForDownloads(for: realm)
                 checkCount(expected: 0, realm, SwiftPerson.self)
                 executeChild()
                 waitForDownloads(for: realm)
@@ -103,9 +100,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testSwiftAddObjectsWithNilPartitionValue() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
-            let realm = try synchronouslyOpenRealm(partitionValue: .null, user: user)
+            let realm = try openRealm(partitionValue: .null, user: user)
             if isParent {
-                waitForDownloads(for: realm)
                 checkCount(expected: 0, realm, SwiftPerson.self)
                 executeChild()
                 waitForDownloads(for: realm)
@@ -133,7 +129,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testSwiftDeleteObjects() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
-            let realm = try synchronouslyOpenRealm(partitionValue: #function, user: user)
+            let realm = try openRealm(partitionValue: #function, user: user)
             if isParent {
                 try realm.write {
                     realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
@@ -144,7 +140,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 checkCount(expected: 3, realm, SwiftPerson.self)
                 executeChild()
             } else {
-                waitForDownloads(for: realm)
                 checkCount(expected: 3, realm, SwiftPerson.self)
                 try realm.write {
                     realm.deleteAll()
@@ -166,15 +161,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
 
-            let realmA = try Realm(configuration: user.configuration(partitionValue: partitionValueA))
-            let realmB = try Realm(configuration: user.configuration(partitionValue: partitionValueB))
-            let realmC = try Realm(configuration: user.configuration(partitionValue: partitionValueC))
+            let realmA = try openRealm(partitionValue: partitionValueA, user: user)
+            let realmB = try openRealm(partitionValue: partitionValueB, user: user)
+            let realmC = try openRealm(partitionValue: partitionValueC, user: user)
 
             if self.isParent {
-                waitForDownloads(for: realmA)
-                waitForDownloads(for: realmB)
-                waitForDownloads(for: realmC)
-
                 checkCount(expected: 0, realmA, SwiftPerson.self)
                 checkCount(expected: 0, realmB, SwiftPerson.self)
                 checkCount(expected: 0, realmC, SwiftPerson.self)
@@ -227,7 +218,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testConnectionState() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
-            let realm = try synchronouslyOpenRealm(partitionValue: #function, user: user)
+            let realm = try immediatelyOpenRealm(partitionValue: #function, user: user)
             let session = realm.syncSession!
 
             func wait(forState desiredState: SyncSession.ConnectionState) {
@@ -259,7 +250,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testClientReset() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
-            let realm = try synchronouslyOpenRealm(partitionValue: #function, user: user)
+            let realm = try openRealm(partitionValue: #function, user: user)
 
             var theError: SyncError?
             let ex = expectation(description: "Waiting for error handler to be called...")
@@ -293,7 +284,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             var theError: SyncError?
 
             try autoreleasepool {
-                let realm = try synchronouslyOpenRealm(partitionValue: #function, user: user)
+                let realm = try openRealm(partitionValue: #function, user: user)
                 let ex = expectation(description: "Waiting for error handler to be called...")
                 app.syncManager.errorHandler = { (error, _) in
                     if let error = error as? SyncError {
@@ -325,9 +316,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func populateRealm(user: User, partitionValue: String) {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
-            var config = user.configuration(partitionValue: partitionValue)
-            config.objectTypes = [SwiftHugeSyncObject.self]
-            let realm = try synchronouslyOpenRealm(configuration: config)
+            let config = user.configuration(testName: partitionValue)
+            let realm = try openRealm(configuration: config)
             try! realm.write {
                 for _ in 0..<bigObjectCount {
                     realm.add(SwiftHugeSyncObject.create())
@@ -391,7 +381,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             var transferred = 0
             var transferrable = 0
             let user = try synchronouslyLogInUser(for: basicCredentials())
-            let realm = try synchronouslyOpenRealm(partitionValue: #function, user: user)
+            let config = user.configuration(testName: #function)
+            let realm = try openRealm(configuration: config)
             let session = realm.syncSession
             XCTAssertNotNil(session)
             var ex = expectation(description: "initial upload")
@@ -408,7 +399,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             ex = expectation(description: "write transaction upload")
             try realm.write {
                 for _ in 0..<bigObjectCount {
-                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+                    realm.add(SwiftHugeSyncObject.create())
                 }
             }
             waitForExpectations(timeout: 10.0, handler: nil)
@@ -433,15 +424,15 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             executeChild()
 
             let ex = expectation(description: "download-realm")
-            let config = user.configuration(partitionValue: #function)
+            let config = user.configuration(testName: #function)
             let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
             XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
             Realm.asyncOpen(configuration: config) { result in
                 switch result {
                 case .success(let realm):
                     self.checkCount(expected: self.bigObjectCount, realm, SwiftHugeSyncObject.self)
-                case .failure:
-                    XCTFail("No realm on async open")
+                case .failure(let error):
+                    XCTFail("No realm on async open: \(error)")
                 }
                 ex.fulfill()
             }
@@ -473,7 +464,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             let ex = expectation(description: "download-realm")
             let customFileURL = realmURLForFile("copy")
-            var config = user.configuration(partitionValue: #function)
+            var config = user.configuration(testName: #function)
             config.fileURL = customFileURL
             let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
             XCTAssertEqual(pathOnDisk, customFileURL.path)
@@ -482,8 +473,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 switch result {
                 case .success(let realm):
                     self.checkCount(expected: self.bigObjectCount, realm, SwiftHugeSyncObject.self)
-                case .failure:
-                    XCTFail("No realm on async open")
+                case .failure(let error):
+                    XCTFail("No realm on async open: \(error)")
                 }
                 ex.fulfill()
             }
@@ -518,7 +509,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             RLMSetAsyncOpenQueue(DispatchQueue(label: "io.realm.asyncOpen"))
 
             let ex = expectation(description: "async open")
-            let config = user.configuration(partitionValue: #function)
+            let config = user.configuration(testName: #function)
             Realm.asyncOpen(configuration: config) { result in
                 guard case .failure = result else {
                     XCTFail("No error on cancelled async open")
@@ -548,7 +539,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             executeChild()
             let ex1 = expectation(description: "async open")
             let ex2 = expectation(description: "download progress")
-            let config = user.configuration(partitionValue: #function)
+            let config = user.configuration(testName: #function)
             let task = Realm.asyncOpen(configuration: config) { result in
                 XCTAssertNotNil(try? result.get())
                 ex1.fulfill()
@@ -623,24 +614,32 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testAppCredentialSupport() {
-        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.facebook(accessToken: "accessToken")), RLMCredentials(facebookToken: "accessToken"))
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.facebook(accessToken: "accessToken")),
+                       RLMCredentials(facebookToken: "accessToken"))
 
-        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.google(serverAuthCode: "serverAuthCode")), RLMCredentials(googleAuthCode: "serverAuthCode"))
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.google(serverAuthCode: "serverAuthCode")),
+                       RLMCredentials(googleAuthCode: "serverAuthCode"))
 
-        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.apple(idToken: "idToken")), RLMCredentials(appleToken: "idToken"))
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.apple(idToken: "idToken")),
+                       RLMCredentials(appleToken: "idToken"))
 
-        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.emailPassword(email: "email", password: "password")), RLMCredentials(email: "email", password: "password"))
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.emailPassword(email: "email", password: "password")),
+                       RLMCredentials(email: "email", password: "password"))
 
-        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.jwt(token: "token")), RLMCredentials(jwt: "token"))
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.jwt(token: "token")),
+                       RLMCredentials(jwt: "token"))
 
         XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.function(payload: ["dog": ["name": "fido"]])),
                        RLMCredentials(functionPayload: ["dog": ["name" as NSString: "fido" as NSString] as NSDictionary]))
 
-        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.userAPIKey("key")), RLMCredentials(userAPIKey: "key"))
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.userAPIKey("key")),
+                       RLMCredentials(userAPIKey: "key"))
 
-        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.serverAPIKey("key")), RLMCredentials(serverAPIKey: "key"))
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.serverAPIKey("key")),
+                       RLMCredentials(serverAPIKey: "key"))
 
-        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.anonymous), RLMCredentials.anonymous())
+        XCTAssertEqual(ObjectiveCSupport.convert(object: Credentials.anonymous),
+                       RLMCredentials.anonymous())
     }
 
     // MARK: - Authentication
@@ -2026,6 +2025,8 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
     }
 }
 
+#if REALM_HAVE_COMBINE || !SWIFT_PACKAGE
+
 // XCTest doesn't care about the @available on the class and will try to run
 // the tests even on older versions. Putting this check inside `defaultTestSuite`
 // results in a warning about it being redundant due to the enclosing check, so
@@ -2427,7 +2428,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             let password = randomString(10)
             app.emailPasswordAuth.registerUser(email: email, password: password)
                 .flatMap { self.app.login(credentials: .emailPassword(email: email, password: password)) }
-                .flatMap { user in Realm.asyncOpen(configuration: user.configuration(partitionValue: #function)) }
+                .flatMap { user in Realm.asyncOpen(configuration: user.configuration(testName: #function)) }
                 .sink(receiveCompletion: { result in
                     if case .failure = result {
                         XCTFail("Should register")
@@ -3340,3 +3341,4 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         }
     }
 }
+#endif

@@ -17,7 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Realm
+
+#if canImport(RealmTestSupport)
 import RealmTestSupport
+#endif
 
 class SwiftRLMStringObject: RLMObject {
     @objc dynamic var stringCol = ""
