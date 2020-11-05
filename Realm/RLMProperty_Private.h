@@ -54,6 +54,8 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
             return @"decimal128";
         case RLMPropertyTypeObjectId:
             return @"object id";
+        case RLMPropertyTypeUUID:
+            return @"uuid";
     }
     return @"Unknown";
 }

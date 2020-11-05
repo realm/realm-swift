@@ -59,6 +59,8 @@ public extension ObjectiveCSupport {
             return val
         case .bool(let val):
             return val as NSNumber
+        case .uuid(let val):
+            return val as NSUUID
         default:
             return nil
         }
@@ -145,6 +147,11 @@ public extension ObjectiveCSupport {
                 return nil
             }
             return .array(val.map(convert))
+        case .UUID:
+            guard let val = bson as? UUID else {
+                return nil
+            }
+            return .uuid(val as UUID)
         default:
             return nil
         }

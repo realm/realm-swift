@@ -39,6 +39,7 @@ static_assert((int)RLMPropertyTypeDate       == (int)realm::PropertyType::Date);
 static_assert((int)RLMPropertyTypeObject     == (int)realm::PropertyType::Object);
 static_assert((int)RLMPropertyTypeObjectId   == (int)realm::PropertyType::ObjectId);
 static_assert((int)RLMPropertyTypeDecimal128 == (int)realm::PropertyType::Decimal);
+static_assert((int)RLMPropertyTypeUUID       == (int)realm::PropertyType::UUID);
 
 BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType) {
     return propertyType == RLMPropertyTypeLinkingObjects;
@@ -176,6 +177,9 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     if (strcmp(type, "ObjectId>\"") == 0) {
         return RLMPropertyTypeObjectId;
     }
+    if (strcmp(type, "UUID>\"") == 0) {
+        return RLMPropertyTypeUUID;
+    }
     return realm::none;
 }
 
@@ -229,6 +233,9 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     }
     else if (strcmp(code, "@\"RLMObjectId\"") == 0) {
         _type = RLMPropertyTypeObjectId;
+    }
+    else if (strcmp(code, "@\"RLMUUID\"") == 0) {
+        _type = RLMPropertyTypeUUID;
     }
     else if (strncmp(code, arrayPrefix, arrayPrefixLen) == 0) {
         _array = true;

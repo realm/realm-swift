@@ -948,6 +948,7 @@ void QueryBuilder::do_add_constraint(RLMPropertyType type, NSPredicateOperatorTy
             add_string_constraint(operatorType, predicateOptions, value_of_type<String>(values)...);
             break;
         case RLMPropertyTypeData:
+        case RLMPropertyTypeUUID:
             add_binary_constraint(operatorType, values...);
             break;
         case RLMPropertyTypeObject:

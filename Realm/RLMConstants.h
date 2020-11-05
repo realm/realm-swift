@@ -59,6 +59,8 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeFloat  = 5,
     /** Double-precision floating-point numbers: `double`, `Double` (Swift) */
     RLMPropertyTypeDouble = 6,
+    /** NSUUID, UUID */
+    RLMPropertyTypeUUID   = 12,
 
 #pragma mark - Object types
 

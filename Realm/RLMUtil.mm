@@ -28,6 +28,7 @@
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
+#import "RLMUUID_Private.hpp"
 
 #import <realm/mixed.hpp>
 #import <realm/object-store/shared_realm.hpp>
@@ -202,6 +203,9 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
             return [value isKindOfClass:[NSNumber class]]
                 || [value isKindOfClass:[RLMDecimal128 class]]
                 || ([value isKindOfClass:[NSString class]] && realm::Decimal128::is_valid_str([value UTF8String]));
+        case RLMPropertyTypeUUID:
+            return [value isKindOfClass:[NSUUID class]]
+                || ([value isKindOfClass:[NSString class]] && realm::UUID::is_valid_string([value UTF8String]));
     }
     @throw RLMException(@"Invalid RLMPropertyType specified");
 }
@@ -429,6 +433,8 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
         case realm::type_OldTable:
         case realm::type_OldDateTime:
             REALM_UNREACHABLE();
+        case realm::type_UUID:
+            return [[NSUUID alloc] initWithRealmUUID:mixed.get<realm::UUID>()];
         default:
             @throw RLMException(@"Invalid data type for RLMPropertyTypeAny property.");
     }
