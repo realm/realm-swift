@@ -53,6 +53,8 @@ class SwiftObject: Object {
     @objc dynamic var decimalCol = Decimal128("123e4")
     @objc dynamic var objectIdCol = ObjectId("1234567890ab1234567890ab")
     @objc dynamic var objectCol: SwiftBoolObject? = SwiftBoolObject()
+    @objc dynamic var uuidCol: UUID = UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!
+    
     let arrayCol = List<SwiftBoolObject>()
 
     class func defaultValues() -> [String: Any] {
@@ -67,7 +69,8 @@ class SwiftObject: Object {
             "decimalCol": Decimal128("123e4"),
             "objectIdCol": ObjectId("1234567890ab1234567890ab"),
             "objectCol": [false],
-            "arrayCol": []
+            "uuidCol": UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
+            "arrayCol": [],
         ]
     }
 }

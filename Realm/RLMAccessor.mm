@@ -790,8 +790,8 @@ realm::ObjectId RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
     return static_cast<RLMObjectId *>(v).value;
 }
 template<>
-realm::UUID RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
-    REALM_UNREACHABLE();
+realm::UUID RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+    return static_cast<NSUUID *>(v).uuidValue;
 }
 template<>
 realm::Mixed RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {

@@ -21,10 +21,8 @@
 @implementation NSUUID (RLMUUIDSupport)
 
 - (instancetype)initWithRealmUUID:(realm::UUID)rUuid {
-    if (self = [self initWithUUIDBytes: rUuid.to_bytes().data()]) {
-        return self;
-    }
-    return nil;
+    self = [self initWithUUIDBytes: rUuid.to_bytes().data()];
+    return self;
 }
 
 - (realm::UUID)uuidValue {
