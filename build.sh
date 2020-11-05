@@ -416,10 +416,15 @@ case "$COMMAND" in
         ;;
 
     ######################################
-    # Core
+    # Dependencies
     ######################################
     "download-core")
         download_common
+        exit 0
+        ;;
+
+    "setup-baas")
+        ruby Realm/ObjectServerTests/setup_baas.rb
         exit 0
         ;;
 
@@ -1101,9 +1106,10 @@ case "$COMMAND" in
             fi
             export REALM_SKIP_PRELAUNCH=1
 
-            if [[ "$target" = *"server"* ]]; then
+            if [[ "$target" = *"server"* ]] || [[ "$target" = "swiftpm"* ]]; then
                 source $(brew --prefix nvm)/nvm.sh --no-use
-                export REALM_NODE_PATH="$(nvm which 10)"
+                nvm install 8.11.2
+                sh build.sh setup-baas
             fi
 
             # Reset CoreSimulator.log

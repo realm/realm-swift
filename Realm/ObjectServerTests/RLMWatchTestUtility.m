@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMWatchTestUtility.h"
+
 #import <Realm/RLMBSON.h>
 
 @implementation RLMWatchTestUtility {

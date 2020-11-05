@@ -16,11 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import <XCTest/XCTest.h>
-
 #import "RLMBSON_Private.hpp"
-#import <realm/object-store/bson.hpp>
+
+#import <realm/object-store/util/bson/bson.hpp>
+
+#import <XCTest/XCTest.h>
 
 using namespace realm::bson;
 
