@@ -19,14 +19,36 @@
 import XCTest
 import RealmSwift
 
-class SwiftSyncTestCase: RLMSyncTestCase {
-    func executeChild(file: StaticString = #file, line: UInt = #line) {
-        XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
+#if canImport(RealmTestSupport)
+import RealmTestSupport
+import RealmSyncTestSupport
+#endif
+
+public class SwiftPerson: Object {
+    @objc public dynamic var _id: ObjectId? = ObjectId.generate()
+    @objc public dynamic var firstName: String = ""
+    @objc public dynamic var lastName: String = ""
+    @objc public dynamic var age: Int = 30
+
+    public convenience init(firstName: String, lastName: String) {
+        self.init()
+        self.firstName = firstName
+        self.lastName = lastName
     }
 
-    func randomString(_ length: Int) -> String {
-      let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-      return String((0..<length).map { _ in letters.randomElement()! })
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
+public func randomString(_ length: Int) -> String {
+    let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    return String((0..<length).map { _ in letters.randomElement()! })
+}
+
+open class SwiftSyncTestCase: RLMSyncTestCase {
+    public func executeChild(file: StaticString = #file, line: UInt = #line) {
+        XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
     }
 
     public func basicCredentials(usernameSuffix: String = "", app: App? = nil) -> Credentials {
@@ -42,30 +64,35 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return credentials
     }
 
-    func synchronouslyOpenRealm(partitionValue: AnyBSON,
-                                user: User,
-                                file: StaticString = #file,
-                                line: UInt = #line) throws -> Realm {
+    public func openRealm(partitionValue: AnyBSON, user: User) throws -> Realm {
         let config = user.configuration(partitionValue: partitionValue)
-        return try synchronouslyOpenRealm(configuration: config)
+        return try openRealm(configuration: config)
     }
 
-    func synchronouslyOpenRealm<T: BSON>(partitionValue: T,
-                                         user: User,
-                                         file: StaticString = #file,
-                                         line: UInt = #line) throws -> Realm {
+    public func openRealm<T: BSON>(partitionValue: T,
+                                   user: User,
+                                   file: StaticString = #file,
+                                   line: UInt = #line) throws -> Realm {
         let config = user.configuration(partitionValue: partitionValue)
-        return try synchronouslyOpenRealm(configuration: config)
+        return try openRealm(configuration: config)
     }
 
-    func synchronouslyOpenRealm(configuration: Realm.Configuration,
-                                file: StaticString = #file,
-                                line: UInt = #line) throws -> Realm {
+    public func openRealm(configuration: Realm.Configuration) throws -> Realm {
+        var configuration = configuration
+        if configuration.objectTypes == nil {
+            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self]
+        }
+        let realm = try Realm(configuration: configuration)
+        waitForDownloads(for: realm)
+        return realm
+    }
+
+    public func immediatelyOpenRealm(partitionValue: String, user: User) throws -> Realm {
+        var configuration = user.configuration(partitionValue: partitionValue)
+        if configuration.objectTypes == nil {
+            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self]
+        }
         return try Realm(configuration: configuration)
-    }
-
-    func immediatelyOpenRealm(partitionValue: String, user: User) throws -> Realm {
-        return try Realm(configuration: user.configuration(partitionValue: partitionValue))
     }
 
     open func synchronouslyLogInUser(for credentials: Credentials,
@@ -90,9 +117,9 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return theUser
     }
 
-    func synchronouslyLogOutUser(_ user: User,
-                                 file: StaticString = #file,
-                                 line: UInt = #line) throws {
+    public func synchronouslyLogOutUser(_ user: User,
+                                        file: StaticString = #file,
+                                        line: UInt = #line) throws {
         var theError: Error?
         let ex = expectation(description: "Should log out the user properly")
 
@@ -110,48 +137,48 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         XCTAssertFalse(user.isLoggedIn)
     }
 
-    func waitForUploads(for realm: Realm) {
+    public func waitForUploads(for realm: Realm) {
         waitForUploads(for: ObjectiveCSupport.convert(object: realm))
     }
 
-    func waitForDownloads(for realm: Realm) {
+    public func waitForDownloads(for realm: Realm) {
         waitForDownloads(for: ObjectiveCSupport.convert(object: realm))
     }
 
-    func checkCount<T: Object>(expected: Int,
-                               _ realm: Realm,
-                               _ type: T.Type,
-                               file: StaticString = #file,
-                               line: UInt = #line) {
+    public func checkCount<T: Object>(expected: Int,
+                                      _ realm: Realm,
+                                      _ type: T.Type,
+                                      file: StaticString = #file,
+                                      line: UInt = #line) {
         let actual = realm.objects(type).count
-        XCTAssert(actual == expected,
-                  "Error: expected \(expected) items, but got \(actual) (process: \(isParent ? "parent" : "child"))",
-                  file: file,
-                  line: line)
+        XCTAssertEqual(actual, expected,
+                       "Error: expected \(expected) items, but got \(actual) (process: \(isParent ? "parent" : "child"))",
+            file: file,
+            line: line)
     }
 
     var exceptionThrown = false
 
-    func assertThrows<T>(_ block: @autoclosure () -> T, named: String? = RLMExceptionName,
-                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+    public func assertThrows<T>(_ block: @autoclosure () -> T, named: String? = RLMExceptionName,
+                                _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrowsWithName(self, { _ = block() }, named, message, fileName, lineNumber)
     }
 
-    func assertThrows<T>(_ block: @autoclosure () -> T, reason: String,
-                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+    public func assertThrows<T>(_ block: @autoclosure () -> T, reason: String,
+                                _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrowsWithReason(self, { _ = block() }, reason, message, fileName, lineNumber)
     }
 
-    func assertThrows<T>(_ block: @autoclosure () -> T, reasonMatching regexString: String,
-                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+    public func assertThrows<T>(_ block: @autoclosure () -> T, reasonMatching regexString: String,
+                                _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
     }
 
-    func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
-                        lineNumber: UInt = #line, block: () throws -> Void) {
+    public func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
+                               lineNumber: UInt = #line, block: () throws -> Void) {
         do {
             try block()
         } catch {

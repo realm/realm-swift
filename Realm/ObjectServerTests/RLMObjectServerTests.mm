@@ -19,10 +19,6 @@
 #import "RLMSyncTestCase.h"
 #import "RLMUser+ObjectServerTests.h"
 
-#import "RLMListBase.h"
-#import <RealmSwift/RealmSwift-Swift.h>
-#import "ObjectServerTests-Swift.h"
-
 #import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
 #import "RLMCredentials.h"
@@ -40,12 +36,37 @@
 #import "RLMWatchTestUtility.h"
 
 #import <realm/object-store/shared_realm.hpp>
+#import <realm/object-store/sync/sync_manager.hpp>
 
-#pragma mark - Test objects
+#pragma mark - Helpers
+
+// These are defined in Swift. Importing the auto-generated header doesn't work
+// when building with SPM, so just redeclare the bits we need.
+@interface RealmServer : NSObject
++ (RealmServer *)shared;
+- (NSString *)createAppAndReturnError:(NSError **)error;
+@end
+
+@interface TimeoutProxyServer : NSObject
+- (instancetype)initWithPort:(uint16_t)port targetPort:(uint16_t)targetPort;
+- (void)startAndReturnError:(NSError **)error;
+- (void)stop;
+@property (nonatomic) double delay;
+@end
+
+@interface RLMUser (Test)
+@end
+@implementation RLMUser (Test)
+- (RLMRealmConfiguration *)configurationWithTestSelector:(SEL)sel {
+    auto config = [self configurationWithPartitionValue:NSStringFromSelector(sel)];
+    config.objectClasses = @[Person.class, HugeSyncObject.class];
+    return config;
+}
+
+@end
 
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
-
 @implementation RLMObjectServerTests
 
 #pragma mark - App Tests
@@ -1382,7 +1403,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMRunChildAndWait();
 
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-    RLMRealmConfiguration *c = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
+    RLMRealmConfiguration *c = [user configurationWithTestSelector:_cmd];
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
 
     [RLMRealm asyncOpenWithConfiguration:c
@@ -1415,7 +1436,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }
 
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-    RLMRealmConfiguration *c = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
+    RLMRealmConfiguration *c = [user configurationWithTestSelector:_cmd];
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
     RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
     CHECK_COUNT(0, HugeSyncObject, realm);
@@ -1455,7 +1476,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self manuallySetAccessTokenForUser:user value:[self badAccessToken]];
     [self manuallySetRefreshTokenForUser:user value:[self badAccessToken]];
     auto ex = [self expectationWithDescription:@"async open"];
-    auto c = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
+    auto c = [user configurationWithTestSelector:_cmd];
     [RLMRealm asyncOpenWithConfiguration:c callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
         XCTAssertNil(realm);
@@ -1481,8 +1502,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMSetAsyncOpenQueue(dispatch_queue_create("io.realm.asyncOpen", 0));
 
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-    RLMRealmConfiguration *c = [user configurationWithPartitionValue:self.appId];
-
+    RLMRealmConfiguration *c = [user configurationWithTestSelector:_cmd];
     [RLMRealm asyncOpenWithConfiguration:c
                            callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
@@ -1512,7 +1532,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *ex1 = [self expectationWithDescription:@"async open"];
     XCTestExpectation *ex2 = [self expectationWithDescription:@"download progress complete"];
-    RLMRealmConfiguration *c = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
+    RLMRealmConfiguration *c = [user configurationWithTestSelector:_cmd];
 
     auto task = [RLMRealm asyncOpenWithConfiguration:c
                                        callbackQueue:dispatch_get_main_queue()
@@ -1617,7 +1637,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     // Reopen the file with a shouldCompactOnLaunch block and verify that it is
     // actually compacted
-    auto config = [user configurationWithPartitionValue:partitionValue];
+    auto config = [user configurationWithTestSelector:_cmd];
     __block bool blockCalled = false;
     __block NSUInteger usedSize = 0;
     config.shouldCompactOnLaunch = ^(NSUInteger, NSUInteger used) {
@@ -1640,10 +1660,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
 - (void)testOpenSynchronouslyInReadOnlyBeforeRemoteSchemaIsInitialized {
     RLMUser *user = [self userForTest:_cmd];
-    NSString *realmId = NSStringFromSelector(_cmd);
 
     if (self.isParent) {
-        RLMRealmConfiguration *config = [user configurationWithPartitionValue:realmId];
+        RLMRealmConfiguration *config = [user configurationWithTestSelector:_cmd];
         config.readOnly = true;
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
         CHECK_COUNT(0, Person, realm);
@@ -1660,7 +1679,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
 - (void)testAddPropertyToReadOnlyRealmWithExistingLocalCopy {
     RLMUser *user = [self userForTest:_cmd];
-    NSString *realmId = NSStringFromSelector(_cmd);
 
     if (!self.isParent) {
         RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
@@ -1670,7 +1688,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }
     RLMRunChildAndWait();
 
-    RLMRealmConfiguration *config = [user configurationWithPartitionValue:realmId];
+    RLMRealmConfiguration *config = [user configurationWithTestSelector:_cmd];
     config.readOnly = true;
     @autoreleasepool {
         RLMRealm *realm = [self asyncOpenRealmWithConfiguration:config];
@@ -1694,7 +1712,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
 - (void)testAddPropertyToReadOnlyRealmWithAsyncOpen {
     RLMUser *user = [self userForTest:_cmd];
-    NSString *realmId = NSStringFromSelector(_cmd);
 
     if (!self.isParent) {
         RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
@@ -1704,7 +1721,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }
     RLMRunChildAndWait();
 
-    RLMRealmConfiguration *config = [user configurationWithPartitionValue:realmId];
+    RLMRealmConfiguration *config = [user configurationWithTestSelector:_cmd];
     config.readOnly = true;
 
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:Person.class];
@@ -2489,6 +2506,7 @@ static NSString *oldPathForPartitionValue(RLMUser *user, id<RLMBSON> partitionVa
         @autoreleasepool {
             auto configuration = [user configurationWithPartitionValue:partitionValue];
             configuration.fileURL = url;
+            configuration.objectClasses = @[Person.class];
             RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
             [realm beginWriteTransaction];
             [Person createInRealm:realm withValue:[Person george]];
@@ -2496,6 +2514,7 @@ static NSString *oldPathForPartitionValue(RLMUser *user, id<RLMBSON> partitionVa
         }
 
         auto configuration = [user configurationWithPartitionValue:partitionValue];
+        configuration.objectClasses = @[Person.class];
         XCTAssertEqualObjects(configuration.fileURL, url);
         RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
         XCTAssertEqual([Person allObjectsInRealm:realm].count, 1U);

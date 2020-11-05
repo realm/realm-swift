@@ -18,7 +18,10 @@
 
 import XCTest
 import Realm
+
+#if canImport(RealmTestSupport)
 import RealmTestSupport
+#endif
 
 class SwiftRLMArrayPropertyTests: RLMTestCase {
 

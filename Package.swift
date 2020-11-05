@@ -27,6 +27,22 @@ let cxxSettings: [CXXSetting] = [
     .define("REALM_VERSION_EXTRA", to: "\"\(coreVersionExtra.count > 1 ? String(coreVersionExtra[1]) : "")\""),
     .define("REALM_VERSION_STRING", to: "\"\(coreVersionStr)\""),
 ]
+let testCxxSettings: [CXXSetting] = cxxSettings + [
+    // Command-line `swift build` resolves header search paths
+    // relative to the package root, while Xcode resolves them
+    // relative to the target root, so we need both.
+    .headerSearchPath("Realm"),
+    .headerSearchPath(".."),
+]
+
+// SPM is supposed to weak-link frameworks that rely on a newer deployment
+// target than the package's, but doesn't do so correctly for Combine
+func combineFlags() -> [SwiftSetting]? {
+    if #available(macOS 10.15, *) {
+        return [.define("REALM_HAVE_COMBINE")]
+    }
+    return nil
+}
 
 let package = Package(
     name: "Realm",
@@ -124,13 +140,7 @@ let package = Package(
             name: "RealmTestSupport",
             dependencies: ["Realm"],
             path: "Realm/TestUtils",
-            cxxSettings: cxxSettings + [
-                // Command-line `swift build` resolves header search paths
-                // relative to the package root, while Xcode resolves them
-                // relative to the target root, so we need both.
-                .headerSearchPath("Realm"),
-                .headerSearchPath(".."),
-            ]
+            cxxSettings: testCxxSettings
         ),
         .testTarget(
             name: "RealmTests",
@@ -141,10 +151,7 @@ let package = Package(
                 "TestHost",
                 "PrimitiveArrayPropertyTests.tpl.m",
             ],
-            cxxSettings: cxxSettings + [
-                .headerSearchPath("Realm"),
-                .headerSearchPath("..")
-            ]
+            cxxSettings: testCxxSettings
         ),
         .testTarget(
             name: "RealmObjcSwiftTests",
@@ -156,6 +163,50 @@ let package = Package(
             dependencies: ["RealmSwift", "RealmTestSupport"],
             path: "RealmSwift/Tests",
             exclude: ["TestUtils.mm"]
+        ),
+
+        // Object server tests have support code written in both obj-c and
+        // Swift which is used by both the obj-c and swift test code. SPM
+        // doesn't support mixed targets, so this ends up requiring four
+        // different targest.
+        .target(
+            name: "RealmSyncTestSupport",
+            dependencies: ["Realm", "RealmSwift", "RealmTestSupport"],
+            path: "Realm/ObjectServerTests",
+            sources: ["RLMSyncTestCase.mm", "RLMUser+ObjectServerTests.mm"],
+            cxxSettings: testCxxSettings
+        ),
+        .target(
+            name: "RealmSwiftSyncTestSupport",
+            dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport"],
+            path: "Realm/ObjectServerTests",
+            sources: [
+                 "SwiftSyncTestCase.swift",
+                 "TimeoutProxyServer.swift",
+                 "WatchTestUtility.swift",
+                 "RealmServer.swift"
+            ]
+        ),
+        .testTarget(
+            name: "SwiftObjectServerTests",
+            dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftSyncTestSupport"],
+            path: "Realm/ObjectServerTests",
+            sources: [
+                 "SwiftObjectServerTests.swift",
+                 "SwiftBSONTests.swift"
+            ],
+            swiftSettings: combineFlags()
+        ),
+        .testTarget(
+            name: "ObjcObjectServerTests",
+            dependencies: ["RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftSyncTestSupport"],
+            path: "Realm/ObjectServerTests",
+            sources: [
+                "RLMBSONTests.mm",
+                "RLMObjectServerTests.mm",
+                "RLMWatchTestUtility.m"
+            ],
+            cxxSettings: testCxxSettings
         )
     ],
     cxxLanguageStandard: .cxx1z
