@@ -350,8 +350,7 @@ id managedGetter(RLMProperty *prop, const char *type) {
                 return getLinkingObjects(obj, prop);
             };
         case RLMPropertyTypeUUID:
-            return makeBoxedGetter<realm::UUID>(index);
-//            return makeWrapperGetter<realm::UUID>(index, prop.optional);
+            return makeWrapperGetter<realm::UUID>(index, prop.optional);
     }
 }
 

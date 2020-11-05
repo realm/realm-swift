@@ -766,7 +766,8 @@
                                                            @"doubleObj": @[@3.3, @4.4, NSNull.null],
                                                            @"stringObj": @[@"a", @"b", NSNull.null],
                                                            @"dateObj": @[now, NSNull.null],
-                                                           @"dataObj": @[bytes, NSNull.null]}];
+                                                           @"dataObj": @[bytes, NSNull.null],
+                                                           @"uuidObj": @[[[NSUUID alloc] initWithUUIDString:@"137decc8-b300-4954-a233-f89909f4fd89"], [[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"]]}];
     XCTAssertEqual(4U, req.intObj.count);
     XCTAssertEqual(3U, req.boolObj.count);
     XCTAssertEqual(3U, req.floatObj.count);

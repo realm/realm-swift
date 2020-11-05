@@ -234,7 +234,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     else if (strcmp(code, "@\"RLMObjectId\"") == 0) {
         _type = RLMPropertyTypeObjectId;
     }
-    else if (strcmp(code, "@\"RLMUUID\"") == 0) {
+    else if (strcmp(code, "@\"NSUUID\"") == 0) {
         _type = RLMPropertyTypeUUID;
     }
     else if (strncmp(code, arrayPrefix, arrayPrefixLen) == 0) {
