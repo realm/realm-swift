@@ -35,7 +35,6 @@
 #import <realm/object-store/object_store.hpp>
 #import <realm/object-store/results.hpp>
 #import <realm/object-store/shared_realm.hpp>
-
 #import <realm/group.hpp>
 
 #import <objc/message.h>
@@ -100,12 +99,6 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
             id ivar = object_getIvar(object, prop.swiftIvar);
             RLMArray *array = [[RLMManagedArray alloc] initWithParent:object property:prop];
             [ivar set_rlmArray:array];
-        }
-        else if (prop.set) {
-            id ivar = object_getIvar(object, prop.swiftIvar);
-            // TODO: RLMSet
-//            RLMSet *array = [[RLMManagedArray alloc] initWithParent:object property:prop];
-//            [ivar set_rlmSet:array];
         }
         else {
             id ivar = object_getIvar(object, prop.swiftIvar);

@@ -29,8 +29,8 @@
 
 #import <realm/object-store/collection_notifications.hpp>
 #import <realm/object-store/list.hpp>
-#import <realm/object-store/set.hpp>
 #import <realm/object-store/results.hpp>
+#import <realm/object-store/set.hpp>
 
 static const int RLMEnumerationBufferSize = 16;
 
@@ -194,7 +194,7 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
     if (count == 0) {
         return @[];
     }
-/*
+
     NSMutableArray *array = [NSMutableArray arrayWithCapacity:count];
     if ([key isEqualToString:@"self"]) {
         RLMAccessorContext context(info);
@@ -234,6 +234,22 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
                 [array addObject:list];
             }
             return array;
+        } else if (prop && prop.set && prop.swiftIvar) {
+            // Grab the actual class for the generic Set from an instance of it
+            // so that we can make instances of the Set without creating a new
+            // object accessor each time
+            Class cls = [object_getIvar(accessor, prop.swiftIvar) class];
+            RLMAccessorContext context(info);
+            for (size_t i = 0; i < count; ++i) {
+                RLMSetBase *set = [[cls alloc] init];
+                set._rlmSet = [[RLMManagedSet alloc] initWithSet:realm::object_store::Set(info.realm->_realm,
+                                                                                          collection.get(i),
+                                                                                          info.tableColumn(prop))
+                                                      parentInfo:&info
+                                                        property:prop];
+                [array addObject:set];
+            }
+            return array;
         }
     }
 
@@ -242,20 +258,12 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
         RLMInitializeSwiftAccessorGenerics(accessor);
         [array addObject:[accessor valueForKey:key] ?: NSNull.null];
     }
-    return array;*/
-}
-
-template<typename Collection>
-NSSet *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClassInfo& info) {
-    return [NSSet new];
+    return array;
 }
 
 template NSArray *RLMCollectionValueForKey(realm::Results&, NSString *, RLMClassInfo&);
 template NSArray *RLMCollectionValueForKey(realm::List&, NSString *, RLMClassInfo&);
 template NSArray *RLMCollectionValueForKey(realm::object_store::Set&, NSString *, RLMClassInfo&);
-
-//template NSSet *RLMCollectionValueForKey(realm::object_store::Set&, NSString *, RLMClassInfo&);
-//template NSSet *RLMCollectionValueForKey(realm::Results&, NSString *, RLMClassInfo&);
 
 void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id value) {
     realm::TableView tv = [collection tableView];

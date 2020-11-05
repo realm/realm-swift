@@ -19,6 +19,7 @@
 #import "RLMRealm_Private.h"
 
 #import "RLMClassInfo.hpp"
+
 #import <realm/object-store/object_schema.hpp>
 
 namespace realm {

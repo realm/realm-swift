@@ -50,59 +50,6 @@
 @interface RLMManagedSet () <RLMThreadConfined_Private>
 @end
 
-//temp cpp impl
-//namespace realm {
-//template<>
-//realm::object_store::Set realm::ThreadSafeReference::resolve<realm::object_store::Set>(std::shared_ptr<realm::Realm> const&) { }
-//
-
-//namespace object_store {
-//
-//realm::ObjKey realm::object_store::Set::get_parent_object_key() const noexcept
-//{
-//    return m_set_base->get_key();
-//}
-//
-//bool realm::object_store::Set::is_valid() const noexcept { return true; }
-//void realm::object_store::Set::verify_attached() const { }
-//void realm::object_store::Set::verify_in_transaction() const { }
-//size_t realm::object_store::Set::size() const { return 1; }
-//
-//template <class T>
-//size_t realm::object_store::Set::find(const T&) { return 1; }
-//template <class T>
-//bool realm::object_store::Set::insert(T) { return true; }
-//template <class T>
-//bool realm::object_store::Set::remove(const T&) { return true; }
-//
-//template <class T, class Context>
-//size_t realm::object_store::Set::find(Context&, const T&) { return 1; }
-//template <class T, class Context>
-//bool realm::object_store::Set::insert(Context&, T value) { return true; }
-//template <class T, class Context>
-//bool realm::object_store::Set::remove(Context&, const T&) { return true; }
-//
-//util::Optional<Mixed> realm::object_store::Set::max(ColKey column) const { return util::none; }
-//util::Optional<Mixed> realm::object_store::Set::min(ColKey column) const { return util::none; }
-//util::Optional<Mixed> realm::object_store::Set::average(ColKey column) const { return util::none; }
-//
-//bool realm::object_store::Set::operator==(const Set& rhs) const noexcept { return true; }
-//
-//Results realm::object_store::Set::as_results() const { return {}; }
-//Results realm::object_store::Set::snapshot() const  { return {}; }
-//
-//Results realm::object_store::Set::sort(SortDescriptor order) const { return {}; }
-//Results realm::object_store::Set::sort(const std::vector<std::pair<std::string, bool>>& keypaths) const { return {}; }
-//Results realm::object_store::Set::filter(Query q) const { return {}; }
-//
-//Set realm::object_store::Set::freeze(const std::shared_ptr<Realm>& realm) const { return *this; }
-//bool realm::object_store::Set::is_frozen() const noexcept { return true;}
-//
-//NotificationToken realm::object_store::Set::add_notification_callback(CollectionChangeCallback cb) & { }
-//
-//}
-//}
-
 //
 // RLMSet implementation
 //
@@ -305,10 +252,10 @@ static void changeSet(__unsafe_unretained RLMManagedSet *const set, NSKeyValueCh
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
-//    return translateErrors([&] {
-//        RLMAccessorContext context(*_objectInfo);
-//        return _backingSet.get(context, index);
-//    });
+    return translateErrors([&] {
+        RLMAccessorContext context(*_objectInfo);
+        return _backingSet.get(context, index);
+    });
 }
 
 static void RLMInsertObject(RLMManagedSet *set, id object) {
@@ -365,9 +312,9 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     RLMSetValidateMatchingObjectType(self, object);
     return translateErrors([&] {
         RLMAccessorContext context(*_objectInfo);
-        _backingSet.find(context, object);
         return RLMConvertNotFound(_backingSet.find(context, object));
     });
+    return 1;
 }
 
 - (id)valueForKeyPath:(NSString *)keyPath {
@@ -379,6 +326,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
         });
     }
     return [super valueForKeyPath:keyPath];
+    return nil;
 }
 
 - (id)valueForKey:(NSString *)key {
@@ -394,9 +342,9 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
         }
 
         _backingSet.verify_attached();
-        //TODO: This is set up for list not set
         return RLMCollectionValueForKey(_backingSet, key, *_objectInfo);
     });
+    return nil;
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {
@@ -444,7 +392,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 
 - (id)sumOfProperty:(NSString *)property {
     auto column = [self columnForProperty:property];
-//    return RLMMixedToObjc(translateErrors(self, [&] { return _backingSet.sum(column); }, @"sumOfProperty"));
+    return RLMMixedToObjc(translateErrors(self, [&] { return _backingSet.sum(column); }, @"sumOfProperty"));
 }
 
 - (id)averageOfProperty:(NSString *)property {
@@ -486,15 +434,17 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
-    if (_type != RLMPropertyTypeObject) {
-        @throw RLMException(@"Querying is currently only implemented for arrays of Realm Objects");
-    }
-    realm::Query query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema,
-                                             _realm.schema, _realm.group);
-
-    return translateErrors([&] {
-        return RLMConvertNotFound(_backingSet.find(std::move(query)));
-    });
+    // TODO: Query not yet implemented in core
+//    if (_type != RLMPropertyTypeObject) {
+//        @throw RLMException(@"Querying is currently only implemented for arrays of Realm Objects");
+//    }
+//    realm::Query query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema,
+//                                             _realm.schema, _realm.group);
+//
+//    return translateErrors([&] {
+//        return RLMConvertNotFound(_backingSet.find(std::move(query)));
+//    });
+    return NSIntegerMax;
 }
 
 - (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes {

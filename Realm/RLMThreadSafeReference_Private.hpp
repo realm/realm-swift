@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMThreadSafeReference.h"
+
 #import <realm/object-store/thread_safe_reference.hpp>
 
 NS_ASSUME_NONNULL_BEGIN

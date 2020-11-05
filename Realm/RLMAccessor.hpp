@@ -18,11 +18,11 @@
 
 #import "RLMAccessor.h"
 
-#import <realm/object-store/object_accessor.hpp>
-
 #import "RLMDecimal128_Private.hpp"
 #import "RLMObjectId_Private.hpp"
 #import "RLMUtil.hpp"
+
+#import <realm/object-store/object_accessor.hpp>
 
 @class RLMRealm;
 class RLMClassInfo;
@@ -46,13 +46,11 @@ public:
     // Accessor context interface
     RLMAccessorContext(RLMAccessorContext& parent, realm::Obj const& parent_obj, realm::Property const& property);
 
+    id box(realm::object_store::Set&&);
     id box(realm::List&&);
     id box(realm::Results&&);
     id box(realm::Object&&);
     id box(realm::Obj&&);
-
-    template<typename T>
-    id box(realm::Set<T>&&);
 
     id box(bool v) { return @(v); }
     id box(double v) { return @(v); }

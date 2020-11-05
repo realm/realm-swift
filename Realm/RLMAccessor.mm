@@ -160,7 +160,6 @@ RLMSet *getSet(__unsafe_unretained RLMObjectBase *const obj, NSUInteger propInde
     RLMVerifyAttached(obj);
     auto prop = obj->_info->rlmObjectSchema.properties[propIndex];
     return [[RLMManagedSet alloc] initWithParent:obj property:prop];
-    return nil;
 }
 
 // array getter/setter
@@ -375,7 +374,7 @@ id makeSetter(__unsafe_unretained RLMProperty *const prop) {
 
 // dynamic setter with column closure
 id managedSetter(RLMProperty *prop, const char *type) {
-    if (prop.array && prop.type != RLMPropertyTypeLinkingObjects) {
+    if ((prop.array || prop.set) && prop.type != RLMPropertyTypeLinkingObjects) {
         return makeSetter<id<NSFastEnumeration>>(prop);
     }
 
@@ -733,6 +732,14 @@ id RLMAccessorContext::box(realm::List&& l) {
     return [[RLMManagedArray alloc] initWithList:std::move(l)
                                       parentInfo:_parentObjectInfo
                                         property:currentProperty];
+}
+
+id RLMAccessorContext::box(realm::object_store::Set&& s) {
+    REALM_ASSERT(_parentObjectInfo);
+    REALM_ASSERT(currentProperty);
+    return [[RLMManagedSet alloc] initWithSet:std::move(s)
+                                   parentInfo:_parentObjectInfo
+                                     property:currentProperty];
 }
 
 id RLMAccessorContext::box(realm::Object&& o) {

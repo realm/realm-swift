@@ -30,11 +30,10 @@
 
 #import <realm/object-store/object_store.hpp>
 #import <realm/object-store/results.hpp>
-
-#include <realm/query_engine.hpp>
-#include <realm/query_expression.hpp>
-#include <realm/util/cf_ptr.hpp>
-#include <realm/util/overload.hpp>
+#import <realm/query_engine.hpp>
+#import <realm/query_expression.hpp>
+#import <realm/util/cf_ptr.hpp>
+#import <realm/util/overload.hpp>
 
 using namespace realm;
 
@@ -616,7 +615,8 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
         }
         return;
     }
-
+    return;
+    /*
     auto as_subexpr = util::overload([](StringData value) { return make_subexpr<ConstantStringValue>(value); },
                                      [](const Columns<String>& c) { return c.clone(); });
     auto left = as_subexpr(column);
@@ -662,7 +662,7 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
         default:
             @throw RLMPredicateException(@"Invalid operator type",
                                          @"Operator '%@' not supported for string type", operatorName(operatorType));
-    }
+    }*/
 }
 
 void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
@@ -672,7 +672,7 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
     switch (operatorType) {
         case NSEqualToPredicateOperatorType:
         case NSNotEqualToPredicateOperatorType:
-            add_string_constraint(operatorType, predicateOptions, std::move(column), value);
+            add_string_constraint<realm::StringData>(operatorType, predicateOptions, std::move(column), value);
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",

@@ -45,8 +45,7 @@ def doBuild() {
           $class           : 'GitSCM',
           branches         : scm.branches,
           gitTool          : 'native git',
-          extensions       : scm.extensions + [[$class: 'CleanCheckout'],
-                                               [$class: 'SubmoduleOption', parentCredentials: true]],
+          extensions       : scm.extensions + [[$class: 'CleanCheckout']],
           userRemoteConfigs: scm.userRemoteConfigs,
         ]
       )

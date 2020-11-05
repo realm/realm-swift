@@ -18,9 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
-#import <realm/object-store/binding_context.hpp>
-
 #import <realm/obj.hpp>
+#import <realm/object-store/binding_context.hpp>
 #import <realm/table.hpp>
 
 @class RLMObjectBase, RLMRealm, RLMSchema, RLMProperty, RLMObjectSchema;

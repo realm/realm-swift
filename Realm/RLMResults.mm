@@ -34,9 +34,9 @@
 
 #import <realm/object-store/results.hpp>
 #import <realm/object-store/shared_realm.hpp>
+#import <realm/table_view.hpp>
 
 #import <objc/message.h>
-#import <realm/table_view.hpp>
 
 using namespace realm;
 
@@ -316,7 +316,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     assertKeyPathIsNotNested(keyPath);
     return [self averageOfProperty:keyPath];
 }
-//TODO: what is the purpose of this? Doesn't seem to have a code path
+
 - (NSArray *)_unionOfObjectsForKeyPath:(NSString *)keyPath {
     assertKeyPathIsNotNested(keyPath);
     return translateRLMResultsErrors([&] {

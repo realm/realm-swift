@@ -236,8 +236,8 @@
 
 #pragma mark SetPropertyObject
 
-//@implementation SetPropertyObject
-//@end
+@implementation SetPropertyObject
+@end
 
 #pragma mark DynamicTestObject
 

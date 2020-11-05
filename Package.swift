@@ -11,7 +11,6 @@ let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
 let cxxSettings: [CXXSetting] = [
     .headerSearchPath("."),
     .headerSearchPath("include"),
-    .headerSearchPath("Realm/ObjectStore/src"),
     .define("REALM_SPM", to: "1"),
     .define("REALM_ENABLE_SYNC", to: "1"),
     .define("REALM_COCOA_VERSION", to: "@\"\(cocoaVersionStr)\""),
@@ -146,8 +145,7 @@ let package = Package(
             ],
             cxxSettings: cxxSettings + [
                 .headerSearchPath("Realm"),
-                .headerSearchPath(".."),
-                .headerSearchPath("../ObjectStore/src"),
+                .headerSearchPath("..")
             ]
         ),
         .testTarget(

@@ -20,29 +20,17 @@
 
 @interface RLMSetObject : RLMObject
 
-@property (nonatomic, strong) RLMSet<RLMString> *stringSet;
-@property (nonatomic, strong) RLMSet<RLMDecimal128> *decimalSet;
-@property (nonatomic, strong) RLMSet<RLMObjectId> *objectIdSet;
-@property (nonatomic, strong) RLMSet<RLMInt> *numberSet;
-@property (nonatomic, strong) RLMArray<EmbeddedIntObject> *embeddedSet;
-@property (nonatomic, strong) RLMSet<RLMData> *dataSet;
-@property (nonatomic, strong) RLMSet<EmployeeObject> *employeeSet;
+@property RLMSet<RLMString> *stringSet;
+@property RLMSet<RLMDecimal128> *decimalSet;
+@property RLMSet<RLMObjectId> *objectIdSet;
+@property RLMSet<RLMInt> *numberSet;
+@property RLMArray<EmbeddedIntObject> *embeddedSet;
+@property RLMSet<RLMData> *dataSet;
+@property RLMSet<EmployeeObject> *employeeSet;
 
 @end
 
 @implementation RLMSetObject
-@end
-
-// TODO: Delete once Core impl is available, and renable in RLMTestObjects
-@interface SetPropertyObject : RLMObject
-
-@property NSString *name;
-@property RLM_GENERIC_SET(StringObject) *stringSet;
-@property RLM_GENERIC_SET(IntObject) *intSet;
-
-@end
-
-@implementation SetPropertyObject
 @end
 
 @interface SetTests : RLMTestCase
@@ -351,6 +339,17 @@
     XCTAssertEqual(1, [[setObj.embeddedSet minOfProperty:@"intCol"] intValue]);
     XCTAssertEqual(3, [[setObj.embeddedSet maxOfProperty:@"intCol"] intValue]);
     XCTAssertThrows([setObj.embeddedSet sumOfProperty:@"prop 1"]);
+}
+
+- (void)testManagedSet {
+    RLMRealm *r = [self realmWithTestPath];
+//    [r beginWriteTransaction];
+//    RLMSetObject *setObj1 = [RLMSetObject new];
+//    [setObj1.stringSet addObjects:@[@"one", @"two", @"three", @"four", @"five"]];
+//    [r addObject:setObj1];
+//    [r commitWriteTransaction];
+
+
 }
 
 @end

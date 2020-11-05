@@ -332,13 +332,13 @@ RLM_ARRAY_TYPE(CircleObject);
 
 #pragma mark SetPropertyObject
 
-//@interface SetPropertyObject : RLMObject
-//
-//@property NSString *name;
-//@property RLM_GENERIC_SET(StringObject) *array;
-//@property RLM_GENERIC_SET(IntObject) *intArray;
-//
-//@end
+@interface SetPropertyObject : RLMObject
+
+@property NSString *name;
+@property RLM_GENERIC_SET(StringObject) *stringSet;
+@property RLM_GENERIC_SET(IntObject) *intSet;
+
+@end
 
 #pragma mark DynamicObject
 

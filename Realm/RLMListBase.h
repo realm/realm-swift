@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-
-@class RLMArray, RLMObjectBase, RLMResults, RLMProperty, RLMLinkingObjects;
+//TODO: Move RLMSetBase to its own file
+@class RLMArray, RLMObjectBase, RLMResults, RLMProperty, RLMLinkingObjects, RLMSet;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -37,6 +37,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)freeze;
 
 @property (nonatomic, readonly) RLMLinkingObjects *results;
+@end
+
+// A base class for Swift generic Lists to make it possible to interact with
+// them from obj-c
+@interface RLMSetBase : NSObject <NSFastEnumeration>
+@property (nonatomic, strong) RLMSet *_rlmSet;
+
+- (instancetype)init;
+- (instancetype)initWithSet:(RLMSet *)set;
 @end
 
 NS_ASSUME_NONNULL_END
