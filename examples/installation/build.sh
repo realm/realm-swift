@@ -140,17 +140,8 @@ xctest() {
         xcodebuild "${project[@]}" "${scheme[@]}" test "${destination[@]}" "${code_signing_flags[@]}"
     fi
 
-    if [ -d "$workspace" ]; then
-        [[ $LANG == 'swift' ]] && scheme=(-scheme RealmSwift) || scheme=(-scheme Realm)
-    else
-        scheme=()
-    fi
-
-    if [[ $PLATFORM == catalyst ]]; then
-        xcodebuild "${project[@]}" "${scheme[@]}" "${destination[@]}" build "${code_signing_flags[@]}"
-    elif [[ $PLATFORM != osx ]]; then
-        [[ $PLATFORM == 'ios' ]] && SDK=iphoneos || SDK=$PLATFORM
-        xcodebuild "${project[@]}" "${scheme[@]}" -sdk "$SDK" build "${code_signing_flags[@]}"
+    if [[ $PLATFORM != osx ]]; then
+        xcodebuild "${project[@]}" "${scheme[@]}" archive "${code_signing_flags[@]}"
     fi
 }
 
