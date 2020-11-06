@@ -1463,7 +1463,8 @@ RLM_ARRAY_TYPE(MigrationTestObject);
     XCTAssertEqualObjects(inputValue[8], @(obj.longCol));
     XCTAssertEqualObjects(inputValue[9], obj.decimalCol);
     XCTAssertEqualObjects(inputValue[10], obj.objectIdCol);
-    XCTAssertEqualObjects(inputValue[11], @[obj.objectCol.stringCol]);
+    XCTAssertEqualObjects(inputValue[11], obj.uuidCol);
+    XCTAssertEqualObjects(inputValue[12], @[obj.objectCol.stringCol]);
 }
 
 - (void)testMultipleMigrationRenameProperty {

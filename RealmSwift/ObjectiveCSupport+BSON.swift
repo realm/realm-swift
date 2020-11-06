@@ -148,7 +148,7 @@ public extension ObjectiveCSupport {
             }
             return .array(val.map(convert))
         case .UUID:
-            guard let val = bson as? UUID else {
+            guard let val = bson as? NSUUID else {
                 return nil
             }
             return .uuid(val as UUID)

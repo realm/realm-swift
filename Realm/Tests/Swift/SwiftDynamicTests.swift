@@ -144,7 +144,7 @@ class SwiftRLMDynamicTests: RLMTestCase {
         }
 
         // check sub object type
-        XCTAssertTrue(schema.properties[11].objectClassName! == "StringObject")
+        XCTAssertTrue(schema.properties[12].objectClassName! == "StringObject")
 
         // check object equality
         XCTAssertNil(robj1["objectCol"], "object should be nil")

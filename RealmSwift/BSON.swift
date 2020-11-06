@@ -56,6 +56,9 @@ extension Decimal128: BSON {
 extension ObjectId: BSON {
 }
 
+extension UUID: BSON {
+}
+
 /// A Dictionary object representing a `BSON` document.
 public typealias Document = Dictionary<String, AnyBSON?>
 

@@ -117,7 +117,8 @@ using namespace realm::bson;
         @"oid": [[RLMObjectId alloc] initWithString:@"507f1f77bcf86cd799439011" error:nil],
         @"regex": [[NSRegularExpression alloc] initWithPattern:@"^abc" options:0 error:nil],
         @"array1": @[@1, @2],
-        @"array2": @[@"string1", @"string2"]
+        @"array2": @[@"string1", @"string2"],
+        @"uuid": [[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"],
     };
     
     auto bson = RLMConvertRLMBSONToBson(document);
@@ -133,6 +134,7 @@ using namespace realm::bson;
     XCTAssertEqual(RLMConvertBsonToRLMBSON(bsonDocument["int32"]), document[@"int32"]);
     XCTAssertEqual(RLMConvertBsonToRLMBSON(bsonDocument["int64"]), document[@"int64"]);
     XCTAssertEqual(RLMConvertBsonToRLMBSON(bsonDocument["double"]), document[@"double"]);
+    XCTAssertEqual(RLMConvertBsonToRLMBSON(bsonDocument["uuid"]), document[@"uuid"]);
     XCTAssertEqualObjects(RLMConvertBsonToRLMBSON(bsonDocument["decimal128"]), document[@"decimal128"]);
     XCTAssertEqualObjects(RLMConvertBsonToRLMBSON(bsonDocument["minkey"]), document[@"minkey"]);
     XCTAssertEqualObjects(RLMConvertBsonToRLMBSON(bsonDocument["maxkey"]), document[@"maxkey"]);
@@ -143,6 +145,7 @@ using namespace realm::bson;
     XCTAssertEqualObjects(RLMConvertBsonToRLMBSON(bsonDocument["regex"]), document[@"regex"]);
     XCTAssertEqualObjects(RLMConvertBsonToRLMBSON(bsonDocument["array1"]), document[@"array1"]);
     XCTAssertEqualObjects(RLMConvertBsonToRLMBSON(bsonDocument["array2"]), document[@"array2"]);
+    XCTAssertEqualObjects(RLMConvertBsonToRLMBSON(bsonDocument["uuid"]), document[@"uuid"]);
 }
 
 @end

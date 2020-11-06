@@ -95,7 +95,7 @@
 }
 
 + (NSArray *)requiredProperties {
-    return @[@"stringCol", @"dateCol", @"binaryCol", @"decimalCol", @"objectIdCol"];
+    return @[@"stringCol", @"dateCol", @"binaryCol", @"decimalCol", @"objectIdCol", @"uuidCol"];
 }
 
 + (NSDictionary *)values:(int)i stringObject:(StringObject *)so {
@@ -114,6 +114,7 @@
         @"decimalCol": [[RLMDecimal128 alloc] initWithNumber:@(i)],
         @"objectIdCol": [RLMObjectId objectId],
         @"objectCol": so ?: NSNull.null,
+        @"uuidCol": so ? [[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"] : [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"],
     };
 }
 @end
@@ -129,7 +130,7 @@
 @implementation AllPrimitiveArrays
 + (NSArray *)requiredProperties {
     return @[@"intObj", @"floatObj", @"doubleObj", @"boolObj", @"stringObj",
-             @"dateObj", @"dataObj", @"decimalObj", @"objectIdObj"];
+             @"dateObj", @"dataObj", @"decimalObj", @"objectIdObj", @"uuidObj"];
 }
 @end
 @implementation AllOptionalPrimitiveArrays

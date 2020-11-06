@@ -169,14 +169,14 @@
     XCTAssertEqual(results.count, 2U, @"Should have 2 objects");
 
     RLMObjectSchema *schema = dyrealm.schema[AllTypesObject.className];
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 12; i++) {
         NSString *propName = [schema.properties[i] name];
         XCTAssertEqualObjects(obj1[propName], results[0][propName]);
         XCTAssertEqualObjects(obj2[propName], results[1][propName]);
     }
 
     // check sub object type
-    XCTAssertEqualObjects([schema.properties[11] objectClassName], @"StringObject",
+    XCTAssertEqualObjects([schema.properties[12] objectClassName], @"StringObject",
                           @"Sub-object type in schema should be 'StringObject'");
 
     // check object equality
@@ -186,7 +186,7 @@
 
     [dyrealm beginWriteTransaction];
     RLMObject *o = results[0];
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 12; i++) {
         RLMProperty *prop = schema.properties[i];
         id value = prop.type == RLMPropertyTypeString ? @1 : @"";
         RLMAssertThrowsWithReason(o[prop.name] = value,
@@ -197,7 +197,7 @@
                                   @"Invalid value '(null)' of type '(null)' for");
     }
 
-    RLMProperty *prop = schema.properties[11];
+    RLMProperty *prop = schema.properties[12];
     RLMAssertThrowsWithReason(o[prop.name] = @"str",
                               @"Invalid value 'str' of type '__NSCFConstantString' for 'StringObject?' property 'AllTypesObject.objectCol'.");
     XCTAssertNoThrow(o[prop.name] = nil);

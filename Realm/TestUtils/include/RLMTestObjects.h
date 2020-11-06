@@ -140,9 +140,9 @@ RLM_ARRAY_TYPE(EmbeddedIntObject)
 @property int64_t       longCol;
 @property RLMDecimal128 *decimalCol;
 @property RLMObjectId  *objectIdCol;
+@property NSUUID       *uuidCol;
 @property StringObject *objectCol;
 @property (readonly) RLMLinkingObjects *linkingObjectsCol;
-@property NSUUID       *uuidCol;
 
 + (NSDictionary *)values:(int)i stringObject:(StringObject *)so;
 
