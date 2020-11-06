@@ -35,6 +35,22 @@ def installationTest(platform, test, language) {
   }
 }
 
+def spmInstallationTest(platform) {
+  return {
+    node('osx') {
+      deleteDir()
+      unstash 'source'
+
+      sh """
+      hostname
+      export REALM_XCODE_VERSION=${carthageXcodeVersion}
+      cd examples/installation
+      ./build.sh test-${platform}-spm
+      """
+    }
+  }
+}
+
 def doBuild() {
   stage('prepare') {
     node('docker') {
@@ -287,6 +303,7 @@ def doBuild() {
 
     parallelBuilds["Installation - iOS Obj-C static"] = installationTest('ios', 'static', 'objc')
     parallelBuilds["Installation - iOS Obj-C CocoaPods dynamic"] = installationTest('ios', 'cocoapods-dynamic', 'objc')
+    parallelBuilds["Installation - iOS Swift Package Manager"] = spmInstallationTest('ios')
 
     parallelBuilds["Installation - Mac Catalyst Obj-C CocoaPods"] = installationTest('catalyst', 'cocoapods', 'objc')
     parallelBuilds["Installation - Mac Catalyst Obj-C CocoaPods dynamic"] = installationTest('catalyst', 'cocoapods-dynamic', 'objc')
