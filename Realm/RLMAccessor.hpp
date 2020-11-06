@@ -78,9 +78,10 @@ public:
                                              realm::Property const& prop);
 
     bool is_same_list(realm::List const& list, id v) const noexcept;
+    bool is_same_set(realm::object_store::Set const& set, id v) const noexcept;
 
     template<typename Func>
-    void enumerate_list(__unsafe_unretained const id v, Func&& func) {
+    void enumerate_collection(__unsafe_unretained const id v, Func&& func) {
         id enumerable = RLMAsFastEnumeration(v) ?: v;
         for (id value in enumerable) {
             func(value);

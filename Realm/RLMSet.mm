@@ -27,6 +27,7 @@
 #import "RLMSwiftSupport.h"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
+#import "RLMConstants.h"
 
 // See -countByEnumeratingWithState:objects:count
 @interface RLMSetHolder : NSObject {
@@ -549,7 +550,7 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
                             set->_objectClassName ?: RLMTypeToString(set->_type));
     }
     if (set->_type != RLMPropertyTypeObject) {
-        if (!RLMValidateValue(value, set->_type, set->_optional, false, nil)) {
+        if (!RLMValidateValue(value, set->_type, set->_optional, RLMCollectionTypeNone, nil)) {
             @throw RLMException(@"Invalid value '%@' of type '%@' for expected type '%@%s'.",
                                 value, [value class], RLMTypeToString(set->_type),
                                 set->_optional ? "?" : "");

@@ -343,11 +343,14 @@
 
 - (void)testManagedSet {
     RLMRealm *r = [self realmWithTestPath];
-//    [r beginWriteTransaction];
-//    RLMSetObject *setObj1 = [RLMSetObject new];
-//    [setObj1.stringSet addObjects:@[@"one", @"two", @"three", @"four", @"five"]];
-//    [r addObject:setObj1];
-//    [r commitWriteTransaction];
+    [r beginWriteTransaction];
+    RLMSetObject *setObj1 = [RLMSetObject new];
+    [setObj1.stringSet addObjects:@[@"one", @"two", @"three", @"four", @"five"]];
+    [r addObject:setObj1];
+    [r commitWriteTransaction];
+
+    RLMResults *results = [RLMSetObject allObjects];
+    XCTAssertEqual(results.count, 1U);
 
 
 }

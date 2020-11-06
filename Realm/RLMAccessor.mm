@@ -974,6 +974,10 @@ bool RLMAccessorContext::is_same_list(realm::List const& list, __unsafe_unretain
     return [v respondsToSelector:@selector(isBackedByList:)] && [v isBackedByList:list];
 }
 
+bool RLMAccessorContext::is_same_set(realm::object_store::Set const& set, __unsafe_unretained id const v) const noexcept {
+    return [v respondsToSelector:@selector(isBackedBySet:)] && [v isBackedBySet:set];
+}
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 @implementation RLMManagedPropertyAccessor

@@ -87,6 +87,18 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeDecimal128 = 11
 };
 
+/**
+ The type of collection that a property is, e.g Set or Array.
+ */
+typedef NS_ENUM(NSUInteger, RLMCollectionType) {
+    /** RLMArray collection type. */
+    RLMCollectionTypeArray,
+    /** RLMSet collection type. */
+    RLMCollectionTypeSet,
+    /** Not a collection type.*/
+    RLMCollectionTypeNone
+};
+
 /** An error domain identifying Realm-specific errors. */
 extern NSString * const RLMErrorDomain;
 
