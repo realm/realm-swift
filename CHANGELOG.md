@@ -1,3 +1,27 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* None.
+
+### Fixed
+* The user identifier was added to the file path for synchronized Realms twice
+  and an extra level of escaping was performed on the partition value. This did
+  not cause functional problems, but made file names more confusing than they
+  needed to be. Existing Realm files will continue to be located at the old
+  path, while newly created files will be created at a shorter path. (Since v10.0.0).
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.1.
+* CocoaPods: 1.10 or later.
+
+### Internal
+* Upgraded realm-core from ? to ?
+* Upgraded realm-sync from ? to ?
+
 10.1.4 Release notes (2020-11-16)
 =============================================================
 

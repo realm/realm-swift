@@ -89,10 +89,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (RLMRealm *)openRealmWithConfiguration:(RLMRealmConfiguration *)configuration;
 
 /// Immediately open a synced Realm.
-- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMUser *)user;
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue user:(RLMUser *)user;
 
 /// Immediately open a synced Realm with encryption key and stop policy.
-- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue
                                                user:(RLMUser *)user
                                       encryptionKey:(nullable NSData *)encryptionKey
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy;
