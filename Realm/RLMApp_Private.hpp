@@ -40,6 +40,7 @@
 
 - (nonnull instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app;
 
++ (void)resetAppCache;
 @end
 
 NSError * _Nonnull RLMAppErrorToNSError(realm::app::AppError const& appError);
