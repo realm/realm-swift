@@ -183,7 +183,10 @@ static NSURL *syncDirectoryForChildProcess() {
 
 #pragma mark RLMSyncTestCase
 
-@implementation RLMSyncTestCase
+@implementation RLMSyncTestCase {
+    NSString *_appId;
+    RLMApp *_app;
+}
 
 #pragma mark - Helper methods
 
@@ -435,8 +438,9 @@ static NSURL *syncDirectoryForChildProcess() {
 - (void)setUp {
     [super setUp];
     self.continueAfterFailure = NO;
-
-    [self setupSyncManager];
+    if (auto ids = NSProcessInfo.processInfo.environment[@"RLMParentAppIds"]) {
+        _appIds = [ids componentsSeparatedByString:@","];   //take the one array for split the string
+    }
 }
 
 - (void)tearDown {
@@ -451,9 +455,6 @@ static NSURL *syncDirectoryForChildProcess() {
         NSLog(@"Failed to create app: %@", error);
         abort();
     }
-    if (auto ids = NSProcessInfo.processInfo.environment[@"RLMParentAppIds"]) {
-        _appIds = [ids componentsSeparatedByString:@","];   //take the one array for split the string
-    }
 
     if (self.isParent) {
         [NSFileManager.defaultManager removeItemAtURL:[self clientDataRoot] error:&error];
@@ -467,8 +468,22 @@ static NSURL *syncDirectoryForChildProcess() {
     syncManager.userAgent = self.name;
 }
 
+- (NSString *)appId {
+    if (!_appId) {
+        [self setupSyncManager];
+    }
+    return _appId;
+}
+
+- (RLMApp *)app {
+    if (!_app) {
+        [self setupSyncManager];
+    }
+    return _app;
+}
+
 - (void)resetSyncManager {
-    if (!self.appId) {
+    if (!_appId) {
         return;
     }
 
@@ -528,6 +543,10 @@ static NSURL *syncDirectoryForChildProcess() {
     [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
                            withIntermediateDirectories:YES attributes:nil error:&error];
     return clientDataRoot;
+}
+
+- (NSTask *)childTask {
+    return [self childTaskWithAppIds:_appId ? @[_appId] : @[]];
 }
 
 @end

@@ -116,11 +116,8 @@
     NSMutableDictionary *env = [NSProcessInfo.processInfo.environment mutableCopy];
     env[@"RLMProcessIsChild"] = @"true";
     env[@"RLMParentProcessBundleID"] = [NSBundle mainBundle].bundleIdentifier;
-    if ([self respondsToSelector:@selector(appId)]) {
-        env[@"RLMParentAppId"] = self.appId;
-    }
-
     if (appIds.count) {
+        env[@"RLMParentAppId"] = appIds[0];
         env[@"RLMParentAppIds"] = [appIds componentsJoinedByString:@","];
     }
 
@@ -152,7 +149,7 @@
     return [self childTaskWithAppIds:@[]];
 }
 
-- (int)runChildAndWaitWithAppIds:(NSArray *)appIds {
+- (NSPipe *)filterPipe {
     NSPipe *pipe = [NSPipe pipe];
     NSMutableData *buffer = [[NSMutableData alloc] init];
 
@@ -173,16 +170,23 @@
         // Remove everything up to the last newline, leaving any data not newline-terminated in the buffer
         [buffer replaceBytesInRange:NSMakeRange(0, start - (char *)buffer.bytes) withBytes:0 length:0];
     };
+    return pipe;
+}
 
+- (int)runChildAndWaitWithAppIds:(NSArray *)appIds {
     NSTask *task = [self childTaskWithAppIds:appIds];
-    task.standardError = pipe;
+    task.standardError = self.filterPipe;
     [task launch];
     [task waitUntilExit];
     return task.terminationStatus;
 }
 
 - (int)runChildAndWait {
-    return [self runChildAndWaitWithAppIds:@[]];
+    NSTask *task = [self childTask];
+    task.standardError = self.filterPipe;
+    [task launch];
+    [task waitUntilExit];
+    return task.terminationStatus;
 }
 
 #else
