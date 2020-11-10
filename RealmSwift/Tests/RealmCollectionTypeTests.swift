@@ -522,6 +522,11 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertTrue(collection.freeze().isFrozen)
     }
 
+    func testThaw() {
+        XCTAssertTrue(collection.freeze().isFrozen)
+        XCTAssertFalse(collection.thaw().isFrozen)
+    }
+
     func testFreezeFromWrongThread() {
         dispatchSyncNewThread {
             self.assertThrows(self.collection.freeze(), reason: "Realm accessed from incorrect thread")
@@ -958,6 +963,9 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 
     override func testIsFrozen() {
         XCTAssertFalse(collection.isFrozen)
+    }
+
+    override func testThaw() {
     }
 
     override func testFreezeFromWrongThread() {
