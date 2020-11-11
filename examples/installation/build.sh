@@ -29,6 +29,7 @@ command:
   test-osx-swift-dynamic:          tests macOS Swift dynamic example.
   test-osx-swift-xcframework:      tests macOS Swift xcframework example.
   test-osx-swift-cocoapods:        tests macOS Swift CocoaPods example.
+  test-catalyst-swift-cocoapods:   tests macOS Catalyst Swift CocoaPods example.
   test-osx-swift-carthage:         tests macOS Swift Carthage example.
   test-osx-spm:                    tests macOS Swift Package Manager example.
 
@@ -117,6 +118,8 @@ xctest() {
         destination=(-destination "id=$simulator_id")
     elif [[ $PLATFORM == watchos ]]; then
         destination=(-sdk watchsimulator)
+    elif [[ $PLATFORM == catalyst ]]; then
+        destination=(-sdk maccatalyst)
     fi
 
     local project=(-project "$DIRECTORY/$NAME.xcodeproj")
