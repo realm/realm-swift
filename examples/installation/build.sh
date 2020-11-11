@@ -72,7 +72,7 @@ xctest() {
     if [[ ! -d "$DIRECTORY" ]]; then
         DIRECTORY="${DIRECTORY/swift/swift-$REALM_SWIFT_VERSION}"
     fi
-    if [[ $PLATFORM != osx ]]; then
+    if [[ $PLATFORM != osx ]] && [[ $PLATFORM != catalyst ]]; then
         if [[ $NAME == Carthage* ]]; then
             # Building for Carthage requires that a simulator exist but not any
             # particular one, and having more than one makes xcodebuild
@@ -119,7 +119,7 @@ xctest() {
     elif [[ $PLATFORM == watchos ]]; then
         destination=(-sdk watchsimulator)
     elif [[ $PLATFORM == catalyst ]]; then
-        destination=(-sdk maccatalyst)
+        destination=(-destination variant='Mac Catalyst')
     fi
 
     local project=(-project "$DIRECTORY/$NAME.xcodeproj")
@@ -138,7 +138,7 @@ xctest() {
         xcodebuild "${project[@]}" "${scheme[@]}" test "${destination[@]}" "${code_signing_flags[@]}"
     fi
 
-    if [[ $PLATFORM != osx ]]; then
+    if [[ $PLATFORM != osx ]] && [[ $PLATFORM != catalyst ]]; then
         [[ $PLATFORM == 'ios' ]] && SDK=iphoneos || SDK=$PLATFORM
         if [ -d "$workspace" ]; then
             [[ $LANG == 'swift' ]] && scheme=(-scheme RealmSwift) || scheme=(-scheme Realm)
@@ -146,6 +146,8 @@ xctest() {
             scheme=()
         fi
         xcodebuild "${project[@]}" "${scheme[@]}" -sdk "$SDK" build "${code_signing_flags[@]}"
+    elif [[ $PLATFORM == catalyst ]]; then
+        xcodebuild "${project[@]}" "${scheme[@]}" "${destination[@]}" build "${code_signing_flags[@]}"
     fi
 }
 

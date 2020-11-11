@@ -257,7 +257,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-CocoaPodsDynamicExample/Pods-CocoaPodsDynamicExample-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-CocoaPodsDynamicExample/Pods-CocoaPodsDynamicExample-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -266,7 +266,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CocoaPodsDynamicExample/Pods-CocoaPodsDynamicExample-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CocoaPodsDynamicExample/Pods-CocoaPodsDynamicExample-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		8A6E522948A70230F174BF82 /* [CP] Check Pods Manifest.lock */ = {
@@ -311,7 +311,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-CocoaPodsDynamicExampleTests/Pods-CocoaPodsDynamicExampleTests-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-CocoaPodsDynamicExampleTests/Pods-CocoaPodsDynamicExampleTests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -320,7 +320,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CocoaPodsDynamicExampleTests/Pods-CocoaPodsDynamicExampleTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CocoaPodsDynamicExampleTests/Pods-CocoaPodsDynamicExampleTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

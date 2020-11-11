@@ -16,8 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+import UIKit
 import XCTest
-@testable import CocoaPodsExample
+import CocoaPodsExample
 import RealmSwift
 
 class CocoaPodsExampleTests: XCTestCase {
