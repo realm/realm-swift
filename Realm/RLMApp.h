@@ -62,7 +62,7 @@ Create a new Realm App configuration.
 */
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
-                   localAppName:(nullable NSString *) localAppName
+                   localAppName:(nullable NSString *)localAppName
                 localAppVersion:(nullable NSString *)localAppVersion;
 
 /**

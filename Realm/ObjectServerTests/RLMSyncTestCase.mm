@@ -157,7 +157,21 @@
 
 @end
 
-static NSTask *s_task;
+#pragma mark AsyncOpenConnectionTimeoutTransport
+
+@implementation AsyncOpenConnectionTimeoutTransport
+- (void)sendRequestToServer:(RLMRequest *)request completion:(RLMNetworkTransportCompletionBlock)completionBlock {
+    if ([request.url hasSuffix:@"location"]) {
+        RLMResponse *r = [RLMResponse new];
+        r.httpStatusCode = 200;
+        r.body = @"{\"deployment_model\":\"GLOBAL\",\"location\":\"US-VA\",\"hostname\":\"http://localhost:5678\",\"ws_hostname\":\"ws://localhost:5678\"}";
+        completionBlock(r);
+    } else {
+        [super sendRequestToServer:request completion:completionBlock];
+    }
+}
+@end
+
 
 static NSURL *syncDirectoryForChildProcess() {
     NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
@@ -313,16 +327,21 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMUser *)logInUserForCredentials:(RLMCredentials *)credentials {
-    RLMApp *app = [self app];
-    __block RLMUser* theUser;
+    return [self logInUserForCredentials:credentials app:self.app];
+}
+
+- (RLMUser *)logInUserForCredentials:(RLMCredentials *)credentials app:(RLMApp *)app {
+    __block RLMUser* user;
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    [app loginWithCredential:credentials completion:^(RLMUser * _Nullable user, NSError * _Nullable) {
-        theUser = user;
+    [app loginWithCredential:credentials completion:^(RLMUser *u, NSError *e) {
+        XCTAssertNotNil(u);
+        XCTAssertNil(e);
+        user = u;
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:4.0 handler:nil];
-    XCTAssertTrue(theUser.state == RLMUserStateLoggedIn, @"User should have been valid, but wasn't");
-    return theUser;
+    [self waitForExpectations:@[expectation] timeout:4.0];
+    XCTAssertTrue(user.state == RLMUserStateLoggedIn, @"User should have been valid, but wasn't");
+    return user;
 }
 
 - (void)logOutUser:(RLMUser *)user {
@@ -409,18 +428,6 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (void)manuallySetRefreshTokenForUser:(RLMUser *)user value:(NSString *)tokenValue {
     [user _syncUser]->update_refresh_token(tokenValue.UTF8String);
-}
-
-// FIXME: remove this API once the new token system is implemented.
-- (void)primeSyncManagerWithSemaphore:(dispatch_semaphore_t)semaphore {
-    if (semaphore == nil) {
-        [[[self app] syncManager] setSessionCompletionNotifier:^(__unused NSError *error){ }];
-        return;
-    }
-    [[[self app] syncManager] setSessionCompletionNotifier:^(NSError *error) {
-        XCTAssertNil(error, @"Session completion block returned with an error: %@", error);
-        dispatch_semaphore_signal(semaphore);
-    }];
 }
 
 #pragma mark - XCUnitTest Lifecycle

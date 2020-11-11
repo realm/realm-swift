@@ -24,11 +24,6 @@ typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMSyncManager ()
-- (void)setSessionCompletionNotifier:(nullable RLMSyncBasicErrorReportingBlock)sessionCompletionNotifier;
-@end
-
-
 @interface Dog : RLMObject
 
 @property RLMObjectId *_id;
@@ -57,6 +52,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString *realm_id;
 @property NSData *dataProp;
 + (instancetype)objectWithRealmId:(NSString *)realmId;
+@end
+
+@interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport
 @end
 
 @interface RLMSyncTestCase : RLMMultiProcessTestCase
@@ -116,6 +114,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Synchronously create, log in, and return a user.
 - (RLMUser *)logInUserForCredentials:(RLMCredentials *)credentials;
+- (RLMUser *)logInUserForCredentials:(RLMCredentials *)credentials app:(RLMApp *)app;
 
 /// Synchronously, log out.
 - (void)logOutUser:(RLMUser *)user;
@@ -127,10 +126,6 @@ NS_ASSUME_NONNULL_BEGIN
                          realms:(NSArray<RLMRealm *> *)realms
                       partitionValues:(NSArray<NSString *> *)partitionValues
                  expectedCounts:(NSArray<NSNumber *> *)counts;
-
-/// "Prime" the sync manager to signal the given semaphore the next time a session is bound. This method should be
-/// called right before a Realm is opened if that Realm's session is the one to be monitored.
-- (void)primeSyncManagerWithSemaphore:(nullable dispatch_semaphore_t)semaphore;
 
 /// Wait for downloads to complete; drop any error.
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm;

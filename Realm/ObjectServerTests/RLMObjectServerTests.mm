@@ -46,24 +46,6 @@
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
 
-@interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport
-@end
-
-@implementation AsyncOpenConnectionTimeoutTransport
-
-- (void)sendRequestToServer:(RLMRequest *)request completion:(RLMNetworkTransportCompletionBlock)completionBlock {
-    if ([request.url hasSuffix:@"location"]) {
-        RLMResponse *r = [RLMResponse new];
-        r.httpStatusCode = 200;
-        r.body = @"{\"deployment_model\":\"GLOBAL\",\"location\":\"US-VA\",\"hostname\":\"http://localhost:5678\",\"ws_hostname\":\"ws://localhost:5678\"}";
-        completionBlock(r);
-    } else {
-        [super sendRequestToServer:request completion:completionBlock];
-    }
-}
-
-@end
-
 @implementation RLMObjectServerTests
 
 #pragma mark - App Tests
@@ -1030,148 +1012,135 @@
 /// A Realm that was opened before a user logged out should be able to resume uploading if the user logs back in.
 - (void)testLogBackInSameRealmUpload {
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                        register:YES];
+                                                        register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
     RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
 
-    [self addPersonsToRealm:realm persons:@[[Person john]]];
-    CHECK_COUNT(1, Person, realm);
-    [self waitForUploadsForRealm:realm];
-    // Log out the user.
-    [self logOutUser:user];
-    // Log the user back in.
-    user = [self logInUserForCredentials:credentials];
-    [self addPersonsToRealm:realm
-                    persons:@[[Person john],
-                              [Person paul],
-                              [Person ringo]]];
-    CHECK_COUNT(4, Person, realm);
-}
-
-// FIXME: Depencancy on Stitch deployment
-/// A Realm that was opened before a user logged out should be able to resume downloading if the user logs back in.
-#if 0
-- (void)testLogBackInSameRealmDownload {
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                        register:YES];
-    RLMUser *user = [self logInUserForCredentials:credentials];
-    RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
-
-    [self addPersonsToRealm:realm persons:@[[Person john]]];
-    CHECK_COUNT(1, Person, realm);
-    [self waitForUploadsForRealm:realm];
-    // Log out the user.
-    [self logOutUser:user];
-    // Log the user back in.
-    user = [self logInUserForCredentials:credentials];
-    [self waitForDownloadsForRealm:realm];
-    [self addPersonsToRealm:realm
-                    persons:@[[Person john],
-                              [Person paul],
-                              [Person ringo]]];
-    [self waitForUploadsForRealm:realm];
-
-    CHECK_COUNT(4, Person, realm);
-}
-
-// FIXME: Disabled until sync server fixes progress notifications
-
-/// A Realm that was opened while a user was logged out should be able to start uploading if the user logs back in.
-- (void)testLogBackInDeferredRealmUpload {
-    // Log in the user.
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                        register:YES];
-    RLMUser *user = [self logInUserForCredentials:credentials];
-
-    NSError *error = nil;
     if (self.isParent) {
-        // Semaphore for knowing when the Realm is successfully opened for sync.
-        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-        [self logOutUser:user];
-        // Open a Realm after the user's been logged out.
-        [self primeSyncManagerWithSemaphore:sema];
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
-        XCTAssertNil(error, @"Error when opening Realm: %@", error);
-
-        [self addPersonsToRealm:realm
-                        persons:@[[Person john]]];
-
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
         CHECK_COUNT(1, Person, realm);
-        user = [self logInUserForCredentials:credentials];
-        // Wait for the Realm's session to be bound.
-        WAIT_FOR_SEMAPHORE(sema, 30);
-        [self addPersonsToRealm:realm
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person ringo]]];
         [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(3, Person, realm);
+        // Log out the user out and back in
+        [self logOutUser:user];
+        user = [self logInUserForCredentials:credentials];
+        [self addPersonsToRealm:realm
+                        persons:@[[Person john], [Person paul], [Person ringo]]];
+        [self waitForUploadsForRealm:realm];
+        CHECK_COUNT(4, Person, realm);
+
+        // Verify that the post-login objects were actually synced
         RLMRunChildAndWait();
     } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
-        XCTAssertNil(error, @"Error when opening Realm: %@", error);
         [self waitForDownloadsForRealm:realm];
+        CHECK_COUNT(4, Person, realm);
+    }
+}
+
+/// A Realm that was opened before a user logged out should be able to resume downloading if the user logs back in.
+- (void)testLogBackInSameRealmDownload {
+    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                        register:self.isParent];
+    RLMUser *user = [self logInUserForCredentials:credentials];
+    RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
+
+    if (self.isParent) {
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
+        CHECK_COUNT(1, Person, realm);
+        [self waitForUploadsForRealm:realm];
+        // Log out the user.
+        [self logOutUser:user];
+        // Log the user back in.
+        user = [self logInUserForCredentials:credentials];
+
+        RLMRunChildAndWait();
+
+        [self waitForDownloadsForRealm:realm];
+        CHECK_COUNT(3, Person, realm);
+    } else {
+        [self waitForDownloadsForRealm:realm];
+        [self addPersonsToRealm:realm persons:@[[Person john], [Person paul]]];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(3, Person, realm);
     }
 }
 
-/// A Realm that was opened while a user was logged out should be able to start downloading if the user logs back in.
-- (void)testLogBackInDeferredRealmDownload {
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                        register:YES];
+/// A Realm that was opened while a user was logged out should be able to start uploading if the user logs back in.
+- (void)testLogBackInDeferredRealmUpload {
+    NSString *partitionValue = NSStringFromSelector(_cmd);
+    RLMCredentials *credentials = [self basicCredentialsWithName:partitionValue
+                                                        register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
 
     NSError *error = nil;
     if (self.isParent) {
-        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-        RLMRunChildAndWait();
-
         [self logOutUser:user];
+
         // Open a Realm after the user's been logged out.
-        [self primeSyncManagerWithSemaphore:sema];
-        RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
         XCTAssertNil(error, @"Error when opening Realm: %@", error);
 
         [self addPersonsToRealm:realm persons:@[[Person john]]];
         CHECK_COUNT(1, Person, realm);
 
         user = [self logInUserForCredentials:credentials];
+        [self addPersonsToRealm:realm
+                        persons:@[[Person john], [Person paul], [Person ringo]]];
+        [self waitForUploadsForRealm:realm];
+        CHECK_COUNT(4, Person, realm);
 
-        // Wait for the Realm's session to be bound.
-        WAIT_FOR_SEMAPHORE(sema, 30);
+        RLMRunChildAndWait();
+    } else {
+        RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
+        XCTAssertNil(error, @"Error when opening Realm: %@", error);
+        [self waitForDownloadsForRealm:realm];
+        CHECK_COUNT(4, Person, realm);
+    }
+}
 
+/// A Realm that was opened while a user was logged out should be able to start downloading if the user logs back in.
+- (void)testLogBackInDeferredRealmDownload {
+    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                        register:self.isParent];
+    RLMUser *user = [self logInUserForCredentials:credentials];
+
+    NSError *error = nil;
+    if (self.isParent) {
+        [self logOutUser:user];
+        RLMRunChildAndWait();
+
+        // Open a Realm after the user's been logged out.
+        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+        XCTAssertNil(error, @"Error when opening Realm: %@", error);
+
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
+        CHECK_COUNT(1, Person, realm);
+
+        user = [self logInUserForCredentials:credentials];
         [self waitForDownloadsForUser:user
                                realms:@[realm]
                       partitionValues:@[self.appId] expectedCounts:@[@4]];
 
     } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
         XCTAssertNil(error, @"Error when opening Realm: %@", error);
         [self addPersonsToRealm:realm
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person ringo]]];
+                        persons:@[[Person john], [Person paul], [Person ringo]]];
         [self waitForUploadsForRealm:realm];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(3, Person, realm);
     }
 }
-#endif
 
 /// After logging back in, a Realm whose path has been opened for the first time should properly upload changes.
 - (void)testLogBackInOpenFirstTimePathUpload {
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                         register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
-    // Now run a basic multi-client test.
     if (self.isParent) {
-        // Log out the user.
         [self logOutUser:user];
-        // Log the user back in.
         user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                    register:NO]];
-        // Open the Realm (for the first time).
-        RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
         [self addPersonsToRealm:realm
                         persons:@[[Person john],
                                   [Person paul]]];
@@ -1180,8 +1149,7 @@
         CHECK_COUNT(2, Person, realm);
         RLMRunChildAndWait();
     } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
-        // Add objects.
+        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
         [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(2, Person, realm);
     }
@@ -1189,27 +1157,20 @@
 
 /// After logging back in, a Realm whose path has been opened for the first time should properly download changes.
 - (void)testLogBackInOpenFirstTimePathDownload {
-    // Log in the user.
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                         register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
 
-    // Now run a basic multi-client test.
     if (self.isParent) {
-        // Log out the user.
         [self logOutUser:user];
-        // Log the user back in.
         user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                    register:NO]];
-        // Open the Realm (for the first time).
-        RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
-        // Run the sub-test.
+        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
         RLMRunChildAndWait();
         [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(2, Person, realm);
     } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
-        // Add objects.
+        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
         [self waitForDownloadsForRealm:realm];
         [self addPersonsToRealm:realm
                         persons:@[[Person john],
@@ -1219,30 +1180,26 @@
     }
 }
 
-// FIXME: Dependancy on Stitch deployment
-#if 0
 /// If a client logs in, connects, logs out, and logs back in, sync should properly upload changes for a new
 /// `RLMRealm` that is opened for the same path as a previously-opened Realm.
 - (void)testLogBackInReopenRealmUpload {
-    // Log in the user.
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                         register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
 
-    // Open the Realm
-    RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
     if (self.isParent) {
-        [self addPersonsToRealm:realm
-                        persons:@[[Person john]]];
-        [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(1, Person, realm);
-        // Log out the user.
-        [self logOutUser:user];
-        // Log the user back in.
-        user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                   register:NO]];
-        // Open the Realm again.
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+        @autoreleasepool {
+            RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+            [self addPersonsToRealm:realm
+                            persons:@[[Person john]]];
+            [self waitForUploadsForRealm:realm];
+            CHECK_COUNT(1, Person, realm);
+            [self logOutUser:user];
+            user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                       register:NO]];
+        }
+
+        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
         [self addPersonsToRealm:realm
                         persons:@[[Person john],
                                   [Person paul],
@@ -1250,8 +1207,10 @@
                                   [Person ringo]]];
         CHECK_COUNT(5, Person, realm);
         [self waitForUploadsForRealm:realm];
+
         RLMRunChildAndWait();
     } else {
+        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
         [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(5, Person, realm);
     }
@@ -1260,33 +1219,27 @@
 /// If a client logs in, connects, logs out, and logs back in, sync should properly download changes for a new
 /// `RLMRealm` that is opened for the same path as a previously-opened Realm.
 - (void)testLogBackInReopenRealmDownload {
-    // Log in the user.
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                         register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
 
-    // Open the Realm
     if (self.isParent) {
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
         [self addPersonsToRealm:realm
                         persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
         XCTAssert([Person allObjectsInRealm:realm].count == 1, @"Expected 1 item");
-        // Log out the user.
         [self logOutUser:user];
-        // Log the user back in.
         user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                    register:NO]];
-        // Run the sub-test.
         RLMRunChildAndWait();
         // Open the Realm again and get the items.
-        realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+        realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
         [self waitForDownloadsForUser:user
                                realms:@[realm]
-                      partitionValues:@[@"realm_id"] expectedCounts:@[@5]];
+                      partitionValues:@[NSStringFromSelector(_cmd)] expectedCounts:@[@5]];
     } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
-        // Add objects.
+        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
         [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
         [self addPersonsToRealm:realm
@@ -1304,8 +1257,10 @@
 - (void)testSuspendAndResume {
     RLMUser *user = [self userForTest:_cmd];
 
-    __attribute__((objc_precise_lifetime)) RLMRealm *realmA = [self openRealmForPartitionValue:@"realm_id" user:user];
-    __attribute__((objc_precise_lifetime)) RLMRealm *realmB = [self openRealmForPartitionValue:@"realm_id" user:user];
+    __attribute__((objc_precise_lifetime))
+    RLMRealm *realmA = [self openRealmForPartitionValue:@"suspend and resume 1" user:user];
+    __attribute__((objc_precise_lifetime))
+    RLMRealm *realmB = [self openRealmForPartitionValue:@"suspend and resume 2" user:user];
     if (self.isParent) {
         [self waitForDownloadsForRealm:realmA];
         [self waitForDownloadsForRealm:realmB];
@@ -1314,13 +1269,13 @@
 
         // Suspend the session for realm A and then add an object to each Realm
         RLMSyncSession *sessionA = [RLMSyncSession sessionForRealm:realmA];
+        RLMSyncSession *sessionB = [RLMSyncSession sessionForRealm:realmB];
+        XCTAssertEqual(sessionB.state, RLMSyncSessionStateActive);
         [sessionA suspend];
+        XCTAssertEqual(realmB.syncSession.state, RLMSyncSessionStateActive);
 
-        [self addPersonsToRealm:realmA
-                        persons:@[[Person john]]];
-
-        [self addPersonsToRealm:realmB
-                        persons:@[[Person ringo]]];
+        [self addPersonsToRealm:realmA persons:@[[Person john]]];
+        [self addPersonsToRealm:realmB persons:@[[Person ringo]]];
         [self waitForUploadsForRealm:realmB];
         RLMRunChildAndWait();
 
@@ -1352,7 +1307,6 @@
         CHECK_COUNT(3, Person, realmB);
     }
 }
-#endif
 
 #pragma mark - Client reset
 
@@ -1418,8 +1372,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
 }
 
-// FIXME: Dependancy on Stitch deployment
-#if 0
 - (void)testStreamingDownloadNotifier {
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                         register:self.isParent];
@@ -1443,8 +1395,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                        mode:RLMSyncProgressModeReportIndefinitely
                                                       block:^(NSUInteger xfr, NSUInteger xfb) {
         // Make sure the values are increasing, and update our stored copies.
-        XCTAssert(xfr >= transferred);
-        XCTAssert(xfb >= transferrable);
+        XCTAssertGreaterThanOrEqual(xfr, transferred);
+        XCTAssertGreaterThanOrEqual(xfb, transferrable);
         transferred = xfr;
         transferrable = xfb;
         callCount++;
@@ -1459,10 +1411,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [token invalidate];
     // The notifier should have been called at least twice: once at the beginning and at least once
     // to report progress.
-    XCTAssert(callCount > 1);
-    XCTAssert(transferred >= transferrable,
-              @"Transferred (%@) needs to be greater than or equal to transferrable (%@)",
-              @(transferred), @(transferrable));
+    XCTAssertGreaterThan(callCount, 1);
+    XCTAssertGreaterThanOrEqual(transferred, transferrable);
 }
 
 - (void)testStreamingUploadNotifier {
@@ -1482,22 +1432,20 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     auto token = [session addProgressNotificationForDirection:RLMSyncProgressDirectionUpload
                                                          mode:RLMSyncProgressModeReportIndefinitely
                                                         block:^(NSUInteger xfr, NSUInteger xfb) {
-        // Make sure the values are
-        // increasing, and update our
-        // stored copies.
-        XCTAssert(xfr >= transferred);
-        XCTAssert(xfb >= transferrable);
+        // Make sure the values are increasing, and update our stored copies.
+        XCTAssertGreaterThanOrEqual(xfr, transferred);
+        XCTAssertGreaterThanOrEqual(xfb, transferrable);
         transferred = xfr;
         transferrable = xfb;
         callCount++;
-        if (transferred > 0 && transferred >= transferrable && transferrable > 1000000 *NUMBER_OF_BIG_OBJECTS) {
+        if (transferred > 0 && transferred >= transferrable && transferrable > 1000000 * NUMBER_OF_BIG_OBJECTS) {
             [ex fulfill];
         }
     }];
     // Upload lots of data
     [realm beginWriteTransaction];
     for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
-        [realm addObject:[Person john]];
+        [realm addObject:[HugeSyncObject objectWithRealmId:NSStringFromSelector(_cmd)]];
     }
     [realm commitWriteTransaction];
     // Wait for upload to begin and finish
@@ -1505,13 +1453,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [token invalidate];
     // The notifier should have been called at least twice: once at the beginning and at least once
     // to report progress.
-    XCTAssert(callCount > 1);
-    XCTAssert(transferred >= transferrable,
-              @"Transferred (%@) needs to be greater than or equal to transferrable (%@)",
-              @(transferred), @(transferrable));
+    XCTAssertGreaterThan(callCount, 1);
+    XCTAssertGreaterThanOrEqual(transferred, transferrable);
 }
-
-#endif
 
 #pragma mark - Download Realm
 
@@ -1561,10 +1505,11 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }
 
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-    RLMRealmConfiguration *c = [user configurationWithPartitionValue:self.appId];
+    RLMRealmConfiguration *c = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
     RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
-    CHECK_COUNT(0, Person, realm);
+    CHECK_COUNT(0, HugeSyncObject, realm);
+    [self waitForUploadsForRealm:realm];
     [realm.syncSession suspend];
 
     // Wait for the child process to upload everything.
@@ -1591,8 +1536,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertGreaterThan(fileSize(c.pathOnDisk), sizeBefore);
     XCTAssertNotNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
     CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
-
-    (void)[realm configuration];
 }
 
 - (void)testDownloadCancelsOnAuthError {
@@ -1645,12 +1588,10 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-// FIXME: Dependancy on new stitch deployment
-#if 0
 - (void)testAsyncOpenProgressNotifications {
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                         register:self.isParent];
-    RLMSUser *user = [self logInUserForCredentials:credentials];
+    RLMUser *user = [self logInUserForCredentials:credentials];
 
     if (!self.isParent) {
         [self populateDataForUser:user partitionValue:self.appId];
@@ -1677,53 +1618,35 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
-#endif
 
 - (void)testAsyncOpenConnectionTimeout {
-    __attribute__((objc_precise_lifetime)) TimeoutProxyServer *proxy = [[TimeoutProxyServer alloc] initWithPort:5678];
+    TimeoutProxyServer *proxy = [[TimeoutProxyServer alloc] initWithPort:5678 targetPort:9090];
     NSError *error;
     [proxy startAndReturnError:&error];
     XCTAssertNil(error);
 
-    // we need to use to two different RLMApps here since we need separate configurations for the different ports.
-    NSString *appId = [RealmServer.shared createAppAndReturnError:nil];
-    RLMApp *appForLogin = [RLMApp appWithId:appId configuration:[[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
-                                                                                                   transport:nil
-                                                                                                localAppName:nil
-                                                                                             localAppVersion:nil
-                                                                                     defaultRequestTimeoutMS:60]];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"anonymous login"];
-    __block RLMUser *user;
-    [appForLogin loginWithCredential:[RLMCredentials anonymousCredentials] completion:^(RLMUser *u, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(u);
-        user = u;
-        [expectation fulfill];
-    }];
-    [self waitForExpectations:@[expectation] timeout:10.0];
-    // clearing out the Apps Cache will allow us to create
-    // a new one with a new configuration
-    appForLogin = nil;
-    realm::app::App::clear_cached_apps();
-    RLMAppConfiguration *config = [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:5678"
+    RLMAppConfiguration *config = [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
                                                                      transport:[AsyncOpenConnectionTimeoutTransport new]
                                                                   localAppName:nil
                                                                localAppVersion:nil
                                                        defaultRequestTimeoutMS:60];
-    RLMApp *app = [RLMApp appWithId:appId
-                      configuration:config];
-    user = [app currentUser];
+    NSString *appId = [RealmServer.shared createAppAndReturnError:nil];
+    RLMApp *app = [RLMApp appWithId:appId configuration:config];
+    RLMUser *user = [self logInUserForCredentials:[RLMCredentials anonymousCredentials] app:app];
+
     RLMRealmConfiguration *c = [user configurationWithPartitionValue:appId];
+    c.objectClasses = @[Person.class];
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.cancelAsyncOpenOnNonFatalErrors = true;
     c.syncConfiguration = syncConfig;
 
     RLMSyncTimeoutOptions *timeoutOptions = [RLMSyncTimeoutOptions new];
     timeoutOptions.connectTimeout = 1000.0;
-    [app syncManager].timeoutOptions = timeoutOptions;
+    app.syncManager.timeoutOptions = timeoutOptions;
 
-    [app.syncManager syncManager]->set_sync_route(realm::util::format("ws://localhost:5678/api/client/v2.0/app/$1/realm-sync", [appId UTF8String]));
+    // Set delay above the timeout so it should fail
+    proxy.delay = 2.0;
+
     XCTestExpectation *ex = [self expectationWithDescription:@"async open"];
     [RLMRealm asyncOpenWithConfiguration:c
                            callbackQueue:dispatch_get_main_queue()
@@ -1735,6 +1658,21 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
+
+    // Delay below the timeout should work
+    proxy.delay = 0.5;
+
+    ex = [self expectationWithDescription:@"async open"];
+    [RLMRealm asyncOpenWithConfiguration:c
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *error) {
+        XCTAssertNotNil(realm);
+        XCTAssertNil(error);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+
+    [proxy stop];
 }
 
 #pragma mark - Compact on Launch
