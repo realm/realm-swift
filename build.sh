@@ -928,6 +928,7 @@ case "$COMMAND" in
         sh build.sh test-osx-objc-cocoapods
         sh build.sh test-osx-swift-cocoapods
         sh build.sh test-catalyst-objc-cocoapods
+        sh build.sh test-catalyst-objc-cocoapods-dynamic
         sh build.sh test-catalyst-swift-cocoapods
         sh build.sh test-watchos-objc-cocoapods
         sh build.sh test-watchos-swift-cocoapods
