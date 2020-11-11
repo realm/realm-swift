@@ -288,12 +288,17 @@ def doBuild() {
     parallelBuilds["Installation - iOS Obj-C static"] = installationTest('ios', 'static', 'objc')
     parallelBuilds["Installation - iOS Obj-C CocoaPods dynamic"] = installationTest('ios', 'cocoapods-dynamic', 'objc')
 
+    parallelBuilds["Installation - Mac Catalyst Obj-C CocoaPods"] = installationTest('catalyst', 'cocoapods', 'objc')
+    parallelBuilds["Installation - Mac Catalyst Obj-C CocoaPods dynamic"] = installationTest('catalyst', 'cocoapods-dynamic', 'objc')
+
     for (def platform in ["osx", "ios", "watchos"]) {
       def platformName = platformNames[platform]
       for (def test in ["dynamic", "cocoapods", "carthage"]) {
         parallelBuilds["Installation - ${platformName} Swift ${test}"] = installationTest(platform, test, 'swift')
       }
     }
+
+    parallelBuilds["Installation - Mac Catalyst Swift CocoaPods"] = installationTest('catalyst', 'cocoapods', 'swift')
 
     parallel parallelBuilds
   }
