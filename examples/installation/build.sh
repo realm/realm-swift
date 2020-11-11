@@ -170,7 +170,7 @@ LANGUAGE=$(echo "$COMMAND" | cut -d - -f 3)
 
 case "$COMMAND" in
     "test-all")
-        for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage; do
+        for target in ios-swift-dynamic ios-swift-cocoapods catalyst-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage; do
             ./build.sh test-$target || exit 1
         done
         for target in ios osx; do
