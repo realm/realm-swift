@@ -119,7 +119,7 @@ xctest() {
     elif [[ $PLATFORM == watchos ]]; then
         destination=(-sdk watchsimulator)
     elif [[ $PLATFORM == catalyst ]]; then
-        destination=(-destination variant='Mac Catalyst')
+        destination=(-destination 'platform=macOS,variant=Mac Catalyst')
     fi
 
     local project=(-project "$DIRECTORY/$NAME.xcodeproj")
@@ -138,15 +138,17 @@ xctest() {
         xcodebuild "${project[@]}" "${scheme[@]}" test "${destination[@]}" "${code_signing_flags[@]}"
     fi
 
+    if [ -d "$workspace" ]; then
+        [[ $LANG == 'swift' ]] && scheme=(-scheme RealmSwift) || scheme=(-scheme Realm)
+    else
+        scheme=()
+    fi
+
     if [[ $PLATFORM != osx ]] && [[ $PLATFORM != catalyst ]]; then
         [[ $PLATFORM == 'ios' ]] && SDK=iphoneos || SDK=$PLATFORM
-        if [ -d "$workspace" ]; then
-            [[ $LANG == 'swift' ]] && scheme=(-scheme RealmSwift) || scheme=(-scheme Realm)
-        else
-            scheme=()
-        fi
         xcodebuild "${project[@]}" "${scheme[@]}" -sdk "$SDK" build "${code_signing_flags[@]}"
     elif [[ $PLATFORM == catalyst ]]; then
+
         xcodebuild "${project[@]}" "${scheme[@]}" "${destination[@]}" build "${code_signing_flags[@]}"
     fi
 }
