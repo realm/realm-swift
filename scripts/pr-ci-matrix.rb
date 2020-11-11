@@ -41,6 +41,8 @@ targets = {
   'cocoapods-ios' => oldest_and_latest,
   'cocoapods-ios-dynamic' => oldest_and_latest,
   'cocoapods-watchos' => oldest_and_latest,
+  'cocoapods-catalyst' => oldest_and_latest,
+  'cocoapods-catalyst-dynamic' => oldest_and_latest,
 
   'swiftpm' => oldest_and_latest,
   'swiftpm-address' => latest_only,
