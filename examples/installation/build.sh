@@ -29,8 +29,8 @@ command:
   test-osx-swift-dynamic:          tests macOS Swift dynamic example.
   test-osx-swift-xcframework:      tests macOS Swift xcframework example.
   test-osx-swift-cocoapods:        tests macOS Swift CocoaPods example.
-  test-catalyst-objc-cocoapods:    tests Mac Catalyst Swift CocoaPods example.
-  test-catalyst-objc-cocoapods-dynamic:   tests Mac Catalyst Swift CocoaPods example.
+  test-catalyst-objc-cocoapods:    tests Mac Catalyst Objective-C CocoaPods example.
+  test-catalyst-objc-cocoapods-dynamic:   tests Mac Catalyst Objective-C CocoaPods example.
   test-catalyst-swift-cocoapods:   tests Mac Catalyst Swift CocoaPods example.
   test-osx-swift-carthage:         tests macOS Swift Carthage example.
   test-osx-spm:                    tests macOS Swift Package Manager example.
