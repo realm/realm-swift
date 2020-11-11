@@ -63,9 +63,9 @@ output_file = """
 # https://wiki.jenkins-ci.org/display/JENKINS/Yaml+Axis+Plugin
 # This is a generated file produced by scripts/pr-ci-matrix.rb.
 
-xcode_version: #{XCODE_VERSIONS.map { |v| "\n - #{v}" }.join()}
-target: #{targets.map { |k, v| "\n - #{k}" }.join()}
-configuration: #{CONFIGURATIONS.map { |v| "\n - #{v}" }.join()}
+xcode_version:#{XCODE_VERSIONS.map { |v| "\n - #{v}" }.join()}
+target:#{targets.map { |k, v| "\n - #{k}" }.join()}
+configuration:#{CONFIGURATIONS.map { |v| "\n - #{v}" }.join()}
 
 exclude:
 """
