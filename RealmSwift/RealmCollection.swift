@@ -501,6 +501,8 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
      `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
     */
     func freeze() -> Self
+
+    func thaw() -> Self
 }
 
 public extension RealmCollection {
@@ -661,6 +663,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func _asNSFastEnumerator() -> Any { fatalError() }
     var isFrozen: Bool { fatalError() }
     func freeze() -> AnyRealmCollection<T> { fatalError() }
+    func thaw() -> AnyRealmCollection<T> { fatalError() }
 }
 
 private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollectionBase<C.Element> {
@@ -778,6 +781,10 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     override func freeze() -> AnyRealmCollection<Element> {
         return AnyRealmCollection(base.freeze())
+    }
+
+    override func thaw() -> AnyRealmCollection<Element> {
+        return AnyRealmCollection(base.thaw())
     }
 }
 
@@ -1076,6 +1083,9 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
     */
     public func freeze() -> AnyRealmCollection { return base.freeze() }
+
+    public func thaw() -> AnyRealmCollection { return base.thaw() }
+
 }
 
 // MARK: AssistedObjectiveCBridgeable
