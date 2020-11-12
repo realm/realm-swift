@@ -361,6 +361,17 @@ extension Decimal128: AddableType {}
     public func freeze() -> Results {
         return Results(rlmResults.freeze())
     }
+    public func thaw() throws -> Results<Element> {
+        guard rlmResults.isFrozen, let frozeRealm = realm else {
+            return self
+        }
+
+        let realm = try Realm(configuration: frozeRealm.configuration)
+        guard let results = realm.resolve(ThreadSafeReference(to: self)) else {
+            throw Realm.Error(.cannotThaw)
+        }
+        return results
+    }
 }
 
 extension Results: RealmCollection {

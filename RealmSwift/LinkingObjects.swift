@@ -328,6 +328,19 @@ import Realm
         return LinkingObjects(propertyName: propertyName, handle: handle?.freeze())
     }
 
+    public func thaw() throws -> LinkingObjects<Element> {
+        guard self.rlmResults.isFrozen, let frozenRealm = realm else {
+            return self
+        }
+
+        let realm = try Realm(configuration: frozenRealm.configuration)
+        guard let linkingObject = realm.resolve(ThreadSafeReference(to: self)) else {
+            throw Realm.Error(.cannotThaw)
+        }
+
+        return linkingObject
+    }
+
     // MARK: Implementation
 
     private init(propertyName: String, handle: RLMLinkingObjectsHandle?) {
