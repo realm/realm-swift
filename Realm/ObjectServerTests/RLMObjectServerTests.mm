@@ -2586,6 +2586,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMRealm *realm = [self openRealmForPartitionValue:realmId user:user];
 
     XCTAssertThrows([realm.configuration setDeleteRealmIfMigrationNeeded:YES], @"Not allow 'deleteRealmIfMigrationNeeded' when sync is enabled.");
+    
+    RLMRealmConfiguration *localRealmConfiguration = [RLMRealmConfiguration defaultConfiguration];
+    XCTAssertNoThrow([localRealmConfiguration setDeleteRealmIfMigrationNeeded:YES]);
 }
 
 @end

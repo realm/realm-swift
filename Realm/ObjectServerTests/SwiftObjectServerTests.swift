@@ -3311,4 +3311,17 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             .store(in: &cancellable)
         wait(for: [dergisterDeviceExpectation], timeout: 4.0)
     }
+
+    func testShouldNotDeleteOnMigrationWithSync_2() {
+        let user = try! synchronouslyLogInUser(for: basicCredentials())
+        var configuration = user.configuration(partitionValue: appId)
+
+        assertThrows(configuration.deleteRealmIfMigrationNeeded = true,
+                     reason: "Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('syncConfig' is set).")
+        
+        var localConfiguration = Realm.Configuration.defaultConfiguration
+        assertSucceeds {
+            localConfiguration.deleteRealmIfMigrationNeeded = true
+        }
+    }
 }
