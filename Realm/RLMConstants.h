@@ -155,6 +155,8 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMError, RLMErrorDomain) {
 
     /// Denotates an error where an input value was invalid.
     RLMErrorInvalidInput = 13,
+
+    RLMErrorCannotThaw = 14,
 };
 
 #pragma mark - Constants

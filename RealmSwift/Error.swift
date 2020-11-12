@@ -68,6 +68,7 @@ extension Realm {
         /// Error thrown by Realm if there is a schema version mismatch, so that a migration is required.
         public static let schemaMismatch: Code = .schemaMismatch
 
+        public static let cannotThaw: Code = .cannotThaw
         /// :nodoc:
         public var code: Code {
             return (_nsError as! RLMError).code
