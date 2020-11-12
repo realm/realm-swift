@@ -2580,4 +2580,12 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectations:@[expectation] timeout:60.0];
 }
 
+- (void)testSyncConfigShouldNotMigrate {
+    RLMUser *user = [self userForTest:_cmd];
+    NSString *realmId = self.appId;
+    RLMRealm *realm = [self openRealmForPartitionValue:realmId user:user];
+
+    XCTAssertThrows([realm.configuration setDeleteRealmIfMigrationNeeded:YES], @"Not allow 'deleteRealmIfMigrationNeeded' when sync is enabled.");
+}
+
 @end

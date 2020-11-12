@@ -233,6 +233,8 @@ static bool isSync(realm::Realm::Config const& config) {
     if (deleteRealmIfMigrationNeeded) {
         if (self.readOnly) {
             @throw RLMException(@"Cannot set `deleteRealmIfMigrationNeeded` when `readOnly` is set.");
+        } else if (isSync(_config) && !_config.sync_config->partition_value.empty()) {
+            @throw RLMException(@"Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('sync.partitionValue' is set).");
         }
         _config.schema_mode = realm::SchemaMode::ResetFile;
     }
