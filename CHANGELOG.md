@@ -1,22 +1,23 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
 ### Enhancements
-* None.
+
+* Add Xcode 12.2 binaries to the release package.
 
 ### Fixed
-* Disallow `RLMRealmConfiguration.deleteRealmIfMigrationNeeded`/`Realm.Config.deleteRealmIfMigrationNeeded` when sync is enabled.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Disallow setting
+  `RLMRealmConfiguration.deleteRealmIfMigrationNeeded`/`Realm.Config.deleteRealmIfMigrationNeeded`
+  when sync is enabled. This did not actually work as it does not delete the
+  relevant server state and broke in confusing ways ([PR #6931](https://github.com/realm/realm-cocoa/pull/6931)).
 
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.1.
 * CocoaPods: 1.10 or later.
-
-### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
 
 10.1.2 Release notes (2020-11-06)
 =============================================================
