@@ -17,7 +17,7 @@ DEPENDENCIES = File.open("#{BASE_DIR}/dependencies.list").map { |line|
   line.chomp.split("=")
 }.to_h
 
-MONGODB_VERSION='4.4.0-rc5'
+MONGODB_VERSION='4.4.1'
 GO_VERSION='1.15.2'
 NODE_VERSION='8.11.2'
 STITCH_VERSION=DEPENDENCIES["STITCH_VERSION"]
