@@ -3318,7 +3318,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
         assertThrows(configuration.deleteRealmIfMigrationNeeded = true,
                      reason: "Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('syncConfig' is set).")
-        
+
         var localConfiguration = Realm.Configuration.defaultConfiguration
         assertSucceeds {
             localConfiguration.deleteRealmIfMigrationNeeded = true

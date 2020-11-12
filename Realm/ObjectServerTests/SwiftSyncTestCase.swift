@@ -130,7 +130,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                   file: file,
                   line: line)
     }
-    
+
     var exceptionThrown = false
 
     func assertThrows<T>(_ block: @autoclosure () -> T, named: String? = RLMExceptionName,
