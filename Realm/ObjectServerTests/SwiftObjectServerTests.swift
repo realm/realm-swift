@@ -3312,7 +3312,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         wait(for: [dergisterDeviceExpectation], timeout: 4.0)
     }
 
-    func testShouldNotDeleteOnMigrationWithSync_2() {
+    func testShouldNotDeleteOnMigrationWithSync() {
         let user = try! synchronouslyLogInUser(for: basicCredentials())
         var configuration = user.configuration(partitionValue: appId)
 
