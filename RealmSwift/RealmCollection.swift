@@ -502,7 +502,7 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
     */
     func freeze() -> Self
 
-    func thaw() -> Self
+    func thaw() throws -> Self
 }
 
 public extension RealmCollection {
@@ -663,7 +663,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func _asNSFastEnumerator() -> Any { fatalError() }
     var isFrozen: Bool { fatalError() }
     func freeze() -> AnyRealmCollection<T> { fatalError() }
-    func thaw() -> AnyRealmCollection<T> { fatalError() }
+    func thaw() throws -> AnyRealmCollection<T> { fatalError() }
 }
 
 private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollectionBase<C.Element> {
@@ -783,8 +783,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
         return AnyRealmCollection(base.freeze())
     }
 
-    override func thaw() -> AnyRealmCollection<Element> {
-        return AnyRealmCollection(base.thaw())
+    override func thaw() throws -> AnyRealmCollection<Element> {
+        return AnyRealmCollection(try base.thaw())
     }
 }
 
@@ -1084,7 +1084,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
     */
     public func freeze() -> AnyRealmCollection { return base.freeze() }
 
-    public func thaw() -> AnyRealmCollection { return base.thaw() }
+    public func thaw() throws -> AnyRealmCollection { return try base.thaw() }
 
 }
 

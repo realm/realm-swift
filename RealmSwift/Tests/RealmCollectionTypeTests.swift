@@ -523,8 +523,10 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testThaw() {
-        XCTAssertTrue(collection.freeze().isFrozen)
-        XCTAssertFalse(collection.thaw().isFrozen)
+        let frozen = collection.freeze()
+        XCTAssertTrue(frozen.isFrozen)
+        let thawed = try! frozen.thaw()
+        XCTAssertFalse(thawed.isFrozen)
     }
 
     func testFreezeFromWrongThread() {
