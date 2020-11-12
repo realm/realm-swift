@@ -146,12 +146,11 @@ xctest() {
         scheme=()
     fi
 
-    if [[ $PLATFORM != osx ]] && [[ $PLATFORM != catalyst ]]; then
+    if [[ $PLATFORM == catalyst ]]; then
+        xcodebuild "${project[@]}" "${scheme[@]}" "${destination[@]}" build "${code_signing_flags[@]}"
+    elif [[ $PLATFORM != osx ]] then
         [[ $PLATFORM == 'ios' ]] && SDK=iphoneos || SDK=$PLATFORM
         xcodebuild "${project[@]}" "${scheme[@]}" -sdk "$SDK" build "${code_signing_flags[@]}"
-    elif [[ $PLATFORM == catalyst ]]; then
-
-        xcodebuild "${project[@]}" "${scheme[@]}" "${destination[@]}" build "${code_signing_flags[@]}"
     fi
 }
 
