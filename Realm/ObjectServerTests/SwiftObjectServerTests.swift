@@ -1191,9 +1191,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))
         XCTAssertEqual(app.currentUser?.customData["apples"], .int64(10))
     }
+}
 
     // MARK: - Mongo Client
-
+class SwiftMongoClientTests: SwiftSyncTestCase {
+    override func tearDown() {
+        _ = setupMongoCollection()
+        super.tearDown()
+    }
     func testMongoClient() {
         let user = try! synchronouslyLogInUser(for: Credentials.anonymous)
         let mongoClient = user.mongoClient("mongodb1")

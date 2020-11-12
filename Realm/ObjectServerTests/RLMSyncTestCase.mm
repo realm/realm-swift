@@ -190,8 +190,8 @@ static NSURL *syncDirectoryForChildProcess() {
 
 #pragma mark - Helper methods
 
-- (BOOL)isPartial {
-    return NO;
+- (RLMUser *)anonymousUser {
+    return [self logInUserForCredentials:[RLMCredentials anonymousCredentials]];
 }
 
 - (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {

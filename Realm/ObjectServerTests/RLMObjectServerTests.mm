@@ -58,10 +58,6 @@ static NSString *generateRandomString(int num) {
     return string;
 }
 
-- (RLMUser *)anonymousUser {
-    return [self logInUserForCredentials:[RLMCredentials anonymousCredentials]];
-}
-
 - (RLMUser *)userForTest:(SEL)sel {
     return [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(sel)
                                                                register:self.isParent]];
@@ -1635,7 +1631,114 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertLessThanOrEqual(finalSize, usedSize + 4096U);
 }
 
+#pragma mark - Read Only
+
+- (void)testOpenSynchronouslyInReadOnlyBeforeRemoteSchemaIsInitialized {
+    RLMUser *user = [self userForTest:_cmd];
+    NSString *realmId = NSStringFromSelector(_cmd);
+
+    if (self.isParent) {
+        RLMRealmConfiguration *config = [user configurationWithPartitionValue:realmId];
+        config.readOnly = true;
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        CHECK_COUNT(0, Person, realm);
+        RLMRunChildAndWait();
+        [self waitForDownloadsForRealm:realm];
+        CHECK_COUNT(1, Person, realm);
+    } else {
+        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
+        [self waitForUploadsForRealm:realm];
+        CHECK_COUNT(1, Person, realm);
+    }
+}
+
+- (void)testAddPropertyToReadOnlyRealmWithExistingLocalCopy {
+    RLMUser *user = [self userForTest:_cmd];
+    NSString *realmId = NSStringFromSelector(_cmd);
+
+    if (!self.isParent) {
+        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
+        [self waitForUploadsForRealm:realm];
+        return;
+    }
+    RLMRunChildAndWait();
+
+    RLMRealmConfiguration *config = [user configurationWithPartitionValue:realmId];
+    config.readOnly = true;
+    @autoreleasepool {
+        RLMRealm *realm = [self asyncOpenRealmWithConfiguration:config];
+        CHECK_COUNT(1, Person, realm);
+    }
+
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:Person.class];
+    objectSchema.properties = [RLMObjectSchema schemaForObjectClass:HugeSyncObject.class].properties;
+    config.customSchema = [[RLMSchema alloc] init];
+    config.customSchema.objectSchema = @[objectSchema];
+
+    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
+                              @"Property 'Person.dataProp' has been added.");
+
+    @autoreleasepool {
+        NSError *error = [self asyncOpenErrorWithConfiguration:config];
+        XCTAssertNotEqual([error.localizedDescription rangeOfString:@"Property 'Person.dataProp' has been added."].location,
+                          NSNotFound);
+    }
+}
+
+- (void)testAddPropertyToReadOnlyRealmWithAsyncOpen {
+    RLMUser *user = [self userForTest:_cmd];
+    NSString *realmId = NSStringFromSelector(_cmd);
+
+    if (!self.isParent) {
+        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
+        [self waitForUploadsForRealm:realm];
+        return;
+    }
+    RLMRunChildAndWait();
+
+    RLMRealmConfiguration *config = [user configurationWithPartitionValue:realmId];
+    config.readOnly = true;
+
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:Person.class];
+    objectSchema.properties = [RLMObjectSchema schemaForObjectClass:HugeSyncObject.class].properties;
+    config.customSchema = [[RLMSchema alloc] init];
+    config.customSchema.objectSchema = @[objectSchema];
+
+    @autoreleasepool {
+        NSError *error = [self asyncOpenErrorWithConfiguration:config];
+        XCTAssertNotEqual([error.localizedDescription rangeOfString:@"Property 'Person.dataProp' has been added."].location,
+                          NSNotFound);
+    }
+}
+
+- (void)testSyncConfigShouldNotMigrate {
+    RLMUser *user = [self userForTest:_cmd];
+    RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+
+    RLMAssertThrowsWithReason([realm.configuration setDeleteRealmIfMigrationNeeded:YES],
+                              @"Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled");
+
+    RLMRealmConfiguration *localRealmConfiguration = [RLMRealmConfiguration defaultConfiguration];
+    XCTAssertNoThrow([localRealmConfiguration setDeleteRealmIfMigrationNeeded:YES]);
+}
+@end
+
 #pragma mark - Mongo Client
+
+@interface RLMMongoClientTests : RLMSyncTestCase
+@end
+
+@implementation RLMMongoClientTests
+- (void)tearDown {
+    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
+    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
+    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
+    [self cleanupRemoteDocuments:collection];
+    [super tearDown];
+}
 
 - (void)testFindOneAndModifyOptions {
     NSDictionary<NSString *, id<RLMBSON>> *projection = @{@"name": @1, @"breed": @1};
@@ -1738,8 +1841,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
-    [self cleanupRemoteDocuments:collection];
-
     XCTestExpectation *insertOneExpectation = [self expectationWithDescription:@"should insert one document"];
     [collection insertOneDocument:@{@"name": @"fido", @"breed": @"cane corso"} completion:^(id<RLMBSON> objectId, NSError *error) {
         XCTAssertEqual(objectId.bsonType, RLMBSONTypeObjectId);
@@ -1777,8 +1878,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-
-    [self cleanupRemoteDocuments:collection];
 
     XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
     [collection insertManyDocuments:@[
@@ -1858,8 +1957,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
-    [self cleanupRemoteDocuments:collection];
-
     XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
     [collection insertManyDocuments:@[
         @{@"name": @"fido", @"breed": @"cane corso"},
@@ -1916,8 +2013,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-
-    [self cleanupRemoteDocuments:collection];
 
     XCTestExpectation *updateExpectation1 = [self expectationWithDescription:@"should update document"];
     [collection updateOneDocumentWhere:@{@"name" : @"scrabby doo"}
@@ -1993,8 +2088,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
-    [self cleanupRemoteDocuments:collection];
-
     RLMFindOneAndModifyOptions *findAndModifyOptions = [[RLMFindOneAndModifyOptions alloc] initWithProjection:@{@"name" : @1, @"breed" : @1}
                                                                                                          sort:@{@"name" : @1, @"breed" : @1}
                                                                                                        upsert:YES
@@ -2048,7 +2141,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
-    [self cleanupRemoteDocuments:collection];
     NSArray<RLMObjectId *> *objectIds = [self insertDogDocuments:collection];
     RLMObjectId *rexObjectId = objectIds[1];
 
@@ -2100,10 +2192,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 
-    // FIXME: It seems there is a possible server bug that does not handle
-    // `projection` in `RLMFindOneAndModifyOptions` correctly. The returned error is:
-    // "expected pre-image to match projection matcher"
-    /*
     XCTestExpectation *findOneAndDeleteExpectation2 = [self expectationWithDescription:@"should find one and delete"];
     NSDictionary<NSString *, id<RLMBSON>> *projection = @{@"name": @1, @"breed": @1};
     NSDictionary<NSString *, id<RLMBSON>> *sort = @{@"_id" : @1, @"breed" : @1};
@@ -2117,94 +2205,14 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                               options:findOneAndModifyOptions
                            completion:^(NSDictionary<NSString *, id<RLMBSON>> *document, NSError *error) {
         XCTAssertNil(document);
-        XCTAssertNil(error);
+        // FIXME: when a projection is used, the server reports the error
+        // "expected pre-image to match projection matcher" when there are no
+        // matches, rather than simply doing nothing like when there is no projection
+//        XCTAssertNil(error);
+        (void)error;
         [findOneAndDeleteExpectation2 fulfill];
     }];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
-    */
-}
-
-#pragma mark - Read Only
-
-- (void)testOpenSynchronouslyInReadOnlyBeforeRemoteSchemaIsInitialized {
-    RLMUser *user = [self userForTest:_cmd];
-    NSString *realmId = NSStringFromSelector(_cmd);
-
-    if (self.isParent) {
-        RLMRealmConfiguration *config = [user configurationWithPartitionValue:realmId];
-        config.readOnly = true;
-        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-        CHECK_COUNT(0, Person, realm);
-        RLMRunChildAndWait();
-        [self waitForDownloadsForRealm:realm];
-        CHECK_COUNT(1, Person, realm);
-    } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-        [self addPersonsToRealm:realm persons:@[[Person john]]];
-        [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(1, Person, realm);
-    }
-}
-
-- (void)testAddPropertyToReadOnlyRealmWithExistingLocalCopy {
-    RLMUser *user = [self userForTest:_cmd];
-    NSString *realmId = NSStringFromSelector(_cmd);
-
-    if (!self.isParent) {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-        [self addPersonsToRealm:realm persons:@[[Person john]]];
-        [self waitForUploadsForRealm:realm];
-        return;
-    }
-    RLMRunChildAndWait();
-
-    RLMRealmConfiguration *config = [user configurationWithPartitionValue:realmId];
-    config.readOnly = true;
-    @autoreleasepool {
-        RLMRealm *realm = [self asyncOpenRealmWithConfiguration:config];
-        CHECK_COUNT(1, Person, realm);
-    }
-
-    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:Person.class];
-    objectSchema.properties = [RLMObjectSchema schemaForObjectClass:HugeSyncObject.class].properties;
-    config.customSchema = [[RLMSchema alloc] init];
-    config.customSchema.objectSchema = @[objectSchema];
-
-    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
-                              @"Property 'Person.dataProp' has been added.");
-
-    @autoreleasepool {
-        NSError *error = [self asyncOpenErrorWithConfiguration:config];
-        XCTAssertNotEqual([error.localizedDescription rangeOfString:@"Property 'Person.dataProp' has been added."].location,
-                          NSNotFound);
-    }
-}
-
-- (void)testAddPropertyToReadOnlyRealmWithAsyncOpen {
-    RLMUser *user = [self userForTest:_cmd];
-    NSString *realmId = NSStringFromSelector(_cmd);
-
-    if (!self.isParent) {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-        [self addPersonsToRealm:realm persons:@[[Person john]]];
-        [self waitForUploadsForRealm:realm];
-        return;
-    }
-    RLMRunChildAndWait();
-
-    RLMRealmConfiguration *config = [user configurationWithPartitionValue:realmId];
-    config.readOnly = true;
-
-    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:Person.class];
-    objectSchema.properties = [RLMObjectSchema schemaForObjectClass:HugeSyncObject.class].properties;
-    config.customSchema = [[RLMSchema alloc] init];
-    config.customSchema.objectSchema = @[objectSchema];
-
-    @autoreleasepool {
-        NSError *error = [self asyncOpenErrorWithConfiguration:config];
-        XCTAssertNotEqual([error.localizedDescription rangeOfString:@"Property 'Person.dataProp' has been added."].location,
-                          NSNotFound);
-    }
 }
 
 #pragma mark - Watch
@@ -2425,16 +2433,5 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     });
 
     [self waitForExpectations:@[expectation] timeout:60.0];
-}
-
-- (void)testSyncConfigShouldNotMigrate {
-    RLMUser *user = [self userForTest:_cmd];
-    RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-
-    RLMAssertThrowsWithReason([realm.configuration setDeleteRealmIfMigrationNeeded:YES],
-                              @"Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled");
-
-    RLMRealmConfiguration *localRealmConfiguration = [RLMRealmConfiguration defaultConfiguration];
-    XCTAssertNoThrow([localRealmConfiguration setDeleteRealmIfMigrationNeeded:YES]);
 }
 @end

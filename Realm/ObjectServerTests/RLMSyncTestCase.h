@@ -60,10 +60,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMSyncTestCase : RLMMultiProcessTestCase
 
 @property (nonatomic, readonly) NSString *appId;
-
-- (RLMAppConfiguration *)defaultAppConfiguration;
-
 @property (nonatomic, readonly) RLMApp *app;
+@property (nonatomic, readonly) RLMUser *anonymousUser;
+@property (nonatomic, readonly) RLMAppConfiguration *defaultAppConfiguration;
 
 /// Any stray app ids passed between processes
 @property (nonatomic, readonly) NSArray<NSString *> *appIds;
