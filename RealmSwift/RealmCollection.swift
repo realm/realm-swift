@@ -500,7 +500,7 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
      transaction on the Realm may result in the Realm file growing to large sizes. See
      `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
     */
-    mutating func freeze() -> Self
+    func freeze() -> Self
 }
 
 public extension RealmCollection {
