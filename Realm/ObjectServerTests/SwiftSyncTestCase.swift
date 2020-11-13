@@ -130,4 +130,34 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                   file: file,
                   line: line)
     }
+
+    var exceptionThrown = false
+
+    func assertThrows<T>(_ block: @autoclosure () -> T, named: String? = RLMExceptionName,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
+        RLMAssertThrowsWithName(self, { _ = block() }, named, message, fileName, lineNumber)
+    }
+
+    func assertThrows<T>(_ block: @autoclosure () -> T, reason: String,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
+        RLMAssertThrowsWithReason(self, { _ = block() }, reason, message, fileName, lineNumber)
+    }
+
+    func assertThrows<T>(_ block: @autoclosure () -> T, reasonMatching regexString: String,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
+        RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
+    }
+
+    func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
+                        lineNumber: UInt = #line, block: () throws -> Void) {
+        do {
+            try block()
+        } catch {
+            XCTFail("Expected no error, but instead caught <\(error)>.",
+                file: (fileName), line: lineNumber)
+        }
+    }
 }

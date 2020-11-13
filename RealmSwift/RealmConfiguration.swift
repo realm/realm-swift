@@ -184,7 +184,19 @@ extension Realm {
 
          - note: Setting this property to `true` doesn't disable file format migrations.
          */
-        public var deleteRealmIfMigrationNeeded: Bool = false
+        public var deleteRealmIfMigrationNeeded: Bool {
+            get {
+                return _deleteRealmIfMigrationNeeded
+            }
+            set(newValue) {
+                if newValue && syncConfiguration != nil {
+                    throwRealmException("Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('syncConfig' is set).")
+                }
+                _deleteRealmIfMigrationNeeded = newValue
+            }
+        }
+
+        private var _deleteRealmIfMigrationNeeded: Bool = false
 
         /**
          A block called when opening a Realm for the first time during the

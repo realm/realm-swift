@@ -248,7 +248,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             var theError: SyncError?
             let ex = expectation(description: "Waiting for error handler to be called...")
-            app.syncManager.errorHandler = { (error, session) in
+            app.syncManager.errorHandler = { (error, _) in
                 if let error = error as? SyncError {
                     theError = error
                 } else {
@@ -280,7 +280,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             try autoreleasepool {
                 let realm = try synchronouslyOpenRealm(partitionValue: self.appId, user: user)
                 let ex = expectation(description: "Waiting for error handler to be called...")
-                app.syncManager.errorHandler = { (error, session) in
+                app.syncManager.errorHandler = { (error, _) in
                     if let error = error as? SyncError {
                         theError = error
                     } else {
@@ -3310,5 +3310,18 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             })
             .store(in: &cancellable)
         wait(for: [dergisterDeviceExpectation], timeout: 4.0)
+    }
+
+    func testShouldNotDeleteOnMigrationWithSync() {
+        let user = try! synchronouslyLogInUser(for: basicCredentials())
+        var configuration = user.configuration(partitionValue: appId)
+
+        assertThrows(configuration.deleteRealmIfMigrationNeeded = true,
+                     reason: "Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('syncConfig' is set).")
+
+        var localConfiguration = Realm.Configuration.defaultConfiguration
+        assertSucceeds {
+            localConfiguration.deleteRealmIfMigrationNeeded = true
+        }
     }
 }
