@@ -16,6 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMUser_Private.h"
 #import "RLMUser_Private.hpp"
 
 #import "RLMCredentials_Private.hpp"
@@ -45,6 +46,17 @@ using namespace realm;
 @interface RLMUser () {
     std::shared_ptr<SyncUser> _user;
 }
+@end
+
+@implementation RLMUserSubscriptionToken {
+@public
+    std::unique_ptr<realm::Subscribable<SyncUser>::Token> _token;
+}
+
+- (NSUInteger)value {
+    return _token->value();
+}
+
 @end
 
 @implementation RLMUser
@@ -265,6 +277,18 @@ using namespace realm;
 
 - (std::shared_ptr<SyncUser>)_syncUser {
     return _user;
+}
+
+- (RLMUserSubscriptionToken *)subscribe:(RLMUserNotificationBlock) block {
+    RLMUserSubscriptionToken *token = [[RLMUserSubscriptionToken alloc] init];
+    token->_token = std::make_unique<Subscribable<SyncUser>::Token>(_user->subscribe([block = std::move(block), self] (auto&) {
+        block(self);
+    }));
+    return token;
+}
+
+- (void)unsubscribe:(RLMUserSubscriptionToken *)token {
+    _user->unsubscribe(*token->_token);
 }
 
 @end

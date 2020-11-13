@@ -16,11 +16,30 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMFindOneAndModifyOptions.h>
-#import "sync/mongo_collection.hpp"
+#import <Realm/RLMApp.h>
 
-@interface RLMFindOneAndModifyOptions ()
+NS_ASSUME_NONNULL_BEGIN
 
-- (realm::app::MongoCollection::FindOneAndModifyOptions)_findOneAndModifyOptions;
+/// Observer block for app notifications.
+typedef void(^RLMAppNotificationBlock)(RLMApp *);
+
+/// Token that identifies an observer. Unsubscribes when deconstructed to
+/// avoid dangling observers, therefore this must be retained to hold
+/// onto a subscription.
+@interface RLMAppSubscriptionToken : NSObject
+
+/// The underlying value of the subscription token.
+@property (nonatomic, readonly) NSUInteger value;
 
 @end
+
+@interface RLMApp ()
+
+/// Subscribe to notifications for this RLMApp.
+- (RLMAppSubscriptionToken *)subscribe:(RLMAppNotificationBlock)block;
+/// Unsubscribe to notifications for this RLMApp.
+- (void)unsubscribe:(RLMAppSubscriptionToken *)token;
+
+@end
+
+NS_ASSUME_NONNULL_END

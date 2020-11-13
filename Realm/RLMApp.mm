@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMApp_Private.hpp"
+#import "RLMApp_Private.h"
 
 #import "RLMCredentials_Private.hpp"
 #import "RLMBSON_Private.hpp"
@@ -35,6 +36,7 @@
 
 using namespace realm;
 
+#pragma mark CocoaNetworkTransport
 namespace {
     /// Internal transport struct to bridge RLMNetworkingTransporting to the GenericNetworkTransport.
     class CocoaNetworkTransport : public realm::app::GenericNetworkTransport {
@@ -81,6 +83,7 @@ namespace {
     };
 }
 
+#pragma mark RLMAppConfiguration
 @implementation RLMAppConfiguration {
     realm::app::App::Config _config;
 }
@@ -214,6 +217,18 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
                                   }];
 }
 
+#pragma mark RLMAppSubscriptionToken
+@implementation RLMAppSubscriptionToken {
+@public
+    std::unique_ptr<realm::Subscribable<app::App>::Token> _token;
+}
+
+- (NSUInteger)value {
+    return _token->value();
+}
+@end
+
+#pragma mark RLMApp
 @interface RLMApp() <ASAuthorizationControllerDelegate> {
     std::shared_ptr<realm::app::App> _app;
     __weak id<RLMASLoginDelegate> _authorizationDelegate API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0));
@@ -368,6 +383,19 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 - (void)authorizationController:(__unused ASAuthorizationController *)controller
            didCompleteWithError:(NSError *)error API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
     [self.authorizationDelegate authenticationDidCompleteWithError:error];
+}
+
+- (RLMAppSubscriptionToken *)subscribe:(RLMAppNotificationBlock)block {
+    RLMAppSubscriptionToken *token = [[RLMAppSubscriptionToken alloc] init];
+
+    token->_token = std::make_unique<realm::Subscribable<app::App>::Token>(_app->subscribe([block = std::move(block), self] (auto&) {
+        block(self);
+    }));
+    return token;
+}
+
+- (void)unsubscribe:(RLMAppSubscriptionToken *)token {
+    return _app->unsubscribe(*token->_token);
 }
 
 @end
