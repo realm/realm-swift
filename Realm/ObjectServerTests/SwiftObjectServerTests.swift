@@ -248,7 +248,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             var theError: SyncError?
             let ex = expectation(description: "Waiting for error handler to be called...")
-            app.syncManager.errorHandler = { (error, session) in
+            app.syncManager.errorHandler = { (error, _) in
                 if let error = error as? SyncError {
                     theError = error
                 } else {
@@ -280,7 +280,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             try autoreleasepool {
                 let realm = try synchronouslyOpenRealm(partitionValue: self.appId, user: user)
                 let ex = expectation(description: "Waiting for error handler to be called...")
-                app.syncManager.errorHandler = { (error, session) in
+                app.syncManager.errorHandler = { (error, _) in
                     if let error = error as? SyncError {
                         theError = error
                     } else {
