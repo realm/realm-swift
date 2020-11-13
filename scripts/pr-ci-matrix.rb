@@ -41,6 +41,7 @@ targets = {
   'cocoapods-ios' => oldest_and_latest,
   'cocoapods-ios-dynamic' => oldest_and_latest,
   'cocoapods-watchos' => oldest_and_latest,
+  'cocoapods-catalyst' => oldest_and_latest,
 
   'swiftpm' => oldest_and_latest,
   'swiftpm-address' => latest_only,
@@ -61,9 +62,9 @@ output_file = """
 # https://wiki.jenkins-ci.org/display/JENKINS/Yaml+Axis+Plugin
 # This is a generated file produced by scripts/pr-ci-matrix.rb.
 
-xcode_version: #{XCODE_VERSIONS.map { |v| "\n - #{v}" }.join()}
-target: #{targets.map { |k, v| "\n - #{k}" }.join()}
-configuration: #{CONFIGURATIONS.map { |v| "\n - #{v}" }.join()}
+xcode_version:#{XCODE_VERSIONS.map { |v| "\n - #{v}" }.join()}
+target:#{targets.map { |k, v| "\n - #{k}" }.join()}
+configuration:#{CONFIGURATIONS.map { |v| "\n - #{v}" }.join()}
 
 exclude:
 """

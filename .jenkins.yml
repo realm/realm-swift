@@ -3,13 +3,13 @@
 # https://wiki.jenkins-ci.org/display/JENKINS/Yaml+Axis+Plugin
 # This is a generated file produced by scripts/pr-ci-matrix.rb.
 
-xcode_version: 
+xcode_version:
  - 11.3
  - 11.4.1
  - 11.7
  - 12.0
  - 12.1
-target: 
+target:
  - docs
  - swiftlint
  - osx
@@ -32,11 +32,12 @@ target:
  - cocoapods-ios
  - cocoapods-ios-dynamic
  - cocoapods-watchos
+ - cocoapods-catalyst
  - swiftpm
  - swiftpm-address
  - swiftpm-thread
  - swiftpm-ios
-configuration: 
+configuration:
  - Debug
  - Release
 
@@ -692,6 +693,38 @@ exclude:
 
   - xcode_version: 12.1
     target: cocoapods-watchos
+    configuration: Debug
+
+  - xcode_version: 11.3
+    target: cocoapods-catalyst
+    configuration: Debug
+
+  - xcode_version: 11.4.1
+    target: cocoapods-catalyst
+    configuration: Debug
+
+  - xcode_version: 11.4.1
+    target: cocoapods-catalyst
+    configuration: Release
+
+  - xcode_version: 11.7
+    target: cocoapods-catalyst
+    configuration: Debug
+
+  - xcode_version: 11.7
+    target: cocoapods-catalyst
+    configuration: Release
+
+  - xcode_version: 12.0
+    target: cocoapods-catalyst
+    configuration: Debug
+
+  - xcode_version: 12.0
+    target: cocoapods-catalyst
+    configuration: Release
+
+  - xcode_version: 12.1
+    target: cocoapods-catalyst
     configuration: Debug
 
   - xcode_version: 11.3
