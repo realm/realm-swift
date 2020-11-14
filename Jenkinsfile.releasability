@@ -1,8 +1,8 @@
-xcodeVersions = ['11.3', '11.4.1', '11.7', '12.0', '12.1']
+xcodeVersions = ['11.3', '11.4.1', '11.7', '12.0', '12.1', '12.2']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
-carthageXcodeVersion = '12.1'
+carthageXcodeVersion = '12.2'
 objcXcodeVersion = '11.3'
 docsSwiftVersion = '5.3'
 
@@ -30,6 +30,22 @@ def installationTest(platform, test, language) {
       fi
 
       ./build.sh test-${platform}-${language}-${test}
+      """
+    }
+  }
+}
+
+def spmInstallationTest(platform) {
+  return {
+    node('osx') {
+      deleteDir()
+      unstash 'source'
+
+      sh """
+      hostname
+      export REALM_XCODE_VERSION=${carthageXcodeVersion}
+      cd examples/installation
+      ./build.sh test-${platform}-spm
       """
     }
   }
@@ -287,6 +303,7 @@ def doBuild() {
 
     parallelBuilds["Installation - iOS Obj-C static"] = installationTest('ios', 'static', 'objc')
     parallelBuilds["Installation - iOS Obj-C CocoaPods dynamic"] = installationTest('ios', 'cocoapods-dynamic', 'objc')
+    parallelBuilds["Installation - iOS Swift Package Manager"] = spmInstallationTest('ios')
 
     parallelBuilds["Installation - Mac Catalyst Obj-C CocoaPods"] = installationTest('catalyst', 'cocoapods', 'objc')
     parallelBuilds["Installation - Mac Catalyst Obj-C CocoaPods dynamic"] = installationTest('catalyst', 'cocoapods-dynamic', 'objc')

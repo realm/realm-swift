@@ -19,7 +19,9 @@
 import UIKit
 import RealmSwift
 
-public class MyModel: RealmSwift.Object {}
+public class MyModel: Object {
+    @objc dynamic var value = 0
+}
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
