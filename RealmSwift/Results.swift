@@ -459,7 +459,7 @@ import SwiftUI
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public final class BoundResults<Element: RealmCollectionValue>: ResultsBase, ObservableObject {
     public typealias Element = Element
-    public var rlmResults: RLMResults<AnyObject>
+    let rlmResults: RLMResults<AnyObject>
 
     init(_ results: Results<Element>) {
         self.rlmResults = results.rlmResults
