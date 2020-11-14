@@ -63,7 +63,7 @@ extension Decimal128: AddableType {}
 protocol ResultsBase : ObservableCollection, Equatable where BackingObjcCollection == RLMResults<AnyObject> {
 
 
-    var rlmResults: RLMResults<AnyObject>! { get }
+    var rlmResults: RLMResults<AnyObject> { get }
 
     init(_ rlmResults: RLMResults<AnyObject>)
 }
@@ -344,7 +344,7 @@ extension ResultsBase {
     /// :nodoc:
     // swiftlint:disable:next identifier_name
     public func _asNSFastEnumerator() -> Any {
-        return rlmResults!
+        return rlmResults
     }
 
     // MARK: Collection Support
@@ -398,7 +398,7 @@ extension ResultsBase {
  */
 @frozen public struct Results<Element: RealmCollectionValue>: ResultsBase, Equatable {
 
-    internal let rlmResults: RLMResults<AnyObject>!
+    internal let rlmResults: RLMResults<AnyObject>
 
     /// A human-readable description of the objects represented by the results.
     public var description: String {
@@ -443,7 +443,7 @@ extension Results: AssistedObjectiveCBridgeable {
     }
 
     internal var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: rlmResults!, metadata: nil)
+        return (objectiveCValue: rlmResults, metadata: nil)
     }
 }
 
@@ -464,7 +464,7 @@ import SwiftUI
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public final class BoundResults<Element: RealmCollectionValue>: ResultsBase, ObservableObject {
     public typealias Element = Element
-    public var rlmResults: RLMResults<AnyObject>!
+    public var rlmResults: RLMResults<AnyObject>
 
     public init(_ results: Results<Element>) {
         self.rlmResults = results.rlmResults
