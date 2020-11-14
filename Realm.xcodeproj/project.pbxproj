@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -262,9 +262,6 @@
 		492F5CB2244F48D800ACEBC0 /* regular_expression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49AD39F0244E1A370097500E /* regular_expression.cpp */; };
 		492F5CB3244F48D800ACEBC0 /* bson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49AD39F2244E1A370097500E /* bson.cpp */; };
 		494566A9246E8C59000FD07F /* ObjectiveCSupport+BSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494566A8246E8C59000FD07F /* ObjectiveCSupport+BSON.swift */; };
-		498C7F4124479905009DE80A /* remote_mongo_database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3A24479905009DE80A /* remote_mongo_database.cpp */; };
-		498C7F4224479905009DE80A /* remote_mongo_collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3B24479905009DE80A /* remote_mongo_collection.cpp */; };
-		498C7F4424479905009DE80A /* remote_mongo_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3D24479905009DE80A /* remote_mongo_client.cpp */; };
 		499321FC24129CFD00A0EC8E /* app_credentials.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 499321FA24129CFD00A0EC8E /* app_credentials.cpp */; };
 		499321FD24129CFD00A0EC8E /* app_credentials.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 499321FA24129CFD00A0EC8E /* app_credentials.cpp */; };
 		499321FE24129CFD00A0EC8E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 499321FB24129CFD00A0EC8E /* app.cpp */; };
@@ -296,6 +293,12 @@
 		534402D1247FCBFE00866F32 /* mongo_timestamp.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 534402CF247FCBFD00866F32 /* mongo_timestamp.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		534402D2247FCCA300866F32 /* bson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49AD39F2244E1A370097500E /* bson.cpp */; };
 		5346E7322487AC9D00595C68 /* RLMBSONTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5346E7312487AC9D00595C68 /* RLMBSONTests.mm */; };
+		53549E44256077E700D04B93 /* mongo_collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53549E3E256077E700D04B93 /* mongo_collection.cpp */; };
+		53549E45256077E700D04B93 /* mongo_collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53549E3E256077E700D04B93 /* mongo_collection.cpp */; };
+		53549E48256077E700D04B93 /* mongo_database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53549E40256077E700D04B93 /* mongo_database.cpp */; };
+		53549E49256077E700D04B93 /* mongo_database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53549E40256077E700D04B93 /* mongo_database.cpp */; };
+		53549E4E256077E700D04B93 /* mongo_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53549E43256077E700D04B93 /* mongo_client.cpp */; };
+		53549E4F256077E700D04B93 /* mongo_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53549E43256077E700D04B93 /* mongo_client.cpp */; };
 		536B7C0C24A4C223006B535D /* dependencies.list in Resources */ = {isa = PBXBuildFile; fileRef = 536B7C0B24A4C223006B535D /* dependencies.list */; };
 		536B7C1024A509AC006B535D /* setup_baas.rb in Resources */ = {isa = PBXBuildFile; fileRef = 49D9DFC4246C8E48003AD31D /* setup_baas.rb */; };
 		537130C824A9E417001FDBBC /* RealmServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537130C724A9E417001FDBBC /* RealmServer.swift */; };
@@ -483,9 +486,6 @@
 		C2CAAE771E9BB5760025454C /* system_configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2CAAE751E9BB5760025454C /* system_configuration.cpp */; };
 		C2CAAE781E9BB5760025454C /* system_configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2CAAE751E9BB5760025454C /* system_configuration.cpp */; };
 		CF330BBE24E57D5F00F07EE2 /* RLMWatchTestUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = CF330BBD24E57D5F00F07EE2 /* RLMWatchTestUtility.m */; };
-		CF56B09B24894E7F0001251D /* remote_mongo_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3D24479905009DE80A /* remote_mongo_client.cpp */; };
-		CF56B09C24894E7F0001251D /* remote_mongo_collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3B24479905009DE80A /* remote_mongo_collection.cpp */; };
-		CF56B09D24894E7F0001251D /* remote_mongo_database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3A24479905009DE80A /* remote_mongo_database.cpp */; };
 		CF6E0482242A141200DB7F14 /* RLMEmailPasswordAuth.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0480242A141200DB7F14 /* RLMEmailPasswordAuth.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF6E0483242A141200DB7F14 /* RLMEmailPasswordAuth.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0481242A141200DB7F14 /* RLMEmailPasswordAuth.mm */; };
 		CF6E0486242A321200DB7F14 /* RLMProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0484242A321200DB7F14 /* RLMProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -940,12 +940,6 @@
 		3FEB383C1E70AC6900F22712 /* ObjectCreationTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ObjectCreationTests.mm; sourceTree = "<group>"; };
 		3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftSchemaTests.swift; sourceTree = "<group>"; };
 		494566A8246E8C59000FD07F /* ObjectiveCSupport+BSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ObjectiveCSupport+BSON.swift"; sourceTree = "<group>"; };
-		498C7F3724479904009DE80A /* remote_mongo_database.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = remote_mongo_database.hpp; path = sync/remote_mongo_database.hpp; sourceTree = "<group>"; };
-		498C7F3824479904009DE80A /* remote_mongo_client.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = remote_mongo_client.hpp; path = sync/remote_mongo_client.hpp; sourceTree = "<group>"; };
-		498C7F3924479904009DE80A /* remote_mongo_collection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = remote_mongo_collection.hpp; path = sync/remote_mongo_collection.hpp; sourceTree = "<group>"; };
-		498C7F3A24479905009DE80A /* remote_mongo_database.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = remote_mongo_database.cpp; path = sync/remote_mongo_database.cpp; sourceTree = "<group>"; };
-		498C7F3B24479905009DE80A /* remote_mongo_collection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = remote_mongo_collection.cpp; path = sync/remote_mongo_collection.cpp; sourceTree = "<group>"; };
-		498C7F3D24479905009DE80A /* remote_mongo_client.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = remote_mongo_client.cpp; path = sync/remote_mongo_client.cpp; sourceTree = "<group>"; };
 		498C7F452447990C009DE80A /* app_service_client.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = app_service_client.hpp; path = sync/app_service_client.hpp; sourceTree = "<group>"; };
 		499321FA24129CFD00A0EC8E /* app_credentials.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app_credentials.cpp; path = sync/app_credentials.cpp; sourceTree = "<group>"; };
 		499321FB24129CFD00A0EC8E /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = sync/app.cpp; sourceTree = "<group>"; };
@@ -977,6 +971,12 @@
 		532E916E24AA533A003FD9DB /* TimeoutProxyServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimeoutProxyServer.swift; path = Realm/ObjectServerTests/TimeoutProxyServer.swift; sourceTree = "<group>"; };
 		534402CF247FCBFD00866F32 /* mongo_timestamp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mongo_timestamp.hpp; sourceTree = "<group>"; };
 		5346E7312487AC9D00595C68 /* RLMBSONTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMBSONTests.mm; path = Realm/ObjectServerTests/RLMBSONTests.mm; sourceTree = "<group>"; };
+		53549E3E256077E700D04B93 /* mongo_collection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mongo_collection.cpp; path = sync/mongo_collection.cpp; sourceTree = "<group>"; };
+		53549E3F256077E700D04B93 /* mongo_database.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = mongo_database.hpp; path = sync/mongo_database.hpp; sourceTree = "<group>"; };
+		53549E40256077E700D04B93 /* mongo_database.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mongo_database.cpp; path = sync/mongo_database.cpp; sourceTree = "<group>"; };
+		53549E41256077E700D04B93 /* mongo_client.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = mongo_client.hpp; path = sync/mongo_client.hpp; sourceTree = "<group>"; };
+		53549E42256077E700D04B93 /* mongo_collection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = mongo_collection.hpp; path = sync/mongo_collection.hpp; sourceTree = "<group>"; };
+		53549E43256077E700D04B93 /* mongo_client.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mongo_client.cpp; path = sync/mongo_client.cpp; sourceTree = "<group>"; };
 		536B7C0B24A4C223006B535D /* dependencies.list */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dependencies.list; sourceTree = "<group>"; };
 		537130C724A9E417001FDBBC /* RealmServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RealmServer.swift; path = Realm/ObjectServerTests/RealmServer.swift; sourceTree = "<group>"; };
 		53C4E950253A34DE0004835F /* app_utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app_utils.cpp; path = sync/app_utils.cpp; sourceTree = "<group>"; };
@@ -1320,14 +1320,14 @@
 				49B1965B2448586000B5B852 /* auth_request_client.hpp */,
 				4993221A2412A07F00A0EC8E /* generic_network_transport.cpp */,
 				4993221B2412A07F00A0EC8E /* generic_network_transport.hpp */,
+				53549E43256077E700D04B93 /* mongo_client.cpp */,
+				53549E41256077E700D04B93 /* mongo_client.hpp */,
+				53549E3E256077E700D04B93 /* mongo_collection.cpp */,
+				53549E42256077E700D04B93 /* mongo_collection.hpp */,
+				53549E40256077E700D04B93 /* mongo_database.cpp */,
+				53549E3F256077E700D04B93 /* mongo_database.hpp */,
 				6879E7C62486B1C200A65EF4 /* push_client.cpp */,
 				6879E7C52486B1AC00A65EF4 /* push_client.hpp */,
-				498C7F3D24479905009DE80A /* remote_mongo_client.cpp */,
-				498C7F3824479904009DE80A /* remote_mongo_client.hpp */,
-				498C7F3B24479905009DE80A /* remote_mongo_collection.cpp */,
-				498C7F3924479904009DE80A /* remote_mongo_collection.hpp */,
-				498C7F3A24479905009DE80A /* remote_mongo_database.cpp */,
-				498C7F3724479904009DE80A /* remote_mongo_database.hpp */,
 				1A15364A1DB045B500C0EC93 /* sync_config.hpp */,
 				1A15364D1DB045B500C0EC93 /* sync_manager.cpp */,
 				1A15364E1DB045B500C0EC93 /* sync_manager.hpp */,
@@ -2746,6 +2746,7 @@
 				3F7A3FAE1CC6EB7300301A17 /* collection_change_builder.cpp in Sources */,
 				3F9801AB1C8E4F6B000A8B07 /* collection_notifications.cpp in Sources */,
 				3F9801A41C8E4F55000A8B07 /* collection_notifier.cpp in Sources */,
+				53549E48256077E700D04B93 /* mongo_database.cpp in Sources */,
 				5D659E811BE04556006515A0 /* external_commit_helper.cpp in Sources */,
 				4993221C2412A08200A0EC8E /* generic_network_transport.cpp in Sources */,
 				5D659E821BE04556006515A0 /* index_set.cpp in Sources */,
@@ -2762,9 +2763,6 @@
 				6879E7C72486B1C200A65EF4 /* push_client.cpp in Sources */,
 				3F0543EC1C56F71500AA5322 /* realm_coordinator.cpp in Sources */,
 				534402CE247FCBE100866F32 /* regular_expression.cpp in Sources */,
-				498C7F4424479905009DE80A /* remote_mongo_client.cpp in Sources */,
-				498C7F4224479905009DE80A /* remote_mongo_collection.cpp in Sources */,
-				498C7F4124479905009DE80A /* remote_mongo_database.cpp in Sources */,
 				3F75566B1BE94CCC0058BC7E /* results.cpp in Sources */,
 				3F9801B01C90FD2D000A8B07 /* results_notifier.cpp in Sources */,
 				5D659E851BE04556006515A0 /* RLMAccessor.mm in Sources */,
@@ -2816,11 +2814,13 @@
 				5D659E9A1BE04556006515A0 /* RLMUpdateChecker.mm in Sources */,
 				CF76F7DD24816AAB00890DD2 /* RLMUpdateResult.mm in Sources */,
 				1ABDCDB01D793008003489E3 /* RLMUser.mm in Sources */,
+				53549E44256077E700D04B93 /* mongo_collection.cpp in Sources */,
 				CFAEF766242B672700EAF721 /* RLMUserAPIKey.mm in Sources */,
 				5D659E9B1BE04556006515A0 /* RLMUtil.mm in Sources */,
 				3F553577243BD50500A91FD8 /* scheduler.cpp in Sources */,
 				5D659E9C1BE04556006515A0 /* schema.cpp in Sources */,
 				5D659E9D1BE04556006515A0 /* shared_realm.cpp in Sources */,
+				53549E4E256077E700D04B93 /* mongo_client.cpp in Sources */,
 				1A1536721DB0464800C0EC93 /* sync_file.cpp in Sources */,
 				1A1536581DB045B500C0EC93 /* sync_manager.cpp in Sources */,
 				1A1536741DB0464800C0EC93 /* sync_metadata.cpp in Sources */,
@@ -2922,6 +2922,7 @@
 				3F7A3FAF1CC6EB7300301A17 /* collection_change_builder.cpp in Sources */,
 				3F9801AC1C8E4F6F000A8B07 /* collection_notifications.cpp in Sources */,
 				3F9801A61C8E4F5A000A8B07 /* collection_notifier.cpp in Sources */,
+				53549E49256077E700D04B93 /* mongo_database.cpp in Sources */,
 				5DD7557F1BE056DE002800DA /* external_commit_helper.cpp in Sources */,
 				4993221D2412A08F00A0EC8E /* generic_network_transport.cpp in Sources */,
 				5DD755801BE056DE002800DA /* index_set.cpp in Sources */,
@@ -2938,9 +2939,6 @@
 				6879E7C82486B1C200A65EF4 /* push_client.cpp in Sources */,
 				3F0543ED1C56F71900AA5322 /* realm_coordinator.cpp in Sources */,
 				492F5CB2244F48D800ACEBC0 /* regular_expression.cpp in Sources */,
-				CF56B09B24894E7F0001251D /* remote_mongo_client.cpp in Sources */,
-				CF56B09C24894E7F0001251D /* remote_mongo_collection.cpp in Sources */,
-				CF56B09D24894E7F0001251D /* remote_mongo_database.cpp in Sources */,
 				3F75566D1BE94CEA0058BC7E /* results.cpp in Sources */,
 				3F9801B11C90FD31000A8B07 /* results_notifier.cpp in Sources */,
 				5DD755831BE056DE002800DA /* RLMAccessor.mm in Sources */,
@@ -2992,11 +2990,13 @@
 				5DD755981BE056DE002800DA /* RLMUpdateChecker.mm in Sources */,
 				CF76F7DE24816AAB00890DD2 /* RLMUpdateResult.mm in Sources */,
 				17051FCE1D93DA0A00EF8E67 /* RLMUser.mm in Sources */,
+				53549E45256077E700D04B93 /* mongo_collection.cpp in Sources */,
 				3F275EC32433B77C00161E7F /* RLMUserAPIKey.mm in Sources */,
 				5DD755991BE056DE002800DA /* RLMUtil.mm in Sources */,
 				3F553578243BD50500A91FD8 /* scheduler.cpp in Sources */,
 				5DD7559A1BE056DE002800DA /* schema.cpp in Sources */,
 				5DD7559B1BE056DE002800DA /* shared_realm.cpp in Sources */,
+				53549E4F256077E700D04B93 /* mongo_client.cpp in Sources */,
 				1A1536761DB0464F00C0EC93 /* sync_file.cpp in Sources */,
 				1A1536631DB045CB00C0EC93 /* sync_manager.cpp in Sources */,
 				1A1536771DB0465400C0EC93 /* sync_metadata.cpp in Sources */,

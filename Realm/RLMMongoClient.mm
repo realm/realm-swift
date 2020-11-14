@@ -21,8 +21,8 @@
 #import "RLMMongoCollection_Private.hpp"
 #import "RLMApp_Private.hpp"
 
-#import "sync/remote_mongo_client.hpp"
-#import "sync/remote_mongo_database.hpp"
+#import "sync/mongo_client.hpp"
+#import "sync/mongo_database.hpp"
 
 #import <realm/util/optional.hpp>
 

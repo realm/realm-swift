@@ -968,3 +968,27 @@ extension Realm {
 
 /// The type of a block to run for notification purposes when the data in a Realm is modified.
 public typealias NotificationBlock = (_ notification: Realm.Notification, _ realm: Realm) -> Void
+
+#if canImport(SwiftUI)
+import SwiftUI
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+private struct RealmEnvironmentKey: EnvironmentKey {
+    static let defaultValue: Realm = try! Realm()
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+public extension EnvironmentValues {
+    var realm: Realm {
+          get { self[RealmEnvironmentKey.self] }
+          set { self[RealmEnvironmentKey.self] = newValue }
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+public extension View {
+    func realm(_ realm: Realm) -> some View {
+        environment(\.realm, realm)
+    }
+}
+#endif

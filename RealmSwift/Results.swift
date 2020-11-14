@@ -60,37 +60,19 @@ extension Int32: AddableType {}
 extension Int64: AddableType {}
 extension Decimal128: AddableType {}
 
-/**
- `Results` is an auto-updating container type in Realm returned from object queries.
+protocol ResultsBase : ObservableCollection, Equatable where BackingObjcCollection == RLMResults<AnyObject> {
 
- `Results` can be queried with the same predicates as `List<Element>`, and you can
- chain queries to further filter query results.
 
- `Results` always reflect the current state of the Realm on the current thread, including during write transactions on
- the current thread. The one exception to this is when using `for...in` enumeration, which will always enumerate over
- the objects which matched the query when the enumeration is begun, even if some of them are deleted or modified to be
- excluded by the filter during the enumeration.
+    var rlmResults: RLMResults<AnyObject>! { get }
 
- `Results` are lazily evaluated the first time they are accessed; they only run queries when the result of the query is
- requested. This means that chaining several temporary `Results` to sort and filter your data does not perform any
- unnecessary work processing the intermediate state.
+    init(_ rlmResults: RLMResults<AnyObject>)
+}
 
- Once the results have been evaluated or a notification block has been added, the results are eagerly kept up-to-date,
- with the work done to keep them up-to-date done on a background thread whenever possible.
-
- Results instances cannot be directly instantiated.
- */
-@frozen public struct Results<Element: RealmCollectionValue>: Equatable {
-
-    internal let rlmResults: RLMResults<AnyObject>
-
+extension ResultsBase {
     /// A human-readable description of the objects represented by the results.
     public var description: String {
         return RLMDescriptionWithMaxDepth("Results", rlmResults, RLMDescriptionMaxDepth)
     }
-
-    /// The type of the objects described by the results.
-    public typealias ElementType = Element
 
     // MARK: Properties
 
@@ -108,14 +90,6 @@ extension Decimal128: AddableType {}
     /// The number of objects in the results.
     public var count: Int { return Int(rlmResults.count) }
 
-    // MARK: Initializers
-
-    internal init(_ rlmResults: RLMResults<AnyObject>) {
-        self.rlmResults = rlmResults
-    }
-    internal init(objc rlmResults: RLMResults<AnyObject>) {
-        self.rlmResults = rlmResults
-    }
 
     // MARK: Index Retrieval
 
@@ -207,7 +181,7 @@ extension Decimal128: AddableType {}
      `students.sorted(byKeyPath: "age", ascending: true)`.
 
      - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
+     floating point, integer, and string types.
 
      - parameter keyPath:   The key path to sort by.
      - parameter ascending: The direction to sort in.
@@ -220,15 +194,15 @@ extension Decimal128: AddableType {}
      Returns a `Results` containing the objects represented by the results, but sorted.
 
      - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
+     floating point, integer, and string types.
 
      - see: `sorted(byKeyPath:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */
     public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element>
-        where S.Iterator.Element == SortDescriptor {
-            return Results<Element>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
+    where S.Iterator.Element == SortDescriptor {
+        return Results<Element>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
     /**
@@ -236,9 +210,9 @@ extension Decimal128: AddableType {}
 
      - parameter keyPaths:  The key paths used produce distinct results
      */
-    public func distinct<S: Sequence>(by keyPaths: S) -> Results<Element>
-        where S.Iterator.Element == String {
-            return Results<Element>(rlmResults.distinctResults(usingKeyPaths: Array(keyPaths)))
+    public func distinct<S: Sequence>(by keyPaths: S) -> Self
+    where S.Iterator.Element == String {
+        return Self(rlmResults.distinctResults(usingKeyPaths: Array(keyPaths)))
     }
 
     // MARK: Aggregate Operations
@@ -317,22 +291,22 @@ extension Decimal128: AddableType {}
      let dogs = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
      let token = dogs.observe { changes in
-         switch changes {
-         case .initial(let dogs):
-             // Will print "dogs.count: 1"
-             print("dogs.count: \(dogs.count)")
-             break
-         case .update:
-             // Will not be hit in this example
-             break
-         case .error:
-             break
-         }
+     switch changes {
+     case .initial(let dogs):
+     // Will print "dogs.count: 1"
+     print("dogs.count: \(dogs.count)")
+     break
+     case .update:
+     // Will not be hit in this example
+     break
+     case .error:
+     break
+     }
      }
      try! realm.write {
-         let dog = Dog()
-         dog.name = "Rex"
-         person.dogs.append(dog)
+     let dog = Dog()
+     dog.name = "Rex"
+     person.dogs.append(dog)
      }
      // end of run loop execution context
      ```
@@ -343,12 +317,12 @@ extension Decimal128: AddableType {}
      - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
 
      - parameter queue: The serial dispatch queue to receive notification on. If
-                        `nil`, notifications are delivered to the current thread.
+     `nil`, notifications are delivered to the current thread.
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     public func observe(on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmCollectionChange<Results>) -> Void) -> NotificationToken {
+                 _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken {
         return rlmResults.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
@@ -358,13 +332,9 @@ extension Decimal128: AddableType {}
         return rlmResults.isFrozen
     }
 
-    public func freeze() -> Results {
-        return Results(rlmResults.freeze())
+    public func freeze() -> Self {
+        return Self(rlmResults.freeze())
     }
-}
-
-extension Results: RealmCollection {
-    // MARK: Sequence Support
 
     /// Returns a `RLMIterator` that yields successive elements in the results.
     public func makeIterator() -> RLMIterator<Element> {
@@ -374,8 +344,7 @@ extension Results: RealmCollection {
     /// :nodoc:
     // swiftlint:disable:next identifier_name
     public func _asNSFastEnumerator() -> Any {
-        return rlmResults
-
+        return rlmResults!
     }
 
     // MARK: Collection Support
@@ -392,6 +361,9 @@ extension Results: RealmCollection {
     public func index(after i: Int) -> Int { return i + 1 }
     public func index(before i: Int) -> Int { return i - 1 }
 
+    internal func isSameObjcCollection(_ objc: RLMResults<AnyObject>) -> Bool {
+        return objc === rlmResults
+    }
     /// :nodoc:
     // swiftlint:disable:next identifier_name
     public func _observe(_ queue: DispatchQueue?,
@@ -399,7 +371,69 @@ extension Results: RealmCollection {
         -> NotificationToken {
             return rlmResults.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
+
+    public static func ==(lhs: Self, rhs: Self) -> Bool {
+        return false
+    }
 }
+/**
+ `Results` is an auto-updating container type in Realm returned from object queries.
+
+ `Results` can be queried with the same predicates as `List<Element>`, and you can
+ chain queries to further filter query results.
+
+ `Results` always reflect the current state of the Realm on the current thread, including during write transactions on
+ the current thread. The one exception to this is when using `for...in` enumeration, which will always enumerate over
+ the objects which matched the query when the enumeration is begun, even if some of them are deleted or modified to be
+ excluded by the filter during the enumeration.
+
+ `Results` are lazily evaluated the first time they are accessed; they only run queries when the result of the query is
+ requested. This means that chaining several temporary `Results` to sort and filter your data does not perform any
+ unnecessary work processing the intermediate state.
+
+ Once the results have been evaluated or a notification block has been added, the results are eagerly kept up-to-date,
+ with the work done to keep them up-to-date done on a background thread whenever possible.
+
+ Results instances cannot be directly instantiated.
+ */
+@frozen public struct Results<Element: RealmCollectionValue>: ResultsBase, Equatable {
+
+    internal let rlmResults: RLMResults<AnyObject>!
+
+    /// A human-readable description of the objects represented by the results.
+    public var description: String {
+        return RLMDescriptionWithMaxDepth("Results", rlmResults, RLMDescriptionMaxDepth)
+    }
+
+    /// The type of the objects described by the results.
+    public typealias Element = Element
+
+    // MARK: Properties
+
+    /// The Realm which manages this results. Note that this property will never return `nil`.
+    public var realm: Realm? { return Realm(rlmResults.realm) }
+
+    /**
+     Indicates if the results are no longer valid.
+
+     The results becomes invalid if `invalidate()` is called on the containing `realm`. An invalidated results can be
+     accessed, but will always be empty.
+     */
+    public var isInvalidated: Bool { return rlmResults.isInvalidated }
+
+    /// The number of objects in the results.
+    public var count: Int { return Int(rlmResults.count) }
+
+    // MARK: Initializers
+
+    internal init(_ rlmResults: RLMResults<AnyObject>) {
+        self.rlmResults = rlmResults
+    }
+    public init(objc rlmResults: RLMResults<AnyObject>) {
+        self.rlmResults = rlmResults
+    }
+}
+
 
 // MARK: AssistedObjectiveCBridgeable
 
@@ -409,7 +443,7 @@ extension Results: AssistedObjectiveCBridgeable {
     }
 
     internal var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: rlmResults, metadata: nil)
+        return (objectiveCValue: rlmResults!, metadata: nil)
     }
 }
 
@@ -423,3 +457,55 @@ extension Results: Encodable where Element: Encodable {
         }
     }
 }
+
+#if canImport(SwiftUI)
+import SwiftUI
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+public final class BoundResults<Element: RealmCollectionValue>: ResultsBase, ObservableObject {
+    public typealias Element = Element
+    public var rlmResults: RLMResults<AnyObject>!
+
+    public init(_ results: Results<Element>) {
+        self.rlmResults = results.rlmResults
+    }
+    init(_ rlmResults: RLMResults<AnyObject>) {
+        self.rlmResults = rlmResults
+    }
+
+    init(objc: RLMResults<AnyObject>) {
+        self.rlmResults = objc
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@propertyWrapper
+public struct BindResults<T>: DynamicProperty where T: Object {
+    private var _wrappedValue: ObservedObject<BoundResults<T>>
+    public var wrappedValue: BoundResults<T> {
+        get {
+            _wrappedValue.wrappedValue
+        }
+    }
+    var token: NotificationToken?
+
+    public init(_ type: T.Type, realm: Realm? = nil) {
+        if let realm = realm {
+            _wrappedValue = ObservedObject(wrappedValue: BoundResults(realm.objects(T.self)))
+        } else {
+            _wrappedValue = ObservedObject(wrappedValue: BoundResults(Environment(\.realm).wrappedValue.objects(T.self)))
+        }
+        token = self._wrappedValue.wrappedValue.observe { [_wrappedValue] value in
+            switch value {
+            case .initial(_):
+                _wrappedValue.wrappedValue.objectWillChange.send()
+            case .update(_, _, _, _):
+                _wrappedValue.wrappedValue.objectWillChange.send()
+            case .error(_):
+                fatalError()
+            }
+        }
+    }
+}
+
+#endif
