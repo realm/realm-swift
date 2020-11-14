@@ -60,8 +60,7 @@ extension Int32: AddableType {}
 extension Int64: AddableType {}
 extension Decimal128: AddableType {}
 
-protocol ResultsBase : ObservableCollection, Equatable where BackingObjcCollection == RLMResults<AnyObject> {
-
+protocol ResultsBase : ObservableCollection where BackingObjcCollection == RLMResults<AnyObject> {
 
     var rlmResults: RLMResults<AnyObject> { get }
 
@@ -371,10 +370,6 @@ extension ResultsBase {
         -> NotificationToken {
             return rlmResults.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
-
-    public static func ==(lhs: Self, rhs: Self) -> Bool {
-        return false
-    }
 }
 /**
  `Results` is an auto-updating container type in Realm returned from object queries.
@@ -466,13 +461,12 @@ public final class BoundResults<Element: RealmCollectionValue>: ResultsBase, Obs
     public typealias Element = Element
     public var rlmResults: RLMResults<AnyObject>
 
-    public init(_ results: Results<Element>) {
+    init(_ results: Results<Element>) {
         self.rlmResults = results.rlmResults
     }
     init(_ rlmResults: RLMResults<AnyObject>) {
         self.rlmResults = rlmResults
     }
-
     init(objc: RLMResults<AnyObject>) {
         self.rlmResults = objc
     }
