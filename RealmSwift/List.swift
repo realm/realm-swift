@@ -35,8 +35,21 @@ public class ListBase: RLMListBase {
         return RLMDescriptionWithMaxDepth("List", _rlmArray, depth)
     }
 
-    /// Returns the number of objects in this List.
-    public var count: Int { return Int(_rlmArray.count) }
+    public func freeze() -> Self {
+        return Self(objc: _rlmArray.freeze())
+    }
+
+    override init() {
+        super.init()
+    }
+
+    required internal init(objc rlmArray: RLMArray<AnyObject>) {
+        super.init(array: rlmArray)
+    }
+
+    public var count: Int {
+        return Int(_rlmArray.count)
+    }
 }
 
 /**
@@ -72,9 +85,13 @@ public final class List<Element: RealmCollectionValue>: ListBase {
         super.init()
     }
 
-    internal init(objc rlmArray: RLMArray<AnyObject>) {
-        super.init(array: rlmArray)
+    required internal init(objc rlmArray: RLMArray<AnyObject>) {
+        super.init(objc: rlmArray)
     }
+
+//    internal init(objc rlmArray: RLMArray<AnyObject>) {
+//        super.init(array: rlmArray)
+//    }
 
     // MARK: Index Retrieval
 
@@ -427,11 +444,6 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     public var isFrozen: Bool {
         return _rlmArray.isFrozen
     }
-
-    public func freeze() -> List {
-        return List(objc: _rlmArray.freeze())
-    }
-
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedArray() -> RLMArray<AnyObject> {
         return Element._rlmArray()
@@ -526,7 +538,7 @@ extension List: RealmCollection {
 }
 
 // MARK: - MutableCollection conformance, range replaceable collection emulation
-extension List: MutableCollection {
+extension List: MutableCollection, RangeReplaceableCollection {
     public typealias SubSequence = Slice<List>
 
     /**
@@ -663,3 +675,141 @@ extension List: AssistedObjectiveCBridgeable {
         return (objectiveCValue: _rlmArray, metadata: nil)
     }
 }
+
+#if canImport(SwiftUI)
+import SwiftUI
+
+// Allows conformance with SwiftUI's `ForEach`
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension Binding: Identifiable where Value: RealmCollectionValue, Value: Identifiable {
+    public var id: Value.ID {
+        return wrappedValue.id
+    }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension Binding: RandomAccessCollection,
+                   Sequence,
+                   Collection,
+                   BidirectionalCollection where Value: RealmCollection,
+                                                 Value: MutableCollection,
+                                                 Value: RangeReplaceableCollection,
+                                                 Value.Element: Identifiable {
+    public var indices: Indices {
+        wrappedValue.indices as! Binding<Value>.Indices
+    }
+
+    public typealias Element = Binding<Value.Element>
+    public typealias FakeType = Array<Element>
+    public typealias Index = Int
+
+    public typealias SubSequence = Slice<Array<Element>>
+
+    public typealias Indices = FakeType.Indices
+
+    @frozen public struct BoundIterator: IteratorProtocol {
+        private var generatorBase: NSFastEnumerationIterator
+
+        init(collection: RLMCollection) {
+            generatorBase = NSFastEnumerationIterator(collection)
+        }
+
+        /// Advance to the next element and return it, or `nil` if no next element exists.
+        public mutating func next() -> Element? {
+            let next = generatorBase.next()
+            if next is NSNull {
+                return Binding<Value.Element>(get: {
+                    Value.Element._nilValue()
+                }, set: {_ in
+                    fatalError()
+                })
+            }
+            if let next = next as? Object? {
+                if next == nil {
+                    return nil as Element?
+                }
+                // FIXME: This will always fail
+                return unsafeBitCast(next, to: Optional<Element>.self)
+            }
+            return Binding<Value.Element>(get: {
+                dynamicBridgeCast(fromObjectiveC: next as Any)
+            }, set: {_ in
+                fatalError()
+            })
+        }
+    }
+
+    public typealias Iterator = BoundIterator
+
+    public func makeIterator() -> BoundIterator {
+        return BoundIterator(collection: wrappedValue as! RLMCollection)
+    }
+    public var startIndex: Index {
+        return wrappedValue.startIndex as! Binding<Value>.Index
+    }
+
+    public var endIndex: Index {
+        return wrappedValue.endIndex as! Binding<Value>.Index
+    }
+
+    public subscript(position: Index) -> Element {
+        get {
+            Binding<Value.Element>(get: {
+                let value = self.wrappedValue[position as! Value.Index]
+                // if value is an Object, thaw it out as this list has been frozen
+                if value.self is Object {
+                    return (value as! Object).thaw() as! Value.Element
+                } else {
+                    return value
+                }
+            }, set: {
+                self.wrappedValue[position as! Value.Index] = $0
+            })
+        }
+    }
+
+    // Method that returns the next index when iterating
+    public func index(after i: Index) -> Index {
+        return wrappedValue.index(after: i as! Value.Index) as! Binding<Value>.Index
+    }
+
+    // MARK: Mutable Collection
+
+    public subscript(bounds: Range<Self.Index>) -> Self.SubSequence {
+        let tmp = wrappedValue[Range<Value.Index>.init(uncheckedBounds: (bounds.lowerBound as! Value.Index,
+                                                                         bounds.upperBound as! Value.Index))]
+        return SubSequence(tmp.map { element in
+            Element(get: { element }, set: { _ in fatalError() })
+        })
+    }
+
+    /// :nodoc:
+    public func remove(atOffsets offsets: IndexSet) {
+        // TODO: use thaw function
+        let realm = try! Realm(configuration: wrappedValue.realm!.configuration)
+        try! realm.write {
+            var resolved = realm.resolve(ThreadSafeReference(to: wrappedValue))
+            resolved!.remove(atOffsets: offsets)
+        }
+    }
+
+    /// :nodoc:
+    public func move(fromOffsets offsets: IndexSet, toOffset destination: Int) {
+        // TODO: use thaw function
+        let realm = try! Realm(configuration: wrappedValue.realm!.configuration)
+        try! realm.write {
+            var resolved = realm.resolve(ThreadSafeReference(to: wrappedValue))
+            resolved!.move(fromOffsets: offsets, toOffset: destination)
+        }
+    }
+
+    public func append(_ value: Value.Element) {
+        // TODO: use thaw function
+        let realm = try! Realm(configuration: wrappedValue.realm!.configuration)
+        try! realm.write {
+            var resolved = realm.resolve(ThreadSafeReference(to: wrappedValue))
+            resolved!.append(value)
+        }
+    }
+}
+#endif
