@@ -30,8 +30,6 @@
 
 using namespace realm;
 
-typedef void(^RLMServerURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSError *);
-
 static_assert((int)RLMHTTPMethodGET        == (int)app::HttpMethod::get);
 static_assert((int)RLMHTTPMethodPOST       == (int)app::HttpMethod::post);
 static_assert((int)RLMHTTPMethodPUT        == (int)app::HttpMethod::put);
