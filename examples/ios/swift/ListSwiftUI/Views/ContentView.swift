@@ -1,126 +1,108 @@
-////////////////////////////////////////////////////////////////////////////
-//
-// Copyright 2020 Realm Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-////////////////////////////////////////////////////////////////////////////
-
-import SwiftUI
 import RealmSwift
+import SwiftUI
 
-struct RecipeRow: View {
-    var recipe: Recipe
-    @EnvironmentObject var state: ContentViewState
+// MARK: Dog Model
+class Dog: Object, Identifiable {
+    private static let dogNames = [
+        "Bella", "Charlie", "Luna", "Lucy", "Max",
+        "Bailey", "Cooper", "Daisy", "Sadie", "Molly"
+    ]
 
-    init(_ recipe: Recipe) {
-        self.recipe = recipe
+    /// The unique id of this dog
+    @objc dynamic var id = ObjectId.generate()
+    /// The name of this dog
+    @objc dynamic var name = dogNames.randomElement()!
+
+    public static func ==(lhs: Dog, rhs: Dog) -> Bool {
+        return lhs.isSameObject(as: rhs)
     }
+}
+
+// MARK: Person Model
+class Person: Object, Identifiable {
+    private static let peopleNames = [
+        "Aoife", "Caoimhe", "Saoirse", "Ciara", "Niamh",
+        "Conor", "Seán", "Oisín", "Patrick", "Cian"
+    ]
+
+    /// The name of the person
+    @objc dynamic var name = peopleNames.randomElement()!
+    /// The dogs this person has
+    var dogs = RealmSwift.List<Dog>()
+}
+
+// MARK: Person View
+struct PersonView: View {
+    // bind a Person to the View
+    @RealmBind var person: Person
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(recipe.name).onTapGesture {
-                    self.state.sectionState[self.recipe] = !self.isExpanded(self.recipe)
-                }.animation(.interactiveSpring())
-                if self.isExpanded(recipe) {
-                    ForEach(recipe.ingredients) { ingredient in
-                        HStack {
-                            URLImage(ingredient.foodType!.imgUrl)
-                            Text(ingredient.name!)
-                        }.padding(.leading, 5)
-                    }.animation(.interactiveSpring())
+        VStack {
+            // The write transaction for the name property of `Person`
+            // is implicit here, and will occur on every edit
+            TextField("name", text: $person.name)
+                .font(Font.largeTitle.bold()).padding()
+            List {
+                // Using the `$` will bind the Dog List to the view.
+                // Each Dog will be be bound as well, and will be
+                // of type `Binding<Dog>`
+                ForEach($person.dogs, id: \.id) { dog in
+                    // The write transaction for the name property of `Dog`
+                    // is implicit here, and will occur on every edit.
+                    TextField("dog name", text: dog.name)
                 }
+                // the remove method on the dogs list
+                // will implicitly write and remove the dogs
+                // at the offsets from the `onDelete(perform:)` method
+                .onDelete(perform: $person.dogs.remove)
+                // the move method on the dogs list
+                // will implicitly write and move the dogs
+                // to and from the offsets from the `onMove(perform:)` method
+                .onMove(perform: $person.dogs.move)
             }
-            Spacer()
         }
-    }
-
-    private func isExpanded(_ section: Recipe) -> Bool {
-        self.state.sectionState[section] ?? false
+        .navigationBarItems(trailing: Button("Add Dog") {
+            // appending a dog to the dogs List implicitly
+            // writes to the Realm, since it has been bound
+            // to the view
+            $person.dogs.append(Dog())
+        })
     }
 }
 
-final class ContentViewState: ObservableObject {
-    /// This dict will allow us to store state on the expansion and contraction of rows.
-    @Published var sectionState: [Recipe: Bool] = [:]
-}
-
-struct ContentView: View {
-    @State private var searchTerm: String = ""
-    @State private var showRecipeFormView = false
-    @ObservedObject var state = ContentViewState()
-    @ObservedObject var recipes: RealmSwift.List<Recipe>
+// MARK: Results View
+struct ResultsView: View {
+    @Environment(\.realm) var realm: Realm
+    @RealmBind(Person.self) var results
 
     var body: some View {
         NavigationView {
             List {
-                Section(header:
-                    HStack {
-                        SearchBar(text: self.$searchTerm)
-                            .frame(width: 300, alignment: .leading)
-                            .padding(5)
-                        NavigationLink(destination: RecipeFormView(recipes: self.recipes, showRecipeFormView: self.$showRecipeFormView),
-                                       isActive: self.$showRecipeFormView,
-                                       label: {
-                                        Button("add recipe") {
-                                            self.showRecipeFormView = true
-                                        }
-                        })
-                }) {
-                    ForEach(filteredCollection().freeze()) { recipe in
-                        RecipeRow(recipe).environmentObject(self.state)
+                ForEach(results) { person in
+                    NavigationLink(destination: PersonView(person: person)) {
+                        Text(person.name)
                     }
-                    .onDelete(perform: delete)
-                    .onMove(perform: move)
                 }
-            }.listStyle(GroupedListStyle())
-                .navigationBarTitle("recipes", displayMode: .large)
-                .navigationBarBackButtonHidden(true)
-                .navigationBarHidden(false)
-                .navigationBarItems(trailing: EditButton())
-        }
-    }
-
-    func filteredCollection() -> AnyRealmCollection<Recipe> {
-        if self.searchTerm.isEmpty {
-            return AnyRealmCollection(self.recipes)
-        } else {
-            return AnyRealmCollection(self.recipes.filter("name CONTAINS[c] %@", searchTerm))
-        }
-    }
-
-    func delete(at offsets: IndexSet) {
-        if let realm = recipes.realm {
-            try! realm.write {
-                realm.delete(recipes[offsets.first!])
             }
-        } else {
-            recipes.remove(at: offsets.first!)
+            .navigationBarTitle("People", displayMode: .large)
+            .navigationBarItems(trailing: Button("Add") {
+                try! realm.write { realm.add(Person()) }
+            })
         }
     }
-
-    func move(fromOffsets offsets: IndexSet, toOffset to: Int) {
-        recipes.realm?.beginWrite()
-        recipes.move(fromOffsets: offsets, toOffset: to)
-        try! recipes.realm?.commitWrite()
-    }
 }
 
-#if DEBUG
-struct ContentViewPreviews: PreviewProvider {
-    static var previews: some View {
-        return ContentView(recipes: .init())
+@main
+struct ContentView: SwiftUI.App {
+    var realm = try! Realm()
+
+    var view: some View {
+        ResultsView().environment(\.realm, realm)
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            view
+        }
     }
 }
-#endif
