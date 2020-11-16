@@ -1,3 +1,21 @@
+////////////////////////////////////////////////////////////////////////////
+ //
+ // Copyright 2020 Realm Inc.
+ //
+ // Licensed under the Apache License, Version 2.0 (the "License");
+ // you may not use this file except in compliance with the License.
+ // You may obtain a copy of the License at
+ //
+ // http://www.apache.org/licenses/LICENSE-2.0
+ //
+ // Unless required by applicable law or agreed to in writing, software
+ // distributed under the License is distributed on an "AS IS" BASIS,
+ // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ // See the License for the specific language governing permissions and
+ // limitations under the License.
+ //
+ ////////////////////////////////////////////////////////////////////////////
+
 import RealmSwift
 import SwiftUI
 
@@ -34,7 +52,7 @@ class Person: Object, Identifiable {
 // MARK: Person View
 struct PersonView: View {
     // bind a Person to the View
-    @RealmBind var person: Person
+    @RealmState var person: Person
 
     var body: some View {
         VStack {
@@ -46,7 +64,7 @@ struct PersonView: View {
                 // Using the `$` will bind the Dog List to the view.
                 // Each Dog will be be bound as well, and will be
                 // of type `Binding<Dog>`
-                ForEach($person.dogs, id: \.id) { dog in
+                ForEach($person.dogs, id: \.id.wrappedValue) { dog in
                     // The write transaction for the name property of `Dog`
                     // is implicit here, and will occur on every edit.
                     TextField("dog name", text: dog.name)
@@ -73,10 +91,10 @@ struct PersonView: View {
 // MARK: Results View
 struct ResultsView: View {
     @Environment(\.realm) var realm: Realm
-    @RealmBind(Person.self) var results
+    @RealmState(Person.self) var results
 
     var body: some View {
-        NavigationView {
+        return NavigationView {
             List {
                 ForEach(results) { person in
                     NavigationLink(destination: PersonView(person: person)) {
