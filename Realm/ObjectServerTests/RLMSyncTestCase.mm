@@ -425,12 +425,9 @@ static NSURL *syncDirectoryForChildProcess() {
     if (auto ids = NSProcessInfo.processInfo.environment[@"RLMParentAppIds"]) {
         _appIds = [ids componentsSeparatedByString:@","];   //take the one array for split the string
     }
-    if (self.isParent) {
-        [NSFileManager.defaultManager removeItemAtURL:self.clientDataRoot error:nil];
-        [NSFileManager.defaultManager removeItemAtURL:syncDirectoryForChildProcess() error:nil];
-        [NSFileManager.defaultManager createDirectoryAtURL:self.clientDataRoot
-                               withIntermediateDirectories:YES attributes:nil error:nil];
-    }
+    [NSFileManager.defaultManager removeItemAtURL:self.clientDataRoot error:nil];
+    [NSFileManager.defaultManager createDirectoryAtURL:self.clientDataRoot
+                           withIntermediateDirectories:YES attributes:nil error:nil];
 }
 
 - (void)tearDown {
