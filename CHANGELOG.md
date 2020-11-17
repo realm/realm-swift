@@ -1,23 +1,21 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.1.4 Release notes (2020-11-16)
 =============================================================
+
 ### Enhancements
-* None.
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Add arm64 slices to the macOS builds.
 
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.2.
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+
+* Upgraded realm-core from v10.0.1 to v10.1.3
+* Upgraded realm-sync from v10.0.1 to v10.1.3
 
 10.1.3 Release notes (2020-11-13)
 =============================================================

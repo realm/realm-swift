@@ -8,11 +8,12 @@
 			<key>HeadersPath</key>
 			<string>Headers</string>
 			<key>LibraryIdentifier</key>
-			<string>macos-x86_64</string>
+			<string>macos-x86_64_arm64</string>
 			<key>LibraryPath</key>
 			<string>librealm-sync.a</string>
 			<key>SupportedArchitectures</key>
-			<array><string>x86_64</string></array>
+			<array><string>x86_64</string>
+<string>arm64</string></array>
 			<key>SupportedPlatform</key>
 			<string>macos</string>
 		</dict>
@@ -49,11 +50,12 @@
 			<key>HeadersPath</key>
 			<string>Headers</string>
 			<key>LibraryIdentifier</key>
-			<string>ios-x86_64-maccatalyst</string>
+			<string>ios-x86_64_arm64-maccatalyst</string>
 			<key>LibraryPath</key>
 			<string>librealm-sync.a</string>
 			<key>SupportedArchitectures</key>
-			<array><string>x86_64</string></array>
+			<array><string>x86_64</string>
+<string>arm64</string></array>
 			<key>SupportedPlatform</key>
 			<string>ios</string>
 			<key>SupportedPlatformVariant</key>
