@@ -10,152 +10,267 @@ xcode_version:
  - 12.1
  - 12.2
 target:
+ - docs
+ - swiftlint
+ - osx
+ - osx-encryption
+ - osx-object-server
  - swiftpm
+ - swiftpm-debug
  - swiftpm-address
  - swiftpm-thread
  - swiftpm-ios
-configuration:
- - Debug
- - Release
+ - ios-static
+ - ios-dynamic
+ - watchos
+ - tvos
+ - osx-swift
+ - ios-swift
+ - tvos-swift
+ - osx-swift-evolution
+ - ios-swift-evolution
+ - tvos-swift-evolution
+ - catalyst
+ - catalyst-swift
+ - xcframework
+ - cocoapods-osx
+ - cocoapods-ios
+ - cocoapods-ios-dynamic
+ - cocoapods-watchos
+ - cocoapods-catalyst
 
 exclude:
 
   - xcode_version: 11.3
-    target: swiftpm
-    configuration: Debug
+    target: docs
 
   - xcode_version: 11.7
-    target: swiftpm
-    configuration: Debug
+    target: docs
+
+  - xcode_version: 12.0
+    target: docs
+
+  - xcode_version: 12.1
+    target: docs
+
+  - xcode_version: 11.3
+    target: swiftlint
 
   - xcode_version: 11.7
-    target: swiftpm
-    configuration: Release
+    target: swiftlint
 
   - xcode_version: 12.0
-    target: swiftpm
-    configuration: Debug
+    target: swiftlint
+
+  - xcode_version: 12.1
+    target: swiftlint
+
+  - xcode_version: 11.7
+    target: osx-encryption
 
   - xcode_version: 12.0
-    target: swiftpm
-    configuration: Release
+    target: osx-encryption
 
   - xcode_version: 12.1
-    target: swiftpm
-    configuration: Debug
+    target: osx-encryption
+
+  - xcode_version: 11.7
+    target: osx-object-server
+
+  - xcode_version: 12.0
+    target: osx-object-server
 
   - xcode_version: 12.1
-    target: swiftpm
-    configuration: Release
-
-  - xcode_version: 12.2
-    target: swiftpm
-    configuration: Debug
+    target: osx-object-server
 
   - xcode_version: 11.3
     target: swiftpm-address
-    configuration: Debug
-
-  - xcode_version: 11.3
-    target: swiftpm-address
-    configuration: Release
 
   - xcode_version: 11.7
     target: swiftpm-address
-    configuration: Debug
-
-  - xcode_version: 11.7
-    target: swiftpm-address
-    configuration: Release
 
   - xcode_version: 12.0
     target: swiftpm-address
-    configuration: Debug
-
-  - xcode_version: 12.0
-    target: swiftpm-address
-    configuration: Release
 
   - xcode_version: 12.1
     target: swiftpm-address
-    configuration: Debug
-
-  - xcode_version: 12.1
-    target: swiftpm-address
-    configuration: Release
-
-  - xcode_version: 12.2
-    target: swiftpm-address
-    configuration: Debug
 
   - xcode_version: 11.3
     target: swiftpm-thread
-    configuration: Debug
-
-  - xcode_version: 11.3
-    target: swiftpm-thread
-    configuration: Release
 
   - xcode_version: 11.7
     target: swiftpm-thread
-    configuration: Debug
-
-  - xcode_version: 11.7
-    target: swiftpm-thread
-    configuration: Release
 
   - xcode_version: 12.0
     target: swiftpm-thread
-    configuration: Debug
-
-  - xcode_version: 12.0
-    target: swiftpm-thread
-    configuration: Release
 
   - xcode_version: 12.1
     target: swiftpm-thread
-    configuration: Debug
-
-  - xcode_version: 12.1
-    target: swiftpm-thread
-    configuration: Release
-
-  - xcode_version: 12.2
-    target: swiftpm-thread
-    configuration: Debug
 
   - xcode_version: 11.3
     target: swiftpm-ios
-    configuration: Debug
+
+  - xcode_version: 11.7
+    target: swiftpm-ios
+
+  - xcode_version: 12.0
+    target: swiftpm-ios
+
+  - xcode_version: 12.1
+    target: swiftpm-ios
+
+  - xcode_version: 11.7
+    target: ios-static
+
+  - xcode_version: 12.0
+    target: ios-static
+
+  - xcode_version: 12.1
+    target: ios-static
+
+  - xcode_version: 11.7
+    target: ios-dynamic
+
+  - xcode_version: 12.0
+    target: ios-dynamic
+
+  - xcode_version: 12.1
+    target: ios-dynamic
+
+  - xcode_version: 11.7
+    target: watchos
+
+  - xcode_version: 12.0
+    target: watchos
+
+  - xcode_version: 12.1
+    target: watchos
+
+  - xcode_version: 11.7
+    target: tvos
+
+  - xcode_version: 12.0
+    target: tvos
+
+  - xcode_version: 12.1
+    target: tvos
+
+  - xcode_version: 11.7
+    target: ios-swift
+
+  - xcode_version: 12.0
+    target: ios-swift
+
+  - xcode_version: 12.1
+    target: ios-swift
+
+  - xcode_version: 11.7
+    target: tvos-swift
+
+  - xcode_version: 12.0
+    target: tvos-swift
+
+  - xcode_version: 12.1
+    target: tvos-swift
 
   - xcode_version: 11.3
-    target: swiftpm-ios
-    configuration: Release
+    target: osx-swift-evolution
 
   - xcode_version: 11.7
-    target: swiftpm-ios
-    configuration: Debug
+    target: osx-swift-evolution
+
+  - xcode_version: 12.0
+    target: osx-swift-evolution
+
+  - xcode_version: 12.1
+    target: osx-swift-evolution
+
+  - xcode_version: 11.3
+    target: ios-swift-evolution
 
   - xcode_version: 11.7
-    target: swiftpm-ios
-    configuration: Release
+    target: ios-swift-evolution
 
   - xcode_version: 12.0
-    target: swiftpm-ios
-    configuration: Debug
+    target: ios-swift-evolution
+
+  - xcode_version: 12.1
+    target: ios-swift-evolution
+
+  - xcode_version: 11.3
+    target: tvos-swift-evolution
+
+  - xcode_version: 11.7
+    target: tvos-swift-evolution
 
   - xcode_version: 12.0
-    target: swiftpm-ios
-    configuration: Release
+    target: tvos-swift-evolution
 
   - xcode_version: 12.1
-    target: swiftpm-ios
-    configuration: Debug
+    target: tvos-swift-evolution
+
+  - xcode_version: 11.7
+    target: catalyst
+
+  - xcode_version: 12.0
+    target: catalyst
 
   - xcode_version: 12.1
-    target: swiftpm-ios
-    configuration: Release
+    target: catalyst
 
-  - xcode_version: 12.2
-    target: swiftpm-ios
-    configuration: Debug
+  - xcode_version: 11.7
+    target: catalyst-swift
+
+  - xcode_version: 12.0
+    target: catalyst-swift
+
+  - xcode_version: 12.1
+    target: catalyst-swift
+
+  - xcode_version: 11.3
+    target: xcframework
+
+  - xcode_version: 11.7
+    target: xcframework
+
+  - xcode_version: 12.0
+    target: xcframework
+
+  - xcode_version: 12.1
+    target: xcframework
+
+  - xcode_version: 11.7
+    target: cocoapods-ios
+
+  - xcode_version: 12.0
+    target: cocoapods-ios
+
+  - xcode_version: 12.1
+    target: cocoapods-ios
+
+  - xcode_version: 11.7
+    target: cocoapods-ios-dynamic
+
+  - xcode_version: 12.0
+    target: cocoapods-ios-dynamic
+
+  - xcode_version: 12.1
+    target: cocoapods-ios-dynamic
+
+  - xcode_version: 11.7
+    target: cocoapods-watchos
+
+  - xcode_version: 12.0
+    target: cocoapods-watchos
+
+  - xcode_version: 12.1
+    target: cocoapods-watchos
+
+  - xcode_version: 11.7
+    target: cocoapods-catalyst
+
+  - xcode_version: 12.0
+    target: cocoapods-catalyst
+
+  - xcode_version: 12.1
+    target: cocoapods-catalyst

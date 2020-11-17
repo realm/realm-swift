@@ -1,21 +1,52 @@
 #!/usr/bin/env ruby
 # A script to generate the .jenkins.yml file for the CI pull request job
 XCODE_VERSIONS = %w(11.3 11.7 12.0 12.1 12.2)
-CONFIGURATIONS = %w(Debug Release)
 
-release_only = ->(v, c) { c == 'Release' }
-latest_only = ->(v, c) { c == 'Release' and v == XCODE_VERSIONS.last }
-oldest_and_latest = ->(v, c) { c == 'Release' and (v == XCODE_VERSIONS.first or v == XCODE_VERSIONS.last) }
+all = ->(v) { true }
+latest_only = ->(v) { v == XCODE_VERSIONS.last }
+oldest_and_latest = ->(v) { v == XCODE_VERSIONS.first or v == XCODE_VERSIONS.last }
 
 def minimum_version(major)
-  ->(v, c) { v.split('.').first.to_i >= major and (c == 'Release' or v == XCODE_VERSIONS.last) }
+  ->(v) { v.split('.').first.to_i >= major }
 end
 
 targets = {
-  'swiftpm' => oldest_and_latest,
+  'docs' => latest_only,
+  'swiftlint' => latest_only,
+
+  'osx' => all,
+  'osx-encryption' => oldest_and_latest,
+  'osx-object-server' => oldest_and_latest,
+
+  'swiftpm' => all,
+  'swiftpm-debug' => all,
   'swiftpm-address' => latest_only,
   'swiftpm-thread' => latest_only,
   'swiftpm-ios' => latest_only,
+
+  'ios-static' => oldest_and_latest,
+  'ios-dynamic' => oldest_and_latest,
+  'watchos' => oldest_and_latest,
+  'tvos' => oldest_and_latest,
+
+  'osx-swift' => all,
+  'ios-swift' => oldest_and_latest,
+  'tvos-swift' => oldest_and_latest,
+
+  'osx-swift-evolution' => latest_only,
+  'ios-swift-evolution' => latest_only,
+  'tvos-swift-evolution' => latest_only,
+
+  'catalyst' => oldest_and_latest,
+  'catalyst-swift' => oldest_and_latest,
+
+  'xcframework' => latest_only,
+
+  'cocoapods-osx' => all,
+  'cocoapods-ios' => oldest_and_latest,
+  'cocoapods-ios-dynamic' => oldest_and_latest,
+  'cocoapods-watchos' => oldest_and_latest,
+  'cocoapods-catalyst' => oldest_and_latest,
 }
 
 output_file = """
@@ -25,21 +56,17 @@ output_file = """
 
 xcode_version:#{XCODE_VERSIONS.map { |v| "\n - #{v}" }.join()}
 target:#{targets.map { |k, v| "\n - #{k}" }.join()}
-configuration:#{CONFIGURATIONS.map { |v| "\n - #{v}" }.join()}
 
 exclude:
 """
 targets.each { |name, filter|
   XCODE_VERSIONS.each { |version|
-    CONFIGURATIONS.each { |configuration|
-      if not filter.call(version, configuration)
-        output_file << """
+    if not filter.call(version)
+      output_file << """
   - xcode_version: #{version}
     target: #{name}
-    configuration: #{configuration}
 """
-      end
-    }
+    end
   }
 }
 
