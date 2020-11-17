@@ -1092,7 +1092,6 @@ case "$COMMAND" in
             sh build.sh verify-swiftlint
         else
             export sha=$GITHUB_PR_SOURCE_BRANCH
-            export CONFIGURATION=$configuration
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO -allowProvisioningUpdates'
             if [[ "$target" = *ios* ]] || [[ "$target" = *tvos* ]] || [[ "$target" = *watchos* ]]; then
                 sh build.sh prelaunch-simulator "$target"
