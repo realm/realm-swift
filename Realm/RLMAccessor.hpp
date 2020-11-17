@@ -64,12 +64,14 @@ public:
     id box(realm::Decimal128 v) { return v.is_null() ? NSNull.null : [[RLMDecimal128 alloc] initWithDecimal128:v]; }
     id box(realm::ObjectId v) { return [[RLMObjectId alloc] initWithValue:v]; }
     id box(realm::Mixed v) { return RLMMixedToObjc(v); }
+    id box(realm::UUID v) { return RLMMixedToObjc(v); }
 
     id box(realm::util::Optional<bool> v) { return v ? @(*v) : NSNull.null; }
     id box(realm::util::Optional<double> v) { return v ? @(*v) : NSNull.null; }
     id box(realm::util::Optional<float> v) { return v ? @(*v) : NSNull.null; }
     id box(realm::util::Optional<int64_t> v) { return v ? @(*v) : NSNull.null; }
     id box(realm::util::Optional<realm::ObjectId> v) { return v ? box(*v) : NSNull.null; }
+    id box(realm::util::Optional<realm::UUID> v) { return v ? box(*v) : NSNull.null; }
 
     void will_change(realm::Obj const&, realm::Property const&);
     void will_change(realm::Object& obj, realm::Property const& prop) { will_change(obj.obj(), prop); }
