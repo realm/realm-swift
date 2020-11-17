@@ -376,6 +376,8 @@ id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
             return [[NSMutableDictionary alloc] initWithBsonDocument:static_cast<BsonDocument>(b)];
         case realm::bson::Bson::Type::Array:
             return [[NSMutableArray alloc] initWithBsonArray:static_cast<BsonArray>(b)];
+        case realm::bson::Bson::Type::Uuid:
+            REALM_COMPILER_HINT_UNREACHABLE();
     }
     return nil;
 }
