@@ -432,6 +432,14 @@ static NSURL *syncDirectoryForChildProcess() {
     return [[XCTestSuite alloc] initWithName:[super defaultTestSuite].name];
 }
 
++ (void)setUp {
+    [super setUp];
+    // Wait for the server to launch
+    if ([RealmServer haveServer]) {
+        (void)[RealmServer shared];
+    }
+}
+
 - (void)setUp {
     [super setUp];
     self.continueAfterFailure = NO;
