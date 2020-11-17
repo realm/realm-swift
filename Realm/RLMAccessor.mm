@@ -771,7 +771,19 @@ realm::ObjectId RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
     return static_cast<RLMObjectId *>(v).value;
 }
 template<>
-realm::UUID RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+realm::UUID RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
+}
+template<>
+realm::Mixed RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
+}
+template<>
+realm::object_store::Set RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
+}
+template<>
+realm::object_store::Dictionary RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
     REALM_UNREACHABLE();
 }
 
@@ -802,7 +814,7 @@ realm::util::Optional<realm::ObjectId> RLMAccessorContext::unbox(__unsafe_unreta
     return to_optional(v, [&](__unsafe_unretained RLMObjectId *v) { return v.value; });
 }
 template<>
-realm::util::Optional<realm::UUID> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+realm::util::Optional<realm::UUID> RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
     REALM_UNREACHABLE();
 }
 
