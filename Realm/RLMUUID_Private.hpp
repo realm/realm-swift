@@ -1,16 +1,27 @@
+////////////////////////////////////////////////////////////////////////////
 //
-//  Header.h
-//  
+// Copyright 2020 Realm Inc.
 //
-//  Created by Pavel Yakimenko on 02/11/2020.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or utilied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
 
-#ifndef Header_h
-#define Header_h
+#ifndef RLMUUID_H
+#define RLMUUID_H
 
 #import <Realm/RLMObject.h>
 #import "RLMProperty.h"
-#include <realm/object-store/util/bson/bson.hpp>
+#import <Foundation/Foundation.h>
 
 namespace realm {
 class UUID;
@@ -18,7 +29,7 @@ class UUID;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSUUID(RLMUUIDSupport) <RLMUUID>
+@interface NSUUID (RLMUUIDSupport) <RLMUUID>
 
 - (instancetype)initWithRealmUUID:(realm::UUID)uuidValue;
 
@@ -27,4 +38,4 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 NS_ASSUME_NONNULL_END
 
-#endif /* Header_h */
+#endif /* RLMUUID_H */

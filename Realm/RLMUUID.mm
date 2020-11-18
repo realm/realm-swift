@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMUUID_Private.hpp"
+#include <realm/object-store/util/bson/bson.hpp>
 
 @implementation NSUUID (RLMUUIDSupport)
 

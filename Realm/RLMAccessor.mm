@@ -30,6 +30,7 @@
 #import "RLMResults_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
+#import "RLMUUID_Private.hpp"
 
 #import <realm/object-store/results.hpp>
 #import <realm/object-store/property.hpp>
