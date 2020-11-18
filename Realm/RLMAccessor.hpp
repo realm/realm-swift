@@ -46,6 +46,7 @@ public:
     // Accessor context interface
     RLMAccessorContext(RLMAccessorContext& parent, realm::Obj const& parent_obj, realm::Property const& property);
 
+    id box(realm::object_store::Dictionary&&);
     id box(realm::object_store::Set&&);
     id box(realm::List&&);
     id box(realm::Results&&);
@@ -79,6 +80,7 @@ public:
 
     bool is_same_list(realm::List const& list, id v) const noexcept;
     bool is_same_set(realm::object_store::Set const& set, id v) const noexcept;
+    bool is_same_dictionary(realm::object_store::Dictionary const& dictionary, id const v) const noexcept;
 
     template<typename Func>
     void enumerate_collection(__unsafe_unretained const id v, Func&& func) {
@@ -86,6 +88,11 @@ public:
         for (id value in enumerable) {
             func(value);
         }
+    }
+
+    template<typename Func>
+    void enumerate_dictionary(__unsafe_unretained const id v, Func&& func) {
+        // FIXME: needs impl
     }
 
     template<typename T>

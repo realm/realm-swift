@@ -124,7 +124,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 //- (void)removeObjectAtIndex:(NSUInteger)index;
 
-//- (void)removeLastObject;
+- (void)removeLastObject;
 
 //TODO: Should be
 - (void)removeObject:(RLMObjectType)object;

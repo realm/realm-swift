@@ -176,7 +176,7 @@ static auto translateErrors(Function&& f) {
 
 template<typename IndexSetFactory>
 static void changeSet(__unsafe_unretained RLMManagedSet *const set,
-                        NSKeyValueChange kind, dispatch_block_t f, IndexSetFactory&& is=nil) {
+                        NSKeyValueChange kind, dispatch_block_t f, IndexSetFactory&& is) {
     translateErrors([&] { set->_backingSet.verify_in_transaction(); });
 
     RLMObservationTracker tracker(set->_realm);
@@ -196,7 +196,7 @@ static void changeSet(__unsafe_unretained RLMManagedSet *const set,
 }
 
 static void changeSet(__unsafe_unretained RLMManagedSet *const set, NSKeyValueChange kind, dispatch_block_t f) {
-    changeSet(set, kind, f);
+    changeSet(set, kind, f, [] { return [NSIndexSet new]; });
 }
 
 static void changeSet(__unsafe_unretained RLMManagedSet *const set, NSKeyValueChange kind, NSUInteger index, dispatch_block_t f) {
@@ -292,6 +292,12 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     RLMRemoveObject(self, object);
 }
 
+- (void)removeObjectAtIndex:(NSUInteger)index {
+    changeSet(self, NSKeyValueChangeRemoval, index, ^{
+        _backingSet.remove(_backingSet.get(index));
+    });
+}
+
 - (void)addObjectsFromSet:(NSSet *)set {
     changeSet(self, NSKeyValueChangeInsertion, NSMakeRange(self.count, set.count), ^{
         RLMAccessorContext context(*_objectInfo);
@@ -304,7 +310,16 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 
 - (void)removeAllObjects {
     changeSet(self, NSKeyValueChangeRemoval, NSMakeRange(0, self.count), ^{
-        //_backingSet.remove_all();
+        _backingSet.remove_all();
+    });
+}
+
+- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)object {
+    RLMSetValidateMatchingObjectType(self, object);
+    changeSet(self, NSKeyValueChangeReplacement, index, ^{
+        RLMAccessorContext context(*_objectInfo);
+        //FIXME: needs impl
+        //_backingSet.set(context, index, object);
     });
 }
 

@@ -66,6 +66,11 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @property RLM_GENERIC_ARRAY(SchemaTestClassBase) *baseArray;
 @property RLM_GENERIC_ARRAY(SchemaTestClassFirstChild) *childArray;
 @property RLM_GENERIC_ARRAY(SchemaTestClassSecondChild) *secondChildArray;
+
+@property RLM_GENERIC_SET(SchemaTestClassBase) *baseSet;
+@property RLM_GENERIC_SET(SchemaTestClassFirstChild) *childSet;
+@property RLM_GENERIC_SET(SchemaTestClassSecondChild) *secondChildSet;
+
 @end
 @implementation SchemaTestClassLink
 @end
@@ -420,11 +425,13 @@ RLM_ARRAY_TYPE(NotARealClass)
                                                             @"secondChildCol": @"IntObject"});
         checkSchema(schema, @"SchemaTestClassLink", @{@"base": @"SchemaTestClassBase",
                                                       @"baseArray": @"SchemaTestClassBase",
+                                                      @"baseSet": @"SchemaTestClassBase",
                                                       @"child": @"SchemaTestClassFirstChild",
                                                       @"childArray": @"SchemaTestClassFirstChild",
+                                                      @"childSet": @"SchemaTestClassFirstChild",
                                                       @"secondChild": @"SchemaTestClassSecondChild",
-                                                      @"secondChildArray": @"SchemaTestClassSecondChild"});
-
+                                                      @"secondChildArray": @"SchemaTestClassSecondChild",
+                                                      @"secondChildSet": @"SchemaTestClassSecondChild"});
 
         // Test creating objects of each class
         [self deleteFiles];

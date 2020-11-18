@@ -360,6 +360,10 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
     });
 }
 
+- (void)removeObject:(id)object {
+
+}
+
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
     va_list args;
     va_start(args, predicateFormat);

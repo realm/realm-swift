@@ -742,6 +742,10 @@ id RLMAccessorContext::box(realm::object_store::Set&& s) {
                                      property:currentProperty];
 }
 
+id RLMAccessorContext::box(realm::object_store::Dictionary&& d) {
+//
+}
+
 id RLMAccessorContext::box(realm::Object&& o) {
     REALM_ASSERT(currentProperty);
     return RLMCreateObjectAccessor(_info.linkTargetType(currentProperty.index), o.obj());
@@ -802,6 +806,10 @@ realm::ObjectId RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
 }
 template<>
 realm::UUID RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
+}
+template<>
+realm::Mixed RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
     REALM_UNREACHABLE();
 }
 
@@ -976,6 +984,11 @@ bool RLMAccessorContext::is_same_list(realm::List const& list, __unsafe_unretain
 
 bool RLMAccessorContext::is_same_set(realm::object_store::Set const& set, __unsafe_unretained id const v) const noexcept {
     return [v respondsToSelector:@selector(isBackedBySet:)] && [v isBackedBySet:set];
+}
+
+bool RLMAccessorContext::is_same_dictionary(realm::object_store::Dictionary const& dictionary, __unsafe_unretained id const v) const noexcept {
+    // FIXME: Implement
+    return NO;
 }
 
 #pragma clang diagnostic push

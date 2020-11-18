@@ -94,6 +94,9 @@ static bool rawTypeShouldBeTreatedAsComputedProperty(NSString *rawType) {
     if (is_array(prop.type)) {
         ret->_array = true;
     }
+    if (is_set(prop.type)) {
+        ret->_set = true;
+    }
     if (!prop.public_name.empty()) {
         ret->_columnName = ret->_name;
         ret->_name = @(prop.public_name.c_str());
@@ -569,6 +572,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     prop->_type = _type;
     prop->_objectClassName = _objectClassName;
     prop->_array = _array;
+    prop->_set = _set;
     prop->_indexed = _indexed;
     prop->_getterName = _getterName;
     prop->_setterName = _setterName;
@@ -621,6 +625,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
              "\tindexed = %@;\n"
              "\tisPrimary = %@;\n"
              "\tarray = %@;\n"
+             "\tset = %@;\n"
              "\toptional = %@;\n"
              "}",
             self.name, RLMTypeToString(self.type),
@@ -628,6 +633,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
             self.indexed ? @"YES" : @"NO",
             self.isPrimary ? @"YES" : @"NO",
             self.array ? @"YES" : @"NO",
+            self.set ? @"YES" : @"NO",
             self.optional ? @"YES" : @"NO"];
 }
 

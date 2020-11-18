@@ -49,6 +49,8 @@
     RLMArray *arrayProp = array.array;
     RLMAssertThrowsWithReasonMatching([arrayProp addObject:obj], @"write transaction");
 
+    NSLog(@"%@", [array description]); //TODO: Crashes
+
     // make sure we can fast enumerate
     for (RLMObject *obj in array.array) {
         XCTAssertTrue(obj.description.length, @"Object should have description");

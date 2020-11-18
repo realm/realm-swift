@@ -242,6 +242,7 @@ RLM_ARRAY_TYPE(EmployeeObject)
 
 @property NSString *name;
 @property RLM_GENERIC_ARRAY(EmployeeObject) *employees;
+@property RLM_GENERIC_SET(EmployeeObject) *employeeSet;
 
 @end
 
