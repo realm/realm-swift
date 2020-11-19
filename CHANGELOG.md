@@ -1,7 +1,9 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* The prebuilt binaries are now packaged as XCFrameworks. This adds support for
+  Catalyst and arm64 simulators when using them to install Realm, removes the
+  need for the strip-frameworks build step, and should simplify installation.
 
 ### Fixed
 * The user identifier was added to the file path for synchronized Realms twice
