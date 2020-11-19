@@ -20,6 +20,9 @@ import Foundation
 import Realm
 import Realm.Private
 
+protocol Thawable {
+    
+}
 /**
  `Object` is a class used to define Realm model objects.
 
@@ -324,21 +327,6 @@ extension Object: ThreadConfined {
     public func freeze() -> Self {
         return realm!.freeze(self)
     }
-
-    // TODO: branch em/thaw will address this,
-    // TODO: this is just the quick and dirty version
-    public func thaw() -> Self {
-         guard let frozenRealm = realm else {
-             return self
-         }
-
-         let realm = try! Realm(configuration: frozenRealm.configuration)
-         guard let obj = realm.resolve(ThreadSafeReference(to: self)) else {
-             fatalError("Could not thaw")
-         }
-
-         return obj
-     }
 }
 
 

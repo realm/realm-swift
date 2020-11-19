@@ -21,96 +21,159 @@ import SwiftUI
 import Combine
 import Realm
 
-/**
- A set of types to be used to "bind" Realm types to views.
- Bound types are observed, and write transactions are implicit.
- */
-
-// MARK: Bound Types
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-protocol Bound: ObservableObject where ObjectWillChangePublisher == ObservableObjectPublisher {
-    associatedtype Value
-
-    var wrappedValue: Value { get }
-
-    init(wrappedValue: Value)
-
-    func observe(binder: inout RealmState<Value>, _ block: @escaping (RealmState<Value>) -> Void) -> NotificationToken
-}
-
 @dynamicMemberLookup
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-final class BoundObject<Value: Object> : Bound {
-    public var wrappedValue: Value
+@propertyWrapper
+public final class RealmBinding<T>: ObservableObject {
+    var getter: () -> T
+    var setter: (T) -> Void
+    private var realm: Realm
+    var _observe: ((inout RealmState<T>, _ block: @escaping (RealmState<T>) -> Void) -> NotificationToken)? = nil
 
-    public required init(wrappedValue: Value) {
-        self.wrappedValue = wrappedValue
+    public var projectedValue: Binding<T> {
+        Binding(get: getter, set: setter)
     }
 
-    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> {
+    public var wrappedValue: T {
+        get {
+            getter()
+        } set {
+            setter(newValue)
+        }
+    }
+
+    init(realm: Realm, get: @escaping () -> T, set: @escaping (T) -> Void) {
+        self.realm = realm
+        self.getter = get
+        self.setter = set
+    }
+
+    init(_ value: T, realm: Realm) where T: EmbeddedObject {
+        self.getter = { value }
+        self.setter = { _ in }
+        self._observe = { (binder: inout RealmState<T>, block: @escaping (RealmState<T>) ->Void) -> NotificationToken in
+            value.observe(on: nil) { [binder] _ in
+                block(binder)
+            }
+        }
+        self.realm = realm
+    }
+
+    init(_ value: T, realm: Realm) where T: Object {
+        self.getter = { value }
+        self.setter = { _ in }
+        self._observe = { (binder: inout RealmState<T>, block: @escaping (RealmState<T>) ->Void) -> NotificationToken in
+            value.observe(on: nil) { [binder] _ in
+                block(binder)
+            }
+        }
+        self.realm = realm
+    }
+
+    init(_ value: T, realm: Realm) where T: RealmCollection {
+        self.getter = { value }
+        self.setter = { _ in }
+        self._observe = { (binder: inout RealmState<T>, block: @escaping (RealmState<T>) ->Void) -> NotificationToken in
+            value.observe(on: nil) { [binder] _ in
+                block(binder)
+            }
+        }
+        self.realm = realm
+    }
+
+    func observe(binder: inout RealmState<T>, _ block: @escaping (RealmState<T>) -> Void) -> NotificationToken? {
+        _observe?(&binder) { [block] binder in
+            block(binder)
+        }
+    }
+
+    public func bind() -> Binding<T> {
+        return Binding(get: getter, set: setter)
+    }
+
+    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<T, V>) -> V {
+        get {
+            self.getter()[keyPath: member]
+        } set {
+            try! self.realm.write {
+                self.getter()[keyPath: member] = newValue
+            }
+        }
+    }
+
+    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
         get {
             Binding(get: {
-                self.wrappedValue[keyPath: member]
-            }, set: { newValue in
-                try! self.wrappedValue.realm!.write {
-                    self.wrappedValue[keyPath: member] = newValue
+                self.getter()[keyPath: member]
+            },
+            set: { newValue in
+                try! self.realm.write {
+                    self.getter()[keyPath: member] = newValue
                 }
             })
         }
     }
 
-    // if property is a collection, we want to freeze it before fetching it
-    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, List<V>>) -> BoundList<V> where V: RealmCollectionValue, V: Identifiable {
+    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<T, V>) -> RealmBinding<V> where V: Object {
         get {
-            BoundList(wrappedValue: (self.wrappedValue[keyPath: member]).freeze())
+            RealmBinding<V>(realm: realm, get: {
+                self.getter()[keyPath: member]
+            },
+            set: { newValue in
+                try! self.realm.write {
+                    self.getter()[keyPath: member] = newValue
+                }
+            })
         }
     }
 
-    func observe(binder: inout RealmState<Value>, _ block: @escaping (RealmState<Value>) -> Void) -> NotificationToken {
-        return wrappedValue.observe { [binder] _ in
-            block(binder)
+    public subscript<CollectionType>(dynamicMember member: ReferenceWritableKeyPath<T, CollectionType>) -> RealmBinding<CollectionType> where CollectionType: RealmCollection {
+        get {
+            RealmBinding<CollectionType>(self.wrappedValue[keyPath: member].freeze(), realm: realm)
         }
     }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public final class BoundList<CollectionValue>: RandomAccessCollection,
-                                        Sequence,
-                                        Collection,
-                                        BidirectionalCollection,
-                                        Bound,
-                                        ObservableObject where CollectionValue: RealmCollectionValue,
-                                                               CollectionValue: Identifiable {
-    func observe(binder: inout RealmState<List<CollectionValue>>,
-                 _ block: @escaping (RealmState<List<CollectionValue>>) -> Void) -> NotificationToken {
-        return wrappedValue.observe { [binder] _ in
-            block(binder)
+extension RealmBinding where T: RealmCollection {
+    public subscript(position: Index) -> Element {
+        get {
+            let value = self.wrappedValue[position]
+            if value.self is ThreadConfined {
+                return (value as! ThreadConfined).thaw() as! T.Element
+            } else {
+                return value
+            }
         }
     }
+}
 
-    public typealias Value = List<CollectionValue>
-    public var wrappedValue: List<CollectionValue>
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension RealmBinding: RandomAccessCollection, BidirectionalCollection, Collection, Sequence where T: RealmCollection {
+    public func index(before i: Index) -> Index {
+        wrappedValue.index(before: i)
+    }
 
-    public required init(wrappedValue: List<CollectionValue>) {
-        self.wrappedValue = wrappedValue
+    public func index(after i: Index) -> Index {
+        wrappedValue.index(after: i)
     }
 
     public var indices: Indices {
         wrappedValue.indices
     }
 
-    public typealias Element = Binding<CollectionValue>
-    public typealias Index = Int
+    public typealias Element = T.Element
+    public typealias Index = T.Index
 
-    public typealias SubSequence = Slice<Array<Element>>
+    public typealias SubSequence = Slice<RealmBinding<T>>
 
-    public typealias Indices = Value.Indices
+    public typealias Indices = T.Indices
 
     @frozen public struct BoundIterator: IteratorProtocol {
         private var generatorBase: NSFastEnumerationIterator
-
-        init(collection: RLMCollection) {
+        private let bound: RealmBinding
+        init(bound: RealmBinding, collection: RLMCollection) {
+            self.bound = bound
             generatorBase = NSFastEnumerationIterator(collection)
         }
 
@@ -118,11 +181,7 @@ public final class BoundList<CollectionValue>: RandomAccessCollection,
         public mutating func next() -> Element? {
             let next = generatorBase.next()
             if next is NSNull {
-                return Element(get: {
-                    CollectionValue._nilValue()
-                }, set: {_ in
-                    fatalError()
-                })
+                return T.Element._nilValue()
             }
             if let next = next as? Object? {
                 if next == nil {
@@ -131,54 +190,41 @@ public final class BoundList<CollectionValue>: RandomAccessCollection,
                 // FIXME: This will always fail
                 return unsafeBitCast(next, to: Optional<Element>.self)
             }
-            return Element(get: {
-                dynamicBridgeCast(fromObjectiveC: next as Any)
-            }, set: {_ in
-                fatalError()
-            })
+
+            return dynamicBridgeCast(fromObjectiveC: next as Any)
         }
     }
 
     public typealias Iterator = BoundIterator
 
     public func makeIterator() -> BoundIterator {
-        return BoundIterator(collection: wrappedValue as! RLMCollection)
+        return BoundIterator(bound: self, collection: wrappedValue as! RLMCollection)
     }
     public var startIndex: Index {
-        return wrappedValue.startIndex 
+        return wrappedValue.startIndex
     }
 
     public var endIndex: Index {
-        return wrappedValue.endIndex 
+        return wrappedValue.endIndex
     }
+}
 
-    public subscript(position: Index) -> Element {
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension RealmBinding where T: ListBase, T: RealmCollection {
+    public subscript(position: T.Index) -> Element {
         get {
-            Element(get: {
-                let value = self.wrappedValue[position ]
-                // if value is an Object, thaw it out as this list has been frozen
-                if value.self is Object {
-                    return (value as! Object).thaw() as! Value.Element
-                } else {
-                    return value
-                }
-            }, set: {
-                self.wrappedValue[position] = $0
-            })
+            let value = self.wrappedValue[position]
+            if value.self is ThreadConfined {
+                return (value as! ThreadConfined).thaw() as! T.Element
+            } else {
+                return value
+            }
         }
     }
 
     // Method that returns the next index when iterating
     public func index(after i: Index) -> Index {
-        return wrappedValue.index(after: i ) 
-    }
-
-    public subscript(bounds: Range<Index>) -> SubSequence {
-        let tmp = wrappedValue[Range<Value.Index>.init(uncheckedBounds: (bounds.lowerBound ,
-                                                                         bounds.upperBound ))]
-        return SubSequence(tmp.map { element in
-            Element(get: { element }, set: { _ in fatalError() })
-        })
+        return wrappedValue.index(after: i )
     }
 
     /// :nodoc:
@@ -186,8 +232,8 @@ public final class BoundList<CollectionValue>: RandomAccessCollection,
         // TODO: use thaw function
         let realm = try! Realm(configuration: wrappedValue.realm!.configuration)
         try! realm.write {
-            let resolved = realm.resolve(ThreadSafeReference(to: wrappedValue))
-            resolved!.remove(atOffsets: offsets)
+            let resolved = realm.resolve(ThreadSafeReference(to: wrappedValue)) as! List<T.Element>
+            resolved.remove(atOffsets: offsets)
         }
     }
 
@@ -196,104 +242,17 @@ public final class BoundList<CollectionValue>: RandomAccessCollection,
         // TODO: use thaw function
         let realm = try! Realm(configuration: wrappedValue.realm!.configuration)
         try! realm.write {
-            let resolved = realm.resolve(ThreadSafeReference(to: wrappedValue))
-            resolved!.move(fromOffsets: offsets, toOffset: destination)
+            let resolved = realm.resolve(ThreadSafeReference(to: wrappedValue)) as! List<T.Element>
+            resolved.move(fromOffsets: offsets, toOffset: destination)
         }
     }
 
-    public func append(_ value: Value.Element) {
+    public func append(_ value: T.Element) {
         // TODO: use thaw function
         let realm = try! Realm(configuration: wrappedValue.realm!.configuration)
         try! realm.write {
-            let resolved = realm.resolve(ThreadSafeReference(to: wrappedValue))
-            resolved!.append(value)
-        }
-    }
-}
-
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-final class BoundResults<Element: RealmCollectionValue>: ResultsBase, Bound {
-    var wrappedValue: Results<Element>
-    
-    typealias T = Results<Element>
-    typealias Element = Element
-
-    let rlmResults: RLMResults<AnyObject>
-
-    init(wrappedValue: Results<Element>) {
-        self.wrappedValue = wrappedValue
-        self.rlmResults = wrappedValue.rlmResults
-    }
-
-    init(_ rlmResults: RLMResults<AnyObject>) {
-        self.wrappedValue = Results(rlmResults)
-        self.rlmResults = rlmResults
-    }
-
-    init(objc: RLMResults<AnyObject>) {
-        self.wrappedValue = Results(objc)
-        self.rlmResults = objc
-    }
-
-    func observe(binder: inout RealmState<Results<Element>>, _ block: @escaping (RealmState<Results<Element>>) -> Void) -> NotificationToken {
-        return wrappedValue.observe { [binder] _ in
-            block(binder)
-        }
-    }
-}
-
-@dynamicMemberLookup
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-@propertyWrapper
-public final class AnyBound<T>: Bound, ObservableObject {
-    public var projectedValue: T {
-        return value
-    }
-    public var wrappedValue: T {
-        return value
-    }
-    public init(wrappedValue: T) {
-        self.value = wrappedValue
-    }
-
-    var value: T
-    var realm: Realm?
-    var _observe: ((inout RealmState<T>, _ block: @escaping (RealmState<T>) -> Void) -> NotificationToken)? = nil
-
-    init(_ value: T, realm: Realm?) where T: Object {
-        self.value = value
-        self._observe = BoundObject(wrappedValue: value).observe
-        self.realm = realm
-    }
-    init<Element>(_ value: T, realm: Realm?) where T == Results<Element> {
-        self.value = value
-        self._observe = BoundResults(wrappedValue: value).observe
-        self.realm = realm
-    }
-
-    func observe(binder: inout RealmState<T>, _ block: @escaping (RealmState<T>) -> Void) -> NotificationToken {
-        _observe!(&binder) { [block] binder in
-            block(binder)
-        }
-    }
-
-    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
-        get {
-            Binding(get: {
-                self.value[keyPath: member]
-            },
-            set: { newValue in
-                try! self.realm!.write {
-                    self.value[keyPath: member] = newValue
-                }
-            })
-        }
-    }
-
-    // if property is a list, we want to freeze it before fetching it
-    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<T, List<V>>) -> BoundList<V> where V: RealmCollectionValue, V: Identifiable {
-        get {
-            BoundList(wrappedValue: (self.wrappedValue[keyPath: member]).freeze())
+            let resolved = realm.resolve(ThreadSafeReference(to: wrappedValue)) as! List<T.Element>
+            resolved.append(value)
         }
     }
 }
@@ -302,54 +261,92 @@ public final class AnyBound<T>: Bound, ObservableObject {
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 private struct RealmEnvironmentKey: EnvironmentKey {
-    static let defaultValue: Realm = try! Realm()
+    static let defaultValue = Realm.Configuration()
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public extension EnvironmentValues {
     var realm: Realm {
-          get { self[RealmEnvironmentKey.self] }
-          set { self[RealmEnvironmentKey.self] = newValue }
+        get { try! Realm(configuration: self[RealmEnvironmentKey.self]) }
+        set { self[RealmEnvironmentKey.self] = newValue.configuration }
     }
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public extension View {
-    func realm(_ realm: Realm) -> some View {
-        environment(\.realm, realm)
+    var realm: Realm {
+        return Environment(\.realm).wrappedValue
+    }
+
+    func bind<T>(_ object: T) -> RealmBinding<T> where T: Object {
+        guard let realm = object.realm else {
+            fatalError("Only managed objects can be view bound")
+        }
+        return RealmBinding(object, realm: realm)
+    }
+
+    func bind<T, V>(_ object: T, _ memberKeyPath: ReferenceWritableKeyPath<T, V>) -> Binding<V> where T: EmbeddedObject {
+        guard let realm = object.realm else {
+            fatalError("Only managed objects can be view bound")
+        }
+        return Binding(get: {
+            object[keyPath: memberKeyPath]
+        }, set: { newValue in
+            try! realm.write {
+                object[keyPath: memberKeyPath] = newValue
+            }
+        })
     }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper
 public struct RealmState<T> : DynamicProperty {
-    private var _wrappedValue: ObservedObject<AnyBound<T>>
+    private var _wrappedValue: ObservedObject<RealmBinding<T>>
     private var token: NotificationToken?
 
     public var wrappedValue: T {
         get {
-            _wrappedValue.wrappedValue.value
+            _wrappedValue.wrappedValue.wrappedValue
+        }
+        set {
+            _wrappedValue.wrappedValue.wrappedValue = newValue
         }
     }
-    /// The property that can be accessed with the `$` syntax and allows access to the `Publisher`
-    public var projectedValue: AnyBound<T> {
+
+    public var projectedValue: RealmBinding<T> {
         return _wrappedValue.wrappedValue
     }
 
-    public init(wrappedValue: T) where T: Object {
-        _wrappedValue = ObservedObject(wrappedValue: AnyBound(wrappedValue, realm: wrappedValue.realm))
+    public init(wrappedValue: T) where T: EmbeddedObject {
+        _wrappedValue = ObservedObject(wrappedValue: RealmBinding(wrappedValue, realm: wrappedValue.realm!))
         token = projectedValue.observe(binder: &self) {
+            $0._wrappedValue.wrappedValue.objectWillChange.send()
+        }
+    }
+
+    public init(wrappedValue: T) where T: Object {
+        _wrappedValue = ObservedObject(wrappedValue: RealmBinding(wrappedValue, realm: wrappedValue.realm!))
+        token = projectedValue.observe(binder: &self) {
+            $0._wrappedValue.wrappedValue.objectWillChange.send()
+        }
+    }
+
+    public init(wrappedValue: T) where T: RealmCollection {
+        _wrappedValue = ObservedObject(wrappedValue: RealmBinding(wrappedValue.freeze(), realm: wrappedValue.realm!))
+        token = RealmBinding(wrappedValue, realm: wrappedValue.realm!).observe(binder: &self) {
             $0._wrappedValue.wrappedValue.objectWillChange.send()
         }
     }
 
     public init<U: Object>(_ type: U.Type, realm: Realm? = nil) where T == Results<U> {
         if let realm = realm {
-            _wrappedValue = ObservedObject(wrappedValue: AnyBound(realm.objects(U.self), realm: realm))
+            _wrappedValue = ObservedObject(wrappedValue: RealmBinding(realm.objects(U.self), realm: realm))
         } else {
             let realm = Environment(\.realm).wrappedValue
-            _wrappedValue = ObservedObject(wrappedValue: AnyBound(realm.objects(U.self), realm: realm))
+            _wrappedValue = ObservedObject(wrappedValue: RealmBinding(realm.objects(U.self), realm: realm))
         }
+
         token = projectedValue.observe(binder: &self) {
             $0._wrappedValue.wrappedValue.objectWillChange.send()
         }

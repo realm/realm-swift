@@ -427,6 +427,12 @@ extension ResultsBase {
     public init(objc rlmResults: RLMResults<AnyObject>) {
         self.rlmResults = rlmResults
     }
+
+    public subscript(bounds: IndexSet) -> SubSequence {
+        get {
+            return SubSequence(base: self, bounds: bounds.rangeView.first!)
+        }
+    }
 }
 
 

@@ -20,11 +20,15 @@ import RealmSwift
 import SwiftUI
 
 // MARK: Dog Model
-class Dog: Object, Identifiable {
-    private static let dogNames = [
-        "Bella", "Charlie", "Luna", "Lucy", "Max",
-        "Bailey", "Cooper", "Daisy", "Sadie", "Molly"
-    ]
+class Dog: EmbeddedObject, ObjectKeyIdentifiable {
+    private static let dogNames =
+        ["Bella","Lucy","Daisy","Molly","Lola","Sophie","Sadie","Maggie","Chloe","Bailey",
+         "Roxy","Zoey","Lily","Luna","Coco","Stella","Gracie","Abby","Penny","Zoe",
+         "Angel","Belle","Layla","Missy","Cali","Honey","Millie","Harley",
+         "Marley","Holly","Kona","Shelby","Jasmine","Ella","Charlie","Minnie",
+         "Loki","Moose","George","Samson","Coco","Benny","Thor","Rufus","Prince",
+         "Kobe","Chase","Oreo","Frankie","Mac","Benji","Bubba","Champ","Brady",
+         "Elvis","Copper","Cash","Archie","Walter"]
 
     /// The unique id of this dog
     @objc dynamic var id = ObjectId.generate()
@@ -34,10 +38,12 @@ class Dog: Object, Identifiable {
     public static func ==(lhs: Dog, rhs: Dog) -> Bool {
         return lhs.isSameObject(as: rhs)
     }
+
+    let handlers = LinkingObjects(fromType: Person.self, property: "dogs")
 }
 
 // MARK: Person Model
-class Person: Object, Identifiable {
+class Person: Object, ObjectKeyIdentifiable {
     private static let peopleNames = [
         "Aoife", "Caoimhe", "Saoirse", "Ciara", "Niamh",
         "Conor", "Seán", "Oisín", "Patrick", "Cian"
@@ -50,7 +56,7 @@ class Person: Object, Identifiable {
 }
 
 // MARK: Person View
-struct PersonView: View {
+struct PersonDetailView: View {
     // bind a Person to the View
     @RealmState var person: Person
 
@@ -64,10 +70,11 @@ struct PersonView: View {
                 // Using the `$` will bind the Dog List to the view.
                 // Each Dog will be be bound as well, and will be
                 // of type `Binding<Dog>`
-                ForEach($person.dogs, id: \.id.wrappedValue) { dog in
+                ForEach($person.dogs, id: \.id) { dog in
+                    // TODO: Think about how to add a conditional for bound vs unbound types
                     // The write transaction for the name property of `Dog`
                     // is implicit here, and will occur on every edit.
-                    TextField("dog name", text: dog.name)
+                    TextField("dog name", text: bind(dog, \.name))
                 }
                 // the remove method on the dogs list
                 // will implicitly write and remove the dogs
@@ -88,16 +95,14 @@ struct PersonView: View {
     }
 }
 
-// MARK: Results View
-struct ResultsView: View {
-    @Environment(\.realm) var realm: Realm
+struct PersonView: View {
     @RealmState(Person.self) var results
 
     var body: some View {
         return NavigationView {
             List {
-                ForEach(results) { person in
-                    NavigationLink(destination: PersonView(person: person)) {
+                ForEach($results, id: \.id) { person in
+                    NavigationLink(destination: PersonDetailView(person: person)) {
                         Text(person.name)
                     }
                 }
@@ -112,10 +117,8 @@ struct ResultsView: View {
 
 @main
 struct ContentView: SwiftUI.App {
-    var realm = try! Realm()
-
     var view: some View {
-        ResultsView().environment(\.realm, realm)
+        PersonView()
     }
 
     var body: some Scene {

@@ -538,7 +538,7 @@ extension List: RealmCollection {
 }
 
 // MARK: - MutableCollection conformance, range replaceable collection emulation
-extension List: MutableCollection, RangeReplaceableCollection {
+extension List: MutableCollection {
     public typealias SubSequence = Slice<List>
 
     /**

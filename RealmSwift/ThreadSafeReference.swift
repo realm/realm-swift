@@ -66,6 +66,25 @@ public protocol ThreadConfined {
      `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
     */
     func freeze() -> Self
+
+    // TODO: branch em/thaw will address this,
+    // TODO: this is just the quick and dirty version
+    func thaw() -> Self
+}
+
+public extension ThreadConfined {
+    func thaw() -> Self {
+        guard let frozenRealm = realm else {
+            return self
+        }
+
+        let realm = try! Realm(configuration: frozenRealm.configuration)
+        guard let obj = realm.resolve(ThreadSafeReference(to: self)) else {
+            fatalError("Could not thaw")
+        }
+
+        return obj
+    }
 }
 
 /**
