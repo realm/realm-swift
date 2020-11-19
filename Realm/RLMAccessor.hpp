@@ -51,6 +51,7 @@ public:
     id box(realm::Object&&);
     id box(realm::Obj&&);
     id box(realm::object_store::Dictionary&&) { REALM_COMPILER_HINT_UNREACHABLE(); }
+    id box(realm::object_store::Set&&) { REALM_COMPILER_HINT_UNREACHABLE(); }
 
     id box(bool v) { return @(v); }
     id box(double v) { return @(v); }
@@ -79,9 +80,10 @@ public:
 
     bool is_same_list(realm::List const& list, id v) const noexcept;
     bool is_same_dictionary(realm::object_store::Dictionary const&, id v) const noexcept { REALM_COMPILER_HINT_UNREACHABLE(); }
+    bool is_same_set(realm::object_store::Set const&, id v) const noexcept { REALM_COMPILER_HINT_UNREACHABLE(); }
 
     template<typename Func>
-    void enumerate_list(__unsafe_unretained const id v, Func&& func) {
+    void enumerate_collection(__unsafe_unretained const id v, Func&& func) {
         id enumerable = RLMAsFastEnumeration(v) ?: v;
         for (id value in enumerable) {
             func(value);
