@@ -132,7 +132,7 @@ extension MinKey: BSON {
 
     /// A UUID.
     case uuid(UUID)
-    
+
     /// A BSON minKey.
     case minKey
 

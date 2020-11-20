@@ -134,7 +134,6 @@ using namespace realm::bson;
     XCTAssertEqual(RLMConvertBsonToRLMBSON(bsonDocument["int32"]), document[@"int32"]);
     XCTAssertEqual(RLMConvertBsonToRLMBSON(bsonDocument["int64"]), document[@"int64"]);
     XCTAssertEqual(RLMConvertBsonToRLMBSON(bsonDocument["double"]), document[@"double"]);
-    XCTAssertEqual(RLMConvertBsonToRLMBSON(bsonDocument["uuid"]), document[@"uuid"]);
     XCTAssertEqualObjects(RLMConvertBsonToRLMBSON(bsonDocument["decimal128"]), document[@"decimal128"]);
     XCTAssertEqualObjects(RLMConvertBsonToRLMBSON(bsonDocument["minkey"]), document[@"minkey"]);
     XCTAssertEqualObjects(RLMConvertBsonToRLMBSON(bsonDocument["maxkey"]), document[@"maxkey"]);

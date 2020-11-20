@@ -285,9 +285,11 @@
     XCTAssertNil(object[@"string"]);
     XCTAssertNil(object[@"data"]);
     XCTAssertNil(object[@"date"]);
+    XCTAssertNil(object[@"uuidCol"]);
 
     NSDate *date = [NSDate date];
     NSData *data = [NSData data];
+    NSUUID *uuid = [NSUUID new];
 
     object[@"intObj"] = @1;
     object[@"floatObj"] = @2.2f;
@@ -296,6 +298,7 @@
     object[@"string"] = @"str";
     object[@"date"] = date;
     object[@"data"] = data;
+    object[@"uuidCol"] = uuid;
 
     XCTAssertEqualObjects(object[@"intObj"], @1);
     XCTAssertEqualObjects(object[@"floatObj"], @2.2f);
@@ -304,6 +307,7 @@
     XCTAssertEqualObjects(object[@"string"], @"str");
     XCTAssertEqualObjects(object[@"date"], date);
     XCTAssertEqualObjects(object[@"data"], data);
+    XCTAssertEqualObjects(object[@"uuidCol"], uuid);
 
     object[@"intObj"] = NSNull.null;
     object[@"floatObj"] = NSNull.null;
@@ -312,6 +316,7 @@
     object[@"string"] = NSNull.null;
     object[@"date"] = NSNull.null;
     object[@"data"] = NSNull.null;
+    object[@"uuidCol"] = NSNull.null;
 
     XCTAssertNil(object[@"intObj"]);
     XCTAssertNil(object[@"floatObj"]);
@@ -320,6 +325,7 @@
     XCTAssertNil(object[@"string"]);
     XCTAssertNil(object[@"data"]);
     XCTAssertNil(object[@"date"]);
+    XCTAssertNil(object[@"uuidCol"]);
 
     object[@"intObj"] = nil;
     object[@"floatObj"] = nil;
@@ -328,6 +334,7 @@
     object[@"string"] = nil;
     object[@"date"] = nil;
     object[@"data"] = nil;
+    object[@"uuidCol"] = nil;
 
     XCTAssertNil(object[@"intObj"]);
     XCTAssertNil(object[@"floatObj"]);
@@ -336,6 +343,7 @@
     XCTAssertNil(object[@"string"]);
     XCTAssertNil(object[@"data"]);
     XCTAssertNil(object[@"date"]);
+    XCTAssertNil(object[@"uuidCol"]);
 
     [dyrealm commitWriteTransaction];
 }
