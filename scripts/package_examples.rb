@@ -86,6 +86,3 @@ xcode_versions.each do |xcode_version|
                   "import Foundation\nimport PlaygroundFrameworkWrapper // only necessary to use a binary release of Realm Swift in this playground.\n")
 end
 
-# Update RubyMotion sample
-
-replace_in_file('examples/ios/rubymotion/Simple/Rakefile', '/build/ios-', '/ios/')

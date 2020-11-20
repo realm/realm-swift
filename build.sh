@@ -1309,7 +1309,7 @@ EOM
             if [[ "${LANG}" == "objc" ]]; then
                 rm -rf ios/swift-* tvos/swift-*
             else
-                rm -rf ios/objc ios/rubymotion osx tvos/objc
+                rm -rf ios/objc osx tvos/objc
             fi
         )
 

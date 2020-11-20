@@ -106,19 +106,6 @@ For more information on complete App Clip flow see: [Responding to invocations](
 
 
 
-## iOS (RubyMotion)
-
-***RubyMotion support is experimental. We make no claims towards stability and/or performance when using Realm in RubyMotion.***
-
-In the `ios/rubymotion` directory, you will find a Simple example demonstrating how to use Realm in a [RubyMotion](http://www.rubymotion.com) iOS app. Make sure to have run `sh build.sh ios-static` from the root of this repo before building and running this example. You can build and run this example by running `rake` from the `rubymotion/Simple` directory.
-
-To use Realm in your own RubyMotion iOS or OSX app, you must define your models in Objective-C and place them in the `models/` directory. Then in your `Rakefile`, define the following `vendor_project`s:
-
-```ruby
-app.vendor_project 'path/to/Realm/Realm.framework', :static, :products => ['Realm'], :force_load => false
-app.vendor_project 'models', :static, :cflags => '-F /path/to/Realm/'
-```
-
 ## OSX (Objective-C)
 
 In the `osx/objc/RealmExamples.xcodeproj` project, you will find the following examples:
