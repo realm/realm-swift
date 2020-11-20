@@ -35,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (realm::UUID)uuidValue;
 
+- (NSComparisonResult)compare:(NSUUID *)other;
+
 @end
 NS_ASSUME_NONNULL_END
 

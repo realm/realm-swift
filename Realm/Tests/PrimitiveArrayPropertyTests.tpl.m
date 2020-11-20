@@ -37,6 +37,9 @@ static RLMObjectId *objectId(NSUInteger i) {
     }
     return objectIds[i];
 }
+static NSUUID *uuid(NSString *uuidString) {
+    return [[NSUUID alloc] initWithUUIDString:uuidString];
+}
 static void count(NSArray *values, double *sum, NSUInteger *count) {
     for (id value in values) {
         if (value != NSNull.null) {

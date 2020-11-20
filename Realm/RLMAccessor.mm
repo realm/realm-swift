@@ -791,7 +791,7 @@ realm::ObjectId RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
 }
 template<>
 realm::UUID RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
-    return static_cast<NSUUID *>(v).uuidValue;
+    return RLMObjcToUUID(v);
 }
 template<>
 realm::Mixed RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {

@@ -440,6 +440,25 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
     }
 }
 
+realm::UUID RLMObjcToUUID(__unsafe_unretained id const value) {
+    try {
+        if (!value || value == NSNull.null) {
+            return realm::UUID(realm::null());
+        }
+        if (auto uuid = RLMDynamicCast<NSUUID>(value)) {
+            return uuid.uuidValue;
+        }
+        if (auto string = RLMDynamicCast<NSString>(value)) {
+            return realm::UUID(string.UTF8String);
+        }
+    }
+    catch (std::exception const& e) {
+        @throw RLMException(@"Cannot convert value '%@' of type '%@' to uuid: %s",
+                            value, [value class], e.what());
+    }
+    @throw RLMException(@"Cannot convert value '%@' of type '%@' to uuid", value, [value class]);
+}
+
 realm::Decimal128 RLMObjcToDecimal128(__unsafe_unretained id const value) {
     try {
         if (!value || value == NSNull.null) {

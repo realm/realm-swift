@@ -58,8 +58,8 @@
 		02AFB4671A80343600E11938 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4621A80343600E11938 /* ResultsTests.m */; };
 		02AFB4681A80343600E11938 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4621A80343600E11938 /* ResultsTests.m */; };
 		02E334C31A5F41C7009F8810 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBA1955FE0100FDED82 /* DynamicTests.m */; };
-		0C5796A025643D7500744CAE /* RLMUUID_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C57969E25643D7500744CAE /* RLMUUID_Private.hpp */; };
-		0C5796A125643D7500744CAE /* RLMUUID_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C57969E25643D7500744CAE /* RLMUUID_Private.hpp */; };
+		0C5796A025643D7500744CAE /* RLMUUID_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C57969E25643D7500744CAE /* RLMUUID_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
+		0C5796A125643D7500744CAE /* RLMUUID_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C57969E25643D7500744CAE /* RLMUUID_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		0C5796A225643D7500744CAE /* RLMUUID.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C57969F25643D7500744CAE /* RLMUUID.mm */; };
 		0C5796A325643D7500744CAE /* RLMUUID.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C57969F25643D7500744CAE /* RLMUUID.mm */; };
 		17051FCE1D93DA0A00EF8E67 /* RLMUser.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1ABDCDAF1D793008003489E3 /* RLMUser.mm */; };
@@ -1564,7 +1564,6 @@
 				5D659EAC1BE04556006515A0 /* RLMConstants.h in Headers */,
 				4993220A24129DCE00A0EC8E /* RLMCredentials.h in Headers */,
 				3F4F3ADD23F71C790048DB43 /* RLMDecimal128.h in Headers */,
-				0C5796A025643D7500744CAE /* RLMUUID_Private.hpp in Headers */,
 				CF6E0482242A141200DB7F14 /* RLMEmailPasswordAuth.h in Headers */,
 				3FC3F912241808B400E27322 /* RLMEmbeddedObject.h in Headers */,
 				CF76F7F324816AAB00890DD2 /* RLMFindOneAndModifyOptions.h in Headers */,
@@ -1611,6 +1610,7 @@
 				E8C6EAF51DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */,
 				3F67DB3C1E26D69C0024533D /* RLMThreadSafeReference.h in Headers */,
 				CF76F7DF24816AAB00890DD2 /* RLMUpdateResult.h in Headers */,
+				0C5796A025643D7500744CAE /* RLMUUID_Private.hpp in Headers */,
 				1ABDCDAE1D792FEB003489E3 /* RLMUser.h in Headers */,
 				53CCC6E8257EC8C400A8FC50 /* RLMUser_Private.h in Headers */,
 				CFAEF765242B672700EAF721 /* RLMUserAPIKey.h in Headers */,
@@ -2807,6 +2807,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */;
 			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_MODULE_NAME = Tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
@@ -2817,6 +2818,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */;
 			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_MODULE_NAME = Tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";

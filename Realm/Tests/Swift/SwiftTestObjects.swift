@@ -67,6 +67,8 @@ class SwiftRLMPrimitiveArrayObject: RLMObject {
     @objc dynamic var optDataCol = RLMArray<NSObject>(objectType: .data, optional: true)
     @objc dynamic var dateCol = RLMArray<NSDate>(objectType: .date, optional: false)
     @objc dynamic var optDateCol = RLMArray<NSObject>(objectType: .date, optional: true)
+    @objc dynamic var uuidCol = RLMArray<NSUUID>(objectType: .UUID, optional: false)
+    @objc dynamic var optUuidCol = RLMArray<NSObject>(objectType: .UUID, optional: true)
 }
 
 class SwiftRLMDogObject: RLMObject {

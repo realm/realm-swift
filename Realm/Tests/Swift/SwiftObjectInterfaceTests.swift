@@ -278,6 +278,24 @@ class SwiftRLMObjectInterfaceTests: RLMTestCase {
         assertThrowsWithReasonMatching(obj.optDataCol.add(str), ".*")
     }
 
+    func testUuidPrimitiveArray() {
+        let obj = SwiftRLMPrimitiveArrayObject()
+        let uuidA = NSUUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+        let uuidB = NSUUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89")!
+
+        obj.uuidCol.add(uuidA)
+        XCTAssertEqual(obj.uuidCol[0], uuidA)
+        XCTAssertEqual(obj.uuidCol.index(of: uuidA), 0)
+        XCTAssertEqual(obj.uuidCol.index(of: uuidB), UInt(NSNotFound))
+    
+        obj.optUuidCol.add(NSNull())
+        XCTAssertEqual(obj.optUuidCol[0], NSNull())
+        obj.optUuidCol.add(uuidA)
+        XCTAssertEqual(obj.optUuidCol[1], uuidA)
+        obj.optUuidCol.add(NSNull())
+        XCTAssertEqual(obj.optUuidCol[2], NSNull())
+    }
+
     // Objective-C models
 
     // Note: Swift doesn't support custom accessor names
