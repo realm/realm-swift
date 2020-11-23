@@ -134,7 +134,9 @@
 }
 
 - (instancetype)thaw {
-    return self;
+    RLMLinkingObjectsHandle *thawed = [[self.class alloc] init];
+    thawed->_results = [self.results thaw];
+    return thawed;
 }
 
 - (RLMResults *)results {

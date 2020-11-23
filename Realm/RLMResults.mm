@@ -519,8 +519,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     // !!! Best way to handle error?
     RLMRealm *liveRealm = [RLMRealm realmWithConfiguration:config error:nil];
     RLMThreadSafeReference *ref = [RLMThreadSafeReference referenceWithThreadConfined:self];
-    RLMResults *liveResults = [liveRealm resolveThreadSafeReference:ref];
-    return liveResults;
+    return [liveRealm resolveThreadSafeReference:ref];
 }
 
 // The compiler complains about the method's argument type not matching due to
