@@ -111,6 +111,7 @@ class ListTests: TestCase {
         XCTAssertFalse(obj.date.contains(Date()))
         XCTAssertFalse(obj.decimal.contains(Decimal128()))
         XCTAssertFalse(obj.objectId.contains(ObjectId()))
+        XCTAssertFalse(obj.uuidOpt.contains(UUID()))
 
         XCTAssertFalse(obj.intOpt.contains { $0 == nil })
         XCTAssertFalse(obj.int8Opt.contains { $0 == nil })
@@ -124,6 +125,7 @@ class ListTests: TestCase {
         XCTAssertFalse(obj.dateOpt.contains { $0 == nil })
         XCTAssertFalse(obj.decimalOpt.contains { $0 == nil })
         XCTAssertFalse(obj.objectIdOpt.contains { $0 == nil })
+        XCTAssertFalse(obj.uuidOpt.contains { $0 == nil })
     }
 
     func testInvalidated() {

@@ -125,6 +125,10 @@ RLM_ARRAY_TYPE(EmbeddedIntObject)
 @property RLMArray<EmbeddedIntObject> *array;
 @end
 
+@interface UuidObject: RLMObject
+@property NSUUID *uuidCol;
+@end
+
 #pragma mark AllTypesObject
 
 @interface AllTypesObject : RLMObject

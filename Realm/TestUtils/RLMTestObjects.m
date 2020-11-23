@@ -87,6 +87,9 @@
 }
 @end
 
+@implementation UuidObject
+@end
+
 #pragma mark AllTypesObject
 
 @implementation AllTypesObject
@@ -114,7 +117,11 @@
         @"decimalCol": [[RLMDecimal128 alloc] initWithNumber:@(i)],
         @"objectIdCol": [RLMObjectId objectId],
         @"objectCol": so ?: NSNull.null,
-        @"uuidCol": so ? [[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"] : [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"],
+        @"uuidCol": i < 4 ? @[[[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"],
+                              [[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"],
+                              [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"],
+                              [[NSUUID alloc] initWithUUIDString:@"b84e8912-a7c2-41cd-8385-86d200d7b31e"]][i] :
+            [[NSUUID alloc] initWithUUIDString:@"b9d325b0-3058-4838-8473-8f1aaae410db"]
     };
 }
 @end

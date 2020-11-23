@@ -309,6 +309,7 @@ class ObjectTests: TestCase {
             XCTAssertNil((object.value(forKey: "date") as! List<Date>).first)
             XCTAssertNil((object.value(forKey: "decimal") as! List<Decimal128>).first)
             XCTAssertNil((object.value(forKey: "objectId") as! List<ObjectId>).first)
+            XCTAssertNil((object.value(forKey: "uuid") as! List<UUID>).first)
 
             // The `as Any?` casts below are only to silence the warning about it
             // happening implicitly and are not functionally required
@@ -324,6 +325,7 @@ class ObjectTests: TestCase {
             XCTAssertNil((object.value(forKey: "dateOpt") as! List<Date?>).first as Any?)
             XCTAssertNil((object.value(forKey: "decimalOpt") as! List<Decimal128?>).first as Any?)
             XCTAssertNil((object.value(forKey: "objectIdOpt") as! List<ObjectId?>).first as Any?)
+            XCTAssertNil((object.value(forKey: "uuidOpt") as! List<UUID?>).first as Any?)
         }
 
         test(SwiftListObject())
@@ -950,7 +952,9 @@ class ObjectTests: TestCase {
                     "doubleOpt": [17.17, nil],
                     "stringOpt": ["18", nil],
                     "dataOpt": ["19".data(using: String.Encoding.utf8)!, nil],
-                    "dateOpt": [Date(timeIntervalSince1970: 20), nil]
+                    "dateOpt": [Date(timeIntervalSince1970: 20), nil],
+                    "uuid": [UUID()],
+                    "uuidOpt": [UUID(), nil]
                 ])
             )
         }
@@ -979,6 +983,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual(optObj.optDoubleCol.value, frozenOptObj.optDoubleCol.value)
         XCTAssertEqual(optObj.optBoolCol.value, frozenOptObj.optBoolCol.value)
         XCTAssertEqual(optObj.optEnumCol.value, frozenOptObj.optEnumCol.value)
+        XCTAssertEqual(optObj.optUuidCol, frozenOptObj.optUuidCol)
 
         let frozenListObj = listObj.freeze()
         XCTAssertEqual(Array(listObj.int), Array(frozenListObj.int))
@@ -1001,5 +1006,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual(Array(listObj.stringOpt), Array(frozenListObj.stringOpt))
         XCTAssertEqual(Array(listObj.dataOpt), Array(frozenListObj.dataOpt))
         XCTAssertEqual(Array(listObj.dateOpt), Array(frozenListObj.dateOpt))
+        XCTAssertEqual(Array(listObj.uuid), Array(frozenListObj.uuid))
+        XCTAssertEqual(Array(listObj.uuidOpt), Array(frozenListObj.uuidOpt))
     }
 }

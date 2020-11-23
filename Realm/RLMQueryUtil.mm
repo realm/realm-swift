@@ -890,6 +890,11 @@ Decimal128 convert<Decimal128>(id value) {
 }
 
 template <>
+UUID convert<UUID>(id value) {
+    return RLMObjcToUUID(value);
+}
+
+template <>
 ObjectId convert<ObjectId>(id value) {
     if (auto objectId = RLMDynamicCast<RLMObjectId>(value)) {
         return objectId.value;
@@ -948,12 +953,14 @@ void QueryBuilder::do_add_constraint(RLMPropertyType type, NSPredicateOperatorTy
             add_string_constraint(operatorType, predicateOptions, value_of_type<String>(values)...);
             break;
         case RLMPropertyTypeData:
-        case RLMPropertyTypeUUID:
             add_binary_constraint(operatorType, values...);
             break;
         case RLMPropertyTypeObject:
         case RLMPropertyTypeLinkingObjects:
             add_link_constraint(operatorType, values...);
+            break;
+        case RLMPropertyTypeUUID:
+            add_bool_constraint(type, operatorType, value_of_type<UUID>(values)...);
             break;
         default:
             @throw RLMPredicateException(@"Unsupported predicate value type",

@@ -1304,6 +1304,7 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.optDecimalCol, (dictionary["optDecimalCol"] as! Decimal128?))
         XCTAssertEqual(object.optObjectIdCol, (dictionary["optObjectIdCol"] as! ObjectId?))
         XCTAssertEqual(object.optObjectCol?.boolCol, boolObjectValue)
+        XCTAssertEqual(object.optUuidCol, (dictionary["optUuidCol"] as! UUID?))
     }
 
     private func defaultSwiftObjectValuesWithReplacements(_ replace: [String: Any]) -> [String: Any] {

@@ -531,6 +531,19 @@
     XCTAssertEqualObjects(tim.name, @"Tim", @"Tim should be first results");
 }
 
+- (void)testUuidRealmQuery {
+    RLMRealm *realm = [self realm];
+
+    [realm beginWriteTransaction];
+    [UuidObject createInRealm:realm withValue:@[[[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"]]];
+    [UuidObject createInRealm:realm withValue:@[[[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"]]];
+    [realm commitWriteTransaction];
+
+    // query on class
+    XCTAssertEqual([UuidObject allObjects].count, 2U);
+    RLMAssertCount(UuidObject, 1U, @"uuidCol == '137DECC8-B300-4954-A233-F89909F4FD89'");
+}
+
 - (void)testArrayQuery
 {
     RLMRealm *realm = [self realm];
@@ -642,6 +655,10 @@
     //////////// sort by decimalCol
     [self verifySort:realm column:@"decimalCol" ascending:YES expected:[RLMDecimal128 decimalWithNumber:@1]];
     [self verifySort:realm column:@"decimalCol" ascending:NO expected:[RLMDecimal128 decimalWithNumber:@4]];
+
+    //////////// sort by uuidCol
+    [self verifySort:realm column:@"uuidCol" ascending:YES expected:[[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"]];
+    [self verifySort:realm column:@"uuidCol" ascending:NO expected:[[NSUUID alloc] initWithUUIDString:@"B9D325B0-3058-4838-8473-8F1AAAE410DB"]];
 
     // sort invalid name
     RLMAssertThrowsWithReason([[AllTypesObject allObjects] sortedResultsUsingKeyPath:@"invalidCol" ascending:YES],
