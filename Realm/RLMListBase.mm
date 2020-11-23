@@ -133,6 +133,10 @@
     return frozen;
 }
 
+- (instancetype)thaw {
+    return self;
+}
+
 - (RLMResults *)results {
     if (_results) {
         return _results;

@@ -510,6 +510,19 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return _realm.frozen;
 }
 
+- (instancetype)thaw {
+    if (!self.frozen) {
+        return self;
+    }
+    
+    RLMRealmConfiguration *config = _realm.configuration;
+    // !!! Best way to handle error?
+    RLMRealm *liveRealm = [RLMRealm realmWithConfiguration:config error:nil];
+    RLMThreadSafeReference *ref = [RLMThreadSafeReference referenceWithThreadConfined:self];
+    RLMResults *liveResults = [liveRealm resolveThreadSafeReference:ref];
+    return liveResults;
+}
+
 // The compiler complains about the method's argument type not matching due to
 // it not having the generic type attached, but it doesn't seem to be possible
 // to actually include the generic type

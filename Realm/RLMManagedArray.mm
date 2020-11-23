@@ -513,6 +513,13 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     });
 }
 
+- (instancetype)thaw {
+    return self;
+    // instantiate rlmrealm
+    // using objectstore threadsafereference
+    // return rlmarray
+}
+
 // The compiler complains about the method's argument type not matching due to
 // it not having the generic type attached, but it doesn't seem to be possible
 // to actually include the generic type

@@ -492,6 +492,8 @@ __attribute__((warn_unused_result));
  */
 - (instancetype)freeze;
 
+- (instancetype)thaw;
+
 #pragma mark - Unavailable Methods
 
 /**
