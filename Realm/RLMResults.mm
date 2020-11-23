@@ -514,9 +514,8 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     if (!self.frozen) {
         return self;
     }
-    
+
     RLMRealmConfiguration *config = _realm.configuration;
-    // !!! Best way to handle error?
     RLMRealm *liveRealm = [RLMRealm realmWithConfiguration:config error:nil];
     RLMThreadSafeReference *ref = [RLMThreadSafeReference referenceWithThreadConfined:self];
     return [liveRealm resolveThreadSafeReference:ref];

@@ -517,15 +517,11 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     if (!self.frozen) {
         return self;
     }
-    
+
     RLMRealmConfiguration *config = [_realm configuration];
-    // !!! Error !!!
     RLMRealm *liveRealm = [RLMRealm realmWithConfiguration:config error:nil];
     RLMThreadSafeReference *ref = [RLMThreadSafeReference referenceWithThreadConfined:self];
     return [liveRealm resolveThreadSafeReference:ref];
-    // instantiate rlmrealm
-    // using objectstore threadsafereference
-    // return rlmarray
 }
 
 // The compiler complains about the method's argument type not matching due to

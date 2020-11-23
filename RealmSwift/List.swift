@@ -434,20 +434,6 @@ public final class List<Element: RealmCollectionValue>: ListBase {
 
     public func thaw() throws -> List {
         return List(objc: _rlmArray.thaw())
-//        List( rlmarray )
-//        return _rlmArray.thaw()
-        
-        // Old
-//        guard _rlmArray.isFrozen, let frozenRealm = realm else {
-//            return self
-//        }
-//
-//        let realm = try Realm(configuration: frozenRealm.configuration)
-//        guard let list = realm.resolve(ThreadSafeReference(to: self)) else {
-//            throw Realm.Error(.cannotThaw)
-//        }
-//
-//        return list
     }
 
     // swiftlint:disable:next identifier_name
