@@ -172,17 +172,24 @@ RLMArray *getArray(__unsafe_unretained RLMObjectBase *const obj, NSUInteger prop
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained id<NSFastEnumeration> const value) {
     auto prop = obj->_info->propertyForTableColumn(key);
-    RLMValidateValueForProperty(value, obj->_info->rlmObjectSchema, prop, true);
+    if (prop.array) {
+        RLMValidateValueForProperty(value, obj->_info->rlmObjectSchema, prop, true);
 
-    realm::List list(obj->_realm->_realm, obj->_row, key);
-    RLMClassInfo *info = obj->_info;
-    if (list.get_type() == realm::PropertyType::Object) {
-        info = &obj->_info->linkTargetType(prop.index);
+        realm::List list(obj->_realm->_realm, obj->_row, key);
+        RLMClassInfo *info = obj->_info;
+        if (list.get_type() == realm::PropertyType::Object) {
+            info = &obj->_info->linkTargetType(prop.index);
+        }
+        RLMAccessorContext ctx(*info);
+        RLMTranslateError([&] {
+            list.assign(ctx, value, realm::CreatePolicy::ForceCreate);
+        });
+    } else if (prop.set) {
+        REALM_TERMINATE("Not implemented");
+    } else {
+        REALM_TERMINATE("Unrecognized NSFastEnumeration type.");
     }
-    RLMAccessorContext ctx(*info);
-    RLMTranslateError([&] {
-        list.assign(ctx, value, realm::CreatePolicy::ForceCreate);
-    });
+
 }
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
@@ -470,8 +477,8 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
 }
 
 id unmanagedSetter(RLMProperty *prop, const char *) {
-    // Only RLMArray needs special handling for the unmanaged setter
-    if (!prop.array) {
+    // Only RLMArray & RLMSet needs special handling for the unmanaged setter
+    if (!(prop.array || prop.set)) {
         return nil;
     }
 
@@ -480,14 +487,27 @@ id unmanagedSetter(RLMProperty *prop, const char *) {
         auto prop = obj->_objectSchema[propName];
         RLMValidateValueForProperty(values, obj->_objectSchema, prop, true);
 
-        // make copy when setting (as is the case for all other variants)
-        RLMArray *ar;
-        if (prop.type == RLMPropertyTypeObject)
-            ar = [[RLMArray alloc] initWithObjectClassName:prop.objectClassName];
-        else
-            ar = [[RLMArray alloc] initWithObjectType:prop.type optional:prop.optional];
-        [ar addObjects:values];
-        superSet(obj, propName, ar);
+        if (prop.array) {
+            // make copy when setting (as is the case for all other variants)
+            RLMArray *ar;
+            if (prop.type == RLMPropertyTypeObject)
+                ar = [[RLMArray alloc] initWithObjectClassName:prop.objectClassName];
+            else
+                ar = [[RLMArray alloc] initWithObjectType:prop.type optional:prop.optional];
+            [ar addObjects:values];
+            superSet(obj, propName, ar);
+        } else if (prop.set) {
+            // make copy when setting (as is the case for all other variants)
+            RLMSet *s;
+            if (prop.type == RLMPropertyTypeObject)
+                s = [[RLMSet alloc] initWithObjectClassName:prop.objectClassName];
+            else
+                s = [[RLMSet alloc] initWithObjectType:prop.type optional:prop.optional];
+            [s addObjects:values];
+            superSet(obj, propName, s);
+        } else {
+            REALM_TERMINATE("Unexpected property type");
+        }
     };
 }
 

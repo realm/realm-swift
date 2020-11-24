@@ -485,7 +485,8 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 }
 
 - (realm::TableView)tableView {
-//    return translateErrors([&] { return _backingSet.get_query(); }).find_all();
+    REALM_TERMINATE("Not implemented yet");
+    //return translateErrors([&] { return _backingSet.get_query(); }).find_all();
 }
 
 - (BOOL)isFrozen {

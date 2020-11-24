@@ -537,9 +537,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
         _objectClassName = [linkPropertyDescriptor.objectClass className];
         _linkOriginPropertyName = linkPropertyDescriptor.propertyName;
     }
-    if ([name isEqualToString:@"stringSetArray"]) {
-        NSLog(@"");
-    }
+
     NSString *rawType;
     bool isReadOnly = false;
     bool isComputed = false;

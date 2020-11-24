@@ -179,6 +179,9 @@
 @implementation ArrayOfPrimaryCompanies
 @end
 
+@implementation SetOfPrimaryCompanies
+@end
+
 #pragma mark LinkToCompanyObject
 
 @implementation LinkToCompanyObject
@@ -249,6 +252,8 @@
 @implementation AggregateObject
 @end
 @implementation AggregateArrayObject
+@end
+@implementation AggregateSetObject
 @end
 
 #pragma mark PrimaryStringObject

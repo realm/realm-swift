@@ -361,7 +361,10 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
 }
 
 - (void)removeObject:(id)object {
-
+    RLMSetValidateMatchingObjectType(self, object);
+    changeSet(self, NSKeyValueChangeRemoval, NSMakeRange(0, _backingSet.count), ^{
+        [_backingSet removeObject:object];
+    });
 }
 
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {

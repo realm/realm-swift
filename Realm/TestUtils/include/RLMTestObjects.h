@@ -268,6 +268,9 @@ RLM_ARRAY_TYPE(DogObject)
 @property RLM_GENERIC_ARRAY(DogObject) *dogs;
 @end
 
+@interface DogSetObject : RLMObject
+@property RLM_GENERIC_SET(DogObject) *dogs;
+@end
 
 #pragma mark OwnerObject
 
@@ -367,6 +370,10 @@ RLM_ARRAY_TYPE(AggregateObject)
 @property RLMArray<AggregateObject *><AggregateObject> *array;
 @end
 
+@interface AggregateSetObject : RLMObject
+@property RLMSet<AggregateObject *><AggregateObject> *set;
+@end
+
 #pragma mark PrimaryStringObject
 
 @interface PrimaryStringObject : RLMObject
@@ -459,6 +466,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 @interface PrimaryCompanyObject : RLMObject
 @property NSString *name;
 @property RLM_GENERIC_ARRAY(PrimaryEmployeeObject) *employees;
+@property RLM_GENERIC_SET(PrimaryEmployeeObject) *employeesSet;
 @property PrimaryEmployeeObject *intern;
 @property LinkToPrimaryEmployeeObject *wrappedIntern;
 @end
@@ -466,6 +474,10 @@ RLM_ARRAY_TYPE(PrimaryCompanyObject);
 
 @interface ArrayOfPrimaryCompanies : RLMObject
 @property RLM_GENERIC_ARRAY(PrimaryCompanyObject) *companies;
+@end
+
+@interface SetOfPrimaryCompanies : RLMObject
+@property RLM_GENERIC_SET(PrimaryCompanyObject) *companies;
 @end
 
 #pragma mark ComputedPropertyNotExplicitlyIgnoredObject
@@ -496,12 +508,14 @@ RLM_ARRAY_TYPE(RenamedProperties2)
 @property (nonatomic) RenamedProperties1 *linkA;
 @property (nonatomic) RenamedProperties2 *linkB;
 @property (nonatomic) RLM_GENERIC_ARRAY(RenamedProperties1) *array;
+@property (nonatomic) RLM_GENERIC_SET(RenamedProperties1) *set;
 @end
 
 @interface LinkToRenamedProperties2 : RLMObject
 @property (nonatomic) RenamedProperties2 *linkC;
 @property (nonatomic) RenamedProperties1 *linkD;
 @property (nonatomic) RLM_GENERIC_ARRAY(RenamedProperties2) *array;
+@property (nonatomic) RLM_GENERIC_SET(RenamedProperties2) *set;
 @end
 
 @interface RenamedPrimaryKey : RLMObject
