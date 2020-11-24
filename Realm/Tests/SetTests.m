@@ -33,7 +33,7 @@
     XCTAssertNotNil(setObj.stringSet);
     [setObj.stringSet addObject:[[StringObject alloc] initWithValue:@[@"string1"]]];
     XCTAssertEqual(setObj.stringSet.count, 1U);
-    XCTAssertEqualObjects([setObj.stringSet firstObject], @"string1");
+    XCTAssertEqualObjects([setObj.stringSet firstObject].stringCol, @"string1");
     [setObj.stringSet addObjects:@[@"string1", @"string2", @"string3"]]; // should not accept duplicates
     XCTAssertEqual(setObj.stringSet.count, 3U);
     XCTAssertEqualObjects(setObj.stringSet[1], @"string2");
@@ -240,15 +240,20 @@
     XCTAssertNotNil(setObj1.stringSet, @"Should be able to get an empty set");
     XCTAssertEqual(setObj1.stringSet.count, 0U, @"Should start with no set elements");
 
-    [setObj1.stringSet addObjects:@[@"one", @"two", @"three", @"one", @"two", @"three"]];
-    [setObj1.intSet addObjects:@[@1, @2, @3, @1, @2, @3]];
+    StringObject *str1 = [StringObject createInRealm:r withValue:@[@"a"]];
+    StringObject *str2 = [StringObject createInRealm:r withValue:@[@"b"]];
+    StringObject *str3 = [StringObject createInRealm:r withValue:@[@"c"]];
+    IntObject *int1 = [IntObject createInRealm:r withValue:@[@1]];
+    IntObject *int2 = [IntObject createInRealm:r withValue:@[@2]];
+    IntObject *int3 = [IntObject createInRealm:r withValue:@[@3]];
+
+    [setObj1.stringSet addObjects:@[str1, str2, str3, str1, str2, str3]];
+    [setObj1.intSet addObjects:@[int1, int2, int3, int1, int2, int3]];
 
     [r addObject:setObj1];
     [r commitWriteTransaction];
 
     RLMResults<SetPropertyObject *> *results = [SetPropertyObject allObjectsInRealm:r];
-    NSLog(@"%@", [results description]); //TODO: Crashes
-
 
     XCTAssertFalse(setObj1.isInvalidated);
     XCTAssertEqual(results.count, 1U);
@@ -256,9 +261,8 @@
     XCTAssertEqual(results[0].stringSet.count, 3U);
     XCTAssertEqualObjects(results[0].stringSet, setObj1.stringSet);
 
-    XCTAssertEqual(results[0].intSet.count, 1U);
-    XCTAssertEqualObjects(results[0].intSet[0], @1234.23);
-
+    XCTAssertEqual(results[0].intSet.count, 3U);
+    XCTAssertEqualObjects(results[0].intSet, setObj1.intSet);
 
     RLMSet *setProp = setObj1.stringSet;
     RLMAssertThrowsWithReasonMatching([setProp addObject:@"another one"], @"write transaction");
@@ -311,8 +315,6 @@
     XCTAssertTrue(stringSet.isInvalidated, @"stringSet should be invalid after parent deletion.");
     [realm commitWriteTransaction];
 }
-
-//////////******************//////////////
 
 - (void)testDeleteObjectInSetProperty {
     RLMRealm *realm = [self realmWithTestPath];
@@ -508,8 +510,7 @@
     [realm cancelWriteTransaction];
 }
 
-- (void)testIndexOfObject
-{
+- (void)testIndexOfObject {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
@@ -524,9 +525,11 @@
     CompanyObject *company = [[CompanyObject alloc] init];
     company.name = @"name";
 
-    [company.employeeSet addObjects:[EmployeeObject allObjects]];
+    RLMResults<EmployeeObject *> *objects = [EmployeeObject allObjects];
+    [company.employeeSet addObjects:objects];
+
     [company.employeeSet removeObject:po2];
-    XCTAssertEqual(0U, company.employeeSet.count);
+    XCTAssertEqual(2U, company.employeeSet.count);
 
     // test unmanaged
     XCTAssertEqual(0U, [company.employeeSet indexOfObject:po1]);
@@ -544,7 +547,7 @@
 
     // non realm employee
     EmployeeObject *notInRealm = [[EmployeeObject alloc] initWithValue:@[@"NoName", @1, @NO]];
-    XCTAssertEqual((NSUInteger)NSNotFound, [company.employeeSet indexOfObject:notInRealm]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [company.employeeSet indexOfObject:po2]);
 
     // invalid object
     XCTAssertThrows([company.employeeSet indexOfObject:(EmployeeObject *)company]);
@@ -581,8 +584,8 @@
     [realm commitWriteTransaction];
 
     // test LinkView RLMSet
-    XCTAssertEqual(0U, [company.employeeSet indexOfObjectWhere:@"name = 'Jill'"]);
-    XCTAssertEqual(1U, [company.employeeSet indexOfObjectWhere:@"name = 'Joe'"]);
+    XCTAssertEqual(0U, [company.employeeSet indexOfObjectWhere:@"name = 'Joe'"]);
+    XCTAssertEqual(1U, [company.employeeSet indexOfObjectWhere:@"name = 'Jill'"]);
     XCTAssertEqual((NSUInteger)NSNotFound, [company.employeeSet indexOfObjectWhere:@"name = 'John'"]);
 
     RLMResults *results = [company.employeeSet objectsWhere:@"age > 30"];
@@ -660,10 +663,10 @@
     size_t count = 0;
     for (EmployeeObject *eo in company.employeeSet) {
         ++count;
-        [company.employeeSet addObject:eo];
+        [company.employeeSet removeObject:eo];
     }
     XCTAssertEqual(totalCount, count);
-    XCTAssertEqual(totalCount * 2, company.employeeSet.count);
+    XCTAssertEqual(0U, company.employeeSet.count);
 
     [realm cancelWriteTransaction];
 
@@ -679,7 +682,7 @@
         [company.employeeSet addObject:eo];
     }
     XCTAssertEqual(totalCount, count);
-    XCTAssertEqual(totalCount * 2, company.employeeSet.count);
+    XCTAssertEqual(totalCount, company.employeeSet.count);
 }
 
 - (void)testDeleteDuringEnumeration {
@@ -710,14 +713,14 @@
     [realm beginWriteTransaction];
     CompanyObject *company = [[CompanyObject alloc] init];
     company.name = @"name";
-    XCTAssertEqualObjects([company.employees valueForKey:@"name"], @[]);
+    XCTAssertEqual(((NSSet *)[company.employeeSet valueForKey:@"name"]).count, 0U);
     [realm addObject:company];
     [realm commitWriteTransaction];
 
-    XCTAssertEqualObjects([company.employees valueForKey:@"age"], @[]);
+    XCTAssertEqual(((NSSet *)[company.employeeSet valueForKey:@"name"]).count, 0U);
 
     // managed
-    NSMutableArray *ages = [NSMutableArray array];
+    NSMutableOrderedSet *ages = [NSMutableOrderedSet orderedSet];
     [realm beginWriteTransaction];
     for (int i = 0; i < 30; ++i) {
         [ages addObject:@(i)];
@@ -726,8 +729,8 @@
     }
     [realm commitWriteTransaction];
 
-    RLM_GENERIC_SET(EmployeeObject) *employeeObjects = [company valueForKey:@"employeesSet"];
-    NSMutableArray *kvcAgeProperties = [NSMutableArray array];
+    RLM_GENERIC_SET(EmployeeObject) *employeeObjects = [company valueForKey:@"employeeSet"];
+    NSMutableOrderedSet *kvcAgeProperties = [NSMutableOrderedSet orderedSet];
     for (EmployeeObject *employee in employeeObjects) {
         [kvcAgeProperties addObject:@(employee.age)];
     }
@@ -750,7 +753,7 @@
 
     // unmanaged object
     company = [[CompanyObject alloc] init];
-    ages = [NSMutableArray array];
+    ages = [NSMutableOrderedSet orderedSet];
     for (int i = 0; i < 30; ++i) {
         [ages addObject:@(i)];
         EmployeeObject *eo = [[EmployeeObject alloc] initWithValue:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
@@ -766,9 +769,8 @@
     XCTAssertEqual([[company.employeeSet valueForKeyPath:@"@max.age"] integerValue], 29);
     XCTAssertEqualWithAccuracy([[company.employeeSet valueForKeyPath:@"@avg.age"] doubleValue], 14.5, 0.1f);
 
-    XCTAssertEqualObjects([company.employeeSet valueForKeyPath:@"@unionOfObjects.age"],
-                          (@[@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17, @18, @19, @20, @21, @22, @23, @24, @25, @26, @27, @28, @29]));
-    XCTAssertEqualObjects([company.employeeSet valueForKeyPath:@"@distinctUnionOfObjects.name"], (@[@"Joe"]));
+    RLMAssertThrowsWithReasonMatching([company.employeeSet valueForKeyPath:@"@unionOfObjects.age"], @"this class does not implement the unionOfObjects");
+    RLMAssertThrowsWithReasonMatching([company.employeeSet valueForKeyPath:@"@distinctUnionOfObjects.name"], @"this class does not implement the distinctUnionOfObjects");
 
     RLMAssertThrowsWithReasonMatching([company.employeeSet valueForKeyPath:@"@sum.dogs.@sum.age"], @"Nested key paths.*not supported");
 }
@@ -781,16 +783,16 @@
     company.name = @"name";
 
     [company.employeeSet setValue:@"name" forKey:@"name"];
-    XCTAssertEqualObjects([company.employeeSet valueForKey:@"name"], @[]);
+    XCTAssertEqual(((NSSet *)[company.employeeSet valueForKey:@"name"]).count, 0U);
 
     [realm addObject:company];
     [realm commitWriteTransaction];
 
     XCTAssertThrows([company.employeeSet setValue:@10 forKey:@"age"]);
-    XCTAssertEqualObjects([company.employeeSet valueForKey:@"age"], @[]);
+    XCTAssertEqual(((NSSet *)[company.employeeSet valueForKey:@"name"]).count, 0U);
 
     // managed
-    NSMutableArray *ages = [NSMutableArray array];
+    NSMutableOrderedSet *ages = [NSMutableOrderedSet orderedSet];
     [realm beginWriteTransaction];
     for (int i = 0; i < 30; ++i) {
         [ages addObject:@(20)];
@@ -805,7 +807,7 @@
 
     // unmanaged object
     company = [[CompanyObject alloc] init];
-    ages = [NSMutableArray array];
+    ages = [NSMutableOrderedSet orderedSet];
     for (int i = 0; i < 30; ++i) {
         [ages addObject:@(20)];
         EmployeeObject *eo = [[EmployeeObject alloc] initWithValue:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
@@ -831,34 +833,35 @@
 
     [realm transactionWithBlock:^{
         [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-        [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
-        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-        [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
-        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-        [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
-        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-        [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
-        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@1, @0.2f, @2.5, @NO, dateMaxInput]];
+        [AggregateObject createInRealm:realm withValue:@[@2, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@3, @0.0f, @2.5, @NO, dateMaxInput]];
+        [AggregateObject createInRealm:realm withValue:@[@4, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@5, @0.0f, @2.5, @NO, dateMaxInput]];
+        [AggregateObject createInRealm:realm withValue:@[@6, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@7, @0.0f, @2.5, @NO, dateMaxInput]];
+        [AggregateObject createInRealm:realm withValue:@[@8, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@9, @1.2f, @0.0, @YES, dateMinInput]];
 
         [obj.set addObjects:[AggregateObject allObjectsInRealm:realm]];
     }];
 
     void (^test)(void) = ^{
         RLMSet *set = obj.set;
-
+        // NSSet will always return distinct values for primitive properties. This does match Cores implementation.
+        // Leaving this test open for questions ATM.
         // SUM
-        XCTAssertEqual([set sumOfProperty:@"intCol"].integerValue, 4);
-        XCTAssertEqualWithAccuracy([set sumOfProperty:@"floatCol"].floatValue, 7.2f, 0.1f);
-        XCTAssertEqualWithAccuracy([set sumOfProperty:@"doubleCol"].doubleValue, 10.0, 0.1f);
+        XCTAssertEqual([set sumOfProperty:@"intCol"].integerValue, 45);
+        XCTAssertEqualWithAccuracy([set sumOfProperty:@"floatCol"].floatValue, 1.4f, 0.1f);
+        XCTAssertEqualWithAccuracy([set sumOfProperty:@"doubleCol"].doubleValue, 2.5, 0.1f);
         RLMAssertThrowsWithReasonMatching([set sumOfProperty:@"foo"], @"foo.*AggregateObject");
         RLMAssertThrowsWithReasonMatching([set sumOfProperty:@"boolCol"], @"sum.*bool");
         RLMAssertThrowsWithReasonMatching([set sumOfProperty:@"dateCol"], @"sum.*date");
 
         // Average
-        XCTAssertEqualWithAccuracy([set averageOfProperty:@"intCol"].doubleValue, 0.4, 0.1f);
-        XCTAssertEqualWithAccuracy([set averageOfProperty:@"floatCol"].doubleValue, 0.72, 0.1f);
-        XCTAssertEqualWithAccuracy([set averageOfProperty:@"doubleCol"].doubleValue, 1.0, 0.1f);
+        XCTAssertEqualWithAccuracy([set averageOfProperty:@"intCol"].doubleValue, 4.5, 0.1f);
+        XCTAssertEqualWithAccuracy([set averageOfProperty:@"floatCol"].doubleValue, 0.46, 0.1f);
+        XCTAssertEqualWithAccuracy([set averageOfProperty:@"doubleCol"].doubleValue, 1.25, 0.1f);
         RLMAssertThrowsWithReasonMatching([set averageOfProperty:@"foo"], @"foo.*AggregateObject");
         RLMAssertThrowsWithReasonMatching([set averageOfProperty:@"boolCol"], @"average.*bool");
         RLMAssertThrowsWithReasonMatching([set averageOfProperty:@"dateCol"], @"average.*date");
@@ -872,7 +875,7 @@
         RLMAssertThrowsWithReasonMatching([set minOfProperty:@"boolCol"], @"min.*bool");
 
         // MAX
-        XCTAssertEqual(1, [[set maxOfProperty:@"intCol"] intValue]);
+        XCTAssertEqual(9, [[set maxOfProperty:@"intCol"] intValue]);
         XCTAssertEqual(1.2f, [[set maxOfProperty:@"floatCol"] floatValue]);
         XCTAssertEqual(2.5, [[set maxOfProperty:@"doubleCol"] doubleValue]);
         XCTAssertEqualObjects(dateMaxInput, [set maxOfProperty:@"dateCol"]);
@@ -937,19 +940,20 @@
     // numeric operators
     XCTAssertEqual([[c1.employeesSet valueForKeyPath:@"@min.age"] intValue], 20);
     XCTAssertEqual([[c1.employeesSet valueForKeyPath:@"@max.age"] intValue], 40);
-    XCTAssertEqual([[c1.employeesSet valueForKeyPath:@"@sum.age"] integerValue], 120);
+    XCTAssertEqual([[c1.employeesSet valueForKeyPath:@"@sum.age"] integerValue], 90);
     XCTAssertEqualWithAccuracy([[c1.employeesSet valueForKeyPath:@"@avg.age"] doubleValue], 30, 0.1f);
 
     // collection
-    XCTAssertEqualObjects([c1.employeesSet valueForKeyPath:@"@unionOfObjects.name"],
-                          (@[@"A", @"B", @"C"]));
-    XCTAssertEqualObjects([[c1.employeesSet valueForKeyPath:@"@distinctUnionOfObjects.name"] sortedArrayUsingSelector:@selector(compare:)],
-                          (@[@"A", @"B", @"C"]));
-    XCTAssertEqualObjects([companies.companies valueForKeyPath:@"@unionOfArrays.employees"],
-                          (@[e1, e2, e3, e4]));
-    NSComparator cmp = ^NSComparisonResult(id obj1, id obj2) { return [[obj1 name] compare:[obj2 name]]; };
-    XCTAssertEqualObjects([[companies.companies valueForKeyPath:@"@distinctUnionOfSets.employees"] sortedArrayUsingComparator:cmp],
-                          (@[e1, e2, e3, e4]));
+//    XCTAssertEqualObjects([c1.employeesSet valueForKeyPath:@"@unionOfObjects.name"],
+//                          (@[@"C", @"A", @"B"]));
+//
+//    XCTAssertEqualObjects([[c1.employeesSet valueForKeyPath:@"@distinctUnionOfObjects.name"] sortedArrayUsingSelector:@selector(compare:)],
+//                          (@[@"A", @"B", @"C"]));
+//    XCTAssertEqualObjects([companies.companies valueForKeyPath:@"@unionOfArrays.employees"],
+//                          (@[e1, e2, e3, e4]));
+//    NSComparator cmp = ^NSComparisonResult(id obj1, id obj2) { return [[obj1 name] compare:[obj2 name]]; };
+//    XCTAssertEqualObjects([[companies.companies valueForKeyPath:@"@distinctUnionOfSets.employees"] sortedArrayUsingComparator:cmp],
+//                          (@[e1, e2, e3, e4]));
 
     // invalid key paths
     RLMAssertThrowsWithReasonMatching([c1.employeesSet valueForKeyPath:@"@invalid.name"],
@@ -1225,7 +1229,7 @@
 
     [realm cancelWriteTransaction];
 }
-
+// Start Wednesday
 - (void)testAssignIncorrectType {
     RLMRealm *realm = self.realmWithTestPath;
     [realm beginWriteTransaction];

@@ -341,7 +341,6 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
         });
     }
     return [super valueForKeyPath:keyPath];
-    return nil;
 }
 
 - (id)valueForKey:(NSString *)key {
@@ -349,7 +348,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     // normal array KVC semantics, but observing @things works very oddly (when
     // it's part of a key path, it's triggered automatically when array index
     // changes occur, and can't be sent explicitly, but works normally when it's
-    // the entire key path), and an RLMManagedArray *can't* have objects where
+    // the entire key path), and an RLMManagedSet *can't* have objects where
     // invalidated is true, so we're not losing much.
     return translateErrors([&]() -> id {
         if ([key isEqualToString:RLMInvalidatedKey]) {
@@ -357,7 +356,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
         }
 
         _backingSet.verify_attached();
-        return RLMCollectionValueForKey(_backingSet, key, *_objectInfo);
+        return  [NSOrderedSet orderedSetWithArray:RLMCollectionValueForKey(_backingSet, key, *_objectInfo)];
     });
     return nil;
 }
@@ -449,21 +448,19 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
-    // TODO: Query not yet implemented in core
-//    if (_type != RLMPropertyTypeObject) {
-//        @throw RLMException(@"Querying is currently only implemented for arrays of Realm Objects");
-//    }
-//    realm::Query query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema,
-//                                             _realm.schema, _realm.group);
-//
-//    return translateErrors([&] {
-//        return RLMConvertNotFound(_backingSet.find(std::move(query)));
-//    });
-    return NSIntegerMax;
+    if (_type != RLMPropertyTypeObject) {
+        @throw RLMException(@"Querying is currently only implemented for sets of Realm Objects");
+    }
+    realm::Query query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema,
+                                             _realm.schema, _realm.group);
+
+    return translateErrors([&] {
+        return RLMConvertNotFound(_backingSet.find(std::move(query)));
+    });
 }
 
 - (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes {
-    // FIXME: this is called by KVO when array changes are made. It's not clear
+    // FIXME: this is called by KVO when set changes are made. It's not clear
     // why, and returning nil seems to work fine.
     return nil;
 }
@@ -485,8 +482,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 }
 
 - (realm::TableView)tableView {
-    REALM_TERMINATE("Not implemented yet");
-    //return translateErrors([&] { return _backingSet.get_query(); }).find_all();
+    return translateErrors([&] { return _backingSet.get_query(); }).find_all();
 }
 
 - (BOOL)isFrozen {

@@ -362,8 +362,9 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
 
 - (void)removeObject:(id)object {
     RLMSetValidateMatchingObjectType(self, object);
+    auto r = [_backingSet indexOfObject:object];
     changeSet(self, NSKeyValueChangeRemoval, NSMakeRange(0, _backingSet.count), ^{
-        [_backingSet removeObject:object];
+        [_backingSet removeObjectAtIndex:[self indexOfObject:object]];
     });
 }
 
@@ -426,7 +427,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
         sum = true;
     }
     else if (![op isEqualToString:@"@avg"]) {
-        // Just delegate to NSArray for all other operators
+        // Just delegate to NSSet for all other operators
         return [_backingSet valueForKeyPath:[op stringByAppendingPathExtension:key]];
     }
 
@@ -478,7 +479,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
 
 - (id)valueForKey:(NSString *)key {
     if ([key isEqualToString:RLMInvalidatedKey]) {
-        return @NO; // Unmanaged arrays are never invalidated
+        return @NO; // Unmanaged sets are never invalidated
     }
     if (!_backingSet) {
         _backingSet = [NSMutableOrderedSet new];
