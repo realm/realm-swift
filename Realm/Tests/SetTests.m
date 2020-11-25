@@ -31,31 +31,38 @@
 - (void)testUnmanagedSet {
     SetPropertyObject *setObj = [SetPropertyObject new];
     XCTAssertNotNil(setObj.stringSet);
-    [setObj.stringSet addObject:[[StringObject alloc] initWithValue:@[@"string1"]]];
+
+    StringObject *str1 = [[StringObject alloc] initWithValue:@[@"string1"]];
+    StringObject *str2 = [[StringObject alloc] initWithValue:@[@"string2"]];
+    StringObject *str3 = [[StringObject alloc] initWithValue:@[@"string3"]];
+    StringObject *str4 = [[StringObject alloc] initWithValue:@[@"string4"]];
+
+    [setObj.stringSet addObject:str1];
     XCTAssertEqual(setObj.stringSet.count, 1U);
     XCTAssertEqualObjects([setObj.stringSet firstObject].stringCol, @"string1");
-    [setObj.stringSet addObjects:@[@"string1", @"string2", @"string3"]]; // should not accept duplicates
+    // should not accept duplicates
+    [setObj.stringSet addObjects:@[str1, str2, str3]];
     XCTAssertEqual(setObj.stringSet.count, 3U);
-    XCTAssertEqualObjects(setObj.stringSet[1], @"string2");
-    XCTAssertEqualObjects(setObj.stringSet[2], @"string3");
+    XCTAssertEqualObjects(setObj.stringSet[1], str2);
+    XCTAssertEqualObjects(setObj.stringSet[2], str3);
 
-    NSSet *aSet = [NSSet setWithArray:@[@"string1", @"string4"]];
+    NSSet *aSet = [NSSet setWithArray:@[str3, str4]];
     [setObj.stringSet addObjects:aSet];
     XCTAssertEqual(setObj.stringSet.count, 4U);
 
-    StringObject *strObj = [[StringObject alloc] initWithValue:@[@"meFirst"]];
+    StringObject *strObj = [[StringObject alloc] initWithValue:@[@"string5"]];
     [setObj.stringSet addObject:strObj];
-    XCTAssertEqualObjects(setObj.stringSet[0], @"string1");
+    XCTAssertEqualObjects(setObj.stringSet[0], str1);
     XCTAssertEqual(setObj.stringSet.count, 5U);
 
     XCTAssertThrows([((id)setObj.stringSet) addObject:[[IntObject alloc] initWithValue:@[@123]]]);
 
-    [setObj.stringSet removeLastObject];
+    [setObj.stringSet removeObject:strObj];
     XCTAssertEqual(setObj.stringSet.count, 4U);
 
-    [setObj.stringSet removeObject:strObj];
+    [setObj.stringSet removeLastObject];
     XCTAssertEqual(setObj.stringSet.count, 3U);
-    XCTAssertEqualObjects(setObj.stringSet[0], @"string1");
+    XCTAssertEqualObjects(setObj.stringSet[0],str1);
 
     [setObj.stringSet removeAllObjects];
     XCTAssertEqual(setObj.stringSet.count, 0U);
@@ -219,16 +226,6 @@
 
     [setObj1.stringObj setObject:@"hello!" atIndexedSubscript:1];
     XCTAssertTrue([[setObj1.stringObj objectAtIndexedSubscript:1] isEqualToString:@"hello!"]);
-}
-
-- (void)testSetAggregate {
-    SetPropertyObject *setObj = [[SetPropertyObject alloc] initWithValue:@[@"setObject", @[], @[@1, @2, @3, @-1, @0, @0]]];
-
-    XCTAssertEqual(5, [setObj.intSet sumOfProperty:@"intCol"].intValue);
-    XCTAssertEqual(1, [setObj.intSet averageOfProperty:@"intCol"].intValue);
-    XCTAssertEqual(-1, [[setObj.intSet minOfProperty:@"intCol"] intValue]);
-    XCTAssertEqual(3, [[setObj.intSet maxOfProperty:@"intCol"] intValue]);
-    XCTAssertThrows([setObj.intSet sumOfProperty:@"prop 1"]);
 }
 
 #pragma mark Managed Set
@@ -400,7 +397,7 @@
     [realm addObject:setObj];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(setObj.stringSet.count, 3U, @"Should have two elements in array");
+    XCTAssertEqual(setObj.stringSet.count, 3U, @"Should have three elements in set");
     XCTAssertEqualObjects([setObj.stringSet[0] stringCol], @"a", @"First element should have property value 'a'");
     XCTAssertEqualObjects([setObj.stringSet[1] stringCol], @"b", @"Second element should have property value 'b'");
 
@@ -943,6 +940,7 @@
     XCTAssertEqual([[c1.employeesSet valueForKeyPath:@"@sum.age"] integerValue], 90);
     XCTAssertEqualWithAccuracy([[c1.employeesSet valueForKeyPath:@"@avg.age"] doubleValue], 30, 0.1f);
 
+    //TODO: disallow these calls on RLMSet
     // collection
 //    XCTAssertEqualObjects([c1.employeesSet valueForKeyPath:@"@unionOfObjects.name"],
 //                          (@[@"C", @"A", @"B"]));
@@ -1229,16 +1227,16 @@
 
     [realm cancelWriteTransaction];
 }
-// Start Wednesday
+
 - (void)testAssignIncorrectType {
     RLMRealm *realm = self.realmWithTestPath;
     [realm beginWriteTransaction];
-    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm
-                                                          withValue:@[@"", @[@[@"a"]], @[@[@0]]]];
-    RLMAssertThrowsWithReason(array.intArray = (id)array.array,
-                              @"RLMArray<StringObject> does not match expected type 'IntObject' for property 'ArrayPropertyObject.intArray'.");
-    RLMAssertThrowsWithReason(array[@"intArray"] = array[@"array"],
-                              @"RLMArray<StringObject> does not match expected type 'IntObject' for property 'ArrayPropertyObject.intArray'.");
+    SetPropertyObject *set = [SetPropertyObject createInRealm:realm
+                                                    withValue:@[@"", @[@[@"a"]], @[@[@0]]]];
+    RLMAssertThrowsWithReason(set.intSet = (id)set.stringSet,
+                              @"RLMSet<StringObject> does not match expected type 'IntObject' for property 'SetPropertyObject.intSet'.");
+    RLMAssertThrowsWithReason(set[@"intSet"] = set[@"stringSet"],
+                              @"RLMSet<StringObject> does not match expected type 'IntObject' for property 'SetPropertyObject.intSet'.");
     [realm cancelWriteTransaction];
 }
 
@@ -1560,12 +1558,12 @@ static RLMSet<IntObject *> *managedTestSet() {
                               @"Frozen Realms do not change and do not have change notifications.");
 }
 
-- (void)testQueryFrozenArray {
+- (void)testQueryFrozenSet {
     RLMSet *frozen = [managedTestSet() freeze];
     XCTAssertEqualObjects([[frozen objectsWhere:@"intCol > 0"] valueForKey:@"intCol"], (@[@1]));
 }
 
-- (void)testFrozenArraysDoNotUpdate {
+- (void)testFrozenSetsDoNotUpdate {
     RLMSet *set = managedTestSet();
     RLMSet *frozen = [set freeze];
     XCTAssertEqual(frozen.count, 2);

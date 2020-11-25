@@ -185,11 +185,19 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
             list.assign(ctx, value, realm::CreatePolicy::ForceCreate);
         });
     } else if (prop.set) {
-        REALM_TERMINATE("Not implemented");
+        RLMValidateValueForProperty(value, obj->_info->rlmObjectSchema, prop, true);
+        realm::object_store::Set set(obj->_realm->_realm, obj->_row, key);
+        RLMClassInfo *info = obj->_info;
+        if (set.get_type() == realm::PropertyType::Object) {
+            info = &obj->_info->linkTargetType(prop.index);
+        }
+        RLMAccessorContext ctx(*info);
+        RLMTranslateError([&] {
+            set.assign(ctx, value, realm::CreatePolicy::ForceCreate);
+        });
     } else {
         REALM_TERMINATE("Unrecognized NSFastEnumeration type.");
     }
-
 }
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
