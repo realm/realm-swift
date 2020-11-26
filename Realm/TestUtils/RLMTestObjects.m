@@ -134,9 +134,16 @@
 @end
 
 @implementation AllPrimitiveSets
++ (NSArray *)requiredProperties {
+    return @[@"intObj", @"floatObj", @"doubleObj", @"boolObj", @"stringObj",
+             @"dateObj", @"dataObj", @"decimalObj", @"objectIdObj"];
+}
 @end
 
 @implementation AllOptionalPrimitiveArrays
+@end
+
+@implementation AllOptionalPrimitiveSets
 @end
 
 @implementation AllOptionalTypesPK

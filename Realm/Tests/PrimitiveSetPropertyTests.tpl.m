@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2017 Realm Inc.
+// Copyright 2020 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,27 +58,27 @@ static double average(NSArray *values) {
     return sum / c;
 }
 
-@interface PrimitiveArrayPropertyTests : RLMTestCase
+@interface PrimitiveSetPropertyTests : RLMTestCase
 @end
 
-@implementation PrimitiveArrayPropertyTests {
-    AllPrimitiveArrays *unmanaged;
-    AllPrimitiveArrays *managed;
-    AllOptionalPrimitiveArrays *optUnmanaged;
-    AllOptionalPrimitiveArrays *optManaged;
+@implementation PrimitiveSetPropertyTests {
+    AllPrimitiveSets *unmanaged;
+    AllPrimitiveSets *managed;
+    AllOptionalPrimitiveSets *optUnmanaged;
+    AllOptionalPrimitiveSets *optManaged;
     RLMRealm *realm;
-    NSArray<RLMArray *> *allArrays;
+    NSArray<RLMSet *> *allSets;
 }
 
 - (void)setUp {
-    unmanaged = [[AllPrimitiveArrays alloc] init];
-    optUnmanaged = [[AllOptionalPrimitiveArrays alloc] init];
+    unmanaged = [[AllPrimitiveSets alloc] init];
+    optUnmanaged = [[AllOptionalPrimitiveSets alloc] init];
     realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    managed = [AllPrimitiveArrays createInRealm:realm withValue:@[]];
-    optManaged = [AllOptionalPrimitiveArrays createInRealm:realm withValue:@[]];
-    allArrays = @[
-        $array,
+    managed = [AllPrimitiveSets createInRealm:realm withValue:@[]];
+    optManaged = [AllOptionalPrimitiveSets createInRealm:realm withValue:@[]];
+    allSets = @[
+        $set,
     ];
 }
 
@@ -89,7 +89,7 @@ static double average(NSArray *values) {
 }
 
 - (void)addObjects {
-    [$array addObjects:$values];
+    [$set addObjects:$values];
 }
 
 - (void)testCount {
@@ -167,17 +167,17 @@ static double average(NSArray *values) {
 }
 
 - (void)testInvalidated {
-    RLMArray *array;
+    RLMSet *set;
     @autoreleasepool {
-        AllPrimitiveArrays *obj = [[AllPrimitiveArrays alloc] init];
-        array = obj.intObj;
-        XCTAssertFalse(array.invalidated);
+        AllPrimitiveSets *obj = [[AllPrimitiveSets alloc] init];
+        set = obj.intObj;
+        XCTAssertFalse(set.invalidated);
     }
-    XCTAssertFalse(array.invalidated);
+    XCTAssertFalse(set.invalidated);
 }
 
 - (void)testDeleteObjectsInRealm {
-    RLMAssertThrowsWithReason([realm deleteObjects:$allArrays], @"Cannot delete objects from RLMArray");
+    RLMAssertThrowsWithReason([realm deleteObjects:$allSets], @"Cannot delete objects from RLMSet");
 }
 
 - (void)testObjectAtIndex {
@@ -189,269 +189,204 @@ static double average(NSArray *values) {
 }
 
 - (void)testFirstObject {
-    XCTAssertNil($allArrays.firstObject);
+    XCTAssertNil($allSets.firstObject);
 
     [self addObjects];
-    XCTAssertEqualObjects($array.firstObject, $first);
+    XCTAssertEqualObjects($set.firstObject, $first);
 
-    [$allArrays removeAllObjects];
+    [$allSets removeAllObjects];
 
-    %o [$array addObject:NSNull.null];
-    %o XCTAssertEqualObjects($array.firstObject, NSNull.null);
+    %o [$set addObject:NSNull.null];
+    %o XCTAssertEqualObjects($set.firstObject, NSNull.null);
 }
 
 - (void)testLastObject {
-    XCTAssertNil($allArrays.lastObject);
+    XCTAssertNil($allSets.lastObject);
 
     [self addObjects];
 
-    XCTAssertEqualObjects($array.lastObject, $last);
+    XCTAssertEqualObjects($set.lastObject, $last);
 
-    [$allArrays removeLastObject];
-    %o XCTAssertEqualObjects($array.lastObject, $v1);
+    [$allSets removeLastObject];
+    %o XCTAssertEqualObjects($set.lastObject, $v1);
 }
 
 - (void)testAddObject {
-    RLMAssertThrowsWithReason([$array addObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
-    %r RLMAssertThrowsWithReason([$array addObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
+    RLMAssertThrowsWithReason([$set addObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %r RLMAssertThrowsWithReason([$set addObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
-    [$array addObject:$v0];
-    XCTAssertEqualObjects($array[0], $v0);
+    [$set addObject:$v0];
+    XCTAssertEqualObjects($set[0], $v0);
 
-    %o [$array addObject:NSNull.null];
-    %o XCTAssertEqualObjects($array[1], NSNull.null);
+    %o [$set addObject:NSNull.null];
+    %o XCTAssertEqualObjects($set[1], NSNull.null);
 }
 
 - (void)testAddObjects {
-    RLMAssertThrowsWithReason([$array addObjects:@[$wrong]], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
-    %r RLMAssertThrowsWithReason([$array addObjects:@[NSNull.null]], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
+    RLMAssertThrowsWithReason([$set addObjects:@[$wrong]], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %r RLMAssertThrowsWithReason([$set addObjects:@[NSNull.null]], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
-    XCTAssertEqualObjects($array[0], $v0);
-    XCTAssertEqualObjects($array[1], $v1);
-    %o XCTAssertEqualObjects($array[2], NSNull.null);
-}
-
-- (void)testInsertObject {
-    RLMAssertThrowsWithReason([$array insertObject:$wrong atIndex:0], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
-    %r RLMAssertThrowsWithReason([$array insertObject:NSNull.null atIndex:0], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
-    RLMAssertThrowsWithReason([$array insertObject:$v0 atIndex:1], ^n @"Index 1 is out of bounds (must be less than 1).");
-
-    [$array insertObject:$v0 atIndex:0];
-    XCTAssertEqualObjects($array[0], $v0);
-
-    [$array insertObject:$v1 atIndex:0];
-    XCTAssertEqualObjects($array[0], $v1);
-    XCTAssertEqualObjects($array[1], $v0);
-
-    %o [$array insertObject:NSNull.null atIndex:1];
-    %o XCTAssertEqualObjects($array[0], $v1);
-    %o XCTAssertEqualObjects($array[1], NSNull.null);
-    %o XCTAssertEqualObjects($array[2], $v0);
+    XCTAssertEqualObjects($set[0], $v0);
+    XCTAssertEqualObjects($set[1], $v1);
+    %o XCTAssertEqualObjects($set[2], NSNull.null);
 }
 
 - (void)testRemoveObject {
-    RLMAssertThrowsWithReason([$allArrays removeObjectAtIndex:0], ^n @"Index 0 is out of bounds (must be less than 0).");
 
-    [self addObjects];
-    %r XCTAssertEqual($array.count, 2U);
-    %o XCTAssertEqual($array.count, 3U);
-
-    %r RLMAssertThrowsWithReason([$array removeObjectAtIndex:2], ^n @"Index 2 is out of bounds (must be less than 2).");
-    %o RLMAssertThrowsWithReason([$array removeObjectAtIndex:3], ^n @"Index 3 is out of bounds (must be less than 3).");
-
-    [$allArrays removeObjectAtIndex:0];
-    %r XCTAssertEqual($array.count, 1U);
-    %o XCTAssertEqual($array.count, 2U);
-
-    XCTAssertEqualObjects($array[0], $v1);
-    %o XCTAssertEqualObjects($array[1], NSNull.null);
 }
 
 - (void)testRemoveLastObject {
-    XCTAssertNoThrow([$allArrays removeLastObject]);
+    XCTAssertNoThrow([$allSets removeLastObject]);
 
     [self addObjects];
-    %r XCTAssertEqual($array.count, 2U);
-    %o XCTAssertEqual($array.count, 3U);
+    %r XCTAssertEqual($set.count, 2U);
+    %o XCTAssertEqual($set.count, 3U);
 
-    [$allArrays removeLastObject];
-    %r XCTAssertEqual($array.count, 1U);
-    %o XCTAssertEqual($array.count, 2U);
+    [$allSets removeLastObject];
+    %r XCTAssertEqual($set.count, 1U);
+    %o XCTAssertEqual($set.count, 2U);
 
-    XCTAssertEqualObjects($array[0], $v0);
-    %o XCTAssertEqualObjects($array[1], $v1);
-}
-
-- (void)testReplace {
-    RLMAssertThrowsWithReason([$array replaceObjectAtIndex:0 withObject:$v0], ^n @"Index 0 is out of bounds (must be less than 0).");
-
-    [$array addObject:$v0]; ^nl [$array replaceObjectAtIndex:0 withObject:$v1]; ^nl XCTAssertEqualObjects($array[0], $v1); ^nl 
-
-    %o [$array replaceObjectAtIndex:0 withObject:NSNull.null]; ^nl XCTAssertEqualObjects($array[0], NSNull.null);
-
-    RLMAssertThrowsWithReason([$array replaceObjectAtIndex:0 withObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
-    %r RLMAssertThrowsWithReason([$array replaceObjectAtIndex:0 withObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
-}
-
-- (void)testMove {
-    RLMAssertThrowsWithReason([$allArrays moveObjectAtIndex:0 toIndex:1], ^n @"Index 0 is out of bounds (must be less than 0).");
-    RLMAssertThrowsWithReason([$allArrays moveObjectAtIndex:1 toIndex:0], ^n @"Index 1 is out of bounds (must be less than 0).");
-
-    [$array addObjects:@[$v0, $v1, $v0, $v1]];
-
-    [$allArrays moveObjectAtIndex:2 toIndex:0];
-
-    XCTAssertEqualObjects([$array valueForKey:@"self"], ^n (@[$v0, $v0, $v1, $v1]));
-}
-
-- (void)testExchange {
-    RLMAssertThrowsWithReason([$allArrays exchangeObjectAtIndex:0 withObjectAtIndex:1], ^n @"Index 0 is out of bounds (must be less than 0).");
-    RLMAssertThrowsWithReason([$allArrays exchangeObjectAtIndex:1 withObjectAtIndex:0], ^n @"Index 1 is out of bounds (must be less than 0).");
-
-    [$array addObjects:@[$v0, $v1, $v0, $v1]];
-
-    [$allArrays exchangeObjectAtIndex:2 withObjectAtIndex:1];
-
-    XCTAssertEqualObjects([$array valueForKey:@"self"], ^n (@[$v0, $v0, $v1, $v1]));
+    XCTAssertEqualObjects($set[0], $v0);
+    %o XCTAssertEqualObjects($set[1], $v1);
 }
 
 - (void)testIndexOfObject {
-    XCTAssertEqual(NSNotFound, [$array indexOfObject:$v0]);
+    XCTAssertEqual(NSNotFound, [$set indexOfObject:$v0]);
 
-    RLMAssertThrowsWithReason([$array indexOfObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    RLMAssertThrowsWithReason([$set indexOfObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
 
-    %r RLMAssertThrowsWithReason([$array indexOfObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
-    %o XCTAssertEqual(NSNotFound, [$array indexOfObject:NSNull.null]);
+    %r RLMAssertThrowsWithReason([$set indexOfObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
+    %o XCTAssertEqual(NSNotFound, [$set indexOfObject:NSNull.null]);
 
     [self addObjects];
 
-    XCTAssertEqual(1U, [$array indexOfObject:$v1]);
+    XCTAssertEqual(1U, [$set indexOfObject:$v1]);
 }
 
 - (void)testIndexOfObjectSorted {
-    %man %r [$array addObjects:@[$v0, $v1, $v0, $v1]];
-    %man %o [$array addObjects:@[$v0, $v1, NSNull.null, $v1, $v0]];
+    %man %r [$set addObjects:@[$v0, $v1, $v0, $v1]];
+    %man %o [$set addObjects:@[$v0, $v1, NSNull.null, $v1, $v0]];
 
-    %man %r XCTAssertEqual(0U, [[$array sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1]);
-    %man %r XCTAssertEqual(2U, [[$array sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
+    %man %r XCTAssertEqual(0U, [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1]);
+    %man %r XCTAssertEqual(2U, [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
 
-    %man %o XCTAssertEqual(0U, [[$array sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1]);
-    %man %o XCTAssertEqual(2U, [[$array sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
-    %man %o XCTAssertEqual(4U, [[$array sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
+    %man %o XCTAssertEqual(0U, [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1]);
+    %man %o XCTAssertEqual(2U, [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
+    %man %o XCTAssertEqual(4U, [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
 }
 
 - (void)testIndexOfObjectDistinct {
-    %man %r [$array addObjects:@[$v0, $v0, $v1]];
-    %man %o [$array addObjects:@[$v0, $v0, NSNull.null, $v1, $v0]];
+    %man %r [$set addObjects:@[$v0, $v0, $v1]];
+    %man %o [$set addObjects:@[$v0, $v0, NSNull.null, $v1, $v0]];
 
-    %man %r XCTAssertEqual(0U, [[$array distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
-    %man %r XCTAssertEqual(1U, [[$array distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1]);
+    %man %r XCTAssertEqual(0U, [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
+    %man %r XCTAssertEqual(1U, [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1]);
 
-    %man %o XCTAssertEqual(0U, [[$array distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
-    %man %o XCTAssertEqual(2U, [[$array distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1]);
-    %man %o XCTAssertEqual(1U, [[$array distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
+    %man %o XCTAssertEqual(0U, [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
+    %man %o XCTAssertEqual(2U, [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1]);
+    %man %o XCTAssertEqual(1U, [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
 }
 
 - (void)testIndexOfObjectWhere {
-    %man RLMAssertThrowsWithReason([$array indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
-    %man RLMAssertThrowsWithReason([[$array sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    %man RLMAssertThrowsWithReason([$set indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    %man RLMAssertThrowsWithReason([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
 
-    %unman XCTAssertEqual(NSNotFound, [$array indexOfObjectWhere:@"TRUEPREDICATE"]);
+    %unman XCTAssertEqual(NSNotFound, [$set indexOfObjectWhere:@"TRUEPREDICATE"]);
 
     [self addObjects];
 
-    %unman XCTAssertEqual(0U, [$array indexOfObjectWhere:@"TRUEPREDICATE"]);
-    %unman XCTAssertEqual(NSNotFound, [$array indexOfObjectWhere:@"FALSEPREDICATE"]);
+    %unman XCTAssertEqual(0U, [$set indexOfObjectWhere:@"TRUEPREDICATE"]);
+    %unman XCTAssertEqual(NSNotFound, [$set indexOfObjectWhere:@"FALSEPREDICATE"]);
 }
 
 - (void)testIndexOfObjectWithPredicate {
-    %man RLMAssertThrowsWithReason([$array indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
-    %man RLMAssertThrowsWithReason([[$array sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    %man RLMAssertThrowsWithReason([$set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    %man RLMAssertThrowsWithReason([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
 
-    %unman XCTAssertEqual(NSNotFound, [$array indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    %unman XCTAssertEqual(NSNotFound, [$set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
 
     [self addObjects];
 
-    %unman XCTAssertEqual(0U, [$array indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
-    %unman XCTAssertEqual(NSNotFound, [$array indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
+    %unman XCTAssertEqual(0U, [$set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    %unman XCTAssertEqual(NSNotFound, [$set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
 }
 
 - (void)testSort {
-    %unman RLMAssertThrowsWithReason([$array sortedResultsUsingKeyPath:@"self" ascending:NO], ^n @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
-    %unman RLMAssertThrowsWithReason([$array sortedResultsUsingDescriptors:@[]], ^n @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
-    %man RLMAssertThrowsWithReason([$array sortedResultsUsingKeyPath:@"not self" ascending:NO], ^n @"can only be sorted on 'self'");
+    %unman RLMAssertThrowsWithReason([$set sortedResultsUsingKeyPath:@"self" ascending:NO], ^n @"This method may only be called on RLMSet instances retrieved from an RLMRealm");
+    %unman RLMAssertThrowsWithReason([$set sortedResultsUsingDescriptors:@[]], ^n @"This method may only be called on RLMSet instances retrieved from an RLMRealm");
+    %man RLMAssertThrowsWithReason([$set sortedResultsUsingKeyPath:@"not self" ascending:NO], ^n @"can only be sorted on 'self'");
 
-    %man %r [$array addObjects:@[$v0, $v1, $v0]];
-    %man %o [$array addObjects:@[$v0, $v1, NSNull.null, $v1, $v0]];
+    %man %r [$set addObjects:@[$v0, $v1, $v0]];
+    %man %o [$set addObjects:@[$v0, $v1, NSNull.null, $v1, $v0]];
 
-    %man %r XCTAssertEqualObjects([[$array sortedResultsUsingDescriptors:@[]] valueForKey:@"self"], ^n (@[$v0, $v1, $v0]));
-    %man %o XCTAssertEqualObjects([[$array sortedResultsUsingDescriptors:@[]] valueForKey:@"self"], ^n (@[$v0, $v1, NSNull.null, $v1, $v0]));
+    %man %r XCTAssertEqualObjects([[$set sortedResultsUsingDescriptors:@[]] valueForKey:@"self"], ^n (@[$v0, $v1, $v0]));
+    %man %o XCTAssertEqualObjects([[$set sortedResultsUsingDescriptors:@[]] valueForKey:@"self"], ^n (@[$v0, $v1, NSNull.null, $v1, $v0]));
 
-    %man %r XCTAssertEqualObjects([[$array sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"], ^n (@[$v1, $v0, $v0]));
-    %man %o XCTAssertEqualObjects([[$array sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"], ^n (@[$v1, $v1, $v0, $v0, NSNull.null]));
+    %man %r XCTAssertEqualObjects([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"], ^n (@[$v1, $v0, $v0]));
+    %man %o XCTAssertEqualObjects([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"], ^n (@[$v1, $v1, $v0, $v0, NSNull.null]));
 
-    %man %r XCTAssertEqualObjects([[$array sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"], ^n (@[$v0, $v0, $v1]));
-    %man %o XCTAssertEqualObjects([[$array sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"], ^n (@[NSNull.null, $v0, $v0, $v1, $v1]));
+    %man %r XCTAssertEqualObjects([[$set sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"], ^n (@[$v0, $v0, $v1]));
+    %man %o XCTAssertEqualObjects([[$set sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"], ^n (@[NSNull.null, $v0, $v0, $v1, $v1]));
 }
 
 - (void)testFilter {
-    %unman RLMAssertThrowsWithReason([$array objectsWhere:@"TRUEPREDICATE"], ^n @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
-    %unman RLMAssertThrowsWithReason([$array objectsWithPredicate:[NSPredicate predicateWithValue:YES]], ^n @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    %unman RLMAssertThrowsWithReason([$set objectsWhere:@"TRUEPREDICATE"], ^n @"This method may only be called on RLMSet instances retrieved from an RLMRealm");
+    %unman RLMAssertThrowsWithReason([$set objectsWithPredicate:[NSPredicate predicateWithValue:YES]], ^n @"This method may only be called on RLMSet instances retrieved from an RLMRealm");
 
-    %man RLMAssertThrowsWithReason([$array objectsWhere:@"TRUEPREDICATE"], ^n @"implemented");
-    %man RLMAssertThrowsWithReason([$array objectsWithPredicate:[NSPredicate predicateWithValue:YES]], ^n @"implemented");
+    %man RLMAssertThrowsWithReason([$set objectsWhere:@"TRUEPREDICATE"], ^n @"implemented");
+    %man RLMAssertThrowsWithReason([$set objectsWithPredicate:[NSPredicate predicateWithValue:YES]], ^n @"implemented");
 
-    %man RLMAssertThrowsWithReason([[$array sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  objectsWhere:@"TRUEPREDICATE"], @"implemented");
-    %man RLMAssertThrowsWithReason([[$array sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    %man RLMAssertThrowsWithReason([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  objectsWhere:@"TRUEPREDICATE"], @"implemented");
+    %man RLMAssertThrowsWithReason([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
 }
 
 - (void)testNotifications {
-    %unman RLMAssertThrowsWithReason([$array addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }], ^n @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    %unman RLMAssertThrowsWithReason([$set addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }], ^n @"This method may only be called on RLMSet instances retrieved from an RLMRealm");
 }
 
 - (void)testMin {
-    %nominmax %unman RLMAssertThrowsWithReason([$array minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type array");
-    %nominmax %man RLMAssertThrowsWithReason([$array minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type array '$class.$prop'");
+    %nominmax %unman RLMAssertThrowsWithReason([$set minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type set");
+    %nominmax %man RLMAssertThrowsWithReason([$set minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type set '$class.$prop'");
 
-    %minmax XCTAssertNil([$array minOfProperty:@"self"]);
+    %minmax XCTAssertNil([$set minOfProperty:@"self"]);
 
     [self addObjects];
 
-    %minmax XCTAssertEqualObjects([$array minOfProperty:@"self"], $v0);
+    %minmax XCTAssertEqualObjects([$set minOfProperty:@"self"], $v0);
 }
 
 - (void)testMax {
-    %nominmax %unman RLMAssertThrowsWithReason([$array maxOfProperty:@"self"], ^n @"maxOfProperty: is not supported for $type array");
-    %nominmax %man RLMAssertThrowsWithReason([$array maxOfProperty:@"self"], ^n @"maxOfProperty: is not supported for $type array '$class.$prop'");
+    %nominmax %unman RLMAssertThrowsWithReason([$set maxOfProperty:@"self"], ^n @"maxOfProperty: is not supported for $type set");
+    %nominmax %man RLMAssertThrowsWithReason([$set maxOfProperty:@"self"], ^n @"maxOfProperty: is not supported for $type set '$class.$prop'");
 
-    %minmax XCTAssertNil([$array maxOfProperty:@"self"]);
+    %minmax XCTAssertNil([$set maxOfProperty:@"self"]);
 
     [self addObjects];
 
-    %minmax XCTAssertEqualObjects([$array maxOfProperty:@"self"], $v1);
+    %minmax XCTAssertEqualObjects([$set maxOfProperty:@"self"], $v1);
 }
 
 - (void)testSum {
-    %nosum %unman RLMAssertThrowsWithReason([$array sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type array");
-    %nosum %man RLMAssertThrowsWithReason([$array sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type array '$class.$prop'");
+    %nosum %unman RLMAssertThrowsWithReason([$set sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type set");
+    %nosum %man RLMAssertThrowsWithReason([$set sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type set '$class.$prop'");
 
-    %sum XCTAssertEqualObjects([$array sumOfProperty:@"self"], @0);
+    %sum XCTAssertEqualObjects([$set sumOfProperty:@"self"], @0);
 
     [self addObjects];
 
-    %sum XCTAssertEqualWithAccuracy([$array sumOfProperty:@"self"].doubleValue, sum($values), .001);
+    %sum XCTAssertEqualWithAccuracy([$set sumOfProperty:@"self"].doubleValue, sum($values), .001);
 }
 
 - (void)testAverage {
-    %noavg %unman RLMAssertThrowsWithReason([$array averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type array");
-    %noavg %man RLMAssertThrowsWithReason([$array averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type array '$class.$prop'");
+    %noavg %unman RLMAssertThrowsWithReason([$set averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type set");
+    %noavg %man RLMAssertThrowsWithReason([$set averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type set '$class.$prop'");
 
-    %avg XCTAssertNil([$array averageOfProperty:@"self"]);
+    %avg XCTAssertNil([$set averageOfProperty:@"self"]);
 
     [self addObjects];
 
-    %avg XCTAssertEqualWithAccuracy([$array averageOfProperty:@"self"].doubleValue, average($values), .001);
+    %avg XCTAssertEqualWithAccuracy([$set averageOfProperty:@"self"].doubleValue, average($values), .001);
 }
 
 - (void)testFastEnumeration {
@@ -459,133 +394,72 @@ static double average(NSArray *values) {
         [self addObjects];
     }
 
-    { ^nl NSUInteger i = 0; ^nl NSArray *values = $values; ^nl for (id value in $array) { ^nl XCTAssertEqualObjects(values[i++ % values.count], value); ^nl } ^nl XCTAssertEqual(i, $array.count); ^nl } ^nl 
+    { ^nl NSUInteger i = 0; ^nl NSArray *values = $values; ^nl for (id value in $set) { ^nl XCTAssertEqualObjects(values[i++ % values.count], value); ^nl } ^nl XCTAssertEqual(i, $set.count); ^nl } ^nl
 }
 
 - (void)testValueForKeySelf {
-    XCTAssertEqualObjects([$allArrays valueForKey:@"self"], @[]);
+    XCTAssertEqualObjects([$allSets valueForKey:@"self"], @[]);
 
     [self addObjects];
 
-    XCTAssertEqualObjects([$array valueForKey:@"self"], ($values));
+    XCTAssertEqualObjects([$set valueForKey:@"self"], ($values));
 }
 
 - (void)testValueForKeyNumericAggregates {
-    %minmax XCTAssertNil([$array valueForKeyPath:@"@min.self"]);
-    %minmax XCTAssertNil([$array valueForKeyPath:@"@max.self"]);
-    %sum XCTAssertEqualObjects([$array valueForKeyPath:@"@sum.self"], @0);
-    %avg XCTAssertNil([$array valueForKeyPath:@"@avg.self"]);
+    %minmax XCTAssertNil([$set valueForKeyPath:@"@min.self"]);
+    %minmax XCTAssertNil([$set valueForKeyPath:@"@max.self"]);
+    %sum XCTAssertEqualObjects([$set valueForKeyPath:@"@sum.self"], @0);
+    %avg XCTAssertNil([$set valueForKeyPath:@"@avg.self"]);
 
     [self addObjects];
 
-    %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@min.self"], $v0);
-    %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@max.self"], $v1);
-    %sum XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@sum.self"] doubleValue], sum($values), .001);
-    %avg XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@avg.self"] doubleValue], average($values), .001);
+    %minmax XCTAssertEqualObjects([$set valueForKeyPath:@"@min.self"], $v0);
+    %minmax XCTAssertEqualObjects([$set valueForKeyPath:@"@max.self"], $v1);
+    %sum XCTAssertEqualWithAccuracy([[$set valueForKeyPath:@"@sum.self"] doubleValue], sum($values), .001);
+    %avg XCTAssertEqualWithAccuracy([[$set valueForKeyPath:@"@avg.self"] doubleValue], average($values), .001);
 }
 
 - (void)testValueForKeyLength {
-    XCTAssertEqualObjects([$allArrays valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([$allSets valueForKey:@"length"], @[]);
 
     [self addObjects];
 
-    %string XCTAssertEqualObjects([$array valueForKey:@"length"], ([$values valueForKey:@"length"]));
-}
-
-// Sort the distinct results to match the order used in values, as it
-// doesn't preserve the order naturally
-static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
-    return [[array valueForKeyPath:[NSString stringWithFormat:@"@distinctUnionOf%@.%@", type, prop]]
-            sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
-                bool aIsNull = a == NSNull.null;
-                bool bIsNull = b == NSNull.null;
-                if (aIsNull && bIsNull) {
-                    return 0;
-                }
-                if (aIsNull) {
-                    return 1;
-                }
-                if (bIsNull) {
-                    return -1;
-                }
-
-                if ([a isKindOfClass:[NSData class]]) {
-                    if ([a length] != [b length]) {
-                        return [a length] < [b length] ? -1 : 1;
-                    }
-                    int result = memcmp([a bytes], [b bytes], [a length]);
-                    if (!result) {
-                        return 0;
-                    }
-                    return result < 0 ? -1 : 1;
-                }
-
-                if ([a isKindOfClass:[RLMObjectId class]]) {
-                    int64_t idx1 = [objectIds indexOfObject:a];
-                    int64_t idx2 = [objectIds indexOfObject:b];
-                    return idx1 - idx2;
-                }
-
-                return [a compare:b];
-            }];
+    %string XCTAssertEqualObjects([$set valueForKey:@"length"], ([$values valueForKey:@"length"]));
 }
 
 - (void)testUnionOfObjects {
-    XCTAssertEqualObjects([$allArrays valueForKeyPath:@"@unionOfObjects.self"], @[]);
-    XCTAssertEqualObjects([$allArrays valueForKeyPath:@"@distinctUnionOfObjects.self"], @[]);
 
-    [self addObjects];
-    [self addObjects];
-
-    XCTAssertEqualObjects([$array valueForKeyPath:@"@unionOfObjects.self"], ^n ($values2));
-    XCTAssertEqualObjects(sortedDistinctUnion($array, @"Objects", @"self"), ^n ($values));
 }
 
-- (void)testUnionOfArrays {
-    RLMResults *allRequired = [AllPrimitiveArrays allObjectsInRealm:realm];
-    RLMResults *allOptional = [AllOptionalPrimitiveArrays allObjectsInRealm:realm];
+- (void)testUnionOfSets {
 
-    %man %r XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.$prop"], @[]);
-    %man %o XCTAssertEqualObjects([allOptional valueForKeyPath:@"@unionOfArrays.$prop"], @[]);
-    %man %r XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.$prop"], @[]);
-    %man %o XCTAssertEqualObjects([allOptional valueForKeyPath:@"@distinctUnionOfArrays.$prop"], @[]);
-
-    [self addObjects];
-
-    [AllPrimitiveArrays createInRealm:realm withValue:managed];
-    [AllOptionalPrimitiveArrays createInRealm:realm withValue:optManaged];
-
-    %man %r XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.$prop"], ^n ($values2));
-    %man %o XCTAssertEqualObjects([allOptional valueForKeyPath:@"@unionOfArrays.$prop"], ^n ($values2));
-    %man %r XCTAssertEqualObjects(sortedDistinctUnion(allRequired, @"Arrays", @"$prop"), ^n ($values));
-    %man %o XCTAssertEqualObjects(sortedDistinctUnion(allOptional, @"Arrays", @"$prop"), ^n ($values));
 }
 
 - (void)testSetValueForKey {
-    RLMAssertThrowsWithReason([$allArrays setValue:@0 forKey:@"not self"], ^n @"this class is not key value coding-compliant for the key not self.");
-    RLMAssertThrowsWithReason([$array setValue:$wrong forKey:@"self"], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
-    %r RLMAssertThrowsWithReason([$array setValue:NSNull.null forKey:@"self"], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
+    RLMAssertThrowsWithReason([$allSets setValue:@0 forKey:@"not self"], ^n @"this class is not key value coding-compliant for the key not self.");
+    RLMAssertThrowsWithReason([$set setValue:$wrong forKey:@"self"], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %r RLMAssertThrowsWithReason([$set setValue:NSNull.null forKey:@"self"], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
 
-    [$array setValue:$v0 forKey:@"self"];
+    [$set setValue:$v0 forKey:@"self"];
 
-    XCTAssertEqualObjects($array[0], $v0);
-    XCTAssertEqualObjects($array[1], $v0);
-    %o XCTAssertEqualObjects($array[2], $v0);
+    XCTAssertEqualObjects($set[0], $v0);
+    XCTAssertEqualObjects($set[1], $v0);
+    %o XCTAssertEqualObjects($set[2], $v0);
 
-    %o [$array setValue:NSNull.null forKey:@"self"];
-    %o XCTAssertEqualObjects($array[0], NSNull.null);
+    %o [$set setValue:NSNull.null forKey:@"self"];
+    %o XCTAssertEqualObjects($set[0], NSNull.null);
 }
 
 - (void)testAssignment {
-    $array = (id)@[$v1]; ^nl XCTAssertEqualObjects($array[0], $v1);
+    $set = (id)@[$v1]; ^nl XCTAssertEqualObjects($set[0], $v1);
 
     // Should replace and not append
-    $array = (id)$values; ^nl XCTAssertEqualObjects([$array valueForKey:@"self"], ($values)); ^nl 
+    $set = (id)$values; ^nl XCTAssertEqualObjects([$set valueForKey:@"self"], ($values)); ^nl
 
-    // Should not clear the array
-    $array = $array; ^nl XCTAssertEqualObjects([$array valueForKey:@"self"], ($values)); ^nl 
+    // Should not clear the set
+    $set = $set; ^nl XCTAssertEqualObjects([$set valueForKey:@"self"], ($values)); ^nl
 
     [unmanaged.intObj removeAllObjects];
     unmanaged.intObj = managed.intObj;
@@ -600,10 +474,10 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     $obj[@"$prop"] = (id)@[$v1]; ^nl XCTAssertEqualObjects($obj[@"$prop"][0], $v1);
 
     // Should replace and not append
-    $obj[@"$prop"] = (id)$values; ^nl XCTAssertEqualObjects([$obj[@"$prop"] valueForKey:@"self"], ($values)); ^nl 
+    $obj[@"$prop"] = (id)$values; ^nl XCTAssertEqualObjects([$obj[@"$prop"] valueForKey:@"self"], ($values)); ^nl
 
-    // Should not clear the array
-    $obj[@"$prop"] = $obj[@"$prop"]; ^nl XCTAssertEqualObjects([$obj[@"$prop"] valueForKey:@"self"], ($values)); ^nl 
+    // Should not clear the set
+    $obj[@"$prop"] = $obj[@"$prop"]; ^nl XCTAssertEqualObjects([$obj[@"$prop"] valueForKey:@"self"], ($values)); ^nl
 
     [unmanaged[@"intObj"] removeAllObjects];
     unmanaged[@"intObj"] = managed.intObj;
@@ -616,154 +490,139 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 
 - (void)testInvalidAssignment {
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)@[NSNull.null],
-                              @"Invalid value '<null>' of type 'NSNull' for 'int' array property 'AllPrimitiveArrays.intObj'.");
+                              @"Invalid value '<null>' of type 'NSNull' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)@[@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' array property 'AllPrimitiveArrays.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)(@[@1, @"a"]),
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' array property 'AllPrimitiveArrays.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)unmanaged.floatObj,
-                              @"RLMArray<float> does not match expected type 'int' for property 'AllPrimitiveArrays.intObj'.");
+                              @"RLMSet<float> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)optUnmanaged.intObj,
-                              @"RLMArray<int?> does not match expected type 'int' for property 'AllPrimitiveArrays.intObj'.");
+                              @"RLMSet<int?> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged[@"intObj"] = unmanaged[@"floatObj"],
-                              @"RLMArray<float> does not match expected type 'int' for property 'AllPrimitiveArrays.intObj'.");
+                              @"RLMSet<float> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged[@"intObj"] = optUnmanaged[@"intObj"],
-                              @"RLMArray<int?> does not match expected type 'int' for property 'AllPrimitiveArrays.intObj'.");
+                              @"RLMSet<int?> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
 
     RLMAssertThrowsWithReason(managed.intObj = (id)@[NSNull.null],
-                              @"Invalid value '<null>' of type 'NSNull' for 'int' array property 'AllPrimitiveArrays.intObj'.");
+                              @"Invalid value '<null>' of type 'NSNull' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)@[@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' array property 'AllPrimitiveArrays.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)(@[@1, @"a"]),
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' array property 'AllPrimitiveArrays.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)managed.floatObj,
-                              @"RLMArray<float> does not match expected type 'int' for property 'AllPrimitiveArrays.intObj'.");
+                              @"RLMSet<float> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)optManaged.intObj,
-                              @"RLMArray<int?> does not match expected type 'int' for property 'AllPrimitiveArrays.intObj'.");
+                              @"RLMSet<int?> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed[@"intObj"] = (id)managed[@"floatObj"],
-                              @"RLMArray<float> does not match expected type 'int' for property 'AllPrimitiveArrays.intObj'.");
+                              @"RLMSet<float> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed[@"intObj"] = (id)optManaged[@"intObj"],
-                              @"RLMArray<int?> does not match expected type 'int' for property 'AllPrimitiveArrays.intObj'.");
+                              @"RLMSet<int?> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
 }
 
 - (void)testAllMethodsCheckThread {
-    RLMArray *array = managed.intObj;
+    RLMSet *set = managed.intObj;
     [self dispatchAsyncAndWait:^{
-        RLMAssertThrowsWithReason([array count], @"thread");
-        RLMAssertThrowsWithReason([array objectAtIndex:0], @"thread");
-        RLMAssertThrowsWithReason([array firstObject], @"thread");
-        RLMAssertThrowsWithReason([array lastObject], @"thread");
+        RLMAssertThrowsWithReason([set count], @"thread");
+        RLMAssertThrowsWithReason([set objectAtIndex:0], @"thread");
+        RLMAssertThrowsWithReason([set firstObject], @"thread");
+        RLMAssertThrowsWithReason([set lastObject], @"thread");
 
-        RLMAssertThrowsWithReason([array addObject:@0], @"thread");
-        RLMAssertThrowsWithReason([array addObjects:@[@0]], @"thread");
-        RLMAssertThrowsWithReason([array insertObject:@0 atIndex:0], @"thread");
-        RLMAssertThrowsWithReason([array removeObjectAtIndex:0], @"thread");
-        RLMAssertThrowsWithReason([array removeLastObject], @"thread");
-        RLMAssertThrowsWithReason([array removeAllObjects], @"thread");
-        RLMAssertThrowsWithReason([array replaceObjectAtIndex:0 withObject:@0], @"thread");
-        RLMAssertThrowsWithReason([array moveObjectAtIndex:0 toIndex:1], @"thread");
-        RLMAssertThrowsWithReason([array exchangeObjectAtIndex:0 withObjectAtIndex:1], @"thread");
+        RLMAssertThrowsWithReason([set addObject:@0], @"thread");
+        RLMAssertThrowsWithReason([set addObjects:@[@0]], @"thread");
+        RLMAssertThrowsWithReason([set removeLastObject], @"thread");
+        RLMAssertThrowsWithReason([set removeAllObjects], @"thread");
 
-        RLMAssertThrowsWithReason([array indexOfObject:@1], @"thread");
-        /* RLMAssertThrowsWithReason([array indexOfObjectWhere:@"TRUEPREDICATE"], @"thread"); */
-        /* RLMAssertThrowsWithReason([array indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]], @"thread"); */
-        /* RLMAssertThrowsWithReason([array objectsWhere:@"TRUEPREDICATE"], @"thread"); */
-        /* RLMAssertThrowsWithReason([array objectsWithPredicate:[NSPredicate predicateWithValue:NO]], @"thread"); */
-        RLMAssertThrowsWithReason([array sortedResultsUsingKeyPath:@"self" ascending:YES], @"thread");
-        RLMAssertThrowsWithReason([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]], @"thread");
-        RLMAssertThrowsWithReason(array[0], @"thread");
-        RLMAssertThrowsWithReason(array[0] = @0, @"thread");
-        RLMAssertThrowsWithReason([array valueForKey:@"self"], @"thread");
-        RLMAssertThrowsWithReason([array setValue:@1 forKey:@"self"], @"thread");
-        RLMAssertThrowsWithReason({for (__unused id obj in array);}, @"thread");
+        RLMAssertThrowsWithReason([set indexOfObject:@1], @"thread");
+        /* RLMAssertThrowsWithReason([set indexOfObjectWhere:@"TRUEPREDICATE"], @"thread"); */
+        /* RLMAssertThrowsWithReason([set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]], @"thread"); */
+        /* RLMAssertThrowsWithReason([set objectsWhere:@"TRUEPREDICATE"], @"thread"); */
+        /* RLMAssertThrowsWithReason([set objectsWithPredicate:[NSPredicate predicateWithValue:NO]], @"thread"); */
+        RLMAssertThrowsWithReason([set sortedResultsUsingKeyPath:@"self" ascending:YES], @"thread");
+        RLMAssertThrowsWithReason([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]], @"thread");
+        RLMAssertThrowsWithReason(set[0], @"thread");
+        RLMAssertThrowsWithReason(set[0] = @0, @"thread");
+        RLMAssertThrowsWithReason([set valueForKey:@"self"], @"thread");
+        RLMAssertThrowsWithReason([set setValue:@1 forKey:@"self"], @"thread");
+        RLMAssertThrowsWithReason({for (__unused id obj in set);}, @"thread");
     }];
 }
 
 - (void)testAllMethodsCheckForInvalidation {
-    RLMArray *array = managed.intObj;
+    RLMSet *set = managed.intObj;
     [realm cancelWriteTransaction];
     [realm invalidate];
 
-    XCTAssertNoThrow([array objectClassName]);
-    XCTAssertNoThrow([array realm]);
-    XCTAssertNoThrow([array isInvalidated]);
+    XCTAssertNoThrow([set objectClassName]);
+    XCTAssertNoThrow([set realm]);
+    XCTAssertNoThrow([set isInvalidated]);
 
-    RLMAssertThrowsWithReason([array count], @"invalidated");
-    RLMAssertThrowsWithReason([array objectAtIndex:0], @"invalidated");
-    RLMAssertThrowsWithReason([array firstObject], @"invalidated");
-    RLMAssertThrowsWithReason([array lastObject], @"invalidated");
+    RLMAssertThrowsWithReason([set count], @"invalidated");
+    RLMAssertThrowsWithReason([set objectAtIndex:0], @"invalidated");
+    RLMAssertThrowsWithReason([set firstObject], @"invalidated");
+    RLMAssertThrowsWithReason([set lastObject], @"invalidated");
 
-    RLMAssertThrowsWithReason([array addObject:@0], @"invalidated");
-    RLMAssertThrowsWithReason([array addObjects:@[@0]], @"invalidated");
-    RLMAssertThrowsWithReason([array insertObject:@0 atIndex:0], @"invalidated");
-    RLMAssertThrowsWithReason([array removeObjectAtIndex:0], @"invalidated");
-    RLMAssertThrowsWithReason([array removeLastObject], @"invalidated");
-    RLMAssertThrowsWithReason([array removeAllObjects], @"invalidated");
-    RLMAssertThrowsWithReason([array replaceObjectAtIndex:0 withObject:@0], @"invalidated");
-    RLMAssertThrowsWithReason([array moveObjectAtIndex:0 toIndex:1], @"invalidated");
-    RLMAssertThrowsWithReason([array exchangeObjectAtIndex:0 withObjectAtIndex:1], @"invalidated");
+    RLMAssertThrowsWithReason([set addObject:@0], @"invalidated");
+    RLMAssertThrowsWithReason([set addObjects:@[@0]], @"invalidated");
+    RLMAssertThrowsWithReason([set removeLastObject], @"invalidated");
+    RLMAssertThrowsWithReason([set removeAllObjects], @"invalidated");
 
-    RLMAssertThrowsWithReason([array indexOfObject:@1], @"invalidated");
-    /* RLMAssertThrowsWithReason([array indexOfObjectWhere:@"TRUEPREDICATE"], @"invalidated"); */
-    /* RLMAssertThrowsWithReason([array indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"invalidated"); */
-    /* RLMAssertThrowsWithReason([array objectsWhere:@"TRUEPREDICATE"], @"invalidated"); */
-    /* RLMAssertThrowsWithReason([array objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"invalidated"); */
-    RLMAssertThrowsWithReason([array sortedResultsUsingKeyPath:@"self" ascending:YES], @"invalidated");
-    RLMAssertThrowsWithReason([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]], @"invalidated");
-    RLMAssertThrowsWithReason(array[0], @"invalidated");
-    RLMAssertThrowsWithReason(array[0] = @0, @"invalidated");
-    RLMAssertThrowsWithReason([array valueForKey:@"self"], @"invalidated");
-    RLMAssertThrowsWithReason([array setValue:@1 forKey:@"self"], @"invalidated");
-    RLMAssertThrowsWithReason({for (__unused id obj in array);}, @"invalidated");
+    RLMAssertThrowsWithReason([set indexOfObject:@1], @"invalidated");
+    /* RLMAssertThrowsWithReason([set indexOfObjectWhere:@"TRUEPREDICATE"], @"invalidated"); */
+    /* RLMAssertThrowsWithReason([set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"invalidated"); */
+    /* RLMAssertThrowsWithReason([set objectsWhere:@"TRUEPREDICATE"], @"invalidated"); */
+    /* RLMAssertThrowsWithReason([set objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"invalidated"); */
+    RLMAssertThrowsWithReason([set sortedResultsUsingKeyPath:@"self" ascending:YES], @"invalidated");
+    RLMAssertThrowsWithReason([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]], @"invalidated");
+    RLMAssertThrowsWithReason(set[0], @"invalidated");
+    RLMAssertThrowsWithReason(set[0] = @0, @"invalidated");
+    RLMAssertThrowsWithReason([set valueForKey:@"self"], @"invalidated");
+    RLMAssertThrowsWithReason([set setValue:@1 forKey:@"self"], @"invalidated");
+    RLMAssertThrowsWithReason({for (__unused id obj in set);}, @"invalidated");
 
     [realm beginWriteTransaction];
 }
 
 - (void)testMutatingMethodsCheckForWriteTransaction {
-    RLMArray *array = managed.intObj;
-    [array addObject:@0];
+    RLMSet *set = managed.intObj;
+    [set addObject:@0];
     [realm commitWriteTransaction];
 
-    XCTAssertNoThrow([array objectClassName]);
-    XCTAssertNoThrow([array realm]);
-    XCTAssertNoThrow([array isInvalidated]);
+    XCTAssertNoThrow([set objectClassName]);
+    XCTAssertNoThrow([set realm]);
+    XCTAssertNoThrow([set isInvalidated]);
 
-    XCTAssertNoThrow([array count]);
-    XCTAssertNoThrow([array objectAtIndex:0]);
-    XCTAssertNoThrow([array firstObject]);
-    XCTAssertNoThrow([array lastObject]);
+    XCTAssertNoThrow([set count]);
+    XCTAssertNoThrow([set objectAtIndex:0]);
+    XCTAssertNoThrow([set firstObject]);
+    XCTAssertNoThrow([set lastObject]);
 
-    XCTAssertNoThrow([array indexOfObject:@1]);
-    /* XCTAssertNoThrow([array indexOfObjectWhere:@"TRUEPREDICATE"]); */
-    /* XCTAssertNoThrow([array indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]); */
-    /* XCTAssertNoThrow([array objectsWhere:@"TRUEPREDICATE"]); */
-    /* XCTAssertNoThrow([array objectsWithPredicate:[NSPredicate predicateWithValue:YES]]); */
-    XCTAssertNoThrow([array sortedResultsUsingKeyPath:@"self" ascending:YES]);
-    XCTAssertNoThrow([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]]);
-    XCTAssertNoThrow(array[0]);
-    XCTAssertNoThrow([array valueForKey:@"self"]);
-    XCTAssertNoThrow({for (__unused id obj in array);});
+    XCTAssertNoThrow([set indexOfObject:@1]);
+    /* XCTAssertNoThrow([set indexOfObjectWhere:@"TRUEPREDICATE"]); */
+    /* XCTAssertNoThrow([set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]); */
+    /* XCTAssertNoThrow([set objectsWhere:@"TRUEPREDICATE"]); */
+    /* XCTAssertNoThrow([set objectsWithPredicate:[NSPredicate predicateWithValue:YES]]); */
+    XCTAssertNoThrow([set sortedResultsUsingKeyPath:@"self" ascending:YES]);
+    XCTAssertNoThrow([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]]);
+    XCTAssertNoThrow(set[0]);
+    XCTAssertNoThrow([set valueForKey:@"self"]);
+    XCTAssertNoThrow({for (__unused id obj in set);});
 
 
-    RLMAssertThrowsWithReason([array addObject:@0], @"write transaction");
-    RLMAssertThrowsWithReason([array addObjects:@[@0]], @"write transaction");
-    RLMAssertThrowsWithReason([array insertObject:@0 atIndex:0], @"write transaction");
-    RLMAssertThrowsWithReason([array removeObjectAtIndex:0], @"write transaction");
-    RLMAssertThrowsWithReason([array removeLastObject], @"write transaction");
-    RLMAssertThrowsWithReason([array removeAllObjects], @"write transaction");
-    RLMAssertThrowsWithReason([array replaceObjectAtIndex:0 withObject:@0], @"write transaction");
-    RLMAssertThrowsWithReason([array moveObjectAtIndex:0 toIndex:1], @"write transaction");
-    RLMAssertThrowsWithReason([array exchangeObjectAtIndex:0 withObjectAtIndex:1], @"write transaction");
+    RLMAssertThrowsWithReason([set addObject:@0], @"write transaction");
+    RLMAssertThrowsWithReason([set addObjects:@[@0]], @"write transaction");
+    RLMAssertThrowsWithReason([set removeLastObject], @"write transaction");
+    RLMAssertThrowsWithReason([set removeAllObjects], @"write transaction");
 
-    RLMAssertThrowsWithReason(array[0] = @0, @"write transaction");
-    RLMAssertThrowsWithReason([array setValue:@1 forKey:@"self"], @"write transaction");
+    RLMAssertThrowsWithReason(set[0] = @0, @"write transaction");
+    RLMAssertThrowsWithReason([set setValue:@1 forKey:@"self"], @"write transaction");
 }
 
 - (void)testDeleteOwningObject {
-    RLMArray *array = managed.intObj;
-    XCTAssertFalse(array.isInvalidated);
+    RLMSet *set = managed.intObj;
+    XCTAssertFalse(set.isInvalidated);
     [realm deleteObject:managed];
-    XCTAssertTrue(array.isInvalidated);
+    XCTAssertTrue(set.isInvalidated);
 }
 
 #pragma clang diagnostic ignored "-Warc-retain-cycles"
@@ -772,8 +631,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     [realm commitWriteTransaction];
 
     id expectation = [self expectationWithDescription:@""];
-    id token = [managed.intObj addNotificationBlock:^(RLMArray *array, RLMCollectionChange *change, NSError *error) {
-        XCTAssertNotNil(array);
+    id token = [managed.intObj addNotificationBlock:^(RLMSet *set, RLMCollectionChange *change, NSError *error) {
+        XCTAssertNotNil(set);
         XCTAssertNil(change);
         XCTAssertNil(error);
         [expectation fulfill];
@@ -788,8 +647,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 
     __block bool first = true;
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [managed.intObj addNotificationBlock:^(RLMArray *array, RLMCollectionChange *change, NSError *error) {
-        XCTAssertNotNil(array);
+    id token = [managed.intObj addNotificationBlock:^(RLMSet *set, RLMCollectionChange *change, NSError *error) {
+        XCTAssertNotNil(set);
         XCTAssertNil(error);
         if (first) {
             XCTAssertNil(change);
@@ -807,8 +666,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     [self dispatchAsyncAndWait:^{
         RLMRealm *r = [RLMRealm defaultRealm];
         [r transactionWithBlock:^{
-            RLMArray *array = [(AllPrimitiveArrays *)[AllPrimitiveArrays allObjectsInRealm:r].firstObject intObj];
-            [array addObject:@0];
+            RLMSet *set = [(AllPrimitiveSets *)[AllPrimitiveSets allObjectsInRealm:r].firstObject intObj];
+            [set addObject:@0];
         }];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
@@ -820,7 +679,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     [realm commitWriteTransaction];
 
     id expectation = [self expectationWithDescription:@""];
-    id token = [managed.intObj addNotificationBlock:^(__unused RLMArray *array, __unused RLMCollectionChange *change, __unused NSError *error) {
+    id token = [managed.intObj addNotificationBlock:^(__unused RLMSet *set, __unused RLMCollectionChange *change, __unused NSError *error) {
         // will throw if it's incorrectly called a second time due to the
         // unrelated write transaction
         [expectation fulfill];
@@ -833,7 +692,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         [self dispatchAsyncAndWait:^{
             RLMRealm *r = [RLMRealm defaultRealm];
             [r transactionWithBlock:^{
-                [AllPrimitiveArrays createInRealm:r withValue:@[]];
+                [AllPrimitiveSets createInRealm:r withValue:@[]];
             }];
         }];
     }];
@@ -844,8 +703,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     [realm commitWriteTransaction];
 
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [managed.intObj addNotificationBlock:^(RLMArray *array, __unused RLMCollectionChange *change, NSError *error) {
-        XCTAssertNotNil(array);
+    id token = [managed.intObj addNotificationBlock:^(RLMSet *set, __unused RLMCollectionChange *change, NSError *error) {
+        XCTAssertNotNil(set);
         XCTAssertNil(error);
         // will throw if it's called a second time before we create the new
         // expectation object immediately before manually refreshing
@@ -862,8 +721,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         [self dispatchAsyncAndWait:^{
             RLMRealm *r = [RLMRealm defaultRealm];
             [r transactionWithBlock:^{
-                RLMArray *array = [(AllPrimitiveArrays *)[AllPrimitiveArrays allObjectsInRealm:r].firstObject intObj];
-                [array addObject:@0];
+                RLMSet *set = [(AllPrimitiveSets *)[AllPrimitiveSets allObjectsInRealm:r].firstObject intObj];
+                [set addObject:@0];
             }];
         }];
     }];
@@ -881,8 +740,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 
     __block bool first = true;
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [managed.intObj addNotificationBlock:^(RLMArray *array, RLMCollectionChange *change, NSError *error) {
-        XCTAssertNotNil(array);
+    id token = [managed.intObj addNotificationBlock:^(RLMSet *set, RLMCollectionChange *change, NSError *error) {
+        XCTAssertNotNil(set);
         XCTAssertNil(error);
         if (first) {
             XCTAssertNil(change);

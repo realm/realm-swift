@@ -142,6 +142,7 @@ let package = Package(
                 "Swift",
                 "TestHost",
                 "PrimitiveArrayPropertyTests.tpl.m",
+                "PrimitiveSetPropertyTests.tpl.m",
             ],
             cxxSettings: cxxSettings + [
                 .headerSearchPath("Realm"),

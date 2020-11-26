@@ -197,6 +197,18 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLMArray<RLMObjectId> *objectIdObj;
 @end
 
+@interface AllOptionalPrimitiveArrays : RLMObject
+@property RLMArray<RLMInt> *intObj;
+@property RLMArray<RLMFloat> *floatObj;
+@property RLMArray<RLMDouble> *doubleObj;
+@property RLMArray<RLMBool> *boolObj;
+@property RLMArray<RLMString> *stringObj;
+@property RLMArray<RLMDate> *dateObj;
+@property RLMArray<RLMData> *dataObj;
+@property RLMArray<RLMDecimal128> *decimalObj;
+@property RLMArray<RLMObjectId> *objectIdObj;
+@end
+
 @interface AllPrimitiveSets : RLMObject
 @property RLMSet<RLMInt> *intObj;
 @property RLMSet<RLMFloat> *floatObj;
@@ -209,16 +221,16 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLMSet<RLMObjectId> *objectIdObj;
 @end
 
-@interface AllOptionalPrimitiveArrays : RLMObject
-@property RLMArray<RLMInt> *intObj;
-@property RLMArray<RLMFloat> *floatObj;
-@property RLMArray<RLMDouble> *doubleObj;
-@property RLMArray<RLMBool> *boolObj;
-@property RLMArray<RLMString> *stringObj;
-@property RLMArray<RLMDate> *dateObj;
-@property RLMArray<RLMData> *dataObj;
-@property RLMArray<RLMDecimal128> *decimalObj;
-@property RLMArray<RLMObjectId> *objectIdObj;
+@interface AllOptionalPrimitiveSets : RLMObject
+@property RLMSet<RLMInt> *intObj;
+@property RLMSet<RLMFloat> *floatObj;
+@property RLMSet<RLMDouble> *doubleObj;
+@property RLMSet<RLMBool> *boolObj;
+@property RLMSet<RLMString> *stringObj;
+@property RLMSet<RLMDate> *dateObj;
+@property RLMSet<RLMData> *dataObj;
+@property RLMSet<RLMDecimal128> *decimalObj;
+@property RLMSet<RLMObjectId> *objectIdObj;
 @end
 
 #pragma mark - Real Life Objects
