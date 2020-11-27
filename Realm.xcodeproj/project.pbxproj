@@ -478,6 +478,8 @@
 		C281E9301E8BC7AC0015BA4A /* network_reachability_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C281E9241E8A9C930015BA4A /* network_reachability_observer.cpp */; };
 		C2CAAE771E9BB5760025454C /* system_configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2CAAE751E9BB5760025454C /* system_configuration.cpp */; };
 		C2CAAE781E9BB5760025454C /* system_configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2CAAE751E9BB5760025454C /* system_configuration.cpp */; };
+		CF1112FC257133E6003A7FDC /* placeholder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF1112FB257133C9003A7FDC /* placeholder.cpp */; };
+		CF111308257133EB003A7FDC /* placeholder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF1112FB257133C9003A7FDC /* placeholder.cpp */; };
 		CF330BBE24E57D5F00F07EE2 /* RLMWatchTestUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = CF330BBD24E57D5F00F07EE2 /* RLMWatchTestUtility.m */; };
 		CF6E0482242A141200DB7F14 /* RLMEmailPasswordAuth.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0480242A141200DB7F14 /* RLMEmailPasswordAuth.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF6E0483242A141200DB7F14 /* RLMEmailPasswordAuth.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0481242A141200DB7F14 /* RLMEmailPasswordAuth.mm */; };
@@ -1052,6 +1054,7 @@
 		C2CAAE721E9642FF0025454C /* network_reachability.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = network_reachability.hpp; path = sync/impl/network_reachability.hpp; sourceTree = "<group>"; };
 		C2CAAE751E9BB5760025454C /* system_configuration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = system_configuration.cpp; sourceTree = "<group>"; };
 		C2CAAE761E9BB5760025454C /* system_configuration.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = system_configuration.hpp; sourceTree = "<group>"; };
+		CF1112FB257133C9003A7FDC /* placeholder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = placeholder.cpp; path = Realm/ObjectStore/src/placeholder.cpp; sourceTree = SOURCE_ROOT; };
 		CF330BBB24E56E3A00F07EE2 /* RLMNetworkTransport_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMNetworkTransport_Private.hpp; sourceTree = "<group>"; };
 		CF330BBC24E57D5F00F07EE2 /* RLMWatchTestUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMWatchTestUtility.h; path = Realm/ObjectServerTests/RLMWatchTestUtility.h; sourceTree = "<group>"; };
 		CF330BBD24E57D5F00F07EE2 /* RLMWatchTestUtility.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RLMWatchTestUtility.m; path = Realm/ObjectServerTests/RLMWatchTestUtility.m; sourceTree = "<group>"; };
@@ -1620,6 +1623,7 @@
 		5DB591A51D063DE5001D8F93 /* util */ = {
 			isa = PBXGroup;
 			children = (
+				CF1112FB257133C9003A7FDC /* placeholder.cpp */,
 				5D274C511D6D16BA006FEBB1 /* apple */,
 				49AD39EC244E1A370097500E /* bson */,
 				3F92F62A222F311C008B2333 /* aligned_union.hpp */,
@@ -2700,6 +2704,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF111308257133EB003A7FDC /* placeholder.cpp in Sources */,
 				499321FE24129CFD00A0EC8E /* app.cpp in Sources */,
 				499321FC24129CFD00A0EC8E /* app_credentials.cpp in Sources */,
 				53C4E952253A34DE0004835F /* app_utils.cpp in Sources */,
@@ -2876,6 +2881,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF1112FC257133E6003A7FDC /* placeholder.cpp in Sources */,
 				499321FF24129CFE00A0EC8E /* app.cpp in Sources */,
 				499321FD24129CFD00A0EC8E /* app_credentials.cpp in Sources */,
 				53C4E96A253A3B460004835F /* app_utils.cpp in Sources */,
