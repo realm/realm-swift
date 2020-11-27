@@ -448,6 +448,7 @@
 				CODE_SIGN_ENTITLEMENTS = CocoaPodsExample/CocoaPodsExample.entitlements;
 				INFOPLIST_FILE = CocoaPodsExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
@@ -463,6 +464,7 @@
 				CODE_SIGN_ENTITLEMENTS = CocoaPodsExample/CocoaPodsExample.entitlements;
 				INFOPLIST_FILE = CocoaPodsExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
