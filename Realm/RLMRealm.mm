@@ -143,10 +143,6 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     bool _sendingNotifications;
 }
 
-+ (BOOL)isCoreDebug {
-    return realm::Version::has_feature(realm::feature_Debug);
-}
-
 + (void)initialize {
     static bool initialized;
     if (initialized) {

@@ -9,6 +9,11 @@ x.y.z Release notes (yyyy-MM-dd)
   not cause functional problems, but made file names more confusing than they
   needed to be. Existing Realm files will continue to be located at the old
   path, while newly created files will be created at a shorter path. (Since v10.0.0).
+* Fix a race condition which could potentially allow queries on frozen Realms
+  to access an uninitialized structure for search indexes (since v5.0.0).
+* Fix several data races in App and SyncSession initialization. These could
+  possibly have caused strange errors the first time a synchronized Realm was
+  opened (since v10.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -19,8 +24,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* Upgraded realm-core from v10.0.1 to v10.2.0
 
 10.1.4 Release notes (2020-11-16)
 =============================================================
