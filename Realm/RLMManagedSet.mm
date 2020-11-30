@@ -240,9 +240,7 @@ static void changeSet(__unsafe_unretained RLMManagedSet *const set, NSKeyValueCh
 }
 
 - (NSUInteger)hash {
-    //TODO: Hash
-//    return std::hash<realm::object_store::Set>()(_backingSet);
-    return 0;
+    return std::hash<realm::object_store::Set>()(_backingSet);
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
@@ -292,12 +290,6 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     RLMRemoveObject(self, object);
 }
 
-- (void)removeObjectAtIndex:(NSUInteger)index {
-    changeSet(self, NSKeyValueChangeRemoval, index, ^{
-        _backingSet.remove(_backingSet.get(index));
-    });
-}
-
 - (void)addObjectsFromSet:(NSSet *)set {
     changeSet(self, NSKeyValueChangeInsertion, NSMakeRange(self.count, set.count), ^{
         RLMAccessorContext context(*_objectInfo);
@@ -311,15 +303,6 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 - (void)removeAllObjects {
     changeSet(self, NSKeyValueChangeRemoval, NSMakeRange(0, self.count), ^{
         _backingSet.remove_all();
-    });
-}
-
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)object {
-    RLMSetValidateMatchingObjectType(self, object);
-    changeSet(self, NSKeyValueChangeReplacement, index, ^{
-        RLMAccessorContext context(*_objectInfo);
-        //FIXME: needs impl
-        //_backingSet.set(context, index, object);
     });
 }
 
@@ -362,17 +345,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {
-    if ([key isEqualToString:@"self"]) {
-        RLMSetValidateMatchingObjectType(self, value);
-        RLMAccessorContext context(*_objectInfo);
-        translateErrors([&] {
-            for (size_t i = 0, count = _backingSet.size(); i < count; ++i) {
-//                _backingSet.set(context, i, value);
-            }
-        });
-        return;
-    }
-    else if (_type == RLMPropertyTypeObject) {
+    if (_type == RLMPropertyTypeObject) {
         RLMSetValidateMatchingObjectType(self, value);
         translateErrors([&] { _backingSet.verify_in_transaction(); });
         RLMCollectionSetValueForKey(self, key, value);

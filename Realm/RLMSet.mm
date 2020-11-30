@@ -92,7 +92,7 @@
 }
 
 - (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index {
-    [self replaceObjectAtIndex:index withObject:newValue];
+    REALM_TERMINATE("Replacing objects at an indexed subscript is not supported on RLMSet");
 }
 
 - (void)intersectSet:(RLMSet<id> *)set {
@@ -301,14 +301,6 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
     });
 }
 
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
-    RLMSetValidateMatchingObjectType(self, anObject);
-    validateSetBounds(self, index);
-    changeSet(self, NSKeyValueChangeReplacement, index, ^{
-        [_backingSet replaceObjectAtIndex:index withObject:anObject];
-    });
-}
-
 - (void)moveObjectAtIndex:(NSUInteger)sourceIndex toIndex:(NSUInteger)destinationIndex {
     validateSetBounds(self, sourceIndex);
     validateSetBounds(self, destinationIndex);
@@ -362,8 +354,12 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
 
 - (void)removeObject:(id)object {
     RLMSetValidateMatchingObjectType(self, object);
-    auto r = [_backingSet indexOfObject:object];
     changeSet(self, NSKeyValueChangeRemoval, NSMakeRange(0, _backingSet.count), ^{
+        // passing in a matching object and calling `[_backingSet removeObject:object]`
+        // does not guarantee the object will be deleted. For example if we try to delete
+        // an object that is IN the set but was derived from a Results collection the `removeObject:`
+        // will fail. To get around this, find the index of the object you are trying to delete
+        // and remove it by index.
         [_backingSet removeObjectAtIndex:[self indexOfObject:object]];
     });
 }
@@ -444,7 +440,12 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
         }
     }
 
-    NSArray *values = [key isEqualToString:@"self"] ? _backingSet : [_backingSet valueForKey:key];
+    // `valueForKeyPath` on NSSet will only return distinct values, which is an
+    // issue as the realm::object_store::Set aggregate methods will calculate
+    // the result based on each element of a property regardless of uniqueness.
+    // To get around this we will need to use the `array` property of the NSMutableOrderedSet
+
+    NSArray *values = [key isEqualToString:@"self"] ? _backingSet : [_backingSet.array valueForKey:key];
     if (_optional) {
         // Filter out NSNull values to match our behavior on managed arrays
         NSIndexSet *nonnull = [values indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger, BOOL *) {
@@ -454,6 +455,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
             values = [values objectsAtIndexes:nonnull];
         }
     }
+
     id result = [values valueForKeyPath:[op stringByAppendingString:@".self"]];
     return sum && !result ? @0 : result;
 }

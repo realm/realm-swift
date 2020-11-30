@@ -119,14 +119,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)addObjects:(id<NSFastEnumeration>)objects;
 
-//TODO: Remove
-//- (void)insertObject:(RLMObjectType)anObject atIndex:(NSUInteger)index;
+/**
+ Removes a given object from the set.
 
-//- (void)removeObjectAtIndex:(NSUInteger)index;
+ @warning This method may only be called during a write transaction.
 
-- (void)removeLastObject;
-
-//TODO: Should be
+ @param object The object in the set that you want to remove.
+ */
 - (void)removeObject:(RLMObjectType)object;
 
 /**
@@ -334,11 +333,11 @@ __attribute__((warn_unused_result));
 - (nullable id)maxOfProperty:(NSString *)property;
 
 /**
- Returns the sum of the values of a given property over all the objects in the array.
+ Returns the sum of distinct values of a given property over all the objects in the set.
 
-     NSNumber *sum = [object.arrayProperty sumOfProperty:@"age"];
+     NSNumber *sum = [object.setProperty sumOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
+ @warning You cannot use this method on `RLMObject`, `RLMArray`,  `RLMSet and `NSData` properties.
 
  @param property The property whose values should be summed. Only properties of
                  types `int`, `float`, and `double` are supported.
