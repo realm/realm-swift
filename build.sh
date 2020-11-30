@@ -20,10 +20,6 @@ readonly source_root="$(dirname "$0")"
 
 : "${REALM_CORE_VERSION:=$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")}" # set to "current" to always use the current build
 
-: "${REALM_SYNC_VERSION:=$(sed -n 's/^REALM_SYNC_VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")}"
-
-: "${REALM_OBJECT_SERVER_VERSION:=$(sed -n 's/^MONGODB_STITCH_ADMIN_SDK_VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")}"
-
 # You can override the xcmode used
 : "${XCMODE:=xcodebuild}" # must be one of: xcodebuild (default), xcpretty, xctool
 
@@ -308,7 +304,7 @@ download_common() {
     suffix='-xcframework'
 
     version=$REALM_CORE_VERSION
-    url="${REALM_BASE_URL}/core/realm-monorepo-xcframework-${version}.tar.xz"
+    url="${REALM_BASE_URL}/core/realm-monorepo-xcframework-v${version}.tar.xz"
 
     # First check if we need to do anything
     if [ -e core/version.txt ]; then
@@ -327,7 +323,7 @@ download_common() {
 
     # We may already have this version downloaded and just need to set it as
     # the active one
-    local versioned_dir="${core}-${version}${suffix}"
+    local versioned_dir="realm-core-${version}${suffix}"
     if [ -e "$versioned_dir/version.txt" ]; then
         echo "Setting ${version} as the active version"
         copy_core "$versioned_dir"
@@ -1363,7 +1359,6 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
 
 EOS)
         changelog=$(cat CHANGELOG.md)

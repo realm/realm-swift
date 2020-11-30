@@ -34,10 +34,6 @@
 #import <realm/util/file.hpp>
 #import <realm/db_options.hpp>
 
-@interface RLMRealm ()
-+ (BOOL)isCoreDebug;
-@end
-
 @interface RLMObjectSchema (Private)
 + (instancetype)schemaForObjectClass:(Class)objectClass;
 
@@ -1908,16 +1904,6 @@
 }
 
 #pragma mark - Assorted tests
-
-#ifndef REALM_SPM
-- (void)testCoreDebug {
-#if DEBUG
-    XCTAssertTrue([RLMRealm isCoreDebug], @"Debug version of Realm should use librealm{-ios}-dbg");
-#else
-    XCTAssertFalse([RLMRealm isCoreDebug], @"Release version of Realm should use librealm{-ios}");
-#endif
-}
-#endif
 
 - (void)testIsEmpty {
     RLMRealm *realm = [RLMRealm defaultRealm];
