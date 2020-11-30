@@ -21,10 +21,10 @@
 @implementation DogSetObject
 @end
 
-@interface SetTests : RLMTestCase
+@interface SetPropertyTests : RLMTestCase
 @end
 
-@implementation SetTests
+@implementation SetPropertyTests
 
 #pragma mark Unmanaged tests
 
@@ -39,7 +39,7 @@
 
     [setObj.stringSet addObject:str1];
     XCTAssertEqual(setObj.stringSet.count, 1U);
-    XCTAssertEqualObjects([setObj.stringSet firstObject].stringCol, @"string1");
+    XCTAssertEqualObjects(setObj.stringSet[0].stringCol, @"string1");
     // should not accept duplicates
     [setObj.stringSet addObjects:@[str1, str2, str3]];
     XCTAssertEqual(setObj.stringSet.count, 3U);

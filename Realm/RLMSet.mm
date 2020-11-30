@@ -445,7 +445,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     // the result based on each element of a property regardless of uniqueness.
     // To get around this we will need to use the `array` property of the NSMutableOrderedSet
 
-    NSArray *values = [key isEqualToString:@"self"] ? _backingSet : [_backingSet.array valueForKey:key];
+    NSArray *values = [key isEqualToString:@"self"] ? _backingSet.array : [_backingSet.array valueForKey:key];
     if (_optional) {
         // Filter out NSNull values to match our behavior on managed arrays
         NSIndexSet *nonnull = [values indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger, BOOL *) {
@@ -492,9 +492,8 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
 - (void)setValue:(id)value forKey:(NSString *)key {
     if ([key isEqualToString:@"self"]) {
         RLMSetValidateMatchingObjectType(self, value);
-        for (NSUInteger i = 0, count = _backingSet.count; i < count; ++i) {
-            _backingSet[i] = value;
-        }
+        [_backingSet removeAllObjects];
+        [_backingSet addObject:value];
         return;
     }
     else if (_type == RLMPropertyTypeObject) {

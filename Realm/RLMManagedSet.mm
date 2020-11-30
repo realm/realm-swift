@@ -345,7 +345,15 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {
-    if (_type == RLMPropertyTypeObject) {
+    if ([key isEqualToString:@"self"]) {
+        RLMSetValidateMatchingObjectType(self, value);
+        RLMAccessorContext context(*_objectInfo);
+        translateErrors([&] {
+            _backingSet.remove_all();
+            _backingSet.insert(context, value);
+            return;
+        });
+    } else if (_type == RLMPropertyTypeObject) {
         RLMSetValidateMatchingObjectType(self, value);
         translateErrors([&] { _backingSet.verify_in_transaction(); });
         RLMCollectionSetValueForKey(self, key, value);
