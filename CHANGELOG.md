@@ -6,6 +6,20 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * None.
+* The user identifier was added to the file path for synchronized Realms twice
+  and an extra level of escaping was performed on the partition value. This did
+  not cause functional problems, but made file names more confusing than they
+  needed to be. Existing Realm files will continue to be located at the old
+  path, while newly created files will be created at a shorter path. (Since v10.0.0).
+* Fix a race condition which could potentially allow queries on frozen Realms
+  to access an uninitialized structure for search indexes (since v5.0.0).
+* Fix several data races in App and SyncSession initialization. These could
+  possibly have caused strange errors the first time a synchronized Realm was
+  opened (since v10.0.0).
+* Fix a use of a dangling reference when refreshing a user’s custom data that
+  could lead to a crash (since v10.0.0).
+* Fix a bug in sync conflict resolution when merging operations on arrays which
+  could result in two clients diverging (since v10.0.0, [Core #4004](https://github.com/realm/realm-core/pull/4004)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -16,8 +30,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* Upgraded realm-core from v10.0.1 to v10.3.0
 
 10.2.0 Release notes (2020-12-02)
 =============================================================
