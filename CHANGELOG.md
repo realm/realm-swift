@@ -1,3 +1,31 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* MongoDB Realm is now supported when installing Realm via Swift Package Manager.
+
+### Fixed
+* The user identifier was added to the file path for synchronized Realms twice
+  and an extra level of escaping was performed on the partition value. This did
+  not cause functional problems, but made file names more confusing than they
+  needed to be. Existing Realm files will continue to be located at the old
+  path, while newly created files will be created at a shorter path. (Since v10.0.0).
+* Fix a race condition which could potentially allow queries on frozen Realms
+  to access an uninitialized structure for search indexes (since v5.0.0).
+* Fix several data races in App and SyncSession initialization. These could
+  possibly have caused strange errors the first time a synchronized Realm was
+  opened (since v10.0.0).
+* Fix a use of a dangling reference when refreshing a user’s custom data that
+  could lead to a crash (since v10.0.0).
+
+### Compatibility
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.2.
+* CocoaPods: 1.10 or later.
+
+### Internal
+* Upgraded realm-core from v10.1.3 to v10.3.1
+
 10.4.0 Release notes (2020-12-10)
 =============================================================
 
