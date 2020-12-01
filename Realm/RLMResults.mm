@@ -28,6 +28,7 @@
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
+#import "RLMRealmConfiguration_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
@@ -515,10 +516,10 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         return self;
     }
 
-    RLMRealmConfiguration *config = _realm.configuration;
-    RLMRealm *liveRealm = [RLMRealm realmWithConfiguration:config error:nil];
-    RLMThreadSafeReference *ref = [RLMThreadSafeReference referenceWithThreadConfined:self];
-    return [liveRealm resolveThreadSafeReference:ref];
+    auto tsr = realm::ThreadSafeReference(_results);
+    auto& config = [_realm.configuration config];
+    SharedRealm realm = Realm::get_shared_realm(config);
+    return [[RLMResults alloc] initWithResults: tsr.resolve<realm::Results>(realm)];
 }
 
 // The compiler complains about the method's argument type not matching due to
