@@ -96,11 +96,27 @@ using namespace realm;
     _user = nullptr;
 }
 
-- (NSString *)pathForPartitionValue:(id<RLMBSON>)partitionValue {
-    std::stringstream s;
-    s << RLMConvertRLMBSONToBson(partitionValue);
-    NSString *encodedPartitionValue = [@(s.str().c_str()) stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
-    return [[NSString alloc] initWithFormat:@"%@/%@", [self identifier], encodedPartitionValue];
+- (std::string)pathForPartitionValue:(std::string const&)partitionValue {
+    if (!_user) {
+        return "";
+    }
+
+    auto path = _user->sync_manager()->path_for_realm(*_user, partitionValue);
+    if ([NSFileManager.defaultManager fileExistsAtPath:@(path.c_str())]) {
+        return path;
+    }
+
+    // Previous versions converted the partition value to a path *twice*,
+    // so if the file resulting from that exists open it instead
+    NSString *encodedPartitionValue = [@(partitionValue.data())
+                                       stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
+    NSString *overEncodedRealmName = [[NSString alloc] initWithFormat:@"%@/%@", self.identifier, encodedPartitionValue];
+    auto legacyPath = _user->sync_manager()->path_for_realm(*_user, overEncodedRealmName.UTF8String);
+    if ([NSFileManager.defaultManager fileExistsAtPath:@(legacyPath.c_str())]) {
+        return legacyPath;
+    }
+
+    return path;
 }
 
 - (nullable RLMSyncSession *)sessionForPartitionValue:(id<RLMBSON>)partitionValue {
@@ -108,7 +124,9 @@ using namespace realm;
         return nil;
     }
 
-    auto path = _user->sync_manager()->path_for_realm(*_user, [[self pathForPartitionValue:partitionValue] UTF8String]);
+    std::stringstream s;
+    s << RLMConvertRLMBSONToBson(partitionValue);
+    auto path = [self pathForPartitionValue:s.str()];
     if (auto session = _user->session_for_on_disk_path(path)) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }

@@ -24,6 +24,7 @@
 #import "ObjectServerTests-Swift.h"
 
 #import "RLMApp_Private.hpp"
+#import "RLMBSON_Private.hpp"
 #import "RLMCredentials.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm+Sync.h"
@@ -2434,4 +2435,71 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     [self waitForExpectations:@[expectation] timeout:60.0];
 }
+
+#pragma mark - File paths
+
+static NSString *newPathForPartitionValue(RLMUser *user, id<RLMBSON> partitionValue) {
+    std::stringstream s;
+    s << RLMConvertRLMBSONToBson(partitionValue);
+    auto path = user._syncUser->sync_manager()->path_for_realm(*user._syncUser, s.str());
+    return @(path.c_str());
+}
+
+- (void)testSyncFilePaths {
+    RLMUser *user = self.anonymousUser;
+    auto configuration = [user configurationWithPartitionValue:@"abc"];
+    XCTAssertTrue([configuration.fileURL.path
+                   hasSuffix:([NSString stringWithFormat:@"mongodb-realm/%@/%@/%%22abc%%22.realm",
+                               self.appId, user.identifier])]);
+    configuration = [user configurationWithPartitionValue:@123];
+    XCTAssertTrue([configuration.fileURL.path
+                   hasSuffix:([NSString stringWithFormat:@"mongodb-realm/%@/%@/%@.realm",
+                               self.appId, user.identifier, @"%7B%22%24numberInt%22%3A%22123%22%7D"])]);
+    configuration = [user configurationWithPartitionValue:nil];
+    XCTAssertTrue([configuration.fileURL.path
+                   hasSuffix:([NSString stringWithFormat:@"mongodb-realm/%@/%@/null.realm",
+                               self.appId, user.identifier])]);
+
+    XCTAssertEqualObjects([user configurationWithPartitionValue:@"abc"].fileURL.path,
+                          newPathForPartitionValue(user, @"abc"));
+    XCTAssertEqualObjects([user configurationWithPartitionValue:@123].fileURL.path,
+                          newPathForPartitionValue(user, @123));
+    XCTAssertEqualObjects([user configurationWithPartitionValue:nil].fileURL.path,
+                          newPathForPartitionValue(user, nil));
+}
+
+static NSString *oldPathForPartitionValue(RLMUser *user, id<RLMBSON> partitionValue) {
+    std::stringstream s;
+    s << RLMConvertRLMBSONToBson(partitionValue);
+    NSString *encodedPartitionValue = [@(s.str().c_str()) stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
+    NSString *encodedRealmName = [[NSString alloc] initWithFormat:@"%@/%@", user.identifier, encodedPartitionValue];
+    auto path = user._syncUser->sync_manager()->path_for_realm(*user._syncUser, encodedRealmName.UTF8String);
+    return @(path.c_str());
+}
+
+- (void)testLegacyFilePathsAreUsedIfFilesArePresent {
+    RLMUser *user = self.anonymousUser;
+
+    auto testPartitionValue = [&](id<RLMBSON> partitionValue) {
+        NSURL *url = [NSURL fileURLWithPath:oldPathForPartitionValue(user, partitionValue)];
+        @autoreleasepool {
+            auto configuration = [user configurationWithPartitionValue:partitionValue];
+            configuration.fileURL = url;
+            RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+            [realm beginWriteTransaction];
+            [Person createInRealm:realm withValue:[Person george]];
+            [realm commitWriteTransaction];
+        }
+
+        auto configuration = [user configurationWithPartitionValue:partitionValue];
+        XCTAssertEqualObjects(configuration.fileURL, url);
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+        XCTAssertEqual([Person allObjectsInRealm:realm].count, 1U);
+    };
+
+    testPartitionValue(@"abc");
+    testPartitionValue(@123);
+    testPartitionValue(nil);
+}
+
 @end
