@@ -21,36 +21,26 @@ import SwiftUI
 import Combine
 import Realm
 
+/**
+ A custom binding type that allows us to wrap Objects or Collections when being used with SwiftUI Views.
+ */
 @dynamicMemberLookup
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-@propertyWrapper
 public final class RealmBinding<T>: ObservableObject {
-    var getter: () -> T
-    var setter: (T) -> Void
+    var value: T
     private var realm: Realm
     var _observe: ((inout RealmState<T>, _ block: @escaping (RealmState<T>) -> Void) -> NotificationToken)? = nil
 
-    public var projectedValue: Binding<T> {
-        Binding(get: getter, set: setter)
-    }
-
     public var wrappedValue: T {
         get {
-            getter()
+            value
         } set {
-            setter(newValue)
+            value = newValue
         }
     }
 
-    init(realm: Realm, get: @escaping () -> T, set: @escaping (T) -> Void) {
-        self.realm = realm
-        self.getter = get
-        self.setter = set
-    }
-
     init(_ value: T, realm: Realm) where T: EmbeddedObject {
-        self.getter = { value }
-        self.setter = { _ in }
+        self.value = value
         self._observe = { (binder: inout RealmState<T>, block: @escaping (RealmState<T>) ->Void) -> NotificationToken in
             value.observe(on: nil) { [binder] _ in
                 block(binder)
@@ -60,8 +50,7 @@ public final class RealmBinding<T>: ObservableObject {
     }
 
     init(_ value: T, realm: Realm) where T: Object {
-        self.getter = { value }
-        self.setter = { _ in }
+        self.value = value
         self._observe = { (binder: inout RealmState<T>, block: @escaping (RealmState<T>) ->Void) -> NotificationToken in
             value.observe(on: nil) { [binder] _ in
                 block(binder)
@@ -71,8 +60,7 @@ public final class RealmBinding<T>: ObservableObject {
     }
 
     init(_ value: T, realm: Realm) where T: RealmCollection {
-        self.getter = { value }
-        self.setter = { _ in }
+        self.value = value
         self._observe = { (binder: inout RealmState<T>, block: @escaping (RealmState<T>) ->Void) -> NotificationToken in
             value.observe(on: nil) { [binder] _ in
                 block(binder)
@@ -87,16 +75,12 @@ public final class RealmBinding<T>: ObservableObject {
         }
     }
 
-    public func bind() -> Binding<T> {
-        return Binding(get: getter, set: setter)
-    }
-
     public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<T, V>) -> V {
         get {
-            self.getter()[keyPath: member]
+            self.value[keyPath: member]
         } set {
             try! self.realm.write {
-                self.getter()[keyPath: member] = newValue
+                self.value[keyPath: member] = newValue
             }
         }
     }
@@ -104,26 +88,25 @@ public final class RealmBinding<T>: ObservableObject {
     public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
         get {
             Binding(get: {
-                self.getter()[keyPath: member]
+                self.value[keyPath: member]
             },
             set: { newValue in
                 try! self.realm.write {
-                    self.getter()[keyPath: member] = newValue
+                    self.value[keyPath: member] = newValue
                 }
             })
         }
     }
 
+    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<T, V>) -> RealmBinding<V> where V: EmbeddedObject {
+        get {
+            RealmBinding<V>(value[keyPath: member], realm: realm)
+        }
+    }
+
     public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<T, V>) -> RealmBinding<V> where V: Object {
         get {
-            RealmBinding<V>(realm: realm, get: {
-                self.getter()[keyPath: member]
-            },
-            set: { newValue in
-                try! self.realm.write {
-                    self.getter()[keyPath: member] = newValue
-                }
-            })
+            RealmBinding<V>(value[keyPath: member], realm: realm)
         }
     }
 
@@ -139,8 +122,8 @@ extension RealmBinding where T: RealmCollection {
     public subscript(position: Index) -> Element {
         get {
             let value = self.wrappedValue[position]
-            if value.self is ThreadConfined {
-                return (value as! ThreadConfined).thaw() as! T.Element
+            if let value = value as? ThreadConfined {
+                return value.thaw() as! T.Element
             } else {
                 return value
             }
@@ -209,6 +192,28 @@ extension RealmBinding: RandomAccessCollection, BidirectionalCollection, Collect
     }
 }
 
+
+//extension RealmBinding where T: ResultsBase {
+//    public func remove(atOffsets offsets: IndexSet) {
+//        // TODO: use thaw function
+//        let realm = try! Realm(configuration: wrappedValue.realm!.configuration)
+//        try! realm.write {
+//            let resolved = wrappedValue.thaw() as! List<T.Element>
+//            resolved.remove(atOffsets: offsets)
+//        }
+//    }
+//
+//    /// :nodoc:
+//    public func move(fromOffsets offsets: IndexSet, toOffset destination: Int) {
+//        // TODO: use thaw function
+//        let realm = try! Realm(configuration: wrappedValue.realm!.configuration)
+//        try! realm.write {
+//            let resolved = wrappedValue.thaw() as! List<T.Element>
+//            resolved.move(fromOffsets: offsets, toOffset: destination)
+//        }
+//    }
+//}
+
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension RealmBinding where T: ListBase, T: RealmCollection {
     public subscript(position: T.Index) -> Element {
@@ -232,7 +237,7 @@ extension RealmBinding where T: ListBase, T: RealmCollection {
         // TODO: use thaw function
         let realm = try! Realm(configuration: wrappedValue.realm!.configuration)
         try! realm.write {
-            let resolved = realm.resolve(ThreadSafeReference(to: wrappedValue)) as! List<T.Element>
+            let resolved = wrappedValue.thaw() as! List<T.Element>
             resolved.remove(atOffsets: offsets)
         }
     }
@@ -242,7 +247,7 @@ extension RealmBinding where T: ListBase, T: RealmCollection {
         // TODO: use thaw function
         let realm = try! Realm(configuration: wrappedValue.realm!.configuration)
         try! realm.write {
-            let resolved = realm.resolve(ThreadSafeReference(to: wrappedValue)) as! List<T.Element>
+            let resolved = wrappedValue.thaw() as! List<T.Element>
             resolved.move(fromOffsets: offsets, toOffset: destination)
         }
     }
@@ -251,7 +256,7 @@ extension RealmBinding where T: ListBase, T: RealmCollection {
         // TODO: use thaw function
         let realm = try! Realm(configuration: wrappedValue.realm!.configuration)
         try! realm.write {
-            let resolved = realm.resolve(ThreadSafeReference(to: wrappedValue)) as! List<T.Element>
+            let resolved = wrappedValue.thaw() as! List<T.Element>
             resolved.append(value)
         }
     }
@@ -266,6 +271,8 @@ private struct RealmEnvironmentKey: EnvironmentKey {
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public extension EnvironmentValues {
+    /// The preferred Realm for the environment.
+    /// If not set, this will be a Realm with the default configuration.
     var realm: Realm {
         get { try! Realm(configuration: self[RealmEnvironmentKey.self]) }
         set { self[RealmEnvironmentKey.self] = newValue.configuration }
@@ -276,13 +283,6 @@ public extension EnvironmentValues {
 public extension View {
     var realm: Realm {
         return Environment(\.realm).wrappedValue
-    }
-
-    func bind<T>(_ object: T) -> RealmBinding<T> where T: Object {
-        guard let realm = object.realm else {
-            fatalError("Only managed objects can be view bound")
-        }
-        return RealmBinding(object, realm: realm)
     }
 
     func bind<T, V>(_ object: T, _ memberKeyPath: ReferenceWritableKeyPath<T, V>) -> Binding<V> where T: EmbeddedObject {
@@ -299,6 +299,12 @@ public extension View {
     }
 }
 
+// MARK: RealmState
+
+/**
+ RealmState is a property wrapper that abstracts realm unique functionality away from the user,
+ to enable simpler realm writes, collection freezes/thaws, and observation.
+ */
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper
 public struct RealmState<T> : DynamicProperty {
