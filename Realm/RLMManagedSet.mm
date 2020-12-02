@@ -222,6 +222,14 @@ static void changeSet(__unsafe_unretained RLMManagedSet *const set, NSKeyValueCh
     return translateErrors([&] { return _backingSet.size(); });
 }
 
+- (NSArray<id> *)array {
+    NSMutableArray *arr = [NSMutableArray new];
+    for (id prop : self) {
+        [arr addObject:prop];
+    }
+    return arr;
+}
+
 - (BOOL)isInvalidated {
     return translateErrors([&] { return !_backingSet.is_valid(); });
 }
@@ -315,6 +323,54 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     return 1;
 }
 
+- (RLMManagedSet *)managedObjectFrom:(RLMSet *)unmanaged {
+    if (!unmanaged.realm) {
+        @throw RLMException(@"Right hand side value must be a managed Set.");
+    }
+
+    if (_type != unmanaged.type) {
+        @throw RLMException(@"Set must match type of \"self\" '%@'", RLMTypeToString(_type));
+    }
+
+    return static_cast<RLMManagedSet *>(unmanaged);
+}
+
+- (BOOL)isSubsetOfSet:(RLMSet<id> *)set {
+    RLMManagedSet *rhs = [self managedObjectFrom:set];
+    return _backingSet.is_subset_of(rhs->_backingSet);
+}
+
+- (void)intersectSet:(RLMSet<id> *)set {
+    RLMManagedSet *rhs = [self managedObjectFrom:set];
+    if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
+        @throw RLMException(@"Can only perform intersectsSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
+    }
+    _backingSet.assign_intersection(rhs->_backingSet);
+}
+
+- (BOOL)intersectsSet:(RLMSet<id> *)set {
+    RLMManagedSet *rhs = [self managedObjectFrom:set];
+    return _backingSet.intersects(rhs->_backingSet);
+}
+
+- (void)unionSet:(RLMSet<id> *)set {
+    RLMManagedSet *rhs = [self managedObjectFrom:set];
+    if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
+        @throw RLMException(@"Can only perform unionSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
+    }
+    changeSet(self, NSKeyValueChangeReplacement, ^{
+        _backingSet.assign_union(rhs->_backingSet);
+    });
+}
+
+- (void)minusSet:(RLMSet<id> *)set {
+    RLMManagedSet *rhs = [self managedObjectFrom:set];
+    if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
+        @throw RLMException(@"Can only perform minusSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
+    }
+    _backingSet.assign_difference(rhs->_backingSet);
+}
+
 - (id)valueForKeyPath:(NSString *)keyPath {
     if ([keyPath hasPrefix:@"@"]) {
         // Delegate KVC collection operators to RLMResults
@@ -402,7 +458,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     }
     // delete all target rows from the realm
     RLMObservationTracker tracker(_realm, true);
-    translateErrors([&] { /*_backingSet.delete_all();*/ });
+    translateErrors([&] { _backingSet.remove_all(); });
 }
 
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties {

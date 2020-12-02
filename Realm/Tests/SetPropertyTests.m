@@ -26,62 +26,7 @@
 
 @implementation SetPropertyTests
 
-#pragma mark Unmanaged tests
-
-- (void)testUnmanagedSet {
-    SetPropertyObject *setObj = [SetPropertyObject new];
-    XCTAssertNotNil(setObj.stringSet);
-
-    StringObject *str1 = [[StringObject alloc] initWithValue:@[@"string1"]];
-    StringObject *str2 = [[StringObject alloc] initWithValue:@[@"string2"]];
-    StringObject *str3 = [[StringObject alloc] initWithValue:@[@"string3"]];
-    StringObject *str4 = [[StringObject alloc] initWithValue:@[@"string4"]];
-
-    [setObj.stringSet addObject:str1];
-    XCTAssertEqual(setObj.stringSet.count, 1U);
-    XCTAssertEqualObjects(setObj.stringSet[0].stringCol, @"string1");
-    // should not accept duplicates
-    [setObj.stringSet addObjects:@[str1, str2, str3]];
-    XCTAssertEqual(setObj.stringSet.count, 3U);
-    XCTAssertEqualObjects(setObj.stringSet[1], str2);
-    XCTAssertEqualObjects(setObj.stringSet[2], str3);
-
-    NSSet *aSet = [NSSet setWithArray:@[str3, str4]];
-    [setObj.stringSet addObjects:aSet];
-    XCTAssertEqual(setObj.stringSet.count, 4U);
-
-    StringObject *strObj = [[StringObject alloc] initWithValue:@[@"string5"]];
-    [setObj.stringSet addObject:strObj];
-    XCTAssertEqualObjects(setObj.stringSet[0], str1);
-    XCTAssertEqual(setObj.stringSet.count, 5U);
-
-    XCTAssertThrows([((id)setObj.stringSet) addObject:[[IntObject alloc] initWithValue:@[@123]]]);
-
-    [setObj.stringSet removeObject:strObj];
-    XCTAssertEqual(setObj.stringSet.count, 4U);
-
-    XCTAssertEqualObjects(setObj.stringSet[0],str1);
-
-    [setObj.stringSet removeAllObjects];
-    XCTAssertEqual(setObj.stringSet.count, 0U);
-}
-
-- (void)testUnmanagedSetComparison {
-    SetPropertyObject *setObj1 = [SetPropertyObject new];
-    SetPropertyObject *setObj2 = [SetPropertyObject new];
-    StringObject *strObj1 = [[StringObject alloc] initWithValue:@[@"one"]];
-    StringObject *strObj2 = [[StringObject alloc] initWithValue:@[@"two"]];
-    StringObject *strObj3 = [[StringObject alloc] initWithValue:@[@"three"]];
-
-    [setObj1.stringSet addObjects:@[strObj1, strObj2, strObj3]];
-    [setObj2.stringSet addObjects:@[strObj1, strObj2, strObj3]];
-    XCTAssertTrue([setObj1.stringSet isEqual:setObj2.stringSet]);
-
-    [setObj1.stringSet addObject:[[StringObject alloc] initWithValue:@[@"four"]]];
-    XCTAssertFalse([setObj1.stringSet isEqual:setObj2.stringSet]);
-}
-
-- (void)testUnmanagedSetUnion {
+- (void)testUnmanagedUnion {
     AllPrimitiveSets *setObj1 = [AllPrimitiveSets new];
     AllPrimitiveSets *setObj2 = [AllPrimitiveSets new];
     AllPrimitiveSets *setObj3 = [AllPrimitiveSets new];
@@ -96,7 +41,7 @@
     XCTAssertTrue([setObj1.stringObj isEqual:setObj3.stringObj]);
 }
 
-- (void)testUnmanagedSetIntersect {
+- (void)testUnmanagedIntersect {
     AllPrimitiveSets *setObj1 = [AllPrimitiveSets new];
     AllPrimitiveSets *setObj2 = [AllPrimitiveSets new];
     AllPrimitiveSets *setObj3 = [AllPrimitiveSets new];
@@ -112,7 +57,7 @@
     XCTAssertTrue([setObj1.stringObj isEqual:setObj3.stringObj]);
 }
 
-- (void)testUnmanagedSetMinus {
+- (void)testUnmanagedMinus {
     AllPrimitiveSets *setObj1 = [AllPrimitiveSets new];
     AllPrimitiveSets *setObj2 = [AllPrimitiveSets new];
     AllPrimitiveSets *setObj3 = [AllPrimitiveSets new];
@@ -127,7 +72,7 @@
     XCTAssertTrue([setObj1.stringObj isEqual:setObj3.stringObj]);
 }
 
-- (void)testUnmanagedSetIsSubsetOfSet {
+- (void)testUnmanagedIsSubsetOfSet {
     AllPrimitiveSets *setObj1 = [AllPrimitiveSets new];
     AllPrimitiveSets *setObj2 = [AllPrimitiveSets new];
     AllPrimitiveSets *setObj3 = [AllPrimitiveSets new];
@@ -138,6 +83,103 @@
 
     XCTAssertFalse([setObj1.stringObj isSubsetOfSet:setObj2.stringObj]);
     XCTAssertTrue([setObj3.stringObj isSubsetOfSet:setObj1.stringObj]);
+}
+
+- (void)testManagedIsSubsetOfSet {
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+    AllPrimitiveSets *setObj1 = [AllPrimitiveSets createInRealm:realm withValue:@[]];
+    AllPrimitiveSets *setObj2 = [AllPrimitiveSets createInRealm:realm withValue:@[]];
+    AllPrimitiveSets *setObj3 = [AllPrimitiveSets createInRealm:realm withValue:@[]];
+    [setObj1.stringObj addObjects:@[@"ten", @"one", @"nine", @"two", @"eight"]];
+    [setObj2.stringObj addObjects:@[@"five", @"six", @"seven", @"eight", @"nine"]];
+    [setObj3.stringObj addObjects:@[@"two", @"one", @"ten"]];
+    [realm commitWriteTransaction];
+    AllPrimitiveSets *unman = [AllPrimitiveSets new];
+
+    XCTAssertThrows([setObj1.stringObj isSubsetOfSet:unman.stringObj]);
+    XCTAssertThrows([setObj1.stringObj isSubsetOfSet:setObj2.intObj]);
+    XCTAssertFalse([setObj1.stringObj isSubsetOfSet:setObj2.stringObj]);
+    XCTAssertTrue([setObj3.stringObj isSubsetOfSet:setObj1.stringObj]);
+}
+
+- (void)testManagedIntersect {
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+    AllPrimitiveSets *setObj1 = [AllPrimitiveSets createInRealm:realm withValue:@[]];
+    AllPrimitiveSets *setObj2 = [AllPrimitiveSets createInRealm:realm withValue:@[]];
+    AllPrimitiveSets *setObj3 = [AllPrimitiveSets createInRealm:realm withValue:@[]];
+
+    [setObj1.stringObj addObjects:@[@"ten", @"one", @"nine", @"two", @"eight"]];
+    [setObj2.stringObj addObjects:@[@"five", @"six", @"seven", @"eight", @"nine"]];
+    [setObj3.stringObj addObjects:@[@"nine", @"eight"]];
+    [realm commitWriteTransaction];
+    AllPrimitiveSets *unman = [AllPrimitiveSets new];
+
+    XCTAssertThrows([setObj1.stringObj intersectSet:setObj2.stringObj]);
+    XCTAssertTrue([setObj1.stringObj intersectsSet:setObj2.stringObj]);
+
+    [realm beginWriteTransaction];
+    XCTAssertThrows([setObj1.stringObj intersectSet:unman.stringObj]);
+    [setObj1.stringObj intersectSet:setObj2.stringObj];
+    [realm commitWriteTransaction];
+
+    XCTAssertTrue([setObj1.stringObj intersectsSet:setObj2.stringObj]);
+    XCTAssertEqual(setObj1.stringObj.count, 2U);
+}
+
+- (void)testManagedUnion {
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+    AllPrimitiveSets *setObj1 = [AllPrimitiveSets createInRealm:realm withValue:@[]];
+    AllPrimitiveSets *setObj2 = [AllPrimitiveSets createInRealm:realm withValue:@[]];
+    AllPrimitiveSets *setObj3 = [AllPrimitiveSets createInRealm:realm withValue:@[]];
+
+    [setObj1.stringObj addObjects:@[@"one", @"two", @"three", @"four", @"five"]];
+    [setObj2.stringObj addObjects:@[@"one", @"two", @"three"]];
+    [setObj3.stringObj addObjects:@[@"one", @"two", @"three", @"four", @"five"]];
+    [realm commitWriteTransaction];
+    AllPrimitiveSets *unman = [AllPrimitiveSets new];
+
+    XCTAssertThrows([setObj1.stringObj unionSet:setObj2.stringObj]);
+    XCTAssertThrows([setObj2.stringObj unionSet:setObj1.stringObj]);
+
+    [realm beginWriteTransaction];
+    [setObj1.stringObj unionSet:setObj2.stringObj];
+    [setObj2.stringObj unionSet:setObj3.stringObj];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(setObj1.stringObj.count, 5U);
+    XCTAssertEqual(setObj2.stringObj.count, 5U);
+}
+
+- (void)testManagedMinus {
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+    AllPrimitiveSets *setObj1 = [AllPrimitiveSets createInRealm:realm withValue:@[]];
+    AllPrimitiveSets *setObj2 = [AllPrimitiveSets createInRealm:realm withValue:@[]];
+    AllPrimitiveSets *setObj3 = [AllPrimitiveSets createInRealm:realm withValue:@[]];
+
+    [setObj1.stringObj addObjects:@[@"one", @"two", @"three", @"four", @"five"]];
+    [setObj2.stringObj addObjects:@[@"one", @"two", @"three"]];
+    [setObj3.stringObj addObjects:@[@"one", @"two", @"three", @"four", @"five"]];
+    [realm commitWriteTransaction];
+    AllPrimitiveSets *unman = [AllPrimitiveSets new];
+
+    XCTAssertThrows([setObj1.stringObj minusSet:setObj2.stringObj]);
+    XCTAssertThrows([setObj2.stringObj minusSet:setObj1.stringObj]);
+
+    [realm beginWriteTransaction];
+    [setObj1.stringObj minusSet:setObj2.stringObj];
+    [setObj2.stringObj minusSet:setObj3.stringObj];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(setObj1.stringObj.count, 2U);
+    XCTAssertTrue([setObj1.stringObj[0] isEqualToString:@"five"]);
+    XCTAssertTrue([setObj1.stringObj[1] isEqualToString:@"four"]);
+    XCTAssertEqual(setObj1.stringObj.count, 2U);
+
+    XCTAssertEqual(setObj2.stringObj.count, 0U);
 }
 
 - (void)testDeleteObjectInUnmanagedSet {
@@ -216,8 +258,6 @@
     XCTAssertThrows([setObj1.stringObj sortedResultsUsingDescriptors:@[]]);
     XCTAssertThrows([setObj1.stringObj distinctResultsUsingKeyPaths:@[]]);
 }
-
-#pragma mark Managed Set
 
 - (void)testPopulateEmptySet {
     RLMRealm *r = [self realmWithTestPath];

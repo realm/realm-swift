@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObject, RLMResults<RLMObjectType>;
 
+/// A collection datatype used for storing distinct objects.
 @interface RLMSet<RLMObjectType> : NSObject<RLMCollection, NSFastEnumeration>
 
 #pragma mark - Properties
@@ -31,6 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, assign) NSUInteger count;
 
+/**
+ The objects in the RLMSet as an NSArray value.
+ */
 @property (nonatomic, readonly) NSArray<RLMObjectType> *array;
 
 /**

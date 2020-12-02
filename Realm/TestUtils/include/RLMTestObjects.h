@@ -211,26 +211,44 @@ RLM_ARRAY_TYPE(AllTypesObject)
 
 @interface AllPrimitiveSets : RLMObject
 @property RLMSet<RLMInt> *intObj;
+@property RLMSet<RLMInt> *intObj2;
 @property RLMSet<RLMFloat> *floatObj;
+@property RLMSet<RLMFloat> *floatObj2;
 @property RLMSet<RLMDouble> *doubleObj;
+@property RLMSet<RLMDouble> *doubleObj2;
 @property RLMSet<RLMBool> *boolObj;
+@property RLMSet<RLMBool> *boolObj2;
 @property RLMSet<RLMString> *stringObj;
+@property RLMSet<RLMString> *stringObj2;
 @property RLMSet<RLMDate> *dateObj;
+@property RLMSet<RLMDate> *dateObj2;
 @property RLMSet<RLMData> *dataObj;
+@property RLMSet<RLMData> *dataObj2;
 @property RLMSet<RLMDecimal128> *decimalObj;
+@property RLMSet<RLMDecimal128> *decimalObj2;
 @property RLMSet<RLMObjectId> *objectIdObj;
+@property RLMSet<RLMObjectId> *objectIdObj2;
 @end
 
 @interface AllOptionalPrimitiveSets : RLMObject
 @property RLMSet<RLMInt> *intObj;
+@property RLMSet<RLMInt> *intObj2;
 @property RLMSet<RLMFloat> *floatObj;
+@property RLMSet<RLMFloat> *floatObj2;
 @property RLMSet<RLMDouble> *doubleObj;
+@property RLMSet<RLMDouble> *doubleObj2;
 @property RLMSet<RLMBool> *boolObj;
+@property RLMSet<RLMBool> *boolObj2;
 @property RLMSet<RLMString> *stringObj;
+@property RLMSet<RLMString> *stringObj2;
 @property RLMSet<RLMDate> *dateObj;
+@property RLMSet<RLMDate> *dateObj2;
 @property RLMSet<RLMData> *dataObj;
+@property RLMSet<RLMData> *dataObj2;
 @property RLMSet<RLMDecimal128> *decimalObj;
+@property RLMSet<RLMDecimal128> *decimalObj2;
 @property RLMSet<RLMObjectId> *objectIdObj;
+@property RLMSet<RLMObjectId> *objectIdObj2;
 @end
 
 #pragma mark - Real Life Objects

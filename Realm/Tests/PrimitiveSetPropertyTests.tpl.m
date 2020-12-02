@@ -339,6 +339,149 @@ static double average(NSArray *values) {
     %unman RLMAssertThrowsWithReason([$set addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }], ^n @"This method may only be called on RLMSet instances retrieved from an RLMRealm");
 }
 
+- (void)testUnion {
+    %man %r [$set addObjects:@[$v0, $v1]];
+    %man %o [$set addObjects:@[$v0, $v1, NSNull.null]];
+    %man %r [$set2 addObjects:@[$v3, $v4]];
+    %man %o [$set2 addObjects:@[$v3, $v4, NSNull.null]];
+    [realm commitWriteTransaction];
+
+    %unman %r [$set addObjects:@[$v0, $v1]];
+    %unman %o [$set addObjects:@[$v0, $v1, NSNull.null]];
+    %unman %r [$set2 addObjects:@[$v3, $v4]];
+    %unman %o [$set2 addObjects:@[$v3, $v4, NSNull.null]];
+
+    %man XCTAssertThrows([$set unionSet:$set2]);
+    %unman [$set unionSet:$set2];
+
+    [realm beginWriteTransaction];
+    %man [$set unionSet:$set2];
+    [realm commitWriteTransaction];
+
+    %unman %r %maxtwovalues XCTAssertEqual($set.count, 2U);
+    %unman %r %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1]));
+    %unman %r %nomaxvalues XCTAssertEqual($set.count, 3U);
+    %unman %r %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0, $v1, $v4]));
+    %unman %o %maxtwovalues XCTAssertEqual($set.count, 3U);
+    %unman %o %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1, $v2]));
+    %unman %o %nomaxvalues XCTAssertEqual($set.count, 4U);
+    %unman %o %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0, $v1, $v3, $v4]));
+    %man %r %maxtwovalues XCTAssertEqual($set.count, 2U);
+    %man %r %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1]));
+    %man %r %nomaxvalues XCTAssertEqual($set.count, 3U);
+    %man %r %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0, $v1, $v4]));
+    %man %o %maxtwovalues XCTAssertEqual($set.count, 3U);
+    %man %o %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1, %v2]));
+    %man %o %nomaxvalues XCTAssertEqual($set.count, 4U);
+    %man %o %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0, $v1, %v3, %v4]));
+}
+
+- (void)testIntersect {
+    %man %r [$set addObjects:@[$v0, $v1]];
+    %man %o [$set addObjects:@[$v0, $v1, NSNull.null]];
+    %man %r [$set2 addObjects:@[$v3, $v4]];
+    %man %o [$set2 addObjects:@[$v3, $v4, NSNull.null]];
+    [realm commitWriteTransaction];
+
+    %unman %r [$set addObjects:@[$v0, $v1]];
+    %unman %o [$set addObjects:@[$v0, $v1, NSNull.null]];
+    %unman %r [$set2 addObjects:@[$v3, $v4]];
+    %unman %o [$set2 addObjects:@[$v3, $v4, NSNull.null]];
+
+    %man XCTAssertThrows([$set intersectSet:$set2]);
+    %man XCTAssertTrue([$set intersectsSet:$set2]);
+    %unman XCTAssertTrue([$set intersectsSet:$set2]);
+
+    %unman [$set intersectSet:$set2];
+
+    [realm beginWriteTransaction];
+    %man [$set intersectSet:$set2];
+    [realm commitWriteTransaction];
+
+    %unman %r %maxtwovalues XCTAssertEqual($set.count, 2U);
+    %unman %r %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1]));
+    %unman %r %nomaxvalues XCTAssertEqual($set.count, 1U);
+    %unman %r %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0]));
+    %unman %o %maxtwovalues XCTAssertEqual($set.count, 2U);
+    %unman %o %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1]));
+    %unman %o %nomaxvalues XCTAssertEqual($set.count, 1U);
+    %unman %o %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0]));
+    %man %r %maxtwovalues XCTAssertEqual($set.count, 2U);
+    %man %r %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1]));
+    %man %r %nomaxvalues XCTAssertEqual($set.count, 1U);
+    %man %r %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v1]));
+    %man %o %maxtwovalues XCTAssertEqual($set.count, 2U);
+    %man %o %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1]));
+    %man %o %nomaxvalues XCTAssertEqual($set.count, 1U);
+    %man %o %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0]));
+}
+
+- (void)testMinus {
+    %man %r [$set addObjects:@[$v0, $v1]];
+    %man %o [$set addObjects:@[$v0, $v1, NSNull.null]];
+    %man %r [$set2 addObjects:@[$v3, $v4]];
+    %man %o [$set2 addObjects:@[$v3, $v4, NSNull.null]];
+    [realm commitWriteTransaction];
+
+    %unman %r [$set addObjects:@[$v0, $v1]];
+    %unman %o [$set addObjects:@[$v0, $v1, NSNull.null]];
+    %unman %r [$set2 addObjects:@[$v3, $v4]];
+    %unman %o [$set2 addObjects:@[$v3, $v4, NSNull.null]];
+
+    %man XCTAssertThrows([$set minusSet:$set2]);
+
+    %unman [$set minusSet:$set2];
+
+    [realm beginWriteTransaction];
+    %man [$set minusSet:$set2];
+    [realm commitWriteTransaction];
+
+    %unman %r %maxtwovalues XCTAssertEqual($set.count, 0U);
+    %unman %r %maxtwovalues XCTAssertEqualObjects($set.array, (@[]));
+    %unman %r %nomaxvalues XCTAssertEqual($set.count, 1U);
+    %unman %r %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v1]));
+    %unman %o %maxtwovalues XCTAssertEqual($set.count, 0U);
+    %unman %o %maxtwovalues XCTAssertEqualObjects($set.array, (@[]));
+    %unman %o %nomaxvalues XCTAssertEqual($set.count, 1U);
+    %unman %o %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v1]));
+    %man %r %maxtwovalues XCTAssertEqual($set.count, 0U);
+    %man %r %maxtwovalues XCTAssertEqualObjects($set.array, (@[]));
+    %man %r %nomaxvalues XCTAssertEqual($set.count, 1U);
+    %man %r %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0]));
+    %man %o %maxtwovalues XCTAssertEqual($set.count, 0U);
+    %man %o %maxtwovalues XCTAssertEqualObjects($set.array, (@[]));
+    %man %o %nomaxvalues XCTAssertEqual($set.count, 1U);
+    %man %o %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v1]));
+}
+
+- (void)testIsSubsetOfSet {
+    %man %r [$set addObjects:@[$v0, $v1]];
+    %man %o [$set addObjects:@[$v0, $v1, NSNull.null]];
+    %man %r [$set2 addObjects:@[$v0, $v1, $v3, $v4]];
+    %man %o [$set2 addObjects:@[$v0, $v1, $v3, $v4, NSNull.null]];
+    [realm commitWriteTransaction];
+
+    %unman %r [$set addObjects:@[$v0, $v1]];
+    %unman %o [$set addObjects:@[$v0, $v1, NSNull.null]];
+    %unman %r [$set2 addObjects:@[$v0, $v1, $v3, $v4]];
+    %unman %o [$set2 addObjects:@[$v0, $v1, $v3, $v4, NSNull.null]];
+
+    %maxtwovalues %r %man XCTAssertTrue([$set2 isSubsetOfSet:$set]);
+    %maxtwovalues %r %unman XCTAssertTrue([$set2 isSubsetOfSet:$set]);
+    %maxtwovalues %o %man XCTAssertFalse([$set2 isSubsetOfSet:$set]);
+    %maxtwovalues %o %unman XCTAssertFalse([$set2 isSubsetOfSet:$set]);
+
+    %maxtwovalues %r %man XCTAssertTrue([$set isSubsetOfSet:$set2]);
+    %maxtwovalues %r %unman XCTAssertTrue([$set isSubsetOfSet:$set2]);
+    %maxtwovalues %o %man XCTAssertTrue([$set isSubsetOfSet:$set2]);
+    %maxtwovalues %o %unman XCTAssertTrue([$set isSubsetOfSet:$set2]);
+
+    %nomaxvalues %man XCTAssertTrue([$set isSubsetOfSet:$set2]);
+    %nomaxvalues %unman XCTAssertTrue([$set isSubsetOfSet:$set2]);
+    %nomaxvalues %man XCTAssertFalse([$set2 isSubsetOfSet:$set]);
+    %nomaxvalues %unman XCTAssertFalse([$set2 isSubsetOfSet:$set]);
+}
+
 - (void)testMin {
     %nominmax %unman RLMAssertThrowsWithReason([$set minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type set");
     %nominmax %man RLMAssertThrowsWithReason([$set minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type set '$class.$prop'");

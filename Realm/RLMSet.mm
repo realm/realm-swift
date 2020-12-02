@@ -102,6 +102,13 @@
     [_backingSet intersectOrderedSet:set->_backingSet];
 }
 
+- (BOOL)intersectsSet:(RLMSet<id> *)set {
+    for (id obj in set) {
+        RLMSetValidateMatchingObjectType(self, obj);
+    }
+    return [_backingSet intersectsSet:set->_backingSet.set];
+}
+
 - (void)minusSet:(RLMSet<id> *)set {
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
@@ -114,13 +121,6 @@
         RLMSetValidateMatchingObjectType(self, obj);
     }
     [_backingSet unionOrderedSet:set->_backingSet];
-}
-
-- (BOOL)intersectsSet:(RLMSet<id> *)set {
-    for (id obj in set) {
-        RLMSetValidateMatchingObjectType(self, obj);
-    }
-    return [_backingSet intersectsSet:set->_backingSet.set];
 }
 
 - (BOOL)isSubsetOfSet:(RLMSet<id> *)set {
