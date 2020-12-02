@@ -1,28 +1,31 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.2.0 Release notes (2020-12-02)
 =============================================================
+
 ### Enhancements
+
 * The prebuilt binaries are now packaged as XCFrameworks. This adds support for
   Catalyst and arm64 simulators when using them to install Realm, removes the
   need for the strip-frameworks build step, and should simplify installation.
+* The support functionality for using the Objective C API from Swift is now
+  included in Realm Swift and now includes all of the required wrappers for
+  MongoDB Realm types. In mixed Objective C/Swift projects, we recommend
+  continuing to use the Objective C types, but import both Realm and RealmSwift
+  in your Swift files.
 
 ### Fixed
+
 * The user identifier was added to the file path for synchronized Realms twice
   and an extra level of escaping was performed on the partition value. This did
   not cause functional problems, but made file names more confusing than they
   needed to be. Existing Realm files will continue to be located at the old
   path, while newly created files will be created at a shorter path. (Since v10.0.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 12.1.
+* Carthage release for Swift is built with Xcode 12.2.
 * CocoaPods: 1.10 or later.
-
-### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
 
 10.1.4 Release notes (2020-11-16)
 =============================================================
