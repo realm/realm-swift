@@ -39,8 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncManager ()
 
-@property (nullable, nonatomic, copy) RLMSyncBasicErrorReportingBlock sessionCompletionNotifier;
-
 - (std::weak_ptr<realm::app::App>)app;
 - (std::shared_ptr<realm::SyncManager>)syncManager;
 - (instancetype)initWithSyncManager:(std::shared_ptr<realm::SyncManager>)syncManager;

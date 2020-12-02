@@ -234,6 +234,9 @@ static bool isSync(realm::Realm::Config const& config) {
         if (self.readOnly) {
             @throw RLMException(@"Cannot set `deleteRealmIfMigrationNeeded` when `readOnly` is set.");
         }
+        if (isSync(_config)) {
+            @throw RLMException(@"Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('syncConfig' is set).");
+        }
         _config.schema_mode = realm::SchemaMode::ResetFile;
     }
     else if (self.deleteRealmIfMigrationNeeded) {

@@ -615,10 +615,11 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
         }
         return;
     }
-    return;
-    /*
-    auto as_subexpr = util::overload([](StringData value) { return make_subexpr<ConstantStringValue>(value); },
-                                     [](const Columns<String>& c) { return c.clone(); });
+
+    auto as_subexpr = util::overload{
+        [](StringData value) { return make_subexpr<ConstantStringValue>(value); },
+        [](const Columns<String>& c) { return c.clone(); }
+    };
     auto left = as_subexpr(column);
     auto right = as_subexpr(value);
 
@@ -662,7 +663,7 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
         default:
             @throw RLMPredicateException(@"Invalid operator type",
                                          @"Operator '%@' not supported for string type", operatorName(operatorType));
-    }*/
+    }
 }
 
 void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
@@ -672,7 +673,7 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
     switch (operatorType) {
         case NSEqualToPredicateOperatorType:
         case NSNotEqualToPredicateOperatorType:
-            add_string_constraint<realm::StringData>(operatorType, predicateOptions, std::move(column), value);
+            add_string_constraint(operatorType, predicateOptions, std::move(column), value);
             break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",

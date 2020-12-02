@@ -55,9 +55,7 @@
     if (syncConfiguration.customFileURL) {
         self.config.path = syncConfiguration.customFileURL.path.UTF8String;
     } else {
-        RLMConvertBsonToRLMBSON(realm::bson::parse(self.config.sync_config->partition_value));
-        self.config.path = self.config.sync_config->user->sync_manager()->path_for_realm(*[user _syncUser],
-                                                                [[user pathForPartitionValue:RLMConvertBsonToRLMBSON(realm::bson::parse(self.config.sync_config->partition_value))] UTF8String]);
+        self.config.path = [user pathForPartitionValue:self.config.sync_config->partition_value];
     }
 
     if (!self.config.encryption_key.empty()) {

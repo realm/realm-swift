@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "10.0.0"
-let cocoaVersionStr = "10.1.1"
+let coreVersionStr = "10.2.0"
+let cocoaVersionStr = "10.1.4"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -88,6 +88,7 @@ let package = Package(
                 "Realm/RLMUtil.mm",
 
                 // Sync source files
+                "Realm/NSError+RLMSync.m",
                 "Realm/RLMApp.mm",
                 "Realm/RLMAPIKeyAuth.mm",
                 "Realm/RLMBSON.mm",
@@ -119,7 +120,7 @@ let package = Package(
             path: "RealmSwift",
             exclude: [
                 "Tests",
-                "Nonsync.swift",
+                "Nonsync.swift"
             ]
         ),
         .target(

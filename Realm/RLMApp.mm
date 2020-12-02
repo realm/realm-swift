@@ -262,14 +262,19 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     return nil;
 }
 
+static NSMutableDictionary *s_apps = [NSMutableDictionary new];
+static std::mutex& s_appMutex = *new std::mutex();
+
++ (void)resetAppCache {
+    std::lock_guard<std::mutex> lock(s_appMutex);
+    [s_apps removeAllObjects];
+    app::App::clear_cached_apps();
+}
+
 + (instancetype)appWithId:(NSString *)appId
             configuration:(RLMAppConfiguration *)configuration
             rootDirectory:(NSURL *)rootDirectory {
-    static NSMutableDictionary *s_apps = [NSMutableDictionary new];
-    // protects the app cache
-    static std::mutex& initLock = *new std::mutex();
-    std::lock_guard<std::mutex> lock(initLock);
-
+    std::lock_guard<std::mutex> lock(s_appMutex);
     if (RLMApp *app = s_apps[appId]) {
         return app;
     }

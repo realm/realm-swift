@@ -23,9 +23,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMFindOptions ()
-
 - (realm::app::MongoCollection::FindOptions)_findOptions;
-
 @end
 
 NS_ASSUME_NONNULL_END

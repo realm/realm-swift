@@ -91,8 +91,8 @@ public:
     }
 
     template<typename Func>
-    void enumerate_dictionary(__unsafe_unretained const id v, Func&& func) {
-        // FIXME: needs impl
+    void enumerate_dictionary(__unsafe_unretained const id, Func&&) {
+        REALM_COMPILER_HINT_UNREACHABLE();
     }
 
     template<typename T>

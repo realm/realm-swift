@@ -773,7 +773,6 @@ id RLMAccessorContext::box(realm::object_store::Set&& s) {
 id RLMAccessorContext::box(realm::object_store::Dictionary&& d) {
 //
 }
-
 id RLMAccessorContext::box(realm::Object&& o) {
     REALM_ASSERT(currentProperty);
     return RLMCreateObjectAccessor(_info.linkTargetType(currentProperty.index), o.obj());
@@ -838,6 +837,10 @@ realm::UUID RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
 }
 template<>
 realm::Mixed RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
+}
+template<>
+realm::object_store::Dictionary RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
     REALM_UNREACHABLE();
 }
 
@@ -1018,7 +1021,6 @@ bool RLMAccessorContext::is_same_dictionary(realm::object_store::Dictionary cons
     // FIXME: Implement
     return NO;
 }
-
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 @implementation RLMManagedPropertyAccessor
