@@ -16,17 +16,20 @@ def remove_reference_to_realm_xcode_project(workspace_path)
   workspace.save_as(workspace_path)
 end
 
-def set_framework_search_path(project_path, search_path)
-  project = Xcodeproj::Project.open(project_path)
-  project.build_configuration_list.set_setting("FRAMEWORK_SEARCH_PATHS", search_path)
-  project.save
-end
-
 def replace_in_file(filepath, pattern, replacement)
   contents = File.read(filepath)
   File.open(filepath, "w") do |file|
     file.puts contents.gsub(pattern, replacement)
   end
+end
+
+def replace_framework(example, path)
+  project_path = "#{example}/RealmExamples.xcodeproj"
+  replace_in_file("#{project_path}/project.pbxproj",
+                  /lastKnownFileType = wrapper.framework; path = (Realm|RealmSwift).framework; sourceTree = BUILT_PRODUCTS_DIR;/,
+                  "lastKnownFileType = wrapper.xcframework; name = \\1.xcframework; path = \"#{path}/\\1.xcframework\"; sourceTree = \"<group>\";")
+  replace_in_file("#{project_path}/project.pbxproj",
+                  /(Realm|RealmSwift).framework/, "\\1.xcframework")
 end
 
 ##########################
@@ -58,22 +61,14 @@ base_examples.each do |example|
   end
 end
 
-framework_directory_for_example = {
-  'examples/ios/objc' => '../../../ios/static',
-  'examples/osx/objc' => '../../../osx',
-  'examples/tvos/objc' => '../../../tvos'
-}
-xcode_versions.each do |xcode_version|
-  framework_directory_for_example["examples/ios/swift-#{xcode_version}"] = "../../../ios/swift-#{xcode_version}"
-  framework_directory_for_example["examples/tvos/swift-#{xcode_version}"] = "../../../tvos/swift-#{xcode_version}"
-end
-
 # Update the paths to the prebuilt frameworks
-framework_directory_for_example.each do |example, framework_directory|
-  project_path = "#{example}/RealmExamples.xcodeproj"
+replace_framework('examples/ios/objc', '../../../ios-static')
+replace_framework('examples/osx/objc', '../../..')
+replace_framework('examples/tvos/objc', '../../..')
 
-  replace_in_file("#{project_path}/project.pbxproj", /path = (Realm|RealmSwift).framework; sourceTree = BUILT_PRODUCTS_DIR;/, "path = \"#{framework_directory}/\\1.framework\"; sourceTree = SOURCE_ROOT;")
-  set_framework_search_path(project_path, framework_directory)
+xcode_versions.each do |xcode_version|
+  replace_framework("examples/ios/swift-#{xcode_version}", "../../../#{xcode_version}")
+  replace_framework("examples/tvos/swift-#{xcode_version}", "../../../#{xcode_version}")
 end
 
 # Update Playground imports and instructions
@@ -86,6 +81,3 @@ xcode_versions.each do |xcode_version|
                   "import Foundation\nimport PlaygroundFrameworkWrapper // only necessary to use a binary release of Realm Swift in this playground.\n")
 end
 
-# Update RubyMotion sample
-
-replace_in_file('examples/ios/rubymotion/Simple/Rakefile', '/build/ios-', '/ios/')

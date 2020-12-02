@@ -19,9 +19,9 @@ def installationTest(platform, test, language) {
       sh """
       hostname
       export REALM_XCODE_VERSION=${carthageXcodeVersion}
-      cd examples/installation
-
       archive=\$(echo \$PWD/realm-${language}-*.zip)
+
+      cd examples/installation
       if [[ -f \$archive ]]; then
         mv \$archive .
         unzip realm-${language}-*.zip

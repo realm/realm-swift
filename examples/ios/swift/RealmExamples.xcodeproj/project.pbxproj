@@ -758,7 +758,6 @@
 				E886FB581A12A6FC00CB2D0B /* Frameworks */,
 				E886FB5B1A12A6FC00CB2D0B /* Resources */,
 				C01304E51A60A6CE00EB3E1E /* CopyFiles */,
-				C06D6CCE1B016A590066C324 /* Strip Framework Architectures */,
 			);
 			buildRules = (
 			);
@@ -776,7 +775,6 @@
 				E8CB07EB19BA6AB60018434A /* Sources */,
 				E8CB07EC19BA6AB60018434A /* Frameworks */,
 				C01304E91A60B77600EB3E1E /* CopyFiles */,
-				C06D6CCE1B016A590066C324 /* Strip Framework Architectures */,
 				227D20941CB4EEE7008F641B /* Resources */,
 			);
 			buildRules = (
@@ -796,7 +794,6 @@
 				E8CB081119BA6ABD0018434A /* Frameworks */,
 				E8CB081219BA6ABD0018434A /* Resources */,
 				C01304E71A60A6EC00EB3E1E /* CopyFiles */,
-				C06D6CCE1B016A590066C324 /* Strip Framework Architectures */,
 			);
 			buildRules = (
 			);
@@ -815,7 +812,6 @@
 				E8CB083619BA6AC60018434A /* Frameworks */,
 				E8CB083719BA6AC60018434A /* Resources */,
 				C09C491C1A6068E500638C9F /* CopyFiles */,
-				C06D6CCE1B016A590066C324 /* Strip Framework Architectures */,
 			);
 			buildRules = (
 			);
@@ -833,7 +829,6 @@
 				E8CB085A19BA6ACA0018434A /* Sources */,
 				E8CB085B19BA6ACA0018434A /* Frameworks */,
 				C09C490D1A6059BA00638C9F /* CopyFiles */,
-				C06D6CCE1B016A590066C324 /* Strip Framework Architectures */,
 				227D209D1CB4F451008F641B /* Resources */,
 			);
 			buildRules = (
@@ -852,7 +847,6 @@
 				E8D3F24F1A11765200620884 /* Sources */,
 				E8D3F2501A11765200620884 /* Frameworks */,
 				C01304E31A60A4A000EB3E1E /* CopyFiles */,
-				C06D6CCE1B016A590066C324 /* Strip Framework Architectures */,
 				227D20911CB4EB18008F641B /* Resources */,
 			);
 			buildRules = (
@@ -1051,24 +1045,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		C06D6CCE1B016A590066C324 /* Strip Framework Architectures */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Strip Framework Architectures";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		493759A0230D8CA60078C28E /* Sources */ = {
@@ -1465,7 +1441,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-                               CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1522,7 +1498,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-                               CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;

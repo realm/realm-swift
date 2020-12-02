@@ -13,26 +13,26 @@
 set -o pipefail
 set -e
 
-source_root="$(dirname "$0")"
+readonly source_root="$(dirname "$0")"
 
 # You can override the version of the core library
-: ${REALM_BASE_URL:="https://static.realm.io/downloads"} # set it if you need to use a remote repo
+: "${REALM_BASE_URL:="https://static.realm.io/downloads"}" # set it if you need to use a remote repo
 
-: ${REALM_CORE_VERSION:=$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' ${source_root}/dependencies.list)} # set to "current" to always use the current build
+: "${REALM_CORE_VERSION:=$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")}" # set to "current" to always use the current build
 
-: ${REALM_SYNC_VERSION:=$(sed -n 's/^REALM_SYNC_VERSION=\(.*\)$/\1/p' ${source_root}/dependencies.list)}
+: "${REALM_SYNC_VERSION:=$(sed -n 's/^REALM_SYNC_VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")}"
 
-: ${REALM_OBJECT_SERVER_VERSION:=$(sed -n 's/^MONGODB_STITCH_ADMIN_SDK_VERSION=\(.*\)$/\1/p' ${source_root}/dependencies.list)}
+: "${REALM_OBJECT_SERVER_VERSION:=$(sed -n 's/^MONGODB_STITCH_ADMIN_SDK_VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")}"
 
 # You can override the xcmode used
-: ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
+: "${XCMODE:=xcodebuild}" # must be one of: xcodebuild (default), xcpretty, xctool
 
 # Provide a fallback value for TMPDIR, relevant for Xcode Bots
-: ${TMPDIR:=$(getconf DARWIN_USER_TEMP_DIR)}
+: "${TMPDIR:=$(getconf DARWIN_USER_TEMP_DIR)}"
 
 PATH=/usr/libexec:$PATH
 
-if ! [ -z "${JENKINS_HOME}" ]; then
+if [ -n "${JENKINS_HOME}" ]; then
     XCPRETTY_PARAMS="--no-utf --report junit --output build/reports/junit.xml"
     CODESIGN_PARAMS="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO"
 fi
@@ -114,7 +114,7 @@ xcode() {
 
 xc() {
     # Logs xcodebuild output in realtime
-    : ${NSUnbufferedIO:=YES}
+    : "${NSUnbufferedIO:=YES}"
     args="$@ SWIFT_VERSION=$REALM_SWIFT_VERSION $REALM_EXTRA_BUILD_ARGUMENTS"
     if [[ "$XCMODE" == "xcodebuild" ]]; then
         xcode "$args"
@@ -132,10 +132,6 @@ xc() {
 xctest() {
   xc "$@" build-for-testing
   xc "$@" test
-}
-
-copy_bcsymbolmap() {
-    find "$1" -name '*.bcsymbolmap' -type f -exec cp {} "$2" \;
 }
 
 build_combined() {
@@ -158,50 +154,26 @@ build_combined() {
 
     # Derive build paths
     local build_products_path="build/DerivedData/Realm/Build/Products"
-    local build_intermediates_path="build/DerivedData/Realm/Build/Intermediates.noindex"
     local product_name="$module_name.framework"
-    local binary_path="$module_name"
     local os_path="$build_products_path/$config-$os$scope_suffix/$product_name"
     local simulator_path="$build_products_path/$config-$simulator$scope_suffix/$product_name"
     local out_path="build/$os_name$scope_suffix$version_suffix"
+    local xcframework_path="$out_path/$module_name.xcframework"
 
     # Build for each platform
     xc "-scheme '$scheme' -configuration $config -sdk $os build"
     xc "-scheme '$scheme' -configuration $config -sdk $simulator build ONLY_ACTIVE_ARCH=NO"
 
-    # Combine .swiftmodule
-    if [ -d $simulator_path/Modules/$module_name.swiftmodule ]; then
-      cp -R $simulator_path/Modules/$module_name.swiftmodule/* $os_path/Modules/$module_name.swiftmodule/
-    fi
-
-    # Copy *.bcsymbolmap to .framework for submitting app with bitcode
-    copy_bcsymbolmap "$build_products_path/$config-$os$scope_suffix" "$os_path"
-
-    # Retrieve build products
-    clean_retrieve $os_path $out_path $product_name
-
-    # Combine ar archives
-    LIPO_OUTPUT="$out_path/$product_name/$module_name"
-    xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
-
-    # The generated headers for Swift libraries have #ifdef checks to only
-    # define symbols for the applicable platforms, so we need to merge them as
-    # well.
-    if [ -f "$out_path/$product_name/Headers/$module_name-Swift.h" ]; then
-        cat "$simulator_path/Headers/$module_name-Swift.h" >> "$out_path/$product_name/Headers/$module_name-Swift.h"
-    fi
-
-    # Verify that the combined library has bitcode and we didn't accidentally
-    # remove it somewhere along the line
-    if [[ "$config" == "Release" ]]; then
-        sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
-    fi
+    # Create the xcframework
+    rm -rf "$xcframework_path"
+    xcodebuild -create-xcframework -allow-internal-distribution -output "$xcframework_path" \
+        -framework "$os_path" -framework "$simulator_path"
 }
 
 copy_realm_framework() {
     local platform="$1"
-    rm -rf build/$platform/swift-$REALM_XCODE_VERSION/Realm.framework
-    cp -R build/$platform/Realm.framework build/$platform/swift-$REALM_XCODE_VERSION
+    rm -rf build/$platform/swift-$REALM_XCODE_VERSION/Realm.xcframework
+    cp -R build/$platform/Realm.xcframework build/$platform/swift-$REALM_XCODE_VERSION
 }
 
 clean_retrieve() {
@@ -590,8 +562,6 @@ case "$COMMAND" in
         ;;
 
     "xcframework")
-        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS BUILD_LIBRARY_FOR_DISTRIBUTION=YES REALM_OBJC_MACH_O_TYPE=staticlib OTHER_LDFLAGS=-ObjC"
-
         # Build all of the requested frameworks
         shift
         PLATFORMS="${*:-osx ios watchos tvos catalyst}"
@@ -604,131 +574,10 @@ case "$COMMAND" in
         find build/DerivedData/Realm/Build/Products -name 'Realm.framework' \
             | grep -v '\-static' \
             | sed 's/.*/-framework &/' \
-            | xargs xcodebuild -create-xcframework -output build/Realm.xcframework
+            | xargs xcodebuild -create-xcframework -allow-internal-distribution -output build/Realm.xcframework
         find build/DerivedData/Realm/Build/Products -name 'RealmSwift.framework' \
             | sed 's/.*/-framework &/' \
-            | xargs xcodebuild -create-xcframework -output build/RealmSwift.xcframework
-
-        # strip-frameworks.sh isn't needed with xcframeworks since we don't
-        # lipo together device/simulator libs
-        find build/Realm.xcframework -name 'strip-frameworks.sh' -delete
-        find build/RealmSwift.xcframework -name 'strip-frameworks.sh' -delete
-
-        # swiftinterface files currently have incorrect name resolution which
-        # results in the RealmSwift.Realm class name clashing with the Realm
-        # module name. Work around this by renaming the Realm module to
-        # RealmObjc. This is safe to do with a pre-built library because the
-        # module name is unrelated to what symbols are exported by an obj-c
-        # library, and we're statically linking the obj-c library into the
-        # swift library so it doesn't need to be loaded at runtime.
-        cd build
-        cp -R Realm.xcframework RealmObjc.xcframework
-        find RealmObjc.xcframework -name 'Realm.framework' \
-            -execdir mv {} RealmObjc.framework \; || true 2> /dev/null
-        find RealmObjc.xcframework -name '*.h' \
-            -exec sed -i '' 's/Realm\//RealmObjc\//' {} \;
-        find RealmObjc.xcframework -name 'module.modulemap' \
-            -exec sed -i '' 's/module Realm/module RealmObjc/' {} \;
-        sed -i '' 's/Realm.framework/RealmObjc.framework/' RealmObjc.xcframework/Info.plist
-
-        find RealmSwift.xcframework -name '*.swiftinterface' \
-            -exec sed -i '' 's/import Realm/import RealmObjc/' {} \; \
-            -exec sed -i '' 's/Realm.RLM/RealmObjc.RLM/g' {} \; \
-            -exec sed -i '' 's/Realm.RealmSwift/RealmObjc.RealmSwift/g' {} \; \
-
-        # Realm is statically linked into RealmSwift so we no longer actually
-        # need the obj-c static library, and just need the framework shell.
-        # Remove everything but placeholder.o so that there's still a library
-        # to link against that just doesn't define any symbols.
-        find RealmObjc.xcframework -name 'Realm' | while read file; do
-            (
-                cd $(dirname $file)
-                if readlink Realm > /dev/null; then
-                    ln -sf Versions/Current/RealmObjc Realm
-                elif lipo -info Realm | grep -q 'Non-fat'; then
-                    ar -t Realm | grep -v placeholder | tr '\n' '\0' | xargs -0 ar -d Realm >/dev/null 2>&1
-                    ranlib Realm >/dev/null 2>&1
-                else
-                    for arch in $(lipo -info Realm | cut -f3 -d':'); do
-                        lipo Realm -thin $arch -output tmp.a
-                        ar -t tmp.a | grep -v placeholder | tr '\n' '\0' | xargs -0 ar -d tmp.a >/dev/null 2>&1
-                        ranlib tmp.a >/dev/null 2>&1
-                        lipo Realm -replace $arch tmp.a -output Realm
-                        rm tmp.a
-                    done
-                fi
-                mv Realm RealmObjc
-            )
-        done
-
-        # We built Realm.framework as a static framework so that we could link
-        # it into RealmSwift.framework and not have to deal with the runtime
-        # implications of renaming the shared library, but we want the end
-        # result to be that Realm.xcframework is a dynamic framework. Our build
-        # system isn't really set up to build both static and dynamic versions
-        # of it, so instead just turn each of the static libraries in
-        # Realm.xcframework into a shared library.
-        cd Realm.xcframework
-        i=0
-        while plist_get Info.plist "AvailableLibraries:$i" > /dev/null; do
-            arch_dir_name="$(plist_get Info.plist "AvailableLibraries:$i:LibraryIdentifier")"
-            platform="$(plist_get Info.plist "AvailableLibraries:$i:SupportedPlatform")"
-            variant="$(plist_get Info.plist "AvailableLibraries:$i:SupportedPlatformVariant" 2> /dev/null || echo 'os')"
-            deployment_target_name="$platform"
-            install_name='@rpath/Realm.framework/Realm'
-            bitcode_flag='-fembed-bitcode'
-            if [ "$variant" = 'simulator' ]; then
-                bitcode_flag=''
-            elif [ "$variant" = 'maccatalyst' ]; then
-                platform='macos'
-            fi
-            case "$platform" in
-              "macos")   sdk='macosx'; install_name='@rpath/Realm.framework/Versions/A/Realm'; bitcode_flag='';;
-              "ios")     sdk="iphone$variant"; deployment_target_name='iphoneos';;
-              "watchos") sdk="watch$variant";;
-              "tvos")    sdk="appletv$variant";;
-            esac
-            if [ "$variant" = 'maccatalyst' ]; then
-                target='x86_64-apple-ios13.0-macabi'
-            else
-                deployment_target=$(grep -i "$deployment_target_name.*_DEPLOYMENT_TARGET" ../../Configuration/Base.xcconfig \
-                                    | sed 's/.*= \(.*\);/\1/')
-                target="${platform}${deployment_target}"
-            fi
-
-            architectures=""
-            j=0
-            while plist_get Info.plist "AvailableLibraries:$i:SupportedArchitectures:$j" > /dev/null; do
-                architectures="${architectures} -arch $(plist_get Info.plist "AvailableLibraries:$i:SupportedArchitectures:$j")"
-                j=$(($j + 1))
-            done
-
-            (
-                cd $arch_dir_name/Realm.framework
-                realm_lib=$(readlink Realm || echo 'Realm')
-                # feature_token.cpp.o depends on PKey, which isn't actually
-                # present in the macOS build of the sync library. This normally
-                # works fine because we never reference any symbols from
-                # feature_token.cpp.o so it doesn't get pulled in at all, but
-                # -all_load makes every object file in the input get linked
-                # into the shared library.
-                ar -d $realm_lib feature_token.cpp.o 2> /dev/null || true
-                clang++ -shared $architectures \
-                    -target ${target} \
-                    -isysroot $(xcrun --sdk ${sdk} --show-sdk-path) \
-                    -install_name "$install_name" \
-                    -compatibility_version 1 -current_version 1 \
-                    -fapplication-extension \
-                    $bitcode_flag \
-                    -Wl,-all_load \
-                    -Wl,-unexported_symbol,'__Z*' \
-                    -o realm.dylib \
-                    Realm -lz
-                mv realm.dylib $realm_lib
-            )
-
-            i=$(($i + 1))
-        done
+            | xargs xcodebuild -create-xcframework -allow-internal-distribution -output build/RealmSwift.xcframework
 
         exit 0
         ;;
@@ -1395,7 +1244,7 @@ EOM
         sh build.sh ios-static
 
         cd build/ios-static
-        zip --symlinks -r realm-framework-ios-static.zip Realm.framework
+        zip --symlinks -r realm-framework-ios-static.zip Realm.xcframework
         ;;
 
     "package")
@@ -1412,70 +1261,73 @@ EOM
 
     "package-release")
         LANG="$2"
-        TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package-${LANG}.XXXX)
+        tempdir=$(mktemp -d $TMPDIR/realm-release-package-${LANG}.XXXX)
+        extract_dir=$(mktemp -d $TMPDIR/realm-release-package-${LANG}.XXXX)
+        version=$(sh build.sh get-version)
+        package_dir="${tempdir}/realm-${LANG}-${version}"
 
-        VERSION=$(sh build.sh get-version)
-
-        FOLDER=${TEMPDIR}/realm-${LANG}-${VERSION}
-
-        mkdir -p ${FOLDER}/osx ${FOLDER}/ios ${FOLDER}/watchos ${FOLDER}/tvos
+        mkdir -p "${package_dir}"
 
         if [[ "${LANG}" == "objc" ]]; then
-            mkdir -p ${FOLDER}/ios/static
-            mkdir -p ${FOLDER}/ios/dynamic
-            mkdir -p ${FOLDER}/Swift
-
-            unzip ${WORKSPACE}/realm-framework-ios-static.zip -d ${FOLDER}/ios/static
+            mkdir -p "${extract_dir}"
+            unzip ${WORKSPACE}/realm-framework-ios-static.zip -d ${package_dir}/ios-static
             for platform in osx ios watchos tvos catalyst; do
-                unzip ${WORKSPACE}/realm-framework-${platform}-${REALM_XCODE_VERSION}.zip -d ${FOLDER}/${platform}
-                mv ${FOLDER}/${platform}/swift-*/Realm.framework ${FOLDER}/${platform}
-                rm -r ${FOLDER}/${platform}/swift-*
+                unzip ${WORKSPACE}/realm-framework-${platform}-${REALM_XCODE_VERSION}.zip -d ${extract_dir}/${platform}
             done
+            find "${extract_dir}" -name 'Realm.framework' \
+                | sed 's/.*/-framework &/' \
+                | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "${package_dir}/Realm.xcframework"
 
-            mv ${FOLDER}/ios/Realm.framework ${FOLDER}/ios/dynamic
+            cp "${WORKSPACE}/Realm/Swift/RLMSupport.swift" "${package_dir}"
+            rm -r "${extract_dir}"
         else
-            for platform in osx ios watchos tvos catalyst; do
-                find ${WORKSPACE} -name "realm-framework-$platform-*.zip" \
-                                  -maxdepth 1 \
-                                  -exec unzip {} -d ${FOLDER}/${platform} \;
+            xcode_versions=$(find . -name 'realm-framework-*-1*' | sed 's@./realm-framework-[a-z]*-\(.*\).zip@\1@' | sort -u)
+            for xcode_version in $xcode_versions; do
+                mkdir -p "${extract_dir}"
+                for platform in osx ios watchos tvos catalyst; do
+                    unzip "realm-framework-$platform-$xcode_version.zip" -d "${extract_dir}/${platform}"
+                done
+                find "${extract_dir}" -name 'Realm.framework' \
+                    | sed 's/.*/-framework &/' \
+                    | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "${package_dir}/${xcode_version}/Realm.xcframework"
+                find "${extract_dir}" -name 'RealmSwift.framework' \
+                    | sed 's/.*/-framework &/' \
+                    | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "${package_dir}/${xcode_version}/RealmSwift.xcframework"
+                rm -r "${extract_dir}"
             done
         fi
 
         (
             cd ${WORKSPACE}
-            cp -R plugin ${FOLDER}
-            cp LICENSE ${FOLDER}/LICENSE.txt
-            if [[ "${LANG}" == "objc" ]]; then
-                cp Realm/Swift/RLMSupport.swift ${FOLDER}/Swift/
-            fi
+            cp -R plugin LICENSE ${package_dir}
         )
 
         (
-            cd ${FOLDER}
+            cd ${package_dir}
             unzip ${WORKSPACE}/realm-examples.zip
             cd examples
             if [[ "${LANG}" == "objc" ]]; then
                 rm -rf ios/swift-* tvos/swift-*
             else
-                rm -rf ios/objc ios/rubymotion osx tvos/objc
+                rm -rf ios/objc osx tvos/objc
             fi
         )
 
-        cat > ${FOLDER}/docs.webloc <<EOF
+        cat > ${package_dir}/docs.webloc <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>URL</key>
-    <string>https://realm.io/docs/${LANG}/${VERSION}</string>
+    <string>https://realm.io/docs/${LANG}/${version}</string>
 </dict>
 </plist>
 EOF
 
         (
-          cd ${TEMPDIR}
-          zip --symlinks -r realm-${LANG}-${VERSION}.zip realm-${LANG}-${VERSION}
-          mv realm-${LANG}-${VERSION}.zip ${WORKSPACE}
+          cd "${tempdir}"
+          zip --symlinks -r "realm-${LANG}-${version}.zip" "realm-${LANG}-${version}"
+          mv "realm-${LANG}-${version}.zip" "${WORKSPACE}"
         )
         ;;
 
@@ -1495,31 +1347,31 @@ EOF
         mkdir -p "$WORKSPACE"
         WORKSPACE="$(cd "$WORKSPACE" && pwd)"
         export WORKSPACE
-        cd $WORKSPACE
-        git clone --recursive $REALM_SOURCE realm-cocoa
+        cd "$WORKSPACE"
+        git clone --recursive "$REALM_SOURCE" realm-cocoa
         cd realm-cocoa
 
         echo 'Packaging iOS'
         sh build.sh package-ios-static
         cp build/ios-static/realm-framework-ios-static.zip .
         sh build.sh package ios
-        cp build/ios/realm-framework-ios-$REALM_XCODE_VERSION.zip .
+        cp "build/ios/realm-framework-ios-$REALM_XCODE_VERSION.zip" .
 
         echo 'Packaging macOS'
         sh build.sh package osx
-        cp build/osx/realm-framework-osx-$REALM_XCODE_VERSION.zip .
+        cp "build/osx/realm-framework-osx-$REALM_XCODE_VERSION.zip" .
 
         echo 'Packaging watchOS'
         sh build.sh package watchos
-        cp build/watchos/realm-framework-watchos-$REALM_XCODE_VERSION.zip .
+        cp "build/watchos/realm-framework-watchos-$REALM_XCODE_VERSION.zip" .
 
         echo 'Packaging tvOS'
         sh build.sh package tvos
-        cp build/tvos/realm-framework-tvos-$REALM_XCODE_VERSION.zip .
+        cp "build/tvos/realm-framework-tvos-$REALM_XCODE_VERSION.zip" .
 
         echo 'Packaging Catalyst'
         sh build.sh package catalyst
-        cp build/catalyst/realm-framework-catalyst-$REALM_XCODE_VERSION.zip .
+        cp "build/catalyst/realm-framework-catalyst-$REALM_XCODE_VERSION.zip" .
 
         echo 'Packaging examples'
         sh build.sh package-examples
