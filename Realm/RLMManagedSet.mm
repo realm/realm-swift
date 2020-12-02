@@ -345,7 +345,9 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
         @throw RLMException(@"Can only perform intersectsSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
-    _backingSet.assign_intersection(rhs->_backingSet);
+    changeSet(self, NSKeyValueChangeReplacement, ^{
+        _backingSet.assign_intersection(rhs->_backingSet);
+    });
 }
 
 - (BOOL)intersectsSet:(RLMSet<id> *)set {
@@ -368,7 +370,9 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
         @throw RLMException(@"Can only perform minusSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
-    _backingSet.assign_difference(rhs->_backingSet);
+    changeSet(self, NSKeyValueChangeReplacement, ^{
+        _backingSet.assign_difference(rhs->_backingSet);
+    });
 }
 
 - (id)valueForKeyPath:(NSString *)keyPath {
