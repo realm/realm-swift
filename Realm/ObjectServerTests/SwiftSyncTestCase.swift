@@ -95,10 +95,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         return try Realm(configuration: configuration)
     }
 
-    open func synchronouslyLogInUser(for credentials: Credentials,
-                                     app: App? = nil,
-                                     file: StaticString = #file,
-                                     line: UInt = #line) throws -> User {
+    open func logInUser(for credentials: Credentials, app: App? = nil) throws -> User {
         var theUser: User!
         let ex = expectation(description: "Should log in the user properly")
 
@@ -115,26 +112,6 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
         waitForExpectations(timeout: 10, handler: nil)
         return theUser
-    }
-
-    public func synchronouslyLogOutUser(_ user: User,
-                                        file: StaticString = #file,
-                                        line: UInt = #line) throws {
-        var theError: Error?
-        let ex = expectation(description: "Should log out the user properly")
-
-        user.logOut { (error) in
-            theError = error
-            ex.fulfill()
-        }
-
-        waitForExpectations(timeout: 10, handler: nil)
-        XCTAssertEqual(user.state, .loggedOut,
-                       "User should have been valid, but wasn't. (error: "
-                        + "\(theError?.localizedDescription ?? "nil"))",
-            file: file,
-            line: line)
-        XCTAssertFalse(user.isLoggedIn)
     }
 
     public func waitForUploads(for realm: Realm) {

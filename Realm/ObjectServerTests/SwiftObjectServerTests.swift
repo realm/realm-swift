@@ -54,7 +54,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             let realm = try openRealm(partitionValue: #function, user: user)
             XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
         } catch {
@@ -64,7 +64,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testBasicSwiftSyncWithNilPartitionValue() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             let realm = try openRealm(partitionValue: .null, user: user)
             XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
         } catch {
@@ -75,7 +75,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     /// If client B adds objects to a Realm, client A should see those new objects.
     func testSwiftAddObjects() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             let realm = try openRealm(partitionValue: #function, user: user)
             if isParent {
                 checkCount(expected: 0, realm, SwiftPerson.self)
@@ -99,7 +99,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testSwiftAddObjectsWithNilPartitionValue() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             let realm = try openRealm(partitionValue: .null, user: user)
             if isParent {
                 checkCount(expected: 0, realm, SwiftPerson.self)
@@ -128,7 +128,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     /// If client B removes objects from a Realm, client A should see those changes.
     func testSwiftDeleteObjects() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             let realm = try openRealm(partitionValue: #function, user: user)
             if isParent {
                 try realm.write {
@@ -159,7 +159,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let partitionValueC = "\(#function)baz"
 
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
 
             let realmA = try openRealm(partitionValue: partitionValueA, user: user)
             let realmB = try openRealm(partitionValue: partitionValueB, user: user)
@@ -217,7 +217,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testConnectionState() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             let realm = try immediatelyOpenRealm(partitionValue: #function, user: user)
             let session = realm.syncSession!
 
@@ -249,7 +249,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testClientReset() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             let realm = try openRealm(partitionValue: #function, user: user)
 
             var theError: SyncError?
@@ -280,7 +280,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testClientResetManualInitiation() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             var theError: SyncError?
 
             try autoreleasepool {
@@ -315,7 +315,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func populateRealm(user: User, partitionValue: String) {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             let config = user.configuration(testName: partitionValue)
             let realm = try openRealm(configuration: config)
             try! realm.write {
@@ -332,7 +332,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testStreamingDownloadNotifier() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             if !isParent {
                 populateRealm(user: user, partitionValue: #function)
                 return
@@ -380,7 +380,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             var transferred = 0
             var transferrable = 0
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             let config = user.configuration(testName: #function)
             let realm = try openRealm(configuration: config)
             let session = realm.syncSession
@@ -414,7 +414,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testDownloadRealm() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             if !isParent {
                 populateRealm(user: user, partitionValue: #function)
                 return
@@ -453,7 +453,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testDownloadRealmToCustomPath() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             if !isParent {
                 populateRealm(user: user, partitionValue: #function)
                 return
@@ -495,7 +495,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testCancelDownloadRealm() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             if !isParent {
                 populateRealm(user: user, partitionValue: #function)
                 return
@@ -529,7 +529,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testAsyncOpenProgress() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
             if !isParent {
                 populateRealm(user: user, partitionValue: #function)
                 return
@@ -573,7 +573,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let user: User
         do {
-            user = try synchronouslyLogInUser(for: basicCredentials(app: app), app: app)
+            user = try logInUser(for: basicCredentials(app: app), app: app)
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
             return
@@ -648,7 +648,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             let email = "testInvalidCredentialsEmail"
             let credentials = basicCredentials()
-            let user = try synchronouslyLogInUser(for: credentials)
+            let user = try logInUser(for: credentials)
             XCTAssertEqual(user.state, .loggedIn)
 
             let credentials2 = Credentials.emailPassword(email: email, password: "NOT_A_VALID_PASSWORD")
@@ -672,7 +672,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testUserExpirationCallback() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let user = try logInUser(for: basicCredentials())
 
             // Set a callback on the user
             var blockCalled = false
@@ -1199,7 +1199,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         super.tearDown()
     }
     func testMongoClient() {
-        let user = try! synchronouslyLogInUser(for: Credentials.anonymous)
+        let user = try! logInUser(for: Credentials.anonymous)
         let mongoClient = user.mongoClient("mongodb1")
         XCTAssertEqual(mongoClient.name, "mongodb1")
         let database = mongoClient.database(named: "test_data")
@@ -1220,7 +1220,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
     }
 
     func setupMongoCollection() -> MongoCollection {
-        let user = try! synchronouslyLogInUser(for: basicCredentials())
+        let user = try! logInUser(for: basicCredentials())
         let mongoClient = user.mongoClient("mongodb1")
         let database = mongoClient.database(named: "test_data")
         let collection = database.collection(withName: "Dog")
@@ -2048,7 +2048,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     }
 
     func setupMongoCollection() -> MongoCollection {
-        let user = try! synchronouslyLogInUser(for: basicCredentials())
+        let user = try! logInUser(for: basicCredentials())
         let mongoClient = user.mongoClient("mongodb1")
         let database = mongoClient.database(named: "test_data")
         let collection = database.collection(withName: "Dog")
@@ -3329,7 +3329,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     }
 
     func testShouldNotDeleteOnMigrationWithSync() {
-        let user = try! synchronouslyLogInUser(for: basicCredentials())
+        let user = try! logInUser(for: basicCredentials())
         var configuration = user.configuration(partitionValue: appId)
 
         assertThrows(configuration.deleteRealmIfMigrationNeeded = true,
