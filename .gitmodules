@@ -1,4 +1,0 @@
-[submodule "Realm/ObjectStore"]
-	path = Realm/ObjectStore
-	url = https://github.com/realm/realm-object-store.git
-	branch = v10
