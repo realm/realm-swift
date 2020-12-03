@@ -1073,8 +1073,8 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      Returns a frozen (immutable) snapshot of this collection.
 
      The frozen copy is an immutable collection which contains the same data as this collection
-    currently contains, but will not update when writes are made to the containing Realm. Unlike
-    live collections, frozen collections can be accessed from any thread.
+     currently contains, but will not update when writes are made to the containing Realm. Unlike
+     live collections, frozen collections can be accessed from any thread.
 
      - warning: This method cannot be called during a write transaction, or when the containing
     Realm is read-only.
@@ -1084,6 +1084,11 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
     */
     public func freeze() -> AnyRealmCollection { return base.freeze() }
 
+    /**
+     Returns a live, mutable version of this frozen collection.
+
+     If a called on a non-frozen collection, will return itself.
+    */
     public func thaw() throws -> AnyRealmCollection { return try base.thaw() }
 
 }

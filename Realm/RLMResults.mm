@@ -502,7 +502,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
     RLMRealm *frozenRealm = [_realm freeze];
     return translateRLMResultsErrors([&] {
-        return [self.class resultsWithObjectInfo:_info->freeze(frozenRealm)
+        return [self.class resultsWithObjectInfo:_info->resolve(frozenRealm)
                                          results:_results.freeze(frozenRealm->_realm)];
     });
 }
