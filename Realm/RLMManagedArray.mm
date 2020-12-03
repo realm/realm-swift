@@ -26,6 +26,7 @@
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
+#import "RLMRealmConfiguration_Private.hpp"
 #import "RLMSchema.h"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
@@ -518,10 +519,13 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
         return self;
     }
 
-    RLMRealmConfiguration *config = [_realm configuration];
-    RLMRealm *liveRealm = [RLMRealm realmWithConfiguration:config error:nil];
-    RLMThreadSafeReference *ref = [RLMThreadSafeReference referenceWithThreadConfined:self];
-    return [liveRealm resolveThreadSafeReference:ref];
+    RLMRealmConfiguration *rlmConfig = _realm.configuration;
+    auto tsr = realm::ThreadSafeReference(_backingList);
+    RLMRealm *liveRealm = [RLMRealm realmWithConfiguration:rlmConfig error:nil];
+    auto& parentInfo = liveRealm->_info[_ownerInfo->rlmObjectSchema.className];
+    return [[self.class alloc] initWithList: tsr.resolve<realm::List>(liveRealm->_realm)
+                                 parentInfo:&parentInfo
+                                   property:parentInfo.rlmObjectSchema[_key]];
 }
 
 // The compiler complains about the method's argument type not matching due to
