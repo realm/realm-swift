@@ -86,6 +86,8 @@ let credentials = Credentials.JWT(token: myToken)
     case facebook(accessToken: String)
     /// Credentials from a Google serverAuthCode.
     case google(serverAuthCode: String)
+    /// Credentials from a Google idToken.
+    case googleId(token: String)
     /// Credentials from an Apple id token.
     case apple(idToken: String)
     /// Credentials from an email and password.

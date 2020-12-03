@@ -411,6 +411,11 @@ static NSString *randomEmail() {
     XCTAssertEqualObjects(googleCredential.provider, @"oauth2-google");
 }
 
+- (void)testGoogleIdCredential {
+    RLMCredentials *googleCredential = [RLMCredentials credentialsWithGoogleIdToken:@"id token"];
+    XCTAssertEqualObjects(googleCredential.provider, @"oauth2-google");
+}
+
 - (void)testAppleCredential {
     RLMCredentials *appleCredential = [RLMCredentials credentialsWithAppleToken:@"apple token"];
     XCTAssertEqualObjects(appleCredential.provider, @"oauth2-apple");
