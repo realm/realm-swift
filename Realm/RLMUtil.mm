@@ -22,6 +22,7 @@
 #import "RLMSet_Private.hpp"
 #import "RLMDecimal128_Private.hpp"
 #import "RLMListBase.h"
+#import "RLMSetBase.h"
 #import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"

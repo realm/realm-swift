@@ -62,6 +62,7 @@ class ObjectSchemaTests: TestCase {
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
+            "        set = NO;\n" +
             "        optional = NO;\n" +
             "    }\n" +
             "    intCol {\n" +
@@ -69,6 +70,7 @@ class ObjectSchemaTests: TestCase {
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
+            "        set = NO;\n" +
             "        optional = NO;\n" +
             "    }\n" +
             "    intEnumCol {\n" +
@@ -76,6 +78,7 @@ class ObjectSchemaTests: TestCase {
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
+            "        set = NO;\n" +
             "        optional = NO;\n" +
             "    }\n" +
             "    floatCol {\n" +
@@ -83,6 +86,7 @@ class ObjectSchemaTests: TestCase {
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
+            "        set = NO;\n" +
             "        optional = NO;\n" +
             "    }\n" +
             "    doubleCol {\n" +
@@ -90,6 +94,7 @@ class ObjectSchemaTests: TestCase {
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
+            "        set = NO;\n" +
             "        optional = NO;\n" +
             "    }\n" +
             "    stringCol {\n" +
@@ -97,6 +102,7 @@ class ObjectSchemaTests: TestCase {
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
+            "        set = NO;\n" +
             "        optional = NO;\n" +
             "    }\n" +
             "    binaryCol {\n" +
@@ -104,6 +110,7 @@ class ObjectSchemaTests: TestCase {
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
+            "        set = NO;\n" +
             "        optional = NO;\n" +
             "    }\n" +
             "    dateCol {\n" +
@@ -111,6 +118,7 @@ class ObjectSchemaTests: TestCase {
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
+            "        set = NO;\n" +
             "        optional = NO;\n" +
             "    }\n" +
             "    decimalCol {\n" +
@@ -118,6 +126,7 @@ class ObjectSchemaTests: TestCase {
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
+            "        set = NO;\n" +
             "        optional = NO;\n" +
             "    }\n" +
             "    objectIdCol {\n" +
@@ -125,6 +134,7 @@ class ObjectSchemaTests: TestCase {
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
+            "        set = NO;\n" +
             "        optional = NO;\n" +
             "    }\n" +
             "    objectCol {\n" +
@@ -134,6 +144,7 @@ class ObjectSchemaTests: TestCase {
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = NO;\n" +
+            "        set = NO;\n" +
             "        optional = YES;\n" +
             "    }\n" +
             "    arrayCol {\n" +
@@ -143,8 +154,19 @@ class ObjectSchemaTests: TestCase {
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +
             "        array = YES;\n" +
+            "        set = NO;\n" +
             "        optional = NO;\n" +
             "    }\n" +
+//            "    setCol {\n" +
+//            "        type = object;\n" +
+//            "        objectClassName = SwiftBoolObject;\n" +
+//            "        linkOriginPropertyName = (null);\n" +
+//            "        indexed = NO;\n" +
+//            "        isPrimary = NO;\n" +
+//            "        array = NO;\n" +
+//            "        set = YES;\n" +
+//            "        optional = NO;\n" +
+//            "    }\n" +
             "}"
 
         XCTAssertEqual(objectSchema.description, expected.replacingOccurrences(of: "    ", with: "\t"))

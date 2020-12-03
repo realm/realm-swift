@@ -45,9 +45,19 @@ import Realm
         return object._rlmArray
     }
 
+    /// Convert a `MutableSet` to a `RLMSet`.
+    public static func convert<T>(object: MutableSet<T>) -> RLMSet<AnyObject> {
+        return object._rlmSet
+    }
+
     /// Convert a `RLMArray` to a `List`.
     public static func convert(object: RLMArray<AnyObject>) -> List<Object> {
         return List(objc: object)
+    }
+
+    /// Convert a `RLMSet` to a `MutableSet`.
+    public static func convert(object: RLMSet<AnyObject>) -> MutableSet<Object> {
+        return MutableSet(objc: object)
     }
 
     /// Convert a `LinkingObjects` to a `RLMResults`.

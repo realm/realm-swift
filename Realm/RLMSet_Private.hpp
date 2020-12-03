@@ -61,14 +61,6 @@ class RLMObservationInfo;
 
 void RLMValidateSetObservationKey(NSString *keyPath, RLMSet *set);
 
-// Initialize the observation info for an array if needed
-void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
-                                   NSString *keyPath, RLMSet *set, id observed);
-
-
-//
-// RLMResults private methods
-//
-//@interface RLMResults () <RLMFastEnumerable>
-//- (void)deleteObjectsFromRealm;
-//@end
+// Initialize the observation info for a set if needed
+void RLMEnsureSetObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
+                                 NSString *keyPath, RLMSet *set, id observed);

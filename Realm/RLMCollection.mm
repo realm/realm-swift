@@ -22,6 +22,7 @@
 #import "RLMArray_Private.hpp"
 #import "RLMSet_Private.hpp"
 #import "RLMListBase.h"
+#import "RLMSetBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"

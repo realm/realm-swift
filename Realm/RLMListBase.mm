@@ -155,7 +155,3 @@
 }
 
 @end
-
-@implementation RLMSetBase
-
-@end

@@ -102,6 +102,7 @@ RLM_ARRAY_TYPE(MigrationTestObject);
 @interface MigrationLinkObject : RLMObject
 @property MigrationTestObject *object;
 @property RLMArray<MigrationTestObject> *array;
+@property RLMSet<MigrationTestObject> *set;
 @end
 
 @implementation MigrationLinkObject

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2020 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,25 +18,17 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMArray, RLMObjectBase, RLMResults, RLMProperty, RLMLinkingObjects, RLMSet;
+@class RLMSet, RLMObjectBase, RLMResults, RLMProperty;
 
 NS_ASSUME_NONNULL_BEGIN
 
-// A base class for Swift generic Lists to make it possible to interact with
+// A base class for Swift generic MutableSets to make it possible to interact with
 // them from obj-c
-@interface RLMListBase : NSObject <NSFastEnumeration>
-@property (nonatomic, strong) RLMArray *_rlmArray;
+@interface RLMSetBase : NSObject <NSFastEnumeration>
+@property (nonatomic, strong) RLMSet *_rlmSet;
 
 - (instancetype)init;
-- (instancetype)initWithArray:(RLMArray *)array;
-@end
-
-@interface RLMLinkingObjectsHandle : NSObject
-- (instancetype)initWithObject:(RLMObjectBase *)object property:(RLMProperty *)property;
-- (instancetype)initWithLinkingObjects:(RLMResults *)linkingObjects;
-- (instancetype)freeze;
-
-@property (nonatomic, readonly) RLMLinkingObjects *results;
+- (instancetype)initWithSet:(RLMSet *)set;
 @end
 
 NS_ASSUME_NONNULL_END

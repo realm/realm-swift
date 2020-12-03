@@ -64,6 +64,7 @@ let package = Package(
                 "Realm/RLMDecimal128.mm",
                 "Realm/RLMEmbeddedObject.mm",
                 "Realm/RLMListBase.mm",
+                "Realm/RLMSetBase.mm",
                 "Realm/RLMManagedArray.mm",
                 "Realm/RLMManagedSet.mm",
                 "Realm/RLMMigration.mm",
