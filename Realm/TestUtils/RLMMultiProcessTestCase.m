@@ -62,6 +62,10 @@
     return self;
 }
 
+- (BOOL)encryptTests {
+    return NO;
+}
+
 - (void)setUp {
     self.isParent = !getenv("RLMProcessIsChild");
     self.xctestPath = [self locateXCTest];

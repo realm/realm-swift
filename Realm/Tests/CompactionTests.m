@@ -79,8 +79,11 @@ static const NSUInteger count = 1000;
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = RLMTestRealmURL();
     configuration.shouldCompactOnLaunch = ^BOOL(NSUInteger totalBytes, NSUInteger usedBytes){
-        // Confirm expected sizes
-        XCTAssertEqual(totalBytes, _expectedTotalBytesBefore);
+        // The reported size is the logical size of the file and not the size
+        // on disk for encrypted Realms
+        if (!self.encryptTests) {
+            XCTAssertEqual(totalBytes, _expectedTotalBytesBefore);
+        }
         XCTAssertTrue((usedBytes < totalBytes) && (usedBytes > expectedUsedBytesBeforeMin));
         return true;
     };
@@ -185,8 +188,11 @@ static const NSUInteger count = 1000;
     __block BOOL compactBlockInvoked = NO;
 
     configurationWithCompactBlock.shouldCompactOnLaunch = ^BOOL(NSUInteger totalBytes, NSUInteger usedBytes){
-        // Confirm expected sizes
-        XCTAssertEqual(totalBytes, _expectedTotalBytesBefore);
+        // The reported size is the logical size of the file and not the size
+        // on disk for encrypted Realms
+        if (!self.encryptTests) {
+            XCTAssertEqual(totalBytes, _expectedTotalBytesBefore);
+        }
         XCTAssertTrue((usedBytes < totalBytes) && (usedBytes > expectedUsedBytesBeforeMin));
         compactBlockInvoked = YES;
         return true;
@@ -209,8 +215,11 @@ static const NSUInteger count = 1000;
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = RLMTestRealmURL();
     configuration.shouldCompactOnLaunch = ^BOOL(NSUInteger totalBytes, NSUInteger usedBytes){
-        // Confirm expected sizes
-        XCTAssertEqual(totalBytes, _expectedTotalBytesBefore);
+        // The reported size is the logical size of the file and not the size
+        // on disk for encrypted Realms
+        if (!self.encryptTests) {
+            XCTAssertEqual(totalBytes, _expectedTotalBytesBefore);
+        }
         XCTAssertTrue((usedBytes < totalBytes) && (usedBytes > expectedUsedBytesBeforeMin));
 
         // Don't compact.
