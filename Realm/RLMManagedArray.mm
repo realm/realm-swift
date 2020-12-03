@@ -506,7 +506,7 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     }
 
     RLMRealm *frozenRealm = [_realm freeze];
-    auto& parentInfo = _ownerInfo->freeze(frozenRealm);
+    auto& parentInfo = _ownerInfo->resolve(frozenRealm);
     return translateRLMResultsErrors([&] {
         return [[self.class alloc] initWithList:_backingList.freeze(frozenRealm->_realm)
                                      parentInfo:&parentInfo
@@ -520,9 +520,10 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     }
 
     RLMRealmConfiguration *rlmConfig = _realm.configuration;
-    auto tsr = realm::ThreadSafeReference(_backingList);
     RLMRealm *liveRealm = [RLMRealm realmWithConfiguration:rlmConfig error:nil];
-    auto& parentInfo = liveRealm->_info[_ownerInfo->rlmObjectSchema.className];
+
+    auto tsr = realm::ThreadSafeReference(_backingList);
+    auto& parentInfo = _ownerInfo->resolve(liveRealm);
     return [[self.class alloc] initWithList: tsr.resolve<realm::List>(liveRealm->_realm)
                                  parentInfo:&parentInfo
                                    property:parentInfo.rlmObjectSchema[_key]];
