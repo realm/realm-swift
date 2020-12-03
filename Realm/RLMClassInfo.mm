@@ -77,8 +77,8 @@ RLMClassInfo &RLMClassInfo::linkTargetType(realm::Property const& property) {
 }
 
 RLMClassInfo &RLMClassInfo::freeze(__unsafe_unretained RLMRealm *const frozenRealm) {
-    REALM_ASSERT(frozenRealm.frozen);
     // FIXME
+    // REALM_ASSERT(frozenRealm.frozen);
     return frozenRealm->_info[rlmObjectSchema.className];
 }
 
