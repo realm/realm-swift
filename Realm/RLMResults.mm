@@ -516,11 +516,13 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         return self;
     }
 
+    RLMRealmConfiguration *rlmConfig = _realm.configuration;
+    RLMRealm *liveRealm = [RLMRealm realmWithConfiguration:rlmConfig error:nil];
+
     auto tsr = realm::ThreadSafeReference(_results);
-    auto& config = [_realm.configuration config];
-    SharedRealm realm = Realm::get_shared_realm(config);
     return translateRLMResultsErrors([&] {
-        return [[self.class alloc] initWithResults: tsr.resolve<realm::Results>(realm)];
+        return [self.class resultsWithObjectInfo:_info->resolve(liveRealm)
+                                         results:tsr.resolve<realm::Results>(liveRealm->_realm)];
     });
 }
 
