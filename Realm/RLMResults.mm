@@ -519,7 +519,9 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     auto tsr = realm::ThreadSafeReference(_results);
     auto& config = [_realm.configuration config];
     SharedRealm realm = Realm::get_shared_realm(config);
-    return [[RLMResults alloc] initWithResults: tsr.resolve<realm::Results>(realm)];
+    return translateRLMResultsErrors([&] {
+        return [[self.class alloc] initWithResults: tsr.resolve<realm::Results>(realm)];
+    });
 }
 
 // The compiler complains about the method's argument type not matching due to

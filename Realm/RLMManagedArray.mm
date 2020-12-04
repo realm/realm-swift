@@ -524,9 +524,11 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
 
     auto tsr = realm::ThreadSafeReference(_backingList);
     auto& parentInfo = _ownerInfo->resolve(liveRealm);
-    return [[self.class alloc] initWithList: tsr.resolve<realm::List>(liveRealm->_realm)
-                                 parentInfo:&parentInfo
-                                   property:parentInfo.rlmObjectSchema[_key]];
+    return translateRLMResultsErrors([&] {
+        return [[self.class alloc] initWithList: tsr.resolve<realm::List>(liveRealm->_realm)
+                                     parentInfo:&parentInfo
+                                       property:parentInfo.rlmObjectSchema[_key]];
+    });
 }
 
 // The compiler complains about the method's argument type not matching due to
