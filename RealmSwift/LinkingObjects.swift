@@ -338,7 +338,7 @@ import Realm
      transaction on the Realm may result in the Realm file growing to large sizes. See
      `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
     */
-    public func thaw() throws -> LinkingObjects<Element> {
+    public func thaw() -> LinkingObjects<Element> {
         return LinkingObjects(propertyName: propertyName, handle: handle?.thaw())
     }
 

@@ -525,7 +525,7 @@ class RealmCollectionTypeTests: TestCase {
     func testThaw() {
         let frozen = collection.freeze()
         XCTAssertTrue(frozen.isFrozen)
-        let thawed = try! frozen.thaw()
+        let thawed = frozen.thaw()
         XCTAssertFalse(thawed.isFrozen)
     }
 

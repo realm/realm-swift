@@ -502,7 +502,17 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
     */
     func freeze() -> Self
 
-    func thaw() throws -> Self
+    /**
+     Returns a live, mutable version of this frozen collection.
+
+     This method resolves a reference to a live copy of the same frozen collection.
+     If a called on a non-frozen collection, will return itself.
+
+     - warning: Holding onto a thawed collection for an extended period while performing write
+     transaction on the Realm may result in the Realm file growing to large sizes. See
+     `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
+    */
+    func thaw() -> Self
 }
 
 public extension RealmCollection {
@@ -663,7 +673,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func _asNSFastEnumerator() -> Any { fatalError() }
     var isFrozen: Bool { fatalError() }
     func freeze() -> AnyRealmCollection<T> { fatalError() }
-    func thaw() throws -> AnyRealmCollection<T> { fatalError() }
+    func thaw() -> AnyRealmCollection<T> { fatalError() }
 }
 
 private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollectionBase<C.Element> {
@@ -783,8 +793,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
         return AnyRealmCollection(base.freeze())
     }
 
-    override func thaw() throws -> AnyRealmCollection<Element> {
-        return AnyRealmCollection(try base.thaw())
+    override func thaw() -> AnyRealmCollection<Element> {
+        return AnyRealmCollection(base.thaw())
     }
 }
 
@@ -1094,7 +1104,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      transaction on the Realm may result in the Realm file growing to large sizes. See
      `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
     */
-    public func thaw() throws -> AnyRealmCollection { return try base.thaw() }
+    public func thaw() -> AnyRealmCollection { return base.thaw() }
 
 }
 
