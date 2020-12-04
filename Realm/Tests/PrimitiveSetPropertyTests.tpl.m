@@ -619,27 +619,27 @@ static double average(NSArray *values) {
     $obj[@"$prop"] = (id)@[$v1]; ^nl XCTAssertEqualObjects($obj[@"$prop"][0], $v1);
 
     // Should replace and not append
-    $obj[@"$prop"] = (id)$values; ^nl XCTAssertEqualObjects([$obj[@"$prop"] valueForKey:@"self"], ($values)); ^nl
+    $obj[@"$prop"] = (id)$values; ^nl XCTAssertEqualObjects([[$obj[@"$prop"] valueForKey:@"self"] allObjects], ($values)); ^nl
 
     // Should not clear the set
-    $obj[@"$prop"] = $obj[@"$prop"]; ^nl XCTAssertEqualObjects([$obj[@"$prop"] valueForKey:@"self"], ($values)); ^nl
+    $obj[@"$prop"] = $obj[@"$prop"]; ^nl XCTAssertEqualObjects([[$obj[@"$prop"] valueForKey:@"self"] allObjects], ($values)); ^nl
 
     [unmanaged[@"intObj"] removeAllObjects];
     unmanaged[@"intObj"] = managed.intObj;
-    XCTAssertEqualObjects([unmanaged[@"intObj"] valueForKey:@"self"], (@[@2, @3]));
+    XCTAssertEqualObjects([[unmanaged[@"intObj"] valueForKey:@"self"] allObjects], (@[@2, @3]));
 
     [managed[@"intObj"] removeAllObjects];
     managed[@"intObj"] = unmanaged.intObj;
-    XCTAssertEqualObjects([managed[@"intObj"] valueForKey:@"self"], (@[@2, @3]));
+    XCTAssertEqualObjects([[managed[@"intObj"] valueForKey:@"self"] allObjects], (@[@2, @3]));
 }
 
 - (void)testInvalidAssignment {
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)@[NSNull.null],
-                              @"Invalid value '<null>' of type 'NSNull' for 'int' set property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value '<null>' of type 'NSNull' for 'int' property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)@[@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)(@[@1, @"a"]),
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)unmanaged.floatObj,
                               @"RLMSet<float> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)optUnmanaged.intObj,
@@ -650,11 +650,11 @@ static double average(NSArray *values) {
                               @"RLMSet<int?> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
 
     RLMAssertThrowsWithReason(managed.intObj = (id)@[NSNull.null],
-                              @"Invalid value '<null>' of type 'NSNull' for 'int' set property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value '<null>' of type 'NSNull' for 'int' property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)@[@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)(@[@1, @"a"]),
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)managed.floatObj,
                               @"RLMSet<float> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)optManaged.intObj,

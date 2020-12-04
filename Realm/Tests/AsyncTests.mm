@@ -975,7 +975,7 @@
     [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
         RLMRealm *realm = [RLMRealm defaultRealm];
         [realm transactionWithBlock:^{
-            [realm deleteObject:[ArrayPropertyObject allObjectsInRealm:realm].firstObject];
+            [realm deleteObject:[SetPropertyObject allObjectsInRealm:realm].firstObject];
         }];
     }];
 
@@ -985,7 +985,7 @@
     [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
         RLMRealm *realm = [RLMRealm defaultRealm];
         [realm transactionWithBlock:^{
-            [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+            [SetPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
         }];
     }];
 

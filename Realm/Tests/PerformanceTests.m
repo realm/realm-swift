@@ -21,7 +21,7 @@
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.h"
 
-#if !DEBUG && TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
+//#if !DEBUG && TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
 
 @interface PerformanceTests : RLMTestCase
 @property (nonatomic) dispatch_queue_t queue;
@@ -232,6 +232,37 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     }];
 }
 
+- (void)testEnumerateAndAccessSetProperty {
+    RLMRealm *realm = [self getStringObjects:5];
+
+    [realm beginWriteTransaction];
+    SetPropertyObject *spo = [SetPropertyObject createInRealm:realm
+                                                    withValue:@[@"name", [StringObject allObjectsInRealm:realm], @[]]];
+    [realm commitWriteTransaction];
+
+    [self measureBlock:^{
+        for (StringObject *so in spo.stringSet) {
+            (void)[so stringCol];
+        }
+    }];
+}
+
+- (void)testEnumerateAndAccessSetPropertySlow {
+    RLMRealm *realm = [self getStringObjects:5];
+
+    [realm beginWriteTransaction];
+    SetPropertyObject *spo = [SetPropertyObject createInRealm:realm
+                                                    withValue:@[@"name", [StringObject allObjectsInRealm:realm], @[]]];
+    [realm commitWriteTransaction];
+
+    [self measureBlock:^{
+        RLMSet *set = spo.stringSet;
+        for (NSUInteger i = 0; i < set.count; ++i) {
+            (void)[set[i] stringCol];
+        }
+    }];
+}
+
 - (void)testEnumerateAndMutateAll {
     RLMRealm *realm = [self getStringObjects:5];
 
@@ -364,7 +395,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [realm commitWriteTransaction];
 
     [self measureBlock:^{
-        (void)[[IntObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"intCol" ascending:YES].lastObject;
+        (void)[[IntObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:@"intCol" ascending:YES].lastObject;
     }];
 }
 
@@ -628,7 +659,10 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
         const NSUInteger initial = obj.array.count;
         [self observeObject:obj keyPath:@"array"
-                      until:^(ArrayPropertyObject *obj) { return obj.array.count < initial; }];
+                      until:^(ArrayPropertyObject *o) {
+            return o.array.count < initial;
+
+        }];
 
         [self startMeasuring];
         [realm beginWriteTransaction];
@@ -684,8 +718,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         const NSUInteger factor = count / 10;
 
         [self observeObject:obj keyPath:@"array"
-                      until:^(id obj) { return [obj array].count >= count; }];
-
+                      until:^(ArrayPropertyObject *o) { return o.array.count >= count; }];
         RLMArray *array = obj.array;
         [self startMeasuring];
         [realm beginWriteTransaction];
@@ -702,6 +735,104 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
                 [realm beginWriteTransaction];
             }
             if (array.count > count) {
+                break;
+            }
+        }
+        [realm commitWriteTransaction];
+
+        dispatch_sync(_queue, ^{});
+    }];
+}
+
+- (void)testSetKVOIndexHandlingRemoveForward {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [self getStringObjects:50];
+        [realm beginWriteTransaction];
+        SetPropertyObject *obj = [SetPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
+        [realm commitWriteTransaction];
+
+        const NSUInteger initial = obj.stringSet.count;
+        [self observeObject:obj keyPath:@"array"
+                      until:^(SetPropertyObject *obj) { return obj.stringSet.count < initial; }];
+
+        [self startMeasuring];
+        [realm beginWriteTransaction];
+        [obj.stringSet removeAllObjects];
+        [realm commitWriteTransaction];
+        dispatch_sync(_queue, ^{});
+    }];
+}
+
+- (void)testSetKVOIndexHandlingRemoveBackwards {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [self getStringObjects:50];
+        [realm beginWriteTransaction];
+        SetPropertyObject *obj = [SetPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
+        [realm commitWriteTransaction];
+
+        const NSUInteger initial = obj.stringSet.count;
+        [self observeObject:obj keyPath:@"array"
+                      until:^(SetPropertyObject *obj) { return obj.stringSet.count < initial; }];
+
+        [self startMeasuring];
+        [realm beginWriteTransaction];
+        [obj.stringSet removeAllObjects];
+        [realm commitWriteTransaction];
+        dispatch_sync(_queue, ^{});
+    }];
+}
+
+- (void)testSetKVOIndexHandlingInsertCompact {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [self getStringObjects:50];
+        [realm beginWriteTransaction];
+        SetPropertyObject *obj = [SetPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+        [realm commitWriteTransaction];
+
+        const NSUInteger count = [StringObject allObjectsInRealm:realm].count / 8;
+        const NSUInteger factor = count / 10;
+
+        [self observeObject:obj keyPath:@"array"
+                      until:^(SetPropertyObject *obj) { return obj.stringSet.count >= count; }];
+
+        RLMSet *set = obj.stringSet;
+        [self startMeasuring];
+        [realm beginWriteTransaction];
+        for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
+            [set addObject:so];
+            if (set.count % factor == 0) {
+                [realm commitWriteTransaction];
+                dispatch_semaphore_wait(_sema, DISPATCH_TIME_FOREVER);
+                [realm beginWriteTransaction];
+            }
+            if (set.count > count) {
+                break;
+            }
+        }
+        [realm commitWriteTransaction];
+
+        dispatch_sync(_queue, ^{});
+    }];
+}
+
+- (void)testSetKVOIndexHandlingInsertSparse {
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        RLMRealm *realm = [self getStringObjects:50];
+        [realm beginWriteTransaction];
+        SetPropertyObject *obj = [SetPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+        [realm commitWriteTransaction];
+
+        const NSUInteger count = [StringObject allObjectsInRealm:realm].count / 8;
+        const NSUInteger factor = count / 10;
+
+        [self observeObject:obj keyPath:@"array"
+                      until:^(id o) { return [o stringSet].count >= count; }];
+        RLMSet *set = obj.stringSet;
+        [self startMeasuring];
+        [realm beginWriteTransaction];
+        for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
+            [set addObject:so];
+            if (set.count > count) {
                 break;
             }
         }
@@ -741,4 +872,4 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
 @end
 
-#endif
+//#endif

@@ -20,7 +20,9 @@
 
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
+#import "RLMSet_Private.hpp"
 #import "RLMListBase.h"
+#import "RLMSetBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
@@ -187,6 +189,12 @@ void RLMObservationInfo::recordObserver(realm::Obj& objectRow, RLMClassInfo *obj
         array->_key = key;
         array->_parentObject = object;
     }
+    else if (prop && prop.set) {
+        id value = valueForKey(key);
+        RLMSet *set = [value isKindOfClass:[RLMSetBase class]] ? [value _rlmSet] : value;
+        set->_key = key;
+        set->_parentObject = object;
+    }
     else if (auto swiftIvar = prop.swiftIvar) {
         if (auto optional = RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, swiftIvar))) {
             RLMInitializeUnmanagedOptional(optional, object, prop);
@@ -226,6 +234,18 @@ id RLMObservationInfo::valueForKey(NSString *key) {
     // the object as that leads to retain cycles.
     if (lastProp.array) {
         RLMArray *value = cachedObjects[key];
+        if (!value) {
+            value = getSuper();
+            if (!cachedObjects) {
+                cachedObjects = [NSMutableDictionary new];
+            }
+            cachedObjects[key] = value;
+        }
+        return value;
+    }
+
+    if (lastProp.set) {
+        RLMSet *value = cachedObjects[key];
         if (!value) {
             value = getSuper();
             if (!cachedObjects) {
