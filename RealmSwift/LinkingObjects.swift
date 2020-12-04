@@ -328,6 +328,16 @@ import Realm
         return LinkingObjects(propertyName: propertyName, handle: handle?.freeze())
     }
 
+    /**
+     Returns a live, mutable version of this frozen collection.
+
+     This method resolves a reference to a live copy of the same frozen collection.
+     If a called on a non-frozen collection, will return itself.
+
+     - warning: Holding onto a thawed collection for an extended period while performing write
+     transaction on the Realm may result in the Realm file growing to large sizes. See
+     `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
+    */
     public func thaw() throws -> LinkingObjects<Element> {
         return LinkingObjects(propertyName: propertyName, handle: handle?.thaw())
     }

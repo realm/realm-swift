@@ -492,6 +492,16 @@ __attribute__((warn_unused_result));
  */
 - (instancetype)freeze;
 
+/**
+ Returns a live, mutable version of this frozen collection.
+
+ This method resolves a reference to a live copy of the same frozen collection.
+ If a called on a non-frozen collection, will return itself.
+
+ @warning Holding onto a thawed collection for an extended period while performing write
+          transaction on the Realm may result in the Realm file growing to large sizes. See
+          `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
+*/
 - (instancetype)thaw;
 
 #pragma mark - Unavailable Methods
