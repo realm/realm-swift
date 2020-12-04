@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -131,11 +131,8 @@
 		3F2E66651CA0BA12004761D5 /* NotificationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F2E66611CA0B9D5004761D5 /* NotificationTests.m */; };
 		3F336E8A1DA2FA14006CB5A0 /* RLMSyncConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A36236A1D83868F00945A54 /* RLMSyncConfiguration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		3F336E8B1DA2FA15006CB5A0 /* RLMSyncConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A36236A1D83868F00945A54 /* RLMSyncConfiguration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		3F34B5BA255DCA1100303EA7 /* mongo_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F34B5B4255DCA1100303EA7 /* mongo_client.cpp */; };
 		3F34B5BB255DCA1100303EA7 /* mongo_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F34B5B4255DCA1100303EA7 /* mongo_client.cpp */; };
-		3F34B5BC255DCA1100303EA7 /* mongo_collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F34B5B5255DCA1100303EA7 /* mongo_collection.cpp */; };
 		3F34B5BD255DCA1100303EA7 /* mongo_collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F34B5B5255DCA1100303EA7 /* mongo_collection.cpp */; };
-		3F34B5C2255DCA1100303EA7 /* mongo_database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F34B5B8255DCA1100303EA7 /* mongo_database.cpp */; };
 		3F34B5C3255DCA1100303EA7 /* mongo_database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F34B5B8255DCA1100303EA7 /* mongo_database.cpp */; };
 		3F3BBAF324B8FD32009D8D51 /* RLMSyncUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A4FFC971D35A71000B4B65C /* RLMSyncUtil.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3F4657371F27F2EF00456B07 /* RLMTestCaseUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 297FBEFA1C19F696009D1118 /* RLMTestCaseUtils.swift */; };
@@ -846,10 +843,7 @@
 		3F2E66611CA0B9D5004761D5 /* NotificationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationTests.m; sourceTree = "<group>"; };
 		3F34B5B4255DCA1100303EA7 /* mongo_client.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mongo_client.cpp; path = sync/mongo_client.cpp; sourceTree = "<group>"; };
 		3F34B5B5255DCA1100303EA7 /* mongo_collection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mongo_collection.cpp; path = sync/mongo_collection.cpp; sourceTree = "<group>"; };
-		3F34B5B6255DCA1100303EA7 /* mongo_collection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = mongo_collection.hpp; path = sync/mongo_collection.hpp; sourceTree = "<group>"; };
-		3F34B5B7255DCA1100303EA7 /* mongo_database.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = mongo_database.hpp; path = sync/mongo_database.hpp; sourceTree = "<group>"; };
 		3F34B5B8255DCA1100303EA7 /* mongo_database.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mongo_database.cpp; path = sync/mongo_database.cpp; sourceTree = "<group>"; };
-		3F34B5B9255DCA1100303EA7 /* mongo_client.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = mongo_client.hpp; path = sync/mongo_client.hpp; sourceTree = "<group>"; };
 		3F35027722C43C5200FDC1E5 /* TestHost-static.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "TestHost-static.xcconfig"; sourceTree = "<group>"; };
 		3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMSwiftSupport.m; path = Realm/RLMSwiftSupport.m; sourceTree = SOURCE_ROOT; };
 		3F4E324B1B98C6C700183A69 /* RLMSchema_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSchema_Private.hpp; sourceTree = "<group>"; };
@@ -1509,6 +1503,16 @@
 			path = bson;
 			sourceTree = "<group>";
 		};
+		537935E1257A641000CEC99E /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				3F34B5B4255DCA1100303EA7 /* mongo_client.cpp */,
+				3F34B5B5255DCA1100303EA7 /* mongo_collection.cpp */,
+				3F34B5B8255DCA1100303EA7 /* mongo_database.cpp */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		5D274C511D6D16BA006FEBB1 /* apple */ = {
 			isa = PBXGroup;
 			children = (
@@ -1804,6 +1808,7 @@
 				5D660FD91BE98C7C0021E04F /* RealmSwift Tests */,
 				3F558C7D22C299DB002F0F30 /* Test Utils */,
 				E81A1FB31955FCE000FDED82 /* CHANGELOG.md */,
+				537935E1257A641000CEC99E /* Recovered References */,
 			);
 			indentWidth = 4;
 			sourceTree = "<group>";
@@ -2737,9 +2742,6 @@
 				1A64CA8B1D8763B400BC0F9B /* keychain_helper.cpp in Sources */,
 				3F9026111C625C5D006AE98E /* list.cpp in Sources */,
 				3F9801A51C8E4F55000A8B07 /* list_notifier.cpp in Sources */,
-				3F34B5BA255DCA1100303EA7 /* mongo_client.cpp in Sources */,
-				3F34B5BC255DCA1100303EA7 /* mongo_collection.cpp in Sources */,
-				3F34B5C2255DCA1100303EA7 /* mongo_database.cpp in Sources */,
 				C281E9301E8BC7AC0015BA4A /* network_reachability_observer.cpp in Sources */,
 				3F73BC961E3A878500FE80B6 /* NSError+RLMSync.m in Sources */,
 				3FAB08481E1EC382001BC8DA /* object.cpp in Sources */,
@@ -2748,6 +2750,7 @@
 				5D659E831BE04556006515A0 /* object_schema.cpp in Sources */,
 				5D659E841BE04556006515A0 /* object_store.cpp in Sources */,
 				6879E7C72486B1C200A65EF4 /* push_client.cpp in Sources */,
+				53B76643255743DA00D33227 /* mongo_client.cpp in Sources */,
 				53B76645255743DA00D33227 /* mongo_database.cpp in Sources */,
 				3F0543EC1C56F71500AA5322 /* realm_coordinator.cpp in Sources */,
 				534402CE247FCBE100866F32 /* regular_expression.cpp in Sources */,
@@ -2784,7 +2787,6 @@
 				5D3E1A2F1C1FC6D5002913BA /* RLMPredicateUtil.mm in Sources */,
 				5D659E921BE04556006515A0 /* RLMProperty.mm in Sources */,
 				CF6E0487242A321200DB7F14 /* RLMProviderClient.mm in Sources */,
-				53B76643255743DA00D33227 /* mongo_client.cpp in Sources */,
 				6807E64C2487F7220096066F /* RLMPushClient.mm in Sources */,
 				5D659E931BE04556006515A0 /* RLMQueryUtil.mm in Sources */,
 				1AD397CE1F72FFC7002AA897 /* RLMRealm+Sync.mm in Sources */,
