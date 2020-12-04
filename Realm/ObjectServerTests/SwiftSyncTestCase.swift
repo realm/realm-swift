@@ -29,14 +29,12 @@ class SwiftSyncTestCase: RLMSyncTestCase {
       return String((0..<length).map { _ in letters.randomElement()! })
     }
 
-    func basicCredentials(usernameSuffix: String = "",
-                          file: StaticString = #file,
-                          line: UInt = #line) -> Credentials {
+    public func basicCredentials(usernameSuffix: String = "", app: App? = nil) -> Credentials {
         let email = "\(randomString(10))\(usernameSuffix)"
         let password = "abcdef"
         let credentials = Credentials.emailPassword(email: email, password: password)
         let ex = expectation(description: "Should register in the user properly")
-        app.emailPasswordAuth.registerUser(email: email, password: password, completion: { error in
+        (app ?? self.app).emailPasswordAuth.registerUser(email: email, password: password, completion: { error in
             XCTAssertNil(error)
             ex.fulfill()
         })
@@ -70,19 +68,20 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return try Realm(configuration: user.configuration(partitionValue: partitionValue))
     }
 
-    func synchronouslyLogInUser(for credentials: Credentials,
-                                file: StaticString = #file,
-                                line: UInt = #line) throws -> User {
+    open func synchronouslyLogInUser(for credentials: Credentials,
+                                     app: App? = nil,
+                                     file: StaticString = #file,
+                                     line: UInt = #line) throws -> User {
         var theUser: User!
         let ex = expectation(description: "Should log in the user properly")
 
-        self.app.login(credentials: credentials) { result in
+        (app ?? self.app).login(credentials: credentials) { result in
             switch result {
             case .success(let user):
                 theUser = user
                 XCTAssertTrue(theUser.isLoggedIn)
-            case .failure:
-                XCTFail("Should login user")
+            case .failure(let error):
+                XCTFail("Should login user: \(error)")
             }
             ex.fulfill()
         }
@@ -129,5 +128,35 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                   "Error: expected \(expected) items, but got \(actual) (process: \(isParent ? "parent" : "child"))",
                   file: file,
                   line: line)
+    }
+
+    var exceptionThrown = false
+
+    func assertThrows<T>(_ block: @autoclosure () -> T, named: String? = RLMExceptionName,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
+        RLMAssertThrowsWithName(self, { _ = block() }, named, message, fileName, lineNumber)
+    }
+
+    func assertThrows<T>(_ block: @autoclosure () -> T, reason: String,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
+        RLMAssertThrowsWithReason(self, { _ = block() }, reason, message, fileName, lineNumber)
+    }
+
+    func assertThrows<T>(_ block: @autoclosure () -> T, reasonMatching regexString: String,
+                         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
+        RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
+    }
+
+    func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
+                        lineNumber: UInt = #line, block: () throws -> Void) {
+        do {
+            try block()
+        } catch {
+            XCTFail("Expected no error, but instead caught <\(error)>.",
+                file: (fileName), line: lineNumber)
+        }
     }
 }

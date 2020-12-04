@@ -131,6 +131,12 @@
 		3F2E66651CA0BA12004761D5 /* NotificationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F2E66611CA0B9D5004761D5 /* NotificationTests.m */; };
 		3F336E8A1DA2FA14006CB5A0 /* RLMSyncConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A36236A1D83868F00945A54 /* RLMSyncConfiguration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		3F336E8B1DA2FA15006CB5A0 /* RLMSyncConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A36236A1D83868F00945A54 /* RLMSyncConfiguration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		3F34B5BA255DCA1100303EA7 /* mongo_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F34B5B4255DCA1100303EA7 /* mongo_client.cpp */; };
+		3F34B5BB255DCA1100303EA7 /* mongo_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F34B5B4255DCA1100303EA7 /* mongo_client.cpp */; };
+		3F34B5BC255DCA1100303EA7 /* mongo_collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F34B5B5255DCA1100303EA7 /* mongo_collection.cpp */; };
+		3F34B5BD255DCA1100303EA7 /* mongo_collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F34B5B5255DCA1100303EA7 /* mongo_collection.cpp */; };
+		3F34B5C2255DCA1100303EA7 /* mongo_database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F34B5B8255DCA1100303EA7 /* mongo_database.cpp */; };
+		3F34B5C3255DCA1100303EA7 /* mongo_database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F34B5B8255DCA1100303EA7 /* mongo_database.cpp */; };
 		3F3BBAF324B8FD32009D8D51 /* RLMSyncUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A4FFC971D35A71000B4B65C /* RLMSyncUtil.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3F4657371F27F2EF00456B07 /* RLMTestCaseUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 297FBEFA1C19F696009D1118 /* RLMTestCaseUtils.swift */; };
 		3F4F3AD523F71C790048DB43 /* RLMDecimal128.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F4F3ACF23F71C790048DB43 /* RLMDecimal128.mm */; };
@@ -307,13 +313,6 @@
 		53CA86CD255D626F000160AF /* RLMUser_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53CA86CC255D626F000160AF /* RLMUser_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		53CA86F0255D85DE000160AF /* RLMApp_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53CA86EF255D85DE000160AF /* RLMApp_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		53CA86F1255D85DE000160AF /* RLMApp_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53CA86EF255D85DE000160AF /* RLMApp_Private.h */; };
-		53ECFDAC24AA0C0D00A4CB89 /* assisted_agg in Resources */ = {isa = PBXBuildFile; fileRef = 53ECFDAB24AA0C0D00A4CB89 /* assisted_agg */; };
-		53ECFDAE24AA0C1100A4CB89 /* create_user in Resources */ = {isa = PBXBuildFile; fileRef = 53ECFDAD24AA0C1100A4CB89 /* create_user */; };
-		53ECFDB024AA0C1700A4CB89 /* stitch_server in Resources */ = {isa = PBXBuildFile; fileRef = 53ECFDAF24AA0C1700A4CB89 /* stitch_server */; };
-		53ECFDB224AA0C1B00A4CB89 /* update_doc in Resources */ = {isa = PBXBuildFile; fileRef = 53ECFDB124AA0C1B00A4CB89 /* update_doc */; };
-		53ECFDB624AA0C3F00A4CB89 /* transpiler in Resources */ = {isa = PBXBuildFile; fileRef = 53ECFDB524AA0C3F00A4CB89 /* transpiler */; };
-		53ECFDB824AA0C4900A4CB89 /* test_config.json in Resources */ = {isa = PBXBuildFile; fileRef = 53ECFDB724AA0C4900A4CB89 /* test_config.json */; };
-		53ECFDB924AA0DE500A4CB89 /* libstitch_support.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 53ECFDB324AA0C3500A4CB89 /* libstitch_support.dylib */; };
 		5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */; };
 		5D03FB1F1E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
 		5D03FB201E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
@@ -329,7 +328,6 @@
 		5D432B8E1CC0713F00A610A9 /* LinkingObjectsTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D432B8C1CC0713F00A610A9 /* LinkingObjectsTests.mm */; };
 		5D6156EE1BE0689200A4BD3F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D659ED91BE04556006515A0 /* Realm.framework */; };
 		5D6156FB1BE08E7E00A4BD3F /* PerformanceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */; };
-		5D6157051BE13CBB00A4BD3F /* strip-frameworks.sh in Resources */ = {isa = PBXBuildFile; fileRef = E81C393E1AE5CE6A00F03B56 /* strip-frameworks.sh */; };
 		5D659E811BE04556006515A0 /* external_commit_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */; };
 		5D659E821BE04556006515A0 /* index_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FBD05FA1B94E1C3004559CF /* index_set.cpp */; };
 		5D659E831BE04556006515A0 /* object_schema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FAE25561B8CEBBE00D01405 /* object_schema.cpp */; };
@@ -480,6 +478,7 @@
 		684BE25224927ACA00F122B1 /* RLMPushClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 6807E6492487E8660096066F /* RLMPushClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6879E7C72486B1C200A65EF4 /* push_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6879E7C62486B1C200A65EF4 /* push_client.cpp */; };
 		6879E7C82486B1C200A65EF4 /* push_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6879E7C62486B1C200A65EF4 /* push_client.cpp */; };
+		68A7B91D2543538B00C703BC /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
 		C042A48D1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C042A48E1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
@@ -845,6 +844,12 @@
 		3F2633C21E9D630000B32D30 /* PrimitiveListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimitiveListTests.swift; sourceTree = "<group>"; };
 		3F275EBD2433A5DA00161E7F /* RLMApp_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMApp_Private.hpp; sourceTree = "<group>"; };
 		3F2E66611CA0B9D5004761D5 /* NotificationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationTests.m; sourceTree = "<group>"; };
+		3F34B5B4255DCA1100303EA7 /* mongo_client.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mongo_client.cpp; path = sync/mongo_client.cpp; sourceTree = "<group>"; };
+		3F34B5B5255DCA1100303EA7 /* mongo_collection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mongo_collection.cpp; path = sync/mongo_collection.cpp; sourceTree = "<group>"; };
+		3F34B5B6255DCA1100303EA7 /* mongo_collection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = mongo_collection.hpp; path = sync/mongo_collection.hpp; sourceTree = "<group>"; };
+		3F34B5B7255DCA1100303EA7 /* mongo_database.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = mongo_database.hpp; path = sync/mongo_database.hpp; sourceTree = "<group>"; };
+		3F34B5B8255DCA1100303EA7 /* mongo_database.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mongo_database.cpp; path = sync/mongo_database.cpp; sourceTree = "<group>"; };
+		3F34B5B9255DCA1100303EA7 /* mongo_client.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = mongo_client.hpp; path = sync/mongo_client.hpp; sourceTree = "<group>"; };
 		3F35027722C43C5200FDC1E5 /* TestHost-static.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "TestHost-static.xcconfig"; sourceTree = "<group>"; };
 		3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMSwiftSupport.m; path = Realm/RLMSwiftSupport.m; sourceTree = SOURCE_ROOT; };
 		3F4E324B1B98C6C700183A69 /* RLMSchema_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSchema_Private.hpp; sourceTree = "<group>"; };
@@ -986,13 +991,6 @@
 		53C4E951253A34DE0004835F /* app_utils.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = app_utils.hpp; path = sync/app_utils.hpp; sourceTree = "<group>"; };
 		53CA86CC255D626F000160AF /* RLMUser_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMUser_Private.h; sourceTree = "<group>"; };
 		53CA86EF255D85DE000160AF /* RLMApp_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMApp_Private.h; path = Realm/RLMApp_Private.h; sourceTree = "<group>"; };
-		53ECFDAB24AA0C0D00A4CB89 /* assisted_agg */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = assisted_agg; path = build/go/src/github.com/10gen/stitch/assisted_agg; sourceTree = "<group>"; };
-		53ECFDAD24AA0C1100A4CB89 /* create_user */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = create_user; path = build/go/src/github.com/10gen/stitch/create_user; sourceTree = "<group>"; };
-		53ECFDAF24AA0C1700A4CB89 /* stitch_server */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = stitch_server; path = build/go/src/github.com/10gen/stitch/stitch_server; sourceTree = "<group>"; };
-		53ECFDB124AA0C1B00A4CB89 /* update_doc */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = update_doc; path = build/go/src/github.com/10gen/stitch/update_doc; sourceTree = "<group>"; };
-		53ECFDB324AA0C3500A4CB89 /* libstitch_support.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libstitch_support.dylib; path = build/go/src/github.com/10gen/stitch/etc/dylib/lib/libstitch_support.dylib; sourceTree = "<group>"; };
-		53ECFDB524AA0C3F00A4CB89 /* transpiler */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = transpiler; path = build/go/src/github.com/10gen/stitch/etc/transpiler/bin/transpiler; sourceTree = "<group>"; };
-		53ECFDB724AA0C4900A4CB89 /* test_config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = test_config.json; path = build/go/src/github.com/10gen/stitch/etc/configs/test_config.json; sourceTree = "<group>"; };
 		5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupport.swift; sourceTree = "<group>"; };
 		5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupportTests.swift; sourceTree = "<group>"; };
 		5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PredicateUtilTests.mm; sourceTree = "<group>"; };
@@ -1151,7 +1149,6 @@
 		E81A1FC31955FE0100FDED82 /* RealmTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RealmTests.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		E81A1FD01955FE0100FDED82 /* SwiftRealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftRealmTests.swift; sourceTree = "<group>"; };
 		E81A1FD11955FE0100FDED82 /* TransactionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransactionTests.m; sourceTree = "<group>"; };
-		E81C393E1AE5CE6A00F03B56 /* strip-frameworks.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "strip-frameworks.sh"; path = "scripts/strip-frameworks.sh"; sourceTree = SOURCE_ROOT; };
 		E8267FED1D90B79000E001C7 /* ObjectServerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ObjectServerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8267FF01D90B8E700E001C7 /* RLMObjectServerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = RLMObjectServerTests.mm; path = Realm/ObjectServerTests/RLMObjectServerTests.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		E82FA60A195632F20043A3C3 /* SwiftArrayPropertyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SwiftArrayPropertyTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -1372,7 +1369,6 @@
 		1AA5AEA21D98CA5300ED8C27 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
-				53ECFD9C24AA08C700A4CB89 /* Server */,
 				1AA5AE9A1D98A1B000ED8C27 /* Object-Server-Tests-Bridging-Header.h */,
 				3F73BC871E3A876600FE80B6 /* ObjectServerTests-Info.plist */,
 				537130C724A9E417001FDBBC /* RealmServer.swift */,
@@ -1513,20 +1509,6 @@
 			path = bson;
 			sourceTree = "<group>";
 		};
-		53ECFD9C24AA08C700A4CB89 /* Server */ = {
-			isa = PBXGroup;
-			children = (
-				53ECFDAB24AA0C0D00A4CB89 /* assisted_agg */,
-				53ECFDAD24AA0C1100A4CB89 /* create_user */,
-				53ECFDAF24AA0C1700A4CB89 /* stitch_server */,
-				53ECFDB524AA0C3F00A4CB89 /* transpiler */,
-				53ECFDB124AA0C1B00A4CB89 /* update_doc */,
-				53ECFDB324AA0C3500A4CB89 /* libstitch_support.dylib */,
-				53ECFDB724AA0C4900A4CB89 /* test_config.json */,
-			);
-			name = Server;
-			sourceTree = "<group>";
-		};
 		5D274C511D6D16BA006FEBB1 /* apple */ = {
 			isa = PBXGroup;
 			children = (
@@ -1614,11 +1596,13 @@
 				3FCB1A7422A9B0A2003807FB /* CodableTests.swift */,
 				3FE2BE0223D8CAD1002860E9 /* CombineTests.swift */,
 				E8AE7C251EA436F800CDFF9A /* CompactionTests.swift */,
+				CFFECBA8250646750010F585 /* Decimal128Tests.swift */,
 				5D660FFF1BE98D880021E04F /* KVOTests.swift */,
 				5D6610001BE98D880021E04F /* ListTests.swift */,
 				5D6610011BE98D880021E04F /* MigrationTests.swift */,
 				5D6610021BE98D880021E04F /* ObjectAccessorTests.swift */,
 				5D6610031BE98D880021E04F /* ObjectCreationTests.swift */,
+				CFFECBB225078D100010F585 /* ObjectIdTests.swift */,
 				5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */,
 				5D6610041BE98D880021E04F /* ObjectSchemaInitializationTests.swift */,
 				5D6610051BE98D880021E04F /* ObjectSchemaTests.swift */,
@@ -1636,8 +1620,6 @@
 				5D6610111BE98D880021E04F /* SwiftUnicodeTests.swift */,
 				5D6610121BE98D880021E04F /* TestCase.swift */,
 				3F73BC841E3A870F00FE80B6 /* ThreadSafeReferenceTests.swift */,
-				CFFECBA8250646750010F585 /* Decimal128Tests.swift */,
-				CFFECBB225078D100010F585 /* ObjectIdTests.swift */,
 			);
 			name = "RealmSwift Tests";
 			path = RealmSwift/Tests;
@@ -1748,6 +1730,7 @@
 				E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */,
 				3F7556731BE95A050058BC7E /* AsyncTests.mm */,
 				E8DA16F71E81210D0055141C /* CompactionTests.m */,
+				CFFECBAB250667A90010F585 /* Decimal128Tests.m */,
 				E81A1FBA1955FE0100FDED82 /* DynamicTests.m */,
 				021A882F1AAFB5BE00EEAC84 /* EncryptionTests.mm */,
 				E81A1FBB1955FE0100FDED82 /* EnumeratorTests.m */,
@@ -1758,6 +1741,7 @@
 				0207AB85195DFA15007EFB12 /* MigrationTests.mm */,
 				3F2E66611CA0B9D5004761D5 /* NotificationTests.m */,
 				3FEB383C1E70AC6900F22712 /* ObjectCreationTests.mm */,
+				CFFECBAF250690EA0010F585 /* ObjectIdTests.m */,
 				E81A1FBE1955FE0100FDED82 /* ObjectInterfaceTests.m */,
 				021A88301AAFB5BE00EEAC84 /* ObjectSchemaTests.m */,
 				E81A1FBF1955FE0100FDED82 /* ObjectTests.m */,
@@ -1774,8 +1758,6 @@
 				E81A1FD11955FE0100FDED82 /* TransactionTests.m */,
 				E8917597197A1B350068ACC6 /* UnicodeTests.m */,
 				021A88311AAFB5BE00EEAC84 /* UtilTests.mm */,
-				CFFECBAB250667A90010F585 /* Decimal128Tests.m */,
-				CFFECBAF250690EA0010F585 /* ObjectIdTests.m */,
 			);
 			name = "Objective-C";
 			sourceTree = "<group>";
@@ -1951,7 +1933,6 @@
 				023B19F71A423BD20067FB81 /* libc++.dylib */,
 				E81A1F621955FC9300FDED82 /* Realm-Info.plist */,
 				02E334C21A5F3C45009F8810 /* Realm.modulemap */,
-				E81C393E1AE5CE6A00F03B56 /* strip-frameworks.sh */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -2379,7 +2360,7 @@
 				CLASSPREFIX = RLM;
 				LastSwiftUpdateCheck = 0710;
 				LastTestingUpgradeCheck = 0510;
-				LastUpgradeCheck = 1200;
+				LastUpgradeCheck = 1220;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					3F1A5E711992EB7400F45F4C = {
@@ -2516,7 +2497,6 @@
 			files = (
 				5D659ED21BE04556006515A0 /* CHANGELOG.md in Resources */,
 				5D659ED51BE04556006515A0 /* LICENSE in Resources */,
-				5D6157051BE13CBB00A4BD3F /* strip-frameworks.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2531,15 +2511,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				53ECFDAC24AA0C0D00A4CB89 /* assisted_agg in Resources */,
-				53ECFDAE24AA0C1100A4CB89 /* create_user in Resources */,
 				536B7C0C24A4C223006B535D /* dependencies.list in Resources */,
-				53ECFDB924AA0DE500A4CB89 /* libstitch_support.dylib in Resources */,
 				536B7C1024A509AC006B535D /* setup_baas.rb in Resources */,
-				53ECFDB024AA0C1700A4CB89 /* stitch_server in Resources */,
-				53ECFDB824AA0C4900A4CB89 /* test_config.json in Resources */,
-				53ECFDB624AA0C3F00A4CB89 /* transpiler in Resources */,
-				53ECFDB224AA0C1B00A4CB89 /* update_doc in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2548,7 +2521,6 @@
 /* Begin PBXShellScriptBuildPhase section */
 		3F1DDB5825155E33007A9630 /* Carthage post-build workaround */ = {
 			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -2574,15 +2546,15 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/Realm/ObjectServerTests/setup_baas.rb",
 			);
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/baas",
-				"$(SRCROOT)/build/go/src/github.com/10gen/stitch/assisted_agg",
-				"$(SRCROOT)/build/go/src/github.com/10gen/stitch/create_user",
-				"$(SRCROOT)/build/go/src/github.com/10gen/stitch/stitch_server",
-				"$(SRCROOT)/build/go/src/github.com/10gen/stitch/update_doc",
+				"$(SRCROOT)/build/bin/assisted_agg",
+				"$(SRCROOT)/build/bin/create_user",
+				"$(SRCROOT)/build/bin/stitch_server",
+				"$(SRCROOT)/build/bin/update_doc",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -2765,6 +2737,9 @@
 				1A64CA8B1D8763B400BC0F9B /* keychain_helper.cpp in Sources */,
 				3F9026111C625C5D006AE98E /* list.cpp in Sources */,
 				3F9801A51C8E4F55000A8B07 /* list_notifier.cpp in Sources */,
+				3F34B5BA255DCA1100303EA7 /* mongo_client.cpp in Sources */,
+				3F34B5BC255DCA1100303EA7 /* mongo_collection.cpp in Sources */,
+				3F34B5C2255DCA1100303EA7 /* mongo_database.cpp in Sources */,
 				C281E9301E8BC7AC0015BA4A /* network_reachability_observer.cpp in Sources */,
 				3F73BC961E3A878500FE80B6 /* NSError+RLMSync.m in Sources */,
 				3FAB08481E1EC382001BC8DA /* object.cpp in Sources */,
@@ -2858,6 +2833,7 @@
 				3FB6ABD92416A27000E318C2 /* Decimal128.swift in Sources */,
 				3FC3F9172419B63200E27322 /* EmbeddedObject.swift in Sources */,
 				29B7FDF61C0DA6560023224E /* Error.swift in Sources */,
+				68A7B91D2543538B00C703BC /* RLMSupport.swift in Sources */,
 				5D1534B81CCFF545008976D7 /* LinkingObjects.swift in Sources */,
 				5D660FF21BE98D670021E04F /* List.swift in Sources */,
 				5D660FF31BE98D670021E04F /* Migration.swift in Sources */,
@@ -2890,19 +2866,19 @@
 				3FCB1A7522A9B0A2003807FB /* CodableTests.swift in Sources */,
 				3FE2BE0323D8CAD1002860E9 /* CombineTests.swift in Sources */,
 				E8AE7C261EA436F800CDFF9A /* CompactionTests.swift in Sources */,
+				CFFECBAA250646820010F585 /* Decimal128Tests.swift in Sources */,
 				3FF3FFAF1F0D6D6400B84599 /* KVOTests.swift in Sources */,
 				5D6610161BE98D880021E04F /* ListTests.swift in Sources */,
-				CFFECBB525078EC40010F585 /* ObjectIdTests.swift in Sources */,
 				3F8824FD1E5E335000586B35 /* MigrationTests.swift in Sources */,
 				3F8824FE1E5E335000586B35 /* ObjectAccessorTests.swift in Sources */,
 				3F8824FF1E5E335000586B35 /* ObjectCreationTests.swift in Sources */,
+				CFFECBB525078EC40010F585 /* ObjectIdTests.swift in Sources */,
 				3F8825001E5E335000586B35 /* ObjectiveCSupportTests.swift in Sources */,
 				3F8825011E5E335000586B35 /* ObjectSchemaInitializationTests.swift in Sources */,
 				3F8825021E5E335000586B35 /* ObjectSchemaTests.swift in Sources */,
 				3F8825031E5E335000586B35 /* ObjectTests.swift in Sources */,
 				3F8825041E5E335000586B35 /* PerformanceTests.swift in Sources */,
 				3F2633C31E9D630000B32D30 /* PrimitiveListTests.swift in Sources */,
-				CFFECBAA250646820010F585 /* Decimal128Tests.swift in Sources */,
 				3F8825051E5E335000586B35 /* PropertyTests.swift in Sources */,
 				3F8825061E5E335000586B35 /* RealmCollectionTypeTests.swift in Sources */,
 				3F8825071E5E335000586B35 /* RealmConfigurationTests.swift in Sources */,
@@ -2941,6 +2917,9 @@
 				E8FD2E381D93345100569F10 /* keychain_helper.cpp in Sources */,
 				3F9026131C625C63006AE98E /* list.cpp in Sources */,
 				3F9801A71C8E4F5A000A8B07 /* list_notifier.cpp in Sources */,
+				3F34B5BB255DCA1100303EA7 /* mongo_client.cpp in Sources */,
+				3F34B5BD255DCA1100303EA7 /* mongo_collection.cpp in Sources */,
+				3F34B5C3255DCA1100303EA7 /* mongo_database.cpp in Sources */,
 				C281E9291E8A9CC90015BA4A /* network_reachability_observer.cpp in Sources */,
 				3F73BC981E3A879E00FE80B6 /* NSError+RLMSync.m in Sources */,
 				3FAB08491E1EC385001BC8DA /* object.cpp in Sources */,
@@ -3049,6 +3028,7 @@
 				E856D214195615A900FB2FCF /* ArrayPropertyTests.m in Sources */,
 				3F7556761BE95A0D0058BC7E /* AsyncTests.mm in Sources */,
 				E8DA16F91E81210D0055141C /* CompactionTests.m in Sources */,
+				CFFECBAE250667B20010F585 /* Decimal128Tests.m in Sources */,
 				E856D216195615A900FB2FCF /* DynamicTests.m in Sources */,
 				021A88331AAFB5C900EEAC84 /* EncryptionTests.mm in Sources */,
 				E856D217195615A900FB2FCF /* EnumeratorTests.m in Sources */,
@@ -3058,6 +3038,7 @@
 				0207AB88195DFA15007EFB12 /* MigrationTests.mm in Sources */,
 				3F2E66651CA0BA12004761D5 /* NotificationTests.m in Sources */,
 				3FEB38401E70AC8800F22712 /* ObjectCreationTests.mm in Sources */,
+				CFFECBB1250690EA0010F585 /* ObjectIdTests.m in Sources */,
 				E856D21A195615A900FB2FCF /* ObjectInterfaceTests.m in Sources */,
 				021A88371AAFB5CE00EEAC84 /* ObjectSchemaTests.m in Sources */,
 				E856D21B195615A900FB2FCF /* ObjectTests.m in Sources */,
@@ -3067,7 +3048,6 @@
 				02AFB4641A80343600E11938 /* PropertyTests.m in Sources */,
 				E856D21D195615A900FB2FCF /* QueryTests.m in Sources */,
 				C042A48E1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */,
-				CFFECBAE250667B20010F585 /* Decimal128Tests.m in Sources */,
 				E856D21E195615A900FB2FCF /* RealmTests.mm in Sources */,
 				02AFB4681A80343600E11938 /* ResultsTests.m in Sources */,
 				3FE5819622C2CCA700BA10E7 /* RLMMultiProcessTestCase.m in Sources */,
@@ -3082,7 +3062,6 @@
 				3F8DCA7919930FCB0008BD7F /* SwiftLinkTests.swift in Sources */,
 				3F8DCA7B19930FCB0008BD7F /* SwiftObjectInterfaceTests.swift in Sources */,
 				3F8DCA7C19930FCB0008BD7F /* SwiftPropertyTypeTest.swift in Sources */,
-				CFFECBB1250690EA0010F585 /* ObjectIdTests.m in Sources */,
 				3F8DCA7D19930FCB0008BD7F /* SwiftRealmTests.swift in Sources */,
 				3F8DCA7519930FCB0008BD7F /* SwiftTestObjects.swift in Sources */,
 				3F8DCA7E19930FCB0008BD7F /* SwiftUnicodeTests.swift in Sources */,
@@ -3100,8 +3079,8 @@
 			files = (
 				E81A1FD51955FE0100FDED82 /* ArrayPropertyTests.m in Sources */,
 				3F7556751BE95A0C0058BC7E /* AsyncTests.mm in Sources */,
-				CFFECBAD250667B20010F585 /* Decimal128Tests.m in Sources */,
 				E8DA16F81E81210D0055141C /* CompactionTests.m in Sources */,
+				CFFECBAD250667B20010F585 /* Decimal128Tests.m in Sources */,
 				02E334C31A5F41C7009F8810 /* DynamicTests.m in Sources */,
 				021A88321AAFB5C800EEAC84 /* EncryptionTests.mm in Sources */,
 				E81A1FDB1955FE0100FDED82 /* EnumeratorTests.m in Sources */,
@@ -3112,6 +3091,7 @@
 				0207AB87195DFA15007EFB12 /* MigrationTests.mm in Sources */,
 				3F2E66641CA0BA11004761D5 /* NotificationTests.m in Sources */,
 				3FEB383F1E70AC8800F22712 /* ObjectCreationTests.mm in Sources */,
+				CFFECBB0250690EA0010F585 /* ObjectIdTests.m in Sources */,
 				E81A1FE11955FE0100FDED82 /* ObjectInterfaceTests.m in Sources */,
 				021A88361AAFB5CD00EEAC84 /* ObjectSchemaTests.m in Sources */,
 				E81A1FE31955FE0100FDED82 /* ObjectTests.m in Sources */,
@@ -3129,7 +3109,6 @@
 				3F558C8B22C29A03002F0F30 /* RLMTestObjects.m in Sources */,
 				0207AB89195DFA15007EFB12 /* SchemaTests.mm in Sources */,
 				3FB4FA1819F5D2740020D53B /* SwiftArrayPropertyTests.swift in Sources */,
-				CFFECBB0250690EA0010F585 /* ObjectIdTests.m in Sources */,
 				3FB4FA1919F5D2740020D53B /* SwiftArrayTests.swift in Sources */,
 				3FB4FA1A19F5D2740020D53B /* SwiftDynamicTests.swift in Sources */,
 				3FB4FA1B19F5D2740020D53B /* SwiftLinkTests.swift in Sources */,

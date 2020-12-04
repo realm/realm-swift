@@ -1,0 +1,13 @@
+# Uncomment this line to define a global platform for your project
+platform :ios, '9.0'
+
+use_frameworks!
+branch = ENV['sha']
+
+target 'CocoaPodsDynamicExample' do
+  pod 'Realm', git: 'https://github.com/realm/realm-cocoa.git', branch: branch, submodules: true
+end
+
+target 'CocoaPodsDynamicExampleTests' do
+  pod 'Realm', git: 'https://github.com/realm/realm-cocoa.git', branch: branch, submodules: true
+end

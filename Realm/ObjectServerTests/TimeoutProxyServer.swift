@@ -17,78 +17,62 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
+import Network
 
+@available(OSX 10.14, *)
 @objc(TimeoutProxyServer)
-class TimeoutProxyServer: NSObject {
-    var incomingRequests: [FileHandle: CFHTTPMessage] = [:]
-    var socket: CFSocket?
-    let port: Int
-    var listeningHandle: FileHandle?
+public class TimeoutProxyServer: NSObject {
+    let port: NWEndpoint.Port
+    let targetPort: NWEndpoint.Port
 
-    @objc init(port: Int) {
-        self.port = port
+    let queue = DispatchQueue(label: "TimeoutProxyServer")
+    var listener: NWListener!
+    var connections = [NWConnection]()
+
+    let serverEndpoint = NWEndpoint.Host("127.0.0.1")
+
+    @objc public var delay: Double = 0
+
+    @objc public init(port: UInt16, targetPort: UInt16) {
+        self.port = NWEndpoint.Port(rawValue: port)!
+        self.targetPort = NWEndpoint.Port(rawValue: targetPort)!
     }
 
-    @objc func start() throws {
-        socket = CFSocketCreate(kCFAllocatorDefault,
-                                PF_INET,
-                                SOCK_STREAM,
-                                IPPROTO_TCP, 0, nil, nil)
-        guard let socket = socket else {
-            throw NSError(domain: "TimeoutServerError",
-                          code: -1,
-                          userInfo: [NSLocalizedDescriptionKey: "Unable to create socket"])
+    @objc public func start() throws {
+        listener = try NWListener(using: NWParameters.tcp, on: port)
+        listener.newConnectionHandler = { incomingConnection in
+            self.connections.append(incomingConnection)
+            incomingConnection.start(queue: self.queue)
+
+            let targetConnection = NWConnection(host: self.serverEndpoint, port: self.targetPort, using: .tcp)
+            targetConnection.start(queue: self.queue)
+            self.connections.append(targetConnection)
+
+            self.queue.asyncAfter(deadline: .now() + self.delay) {
+                self.copy(from: incomingConnection, to: targetConnection)
+                self.copy(from: targetConnection, to: incomingConnection)
+            }
         }
-
-
-        var reuse = true
-        let fileDescriptor = CFSocketGetNative(socket)
-        guard setsockopt(fileDescriptor, SOL_SOCKET, SO_REUSEADDR,
-                       &reuse, socklen_t(MemoryLayout.size(ofValue: Int.self))) != 0 else {
-            throw NSError(domain: "TimeoutServerError",
-                          code: -1,
-                          userInfo: [NSLocalizedDescriptionKey: "Unable to set socket options"])
-        }
-
-        var address = sockaddr_in()
-        address.sin_len = __uint8_t(MemoryLayout.size(ofValue: address))
-        address.sin_family = sa_family_t(AF_INET)
-        address.sin_addr.s_addr = INADDR_ANY.bigEndian
-        address.sin_port = UInt16(port).bigEndian
-
-        let data = Data(bytes: &address, count: MemoryLayout.size(ofValue: address)) as CFData
-        guard CFSocketSetAddress(socket, data) == .success else {
-            throw NSError(domain: "TimeoutServerError",
-                          code: -1,
-                          userInfo: [NSLocalizedDescriptionKey: "Unable to create socket"])
-        }
-
-        listeningHandle = FileHandle(fileDescriptor: fileDescriptor, closeOnDealloc: true)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(receiveIncomingConnectionNotification(notification:)),
-                                               name: NSNotification.Name.NSFileHandleConnectionAccepted,
-                                               object: nil)
-        listeningHandle!.acceptConnectionInBackgroundAndNotify()
+        listener.start(queue: self.queue)
     }
 
-    @objc func receiveIncomingConnectionNotification(notification: Notification) {
-        let userInfo = notification.userInfo
-        let incomingFileHandle = userInfo?[NSFileHandleNotificationFileHandleItem] as? FileHandle
-
-        if let incomingFileHandle = incomingFileHandle {
-            incomingRequests[incomingFileHandle] = CFHTTPMessageCreateEmpty(kCFAllocatorDefault, true).takeRetainedValue()
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(receiveIncomingDataNotification(notification:)),
-                                                   name: NSNotification.Name.NSFileHandleDataAvailable,
-                                                   object: incomingFileHandle)
-
-            incomingFileHandle.waitForDataInBackgroundAndNotify()
+    @objc public func stop() {
+        for connection in connections {
+            connection.forceCancel()
         }
-
-        listeningHandle?.acceptConnectionInBackgroundAndNotify()
+        listener.cancel()
     }
 
-    @objc func receiveIncomingDataNotification(notification: Notification) {
-        // let the incoming requests timeout
+    private func copy(from: NWConnection, to: NWConnection) {
+        from.receive(minimumIncompleteLength: 1, maximumLength: 8192) { [weak self] (data, context, isComplete, _) in
+            guard let data = data else {
+                self?.copy(from: from, to: to)
+                return
+            }
+            to.send(content: data, contentContext: context ?? .defaultMessage,
+                    isComplete: isComplete, completion: .contentProcessed({ [weak self] _ in
+                        self?.copy(from: from, to: to)
+                    }))
+        }
     }
 }

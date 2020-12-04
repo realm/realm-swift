@@ -153,7 +153,6 @@
 				1403AF811BFDCA8200C1FBB4 /* Realm.framework */,
 			);
 			name = Realm;
-			path = DownloadCache;
 			sourceTree = "<group>";
 		};
 		14835DF11BFE582C00B9A267 /* Seed Data */ = {
@@ -201,7 +200,6 @@
 				1403AF681BFDC8D300C1FBB4 /* Frameworks */,
 				1403AF691BFDC8D300C1FBB4 /* Resources */,
 				1403AF871BFDCA8200C1FBB4 /* Embed Frameworks */,
-				1403AF891BFDCAFD00C1FBB4 /* Strip Framework Architectures */,
 			);
 			buildRules = (
 			);
@@ -220,7 +218,6 @@
 				149391141BFE50930036B420 /* Frameworks */,
 				149391151BFE50930036B420 /* Resources */,
 				1493912F1BFE52880036B420 /* Embed Frameworks */,
-				149391301BFE529A0036B420 /* Strip Framework Architectures */,
 			);
 			buildRules = (
 			);
@@ -237,7 +234,7 @@
 		1403AF401BFDC60A00C1FBB4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1130;
+				LastUpgradeCheck = 1220;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					1403AF6A1BFDC8D300C1FBB4 = {
@@ -288,37 +285,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		1403AF891BFDCAFD00C1FBB4 /* Strip Framework Architectures */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Strip Framework Architectures";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"";
-		};
-		149391301BFE529A0036B420 /* Strip Framework Architectures */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Strip Framework Architectures";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1403AF671BFDC8D300C1FBB4 /* Sources */ = {
@@ -389,6 +355,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -443,6 +410,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;

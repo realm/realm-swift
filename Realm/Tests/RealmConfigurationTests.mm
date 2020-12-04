@@ -96,7 +96,7 @@
     RLMRealmConfiguration *defaultConfiguration = [RLMRealmConfiguration defaultConfiguration];
     XCTAssertEqualObjects(defaultConfiguration.fileURL, RLMDefaultRealmURL());
     XCTAssertNil(defaultConfiguration.inMemoryIdentifier);
-    XCTAssertNil(defaultConfiguration.encryptionKey);
+    XCTAssertEqual(!!defaultConfiguration.encryptionKey, self.encryptTests);
     XCTAssertFalse(defaultConfiguration.readOnly);
     XCTAssertEqual(defaultConfiguration.schemaVersion, 0U);
     XCTAssertNil(defaultConfiguration.migrationBlock);

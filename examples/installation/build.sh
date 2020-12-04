@@ -29,6 +29,9 @@ command:
   test-osx-swift-dynamic:          tests macOS Swift dynamic example.
   test-osx-swift-xcframework:      tests macOS Swift xcframework example.
   test-osx-swift-cocoapods:        tests macOS Swift CocoaPods example.
+  test-catalyst-objc-cocoapods:    tests Mac Catalyst Objective-C CocoaPods example.
+  test-catalyst-objc-cocoapods-dynamic:   tests Mac Catalyst Objective-C CocoaPods example.
+  test-catalyst-swift-cocoapods:   tests Mac Catalyst Swift CocoaPods example.
   test-osx-swift-carthage:         tests macOS Swift Carthage example.
   test-osx-spm:                    tests macOS Swift Package Manager example.
 
@@ -71,7 +74,7 @@ xctest() {
     if [[ ! -d "$DIRECTORY" ]]; then
         DIRECTORY="${DIRECTORY/swift/swift-$REALM_SWIFT_VERSION}"
     fi
-    if [[ $PLATFORM != osx ]]; then
+    if [[ $PLATFORM != osx ]] && [[ $PLATFORM != catalyst ]]; then
         if [[ $NAME == Carthage* ]]; then
             # Building for Carthage requires that a simulator exist but not any
             # particular one, and having more than one makes xcodebuild
@@ -117,6 +120,8 @@ xctest() {
         destination=(-destination "id=$simulator_id")
     elif [[ $PLATFORM == watchos ]]; then
         destination=(-sdk watchsimulator)
+    elif [[ $PLATFORM == catalyst ]]; then
+        destination=(-destination 'platform=macOS,variant=Mac Catalyst')
     fi
 
     local project=(-project "$DIRECTORY/$NAME.xcodeproj")
@@ -128,7 +133,7 @@ xctest() {
     local scheme=(-scheme "$NAME")
 
     # Ensure that dynamic framework tests try to use the correct version of the prebuilt libraries.
-    sed -i '' 's@/swift-[0-9.]*@/swift-'"${REALM_XCODE_VERSION}"'@' "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
+    sed -i '' 's@/realm-swift-latest@/realm-swift-latest/'"${REALM_XCODE_VERSION}"'@' "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
 
     xcodebuild "${project[@]}" "${scheme[@]}" clean build "${destination[@]}" "${code_signing_flags[@]}"
     if [[ $PLATFORM != watchos ]]; then
@@ -136,13 +141,7 @@ xctest() {
     fi
 
     if [[ $PLATFORM != osx ]]; then
-        [[ $PLATFORM == 'ios' ]] && SDK=iphoneos || SDK=$PLATFORM
-        if [ -d "$workspace" ]; then
-            [[ $LANG == 'swift' ]] && scheme=(-scheme RealmSwift) || scheme=(-scheme Realm)
-        else
-            scheme=()
-        fi
-        xcodebuild "${project[@]}" "${scheme[@]}" -sdk "$SDK" build "${code_signing_flags[@]}"
+        xcodebuild "${project[@]}" "${scheme[@]}" archive "${code_signing_flags[@]}"
     fi
 }
 
@@ -161,7 +160,7 @@ LANGUAGE=$(echo "$COMMAND" | cut -d - -f 3)
 
 case "$COMMAND" in
     "test-all")
-        for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage; do
+        for target in ios-swift-dynamic ios-swift-cocoapods catalyst-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage; do
             ./build.sh test-$target || exit 1
         done
         for target in ios osx; do

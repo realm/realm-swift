@@ -14,8 +14,8 @@
 		E8561ACE1AFB1518006E087E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E8561ACD1AFB1518006E087E /* Images.xcassets */; };
 		E8561AD11AFB1518006E087E /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = E8561ACF1AFB1518006E087E /* LaunchScreen.xib */; };
 		E8561ADD1AFB1518006E087E /* DynamicExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8561ADC1AFB1518006E087E /* DynamicExampleTests.m */; };
-		E8561AE71AFB1534006E087E /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8561AE61AFB1534006E087E /* Realm.framework */; };
-		E8561AE81AFB1534006E087E /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E8561AE61AFB1534006E087E /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E8561AE71AFB1534006E087E /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8561AE61AFB1534006E087E /* Realm.xcframework */; };
+		E8561AE81AFB1534006E087E /* Realm.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E8561AE61AFB1534006E087E /* Realm.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,7 +35,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				E8561AE81AFB1534006E087E /* Realm.framework in Embed Frameworks */,
+				E8561AE81AFB1534006E087E /* Realm.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -56,7 +56,7 @@
 		E8561AD61AFB1518006E087E /* DynamicExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DynamicExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8561ADB1AFB1518006E087E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E8561ADC1AFB1518006E087E /* DynamicExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DynamicExampleTests.m; sourceTree = "<group>"; };
-		E8561AE61AFB1534006E087E /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../realm-objc-latest/ios/dynamic/Realm.framework"; sourceTree = "<group>"; };
+		E8561AE61AFB1534006E087E /* Realm.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = "../../../realm-objc-latest/Realm.xcframework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,7 +64,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8561AE71AFB1534006E087E /* Realm.framework in Frameworks */,
+				E8561AE71AFB1534006E087E /* Realm.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,7 +84,7 @@
 				E8561ABF1AFB1518006E087E /* DynamicExample */,
 				E8561AD91AFB1518006E087E /* DynamicExampleTests */,
 				E8561ABE1AFB1518006E087E /* Products */,
-				E8561AE61AFB1534006E087E /* Realm.framework */,
+				E8561AE61AFB1534006E087E /* Realm.xcframework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -149,7 +149,6 @@
 				E8561ABA1AFB1518006E087E /* Frameworks */,
 				E8561ABB1AFB1518006E087E /* Resources */,
 				E8561AE91AFB1534006E087E /* Embed Frameworks */,
-				C07E5D8B1B15100E00ED625C /* Strip Framework Architectures */,
 			);
 			buildRules = (
 			);
@@ -184,7 +183,7 @@
 		E8561AB51AFB1518006E087E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1020;
+				LastUpgradeCheck = 1220;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					E8561ABC1AFB1518006E087E = {
@@ -201,6 +200,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -234,24 +234,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		C07E5D8B1B15100E00ED625C /* Strip Framework Architectures */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Strip Framework Architectures";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E8561AB91AFB1518006E087E /* Sources */ = {
@@ -324,6 +306,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -379,6 +362,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;

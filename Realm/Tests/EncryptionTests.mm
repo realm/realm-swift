@@ -134,7 +134,9 @@
     }
 
     @autoreleasepool {
-        RLMRealm *realm = [self realmWithTestPath];
+        RLMRealmConfiguration *config = [self configurationWithKey:nil];
+        config.fileURL = RLMTestRealmURL();
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
     }
 }

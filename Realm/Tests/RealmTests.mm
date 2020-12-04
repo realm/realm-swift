@@ -1746,15 +1746,14 @@
 }
 #pragma mark - Write Copy to Path
 
-- (void)testWriteCopyOfRealm
-{
+- (void)testWriteCopyOfRealm {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{
         [IntObject createInRealm:realm withValue:@[@0]];
     }];
 
     NSError *writeError;
-    XCTAssertTrue([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:&writeError]);
+    XCTAssertTrue([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:realm.configuration.encryptionKey error:&writeError]);
     XCTAssertNil(writeError);
     RLMRealm *copy = [self realmWithTestPath];
     XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
@@ -1844,7 +1843,9 @@
         [IntObject createInRealm:realm withValue:@[@0]];
 
         NSError *writeError;
-        XCTAssertTrue([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:&writeError]);
+        XCTAssertTrue([realm writeCopyToURL:RLMTestRealmURL()
+                              encryptionKey:realm.configuration.encryptionKey
+                                      error:&writeError]);
         XCTAssertNil(writeError);
         RLMRealm *copy = [self realmWithTestPath];
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);

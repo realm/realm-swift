@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # A script to generate the .jenkins.yml file for the CI pull request job
-XCODE_VERSIONS = %w(11.3 11.4.1 11.7 12.0 12.1)
+XCODE_VERSIONS = %w(11.3 11.7 12.0 12.1 12.2)
 CONFIGURATIONS = %w(Debug Release)
 
 release_only = ->(v, c) { c == 'Release' }
@@ -41,6 +41,7 @@ targets = {
   'cocoapods-ios' => oldest_and_latest,
   'cocoapods-ios-dynamic' => oldest_and_latest,
   'cocoapods-watchos' => oldest_and_latest,
+  'cocoapods-catalyst' => oldest_and_latest,
 
   'swiftpm' => oldest_and_latest,
   'swiftpm-address' => latest_only,
@@ -61,9 +62,9 @@ output_file = """
 # https://wiki.jenkins-ci.org/display/JENKINS/Yaml+Axis+Plugin
 # This is a generated file produced by scripts/pr-ci-matrix.rb.
 
-xcode_version: #{XCODE_VERSIONS.map { |v| "\n - #{v}" }.join()}
-target: #{targets.map { |k, v| "\n - #{k}" }.join()}
-configuration: #{CONFIGURATIONS.map { |v| "\n - #{v}" }.join()}
+xcode_version:#{XCODE_VERSIONS.map { |v| "\n - #{v}" }.join()}
+target:#{targets.map { |k, v| "\n - #{k}" }.join()}
+configuration:#{CONFIGURATIONS.map { |v| "\n - #{v}" }.join()}
 
 exclude:
 """
