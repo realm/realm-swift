@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMApp_Private.hpp"
-#import "RLMApp_Private.h"
 
 #import "RLMCredentials_Private.hpp"
 #import "RLMBSON_Private.hpp"
@@ -400,7 +399,7 @@ static std::mutex& s_appMutex = *new std::mutex();
 }
 
 - (RLMAppSubscriptionToken *)subscribe:(RLMAppNotificationBlock)block {
-    return [[RLMAppSubscriptionToken alloc] initWithToken:_app->subscribe([block = std::move(block), self] (auto&) {
+    return [[RLMAppSubscriptionToken alloc] initWithToken:_app->subscribe([block, self] (auto&) {
         block(self);
     })];
 }

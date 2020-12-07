@@ -16,7 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUser_Private.h"
 #import "RLMUser_Private.hpp"
 
 #import "RLMCredentials_Private.hpp"
@@ -307,7 +306,7 @@ using namespace realm;
 }
 
 - (RLMUserSubscriptionToken *)subscribe:(RLMUserNotificationBlock) block {
-    return [[RLMUserSubscriptionToken alloc] initWithToken:_user->subscribe([block = std::move(block), self] (auto&) {
+    return [[RLMUserSubscriptionToken alloc] initWithToken:_user->subscribe([block, self] (auto&) {
         block(self);
     })];
 }
