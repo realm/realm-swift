@@ -223,6 +223,15 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     std::unique_ptr<realm::Subscribable<app::App>::Token> _token;
 }
 
+- (instancetype)initWithToken:(realm::Subscribable<app::App>::Token&&)token {
+    if (self = [super init]) {
+        _token = std::make_unique<realm::Subscribable<app::App>::Token>(std::move(token));
+        return self;
+    }
+
+    return nil;
+}
+
 - (NSUInteger)value {
     return _token->value();
 }
@@ -391,12 +400,9 @@ static std::mutex& s_appMutex = *new std::mutex();
 }
 
 - (RLMAppSubscriptionToken *)subscribe:(RLMAppNotificationBlock)block {
-    RLMAppSubscriptionToken *token = [[RLMAppSubscriptionToken alloc] init];
-
-    token->_token = std::make_unique<realm::Subscribable<app::App>::Token>(_app->subscribe([block = std::move(block), self] (auto&) {
+    return [[RLMAppSubscriptionToken alloc] initWithToken:_app->subscribe([block = std::move(block), self] (auto&) {
         block(self);
-    }));
-    return token;
+    })];
 }
 
 - (void)unsubscribe:(RLMAppSubscriptionToken *)token {

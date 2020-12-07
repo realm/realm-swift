@@ -53,6 +53,15 @@ using namespace realm;
     std::unique_ptr<realm::Subscribable<SyncUser>::Token> _token;
 }
 
+- (instancetype)initWithToken:(realm::Subscribable<SyncUser>::Token&&)token {
+    if (self = [super init]) {
+        _token = std::make_unique<realm::Subscribable<SyncUser>::Token>(std::move(token));
+        return self;
+    }
+
+    return nil;
+}
+
 - (NSUInteger)value {
     return _token->value();
 }
@@ -298,11 +307,9 @@ using namespace realm;
 }
 
 - (RLMUserSubscriptionToken *)subscribe:(RLMUserNotificationBlock) block {
-    RLMUserSubscriptionToken *token = [[RLMUserSubscriptionToken alloc] init];
-    token->_token = std::make_unique<Subscribable<SyncUser>::Token>(_user->subscribe([block = std::move(block), self] (auto&) {
+    return [[RLMUserSubscriptionToken alloc] initWithToken:_user->subscribe([block = std::move(block), self] (auto&) {
         block(self);
-    }));
-    return token;
+    })];
 }
 
 - (void)unsubscribe:(RLMUserSubscriptionToken *)token {
