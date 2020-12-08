@@ -2405,7 +2405,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let loginEx = expectation(description: "Login user")
         let appEx = expectation(description: "App changes triggered")
         var triggered = 0
-        app.objectWillChange.sink { app in
+        app.objectWillChange.sink { _ in
             triggered += 1
             if triggered == 2 {
                 appEx.fulfill()
