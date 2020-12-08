@@ -4,8 +4,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add Google OpenID Connect Credentials, an alternative login credential to the Google OAuth 2.0 credential.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Fixed a bug that would prevent eventual consistency during conflict
+  resolution. Affected clients would experience data divergence and potentially
+  consistency errors as a result if they experienced conflict resolution
+  between cycles of Create-Erase-Create for objects with primary keys (since v10.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -17,7 +19,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* Upgraded realm-sync from v10.0.3 to v10.1.4
 
 10.2.0 Release notes (2020-12-02)
 =============================================================
