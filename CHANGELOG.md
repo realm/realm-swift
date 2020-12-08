@@ -1,24 +1,27 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.3.0 Release notes (2020-12-08)
 =============================================================
+
 ### Enhancements
-* Add Google OpenID Connect Credentials, an alternative login credential to the Google OAuth 2.0 credential.
+
+* Add Google OpenID Connect Credentials, an alternative login credential to the
+  Google OAuth 2.0 credential.
 
 ### Fixed
+
 * Fixed a bug that would prevent eventual consistency during conflict
   resolution. Affected clients would experience data divergence and potentially
   consistency errors as a result if they experienced conflict resolution
   between cycles of Create-Erase-Create for objects with primary keys (since v10.0.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.2.
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
 * Upgraded realm-sync from v10.0.3 to v10.1.4
 
 10.2.0 Release notes (2020-12-02)
