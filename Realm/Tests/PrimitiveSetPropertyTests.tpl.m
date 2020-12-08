@@ -216,10 +216,10 @@ static double average(NSArray *values) {
     %r RLMAssertThrowsWithReason([$set addObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [$set addObject:$v0];
-    XCTAssertEqualObjects($set[0], $v0);
+    XCTAssertEqualObjects($set.array[0], $v0);
 
     %o [$set addObject:NSNull.null];
-    %o XCTAssertEqualObjects($set[0], NSNull.null);
+    %o XCTAssertEqualObjects($set.array[0], NSNull.null);
 }
 
 - (void)testAddObjects {
@@ -227,9 +227,9 @@ static double average(NSArray *values) {
     %r RLMAssertThrowsWithReason([$set addObjects:@[NSNull.null]], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
-    XCTAssertEqualObjects($set[0], $v0);
-    XCTAssertEqualObjects($set[1], $v1);
-    %o XCTAssertEqualObjects($set[2], $v2);
+    XCTAssertEqualObjects($set.array[0], $v0);
+    XCTAssertEqualObjects($set.array[1], $v1);
+    %o XCTAssertEqualObjects($set.array[2], $v2);
 }
 
 - (void)testRemoveObject {
@@ -237,12 +237,12 @@ static double average(NSArray *values) {
     %r XCTAssertEqual($set.count, 2U);
     %o XCTAssertEqual($set.count, 3U);
 
-    [$allSets removeObject:$allSets[0]];
+    [$allSets removeObject:$allSets.array[0]];
     %r XCTAssertEqual($set.count, 1U);
     %o XCTAssertEqual($set.count, 2U);
 
-    XCTAssertEqualObjects($set[0], $v1);
-    %o XCTAssertEqualObjects($set[1], $v2);
+    XCTAssertEqualObjects($set.array[0], $v1);
+    %o XCTAssertEqualObjects($set.array[1], $v2);
 }
 
 - (void)testIndexOfObject {
@@ -587,18 +587,17 @@ static double average(NSArray *values) {
     // setValue overrides all existing values
     [$set setValue:$v0 forKey:@"self"];
 
-    %unman RLMAssertThrowsWithReason($set[1], @"Index 1 is out of bounds (must be less than 1).");
-    %man RLMAssertThrowsWithReason($set[1], @"Requested index 1 greater than max 0");
+    RLMAssertThrowsWithReason($set.array[1], @"index 1 beyond bounds [0 .. 0]");
 
-    XCTAssertEqualObjects($set[0], $v0);
-    %o XCTAssertEqualObjects($set[0], $v0);
+    XCTAssertEqualObjects($set.array[0], $v0);
+    %o XCTAssertEqualObjects($set.array[0], $v0);
 
     %o [$set setValue:NSNull.null forKey:@"self"];
-    %o XCTAssertEqualObjects($set[0], NSNull.null);
+    %o XCTAssertEqualObjects($set.array[0], NSNull.null);
 }
 
 - (void)testAssignment {
-    $set = (id)@[$v1]; ^nl XCTAssertEqualObjects($set[0], $v1);
+    $set = (id)@[$v1]; ^nl XCTAssertEqualObjects($set.array[0], $v1);
 
     // Should replace and not append
     $set = (id)$values; ^nl XCTAssertEqualObjects([[$set valueForKey:@"self"] allObjects], ($values)); ^nl
@@ -616,7 +615,7 @@ static double average(NSArray *values) {
 }
 
 - (void)testDynamicAssignment {
-    $obj[@"$prop"] = (id)@[$v1]; ^nl XCTAssertEqualObjects($obj[@"$prop"][0], $v1);
+    $obj[@"$prop"] = (id)@[$v1]; ^nl XCTAssertEqualObjects(((RLMSet *)$obj[@"$prop"]).array[0], $v1);
 
     // Should replace and not append
     $obj[@"$prop"] = (id)$values; ^nl XCTAssertEqualObjects([[$obj[@"$prop"] valueForKey:@"self"] allObjects], ($values)); ^nl
@@ -684,7 +683,7 @@ static double average(NSArray *values) {
         /* RLMAssertThrowsWithReason([set objectsWithPredicate:[NSPredicate predicateWithValue:NO]], @"thread"); */
         RLMAssertThrowsWithReason([set sortedResultsUsingKeyPath:@"self" ascending:YES], @"thread");
         RLMAssertThrowsWithReason([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]], @"thread");
-        RLMAssertThrowsWithReason(set[0], @"thread");
+        RLMAssertThrowsWithReason(set.array[0], @"thread");
         RLMAssertThrowsWithReason([set valueForKey:@"self"], @"thread");
         RLMAssertThrowsWithReason([set setValue:@1 forKey:@"self"], @"thread");
         RLMAssertThrowsWithReason({for (__unused id obj in set);}, @"thread");
@@ -716,7 +715,7 @@ static double average(NSArray *values) {
     /* RLMAssertThrowsWithReason([set objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"invalidated"); */
     RLMAssertThrowsWithReason([set sortedResultsUsingKeyPath:@"self" ascending:YES], @"invalidated");
     RLMAssertThrowsWithReason([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]], @"invalidated");
-    RLMAssertThrowsWithReason(set[0], @"invalidated");
+    RLMAssertThrowsWithReason(set.array[0], @"invalidated");
     RLMAssertThrowsWithReason([set valueForKey:@"self"], @"invalidated");
     RLMAssertThrowsWithReason([set setValue:@1 forKey:@"self"], @"invalidated");
     RLMAssertThrowsWithReason({for (__unused id obj in set);}, @"invalidated");
@@ -745,7 +744,7 @@ static double average(NSArray *values) {
     /* XCTAssertNoThrow([set objectsWithPredicate:[NSPredicate predicateWithValue:YES]]); */
     XCTAssertNoThrow([set sortedResultsUsingKeyPath:@"self" ascending:YES]);
     XCTAssertNoThrow([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]]);
-    XCTAssertNoThrow(set[0]);
+    XCTAssertNoThrow(set.array[0]);
     XCTAssertNoThrow([set valueForKey:@"self"]);
     XCTAssertNoThrow({for (__unused id obj in set);});
 

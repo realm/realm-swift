@@ -241,7 +241,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [realm commitWriteTransaction];
 
     [self measureBlock:^{
-        for (StringObject *so in spo.stringSet) {
+        for (StringObject *so in spo.set) {
             (void)[so stringCol];
         }
     }];
@@ -256,7 +256,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [realm commitWriteTransaction];
 
     [self measureBlock:^{
-        RLMSet *set = spo.stringSet;
+        RLMSet *set = spo.set;
         for (NSUInteger i = 0; i < set.count; ++i) {
             (void)[set[i] stringCol];
         }
@@ -751,13 +751,13 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         SetPropertyObject *obj = [SetPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
         [realm commitWriteTransaction];
 
-        const NSUInteger initial = obj.stringSet.count;
-        [self observeObject:obj keyPath:@"array"
-                      until:^(SetPropertyObject *obj) { return obj.stringSet.count < initial; }];
+        const NSUInteger initial = obj.set.count;
+        [self observeObject:obj keyPath:@"set"
+                      until:^(SetPropertyObject *obj) { return obj.set.count < initial; }];
 
         [self startMeasuring];
         [realm beginWriteTransaction];
-        [obj.stringSet removeAllObjects];
+        [obj.set removeAllObjects];
         [realm commitWriteTransaction];
         dispatch_sync(_queue, ^{});
     }];
@@ -770,13 +770,13 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         SetPropertyObject *obj = [SetPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
         [realm commitWriteTransaction];
 
-        const NSUInteger initial = obj.stringSet.count;
-        [self observeObject:obj keyPath:@"array"
-                      until:^(SetPropertyObject *obj) { return obj.stringSet.count < initial; }];
+        const NSUInteger initial = obj.set.count;
+        [self observeObject:obj keyPath:@"set"
+                      until:^(SetPropertyObject *obj) { return obj.set.count < initial; }];
 
         [self startMeasuring];
         [realm beginWriteTransaction];
-        [obj.stringSet removeAllObjects];
+        [obj.set removeAllObjects];
         [realm commitWriteTransaction];
         dispatch_sync(_queue, ^{});
     }];
@@ -792,10 +792,10 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         const NSUInteger count = [StringObject allObjectsInRealm:realm].count / 8;
         const NSUInteger factor = count / 10;
 
-        [self observeObject:obj keyPath:@"array"
-                      until:^(SetPropertyObject *obj) { return obj.stringSet.count >= count; }];
+        [self observeObject:obj keyPath:@"set"
+                      until:^(SetPropertyObject *obj) { return obj.set.count >= count; }];
 
-        RLMSet *set = obj.stringSet;
+        RLMSet *set = obj.set;
         [self startMeasuring];
         [realm beginWriteTransaction];
         for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
@@ -825,9 +825,9 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         const NSUInteger count = [StringObject allObjectsInRealm:realm].count / 8;
         const NSUInteger factor = count / 10;
 
-        [self observeObject:obj keyPath:@"array"
-                      until:^(id o) { return [o stringSet].count >= count; }];
-        RLMSet *set = obj.stringSet;
+        [self observeObject:obj keyPath:@"set"
+                      until:^(SetPropertyObject *o) { return [o set].count >= count; }];
+        RLMSet *set = obj.set;
         [self startMeasuring];
         [realm beginWriteTransaction];
         for (StringObject *so in [StringObject allObjectsInRealm:realm]) {

@@ -65,6 +65,17 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property RLMArray<RLMDecimal128> *decimal128Array;
 @property RLMArray<KVOObject>     *objectArray;
 
+@property RLMSet<RLMBool>       *boolSet;
+@property RLMSet<RLMInt>        *intSet;
+@property RLMSet<RLMFloat>      *floatSet;
+@property RLMSet<RLMDouble>     *doubleSet;
+@property RLMSet<RLMString>     *stringSet;
+@property RLMSet<RLMData>       *dataSet;
+@property RLMSet<RLMDate>       *dateSet;
+@property RLMSet<RLMObjectId>   *objectIdSet;
+@property RLMSet<RLMDecimal128> *decimal128Set;
+@property RLMSet<KVOObject>     *objectSet;
+
 @property NSNumber<RLMInt>    *optIntCol;
 @property NSNumber<RLMFloat>  *optFloatCol;
 @property NSNumber<RLMDouble> *optDoubleCol;
@@ -83,6 +94,7 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property int pk; // Primary key for isEqual:
 @property KVOObject *obj;
 @property RLMArray<KVOObject> *array;
+@property RLMSet<KVOObject> *set;
 @end
 @implementation KVOLinkObject1
 + (NSString *)primaryKey {
@@ -94,6 +106,7 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property int pk; // Primary key for isEqual:
 @property KVOLinkObject1 *obj;
 @property RLMArray<KVOLinkObject1> *array;
+@property RLMSet<KVOLinkObject1> *set;
 @end
 @implementation KVOLinkObject2
 + (NSString *)primaryKey {
@@ -129,6 +142,17 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSMutableArray *objectIdArray;
 @property NSMutableArray *decimal128Array;
 
+@property NSMutableSet *boolSet;
+@property NSMutableSet *intSet;
+@property NSMutableSet *floatSet;
+@property NSMutableSet *doubleSet;
+@property NSMutableSet *stringSet;
+@property NSMutableSet *dataSet;
+@property NSMutableSet *dateSet;
+@property NSMutableSet *objectSet;
+@property NSMutableSet *objectIdSet;
+@property NSMutableSet *decimal128Set;
+
 @property NSNumber<RLMInt> *optIntCol;
 @property NSNumber<RLMFloat> *optFloatCol;
 @property NSNumber<RLMDouble> *optDoubleCol;
@@ -140,6 +164,7 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @interface PlainLinkObject1 : NSObject
 @property PlainKVOObject *obj;
 @property NSMutableArray *array;
+@property NSMutableSet *set;
 @end
 @implementation PlainLinkObject1
 @end
@@ -147,6 +172,7 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @interface PlainLinkObject2 : NSObject
 @property PlainLinkObject1 *obj;
 @property NSMutableArray *array;
+@property NSMutableSet *set;
 @end
 @implementation PlainLinkObject2
 @end
@@ -310,6 +336,14 @@ public:
     XCTAssertTrue(r.empty()); \
 } while (0)
 
+#define AssertSet(kind) do { \
+    if (NSDictionary *note = AssertNotification(r)) { \
+        NSLog(@"%@", note); \
+        XCTAssertEqual([note[NSKeyValueChangeKindKey] intValue], static_cast<int>(kind)); \
+    } \
+    XCTAssertTrue(r.empty()); \
+} while (0)
+
 // Tests for plain Foundation key-value observing to verify that we correctly
 // match the standard semantics. Each of the subclasses of KVOTests runs the
 // same set of tests on RLMObjects in difference scenarios
@@ -356,6 +390,16 @@ public:
     obj.objectIdArray = [NSMutableArray array];
     obj.decimal128Array = [NSMutableArray array];
     obj.objectArray = [NSMutableArray array];
+    obj.boolSet = [NSMutableSet set];
+    obj.intSet = [NSMutableSet set];
+    obj.floatSet = [NSMutableSet set];
+    obj.doubleSet = [NSMutableSet set];
+    obj.stringSet = [NSMutableSet set];
+    obj.dataSet = [NSMutableSet set];
+    obj.dateSet = [NSMutableSet set];
+    obj.objectIdSet = [NSMutableSet set];
+    obj.decimal128Set = [NSMutableSet set];
+    obj.objectSet = [NSMutableSet set];
     return obj;
 }
 
@@ -363,11 +407,13 @@ public:
     PlainLinkObject1 *obj1 = [PlainLinkObject1 new];
     obj1.obj = [self createObject];
     obj1.array = [NSMutableArray new];
+    obj1.set = [NSMutableSet new];
 
     PlainLinkObject2 *obj2 = [PlainLinkObject2 new];
     obj2.obj = obj1;
     obj2.array = [NSMutableArray new];
-
+    obj2.set = [NSMutableSet new];
+    
     return obj2;
 }
 
@@ -389,11 +435,11 @@ public:
 - (void)testRemoveObserver {
     // iOS 14.2 beta 2 has stopped throwing exceptions when a KVO observer is removed that does not exist
     // FIXME: revisit this once 14.2 is out to see if this was an intended change
-#if REALM_PLATFORM_IOS
-    if (@available(iOS 14.2, *)) {
-        return;
-    }
-#endif
+//#if REALM_PLATFORM_IOS
+//    if (@available(iOS 14.2, *)) {
+//        return;
+//    }
+//#endif
 
     KVOObject *obj = [self createObject];
     XCTAssertThrowsSpecificNamed([obj removeObserver:self forKeyPath:@"int32Col"], NSException, NSRangeException);
@@ -789,6 +835,76 @@ public:
     }
 
     {
+        KVORecorder r(self, obj, @"intSet");
+        obj.intSet = obj.intSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"boolSet");
+        obj.boolSet = obj.boolSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"floatSet");
+        obj.floatSet = obj.floatSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"doubleSet");
+        obj.doubleSet = obj.doubleSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"stringSet");
+        obj.stringSet = obj.stringSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"dataSet");
+        obj.dataSet = obj.dataSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"dateSet");
+        obj.dateSet = obj.dateSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"objectIdSet");
+        obj.objectIdSet = obj.objectIdSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"decimal128Set");
+        obj.decimal128Set = obj.decimal128Set;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"objectSet");
+        obj.objectSet = obj.objectSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
         KVORecorder r(self, obj, @"optIntCol");
         obj.optIntCol = @1;
         AssertChanged(r, NSNull.null, @1);
@@ -1048,6 +1164,13 @@ public:
     }
 
     {
+        KVORecorder r(self, obj, @"objectSet");
+        obj[@"objectSet"] = obj.objectSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
         KVORecorder r(self, obj, @"optIntCol");
         obj[@"optIntCol"] = @1;
         AssertChanged(r, NSNull.null, @1);
@@ -1182,6 +1305,120 @@ public:
     }
 }
 
+
+- (void)testSetDiffs {
+    // IndexSets are optional on RLMSet notifications.
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVORecorder r(self, obj, @"set");
+
+    id mutator = [obj mutableSetValueForKey:@"set"];
+
+    [mutator addObject:obj.obj];
+    AssertSet(NSKeyValueChangeInsertion);
+//    [mutator removeObject:obj.obj];
+//    AssertKind(NSKeyValueChangeRemoval);
+//    [mutator addObject:obj.obj];
+//    AssertKind(NSKeyValueChangeInsertion);
+
+//    [mutator removeObject:obj.obj];
+//    AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:0]);
+//    AssertNotification(r);
+
+//    [mutator addObject:obj.obj];
+//    AssertIndexChange(NSKeyValueChangeInsertion, nil);
+//
+//    [mutator addObject:obj.obj];
+//    AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:1]);
+//
+
+//
+//    [mutator replaceObjectAtIndex:0 withObject:obj.obj];
+//    AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndex:0]);
+/*
+    NSMutableIndexSet *indexes = [NSMutableIndexSet new];
+    [indexes addIndex:0];
+    [indexes addIndex:2];
+    [mutator insertObjects:@[obj.obj, obj.obj] atIndexes:indexes];
+    AssertIndexChange(NSKeyValueChangeInsertion, indexes);
+
+    [mutator removeObjectsAtIndexes:indexes];
+    AssertIndexChange(NSKeyValueChangeRemoval, indexes);
+
+    if (![obj.set isKindOfClass:[NSOrderedSet class]]) {
+        // We deliberately diverge from NSMutableArray for `removeAllObjects` and
+        // `addObjectsFromArray:`, because generating a separate notification for
+        // each object added or removed is needlessly pessimal.
+        [mutator addObjectsFromArray:@[obj.obj, obj.obj]];
+        AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(1, 2)]);
+
+        // NSArray sends multiple notifications for exchange, which we can't do
+        // on refresh
+        [mutator exchangeObjectAtIndex:0 withObjectAtIndex:1];
+        AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
+
+        // NSArray doesn't have move
+        [mutator moveObjectAtIndex:1 toIndex:0];
+        AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
+
+        [mutator removeLastObject];
+        AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:2]);
+
+        [mutator removeAllObjects];
+        AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
+    }*/
+}
+
+- (void)testPrimitiveSetDiffs {
+    KVOObject *obj = [self createObject];
+    KVORecorder r(self, obj, @"intArray");
+
+    id mutator = [obj mutableArrayValueForKey:@"intArray"];
+
+    [mutator addObject:@1];
+    AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:0]);
+
+    [mutator addObject:@2];
+    AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:1]);
+
+    [mutator removeObjectAtIndex:0];
+    AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:0]);
+
+    [mutator replaceObjectAtIndex:0 withObject:@3];
+    AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndex:0]);
+
+    NSMutableIndexSet *indexes = [NSMutableIndexSet new];
+    [indexes addIndex:0];
+    [indexes addIndex:2];
+    [mutator insertObjects:@[@4, @5] atIndexes:indexes];
+    AssertIndexChange(NSKeyValueChangeInsertion, indexes);
+
+    [mutator removeObjectsAtIndexes:indexes];
+    AssertIndexChange(NSKeyValueChangeRemoval, indexes);
+
+    if (![obj.intArray isKindOfClass:[NSArray class]]) {
+        // We deliberately diverge from NSMutableArray for `removeAllObjects` and
+        // `addObjectsFromArray:`, because generating a separate notification for
+        // each object added or removed is needlessly pessimal.
+        [mutator addObjectsFromArray:@[@6, @7]];
+        AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(1, 2)]);
+
+        // NSArray sends multiple notifications for exchange, which we can't do
+        // on refresh
+        [mutator exchangeObjectAtIndex:0 withObjectAtIndex:1];
+        AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
+
+        // NSArray doesn't have move
+        [mutator moveObjectAtIndex:1 toIndex:0];
+        AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
+
+        [mutator removeLastObject];
+        AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:2]);
+
+        [mutator removeAllObjects];
+        AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
+    }
+}
+
 - (void)testIgnoredProperty {
     KVOObject *obj = [self createObject];
     KVORecorder r(self, obj, @"ignored");
@@ -1237,6 +1474,15 @@ public:
 
     KVORecorder r(self, obj, @"boolCol");
     [obj.objectArray setValue:@YES forKey:@"boolCol"];
+    AssertChanged(r, @NO, @YES);
+}
+
+- (void)testSetKVC {
+    KVOObject *obj = [self createObject];
+    [obj.objectSet addObject:obj];
+
+    KVORecorder r(self, obj, @"boolCol");
+    [obj.objectSet setValue:@YES forKey:@"boolCol"];
     AssertChanged(r, @NO, @YES);
 }
 

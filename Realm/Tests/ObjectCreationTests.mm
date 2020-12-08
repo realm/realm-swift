@@ -55,6 +55,8 @@
 @property PrimaryStringObject *primaryString;
 @property RLM_GENERIC_ARRAY(IntObject) *intArray;
 @property RLM_GENERIC_ARRAY(PrimaryIntObject) *primaryIntArray;
+@property RLM_GENERIC_SET(IntObject) *intSet;
+@property RLM_GENERIC_SET(PrimaryIntObject) *primaryIntSet;
 @end
 
 @implementation AllLinks
@@ -66,6 +68,8 @@
 @property PrimaryStringObject *primaryString;
 @property RLM_GENERIC_ARRAY(IntObject) *intArray;
 @property RLM_GENERIC_ARRAY(PrimaryIntObject) *primaryIntArray;
+@property RLM_GENERIC_SET(IntObject) *intSet;
+@property RLM_GENERIC_SET(PrimaryIntObject) *primaryIntSet;
 @end
 
 @implementation AllLinksWithPrimary
@@ -141,12 +145,58 @@
     XCTAssertEqual(eo.hired, YES);
 }
 
+- (void)testInitWithSet {
+    auto co = [[CompanyObject alloc] initWithValue:@[]];
+    XCTAssertNil(co.name);
+    XCTAssertEqual(co.employeeSet.count, 0U);
+
+    co = [[CompanyObject alloc] initWithValue:@[@"empty company"]];
+    XCTAssertEqualObjects(co.name, @"empty company");
+    XCTAssertEqual(co.employeeSet.count, 0U);
+
+    co = [[CompanyObject alloc] initWithValue:@[@"empty company", NSNull.null]];
+    XCTAssertEqualObjects(co.name, @"empty company");
+    XCTAssertEqual(co.employeeSet.count, 0U);
+
+    co = [[CompanyObject alloc] initWithValue:@[@"empty company", @[]]];
+    XCTAssertEqualObjects(co.name, @"empty company");
+    XCTAssertEqual(co.employeeSet.count, 0U);
+
+    co = [[CompanyObject alloc] initWithValue:@[@"one employee",
+                                                @[@[@"name", @2, @YES]],
+                                                @[@[@"name", @2, @YES]]]];
+    XCTAssertEqualObjects(co.name, @"one employee");
+    XCTAssertEqual(co.employeeSet.count, 1U);
+    EmployeeObject *eo = co.employeeSet.firstObject;
+    XCTAssertEqualObjects(eo.name, @"name");
+    XCTAssertEqual(eo.age, 2);
+    XCTAssertEqual(eo.hired, YES);
+
+    co = [[CompanyObject alloc] initWithValue:@[@"one employee", @[eo], @[eo]]];
+    XCTAssertEqualObjects(co.name, @"one employee");
+    XCTAssertEqual(co.employeeSet.count, 1U);
+    eo = co.employeeSet.firstObject;
+    XCTAssertEqualObjects(eo.name, @"name");
+    XCTAssertEqual(eo.age, 2);
+    XCTAssertEqual(eo.hired, YES);
+}
+
 - (void)testWithNonArrayEnumerableForRLMArrayProperty {
     auto employees = @[@[@"name", @2, @YES], @[@"name 2", @3, @NO]];
     auto co = [[CompanyObject alloc] initWithValue:@[@"one employee", employees.reverseObjectEnumerator]];
     XCTAssertEqual(2U, co.employees.count);
     XCTAssertEqualObjects(@"name 2", co.employees[0].name);
     XCTAssertEqualObjects(@"name", co.employees[1].name);
+}
+
+- (void)testWithNonSetEnumerableForRLMSetProperty {
+    auto employees = @[@[@"name", @2, @YES], @[@"name 2", @3, @NO]];
+    auto co = [[CompanyObject alloc] initWithValue:@[@"one employee",
+                                                     employees.reverseObjectEnumerator,
+                                                     employees.reverseObjectEnumerator]];
+    XCTAssertEqual(2U, co.employeeSet.count);
+    XCTAssertEqualObjects(@"name 2", co.employeeSet.array[0].name);
+    XCTAssertEqualObjects(@"name", co.employeeSet.array[1].name);
 }
 
 - (void)testInitWithArrayUsesDefaultValuesForMissingFields {
@@ -186,39 +236,58 @@
     XCTAssertEqual(co.employees.count, 0U);
 
     co = [[CompanyObject alloc] initWithValue:@{@"name": @"empty company",
-                                                @"employees": NSNull.null}];
+                                                @"employees": NSNull.null,
+                                                @"employeeSet": NSNull.null}];
     XCTAssertEqualObjects(co.name, @"empty company");
     XCTAssertEqual(co.employees.count, 0U);
+    XCTAssertEqual(co.employeeSet.count, 0U);
 
     co = [[CompanyObject alloc] initWithValue:@{@"name": @"empty company",
-                                                @"employees": @[]}];
+                                                @"employees": @[],
+                                                @"employeeSet": @[]}];
     XCTAssertEqualObjects(co.name, @"empty company");
     XCTAssertEqual(co.employees.count, 0U);
+    XCTAssertEqual(co.employeeSet.count, 0U);
 
     co = [[CompanyObject alloc] initWithValue:@{@"name": @"one employee",
-                                                @"employees": @[@[@"name", @2, @YES]]}];
+                                                @"employees": @[@[@"name", @2, @YES]],
+                                                @"employeeSet": @[@[@"name", @2, @YES]]}];
     XCTAssertEqualObjects(co.name, @"one employee");
     XCTAssertEqual(co.employees.count, 1U);
+    XCTAssertEqual(co.employeeSet.count, 1U);
     EmployeeObject *eo = co.employees.firstObject;
+    EmployeeObject *eo2 = co.employeeSet.firstObject;
     XCTAssertEqualObjects(eo.name, @"name");
+    XCTAssertEqualObjects(eo2.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
+    XCTAssertEqual(eo2.age, 2);
+    XCTAssertEqual(eo2.hired, YES);
 
     co = [[CompanyObject alloc] initWithValue:@{@"name": @"one employee",
                                                 @"employees": @[@{@"name": @"name",
                                                                   @"age": @2,
+                                                                  @"hired": @YES}],
+                                                @"employeeSet": @[@{@"name": @"name",
+                                                                  @"age": @2,
                                                                   @"hired": @YES}]}];
     XCTAssertEqualObjects(co.name, @"one employee");
     XCTAssertEqual(co.employees.count, 1U);
+    XCTAssertEqual(co.employeeSet.count, 1U);
     eo = co.employees.firstObject;
+    eo2 = co.employeeSet.firstObject;
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
+    XCTAssertEqualObjects(eo2.name, @"name");
+    XCTAssertEqual(eo2.age, 2);
+    XCTAssertEqual(eo2.hired, YES);
 
     co = [[CompanyObject alloc] initWithValue:@{@"name": @"no employees",
                                                 @"extra fields": @"are okay"}];
     XCTAssertEqualObjects(co.name, @"no employees");
     XCTAssertEqual(co.employees.count, 0U);
+    XCTAssertEqual(co.employeeSet.count, 0U);
 }
 
 - (void)testInitWithInvalidDictionary {
@@ -269,6 +338,12 @@
     auto array2 = [[AllPrimitiveArrays alloc] initWithValue:array1];
     XCTAssertEqual(array2.intObj.count, 1U);
     XCTAssertEqualObjects(array2.intObj.firstObject, @2);
+
+    auto set1 = [[AllPrimitiveSets alloc] init];
+    [set1.intObj addObject:@2];
+    auto set2 = [[AllPrimitiveSets alloc] initWithValue:array1];
+    XCTAssertEqual(set2.intObj.count, 1U);
+    XCTAssertEqualObjects(set2.intObj.firstObject, @2);
 }
 
 - (void)testInitWithInvalidObject {
@@ -294,6 +369,17 @@
                              @"Invalid value '0' of type '__NSCFConstantString' for 'int' array property 'AllPrimitiveArrays.intObj'.");
     RLMAssertThrowsWithReason([[AllPrimitiveArrays alloc] initWithValue:@{@"intObj": @1}],
                              @"Invalid value (1) for 'int' array property 'AllPrimitiveArrays.intObj': value is not enumerable.");
+}
+
+- (void)testInitPrimitiveSetsWithInvalidValues {
+    RLMAssertThrowsWithReason([[AllPrimitiveSets alloc] initWithValue:@{@"intObj": @[NSNull.null]}],
+                             @"Invalid value '<null>' of type 'NSNull' for 'int' property 'AllPrimitiveSets.intObj'.");
+    RLMAssertThrowsWithReason([[AllPrimitiveSets alloc] initWithValue:@{@"intObj": @[@1.1]}],
+                             @"Invalid value '1.1' of type '__NSCFNumber' for 'int' property 'AllPrimitiveSets.intObj'.");
+    RLMAssertThrowsWithReason([[AllPrimitiveSets alloc] initWithValue:@{@"intObj": @[@"0"]}],
+                             @"Invalid value '0' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
+    RLMAssertThrowsWithReason([[AllPrimitiveSets alloc] initWithValue:@{@"intObj": @1}],
+                             @"Invalid value (1) for 'int' set property 'AllPrimitiveSets.intObj': value is not enumerable.");
 }
 
 - (void)testInitWithCustomAccessors {
@@ -391,6 +477,29 @@
     XCTAssertEqualObjects([arrays.stringObj valueForKey:@"self"], (@[@"a", @"b"]));
     XCTAssertEqualObjects([arrays.dateObj valueForKey:@"self"], (@[now]));
     XCTAssertEqualObjects([arrays.dataObj valueForKey:@"self"], (@[bytes]));
+
+    auto sets = [[AllPrimitiveSets alloc] initWithValue:@{@"intObj": @[@1, @2, @3],
+                                                          @"boolObj": @[@YES, @NO],
+                                                          @"floatObj": @[@1.1f, @2.2f],
+                                                          @"doubleObj": @[@3.3, @4.4],
+                                                          @"stringObj": @[@"a", @"b"],
+                                                          @"dateObj": @[now],
+                                                          @"dataObj": @[bytes]}];
+    XCTAssertEqual(3U, sets.intObj.count);
+    XCTAssertEqual(2U, sets.boolObj.count);
+    XCTAssertEqual(2U, sets.floatObj.count);
+    XCTAssertEqual(2U, sets.doubleObj.count);
+    XCTAssertEqual(2U, sets.stringObj.count);
+    XCTAssertEqual(1U, sets.dateObj.count);
+    XCTAssertEqual(1U, sets.dataObj.count);
+
+    XCTAssertEqualObjects([[sets.intObj valueForKey:@"self"] allObjects], (@[@1, @2, @3]));
+    XCTAssertEqualObjects([[sets.boolObj valueForKey:@"self"] allObjects], (@[@YES, @NO]));
+    XCTAssertEqualObjects([[sets.floatObj valueForKey:@"self"] allObjects], (@[@1.1f, @2.2f]));
+    XCTAssertEqualObjects([[sets.doubleObj valueForKey:@"self"] allObjects], (@[@3.3, @4.4]));
+    XCTAssertEqualObjects([[sets.stringObj valueForKey:@"self"] allObjects], (@[@"a", @"b"]));
+    XCTAssertEqualObjects([[sets.dateObj valueForKey:@"self"] allObjects], (@[now]));
+    XCTAssertEqualObjects([[sets.dataObj valueForKey:@"self"] allObjects], (@[bytes]));
 }
 
 - (void)testInitValidatesNumberTypes {

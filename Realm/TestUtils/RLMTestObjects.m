@@ -121,6 +121,9 @@
 @implementation ArrayOfAllTypesObject
 @end
 
+@implementation SetOfAllTypesObject
+@end
+
 @implementation LinkToAllTypesObject
 @end
 
@@ -241,6 +244,11 @@
 @implementation CircleArrayObject
 @end
 
+#pragma mark CircleSetObject
+
+@implementation CircleSetObject
+@end
+
 #pragma mark ArrayPropertyObject
 
 @implementation ArrayPropertyObject
@@ -317,6 +325,12 @@
 
 @implementation IntegerArrayPropertyObject
 @end
+
+#pragma mark IntegerSetPropertyObject
+
+@implementation IntegerSetPropertyObject
+@end
+
 
 @implementation NumberObject
 @end

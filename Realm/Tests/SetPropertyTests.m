@@ -175,8 +175,8 @@
     [realm commitWriteTransaction];
 
     XCTAssertEqual(setObj1.stringObj.count, 2U);
-    XCTAssertTrue([setObj1.stringObj[0] isEqualToString:@"five"]);
-    XCTAssertTrue([setObj1.stringObj[1] isEqualToString:@"four"]);
+    XCTAssertTrue([setObj1.stringObj.array[0] isEqualToString:@"five"]);
+    XCTAssertTrue([setObj1.stringObj.array[1] isEqualToString:@"four"]);
     XCTAssertEqual(setObj1.stringObj.count, 2U);
 
     XCTAssertEqual(setObj2.stringObj.count, 0U);
@@ -192,9 +192,9 @@
     stringObj2.stringCol = @"b";
     StringObject *stringObj3 = [[StringObject alloc] init];
     stringObj3.stringCol = @"c";
-    [set.stringSet addObject:stringObj1];
-    [set.stringSet addObject:stringObj2];
-    [set.stringSet addObject:stringObj3];
+    [set.set addObject:stringObj1];
+    [set.set addObject:stringObj2];
+    [set.set addObject:stringObj3];
 
     IntObject *intObj1 = [[IntObject alloc] init];
     intObj1.intCol = 0;
@@ -206,30 +206,30 @@
     [set.intSet addObject:intObj2];
     [set.intSet addObject:intObj3];
 
-    XCTAssertEqualObjects(set.stringSet[0], stringObj1, @"Objects should be equal");
-    XCTAssertEqualObjects(set.stringSet[1], stringObj2, @"Objects should be equal");
-    XCTAssertEqualObjects(set.stringSet[2], stringObj3, @"Objects should be equal");
-    XCTAssertEqual(set.stringSet.count, 3U, @"Should have 3 elements in string set");
+    XCTAssertEqualObjects(set.set.array[0], stringObj1, @"Objects should be equal");
+    XCTAssertEqualObjects(set.set.array[1], stringObj2, @"Objects should be equal");
+    XCTAssertEqualObjects(set.set.array[2], stringObj3, @"Objects should be equal");
+    XCTAssertEqual(set.set.count, 3U, @"Should have 3 elements in string set");
 
-    XCTAssertEqualObjects(set.intSet[0], intObj1, @"Objects should be equal");
-    XCTAssertEqualObjects(set.intSet[1], intObj2, @"Objects should be equal");
-    XCTAssertEqualObjects(set.intSet[2], intObj3, @"Objects should be equal");
+    XCTAssertEqualObjects(set.intSet.array[0], intObj1, @"Objects should be equal");
+    XCTAssertEqualObjects(set.intSet.array[1], intObj2, @"Objects should be equal");
+    XCTAssertEqualObjects(set.intSet.array[2], intObj3, @"Objects should be equal");
     XCTAssertEqual(set.intSet.count, 3U, @"Should have 3 elements in int set");
 
-    [set.stringSet removeObject:stringObj3];
+    [set.set removeObject:stringObj3];
 
-    XCTAssertEqualObjects(set.stringSet[0], stringObj1, @"Objects should be equal");
-    XCTAssertEqualObjects(set.stringSet[1], stringObj2, @"Objects should be equal");
-    XCTAssertEqual(set.stringSet.count, 2U, @"Should have 2 elements in string set");
+    XCTAssertEqualObjects(set.set.array[0], stringObj1, @"Objects should be equal");
+    XCTAssertEqualObjects(set.set.array[1], stringObj2, @"Objects should be equal");
+    XCTAssertEqual(set.set.count, 2U, @"Should have 2 elements in string set");
 
-    [set.stringSet removeObject:stringObj2];
+    [set.set removeObject:stringObj2];
 
-    XCTAssertEqualObjects(set.stringSet[0], stringObj1, @"Objects should be equal");
-    XCTAssertEqual(set.stringSet.count, 1U, @"Should have 1 elements in string set");
+    XCTAssertEqualObjects(set.set.array[0], stringObj1, @"Objects should be equal");
+    XCTAssertEqual(set.set.count, 1U, @"Should have 1 elements in string set");
 
-    [set.stringSet removeObject:stringObj1];
+    [set.set removeObject:stringObj1];
 
-    XCTAssertEqual(set.stringSet.count, 0U, @"Should have 0 elements in string set");
+    XCTAssertEqual(set.set.count, 0U, @"Should have 0 elements in string set");
 
     [set.intSet removeAllObjects];
     XCTAssertEqual(set.intSet.count, 0U, @"Should have 0 elements in int set");
@@ -263,8 +263,8 @@
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
     SetPropertyObject *setObj1 = [SetPropertyObject new];
-    XCTAssertNotNil(setObj1.stringSet, @"Should be able to get an empty set");
-    XCTAssertEqual(setObj1.stringSet.count, 0U, @"Should start with no set elements");
+    XCTAssertNotNil(setObj1.set, @"Should be able to get an empty set");
+    XCTAssertEqual(setObj1.set.count, 0U, @"Should start with no set elements");
 
     StringObject *str1 = [StringObject createInRealm:r withValue:@[@"a"]];
     StringObject *str2 = [StringObject createInRealm:r withValue:@[@"b"]];
@@ -273,7 +273,7 @@
     IntObject *int2 = [IntObject createInRealm:r withValue:@[@2]];
     IntObject *int3 = [IntObject createInRealm:r withValue:@[@3]];
 
-    [setObj1.stringSet addObjects:@[str1, str2, str3, str1, str2, str3]];
+    [setObj1.set addObjects:@[str1, str2, str3, str1, str2, str3]];
     [setObj1.intSet addObjects:@[int1, int2, int3, int1, int2, int3]];
 
     [r addObject:setObj1];
@@ -284,17 +284,17 @@
     XCTAssertFalse(setObj1.isInvalidated);
     XCTAssertEqual(results.count, 1U);
 
-    XCTAssertEqual(results[0].stringSet.count, 3U);
-    XCTAssertEqualObjects(results[0].stringSet, setObj1.stringSet);
+    XCTAssertEqual(results[0].set.count, 3U);
+    XCTAssertEqualObjects(results[0].set, setObj1.set);
 
     XCTAssertEqual(results[0].intSet.count, 3U);
     XCTAssertEqualObjects(results[0].intSet, setObj1.intSet);
 
-    RLMSet *setProp = setObj1.stringSet;
+    RLMSet *setProp = setObj1.set;
     RLMAssertThrowsWithReasonMatching([setProp addObject:@"another one"], @"write transaction");
 
     // make sure we can fast enumerate
-    for (RLMObject *obj in setObj1.stringSet) {
+    for (RLMObject *obj in setObj1.set) {
         XCTAssertTrue(obj.description.length, @"Object should have description");
     }
 }
@@ -304,19 +304,19 @@
 
     [realm beginWriteTransaction];
     SetPropertyObject *setObj = [SetPropertyObject createInRealm:realm withValue:@[@"setObject", @[], @[]]];
-    XCTAssertNotNil(setObj.stringSet, @"Should be able to get an empty set");
-    XCTAssertEqual(setObj.stringSet.count, 0U, @"Should start with no set elements");
+    XCTAssertNotNil(setObj.set, @"Should be able to get an empty set");
+    XCTAssertEqual(setObj.set.count, 0U, @"Should start with no set elements");
 
     StringObject *obj = [[StringObject alloc] init];
     obj.stringCol = @"a";
-    RLMSet *set = setObj.stringSet;
+    RLMSet *set = setObj.set;
     [set addObject:obj];
     [set addObject:[StringObject createInRealm:realm withValue:@[@"b"]]];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(set.count, 2U, @"Should have two elements in set");
-    XCTAssertEqualObjects([set[0] stringCol], @"a", @"First element should have property value 'a'");
-    XCTAssertEqualObjects([setObj.stringSet[1] stringCol], @"b", @"Second element should have property value 'b'");
+    XCTAssertEqualObjects([set.array[0] stringCol], @"a", @"First element should have property value 'a'");
+    XCTAssertEqualObjects([setObj.set.array[1] stringCol], @"b", @"Second element should have property value 'b'");
 
     RLMAssertThrowsWithReasonMatching([set addObject:obj], @"write transaction");
 }
@@ -335,7 +335,7 @@
 
     [realm beginWriteTransaction];
     SetPropertyObject *setObj = [SetPropertyObject createInRealm:realm withValue:@[@"setObject", @[@[@"a"]], @[]]];
-    RLMSet *stringSet = setObj.stringSet;
+    RLMSet *stringSet = setObj.set;
     XCTAssertFalse(stringSet.isInvalidated, @"stringSet should be valid after creation.");
     [realm deleteObject:setObj];
     XCTAssertTrue(stringSet.isInvalidated, @"stringSet should be invalid after parent deletion.");
@@ -347,7 +347,7 @@
 
     [realm beginWriteTransaction];
     SetPropertyObject *setObj = [SetPropertyObject createInRealm:realm withValue:@[@"setObject", @[@[@"a"]], @[]]];
-    RLMSet *stringSet = setObj.stringSet;
+    RLMSet *stringSet = setObj.set;
     StringObject *firstObject = stringSet.firstObject;
     [realm deleteObjects:[StringObject allObjectsInRealm:realm]];
     XCTAssertFalse(stringSet.isInvalidated, @"stringSet should be valid after member object deletion.");
@@ -364,7 +364,7 @@
     StringObject *child1 = [StringObject createInRealm:realm withValue:@[@"a"]];
     StringObject *child2 = [[StringObject alloc] init];
     child2.stringCol = @"b";
-    [obj.stringSet addObjects:@[child2, child1]];
+    [obj.set addObjects:@[child2, child1]];
     [realm commitWriteTransaction];
 
     RLMResults *children = [StringObject allObjectsInRealm:realm];
@@ -403,10 +403,10 @@
 
     SetPropertyObject *setObj = [[SetPropertyObject alloc] init];
     setObj.name = @"name";
-    XCTAssertNotNil(setObj.stringSet, @"RLMSet property should get created on access");
+    XCTAssertNotNil(setObj.set, @"RLMSet property should get created on access");
 
-    XCTAssertNil(setObj.stringSet.firstObject, @"No objects added yet");
-    XCTAssertNil(setObj.stringSet.lastObject, @"No objects added yet");
+    XCTAssertNil(setObj.set.firstObject, @"No objects added yet");
+    XCTAssertNil(setObj.set.lastObject, @"No objects added yet");
 
     StringObject *obj1 = [[StringObject alloc] init];
     obj1.stringCol = @"a";
@@ -414,35 +414,35 @@
     obj2.stringCol = @"b";
     StringObject *obj3 = [[StringObject alloc] init];
     obj3.stringCol = @"c";
-    [setObj.stringSet addObject:obj1];
-    [setObj.stringSet addObject:obj2];
-    [setObj.stringSet addObject:obj3];
+    [setObj.set addObject:obj1];
+    [setObj.set addObject:obj2];
+    [setObj.set addObject:obj3];
 
-    XCTAssertEqualObjects(setObj.stringSet.firstObject, obj1, @"Objects should be equal");
-    XCTAssertEqualObjects(setObj.stringSet.lastObject, obj3, @"Objects should be equal");
-    XCTAssertEqualObjects([setObj.stringSet objectAtIndex:1], obj2, @"Objects should be equal");
+    XCTAssertEqualObjects(setObj.set.firstObject, obj1, @"Objects should be equal");
+    XCTAssertEqualObjects(setObj.set.lastObject, obj3, @"Objects should be equal");
+    XCTAssertEqualObjects([setObj.set objectAtIndex:1], obj2, @"Objects should be equal");
 
     [realm beginWriteTransaction];
     [realm addObject:setObj];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(setObj.stringSet.count, 3U, @"Should have three elements in set");
-    XCTAssertEqualObjects([setObj.stringSet[0] stringCol], @"a", @"First element should have property value 'a'");
-    XCTAssertEqualObjects([setObj.stringSet[1] stringCol], @"b", @"Second element should have property value 'b'");
+    XCTAssertEqual(setObj.set.count, 3U, @"Should have three elements in set");
+    XCTAssertEqualObjects([setObj.set.array[0] stringCol], @"a", @"First element should have property value 'a'");
+    XCTAssertEqualObjects([setObj.set.array[1] stringCol], @"b", @"Second element should have property value 'b'");
 
     [realm beginWriteTransaction];
 
-    [setObj.stringSet removeObject:obj3];
-    XCTAssertEqual(setObj.stringSet.count, 2U, @"2 objects left");
-    [setObj.stringSet addObject:obj1];
-    [setObj.stringSet removeAllObjects];
-    XCTAssertEqual(setObj.stringSet.count, 0U, @"All objects removed");
+    [setObj.set removeObject:obj3];
+    XCTAssertEqual(setObj.set.count, 2U, @"2 objects left");
+    [setObj.set addObject:obj1];
+    [setObj.set removeAllObjects];
+    XCTAssertEqual(setObj.set.count, 0U, @"All objects removed");
     [realm commitWriteTransaction];
 
     SetPropertyObject *setObj2 = [[SetPropertyObject alloc] init];
     IntObject *intObj = [[IntObject alloc] init];
     intObj.intCol = 1;
-    RLMAssertThrowsWithReasonMatching([setObj2.stringSet addObject:(id)intObj], @"IntObject.*StringObject");
+    RLMAssertThrowsWithReasonMatching([setObj2.set addObject:(id)intObj], @"IntObject.*StringObject");
     [setObj2.intSet addObject:intObj];
 
     XCTAssertThrows([setObj2.intSet objectsWhere:@"intCol == 1"], @"Should throw on unmanaged RLMSet");
@@ -467,12 +467,12 @@
 
     set.name = @"name";
     set.name = @"name2";
-    XCTAssertNotNil(set.stringSet, @"RLMSet property should get created on access");
-    XCTAssertNotNil(set2.stringSet, @"RLMSet property should get created on access");
-    XCTAssertTrue([set.stringSet isEqual:set2.stringSet], @"Empty sets should be equal");
+    XCTAssertNotNil(set.set, @"RLMSet property should get created on access");
+    XCTAssertNotNil(set2.set, @"RLMSet property should get created on access");
+    XCTAssertTrue([set.set isEqual:set2.set], @"Empty sets should be equal");
 
-    XCTAssertNil(set.stringSet.firstObject, @"No objects added yet");
-    XCTAssertNil(set2.stringSet.lastObject, @"No objects added yet");
+    XCTAssertNil(set.set.firstObject, @"No objects added yet");
+    XCTAssertNil(set2.set.lastObject, @"No objects added yet");
 
     StringObject *obj1 = [[StringObject alloc] init];
     obj1.stringCol = @"a";
@@ -480,26 +480,26 @@
     obj2.stringCol = @"b";
     StringObject *obj3 = [[StringObject alloc] init];
     obj3.stringCol = @"c";
-    [set.stringSet addObject:obj1];
-    [set.stringSet addObject:obj2];
-    [set.stringSet addObject:obj3];
+    [set.set addObject:obj1];
+    [set.set addObject:obj2];
+    [set.set addObject:obj3];
 
-    [set2.stringSet addObject:obj1];
-    [set2.stringSet addObject:obj2];
-    [set2.stringSet addObject:obj3];
+    [set2.set addObject:obj1];
+    [set2.set addObject:obj2];
+    [set2.set addObject:obj3];
 
-    XCTAssertTrue([set.stringSet isEqual:set2.stringSet], @"Sets should be equal");
-    [set2.stringSet removeObject:obj3];
-    XCTAssertFalse([set.stringSet isEqual:set2.stringSet], @"Sets should not be equal");
-    [set2.stringSet addObject:obj3];
-    XCTAssertTrue([set.stringSet isEqual:set2.stringSet], @"Sets should be equal");
+    XCTAssertTrue([set.set isEqual:set2.set], @"Sets should be equal");
+    [set2.set removeObject:obj3];
+    XCTAssertFalse([set.set isEqual:set2.set], @"Sets should not be equal");
+    [set2.set addObject:obj3];
+    XCTAssertTrue([set.set isEqual:set2.set], @"Sets should be equal");
 
     [realm beginWriteTransaction];
     [realm addObject:set];
     [realm commitWriteTransaction];
 
-    XCTAssertFalse([set.stringSet isEqual:set2.stringSet], @"Comparing a managed set to an unmanaged one should fail");
-    XCTAssertFalse([set2.stringSet isEqual:set.stringSet], @"Comparing a managed set to an unmanaged one should fail");
+    XCTAssertFalse([set.set isEqual:set2.set], @"Comparing a managed set to an unmanaged one should fail");
+    XCTAssertFalse([set2.set isEqual:set.set], @"Comparing a managed set to an unmanaged one should fail");
 }
 
 - (void)testUnmanagedPrimitive {
@@ -513,7 +513,7 @@
     XCTAssertTrue([obj.dateObj isKindOfClass:[RLMSet class]]);
 
     [obj.intObj addObject:@1];
-    XCTAssertEqualObjects(obj.intObj[0], @1);
+    XCTAssertEqualObjects(obj.intObj.array[0], @1);
     XCTAssertThrows([obj.intObj addObject:@""]);
 
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -1031,10 +1031,10 @@
     [realm commitWriteTransaction];
 
     RLMResults *notActuallySorted = [set sortedResultsUsingDescriptors:@[]];
-    XCTAssertTrue([set[0] isEqualToObject:notActuallySorted[0]]);
-    XCTAssertTrue([set[1] isEqualToObject:notActuallySorted[1]]);
-    XCTAssertTrue([set[2] isEqualToObject:notActuallySorted[2]]);
-    XCTAssertTrue([set[3] isEqualToObject:notActuallySorted[3]]);
+    XCTAssertTrue([set.array[0] isEqualToObject:notActuallySorted[0]]);
+    XCTAssertTrue([set.array[1] isEqualToObject:notActuallySorted[1]]);
+    XCTAssertTrue([set.array[2] isEqualToObject:notActuallySorted[2]]);
+    XCTAssertTrue([set.array[3] isEqualToObject:notActuallySorted[3]]);
 }
 
 - (void)testSortByMultipleColumns {
@@ -1118,13 +1118,13 @@
     [realm commitWriteTransaction];
 
     XCTAssertEqual(peopleInCompany.count, 2U, @"link deleted when accessing via links");
-    EmployeeObject *test = peopleInCompany[0];
+    EmployeeObject *test = peopleInCompany.array[0];
     XCTAssertEqual(test.age, po1.age, @"Should be equal");
     XCTAssertEqualObjects(test.name, po1.name, @"Should be equal");
     XCTAssertEqual(test.hired, po1.hired, @"Should be equal");
     XCTAssertTrue([test isEqualToObject:po1], @"Should be equal");
 
-    test = peopleInCompany[1];
+    test = peopleInCompany.array[1];
     XCTAssertEqual(test.age, po2.age, @"Should be equal");
     XCTAssertEqualObjects(test.name, po2.name, @"Should be equal");
     XCTAssertEqual(test.hired, po2.hired, @"Should be equal");
@@ -1257,7 +1257,7 @@
     [realm beginWriteTransaction];
     SetPropertyObject *set = [SetPropertyObject createInRealm:realm
                                                     withValue:@[@"", @[@[@"a"]], @[@[@0]]]];
-    RLMAssertThrowsWithReason(set.intSet = (id)set.stringSet,
+    RLMAssertThrowsWithReason(set.intSet = (id)set.set,
                               @"RLMSet<StringObject> does not match expected type 'IntObject' for property 'SetPropertyObject.intSet'.");
     RLMAssertThrowsWithReason(set[@"intSet"] = set[@"stringSet"],
                               @"RLMSet<StringObject> does not match expected type 'IntObject' for property 'SetPropertyObject.intSet'.");
@@ -1290,7 +1290,7 @@
 
     __block bool first = true;
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [set.stringSet addNotificationBlock:^(RLMSet *set, RLMCollectionChange *change, NSError *error) {
+    id token = [set.set addNotificationBlock:^(RLMSet *set, RLMCollectionChange *change, NSError *error) {
         XCTAssertNotNil(set);
         XCTAssert(first ? !change : !!change);
         XCTAssertNil(error);
@@ -1303,7 +1303,7 @@
     [self dispatchAsyncAndWait:^{
         RLMRealm *realm = self.realmWithTestPath;
         [realm transactionWithBlock:^{
-            RLMSet *set = ((SetPropertyObject *)[SetPropertyObject allObjectsInRealm:realm].firstObject).stringSet;
+            RLMSet *set = ((SetPropertyObject *)[SetPropertyObject allObjectsInRealm:realm].firstObject).set;
             [set addObject:[[StringObject alloc] init]];
         }];
     }];
@@ -1346,7 +1346,7 @@
     [realm commitWriteTransaction];
 
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [set.stringSet addNotificationBlock:^(RLMSet *set, __unused RLMCollectionChange *change, NSError *error) {
+    id token = [set.set addNotificationBlock:^(RLMSet *set, __unused RLMCollectionChange *change, NSError *error) {
         XCTAssertNotNil(set);
         XCTAssertNil(error);
         // will throw if it's called a second time before we create the new
@@ -1364,7 +1364,7 @@
         [self dispatchAsyncAndWait:^{
             RLMRealm *realm = self.realmWithTestPath;
             [realm transactionWithBlock:^{
-                RLMSet *set = ((SetPropertyObject *)[SetPropertyObject allObjectsInRealm:realm].firstObject).stringSet;
+                RLMSet *set = ((SetPropertyObject *)[SetPropertyObject allObjectsInRealm:realm].firstObject).set;
                 [set addObject:[[StringObject alloc] init]];
             }];
         }];
@@ -1384,7 +1384,7 @@
     [realm commitWriteTransaction];
 
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [set.stringSet addNotificationBlock:^(RLMSet *set, __unused RLMCollectionChange *change, NSError *error) {
+    id token = [set.set addNotificationBlock:^(RLMSet *set, __unused RLMCollectionChange *change, NSError *error) {
         XCTAssertNotNil(set);
         XCTAssertNil(error);
         [expectation fulfill];
@@ -1431,7 +1431,7 @@ static RLMSet<IntObject *> *managedTestSet() {
         RLMAssertThrowsWithReasonMatching([set objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
         RLMAssertThrowsWithReasonMatching([set sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"thread");
         RLMAssertThrowsWithReasonMatching([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]], @"thread");
-        RLMAssertThrowsWithReasonMatching(set[0], @"thread");
+        RLMAssertThrowsWithReasonMatching(set.array[0], @"thread");
         RLMAssertThrowsWithReasonMatching([set valueForKey:@"intCol"], @"thread");
         RLMAssertThrowsWithReasonMatching([set setValue:@1 forKey:@"intCol"], @"thread");
         RLMAssertThrowsWithReasonMatching({for (__unused id obj in set);}, @"thread");
@@ -1468,7 +1468,7 @@ static RLMSet<IntObject *> *managedTestSet() {
     XCTAssertNoThrow([set objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
     XCTAssertNoThrow([set sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
     XCTAssertNoThrow([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
-    XCTAssertNoThrow(set[0]);
+    XCTAssertNoThrow(set.array[0]);
     XCTAssertNoThrow([set valueForKey:@"intCol"]);
     XCTAssertNoThrow([set setValue:@1 forKey:@"intCol"]);
     XCTAssertNoThrow({for (__unused id obj in set);});
@@ -1499,7 +1499,7 @@ static RLMSet<IntObject *> *managedTestSet() {
     RLMAssertThrowsWithReasonMatching([set objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]], @"invalidated");
-    RLMAssertThrowsWithReasonMatching(set[0], @"invalidated");
+    RLMAssertThrowsWithReasonMatching(set.array[0], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set valueForKey:@"intCol"], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set setValue:@1 forKey:@"intCol"], @"invalidated");
     RLMAssertThrowsWithReasonMatching({for (__unused id obj in set);}, @"invalidated");
@@ -1527,7 +1527,7 @@ static RLMSet<IntObject *> *managedTestSet() {
     XCTAssertNoThrow([set objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
     XCTAssertNoThrow([set sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
     XCTAssertNoThrow([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
-    XCTAssertNoThrow(set[0]);
+    XCTAssertNoThrow(set.array[0]);
     XCTAssertNoThrow([set valueForKey:@"intCol"]);
     XCTAssertNoThrow({for (__unused id obj in set);});
 
@@ -1586,7 +1586,7 @@ static RLMSet<IntObject *> *managedTestSet() {
     RLMSet *frozen = [set freeze];
     XCTAssertEqual(frozen.count, 2);
     [set.realm transactionWithBlock:^{
-        [set removeObject:set[0]];
+        [set removeObject:set.array[0]];
     }];
     XCTAssertEqual(frozen.count, 2);
 }

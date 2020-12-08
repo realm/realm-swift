@@ -18,7 +18,6 @@
 
 #import "RLMQueryUtil.hpp"
 
-#import "RLMArray.h"
 #import "RLMDecimal128_Private.hpp"
 #import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.h"
@@ -263,7 +262,7 @@ public:
 
     bool has_any_to_many_links() const {
         return std::any_of(begin(m_links), end(m_links),
-                           [](RLMProperty *property) { return property.array; });
+                           [](RLMProperty *property) { return property.array || property.set; });
     }
 
     ColumnReference last_link_column() const {
@@ -330,8 +329,8 @@ public:
         , m_link_column(std::move(link_column))
         , m_column(std::move(column))
     {
-        RLMPrecondition(m_link_column.property().array,
-                        @"Invalid predicate", @"Collection operation can only be applied to a property of type RLMArray.");
+        RLMPrecondition((m_link_column.property().array || m_link_column.property().set),
+                        @"Invalid predicate", @"Collection operation can only be applied to a property of type RLMArray / RLMSet.");
 
         switch (m_type) {
             case Count:
@@ -787,7 +786,7 @@ void QueryBuilder::add_link_constraint(NSPredicateOperatorType operatorType,
         // For arrays this effectively checks if there are any objects in the
         // array, while for links it's just always constant true or false
         // (for != and = respectively).
-        if (column.property().array) {
+        if (column.property().array || column.property().set) {
             add_bool_constraint(RLMPropertyTypeObject, operatorType, column.resolve<Link>(), null());
         }
         else if (operatorType == NSEqualToPredicateOperatorType) {
@@ -1015,7 +1014,7 @@ KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, N
                         @"Property '%@' not found in object of type '%@'",
                         propertyName, objectSchema.className);
 
-        if (property.array)
+        if (property.array || property.set)
             keyPathContainsToManyRelationship = true;
 
         if (end != NSNotFound) {
@@ -1044,7 +1043,7 @@ ColumnReference QueryBuilder::column_reference_from_key_path(RLMObjectSchema *ob
                                      @"Aggregate operations can only be used on key paths that include an array property");
     } else if (!isAggregate && keyPath.containsToManyRelationship) {
         @throw RLMPredicateException(@"Invalid predicate",
-                                     @"Key paths that include an array property must use aggregate operations");
+                                     @"Key paths that include a collection property must use aggregate operations");
     }
 
     return ColumnReference(m_query, m_group, m_schema, keyPath.property, std::move(keyPath.links));
@@ -1056,7 +1055,7 @@ void validate_property_value(const ColumnReference& column,
                              __unsafe_unretained RLMObjectSchema *const objectSchema,
                              __unsafe_unretained NSString *const keyPath) {
     RLMProperty *prop = column.property();
-    if (prop.array) {
+    if (prop.array || prop.set) {
         RLMPrecondition([RLMObjectBaseObjectSchema(RLMDynamicCast<RLMObjectBase>(value)).className isEqualToString:prop.objectClassName],
                         @"Invalid value", err, prop.objectClassName, keyPath, objectSchema.className, value);
     }

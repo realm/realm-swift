@@ -174,9 +174,9 @@ static auto translateErrors(Function&& f) {
     }
 }
 
-template<typename IndexSetFactory>
 static void changeSet(__unsafe_unretained RLMManagedSet *const set,
-                        NSKeyValueChange kind, dispatch_block_t f, IndexSetFactory&& is) {
+                      NSKeyValueChange kind,
+                      dispatch_block_t f) {
     translateErrors([&] { set->_backingSet.verify_in_transaction(); });
 
     RLMObservationTracker tracker(set->_realm);
@@ -185,30 +185,10 @@ static void changeSet(__unsafe_unretained RLMManagedSet *const set,
                                          set->_backingSet.get_parent_object_key(),
                                          *set->_ownerInfo);
     if (obsInfo) {
-        if (is) {
-            tracker.willChange(obsInfo, set->_key, kind, is());
-        } else {
-            tracker.willChange(obsInfo, set->_key, kind, nil);
-        }
+        tracker.willChange(obsInfo, set->_key, kind, nil);
     }
 
     translateErrors(f);
-}
-
-static void changeSet(__unsafe_unretained RLMManagedSet *const set, NSKeyValueChange kind, dispatch_block_t f) {
-    changeSet(set, kind, f, [] { return [NSIndexSet new]; });
-}
-
-static void changeSet(__unsafe_unretained RLMManagedSet *const set, NSKeyValueChange kind, NSUInteger index, dispatch_block_t f) {
-    changeSet(set, kind, f, [=] { return [NSIndexSet indexSetWithIndex:index]; });
-}
-
-static void changeSet(__unsafe_unretained RLMManagedSet *const set, NSKeyValueChange kind, NSRange range, dispatch_block_t f) {
-    changeSet(set, kind, f, [=] { return [NSIndexSet indexSetWithIndexesInRange:range]; });
-}
-
-static void changeSet(__unsafe_unretained RLMManagedSet *const set, NSKeyValueChange kind, NSIndexSet *is, dispatch_block_t f) {
-    changeSet(set, kind, f, [=] { return is; });
 }
 
 //
@@ -298,18 +278,8 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     RLMRemoveObject(self, object);
 }
 
-- (void)addObjectsFromSet:(NSSet *)set {
-    changeSet(self, NSKeyValueChangeInsertion, NSMakeRange(self.count, set.count), ^{
-        RLMAccessorContext context(*_objectInfo);
-        for (id obj in set) {
-            RLMSetValidateMatchingObjectType(self, obj);
-            _backingSet.insert(context, obj);
-        }
-    });
-}
-
 - (void)removeAllObjects {
-    changeSet(self, NSKeyValueChangeRemoval, NSMakeRange(0, self.count), ^{
+    changeSet(self, NSKeyValueChangeRemoval, ^{
         _backingSet.remove_all();
     });
 }
@@ -320,7 +290,6 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
         RLMAccessorContext context(*_objectInfo);
         return RLMConvertNotFound(_backingSet.find(context, object));
     });
-    return 1;
 }
 
 - (RLMManagedSet *)managedObjectFrom:(RLMSet *)unmanaged {
@@ -345,7 +314,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
         @throw RLMException(@"Can only perform intersectsSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
-    changeSet(self, NSKeyValueChangeReplacement, ^{
+    changeSet(self, NSKeyValueChangeRemoval, ^{
         _backingSet.assign_intersection(rhs->_backingSet);
     });
 }
@@ -360,7 +329,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
         @throw RLMException(@"Can only perform unionSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
-    changeSet(self, NSKeyValueChangeReplacement, ^{
+    changeSet(self, NSKeyValueChangeInsertion, ^{
         _backingSet.assign_union(rhs->_backingSet);
     });
 }
@@ -370,7 +339,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
         @throw RLMException(@"Can only perform minusSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
-    changeSet(self, NSKeyValueChangeReplacement, ^{
+    changeSet(self, NSKeyValueChangeRemoval, ^{
         _backingSet.assign_difference(rhs->_backingSet);
     });
 }

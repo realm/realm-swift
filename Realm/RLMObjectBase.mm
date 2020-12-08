@@ -20,6 +20,7 @@
 
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
+#import "RLMSet_Private.hpp"
 #import "RLMDecimal128.h"
 #import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
@@ -360,6 +361,14 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     return [super mutableArrayValueForKey:key];
 }
 
+- (id)mutableSetValueForKey:(NSString *)key {
+    id obj = [self valueForKey:key];
+    if ([obj isKindOfClass:[RLMSet class]]) {
+        return obj;
+    }
+    return [super mutableSetValueForKey:key];
+}
+
 - (void)addObserver:(id)observer
          forKeyPath:(NSString *)keyPath
             options:(NSKeyValueObservingOptions)options
@@ -384,6 +393,22 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     }
 
     return [super automaticallyNotifiesObserversForKey:key];
+}
+
+- (void)willChangeValueForKey:(NSString *)key
+              withSetMutation:(NSKeyValueSetMutationKind)mutationKind
+                 usingObjects:(NSSet *)objects {
+    RLMSet *realmSet = [self valueForKey:key];
+    NSSet *set = [NSSet setWithArray:realmSet.array];
+    // place the new `set` somewhere
+
+    [super willChangeValueForKey:key withSetMutation:mutationKind usingObjects:objects];
+}
+
+- (void)didChangeValueForKey:(NSString *)key
+             withSetMutation:(NSKeyValueSetMutationKind)mutationKind
+                usingObjects:(NSSet *)objects {
+
 }
 
 #pragma mark - Thread Confined Protocol Conformance

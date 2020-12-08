@@ -159,6 +159,10 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLM_GENERIC_ARRAY(AllTypesObject) *array;
 @end
 
+@interface SetOfAllTypesObject : RLMObject
+@property RLM_GENERIC_SET(AllTypesObject) *set;
+@end
+
 @interface AllOptionalTypes : RLMObject
 @property NSNumber<RLMInt> *intObj;
 @property NSNumber<RLMFloat> *floatObj;
@@ -354,6 +358,12 @@ RLM_ARRAY_TYPE(CircleObject);
 @property RLM_GENERIC_ARRAY(CircleObject) *circles;
 @end
 
+#pragma mark CircleSetObject
+
+@interface CircleSetObject : RLMObject
+@property RLM_GENERIC_SET(CircleObject) *circles;
+@end
+
 #pragma mark ArrayPropertyObject
 
 @interface ArrayPropertyObject : RLMObject
@@ -369,7 +379,7 @@ RLM_ARRAY_TYPE(CircleObject);
 @interface SetPropertyObject : RLMObject
 
 @property NSString *name;
-@property RLM_GENERIC_SET(StringObject) *stringSet;
+@property RLM_GENERIC_SET(StringObject) *set;
 @property RLM_GENERIC_SET(IntObject) *intSet;
 
 @end
@@ -442,6 +452,15 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
 @property NSInteger number;
 @property RLM_GENERIC_ARRAY(IntObject) *array;
+
+@end
+
+#pragma mark IntegerSetPropertyObject
+
+@interface IntegerSetPropertyObject : RLMObject
+
+@property NSInteger number;
+@property RLM_GENERIC_SET(IntObject) *set;
 
 @end
 

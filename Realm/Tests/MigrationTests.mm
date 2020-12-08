@@ -872,7 +872,7 @@ RLM_ARRAY_TYPE(MigrationTestObject);
     // create realm with old schema and populate
     [self createTestRealmWithSchema:RLMSchema.sharedSchema.objectSchema block:^(RLMRealm *realm) {
         id obj = [realm createObject:MigrationTestObject.className withValue:@[@1, @"1"]];
-        [realm createObject:MigrationLinkObject.className withValue:@[obj, @[obj]]];
+        [realm createObject:MigrationLinkObject.className withValue:@[obj, @[obj], @[obj]]];
     }];
 
     // Make the object link property link to a different class
@@ -892,6 +892,8 @@ RLM_ARRAY_TYPE(MigrationTestObject);
 
                                            XCTAssertEqual(1U, [oldObject[@"array"] count]);
                                            XCTAssertEqual(1U, [newObject[@"array"] count]);
+                                           XCTAssertEqual(1U, [oldObject[@"set"] count]);
+                                           XCTAssertEqual(1U, [newObject[@"set"] count]);
                                        }];
     };
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
@@ -922,6 +924,36 @@ RLM_ARRAY_TYPE(MigrationTestObject);
 
                                            XCTAssertEqual(1U, [oldObject[@"array"] count]);
                                            XCTAssertEqual(0U, [newObject[@"array"] count]);
+                                       }];
+    };
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    RLMAssertRealmSchemaMatchesTable(self, realm);
+}
+
+- (void)testChangeSetLinkType {
+    // create realm with old schema and populate
+    RLMRealmConfiguration *config = [self config];
+    [self createTestRealmWithSchema:RLMSchema.sharedSchema.objectSchema block:^(RLMRealm *realm) {
+        id obj = [realm createObject:MigrationTestObject.className withValue:@[@1, @"1"]];
+        [realm createObject:MigrationLinkObject.className withValue:@[obj, @[obj], @[obj]]];
+    }];
+
+    // Make the set linklist property link to a different class
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:MigrationLinkObject.class];
+    [objectSchema.properties[2] setObjectClassName:MigrationLinkObject.className];
+    config.customSchema = [self schemaWithObjects:@[objectSchema, [RLMObjectSchema schemaForObjectClass:MigrationTestObject.class]]];
+
+    // Apply migration
+    config.schemaVersion = 1;
+    config.migrationBlock = ^(RLMMigration *migration, uint64_t oldSchemaVersion) {
+        XCTAssertEqual(oldSchemaVersion, 0U, @"Initial schema version should be 0");
+        [migration enumerateObjects:MigrationLinkObject.className
+                                       block:^(RLMObject *oldObject, RLMObject *newObject) {
+                                           XCTAssertNotNil(oldObject[@"object"]);
+                                           XCTAssertNotNil(newObject[@"object"]);
+
+                                           XCTAssertEqual(1U, [oldObject[@"set"] count]);
+                                           XCTAssertEqual(0U, [newObject[@"set"] count]);
                                        }];
     };
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
@@ -1002,9 +1034,11 @@ RLM_ARRAY_TYPE(MigrationTestObject);
 }
 
 - (void)testEnumeratedObjectsDuringMigration {
-    [self createTestRealmWithClasses:@[StringObject.class, ArrayPropertyObject.class, IntObject.class] block:^(RLMRealm *realm) {
+    [self createTestRealmWithClasses:@[StringObject.class, ArrayPropertyObject.class, SetPropertyObject.class, IntObject.class]
+                               block:^(RLMRealm *realm) {
         [StringObject createInRealm:realm withValue:@[@"string"]];
         [ArrayPropertyObject createInRealm:realm withValue:@[@"array", @[@[@"string"]], @[@[@1]]]];
+        [SetPropertyObject createInRealm:realm withValue:@[@"set", @[@[@"string"]], @[@[@1]]]];
     }];
 
     RLMRealm *realm = [self migrateTestRealmWithBlock:^(RLMMigration *migration, uint64_t) {
@@ -1021,6 +1055,13 @@ RLM_ARRAY_TYPE(MigrationTestObject);
             XCTAssertEqual(RLMDynamicObject.class, oldObject.class);
             XCTAssertEqual(RLMDynamicObject.class, [[oldObject[@"array"] firstObject] class]);
             XCTAssertEqual(RLMDynamicObject.class, [[newObject[@"array"] firstObject] class]);
+        }];
+
+        [migration enumerateObjects:SetPropertyObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqual(RLMDynamicObject.class, newObject.class);
+            XCTAssertEqual(RLMDynamicObject.class, oldObject.class);
+            XCTAssertEqual(RLMDynamicObject.class, [[oldObject[@"set"] firstObject] class]);
+            XCTAssertEqual(RLMDynamicObject.class, [[newObject[@"set"] firstObject] class]);
         }];
     }];
 

@@ -35,7 +35,7 @@
     std::unique_ptr<id[]> items;
 }
 @end
-@implementation RLMSetHolder //TODO: Is this required?
+@implementation RLMSetHolder
 @end
 
 @interface RLMSet () <RLMThreadConfined_Private>
@@ -77,18 +77,19 @@
 }
 
 - (void)addObject:(id)object {
-    [self insertObject:object atIndex:self.count];
+    RLMSetValidateMatchingObjectType(self, object);
+    changeSet(self, NSKeyValueUnionSetMutation, ^{
+        [_backingSet addObject:object];
+    });
 }
 
 - (void)removeLastObject {
     NSUInteger count = self.count;
     if (count) {
-        [self removeObjectAtIndex:count-1];
+        changeSet(self, NSKeyValueMinusSetMutation, ^{
+            [_backingSet removeObjectAtIndex:count-1];
+        });
     }
-}
-
-- (id)objectAtIndexedSubscript:(NSUInteger)index {
-    return [self objectAtIndex:index];
 }
 
 - (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index {
@@ -99,7 +100,9 @@
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    [_backingSet intersectOrderedSet:set->_backingSet];
+    changeSet(self, NSKeyValueIntersectSetMutation, ^{
+        [_backingSet intersectOrderedSet:set->_backingSet];
+    });
 }
 
 - (BOOL)intersectsSet:(RLMSet<id> *)set {
@@ -113,14 +116,18 @@
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    [_backingSet minusOrderedSet:set->_backingSet];
+    changeSet(self, NSKeyValueMinusSetMutation, ^{
+        [_backingSet minusOrderedSet:set->_backingSet];
+    });
 }
 
 - (void)unionSet:(RLMSet<id> *)set {
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    [_backingSet unionOrderedSet:set->_backingSet];
+    changeSet(self, NSKeyValueUnionSetMutation, ^{
+        [_backingSet unionOrderedSet:set->_backingSet];
+    });
 }
 
 - (BOOL)isSubsetOfSet:(RLMSet<id> *)set {
@@ -216,38 +223,21 @@
     return i;
 }
 
-
-template<typename IndexSetFactory>
 static void changeSet(__unsafe_unretained RLMSet *const set,
-                      NSKeyValueChange kind, dispatch_block_t f, IndexSetFactory&& is) {
+                      NSKeyValueSetMutationKind kind,
+                      dispatch_block_t f) {
     if (!set->_backingSet) {
         set->_backingSet = [NSMutableOrderedSet new];
     }
 
     if (RLMObjectBase *parent = set->_parentObject) {
-        NSIndexSet *indexes = is();
-        [parent willChange:kind valuesAtIndexes:indexes forKey:set->_key];
+        [parent willChangeValueForKey:set->_key withSetMutation:kind usingObjects:[NSSet set]];
         f();
-        [parent didChange:kind valuesAtIndexes:indexes forKey:set->_key];
+        [parent didChangeValueForKey:set->_key withSetMutation:kind usingObjects:[NSSet set]];
     }
     else {
         f();
     }
-}
-
-static void changeSet(__weak RLMSet *const set, NSKeyValueChange kind,
-                        NSUInteger index, dispatch_block_t f) {
-    changeSet(set, kind, f, [=] { return [NSIndexSet indexSetWithIndex:index]; });
-}
-
-static void changeSet(__weak RLMSet *const set, NSKeyValueChange kind,
-                        NSRange range, dispatch_block_t f) {
-    changeSet(set, kind, f, [=] { return [NSIndexSet indexSetWithIndexesInRange:range]; });
-}
-
-static void changeSet(__weak RLMSet *const set, NSKeyValueChange kind,
-                        NSIndexSet *is, dispatch_block_t f) {
-    changeSet(set, kind, f, [=] { return is; });
 }
 
 static void validateSetBounds(__unsafe_unretained RLMSet *const set,
@@ -258,73 +248,6 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
         @throw RLMException(@"Index %llu is out of bounds (must be less than %llu).",
                             (unsigned long long)index, (unsigned long long)max);
     }
-}
-
-- (void)addObjectsFromSet:(RLMSet *)set {
-    for (id obj in set) {
-        RLMSetValidateMatchingObjectType(self, obj);
-    }
-    changeSet(self, NSKeyValueChangeInsertion, NSMakeRange(_backingSet.count, set.count), ^{
-        [_backingSet addObjectsFromArray:[set->_backingSet.array copy]];
-    });
-}
-
-- (void)insertObject:(id)anObject atIndex:(NSUInteger)index {
-    RLMSetValidateMatchingObjectType(self, anObject);
-    validateSetBounds(self, index, true);
-    changeSet(self, NSKeyValueChangeInsertion, index, ^{
-        [_backingSet insertObject:anObject atIndex:index];
-    });
-}
-
-- (void)insertObjects:(id<NSFastEnumeration>)objects atIndexes:(NSIndexSet *)indexes {
-    changeSet(self, NSKeyValueChangeInsertion, indexes, ^{
-        NSUInteger currentIndex = [indexes firstIndex];
-        for (RLMObject *obj in objects) {
-            RLMSetValidateMatchingObjectType(self, obj);
-            [_backingSet insertObject:obj atIndex:currentIndex];
-            currentIndex = [indexes indexGreaterThanIndex:currentIndex];
-        }
-    });
-}
-
-- (void)removeObjectAtIndex:(NSUInteger)index {
-    validateSetBounds(self, index);
-    changeSet(self, NSKeyValueChangeRemoval, index, ^{
-        [_backingSet removeObjectAtIndex:index];
-    });
-}
-
-- (void)removeObjectsAtIndexes:(NSIndexSet *)indexes {
-    changeSet(self, NSKeyValueChangeRemoval, indexes, ^{
-        [_backingSet removeObjectsAtIndexes:indexes];
-    });
-}
-
-- (void)moveObjectAtIndex:(NSUInteger)sourceIndex toIndex:(NSUInteger)destinationIndex {
-    validateSetBounds(self, sourceIndex);
-    validateSetBounds(self, destinationIndex);
-    id original = _backingSet.array[sourceIndex];
-
-    auto start = std::min(sourceIndex, destinationIndex);
-    auto len = std::max(sourceIndex, destinationIndex) - start + 1;
-    changeSet(self, NSKeyValueChangeReplacement, {start, len}, ^{
-        [_backingSet removeObjectAtIndex:sourceIndex];
-        [_backingSet insertObject:original atIndex:destinationIndex];
-    });
-}
-
-- (void)exchangeObjectAtIndex:(NSUInteger)index1 withObjectAtIndex:(NSUInteger)index2 {
-    validateSetBounds(self, index1);
-    validateSetBounds(self, index2);
-
-    changeSet(self, NSKeyValueChangeReplacement, ^{
-        [_backingSet exchangeObjectAtIndex:index1 withObjectAtIndex:index2];
-    }, [=] {
-        NSMutableIndexSet *set = [[NSMutableIndexSet alloc] initWithIndex:index1];
-        [set addIndex:index2];
-        return set;
-    });
 }
 
 - (NSUInteger)indexOfObject:(id)object {
@@ -347,21 +270,25 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
 }
 
 - (void)removeAllObjects {
-    changeSet(self, NSKeyValueChangeRemoval, NSMakeRange(0, _backingSet.count), ^{
+    changeSet(self, NSKeyValueMinusSetMutation, ^{
         [_backingSet removeAllObjects];
     });
 }
 
 - (void)removeObject:(id)object {
     RLMSetValidateMatchingObjectType(self, object);
-    changeSet(self, NSKeyValueChangeRemoval, NSMakeRange(0, _backingSet.count), ^{
-        // passing in a matching object and calling `[_backingSet removeObject:object]`
-        // does not guarantee the object will be deleted. For example if we try to delete
-        // an object that is IN the set but was derived from a Results collection the `removeObject:`
-        // will fail. To get around this, find the index of the object you are trying to delete
-        // and remove it by index.
-        [_backingSet removeObjectAtIndex:[self indexOfObject:object]];
-    });
+    // passing in a matching object and calling `[_backingSet removeObject:object]`
+    // does not guarantee the object will be deleted, because an object is identified by instance,
+    // not the containing value. For example if we try to delete an object that is in the
+    // set but was derived from a Results collection the `removeObject:` will fail.
+    // To get around this, find the index of the object you are trying to delete
+    // and remove it by index.
+    NSUInteger index = [self indexOfObject:object];
+    if (index != NSNotFound) {
+        changeSet(self, NSKeyValueMinusSetMutation, ^{
+            [_backingSet removeObjectAtIndex:index];
+        });
+    }
 }
 
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
@@ -444,7 +371,6 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     // issue as the realm::object_store::Set aggregate methods will calculate
     // the result based on each element of a property regardless of uniqueness.
     // To get around this we will need to use the `array` property of the NSMutableOrderedSet
-
     NSArray *values = [key isEqualToString:@"self"] ? _backingSet.array : [_backingSet.array valueForKey:key];
     if (_optional) {
         // Filter out NSNull values to match our behavior on managed arrays
@@ -614,6 +540,10 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
 
 - (instancetype)freeze {
     @throw RLMException(@"This method may only be called on RLMSet instances retrieved from an RLMRealm");
+}
+
+- (nonnull id)objectAtIndexedSubscript:(NSUInteger)index {
+    @throw RLMException(@"objectAtIndexedSubscript is not supported on RLMSet, use RLMSet.array");
 }
 
 #pragma mark - Thread Confined Protocol Conformance
