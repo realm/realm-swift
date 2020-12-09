@@ -329,14 +329,10 @@ import Realm
     }
 
     /**
-     Returns a live, mutable version of this frozen collection.
+     Returns a live version of this frozen collection.
 
      This method resolves a reference to a live copy of the same frozen collection.
-     If a called on a non-frozen collection, will return itself.
-
-     - warning: Holding onto a thawed collection for an extended period while performing write
-     transaction on the Realm may result in the Realm file growing to large sizes. See
-     `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
+     If called on a live collection, will return itself.
     */
     public func thaw() -> LinkingObjects<Element> {
         return LinkingObjects(propertyName: propertyName, handle: handle?.thaw())
