@@ -38,7 +38,7 @@
 @implementation RLMSetHolder
 @end
 
-@interface RLMSet () <RLMThreadConfined_Private>
+@interface RLMSet () <RLMThreadConfined_Private, NSCopying>
 @end
 
 @implementation RLMSet {
@@ -231,9 +231,10 @@ static void changeSet(__unsafe_unretained RLMSet *const set,
     }
 
     if (RLMObjectBase *parent = set->_parentObject) {
-        [parent willChangeValueForKey:set->_key withSetMutation:kind usingObjects:[NSSet set]];
+        // TODO: pass in other Set.
+        [parent willChangeValueForKey:set->_key withSetMutation:kind usingObjects:(id)set];
         f();
-        [parent didChangeValueForKey:set->_key withSetMutation:kind usingObjects:[NSSet set]];
+        [parent didChangeValueForKey:set->_key withSetMutation:kind usingObjects:(id)set];
     }
     else {
         f();
@@ -476,6 +477,21 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
             options:(NSKeyValueObservingOptions)options context:(void *)context {
     RLMValidateSetObservationKey(keyPath, self);
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
+}
+
+// Set specific KVO notifications call `copyWithZone` as the Foundation library
+// will call `mutableCopy` or `copy` when performing the diff between the old set
+// value and the new set value on mutation.
+- (id)copyWithZone:(nullable NSZone *)zone {
+//    RLMSet *s = [RLMSet allocWithZone:zone];
+//    s->_backingSet = _backingSet;
+//    s->_frozen = _frozen;
+//    s->_key = _key;
+//    s->_optional = _optional;
+//    s->_type = _type;
+//    s->_parentObject = _parentObject;
+//    s->_objectClassName = _objectClassName;
+    return self;
 }
 
 void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,

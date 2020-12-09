@@ -1316,7 +1316,7 @@ public:
     [mutator addObject:obj.obj];
     AssertSet(NSKeyValueChangeInsertion);
 //    [mutator removeObject:obj.obj];
-//    AssertKind(NSKeyValueChangeRemoval);
+//    AssertSet(NSKeyValueChangeRemoval);
 //    [mutator addObject:obj.obj];
 //    AssertKind(NSKeyValueChangeInsertion);
 

@@ -61,6 +61,9 @@ public:
     void willChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const;
     void didChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const;
 
+    void willChangeSet(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting) const;
+    void didChangeSet(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting) const;
+
     bool isForRow(realm::ObjKey key) const {
         return row.get_key() == key;
     }
@@ -153,6 +156,10 @@ public:
                     NSKeyValueChange kind=NSKeyValueChangeSetting,
                     NSIndexSet *indexes=nil);
     void didChange();
+
+    void willChangeSet(RLMObservationInfo *info, NSString *key,
+                    NSKeyValueChange kind=NSKeyValueChangeSetting);
+    void didChangeSet();
 
 private:
     std::vector<std::vector<RLMObservationInfo *> *> _observedTables;

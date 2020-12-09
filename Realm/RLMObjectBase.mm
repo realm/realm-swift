@@ -121,7 +121,7 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
         }
         return coerceToObjectType(obj, objectClass, schema);
     }
-    else if (prop.type == RLMPropertyTypeDecimal128 && !prop.array) {
+    else if (prop.type == RLMPropertyTypeDecimal128 && !(prop.array || prop.set)) {
         return [[RLMDecimal128 alloc] initWithValue:obj];
     }
     return obj;

@@ -949,8 +949,8 @@
     EmployeeObject *e2 = [PrimaryEmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
     EmployeeObject *e3 = [PrimaryEmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
     EmployeeObject *e4 = [PrimaryEmployeeObject createInRealm:realm withValue:@{@"name": @"D", @"age": @50, @"hired": @YES}];
-    PrimaryCompanyObject *c1 = [PrimaryCompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employeesSet": @[e1, e2, e3, e2]}];
-    PrimaryCompanyObject *c2 = [PrimaryCompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG 2", @"employeesSet": @[e1, e4]}];
+    PrimaryCompanyObject *c1 = [PrimaryCompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employeeSet": @[e1, e2, e3, e2]}];
+    PrimaryCompanyObject *c2 = [PrimaryCompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG 2", @"employeeSet": @[e1, e4]}];
 
     SetOfPrimaryCompanies *companies = [SetOfPrimaryCompanies createInRealm:realm withValue:@[@[c1, c2]]];
     [realm commitWriteTransaction];
@@ -1259,7 +1259,7 @@
                                                     withValue:@[@"", @[@[@"a"]], @[@[@0]]]];
     RLMAssertThrowsWithReason(set.intSet = (id)set.set,
                               @"RLMSet<StringObject> does not match expected type 'IntObject' for property 'SetPropertyObject.intSet'.");
-    RLMAssertThrowsWithReason(set[@"intSet"] = set[@"stringSet"],
+    RLMAssertThrowsWithReason(set[@"intSet"] = set[@"set"],
                               @"RLMSet<StringObject> does not match expected type 'IntObject' for property 'SetPropertyObject.intSet'.");
     [realm cancelWriteTransaction];
 }

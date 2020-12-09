@@ -119,6 +119,18 @@ void RLMObservationInfo::willChange(NSString *key, NSKeyValueChange kind, NSInde
     }
 }
 
+void RLMObservationInfo::willChangeSet(NSString *key, NSKeyValueChange kind) const {
+    forEach([=](__unsafe_unretained auto o) {
+        [o willChangeValueForKey:key withSetMutation:NSKeyValueUnionSetMutation usingObjects:nil];
+    });
+}
+
+void RLMObservationInfo::didChangeSet(NSString *key, NSKeyValueChange kind) const {
+    forEach([=](__unsafe_unretained auto o) {
+        [o didChangeValueForKey:key withSetMutation:NSKeyValueUnionSetMutation usingObjects:nil];
+    });
+}
+
 void RLMObservationInfo::didChange(NSString *key, NSKeyValueChange kind, NSIndexSet *indexes) const {
     if (indexes) {
         forEach([=](__unsafe_unretained auto o) {
@@ -338,6 +350,16 @@ void RLMObservationTracker::willChange(RLMObservationInfo *info, NSString *key,
     }
 }
 
+void RLMObservationTracker::willChangeSet(RLMObservationInfo *info, NSString *key,
+                                       NSKeyValueChange kind) {
+    _key = key;
+    _kind = kind;
+    _info = info;
+    if (_info) {
+        _info->willChangeSet(key, kind);
+    }
+}
+
 void RLMObservationTracker::trackDeletions() {
     if (_group.has_cascade_notification_handler()) {
         // We're nested inside another call which will handle any cascaded changes for us
@@ -474,6 +496,27 @@ void RLMObservationTracker::didChange() {
     }
     for (auto info : reverse(_invalidated)) {
         info->didChange(RLMInvalidatedKey);
+    }
+    _observedTables.clear();
+    _changes.clear();
+    _invalidated.clear();
+}
+
+void RLMObservationTracker::didChangeSet() {
+    if (_info) {
+        _info->didChange(_key, _kind, _indexes);
+        _info = nullptr;
+    }
+    if (_observedTables.empty()) {
+        return;
+    }
+    _group.set_cascade_notification_handler(nullptr);
+
+    for (auto const& change : reverse(_changes)) {
+        change.info->didChangeSet(change.property, NSKeyValueChangeRemoval);
+    }
+    for (auto info : reverse(_invalidated)) {
+        info->didChangeSet(RLMInvalidatedKey);
     }
     _observedTables.clear();
     _changes.clear();

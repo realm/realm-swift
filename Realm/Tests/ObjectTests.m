@@ -85,6 +85,7 @@
 RLM_ARRAY_TYPE(CycleObject)
 @interface CycleObject : RLMObject
 @property RLM_GENERIC_ARRAY(CycleObject) *objects;
+@property RLM_GENERIC_SET(CycleObject) *objectSet;
 @end
 
 @implementation CycleObject
@@ -103,6 +104,7 @@ RLM_ARRAY_TYPE(CycleObject)
 @property PrimaryStringObjectWrapper *primaryStringObjectWrapper;
 @property StringObject *stringObject;
 @property RLM_GENERIC_ARRAY(PrimaryIntObject) *primaryIntArray;
+@property RLM_GENERIC_SET(PrimaryIntObject) *primaryIntSet;
 @property NSString *stringCol;
 @end
 
@@ -981,6 +983,7 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     [RLMRealm.defaultRealm transactionWithBlock:^{
         [RLMRealm.defaultRealm addObject:obj];
         [obj.objects addObject:obj];
+        [obj.objectSet addObject:obj];
     }];
     XCTAssertNoThrow(obj.description);
 }
@@ -1173,7 +1176,7 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
-    [PrimaryNestedObject createOrUpdateInDefaultRealmWithValue:@[@0, @[@"string", @1], @[@[@"string", @1]], @[@"string"], @[@[@1]], @""]];
+    [PrimaryNestedObject createOrUpdateInDefaultRealmWithValue:@[@0, @[@"string", @1], @[@[@"string", @1]], @[@"string"], @[@[@1]], @[@[@1]], @""]];
     XCTAssertEqual([[PrimaryNestedObject allObjects] count], 1U, @"Should have 1 object");
     XCTAssertEqual([[PrimaryStringObject allObjects] count], 1U, @"Should have 1 object");
     XCTAssertEqual([[PrimaryIntObject allObjects] count], 1U, @"Should have 1 object");
@@ -1188,28 +1191,31 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     XCTAssertEqual([PrimaryStringObject.allObjects.lastObject intCol], 2, @"intCol should be 2");
     XCTAssertEqualObjects([PrimaryNestedObject.allObjects.lastObject stringCol], @"", @"stringCol should not have been updated");
     XCTAssertEqual(1U, [PrimaryNestedObject.allObjects.lastObject primaryIntArray].count, @"intArray should not have been overwritten");
+    XCTAssertEqual(1U, [PrimaryNestedObject.allObjects.lastObject primaryIntSet].count, @"intSet should not have been overwritten");
     XCTAssertEqual([[StringObject allObjects] count], 2U, @"Should have 2 objects");
 
     // test partial update nulling out object/array properties
     [PrimaryNestedObject createOrUpdateInDefaultRealmWithValue:@{@"primaryCol": @0,
                                                                   @"stringCol": @"updated",
                                                                   @"stringObject": NSNull.null,
-                                                                  @"primaryIntArray": NSNull.null}];
+                                                                  @"primaryIntArray": NSNull.null,
+                                                                  @"primaryIntSet": NSNull.null}];
     PrimaryNestedObject *obj = PrimaryNestedObject.allObjects.lastObject;
     XCTAssertEqual(2, obj.primaryStringObject.intCol, @"primaryStringObject should not have changed");
     XCTAssertEqualObjects(obj.stringCol, @"updated", @"stringCol should have been updated");
     XCTAssertEqual(0U, obj.primaryIntArray.count, @"intArray should not have been emptied");
+    XCTAssertEqual(0U, obj.primaryIntSet.count, @"intSet should not have been emptied");
     XCTAssertNil(obj.stringObject, @"stringObject should be nil");
 
     // inserting new object should update nested
-    obj = [PrimaryNestedObject createOrUpdateInDefaultRealmWithValue:@[@1, @[@"string", @3], @[@[@"string", @3]], @[@"string"], @[], @""]];
+    obj = [PrimaryNestedObject createOrUpdateInDefaultRealmWithValue:@[@1, @[@"string", @3], @[@[@"string", @3]], @[@"string"], @[], @[], @""]];
     XCTAssertEqual([[PrimaryNestedObject allObjects] count], 2U, @"Should have 2 objects");
     XCTAssertEqual([[PrimaryStringObject allObjects] count], 1U, @"Should have 1 object");
     XCTAssertEqual([(PrimaryStringObject *)[[PrimaryStringObject allObjects] lastObject] intCol], 3, @"intCol should be 3");
 
     // test addOrUpdateObject
     obj.primaryStringObject = [PrimaryStringObject createInDefaultRealmWithValue:@[@"string2", @1]];
-    PrimaryNestedObject *obj1 = [[PrimaryNestedObject alloc] initWithValue:@[@1, @[@"string2", @4], @[@[@"string2", @4]], @[@"string"], @[@[@1], @[@2]], @""]];
+    PrimaryNestedObject *obj1 = [[PrimaryNestedObject alloc] initWithValue:@[@1, @[@"string2", @4], @[@[@"string2", @4]], @[@"string"], @[@[@1], @[@2]], @[@[@1], @[@2]], @""]];
     [realm addOrUpdateObject:obj1];
     XCTAssertEqual([[PrimaryNestedObject allObjects] count], 2U, @"Should have 2 objects");
     XCTAssertEqual([[PrimaryStringObject allObjects] count], 2U, @"Should have 2 objects");

@@ -341,7 +341,7 @@
 
     auto set1 = [[AllPrimitiveSets alloc] init];
     [set1.intObj addObject:@2];
-    auto set2 = [[AllPrimitiveSets alloc] initWithValue:array1];
+    auto set2 = [[AllPrimitiveSets alloc] initWithValue:set1];
     XCTAssertEqual(set2.intObj.count, 1U);
     XCTAssertEqualObjects(set2.intObj.firstObject, @2);
 }

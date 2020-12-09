@@ -185,7 +185,7 @@ static void changeSet(__unsafe_unretained RLMManagedSet *const set,
                                          set->_backingSet.get_parent_object_key(),
                                          *set->_ownerInfo);
     if (obsInfo) {
-        tracker.willChange(obsInfo, set->_key, kind, nil);
+        tracker.willChangeSet(obsInfo, set->_key, kind);
     }
 
     translateErrors(f);
