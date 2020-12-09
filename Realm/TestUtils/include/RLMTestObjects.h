@@ -515,7 +515,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 @interface PrimaryCompanyObject : RLMObject
 @property NSString *name;
 @property RLM_GENERIC_ARRAY(PrimaryEmployeeObject) *employees;
-@property RLM_GENERIC_SET(PrimaryEmployeeObject) *employeesSet;
+@property RLM_GENERIC_SET(PrimaryEmployeeObject) *employeeSet;
 @property PrimaryEmployeeObject *intern;
 @property LinkToPrimaryEmployeeObject *wrappedIntern;
 @end

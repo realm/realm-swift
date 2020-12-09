@@ -395,22 +395,6 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     return [super automaticallyNotifiesObserversForKey:key];
 }
 
-- (void)willChangeValueForKey:(NSString *)key
-              withSetMutation:(NSKeyValueSetMutationKind)mutationKind
-                 usingObjects:(NSSet *)objects {
-    RLMSet *realmSet = [self valueForKey:key];
-    NSSet *set = [NSSet setWithArray:realmSet.array];
-    // place the new `set` somewhere
-
-    [super willChangeValueForKey:key withSetMutation:mutationKind usingObjects:objects];
-}
-
-- (void)didChangeValueForKey:(NSString *)key
-             withSetMutation:(NSKeyValueSetMutationKind)mutationKind
-                usingObjects:(NSSet *)objects {
-
-}
-
 #pragma mark - Thread Confined Protocol Conformance
 
 - (realm::ThreadSafeReference)makeThreadSafeReference {

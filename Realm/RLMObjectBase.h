@@ -39,15 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSString *)_realmObjectName;
 + (nullable NSDictionary<NSString *, NSString *> *)_realmColumnNames;
 
-// The Foundation library assumes that observing set mutations the underlying value is an NSSet, this imposes an issue for us where
-// we need to dynamically cast the RLMSet object to NSSet inorder to deliver the correct results.
-- (void)willChangeValueForKey:(NSString *)key
-              withSetMutation:(NSKeyValueSetMutationKind)mutationKind
-                 usingObjects:(NSSet *)objects;
-- (void)didChangeValueForKey:(NSString *)key
-             withSetMutation:(NSKeyValueSetMutationKind)mutationKind
-                usingObjects:(NSSet *)objects;
-
 @end
 
 /**

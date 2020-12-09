@@ -956,13 +956,13 @@
     [realm commitWriteTransaction];
 
     // count operator
-    XCTAssertEqual([[c1.employeesSet valueForKeyPath:@"@count"] integerValue], 3);
+    XCTAssertEqual([[c1.employeeSet valueForKeyPath:@"@count"] integerValue], 3);
 
     // numeric operators
-    XCTAssertEqual([[c1.employeesSet valueForKeyPath:@"@min.age"] intValue], 20);
-    XCTAssertEqual([[c1.employeesSet valueForKeyPath:@"@max.age"] intValue], 40);
-    XCTAssertEqual([[c1.employeesSet valueForKeyPath:@"@sum.age"] integerValue], 90);
-    XCTAssertEqualWithAccuracy([[c1.employeesSet valueForKeyPath:@"@avg.age"] doubleValue], 30, 0.1f);
+    XCTAssertEqual([[c1.employeeSet valueForKeyPath:@"@min.age"] intValue], 20);
+    XCTAssertEqual([[c1.employeeSet valueForKeyPath:@"@max.age"] intValue], 40);
+    XCTAssertEqual([[c1.employeeSet valueForKeyPath:@"@sum.age"] integerValue], 90);
+    XCTAssertEqualWithAccuracy([[c1.employeeSet valueForKeyPath:@"@avg.age"] doubleValue], 30, 0.1f);
 
     //TODO: disallow these calls on RLMSet
     // collection
@@ -978,13 +978,13 @@
 //                          (@[e1, e2, e3, e4]));
 
     // invalid key paths
-    RLMAssertThrowsWithReasonMatching([c1.employeesSet valueForKeyPath:@"@invalid.name"],
+    RLMAssertThrowsWithReasonMatching([c1.employeeSet valueForKeyPath:@"@invalid.name"],
                                       @"Unsupported KVC collection operator found in key path '@invalid.name'");
-    RLMAssertThrowsWithReasonMatching([c1.employeesSet valueForKeyPath:@"@sum"],
+    RLMAssertThrowsWithReasonMatching([c1.employeeSet valueForKeyPath:@"@sum"],
                                       @"Missing key path for KVC collection operator sum in key path '@sum'");
-    RLMAssertThrowsWithReasonMatching([c1.employeesSet valueForKeyPath:@"@sum."],
+    RLMAssertThrowsWithReasonMatching([c1.employeeSet valueForKeyPath:@"@sum."],
                                       @"Missing key path for KVC collection operator sum in key path '@sum.'");
-    RLMAssertThrowsWithReasonMatching([c1.employeesSet valueForKeyPath:@"@sum.employees.@sum.age"],
+    RLMAssertThrowsWithReasonMatching([c1.employeeSet valueForKeyPath:@"@sum.employees.@sum.age"],
                                       @"Nested key paths.*not supported");
 }
 
