@@ -285,7 +285,7 @@ fi
 
 copy_core() {
     local src="$1"
-    if [ -d .git ]; then
+    if [ -e .git ]; then
         git clean -xfdq core
     else
         rm -r core
