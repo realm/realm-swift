@@ -1,11 +1,14 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.4.0 Release notes (2020-12-10)
 =============================================================
+
 ### Enhancements
+
 * Add Combine support for App and User. These two types now have a
   `objectWillChange` property that emits each time the state of the object has
   changed (such as due to the user logging in or out). ([PR #6977](https://github.com/realm/realm-cocoa/pull/6977)).
 
 ### Fixed
+
 * Integrating changsets from the server would sometimes hit the assertion
   failure "n != realm::npos" inside Table::create_object_with_primary_key()
   when creating an object with a primary key which previously had been used and
@@ -13,15 +16,15 @@ x.y.z Release notes (yyyy-MM-dd)
 * The arm64 simulator slices were not actually included in the XCFramework
   release package. ([PR #6982](https://github.com/realm/realm-cocoa/pull/6982), since v10.2.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.2.
 * CocoaPods: 1.10 or later.
 
 ### Internal
+
 * Upgraded realm-core from v10.1.3 to v10.1.4
 * Upgraded realm-sync from v10.1.4 to v10.1.5
 
