@@ -525,8 +525,16 @@ class RealmCollectionTypeTests: TestCase {
     func testThaw() {
         let frozen = collection.freeze()
         XCTAssertTrue(frozen.isFrozen)
-        let thawed = frozen.thaw()
-        XCTAssertFalse(thawed.isFrozen)
+
+        let frozenRealm = frozen.realm!
+        assertThrows(try! frozenRealm.write { frozenRealm.delete(frozen) }, reason: "Can't perform transactions on a frozen Realm")
+
+        let live = frozen.thaw()
+        XCTAssertFalse(live.isFrozen)
+
+        let liveRealm = live.realm!
+        try! liveRealm.write { liveRealm.delete(live) }
+        XCTAssertTrue(live.isEmpty)
     }
 
     func testFreezeFromWrongThread() {
