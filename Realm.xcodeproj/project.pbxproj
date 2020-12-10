@@ -304,6 +304,10 @@
 		537130C824A9E417001FDBBC /* RealmServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537130C724A9E417001FDBBC /* RealmServer.swift */; };
 		53C4E952253A34DE0004835F /* app_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C4E950253A34DE0004835F /* app_utils.cpp */; };
 		53C4E96A253A3B460004835F /* app_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C4E950253A34DE0004835F /* app_utils.cpp */; };
+		53CCC6C4257EC8A300A8FC50 /* RLMApp_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53CCC6C3257EC8A300A8FC50 /* RLMApp_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		53CCC6C5257EC8A300A8FC50 /* RLMApp_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53CCC6C3257EC8A300A8FC50 /* RLMApp_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		53CCC6E8257EC8C400A8FC50 /* RLMUser_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53CCC6E7257EC8C300A8FC50 /* RLMUser_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		53CCC6E9257EC8C400A8FC50 /* RLMUser_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53CCC6E7257EC8C300A8FC50 /* RLMUser_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */; };
 		5D03FB1F1E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
 		5D03FB201E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
@@ -974,6 +978,8 @@
 		537130C724A9E417001FDBBC /* RealmServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RealmServer.swift; path = Realm/ObjectServerTests/RealmServer.swift; sourceTree = "<group>"; };
 		53C4E950253A34DE0004835F /* app_utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app_utils.cpp; path = sync/app_utils.cpp; sourceTree = "<group>"; };
 		53C4E951253A34DE0004835F /* app_utils.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = app_utils.hpp; path = sync/app_utils.hpp; sourceTree = "<group>"; };
+		53CCC6C3257EC8A300A8FC50 /* RLMApp_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMApp_Private.h; sourceTree = "<group>"; };
+		53CCC6E7257EC8C300A8FC50 /* RLMUser_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMUser_Private.h; sourceTree = "<group>"; };
 		5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupport.swift; sourceTree = "<group>"; };
 		5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupportTests.swift; sourceTree = "<group>"; };
 		5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PredicateUtilTests.mm; sourceTree = "<group>"; };
@@ -1374,6 +1380,7 @@
 				3F73BC941E3A878500FE80B6 /* NSError+RLMSync.m */,
 				4993220724129DCE00A0EC8E /* RLMApp.h */,
 				4993220524129DCD00A0EC8E /* RLMApp.mm */,
+				53CCC6C3257EC8A300A8FC50 /* RLMApp_Private.h */,
 				3F275EBD2433A5DA00161E7F /* RLMApp_Private.hpp */,
 				49E12CF1245DB7E800359DF1 /* RLMBSON.h */,
 				49E12CEF245DB7CC00359DF1 /* RLMBSON.mm */,
@@ -1407,6 +1414,7 @@
 				1A0512731D87413000806AEC /* RLMSyncUtil_Private.hpp */,
 				1ABDCDAD1D792FEB003489E3 /* RLMUser.h */,
 				1ABDCDAF1D793008003489E3 /* RLMUser.mm */,
+				53CCC6E7257EC8C300A8FC50 /* RLMUser_Private.h */,
 				1A33C42A1DAEB9C4001E87AA /* RLMUser_Private.hpp */,
 			);
 			name = Sync;
@@ -2003,6 +2011,8 @@
 				6807E64A2487E8660096066F /* RLMPushClient.h in Headers */,
 				6807E64F2487F9210096066F /* RLMPushClient_Private.hpp in Headers */,
 				1AD397CF1F72FFC7002AA897 /* RLMRealm+Sync.h in Headers */,
+				53CCC6C4257EC8A300A8FC50 /* RLMApp_Private.h in Headers */,
+				53CCC6E8257EC8C400A8FC50 /* RLMUser_Private.h in Headers */,
 				5D659EBF1BE04556006515A0 /* RLMRealm.h in Headers */,
 				5D659EC01BE04556006515A0 /* RLMRealm_Dynamic.h in Headers */,
 				5D659EC11BE04556006515A0 /* RLMRealm_Private.h in Headers */,
@@ -2080,7 +2090,9 @@
 				684BE25224927ACA00F122B1 /* RLMPushClient.h in Headers */,
 				6807E6502487F9210096066F /* RLMPushClient_Private.hpp in Headers */,
 				1AD397D01F72FFCC002AA897 /* RLMRealm+Sync.h in Headers */,
+				53CCC6E9257EC8C400A8FC50 /* RLMUser_Private.h in Headers */,
 				5DD755BD1BE056DE002800DA /* RLMRealm.h in Headers */,
+				53CCC6C5257EC8A300A8FC50 /* RLMApp_Private.h in Headers */,
 				5DD755BE1BE056DE002800DA /* RLMRealm_Dynamic.h in Headers */,
 				5DD755BF1BE056DE002800DA /* RLMRealm_Private.h in Headers */,
 				1AFEF8421D52CD8F00495005 /* RLMRealmConfiguration+Sync.h in Headers */,

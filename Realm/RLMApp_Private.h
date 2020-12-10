@@ -16,31 +16,30 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMApp_Private.h>
-#import <memory>
-#import "sync/app.hpp"
+#import <Realm/RLMApp.h>
 
-@interface RLMAppConfiguration()
+NS_ASSUME_NONNULL_BEGIN
 
-- (realm::app::App::Config&)config;
+/// Observer block for app notifications.
+typedef void(^RLMAppNotificationBlock)(RLMApp *);
 
-- (void)setAppId:(nonnull NSString *)appId;
+/// Token that identifies an observer. Unsubscribes when deconstructed to
+/// avoid dangling observers, therefore this must be retained to hold
+/// onto a subscription.
+@interface RLMAppSubscriptionToken : NSObject
 
-- (nonnull instancetype)initWithConfig:(const realm::app::App::Config&)config;
+/// The underlying value of the subscription token.
+@property (nonatomic, readonly) NSUInteger value;
 
 @end
 
 @interface RLMApp ()
 
-- (std::shared_ptr<realm::app::App>)_realmApp;
+/// Subscribe to notifications for this RLMApp.
+- (RLMAppSubscriptionToken *)subscribe:(RLMAppNotificationBlock)block;
+/// Unsubscribe to notifications for this RLMApp.
+- (void)unsubscribe:(RLMAppSubscriptionToken *)token;
 
-+ (nonnull instancetype)appWithId:(nonnull NSString *)appId
-                    configuration:(nonnull RLMAppConfiguration *)configuration
-                    rootDirectory:(nullable NSURL *)rootDirectory;
-
-- (nonnull instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app;
-
-+ (void)resetAppCache;
 @end
 
-NSError * _Nonnull RLMAppErrorToNSError(realm::app::AppError const& appError);
+NS_ASSUME_NONNULL_END
