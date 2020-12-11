@@ -24,7 +24,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from v10.1.3 to v10.3.1
+* Upgraded realm-core from v10.1.4 to v10.3.2
 
 10.4.0 Release notes (2020-12-10)
 =============================================================
