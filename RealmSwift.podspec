@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   has_versioned_docs          = !(version =~ /alpha|beta|rc/)
   s.documentation_url         = "https://realm.io/docs/swift/#{has_versioned_docs ? s.version : 'latest'}"
   s.license                   = { :type => 'Apache 2.0', :file => 'LICENSE' }
-
+  s.swift_version    = '5.0'
   s.dependency 'Realm', "= #{s.version}"
   s.source_files = 'RealmSwift/*.swift'
   s.exclude_files = 'RealmSwift/Nonsync.swift'
@@ -31,4 +31,5 @@ Pod::Spec.new do |s|
   s.osx.deployment_target     = '10.9'
   s.watchos.deployment_target = '2.0'
   s.tvos.deployment_target    = '9.0'
+  
 end
