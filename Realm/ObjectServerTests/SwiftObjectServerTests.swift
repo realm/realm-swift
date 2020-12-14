@@ -1996,10 +1996,11 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             changeStream2 = collection.watch(filterIds: [objectIds[1]], delegate: watchTestUtility2)
         }
 
+        let teardownEx = expectation(description: "All changes complete")
         DispatchQueue.global().async {
             watchTestUtility1.isOpenSemaphore.wait()
             watchTestUtility2.isOpenSemaphore.wait()
-            for i in 0..<5 {
+            for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
                                              update: ["name": name, "breed": "king charles"]) { result in
@@ -2015,13 +2016,12 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
                 }
                 watchTestUtility1.semaphore.wait()
                 watchTestUtility2.semaphore.wait()
-                if i == 2 {
-                    changeStream1?.close()
-                    changeStream2?.close()
-                }
             }
+            changeStream1?.close()
+            changeStream2?.close()
+            teardownEx.fulfill()
         }
-        wait(for: [watchEx], timeout: 60.0)
+        wait(for: [watchEx, teardownEx], timeout: 60.0)
     }
 
     func testShouldNotDeleteOnMigrationWithSync() {
@@ -2156,7 +2156,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         DispatchQueue.global().async {
             openSema.wait()
             openSema2.wait()
-            for i in 0..<3 {
+            for _ in 0..<3 {
                 collection.insertOne(document) { result in
                     if case .failure(let error) = result {
                         XCTFail("Failed to insert: \(error)")
@@ -2164,9 +2164,9 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 }
                 sema.wait()
                 sema2.wait()
-                if i == 2 {
-                    self.subscriptions.forEach { $0.cancel() }
-                }
+            }
+            DispatchQueue.main.async {
+                self.subscriptions.forEach { $0.cancel() }
             }
         }
         wait(for: [watchEx1, watchEx2], timeout: 60.0)
@@ -2259,9 +2259,9 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 }
                 sema1.wait()
                 sema2.wait()
-                if i == 2 {
-                    self.subscriptions.forEach { $0.cancel() }
-                }
+            }
+            DispatchQueue.main.async {
+                self.subscriptions.forEach { $0.cancel() }
             }
         }
         wait(for: [watchEx1, watchEx2], timeout: 60.0)
@@ -2354,9 +2354,9 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 }
                 sema1.wait()
                 sema2.wait()
-                if i == 2 {
-                    self.subscriptions.forEach { $0.cancel() }
-                }
+            }
+            DispatchQueue.main.async {
+                self.subscriptions.forEach { $0.cancel() }
             }
         }
         wait(for: [watchEx1, watchEx2], timeout: 60.0)
