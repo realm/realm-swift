@@ -2023,6 +2023,19 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         }
         wait(for: [watchEx], timeout: 60.0)
     }
+
+    func testShouldNotDeleteOnMigrationWithSync() {
+        let user = try! logInUser(for: basicCredentials())
+        var configuration = user.configuration(testName: appId)
+
+        assertThrows(configuration.deleteRealmIfMigrationNeeded = true,
+                     reason: "Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('syncConfig' is set).")
+
+        var localConfiguration = Realm.Configuration.defaultConfiguration
+        assertSucceeds {
+            localConfiguration.deleteRealmIfMigrationNeeded = true
+        }
+    }
 }
 
 #if REALM_HAVE_COMBINE || !SWIFT_PACKAGE
@@ -2039,12 +2052,54 @@ func hasCombine() -> Bool {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension Publisher {
+    func expectValue(_ testCase: XCTestCase, _ expectation: XCTestExpectation, receiveValue: ((Self.Output) -> Void)? = nil) -> AnyCancellable {
+        return self.sink(receiveCompletion: { result in
+            if case .failure(let error) = result {
+                XCTFail("Unexpected failure: \(error)")
+            }
+        }, receiveValue: { value in
+            receiveValue?(value)
+            expectation.fulfill()
+        })
+    }
+
+    func await(_ testCase: XCTestCase, timeout: TimeInterval = 4.0, receiveValue: ((Self.Output) -> Void)? = nil) {
+        let expectation = testCase.expectation(description: "Async combine pipeline")
+        let cancellable = self.expectValue(testCase, expectation, receiveValue: receiveValue)
+        testCase.wait(for: [expectation], timeout: timeout)
+        cancellable.cancel()
+    }
+
+    func awaitFailure(_ testCase: XCTestCase, timeout: TimeInterval = 4.0) {
+        let expectation = testCase.expectation(description: "Async combine pipeline should fail")
+        let cancellable = self.sink(receiveCompletion: { result in
+            if case .failure = result {
+                expectation.fulfill()
+            }
+        }, receiveValue: { value in
+            XCTFail("Should have failed but got \(value)")
+        })
+        testCase.wait(for: [expectation], timeout: timeout)
+        cancellable.cancel()
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class CombineObjectServerTests: SwiftSyncTestCase {
     override class var defaultTestSuite: XCTestSuite {
         if hasCombine() {
             return super.defaultTestSuite
         }
         return XCTestSuite(name: "\(type(of: self))")
+    }
+
+    var subscriptions: Set<AnyCancellable> = []
+
+    override func tearDown() {
+        subscriptions.forEach { $0.cancel() }
+        subscriptions = []
+        super.tearDown()
     }
 
     func setupMongoCollection() -> MongoCollection {
@@ -2057,14 +2112,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     }
 
     func removeAllFromCollection(_ collection: MongoCollection) {
-        let deleteEx = expectation(description: "Delete all from Mongo collection")
-        collection.deleteManyDocuments(filter: [:]) { result in
-            if case .failure = result {
-                XCTFail("Should delete")
-            }
-            deleteEx.fulfill()
-        }
-        wait(for: [deleteEx], timeout: 4.0)
+        collection.deleteManyDocuments(filter: [:]).await(self)
     }
 
     // swiftlint:disable multiple_closures_with_trailing_closure
@@ -2080,8 +2128,6 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         watchEx1.expectedFulfillmentCount = 3
         let watchEx2 = expectation(description: "Watch 3 document events")
         watchEx2.expectedFulfillmentCount = 3
-
-        var subscriptions: Set<AnyCancellable> = []
 
         collection.watch()
             .onOpen {
@@ -2112,14 +2158,14 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             openSema2.wait()
             for i in 0..<3 {
                 collection.insertOne(document) { result in
-                    if case .failure = result {
-                        XCTFail("Should insert")
+                    if case .failure(let error) = result {
+                        XCTFail("Failed to insert: \(error)")
                     }
                 }
                 sema.wait()
                 sema2.wait()
                 if i == 2 {
-                    subscriptions.forEach { $0.cancel() }
+                    self.subscriptions.forEach { $0.cancel() }
                 }
             }
         }
@@ -2155,7 +2201,6 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         watchEx1.expectedFulfillmentCount = 3
         let watchEx2 = expectation(description: "Watch 3 document events")
         watchEx2.expectedFulfillmentCount = 3
-        var subscriptions: Set<AnyCancellable> = []
 
         collection.watch(filterIds: [objectIds[0]])
             .onOpen {
@@ -2174,7 +2219,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                     watchEx1.fulfill()
                     sema1.signal()
                 }
-        }.store(in: &subscriptions)
+            }.store(in: &subscriptions)
 
         collection.watch(filterIds: [objectIds[1]])
             .onOpen {
@@ -2193,7 +2238,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                     watchEx2.fulfill()
                     sema2.signal()
                 }
-        }.store(in: &subscriptions)
+            }.store(in: &subscriptions)
 
         DispatchQueue.global().async {
             openSema1.wait()
@@ -2202,20 +2247,20 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
                                              update: ["name": name, "breed": "king charles"]) { result in
-                    if case .failure = result {
-                        XCTFail("Should update")
+                    if case .failure(let error) = result {
+                        XCTFail("Failed to update: \(error)")
                     }
                 }
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[1])],
                                              update: ["name": name, "breed": "king charles"]) { result in
-                    if case .failure = result {
-                        XCTFail("Should update")
+                    if case .failure(let error) = result {
+                        XCTFail("Failed to update: \(error)")
                     }
                 }
                 sema1.wait()
                 sema2.wait()
                 if i == 2 {
-                    subscriptions.forEach { $0.cancel() }
+                    self.subscriptions.forEach { $0.cancel() }
                 }
             }
         }
@@ -2240,8 +2285,8 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             case .success(let objIds):
                 XCTAssertEqual(objIds.count, 4)
                 objectIds = objIds.map { $0.objectIdValue! }
-            case .failure:
-                XCTFail("Should insert")
+            case .failure(let error):
+                XCTFail("Failed to insert: \(error)")
             }
             insertManyEx.fulfill()
         }
@@ -2251,7 +2296,6 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         watchEx1.expectedFulfillmentCount = 3
         let watchEx2 = expectation(description: "Watch 3 document events")
         watchEx2.expectedFulfillmentCount = 3
-        var subscriptions: Set<AnyCancellable> = []
 
         collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[0])])
             .onOpen {
@@ -2311,7 +2355,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 sema1.wait()
                 sema2.wait()
                 if i == 2 {
-                    subscriptions.forEach { $0.cancel() }
+                    self.subscriptions.forEach { $0.cancel() }
                 }
             }
         }
@@ -2323,83 +2367,17 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     func testEmailPasswordAuthenticationCombine() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
-        var cancellable = Set<AnyCancellable>()
+        let auth = app.emailPasswordAuth
 
-        let registerUserEx = expectation(description: "Register user")
-        app.emailPasswordAuth.registerUser(email: email, password: password)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should register")
-                }
-            }, receiveValue: { _ in
-                registerUserEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [registerUserEx], timeout: 4.0)
-
-        let confirmUserEx = expectation(description: "Confirm user")
-        app.emailPasswordAuth.confirmUser("atoken", tokenId: "atokenid")
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    confirmUserEx.fulfill()
-                }
-            }, receiveValue: { _ in
-                XCTFail("Should auto confirm")
-            })
-            .store(in: &cancellable)
-        wait(for: [confirmUserEx], timeout: 4.0)
-
-        let resendEmailEx = expectation(description: "Resend email confirmation")
-        app.emailPasswordAuth.resendConfirmationEmail(email: "atoken")
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    resendEmailEx.fulfill()
-                }
-            }, receiveValue: { _ in
-                XCTFail("Should auto confirm")
-            })
-            .store(in: &cancellable)
-        wait(for: [resendEmailEx], timeout: 4.0)
-
-        let sendResetPasswordEx = expectation(description: "Send reset password email")
-        app.emailPasswordAuth.sendResetPasswordEmail(email: "atoken")
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    sendResetPasswordEx.fulfill()
-                }
-            }, receiveValue: { _ in
-                XCTFail("Should not send reset password")
-            })
-            .store(in: &cancellable)
-        wait(for: [sendResetPasswordEx], timeout: 4.0)
-
-        let resetPasswordEx = expectation(description: "Reset password email")
-        app.emailPasswordAuth.resetPassword(to: "password", token: "atoken", tokenId: "tokenId")
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    resetPasswordEx.fulfill()
-                }
-            }, receiveValue: { _ in
-                XCTFail("Should not reset password")
-            })
-            .store(in: &cancellable)
-        wait(for: [resetPasswordEx], timeout: 4.0)
-
-        let callResetFunctionEx = expectation(description: "Reset password function")
-        app.emailPasswordAuth.callResetPasswordFunction(email: email, password: randomString(10), args: [[:]])
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    callResetFunctionEx.fulfill()
-                }
-            }, receiveValue: { _ in
-                XCTFail("Should not call reset password")
-            })
-            .store(in: &cancellable)
-        wait(for: [callResetFunctionEx], timeout: 4.0)
+        auth.registerUser(email: email, password: password).await(self)
+        auth.confirmUser("atoken", tokenId: "atokenid").awaitFailure(self)
+        auth.resendConfirmationEmail(email: "atoken").awaitFailure(self)
+        auth.sendResetPasswordEmail(email: "atoken").awaitFailure(self)
+        auth.resetPassword(to: "password", token: "atoken", tokenId: "tokenId").awaitFailure(self)
+        auth.callResetPasswordFunction(email: email, password: randomString(10), args: [[:]]).awaitFailure(self)
     }
 
     func testAppLoginCombine() {
-        var cancellable = Set<AnyCancellable>()
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
 
@@ -2411,7 +2389,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             if triggered == 2 {
                 appEx.fulfill()
             }
-        }.store(in: &cancellable)
+        }.store(in: &subscriptions)
 
         app.emailPasswordAuth.registerUser(email: email, password: password)
             .flatMap { self.app.login(credentials: .emailPassword(email: email, password: password)) }
@@ -2423,31 +2401,26 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 user.objectWillChange.sink { user in
                     XCTAssert(!user.isLoggedIn)
                     loginEx.fulfill()
-                }.store(in: &cancellable)
+                }.store(in: &self.subscriptions)
                 XCTAssertEqual(user.id, self.app.currentUser?.id)
                 user.logOut { _ in } // logout user and make sure it is observed
             })
-            .store(in: &cancellable)
+            .store(in: &subscriptions)
         wait(for: [loginEx, appEx], timeout: 30.0)
         XCTAssertEqual(self.app.allUsers.count, 1)
         XCTAssertEqual(triggered, 2)
     }
 
     func testAsyncOpenCombine() {
-        var cancellable = Set<AnyCancellable>()
-
         if isParent {
-            let chainEx = expectation(description: "Should chain realm register => login => realm upload")
             let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
             let password = randomString(10)
             app.emailPasswordAuth.registerUser(email: email, password: password)
                 .flatMap { self.app.login(credentials: .emailPassword(email: email, password: password)) }
-                .flatMap { user in Realm.asyncOpen(configuration: user.configuration(testName: #function)) }
-                .sink(receiveCompletion: { result in
-                    if case .failure(let error) = result {
-                        XCTFail("Failed to register: \(error)")
-                    }
-                }, receiveValue: { realm in
+                .flatMap { user in
+                    Realm.asyncOpen(configuration: user.configuration(testName: #function))
+                }
+                .await(self, timeout: 30.0) { realm in
                     try! realm.write {
                         realm.add(SwiftHugeSyncObject.create())
                         realm.add(SwiftHugeSyncObject.create())
@@ -2460,9 +2433,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                     }
                     self.wait(for: [progressEx], timeout: 30.0)
                     token?.invalidate()
-                    chainEx.fulfill()
-                }).store(in: &cancellable)
-            wait(for: [chainEx], timeout: 30.0)
+                }
             executeChild()
         } else {
             let chainEx = expectation(description: "Should chain realm login => realm async open")
@@ -2475,73 +2446,37 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                         }
                     }
                 }
-                .sink(receiveCompletion: { result in
-                    if case .failure(let error) = result {
-                        XCTFail("Failed to register: \(error)")
-                    }
-                }, receiveValue: { realm in
+                .expectValue(self, chainEx) { realm in
                     XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
-                    chainEx.fulfill()
-                }).store(in: &cancellable)
+                }.store(in: &subscriptions)
             wait(for: [chainEx, progressEx], timeout: 30.0)
         }
     }
 
     func testAsyncOpenStandaloneCombine() {
-        var cancellable = Set<AnyCancellable>()
-
-        let asyncOpenEx = expectation(description: "Should open realm")
-
         autoreleasepool {
             let realm = try! Realm()
             try! realm.write {
                 (0..<10000).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket")) }
             }
         }
-
-        Realm.asyncOpen().sink(receiveCompletion: { result in
-            if case .failure = result {
-                XCTFail("Should open realm")
-            }
-        }, receiveValue: { realm in
+        Realm.asyncOpen().await(self) { realm in
             XCTAssertEqual(realm.objects(SwiftPerson.self).count, 10000)
-            asyncOpenEx.fulfill()
-        }).store(in: &cancellable)
-
-        wait(for: [asyncOpenEx], timeout: 4.0)
+        }
     }
 
     func testRefreshCustomDataCombine() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
-        var cancellable = Set<AnyCancellable>()
 
-        let registerUserEx = expectation(description: "Register user")
-        app.emailPasswordAuth.registerUser(email: email, password: password)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should register")
-                }
-            }, receiveValue: { _ in
-                registerUserEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [registerUserEx], timeout: 4.0)
+        app.emailPasswordAuth.registerUser(email: email, password: password).await(self)
 
         let credentials = Credentials.emailPassword(email: email, password: password)
         var syncUser: User!
-        let loginEx = expectation(description: "Login user")
         app.login(credentials: credentials)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should login")
-                }
-            }, receiveValue: { user in
+            .await(self) { user in
                 syncUser = user
-                loginEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [loginEx], timeout: 4.0)
+            }
 
         let userDataEx = expectation(description: "Update user data")
         syncUser.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
@@ -2550,284 +2485,106 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [userDataEx], timeout: 4.0)
 
-        let refreshDataEx = expectation(description: "Refresh user data")
         syncUser.refreshCustomData()
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should refresh")
-                }
-            }, receiveValue: { customData in
+            .await(self) { customData in
                 XCTAssertEqual(customData["apples"] as! Int, 10)
                 XCTAssertEqual(customData["favourite_colour"] as! String, "green")
-                refreshDataEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [refreshDataEx], timeout: 4.0)
+            }
 
         XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))
         XCTAssertEqual(app.currentUser?.customData["apples"], .int64(10))
     }
 
     func testMongoCollectionInsertCombine() {
-        var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
 
-        let insertOneEx1 = expectation(description: "Insert one document")
-        collection.insertOne(document)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should insert")
-                }
-            }, receiveValue: { _ in
-                insertOneEx1.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [insertOneEx1], timeout: 4.0)
-
-        let insertManyEx1 = expectation(description: "Insert many documents")
+        collection.insertOne(document).await(self)
         collection.insertMany([document, document2])
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should insert")
-                }
-            }, receiveValue: { objectIds in
+            .await(self) { objectIds in
                 XCTAssertEqual(objectIds.count, 2)
-                insertManyEx1.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [insertManyEx1], timeout: 4.0)
-
-        let findEx1 = expectation(description: "Find documents")
+            }
         collection.find(filter: [:])
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should find")
-                }
-            }, receiveValue: { findResult in
+            .await(self) { findResult in
                 XCTAssertEqual(findResult.map({ $0["name"]??.stringValue }), ["fido", "fido", "rex"])
-                findEx1.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [findEx1], timeout: 4.0)
+            }
     }
 
     func testMongoCollectionFindCombine() {
-        var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
         let document3: Document = ["name": "rex", "breed": "tibetan mastiff", "coat": ["fawn", "brown", "white"]]
         let findOptions = FindOptions(1, nil, nil)
 
-        let notFoundEx1 = expectation(description: "Find documents")
         collection.find(filter: [:], options: findOptions)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should try to find")
-                }
-            }, receiveValue: { findResult in
+            .await(self) { findResult in
                 XCTAssertEqual(findResult.count, 0)
-                notFoundEx1.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [notFoundEx1], timeout: 4.0)
-
-        let insEx1 = expectation(description: "Insert document")
-        collection.insertMany([document, document2, document3])
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
-            .store(in: &cancellable)
-        wait(for: [insEx1], timeout: 4.0)
-
-        let findEx1 = expectation(description: "Find documents")
+            }
+        collection.insertMany([document, document2, document3]).await(self)
         collection.find(filter: [:])
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should find")
-                }
-            }, receiveValue: { findResult in
+            .await(self) { findResult in
                 XCTAssertEqual(findResult.map({ $0["name"]??.stringValue }), ["fido", "rex", "rex"])
-                findEx1.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [findEx1], timeout: 4.0)
-
-        let findEx2 = expectation(description: "Find documents")
+            }
         collection.find(filter: [:], options: findOptions)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should find")
-                }
-            }, receiveValue: { findResult in
+            .await(self) { findResult in
                 XCTAssertEqual(findResult.count, 1)
                 XCTAssertEqual(findResult[0]["name"]??.stringValue, "fido")
-                findEx2.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [findEx2], timeout: 4.0)
-
-        let findEx3 = expectation(description: "Find documents")
+            }
         collection.find(filter: document3, options: findOptions)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should find")
-                }
-            }, receiveValue: { findResult in
+            .await(self) { findResult in
                 XCTAssertEqual(findResult.count, 1)
-                findEx3.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [findEx3], timeout: 4.0)
+            }
+        collection.findOneDocument(filter: document).await(self)
 
-        let findOneEx1 = expectation(description: "Find one document")
-        collection.findOneDocument(filter: document)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should find")
-                }
-            }, receiveValue: { _ in
-                findOneEx1.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [findOneEx1], timeout: 4.0)
-
-        let findOneEx2 = expectation(description: "Find one document")
-        collection.findOneDocument(filter: document, options: findOptions)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should find")
-                }
-            }, receiveValue: { _ in
-                findOneEx2.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [findOneEx2], timeout: 4.0)
+        collection.findOneDocument(filter: document, options: findOptions).await(self)
     }
 
     func testMongoCollectionCountAndAggregateCombine() {
-        var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
-        let insEx1 = expectation(description: "Insert document")
-        collection.insertMany([document])
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
-            .store(in: &cancellable)
-        wait(for: [insEx1], timeout: 4.0)
-
-        let agrEx1 = expectation(description: "Insert document")
+        collection.insertMany([document]).await(self)
         collection.aggregate(pipeline: [["$match": ["name": "fido"]], ["$group": ["_id": "$name"]]])
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in agrEx1.fulfill() })
-            .store(in: &cancellable)
-        wait(for: [agrEx1], timeout: 4.0)
-
-        let countEx1 = expectation(description: "Count documents")
-        collection.count(filter: document)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should count")
-                }
-            }, receiveValue: { _ in
-                countEx1.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [countEx1], timeout: 4.0)
-
-        let countEx2 = expectation(description: "Count documents")
-        collection.count(filter: document, limit: 1)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should count")
-                }
-            }, receiveValue: { count in
-                XCTAssertEqual(count, 1)
-                countEx2.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [countEx2], timeout: 4.0)
+            .await(self)
+        collection.count(filter: document).await(self) { count in
+            XCTAssertEqual(count, 1)
+        }
+        collection.count(filter: document, limit: 1).await(self) { count in
+            XCTAssertEqual(count, 1)
+        }
     }
 
     func testMongoCollectionDeleteOneCombine() {
-        var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
 
-        let deleteEx1 = expectation(description: "Delete 0 documents")
-        collection.deleteOneDocument(filter: document)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should count")
-                }
-            }, receiveValue: { count in
-                XCTAssertEqual(count, 0)
-                deleteEx1.fulfill()
-            })
-        .store(in: &cancellable)
-        wait(for: [deleteEx1], timeout: 4.0)
-
-        let insEx1 = expectation(description: "Insert document")
-        collection.insertMany([document, document2])
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill()})
-            .store(in: &cancellable)
-        wait(for: [insEx1], timeout: 4.0)
-
-        let deleteEx2 = expectation(description: "Delete one document")
-        collection.deleteOneDocument(filter: document)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should count")
-                }
-            }, receiveValue: { count in
-                XCTAssertEqual(count, 1)
-                deleteEx2.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [deleteEx2], timeout: 4.0)
+        collection.deleteOneDocument(filter: document).await(self) { count in
+            XCTAssertEqual(count, 0)
+        }
+        collection.insertMany([document, document2]).await(self)
+        collection.deleteOneDocument(filter: document).await(self) { count in
+            XCTAssertEqual(count, 1)
+        }
     }
 
     func testMongoCollectionDeleteManyCombine() {
-        var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
 
-        let deleteEx1 = expectation(description: "Delete 0 documents")
-        collection.deleteManyDocuments(filter: document)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should try to delete")
-                }
-            }, receiveValue: { count in
-                XCTAssertEqual(count, 0)
-                deleteEx1.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [deleteEx1], timeout: 4.0)
-
-        let insEx1 = expectation(description: "Insert document")
-        collection.insertMany([document, document2])
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
-            .store(in: &cancellable)
-        wait(for: [insEx1], timeout: 4.0)
-
-        let deleteEx2 = expectation(description: "Delete one document")
-        collection.deleteManyDocuments(filter: ["breed": "cane corso"])
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should delete")
-                }
-            }, receiveValue: { count in
-                XCTAssertEqual(count, 2)
-                deleteEx2.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [deleteEx2], timeout: 4.0)
+        collection.deleteManyDocuments(filter: document).await(self) { count in
+            XCTAssertEqual(count, 0)
+        }
+        collection.insertMany([document, document2]).await(self)
+        collection.deleteManyDocuments(filter: ["breed": "cane corso"]).await(self) { count in
+            XCTAssertEqual(count, 2)
+        }
     }
 
     func testMongoCollectionUpdateOneCombine() {
-        var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
@@ -2835,45 +2592,21 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let document4: Document = ["name": "ted", "breed": "bullmastiff"]
         let document5: Document = ["name": "bill", "breed": "great dane"]
 
-        let insEx1 = expectation(description: "Insert document")
-        collection.insertMany([document, document2, document3, document4])
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
-            .store(in: &cancellable)
-        wait(for: [insEx1], timeout: 4.0)
+        collection.insertMany([document, document2, document3, document4]).await(self)
+        collection.updateOneDocument(filter: document, update: document2).await(self) { updateResult in
+            XCTAssertEqual(updateResult.matchedCount, 1)
+            XCTAssertEqual(updateResult.modifiedCount, 1)
+            XCTAssertNil(updateResult.objectId)
+        }
 
-        let updateEx1 = expectation(description: "Update one document")
-        collection.updateOneDocument(filter: document, update: document2)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should update")
-                }
-            }, receiveValue: { updateResult in
-                XCTAssertEqual(updateResult.matchedCount, 1)
-                XCTAssertEqual(updateResult.modifiedCount, 1)
-                XCTAssertNil(updateResult.objectId)
-                updateEx1.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [updateEx1], timeout: 4.0)
-
-        let updateEx2 = expectation(description: "Update one document")
-        collection.updateOneDocument(filter: document5, update: document2, upsert: true)
-        .sink(receiveCompletion: { result in
-            if case .failure = result {
-                XCTFail("Should try to update")
-            }
-        }, receiveValue: { updateResult in
+        collection.updateOneDocument(filter: document5, update: document2, upsert: true).await(self) { updateResult in
             XCTAssertEqual(updateResult.matchedCount, 0)
             XCTAssertEqual(updateResult.modifiedCount, 0)
             XCTAssertNotNil(updateResult.objectId)
-            updateEx2.fulfill()
-        })
-        .store(in: &cancellable)
-        wait(for: [updateEx2], timeout: 4.0)
+        }
     }
 
     func testMongoCollectionUpdateManyCombine() {
-        var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
@@ -2881,479 +2614,177 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let document4: Document = ["name": "ted", "breed": "bullmastiff"]
         let document5: Document = ["name": "bill", "breed": "great dane"]
 
-        let insEx1 = expectation(description: "Insert document")
-        collection.insertMany([document, document2, document3, document4])
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in
-                insEx1.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [insEx1], timeout: 4.0)
-
-        let updateEx1 = expectation(description: "Update one document")
-        collection.updateManyDocuments(filter: document, update: document2)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should update")
-                }
-            }, receiveValue: { updateResult in
-                XCTAssertEqual(updateResult.matchedCount, 1)
-                XCTAssertEqual(updateResult.modifiedCount, 1)
-                XCTAssertNil(updateResult.objectId)
-                updateEx1.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [updateEx1], timeout: 4.0)
-
-        let updateEx2 = expectation(description: "Update one document")
-        collection.updateManyDocuments(filter: document5, update: document2, upsert: true)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should try to update")
-                }
-            }, receiveValue: { updateResult in
-                XCTAssertEqual(updateResult.matchedCount, 0)
-                XCTAssertEqual(updateResult.modifiedCount, 0)
-                XCTAssertNotNil(updateResult.objectId)
-                updateEx2.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [updateEx2], timeout: 4.0)
+        collection.insertMany([document, document2, document3, document4]).await(self)
+        collection.updateManyDocuments(filter: document, update: document2).await(self) { updateResult in
+            XCTAssertEqual(updateResult.matchedCount, 1)
+            XCTAssertEqual(updateResult.modifiedCount, 1)
+            XCTAssertNil(updateResult.objectId)
+        }
+        collection.updateManyDocuments(filter: document5, update: document2, upsert: true).await(self) { updateResult in
+            XCTAssertEqual(updateResult.matchedCount, 0)
+            XCTAssertEqual(updateResult.modifiedCount, 0)
+            XCTAssertNotNil(updateResult.objectId)
+        }
     }
 
     func testMongoCollectionFindAndUpdateCombine() {
-        var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
         let document3: Document = ["name": "john", "breed": "cane corso"]
 
-        let findOneUpdateEx1 = expectation(description: "Find one document and update")
-        collection.findOneAndUpdate(filter: document, update: document2)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should try to update")
-                }
-            }, receiveValue: { updateResult in
-                XCTAssertNil(updateResult)
-                findOneUpdateEx1.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [findOneUpdateEx1], timeout: 4.0)
+        collection.findOneAndUpdate(filter: document, update: document2).await(self)
 
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
-        let findOneUpdateEx2 = expectation(description: "Find one document and update")
-        collection.findOneAndUpdate(filter: document2, update: document3, options: options1)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should update")
-                }
-            }, receiveValue: { updateResult in
-                guard let updateResult = updateResult else {
-                    XCTFail("Should find")
-                    return
-                }
-                XCTAssertEqual(updateResult["name"]??.stringValue, "john")
-                findOneUpdateEx2.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [findOneUpdateEx2], timeout: 4.0)
+        collection.findOneAndUpdate(filter: document2, update: document3, options: options1).await(self) { updateResult in
+            guard let updateResult = updateResult else {
+                XCTFail("Should find")
+                return
+            }
+            XCTAssertEqual(updateResult["name"]??.stringValue, "john")
+        }
 
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
-        let findOneUpdateEx3 = expectation(description: "Find one document and update")
-        collection.findOneAndUpdate(filter: document, update: document2, options: options2)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should update")
-                }
-            }, receiveValue: { updateResult in
-                guard let updateResult = updateResult else {
-                    XCTFail("Should find")
-                    return
-                }
-                XCTAssertEqual(updateResult["name"]??.stringValue, "rex")
-                findOneUpdateEx3.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [findOneUpdateEx3], timeout: 4.0)
+        collection.findOneAndUpdate(filter: document, update: document2, options: options2).await(self) { updateResult in
+            guard let updateResult = updateResult else {
+                XCTFail("Should find")
+                return
+            }
+            XCTAssertEqual(updateResult["name"]??.stringValue, "rex")
+        }
     }
 
     func testMongoCollectionFindAndReplaceCombine() {
-        var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
         let document3: Document = ["name": "john", "breed": "cane corso"]
 
-        let findOneReplaceEx1 = expectation(description: "Find one document and replace")
-        collection.findOneAndReplace(filter: document, replacement: document2)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should try to replace")
-                }
-            }, receiveValue: { updateResult in
-                XCTAssertNil(updateResult)
-                findOneReplaceEx1.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [findOneReplaceEx1], timeout: 4.0)
+        collection.findOneAndReplace(filter: document, replacement: document2).await(self) { updateResult in
+            XCTAssertNil(updateResult)
+        }
 
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
-        let findOneReplaceEx2 = expectation(description: "Find one document and replace")
-        collection.findOneAndReplace(filter: document2, replacement: document3, options: options1)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should replace")
-                }
-            }, receiveValue: { updateResult in
-                guard let updateResult = updateResult else {
-                    XCTFail("Should find")
-                    return
-                }
-                XCTAssertEqual(updateResult["name"]??.stringValue, "john")
-                findOneReplaceEx2.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [findOneReplaceEx2], timeout: 4.0)
+        collection.findOneAndReplace(filter: document2, replacement: document3, options: options1).await(self) { updateResult in
+            guard let updateResult = updateResult else {
+                XCTFail("Should find")
+                return
+            }
+            XCTAssertEqual(updateResult["name"]??.stringValue, "john")
+        }
 
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, false)
-        let findOneReplaceEx3 = expectation(description: "Find one document and replace")
-        collection.findOneAndReplace(filter: document, replacement: document2, options: options2)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should try to replace")
-                }
-            }, receiveValue: { updateResult in
-                XCTAssertNil(updateResult)
-                findOneReplaceEx3.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [findOneReplaceEx3], timeout: 4.0)
+        collection.findOneAndReplace(filter: document, replacement: document2, options: options2).await(self) { updateResult in
+            XCTAssertNil(updateResult)
+        }
     }
 
     func testMongoCollectionFindAndDeleteCombine() {
-        var cancellable = Set<AnyCancellable>()
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
+        collection.insertMany([document]).await(self)
 
-        let insEx1 = expectation(description: "Insert document")
-        collection.insertMany([document])
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in insEx1.fulfill() })
-            .store(in: &cancellable)
-        wait(for: [insEx1], timeout: 4.0)
+        collection.findOneAndDelete(filter: document).await(self) { updateResult in
+            XCTAssertNotNil(updateResult)
+        }
+        collection.findOneAndDelete(filter: document).await(self) { updateResult in
+            XCTAssertNil(updateResult)
+        }
 
-        let findOneDeleteEx1 = expectation(description: "Find one document and delete")
-        collection.findOneAndDelete(filter: document)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should try to delete")
-                }
-            }, receiveValue: { updateResult in
-                XCTAssertNotNil(updateResult)
-                findOneDeleteEx1.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [findOneDeleteEx1], timeout: 4.0)
+        collection.insertMany([document]).await(self)
+        let options1 = FindOneAndModifyOptions(projection: ["name": 1], sort: ["_id": 1], upsert: false, shouldReturnNewDocument: false)
+        collection.findOneAndDelete(filter: document, options: options1).await(self) { deleteResult in
+            XCTAssertNotNil(deleteResult)
+        }
+        collection.findOneAndDelete(filter: document, options: options1).await(self) { deleteResult in
+            XCTAssertNil(deleteResult)
+        }
 
-        let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], false, false)
-        let findOneDeleteEx2 = expectation(description: "Find one document and delete")
-        collection.findOneAndDelete(filter: document, options: options1)
-            .sink(receiveCompletion: { result in
-                if case .failure(let error) = result,
-                    error.localizedDescription == "expected pre-image to match projection matcher" {
-                    // FIXME: It seems there is a possible server bug that does not handle
-                    // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
-                    // "expected pre-image to match projection matcher"
-                    // https://jira.mongodb.org/browse/REALMC-6878
-                    findOneDeleteEx2.fulfill()
-                } else {
-                    XCTFail("Please review test cases for findOneAndDelete.")
-                }
-            }, receiveValue: { _ in
-                XCTFail("Please review test cases for findOneAndDelete.")
-            })
-//            .sink(receiveCompletion: { result in
-//                if case .failure(let error) = result {
-//                    XCTFail("Should try to find instead of \(error)")
-//                }
-//            }, receiveValue: { deleteResult in
-//                XCTAssertNil(deleteResult)
-//                findOneDeleteEx2.fulfill()
-//            })
-        .store(in: &cancellable)
-        wait(for: [findOneDeleteEx2], timeout: 4.0)
-
+        collection.insertMany([document]).await(self)
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
-        let findOneDeleteEx3 = expectation(description: "Find one document and delete")
-        collection.findOneAndDelete(filter: document, options: options2)
-            .sink(receiveCompletion: { result in
-                if case .failure(let error) = result,
-                    error.localizedDescription == "expected pre-image to match projection matcher" {
-                    // FIXME: It seems there is a possible server bug that does not handle
-                    // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
-                    // "expected pre-image to match projection matcher"
-                    // https://jira.mongodb.org/browse/REALMC-6878
-                    findOneDeleteEx3.fulfill()
-                } else {
-                    XCTFail("Please review test cases for findOneAndDelete.")
-                }
-            }, receiveValue: { _ in
-                XCTFail("Please review test cases for findOneAndDelete.")
-            })
-//            .sink(receiveCompletion: { result in
-//                if case .failure(let error) = result {
-//                    XCTFail("Should try to find instead of \(error)")
-//                }
-//            }, receiveValue: { deleteResult in
-//                guard let deleteResult = deleteResult else {
-//                    XCTFail("Should delete")
-//                    return
-//                }
-//                XCTAssertEqual(deleteResult["name"] as! String, "fido")
-//                findOneDeleteEx3.fulfill()
-//            })
-            .store(in: &cancellable)
-        wait(for: [findOneDeleteEx3], timeout: 4.0)
+        collection.findOneAndDelete(filter: document, options: options2).await(self) { deleteResult in
+            XCTAssertNotNil(deleteResult)
+        }
+        collection.findOneAndDelete(filter: document, options: options2).await(self) { deleteResult in
+            XCTAssertNil(deleteResult)
+        }
 
-        let findEx = expectation(description: "Find documents")
-        collection.find(filter: [:])
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should try to update")
-                }
-            }, receiveValue: { updateResult in
-                XCTAssertEqual(updateResult.count, 0)
-                findEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [findEx], timeout: 4.0)
+        collection.insertMany([document]).await(self)
+        collection.find(filter: [:]).await(self) { updateResult in
+            XCTAssertEqual(updateResult.count, 1)
+        }
     }
 
     func testCallFunctionCombine() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
-        var cancellable = Set<AnyCancellable>()
 
-        let regEx = expectation(description: "Should register")
-        app.emailPasswordAuth.registerUser(email: email, password: password)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should register")
-                }
-            }, receiveValue: { _ in
-                regEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [regEx], timeout: 4.0)
+        app.emailPasswordAuth.registerUser(email: email, password: password).await(self)
 
         let credentials = Credentials.emailPassword(email: email, password: password)
         var syncUser: User!
-        let loginEx = expectation(description: "Should login")
-        app.login(credentials: credentials)
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should login")
-                }
-            }, receiveValue: { user in
-                syncUser = user
-                loginEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [loginEx], timeout: 4.0)
+        app.login(credentials: credentials).await(self) { user in
+            syncUser = user
+        }
 
-        let sumEx = expectation(description: "Should calc sum")
-        syncUser.functions.sum([1, 2, 3, 4, 5])
-            .sink(receiveCompletion: { (result) in
-                if case .failure = result {
-                    XCTFail("Should calc sum 15")
-                }
-            }, receiveValue: { bson in
-                guard case let .int64(sum) = bson else {
-                    XCTFail("Should be int64")
-                    return
-                }
-                XCTAssertEqual(sum, 15)
-                sumEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [sumEx], timeout: 4.0)
+        syncUser.functions.sum([1, 2, 3, 4, 5]).await(self) { bson in
+            guard case let .int64(sum) = bson else {
+                XCTFail("Should be int64")
+                return
+            }
+            XCTAssertEqual(sum, 15)
+        }
 
-        let userDataEx = expectation(description: "Should update user data")
-        syncUser.functions.updateUserData([["favourite_colour": "green", "apples": 10]])
-            .sink(receiveCompletion: { result in
-                if case .failure = result {
-                    XCTFail("Should update user data")
-                }
-            }, receiveValue: { bson in
-                guard case let .bool(upd) = bson else {
-                    XCTFail("Should be bool")
-                    return
-                }
-                XCTAssertTrue(upd)
-                userDataEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [userDataEx], timeout: 4.0)
-
+        syncUser.functions.updateUserData([["favourite_colour": "green", "apples": 10]]).await(self) { bson in
+            guard case let .bool(upd) = bson else {
+                XCTFail("Should be bool")
+                return
+            }
+            XCTAssertTrue(upd)
+        }
     }
 
     func testAPIKeyAuthCombine() {
-        var cancellable = Set<AnyCancellable>()
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
 
-        let registerUserEx = expectation(description: "Register user")
-        app.emailPasswordAuth.registerUser(email: email, password: password)
-            .sink(receiveCompletion: { _ in },
-                  receiveValue: { _ in registerUserEx.fulfill() })
-            .store(in: &cancellable)
-        wait(for: [registerUserEx], timeout: 4.0)
+        app.emailPasswordAuth.registerUser(email: email, password: password).await(self)
 
-        let loginEx = expectation(description: "Login user")
         var syncUser: User?
-        app.login(credentials: Credentials.emailPassword(email: email, password: password))
-            .sink(receiveCompletion: { _ in },
-                  receiveValue: { (user) in
-                syncUser = user
-                loginEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [loginEx], timeout: 4.0)
+        app.login(credentials: Credentials.emailPassword(email: email, password: password)).await(self) { user in
+            syncUser = user
+        }
 
-        let createAPIKeyEx = expectation(description: "Create user api key")
         var apiKey: UserAPIKey?
-        syncUser?.apiKeysAuth.createAPIKey(named: "my-api-key")
-            .sink(receiveCompletion: { (result) in
-                if case .failure = result {
-                    XCTFail("Should create user api key")
-                }
-            }, receiveValue: { (userApiKey) in
-                apiKey = userApiKey
-                createAPIKeyEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [createAPIKeyEx], timeout: 4.0)
+        syncUser?.apiKeysAuth.createAPIKey(named: "my-api-key").await(self) { userApiKey in
+            apiKey = userApiKey
+        }
 
-        let fetchAPIKeyEx = expectation(description: "Fetch user api key")
         var objId: ObjectId? = try? ObjectId(string: apiKey!.objectId.stringValue)
-        syncUser?.apiKeysAuth.fetchAPIKey(objId!)
-            .sink(receiveCompletion: { (result) in
-                if case .failure = result {
-                    XCTFail("Should fetch user api key")
-                }
-            }, receiveValue: { (userApiKey) in
-                apiKey = userApiKey
-                fetchAPIKeyEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [fetchAPIKeyEx], timeout: 4.0)
+        syncUser?.apiKeysAuth.fetchAPIKey(objId!).await(self) { userApiKey in
+            apiKey = userApiKey
+        }
 
-        let fetchAPIKeysEx = expectation(description: "Fetch user api keys")
-        syncUser?.apiKeysAuth.fetchAPIKeys()
-            .sink(receiveCompletion: { (result) in
-                if case .failure = result {
-                    XCTFail("Should fetch user api keys")
-                }
-            }, receiveValue: { (userApiKeys) in
-                XCTAssertEqual(userApiKeys.count, 1)
-                fetchAPIKeysEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [fetchAPIKeysEx], timeout: 4.0)
+        syncUser?.apiKeysAuth.fetchAPIKeys().await(self) { userApiKeys in
+            XCTAssertEqual(userApiKeys.count, 1)
+        }
 
-        let disableKeyEx = expectation(description: "Disable API key")
         objId = try? ObjectId(string: apiKey!.objectId.stringValue)
-        syncUser?.apiKeysAuth.disableAPIKey(objId!)
-            .sink(receiveCompletion: { (result) in
-                if case .failure = result {
-                    XCTFail("Should disable user api key")
-                }
-            }, receiveValue: { _ in
-                disableKeyEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [disableKeyEx], timeout: 4.0)
-
-        let enableKeyEx = expectation(description: "Enable API key")
-        syncUser?.apiKeysAuth.enableAPIKey(objId!)
-            .sink(receiveCompletion: { (result) in
-                if case .failure = result {
-                    XCTFail("Should enable user api key")
-                }
-            }, receiveValue: { _ in
-                enableKeyEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [enableKeyEx], timeout: 4.0)
-
-        let deleteKeyEx = expectation(description: "Delete API key")
-        syncUser?.apiKeysAuth.deleteAPIKey(objId!)
-            .sink(receiveCompletion: { (result) in
-                if case .failure = result {
-                    XCTFail("Should delete user api key")
-                }
-            }, receiveValue: { _ in
-                deleteKeyEx.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [deleteKeyEx], timeout: 4.0)
+        syncUser?.apiKeysAuth.disableAPIKey(objId!).await(self)
+        syncUser?.apiKeysAuth.enableAPIKey(objId!).await(self)
+        syncUser?.apiKeysAuth.deleteAPIKey(objId!).await(self)
     }
 
     func testPushRegistrationCombine() {
-        var cancellable = Set<AnyCancellable>()
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
 
-        let registerUserEx = expectation(description: "Register user")
-        app.emailPasswordAuth.registerUser(email: email, password: password)
-            .sink(receiveCompletion: { _ in },
-                  receiveValue: { _ in registerUserEx.fulfill() })
-            .store(in: &cancellable)
-        wait(for: [registerUserEx], timeout: 4.0)
+        app.emailPasswordAuth.registerUser(email: email, password: password).await(self)
+        app.login(credentials: Credentials.emailPassword(email: email, password: password)).await(self)
 
-        let loginEx = expectation(description: "Login user")
-        app.login(credentials: Credentials.emailPassword(email: email, password: password))
-            .sink(receiveCompletion: { _ in },
-                  receiveValue: { _ in loginEx.fulfill() })
-            .store(in: &cancellable)
-        wait(for: [loginEx], timeout: 4.0)
-
-        let registerDeviceExpectation = expectation(description: "Register Device")
         let client = app.pushClient(serviceName: "gcm")
-        client.registerDevice(token: "some-token", user: app.currentUser!)
-            .sink(receiveCompletion: { (result) in
-                if case .failure = result {
-                    XCTFail("Should register device")
-                }
-            }, receiveValue: { _ in
-                registerDeviceExpectation.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [registerDeviceExpectation], timeout: 4.0)
-
-        let dergisterDeviceExpectation = expectation(description: "Deregister Device")
-        client.deregisterDevice(user: app.currentUser!)
-            .sink(receiveCompletion: { (result) in
-                if case .failure = result {
-                    XCTFail("Should deregister device")
-                }
-            }, receiveValue: { _ in
-                dergisterDeviceExpectation.fulfill()
-            })
-            .store(in: &cancellable)
-        wait(for: [dergisterDeviceExpectation], timeout: 4.0)
-    }
-
-    func testShouldNotDeleteOnMigrationWithSync() {
-        let user = try! logInUser(for: basicCredentials())
-        var configuration = user.configuration(testName: appId)
-
-        assertThrows(configuration.deleteRealmIfMigrationNeeded = true,
-                     reason: "Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('syncConfig' is set).")
-
-        var localConfiguration = Realm.Configuration.defaultConfiguration
-        assertSucceeds {
-            localConfiguration.deleteRealmIfMigrationNeeded = true
-        }
+        client.registerDevice(token: "some-token", user: app.currentUser!).await(self)
+        client.deregisterDevice(user: app.currentUser!).await(self)
     }
 }
 #endif
