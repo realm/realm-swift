@@ -2469,7 +2469,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             let progressEx = expectation(description: "Should receive progress notification")
             app.login(credentials: .anonymous)
                 .flatMap {
-                    Realm.asyncOpen(configuration: $0.configuration(partitionValue: #function)).onProgressNotification {
+                    Realm.asyncOpen(configuration: $0.configuration(testName: #function)).onProgressNotification {
                         if $0.isTransferComplete {
                             progressEx.fulfill()
                         }
@@ -3345,7 +3345,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
     func testShouldNotDeleteOnMigrationWithSync() {
         let user = try! logInUser(for: basicCredentials())
-        var configuration = user.configuration(partitionValue: appId)
+        var configuration = user.configuration(testName: appId)
 
         assertThrows(configuration.deleteRealmIfMigrationNeeded = true,
                      reason: "Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('syncConfig' is set).")
