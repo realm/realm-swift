@@ -1858,8 +1858,38 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     XCTAssertFalse(realm.frozen);
     RLMRealm *frozenRealm = [realm freeze];
+    RLMRealm *thawedRealm = [frozenRealm thaw];
     XCTAssertFalse(realm.frozen);
+    XCTAssertFalse(thawedRealm.frozen);
     XCTAssertTrue(frozenRealm.frozen);
+}
+
+- (void)testThaw {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    XCTAssertFalse(realm.frozen);
+
+    [realm beginWriteTransaction];
+    IntObject *obj = [IntObject new];
+    obj.intCol = 1;
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+
+    RLMRealm *frozenRealm = [realm freeze];
+    XCTAssertTrue(frozenRealm.frozen);
+    IntObject *frozenObj = [[IntObject objectsInRealm:frozenRealm where:@"intCol = 1"] firstObject];
+    XCTAssertTrue(frozenObj.frozen);
+
+    RLMRealm *thawedRealm = [realm thaw];
+    XCTAssertFalse(thawedRealm.frozen);
+    IntObject *thawedObj = [[IntObject objectsInRealm:thawedRealm where:@"intCol = 1"] firstObject];
+
+    [realm beginWriteTransaction];
+    thawedObj.intCol = 2;
+    [realm commitWriteTransaction];
+    XCTAssertFalse(thawedObj.intCol == frozenObj.intCol);
+
+    IntObject *nilObj = [[IntObject objectsInRealm:thawedRealm where:@"intCol = 1"] firstObject];
+    XCTAssertNil(nilObj);
 }
 
 - (void)testRefreshFrozen {

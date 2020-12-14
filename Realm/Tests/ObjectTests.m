@@ -1398,6 +1398,9 @@ static IntObject *managedObject() {
 - (void)testMutateFrozenObject {
     IntObject *obj = managedObject();
     IntObject *frozen = obj.freeze;
+
+    RLMRealm *realm = frozen.realm;
+    RLMAssertThrowsWithReason([realm beginWriteTransaction], @"Can't perform transactions on a frozen Realm");
     XCTAssertThrows(frozen.intCol = 1);
 }
 
@@ -1467,6 +1470,20 @@ static IntObject *managedObject() {
     // Frozen objects have the value of the object at the start of the transaction
     XCTAssertEqual(obj.freeze.intCol, 1);
     [realm cancelWriteTransaction];
+}
+
+- (void)testThaw {
+    IntObject *frozen = [managedObject() freeze];
+    XCTAssertTrue([frozen isFrozen]);
+
+    IntObject *live = [frozen thaw];
+    XCTAssertFalse([live isFrozen]);
+
+    RLMRealm *liveRealm = live.realm;
+    [liveRealm beginWriteTransaction];
+    XCTAssert(live.intCol = 1);
+    [liveRealm commitWriteTransaction];
+    XCTAssert(live.intCol != frozen.intCol);
 }
 
 @end
