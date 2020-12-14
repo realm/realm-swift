@@ -488,6 +488,25 @@ id RLMObjectFreeze(RLMObjectBase *obj) {
     return frozen;
 }
 
+id RLMObjectThaw(RLMObjectBase *obj) {
+    if (!obj->_realm && !obj.isInvalidated) {
+        @throw RLMException(@"Unmanaged objects cannot be frozen.");
+    }
+    RLMVerifyAttached(obj);
+    if (!obj->_realm.frozen) {
+        return obj;
+    }
+    RLMRealmConfiguration *config = obj->_realm.configuration;
+    RLMRealm *liveRealm = [RLMRealm realmWithConfiguration:config error:nil];
+    RLMObjectBase *live = RLMCreateManagedAccessor(obj.class, &liveRealm->_info[obj->_info->rlmObjectSchema.className]);
+    live->_row = liveRealm->_realm->import_copy_of(obj->_row);
+    if (!live->_row.is_valid()) {
+        @throw RLMException(@"Cannot freeze an object in the same write transaction as it was created in.");
+    }
+    RLMInitializeSwiftAccessorGenerics(live);
+    return live;
+}
+
 id RLMValidatedValueForProperty(id object, NSString *key, NSString *className) {
     @try {
         return [object valueForKey:key];

@@ -324,6 +324,10 @@ extension Object: ThreadConfined {
     public func freeze() -> Self {
         return realm!.freeze(self)
     }
+    
+    public func thaw() -> Self {
+        return realm!.thaw(self)
+    }
 }
 
 

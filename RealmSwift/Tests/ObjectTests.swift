@@ -43,6 +43,60 @@ class ObjectTests: TestCase {
     // init() Tests are in ObjectCreationTests.swift
 
     // init(value:) tests are in ObjectCreationTests.swift
+    
+    func createAllPropertyTypesObj () -> (SwiftObject, SwiftOptionalObject, SwiftListObject) {
+        let realm = try! Realm()
+        return try! realm.write {
+            return (
+                realm.create(SwiftObject.self, value: [
+                    "boolCol": true,
+                    "intCol": 456,
+                    "floatCol": 4.56 as Float,
+                    "doubleCol": 45.6,
+                    "stringCol": "b",
+                    "binaryCol": "b".data(using: String.Encoding.utf8)!,
+                    "dateCol": Date(timeIntervalSince1970: 2),
+                    "objectCol": [true]
+                ]),
+                realm.create(SwiftOptionalObject.self, value: [
+                    "optNSStringCol": "NSString",
+                    "optStringCol": "String",
+                    "optBinaryCol": Data(),
+                    "optDateCol": Date(),
+                    "optIntCol": 1,
+                    "optInt8Col": 2,
+                    "optInt16Col": 3,
+                    "optInt32Col": 4,
+                    "optInt64Col": 5,
+                    "optFloatCol": 6.1,
+                    "optDoubleCol": 7.2,
+                    "optBoolCol": true
+                ]),
+                realm.create(SwiftListObject.self, value: [
+                    "int": [1],
+                    "int8": [2],
+                    "int16": [3],
+                    "int32": [4],
+                    "int64": [5],
+                    "float": [6.6 as Float],
+                    "double": [7.7],
+                    "string": ["8"],
+                    "data": ["9".data(using: String.Encoding.utf8)!],
+                    "date": [Date(timeIntervalSince1970: 10)],
+                    "intOpt": [11, nil],
+                    "int8Opt": [12, nil],
+                    "int16Opt": [13, nil],
+                    "int32Opt": [14, nil],
+                    "int64Opt": [15, nil],
+                    "floatOpt": [16.16, nil],
+                    "doubleOpt": [17.17, nil],
+                    "stringOpt": ["18", nil],
+                    "dataOpt": ["19".data(using: String.Encoding.utf8)!, nil],
+                    "dateOpt": [Date(timeIntervalSince1970: 20), nil]
+                ])
+            )
+        }
+    }
 
     func testRealm() {
         let standalone = SwiftStringObject()
@@ -903,58 +957,8 @@ class ObjectTests: TestCase {
     }
 
     func testFreezeAllPropertyTypes() {
-        let realm = try! Realm()
-        let (obj, optObj, listObj) = try! realm.write {
-            return (
-                realm.create(SwiftObject.self, value: [
-                    "boolCol": true,
-                    "intCol": 456,
-                    "floatCol": 4.56 as Float,
-                    "doubleCol": 45.6,
-                    "stringCol": "b",
-                    "binaryCol": "b".data(using: String.Encoding.utf8)!,
-                    "dateCol": Date(timeIntervalSince1970: 2),
-                    "objectCol": [true]
-                ]),
-                realm.create(SwiftOptionalObject.self, value: [
-                    "optNSStringCol": "NSString",
-                    "optStringCol": "String",
-                    "optBinaryCol": Data(),
-                    "optDateCol": Date(),
-                    "optIntCol": 1,
-                    "optInt8Col": 2,
-                    "optInt16Col": 3,
-                    "optInt32Col": 4,
-                    "optInt64Col": 5,
-                    "optFloatCol": 6.1,
-                    "optDoubleCol": 7.2,
-                    "optBoolCol": true
-                ]),
-                realm.create(SwiftListObject.self, value: [
-                    "int": [1],
-                    "int8": [2],
-                    "int16": [3],
-                    "int32": [4],
-                    "int64": [5],
-                    "float": [6.6 as Float],
-                    "double": [7.7],
-                    "string": ["8"],
-                    "data": ["9".data(using: String.Encoding.utf8)!],
-                    "date": [Date(timeIntervalSince1970: 10)],
-                    "intOpt": [11, nil],
-                    "int8Opt": [12, nil],
-                    "int16Opt": [13, nil],
-                    "int32Opt": [14, nil],
-                    "int64Opt": [15, nil],
-                    "floatOpt": [16.16, nil],
-                    "doubleOpt": [17.17, nil],
-                    "stringOpt": ["18", nil],
-                    "dataOpt": ["19".data(using: String.Encoding.utf8)!, nil],
-                    "dateOpt": [Date(timeIntervalSince1970: 20), nil]
-                ])
-            )
-        }
-
+        let (obj, optObj, listObj) = createAllPropertyTypesObj()
+        
         let frozenObj = obj.freeze()
         XCTAssertEqual(obj.boolCol, frozenObj.boolCol)
         XCTAssertEqual(obj.intCol, frozenObj.intCol)
@@ -1001,5 +1005,83 @@ class ObjectTests: TestCase {
         XCTAssertEqual(Array(listObj.stringOpt), Array(frozenListObj.stringOpt))
         XCTAssertEqual(Array(listObj.dataOpt), Array(frozenListObj.dataOpt))
         XCTAssertEqual(Array(listObj.dateOpt), Array(frozenListObj.dateOpt))
+    }
+    
+    func testThawAllPropertyTypes() {
+        let (obj, optObj, listObj) = createAllPropertyTypesObj()
+
+        let frozenObj = obj.freeze()
+        XCTAssertTrue(frozenObj.isFrozen)
+        assertThrows(try! frozenObj.realm!.write { frozenObj.realm!.delete(frozenObj) }, reason: "Can't perform transactions on a frozen Realm")
+
+        let liveObj = frozenObj.thaw()
+        XCTAssertFalse(liveObj.isFrozen)
+        
+        XCTAssertEqual(liveObj.boolCol, frozenObj.boolCol)
+        XCTAssertEqual(liveObj.intCol, frozenObj.intCol)
+        XCTAssertEqual(liveObj.floatCol, frozenObj.floatCol)
+        XCTAssertEqual(liveObj.doubleCol, frozenObj.doubleCol)
+        XCTAssertEqual(liveObj.stringCol, frozenObj.stringCol)
+        XCTAssertEqual(liveObj.binaryCol, frozenObj.binaryCol)
+        XCTAssertEqual(liveObj.dateCol, frozenObj.dateCol)
+        XCTAssertEqual(liveObj.objectCol?.boolCol, frozenObj.objectCol?.boolCol)
+        
+        try! liveObj.realm!.write({ liveObj.boolCol = !liveObj.boolCol })
+        XCTAssert(liveObj.boolCol != frozenObj.boolCol)
+
+        let frozenOptObj = optObj.freeze()
+        XCTAssertTrue(frozenOptObj.isFrozen)
+        assertThrows(try! frozenOptObj.realm!.write { frozenOptObj.realm!.delete(frozenOptObj) }, reason: "Can't perform transactions on a frozen Realm")
+
+        let liveOptObj = frozenOptObj.thaw()
+        XCTAssertFalse(liveOptObj.isFrozen)
+        
+        XCTAssertEqual(liveOptObj.optNSStringCol, frozenOptObj.optNSStringCol)
+        XCTAssertEqual(liveOptObj.optStringCol, frozenOptObj.optStringCol)
+        XCTAssertEqual(liveOptObj.optBinaryCol, frozenOptObj.optBinaryCol)
+        XCTAssertEqual(liveOptObj.optDateCol, frozenOptObj.optDateCol)
+        XCTAssertEqual(liveOptObj.optIntCol.value, frozenOptObj.optIntCol.value)
+        XCTAssertEqual(liveOptObj.optInt8Col.value, frozenOptObj.optInt8Col.value)
+        XCTAssertEqual(liveOptObj.optInt16Col.value, frozenOptObj.optInt16Col.value)
+        XCTAssertEqual(liveOptObj.optInt32Col.value, frozenOptObj.optInt32Col.value)
+        XCTAssertEqual(liveOptObj.optInt64Col.value, frozenOptObj.optInt64Col.value)
+        XCTAssertEqual(liveOptObj.optFloatCol.value, frozenOptObj.optFloatCol.value)
+        XCTAssertEqual(liveOptObj.optDoubleCol.value, frozenOptObj.optDoubleCol.value)
+        XCTAssertEqual(liveOptObj.optBoolCol.value, frozenOptObj.optBoolCol.value)
+        XCTAssertEqual(liveOptObj.optEnumCol.value, frozenOptObj.optEnumCol.value)
+        
+        try! liveOptObj.realm!.write({ liveOptObj.optBoolCol.value = false })
+        XCTAssert(liveOptObj.optBoolCol.value != frozenOptObj.optBoolCol.value)
+
+        let frozenListObj = listObj.freeze()
+        XCTAssertTrue(frozenListObj.isFrozen)
+        assertThrows(try! frozenListObj.realm!.write { frozenListObj.realm!.delete(frozenListObj) }, reason: "Can't perform transactions on a frozen Realm")
+        
+        let liveListObj = frozenListObj.thaw()
+        XCTAssertFalse(liveListObj.isFrozen)
+        
+        XCTAssertEqual(Array(liveListObj.int), Array(frozenListObj.int))
+        XCTAssertEqual(Array(liveListObj.int8), Array(frozenListObj.int8))
+        XCTAssertEqual(Array(liveListObj.int16), Array(frozenListObj.int16))
+        XCTAssertEqual(Array(liveListObj.int32), Array(frozenListObj.int32))
+        XCTAssertEqual(Array(liveListObj.int64), Array(frozenListObj.int64))
+        XCTAssertEqual(Array(liveListObj.float), Array(frozenListObj.float))
+        XCTAssertEqual(Array(liveListObj.double), Array(frozenListObj.double))
+        XCTAssertEqual(Array(liveListObj.string), Array(frozenListObj.string))
+        XCTAssertEqual(Array(liveListObj.data), Array(frozenListObj.data))
+        XCTAssertEqual(Array(liveListObj.date), Array(frozenListObj.date))
+        XCTAssertEqual(Array(liveListObj.intOpt), Array(frozenListObj.intOpt))
+        XCTAssertEqual(Array(liveListObj.int8Opt), Array(frozenListObj.int8Opt))
+        XCTAssertEqual(Array(liveListObj.int16Opt), Array(frozenListObj.int16Opt))
+        XCTAssertEqual(Array(liveListObj.int32Opt), Array(frozenListObj.int32Opt))
+        XCTAssertEqual(Array(liveListObj.int64Opt), Array(frozenListObj.int64Opt))
+        XCTAssertEqual(Array(liveListObj.floatOpt), Array(frozenListObj.floatOpt))
+        XCTAssertEqual(Array(liveListObj.doubleOpt), Array(frozenListObj.doubleOpt))
+        XCTAssertEqual(Array(liveListObj.stringOpt), Array(frozenListObj.stringOpt))
+        XCTAssertEqual(Array(liveListObj.dataOpt), Array(frozenListObj.dataOpt))
+        XCTAssertEqual(Array(liveListObj.dateOpt), Array(frozenListObj.dateOpt))
+        
+        try! liveListObj.realm!.write({ liveListObj.int.append(1) })
+        XCTAssert(Array(liveListObj.int) != Array(frozenListObj.int))
     }
 }

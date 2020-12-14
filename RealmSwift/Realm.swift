@@ -821,6 +821,10 @@ import Realm.Private
     public func freeze<T: ObjectBase>(_ obj: T) -> T {
         return RLMObjectFreeze(obj) as! T
     }
+    
+    public func thaw<T: ObjectBase>(_ obj: T) -> T {
+        return RLMObjectThaw(obj) as! T
+    }
 
     /**
      Returns a frozen (immutable) snapshot of the given collection.
