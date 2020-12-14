@@ -2449,7 +2449,8 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                     }
                 }, receiveValue: { realm in
                     try! realm.write {
-                        (0..<10000).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket"))}
+                        realm.add(SwiftHugeSyncObject.create())
+                        realm.add(SwiftHugeSyncObject.create())
                     }
                     let progressEx = self.expectation(description: "Should upload")
                     let token = realm.syncSession!.addProgressNotification(for: .upload, mode: .forCurrentlyOutstandingWork) {
@@ -2479,7 +2480,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                         XCTFail("Should register")
                     }
                 }, receiveValue: { realm in
-                    XCTAssertEqual(realm.objects(SwiftPerson.self).count, 10000)
+                    XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
                     chainEx.fulfill()
                 }).store(in: &cancellable)
             wait(for: [chainEx, progressEx], timeout: 30.0)
