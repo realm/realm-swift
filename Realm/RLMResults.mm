@@ -516,9 +516,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         return self;
     }
 
-    RLMRealmConfiguration *config = _realm.configuration;
-    RLMRealm *liveRealm = [RLMRealm realmWithConfiguration:config error:nil];
-
+    RLMRealm *liveRealm = [_realm thaw];
     return translateRLMResultsErrors([&] {
         return [self.class resultsWithObjectInfo:_info->resolve(liveRealm)
                                          results:_results.freeze(liveRealm->_realm)];
