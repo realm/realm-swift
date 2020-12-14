@@ -1,23 +1,58 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.4.0 Release notes (2020-12-10)
 =============================================================
+
 ### Enhancements
-* Add Google OpenID Connect Credentials, an alternative login credential to the Google OAuth 2.0 credential.
+
+* Add Combine support for App and User. These two types now have a
+  `objectWillChange` property that emits each time the state of the object has
+  changed (such as due to the user logging in or out). ([PR #6977](https://github.com/realm/realm-cocoa/pull/6977)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Integrating changsets from the server would sometimes hit the assertion
+  failure "n != realm::npos" inside Table::create_object_with_primary_key()
+  when creating an object with a primary key which previously had been used and
+  had incoming links. ([Core PR #4180](https://github.com/realm/realm-core/pull/4180), since v10.0.0).
+* The arm64 simulator slices were not actually included in the XCFramework
+  release package. ([PR #6982](https://github.com/realm/realm-cocoa/pull/6982), since v10.2.0).
 
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.2.
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+
+* Upgraded realm-core from v10.1.3 to v10.1.4
+* Upgraded realm-sync from v10.1.4 to v10.1.5
+
+10.3.0 Release notes (2020-12-08)
+=============================================================
+
+### Enhancements
+
+* Add Google OpenID Connect Credentials, an alternative login credential to the
+  Google OAuth 2.0 credential.
+
+### Fixed
+
+* Fixed a bug that would prevent eventual consistency during conflict
+  resolution. Affected clients would experience data divergence and potentially
+  consistency errors as a result if they experienced conflict resolution
+  between cycles of Create-Erase-Create for objects with primary keys (since v10.0.0).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.2.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-sync from v10.1.3 to v10.1.4
 
 10.2.0 Release notes (2020-12-02)
 =============================================================

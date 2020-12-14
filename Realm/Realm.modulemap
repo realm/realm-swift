@@ -6,6 +6,7 @@ framework module Realm {
 
     explicit module Private {
         header "RLMAccessor.h"
+        header "RLMApp_Private.h"
         header "RLMArray_Private.h"
         header "RLMCollection_Private.h"
         header "RLMListBase.h"
@@ -22,6 +23,7 @@ framework module Realm {
         header "RLMSchema_Private.h"
         header "RLMSyncConfiguration_Private.h"
         header "RLMSyncUtil_Private.h"
+        header "RLMUser_Private.h"
     }
 
     explicit module Dynamic {

@@ -2403,6 +2403,15 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         let password = randomString(10)
 
         let loginEx = expectation(description: "Login user")
+        let appEx = expectation(description: "App changes triggered")
+        var triggered = 0
+        app.objectWillChange.sink { _ in
+            triggered += 1
+            if triggered == 2 {
+                appEx.fulfill()
+            }
+        }.store(in: &cancellable)
+
         app.emailPasswordAuth.registerUser(email: email, password: password)
             .flatMap { self.app.login(credentials: .emailPassword(email: email, password: password)) }
             .sink(receiveCompletion: { result in
@@ -2410,12 +2419,17 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                     XCTFail("Should have completed login chain: \(error.localizedDescription)")
                 }
             }, receiveValue: { user in
+                user.objectWillChange.sink { user in
+                    XCTAssert(!user.isLoggedIn)
+                    loginEx.fulfill()
+                }.store(in: &cancellable)
                 XCTAssertEqual(user.id, self.app.currentUser?.id)
-                loginEx.fulfill()
+                user.logOut { _ in } // logout user and make sure it is observed
             })
             .store(in: &cancellable)
-        wait(for: [loginEx], timeout: 4.0)
+        wait(for: [loginEx, appEx], timeout: 30.0)
         XCTAssertEqual(self.app.allUsers.count, 1)
+        XCTAssertEqual(triggered, 2)
     }
 
     func testAsyncOpenCombine() {

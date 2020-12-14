@@ -60,10 +60,9 @@ IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 WATCHOS_DEPLOYMENT_TARGET = 2.0;
 TVOS_DEPLOYMENT_TARGET = 9.0;
 
-// Xcode 11 "helpfully" "corrects" arm64 to x86_64 when you try to exclude
-// arm64 on platforms that it doesn't support building for arm64 on.
-REALM_ARM_ARCHS_1200 = arm64 arm64e;
-REALM_ARM_ARCHS = $(REALM_ARM_ARCHS_$(XCODE_VERSION_MAJOR))
+// Disable building the arm64 simulators when using Carthage as it doesn't support them yet
+REALM_ARM_ARCHS_YES = arm64 arm64e;
+REALM_ARM_ARCHS = $(REALM_ARM_ARCHS_$(CARTHAGE))
 
 EXCLUDED_ARCHS[sdk=watchsimulator*] = $(REALM_ARM_ARCHS);
 EXCLUDED_ARCHS[sdk=iphonesimulator*] = $(REALM_ARM_ARCHS);

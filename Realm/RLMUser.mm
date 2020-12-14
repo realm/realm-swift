@@ -47,6 +47,26 @@ using namespace realm;
 }
 @end
 
+@implementation RLMUserSubscriptionToken {
+@public
+    std::unique_ptr<realm::Subscribable<SyncUser>::Token> _token;
+}
+
+- (instancetype)initWithToken:(realm::Subscribable<SyncUser>::Token&&)token {
+    if (self = [super init]) {
+        _token = std::make_unique<realm::Subscribable<SyncUser>::Token>(std::move(token));
+        return self;
+    }
+
+    return nil;
+}
+
+- (NSUInteger)value {
+    return _token->value();
+}
+
+@end
+
 @implementation RLMUser
 
 #pragma mark - API
@@ -283,6 +303,16 @@ using namespace realm;
 
 - (std::shared_ptr<SyncUser>)_syncUser {
     return _user;
+}
+
+- (RLMUserSubscriptionToken *)subscribe:(RLMUserNotificationBlock) block {
+    return [[RLMUserSubscriptionToken alloc] initWithToken:_user->subscribe([block, self] (auto&) {
+        block(self);
+    })];
+}
+
+- (void)unsubscribe:(RLMUserSubscriptionToken *)token {
+    _user->unsubscribe(*token->_token);
 }
 
 @end
