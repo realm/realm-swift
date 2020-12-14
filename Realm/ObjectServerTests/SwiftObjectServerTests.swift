@@ -2444,8 +2444,8 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                 .flatMap { self.app.login(credentials: .emailPassword(email: email, password: password)) }
                 .flatMap { user in Realm.asyncOpen(configuration: user.configuration(testName: #function)) }
                 .sink(receiveCompletion: { result in
-                    if case .failure = result {
-                        XCTFail("Should register")
+                    if case .failure(let error) = result {
+                        XCTFail("Failed to register: \(error)")
                     }
                 }, receiveValue: { realm in
                     try! realm.write {
@@ -2476,8 +2476,8 @@ class CombineObjectServerTests: SwiftSyncTestCase {
                     }
                 }
                 .sink(receiveCompletion: { result in
-                    if case .failure = result {
-                        XCTFail("Should register")
+                    if case .failure(let error) = result {
+                        XCTFail("Failed to register: \(error)")
                     }
                 }, receiveValue: { realm in
                     XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
