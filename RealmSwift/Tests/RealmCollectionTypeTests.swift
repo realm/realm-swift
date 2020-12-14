@@ -535,6 +535,7 @@ class RealmCollectionTypeTests: TestCase {
         let liveRealm = live.realm!
         try! liveRealm.write { liveRealm.delete(live) }
         XCTAssertTrue(live.isEmpty)
+        XCTAssertFalse(frozen.isEmpty)
     }
 
     func testFreezeFromWrongThread() {

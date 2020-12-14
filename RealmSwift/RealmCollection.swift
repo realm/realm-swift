@@ -503,7 +503,7 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
     func freeze() -> Self
 
     /**
-     Returns a live version of this frozen collection.
+     Returns a live (mutable) version of this frozen collection.
 
      This method resolves a reference to a live copy of the same frozen collection.
      If called on a live collection, will return itself.
@@ -1097,7 +1097,6 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      If called on a live collection, will return itself.
     */
     public func thaw() -> AnyRealmCollection { return base.thaw() }
-
 }
 
 // MARK: AssistedObjectiveCBridgeable

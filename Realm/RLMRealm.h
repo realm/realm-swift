@@ -213,7 +213,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns a live reference of this Realm.
 
- All objects and collections read from this realm will no longer be frozen.
+ All objects and collections read from the returned Realm will no longer be frozen.
  This method will return `self` if it is not already frozen.
  */
 - (RLMRealm *)thaw;
