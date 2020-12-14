@@ -77,7 +77,6 @@ RLMClassInfo &RLMClassInfo::linkTargetType(realm::Property const& property) {
 }
 
 RLMClassInfo &RLMClassInfo::resolve(__unsafe_unretained RLMRealm *const realm) {
-    // FIXME
     return realm->_info[rlmObjectSchema.className];
 }
 
