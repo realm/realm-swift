@@ -10,7 +10,7 @@
 			<key>LibraryIdentifier</key>
 			<string>macos-x86_64_arm64</string>
 			<key>LibraryPath</key>
-			<string>librealm-sync.a</string>
+			<string>librealm-monorepo.a</string>
 			<key>SupportedArchitectures</key>
 			<array><string>x86_64</string>
 <string>arm64</string></array>
@@ -23,7 +23,7 @@
 			<key>LibraryIdentifier</key>
 			<string>ios-armv7_arm64</string>
 			<key>LibraryPath</key>
-			<string>librealm-sync.a</string>
+			<string>librealm-monorepo.a</string>
 			<key>SupportedArchitectures</key>
 			<array><string>armv7</string>
 <string>arm64</string></array>
@@ -36,7 +36,7 @@
 			<key>LibraryIdentifier</key>
 			<string>ios-arm64_i386_x86_64-simulator</string>
 			<key>LibraryPath</key>
-			<string>librealm-sync.a</string>
+			<string>librealm-monorepo.a</string>
 			<key>SupportedArchitectures</key>
 			<array><string>arm64</string>
 <string>i386</string>
@@ -52,7 +52,7 @@
 			<key>LibraryIdentifier</key>
 			<string>ios-x86_64_arm64-maccatalyst</string>
 			<key>LibraryPath</key>
-			<string>librealm-sync.a</string>
+			<string>librealm-monorepo.a</string>
 			<key>SupportedArchitectures</key>
 			<array><string>x86_64</string>
 <string>arm64</string></array>
@@ -67,7 +67,7 @@
 			<key>LibraryIdentifier</key>
 			<string>watchos-armv7k_arm64_32</string>
 			<key>LibraryPath</key>
-			<string>librealm-sync.a</string>
+			<string>librealm-monorepo.a</string>
 			<key>SupportedArchitectures</key>
 			<array><string>armv7k</string>
 <string>arm64_32</string></array>
@@ -80,7 +80,7 @@
 			<key>LibraryIdentifier</key>
 			<string>watchos-arm64_i386_x86_64-simulator</string>
 			<key>LibraryPath</key>
-			<string>librealm-sync.a</string>
+			<string>librealm-monorepo.a</string>
 			<key>SupportedArchitectures</key>
 			<array><string>arm64</string>
 <string>i386</string>
@@ -96,7 +96,7 @@
 			<key>LibraryIdentifier</key>
 			<string>tvos-arm64</string>
 			<key>LibraryPath</key>
-			<string>librealm-sync.a</string>
+			<string>librealm-monorepo.a</string>
 			<key>SupportedArchitectures</key>
 			<array><string>arm64</string></array>
 			<key>SupportedPlatform</key>
@@ -108,7 +108,7 @@
 			<key>LibraryIdentifier</key>
 			<string>tvos-arm64_x86_64-simulator</string>
 			<key>LibraryPath</key>
-			<string>librealm-sync.a</string>
+			<string>librealm-monorepo.a</string>
 			<key>SupportedArchitectures</key>
 			<array><string>arm64</string>
 <string>x86_64</string></array>

@@ -17,7 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealmConfiguration_Private.h"
-#import "shared_realm.hpp"
+
+#import <realm/object-store/shared_realm.hpp>
 
 @interface RLMRealmConfiguration ()
 - (realm::Realm::Config&)config;

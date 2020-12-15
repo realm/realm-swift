@@ -3,7 +3,7 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "10.1.4"
+let coreVersionStr = "10.3.2"
 let cocoaVersionStr = "10.4.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
@@ -11,11 +11,12 @@ let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
 let cxxSettings: [CXXSetting] = [
     .headerSearchPath("."),
     .headerSearchPath("include"),
-    .headerSearchPath("Realm/ObjectStore/src"),
     .define("REALM_SPM", to: "1"),
+    .define("REALM_ENABLE_SYNC", to: "1"),
     .define("REALM_COCOA_VERSION", to: "@\"\(cocoaVersionStr)\""),
     .define("REALM_VERSION", to: "\"\(coreVersionStr)\""),
 
+    .define("REALM_DEBUG", .when(configuration: .debug)),
     .define("REALM_NO_CONFIG"),
     .define("REALM_INSTALL_LIBEXECDIR", to: ""),
     .define("REALM_ENABLE_ASSERTIONS", to: "1"),
@@ -27,6 +28,22 @@ let cxxSettings: [CXXSetting] = [
     .define("REALM_VERSION_EXTRA", to: "\"\(coreVersionExtra.count > 1 ? String(coreVersionExtra[1]) : "")\""),
     .define("REALM_VERSION_STRING", to: "\"\(coreVersionStr)\""),
 ]
+let testCxxSettings: [CXXSetting] = cxxSettings + [
+    // Command-line `swift build` resolves header search paths
+    // relative to the package root, while Xcode resolves them
+    // relative to the target root, so we need both.
+    .headerSearchPath("Realm"),
+    .headerSearchPath(".."),
+]
+
+// SPM is supposed to weak-link frameworks that rely on a newer deployment
+// target than the package's, but doesn't do so correctly for Combine
+func combineFlags() -> [SwiftSetting]? {
+    if #available(macOS 10.15, *) {
+        return [.define("REALM_HAVE_COMBINE")]
+    }
+    return nil
+}
 
 let package = Package(
     name: "Realm",
@@ -45,40 +62,14 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!)),
+        .package(url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
     ],
     targets: [
       .target(
             name: "Realm",
-            dependencies: ["RealmCore"],
+            dependencies: ["RealmObjectStore"],
             path: ".",
             sources: [
-                "Realm/ObjectStore/src/binding_callback_thread_observer.cpp",
-                "Realm/ObjectStore/src/collection_notifications.cpp",
-                "Realm/ObjectStore/src/impl/apple/external_commit_helper.cpp",
-                "Realm/ObjectStore/src/impl/apple/keychain_helper.cpp",
-                "Realm/ObjectStore/src/impl/collection_change_builder.cpp",
-                "Realm/ObjectStore/src/impl/collection_notifier.cpp",
-                "Realm/ObjectStore/src/impl/list_notifier.cpp",
-                "Realm/ObjectStore/src/impl/object_notifier.cpp",
-                "Realm/ObjectStore/src/impl/primitive_list_notifier.cpp",
-                "Realm/ObjectStore/src/impl/realm_coordinator.cpp",
-                "Realm/ObjectStore/src/impl/results_notifier.cpp",
-                "Realm/ObjectStore/src/impl/transact_log_handler.cpp",
-                "Realm/ObjectStore/src/impl/weak_realm_notifier.cpp",
-                "Realm/ObjectStore/src/index_set.cpp",
-                "Realm/ObjectStore/src/list.cpp",
-                "Realm/ObjectStore/src/object.cpp",
-                "Realm/ObjectStore/src/object_changeset.cpp",
-                "Realm/ObjectStore/src/object_schema.cpp",
-                "Realm/ObjectStore/src/object_store.cpp",
-                "Realm/ObjectStore/src/results.cpp",
-                "Realm/ObjectStore/src/schema.cpp",
-                "Realm/ObjectStore/src/shared_realm.cpp",
-                "Realm/ObjectStore/src/thread_safe_reference.cpp",
-                "Realm/ObjectStore/src/util/scheduler.cpp",
-                "Realm/ObjectStore/src/util/uuid.cpp",
-                "Realm/ObjectStore/src/util/scheduler.cpp",
                 "Realm/RLMAccessor.mm",
                 "Realm/RLMAnalytics.mm",
                 "Realm/RLMArray.mm",
@@ -108,7 +99,31 @@ let package = Package(
                 "Realm/RLMSwiftSupport.m",
                 "Realm/RLMThreadSafeReference.mm",
                 "Realm/RLMUpdateChecker.mm",
-                "Realm/RLMUtil.mm"
+                "Realm/RLMUtil.mm",
+
+                // Sync source files
+                "Realm/NSError+RLMSync.m",
+                "Realm/RLMApp.mm",
+                "Realm/RLMAPIKeyAuth.mm",
+                "Realm/RLMBSON.mm",
+                "Realm/RLMCredentials.mm",
+                "Realm/RLMEmailPasswordAuth.mm",
+                "Realm/RLMFindOneAndModifyOptions.mm",
+                "Realm/RLMFindOptions.mm",
+                "Realm/RLMMongoClient.mm",
+                "Realm/RLMMongoCollection.mm",
+                "Realm/RLMNetworkTransport.mm",
+                "Realm/RLMProviderClient.mm",
+                "Realm/RLMPushClient.mm",
+                "Realm/RLMRealm+Sync.mm",
+                "Realm/RLMRealmConfiguration+Sync.mm",
+                "Realm/RLMSyncConfiguration.mm",
+                "Realm/RLMSyncManager.mm",
+                "Realm/RLMSyncSession.mm",
+                "Realm/RLMSyncUtil.mm",
+                "Realm/RLMUpdateResult.mm",
+                "Realm/RLMUser.mm",
+                "Realm/RLMUserAPIKey.mm"
             ],
             publicHeadersPath: "include",
             cxxSettings: cxxSettings
@@ -118,26 +133,15 @@ let package = Package(
             dependencies: ["Realm"],
             path: "RealmSwift",
             exclude: [
-                "Sync.swift",
-                "BSON.swift",
-                "App.swift",
-                "MongoClient.swift",
-                "ObjectiveCSupport+Sync.swift",
-                "ObjectiveCSupport+BSON.swift",
                 "Tests",
+                "Nonsync.swift"
             ]
         ),
         .target(
             name: "RealmTestSupport",
             dependencies: ["Realm"],
             path: "Realm/TestUtils",
-            cxxSettings: cxxSettings + [
-                // Command-line `swift build` resolves header search paths
-                // relative to the package root, while Xcode resolves them
-                // relative to the target root, so we need both.
-                .headerSearchPath("Realm"),
-                .headerSearchPath(".."),
-            ]
+            cxxSettings: testCxxSettings
         ),
         .testTarget(
             name: "RealmTests",
@@ -148,11 +152,7 @@ let package = Package(
                 "TestHost",
                 "PrimitiveArrayPropertyTests.tpl.m",
             ],
-            cxxSettings: cxxSettings + [
-                .headerSearchPath("Realm"),
-                .headerSearchPath(".."),
-                .headerSearchPath("../ObjectStore/src"),
-            ]
+            cxxSettings: testCxxSettings
         ),
         .testTarget(
             name: "RealmObjcSwiftTests",
@@ -164,6 +164,50 @@ let package = Package(
             dependencies: ["RealmSwift", "RealmTestSupport"],
             path: "RealmSwift/Tests",
             exclude: ["TestUtils.mm"]
+        ),
+
+        // Object server tests have support code written in both obj-c and
+        // Swift which is used by both the obj-c and swift test code. SPM
+        // doesn't support mixed targets, so this ends up requiring four
+        // different targest.
+        .target(
+            name: "RealmSyncTestSupport",
+            dependencies: ["Realm", "RealmSwift", "RealmTestSupport"],
+            path: "Realm/ObjectServerTests",
+            sources: ["RLMSyncTestCase.mm", "RLMUser+ObjectServerTests.mm"],
+            cxxSettings: testCxxSettings
+        ),
+        .target(
+            name: "RealmSwiftSyncTestSupport",
+            dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport"],
+            path: "Realm/ObjectServerTests",
+            sources: [
+                 "SwiftSyncTestCase.swift",
+                 "TimeoutProxyServer.swift",
+                 "WatchTestUtility.swift",
+                 "RealmServer.swift"
+            ]
+        ),
+        .testTarget(
+            name: "SwiftObjectServerTests",
+            dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftSyncTestSupport"],
+            path: "Realm/ObjectServerTests",
+            sources: [
+                 "SwiftObjectServerTests.swift",
+                 "SwiftBSONTests.swift"
+            ],
+            swiftSettings: combineFlags()
+        ),
+        .testTarget(
+            name: "ObjcObjectServerTests",
+            dependencies: ["RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftSyncTestSupport"],
+            path: "Realm/ObjectServerTests",
+            sources: [
+                "RLMBSONTests.mm",
+                "RLMObjectServerTests.mm",
+                "RLMWatchTestUtility.m"
+            ],
+            cxxSettings: testCxxSettings
         )
     ],
     cxxLanguageStandard: .cxx1z

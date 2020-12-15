@@ -204,5 +204,10 @@
 - (int)runChildAndWait {
     return 1;
 }
+
+- (int)runChildAndWaitWithAppIds:(__unused NSArray *)appIds {
+    return 1;
+}
+
 #endif
 @end

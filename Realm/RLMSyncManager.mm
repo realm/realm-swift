@@ -26,9 +26,9 @@
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 
-#import "sync/sync_config.hpp"
-#import "sync/sync_manager.hpp"
-#import "sync/sync_session.hpp"
+#import <realm/sync/config.hpp>
+#import <realm/object-store/sync/sync_manager.hpp>
+#import <realm/object-store/sync/sync_session.hpp>
 
 #if !defined(REALM_COCOA_VERSION)
 #import "RLMVersion.h"

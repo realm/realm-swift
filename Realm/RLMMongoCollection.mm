@@ -26,9 +26,9 @@
 #import "RLMUpdateResult_Private.hpp"
 #import "RLMUser_Private.hpp"
 
-#import "sync/mongo_client.hpp"
-#import "sync/mongo_collection.hpp"
-#import "sync/mongo_database.hpp"
+#import <realm/object-store/sync/mongo_client.hpp>
+#import <realm/object-store/sync/mongo_collection.hpp>
+#import <realm/object-store/sync/mongo_database.hpp>
 
 @implementation RLMChangeStream {
     realm::app::WatchStream _watchStream;
