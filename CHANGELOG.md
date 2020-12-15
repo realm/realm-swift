@@ -1,9 +1,12 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.5.0 Release notes (2020-12-14)
 =============================================================
+
 ### Enhancements
+
 * MongoDB Realm is now supported when installing Realm via Swift Package Manager.
 
 ### Fixed
+
 * The user identifier was added to the file path for synchronized Realms twice
   and an extra level of escaping was performed on the partition value. This did
   not cause functional problems, but made file names more confusing than they
@@ -18,12 +21,14 @@ x.y.z Release notes (yyyy-MM-dd)
   could lead to a crash (since v10.0.0).
 
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.2.
 * CocoaPods: 1.10 or later.
 
 ### Internal
+
 * Upgraded realm-core from v10.1.4 to v10.3.2
 
 10.4.0 Release notes (2020-12-10)
