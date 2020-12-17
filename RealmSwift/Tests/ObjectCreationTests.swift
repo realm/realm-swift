@@ -1341,7 +1341,7 @@ class ObjectCreationTests: TestCase {
         case .decimal128: return [1, "2", Decimal128(number: 3)]
         case .any: fatalError("not supported")
         case .linkingObjects: fatalError("not supported")
-        case .UUID:     return [UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!, UUID(uuidString: "00000000-0000-0000-0000-000000000000")!]
+        case .UUID: return [UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!, UUID(uuidString: "00000000-0000-0000-0000-000000000000")!]
         }
     }
 
@@ -1365,7 +1365,7 @@ class ObjectCreationTests: TestCase {
         case .decimal128: return ["invalid"]
         case .any: fatalError("not supported")
         case .linkingObjects: fatalError("not supported")
-        case .UUID:     return ["invalid"]
+        case .UUID: return ["invalid"]
         }
     }
 }

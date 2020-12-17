@@ -22,24 +22,12 @@
 @implementation NSUUID (RLMUUIDSupport)
 
 - (instancetype)initWithRealmUUID:(realm::UUID)rUuid {
-    self = [self initWithUUIDBytes: rUuid.to_bytes().data()];
+    self = [self initWithUUIDBytes:rUuid.to_bytes().data()];
     return self;
 }
 
 - (realm::UUID)uuidValue {
-    return realm::UUID([self.UUIDString cStringUsingEncoding: NSUTF8StringEncoding]);
-}
-
-- (NSComparisonResult)compare:(NSUUID *)other {
-    realm::UUID leftVal = self.uuidValue;
-    realm::UUID rightVal = other.uuidValue;
-    if (leftVal == rightVal) {
-        return NSOrderedSame;
-    }
-    else if (leftVal < rightVal) {
-        return NSOrderedAscending;
-    }
-    return NSOrderedDescending;
+    return realm::UUID(self.UUIDString.UTF8String);
 }
 
 @end

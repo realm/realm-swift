@@ -442,9 +442,6 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
 
 realm::UUID RLMObjcToUUID(__unsafe_unretained id const value) {
     try {
-        if (!value || value == NSNull.null) {
-            return realm::UUID(realm::null());
-        }
         if (auto uuid = RLMDynamicCast<NSUUID>(value)) {
             return uuid.uuidValue;
         }

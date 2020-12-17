@@ -16,10 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef RLMUUID_H
-#define RLMUUID_H
-
-#import <Realm/RLMObject.h>
 #import "RLMProperty.h"
 #import <Foundation/Foundation.h>
 
@@ -35,9 +31,5 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (realm::UUID)uuidValue;
 
-- (NSComparisonResult)compare:(NSUUID *)other;
-
 @end
 NS_ASSUME_NONNULL_END
-
-#endif /* RLMUUID_H */
