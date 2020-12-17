@@ -527,7 +527,7 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertTrue(frozen.isFrozen)
 
         let frozenRealm = frozen.realm!
-        assertThrows(try! frozenRealm.write { frozenRealm.delete(frozen) }, reason: "Can't perform transactions on a frozen Realm")
+        assertThrows(try! frozenRealm.write {}, reason: "Can't perform transactions on a frozen Realm")
 
         let live = frozen.thaw()
         XCTAssertFalse(live.isFrozen)
@@ -536,6 +536,50 @@ class RealmCollectionTypeTests: TestCase {
         try! liveRealm.write { liveRealm.delete(live) }
         XCTAssertTrue(live.isEmpty)
         XCTAssertFalse(frozen.isEmpty)
+    }
+    
+    func testThawFromDifferentThread() {
+        let frozen = collection.freeze()
+        XCTAssertTrue(frozen.isFrozen)
+
+        dispatchSyncNewThread {
+            let live = frozen.thaw()
+            XCTAssertFalse(live.isFrozen)
+
+            let liveRealm = live.realm!
+            try! liveRealm.write { liveRealm.delete(live) }
+            XCTAssertTrue(live.isEmpty)
+            XCTAssertFalse(frozen.isEmpty)
+        }
+    }
+    
+    func testThawPreviousVersion() {
+        let frozen = collection.freeze()
+        XCTAssertTrue(frozen.isFrozen)
+        XCTAssertEqual(collection.count, frozen.count)
+        
+        let realm = collection.realm!
+        try! realm.write({ realm.delete(collection) })
+        XCTAssertNotEqual(frozen.count, collection.count, "Frozen collections should not change")
+        
+        let live = frozen.thaw()
+        XCTAssertTrue(live.isEmpty, "Thawed collection should reflect transactions since the original reference was frozen")
+        XCTAssertFalse(frozen.isEmpty)
+        XCTAssertEqual(live.count, self.collection.count)
+    }
+    
+    func testThawDeletedParent() {
+        let frozenElement = collection.first!.freeze()
+        XCTAssertTrue(frozenElement.isFrozen)
+        
+        let realm = collection.realm!
+        try! realm.write({ realm.delete(collection) })
+        XCTAssertNil(collection.first)
+        XCTAssertNotNil(frozenElement)
+        
+        let thawed = frozenElement.thaw()
+        XCTAssertNil(thawed)
+        
     }
 
     func testFreezeFromWrongThread() {
@@ -977,6 +1021,15 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     }
 
     override func testThaw() {
+    }
+    
+    override func testThawFromDifferentThread() {
+    }
+    
+    override func testThawPreviousVersion() {
+    }
+    
+    override func testThawDeletedParent() {
     }
 
     override func testFreezeFromWrongThread() {

@@ -1004,9 +1004,7 @@ class ObjectTests: TestCase {
     func testObjectThaw() {
         let realm = try! Realm()
         let obj = try! realm.write {
-            realm.create(SwiftObject.self, value: [
-                "boolCol": true
-            ])
+            realm.create(SwiftBoolObject.self, value: ["boolCol": true])
         }
 
         let frozenObj = obj.freeze()
@@ -1018,6 +1016,41 @@ class ObjectTests: TestCase {
         XCTAssertEqual(liveObj.boolCol, frozenObj.boolCol)
 
         try! liveObj.realm!.write({ liveObj.boolCol = false })
-        XCTAssert(liveObj.boolCol != frozenObj.boolCol)
+        XCTAssertNotEqual(liveObj.boolCol, frozenObj.boolCol)
+    }
+    
+    func testThawFromDifferentThread() {
+        let realm = try! Realm()
+        let obj = try! realm.write {
+            realm.create(SwiftBoolObject.self, value: ["boolCol": true])
+        }
+        
+        let frozenObj = obj.freeze()
+        dispatchSyncNewThread {
+            let liveObj = frozenObj.thaw()
+            XCTAssertFalse(liveObj.isFrozen)
+
+            try! liveObj.realm!.write({ liveObj.boolCol = false })
+            XCTAssertNotEqual(liveObj.boolCol, frozenObj.boolCol)
+        }
+        
+        XCTAssertTrue(frozenObj.boolCol)
+    }
+    
+    func testThawPreviousVersion() {
+        let realm = try! Realm()
+        let obj = try! realm.write {
+            realm.create(SwiftBoolObject.self, value: ["boolCol": true])
+        }
+        
+        let frozen = obj.freeze()
+        XCTAssertTrue(frozen.isFrozen)
+        
+        try! obj.realm!.write({ obj.boolCol = false })
+        XCTAssert(frozen.boolCol, "Frozen objects shouldn't mutate")
+        
+        let thawed = frozen.thaw()
+        XCTAssertFalse(thawed.isFrozen)
+        XCTAssertFalse(thawed.boolCol, "Thawed objects should reflect transactions since the original reference was frozen")
     }
 }

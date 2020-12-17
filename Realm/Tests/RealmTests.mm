@@ -1864,34 +1864,6 @@
     XCTAssertTrue(frozenRealm.frozen);
 }
 
-- (void)testThaw {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    XCTAssertFalse(realm.frozen);
-
-    [realm beginWriteTransaction];
-    IntObject *obj = [IntObject new];
-    obj.intCol = 1;
-    [realm addObject:obj];
-    [realm commitWriteTransaction];
-
-    RLMRealm *frozenRealm = [realm freeze];
-    XCTAssertTrue(frozenRealm.frozen);
-    IntObject *frozenObj = [[IntObject objectsInRealm:frozenRealm where:@"intCol = 1"] firstObject];
-    XCTAssertTrue(frozenObj.frozen);
-
-    RLMRealm *thawedRealm = [realm thaw];
-    XCTAssertFalse(thawedRealm.frozen);
-    IntObject *thawedObj = [[IntObject objectsInRealm:thawedRealm where:@"intCol = 1"] firstObject];
-
-    [realm beginWriteTransaction];
-    thawedObj.intCol = 2;
-    [realm commitWriteTransaction];
-    XCTAssertFalse(thawedObj.intCol == frozenObj.intCol);
-
-    IntObject *nilObj = [[IntObject objectsInRealm:thawedRealm where:@"intCol = 1"] firstObject];
-    XCTAssertNil(nilObj);
-}
-
 - (void)testRefreshFrozen {
     RLMRealm *realm = [RLMRealm defaultRealm];
     RLMRealm *frozenRealm = realm.freeze;
@@ -1935,6 +1907,68 @@
     [realm invalidate];
     RLMAssertThrowsWithReason([IntObject allObjectsInRealm:realm],
                               @"Cannot read from a frozen Realm which has been invalidated.");
+}
+
+- (void)testThaw {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    XCTAssertFalse(realm.frozen);
+
+    [realm beginWriteTransaction];
+    [IntObject createInRealm: realm withValue:@[@1]];
+    [realm commitWriteTransaction];
+
+    RLMRealm *frozenRealm = [realm freeze];
+    XCTAssertTrue(frozenRealm.frozen);
+    IntObject *frozenObj = [[IntObject objectsInRealm:frozenRealm where:@"intCol = 1"] firstObject];
+    XCTAssertTrue(frozenObj.frozen);
+
+    RLMRealm *thawedRealm = [realm thaw];
+    XCTAssertFalse(thawedRealm.frozen);
+    IntObject *thawedObj = [[IntObject objectsInRealm:thawedRealm where:@"intCol = 1"] firstObject];
+
+    [realm beginWriteTransaction];
+    thawedObj.intCol = 2;
+    [realm commitWriteTransaction];
+    XCTAssertNotEqual(thawedObj.intCol, frozenObj.intCol);
+
+    IntObject *nilObj = [[IntObject objectsInRealm:thawedRealm where:@"intCol = 1"] firstObject];
+    XCTAssertNil(nilObj);
+}
+
+- (void)testThawDifferentThread {
+    RLMRealm *frozenRealm = [[RLMRealm defaultRealm] freeze];
+    XCTAssertTrue(frozenRealm.frozen);
+    
+    // Thaw on a thread which already has a Realm should use existing reference.
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        RLMRealm *thawed = [frozenRealm thaw];
+        XCTAssertFalse(thawed.frozen);
+        XCTAssertEqual(thawed, realm);
+    }];
+    
+    // Thaw on thread without existing refernce.
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *thawed = [frozenRealm thaw];
+        XCTAssertFalse(thawed.frozen);
+    }];
+}
+
+-(void)testThawPreviousVersion {
+    RLMRealm *frozenRealm = [[RLMRealm defaultRealm] freeze];
+    XCTAssertTrue(frozenRealm.frozen);
+    XCTAssertEqual(frozenRealm.isEmpty, [[RLMRealm defaultRealm] isEmpty]);
+
+    [RLMRealm.defaultRealm beginWriteTransaction];
+    [IntObject createInDefaultRealmWithValue:@[@1]];
+    [RLMRealm.defaultRealm commitWriteTransaction];
+    XCTAssertNotEqual(frozenRealm.isEmpty, [[RLMRealm defaultRealm] isEmpty], "Contents of frozen Realm should not mutate");
+
+
+    RLMRealm *thawed = [frozenRealm thaw];
+    XCTAssertFalse(thawed.isFrozen);
+    XCTAssertEqual(thawed.isEmpty, [[RLMRealm defaultRealm] isEmpty], "Thawed realm should reflect transactions since the original reference was frozen");
+    XCTAssertNotEqual(thawed.isEmpty, frozenRealm.isEmpty);
 }
 
 #pragma mark - Assorted tests

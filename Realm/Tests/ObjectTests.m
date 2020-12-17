@@ -1481,9 +1481,44 @@ static IntObject *managedObject() {
 
     RLMRealm *liveRealm = live.realm;
     [liveRealm beginWriteTransaction];
-    XCTAssert(live.intCol = 1);
+    live.intCol = 1;
     [liveRealm commitWriteTransaction];
-    XCTAssert(live.intCol != frozen.intCol);
+    XCTAssertNotEqual(live.intCol, frozen.intCol);
+}
+
+- (void)testThawDifferentThread {
+    IntObject *frozen = [managedObject() freeze];
+    XCTAssertTrue([frozen isFrozen]);
+
+    [self dispatchAsyncAndWait:^{
+        IntObject *live = [frozen thaw];
+        XCTAssertFalse([live isFrozen]);
+
+        RLMRealm *liveRealm = live.realm;
+        [liveRealm beginWriteTransaction];
+        live.intCol = 1;
+        [liveRealm commitWriteTransaction];
+        XCTAssertNotEqual(live.intCol, frozen.intCol);
+    }];
+    
+    XCTAssertEqual(frozen.intCol, 0);
+}
+
+- (void)testThawPreviousVersion {
+    IntObject *obj = managedObject();
+    IntObject *frozen = [obj freeze];
+    XCTAssertTrue([frozen isFrozen]);
+    XCTAssertEqual(obj.intCol, frozen.intCol);
+    
+    RLMRealm *realm = obj.realm;
+    [realm beginWriteTransaction];
+    obj.intCol = 1;
+    [realm commitWriteTransaction];
+    XCTAssertNotEqual(obj.intCol, frozen.intCol, @"Frozen object shouldn't mutate");
+    
+    IntObject *thawed = [frozen thaw];
+    XCTAssertFalse(thawed.frozen);
+    XCTAssertEqual(thawed.intCol, obj.intCol, @"Thawed object should reflect transactions since the original reference was frozen.");
 }
 
 @end
