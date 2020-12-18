@@ -58,6 +58,10 @@
 		02AFB4671A80343600E11938 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4621A80343600E11938 /* ResultsTests.m */; };
 		02AFB4681A80343600E11938 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4621A80343600E11938 /* ResultsTests.m */; };
 		02E334C31A5F41C7009F8810 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBA1955FE0100FDED82 /* DynamicTests.m */; };
+		0C5796A025643D7500744CAE /* RLMUUID_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C57969E25643D7500744CAE /* RLMUUID_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
+		0C5796A125643D7500744CAE /* RLMUUID_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C57969E25643D7500744CAE /* RLMUUID_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
+		0C5796A225643D7500744CAE /* RLMUUID.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C57969F25643D7500744CAE /* RLMUUID.mm */; };
+		0C5796A325643D7500744CAE /* RLMUUID.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C57969F25643D7500744CAE /* RLMUUID.mm */; };
 		17051FCE1D93DA0A00EF8E67 /* RLMUser.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1ABDCDAF1D793008003489E3 /* RLMUser.mm */; };
 		1A0512721D873F3300806AEC /* RLMSyncConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A3623661D8384BA00945A54 /* RLMSyncConfiguration.mm */; };
 		1A0512761D8746CD00806AEC /* RLMSyncConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A3623651D8384BA00945A54 /* RLMSyncConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -648,6 +652,9 @@
 		02B8EF5B19E7048D0045A93D /* RLMCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMCollection.h; sourceTree = "<group>"; };
 		02E334C21A5F3C45009F8810 /* Realm.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = Realm.modulemap; sourceTree = "<group>"; };
 		02E334C41A5F4923009F8810 /* RLMRealm_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMRealm_Private.hpp; sourceTree = "<group>"; };
+		0C074C292552E98700CA56C2 /* realm-core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "realm-core"; path = "../realm-core"; sourceTree = "<group>"; };
+		0C57969E25643D7500744CAE /* RLMUUID_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMUUID_Private.hpp; sourceTree = "<group>"; };
+		0C57969F25643D7500744CAE /* RLMUUID.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUUID.mm; sourceTree = "<group>"; };
 		1A0512731D87413000806AEC /* RLMSyncUtil_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSyncUtil_Private.hpp; sourceTree = "<group>"; };
 		1A1C6E241D3FFCF70077B6E7 /* RLMSyncUtil_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMSyncUtil_Private.h; sourceTree = "<group>"; };
 		1A1EBF861F269E8E00F47698 /* RLMResults_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMResults_Private.hpp; sourceTree = "<group>"; };
@@ -921,7 +928,7 @@
 		E81A1FD01955FE0100FDED82 /* SwiftRealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftRealmTests.swift; sourceTree = "<group>"; };
 		E81A1FD11955FE0100FDED82 /* TransactionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransactionTests.m; sourceTree = "<group>"; };
 		E8267FED1D90B79000E001C7 /* ObjectServerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ObjectServerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E8267FF01D90B8E700E001C7 /* RLMObjectServerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = RLMObjectServerTests.mm; path = Realm/ObjectServerTests/RLMObjectServerTests.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		E8267FF01D90B8E700E001C7 /* RLMObjectServerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = RLMObjectServerTests.mm; path = Realm/ObjectServerTests/RLMObjectServerTests.mm; sourceTree = "<group>"; };
 		E82FA60A195632F20043A3C3 /* SwiftArrayPropertyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SwiftArrayPropertyTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E82FA60B195632F20043A3C3 /* SwiftArrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SwiftArrayTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E82FA60D195632F20043A3C3 /* SwiftLinkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SwiftLinkTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -1371,6 +1378,7 @@
 		E8D89B8E1955FC6D00CF2B9A = {
 			isa = PBXGroup;
 			children = (
+				0C074C292552E98700CA56C2 /* realm-core */,
 				5D660FB71BE98B770021E04F /* Configuration */,
 				1A7B82361D51254600750296 /* Frameworks */,
 				E81A1FB41955FCE000FDED82 /* LICENSE */,
@@ -1497,6 +1505,8 @@
 				3F20DA2119BE1EA6007DE308 /* RLMUpdateChecker.mm */,
 				E81A1F811955FC9300FDED82 /* RLMUtil.hpp */,
 				E81A1F821955FC9300FDED82 /* RLMUtil.mm */,
+				0C57969E25643D7500744CAE /* RLMUUID_Private.hpp */,
+				0C57969F25643D7500744CAE /* RLMUUID.mm */,
 			);
 			path = Realm;
 			sourceTree = "<group>";
@@ -1600,6 +1610,7 @@
 				E8C6EAF51DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */,
 				3F67DB3C1E26D69C0024533D /* RLMThreadSafeReference.h in Headers */,
 				CF76F7DF24816AAB00890DD2 /* RLMUpdateResult.h in Headers */,
+				0C5796A025643D7500744CAE /* RLMUUID_Private.hpp in Headers */,
 				1ABDCDAE1D792FEB003489E3 /* RLMUser.h in Headers */,
 				53CCC6E8257EC8C400A8FC50 /* RLMUser_Private.h in Headers */,
 				CFAEF765242B672700EAF721 /* RLMUserAPIKey.h in Headers */,
@@ -1678,6 +1689,7 @@
 				E8C6EAF41DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */,
 				3F67DB401E26D6A20024533D /* RLMThreadSafeReference.h in Headers */,
 				CF76F7E024816AAB00890DD2 /* RLMUpdateResult.h in Headers */,
+				0C5796A125643D7500744CAE /* RLMUUID_Private.hpp in Headers */,
 				1ABDCDB11D793012003489E3 /* RLMUser.h in Headers */,
 				53CCC6E9257EC8C400A8FC50 /* RLMUser_Private.h in Headers */,
 				3F275EC02433AB3300161E7F /* RLMUserAPIKey.h in Headers */,
@@ -2203,6 +2215,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F73BC961E3A878500FE80B6 /* NSError+RLMSync.m in Sources */,
+				0C5796A225643D7500744CAE /* RLMUUID.mm in Sources */,
 				5D659E851BE04556006515A0 /* RLMAccessor.mm in Sources */,
 				5D659E861BE04556006515A0 /* RLMAnalytics.mm in Sources */,
 				CFAEF762242B5F9A00EAF721 /* RLMAPIKeyAuth.mm in Sources */,
@@ -2338,6 +2351,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F73BC981E3A879E00FE80B6 /* NSError+RLMSync.m in Sources */,
+				0C5796A325643D7500744CAE /* RLMUUID.mm in Sources */,
 				5DD755831BE056DE002800DA /* RLMAccessor.mm in Sources */,
 				5DD755841BE056DE002800DA /* RLMAnalytics.mm in Sources */,
 				3F275EC22433AB3E00161E7F /* RLMAPIKeyAuth.mm in Sources */,
@@ -2793,6 +2807,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */;
 			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_MODULE_NAME = Tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
@@ -2803,6 +2818,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */;
 			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_MODULE_NAME = Tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";

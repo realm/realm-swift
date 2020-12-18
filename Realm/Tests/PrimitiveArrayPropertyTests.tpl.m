@@ -37,6 +37,9 @@ static RLMObjectId *objectId(NSUInteger i) {
     }
     return objectIds[i];
 }
+static NSUUID *uuid(NSString *uuidString) {
+    return [[NSUUID alloc] initWithUUIDString:uuidString];
+}
 static void count(NSArray *values, double *sum, NSUInteger *count) {
     for (id value in values) {
         if (value != NSNull.null) {
@@ -57,6 +60,14 @@ static double average(NSArray *values) {
     count(values, &sum, &c);
     return sum / c;
 }
+@interface NSUUID (RLMUUIDCompateTests)
+- (NSComparisonResult)compare:(NSUUID *)other;
+@end
+@implementation NSUUID (RLMUUIDCompateTests)
+- (NSComparisonResult)compare:(NSUUID *)other {
+    return [[self UUIDString] compare:other.UUIDString];
+}
+@end
 
 @interface PrimitiveArrayPropertyTests : RLMTestCase
 @end

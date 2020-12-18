@@ -1476,10 +1476,10 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
         let insertManyEx = expectation(description: "Insert many documents")
-        collection.insertMany([document]) { result in
+        collection.insertMany([document, document]) { result in
             switch result {
             case .success(let objectIds):
-                XCTAssertEqual(objectIds.count, 1)
+                XCTAssertEqual(objectIds.count, 2)
             case .failure:
                 XCTFail("Should insert")
             }
@@ -1500,37 +1500,33 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         }
         wait(for: [findOneDeleteEx1], timeout: 4.0)
 
-        // FIXME: It seems there is a possible server bug that does not handle
-        // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
-        // "expected pre-image to match projection matcher"
-        // https://jira.mongodb.org/browse/REALMC-6878
-        /*
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], false, false)
         let findOneDeleteEx2 = expectation(description: "Find one document and delete")
-        collection.findOneAndDelete(filter: document, options: options1) { (document, error) in
-            // Document does not exist, but should not return an error because of that
-            XCTAssertNil(document)
-            XCTAssertNil(error)
-            findOneDeleteEx2.fulfill()
+        collection.findOneAndDelete(filter: document, options: options1) { result in
+            switch result {
+            case .success(let document):
+                XCTAssertNotNil(document)
+                XCTAssertEqual(document!["name"]??.stringValue, "fido")
+                findOneDeleteEx2.fulfill()
+            case .failure:
+                XCTFail("Should find")
+            }
         }
         wait(for: [findOneDeleteEx2], timeout: 4.0)
-        */
 
-        // FIXME: It seems there is a possible server bug that does not handle
-        // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
-        // "expected pre-image to match projection matcher"
-        // https://jira.mongodb.org/browse/REALMC-6878
-        /*
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
         let findOneDeleteEx3 = expectation(description: "Find one document and delete")
-        collection.findOneAndDelete(filter: document, options: options2) { (document, error) in
-            XCTAssertNotNil(document)
-            XCTAssertEqual(document!["name"] as! String, "fido")
-            XCTAssertNil(error)
-            findOneDeleteEx3.fulfill()
+        collection.findOneAndDelete(filter: document, options: options2) { result in
+            switch result {
+            case .success(let document):
+                // Document does not exist, but should not return an error because of that
+                XCTAssertNil(document)
+                findOneDeleteEx3.fulfill()
+            case .failure:
+                XCTFail("Should find")
+            }
         }
         wait(for: [findOneDeleteEx3], timeout: 4.0)
-        */
 
         let findEx = expectation(description: "Find documents")
         collection.find(filter: [:]) { result in

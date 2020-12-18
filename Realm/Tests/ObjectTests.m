@@ -286,12 +286,12 @@ RLM_ARRAY_TYPE(CycleObject)
     c.objectIdCol = objectId1;
     c.objectCol = [[StringObject alloc] init];
     c.objectCol.stringCol = @"c";
-
+    c.uuidCol = [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"];
     [realm addObject:c];
 
     [AllTypesObject createInRealm:realm withValue:@[@YES, @506, @7.7f, @8.8, @"banach", bin2,
                                                     timeNow, @YES, @(-20), [RLMDecimal128 decimalWithNumber:@2],
-                                                    objectId2, NSNull.null]];
+                                                    objectId2, [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"], NSNull.null]];
     [realm commitWriteTransaction];
 
     AllTypesObject *row1 = [AllTypesObject allObjects][0];
@@ -321,6 +321,8 @@ RLM_ARRAY_TYPE(CycleObject)
     XCTAssertEqualObjects(row2.objectIdCol, objectId2);
     XCTAssertTrue([row1.objectCol.stringCol isEqual:@"c"], @"row1.objectCol");
     XCTAssertNil(row2.objectCol,                        @"row2.objectCol");
+    XCTAssertTrue([row1.uuidCol.UUIDString isEqualToString: @"137DECC8-B300-4954-A233-F89909F4FD89"], @"row1.uuidCol");
+    XCTAssertTrue([row2.uuidCol.UUIDString isEqualToString: @"137DECC8-B300-4954-A233-F89909F4FD89"], @"row2.uuidCol");
 
     [realm transactionWithBlock:^{
         row1.boolCol = NO;
@@ -804,7 +806,7 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
                                           timeNow, @NO, @(99),
                                           [RLMDecimal128 decimalWithNumber:@2],
                                           [RLMObjectId objectId],
-                                          to];
+                                          [[NSUUID alloc] init], to];
 
     [realm beginWriteTransaction];
 

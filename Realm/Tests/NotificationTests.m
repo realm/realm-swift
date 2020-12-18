@@ -897,6 +897,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 @property RLMObjectId  *objectIdCol;
 @property RLMDecimal128 *decimalCol;
 @property StringObject *objectCol;
+@property NSUUID *uuidCol;
 
 @property (nonatomic) int pk;
 @end

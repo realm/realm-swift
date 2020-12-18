@@ -46,13 +46,14 @@ import Realm.Private
  - `Data`, `NSData`
  - `Decimal128`
  - `ObjectId`
+ - `UUID`
  - `@objc enum` which has been delcared as conforming to `RealmEnum`.
  - `RealmOptional<Value>` for optional numeric properties
  - `Object` subclasses, to model many-to-one relationships
  - `EmbeddedObject` subclasses, to model owning one-to-one relationships
  - `List<Element>`, to model many-to-many relationships
 
- `String`, `NSString`, `Date`, `NSDate`, `Data`, `NSData`, `Decimal128`, and `ObjectId`  properties
+ `String`, `NSString`, `Date`, `NSDate`, `Data`, `NSData`, `UUID`, `NSUUID`, `Decimal128` and `ObjectId`  properties
  can be declared as optional. `Object` and `EmbeddedObject` subclasses *must* be declared as optional.
  `Int`, `Int8`, `Int16`, `Int32`, `Int64`, `Float`, `Double`, `Bool`,  enum, and `List` properties cannot.
  To store an optional number, use `RealmOptional<Int>`, `RealmOptional<Float>`, `RealmOptional<Double>`, or
@@ -583,6 +584,13 @@ extension ObjectId: _ManagedPropertyType {
     // swiftlint:disable:next identifier_name
     public static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .objectId
+    }
+}
+/// :nodoc:
+extension UUID: _ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
+    public static func _rlmProperty(_ prop: RLMProperty) {
+        prop.type = .UUID
     }
 }
 

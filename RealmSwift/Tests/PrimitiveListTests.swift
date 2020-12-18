@@ -187,6 +187,17 @@ struct ObjectIdFactory: ValueFactory {
     }
 }
 
+struct UUIDFactory: ValueFactory {
+    static func array(_ obj: SwiftListObject) -> List<UUID> {
+        return obj.uuid
+    }
+
+    static private let _values = [UUID(), UUID(), UUID()]
+    static func values() -> [UUID] {
+        return _values
+    }
+}
+
 struct OptionalIntFactory: ValueFactory {
     typealias W = Int
 
@@ -339,6 +350,18 @@ struct OptionalObjectIdFactory: ValueFactory {
 
     static func values() -> [ObjectId?] {
         return [nil] + ObjectIdFactory.values().dropLast()
+    }
+}
+
+struct OptionalUUIDFactory: ValueFactory {
+    typealias W = UUID
+
+    static func array(_ obj: SwiftListObject) -> List<UUID?> {
+        return obj.uuidOpt
+    }
+
+    static func values() -> [UUID?] {
+        return [nil] + UUIDFactory.values().dropLast()
     }
 }
 

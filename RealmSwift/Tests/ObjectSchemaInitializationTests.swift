@@ -181,7 +181,7 @@ class ObjectSchemaInitializationTests: TestCase {
 
         let types = Set(schema.properties.map { $0.type })
         XCTAssertEqual(types, Set([.string, .string, .data, .date, .object, .int,
-                                   .float, .double, .bool, .decimal128, .objectId]))
+                                   .float, .double, .bool, .decimal128, .objectId, .UUID]))
     }
 
     func testImplicitlyUnwrappedOptionalsAreParsedAsOptionals() {
@@ -193,6 +193,7 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertTrue(schema["optDateCol"]!.isOptional)
         XCTAssertTrue(schema["optDecimalCol"]!.isOptional)
         XCTAssertTrue(schema["optObjectIdCol"]!.isOptional)
+        XCTAssertTrue(schema["optUuidCol"]!.isOptional)
     }
 
     func testNonRealmOptionalTypesDeclaredAsRealmOptional() {

@@ -339,7 +339,8 @@
     XCTAssertTrue([obj.stringObj isKindOfClass:[RLMArray class]]);
     XCTAssertTrue([obj.dataObj isKindOfClass:[RLMArray class]]);
     XCTAssertTrue([obj.dateObj isKindOfClass:[RLMArray class]]);
-
+    XCTAssertTrue([obj.uuidObj isKindOfClass:[RLMArray class]]);
+    
     [obj.intObj addObject:@1];
     XCTAssertEqualObjects(obj.intObj[0], @1);
     XCTAssertThrows([obj.intObj addObject:@""]);
@@ -355,7 +356,8 @@
     XCTAssertTrue([obj.stringObj isKindOfClass:[RLMArray class]]);
     XCTAssertTrue([obj.dataObj isKindOfClass:[RLMArray class]]);
     XCTAssertTrue([obj.dateObj isKindOfClass:[RLMArray class]]);
-
+    XCTAssertTrue([obj.uuidObj isKindOfClass:[RLMArray class]]);
+    
     [obj.intObj addObject:@5];
     XCTAssertEqualObjects(obj.intObj.firstObject, @5);
     [realm cancelWriteTransaction];

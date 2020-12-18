@@ -125,6 +125,10 @@ RLM_ARRAY_TYPE(EmbeddedIntObject)
 @property RLMArray<EmbeddedIntObject> *array;
 @end
 
+@interface UuidObject: RLMObject
+@property NSUUID *uuidCol;
+@end
+
 #pragma mark AllTypesObject
 
 @interface AllTypesObject : RLMObject
@@ -140,6 +144,7 @@ RLM_ARRAY_TYPE(EmbeddedIntObject)
 @property int64_t       longCol;
 @property RLMDecimal128 *decimalCol;
 @property RLMObjectId  *objectIdCol;
+@property NSUUID       *uuidCol;
 @property StringObject *objectCol;
 @property (readonly) RLMLinkingObjects *linkingObjectsCol;
 
@@ -167,6 +172,7 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property NSDate *date;
 @property RLMDecimal128 *decimal;
 @property RLMObjectId *objectId;
+@property NSUUID *uuidCol;
 @end
 
 @interface AllOptionalTypesPK : RLMObject
@@ -181,6 +187,7 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property NSDate *date;
 @property RLMDecimal128 *decimal;
 @property RLMObjectId *objectId;
+@property NSUUID *uuidCol;
 @end
 
 @interface AllPrimitiveArrays : RLMObject
@@ -193,6 +200,7 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLMArray<RLMData> *dataObj;
 @property RLMArray<RLMDecimal128> *decimalObj;
 @property RLMArray<RLMObjectId> *objectIdObj;
+@property RLMArray<RLMUUID> *uuidObj;
 @end
 
 @interface AllOptionalPrimitiveArrays : RLMObject
@@ -205,6 +213,7 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLMArray<RLMData> *dataObj;
 @property RLMArray<RLMDecimal128> *decimalObj;
 @property RLMArray<RLMObjectId> *objectIdObj;
+@property RLMArray<RLMUUID> *uuidObj;
 @end
 
 #pragma mark - Real Life Objects
