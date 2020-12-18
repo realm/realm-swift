@@ -32,7 +32,7 @@ class ObjectSchemaTests: TestCase {
         XCTAssertEqual(propertyNames,
                        ["boolCol", "intCol", "intEnumCol", "floatCol", "doubleCol",
                         "stringCol", "binaryCol", "dateCol", "decimalCol",
-                        "objectIdCol", "objectCol", "arrayCol"]
+                        "objectIdCol", "objectCol", "uuidCol", "arrayCol"]
         )
     }
 
@@ -55,98 +55,105 @@ class ObjectSchemaTests: TestCase {
 
     func testDescription() {
         let objectSchema = swiftObjectSchema
-        let expected =
-            "SwiftObject {\n" +
-            "    boolCol {\n" +
-            "        type = bool;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    intCol {\n" +
-            "        type = int;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    intEnumCol {\n" +
-            "        type = int;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    floatCol {\n" +
-            "        type = float;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    doubleCol {\n" +
-            "        type = double;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    stringCol {\n" +
-            "        type = string;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    binaryCol {\n" +
-            "        type = data;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    dateCol {\n" +
-            "        type = date;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    decimalCol {\n" +
-            "        type = decimal128;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    objectIdCol {\n" +
-            "        type = object id;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    objectCol {\n" +
-            "        type = object;\n" +
-            "        objectClassName = SwiftBoolObject;\n" +
-            "        linkOriginPropertyName = (null);\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = YES;\n" +
-            "    }\n" +
-            "    arrayCol {\n" +
-            "        type = object;\n" +
-            "        objectClassName = SwiftBoolObject;\n" +
-            "        linkOriginPropertyName = (null);\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = YES;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "}"
-
+        let expected = """
+        SwiftObject {
+            boolCol {
+                type = bool;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                optional = NO;
+            }
+            intCol {
+                type = int;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                optional = NO;
+            }
+            intEnumCol {
+                type = int;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                optional = NO;
+            }
+            floatCol {
+                type = float;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                optional = NO;
+            }
+            doubleCol {
+                type = double;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                optional = NO;
+            }
+            stringCol {
+                type = string;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                optional = NO;
+            }
+            binaryCol {
+                type = data;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                optional = NO;
+            }
+            dateCol {
+                type = date;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                optional = NO;
+            }
+            decimalCol {
+                type = decimal128;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                optional = NO;
+            }
+            objectIdCol {
+                type = object id;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                optional = NO;
+            }
+            objectCol {
+                type = object;
+                objectClassName = SwiftBoolObject;
+                linkOriginPropertyName = (null);
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                optional = YES;
+            }
+            uuidCol {
+                type = uuid;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                optional = NO;
+            }
+            arrayCol {
+                type = object;
+                objectClassName = SwiftBoolObject;
+                linkOriginPropertyName = (null);
+                indexed = NO;
+                isPrimary = NO;
+                array = YES;
+                optional = NO;
+            }
+        }
+        """
         XCTAssertEqual(objectSchema.description, expected.replacingOccurrences(of: "    ", with: "\t"))
     }
 

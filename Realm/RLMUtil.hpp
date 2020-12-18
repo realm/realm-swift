@@ -192,6 +192,7 @@ static inline void RLMNSStringToStdString(std::string &out, NSString *in) {
 
 id RLMMixedToObjc(realm::Mixed const& value);
 realm::Decimal128 RLMObjcToDecimal128(id value);
+realm::UUID RLMObjcToUUID(__unsafe_unretained id const value);
 
 // Given a bundle identifier, return the base directory on the disk within which Realm database and support files should
 // be stored.

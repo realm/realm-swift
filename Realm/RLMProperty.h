@@ -38,6 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol RLMDecimal128 @end
 /// :nodoc:
 @protocol RLMObjectId @end
+/// :nodoc:
+@protocol RLMUUID @end
 
 /// :nodoc:
 @interface NSNumber ()<RLMInt, RLMBool, RLMDouble, RLMFloat>
