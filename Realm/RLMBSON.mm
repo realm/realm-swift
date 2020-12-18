@@ -349,7 +349,7 @@ Bson RLMConvertRLMBSONToBson(id<RLMBSON> b) {
         case RLMBSONTypeArray:
             return [((NSArray *)b) bsonArrayValue];
         case RLMBSONTypeUUID:
-            return [((NSUUID *)b) uuidValue];
+            return [((NSUUID *)b) rlm_uuidValue];
     }
 }
 

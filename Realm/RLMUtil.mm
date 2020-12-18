@@ -443,7 +443,7 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
 realm::UUID RLMObjcToUUID(__unsafe_unretained id const value) {
     try {
         if (auto uuid = RLMDynamicCast<NSUUID>(value)) {
-            return uuid.uuidValue;
+            return uuid.rlm_uuidValue;
         }
         if (auto string = RLMDynamicCast<NSString>(value)) {
             return realm::UUID(string.UTF8String);

@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithRealmUUID:(realm::UUID)uuidValue;
 
-- (realm::UUID)uuidValue;
+- (realm::UUID)rlm_uuidValue;
 
 @end
 NS_ASSUME_NONNULL_END

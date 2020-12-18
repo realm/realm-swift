@@ -26,7 +26,7 @@
     return self;
 }
 
-- (realm::UUID)uuidValue {
+- (realm::UUID)rlm_uuidValue {
     return realm::UUID(self.UUIDString.UTF8String);
 }
 

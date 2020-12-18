@@ -246,7 +246,7 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSUUID *const value) {
     if (value) {
-        obj->_row.set(key, value.uuidValue);
+        obj->_row.set(key, value.rlm_uuidValue);
     }
     else {
         setNull(obj->_row, key);
@@ -834,7 +834,7 @@ realm::util::Optional<realm::ObjectId> RLMAccessorContext::unbox(__unsafe_unreta
 }
 template<>
 realm::util::Optional<realm::UUID> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
-    return to_optional(v, [&](__unsafe_unretained NSUUID *v) { return [v uuidValue]; });
+    return to_optional(v, [&](__unsafe_unretained NSUUID *v) { return [v rlm_uuidValue]; });
 }
 
 std::pair<realm::Obj, bool>
