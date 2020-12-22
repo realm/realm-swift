@@ -156,12 +156,12 @@ didCompleteWithError:(NSError *)error
     response.httpStatusCode = httpResponse.statusCode;
 
     if (error) {
-        response.body = [error localizedDescription];
-        return _completionBlock(response);
+        response.status = RLMResponseStatusFailed;
+        response.value.error = error;
+    } else {
+        response.status = RLMResponseStatusSuccess;
+        response.value.body = [[NSString alloc] initWithData:_data encoding:NSUTF8StringEncoding];
     }
-
-    response.body = [[NSString alloc] initWithData:_data encoding:NSUTF8StringEncoding];
-
     _completionBlock(response);
 }
 
@@ -202,20 +202,16 @@ didCompleteWithError:(NSError *)error
               task:(NSURLSessionTask *)task
 didCompleteWithError:(NSError *)error
 {
-    RLMResponse *response = [RLMResponse new];
-    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) task.response;
-    response.headers = httpResponse.allHeaderFields;
-    response.httpStatusCode = httpResponse.statusCode;
+    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)task.response;
 
     // -999 indicates that the session was cancelled.
-    if (error && (error.code != -999)) {
-        response.body = [error localizedDescription];
-        return [_subscriber didCloseWithError:error];
-    } else if (error && (error.code == -999)) {
+    if (error && error.code != -999) {
+         return [_subscriber didCloseWithError:error];
+    } else if (error.code == -999) {
         return [_subscriber didCloseWithError:nil];
     }
 
-    if (response.httpStatusCode != 200) {
+    if (httpResponse.statusCode != 200) {
         NSString *errorStatus = [NSString stringWithFormat:@"URLSession HTTP error code: %ld",
                                  (long)httpResponse.statusCode];
         NSError *error = [NSError errorWithDomain:RLMErrorDomain
@@ -223,6 +219,7 @@ didCompleteWithError:(NSError *)error
                                          userInfo:@{NSLocalizedDescriptionKey: errorStatus}];
         return [_subscriber didCloseWithError:error];
     }
+    return [_subscriber didCloseWithError:error];
 }
 
 @end

@@ -55,20 +55,34 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMHTTPMethod) {
 
 @end
 
+typedef NS_ENUM(NSUInteger, RLMResponseStatus) {
+    RLMResponseStatusSuccess,
+    RLMResponseStatusFailed,
+};
+
+@interface RLMResponseValue: NSObject
+@property (nonatomic, strong) NSString *body;
+@property (nonatomic, strong) NSError *error;
+@end
+
 /// The contents of an HTTP response.
 @interface RLMResponse : NSObject
+
+@property (nonatomic, assign) RLMResponseStatus status;
 
 /// The status code of the HTTP response.
 @property (nonatomic, assign) NSInteger httpStatusCode;
 
-/// A custom status code provided by the SDK.
-@property (nonatomic, assign) NSInteger customStatusCode;
+///// A custom status code provided by the SDK.
+//@property (nonatomic, assign) NSInteger customStatusCode;
 
 /// The headers of the HTTP response.
 @property (nonatomic, strong) NSDictionary<NSString *, NSString *>* headers;
 
-/// The body of the HTTP response.
-@property (nonatomic, strong) NSString *body;
+///// The body of the HTTP response.
+//@property (nonatomic, strong) NSString *body;
+
+@property (nonatomic, strong) RLMResponseValue *value;
 
 @end
 
