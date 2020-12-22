@@ -181,34 +181,21 @@ static double average(NSArray *values) {
 }
 
 - (void)testObjectAtIndex {
-    RLMAssertThrowsWithReason([unmanaged.intObj objectAtIndex:0],
-                              @"Index 0 is out of bounds (must be less than 0).");
-
-    [unmanaged.intObj addObject:@1];
-    XCTAssertEqualObjects([unmanaged.intObj objectAtIndex:0], @1);
+    RLMAssertThrowsWithReason([$allSets objectAtIndex:0], @"objectAtIndex: is not available on RLMSet");
 }
 
 - (void)testFirstObject {
-    XCTAssertNil($allSets.firstObject);
-
-    [self addObjects];
-    XCTAssertEqualObjects($set.firstObject, $first);
-
-    [$allSets removeAllObjects];
-
-    %o [$set addObject:NSNull.null];
-    %o XCTAssertEqualObjects($set.firstObject, NSNull.null);
+    RLMAssertThrowsWithReason($allSets.firstObject, @"firstObject is not available on RLMSet");
 }
 
 - (void)testLastObject {
-    XCTAssertNil($allSets.lastObject);
+    RLMAssertThrowsWithReason($allSets.lastObject, @"lastObject is not available on RLMSet");
+}
 
-    [self addObjects];
-
-    XCTAssertEqualObjects($set.lastObject, $last);
-
-    [$allSets removeAllObjects];
-    XCTAssertNil($set.lastObject);
+- (void)testContainsObject {
+    XCTAssertFalse([$set containsObject:$v0]);
+    [$set addObject:$v0];
+    XCTAssertTrue([$set containsObject:$v0]);
 }
 
 - (void)testAddObject {
@@ -216,10 +203,10 @@ static double average(NSArray *values) {
     %r RLMAssertThrowsWithReason([$set addObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [$set addObject:$v0];
-    XCTAssertEqualObjects($set.array[0], $v0);
+    XCTAssertTrue([$set containsObject:$v0]);
 
     %o [$set addObject:NSNull.null];
-    %o XCTAssertEqualObjects($set.array[0], NSNull.null);
+    %o XCTAssertTrue([$set containsObject:NSNull.null]);
 }
 
 - (void)testAddObjects {
@@ -227,9 +214,9 @@ static double average(NSArray *values) {
     %r RLMAssertThrowsWithReason([$set addObjects:@[NSNull.null]], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
-    XCTAssertEqualObjects($set.array[0], $v0);
-    XCTAssertEqualObjects($set.array[1], $v1);
-    %o XCTAssertEqualObjects($set.array[2], $v2);
+    XCTAssertTrue([$set containsObject:$v0]);
+    XCTAssertTrue([$set containsObject:$v1]);
+    %o XCTAssertTrue([$set containsObject:$v2]);
 }
 
 - (void)testRemoveObject {
@@ -237,25 +224,13 @@ static double average(NSArray *values) {
     %r XCTAssertEqual($set.count, 2U);
     %o XCTAssertEqual($set.count, 3U);
 
-    [$allSets removeObject:$allSets.array[0]];
+    [$allSets removeObject:$allSets.allObjects[0]];
     %r XCTAssertEqual($set.count, 1U);
     %o XCTAssertEqual($set.count, 2U);
-
-    XCTAssertEqualObjects($set.array[0], $v1);
-    %o XCTAssertEqualObjects($set.array[1], $v2);
 }
 
 - (void)testIndexOfObject {
-    XCTAssertEqual(NSNotFound, [$set indexOfObject:$v0]);
-
-    RLMAssertThrowsWithReason([$set indexOfObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
-
-    %r RLMAssertThrowsWithReason([$set indexOfObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
-    %o XCTAssertEqual(NSNotFound, [$set indexOfObject:NSNull.null]);
-
-    [self addObjects];
-
-    XCTAssertEqual(1U, [$set indexOfObject:$v1]);
+    RLMAssertThrowsWithReason([$set indexOfObject:$v0], ^n @"indexOfObject: is not available for RLMSet");
 }
 
 - (void)testIndexOfObjectSorted {
@@ -283,27 +258,17 @@ static double average(NSArray *values) {
 }
 
 - (void)testIndexOfObjectWhere {
-    %man RLMAssertThrowsWithReason([$set indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    %man RLMAssertThrowsWithReason([$set indexOfObjectWhere:@"TRUEPREDICATE"], @"not available");
     %man RLMAssertThrowsWithReason([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
-
-    %unman XCTAssertEqual(NSNotFound, [$set indexOfObjectWhere:@"TRUEPREDICATE"]);
-
-    [self addObjects];
-
-    %unman XCTAssertEqual(0U, [$set indexOfObjectWhere:@"TRUEPREDICATE"]);
-    %unman XCTAssertEqual(NSNotFound, [$set indexOfObjectWhere:@"FALSEPREDICATE"]);
+    %unman RLMAssertThrowsWithReason([$set indexOfObjectWhere:@"TRUEPREDICATE"], @"not available");
+    %unman RLMAssertThrowsWithReason([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  indexOfObjectWhere:@"TRUEPREDICATE"], @"instances");
 }
 
 - (void)testIndexOfObjectWithPredicate {
-    %man RLMAssertThrowsWithReason([$set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    %man RLMAssertThrowsWithReason([$set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"not available");
     %man RLMAssertThrowsWithReason([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
-
-    %unman XCTAssertEqual(NSNotFound, [$set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
-
-    [self addObjects];
-
-    %unman XCTAssertEqual(0U, [$set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
-    %unman XCTAssertEqual(NSNotFound, [$set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
+    %unman RLMAssertThrowsWithReason([$set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"not available");
+    %unman RLMAssertThrowsWithReason([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"instances");
 }
 
 - (void)testSort {
@@ -339,6 +304,45 @@ static double average(NSArray *values) {
     %unman RLMAssertThrowsWithReason([$set addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }], ^n @"This method may only be called on RLMSet instances retrieved from an RLMRealm");
 }
 
+- (void)testSetSet {
+    %man %r [$set addObjects:@[$v0, $v1]];
+    %man %o [$set addObjects:@[$v0, $v1, NSNull.null]];
+    %man %r [$set2 addObjects:@[$v3, $v4]];
+    %man %o [$set2 addObjects:@[$v3, $v4, NSNull.null]];
+    [realm commitWriteTransaction];
+
+    %unman %r [$set addObjects:@[$v0, $v1]];
+    %unman %o [$set addObjects:@[$v0, $v1, NSNull.null]];
+    %unman %r [$set2 addObjects:@[$v3, $v4]];
+    %unman %o [$set2 addObjects:@[$v3, $v4, NSNull.null]];
+
+    %unman [$set setSet:$set2];
+
+    [realm beginWriteTransaction];
+    %man [$set setSet:$set2];
+    [realm commitWriteTransaction];
+
+    %unman %r %maxtwovalues XCTAssertEqual($set.count, 2U);
+    %unman %r %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
+    %unman %r %nomaxvalues XCTAssertEqual($set.count, 2U);
+    %unman %r %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v4]]));
+    %unman %o %maxtwovalues XCTAssertEqual($set.count, 3U);
+    %unman %o %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v2]]));
+    %unman %o %nomaxvalues XCTAssertEqual($set.count, 3U);
+    // x
+    %unman %o %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v3, $v4]]));
+    //c
+    %man %r %maxtwovalues XCTAssertEqual($set.count, 2U);
+    //x
+    %man %r %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
+    %man %r %nomaxvalues XCTAssertEqual($set.count, 3U);
+    %man %r %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v4]]));
+    %man %o %maxtwovalues XCTAssertEqual($set.count, 3U);
+    %man %o %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, %v2]]));
+    %man %o %nomaxvalues XCTAssertEqual($set.count, 3U);
+    %man %o %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, %v3, %v4]]));
+}
+
 - (void)testUnion {
     %man %r [$set addObjects:@[$v0, $v1]];
     %man %o [$set addObjects:@[$v0, $v1, NSNull.null]];
@@ -359,21 +363,21 @@ static double average(NSArray *values) {
     [realm commitWriteTransaction];
 
     %unman %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %unman %r %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1]));
+    %unman %r %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
     %unman %r %nomaxvalues XCTAssertEqual($set.count, 3U);
-    %unman %r %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0, $v1, $v4]));
+    %unman %r %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1, $v4]));
     %unman %o %maxtwovalues XCTAssertEqual($set.count, 3U);
-    %unman %o %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1, $v2]));
+    %unman %o %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1, $v2]));
     %unman %o %nomaxvalues XCTAssertEqual($set.count, 4U);
-    %unman %o %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0, $v1, $v3, $v4]));
+    %unman %o %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1, $v3, $v4]));
     %man %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %man %r %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1]));
+    %man %r %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
     %man %r %nomaxvalues XCTAssertEqual($set.count, 3U);
-    %man %r %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0, $v1, $v4]));
+    %man %r %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1, $v4]));
     %man %o %maxtwovalues XCTAssertEqual($set.count, 3U);
-    %man %o %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1, %v2]));
+    %man %o %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1, %v2]));
     %man %o %nomaxvalues XCTAssertEqual($set.count, 4U);
-    %man %o %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0, $v1, %v3, %v4]));
+    %man %o %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1, %v3, %v4]));
 }
 
 - (void)testIntersect {
@@ -399,21 +403,21 @@ static double average(NSArray *values) {
     [realm commitWriteTransaction];
 
     %unman %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %unman %r %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1]));
+    %unman %r %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
     %unman %r %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %unman %r %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0]));
+    %unman %r %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0]));
     %unman %o %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %unman %o %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1]));
+    %unman %o %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
     %unman %o %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %unman %o %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0]));
+    %unman %o %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0]));
     %man %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %man %r %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1]));
+    %man %r %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
     %man %r %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %man %r %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v1]));
+    %man %r %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v1]));
     %man %o %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %man %o %maxtwovalues XCTAssertEqualObjects($set.array, (@[$v0, $v1]));
+    %man %o %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
     %man %o %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %man %o %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0]));
+    %man %o %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0]));
 }
 
 - (void)testMinus {
@@ -437,21 +441,21 @@ static double average(NSArray *values) {
     [realm commitWriteTransaction];
 
     %unman %r %maxtwovalues XCTAssertEqual($set.count, 0U);
-    %unman %r %maxtwovalues XCTAssertEqualObjects($set.array, (@[]));
+    %unman %r %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[]));
     %unman %r %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %unman %r %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v1]));
+    %unman %r %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v1]));
     %unman %o %maxtwovalues XCTAssertEqual($set.count, 0U);
-    %unman %o %maxtwovalues XCTAssertEqualObjects($set.array, (@[]));
+    %unman %o %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[]));
     %unman %o %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %unman %o %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v1]));
+    %unman %o %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v1]));
     %man %r %maxtwovalues XCTAssertEqual($set.count, 0U);
-    %man %r %maxtwovalues XCTAssertEqualObjects($set.array, (@[]));
+    %man %r %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[]));
     %man %r %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %man %r %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v0]));
+    %man %r %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0]));
     %man %o %maxtwovalues XCTAssertEqual($set.count, 0U);
-    %man %o %maxtwovalues XCTAssertEqualObjects($set.array, (@[]));
+    %man %o %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[]));
     %man %o %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %man %o %nomaxvalues XCTAssertEqualObjects($set.array, (@[$v1]));
+    %man %o %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v1]));
 }
 
 - (void)testIsSubsetOfSet {
@@ -573,7 +577,7 @@ static double average(NSArray *values) {
 
     [self addObjects];
     // Note: using `valueForKey:@"length"` on an NSSet will always return distinct values
-    // so if we have an array with the values @["a", "b"], the length would be 2, but for a set it will be 1
+    // so if we have an allObjects with the values @["a", "b"], the length would be 2, but for a set it will be 1
     %string XCTAssertEqualObjects([[$set valueForKey:@"length"] allObjects], ([$values valueForKey:@"length"]));
 }
 
@@ -587,17 +591,17 @@ static double average(NSArray *values) {
     // setValue overrides all existing values
     [$set setValue:$v0 forKey:@"self"];
 
-    RLMAssertThrowsWithReason($set.array[1], @"index 1 beyond bounds [0 .. 0]");
+    RLMAssertThrowsWithReason($set.allObjects[1], @"index 1 beyond bounds [0 .. 0]");
 
-    XCTAssertEqualObjects($set.array[0], $v0);
-    %o XCTAssertEqualObjects($set.array[0], $v0);
+    XCTAssertEqualObjects($set.allObjects[0], $v0);
+    %o XCTAssertEqualObjects($set.allObjects[0], $v0);
 
     %o [$set setValue:NSNull.null forKey:@"self"];
-    %o XCTAssertEqualObjects($set.array[0], NSNull.null);
+    %o XCTAssertEqualObjects($set.allObjects[0], NSNull.null);
 }
 
 - (void)testAssignment {
-    $set = (id)@[$v1]; ^nl XCTAssertEqualObjects($set.array[0], $v1);
+    $set = (id)@[$v1]; ^nl XCTAssertEqualObjects($set.allObjects[0], $v1);
 
     // Should replace and not append
     $set = (id)$values; ^nl XCTAssertEqualObjects([[$set valueForKey:@"self"] allObjects], ($values)); ^nl
@@ -615,7 +619,7 @@ static double average(NSArray *values) {
 }
 
 - (void)testDynamicAssignment {
-    $obj[@"$prop"] = (id)@[$v1]; ^nl XCTAssertEqualObjects(((RLMSet *)$obj[@"$prop"]).array[0], $v1);
+    $obj[@"$prop"] = (id)@[$v1]; ^nl XCTAssertEqualObjects(((RLMSet *)$obj[@"$prop"]).allObjects[0], $v1);
 
     // Should replace and not append
     $obj[@"$prop"] = (id)$values; ^nl XCTAssertEqualObjects([[$obj[@"$prop"] valueForKey:@"self"] allObjects], ($values)); ^nl
@@ -668,22 +672,13 @@ static double average(NSArray *values) {
     RLMSet *set = managed.intObj;
     [self dispatchAsyncAndWait:^{
         RLMAssertThrowsWithReason([set count], @"thread");
-        RLMAssertThrowsWithReason([set objectAtIndex:0], @"thread");
-        RLMAssertThrowsWithReason([set firstObject], @"thread");
-        RLMAssertThrowsWithReason([set lastObject], @"thread");
 
         RLMAssertThrowsWithReason([set addObject:@0], @"thread");
         RLMAssertThrowsWithReason([set addObjects:@[@0]], @"thread");
         RLMAssertThrowsWithReason([set removeAllObjects], @"thread");
-
-        RLMAssertThrowsWithReason([set indexOfObject:@1], @"thread");
-        /* RLMAssertThrowsWithReason([set indexOfObjectWhere:@"TRUEPREDICATE"], @"thread"); */
-        /* RLMAssertThrowsWithReason([set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]], @"thread"); */
-        /* RLMAssertThrowsWithReason([set objectsWhere:@"TRUEPREDICATE"], @"thread"); */
-        /* RLMAssertThrowsWithReason([set objectsWithPredicate:[NSPredicate predicateWithValue:NO]], @"thread"); */
         RLMAssertThrowsWithReason([set sortedResultsUsingKeyPath:@"self" ascending:YES], @"thread");
         RLMAssertThrowsWithReason([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]], @"thread");
-        RLMAssertThrowsWithReason(set.array[0], @"thread");
+        RLMAssertThrowsWithReason(set.allObjects[0], @"thread");
         RLMAssertThrowsWithReason([set valueForKey:@"self"], @"thread");
         RLMAssertThrowsWithReason([set setValue:@1 forKey:@"self"], @"thread");
         RLMAssertThrowsWithReason({for (__unused id obj in set);}, @"thread");
@@ -700,22 +695,14 @@ static double average(NSArray *values) {
     XCTAssertNoThrow([set isInvalidated]);
 
     RLMAssertThrowsWithReason([set count], @"invalidated");
-    RLMAssertThrowsWithReason([set objectAtIndex:0], @"invalidated");
-    RLMAssertThrowsWithReason([set firstObject], @"invalidated");
-    RLMAssertThrowsWithReason([set lastObject], @"invalidated");
 
     RLMAssertThrowsWithReason([set addObject:@0], @"invalidated");
     RLMAssertThrowsWithReason([set addObjects:@[@0]], @"invalidated");
     RLMAssertThrowsWithReason([set removeAllObjects], @"invalidated");
 
-    RLMAssertThrowsWithReason([set indexOfObject:@1], @"invalidated");
-    /* RLMAssertThrowsWithReason([set indexOfObjectWhere:@"TRUEPREDICATE"], @"invalidated"); */
-    /* RLMAssertThrowsWithReason([set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"invalidated"); */
-    /* RLMAssertThrowsWithReason([set objectsWhere:@"TRUEPREDICATE"], @"invalidated"); */
-    /* RLMAssertThrowsWithReason([set objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"invalidated"); */
     RLMAssertThrowsWithReason([set sortedResultsUsingKeyPath:@"self" ascending:YES], @"invalidated");
     RLMAssertThrowsWithReason([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]], @"invalidated");
-    RLMAssertThrowsWithReason(set.array[0], @"invalidated");
+    RLMAssertThrowsWithReason(set.allObjects[0], @"invalidated");
     RLMAssertThrowsWithReason([set valueForKey:@"self"], @"invalidated");
     RLMAssertThrowsWithReason([set setValue:@1 forKey:@"self"], @"invalidated");
     RLMAssertThrowsWithReason({for (__unused id obj in set);}, @"invalidated");
@@ -733,18 +720,9 @@ static double average(NSArray *values) {
     XCTAssertNoThrow([set isInvalidated]);
 
     XCTAssertNoThrow([set count]);
-    XCTAssertNoThrow([set objectAtIndex:0]);
-    XCTAssertNoThrow([set firstObject]);
-    XCTAssertNoThrow([set lastObject]);
-
-    XCTAssertNoThrow([set indexOfObject:@1]);
-    /* XCTAssertNoThrow([set indexOfObjectWhere:@"TRUEPREDICATE"]); */
-    /* XCTAssertNoThrow([set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]); */
-    /* XCTAssertNoThrow([set objectsWhere:@"TRUEPREDICATE"]); */
-    /* XCTAssertNoThrow([set objectsWithPredicate:[NSPredicate predicateWithValue:YES]]); */
     XCTAssertNoThrow([set sortedResultsUsingKeyPath:@"self" ascending:YES]);
     XCTAssertNoThrow([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]]);
-    XCTAssertNoThrow(set.array[0]);
+    XCTAssertNoThrow(set.allObjects[0]);
     XCTAssertNoThrow([set valueForKey:@"self"]);
     XCTAssertNoThrow({for (__unused id obj in set);});
 

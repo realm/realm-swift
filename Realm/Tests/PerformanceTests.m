@@ -21,7 +21,7 @@
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.h"
 
-//#if !DEBUG && TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
+#if !DEBUG && TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
 
 @interface PerformanceTests : RLMTestCase
 @property (nonatomic) dispatch_queue_t queue;
@@ -258,7 +258,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [self measureBlock:^{
         RLMSet *set = spo.set;
         for (NSUInteger i = 0; i < set.count; ++i) {
-            (void)[set[i] stringCol];
+            (void)set.count;
         }
     }];
 }
@@ -872,4 +872,4 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
 @end
 
-//#endif
+#endif

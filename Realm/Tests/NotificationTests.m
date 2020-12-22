@@ -907,12 +907,12 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 - (void)testRemoveFromSet {
     ExpectChange(self, @[@0], @[], @[], ^(RLMRealm *realm) {
         RLMSet *set = [[[SetPropertyObject allObjectsInRealm:realm] firstObject] intSet];
-        [set removeObject:set.array[0]];
+        [set removeObject:set.allObjects[0]];
     });
 
     ExpectNoChange(self, ^(RLMRealm *realm) {
         RLMSet *set = [[[SetPropertyObject allObjectsInRealm:realm] firstObject] intSet];
-        [set removeObject:set.array[0]];
+        [set removeObject:set.allObjects[0]];
     });
 }
 

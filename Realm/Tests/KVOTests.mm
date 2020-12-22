@@ -1305,118 +1305,56 @@ public:
     }
 }
 
-
-- (void)testSetDiffs {
-    // IndexSets are optional on RLMSet notifications.
+// FIXME: This test will fail when ran against multiple accessors.
+// Are we able to use RLMClassInfo to store a BOOL stating we are in a notification?
+- (void)testSetKVO {
     KVOLinkObject2 *obj = [self createLinkObject];
+    KVOLinkObject2 *obj2 = [self createLinkObject];
     KVORecorder r(self, obj, @"set");
 
     id mutator = [obj mutableSetValueForKey:@"set"];
+    id mutator2 = [obj2 mutableSetValueForKey:@"set"];
 
     [mutator addObject:obj.obj];
+    [mutator2 addObject:obj2.obj];
     AssertSet(NSKeyValueChangeInsertion);
-//    [mutator removeObject:obj.obj];
-//    AssertSet(NSKeyValueChangeRemoval);
-//    [mutator addObject:obj.obj];
-//    AssertKind(NSKeyValueChangeInsertion);
+    [mutator removeObject:obj.obj];
+    AssertSet(NSKeyValueChangeRemoval);
+    [mutator setSet:mutator2];
+    AssertSet(NSKeyValueChangeReplacement);
 
-//    [mutator removeObject:obj.obj];
-//    AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:0]);
-//    AssertNotification(r);
-
-//    [mutator addObject:obj.obj];
-//    AssertIndexChange(NSKeyValueChangeInsertion, nil);
-//
-//    [mutator addObject:obj.obj];
-//    AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:1]);
-//
-
-//
-//    [mutator replaceObjectAtIndex:0 withObject:obj.obj];
-//    AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndex:0]);
-/*
-    NSMutableIndexSet *indexes = [NSMutableIndexSet new];
-    [indexes addIndex:0];
-    [indexes addIndex:2];
-    [mutator insertObjects:@[obj.obj, obj.obj] atIndexes:indexes];
-    AssertIndexChange(NSKeyValueChangeInsertion, indexes);
-
-    [mutator removeObjectsAtIndexes:indexes];
-    AssertIndexChange(NSKeyValueChangeRemoval, indexes);
-
-    if (![obj.set isKindOfClass:[NSOrderedSet class]]) {
-        // We deliberately diverge from NSMutableArray for `removeAllObjects` and
-        // `addObjectsFromArray:`, because generating a separate notification for
-        // each object added or removed is needlessly pessimal.
-        [mutator addObjectsFromArray:@[obj.obj, obj.obj]];
-        AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(1, 2)]);
-
-        // NSArray sends multiple notifications for exchange, which we can't do
-        // on refresh
-        [mutator exchangeObjectAtIndex:0 withObjectAtIndex:1];
-        AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
-
-        // NSArray doesn't have move
-        [mutator moveObjectAtIndex:1 toIndex:0];
-        AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
-
-        [mutator removeLastObject];
-        AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:2]);
-
-        [mutator removeAllObjects];
-        AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
-    }*/
+    [mutator intersectSet:mutator2];
+    AssertSet(NSKeyValueChangeRemoval);
+    [mutator minusSet:mutator2];
+    AssertSet(NSKeyValueChangeRemoval);
+    [mutator unionSet:mutator2];
+    AssertSet(NSKeyValueChangeInsertion);
 }
 
-- (void)testPrimitiveSetDiffs {
+// FIXME: This test will fail when ran against multiple accessors.
+// Are we able to use RLMClassInfo to store a BOOL stating we are in a notification?
+- (void)testPrimitiveSetKVO {
     KVOObject *obj = [self createObject];
-    KVORecorder r(self, obj, @"intArray");
+    KVOObject *obj2 = [self createObject];
+    KVORecorder r(self, obj, @"intSet");
 
-    id mutator = [obj mutableArrayValueForKey:@"intArray"];
+    id mutator = [obj mutableSetValueForKey:@"intSet"];
+    id mutator2 = [obj2 mutableSetValueForKey:@"intSet"];
 
     [mutator addObject:@1];
-    AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:0]);
+    [mutator2 addObject:@2];
+    AssertSet(NSKeyValueChangeInsertion);
+    [mutator removeObject:@1];
+    AssertSet(NSKeyValueChangeRemoval);
+    [mutator setSet:mutator2];
+    AssertSet(NSKeyValueChangeReplacement);
 
-    [mutator addObject:@2];
-    AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:1]);
-
-    [mutator removeObjectAtIndex:0];
-    AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:0]);
-
-    [mutator replaceObjectAtIndex:0 withObject:@3];
-    AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndex:0]);
-
-    NSMutableIndexSet *indexes = [NSMutableIndexSet new];
-    [indexes addIndex:0];
-    [indexes addIndex:2];
-    [mutator insertObjects:@[@4, @5] atIndexes:indexes];
-    AssertIndexChange(NSKeyValueChangeInsertion, indexes);
-
-    [mutator removeObjectsAtIndexes:indexes];
-    AssertIndexChange(NSKeyValueChangeRemoval, indexes);
-
-    if (![obj.intArray isKindOfClass:[NSArray class]]) {
-        // We deliberately diverge from NSMutableArray for `removeAllObjects` and
-        // `addObjectsFromArray:`, because generating a separate notification for
-        // each object added or removed is needlessly pessimal.
-        [mutator addObjectsFromArray:@[@6, @7]];
-        AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(1, 2)]);
-
-        // NSArray sends multiple notifications for exchange, which we can't do
-        // on refresh
-        [mutator exchangeObjectAtIndex:0 withObjectAtIndex:1];
-        AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
-
-        // NSArray doesn't have move
-        [mutator moveObjectAtIndex:1 toIndex:0];
-        AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
-
-        [mutator removeLastObject];
-        AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:2]);
-
-        [mutator removeAllObjects];
-        AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
-    }
+    [mutator intersectSet:mutator2];
+    AssertSet(NSKeyValueChangeRemoval);
+    [mutator minusSet:mutator2];
+    AssertSet(NSKeyValueChangeRemoval);
+    [mutator unionSet:mutator2];
+    AssertSet(NSKeyValueChangeInsertion);
 }
 
 - (void)testIgnoredProperty {
@@ -2270,6 +2208,9 @@ public:
         return copy;
     }
     else if (RLMArray *array = RLMDynamicCast<RLMArray>(value)) {
+        return array;
+    }
+    else if (RLMSet *set = RLMDynamicCast<RLMSet>(value)) {
         return array;
     }
     else {

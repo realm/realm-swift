@@ -60,6 +60,11 @@
     RLMClassInfo *_objectInfo;
     RLMClassInfo *_ownerInfo;
     std::unique_ptr<RLMObservationInfo> _observationInfo;
+@private
+    // Used for tracking progress of NSKeyValueObservations.
+    // YES if a KVO notification is at willChange stage.
+    // NO once didChange has returned.
+    BOOL _firingNotification;
 }
 
 - (RLMManagedSet *)initWithSet:(realm::object_store::Set)set
@@ -175,20 +180,23 @@ static auto translateErrors(Function&& f) {
 }
 
 static void changeSet(__unsafe_unretained RLMManagedSet *const set,
-                      NSKeyValueChange kind,
+                      __unsafe_unretained RLMManagedSet *const otherSet,
+                      NSKeyValueSetMutationKind kind,
                       dispatch_block_t f) {
     translateErrors([&] { set->_backingSet.verify_in_transaction(); });
 
-    RLMObservationTracker tracker(set->_realm);
+    RLMObservationTracker tracker(set->_realm, false, RLMCollectionTypeSet);
     tracker.trackDeletions();
     auto obsInfo = RLMGetObservationInfo(set->_observationInfo.get(),
                                          set->_backingSet.get_parent_object_key(),
                                          *set->_ownerInfo);
     if (obsInfo) {
-        tracker.willChangeSet(obsInfo, set->_key, kind);
+        set->_firingNotification = YES;
+        tracker.willChangeSet(obsInfo, set->_key, kind, otherSet);
     }
 
     translateErrors(f);
+    set->_firingNotification = NO;
 }
 
 //
@@ -202,7 +210,7 @@ static void changeSet(__unsafe_unretained RLMManagedSet *const set,
     return translateErrors([&] { return _backingSet.size(); });
 }
 
-- (NSArray<id> *)array {
+- (NSArray<id> *)allObjects {
     NSMutableArray *arr = [NSMutableArray new];
     for (id prop : self) {
         [arr addObject:prop];
@@ -237,16 +245,9 @@ static void changeSet(__unsafe_unretained RLMManagedSet *const set,
     return RLMFastEnumerate(state, len, self);
 }
 
-- (id)objectAtIndex:(NSUInteger)index {
-    return translateErrors([&] {
-        RLMAccessorContext context(*_objectInfo);
-        return _backingSet.get(context, index);
-    });
-}
-
 static void RLMInsertObject(RLMManagedSet *set, id object) {
     RLMSetValidateMatchingObjectType(set, object);
-    changeSet(set, NSKeyValueChangeInsertion, ^{
+    changeSet(set, nil, NSKeyValueUnionSetMutation, ^{
         RLMAccessorContext context(*set->_objectInfo);
         set->_backingSet.insert(context, object);
     });
@@ -254,7 +255,7 @@ static void RLMInsertObject(RLMManagedSet *set, id object) {
 
 static void RLMRemoveObject(RLMManagedSet *set, id object) {
     RLMSetValidateMatchingObjectType(set, object);
-    changeSet(set, NSKeyValueChangeRemoval, ^{
+    changeSet(set, nil, NSKeyValueMinusSetMutation, ^{
         RLMAccessorContext context(*set->_objectInfo);
         set->_backingSet.remove(context, object);
     });
@@ -265,7 +266,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 }
 
 - (void)addObjects:(id<NSFastEnumeration>)objects {
-    changeSet(self, NSKeyValueChangeInsertion, ^{
+    changeSet(self, nil, NSKeyValueUnionSetMutation, ^{
         RLMAccessorContext context(*_objectInfo);
         for (id obj in objects) {
             RLMSetValidateMatchingObjectType(self, obj);
@@ -279,29 +280,21 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 }
 
 - (void)removeAllObjects {
-    changeSet(self, NSKeyValueChangeRemoval, ^{
+    changeSet(self, nil, NSKeyValueMinusSetMutation, ^{
         _backingSet.remove_all();
     });
 }
 
-- (NSUInteger)indexOfObject:(id)object {
-    RLMSetValidateMatchingObjectType(self, object);
-    return translateErrors([&] {
-        RLMAccessorContext context(*_objectInfo);
-        return RLMConvertNotFound(_backingSet.find(context, object));
-    });
-}
-
-- (RLMManagedSet *)managedObjectFrom:(RLMSet *)unmanaged {
-    if (!unmanaged.realm) {
+- (RLMManagedSet *)managedObjectFrom:(RLMSet *)set {
+    if (!set.realm) {
         @throw RLMException(@"Right hand side value must be a managed Set.");
     }
 
-    if (_type != unmanaged.type) {
+    if (_type != set.type) {
         @throw RLMException(@"Set must match type of \"self\" '%@'", RLMTypeToString(_type));
     }
 
-    return static_cast<RLMManagedSet *>(unmanaged);
+    return static_cast<RLMManagedSet *>(set);
 }
 
 - (BOOL)isSubsetOfSet:(RLMSet<id> *)set {
@@ -309,12 +302,38 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     return _backingSet.is_subset_of(rhs->_backingSet);
 }
 
+- (BOOL)containsObject:(id)obj {
+    RLMSetValidateMatchingObjectType(self, obj);
+    RLMAccessorContext context(*_objectInfo);
+    auto r = _backingSet.find(context, obj);
+    return (r >= 0) && (r != realm::npos);
+}
+
+- (BOOL)isEqualToSet:(RLMSet<id> *)set {
+    RLMManagedSet *rhs = [self managedObjectFrom:set];
+    return [self isEqual:set];
+}
+
+- (void)setSet:(RLMSet<id> *)set {
+    RLMManagedSet *rhs = [self managedObjectFrom:set];
+    for (id obj in set) {
+        RLMSetValidateMatchingObjectType(self, obj);
+    }
+    if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
+        @throw RLMException(@"Can only perform setSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
+    }
+    changeSet(self, rhs, NSKeyValueSetSetMutation, ^{
+        RLMAccessorContext context(*_objectInfo);
+        _backingSet.assign(context, rhs);
+    });
+}
+
 - (void)intersectSet:(RLMSet<id> *)set {
     RLMManagedSet *rhs = [self managedObjectFrom:set];
     if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
         @throw RLMException(@"Can only perform intersectsSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
-    changeSet(self, NSKeyValueChangeRemoval, ^{
+    changeSet(self, rhs, NSKeyValueIntersectSetMutation, ^{
         _backingSet.assign_intersection(rhs->_backingSet);
     });
 }
@@ -329,7 +348,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
         @throw RLMException(@"Can only perform unionSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
-    changeSet(self, NSKeyValueChangeInsertion, ^{
+    changeSet(self, nil, NSKeyValueUnionSetMutation, ^{
         _backingSet.assign_union(rhs->_backingSet);
     });
 }
@@ -339,9 +358,13 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
         @throw RLMException(@"Can only perform minusSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
-    changeSet(self, NSKeyValueChangeRemoval, ^{
+    if (_firingNotification) {
         _backingSet.assign_difference(rhs->_backingSet);
-    });
+    } else {
+        changeSet(self, rhs, NSKeyValueMinusSetMutation, ^{
+            _backingSet.assign_difference(rhs->_backingSet);
+        });
+    }
 }
 
 - (id)valueForKeyPath:(NSString *)keyPath {
@@ -430,7 +453,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
         @throw RLMException(@"Cannot delete objects from RLMSet<%@>: only RLMObjects can be deleted.", RLMTypeToString(_type));
     }
     // delete all target rows from the realm
-    RLMObservationTracker tracker(_realm, true);
+    RLMObservationTracker tracker(_realm, true, RLMCollectionTypeSet);
     translateErrors([&] { _backingSet.remove_all(); });
 }
 
@@ -455,18 +478,6 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
     auto query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema, _realm.schema, _realm.group);
     auto results = translateErrors([&] { return _backingSet.filter(std::move(query)); });
     return [RLMResults resultsWithObjectInfo:*_objectInfo results:std::move(results)];
-}
-
-- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
-    if (_type != RLMPropertyTypeObject) {
-        @throw RLMException(@"Querying is currently only implemented for sets of Realm Objects");
-    }
-    realm::Query query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema,
-                                             _realm.schema, _realm.group);
-
-    return translateErrors([&] {
-        return RLMConvertNotFound(_backingSet.find(std::move(query)));
-    });
 }
 
 - (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes {

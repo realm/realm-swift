@@ -167,7 +167,7 @@
                                                 @[@[@"name", @2, @YES]]]];
     XCTAssertEqualObjects(co.name, @"one employee");
     XCTAssertEqual(co.employeeSet.count, 1U);
-    EmployeeObject *eo = co.employeeSet.firstObject;
+    EmployeeObject *eo = co.employeeSet.allObjects[0];
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
@@ -175,7 +175,7 @@
     co = [[CompanyObject alloc] initWithValue:@[@"one employee", @[eo], @[eo]]];
     XCTAssertEqualObjects(co.name, @"one employee");
     XCTAssertEqual(co.employeeSet.count, 1U);
-    eo = co.employeeSet.firstObject;
+    eo = co.employeeSet.allObjects[0];
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
@@ -195,8 +195,8 @@
                                                      employees.reverseObjectEnumerator,
                                                      employees.reverseObjectEnumerator]];
     XCTAssertEqual(2U, co.employeeSet.count);
-    XCTAssertEqualObjects(@"name 2", co.employeeSet.array[0].name);
-    XCTAssertEqualObjects(@"name", co.employeeSet.array[1].name);
+    XCTAssertEqualObjects(@"name 2", co.employeeSet.allObjects[0].name);
+    XCTAssertEqualObjects(@"name", co.employeeSet.allObjects[1].name);
 }
 
 - (void)testInitWithArrayUsesDefaultValuesForMissingFields {
@@ -256,7 +256,7 @@
     XCTAssertEqual(co.employees.count, 1U);
     XCTAssertEqual(co.employeeSet.count, 1U);
     EmployeeObject *eo = co.employees.firstObject;
-    EmployeeObject *eo2 = co.employeeSet.firstObject;
+    EmployeeObject *eo2 = co.employeeSet.allObjects[0];
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqualObjects(eo2.name, @"name");
     XCTAssertEqual(eo.age, 2);
@@ -275,7 +275,7 @@
     XCTAssertEqual(co.employees.count, 1U);
     XCTAssertEqual(co.employeeSet.count, 1U);
     eo = co.employees.firstObject;
-    eo2 = co.employeeSet.firstObject;
+    eo2 = co.employeeSet.allObjects[0];
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
@@ -553,7 +553,7 @@
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
-    eo = co.employeeSet.firstObject;
+    eo = co.employeeSet.allObjects[0];
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
@@ -617,7 +617,7 @@
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
-    eo = co.employeeSet.firstObject;
+    eo = co.employeeSet.allObjects[0];
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
@@ -636,7 +636,7 @@
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
-    eo = co.employeeSet.firstObject;
+    eo = co.employeeSet.allObjects[0];
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
@@ -680,8 +680,8 @@
     // Deep copy, so it's a different object
     XCTAssertFalse([co.employees[0] isEqualToObject:co2.employees[0]]);
     XCTAssertEqualObjects(co.employees[0].name, co2.employees[0].name);
-    XCTAssertFalse([co.employeeSet.firstObject isEqualToObject:co2.employeeSet.firstObject]);
-    XCTAssertEqualObjects(co.employeeSet.firstObject.name, co2.employeeSet.firstObject.name);
+    XCTAssertFalse([co.employeeSet.allObjects[0] isEqualToObject:co2.employeeSet.allObjects[0]]);
+    XCTAssertEqualObjects(co.employeeSet.allObjects[0].name, co2.employeeSet.allObjects[0].name);
 
     auto dogExt = [DogExtraObject createInRealm:realm withValue:@[@"Fido", @12, @"Poodle"]];
     auto dog = [DogObject createInRealm:realm withValue:dogExt];
@@ -1229,8 +1229,8 @@
     XCTAssertEqualObjects(@"name 2", co.employees[0].name);
     XCTAssertEqualObjects(@"name", co.employees[1].name);
     XCTAssertEqual(2U, co.employeeSet.count);
-    XCTAssertEqualObjects(@"name 2", co.employeeSet.firstObject.name);
-    XCTAssertEqualObjects(@"name", co.employeeSet.lastObject.name);
+    XCTAssertEqualObjects(@"name 2", co.employeeSet.allObjects[0].name);
+    XCTAssertEqualObjects(@"name", co.employeeSet.allObjects[0].name);
 
     [realm cancelWriteTransaction];
 }
@@ -1794,9 +1794,8 @@
     XCTAssertEqual(2, company.employees[0].age);
     XCTAssertEqual(2, company.employees[1].age);
     XCTAssertEqualObjects(company.employees[0], company.employees[1]);
-    XCTAssertEqual(2, company.employeeSet.firstObject.age);
-    XCTAssertEqual(2, company.employeeSet.lastObject.age);
-    XCTAssertEqualObjects(company.employeeSet.firstObject, company.employeeSet.lastObject);
+    XCTAssertEqual(2, company.employeeSet.allObjects[0].age);
+    XCTAssertEqualObjects(company.employeeSet.allObjects[0], company.employeeSet.allObjects.lastObject);
 }
 
 - (void)testAddOrUpdateReplacesExistingArrayPropertiesAndDoesNotMergeThem {
@@ -1818,7 +1817,7 @@
     XCTAssertEqual(1U, obj1.intArray.count);
     XCTAssertEqual(4, obj1.intArray[0].intCol);
     XCTAssertEqual(1U, obj1.intSet.count);
-    XCTAssertEqual(4, obj1.intSet.firstObject.intCol);
+    XCTAssertEqual(4, obj1.intSet.allObjects[0].intCol);
     XCTAssertEqual(6, obj1.primaryString.intCol);
 
     [realm cancelWriteTransaction];

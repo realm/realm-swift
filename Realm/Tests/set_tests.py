@@ -6,6 +6,8 @@ import os, re
 # (un)avg: Type supports average()
 # r/o: Type is Required or Optional
 # (un)man: Type is Managed or Unmanaged
+# maxtwovalues: Type that can contain only 2 values, e.g non-optional bool
+# nomaxvalues: Type that can contain any amount of values
 
 types = [
   # Class, Object, Property, Values, Values2, Tags

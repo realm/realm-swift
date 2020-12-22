@@ -21,8 +21,9 @@
 #import <realm/obj.hpp>
 #import <realm/object-store/binding_context.hpp>
 #import <realm/table.hpp>
+#import <Realm/RLMConstants.h>
 
-@class RLMObjectBase, RLMRealm, RLMSchema, RLMProperty, RLMObjectSchema;
+@class RLMObjectBase, RLMRealm, RLMSchema, RLMProperty, RLMObjectSchema, RLMSet;
 class RLMClassInfo;
 class RLMSchemaInfo;
 
@@ -47,7 +48,7 @@ namespace realm {
 class RLMObservationInfo {
 public:
     RLMObservationInfo(id object);
-    RLMObservationInfo(RLMClassInfo &objectSchema, realm::ObjKey row, id object);
+    RLMObservationInfo(RLMClassInfo &objectSchema, realm::ObjKey row, id object, RLMCollectionType collectionType=RLMCollectionTypeNone);
     ~RLMObservationInfo();
 
     realm::Obj const& getRow() const {
@@ -61,8 +62,8 @@ public:
     void willChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const;
     void didChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const;
 
-    void willChangeSet(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting) const;
-    void didChangeSet(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting) const;
+    void willChangeSet(NSString *key, NSKeyValueSetMutationKind kind, RLMSet *otherSet) const;
+    void didChangeSet(NSString *key, NSKeyValueSetMutationKind kind, RLMSet *otherSet) const;
 
     bool isForRow(realm::ObjKey key) const {
         return row.get_key() == key;
@@ -87,7 +88,6 @@ public:
     id valueForKey(NSString *key);
 
     void prepareForInvalidation();
-
 private:
     // Doubly-linked-list of observed objects for the same row as this
     RLMObservationInfo *next = nullptr;
@@ -109,6 +109,8 @@ private:
     // objects returned from valueForKey() to keep them alive in case observers
     // are added and so that they can still be accessed after row is detached
     NSMutableDictionary *cachedObjects;
+
+    RLMCollectionType collectionType;
 
     void setRow(realm::Table const& table, realm::ObjKey newRow);
 
@@ -147,7 +149,7 @@ void RLMClearTable(RLMClassInfo &realm);
 
 class RLMObservationTracker {
 public:
-    RLMObservationTracker(RLMRealm *realm, bool trackDeletions=false);
+    RLMObservationTracker(RLMRealm *realm, bool trackDeletions=false, RLMCollectionType collectionType=RLMCollectionTypeNone);
     ~RLMObservationTracker();
 
     void trackDeletions();
@@ -157,8 +159,10 @@ public:
                     NSIndexSet *indexes=nil);
     void didChange();
 
-    void willChangeSet(RLMObservationInfo *info, NSString *key,
-                    NSKeyValueChange kind=NSKeyValueChangeSetting);
+    void willChangeSet(RLMObservationInfo *info,
+                       NSString *key,
+                       NSKeyValueSetMutationKind kind,
+                       RLMSet *otherSet);
     void didChangeSet();
 
 private:
@@ -169,12 +173,18 @@ private:
 
     NSString *_key;
     NSKeyValueChange _kind = NSKeyValueChangeSetting;
+    NSKeyValueSetMutationKind _setMutationkind;
     NSIndexSet *_indexes;
+    RLMSet *_otherSet;
+    RLMCollectionType _collectionType;
 
     struct Change {
         RLMObservationInfo *info;
         __unsafe_unretained NSString *property;
         NSMutableIndexSet *indexes;
+        // Set specific
+        RLMSet *otherSet;
+        NSKeyValueSetMutationKind *setMutationKind;
     };
     std::vector<Change> _changes;
     std::vector<RLMObservationInfo *> _invalidated;

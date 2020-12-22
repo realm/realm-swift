@@ -38,13 +38,17 @@
 @implementation RLMSetHolder
 @end
 
-@interface RLMSet () <RLMThreadConfined_Private, NSCopying>
+@interface RLMSet () <RLMThreadConfined_Private, NSCopying, NSMutableCopying>
 @end
 
 @implementation RLMSet {
 @public
     // Backing set when this instance is unmanaged
-    NSMutableOrderedSet *_backingSet;
+    NSMutableSet *_backingSet;
+    // Used for tracking progress of NSKeyValueObservations.
+    // YES if a KVO notification is at willChange stage.
+    // NO once didChange has returned.
+    BOOL _firingNotification;
 }
 
 #pragma mark - Initializers
@@ -78,30 +82,30 @@
 
 - (void)addObject:(id)object {
     RLMSetValidateMatchingObjectType(self, object);
-    changeSet(self, NSKeyValueUnionSetMutation, ^{
+    changeSet(self, nil, NSKeyValueUnionSetMutation, ^{
         [_backingSet addObject:object];
     });
-}
-
-- (void)removeLastObject {
-    NSUInteger count = self.count;
-    if (count) {
-        changeSet(self, NSKeyValueMinusSetMutation, ^{
-            [_backingSet removeObjectAtIndex:count-1];
-        });
-    }
 }
 
 - (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index {
     REALM_TERMINATE("Replacing objects at an indexed subscript is not supported on RLMSet");
 }
 
+- (void)setSet:(RLMSet<id> *)set {
+    for (id obj in set) {
+        RLMSetValidateMatchingObjectType(self, obj);
+    }
+    changeSet(self, set, NSKeyValueSetSetMutation, ^{
+        [_backingSet setSet:set->_backingSet];
+    });
+}
+
 - (void)intersectSet:(RLMSet<id> *)set {
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    changeSet(self, NSKeyValueIntersectSetMutation, ^{
-        [_backingSet intersectOrderedSet:set->_backingSet];
+    changeSet(self, set, NSKeyValueIntersectSetMutation, ^{
+        [_backingSet intersectSet:set->_backingSet];
     });
 }
 
@@ -109,24 +113,28 @@
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    return [_backingSet intersectsSet:set->_backingSet.set];
+    return [_backingSet intersectsSet:set->_backingSet];
 }
 
 - (void)minusSet:(RLMSet<id> *)set {
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    changeSet(self, NSKeyValueMinusSetMutation, ^{
-        [_backingSet minusOrderedSet:set->_backingSet];
-    });
+    if (_firingNotification) {
+        [_backingSet minusSet:set->_backingSet];
+    } else {
+        changeSet(self, set, NSKeyValueMinusSetMutation, ^{
+            [_backingSet minusSet:set->_backingSet];
+        });
+    }
 }
 
 - (void)unionSet:(RLMSet<id> *)set {
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    changeSet(self, NSKeyValueUnionSetMutation, ^{
-        [_backingSet unionOrderedSet:set->_backingSet];
+    changeSet(self, set, NSKeyValueUnionSetMutation, ^{
+        [_backingSet unionSet:set->_backingSet];
     });
 }
 
@@ -134,7 +142,16 @@
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    return [_backingSet isSubsetOfSet:set->_backingSet.set];
+    return [_backingSet isSubsetOfSet:set->_backingSet];
+}
+
+- (BOOL)containsObject:(id)obj {
+    RLMSetValidateMatchingObjectType(self, obj);
+    return [_backingSet containsObject:obj];
+}
+
+- (BOOL)isEqualToSet:(RLMSet<id> *)set {
+    return [self isEqual:set];
 }
 
 - (RLMResults *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending {
@@ -150,8 +167,8 @@
 }
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args {
-    return [self indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:predicateFormat
-                                                                   arguments:args]];
+    @throw RLMException(@"indexOfObjectWhere: is not available on RLMSet");
+
 }
 
 #pragma mark - Unmanaged RLMSet implementation
@@ -160,32 +177,33 @@
     return nil;
 }
 
+// It doesn't make sense for us to expose these methods as NSSet doesn't and
+// we also don't guarantee ordering.
 - (id)firstObject {
-    if (self.count) {
-        return [self objectAtIndex:0];
-    }
-    return nil;
+    @throw RLMException(@"firstObject is not available on RLMSet");
 }
 
 - (id)lastObject {
-    NSUInteger count = self.count;
-    if (count) {
-        return [self objectAtIndex:count-1];
-    }
-    return nil;
+    @throw RLMException(@"lastObject is not available on RLMSet");
+}
+
+- (NSUInteger)indexOfObjectWithPredicate:(nonnull NSPredicate *)predicate {
+    @throw RLMException(@"indexOfObjectWithPredicate: is not available on RLMSet");
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
-    validateSetBounds(self, index);
-    return [_backingSet.array objectAtIndex:index];
+    @throw RLMException(@"objectAtIndex: is not available on RLMSet");
 }
 
 - (NSUInteger)count {
     return _backingSet.count;
 }
 
-- (NSArray<id> *)array {
-    return _backingSet.array;
+- (NSArray<id> *)allObjects {
+    // RLMManagedSet's have a default sort order of ascending, while unmanaged is decending,
+    // this simply keeps the `allObjects` call in line with the managed counterpart.
+//    return [[_backingSet.allObjects reverseObjectEnumerator] allObjects];
+    return _backingSet.allObjects;
 }
 
 - (BOOL)isInvalidated {
@@ -224,17 +242,19 @@
 }
 
 static void changeSet(__unsafe_unretained RLMSet *const set,
+                      __unsafe_unretained RLMSet *const otherSet,
                       NSKeyValueSetMutationKind kind,
                       dispatch_block_t f) {
     if (!set->_backingSet) {
-        set->_backingSet = [NSMutableOrderedSet new];
+        set->_backingSet = [NSMutableSet new];
     }
 
     if (RLMObjectBase *parent = set->_parentObject) {
-        // TODO: pass in other Set.
-        [parent willChangeValueForKey:set->_key withSetMutation:kind usingObjects:(id)set];
+        set->_firingNotification = YES;
+        [parent willChangeValueForKey:set->_key withSetMutation:kind usingObjects:(id)otherSet];
         f();
-        [parent didChangeValueForKey:set->_key withSetMutation:kind usingObjects:(id)set];
+        [parent didChangeValueForKey:set->_key withSetMutation:kind usingObjects:(id)otherSet];
+        set->_firingNotification = NO;
     }
     else {
         f();
@@ -252,44 +272,20 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
 }
 
 - (NSUInteger)indexOfObject:(id)object {
-    RLMSetValidateMatchingObjectType(self, object);
-    if (!_backingSet) {
-        return NSNotFound;
-    }
-    if (_type != RLMPropertyTypeObject) {
-        return [_backingSet.array indexOfObject:object];
-    }
-
-    NSUInteger index = 0;
-    for (RLMObjectBase *cmp in _backingSet) {
-        if (RLMObjectBaseAreEqual(object, cmp)) {
-            return index;
-        }
-        index++;
-    }
-    return NSNotFound;
+    @throw RLMException(@"indexOfObject: is not available for RLMSet");
 }
 
 - (void)removeAllObjects {
-    changeSet(self, NSKeyValueMinusSetMutation, ^{
+    changeSet(self, nil, NSKeyValueMinusSetMutation, ^{
         [_backingSet removeAllObjects];
     });
 }
 
 - (void)removeObject:(id)object {
     RLMSetValidateMatchingObjectType(self, object);
-    // passing in a matching object and calling `[_backingSet removeObject:object]`
-    // does not guarantee the object will be deleted, because an object is identified by instance,
-    // not the containing value. For example if we try to delete an object that is in the
-    // set but was derived from a Results collection the `removeObject:` will fail.
-    // To get around this, find the index of the object you are trying to delete
-    // and remove it by index.
-    NSUInteger index = [self indexOfObject:object];
-    if (index != NSNotFound) {
-        changeSet(self, NSKeyValueMinusSetMutation, ^{
-            [_backingSet removeObjectAtIndex:index];
-        });
-    }
+    changeSet(self, nil, NSKeyValueMinusSetMutation, ^{
+        [_backingSet removeObject:object];
+    });
 }
 
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
@@ -325,7 +321,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
 
     RLMObjectSchema *objectSchema;
     if (_backingSet.count) {
-        objectSchema = [_backingSet.array[0] objectSchema];
+        objectSchema = [_backingSet.allObjects[0] objectSchema];
     }
     else {
         objectSchema = [RLMSchema.partialPrivateSharedSchema schemaForClassName:_objectClassName];
@@ -340,6 +336,10 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     // between unmanaged and managed arrays.
     if ([key rangeOfString:@"."].location != NSNotFound) {
         @throw RLMException(@"Nested key paths are not supported yet for KVC collection operators.");
+    }
+
+    if ([op isEqualToString:@"@distinctUnionOfObjects"]) {
+        @throw RLMException(@"this class does not implement the distinctUnionOfObjects");
     }
 
     bool allowDate = false;
@@ -372,7 +372,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     // issue as the realm::object_store::Set aggregate methods will calculate
     // the result based on each element of a property regardless of uniqueness.
     // To get around this we will need to use the `array` property of the NSMutableOrderedSet
-    NSArray *values = [key isEqualToString:@"self"] ? _backingSet.array : [_backingSet.array valueForKey:key];
+    NSArray *values = [key isEqualToString:@"self"] ? _backingSet.allObjects : [_backingSet.allObjects valueForKey:key];
     if (_optional) {
         // Filter out NSNull values to match our behavior on managed arrays
         NSIndexSet *nonnull = [values indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger, BOOL *) {
@@ -393,7 +393,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     }
 
     if (!_backingSet) {
-        _backingSet = [NSMutableOrderedSet new];
+        _backingSet = [NSMutableSet new];
     }
 
     NSUInteger dot = [keyPath rangeOfString:@"."].location;
@@ -411,7 +411,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
         return @NO; // Unmanaged sets are never invalidated
     }
     if (!_backingSet) {
-        _backingSet = [NSMutableOrderedSet new];
+        _backingSet = [NSMutableSet new];
     }
     return [_backingSet valueForKey:key];
 }
@@ -447,21 +447,8 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     return [self aggregateProperty:property operation:@"@avg" method:_cmd];
 }
 
-- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
-    if (!_backingSet) {
-        return NSNotFound;
-    }
-
-    return [_backingSet indexOfObjectPassingTest:^BOOL(id obj, NSUInteger, BOOL *) {
-        return [predicate evaluateWithObject:obj];
-    }];
-}
-
 - (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
-    if (!_backingSet) {
-        _backingSet = [NSMutableOrderedSet new];
-    }
-    return [_backingSet objectsAtIndexes:indexes];
+    REALM_TERMINATE("objectsAtIndexes: is not available for RLMSet");
 }
 
 - (BOOL)isEqual:(id)object {
@@ -483,14 +470,28 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
 // will call `mutableCopy` or `copy` when performing the diff between the old set
 // value and the new set value on mutation.
 - (id)copyWithZone:(nullable NSZone *)zone {
-//    RLMSet *s = [RLMSet allocWithZone:zone];
-//    s->_backingSet = _backingSet;
-//    s->_frozen = _frozen;
-//    s->_key = _key;
-//    s->_optional = _optional;
-//    s->_type = _type;
-//    s->_parentObject = _parentObject;
-//    s->_objectClassName = _objectClassName;
+    RLMSet *s = [RLMSet allocWithZone:zone];
+    s->_backingSet = _backingSet;
+    s->_frozen = _frozen;
+    s->_key = _key;
+    s->_optional = _optional;
+    s->_type = _type;
+    s->_parentObject = _parentObject;
+    s->_objectClassName = _objectClassName;
+    s->_firingNotification = _firingNotification;
+    return self;
+}
+
+- (id)mutableCopyWithZone:(nullable NSZone *)zone {
+    RLMSet *s = [RLMSet allocWithZone:zone];
+    s->_backingSet = _backingSet;
+    s->_frozen = _frozen;
+    s->_key = _key;
+    s->_optional = _optional;
+    s->_type = _type;
+    s->_parentObject = _parentObject;
+    s->_objectClassName = _objectClassName;
+    s->_firingNotification = _firingNotification;
     return self;
 }
 
@@ -559,7 +560,7 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
 }
 
 - (nonnull id)objectAtIndexedSubscript:(NSUInteger)index {
-    @throw RLMException(@"objectAtIndexedSubscript is not supported on RLMSet, use RLMSet.array");
+    @throw RLMException(@"objectAtIndexedSubscript is not supported on RLMSet, use RLMSet.allObjects");
 }
 
 #pragma mark - Thread Confined Protocol Conformance

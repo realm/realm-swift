@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The objects in the RLMSet as an NSArray value.
  */
-@property (nonatomic, readonly) NSArray<RLMObjectType> *array;
+@property (nonatomic, readonly) NSArray<RLMObjectType> *allObjects;
 
 /**
  The type of the objects in the set.
@@ -72,35 +72,6 @@ NS_ASSUME_NONNULL_BEGIN
  never frozen.
  */
 @property (nonatomic, readonly, getter = isFrozen) BOOL frozen;
-
-#pragma mark - Accessing Objects from an Set
-
-/**
- Returns the object at the index specified.
-
- @param index   The index to look up.
-
- @return An object of the type contained in the set.
- */
-- (RLMObjectType)objectAtIndex:(NSUInteger)index;
-
-/**
- Returns the first object in the set.
-
- Returns `nil` if called on an empty set.
-
- @return An object of the type contained in the set.
- */
-- (nullable RLMObjectType)firstObject;
-
-/**
- Returns the last object in the set.
-
- Returns `nil` if called on an empty set.
-
- @return An object of the type contained in the set.
- */
-- (nullable RLMObjectType)lastObject;
 
 #pragma mark - Adding, Removing, and Replacing Objects in a Set
 
@@ -139,37 +110,35 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)removeAllObjects;
 
+/**
+ Empties the receiving set, then adds each object contained in another given set.
+
+ @param set The RLMSet whose members replace the receiving set's content.
+ */
+- (void)setSet:(RLMSet<RLMObjectType> *)set;
+
+/**
+ Removes from the receiving set each object that isn’t a member of another given set.
+
+ @param set The RLMSet with which to perform the intersection.
+ */
+- (void)intersectSet:(RLMSet<RLMObjectType> *)set;
+
+/**
+ Removes each object in another given set from the receiving set, if present.
+
+ @param set The set of objects to remove from the receiving set.
+ */
+- (void)minusSet:(RLMSet<RLMObjectType> *)set;
+
+/**
+ Adds each object in another given set to the receiving set, if not present.
+
+ @param set The set of objects to add to the receiving set.
+ */
+- (void)unionSet:(RLMSet<RLMObjectType> *)set;
+
 #pragma mark - Querying a Set
-
-/**
- Returns the index of an object in the set.
-
- Returns `NSNotFound` if the object is not found in the set.
-
- @param object  An object (of the same type as returned from the `objectClassName` selector).
- */
-- (NSUInteger)indexOfObject:(RLMObjectType)object;
-
-/**
- Returns the index of the first object in the array matching the predicate.
-
- @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
-
- @return The index of the object, or `NSNotFound` if the object is not found in the set.
- */
-- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...;
-
-/// :nodoc:
-- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args;
-
-/**
- Returns the index of the object in the set matching the predicate.
-
- @param predicate   The predicate with which to filter the objects.
-
- @return    The index of the object, or `NSNotFound` if the object is not found in the set.
- */
-- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate;
 
 /// :nodoc:
 - (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat, ...;
@@ -189,37 +158,56 @@ NS_ASSUME_NONNULL_BEGIN
 /// :nodoc:
 - (RLMResults<RLMObjectType> *)distinctResultsUsingKeyPaths:(NSArray<NSString *> *)keyPaths;
 
-/// :nodoc:
-- (RLMObjectType)objectAtIndexedSubscript:(NSUInteger)index;
+/**
+ Returns a Boolean value that indicates whether at least one object in the receiving set is also present in another given set.
 
-/// :nodoc:
-- (void)setObject:(RLMObjectType)newValue atIndexedSubscript:(NSUInteger)index;
+ @param set The RLMSet to compare the receiving set to.
 
+ @return YES if at least one object in the receiving set is also present in otherSet, otherwise NO.
+ */
+- (BOOL)intersectsSet:(RLMSet<RLMObjectType> *)set;
 
-- (void)intersectSet:(RLMSet<RLMObjectType> *)set;
+/**
+ Returns a Boolean value that indicates whether every object in the receiving set is also present in another given set.
 
-- (void)minusSet:(RLMSet<RLMObjectType> *)set;
+ @param set The RLMSet to compare the receiving set to.
 
-- (void)unionSet:(RLMSet<RLMObjectType> *)set;
+ @return YES if every object in the receiving set is also present in otherSet, otherwise NO.
+ */
+- (BOOL)isSubsetOfSet:(RLMSet<RLMObjectType> *)set;
 
-- (BOOL)intersectsSet:(RLMSet<id> *)set;
+/**
+ Returns a Boolean value that indicates whether a given object is present in the set.
 
-- (BOOL)isSubsetOfSet:(RLMSet<id> *)set;
+ @param anObject An object to look for in the set.
+
+ @return YES if anObject is present in the set, otherwise NO.
+ */
+- (BOOL)containsObject:(RLMObjectType)anObject;
+
+/**
+ Compares the receiving set to another set.
+
+ @param otherSet The set with which to compare the receiving set.
+
+ @return YES if the contents of otherSet are equal to the contents of the receiving set, otherwise NO.
+ */
+- (BOOL)isEqualToSet:(RLMSet<RLMObjectType> *)otherSet;
 
 #pragma mark - Notifications
 
 /**
- Registers a block to be called each time the array changes.
+ Registers a block to be called each time the set changes.
 
- The block will be asynchronously called with the initial array, and then
+ The block will be asynchronously called with the initial set, and then
  called again after each write transaction which changes any of the objects in
- the array, which objects are in the results, or the order of the objects in the
- array.
+ the set, which objects are in the results, or the order of the objects in the
+ set.
 
  The `changes` parameter will be `nil` the first time the block is called.
  For each call after that, it will contain information about
- which rows in the array were added, removed or modified. If a write transaction
- did not modify any objects in the array, the block is not called at all.
+ which rows in the set were added, removed or modified. If a write transaction
+ did not modify any objects in the set, the block is not called at all.
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
@@ -239,7 +227,7 @@ NS_ASSUME_NONNULL_BEGIN
 
      Person *person = [[Person allObjectsInRealm:realm] firstObject];
      NSLog(@"person.dogs.count: %zu", person.dogs.count); // => 0
-     self.token = [person.dogs addNotificationBlock(RLMArray<Dog *> *dogs,
+     self.token = [person.dogs addNotificationBlock(RLMSet<Dog *> *dogs,
                                                     RLMCollectionChange *changes,
                                                     NSError *error) {
          // Only fired once for the example
@@ -257,9 +245,9 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning This method cannot be called during a write transaction, or when the
           containing Realm is read-only.
- @warning This method may only be called on a non-frozen managed array.
+ @warning This method may only be called on a non-frozen managed set.
 
- @param block The block to be called each time the array changes.
+ @param block The block to be called each time the set changes.
  @return A token which must be held for as long as you want updates to be delivered.
  */
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSet<RLMObjectType> *_Nullable set,
@@ -268,17 +256,17 @@ NS_ASSUME_NONNULL_BEGIN
 __attribute__((warn_unused_result));
 
 /**
- Registers a block to be called each time the array changes.
+ Registers a block to be called each time the set changes.
 
- The block will be asynchronously called with the initial array, and then
+ The block will be asynchronously called with the initial set, and then
  called again after each write transaction which changes any of the objects in
- the array, which objects are in the results, or the order of the objects in the
- array.
+ the set, which objects are in the results, or the order of the objects in the
+ set.
 
  The `changes` parameter will be `nil` the first time the block is called.
  For each call after that, it will contain information about
- which rows in the array were added, removed or modified. If a write transaction
- did not modify any objects in the array, the block is not called at all.
+ which rows in the set were added, removed or modified. If a write transaction
+ did not modify any objects in the set, the block is not called at all.
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
@@ -309,30 +297,30 @@ __attribute__((warn_unused_result));
 #pragma mark - Aggregating Property Values
 
 /**
- Returns the minimum (lowest) value of the given property among all the objects in the array.
+ Returns the minimum (lowest) value of the given property among all the objects in the set.
 
-     NSNumber *min = [object.arrayProperty minOfProperty:@"age"];
+     NSNumber *min = [object.setProperty minOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
+ @warning You cannot use this method on `RLMObject`,  `RLMArray`,  `RLMSet`, and `NSData` properties.
 
  @param property The property whose minimum value is desired. Only properties of
                  types `int`, `float`, `double`, and `NSDate` are supported.
 
- @return The minimum value of the property, or `nil` if the array is empty.
+ @return The minimum value of the property, or `nil` if the set is empty.
  */
 - (nullable id)minOfProperty:(NSString *)property;
 
 /**
- Returns the maximum (highest) value of the given property among all the objects in the array.
+ Returns the maximum (highest) value of the given property among all the objects in the set.
 
-     NSNumber *max = [object.arrayProperty maxOfProperty:@"age"];
+     NSNumber *max = [object.setProperty maxOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
+ @warning You cannot use this method on `RLMObject`, `RLMArray`,  `RLMSet`, and `NSData` properties.
 
  @param property The property whose maximum value is desired. Only properties of
                  types `int`, `float`, `double`, and `NSDate` are supported.
 
- @return The maximum value of the property, or `nil` if the array is empty.
+ @return The maximum value of the property, or `nil` if the set is empty.
  */
 - (nullable id)maxOfProperty:(NSString *)property;
 
@@ -351,33 +339,33 @@ __attribute__((warn_unused_result));
 - (NSNumber *)sumOfProperty:(NSString *)property;
 
 /**
- Returns the average value of a given property over the objects in the array.
+ Returns the average value of a given property over the objects in the set.
 
-     NSNumber *average = [object.arrayProperty averageOfProperty:@"age"];
+     NSNumber *average = [object.setProperty averageOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
+ @warning You cannot use this method on `RLMObject`, `RLMSet`,  `RLMArray`, and `NSData` properties.
 
  @param property The property whose average value should be calculated. Only
                  properties of types `int`, `float`, and `double` are supported.
 
- @return    The average value of the given property, or `nil` if the array is empty.
+ @return    The average value of the given property, or `nil` if the set is empty.
  */
 - (nullable NSNumber *)averageOfProperty:(NSString *)property;
 
 #pragma mark - Freeze
 
 /**
- Returns a frozen (immutable) snapshot of this array.
+ Returns a frozen (immutable) snapshot of this set.
 
- The frozen copy is an immutable array which contains the same data as this
- array currently contains, but will not update when writes are made to the
- containing Realm. Unlike live arrays, frozen arrays can be accessed from any
+ The frozen copy is an immutable set which contains the same data as this
+ et currently contains, but will not update when writes are made to the
+ containing Realm. Unlike live sets, frozen sets can be accessed from any
  thread.
 
  @warning This method cannot be called during a write transaction, or when the
           containing Realm is read-only.
- @warning This method may only be called on a managed array.
- @warning Holding onto a frozen array for an extended period while performing
+ @warning This method may only be called on a managed set.
+ @warning Holding onto a frozen set for an extended period while performing
           write transaction on the Realm may result in the Realm file growing
           to large sizes. See `RLMRealmConfiguration.maximumNumberOfActiveVersions`
           for more information.
@@ -387,14 +375,14 @@ __attribute__((warn_unused_result));
 #pragma mark - Unavailable Methods
 
 /**
- `-[RLMArray init]` is not available because `RLMArray`s cannot be created directly.
- `RLMArray` properties on `RLMObject`s are lazily created when accessed.
+ `-[RLMSet init]` is not available because `RLMSet`s cannot be created directly.
+ ``RLMSet` properties on `RLMObject`s are lazily created when accessed.
  */
 - (instancetype)init __attribute__((unavailable("RLMSets cannot be created directly")));
 
 /**
- `+[RLMArray new]` is not available because `RLMArray`s cannot be created directly.
- `RLMArray` properties on `RLMObject`s are lazily created when accessed.
+ `+[RLMSet new]` is not available because `RLMSet`s cannot be created directly.
+ `RLMSet` properties on `RLMObject`s are lazily created when accessed.
  */
 + (instancetype)new __attribute__((unavailable("RLMSet cannot be created directly")));
 

@@ -285,13 +285,13 @@
     RLMObject *setObj = results.firstObject;
     RLMSet<RLMObject *> *set = setObj[@"set"];
     XCTAssertEqual(2U, set.count);
-    XCTAssertEqualObjects(set.array[0][@"stringCol"], stringObject[@"stringCol"]);
+    XCTAssertEqualObjects(set.allObjects[0][@"stringCol"], stringObject[@"stringCol"]);
 
     [set addObject:stringObject];
 
     XCTAssertEqual(2U, set.count);
-    XCTAssertEqualObjects(set.array[0][@"stringCol"], stringObject[@"stringCol"]);
-    XCTAssertEqualObjects(set.array[1][@"stringCol"], stringObject1[@"stringCol"]);
+    XCTAssertEqualObjects(set.allObjects[0][@"stringCol"], stringObject[@"stringCol"]);
+    XCTAssertEqualObjects(set.allObjects[1][@"stringCol"], stringObject1[@"stringCol"]);
 
     setObj[@"set"] = NSNull.null;
     XCTAssertEqual(0U, set.count);
@@ -303,8 +303,8 @@
     XCTAssertEqual(0U, set.count);
 
     setObj[@"set"] = @[stringObject, stringObject1];
-    XCTAssertEqualObjects(set.array[0][@"stringCol"], stringObject[@"stringCol"]);
-    XCTAssertEqualObjects(set.array[1][@"stringCol"], stringObject1[@"stringCol"]);
+    XCTAssertEqualObjects(set.allObjects[0][@"stringCol"], stringObject[@"stringCol"]);
+    XCTAssertEqualObjects(set.allObjects[1][@"stringCol"], stringObject1[@"stringCol"]);
 
     [dyrealm commitWriteTransaction];
 }

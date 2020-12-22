@@ -175,8 +175,8 @@
     [realm commitWriteTransaction];
 
     XCTAssertEqual(setObj1.stringObj.count, 2U);
-    XCTAssertTrue([setObj1.stringObj.array[0] isEqualToString:@"five"]);
-    XCTAssertTrue([setObj1.stringObj.array[1] isEqualToString:@"four"]);
+    XCTAssertTrue([setObj1.stringObj.allObjects[0] isEqualToString:@"five"]);
+    XCTAssertTrue([setObj1.stringObj.allObjects[1] isEqualToString:@"four"]);
     XCTAssertEqual(setObj1.stringObj.count, 2U);
 
     XCTAssertEqual(setObj2.stringObj.count, 0U);
@@ -206,25 +206,25 @@
     [set.intSet addObject:intObj2];
     [set.intSet addObject:intObj3];
 
-    XCTAssertEqualObjects(set.set.array[0], stringObj1, @"Objects should be equal");
-    XCTAssertEqualObjects(set.set.array[1], stringObj2, @"Objects should be equal");
-    XCTAssertEqualObjects(set.set.array[2], stringObj3, @"Objects should be equal");
+    XCTAssertTrue([set.set containsObject:stringObj1]);
+    XCTAssertTrue([set.set containsObject:stringObj2]);
+    XCTAssertTrue([set.set containsObject:stringObj3]);
     XCTAssertEqual(set.set.count, 3U, @"Should have 3 elements in string set");
 
-    XCTAssertEqualObjects(set.intSet.array[0], intObj1, @"Objects should be equal");
-    XCTAssertEqualObjects(set.intSet.array[1], intObj2, @"Objects should be equal");
-    XCTAssertEqualObjects(set.intSet.array[2], intObj3, @"Objects should be equal");
+    XCTAssertTrue([set.intSet containsObject:intObj1]);
+    XCTAssertTrue([set.intSet containsObject:intObj2]);
+    XCTAssertTrue([set.intSet containsObject:intObj3]);
     XCTAssertEqual(set.intSet.count, 3U, @"Should have 3 elements in int set");
 
     [set.set removeObject:stringObj3];
 
-    XCTAssertEqualObjects(set.set.array[0], stringObj1, @"Objects should be equal");
-    XCTAssertEqualObjects(set.set.array[1], stringObj2, @"Objects should be equal");
+    XCTAssertTrue([set.set containsObject:stringObj1]);
+    XCTAssertTrue([set.set containsObject:stringObj1]);
     XCTAssertEqual(set.set.count, 2U, @"Should have 2 elements in string set");
 
     [set.set removeObject:stringObj2];
 
-    XCTAssertEqualObjects(set.set.array[0], stringObj1, @"Objects should be equal");
+    XCTAssertEqualObjects(set.set.allObjects[0], stringObj1, @"Objects should be equal");
     XCTAssertEqual(set.set.count, 1U, @"Should have 1 elements in string set");
 
     [set.set removeObject:stringObj1];
@@ -235,28 +235,10 @@
     XCTAssertEqual(set.intSet.count, 0U, @"Should have 0 elements in int set");
 }
 
-- (void)testUnmanagedSetIndexOf {
-    AllPrimitiveSets *setObj1 = [AllPrimitiveSets new];
-    [setObj1.stringObj addObjects:@[@"ten", @"one", @"nine", @"two", @"eight"]];
-
-    XCTAssertEqual([setObj1.stringObj indexOfObject:@"nonexistent"], NSNotFound);
-    XCTAssertEqual([setObj1.stringObj indexOfObject:@"eight"], 4U);
-
-    XCTAssertEqual(([setObj1.stringObj indexOfObjectWhere:@"SELF == %@", @"one"]), 1U);
-    XCTAssertEqual(([setObj1.stringObj indexOfObjectWhere:@"SELF == %@", @"nonexistent"]), NSNotFound);
-
-    XCTAssertEqual(([setObj1.stringObj indexOfObjectWhere:@"SELF == 'one'"]), 1U);
-    XCTAssertEqual(([setObj1.stringObj indexOfObjectWhere:@"SELF == 'nonexistent'"]), NSNotFound);
-
-    XCTAssertEqual(([setObj1.stringObj indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"SELF == %@", @"one"]]), 1U);
-    XCTAssertEqual(([setObj1.stringObj indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"SELF == %@", @"nonexistent"]]), NSNotFound);
-}
-
 - (void)testUnmanagedSetSort {
     AllPrimitiveSets *setObj1 = [AllPrimitiveSets new];
     XCTAssertThrows([setObj1.stringObj sortedResultsUsingKeyPath:@"age" ascending:YES]);
     XCTAssertThrows([setObj1.stringObj sortedResultsUsingDescriptors:@[]]);
-    XCTAssertThrows([setObj1.stringObj distinctResultsUsingKeyPaths:@[]]);
 }
 
 - (void)testPopulateEmptySet {
@@ -315,8 +297,8 @@
     [realm commitWriteTransaction];
 
     XCTAssertEqual(set.count, 2U, @"Should have two elements in set");
-    XCTAssertEqualObjects([set.array[0] stringCol], @"a", @"First element should have property value 'a'");
-    XCTAssertEqualObjects([setObj.set.array[1] stringCol], @"b", @"Second element should have property value 'b'");
+    XCTAssertEqualObjects([set.allObjects[0] stringCol], @"a", @"First element should have property value 'a'");
+    XCTAssertEqualObjects([setObj.set.allObjects[1] stringCol], @"b", @"Second element should have property value 'b'");
 
     RLMAssertThrowsWithReasonMatching([set addObject:obj], @"write transaction");
 }
@@ -348,7 +330,7 @@
     [realm beginWriteTransaction];
     SetPropertyObject *setObj = [SetPropertyObject createInRealm:realm withValue:@[@"setObject", @[@[@"a"]], @[]]];
     RLMSet *stringSet = setObj.set;
-    StringObject *firstObject = stringSet.firstObject;
+    StringObject *firstObject = stringSet.allObjects[0];
     [realm deleteObjects:[StringObject allObjectsInRealm:realm]];
     XCTAssertFalse(stringSet.isInvalidated, @"stringSet should be valid after member object deletion.");
     XCTAssertTrue(firstObject.isInvalidated, @"firstObject should be invalid after deletion.");
@@ -405,8 +387,7 @@
     setObj.name = @"name";
     XCTAssertNotNil(setObj.set, @"RLMSet property should get created on access");
 
-    XCTAssertNil(setObj.set.firstObject, @"No objects added yet");
-    XCTAssertNil(setObj.set.lastObject, @"No objects added yet");
+    XCTAssertEqual(setObj.set.count, 0U, @"No objects added yet");
 
     StringObject *obj1 = [[StringObject alloc] init];
     obj1.stringCol = @"a";
@@ -418,17 +399,13 @@
     [setObj.set addObject:obj2];
     [setObj.set addObject:obj3];
 
-    XCTAssertEqualObjects(setObj.set.firstObject, obj1, @"Objects should be equal");
-    XCTAssertEqualObjects(setObj.set.lastObject, obj3, @"Objects should be equal");
-    XCTAssertEqualObjects([setObj.set objectAtIndex:1], obj2, @"Objects should be equal");
+    XCTAssertTrue([setObj.set containsObject:obj1]);
+    XCTAssertTrue([setObj.set containsObject:obj2]);
+    XCTAssertTrue([setObj.set containsObject:obj3]);
 
     [realm beginWriteTransaction];
     [realm addObject:setObj];
     [realm commitWriteTransaction];
-
-    XCTAssertEqual(setObj.set.count, 3U, @"Should have three elements in set");
-    XCTAssertEqualObjects([setObj.set.array[0] stringCol], @"a", @"First element should have property value 'a'");
-    XCTAssertEqualObjects([setObj.set.array[1] stringCol], @"b", @"Second element should have property value 'b'");
 
     [realm beginWriteTransaction];
 
@@ -449,17 +426,11 @@
     XCTAssertThrows(([setObj2.intSet objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on unmanaged RLMSet");
     XCTAssertThrows([setObj2.intSet sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"Should throw on unmanaged RLMSet");
 
-    XCTAssertEqual(0U, [setObj2.intSet indexOfObjectWhere:@"intCol == 1"]);
-    XCTAssertEqual(0U, ([setObj2.intSet indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]));
-
-    XCTAssertEqual([setObj2.intSet indexOfObject:intObj], 0U, @"Should be first element");
-    XCTAssertEqual([setObj2.intSet indexOfObject:intObj], 0U, @"Should be first element");
-
     // test unmanaged with literals
     __unused SetPropertyObject *obj = [[SetPropertyObject alloc] initWithValue:@[@"n", @[], @[[[IntObject alloc] initWithValue: @[@1]]]]];
 }
 
-- (void)testUnmanagedComparision {
+- (void)testComparision {
     RLMRealm *realm = [self realmWithTestPath];
 
     SetPropertyObject *set = [[SetPropertyObject alloc] init];
@@ -471,8 +442,8 @@
     XCTAssertNotNil(set2.set, @"RLMSet property should get created on access");
     XCTAssertTrue([set.set isEqual:set2.set], @"Empty sets should be equal");
 
-    XCTAssertNil(set.set.firstObject, @"No objects added yet");
-    XCTAssertNil(set2.set.lastObject, @"No objects added yet");
+    XCTAssertEqual(set.set.count, 0U);
+    XCTAssertEqual(set2.set.count, 0U);
 
     StringObject *obj1 = [[StringObject alloc] init];
     obj1.stringCol = @"a";
@@ -489,17 +460,22 @@
     [set2.set addObject:obj3];
 
     XCTAssertTrue([set.set isEqual:set2.set], @"Sets should be equal");
+    XCTAssertTrue([set.set isEqualToSet:set2.set], @"Sets should be equal");
     [set2.set removeObject:obj3];
     XCTAssertFalse([set.set isEqual:set2.set], @"Sets should not be equal");
+    XCTAssertFalse([set.set isEqualToSet:set2.set], @"Sets should not be equal");
     [set2.set addObject:obj3];
     XCTAssertTrue([set.set isEqual:set2.set], @"Sets should be equal");
+    XCTAssertTrue([set.set isEqualToSet:set2.set], @"Sets should be equal");
 
     [realm beginWriteTransaction];
     [realm addObject:set];
     [realm commitWriteTransaction];
 
     XCTAssertFalse([set.set isEqual:set2.set], @"Comparing a managed set to an unmanaged one should fail");
+    XCTAssertThrows([set.set isEqualToSet:set2.set], @"Right hand side value must be a managed Set.");
     XCTAssertFalse([set2.set isEqual:set.set], @"Comparing a managed set to an unmanaged one should fail");
+    XCTAssertFalse([set2.set isEqualToSet:set.set], @"Comparing a managed set to an unmanaged one should fail");
 }
 
 - (void)testUnmanagedPrimitive {
@@ -513,7 +489,7 @@
     XCTAssertTrue([obj.dateObj isKindOfClass:[RLMSet class]]);
 
     [obj.intObj addObject:@1];
-    XCTAssertEqualObjects(obj.intObj.array[0], @1);
+    XCTAssertEqualObjects(obj.intObj.allObjects[0], @1);
     XCTAssertThrows([obj.intObj addObject:@""]);
 
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -529,93 +505,8 @@
     XCTAssertTrue([obj.dateObj isKindOfClass:[RLMSet class]]);
 
     [obj.intObj addObject:@5];
-    XCTAssertEqualObjects(obj.intObj.firstObject, @5);
+    XCTAssertTrue([obj.intObj containsObject:@5]);
     [realm cancelWriteTransaction];
-}
-
-- (void)testIndexOfObject {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-
-    [realm beginWriteTransaction];
-    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
-    EmployeeObject *po2 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"John", @"age": @30, @"hired": @NO}];
-    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
-    EmployeeObject *deleted = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
-    EmployeeObject *indirectlyDeleted = [EmployeeObject allObjectsInRealm:realm].lastObject;
-    [realm deleteObject:deleted];
-
-    // create company
-    CompanyObject *company = [[CompanyObject alloc] init];
-    company.name = @"name";
-
-    RLMResults<EmployeeObject *> *objects = [EmployeeObject allObjects];
-    [company.employeeSet addObjects:objects];
-
-    [company.employeeSet removeObject:po2];
-    XCTAssertEqual(2U, company.employeeSet.count);
-
-    // test unmanaged
-    XCTAssertEqual(0U, [company.employeeSet indexOfObject:po1]);
-    XCTAssertEqual(1U, [company.employeeSet indexOfObject:po3]);
-    XCTAssertEqual((NSUInteger)NSNotFound, [company.employees indexOfObject:po2]);
-
-    // add to realm
-    [realm addObject:company];
-    [realm commitWriteTransaction];
-
-    // test LinkView RLMSet
-    XCTAssertEqual(0U, [company.employeeSet indexOfObject:po1]);
-    XCTAssertEqual(1U, [company.employeeSet indexOfObject:po3]);
-    XCTAssertEqual((NSUInteger)NSNotFound, [company.employeeSet indexOfObject:po2]);
-
-    // non realm employee
-    EmployeeObject *notInRealm = [[EmployeeObject alloc] initWithValue:@[@"NoName", @1, @NO]];
-    XCTAssertEqual((NSUInteger)NSNotFound, [company.employeeSet indexOfObject:po2]);
-
-    // invalid object
-    XCTAssertThrows([company.employeeSet indexOfObject:(EmployeeObject *)company]);
-    RLMAssertThrowsWithReasonMatching([company.employeeSet indexOfObject:deleted], @"invalidated");
-    RLMAssertThrowsWithReasonMatching([company.employeeSet indexOfObject:indirectlyDeleted], @"invalidated");
-
-    RLMResults *employees = [company.employeeSet objectsWhere:@"age = %@", @40];
-    XCTAssertEqual(0U, [employees indexOfObject:po1]);
-    XCTAssertEqual((NSUInteger)NSNotFound, [employees indexOfObject:po3]);
-}
-
-- (void)testIndexOfObjectWhere
-{
-    RLMRealm *realm = [RLMRealm defaultRealm];
-
-    [realm beginWriteTransaction];
-    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
-    [EmployeeObject createInRealm:realm withValue:@{@"name": @"John", @"age": @30, @"hired": @NO}];
-    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
-    EmployeeObject *po4 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Bill", @"age": @55, @"hired": @YES}];
-
-    // create company
-    CompanyObject *company = [[CompanyObject alloc] init];
-    company.name = @"name";
-    [company.employeeSet addObjects:@[po3, po1, po4]];
-
-    // test unmanaged
-    XCTAssertEqual(0U, [company.employeeSet indexOfObjectWhere:@"name = 'Jill'"]);
-    XCTAssertEqual(1U, [company.employeeSet indexOfObjectWhere:@"name = 'Joe'"]);
-    XCTAssertEqual((NSUInteger)NSNotFound, [company.employeeSet indexOfObjectWhere:@"name = 'John'"]);
-
-    // add to realm
-    [realm addObject:company];
-    [realm commitWriteTransaction];
-
-    // test LinkView RLMSet
-    XCTAssertEqual(0U, [company.employeeSet indexOfObjectWhere:@"name = 'Joe'"]);
-    XCTAssertEqual(1U, [company.employeeSet indexOfObjectWhere:@"name = 'Jill'"]);
-    XCTAssertEqual((NSUInteger)NSNotFound, [company.employeeSet indexOfObjectWhere:@"name = 'John'"]);
-
-    RLMResults *results = [company.employeeSet objectsWhere:@"age > 30"];
-    XCTAssertEqual(0U, [results indexOfObjectWhere:@"name = 'Joe'"]);
-    XCTAssertEqual(1U, [results indexOfObjectWhere:@"name = 'Bill'"]);
-    XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObjectWhere:@"name = 'John'"]);
-    XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObjectWhere:@"name = 'Jill'"]);
 }
 
 - (void)testFastEnumeration
@@ -760,8 +651,8 @@
     XCTAssertEqualObjects(kvcAgeProperties, ages);
 
     XCTAssertEqualObjects([company.employeeSet valueForKey:@"age"], ages);
-    XCTAssertTrue([[[company.employeeSet valueForKey:@"self"] firstObject] isEqualToObject:company.employeeSet.firstObject]);
-    XCTAssertTrue([[[company.employeeSet valueForKey:@"self"] lastObject] isEqualToObject:company.employeeSet.lastObject]);
+    XCTAssertTrue([company.employeeSet containsObject:[[company.employeeSet valueForKey:@"self"] firstObject]]);
+    XCTAssertTrue([company.employeeSet containsObject:[[company.employeeSet valueForKey:@"self"] lastObject]]);
 
     XCTAssertEqual([[company.employeeSet valueForKeyPath:@"@count"] integerValue], 30);
     XCTAssertEqual([[company.employeeSet valueForKeyPath:@"@min.age"] integerValue], 0);
@@ -783,9 +674,9 @@
         [company.employeeSet addObject:eo];
     }
 
-    XCTAssertEqualObjects([company.employeeSet valueForKey:@"age"], ages);
-    XCTAssertTrue([[[company.employeeSet valueForKey:@"self"] firstObject] isEqualToObject:company.employeeSet.firstObject]);
-    XCTAssertTrue([[[company.employeeSet valueForKey:@"self"] lastObject] isEqualToObject:company.employeeSet.lastObject]);
+    for (EmployeeObject *e in [[company.employeeSet valueForKey:@"self"] allObjects]) {
+        XCTAssertTrue([company.employeeSet containsObject:e]);
+    }
 
     XCTAssertEqual([[company.employeeSet valueForKeyPath:@"@count"] integerValue], 30);
     XCTAssertEqual([[company.employeeSet valueForKeyPath:@"@min.age"] integerValue], 0);
@@ -815,7 +706,7 @@
     XCTAssertEqual(((NSSet *)[company.employeeSet valueForKey:@"name"]).count, 0U);
 
     // managed
-    NSMutableOrderedSet *ages = [NSMutableOrderedSet orderedSet];
+    NSMutableSet *ages = [NSMutableSet set];
     [realm beginWriteTransaction];
     for (int i = 0; i < 30; ++i) {
         [ages addObject:@(20)];
@@ -826,11 +717,11 @@
     [company.employeeSet setValue:@20 forKey:@"age"];
     [realm commitWriteTransaction];
 
-    XCTAssertEqualObjects([company.employeeSet valueForKey:@"age"], ages);
+    XCTAssertTrue([[company.employeeSet valueForKey:@"age"] isSubsetOfSet:ages]);
 
     // unmanaged object
     company = [[CompanyObject alloc] init];
-    ages = [NSMutableOrderedSet orderedSet];
+    ages = [NSMutableSet set];
     for (int i = 0; i < 30; ++i) {
         [ages addObject:@(20)];
         EmployeeObject *eo = [[EmployeeObject alloc] initWithValue:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
@@ -839,7 +730,7 @@
 
     [company.employeeSet setValue:@20 forKey:@"age"];
 
-    XCTAssertEqualObjects([company.employeeSet valueForKey:@"age"], ages);
+    XCTAssertTrue([[company.employeeSet valueForKey:@"age"] isSubsetOfSet:ages]);
 }
 
 - (void)testObjectAggregate {
@@ -1003,7 +894,7 @@
     // Unmanaged object can be accessed from other threads
     [self dispatchAsyncAndWait:^{
         XCTAssertNoThrow(company.employeeSet);
-        XCTAssertNoThrow([employees lastObject]);
+        XCTAssertNoThrow([employees allObjects]);
     }];
 
     [RLMRealm.defaultRealm beginWriteTransaction];
@@ -1012,10 +903,10 @@
 
     employees = company.employeeSet;
     XCTAssertNoThrow(company.employeeSet);
-    XCTAssertNoThrow([employees lastObject]);
+    XCTAssertNoThrow([employees allObjects]);
     [self dispatchAsyncAndWait:^{
         XCTAssertThrows(company.employeeSet);
-        XCTAssertThrows([employees lastObject]);
+        XCTAssertThrows([employees allObjects]);
     }];
 }
 
@@ -1031,10 +922,10 @@
     [realm commitWriteTransaction];
 
     RLMResults *notActuallySorted = [set sortedResultsUsingDescriptors:@[]];
-    XCTAssertTrue([set.array[0] isEqualToObject:notActuallySorted[0]]);
-    XCTAssertTrue([set.array[1] isEqualToObject:notActuallySorted[1]]);
-    XCTAssertTrue([set.array[2] isEqualToObject:notActuallySorted[2]]);
-    XCTAssertTrue([set.array[3] isEqualToObject:notActuallySorted[3]]);
+    XCTAssertTrue([set.allObjects[0] isEqualToObject:notActuallySorted[0]]);
+    XCTAssertTrue([set.allObjects[1] isEqualToObject:notActuallySorted[1]]);
+    XCTAssertTrue([set.allObjects[2] isEqualToObject:notActuallySorted[2]]);
+    XCTAssertTrue([set.allObjects[3] isEqualToObject:notActuallySorted[3]]);
 }
 
 - (void)testSortByMultipleColumns {
@@ -1118,13 +1009,13 @@
     [realm commitWriteTransaction];
 
     XCTAssertEqual(peopleInCompany.count, 2U, @"link deleted when accessing via links");
-    EmployeeObject *test = peopleInCompany.array[0];
+    EmployeeObject *test = peopleInCompany.allObjects[0];
     XCTAssertEqual(test.age, po1.age, @"Should be equal");
     XCTAssertEqualObjects(test.name, po1.name, @"Should be equal");
     XCTAssertEqual(test.hired, po1.hired, @"Should be equal");
     XCTAssertTrue([test isEqualToObject:po1], @"Should be equal");
 
-    test = peopleInCompany.array[1];
+    test = peopleInCompany.allObjects[1];
     XCTAssertEqual(test.age, po2.age, @"Should be equal");
     XCTAssertEqualObjects(test.name, po2.name, @"Should be equal");
     XCTAssertEqual(test.hired, po2.hired, @"Should be equal");
@@ -1410,28 +1301,23 @@ static RLMSet<IntObject *> *managedTestSet() {
 
 - (void)testAllMethodsCheckThread {
     RLMSet<IntObject *> *set = managedTestSet();
-    IntObject *io = set.firstObject;
+    IntObject *io = set.allObjects[0];
     RLMRealm *realm = set.realm;
     [realm beginWriteTransaction];
 
     [self dispatchAsyncAndWait:^{
         RLMAssertThrowsWithReasonMatching([set count], @"thread");
-        RLMAssertThrowsWithReasonMatching([set objectAtIndex:0], @"thread");
-        RLMAssertThrowsWithReasonMatching([set firstObject], @"thread");
-        RLMAssertThrowsWithReasonMatching([set lastObject], @"thread");
+        RLMAssertThrowsWithReasonMatching([set allObjects], @"thread");
 
         RLMAssertThrowsWithReasonMatching([set addObject:io], @"thread");
         RLMAssertThrowsWithReasonMatching([set addObjects:@[io]], @"thread");
         RLMAssertThrowsWithReasonMatching([set removeAllObjects], @"thread");
 
-        RLMAssertThrowsWithReasonMatching([set indexOfObject:[IntObject allObjects].firstObject], @"thread");
-        RLMAssertThrowsWithReasonMatching([set indexOfObjectWhere:@"intCol = 0"], @"thread");
-        RLMAssertThrowsWithReasonMatching([set indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
         RLMAssertThrowsWithReasonMatching([set objectsWhere:@"intCol = 0"], @"thread");
         RLMAssertThrowsWithReasonMatching([set objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
         RLMAssertThrowsWithReasonMatching([set sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"thread");
         RLMAssertThrowsWithReasonMatching([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]], @"thread");
-        RLMAssertThrowsWithReasonMatching(set.array[0], @"thread");
+        RLMAssertThrowsWithReasonMatching(set.allObjects[0], @"thread");
         RLMAssertThrowsWithReasonMatching([set valueForKey:@"intCol"], @"thread");
         RLMAssertThrowsWithReasonMatching([set setValue:@1 forKey:@"intCol"], @"thread");
         RLMAssertThrowsWithReasonMatching({for (__unused id obj in set);}, @"thread");
@@ -1441,7 +1327,7 @@ static RLMSet<IntObject *> *managedTestSet() {
 
 - (void)testAllMethodsCheckForInvalidation {
     RLMSet<IntObject *> *set = managedTestSet();
-    IntObject *io = set.firstObject;
+    IntObject *io = set.allObjects[0];
     RLMRealm *realm = set.realm;
 
     [realm beginWriteTransaction];
@@ -1451,9 +1337,7 @@ static RLMSet<IntObject *> *managedTestSet() {
     XCTAssertNoThrow([set isInvalidated]);
 
     XCTAssertNoThrow([set count]);
-    XCTAssertNoThrow([set objectAtIndex:0]);
-    XCTAssertNoThrow([set firstObject]);
-    XCTAssertNoThrow([set lastObject]);
+    XCTAssertNoThrow([set allObjects]);
 
     XCTAssertNoThrow([set addObject:io]);
     XCTAssertNoThrow([set addObjects:@[io]]);
@@ -1461,14 +1345,11 @@ static RLMSet<IntObject *> *managedTestSet() {
     XCTAssertNoThrow([set removeAllObjects]);
     [set addObjects:@[io, io, io]];
 
-    XCTAssertNoThrow([set indexOfObject:[IntObject allObjects].firstObject]);
-    XCTAssertNoThrow([set indexOfObjectWhere:@"intCol = 0"]);
-    XCTAssertNoThrow([set indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
     XCTAssertNoThrow([set objectsWhere:@"intCol = 0"]);
     XCTAssertNoThrow([set objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
     XCTAssertNoThrow([set sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
     XCTAssertNoThrow([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
-    XCTAssertNoThrow(set.array[0]);
+    XCTAssertNoThrow(set.allObjects[0]);
     XCTAssertNoThrow([set valueForKey:@"intCol"]);
     XCTAssertNoThrow([set setValue:@1 forKey:@"intCol"]);
     XCTAssertNoThrow({for (__unused id obj in set);});
@@ -1483,23 +1364,18 @@ static RLMSet<IntObject *> *managedTestSet() {
     XCTAssertNoThrow([set isInvalidated]);
 
     RLMAssertThrowsWithReasonMatching([set count], @"invalidated");
-    RLMAssertThrowsWithReasonMatching([set objectAtIndex:0], @"invalidated");
-    RLMAssertThrowsWithReasonMatching([set firstObject], @"invalidated");
-    RLMAssertThrowsWithReasonMatching([set lastObject], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([set allObjects], @"invalidated");
 
     RLMAssertThrowsWithReasonMatching([set addObject:io], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set addObjects:@[io]], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set removeObject:io], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set removeAllObjects], @"invalidated");
 
-    RLMAssertThrowsWithReasonMatching([set indexOfObject:[IntObject allObjects].firstObject], @"invalidated");
-    RLMAssertThrowsWithReasonMatching([set indexOfObjectWhere:@"intCol = 0"], @"invalidated");
-    RLMAssertThrowsWithReasonMatching([set indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set objectsWhere:@"intCol = 0"], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]], @"invalidated");
-    RLMAssertThrowsWithReasonMatching(set.array[0], @"invalidated");
+    RLMAssertThrowsWithReasonMatching(set.allObjects[0], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set valueForKey:@"intCol"], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set setValue:@1 forKey:@"intCol"], @"invalidated");
     RLMAssertThrowsWithReasonMatching({for (__unused id obj in set);}, @"invalidated");
@@ -1509,25 +1385,19 @@ static RLMSet<IntObject *> *managedTestSet() {
 
 - (void)testMutatingMethodsCheckForWriteTransaction {
     RLMSet<IntObject *> *set = managedTestSet();
-    IntObject *io = set.firstObject;
+    IntObject *io = set.allObjects[0];
 
     XCTAssertNoThrow([set objectClassName]);
     XCTAssertNoThrow([set realm]);
     XCTAssertNoThrow([set isInvalidated]);
 
     XCTAssertNoThrow([set count]);
-    XCTAssertNoThrow([set objectAtIndex:0]);
-    XCTAssertNoThrow([set firstObject]);
-    XCTAssertNoThrow([set lastObject]);
+    XCTAssertNoThrow([set allObjects]);
 
-    XCTAssertNoThrow([set indexOfObject:[IntObject allObjects].firstObject]);
-    XCTAssertNoThrow([set indexOfObjectWhere:@"intCol = 0"]);
-    XCTAssertNoThrow([set indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
     XCTAssertNoThrow([set objectsWhere:@"intCol = 0"]);
     XCTAssertNoThrow([set objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
     XCTAssertNoThrow([set sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
     XCTAssertNoThrow([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
-    XCTAssertNoThrow(set.array[0]);
     XCTAssertNoThrow([set valueForKey:@"intCol"]);
     XCTAssertNoThrow({for (__unused id obj in set);});
 
@@ -1586,7 +1456,7 @@ static RLMSet<IntObject *> *managedTestSet() {
     RLMSet *frozen = [set freeze];
     XCTAssertEqual(frozen.count, 2);
     [set.realm transactionWithBlock:^{
-        [set removeObject:set.array[0]];
+        [set removeObject:set.allObjects[0]];
     }];
     XCTAssertEqual(frozen.count, 2);
 }

@@ -53,9 +53,10 @@ namespace {
     }
 }
 
-RLMObservationInfo::RLMObservationInfo(RLMClassInfo &objectSchema, realm::ObjKey row, id object)
+RLMObservationInfo::RLMObservationInfo(RLMClassInfo &objectSchema, realm::ObjKey row, id object, RLMCollectionType collectionType)
 : object(object)
 , objectSchema(&objectSchema)
+, collectionType(collectionType)
 {
     setRow(*objectSchema.table(), row);
 }
@@ -119,15 +120,15 @@ void RLMObservationInfo::willChange(NSString *key, NSKeyValueChange kind, NSInde
     }
 }
 
-void RLMObservationInfo::willChangeSet(NSString *key, NSKeyValueChange kind) const {
+void RLMObservationInfo::willChangeSet(NSString *key, NSKeyValueSetMutationKind kind, RLMSet *otherSet) const {
     forEach([=](__unsafe_unretained auto o) {
-        [o willChangeValueForKey:key withSetMutation:NSKeyValueUnionSetMutation usingObjects:nil];
+        [o willChangeValueForKey:key withSetMutation:kind usingObjects:(id)otherSet];
     });
 }
 
-void RLMObservationInfo::didChangeSet(NSString *key, NSKeyValueChange kind) const {
+void RLMObservationInfo::didChangeSet(NSString *key, NSKeyValueSetMutationKind kind, RLMSet *otherSet) const {
     forEach([=](__unsafe_unretained auto o) {
-        [o didChangeValueForKey:key withSetMutation:NSKeyValueUnionSetMutation usingObjects:nil];
+        [o didChangeValueForKey:key withSetMutation:kind usingObjects:(id)otherSet];
     });
 }
 
@@ -326,9 +327,10 @@ void RLMClearTable(RLMClassInfo &objectSchema) {
     objectSchema.observedObjects.clear();
 }
 
-RLMObservationTracker::RLMObservationTracker(__unsafe_unretained RLMRealm *const realm, bool trackDeletions)
+RLMObservationTracker::RLMObservationTracker(__unsafe_unretained RLMRealm *const realm, bool trackDeletions, RLMCollectionType collectionType)
 : _realm(realm)
 , _group(realm.group)
+, _collectionType(collectionType)
 {
     if (trackDeletions) {
         this->trackDeletions();
@@ -336,7 +338,11 @@ RLMObservationTracker::RLMObservationTracker(__unsafe_unretained RLMRealm *const
 }
 
 RLMObservationTracker::~RLMObservationTracker() {
-    didChange();
+    if (_collectionType == RLMCollectionTypeSet) {
+        didChangeSet();
+    } else {
+        didChange();
+    }
 }
 
 void RLMObservationTracker::willChange(RLMObservationInfo *info, NSString *key,
@@ -350,13 +356,16 @@ void RLMObservationTracker::willChange(RLMObservationInfo *info, NSString *key,
     }
 }
 
-void RLMObservationTracker::willChangeSet(RLMObservationInfo *info, NSString *key,
-                                       NSKeyValueChange kind) {
+void RLMObservationTracker::willChangeSet(RLMObservationInfo *info,
+                                          NSString *key,
+                                          NSKeyValueSetMutationKind kind,
+                                          RLMSet *otherSet) {
     _key = key;
-    _kind = kind;
+    _setMutationkind = kind;
+    _otherSet = otherSet;
     _info = info;
     if (_info) {
-        _info->willChangeSet(key, kind);
+        _info->willChangeSet(key, kind, otherSet);
     }
 }
 
@@ -504,7 +513,7 @@ void RLMObservationTracker::didChange() {
 
 void RLMObservationTracker::didChangeSet() {
     if (_info) {
-        _info->didChange(_key, _kind, _indexes);
+        _info->didChangeSet(_key, _setMutationkind, _otherSet);
         _info = nullptr;
     }
     if (_observedTables.empty()) {
@@ -513,10 +522,10 @@ void RLMObservationTracker::didChangeSet() {
     _group.set_cascade_notification_handler(nullptr);
 
     for (auto const& change : reverse(_changes)) {
-        change.info->didChangeSet(change.property, NSKeyValueChangeRemoval);
+        change.info->didChangeSet(change.property, *change.setMutationKind, change.otherSet);
     }
     for (auto info : reverse(_invalidated)) {
-        info->didChangeSet(RLMInvalidatedKey);
+        info->didChangeSet(RLMInvalidatedKey, NSKeyValueUnionSetMutation, nil);
     }
     _observedTables.clear();
     _changes.clear();
