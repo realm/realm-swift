@@ -329,14 +329,11 @@ static double average(NSArray *values) {
     %unman %o %maxtwovalues XCTAssertEqual($set.count, 3U);
     %unman %o %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v2]]));
     %unman %o %nomaxvalues XCTAssertEqual($set.count, 3U);
-    // x
     %unman %o %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v3, $v4]]));
-    //c
     %man %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    //x
     %man %r %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
-    %man %r %nomaxvalues XCTAssertEqual($set.count, 3U);
-    %man %r %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v4]]));
+    %man %r %nomaxvalues XCTAssertEqual($set.count, 2U);
+    %man %r %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v1, $v4]]));
     %man %o %maxtwovalues XCTAssertEqual($set.count, 3U);
     %man %o %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, %v2]]));
     %man %o %nomaxvalues XCTAssertEqual($set.count, 3U);
@@ -363,21 +360,21 @@ static double average(NSArray *values) {
     [realm commitWriteTransaction];
 
     %unman %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %unman %r %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
+    %unman %r %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
     %unman %r %nomaxvalues XCTAssertEqual($set.count, 3U);
-    %unman %r %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1, $v4]));
+    %unman %r %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v4]]));
     %unman %o %maxtwovalues XCTAssertEqual($set.count, 3U);
-    %unman %o %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1, $v2]));
+    %unman %o %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v2]]));
     %unman %o %nomaxvalues XCTAssertEqual($set.count, 4U);
-    %unman %o %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1, $v3, $v4]));
+    %unman %o %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v3, $v4]]));
     %man %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %man %r %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
+    %man %r %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
     %man %r %nomaxvalues XCTAssertEqual($set.count, 3U);
-    %man %r %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1, $v4]));
+    %man %r %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v4]]));
     %man %o %maxtwovalues XCTAssertEqual($set.count, 3U);
-    %man %o %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1, %v2]));
+    %man %o %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, %v2]]));
     %man %o %nomaxvalues XCTAssertEqual($set.count, 4U);
-    %man %o %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1, %v3, %v4]));
+    %man %o %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, %v3, %v4]]));
 }
 
 - (void)testIntersect {
@@ -403,19 +400,19 @@ static double average(NSArray *values) {
     [realm commitWriteTransaction];
 
     %unman %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %unman %r %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
+    %unman %r %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
     %unman %r %nomaxvalues XCTAssertEqual($set.count, 1U);
     %unman %r %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0]));
     %unman %o %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %unman %o %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
+    %unman %o %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
     %unman %o %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %unman %o %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0]));
+    %unman %o %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0]]));
     %man %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %man %r %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
+    %man %r %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
     %man %r %nomaxvalues XCTAssertEqual($set.count, 1U);
     %man %r %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v1]));
     %man %o %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %man %o %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
+    %man %o %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
     %man %o %nomaxvalues XCTAssertEqual($set.count, 1U);
     %man %o %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0]));
 }
@@ -543,7 +540,7 @@ static double average(NSArray *values) {
         [self addObjects];
     }
 
-    { ^nl NSUInteger i = 0; ^nl NSArray *values = $values; ^nl for (id value in $set) { ^nl XCTAssertEqualObjects(values[i++ % values.count], value); ^nl } ^nl XCTAssertEqual(i, $set.count); ^nl } ^nl
+    { ^nl NSUInteger i = 0; ^nl NSArray *values = $values; ^nl for (id value in $set) { ^nl XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); ^nl } ^nl } ^nl
 }
 
 - (void)testValueForKeySelf {
@@ -551,7 +548,7 @@ static double average(NSArray *values) {
 
     [self addObjects];
 
-    XCTAssertEqualObjects([[$set valueForKey:@"self"] allObjects], ($values));
+    XCTAssertEqualObjects([NSSet setWithArray:[[$set valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values]));
 }
 
 - (void)testValueForKeyNumericAggregates {
@@ -604,36 +601,36 @@ static double average(NSArray *values) {
     $set = (id)@[$v1]; ^nl XCTAssertEqualObjects($set.allObjects[0], $v1);
 
     // Should replace and not append
-    $set = (id)$values; ^nl XCTAssertEqualObjects([[$set valueForKey:@"self"] allObjects], ($values)); ^nl
+    $set = (id)$values; ^nl XCTAssertEqualObjects([NSSet setWithArray:[[$set valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values])); ^nl
 
     // Should not clear the set
-    $set = $set; ^nl XCTAssertEqualObjects([[$set valueForKey:@"self"] allObjects], ($values)); ^nl
+    $set = $set; ^nl XCTAssertEqualObjects([NSSet setWithArray:[[$set valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values])); ^nl
 
     [unmanaged.intObj removeAllObjects];
     unmanaged.intObj = managed.intObj;
-    XCTAssertEqualObjects([[unmanaged.intObj valueForKey:@"self"] allObjects], (@[@2, @3]));
+    XCTAssertEqualObjects([NSSet setWithArray:[[unmanaged.intObj valueForKey:@"self"] allObjects]], ([NSSet setWithArray:@[@2, @3]]));
 
     [managed.intObj removeAllObjects];
     managed.intObj = unmanaged.intObj;
-    XCTAssertEqualObjects([[managed.intObj valueForKey:@"self"] allObjects], (@[@2, @3]));
+    XCTAssertEqualObjects([NSSet setWithArray:[[managed.intObj valueForKey:@"self"] allObjects]], ([NSSet setWithArray:@[@2, @3]]));
 }
 
 - (void)testDynamicAssignment {
     $obj[@"$prop"] = (id)@[$v1]; ^nl XCTAssertEqualObjects(((RLMSet *)$obj[@"$prop"]).allObjects[0], $v1);
 
     // Should replace and not append
-    $obj[@"$prop"] = (id)$values; ^nl XCTAssertEqualObjects([[$obj[@"$prop"] valueForKey:@"self"] allObjects], ($values)); ^nl
+    $obj[@"$prop"] = (id)$values; ^nl XCTAssertEqualObjects([NSSet setWithArray:[[$obj[@"$prop"] valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values])); ^nl
 
     // Should not clear the set
-    $obj[@"$prop"] = $obj[@"$prop"]; ^nl XCTAssertEqualObjects([[$obj[@"$prop"] valueForKey:@"self"] allObjects], ($values)); ^nl
+    $obj[@"$prop"] = $obj[@"$prop"]; ^nl XCTAssertEqualObjects([NSSet setWithArray:[[$obj[@"$prop"] valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values])); ^nl
 
     [unmanaged[@"intObj"] removeAllObjects];
     unmanaged[@"intObj"] = managed.intObj;
-    XCTAssertEqualObjects([[unmanaged[@"intObj"] valueForKey:@"self"] allObjects], (@[@2, @3]));
+    XCTAssertEqualObjects([NSSet setWithArray:[[unmanaged[@"intObj"] valueForKey:@"self"] allObjects]], ([NSSet setWithArray:@[@2, @3]]));
 
     [managed[@"intObj"] removeAllObjects];
     managed[@"intObj"] = unmanaged.intObj;
-    XCTAssertEqualObjects([[managed[@"intObj"] valueForKey:@"self"] allObjects], (@[@2, @3]));
+    XCTAssertEqualObjects([NSSet setWithArray:[[managed[@"intObj"] valueForKey:@"self"] allObjects]], ([NSSet setWithArray:@[@2, @3]]));
 }
 
 - (void)testInvalidAssignment {
