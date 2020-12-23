@@ -32,7 +32,7 @@ class ObjectSchemaTests: TestCase {
         XCTAssertEqual(propertyNames,
                        ["boolCol", "intCol", "intEnumCol", "floatCol", "doubleCol",
                         "stringCol", "binaryCol", "dateCol", "decimalCol",
-                        "objectIdCol", "objectCol", "arrayCol"]
+                        "objectIdCol", "objectCol", "uuidCol", "arrayCol"]
         )
     }
 
@@ -147,6 +147,14 @@ class ObjectSchemaTests: TestCase {
             "        set = NO;\n" +
             "        optional = YES;\n" +
             "    }\n" +
+            "    uuidCol {\n" +
+            "    type = uuid;\n" +
+            "    indexed = NO;\n" +
+            "    isPrimary = NO;\n" +
+            "    array = NO;\n" +
+            "    set = NO;\n" +
+            "    optional = NO;\n" +
+            "    }\n" +
             "    arrayCol {\n" +
             "        type = object;\n" +
             "        objectClassName = SwiftBoolObject;\n" +
@@ -157,16 +165,16 @@ class ObjectSchemaTests: TestCase {
             "        set = NO;\n" +
             "        optional = NO;\n" +
             "    }\n" +
-//            "    setCol {\n" +
-//            "        type = object;\n" +
-//            "        objectClassName = SwiftBoolObject;\n" +
-//            "        linkOriginPropertyName = (null);\n" +
-//            "        indexed = NO;\n" +
-//            "        isPrimary = NO;\n" +
-//            "        array = NO;\n" +
-//            "        set = YES;\n" +
-//            "        optional = NO;\n" +
-//            "    }\n" +
+            "    setCol {\n" +
+            "        type = object;\n" +
+            "        objectClassName = SwiftBoolObject;\n" +
+            "        linkOriginPropertyName = (null);\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        set = YES;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
             "}"
 
         XCTAssertEqual(objectSchema.description, expected.replacingOccurrences(of: "    ", with: "\t"))

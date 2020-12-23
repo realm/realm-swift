@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUser.h"
+#import "RLMUser_Private.h"
 
 #import "RLMSyncConfiguration.h"
 #import "RLMSyncUtil_Private.h"

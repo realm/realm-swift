@@ -34,11 +34,12 @@
 			<key>HeadersPath</key>
 			<string>Headers</string>
 			<key>LibraryIdentifier</key>
-			<string>ios-i386_x86_64-simulator</string>
+			<string>ios-arm64_i386_x86_64-simulator</string>
 			<key>LibraryPath</key>
 			<string>librealm-monorepo.a</string>
 			<key>SupportedArchitectures</key>
-			<array><string>i386</string>
+			<array><string>arm64</string>
+<string>i386</string>
 <string>x86_64</string></array>
 			<key>SupportedPlatform</key>
 			<string>ios</string>
@@ -64,14 +65,12 @@
 			<key>HeadersPath</key>
 			<string>Headers</string>
 			<key>LibraryIdentifier</key>
-			<string>watchos-armv7k_arm64_32_i386_x86_64</string>
+			<string>watchos-armv7k_arm64_32</string>
 			<key>LibraryPath</key>
 			<string>librealm-monorepo.a</string>
 			<key>SupportedArchitectures</key>
 			<array><string>armv7k</string>
-<string>arm64_32</string>
-<string>i386</string>
-<string>x86_64</string></array>
+<string>arm64_32</string></array>
 			<key>SupportedPlatform</key>
 			<string>watchos</string>
 		</dict>
@@ -79,11 +78,12 @@
 			<key>HeadersPath</key>
 			<string>Headers</string>
 			<key>LibraryIdentifier</key>
-			<string>watchos-i386_x86_64-simulator</string>
+			<string>watchos-arm64_i386_x86_64-simulator</string>
 			<key>LibraryPath</key>
 			<string>librealm-monorepo.a</string>
 			<key>SupportedArchitectures</key>
-			<array><string>i386</string>
+			<array><string>arm64</string>
+<string>i386</string>
 <string>x86_64</string></array>
 			<key>SupportedPlatform</key>
 			<string>watchos</string>
@@ -106,11 +106,12 @@
 			<key>HeadersPath</key>
 			<string>Headers</string>
 			<key>LibraryIdentifier</key>
-			<string>tvos-x86_64-simulator</string>
+			<string>tvos-arm64_x86_64-simulator</string>
 			<key>LibraryPath</key>
 			<string>librealm-monorepo.a</string>
 			<key>SupportedArchitectures</key>
-			<array><string>x86_64</string></array>
+			<array><string>arm64</string>
+<string>x86_64</string></array>
 			<key>SupportedPlatform</key>
 			<string>tvos</string>
 			<key>SupportedPlatformVariant</key>

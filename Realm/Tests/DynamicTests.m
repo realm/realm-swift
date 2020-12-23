@@ -83,7 +83,7 @@
     }
     XCTAssertNotNil(expectedSchema);
 
-    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.fileURL = RLMTestRealmURL();
     config.dynamic = YES;
 
@@ -169,14 +169,14 @@
     XCTAssertEqual(results.count, 2U, @"Should have 2 objects");
 
     RLMObjectSchema *schema = dyrealm.schema[AllTypesObject.className];
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 12; i++) {
         NSString *propName = [schema.properties[i] name];
         XCTAssertEqualObjects(obj1[propName], results[0][propName]);
         XCTAssertEqualObjects(obj2[propName], results[1][propName]);
     }
 
     // check sub object type
-    XCTAssertEqualObjects([schema.properties[11] objectClassName], @"StringObject",
+    XCTAssertEqualObjects([schema.properties[12] objectClassName], @"StringObject",
                           @"Sub-object type in schema should be 'StringObject'");
 
     // check object equality
@@ -186,7 +186,7 @@
 
     [dyrealm beginWriteTransaction];
     RLMObject *o = results[0];
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 12; i++) {
         RLMProperty *prop = schema.properties[i];
         id value = prop.type == RLMPropertyTypeString ? @1 : @"";
         RLMAssertThrowsWithReason(o[prop.name] = value,
@@ -197,7 +197,7 @@
                                   @"Invalid value '(null)' of type '(null)' for");
     }
 
-    RLMProperty *prop = schema.properties[11];
+    RLMProperty *prop = schema.properties[12];
     RLMAssertThrowsWithReason(o[prop.name] = @"str",
                               @"Invalid value 'str' of type '__NSCFConstantString' for 'StringObject?' property 'AllTypesObject.objectCol'.");
     XCTAssertNoThrow(o[prop.name] = nil);
@@ -326,9 +326,11 @@
     XCTAssertNil(object[@"string"]);
     XCTAssertNil(object[@"data"]);
     XCTAssertNil(object[@"date"]);
+    XCTAssertNil(object[@"uuidCol"]);
 
     NSDate *date = [NSDate date];
     NSData *data = [NSData data];
+    NSUUID *uuid = [NSUUID new];
 
     object[@"intObj"] = @1;
     object[@"floatObj"] = @2.2f;
@@ -337,6 +339,7 @@
     object[@"string"] = @"str";
     object[@"date"] = date;
     object[@"data"] = data;
+    object[@"uuidCol"] = uuid;
 
     XCTAssertEqualObjects(object[@"intObj"], @1);
     XCTAssertEqualObjects(object[@"floatObj"], @2.2f);
@@ -345,6 +348,7 @@
     XCTAssertEqualObjects(object[@"string"], @"str");
     XCTAssertEqualObjects(object[@"date"], date);
     XCTAssertEqualObjects(object[@"data"], data);
+    XCTAssertEqualObjects(object[@"uuidCol"], uuid);
 
     object[@"intObj"] = NSNull.null;
     object[@"floatObj"] = NSNull.null;
@@ -353,6 +357,7 @@
     object[@"string"] = NSNull.null;
     object[@"date"] = NSNull.null;
     object[@"data"] = NSNull.null;
+    object[@"uuidCol"] = NSNull.null;
 
     XCTAssertNil(object[@"intObj"]);
     XCTAssertNil(object[@"floatObj"]);
@@ -361,6 +366,7 @@
     XCTAssertNil(object[@"string"]);
     XCTAssertNil(object[@"data"]);
     XCTAssertNil(object[@"date"]);
+    XCTAssertNil(object[@"uuidCol"]);
 
     object[@"intObj"] = nil;
     object[@"floatObj"] = nil;
@@ -369,6 +375,7 @@
     object[@"string"] = nil;
     object[@"date"] = nil;
     object[@"data"] = nil;
+    object[@"uuidCol"] = nil;
 
     XCTAssertNil(object[@"intObj"]);
     XCTAssertNil(object[@"floatObj"]);
@@ -377,6 +384,7 @@
     XCTAssertNil(object[@"string"]);
     XCTAssertNil(object[@"data"]);
     XCTAssertNil(object[@"date"]);
+    XCTAssertNil(object[@"uuidCol"]);
 
     [dyrealm commitWriteTransaction];
 }

@@ -31,7 +31,17 @@ public class TimeoutProxyServer: NSObject {
 
     let serverEndpoint = NWEndpoint.Host("127.0.0.1")
 
-    @objc public var delay: Double = 0
+    private var _delay: Double = 0
+    @objc public var delay: Double {
+        get {
+            _delay
+        }
+        set {
+            queue.sync {
+                _delay = newValue
+            }
+        }
+    }
 
     @objc public init(port: UInt16, targetPort: UInt16) {
         self.port = NWEndpoint.Port(rawValue: port)!
@@ -57,10 +67,12 @@ public class TimeoutProxyServer: NSObject {
     }
 
     @objc public func stop() {
-        for connection in connections {
-            connection.forceCancel()
-        }
         listener.cancel()
+        queue.sync {
+            for connection in connections {
+                connection.forceCancel()
+            }
+        }
     }
 
     private func copy(from: NWConnection, to: NWConnection) {

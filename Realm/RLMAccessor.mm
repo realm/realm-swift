@@ -31,6 +31,7 @@
 #import "RLMResults_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
+#import "RLMUUID_Private.hpp"
 
 #import <realm/object-store/results.hpp>
 #import <realm/object-store/property.hpp>
@@ -78,6 +79,11 @@ bool is_null(realm::ObjectId const&) {
 template<>
 bool is_null(realm::Decimal128 const& v) {
     return v.is_null();
+}
+
+template<>
+bool is_null(realm::UUID const&) {
+    return false;
 }
 
 template<typename T>
@@ -260,6 +266,16 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
     }
 }
 
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
+              __unsafe_unretained NSUUID *const value) {
+    if (value) {
+        obj->_row.set(key, value.rlm_uuidValue);
+    }
+    else {
+        setNull(obj->_row, key);
+    }
+}
+
 RLMLinkingObjects *getLinkingObjects(__unsafe_unretained RLMObjectBase *const obj,
                                      __unsafe_unretained RLMProperty *const property) {
     RLMVerifyAttached(obj);
@@ -363,6 +379,8 @@ id managedGetter(RLMProperty *prop, const char *type) {
             return ^(__unsafe_unretained RLMObjectBase *const obj) {
                 return getLinkingObjects(obj, prop);
             };
+        case RLMPropertyTypeUUID:
+            return makeWrapperGetter<realm::UUID>(index, prop.optional);
     }
 }
 
@@ -422,6 +440,7 @@ id managedSetter(RLMProperty *prop, const char *type) {
         case RLMPropertyTypeObject:         return makeSetter<RLMObjectBase *>(prop);
         case RLMPropertyTypeObjectId:       return makeSetter<RLMObjectId *>(prop);
         case RLMPropertyTypeDecimal128:     return makeSetter<RLMDecimal128 *>(prop);
+        case RLMPropertyTypeUUID:           return makeSetter<NSUUID *>(prop);
     }
 }
 
@@ -833,14 +852,14 @@ realm::ObjectId RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
 }
 template<>
 realm::UUID RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+    return RLMObjcToUUID(v);
+}
+template<>
+realm::Mixed RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
     REALM_UNREACHABLE();
 }
 template<>
-realm::Mixed RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
-    REALM_UNREACHABLE();
-}
-template<>
-realm::object_store::Dictionary RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+realm::object_store::Dictionary RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
     REALM_UNREACHABLE();
 }
 
@@ -872,7 +891,7 @@ realm::util::Optional<realm::ObjectId> RLMAccessorContext::unbox(__unsafe_unreta
 }
 template<>
 realm::util::Optional<realm::UUID> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
-    REALM_UNREACHABLE();
+    return to_optional(v, [&](__unsafe_unretained NSUUID *v) { return [v rlm_uuidValue]; });
 }
 
 std::pair<realm::Obj, bool>

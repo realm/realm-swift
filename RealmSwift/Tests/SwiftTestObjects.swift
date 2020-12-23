@@ -53,6 +53,8 @@ class SwiftObject: Object {
     @objc dynamic var decimalCol = Decimal128("123e4")
     @objc dynamic var objectIdCol = ObjectId("1234567890ab1234567890ab")
     @objc dynamic var objectCol: SwiftBoolObject? = SwiftBoolObject()
+    @objc dynamic var uuidCol: UUID = UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!
+
     let arrayCol = List<SwiftBoolObject>()
 
     class func defaultValues() -> [String: Any] {
@@ -67,6 +69,7 @@ class SwiftObject: Object {
             "decimalCol": Decimal128("123e4"),
             "objectIdCol": ObjectId("1234567890ab1234567890ab"),
             "objectCol": [false],
+            "uuidCol": UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
             "arrayCol": []
         ]
     }
@@ -79,6 +82,7 @@ class SwiftOptionalObject: Object {
     @objc dynamic var optDateCol: Date?
     @objc dynamic var optDecimalCol: Decimal128?
     @objc dynamic var optObjectIdCol: ObjectId?
+    @objc dynamic var optUuidCol: UUID?
     let optIntCol = RealmOptional<Int>()
     let optInt8Col = RealmOptional<Int8>()
     let optInt16Col = RealmOptional<Int16>()
@@ -110,6 +114,7 @@ class SwiftListObject: Object {
     let date = List<Date>()
     let decimal = List<Decimal128>()
     let objectId = List<ObjectId>()
+    let uuid = List<UUID>()
 
     let intOpt = List<Int?>()
     let int8Opt = List<Int8?>()
@@ -123,6 +128,7 @@ class SwiftListObject: Object {
     let dateOpt = List<Date?>()
     let decimalOpt = List<Decimal128?>()
     let objectIdOpt = List<ObjectId?>()
+    let uuidOpt = List<UUID?>()
 }
 
 class SwiftImplicitlyUnwrappedOptionalObject: Object {
@@ -133,6 +139,7 @@ class SwiftImplicitlyUnwrappedOptionalObject: Object {
     @objc dynamic var optDecimalCol: Decimal128!
     @objc dynamic var optObjectIdCol: ObjectId!
     @objc dynamic var optObjectCol: SwiftBoolObject!
+    @objc dynamic var optUuidCol: UUID!
 }
 
 class SwiftOptionalDefaultValuesObject: Object {
@@ -142,6 +149,7 @@ class SwiftOptionalDefaultValuesObject: Object {
     @objc dynamic var optDateCol: Date? = Date(timeIntervalSince1970: 10)
     @objc dynamic var optDecimalCol: Decimal128? = "123"
     @objc dynamic var optObjectIdCol: ObjectId? = ObjectId("1234567890ab1234567890ab")
+    @objc dynamic var optUuidCol: UUID? = UUID(uuidString: "00000000-0000-0000-0000-000000000000")
     let optIntCol = RealmOptional<Int>(1)
     let optInt8Col = RealmOptional<Int8>(1)
     let optInt16Col = RealmOptional<Int16>(1)
@@ -168,7 +176,8 @@ class SwiftOptionalDefaultValuesObject: Object {
             "optInt64Col": 1,
             "optFloatCol": 2.2 as Float,
             "optDoubleCol": 3.3,
-            "optBoolCol": true
+            "optBoolCol": true,
+            "optUuidCol": UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
         ]
     }
 }

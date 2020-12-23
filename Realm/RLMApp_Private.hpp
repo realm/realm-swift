@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMApp.h>
+#import <Realm/RLMApp_Private.h>
 
 #import <realm/object-store/sync/app.hpp>
 

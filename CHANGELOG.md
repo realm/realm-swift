@@ -1,9 +1,33 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add Xcode 12.3 binary to release package.
 
 ### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.3.
+* CocoaPods: 1.10 or later.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
+10.5.0 Release notes (2020-12-14)
+=============================================================
+
+### Enhancements
+
+* MongoDB Realm is now supported when installing Realm via Swift Package Manager.
+* Added support for UUID data type
+
+### Fixed
+
 * The user identifier was added to the file path for synchronized Realms twice
   and an extra level of escaping was performed on the partition value. This did
   not cause functional problems, but made file names more confusing than they
@@ -14,17 +38,105 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fix several data races in App and SyncSession initialization. These could
   possibly have caused strange errors the first time a synchronized Realm was
   opened (since v10.0.0).
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Fix a use of a dangling reference when refreshing a user’s custom data that
+  could lead to a crash (since v10.0.0).
 
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 12.1.
+* Carthage release for Swift is built with Xcode 12.2.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.1.4 to v10.3.2
+
+10.4.0 Release notes (2020-12-10)
+=============================================================
+
+### Enhancements
+
+* Add Combine support for App and User. These two types now have a
+  `objectWillChange` property that emits each time the state of the object has
+  changed (such as due to the user logging in or out). ([PR #6977](https://github.com/realm/realm-cocoa/pull/6977)).
+
+### Fixed
+
+* Integrating changsets from the server would sometimes hit the assertion
+  failure "n != realm::npos" inside Table::create_object_with_primary_key()
+  when creating an object with a primary key which previously had been used and
+  had incoming links. ([Core PR #4180](https://github.com/realm/realm-core/pull/4180), since v10.0.0).
+* The arm64 simulator slices were not actually included in the XCFramework
+  release package. ([PR #6982](https://github.com/realm/realm-cocoa/pull/6982), since v10.2.0).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.2.
 * CocoaPods: 1.10 or later.
 
 ### Internal
 * Upgraded realm-core from v10.0.1 to v10.2.0
+
+* Upgraded realm-core from v10.1.3 to v10.1.4
+* Upgraded realm-sync from v10.1.4 to v10.1.5
+
+10.3.0 Release notes (2020-12-08)
+=============================================================
+
+### Enhancements
+
+* Add Google OpenID Connect Credentials, an alternative login credential to the
+  Google OAuth 2.0 credential.
+
+### Fixed
+
+* Fixed a bug that would prevent eventual consistency during conflict
+  resolution. Affected clients would experience data divergence and potentially
+  consistency errors as a result if they experienced conflict resolution
+  between cycles of Create-Erase-Create for objects with primary keys (since v10.0.0).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.2.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-sync from v10.1.3 to v10.1.4
+
+10.2.0 Release notes (2020-12-02)
+=============================================================
+
+### Enhancements
+
+* The prebuilt binaries are now packaged as XCFrameworks. This adds support for
+  Catalyst and arm64 simulators when using them to install Realm, removes the
+  need for the strip-frameworks build step, and should simplify installation.
+* The support functionality for using the Objective C API from Swift is now
+  included in Realm Swift and now includes all of the required wrappers for
+  MongoDB Realm types. In mixed Objective C/Swift projects, we recommend
+  continuing to use the Objective C types, but import both Realm and RealmSwift
+  in your Swift files.
+
+### Fixed
+
+* The user identifier was added to the file path for synchronized Realms twice
+  and an extra level of escaping was performed on the partition value. This did
+  not cause functional problems, but made file names more confusing than they
+  needed to be. Existing Realm files will continue to be located at the old
+  path, while newly created files will be created at a shorter path. (Since v10.0.0).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.2.
+* CocoaPods: 1.10 or later.
 
 10.1.4 Release notes (2020-11-16)
 =============================================================

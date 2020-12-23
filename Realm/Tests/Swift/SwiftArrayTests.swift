@@ -16,10 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import XCTest
-import Realm
 import Foundation
+import Realm
+import XCTest
+
+#if canImport(RealmTestSupport)
 import RealmTestSupport
+#endif
 
 class SwiftRLMArrayTests: RLMTestCase {
 

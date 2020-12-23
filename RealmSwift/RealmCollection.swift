@@ -174,6 +174,7 @@ private func arrayType<T>(_ type: T.Type) -> RLMArray<AnyObject> {
     case is Date.Type:       return RLMArray(objectType: .date, optional: true)
     case is Decimal128.Type: return RLMArray(objectType: .decimal128, optional: true)
     case is ObjectId.Type:   return RLMArray(objectType: .objectId, optional: true)
+    case is UUID.Type:       return RLMArray(objectType: .UUID, optional: true)
     default: fatalError("Unsupported type for List: \(type)?")
     }
 }
@@ -293,6 +294,12 @@ extension ObjectId: RealmCollectionValue {
     /// :nodoc:
     public static func _rlmSet() -> RLMSet<AnyObject> {
         return RLMSet(objectType: .objectId, optional: false)
+    }
+}
+extension UUID: RealmCollectionValue {
+    /// :nodoc:
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        return RLMArray(objectType: .UUID, optional: false)
     }
 }
 

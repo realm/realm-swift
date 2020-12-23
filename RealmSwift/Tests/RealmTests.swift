@@ -548,6 +548,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(object["optDecimalCol"] as! Decimal128?, dictionary["optDecimalCol"] as! Decimal128?)
         XCTAssertEqual(object["optObjectIdCol"] as! ObjectId?, dictionary["optObjectIdCol"] as! ObjectId?)
         XCTAssertEqual((object["optObjectCol"] as? SwiftBoolObject)?.boolCol, true)
+        XCTAssertEqual(object["optUuidCol"] as! UUID, dictionary["optUuidCol"] as! UUID)
     }
 
     func testIterateDynamicObjects() {

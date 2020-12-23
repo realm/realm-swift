@@ -278,14 +278,15 @@ class Admin {
  A sandboxed server. This singleton launches and maintains all server processes
  and allows for app creation.
  */
+@available(OSX 10.13, *)
 @objc(RealmServer)
-class RealmServer: NSObject {
+public class RealmServer: NSObject {
     public enum LogLevel {
         case none, info, warn, error
     }
 
     /// Shared RealmServer. This class only needs to be initialized and torn down once per test suite run.
-    @objc static var shared = RealmServer()
+    @objc public static var shared = RealmServer()
 
     /// Log level for the server and mongo processes.
     public var logLevel = LogLevel.none
@@ -313,6 +314,14 @@ class RealmServer: NSObject {
 
     /// The current admin session
     private var session: Admin.AdminSession?
+
+    /// Check if the BaaS files are present and we can run the server
+    @objc public class func haveServer() -> Bool {
+        let goDir = RealmServer.rootUrl
+            .appendingPathComponent("build")
+            .appendingPathComponent("stitch")
+        return FileManager.default.fileExists(atPath: goDir.path)
+    }
 
     private override init() {
         super.init()
@@ -498,7 +507,7 @@ class RealmServer: NSObject {
         }
     }
 
-    typealias AppId = String
+    public typealias AppId = String
 
     private func failOnError<T>(_ result: Result<T, Error>) {
         if case .failure(let error) = result {
@@ -507,7 +516,7 @@ class RealmServer: NSObject {
     }
 
     /// Create a new server app
-    @objc func createApp() throws -> AppId {
+    @objc public func createApp() throws -> AppId {
         guard let session = session else {
             throw URLError(.unknown)
         }

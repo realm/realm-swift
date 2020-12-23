@@ -9,16 +9,16 @@ import RealmSwift
 
 //: I. Define the data entities
 
-class Person: Object {
+@objcMembers class Person: Object {
     dynamic var name = ""
     dynamic var age = 0
     dynamic var spouse: Person?
     let cars = List<Car>()
 
-    override var description: String { return "Person {\(name), \(age), \(spouse?.name)}" }
+    override var description: String { return "Person {\(name), \(age), \(spouse?.name ?? "nil")}" }
 }
 
-class Car: Object {
+@objcMembers class Car: Object {
     dynamic var brand = ""
     dynamic var name: String?
     dynamic var year = 0
@@ -65,7 +65,7 @@ let favorites = ["Jennifer"]
 
 let favoritePeopleWithSpousesAndCars = realm.objects(Person.self)
     .filter("cars.@count > 1 && spouse != nil && name IN %@", favorites)
-    .sorted(byProperty: "age")
+    .sorted(byKeyPath: "age")
 
 for person in favoritePeopleWithSpousesAndCars {
     person.name

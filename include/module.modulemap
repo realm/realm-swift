@@ -8,6 +8,7 @@ module Realm {
 
     explicit module Private {
         header "Realm/RLMAccessor.h"
+        header "Realm/RLMApp_Private.h"
         header "Realm/RLMArray_Private.h"
         header "Realm/RLMCollection_Private.h"
         header "Realm/RLMSet_Private.h"
@@ -20,12 +21,13 @@ module Realm {
         header "Realm/RLMObjectStore.h"
         header "Realm/RLMOptionalBase.h"
         header "Realm/RLMProperty_Private.h"
-        header "Realm/RLMRealm_Private.h"
         header "Realm/RLMRealmConfiguration_Private.h"
+        header "Realm/RLMRealm_Private.h"
         header "Realm/RLMResults_Private.h"
         header "Realm/RLMSchema_Private.h"
         header "Realm/RLMSyncConfiguration_Private.h"
         header "Realm/RLMSyncUtil_Private.h"
+        header "Realm/RLMUser_Private.h"
     }
 
     explicit module Dynamic {

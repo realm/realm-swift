@@ -76,6 +76,7 @@ Pod::Spec.new do |s|
                               # Realm.Private module
   private_header_files      = 'include/**/RLMAccessor.h',
                               'include/**/RLMArray_Private.h',
+                              'include/**/RLMApp_Private.h',
                               'include/**/RLMBSON_Private.h',
                               'include/**/RLMCollection_Private.h',
                               'include/**/RLMListBase.h',
@@ -97,6 +98,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMMongoCollection_Private.h',
                               'include/**/RLMMongoDatabase_Private.h',
                               'include/**/RLMUpdateResult_Private.h',
+                              'include/**/RLMUser_Private.h',
                               'include/**/RLMProviderClient_Private.h'
 
 

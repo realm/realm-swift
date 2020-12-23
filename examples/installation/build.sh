@@ -133,7 +133,7 @@ xctest() {
     local scheme=(-scheme "$NAME")
 
     # Ensure that dynamic framework tests try to use the correct version of the prebuilt libraries.
-    sed -i '' 's@/swift-[0-9.]*@/swift-'"${REALM_XCODE_VERSION}"'@' "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
+    sed -i '' 's@/realm-swift-latest@/realm-swift-latest/'"${REALM_XCODE_VERSION}"'@' "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
 
     xcodebuild "${project[@]}" "${scheme[@]}" clean build "${destination[@]}" "${code_signing_flags[@]}"
     if [[ $PLATFORM != watchos ]]; then

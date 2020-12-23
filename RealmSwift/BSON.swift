@@ -56,6 +56,9 @@ extension Decimal128: BSON {
 extension ObjectId: BSON {
 }
 
+extension UUID: BSON {
+}
+
 /// A Dictionary object representing a `BSON` document.
 public typealias Document = Dictionary<String, AnyBSON?>
 
@@ -127,6 +130,9 @@ extension MinKey: BSON {
     /// - SeeAlso: https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst
     case decimal128(Decimal128)
 
+    /// A UUID.
+    case uuid(UUID)
+
     /// A BSON minKey.
     case minKey
 
@@ -166,6 +172,8 @@ extension MinKey: BSON {
             self = .datetime(val)
         case let val as Decimal128:
             self = .decimal128(val)
+        case let val as UUID:
+            self = .uuid(val)
         case let val as ObjectId:
             self = .objectId(val)
         case let val as Document:
@@ -287,6 +295,14 @@ extension MinKey: BSON {
             return nil
         }
         return t
+    }
+
+    /// If this `BSON` is a `.uuid`, return it as a `UUID`. Otherwise, return nil.
+    public var uuidValue: UUID? {
+        guard case let .uuid(s) = self else {
+            return nil
+        }
+        return s
     }
 
     /// If this `BSON` is a `.null` return true. Otherwise, false.

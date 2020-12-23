@@ -20,6 +20,7 @@
 
 #import "RLMDecimal128_Private.hpp"
 #import "RLMObjectId_Private.hpp"
+#import "RLMUUID_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import <realm/object-store/util/bson/bson.hpp>
@@ -208,6 +209,16 @@ using namespace bson;
 
 @end
 
+#pragma mark NSUUID
+
+@implementation NSUUID (RLMBSON)
+
+- (RLMBSONType)bsonType {
+    return RLMBSONTypeUUID;
+}
+
+@end
+
 #pragma mark NSRegularExpression
 
 @implementation NSRegularExpression (RLMBSON)
@@ -337,6 +348,8 @@ Bson RLMConvertRLMBSONToBson(id<RLMBSON> b) {
             return [((NSDictionary *)b) bsonDocumentValue];
         case RLMBSONTypeArray:
             return [((NSArray *)b) bsonArrayValue];
+        case RLMBSONTypeUUID:
+            return [((NSUUID *)b) rlm_uuidValue];
     }
 }
 
@@ -376,6 +389,8 @@ id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
             return [[NSMutableDictionary alloc] initWithBsonDocument:static_cast<BsonDocument>(b)];
         case realm::bson::Bson::Type::Array:
             return [[NSMutableArray alloc] initWithBsonArray:static_cast<BsonArray>(b)];
+        case realm::bson::Bson::Type::Uuid:
+            return [[NSUUID alloc] initWithRealmUUID:static_cast<realm::UUID>(b)];
     }
     return nil;
 }

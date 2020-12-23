@@ -17,7 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Realm
+
+#if canImport(RealmTestSupport)
 import RealmTestSupport
+#endif
 
 class SwiftRLMStringObject: RLMObject {
     @objc dynamic var stringCol = ""
@@ -45,6 +48,7 @@ class SwiftRLMObject: RLMObject {
     @objc dynamic var dateCol = Date(timeIntervalSince1970: 1)
     @objc dynamic var objectCol = SwiftRLMBoolObject()
     @objc dynamic var arrayCol = RLMArray<SwiftRLMBoolObject>(objectClassName: SwiftRLMBoolObject.className())
+    @objc dynamic var uuidCol = UUID(uuidString: "00000000-0000-0000-0000-000000000000")
 }
 
 class SwiftRLMOptionalObject: RLMObject {
@@ -53,6 +57,7 @@ class SwiftRLMOptionalObject: RLMObject {
     @objc dynamic var optBinaryCol: Data?
     @objc dynamic var optDateCol: Date?
     @objc dynamic var optObjectCol: SwiftRLMBoolObject?
+    @objc dynamic var uuidCol: UUID?
 }
 
 class SwiftRLMPrimitiveArrayObject: RLMObject {
@@ -62,6 +67,8 @@ class SwiftRLMPrimitiveArrayObject: RLMObject {
     @objc dynamic var optDataCol = RLMArray<NSObject>(objectType: .data, optional: true)
     @objc dynamic var dateCol = RLMArray<NSDate>(objectType: .date, optional: false)
     @objc dynamic var optDateCol = RLMArray<NSObject>(objectType: .date, optional: true)
+    @objc dynamic var uuidCol = RLMArray<NSUUID>(objectType: .UUID, optional: false)
+    @objc dynamic var optUuidCol = RLMArray<NSObject>(objectType: .UUID, optional: true)
 }
 
 class SwiftRLMDogObject: RLMObject {

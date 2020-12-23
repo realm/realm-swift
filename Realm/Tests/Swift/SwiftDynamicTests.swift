@@ -16,11 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import XCTest
 import Foundation
-import Realm.Private
 import Realm.Dynamic
+import Realm.Private
+import XCTest
+
+#if canImport(RealmTestSupport)
 import RealmTestSupport
+#endif
 
 class SwiftRLMDynamicTests: RLMTestCase {
 
@@ -141,7 +144,7 @@ class SwiftRLMDynamicTests: RLMTestCase {
         }
 
         // check sub object type
-        XCTAssertTrue(schema.properties[11].objectClassName! == "StringObject")
+        XCTAssertTrue(schema.properties[12].objectClassName! == "StringObject")
 
         // check object equality
         XCTAssertNil(robj1["objectCol"], "object should be nil")
