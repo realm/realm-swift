@@ -537,7 +537,7 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertTrue(live.isEmpty)
         XCTAssertFalse(frozen.isEmpty)
     }
-    
+
     func testThawFromDifferentThread() {
         let frozen = collection.freeze()
         XCTAssertTrue(frozen.isFrozen)
@@ -552,34 +552,122 @@ class RealmCollectionTypeTests: TestCase {
             XCTAssertFalse(frozen.isEmpty)
         }
     }
-    
+
     func testThawPreviousVersion() {
         let frozen = collection.freeze()
         XCTAssertTrue(frozen.isFrozen)
         XCTAssertEqual(collection.count, frozen.count)
-        
+
         let realm = collection.realm!
         try! realm.write({ realm.delete(collection) })
         XCTAssertNotEqual(frozen.count, collection.count, "Frozen collections should not change")
-        
+
         let live = frozen.thaw()
         XCTAssertTrue(live.isEmpty, "Thawed collection should reflect transactions since the original reference was frozen")
         XCTAssertFalse(frozen.isEmpty)
         XCTAssertEqual(live.count, self.collection.count)
     }
-    
+
+    func testThawUpdatedOnDifferentThread() {
+        let tsr = ThreadSafeReference(to: collection)
+        var frozen: AnyRealmCollection<CTTNullableStringObjectWithLink> = nil
+        var frozenQuery: Results<CTTNullableStringObjectWithLink> = nil
+
+        XCTAssertEqual(collection.count, 2) // stringCol "1" and "2"
+        XCTAssertEqual(collection.filter("stringCol == %@", "3").count, 0)
+
+        dispatchSyncNewThread {
+            let realm = try! Realm(configuration: self.collection.realm!.configuration)
+            let collection = realm.resolve(tsr)!
+            try! realm.write({ collection.first!.stringCol = "3" })
+            try! realm.write({ realm.delete(collection.last!) })
+
+            let query = collection.filter("stringCol == %@", "1")
+            frozen = collection.freeze() // Results::Mode::TableView
+            frozenQuery = query.freeze() // Results::Mode::Query
+
+        }
+
+        let thawed = frozen!.thaw()
+        XCTAssertEqual(frozen!.count, 1)
+        XCTAssertEqual(frozen!.first?.stringCol, "3")
+        XCTAssertEqual(frozen!.filter("stringCol == %@", "1").count, 0)
+        XCTAssertEqual(frozen!.filter("stringCol == %@", "2").count, 0)
+        XCTAssertEqual(frozen!.filter("stringCol == %@", "3").count, 1)
+
+        XCTAssertEqual(thawed.count, 2)
+        XCTAssertEqual(thawed.first?.stringCol, "1")
+        XCTAssertEqual(thawed.filter("stringCol == %@", "1").count, 1)
+        XCTAssertEqual(thawed.filter("stringCol == %@", "2").count, 1)
+        XCTAssertEqual(thawed.filter("stringCol == %@", "3").count, 0)
+
+        XCTAssertEqual(collection.count, 2)
+        XCTAssertEqual(collection.first?.stringCol, "1")
+        XCTAssertEqual(collection.filter("stringCol == %@", "1").count, 1)
+        XCTAssertEqual(collection.filter("stringCol == %@", "2").count, 1)
+        XCTAssertEqual(collection.filter("stringCol == %@", "3").count, 0)
+
+        let thawedQuery = frozenQuery!.thaw()
+        XCTAssertEqual(frozenQuery!.count, 0)
+        XCTAssertEqual(frozenQuery!.first?.stringCol, nil)
+        XCTAssertEqual(frozenQuery!.filter("stringCol == %@", "1").count, 0)
+        XCTAssertEqual(frozenQuery!.filter("stringCol == %@", "2").count, 0)
+        XCTAssertEqual(frozenQuery!.filter("stringCol == %@", "3").count, 0)
+
+        XCTAssertEqual(thawedQuery.count, 1)
+        XCTAssertEqual(thawedQuery.first?.stringCol, "1")
+        XCTAssertEqual(thawedQuery.filter("stringCol == %@", "1").count, 1)
+        XCTAssertEqual(thawedQuery.filter("stringCol == %@", "2").count, 0)
+        XCTAssertEqual(thawedQuery.filter("stringCol == %@", "3").count, 0)
+
+        collection.realm!.refresh()
+
+        XCTAssertEqual(thawed.count, 1)
+        XCTAssertEqual(thawed.first?.stringCol, "3")
+        XCTAssertEqual(thawed.filter("stringCol == %@", "1").count, 0)
+        XCTAssertEqual(thawed.filter("stringCol == %@", "2").count, 0)
+        XCTAssertEqual(thawed.filter("stringCol == %@", "3").count, 1)
+
+        XCTAssertEqual(thawedQuery.count, 0)
+        XCTAssertEqual(thawedQuery.first?.stringCol, nil)
+        XCTAssertEqual(thawedQuery.filter("stringCol == %@", "1").count, 0)
+        XCTAssertEqual(thawedQuery.filter("stringCol == %@", "2").count, 0)
+        XCTAssertEqual(thawedQuery.filter("stringCol == %@", "3").count, 0)
+
+        XCTAssertEqual(collection.count, 1)
+        XCTAssertEqual(collection.first?.stringCol, "3")
+        XCTAssertEqual(collection.filter("stringCol == %@", "1").count, 0)
+        XCTAssertEqual(collection.filter("stringCol == %@", "2").count, 0)
+        XCTAssertEqual(collection.filter("stringCol == %@", "3").count, 1)
+    }
+
+    func testThawCreatedOnDifferentThread() {
+        var frozen: SwiftBoolObject = nil
+        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 0)
+
+        dispatchSyncNewThread {
+            let obj = try! Realm().write {
+                try! Realm().create(SwiftBoolObject.self, value: ["boolCol": true])
+            }
+            frozen = obj.freeze()
+        }
+        XCTAssertNil(frozen?.thaw(), "Thaw shouldn't reflect background transactions until main thread realm is refreshed")
+        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 0)
+        try! Realm().refresh()
+        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 1)
+    }
+
     func testThawDeletedParent() {
         let frozenElement = collection.first!.freeze()
         XCTAssertTrue(frozenElement.isFrozen)
-        
+
         let realm = collection.realm!
         try! realm.write({ realm.delete(collection) })
         XCTAssertNil(collection.first)
         XCTAssertNotNil(frozenElement)
-        
+
         let thawed = frozenElement.thaw()
         XCTAssertNil(thawed)
-        
     }
 
     func testFreezeFromWrongThread() {
@@ -1022,14 +1110,17 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 
     override func testThaw() {
     }
-    
+
     override func testThawFromDifferentThread() {
     }
-    
+
     override func testThawPreviousVersion() {
     }
-    
+
     override func testThawDeletedParent() {
+    }
+
+    override func testThawUpdatedOnDifferentThread() {
     }
 
     override func testFreezeFromWrongThread() {

@@ -1001,7 +1001,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual(Array(listObj.dateOpt), Array(frozenListObj.dateOpt))
     }
 
-    func testObjectThaw() {
+    func testThaw() {
         let realm = try! Realm()
         let obj = try! realm.write {
             realm.create(SwiftBoolObject.self, value: ["boolCol": true])
@@ -1009,48 +1009,78 @@ class ObjectTests: TestCase {
 
         let frozenObj = obj.freeze()
         XCTAssertTrue(frozenObj.isFrozen)
-        assertThrows(try! frozenObj.realm!.write { frozenObj.realm!.delete(frozenObj) }, reason: "Can't perform transactions on a frozen Realm")
+        assertThrows(try! frozenObj.realm!.write {}, reason: "Can't perform transactions on a frozen Realm")
 
-        let liveObj = frozenObj.thaw()
+        let liveObj = frozenObj.thaw()!
         XCTAssertFalse(liveObj.isFrozen)
         XCTAssertEqual(liveObj.boolCol, frozenObj.boolCol)
 
         try! liveObj.realm!.write({ liveObj.boolCol = false })
         XCTAssertNotEqual(liveObj.boolCol, frozenObj.boolCol)
     }
-    
-    func testThawFromDifferentThread() {
+
+    func testThawDeleted() {
         let realm = try! Realm()
         let obj = try! realm.write {
             realm.create(SwiftBoolObject.self, value: ["boolCol": true])
         }
-        
-        let frozenObj = obj.freeze()
-        dispatchSyncNewThread {
-            let liveObj = frozenObj.thaw()
-            XCTAssertFalse(liveObj.isFrozen)
 
-            try! liveObj.realm!.write({ liveObj.boolCol = false })
-            XCTAssertNotEqual(liveObj.boolCol, frozenObj.boolCol)
-        }
-        
-        XCTAssertTrue(frozenObj.boolCol)
+        let frozen = obj.freeze()
+        try! realm.write { realm.delete(obj) }
+        XCTAssertNotNil(frozen)
+
+        let thawed = frozen.thaw()
+        XCTAssertNil(thawed, "Thaw should return nil when object was deleted")
     }
-    
+
     func testThawPreviousVersion() {
         let realm = try! Realm()
         let obj = try! realm.write {
             realm.create(SwiftBoolObject.self, value: ["boolCol": true])
         }
-        
+
         let frozen = obj.freeze()
         XCTAssertTrue(frozen.isFrozen)
-        
+
         try! obj.realm!.write({ obj.boolCol = false })
         XCTAssert(frozen.boolCol, "Frozen objects shouldn't mutate")
-        
-        let thawed = frozen.thaw()
+
+        let thawed = frozen.thaw()!
         XCTAssertFalse(thawed.isFrozen)
-        XCTAssertFalse(thawed.boolCol, "Thawed objects should reflect transactions since the original reference was frozen")
+        XCTAssertFalse(thawed.boolCol, "Thaw should reflect transactions since the original reference was frozen")
+    }
+
+    func testThawUpdatedOnDifferentThread() {
+        let obj = try! Realm().write {
+            try! Realm().create(SwiftBoolObject.self, value: ["boolCol": true])
+        }
+        let tsr = ThreadSafeReference(to: obj)
+        var frozen: SwiftBoolObject = nil
+
+        dispatchSyncNewThread {
+            let obj = try! Realm().resolve(tsr)!
+            try! Realm().write({ obj.boolCol = false })
+            frozen = obj.freeze()
+        }
+        let thawed = frozen!.thaw()!
+        XCTAssert(thawed.boolCol, "Thaw shouldn't reflect background transactions until main thread realm is refreshed")
+        try! Realm().refresh()
+        XCTAssertFalse(thawed.boolCol)
+    }
+
+    func testThawCreatedOnDifferentThread() {
+        var frozen: SwiftBoolObject = nil
+        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 0)
+
+        dispatchSyncNewThread {
+            let obj = try! Realm().write {
+                try! Realm().create(SwiftBoolObject.self, value: ["boolCol": true])
+            }
+            frozen = obj.freeze()
+        }
+        XCTAssertNil(frozen?.thaw(), "Thaw shouldn't reflect background transactions until main thread realm is refreshed")
+        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 0)
+        try! Realm().refresh()
+        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 1)
     }
 }
