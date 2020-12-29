@@ -195,8 +195,9 @@
                                                      employees.reverseObjectEnumerator,
                                                      employees.reverseObjectEnumerator]];
     XCTAssertEqual(2U, co.employeeSet.count);
-    XCTAssertEqualObjects(@"name 2", co.employeeSet.allObjects[0].name);
-    XCTAssertEqualObjects(@"name", co.employeeSet.allObjects[1].name);
+
+    XCTAssertTrue([[co.employeeSet valueForKey:@"name"] containsObject:@"name"]);
+    XCTAssertTrue([[co.employeeSet valueForKey:@"name"] containsObject:@"name 2"]);
 }
 
 - (void)testInitWithArrayUsesDefaultValuesForMissingFields {
@@ -343,7 +344,7 @@
     [set1.intObj addObject:@2];
     auto set2 = [[AllPrimitiveSets alloc] initWithValue:set1];
     XCTAssertEqual(set2.intObj.count, 1U);
-    XCTAssertEqualObjects(set2.intObj.firstObject, @2);
+    XCTAssertEqualObjects(set2.intObj.allObjects[0], @2);
 }
 
 - (void)testInitWithInvalidObject {
@@ -493,13 +494,13 @@
     XCTAssertEqual(1U, sets.dateObj.count);
     XCTAssertEqual(1U, sets.dataObj.count);
 
-    XCTAssertEqualObjects([[sets.intObj valueForKey:@"self"] allObjects], (@[@1, @2, @3]));
-    XCTAssertEqualObjects([[sets.boolObj valueForKey:@"self"] allObjects], (@[@YES, @NO]));
-    XCTAssertEqualObjects([[sets.floatObj valueForKey:@"self"] allObjects], (@[@1.1f, @2.2f]));
-    XCTAssertEqualObjects([[sets.doubleObj valueForKey:@"self"] allObjects], (@[@3.3, @4.4]));
-    XCTAssertEqualObjects([[sets.stringObj valueForKey:@"self"] allObjects], (@[@"a", @"b"]));
-    XCTAssertEqualObjects([[sets.dateObj valueForKey:@"self"] allObjects], (@[now]));
-    XCTAssertEqualObjects([[sets.dataObj valueForKey:@"self"] allObjects], (@[bytes]));
+    XCTAssertTrue([[NSSet setWithArray:[[sets.intObj valueForKey:@"self"] allObjects]] isEqualToSet:[NSSet setWithArray:(@[@1, @2, @3])]]);
+    XCTAssertTrue([[NSSet setWithArray:[[sets.boolObj valueForKey:@"self"] allObjects]] isEqualToSet:[NSSet setWithArray:(@[@YES, @NO])]]);
+    XCTAssertTrue([[NSSet setWithArray:[[sets.floatObj valueForKey:@"self"] allObjects]] isEqualToSet:[NSSet setWithArray:(@[@1.1f, @2.2f])]]);
+    XCTAssertTrue([[NSSet setWithArray:[[sets.doubleObj valueForKey:@"self"] allObjects]] isEqualToSet:[NSSet setWithArray:(@[@3.3, @4.4])]]);
+    XCTAssertTrue([[NSSet setWithArray:[[sets.stringObj valueForKey:@"self"] allObjects]] isEqualToSet:[NSSet setWithArray:(@[@"a", @"b"])]]);
+    XCTAssertTrue([[NSSet setWithArray:[[sets.dateObj valueForKey:@"self"] allObjects]] isEqualToSet:[NSSet setWithArray:(@[now])]]);
+    XCTAssertTrue([[NSSet setWithArray:[[sets.dataObj valueForKey:@"self"] allObjects]] isEqualToSet:[NSSet setWithArray:(@[bytes])]]);
 }
 
 - (void)testInitValidatesNumberTypes {
@@ -1230,8 +1231,8 @@
     XCTAssertEqualObjects(@"name 2", co.employees[0].name);
     XCTAssertEqualObjects(@"name", co.employees[1].name);
     XCTAssertEqual(2U, co.employeeSet.count);
-    XCTAssertEqualObjects(@"name 2", co.employeeSet.allObjects[0].name);
-    XCTAssertEqualObjects(@"name", co.employeeSet.allObjects[0].name);
+    XCTAssertTrue([[co.employeeSet valueForKey:@"name"] containsObject:@"name 2"]);
+    XCTAssertTrue([[co.employeeSet valueForKey:@"name"] containsObject:@"name"]);
 
     [realm cancelWriteTransaction];
 }

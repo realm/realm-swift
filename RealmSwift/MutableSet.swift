@@ -53,7 +53,7 @@ public class MutableSetBase: RLMSetBase {
 
  Properties of `MutableSet` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
  */
-public final class MutableSet<Element: RealmCollectionValue>: RLMSetBase {
+public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
 
     // MARK: Properties
 
@@ -76,46 +76,6 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSetBase {
         super.init(set: rlmSet)
     }
 
-    // MARK: Index Retrieval
-
-    /**
-     Returns the index of an object in the set, or `nil` if the object is not present.
-
-     - parameter object: An object to find.
-     */
-    public func index(of object: Element) -> Int? {
-        return notFoundToNil(index: _rlmSet.index(of: dynamicBridgeCast(fromSwift: object) as AnyObject))
-    }
-
-    /**
-     Returns the index of the first object in the list matching the predicate, or `nil` if no objects match.
-
-     - parameter predicate: The predicate with which to filter the objects.
-    */
-    public func index(matching predicate: NSPredicate) -> Int? {
-        return notFoundToNil(index: _rlmSet.indexOfObject(with: predicate))
-    }
-
-    // MARK: Object Retrieval
-
-    /**
-     Returns the object at the given index.
-
-     - parameter index: The index of the object to retrieve or replace.
-     */
-    public subscript(position: Int) -> Element {
-        get {
-            throwForNegativeIndex(position)
-            return dynamicBridgeCast(fromObjectiveC: _rlmSet.object(at: UInt(position)))
-        }
-    }
-
-    /// Returns the first object in the set, or `nil` if the list is empty.
-    public var first: Element? { return _rlmSet.firstObject().map(dynamicBridgeCast) }
-
-    /// Returns the last object in the set, or `nil` if the list is empty.
-    public var last: Element? { return _rlmSet.lastObject().map(dynamicBridgeCast) }
-
     // MARK: KVC
 
     /**
@@ -123,7 +83,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSetBase {
      objects.
      */
     @nonobjc public func value(forKey key: String) -> [AnyObject] {
-        return _rlmSet.value(forKeyPath: key)! as! [AnyObject]
+        return (_rlmSet.value(forKeyPath: key)! as! NSSet).allObjects as [AnyObject]
     }
 
     /**
@@ -133,7 +93,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSetBase {
      - parameter keyPath: The key path to the property whose values are desired.
      */
     @nonobjc public func value(forKeyPath keyPath: String) -> [AnyObject] {
-        return _rlmSet.value(forKeyPath: keyPath) as! [AnyObject]
+        return (_rlmSet.value(forKeyPath: keyPath)! as! NSSet).allObjects as [AnyObject]
     }
 
     /**
@@ -159,6 +119,16 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSetBase {
         return Results<Element>(_rlmSet.objects(with: predicate))
     }
 
+    /// Returns a Boolean value indicating whether the Set contains the
+    /// given object.
+    ///
+    /// - Parameter object: The element to find in the Set.
+    /// - Returns: `true` if the element was found in the Set; otherwise,
+    ///   `false`.
+    public func contains(_ object: Element) -> Bool {
+        return _rlmSet.contains(dynamicBridgeCast(fromSwift: object) as AnyObject)
+    }
+
     // MARK: Sorting
 
     /**
@@ -179,7 +149,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSetBase {
     }
 
     /**
-     Returns a `Results` containing the objects in the list, but sorted.
+     Returns a `Results` containing the objects in the set, but sorted.
 
      - warning: MutableSets may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
                 floating point, integer, and string types.
@@ -206,7 +176,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSetBase {
     }
 
     /**
-     Returns the maximum (highest) value of the given property among all the objects in the list, or `nil` if the set
+     Returns the maximum (highest) value of the given property among all the objects in the set, or `nil` if the set
      is empty.
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
@@ -397,12 +367,12 @@ extension MutableSet where Element: AddableType {
 }
 
 extension MutableSet: RealmCollection {
-//    /// The type of the objects stored within the set.
-//    public typealias ElementType = Element
+    /// The type of the objects stored within the set.
+    public typealias ElementType = Element
 
     // MARK: Sequence Support
 
-    /// Returns a `RLMIterator` that yields successive elements in the `List`.
+    /// Returns a `RLMIterator` that yields successive elements in the `MutableSet`.
     public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: _rlmSet)
     }
@@ -432,7 +402,33 @@ extension MutableSet: RealmCollection {
         -> NotificationToken {
             return _rlmSet.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
+
+    // MARK: Unavailable Methods
+    // Implemented for conformance
+
+    /// :nodoc:
+    public func index(of object: Element) -> Int? {
+        fatalError("index(of:) is not available on MutableSet")
+    }
+
+    /// :nodoc:
+    public func index(matching predicate: NSPredicate) -> Int? {
+        fatalError("index(matching:) is not available on MutableSet")
+    }
+
+    /// :nodoc:
+    public subscript(position: Int) -> Element {
+        fatalError("subscript is not available on MutableSet")
+    }
+
+    /// :nodoc:
+    public var first: Element? { fatalError("first is not available on MutableSet") }
+
+    /// :nodoc:
+    public var last: Element? { fatalError("last is not available on MutableSet") }
 }
+
+
 
 // MARK: - Codable
 

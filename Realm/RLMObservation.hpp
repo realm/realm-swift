@@ -62,8 +62,19 @@ public:
     void willChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const;
     void didChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const;
 
-    void willChangeSet(NSString *key, NSKeyValueSetMutationKind kind, RLMSet *otherSet) const;
-    void didChangeSet(NSString *key, NSKeyValueSetMutationKind kind, RLMSet *otherSet) const;
+    void willChangeSet(NSString *key, NSKeyValueSetMutationKind kind, RLMSet *otherSet);
+    void didChangeSet(NSString *key, NSKeyValueSetMutationKind kind, RLMSet *otherSet);
+    void willChangeSet(NSString *key, NSKeyValueSetMutationKind kind, const realm::Obj& obj, const realm::ColKey& col_key);
+//    void didChangeSet(NSString *key, NSKeyValueSetMutationKind kind, RLMSet *otherSet);
+
+    // true when willChangeSet is invoked, false once didChangeSet has completed.
+    // RLMManagedSet gets it's own notification progress tracker because [RLMSet setSet]
+    // will also trigger [RLMSet minusSet] when a KVO notification is fired. So in order to preserve
+    // the original NSKeyValueSetMutationKind we need to not allow [RLMSet minusSet] to fire a second
+    // notification in the chain.
+    bool isFiringNotificationForSet = false;
+
+    RLMCollectionType collectionType;
 
     bool isForRow(realm::ObjKey key) const {
         return row.get_key() == key;
@@ -109,8 +120,6 @@ private:
     // objects returned from valueForKey() to keep them alive in case observers
     // are added and so that they can still be accessed after row is detached
     NSMutableDictionary *cachedObjects;
-
-    RLMCollectionType collectionType;
 
     void setRow(realm::Table const& table, realm::ObjKey newRow);
 

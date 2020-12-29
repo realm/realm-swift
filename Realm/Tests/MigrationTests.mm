@@ -1058,8 +1058,8 @@ RLM_ARRAY_TYPE(MigrationTestObject);
         [migration enumerateObjects:SetPropertyObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
             XCTAssertEqual(RLMDynamicObject.class, newObject.class);
             XCTAssertEqual(RLMDynamicObject.class, oldObject.class);
-            XCTAssertEqual(RLMDynamicObject.class, [[oldObject[@"set"] firstObject] class]);
-            XCTAssertEqual(RLMDynamicObject.class, [[newObject[@"set"] firstObject] class]);
+            XCTAssertEqual(RLMDynamicObject.class, [[oldObject[@"set"] allObjects][0] class]);
+            XCTAssertEqual(RLMDynamicObject.class, [[newObject[@"set"] allObjects][0] class]);
         }];
     }];
 

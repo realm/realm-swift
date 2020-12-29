@@ -907,7 +907,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 - (void)testRemoveFromSet {
     ExpectChange(self, @[@0], @[], @[], ^(RLMRealm *realm) {
         RLMSet *set = [[[SetPropertyObject allObjectsInRealm:realm] firstObject] intSet];
-        [set removeObject:set.allObjects[0]];
+        [set removeObject:set.allObjects[1]];
     });
 
     ExpectNoChange(self, ^(RLMRealm *realm) {
@@ -925,19 +925,18 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 
 - (void)testDeleteSet {
     ExpectChange(self, @[@0, @1, @2, @3], @[], @[], ^(RLMRealm *realm) {
-                      [realm deleteObjects:[SetPropertyObject allObjectsInRealm:realm]];
+        [realm deleteObjects:[SetPropertyObject allObjectsInRealm:realm]];
     });
 }
 
 - (void)testModifyObjectShiftedByInsertsAndDeletions {
-    ExpectChange(self, @[@1], @[], @[@2], ^(RLMRealm *realm) {
+    ExpectChange(self, @[@0, @1], @[], @[], ^(RLMRealm *realm) {
         [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 2"]];
-        [[IntObject objectsInRealm:realm where:@"intCol = 3"] setValue:@4 forKey:@"intCol"];
+        [[IntObject objectsInRealm:realm where:@"intCol = 1"] setValue:@10 forKey:@"intCol"];
     });
-    ExpectChange(self, @[], @[@0], @[@3], ^(RLMRealm *realm) {
+    ExpectNoChange(self, ^(RLMRealm *realm) {
         RLMSet *set = [[[SetPropertyObject allObjectsInRealm:realm] firstObject] intSet];
-        [set addObject:[IntObject createInRealm:realm withValue:@[@3]]];
-        [[IntObject objectsInRealm:realm where:@"intCol = 4"] setValue:@3 forKey:@"intCol"];
+        [[IntObject objectsInRealm:realm where:@"intCol = 9"] setValue:@11 forKey:@"intCol"];
     });
 }
 @end

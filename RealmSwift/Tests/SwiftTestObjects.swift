@@ -131,6 +131,36 @@ class SwiftListObject: Object {
     let uuidOpt = List<UUID?>()
 }
 
+class SwiftSetObject: Object {
+    let int = MutableSet<Int>()
+    let int8 = MutableSet<Int8>()
+    let int16 = MutableSet<Int16>()
+    let int32 = MutableSet<Int32>()
+    let int64 = MutableSet<Int64>()
+    let float = MutableSet<Float>()
+    let double = MutableSet<Double>()
+    let string = MutableSet<String>()
+    let data = MutableSet<Data>()
+    let date = MutableSet<Date>()
+    let decimal = MutableSet<Decimal128>()
+    let objectId = MutableSet<ObjectId>()
+    let uuid = MutableSet<UUID>()
+
+    let intOpt = MutableSet<Int?>()
+    let int8Opt = MutableSet<Int8?>()
+    let int16Opt = MutableSet<Int16?>()
+    let int32Opt = MutableSet<Int32?>()
+    let int64Opt = MutableSet<Int64?>()
+    let floatOpt = MutableSet<Float?>()
+    let doubleOpt = MutableSet<Double?>()
+    let stringOpt = MutableSet<String?>()
+    let dataOpt = MutableSet<Data?>()
+    let dateOpt = MutableSet<Date?>()
+    let decimalOpt = MutableSet<Decimal128?>()
+    let objectIdOpt = MutableSet<ObjectId?>()
+    let uuidOpt = MutableSet<UUID?>()
+}
+
 class SwiftImplicitlyUnwrappedOptionalObject: Object {
     @objc dynamic var optNSStringCol: NSString!
     @objc dynamic var optStringCol: String!

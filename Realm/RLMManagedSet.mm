@@ -60,11 +60,6 @@
     RLMClassInfo *_objectInfo;
     RLMClassInfo *_ownerInfo;
     std::unique_ptr<RLMObservationInfo> _observationInfo;
-@private
-    // Used for tracking progress of NSKeyValueObservations.
-    // YES if a KVO notification is at willChange stage.
-    // NO once didChange has returned.
-    BOOL _firingNotification;
 }
 
 - (RLMManagedSet *)initWithSet:(realm::object_store::Set)set
@@ -190,13 +185,11 @@ static void changeSet(__unsafe_unretained RLMManagedSet *const set,
     auto obsInfo = RLMGetObservationInfo(set->_observationInfo.get(),
                                          set->_backingSet.get_parent_object_key(),
                                          *set->_ownerInfo);
-    if (obsInfo) {
-        set->_firingNotification = YES;
+    if (obsInfo && !obsInfo->isFiringNotificationForSet) {
         tracker.willChangeSet(obsInfo, set->_key, kind, otherSet);
     }
 
     translateErrors(f);
-    set->_firingNotification = NO;
 }
 
 //
@@ -354,17 +347,21 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 }
 
 - (void)minusSet:(RLMSet<id> *)set {
+    // Required for KVO in a multiple Realm enviornment.
+    auto obsInfo = RLMGetObservationInfo(_observationInfo.get(),
+                                         _backingSet.get_parent_object_key(),
+                                         *_ownerInfo);
+    if (obsInfo && obsInfo->isFiringNotificationForSet) {
+        return;
+    }
+
     RLMManagedSet *rhs = [self managedObjectFrom:set];
     if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
         @throw RLMException(@"Can only perform minusSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
     }
-    if (_firingNotification) {
+    changeSet(self, rhs, NSKeyValueMinusSetMutation, ^{
         _backingSet.assign_difference(rhs->_backingSet);
-    } else {
-        changeSet(self, rhs, NSKeyValueMinusSetMutation, ^{
-            _backingSet.assign_difference(rhs->_backingSet);
-        });
-    }
+    });
 }
 
 - (id)valueForKeyPath:(NSString *)keyPath {
@@ -492,6 +489,12 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
             context:(void *)context {
     RLMEnsureSetObservationInfo(_observationInfo, keyPath, self, self);
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
+}
+
+- (RLMManagedSet *)copyWithBackingSet:(realm::object_store::Set)otherSet {
+    RLMManagedSet *s = [self mutableCopy];
+    s->_backingSet = otherSet;
+    return s;
 }
 
 - (RLMFastEnumerator *)fastEnumerator {
