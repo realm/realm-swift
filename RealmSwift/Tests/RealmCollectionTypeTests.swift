@@ -570,8 +570,8 @@ class RealmCollectionTypeTests: TestCase {
 
     func testThawUpdatedOnDifferentThread() {
         let tsr = ThreadSafeReference(to: collection)
-        var frozen: AnyRealmCollection<CTTNullableStringObjectWithLink> = nil
-        var frozenQuery: Results<CTTNullableStringObjectWithLink> = nil
+        var frozen: AnyRealmCollection<CTTNullableStringObjectWithLink>?
+        var frozenQuery: Results<CTTNullableStringObjectWithLink>?
 
         XCTAssertEqual(collection.count, 2) // stringCol "1" and "2"
         XCTAssertEqual(collection.filter("stringCol == %@", "3").count, 0)
@@ -642,7 +642,7 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testThawCreatedOnDifferentThread() {
-        var frozen: SwiftBoolObject = nil
+        var frozen: SwiftBoolObject?
         XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 0)
 
         dispatchSyncNewThread {

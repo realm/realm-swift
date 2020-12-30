@@ -331,7 +331,7 @@ extension Object: ThreadConfined {
      This method creates a managed accessor to a live copy of the same frozen object.
      Will return self if called on an already live object.
      */
-    public func thaw() -> Self {
+    public func thaw() -> Self? {
         return realm!.thaw(self)
     }
 }

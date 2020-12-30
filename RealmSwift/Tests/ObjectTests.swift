@@ -1055,7 +1055,7 @@ class ObjectTests: TestCase {
             try! Realm().create(SwiftBoolObject.self, value: ["boolCol": true])
         }
         let tsr = ThreadSafeReference(to: obj)
-        var frozen: SwiftBoolObject = nil
+        var frozen: SwiftBoolObject?
 
         dispatchSyncNewThread {
             let obj = try! Realm().resolve(tsr)!
@@ -1069,7 +1069,7 @@ class ObjectTests: TestCase {
     }
 
     func testThawCreatedOnDifferentThread() {
-        var frozen: SwiftBoolObject = nil
+        var frozen: SwiftBoolObject?
         XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 0)
 
         dispatchSyncNewThread {

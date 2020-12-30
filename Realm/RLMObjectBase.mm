@@ -489,6 +489,9 @@ id RLMObjectFreeze(RLMObjectBase *obj) {
 }
 
 id RLMObjectThaw(RLMObjectBase *obj) {
+    if (!obj->_realm && !obj.isInvalidated) {
+        @throw RLMException(@"Unmanaged objects cannot be frozen.");
+    }
     RLMVerifyAttached(obj);
     if (!obj->_realm.frozen) {
         return obj;
@@ -496,6 +499,9 @@ id RLMObjectThaw(RLMObjectBase *obj) {
     RLMRealm *liveRealm = [obj->_realm thaw];
     RLMObjectBase *live = RLMCreateManagedAccessor(obj.class, &liveRealm->_info[obj->_info->rlmObjectSchema.className]);
     live->_row = liveRealm->_realm->import_copy_of(obj->_row);
+    if (!live->_row.is_valid()) {
+        return nil;
+    }
     RLMInitializeSwiftAccessorGenerics(live);
     return live;
 }
