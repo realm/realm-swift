@@ -191,7 +191,8 @@ private func setType<T>(_ type: T.Type) -> RLMSet<AnyObject> {
     case is Date.Type:       return RLMSet(objectType: .date, optional: true)
     case is Decimal128.Type: return RLMSet(objectType: .decimal128, optional: true)
     case is ObjectId.Type:   return RLMSet(objectType: .objectId, optional: true)
-    default: fatalError("Unsupported type for List: \(type)?")
+    case is UUID.Type:       return RLMSet(objectType: .UUID, optional: true)
+    default: fatalError("Unsupported type for MutableSet: \(type)?")
     }
 }
 
@@ -300,6 +301,10 @@ extension UUID: RealmCollectionValue {
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .UUID, optional: false)
+    }
+    /// :nodoc:
+    public static func _rlmSet() -> RLMSet<AnyObject> {
+        return RLMSet(objectType: .UUID, optional: false)
     }
 }
 

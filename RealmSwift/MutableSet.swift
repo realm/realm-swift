@@ -253,6 +253,39 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
         _rlmSet.removeAllObjects()
     }
 
+    /**
+     Mutates the set in place with the elements that are common to both this set and the given sequence.
+
+     - warning: This method may only be called during a write transaction.
+
+     - parameter other: Another set.
+     */
+    func formIntersection(_ other: MutableSet<Element>) {
+        _rlmSet.intersect(dynamicBridgeCast(fromSwift: other) as! RLMSet<AnyObject>)
+    }
+
+    /**
+     Mutates the set in place and removes the elements of the given set from this set.
+
+     - warning: This method may only be called during a write transaction.
+
+     - parameter other: Another set.
+     */
+    func subtract(_ other: MutableSet<Element>) {
+        _rlmSet.minus(dynamicBridgeCast(fromSwift: other) as! RLMSet<AnyObject>)
+    }
+
+    /**
+     Inserts the elements of the given sequence into the set.
+
+     - warning: This method may only be called during a write transaction.
+
+     - parameter other: Another set.
+     */
+    func formUnion(_ other: MutableSet<Element>) {
+        _rlmSet.union(dynamicBridgeCast(fromSwift: other) as! RLMSet<AnyObject>)
+    }
+
     // MARK: Notifications
 
     /**

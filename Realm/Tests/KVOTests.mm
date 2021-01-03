@@ -344,20 +344,6 @@ public:
     XCTAssertTrue(r.empty()); \
 } while (0)
 
-#define AssertSetChange(kind, oldSet, newSet) do { \
-    if (NSDictionary *note = AssertNotification(r)) { \
-        NSLog(@"%@", note); \
-        XCTAssertEqual([note[NSKeyValueChangeKindKey] intValue], static_cast<int>(kind)); \
-        if (oldSet) { \
-            XCTAssertTrue([note[NSKeyValueChangeOldKey] contains], indexes); \
-        } \
-        if (oldSet) { \
-            XCTAssertEqualObjects(note[NSKeyValueChangeNewKey], indexes); \
-        } \
-    } \
-    XCTAssertTrue(r.empty()); \
-} while (0)
-
 // Tests for plain Foundation key-value observing to verify that we correctly
 // match the standard semantics. Each of the subclasses of KVOTests runs the
 // same set of tests on RLMObjects in difference scenarios
@@ -1318,8 +1304,14 @@ public:
         AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
     }
 }
-
+// There are alot of inconsistencies w.r.t these tests. First being the
+// 'old' & 'new' RLMSet may not be included in the KVO notification dictionary where expected.
+// 'KVOTests' class will always include the 'new' or 'old' dictionaries.
+// 'KVOMultipleRealmsTests' produces rather undesired behavior because we cannot control the transaction log
+// in a way that would best suit Set specific cases. Therefor there is a failing assertion when testing against
+// multiple Realms.
 - (void)testSetKVO {
+    NSDictionary *note;
     KVOLinkObject2 *obj = [self createLinkObject];
     KVOLinkObject2 *obj2 = [self createLinkObject];
     KVORecorder r(self, obj, @"set");
@@ -1330,6 +1322,7 @@ public:
     [mutator addObject:obj.obj];
     [mutator2 addObject:obj2.obj];
     AssertSet(NSKeyValueChangeInsertion);
+
     [mutator removeObject:obj.obj];
     AssertSet(NSKeyValueChangeRemoval);
     [mutator addObject:obj.obj];
@@ -1338,8 +1331,8 @@ public:
     [mutator setSet:mutator2];
     AssertSet(NSKeyValueChangeReplacement);
 
-//    [mutator intersectSet:mutator2];
-//    AssertSet(NSKeyValueChangeRemoval);
+    [mutator intersectSet:mutator2];
+    AssertSet(NSKeyValueChangeRemoval);
     [mutator minusSet:mutator2];
     AssertSet(NSKeyValueChangeRemoval);
     [mutator unionSet:mutator2];
@@ -1365,8 +1358,8 @@ public:
     [mutator setSet:mutator2];
     AssertSet(NSKeyValueChangeReplacement);
 
-//    [mutator intersectSet:mutator2];
-//    AssertSet(NSKeyValueChangeRemoval);
+    [mutator intersectSet:mutator2];
+    AssertSet(NSKeyValueChangeRemoval);
     [mutator minusSet:mutator2];
     AssertSet(NSKeyValueChangeRemoval);
     [mutator unionSet:mutator2];

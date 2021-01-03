@@ -217,7 +217,7 @@
         return 0;
     }
 
-    // We need to enumerate a copy of the backing array so that it doesn't
+    // We need to enumerate a copy of the backing set so that it doesn't
     // reflect changes made during enumeration. This copy has to be autoreleased
     // (since there's nowhere for us to store a strong reference), and uses
     // RLMArrayHolder rather than an NSArray because NSArray doesn't guarantee

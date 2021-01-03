@@ -192,7 +192,7 @@ extension Object: RealmCollectionValue {
         if let accessor = prop.swiftAccessor {
             return accessor.get(Unmanaged.passUnretained(self).toOpaque() + ivar_getOffset(prop.swiftIvar!))
         }
-        if let ivar = prop.swiftIvar, prop.array {
+        if let ivar = prop.swiftIvar, prop.array, prop.set {
             return object_getIvar(self, ivar)
         }
         return RLMDynamicGet(self, prop)
@@ -598,11 +598,14 @@ extension UUID: _ManagedPropertyType {
 extension Object: _ManagedPropertyType {
     // swiftlint:disable:next identifier_name
     public static func _rlmProperty(_ prop: RLMProperty) {
-        if !prop.optional && !prop.array {
+        if !prop.optional && !(prop.array || prop.set) {
             throwRealmException("Object property '\(prop.name)' must be marked as optional.")
         }
         if prop.optional && prop.array {
             throwRealmException("List<\(className())> property '\(prop.name)' must not be marked as optional.")
+        }
+        if prop.optional && prop.set {
+            throwRealmException("MutableSet<\(className())> property '\(prop.name)' must not be marked as optional.")
         }
         prop.type = .object
         prop.objectClassName = className()
@@ -623,6 +626,17 @@ extension List: _ManagedPropertyType where Element: _ManagedPropertyType {
     // swiftlint:disable:next identifier_name
     public static func _rlmProperty(_ prop: RLMProperty) {
         prop.array = true
+        Element._rlmProperty(prop)
+    }
+    // swiftlint:disable:next identifier_name
+    public static func _rlmRequireObjc() -> Bool { return false }
+}
+
+/// :nodoc:
+extension MutableSet: _ManagedPropertyType where Element: _ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
+    public static func _rlmProperty(_ prop: RLMProperty) {
+        prop.set = true
         Element._rlmProperty(prop)
     }
     // swiftlint:disable:next identifier_name
