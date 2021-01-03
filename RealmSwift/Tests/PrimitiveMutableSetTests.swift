@@ -26,7 +26,6 @@ class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase 
     var obj: SwiftSetObject!
     var mutableSet: MutableSet<V.T>!
     var values: [V.T]!
-    var valuesSet: Set<V.T>!
 
     class func _defaultTestSuite() -> XCTestSuite {
         return defaultTestSuite
@@ -35,14 +34,13 @@ class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase 
     override func setUp() {
         obj = SwiftSetObject()
         if O.isManaged() {
-            let config = Realm.Configuration(inMemoryIdentifier: "test", objectTypes: [SwiftListObject.self])
+            let config = Realm.Configuration(inMemoryIdentifier: "test", objectTypes: [SwiftSetObject.self])
             realm = try! Realm(configuration: config)
             realm!.beginWrite()
             realm!.add(obj)
         }
         mutableSet = V.mutableSet(obj)
         values = V.values()
-        valuesSet = Set(values)
     }
 
     override func tearDown() {
@@ -62,77 +60,20 @@ class PrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMuta
         }
     }
 
-//    func testIndexOf() {
-//        XCTAssertNil(mutableSet.index(of: values[0]))
-//
-//        mutableSet.insert(values[0])
-//        XCTAssertEqual(0, mutableSet.index(of: values[0]))
-//
-//        mutableSet.insert(values[1])
-//        XCTAssertEqual(0, mutableSet.index(of: values[0]))
-//        XCTAssertEqual(1, mutableSet.index(of: values[1]))
-//    }
-
-    // FIXME: Not yet implemented
-//    func disabled_testIndexMatching() {
-//        XCTAssertNil(mutableSet.index(matching: "self = %@", values[0]))
-//
-//        mutableSet.insert(values[0])
-//        XCTAssertEqual(0, mutableSet.index(matching: "self = %@", values[0]))
-//
-//        mutableSet.insert(values[1])
-//        XCTAssertEqual(0, mutableSet.index(matching: "self = %@", values[0]))
-//        XCTAssertEqual(1, mutableSet.index(matching: "self = %@", values[1]))
-//    }
-
-//    func testSubscript() {
+//    func testValueForKey() {
+//        XCTAssertEqual(mutableSet.value(forKey: "self").count, 0)
 //        mutableSet.insert(objectsIn: values)
-//        for i in 0..<values.count {
-//            XCTAssertEqual(mutableSet[i], values[i])
-//        }
-//        assertThrows(mutableSet[values.count], reason: "Index 3 is out of bounds")
-//        assertThrows(mutableSet[-1], reason: "negative value")
-//    }
 //
-//    func testFirst() {
-//        mutableSet.insert(objectsIn: values)
-//        XCTAssertEqual(mutableSet.first, values.first)
-//        mutableSet.removeAll()
-//        XCTAssertNil(mutableSet.first)
-//    }
+////        XCTAssertTrue( mutableSet.value(forKey: "self").map { /*values!.contains(dynamicBridgeCast(fromObjectiveC: $0) as V.T*/ print($0) ) }! )
 //
-//    func testLast() {
-//        mutableSet.insert(objectsIn: values)
-//        XCTAssertEqual(mutableSet.last, values.last)
-//        mutableSet.removeAll()
-//        XCTAssertNil(mutableSet.last)
+//        print(mutableSet)
+//        // two ambiguous value(forKeys)?
 //
+////        Set((mutableSet.value(forKey: "self") as [AnyObject])
+////        mutableSet.value(forKey: "self").map { /*values!.contains(dynamicBridgeCast(fromObjectiveC: $0) as V.T*/ print($0) }!
+//
+//        assertThrows(mutableSet.value(forKey: "not self"), named: "NSUnknownKeyException")
 //    }
-
-    func testValueForKey() {
-        XCTAssertEqual(mutableSet.value(forKey: "self").count, 0)
-        mutableSet.insert(objectsIn: values)
-
-//        XCTAssertTrue( mutableSet.value(forKey: "self").map { /*values!.contains(dynamicBridgeCast(fromObjectiveC: $0) as V.T*/ print($0) ) }! )
-
-        print(mutableSet)
-        // two ambiguous value(forKeys)?
-
-//        Set((mutableSet.value(forKey: "self") as [AnyObject])
-//        mutableSet.value(forKey: "self").map { /*values!.contains(dynamicBridgeCast(fromObjectiveC: $0) as V.T*/ print($0) }!
-
-        assertThrows(mutableSet.value(forKey: "not self"), named: "NSUnknownKeyException")
-    }
-
-    func testSetValueForKey() {
-        // does this even make any sense?
-
-    }
-
-    func testFilter() {
-        // not implemented
-
-    }
 
     func testInsert() {
         XCTAssertEqual(Int(0), mutableSet.count)
@@ -140,40 +81,38 @@ class PrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMuta
         mutableSet.insert(values[0])
         XCTAssertEqual(Int(1), mutableSet.count)
         XCTAssertTrue(mutableSet.contains(values[0]))
-//
-//        mutableSet.insert(values[1])
-//        XCTAssertEqual(Int(2), mutableSet.count)
-//        XCTAssertEqual(values[1], mutableSet[0])
-//        XCTAssertEqual(values[0], mutableSet[1])
-//
-//        mutableSet.insert(values[2])
-//        XCTAssertEqual(Int(3), mutableSet.count)
-//        XCTAssertEqual(values[1], mutableSet[0])
-//        XCTAssertEqual(values[0], mutableSet[1])
-//        XCTAssertEqual(values[2], mutableSet[2])
+
+        mutableSet.insert(values[1])
+        XCTAssertEqual(Int(2), mutableSet.count)
+        XCTAssertTrue(mutableSet.contains(values[0]))
+        XCTAssertTrue(mutableSet.contains(values[1]))
+
+        mutableSet.insert(values[2])
+        XCTAssertEqual(Int(3), mutableSet.count)
+        XCTAssertTrue(mutableSet.contains(values[0]))
+        XCTAssertTrue(mutableSet.contains(values[1]))
+
+        mutableSet.insert(values[2])
+        XCTAssertEqual(Int(3), mutableSet.count)
+        XCTAssertTrue(mutableSet.contains(values[0]))
+        XCTAssertTrue(mutableSet.contains(values[1]))
+        XCTAssertTrue(mutableSet.contains(values[2]))
+        // Insert duplicate
+        mutableSet.insert(values[2])
+        XCTAssertEqual(Int(3), mutableSet.count)
+        XCTAssertTrue(mutableSet.contains(values[0]))
+        XCTAssertTrue(mutableSet.contains(values[1]))
+        XCTAssertTrue(mutableSet.contains(values[2]))
     }
 
     func testRemove() {
-//        assertThrows(mutableSet.remove(at: 0))
-//        assertThrows(mutableSet.remove(at: -1))
-//
-//        mutableSet.append(objectsIn: values)
-//
-//        assertThrows(mutableSet.remove(at: -1))
-//        XCTAssertEqual(values[0], mutableSet[0])
-//        XCTAssertEqual(values[1], mutableSet[1])
-//        XCTAssertEqual(values[2], mutableSet[2])
-//        assertThrows(mutableSet[3])
-//
-//        mutableSet.remove(at: 0)
-//        XCTAssertEqual(values[1], mutableSet[0])
-//        XCTAssertEqual(values[2], mutableSet[1])
-//        assertThrows(mutableSet[2])
-//        assertThrows(mutableSet.remove(at: 2))
-//
-//        mutableSet.remove(at: 1)
-//        XCTAssertEqual(values[1], mutableSet[0])
-//        assertThrows(mutableSet[1])
+        mutableSet.removeAll()
+        XCTAssertEqual(mutableSet.count, 0)
+        mutableSet.insert(objectsIn: values)
+        mutableSet.remove(values[0])
+        XCTAssertFalse(mutableSet.contains(values[0]))
+        XCTAssertTrue(mutableSet.contains(values[1]))
+        XCTAssertTrue(mutableSet.contains(values[2]))
     }
 
     func testRemoveAll() {
@@ -187,13 +126,13 @@ class PrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMuta
 class MinMaxPrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T: MinMaxType {
     func testMin() {
         XCTAssertNil(mutableSet.min())
-        mutableSet.insert(objectsIn: values.reversed())
+        mutableSet.insert(objectsIn: values)
         XCTAssertEqual(mutableSet.min(), values.first)
     }
 
     func testMax() {
         XCTAssertNil(mutableSet.max())
-        mutableSet.insert(objectsIn: values.reversed())
+        mutableSet.insert(objectsIn: values)
         XCTAssertEqual(mutableSet.max(), values.last)
     }
 }
@@ -207,14 +146,14 @@ class OptionalMinMaxPrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>:
 
     func testMin() {
         XCTAssertNil(mutableSet2.min())
-        mutableSet.insert(objectsIn: values.reversed())
+        mutableSet.insert(objectsIn: values)
         let expected = values[1] as! V.W
         XCTAssertEqual(mutableSet2.min(), expected)
     }
 
     func testMax() {
         XCTAssertNil(mutableSet2.max())
-        mutableSet.insert(objectsIn: values.reversed())
+        mutableSet.insert(objectsIn: values)
         let expected = values[2] as! V.W
         XCTAssertEqual(mutableSet2.max(), expected)
     }
@@ -279,8 +218,8 @@ class SortablePrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primi
         shuffled.append(values!.first!)
         mutableSet.insert(objectsIn: shuffled)
 
-//        assertEqual(mutableSet(mutableSet.sorted(ascending: true)), values)
-//        assertEqual(mutableSet(mutableSet.sorted(ascending: false)), values.reversed())
+        assertEqual(Array(mutableSet.sorted(ascending: true)), values)
+        assertEqual(Array(mutableSet.sorted(ascending: false)), values.reversed())
     }
 }
 
@@ -291,10 +230,10 @@ class OptionalSortablePrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory
         shuffled.append(values!.first!)
         mutableSet.insert(objectsIn: shuffled)
 
-        let mutableSet2 = unsafeDowncast(mutableSet!, to: List<V.W?>.self)
-        let values2 = unsafeBitCast(values!, to: MutableSet<V.W?>.self)
-//        assertEqual(mutableSet(mutableSet2.sorted(ascending: true)), values2)
-//        assertEqual(mutableSet(mutableSet2.sorted(ascending: false)), values2.reversed())
+        let mutableSet2 = unsafeDowncast(mutableSet!, to: MutableSet<V.W?>.self)
+        let values2 = unsafeBitCast(values!, to: Array<V.W?>.self)
+        assertEqual(Array(mutableSet2.sorted(ascending: true)), values2)
+        assertEqual(Array(mutableSet2.sorted(ascending: false)), values2.reversed())
     }
 }
 
@@ -366,7 +305,7 @@ func addMutableSetTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type
 
 class UnmanagedPrimitiveMutableSetTests: TestCase {
     class func _defaultTestSuite() -> XCTestSuite {
-        let suite = XCTestSuite(name: "Unmanaged Primitive Lists")
+        let suite = XCTestSuite(name: "Unmanaged Primitive Sets")
         addMutableSetTests(suite, UnmanagedObjectFactory.self)
         return suite
     }
@@ -378,7 +317,7 @@ class UnmanagedPrimitiveMutableSetTests: TestCase {
 
 class ManagedPrimitiveMutableSetTests: TestCase {
     class func _defaultTestSuite() -> XCTestSuite {
-        let suite = XCTestSuite(name: "Managed Primitive Lists")
+        let suite = XCTestSuite(name: "Managed Primitive Sets")
         addMutableSetTests(suite, ManagedObjectFactory.self)
 
         _ = SortablePrimitiveMutableSetTests<ManagedObjectFactory, IntFactory>._defaultTestSuite().tests.map(suite.addTest)
