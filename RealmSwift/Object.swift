@@ -78,6 +78,10 @@ extension Object: RealmCollectionValue {
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectClassName: className())
     }
+    /// :nodoc:
+    public static func _rlmSet() -> RLMSet<AnyObject> {
+        return RLMSet(objectClassName: className())
+    }
 
     // MARK: Initializers
 
@@ -192,7 +196,7 @@ extension Object: RealmCollectionValue {
         if let accessor = prop.swiftAccessor {
             return accessor.get(Unmanaged.passUnretained(self).toOpaque() + ivar_getOffset(prop.swiftIvar!))
         }
-        if let ivar = prop.swiftIvar, prop.array, prop.set {
+        if let ivar = prop.swiftIvar, (prop.array || prop.set) {
             return object_getIvar(self, ivar)
         }
         return RLMDynamicGet(self, prop)

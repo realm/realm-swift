@@ -56,6 +56,7 @@ class SwiftObject: Object {
     @objc dynamic var uuidCol: UUID = UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!
 
     let arrayCol = List<SwiftBoolObject>()
+    let setCol = MutableSet<SwiftBoolObject>()
 
     class func defaultValues() -> [String: Any] {
         return  [
@@ -70,7 +71,8 @@ class SwiftObject: Object {
             "objectIdCol": ObjectId("1234567890ab1234567890ab"),
             "objectCol": [false],
             "uuidCol": UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
-            "arrayCol": []
+            "arrayCol": [],
+            "setCol": []
         ]
     }
 }

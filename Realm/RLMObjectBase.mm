@@ -23,6 +23,7 @@
 #import "RLMSet_Private.hpp"
 #import "RLMDecimal128.h"
 #import "RLMListBase.h"
+#import "RLMSetBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObservation.hpp"
@@ -207,6 +208,16 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
             if (value) {
                 [array addObjects:validatedObjectForProperty(value, _objectSchema, property,
                                                              RLMSchema.partialPrivateSharedSchema)];
+            }
+        }
+        else if (property.set) {
+            value = RLMAsFastEnumeration(value);
+            RLMSet *set = [object_getIvar(self, ivar) _rlmSet];
+            [set removeAllObjects];
+
+            if (value) {
+                [set addObjects:validatedObjectForProperty(value, _objectSchema, property,
+                                                           RLMSchema.partialPrivateSharedSchema)];
             }
         }
         else if (property.optional) {

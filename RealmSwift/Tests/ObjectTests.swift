@@ -74,7 +74,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual(schema.properties.map { $0.name },
                        ["boolCol", "intCol", "intEnumCol", "floatCol", "doubleCol",
                         "stringCol", "binaryCol", "dateCol", "decimalCol",
-                        "objectIdCol", "objectCol", "uuidCol", "arrayCol"]
+                        "objectIdCol", "objectCol", "uuidCol", "arrayCol", "setCol"]
         )
     }
 

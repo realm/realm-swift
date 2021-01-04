@@ -80,13 +80,14 @@ class ObjectCreationTests: TestCase {
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
-            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "setCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
            ]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
-            for validValue in validValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
+            for validValue in validValuesForSwiftObjectType(props[propNum].type, (props[propNum].isArray || props[propNum].isSet)) {
                 // update dict with valid value and init
                 var values = baselineValues
                 values[props[propNum].name] = validValue
@@ -122,12 +123,12 @@ class ObjectCreationTests: TestCase {
                                      Date(timeIntervalSince1970: 2), Decimal128(number: 123),
                                      ObjectId.generate(), ["boolCol": true],
                                      UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
-                                     [[true], [false]]]
+                                     [[true], [false]], [[true], [false]]]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
-            for validValue in validValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
+            for validValue in validValuesForSwiftObjectType(props[propNum].type, (props[propNum].isArray || props[propNum].isSet)) {
                 // update dict with valid value and init
                 var values = baselineValues
                 values[propNum] = validValue
@@ -238,13 +239,14 @@ class ObjectCreationTests: TestCase {
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
-            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "setCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
         ]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
-            for validValue in validValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
+            for validValue in validValuesForSwiftObjectType(props[propNum].type, (props[propNum].isArray || props[propNum].isSet)) {
                 // update dict with valid value and init
                 var values = baselineValues
                 values[props[propNum].name] = validValue
@@ -290,12 +292,12 @@ class ObjectCreationTests: TestCase {
                                      Date(timeIntervalSince1970: 2), Decimal128(number: 123),
                                      ObjectId.generate(), ["boolCol": true],
                                      UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
-                                     [[true], [false]]]
+                                     [[true], [false]], [[true], [false]]]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
-            for validValue in validValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
+            for validValue in validValuesForSwiftObjectType(props[propNum].type, (props[propNum].isArray || props[propNum].isSet)) {
                 // update dict with valid value and init
                 var values = baselineValues
                 values[propNum] = validValue
@@ -1260,8 +1262,12 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.objectIdCol, (array[9] as! ObjectId))
         XCTAssertEqual(object.objectCol!.boolCol, boolObjectValue)
         XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
+        XCTAssertEqual(object.setCol.count, boolObjectListValues.count)
         for i in 0..<boolObjectListValues.count {
             XCTAssertEqual(object.arrayCol[i].boolCol, boolObjectListValues[i])
+        }
+        object.setCol.forEach { obj in
+            XCTAssertTrue(boolObjectListValues.contains(obj.boolCol))
         }
     }
 
