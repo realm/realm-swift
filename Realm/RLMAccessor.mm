@@ -31,6 +31,7 @@
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
 #import "RLMUUID_Private.hpp"
+#import "RLMValue.h"
 
 #import <realm/object-store/results.hpp>
 #import <realm/object-store/property.hpp>
@@ -79,7 +80,10 @@ template<>
 bool is_null(realm::Decimal128 const& v) {
     return v.is_null();
 }
-
+template<>
+bool is_null(realm::Mixed const& v) {
+    return v.is_null();
+}
 template<>
 bool is_null(realm::UUID const&) {
     return false;
@@ -253,6 +257,44 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
     }
 }
 
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
+              __unsafe_unretained id<RLMValue> const value) {
+    RLMTranslateError([&] {
+        switch (value.valueType) {
+            case RLMValueTypeInt:
+                setValue(obj, key, (NSNumber<RLMInt> *)value);
+                break;
+            case RLMValueTypeBool:
+                setValue(obj, key, (NSNumber<RLMBool> *)value);
+                break;
+            case RLMValueTypeFloat:
+                setValue(obj, key, (NSNumber<RLMFloat> *)value);
+                break;
+            case RLMValueTypeDouble:
+                setValue(obj, key, (NSNumber<RLMDouble> *)value);
+                break;
+            case RLMValueTypeString:
+                setValue(obj, key, (NSString *)value);
+                break;
+            case RLMValueTypeData:
+                setValue(obj, key, (NSData *)value);
+                break;
+            case RLMValueTypeDate:
+                setValue(obj, key, (NSDate *)value);
+                break;
+            case RLMValueTypeObject:
+                setValue(obj, key, (RLMObjectBase *)value);
+                break;
+            case RLMValueTypeObjectId:
+                setValue(obj, key, (RLMObjectId *)value);
+                break;
+            case RLMValueTypeDecimal128:
+                setValue(obj, key, (RLMDecimal128 *)value);
+                break;
+        }
+    });
+}
+
 RLMLinkingObjects *getLinkingObjects(__unsafe_unretained RLMObjectBase *const obj,
                                      __unsafe_unretained RLMProperty *const property) {
     RLMVerifyAttached(obj);
@@ -345,7 +387,7 @@ id managedGetter(RLMProperty *prop, const char *type) {
         case RLMPropertyTypeObjectId:
             return makeWrapperGetter<realm::ObjectId>(index, prop.optional);
         case RLMPropertyTypeAny:
-            @throw RLMException(@"Cannot create accessor class for schema with Mixed properties");
+            return makeBoxedGetter<realm::Mixed>(index);
         case RLMPropertyTypeLinkingObjects:
             return ^(__unsafe_unretained RLMObjectBase *const obj) {
                 return getLinkingObjects(obj, prop);
@@ -406,7 +448,7 @@ id managedSetter(RLMProperty *prop, const char *type) {
         case RLMPropertyTypeString:         return makeSetter<NSString *>(prop);
         case RLMPropertyTypeDate:           return makeSetter<NSDate *>(prop);
         case RLMPropertyTypeData:           return makeSetter<NSData *>(prop);
-        case RLMPropertyTypeAny:            return nil;
+        case RLMPropertyTypeAny:            return makeSetter<id<RLMValue>>(prop);
         case RLMPropertyTypeLinkingObjects: return nil;
         case RLMPropertyTypeObject:         return makeSetter<RLMObjectBase *>(prop);
         case RLMPropertyTypeObjectId:       return makeSetter<RLMObjectId *>(prop);
@@ -794,8 +836,29 @@ realm::UUID RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
     return RLMObjcToUUID(v);
 }
 template<>
-realm::Mixed RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
-    REALM_UNREACHABLE();
+realm::Mixed RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+    switch ([(id<RLMValue>)v valueType]) {
+        case RLMValueTypeInt:
+            return realm::Mixed([(NSNumber *)v intValue]);
+        case RLMValueTypeBool:
+            return realm::Mixed([(NSNumber *)v boolValue]);
+        case RLMValueTypeFloat:
+            return realm::Mixed([(NSNumber *)v floatValue]);
+        case RLMValueTypeDouble:
+            return realm::Mixed([(NSNumber *)v doubleValue]);
+        case RLMValueTypeString:
+            return realm::Mixed([(NSString *)v cStringUsingEncoding:NSUTF8StringEncoding]);
+        case RLMValueTypeData:
+            return realm::Mixed([(NSData *)v bytes]);
+        case RLMValueTypeDate:
+            realm::Timestamp([(NSDate *)v timeIntervalSince1970], 0);
+        case RLMValueTypeObject:
+            return realm::Mixed(((RLMObjectBase *)v)->_row.get_key());
+        case RLMValueTypeObjectId:
+            return realm::Mixed([(RLMObjectId *)v value]);
+        case RLMValueTypeDecimal128:
+            return realm::Mixed([(RLMDecimal128 *)v decimal128Value]);
+    }
 }
 template<>
 realm::object_store::Set RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {

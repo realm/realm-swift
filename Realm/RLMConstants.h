@@ -68,12 +68,7 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeString = 2,
     /** Binary data: `NSData` */
     RLMPropertyTypeData   = 3,
-    /**
-     Any object: `id`.
-
-     This property type is no longer supported for new models. However, old files
-     with any-typed properties are still supported for migration purposes.
-     */
+    /** Any type: `id<RLMValue>`, `AnyRLMValue. */
     RLMPropertyTypeAny    = 9,
     /** Dates: `NSDate` */
     RLMPropertyTypeDate   = 4,
@@ -86,7 +81,7 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeLinkingObjects = 8,
 
     RLMPropertyTypeObjectId = 10,
-    RLMPropertyTypeDecimal128 = 11,
+    RLMPropertyTypeDecimal128 = 11
 };
 
 /** An error domain identifying Realm-specific errors. */

@@ -226,6 +226,10 @@ using namespace realm;
     });
 }
 
+- (id)profile {
+    _user->user_profile();
+}
+
 - (RLMAPIKeyAuth *)apiKeysAuth {
     return [[RLMAPIKeyAuth alloc] initWithApp: _app];
 }
