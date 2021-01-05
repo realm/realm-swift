@@ -25,7 +25,7 @@
 #import "RLMVersion.h"
 #endif
 
-#import "shared_realm.hpp"
+#import <realm/object-store/shared_realm.hpp>
 
 @interface UtilTests : RLMTestCase
 

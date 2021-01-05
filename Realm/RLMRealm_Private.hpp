@@ -19,7 +19,8 @@
 #import "RLMRealm_Private.h"
 
 #import "RLMClassInfo.hpp"
-#import "object_schema.hpp"
+
+#import <realm/object-store/object_schema.hpp>
 
 namespace realm {
     class Group;

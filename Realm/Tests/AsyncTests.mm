@@ -21,9 +21,8 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealm_Private.hpp"
 
-#import "impl/realm_coordinator.hpp"
-
 #import <realm/string_data.hpp>
+#import <realm/object-store/impl/realm_coordinator.hpp>
 
 #import <sys/resource.h>
 

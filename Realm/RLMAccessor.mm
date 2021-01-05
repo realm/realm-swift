@@ -31,8 +31,8 @@
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
 
-#import "results.hpp"
-#import "property.hpp"
+#import <realm/object-store/results.hpp>
+#import <realm/object-store/property.hpp>
 
 #import <objc/runtime.h>
 #import <objc/message.h>
@@ -41,7 +41,7 @@
 
 namespace realm {
 template<>
-Obj ConstObj::get<Obj>(ColKey col) const {
+Obj Obj::get<Obj>(ColKey col) const {
     ObjKey key = get<ObjKey>(col);
     return key ? get_target_table(col)->get_object(key) : Obj();
 }
@@ -770,6 +770,22 @@ template<>
 realm::ObjectId RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
     return static_cast<RLMObjectId *>(v).value;
 }
+template<>
+realm::UUID RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
+}
+template<>
+realm::Mixed RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
+}
+template<>
+realm::object_store::Set RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
+}
+template<>
+realm::object_store::Dictionary RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
+}
 
 template<typename Fn>
 static auto to_optional(__unsafe_unretained id const value, Fn&& fn) {
@@ -796,6 +812,10 @@ realm::util::Optional<int64_t> RLMAccessorContext::unbox(__unsafe_unretained id 
 template<>
 realm::util::Optional<realm::ObjectId> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
     return to_optional(v, [&](__unsafe_unretained RLMObjectId *v) { return v.value; });
+}
+template<>
+realm::util::Optional<realm::UUID> RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
 }
 
 std::pair<realm::Obj, bool>

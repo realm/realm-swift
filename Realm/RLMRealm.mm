@@ -37,24 +37,23 @@
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
-#include "impl/realm_coordinator.hpp"
-#include "object_store.hpp"
-#include "schema.hpp"
-#include "shared_realm.hpp"
-#include "thread_safe_reference.hpp"
-#include "util/scheduler.hpp"
-
-#include <realm/disable_sync_to_disk.hpp>
-#include <realm/util/scope_exit.hpp>
-#include <realm/version.hpp>
+#import <realm/disable_sync_to_disk.hpp>
+#import <realm/object-store/impl/realm_coordinator.hpp>
+#import <realm/object-store/object_store.hpp>
+#import <realm/object-store/schema.hpp>
+#import <realm/object-store/shared_realm.hpp>
+#import <realm/object-store/thread_safe_reference.hpp>
+#import <realm/object-store/util/scheduler.hpp>
+#import <realm/util/scope_exit.hpp>
+#import <realm/version.hpp>
 
 #if REALM_ENABLE_SYNC
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 
-#import "sync/async_open_task.hpp"
-#import "sync/sync_session.hpp"
+#import <realm/object-store/sync/async_open_task.hpp>
+#import <realm/object-store/sync/sync_session.hpp>
 #endif
 
 using namespace realm;
@@ -142,10 +141,6 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 @implementation RLMRealm {
     NSHashTable<RLMFastEnumerator *> *_collectionEnumerators;
     bool _sendingNotifications;
-}
-
-+ (BOOL)isCoreDebug {
-    return realm::Version::has_feature(realm::feature_Debug);
 }
 
 + (void)initialize {

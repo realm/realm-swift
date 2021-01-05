@@ -17,26 +17,15 @@
 # core
 core
 core-*
-
-# sync
-/sync-*
-
-# sh build.sh config
-/Realm/config.mk
+realm-core-*-xcframework
 
 # sh build.sh test
 build/
-
-# sh build.sh build-iphone
-/iphone-lib/include
 
 # sh build.sh ios-framework
 # sh build.sh package-examples
 */Realm.framework
 Realm.framework
-
-# sh build.sh build-cocoa
-bin
 
 # sh build.sh cocoapods-setup
 /include
@@ -110,8 +99,6 @@ SwiftVersion.swift
 examples/ios/objc/Draw/Constants.h
 
 ## Sync testing
-test-ros-instance
-Realm/ObjectServerTests/node_modules
 /stitch
 
 ## Swiftpm

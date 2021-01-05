@@ -16,7 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#if canImport(RealmTestSupport)
 import RealmTestSupport
+#endif
 
 extension RLMTestCase {
     func assertThrowsWithReasonMatching<T>(_ block: @autoclosure @escaping () -> T, _ regexString: String,

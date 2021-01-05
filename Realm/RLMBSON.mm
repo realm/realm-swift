@@ -16,14 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import <sstream>
+#import "RLMBSON_Private.hpp"
 
-#import "RLMUtil.hpp"
 #import "RLMDecimal128_Private.hpp"
 #import "RLMObjectId_Private.hpp"
-#import "RLMBSON_Private.hpp"
-#import "util/bson/bson.hpp"
+#import "RLMUtil.hpp"
+
+#import <realm/object-store/util/bson/bson.hpp>
 
 using namespace realm;
 using namespace bson;
@@ -377,6 +376,8 @@ id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
             return [[NSMutableDictionary alloc] initWithBsonDocument:static_cast<BsonDocument>(b)];
         case realm::bson::Bson::Type::Array:
             return [[NSMutableArray alloc] initWithBsonArray:static_cast<BsonArray>(b)];
+        case realm::bson::Bson::Type::Uuid:
+            REALM_COMPILER_HINT_UNREACHABLE();
     }
     return nil;
 }

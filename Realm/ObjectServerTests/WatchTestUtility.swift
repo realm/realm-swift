@@ -18,17 +18,18 @@
 
 import Foundation
 import RealmSwift
+import XCTest
 
-class WatchTestUtility: ChangeEventDelegate {
-    var semaphore: DispatchSemaphore
-    var isOpenSemaphore: DispatchSemaphore
+final public class WatchTestUtility: ChangeEventDelegate {
+    public let semaphore: DispatchSemaphore
+    public let isOpenSemaphore: DispatchSemaphore
     private var targetEventCount: Int
     private var changeEventCount = 0
     private var didOpenWasCalled = false
     private var matchingObjectId: ObjectId?
     private weak var expectation: XCTestExpectation?
 
-    init(targetEventCount: Int, matchingObjectId: ObjectId? = nil, expectation: inout XCTestExpectation) {
+    public init(targetEventCount: Int, matchingObjectId: ObjectId? = nil, expectation: inout XCTestExpectation) {
         self.targetEventCount = targetEventCount
         self.matchingObjectId = matchingObjectId
         self.expectation = expectation
@@ -36,23 +37,23 @@ class WatchTestUtility: ChangeEventDelegate {
         isOpenSemaphore = DispatchSemaphore(value: 0)
     }
 
-    func changeStreamDidOpen(_ changeStream: ChangeStream) {
+    public func changeStreamDidOpen(_ changeStream: ChangeStream) {
         didOpenWasCalled = true
         isOpenSemaphore.signal()
     }
 
-    func changeStreamDidClose(with error: Error?) {
+    public func changeStreamDidClose(with error: Error?) {
         XCTAssertNil(error)
         XCTAssertTrue(didOpenWasCalled)
         XCTAssertEqual(changeEventCount, targetEventCount)
         expectation?.fulfill()
     }
 
-    func changeStreamDidReceive(error: Error) {
+    public func changeStreamDidReceive(error: Error) {
         XCTAssertNil(error)
     }
 
-    func changeStreamDidReceive(changeEvent: AnyBSON?) {
+    public func changeStreamDidReceive(changeEvent: AnyBSON?) {
         changeEventCount+=1
         XCTAssertNotNil(changeEvent)
         guard let changeEvent = changeEvent else {
