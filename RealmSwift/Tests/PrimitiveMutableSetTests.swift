@@ -24,7 +24,9 @@ import RealmSwift
 class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
     var realm: Realm?
     var obj: SwiftSetObject!
+    var obj2: SwiftSetObject!
     var mutableSet: MutableSet<V.T>!
+    var otherMutableSet: MutableSet<V.T>!
     var values: [V.T]!
 
     class func _defaultTestSuite() -> XCTestSuite {
@@ -33,13 +35,16 @@ class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase 
 
     override func setUp() {
         obj = SwiftSetObject()
+        obj2 = SwiftSetObject()
         if O.isManaged() {
             let config = Realm.Configuration(inMemoryIdentifier: "test", objectTypes: [SwiftSetObject.self])
             realm = try! Realm(configuration: config)
             realm!.beginWrite()
             realm!.add(obj)
+            realm!.add(obj2)
         }
         mutableSet = V.mutableSet(obj)
+        otherMutableSet = V.mutableSet(obj2)
         values = V.values()
     }
 
@@ -47,7 +52,9 @@ class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase 
         realm?.cancelWrite()
         realm = nil
         mutableSet = nil
+        otherMutableSet = nil
         obj = nil
+        obj2 = nil
     }
 }
 
@@ -60,20 +67,14 @@ class PrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMuta
         }
     }
 
-//    func testValueForKey() {
-//        XCTAssertEqual(mutableSet.value(forKey: "self").count, 0)
-//        mutableSet.insert(objectsIn: values)
-//
-////        XCTAssertTrue( mutableSet.value(forKey: "self").map { /*values!.contains(dynamicBridgeCast(fromObjectiveC: $0) as V.T*/ print($0) ) }! )
-//
-//        print(mutableSet)
-//        // two ambiguous value(forKeys)?
-//
-////        Set((mutableSet.value(forKey: "self") as [AnyObject])
-////        mutableSet.value(forKey: "self").map { /*values!.contains(dynamicBridgeCast(fromObjectiveC: $0) as V.T*/ print($0) }!
-//
-//        assertThrows(mutableSet.value(forKey: "not self"), named: "NSUnknownKeyException")
-//    }
+    func testValueForKey() {
+        XCTAssertEqual(mutableSet.value(forKey: "self").count, 0)
+        mutableSet.insert(objectsIn: values)
+        let valuesSet = Set(values!)
+        let kvoSet = Set(mutableSet.value(forKey: "self").map { dynamicBridgeCast(fromObjectiveC: $0) as V.T })
+        XCTAssertEqual(valuesSet, kvoSet)
+        assertThrows(mutableSet.value(forKey: "not self"), named: "NSUnknownKeyException")
+    }
 
     func testInsert() {
         XCTAssertEqual(Int(0), mutableSet.count)
@@ -120,6 +121,77 @@ class PrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMuta
         mutableSet.insert(objectsIn: values)
         mutableSet.removeAll()
         XCTAssertEqual(mutableSet.count, 0)
+    }
+
+    func testIsSubset() {
+        XCTAssertEqual(Int(0), mutableSet.count)
+        XCTAssertEqual(Int(0), otherMutableSet.count)
+        mutableSet.insert(objectsIn: values)
+        otherMutableSet.insert(values[0])
+        // Both sets contain values[0]
+        XCTAssertTrue(otherMutableSet.isSubset(of: mutableSet))
+        otherMutableSet.remove(values[0])
+        XCTAssertFalse(mutableSet.isSubset(of: otherMutableSet))
+    }
+
+    func testContains() {
+        XCTAssertEqual(Int(0), mutableSet.count)
+        XCTAssertEqual(Int(0), otherMutableSet.count)
+        mutableSet.insert(objectsIn: values)
+        XCTAssertEqual(values.count, mutableSet.count)
+        values.forEach {
+            XCTAssertTrue(mutableSet.contains($0))
+        }
+    }
+
+    func testIntersects() {
+        XCTAssertEqual(Int(0), mutableSet.count)
+        XCTAssertEqual(Int(0), otherMutableSet.count)
+        mutableSet.insert(objectsIn: values)
+        otherMutableSet.insert(values[0])
+        // Both sets contain values[0]
+        XCTAssertTrue(otherMutableSet.intersects(mutableSet))
+        otherMutableSet.remove(values[0])
+        XCTAssertFalse(mutableSet.intersects(otherMutableSet))
+    }
+
+    func testFormIntersection() {
+        XCTAssertEqual(Int(0), mutableSet.count)
+        XCTAssertEqual(Int(0), otherMutableSet.count)
+        mutableSet.insert(objectsIn: values)
+        otherMutableSet.insert(values[0])
+        // Both sets contain values[0]
+        mutableSet.formIntersection(otherMutableSet)
+        XCTAssertEqual(Int(1), otherMutableSet.count)
+        // Fails with PrimitiveMutableSetTests<OF, StringFactory>
+        XCTAssertTrue(mutableSet.contains(values[0]))
+    }
+    // Fails with PrimitiveMutableSetTests<OF, StringFactory>
+    func testFormUnion() {
+        XCTAssertEqual(Int(0), mutableSet.count)
+        XCTAssertEqual(Int(0), otherMutableSet.count)
+        mutableSet.insert(values[0])
+        mutableSet.insert(values[1])
+        otherMutableSet.insert(values[0])
+        otherMutableSet.insert(values[2])
+        mutableSet.formUnion(otherMutableSet)
+        XCTAssertEqual(Int(3), mutableSet.count)
+        XCTAssertTrue(mutableSet.contains(values[0]))
+        XCTAssertTrue(mutableSet.contains(values[1]))
+        XCTAssertTrue(mutableSet.contains(values[2]))
+    }
+
+    func testSubtract() {
+        XCTAssertEqual(Int(0), mutableSet.count)
+        XCTAssertEqual(Int(0), otherMutableSet.count)
+        mutableSet.insert(values[0])
+        mutableSet.insert(values[1])
+        otherMutableSet.insert(values[0])
+        otherMutableSet.insert(values[2])
+        mutableSet.subtract(otherMutableSet)
+        XCTAssertEqual(Int(1), mutableSet.count)
+        XCTAssertFalse(mutableSet.contains(values[0]))
+        XCTAssertTrue(mutableSet.contains(values[1]))
     }
 }
 

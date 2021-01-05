@@ -422,7 +422,7 @@
     [realm deleteObject:obj];
     [realm commitWriteTransaction];
 }
-// FIXME
+
 - (void)testRealmBatchRemoveObjects {
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
@@ -447,45 +447,45 @@
     // add objects to linkView
     [realm beginWriteTransaction];
     ArrayPropertyObject *arrayObj = [ArrayPropertyObject createInRealm:realm withValue:@[@"name", @[@[@"a"], @[@"b"], @[@"c"]], @[]]];
-    SetPropertyObject *setObj = [SetPropertyObject createInRealm:realm withValue:@[@"name", @[@[@"a"], @[@"b"], @[@"c"]], @[]]];
-    [StringObject createInRealm:realm withValue:@[@"d"]];
+    SetPropertyObject *setObj = [SetPropertyObject createInRealm:realm withValue:@[@"name", @[@[@"d"], @[@"e"], @[@"f"]], @[]]];
+    [StringObject createInRealm:realm withValue:@[@"g"]];
     [realm commitWriteTransaction];
 
-//    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 4U, @"Expecting 4 objects");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 7U, @"Expecting 7 objects");
 
     // remove from linkView
     [realm beginWriteTransaction];
     [realm deleteObjects:arrayObj.array];
-//    [realm deleteObjects:setObj.set];
+    [realm deleteObjects:setObj.set];
     [realm commitWriteTransaction];
 
-//    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 1U, @"Expecting 1 object");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 1U, @"Expecting 1 object");
     XCTAssertEqual(arrayObj.array.count, 0U, @"Expecting 0 objects");
-//    XCTAssertEqual(setObj.set.count, 0U, @"Expecting 0 objects");
+    XCTAssertEqual(setObj.set.count, 0U, @"Expecting 0 objects");
 
     // remove NSArray
     NSArray *arrayOfLastObject = @[[[StringObject allObjectsInRealm:realm] lastObject]];
     [realm beginWriteTransaction];
     [realm deleteObjects:arrayOfLastObject];
     [realm commitWriteTransaction];
-//    XCTAssertEqual(objects.count, 0U, @"Expecting 0 objects");
+    XCTAssertEqual(objects.count, 0U, @"Expecting 0 objects");
 
     // add objects to linkView
     [realm beginWriteTransaction];
     [arrayObj.array addObject:[StringObject createInRealm:realm withValue:@[@"a"]]];
     [arrayObj.array addObject:[[StringObject alloc] initWithValue:@[@"b"]]];
-//    [setObj.set addObject:[StringObject createInRealm:realm withValue:@[@"a"]]];
-//    [setObj.set addObject:[[StringObject alloc] initWithValue:@[@"b"]]];
+    [setObj.set addObject:[StringObject createInRealm:realm withValue:@[@"c"]]];
+    [setObj.set addObject:[[StringObject alloc] initWithValue:@[@"d"]]];
     [realm commitWriteTransaction];
 
     // remove objects from realm
     XCTAssertEqual(arrayObj.array.count, 2U, @"Expecting 2 objects");
-//    XCTAssertEqual(setObj.set.count, 2U, @"Expecting 2 objects");
+    XCTAssertEqual(setObj.set.count, 2U, @"Expecting 2 objects");
     [realm beginWriteTransaction];
     [realm deleteObjects:[StringObject allObjectsInRealm:realm]];
     [realm commitWriteTransaction];
     XCTAssertEqual(arrayObj.array.count, 0U, @"Expecting 0 objects");
-//    XCTAssertEqual(setObj.set.count, 0U, @"Expecting 0 objects");
+    XCTAssertEqual(setObj.set.count, 0U, @"Expecting 0 objects");
 }
 
 - (void)testAddManagedObjectToOtherRealm {

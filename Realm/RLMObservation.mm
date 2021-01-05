@@ -53,10 +53,9 @@ namespace {
     }
 }
 
-RLMObservationInfo::RLMObservationInfo(RLMClassInfo &objectSchema, realm::ObjKey row, id object, RLMCollectionType collectionType)
+RLMObservationInfo::RLMObservationInfo(RLMClassInfo &objectSchema, realm::ObjKey row, id object)
 : object(object)
 , objectSchema(&objectSchema)
-, collectionType(collectionType)
 {
     setRow(*objectSchema.table(), row);
 }
@@ -120,33 +119,6 @@ void RLMObservationInfo::willChange(NSString *key, NSKeyValueChange kind, NSInde
     }
 }
 
-void RLMObservationInfo::willChangeSet(NSString *key, NSKeyValueSetMutationKind kind, RLMSet *otherSet) {
-    isFiringNotificationForSet = true;
-    forEach([=](__unsafe_unretained auto o) {
-        [o willChangeValueForKey:key withSetMutation:kind usingObjects:(id)otherSet];
-    });
-}
-
-void RLMObservationInfo::willChangeSet(NSString *key,
-                                       NSKeyValueSetMutationKind kind,
-                                       const realm::Obj& obj,
-                                       const realm::ColKey& col_key) {
-    isFiringNotificationForSet = true;
-    forEach([=](__unsafe_unretained auto o) {
-        RLMManagedSet *s = [o valueForKey:key];
-        RLMRealm *r = (RLMRealm *)[o realm];
-        s = [s copyWithBackingSet:realm::object_store::Set(r->_realm, obj, col_key)];
-        [o willChangeValueForKey:key withSetMutation:kind usingObjects:(id)s];
-    });
-}
-
-void RLMObservationInfo::didChangeSet(NSString *key, NSKeyValueSetMutationKind kind, RLMSet *otherSet) {
-    forEach([=](__unsafe_unretained auto o) {
-        [o didChangeValueForKey:key withSetMutation:kind usingObjects:(id)otherSet];
-    });
-    isFiringNotificationForSet = false;
-}
-
 void RLMObservationInfo::didChange(NSString *key, NSKeyValueChange kind, NSIndexSet *indexes) const {
     if (indexes) {
         forEach([=](__unsafe_unretained auto o) {
@@ -197,6 +169,7 @@ void RLMObservationInfo::recordObserver(realm::Obj& objectRow, RLMClassInfo *obj
     if (objectRow) {
         this->objectSchema = objectInfo;
         setRow(*objectRow.get_table(), objectRow.get_key());
+        return;
     }
 
     // Arrays need a reference to their containing object to avoid having to
@@ -210,20 +183,17 @@ void RLMObservationInfo::recordObserver(realm::Obj& objectRow, RLMClassInfo *obj
     NSUInteger sep = [keyPath rangeOfString:@"."].location;
     NSString *key = sep == NSNotFound ? keyPath : [keyPath substringToIndex:sep];
     RLMProperty *prop = objectSchema[key];
-    collectionType = RLMCollectionTypeNone;
     if (prop && prop.array) {
         id value = valueForKey(key);
         RLMArray *array = [value isKindOfClass:[RLMListBase class]] ? [value _rlmArray] : value;
         array->_key = key;
         array->_parentObject = object;
-        collectionType = RLMCollectionTypeArray;
     }
     else if (prop && prop.set) {
         id value = valueForKey(key);
         RLMSet *set = [value isKindOfClass:[RLMSetBase class]] ? [value _rlmSet] : value;
         set->_key = key;
         set->_parentObject = object;
-        collectionType = RLMCollectionTypeSet;
     }
     else if (auto swiftIvar = prop.swiftIvar) {
         if (auto optional = RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, swiftIvar))) {
@@ -347,7 +317,6 @@ void RLMClearTable(RLMClassInfo &objectSchema) {
 RLMObservationTracker::RLMObservationTracker(__unsafe_unretained RLMRealm *const realm, bool trackDeletions, RLMCollectionType collectionType)
 : _realm(realm)
 , _group(realm.group)
-, _collectionType(collectionType)
 {
     if (trackDeletions) {
         this->trackDeletions();
@@ -355,11 +324,7 @@ RLMObservationTracker::RLMObservationTracker(__unsafe_unretained RLMRealm *const
 }
 
 RLMObservationTracker::~RLMObservationTracker() {
-    if (_collectionType == RLMCollectionTypeSet) {
-        didChangeSet();
-    } else {
-        didChange();
-    }
+    didChange();
 }
 
 void RLMObservationTracker::willChange(RLMObservationInfo *info, NSString *key,
@@ -370,19 +335,6 @@ void RLMObservationTracker::willChange(RLMObservationInfo *info, NSString *key,
     _info = info;
     if (_info) {
         _info->willChange(key, kind, indexes);
-    }
-}
-
-void RLMObservationTracker::willChangeSet(RLMObservationInfo *info,
-                                          NSString *key,
-                                          NSKeyValueSetMutationKind kind,
-                                          RLMSet *otherSet) {
-    _key = key;
-    _setMutationkind = kind;
-    _otherSet = otherSet;
-    _info = info;
-    if (_info) {
-        _info->willChangeSet(key, kind, otherSet);
     }
 }
 
@@ -528,27 +480,6 @@ void RLMObservationTracker::didChange() {
     _invalidated.clear();
 }
 
-void RLMObservationTracker::didChangeSet() {
-    if (_info) {
-        _info->didChangeSet(_key, _setMutationkind, _otherSet);
-        _info = nullptr;
-    }
-    if (_observedTables.empty()) {
-        return;
-    }
-    _group.set_cascade_notification_handler(nullptr);
-
-    for (auto const& change : reverse(_changes)) {
-        change.info->didChangeSet(change.property, *change.setMutationKind, change.otherSet);
-    }
-    for (auto info : reverse(_invalidated)) {
-        info->didChangeSet(RLMInvalidatedKey, NSKeyValueUnionSetMutation, nil);
-    }
-    _observedTables.clear();
-    _changes.clear();
-    _invalidated.clear();
-}
-
 namespace {
 template<typename Func>
 void forEach(realm::BindingContext::ObserverState const& state, Func&& func) {
@@ -625,10 +556,7 @@ void RLMWillChange(std::vector<realm::BindingContext::ObserverState> const& obse
         for (auto const& o : observed) {
             forEach(o, [&](realm::ColKey colKey, auto const& change, RLMObservationInfo *info) {
                 if (colKey.is_set()) {
-                    info->willChangeSet(info->columnName(colKey),
-                                        convert_to_set_mutation_kind(change.kind),
-                                        info->getRow(),
-                                        colKey);
+                    info->willChange(info->columnName(colKey));
                 } else {
                     info->willChange(info->columnName(colKey),
                                      convert(change.kind), convert(change.indices, indexes));
@@ -648,8 +576,8 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
         NSMutableIndexSet *indexes = [NSMutableIndexSet new];
         for (auto const& o : reverse(observed)) {
             forEach(o, [&](realm::ColKey col, auto const& change, RLMObservationInfo *info) {
-                if (info->collectionType == RLMCollectionTypeSet) {
-                    info->didChangeSet(info->columnName(col), convert_to_set_mutation_kind(change.kind), nil);
+                if (col.is_set()) {
+                    info->willChange(info->columnName(col));
                 } else {
                     info->didChange(info->columnName(col), convert(change.kind), convert(change.indices, indexes));
                 }

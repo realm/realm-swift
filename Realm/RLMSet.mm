@@ -45,10 +45,6 @@
 @public
     // Backing set when this instance is unmanaged
     NSMutableSet *_backingSet;
-    // Used for tracking progress of NSKeyValueObservations.
-    // YES if a KVO notification is at willChange stage.
-    // NO once didChange has returned.
-    BOOL _firingNotification;
 }
 
 #pragma mark - Initializers
@@ -82,7 +78,7 @@
 
 - (void)addObject:(id)object {
     RLMSetValidateMatchingObjectType(self, object);
-    changeSet(self, nil, NSKeyValueUnionSetMutation, ^{
+    changeSet(self, ^{
         [_backingSet addObject:object];
     });
 }
@@ -95,7 +91,7 @@
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    changeSet(self, set, NSKeyValueSetSetMutation, ^{
+    changeSet(self, ^{
         [_backingSet setSet:set->_backingSet];
     });
 }
@@ -104,7 +100,7 @@
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    changeSet(self, set, NSKeyValueIntersectSetMutation, ^{
+    changeSet(self, ^{
         [_backingSet intersectSet:set->_backingSet];
     });
 }
@@ -120,20 +116,16 @@
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    if (_firingNotification) {
+    changeSet(self, ^{
         [_backingSet minusSet:set->_backingSet];
-    } else {
-        changeSet(self, set, NSKeyValueMinusSetMutation, ^{
-            [_backingSet minusSet:set->_backingSet];
-        });
-    }
+    });
 }
 
 - (void)unionSet:(RLMSet<id> *)set {
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    changeSet(self, set, NSKeyValueUnionSetMutation, ^{
+    changeSet(self, ^{
         [_backingSet unionSet:set->_backingSet];
     });
 }
@@ -242,19 +234,15 @@
 }
 
 static void changeSet(__unsafe_unretained RLMSet *const set,
-                      __unsafe_unretained RLMSet *const otherSet,
-                      NSKeyValueSetMutationKind kind,
                       dispatch_block_t f) {
     if (!set->_backingSet) {
         set->_backingSet = [NSMutableSet new];
     }
 
     if (RLMObjectBase *parent = set->_parentObject) {
-        set->_firingNotification = YES;
-        [parent willChangeValueForKey:set->_key withSetMutation:kind usingObjects:(id)otherSet];
+        [parent willChangeValueForKey:set->_key];
         f();
-        [parent didChangeValueForKey:set->_key withSetMutation:kind usingObjects:(id)otherSet];
-        set->_firingNotification = NO;
+        [parent didChangeValueForKey:set->_key];
     }
     else {
         f();
@@ -276,14 +264,14 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
 }
 
 - (void)removeAllObjects {
-    changeSet(self, nil, NSKeyValueMinusSetMutation, ^{
+    changeSet(self, ^{
         [_backingSet removeAllObjects];
     });
 }
 
 - (void)removeObject:(id)object {
     RLMSetValidateMatchingObjectType(self, object);
-    changeSet(self, nil, NSKeyValueMinusSetMutation, ^{
+    changeSet(self, ^{
         [_backingSet removeObject:object];
     });
 }
@@ -464,35 +452,6 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
             options:(NSKeyValueObservingOptions)options context:(void *)context {
     RLMValidateSetObservationKey(keyPath, self);
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
-}
-
-// Set specific KVO notifications call `copyWithZone` as the Foundation library
-// will call `mutableCopy` or `copy` when performing the diff between the old set
-// value and the new set value on mutation.
-- (id)copyWithZone:(nullable NSZone *)zone {
-    RLMSet *s = [RLMSet allocWithZone:zone];
-    s->_backingSet = _backingSet;
-    s->_frozen = _frozen;
-    s->_key = _key;
-    s->_optional = _optional;
-    s->_type = _type;
-    s->_parentObject = _parentObject;
-    s->_objectClassName = _objectClassName;
-    s->_firingNotification = _firingNotification;
-    return self;
-}
-
-- (id)mutableCopyWithZone:(nullable NSZone *)zone {
-    RLMSet *s = [RLMSet allocWithZone:zone];
-    s->_backingSet = _backingSet;
-    s->_frozen = _frozen;
-    s->_key = _key;
-    s->_optional = _optional;
-    s->_type = _type;
-    s->_parentObject = _parentObject;
-    s->_objectClassName = _objectClassName;
-    s->_firingNotification = _firingNotification;
-    return self;
 }
 
 void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,

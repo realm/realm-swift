@@ -175,18 +175,16 @@ static auto translateErrors(Function&& f) {
 }
 
 static void changeSet(__unsafe_unretained RLMManagedSet *const set,
-                      __unsafe_unretained RLMManagedSet *const otherSet,
-                      NSKeyValueSetMutationKind kind,
                       dispatch_block_t f) {
     translateErrors([&] { set->_backingSet.verify_in_transaction(); });
 
-    RLMObservationTracker tracker(set->_realm, false, RLMCollectionTypeSet);
+    RLMObservationTracker tracker(set->_realm, false);
     tracker.trackDeletions();
     auto obsInfo = RLMGetObservationInfo(set->_observationInfo.get(),
                                          set->_backingSet.get_parent_object_key(),
                                          *set->_ownerInfo);
-    if (obsInfo && !obsInfo->isFiringNotificationForSet) {
-        tracker.willChangeSet(obsInfo, set->_key, kind, otherSet);
+    if (obsInfo) {
+        tracker.willChange(obsInfo, set->_key);
     }
 
     translateErrors(f);
@@ -240,7 +238,7 @@ static void changeSet(__unsafe_unretained RLMManagedSet *const set,
 
 static void RLMInsertObject(RLMManagedSet *set, id object) {
     RLMSetValidateMatchingObjectType(set, object);
-    changeSet(set, nil, NSKeyValueUnionSetMutation, ^{
+    changeSet(set, ^{
         RLMAccessorContext context(*set->_objectInfo);
         set->_backingSet.insert(context, object);
     });
@@ -248,10 +246,16 @@ static void RLMInsertObject(RLMManagedSet *set, id object) {
 
 static void RLMRemoveObject(RLMManagedSet *set, id object) {
     RLMSetValidateMatchingObjectType(set, object);
-    changeSet(set, nil, NSKeyValueMinusSetMutation, ^{
+    changeSet(set, ^{
         RLMAccessorContext context(*set->_objectInfo);
         set->_backingSet.remove(context, object);
     });
+}
+
+static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMManagedSet *otherSet) {
+    if (!set.realm.inWriteTransaction && !otherSet.realm.inWriteTransaction) {
+        @throw RLMException(@"Can only perform %@ in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.", message);
+    }
 }
 
 - (void)addObject:(id)object {
@@ -259,7 +263,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 }
 
 - (void)addObjects:(id<NSFastEnumeration>)objects {
-    changeSet(self, nil, NSKeyValueUnionSetMutation, ^{
+    changeSet(self, ^{
         RLMAccessorContext context(*_objectInfo);
         for (id obj in objects) {
             RLMSetValidateMatchingObjectType(self, obj);
@@ -273,12 +277,15 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 }
 
 - (void)removeAllObjects {
-    changeSet(self, nil, NSKeyValueMinusSetMutation, ^{
+    changeSet(self, ^{
         _backingSet.remove_all();
     });
 }
 
 - (RLMManagedSet *)managedObjectFrom:(RLMSet *)set {
+    for (id obj in set) {
+        RLMSetValidateMatchingObjectType(self, obj);
+    }
     if (!set.realm) {
         @throw RLMException(@"Right hand side value must be a managed Set.");
     }
@@ -309,13 +316,8 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 
 - (void)setSet:(RLMSet<id> *)set {
     RLMManagedSet *rhs = [self managedObjectFrom:set];
-    for (id obj in set) {
-        RLMSetValidateMatchingObjectType(self, obj);
-    }
-    if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
-        @throw RLMException(@"Can only perform setSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
-    }
-    changeSet(self, rhs, NSKeyValueSetSetMutation, ^{
+    ensureInWriteTransaction(@"[RLMSet setSet:]", self, rhs);
+    changeSet(self, ^{
         RLMAccessorContext context(*_objectInfo);
         _backingSet.assign(context, rhs);
     });
@@ -323,10 +325,8 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 
 - (void)intersectSet:(RLMSet<id> *)set {
     RLMManagedSet *rhs = [self managedObjectFrom:set];
-    if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
-        @throw RLMException(@"Can only perform intersectsSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
-    }
-    changeSet(self, rhs, NSKeyValueIntersectSetMutation, ^{
+    ensureInWriteTransaction(@"[RLMSet intersectSet:]", self, rhs);
+    changeSet(self, ^{
         _backingSet.assign_intersection(rhs->_backingSet);
     });
 }
@@ -338,28 +338,16 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
 
 - (void)unionSet:(RLMSet<id> *)set {
     RLMManagedSet *rhs = [self managedObjectFrom:set];
-    if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
-        @throw RLMException(@"Can only perform unionSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
-    }
-    changeSet(self, nil, NSKeyValueUnionSetMutation, ^{
+    ensureInWriteTransaction(@"[RLMSet unionSet:]", self, rhs);
+    changeSet(self, ^{
         _backingSet.assign_union(rhs->_backingSet);
     });
 }
 
 - (void)minusSet:(RLMSet<id> *)set {
-    // Required for KVO in a multiple Realm enviornment.
-    auto obsInfo = RLMGetObservationInfo(_observationInfo.get(),
-                                         _backingSet.get_parent_object_key(),
-                                         *_ownerInfo);
-    if (obsInfo && obsInfo->isFiringNotificationForSet) {
-        return;
-    }
-
     RLMManagedSet *rhs = [self managedObjectFrom:set];
-    if (!self.realm.inWriteTransaction && !rhs.realm.inWriteTransaction) {
-        @throw RLMException(@"Can only perform minusSet: in a Realm in a write transaction - call beginWriteTransaction on an RLMRealm instance first.");
-    }
-    changeSet(self, rhs, NSKeyValueMinusSetMutation, ^{
+    ensureInWriteTransaction(@"[RLMSet minusSet:]", self, rhs);
+    changeSet(self, ^{
         _backingSet.assign_difference(rhs->_backingSet);
     });
 }
@@ -388,7 +376,7 @@ static void RLMRemoveObject(RLMManagedSet *set, id object) {
         }
 
         _backingSet.verify_attached();
-        return  [NSOrderedSet orderedSetWithArray:RLMCollectionValueForKey(_backingSet, key, *_objectInfo)];
+        return  [NSSet setWithArray:RLMCollectionValueForKey(_backingSet, key, *_objectInfo)];
     });
     return nil;
 }

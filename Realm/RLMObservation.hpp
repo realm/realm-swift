@@ -23,7 +23,7 @@
 #import <realm/table.hpp>
 #import <Realm/RLMConstants.h>
 
-@class RLMObjectBase, RLMRealm, RLMSchema, RLMProperty, RLMObjectSchema, RLMSet;
+@class RLMObjectBase, RLMRealm, RLMSchema, RLMProperty, RLMObjectSchema;
 class RLMClassInfo;
 class RLMSchemaInfo;
 
@@ -48,7 +48,7 @@ namespace realm {
 class RLMObservationInfo {
 public:
     RLMObservationInfo(id object);
-    RLMObservationInfo(RLMClassInfo &objectSchema, realm::ObjKey row, id object, RLMCollectionType collectionType=RLMCollectionTypeNone);
+    RLMObservationInfo(RLMClassInfo &objectSchema, realm::ObjKey row, id object);
     ~RLMObservationInfo();
 
     realm::Obj const& getRow() const {
@@ -61,20 +61,6 @@ public:
     // Sends the array versions if indexes is non-nil, normal versions otherwise
     void willChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const;
     void didChange(NSString *key, NSKeyValueChange kind=NSKeyValueChangeSetting, NSIndexSet *indexes=nil) const;
-
-    void willChangeSet(NSString *key, NSKeyValueSetMutationKind kind, RLMSet *otherSet);
-    void didChangeSet(NSString *key, NSKeyValueSetMutationKind kind, RLMSet *otherSet);
-    void willChangeSet(NSString *key, NSKeyValueSetMutationKind kind, const realm::Obj& obj, const realm::ColKey& col_key);
-//    void didChangeSet(NSString *key, NSKeyValueSetMutationKind kind, RLMSet *otherSet);
-
-    // true when willChangeSet is invoked, false once didChangeSet has completed.
-    // RLMManagedSet gets it's own notification progress tracker because [RLMSet setSet]
-    // will also trigger [RLMSet minusSet] when a KVO notification is fired. So in order to preserve
-    // the original NSKeyValueSetMutationKind we need to not allow [RLMSet minusSet] to fire a second
-    // notification in the chain.
-    bool isFiringNotificationForSet = false;
-
-    RLMCollectionType collectionType;
 
     bool isForRow(realm::ObjKey key) const {
         return row.get_key() == key;
@@ -168,12 +154,6 @@ public:
                     NSIndexSet *indexes=nil);
     void didChange();
 
-    void willChangeSet(RLMObservationInfo *info,
-                       NSString *key,
-                       NSKeyValueSetMutationKind kind,
-                       RLMSet *otherSet);
-    void didChangeSet();
-
 private:
     std::vector<std::vector<RLMObservationInfo *> *> _observedTables;
     __unsafe_unretained RLMRealm const*_realm;
@@ -184,16 +164,11 @@ private:
     NSKeyValueChange _kind = NSKeyValueChangeSetting;
     NSKeyValueSetMutationKind _setMutationkind;
     NSIndexSet *_indexes;
-    RLMSet *_otherSet;
-    RLMCollectionType _collectionType;
 
     struct Change {
         RLMObservationInfo *info;
         __unsafe_unretained NSString *property;
         NSMutableIndexSet *indexes;
-        // Set specific
-        RLMSet *otherSet;
-        NSKeyValueSetMutationKind *setMutationKind;
     };
     std::vector<Change> _changes;
     std::vector<RLMObservationInfo *> _invalidated;

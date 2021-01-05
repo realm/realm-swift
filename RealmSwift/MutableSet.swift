@@ -119,14 +119,34 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
         return Results<Element>(_rlmSet.objects(with: predicate))
     }
 
-    /// Returns a Boolean value indicating whether the Set contains the
-    /// given object.
-    ///
-    /// - Parameter object: The element to find in the Set.
-    /// - Returns: `true` if the element was found in the Set; otherwise,
-    ///   `false`.
+    /**
+     Returns a Boolean value indicating whether the Set contains the
+     given object.
+
+     - parameter object: The element to find in the MutableSet.
+     */
     public func contains(_ object: Element) -> Bool {
         return _rlmSet.contains(dynamicBridgeCast(fromSwift: object) as AnyObject)
+    }
+
+    /**
+     Returns a Boolean value that indicates whether this set is a subset
+     of the given set.
+
+     - Parameter object: Another MutableSet to compare.
+     */
+    public func isSubset(of possibleSuperset: MutableSet<Element>) -> Bool {
+        return _rlmSet.isSubset(of: possibleSuperset._rlmSet)
+    }
+
+    /**
+     Returns a Boolean value that indicates whether this set intersects
+     with another given set.
+
+     - Parameter object: Another MutableSet to compare.
+     */
+    public func intersects(_ otherSet: MutableSet<Element>) -> Bool {
+        return _rlmSet.intersects(otherSet._rlmSet)
     }
 
     // MARK: Sorting
@@ -260,8 +280,8 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
 
      - parameter other: Another set.
      */
-    func formIntersection(_ other: MutableSet<Element>) {
-        _rlmSet.intersect(dynamicBridgeCast(fromSwift: other) as! RLMSet<AnyObject>)
+    public func formIntersection(_ other: MutableSet<Element>) {
+        _rlmSet.intersect(other._rlmSet)
     }
 
     /**
@@ -271,8 +291,8 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
 
      - parameter other: Another set.
      */
-    func subtract(_ other: MutableSet<Element>) {
-        _rlmSet.minus(dynamicBridgeCast(fromSwift: other) as! RLMSet<AnyObject>)
+    public func subtract(_ other: MutableSet<Element>) {
+        _rlmSet.minus(other._rlmSet)
     }
 
     /**
@@ -282,8 +302,8 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
 
      - parameter other: Another set.
      */
-    func formUnion(_ other: MutableSet<Element>) {
-        _rlmSet.union(dynamicBridgeCast(fromSwift: other) as! RLMSet<AnyObject>)
+    public func formUnion(_ other: MutableSet<Element>) {
+        _rlmSet.union(other._rlmSet)
     }
 
     // MARK: Notifications
