@@ -196,27 +196,15 @@
     RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"SOME person.age > 5"], @"Aggregate operations can only.*array property");
     RLMAssertThrowsWithReasonMatching([PersonLinkObject objectsWhere:@"NONE person.age > 5"], @"Aggregate operations can only.*array property");
 
-    // nil on LHS of comparison with nullable property
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = boolObj"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = intObj"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = floatObj"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = doubleObj"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = string"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = data"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = date"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = objectId"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = decimal"]);
-
     // comparing two constants
-    XCTAssertThrows([PersonObject objectsWhere:@"5 = 5"]);
-    XCTAssertThrows([PersonObject objectsWhere:@"nil = nil"]);
+    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"5 = 5"],
+                              @"Predicate expressions must compare a keypath and another keypath or a constant value");
+    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"nil = nil"],
+                              @"Predicate expressions must compare a keypath and another keypath or a constant value");
 
     // substring operations with constant on LHS
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' CONTAINS string"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' BEGINSWITH string"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' ENDSWITH string"]);
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' LIKE string"]);
-    XCTAssertThrows(([AllOptionalTypes objectsWhere:@"%@ CONTAINS data", [NSData data]]));
+    RLMAssertThrowsWithReason(([AllOptionalTypes objectsWhere:@"%@ CONTAINS data", [NSData data]]),
+                              @"Operator 'CONTAINS' requires a keypath on the left side");
 
     // data is missing stuff
     XCTAssertThrows([AllOptionalTypes objectsWhere:@"data = data"]);
@@ -484,9 +472,9 @@
     RLMAssertThrowsWithReason([allObjects objectsWhere:@"boolCol BETWEEN {true, false}"],
                               @"not supported for type bool");
     RLMAssertThrowsWithReason([allObjects objectsWhere:@"stringCol BETWEEN {'', ''}"],
-                              @"not supported for string type");
+                              @"not supported for type string");
     RLMAssertThrowsWithReason(([allObjects objectsWhere:@"binaryCol BETWEEN %@", @[NSData.data, NSData.data]]),
-                              @"not supported for binary type");
+                              @"not supported for type data");
     RLMAssertThrowsWithReason([allObjects objectsWhere:@"cBoolCol BETWEEN {true, false}"],
                               @"not supported for type bool");
     RLMAssertThrowsWithReason(([allObjects objectsWhere:@"objectIdCol BETWEEN %@",
@@ -510,6 +498,13 @@
     RLMAssertCount(AllTypesObject, 3U, @"dateCol >= %@", dates[0]);
     RLMAssertCount(AllTypesObject, 1U, @"dateCol == %@", dates[0]);
     RLMAssertCount(AllTypesObject, 2U, @"dateCol != %@", dates[0]);
+
+    RLMAssertCount(AllTypesObject, 2U, @"%@ < dateCol", dates[0]);
+    RLMAssertCount(AllTypesObject, 3U, @"%@ <= dateCol", dates[0]);
+    RLMAssertCount(AllTypesObject, 2U, @"%@ > dateCol", dates[2]);
+    RLMAssertCount(AllTypesObject, 3U, @"%@ >= dateCol", dates[2]);
+    RLMAssertCount(AllTypesObject, 1U, @"%@ == dateCol", dates[0]);
+    RLMAssertCount(AllTypesObject, 2U, @"%@ != dateCol", dates[0]);
 }
 
 - (void)testDefaultRealmQuery {
@@ -2097,11 +2092,13 @@
     RLMAssertCount(self.queryObjectClass, 3U, @"%@ != objectId2", oid1);
 
     RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"'Realm' CONTAINS string1"].count,
-                                      @"Operator 'CONTAINS' is not supported .* right side");
+                                      @"Operator 'CONTAINS' requires a keypath on the left side.");
     RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"'Amazon' BEGINSWITH string2"].count,
-                                      @"Operator 'BEGINSWITH' is not supported .* right side");
+                                      @"Operator 'BEGINSWITH' requires a keypath on the left side.");
     RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"'Tuba' ENDSWITH string1"].count,
-                                      @"Operator 'ENDSWITH' is not supported .* right side");
+                                      @"Operator 'ENDSWITH' requires a keypath on the left side.");
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"'Tuba' LIKE string1"].count,
+                                      @"Operator 'LIKE' requires a keypath on the left side.");
 }
 
 - (void)testLinksToDeletedOrMovedObject
@@ -2617,9 +2614,6 @@ struct NullTestData {
 - (void)testPrimitiveOperatorsOnAllNullablePropertyTypes {
     RLMRealm *realm = [self realm];
 
-    // nil on LHS is currently not supported by core
-    XCTAssertThrows([AllOptionalTypes objectsWhere:@"nil = boolObj"]);
-
     // These need to be stored in variables because the struct does not retain them
     NSData *matchingData = [@"" dataUsingEncoding:NSUTF8StringEncoding];
     NSData *notMatchingData = [@"a" dataUsingEncoding:NSUTF8StringEncoding];
@@ -2726,6 +2720,118 @@ struct NullTestData {
             RLMAssertOperator(CONTAINS, 0U, 0U, 0U);
         }
     }
+
+#undef RLMAssertCountWithString
+#undef RLMAssertCountWithPredicate
+#undef RLMAssertOperator
+}
+
+- (void)testPrimitiveOperatorsOnAllNullablePropertyTypesKeypathOnRHS {
+    RLMRealm *realm = [self realm];
+
+    // These need to be stored in variables because the struct does not retain them
+    NSData *matchingData = [@"" dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *notMatchingData = [@"a" dataUsingEncoding:NSUTF8StringEncoding];
+    NSDate *matchingDate = [NSDate dateWithTimeIntervalSince1970:1];
+    NSDate *notMatchingDate = [NSDate dateWithTimeIntervalSince1970:2];
+    RLMDecimal128 *matchingDecimal = [RLMDecimal128 decimalWithNumber:@1];
+    RLMDecimal128 *notMatchingDecimal = [RLMDecimal128 decimalWithNumber:@2];
+    RLMObjectId *matchingObjectId = [RLMObjectId objectId];
+    RLMObjectId *notMatchingObjectId = [RLMObjectId objectId];
+
+    struct NullTestData data[] = {
+        {@"boolObj", @"YES", @"NO", @YES, @NO},
+        {@"intObj", @"1", @"0", @1, @0, true},
+        {@"floatObj", @"1", @"0", @1, @0, true},
+        {@"doubleObj", @"1", @"0", @1, @0, true},
+        {@"string", @"'a'", @"''", @"a", @"", false, true},
+        {@"data", nil, nil, notMatchingData, matchingData, false, true},
+        {@"date", nil, nil, notMatchingDate, matchingDate, true},
+        {@"decimal", nil, nil, notMatchingDecimal, matchingDecimal, true},
+        {@"objectId", nil, nil, notMatchingObjectId, matchingObjectId, false},
+    };
+
+    // Assert that the query "prop op value" gives expectedCount results when
+    // assembled via string formatting
+#define RLMAssertCountWithString(expectedCount, op, prop, value) \
+    do { \
+        NSString *queryStr = [NSString stringWithFormat:@"%@ " #op " %@", value, prop]; \
+        NSUInteger actual = [AllOptionalTypes objectsWhere:queryStr].count; \
+        XCTAssertEqual(expectedCount, actual, @"%@: expected %@, got %@", queryStr, @(expectedCount), @(actual)); \
+        queryStr = [NSString stringWithFormat:@"%@ " #op " %@", value, prop]; \
+        actual = [AllOptionalTypes objectsWhere:queryStr].count; \
+        XCTAssertEqual(expectedCount, actual, @"%@: expected %@, got %@", queryStr, @(expectedCount), @(actual)); \
+    } while (0)
+
+    // Assert that the query "prop op value" gives expectedCount results when
+    // assembled via predicateWithFormat
+#define RLMAssertCountWithPredicate(expectedCount, op, prop, value) \
+    do { \
+        NSPredicate *query = [NSPredicate predicateWithFormat:@ "%@ " #op " %K", value, prop]; \
+        NSUInteger actual = [AllOptionalTypes objectsWithPredicate:query].count; \
+        XCTAssertEqual(expectedCount, actual, @"%@ " #op " %@: expected %@, got %@", prop, value, @(expectedCount), @(actual)); \
+    } while (0)
+
+    // Assert that the given operator gives the expected count for each of the
+    // stored value, a different value, and nil
+#define RLMAssertOperator(op, matchingCount, notMatchingCount, nilCount) \
+    do { \
+        if (d.matchingStr) { \
+            RLMAssertCountWithString(matchingCount, op, d.propertyName, d.matchingStr); \
+            RLMAssertCountWithString(notMatchingCount, op, d.propertyName, d.nonMatchingStr); \
+        } \
+        RLMAssertCountWithString(nilCount, op, d.propertyName, nil); \
+ \
+        RLMAssertCountWithPredicate(matchingCount, op, d.propertyName, d.matchingValue); \
+        RLMAssertCountWithPredicate(notMatchingCount, op, d.propertyName, d.nonMatchingValue); \
+        RLMAssertCountWithPredicate(nilCount, op, d.propertyName, nil); \
+    } while (0)
+
+    // First test with the `matchingValue` stored in each property
+
+    [realm beginWriteTransaction];
+    [AllOptionalTypes createInRealm:realm withValue:@[@NO, @0, @0, @0, @"", matchingData, matchingDate, matchingDecimal, matchingObjectId]];
+    [realm commitWriteTransaction];
+
+    for (size_t i = 0; i < sizeof(data) / sizeof(data[0]); ++i) {
+        struct NullTestData d = data[i];
+        RLMAssertOperator(=,  1U, 0U, 0U);
+        RLMAssertOperator(!=, 0U, 1U, 1U);
+
+        if (d.orderable) {
+            RLMAssertOperator(>,  0U, 1U, 0U);
+            RLMAssertOperator(>=, 1U, 1U, 0U);
+            RLMAssertOperator(<,  0U, 0U, 0U);
+            RLMAssertOperator(<=, 1U, 0U, 0U);
+        }
+    }
+
+    // Retest with all properties nil
+
+    [realm beginWriteTransaction];
+    [realm deleteAllObjects];
+    [AllOptionalTypes createInRealm:realm withValue:@[NSNull.null, NSNull.null,
+                                                      NSNull.null, NSNull.null,
+                                                      NSNull.null, NSNull.null,
+                                                      NSNull.null]];
+    [realm commitWriteTransaction];
+
+    for (size_t i = 0; i < sizeof(data) / sizeof(data[0]); ++i) {
+        struct NullTestData d = data[i];
+        RLMAssertOperator(=, 0U, 0U, 1U);
+        RLMAssertOperator(!=, 1U, 1U, 0U);
+
+        if (d.orderable) {
+            RLMAssertOperator(>,  0U, 0U, 0U);
+            RLMAssertOperator(>=, 0U, 0U, 1U);
+            RLMAssertOperator(<,  0U, 0U, 0U);
+            RLMAssertOperator(<=, 0U, 0U, 1U);
+        }
+    }
+
+#undef RLMAssertCountWithString
+#undef RLMAssertCountWithPredicate
+#undef RLMAssertOperator
 }
 
 - (void)testINPredicateOnNullWithNonNullValues
