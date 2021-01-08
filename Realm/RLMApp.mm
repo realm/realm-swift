@@ -65,13 +65,34 @@ namespace {
 
                 // Convert the RLMResponse to an app:Response and pass downstream to
                 // the object store
-                completion({
-                    // From here we go to the core
-                    .body = response.value.body.UTF8String,
-                    .headers = bridgingHeaders,
-                    .http_status_code = static_cast<int>(response.httpStatusCode),
-                    .custom_status_code = 0//static_cast<int>(response.customStatusCode)
-                });
+                if (response.status == RLMResponseStatusSuccess) {
+                    auto errorCode = realm::app::make_error_code(realm::app::service_error_code_from_string([response.error.domain UTF8String]));
+                    std::optional<app::AppError> error = app::AppError(errorCode,
+                                                                       response.error.description.UTF8String,
+                                                                       "",
+                                                                       static_cast<int>(response.httpStatusCode),
+                                                                       std::nullopt
+                                                                       );
+                    app::Response appResponse = {
+                        app::ResponseStatus::failure,
+                        static_cast<int>(response.httpStatusCode),
+                        static_cast<int>(response.customStatusCode),
+                        bridgingHeaders,
+                        error,
+                        std::nullopt
+                    };
+                    completion(appResponse);
+                } else {
+                    app::Response appResponse = {
+                        app::ResponseStatus::success,
+                        static_cast<int>(response.httpStatusCode),
+                        static_cast<int>(response.customStatusCode),
+                        bridgingHeaders,
+                        std::nullopt,
+                        response.body.UTF8String
+                    };
+                    completion(appResponse);
+                }
             }];
         }
 

@@ -60,11 +60,6 @@ typedef NS_ENUM(NSUInteger, RLMResponseStatus) {
     RLMResponseStatusFailed,
 };
 
-@interface RLMResponseValue: NSObject
-@property (nonatomic, strong) NSString *body;
-@property (nonatomic, strong) NSError *error;
-@end
-
 /// The contents of an HTTP response.
 @interface RLMResponse : NSObject
 
@@ -74,15 +69,16 @@ typedef NS_ENUM(NSUInteger, RLMResponseStatus) {
 @property (nonatomic, assign) NSInteger httpStatusCode;
 
 ///// A custom status code provided by the SDK.
-//@property (nonatomic, assign) NSInteger customStatusCode;
+@property (nonatomic, assign) NSInteger customStatusCode;
 
 /// The headers of the HTTP response.
 @property (nonatomic, strong) NSDictionary<NSString *, NSString *>* headers;
 
-///// The body of the HTTP response.
-//@property (nonatomic, strong) NSString *body;
+/// The body of the HTTP response.
+@property (nonatomic, strong) NSString *body;
 
-@property (nonatomic, strong) RLMResponseValue *value;
+/// In case of failure there will be an error.
+@property (nonatomic, strong) NSError *error;
 
 @end
 

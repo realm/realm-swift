@@ -168,7 +168,7 @@
         RLMResponse *r = [RLMResponse new];
         r.status = RLMResponseStatusSuccess;
         r.httpStatusCode = 200;
-        r.value.body = @"{\"deployment_model\":\"GLOBAL\",\"location\":\"US-VA\",\"hostname\":\"http://localhost:5678\",\"ws_hostname\":\"ws://localhost:5678\"}";
+        r.body = @"{\"deployment_model\":\"GLOBAL\",\"location\":\"US-VA\",\"hostname\":\"http://localhost:5678\",\"ws_hostname\":\"ws://localhost:5678\"}";
         completionBlock(r);
     } else {
         [super sendRequestToServer:request completion:completionBlock];
