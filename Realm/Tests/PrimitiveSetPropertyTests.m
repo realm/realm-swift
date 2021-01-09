@@ -253,9 +253,11 @@ static double average(NSArray *values) {
 }
 
 - (void)testObjectAtIndex {
-    for (RLMSet *set in allSets) {
-        RLMAssertThrowsWithReason([set objectAtIndex:0], @"objectAtIndex: is not available on RLMSet");
-    }
+    RLMAssertThrowsWithReason([unmanaged.intObj objectAtIndex:0],
+                              @"Index 0 is out of bounds (must be less than 0).");
+
+    [unmanaged.intObj addObject:@1];
+    XCTAssertEqualObjects([unmanaged.intObj objectAtIndex:0], @1);
 }
 
 - (void)testFirstObject {
@@ -1008,15 +1010,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(0U, [[optManaged.dateObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:date(1)]);
     XCTAssertEqual(0U, [[optManaged.decimalObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:decimal128(1)]);
     XCTAssertEqual(0U, [[optManaged.objectIdObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:objectId(1)]);
-    XCTAssertEqual(1U, [[optManaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
-    XCTAssertEqual(1U, [[optManaged.intObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
-    XCTAssertEqual(1U, [[optManaged.floatObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
-    XCTAssertEqual(1U, [[optManaged.doubleObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
-    XCTAssertEqual(1U, [[optManaged.stringObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
-    XCTAssertEqual(1U, [[optManaged.dataObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
-    XCTAssertEqual(1U, [[optManaged.dateObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
-    XCTAssertEqual(1U, [[optManaged.decimalObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
-    XCTAssertEqual(1U, [[optManaged.objectIdObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
     XCTAssertEqual(1U, [[optManaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
     XCTAssertEqual(1U, [[optManaged.intObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
     XCTAssertEqual(1U, [[optManaged.floatObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);

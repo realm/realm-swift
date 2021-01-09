@@ -823,13 +823,13 @@
     XCTAssertEqual(1U, req.dateObj.count);
     XCTAssertEqual(1U, req.dataObj.count);
 
-    XCTAssertEqualObjects([[req.intObj valueForKey:@"self"] allObjects], (@[@1, @2, @3]));
-    XCTAssertEqualObjects([[req.boolObj valueForKey:@"self"] allObjects], (@[@NO, @YES]));
-    XCTAssertEqualObjects([[req.floatObj valueForKey:@"self"] allObjects], (@[@1.1f, @2.2f]));
-    XCTAssertEqualObjects([[req.doubleObj valueForKey:@"self"] allObjects], (@[@3.3, @4.4]));
-    XCTAssertEqualObjects([[req.stringObj valueForKey:@"self"] allObjects], (@[@"a", @"b"]));
-    XCTAssertEqualObjects([[req.dateObj valueForKey:@"self"] allObjects], (@[now]));
-    XCTAssertEqualObjects([[req.dataObj valueForKey:@"self"] allObjects], (@[bytes]));
+    XCTAssertEqualObjects([req.intObj valueForKey:@"self"], ([NSSet setWithArray:@[@1, @2, @3]]));
+    XCTAssertEqualObjects([req.boolObj valueForKey:@"self"], ([NSSet setWithArray:@[@NO, @YES]]));
+    XCTAssertEqualObjects([req.floatObj valueForKey:@"self"], ([NSSet setWithArray:@[@1.1f, @2.2f]]));
+    XCTAssertEqualObjects([req.doubleObj valueForKey:@"self"], ([NSSet setWithArray:@[@3.3, @4.4]]));
+    XCTAssertEqualObjects([req.stringObj valueForKey:@"self"], ([NSSet setWithArray:@[@"a", @"b"]]));
+    XCTAssertEqualObjects([req.dateObj valueForKey:@"self"], ([NSSet setWithArray:@[now]]));
+    XCTAssertEqualObjects([req.dataObj valueForKey:@"self"], ([NSSet setWithArray:@[bytes]]));
 
     [realm cancelWriteTransaction];
 }
@@ -1040,13 +1040,13 @@
     XCTAssertEqual(2U, req.dateObj.count);
     XCTAssertEqual(2U, req.dataObj.count);
 
-    XCTAssertEqualObjects([[req.intObj valueForKey:@"self"] allObjects], (@[NSNull.null, @1, @2, @3]));
-    XCTAssertEqualObjects([[req.boolObj valueForKey:@"self"] allObjects], (@[NSNull.null, @NO, @YES]));
-    XCTAssertEqualObjects([[req.floatObj valueForKey:@"self"] allObjects], (@[NSNull.null, @1.1f, @2.2f]));
-    XCTAssertEqualObjects([[req.doubleObj valueForKey:@"self"] allObjects], (@[NSNull.null, @3.3, @4.4]));
-    XCTAssertEqualObjects([[req.stringObj valueForKey:@"self"] allObjects], (@[NSNull.null, @"a", @"b"]));
-    XCTAssertEqualObjects([[req.dateObj valueForKey:@"self"] allObjects], (@[NSNull.null, now]));
-    XCTAssertEqualObjects([[req.dataObj valueForKey:@"self"] allObjects], (@[NSNull.null, bytes]));
+    XCTAssertEqualObjects([req.intObj valueForKey:@"self"], ([NSSet setWithArray:@[NSNull.null, @1, @2, @3]]));
+    XCTAssertEqualObjects([req.boolObj valueForKey:@"self"], ([NSSet setWithArray:@[NSNull.null, @NO, @YES]]));
+    XCTAssertEqualObjects([req.floatObj valueForKey:@"self"], ([NSSet setWithArray:@[NSNull.null, @1.1f, @2.2f]]));
+    XCTAssertEqualObjects([req.doubleObj valueForKey:@"self"], ([NSSet setWithArray:@[NSNull.null, @3.3, @4.4]]));
+    XCTAssertEqualObjects([req.stringObj valueForKey:@"self"], ([NSSet setWithArray:@[NSNull.null, @"a", @"b"]]));
+    XCTAssertEqualObjects([req.dateObj valueForKey:@"self"], ([NSSet setWithArray:@[NSNull.null, now]]));
+    XCTAssertEqualObjects([req.dataObj valueForKey:@"self"], ([NSSet setWithArray:@[NSNull.null, bytes]]));
 
     [realm cancelWriteTransaction];
 }

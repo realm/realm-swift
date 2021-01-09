@@ -181,7 +181,11 @@ static double average(NSArray *values) {
 }
 
 - (void)testObjectAtIndex {
-    RLMAssertThrowsWithReason([$allSets objectAtIndex:0], @"objectAtIndex: is not available on RLMSet");
+    RLMAssertThrowsWithReason([unmanaged.intObj objectAtIndex:0],
+                              @"Index 0 is out of bounds (must be less than 0).");
+
+    [unmanaged.intObj addObject:@1];
+    XCTAssertEqualObjects([unmanaged.intObj objectAtIndex:0], @1);
 }
 
 - (void)testFirstObject {
@@ -242,7 +246,6 @@ static double average(NSArray *values) {
 
     %man %o XCTAssertEqual(0U, [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1]);
     %man %o XCTAssertEqual(1U, [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
-    %man %o XCTAssertEqual(1U, [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
 }
 
 - (void)testIndexOfObjectDistinct {

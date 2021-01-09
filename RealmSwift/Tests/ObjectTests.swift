@@ -123,17 +123,17 @@ class ObjectTests: TestCase {
         let recursiveObject = SwiftRecursiveObject()
         recursiveObject.objects.append(recursiveObject)
         recursiveObject.objectSet.insert(recursiveObject)
-        assertMatches(recursiveObject.description, "SwiftRecursiveObject \\{\n\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t\tobjectSet = <Maximum depth exceeded>;\n\t\t\t\t\\}\n\t\t\t\\);\n\t\t\\}\n\t\\);\n\\}")
+        assertMatches(recursiveObject.description, "SwiftRecursiveObject {\n\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> (\n\t\t[0] SwiftRecursiveObject {\n\t\t\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> (\n\t\t\t\t[0] SwiftRecursiveObject {\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t\tobjectSet = <Maximum depth exceeded>;\n\t\t\t\t}\n\t\t\t);\n\t\t\tobjectSet = MutableSet<SwiftRecursiveObject> <0x[0-9a-f]+> (\n\t\t\t\t[0] SwiftRecursiveObject {\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t\tobjectSet = <Maximum depth exceeded>;\n\t\t\t\t}\n\t\t\t);\n\t\t}\n\t);\n\tobjectSet = MutableSet<SwiftRecursiveObject> <0x[0-9a-f]+> (\n\t\t[0] SwiftRecursiveObject {\n\t\t\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> (\n\t\t\t\t[0] SwiftRecursiveObject {\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t\tobjectSet = <Maximum depth exceeded>;\n\t\t\t\t}\n\t\t\t);\n\t\t\tobjectSet = MutableSet<SwiftRecursiveObject> <0x[0-9a-f]+> (\n\t\t\t\t[0] SwiftRecursiveObject {\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t\tobjectSet = <Maximum depth exceeded>;\n\t\t\t\t}\n\t\t\t);\n\t\t}\n\t);\n}")
 
         let renamedObject = LinkToSwiftRenamedProperties1()
         renamedObject.linkA = SwiftRenamedProperties1()
-        assertMatches(renamedObject.description, "LinkToSwiftRenamedProperties1 \\{\n\tlinkA = SwiftRenamedProperties1 \\{\n\t\tpropA = 0;\n\t\tpropB = ;\n\t\\};\n\tlinkB = \\(null\\);\n\tarray1 = List<SwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
+        assertMatches(renamedObject.description, "LinkToSwiftRenamedProperties1 {\n\tlinkA = SwiftRenamedProperties1 {\n\t\tpropA = 0;\n\t\tpropB = ;\n\t};\n\tlinkB = (null);\n\tarray1 = List<SwiftRenamedProperties1> <0x[0-9a-f]+> (\n\t\n\t);\n\tset1 = MutableSet<SwiftRenamedProperties1> <0x[0-9a-f]+> (\n\t\n\t);\n}")
         assertMatches(renamedObject.linkA!.linking1.description, "LinkingObjects<LinkToSwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\n\\)")
 
         let realm = try! Realm()
         try! realm.write { realm.add(renamedObject) }
-        assertMatches(renamedObject.description, "LinkToSwiftRenamedProperties1 \\{\n\tlinkA = SwiftRenamedProperties1 \\{\n\t\tpropA = 0;\n\t\tpropB = ;\n\t\\};\n\tlinkB = \\(null\\);\n\tarray1 = List<SwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
-        assertMatches(renamedObject.linkA!.linking1.description, "LinkingObjects<LinkToSwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\\[0\\] LinkToSwiftRenamedProperties1 \\{\n\t\tlinkA = SwiftRenamedProperties1 \\{\n\t\t\tpropA = 0;\n\t\t\tpropB = ;\n\t\t\\};\n\t\tlinkB = \\(null\\);\n\t\tarray1 = List<SwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\\}\n\\)")
+        assertMatches(renamedObject.description, "LinkToSwiftRenamedProperties1 {\n\tlinkA = SwiftRenamedProperties1 {\n\t\tpropA = 0;\n\t\tpropB = ;\n\t};\n\tlinkB = (null);\n\tarray1 = List<SwiftRenamedProperties1> <0x[0-9a-f]+> (\n\t\n\t);\n\tset1 = MutableSet<SwiftRenamedProperties1> <0x[0-9a-f]+> (\n\t\n\t);\n}")
+        assertMatches(renamedObject.linkA!.linking1.description, "LinkingObjects<LinkToSwiftRenamedProperties1> <0x[0-9a-f]+> (\n\t[0] LinkToSwiftRenamedProperties1 {\n\t\tlinkA = SwiftRenamedProperties1 {\n\t\t\tpropA = 0;\n\t\t\tpropB = ;\n\t\t};\n\t\tlinkB = (null);\n\t\tarray1 = List<SwiftRenamedProperties1> <0x[0-9a-f]+> (\n\t\t\n\t\t);\n\t\tset1 = MutableSet<SwiftRenamedProperties1> <0x[0-9a-f]+> (\n\t\t\n\t\t);\n\t}\n)")
         // swiftlint:enable line_length
     }
 

@@ -111,6 +111,12 @@ class SwiftRLMArrayPropertyObject: RLMObject {
     @objc dynamic var intArray = RLMArray<SwiftRLMIntObject>(objectClassName: SwiftRLMIntObject.className())
 }
 
+class SwiftRLMSetPropertyObject: RLMObject {
+    @objc dynamic var name = ""
+    @objc dynamic var set = RLMSet<SwiftRLMStringObject>(objectClassName: SwiftRLMStringObject.className())
+    @objc dynamic var intSet = RLMSet<SwiftRLMIntObject>(objectClassName: SwiftRLMIntObject.className())
+}
+
 class SwiftRLMDynamicObject: RLMObject {
     @objc dynamic var stringCol = "a"
     @objc dynamic var intCol = 0

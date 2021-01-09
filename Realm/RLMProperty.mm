@@ -19,6 +19,7 @@
 #import "RLMProperty_Private.hpp"
 
 #import "RLMArray_Private.hpp"
+#import "RLMSet_Private.hpp"
 #import "RLMListBase.h"
 #import "RLMObject.h"
 #import "RLMObjectSchema_Private.hpp"
@@ -471,7 +472,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
         }
     }
 
-    // convert array types to objc variant
+    // convert array / set types to objc variant
     if ([rawType isEqualToString:@"@\"RLMArray\""]) {
         RLMArray *value = propertyValue;
         _type = value.type;
@@ -481,6 +482,18 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
         if (_type == RLMPropertyTypeObject && ![RLMSchema classForString:_objectClassName]) {
             @throw RLMException(@"Property '%@' is of type 'RLMArray<%@>' which is not a supported RLMArray object type. "
                                 @"RLMArrays can only contain instances of RLMObject subclasses. "
+                                @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);
+        }
+    }
+    else if ([rawType isEqualToString:@"@\"RLMSet\""]) {
+        RLMSet *value = propertyValue;
+        _type = value.type;
+        _optional = value.optional;
+        _set = true;
+        _objectClassName = value.objectClassName;
+        if (_type == RLMPropertyTypeObject && ![RLMSchema classForString:_objectClassName]) {
+            @throw RLMException(@"Property '%@' is of type 'RLMSet<%@>' which is not a supported RLMSet object type. "
+                                @"RLMSets can only contain instances of RLMObject subclasses. "
                                 @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);
         }
     }

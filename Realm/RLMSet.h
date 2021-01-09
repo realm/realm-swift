@@ -33,11 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, assign) NSUInteger count;
 
 /**
- The objects in the RLMSet as an NSArray value.
- */
-@property (nonatomic, readonly) NSArray<RLMObjectType> *allObjects;
-
-/**
  The type of the objects in the set.
  */
 @property (nonatomic, readonly, assign) RLMPropertyType type;
@@ -46,6 +41,11 @@ NS_ASSUME_NONNULL_BEGIN
  Indicates whether the objects in the collection can be `nil`.
  */
 @property (nonatomic, readonly, getter = isOptional) BOOL optional;
+
+/**
+ The objects in the RLMSet as an NSArray value.
+ */
+@property (nonatomic, readonly) NSArray<RLMObjectType> *allObjects;
 
 /**
  The class name of the objects contained in the set.
