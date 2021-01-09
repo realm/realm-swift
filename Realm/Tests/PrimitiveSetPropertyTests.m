@@ -3601,12 +3601,10 @@ static double average(NSArray *values) {
     }
 
     [self addObjects];
-    // Note: using `valueForKey:@"length"` on an NSSet will always return distinct values
-    // so if we have an allObjects with the values @["a", "b"], the length would be 2, but for a set it will be 1
-    XCTAssertEqualObjects([[unmanaged.stringObj valueForKey:@"length"] allObjects], ([@[@"a", @"bc"] valueForKey:@"length"]));
-    XCTAssertEqualObjects([[optUnmanaged.stringObj valueForKey:@"length"] allObjects], ([@[NSNull.null, @"a", @"bc"] valueForKey:@"length"]));
-    XCTAssertEqualObjects([[managed.stringObj valueForKey:@"length"] allObjects], ([@[@"a", @"bc"] valueForKey:@"length"]));
-    XCTAssertEqualObjects([[optManaged.stringObj valueForKey:@"length"] allObjects], ([@[NSNull.null, @"a", @"bc"] valueForKey:@"length"]));
+    XCTAssertEqualObjects([unmanaged.stringObj valueForKey:@"length"], ([[NSSet setWithArray:@[@"a", @"bc"]] valueForKey:@"length"]));
+    XCTAssertEqualObjects([optUnmanaged.stringObj valueForKey:@"length"], ([[NSSet setWithArray:@[NSNull.null, @"a", @"bc"]] valueForKey:@"length"]));
+    XCTAssertEqualObjects([managed.stringObj valueForKey:@"length"], ([[NSSet setWithArray:@[@"a", @"bc"]] valueForKey:@"length"]));
+    XCTAssertEqualObjects([optManaged.stringObj valueForKey:@"length"], ([[NSSet setWithArray:@[NSNull.null, @"a", @"bc"]] valueForKey:@"length"]));
 }
 
 - (void)testSetValueForKey {

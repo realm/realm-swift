@@ -573,9 +573,7 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects([[$allSets valueForKey:@"length"] allObjects], @[]);
 
     [self addObjects];
-    // Note: using `valueForKey:@"length"` on an NSSet will always return distinct values
-    // so if we have an allObjects with the values @["a", "b"], the length would be 2, but for a set it will be 1
-    %string XCTAssertEqualObjects([[$set valueForKey:@"length"] allObjects], ([$values valueForKey:@"length"]));
+    %string XCTAssertEqualObjects([$set valueForKey:@"length"], ([[NSSet setWithArray:$values] valueForKey:@"length"]));
 }
 
 - (void)testSetValueForKey {
