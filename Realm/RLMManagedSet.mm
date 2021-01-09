@@ -352,6 +352,13 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     });
 }
 
+- (id)objectAtIndex:(NSUInteger)index {
+    return translateErrors([&] {
+        RLMAccessorContext context(*_objectInfo);
+        return _backingSet.get(context, index);
+    });
+}
+
 - (id)valueForKeyPath:(NSString *)keyPath {
     if ([keyPath hasPrefix:@"@"]) {
         // Delegate KVC collection operators to RLMResults
@@ -439,7 +446,7 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     }
     // delete all target rows from the realm
     RLMObservationTracker tracker(_realm, true, RLMCollectionTypeSet);
-    translateErrors([&] { _backingSet.remove_all(); });
+    translateErrors([&] { _backingSet.delete_all(); });
 }
 
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties {

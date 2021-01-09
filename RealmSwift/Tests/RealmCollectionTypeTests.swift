@@ -594,6 +594,14 @@ class ResultsTests: RealmCollectionTypeTests {
         }
     }
 
+    override func testAssignSetProperty() {
+        try! realmWithTestPath().write {
+            let set = CTTStringSet()
+            realmWithTestPath().add(set)
+            set["set"] = collectionBaseInWriteTransaction()
+        }
+    }
+
     func addObjectToResults() {
         let realm = realmWithTestPath()
         try! realm.write {
@@ -823,6 +831,8 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
             array["array"] = collectionBaseInWriteTransaction()
         }
     }
+
+    override func testAssignSetProperty() { }
 
     override func testDescription() {
         // swiftlint:disable:next line_length
@@ -1344,6 +1354,14 @@ class LinkingObjectsCollectionTypeTests: RealmCollectionTypeTests {
         try! realmWithTestPath().write {
             realmWithTestPath().add(array)
             array["array"] = collectionBaseInWriteTransaction()
+        }
+    }
+
+    override func testAssignSetProperty() {
+        let set = CTTStringSet()
+        try! realmWithTestPath().write {
+            realmWithTestPath().add(set)
+            set["set"] = collectionBaseInWriteTransaction()
         }
     }
 

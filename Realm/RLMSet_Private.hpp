@@ -34,6 +34,8 @@ class RLMClassInfo;
 class RLMObservationInfo;
 
 @interface RLMSet () {
+
+
 @protected
     NSString *_objectClassName;
     RLMPropertyType _type;

@@ -456,8 +456,15 @@ extension MutableSet: RealmCollection {
             return _rlmSet.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
-    // MARK: Unavailable Methods
-    // Implemented for conformance
+    // MARK: Object Retrieval
+
+    /**
+     - warning: Ordering is not guaranteed on a MutableSet. Subscripting is implemented for
+                convenience should not be relied on.
+     */
+    public subscript(position: Int) -> Element {
+        return dynamicBridgeCast(fromObjectiveC: self.object(at: UInt(position)))
+    }
 
     /// :nodoc:
     public func index(of object: Element) -> Int? {
@@ -469,19 +476,38 @@ extension MutableSet: RealmCollection {
         fatalError("index(matching:) is not available on MutableSet")
     }
 
-    /// :nodoc:
-    public subscript(position: Int) -> Element {
-        fatalError("subscript is not available on MutableSet")
+    /**
+     - warning: Ordering is not guaranteed on a MutableSet. `first` is implemented for
+                convenience should not be relied on.
+     */
+    public var first: Element? {
+        return self[0]
     }
 
-    /// :nodoc:
-    public var first: Element? { fatalError("first is not available on MutableSet") }
-
-    /// :nodoc:
-    public var last: Element? { fatalError("last is not available on MutableSet") }
+    /**
+     - warning: Ordering is not guaranteed on a MutableSet. `last` is implemented for
+                convenience should not be relied on.
+     */
+    public var last: Element? {
+        return self[count-1]
+    }
 }
 
-
+extension MutableSet : ExpressibleByArrayLiteral {
+    /// Creates a set containing the elements of the given array literal.
+    ///
+    /// Do not call this initializer directly. It is used by the compiler when
+    /// you use an array literal. Instead, create a new set using an array
+    /// literal as its value by enclosing a comma-separated list of values in
+    /// square brackets. You can use an array literal anywhere a set is expected
+    /// by the type context.
+    ///
+    /// - Parameter elements: A variadic list of elements of the new set.
+    @inlinable public convenience init(arrayLiteral elements: Element...) {
+        self.init()
+        insert(objectsIn: elements)
+    }
+}
 
 // MARK: - Codable
 

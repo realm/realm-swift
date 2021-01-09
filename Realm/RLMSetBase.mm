@@ -25,10 +25,6 @@
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 
-@interface RLMSet (KVO)
-- (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes;
-@end
-
 @implementation RLMSetBase {
     std::unique_ptr<RLMObservationInfo> _observationInfo;
 }
@@ -70,8 +66,8 @@
     return [self._rlmSet countByEnumeratingWithState:state objects:buffer count:len];
 }
 
-- (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
-    return [self._rlmSet objectsAtIndexes:indexes];
+- (id)objectAtIndex:(NSUInteger)index {
+    return [self._rlmSet objectAtIndex:index];
 }
 
 - (void)addObserver:(id)observer

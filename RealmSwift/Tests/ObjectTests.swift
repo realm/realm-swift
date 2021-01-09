@@ -118,11 +118,12 @@ class ObjectTests: TestCase {
         let object = SwiftObject()
 
         // swiftlint:disable line_length
-        assertMatches(object.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <.*61.*>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tdecimalCol = 1.23E6;\n\tobjectIdCol = 1234567890ab1234567890ab;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tuuidCol = 137DECC8-B300-4954-A233-F89909F4FD89;\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
+        assertMatches(object.description, "SwiftObject {\n\tboolCol = 0;\n\tintCol = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1.23;\n\tdoubleCol = 12.3;\n\tstringCol = a;\n\tbinaryCol = <length = 1, bytes = 0x61 — 1 total bytes>;\n\tdateCol = 1970-01-01 00:00:01 +0000;\n\tdecimalCol = 1.23E6;\n\tobjectIdCol = 1234567890ab1234567890ab;\n\tobjectCol = SwiftBoolObject {\n\t\tboolCol = 0;\n\t};\n\tuuidCol = 137DECC8-B300-4954-A233-F89909F4FD89;\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> (\n\t\n\t);\n\tsetCol = MutableSet<SwiftBoolObject> <0x[0-9a-f]+> (\n\t\n\t);\n}")
 
         let recursiveObject = SwiftRecursiveObject()
         recursiveObject.objects.append(recursiveObject)
-        assertMatches(recursiveObject.description, "SwiftRecursiveObject \\{\n\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t\\}\n\t\t\t\\);\n\t\t\\}\n\t\\);\n\\}")
+        recursiveObject.objectSet.insert(recursiveObject)
+        assertMatches(recursiveObject.description, "SwiftRecursiveObject \\{\n\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t\tobjectSet = <Maximum depth exceeded>;\n\t\t\t\t\\}\n\t\t\t\\);\n\t\t\\}\n\t\\);\n\\}")
 
         let renamedObject = LinkToSwiftRenamedProperties1()
         renamedObject.linkA = SwiftRenamedProperties1()
@@ -256,6 +257,7 @@ class ObjectTests: TestCase {
             XCTAssertEqual(object.value(forKey: "dateCol") as! Date?, Date(timeIntervalSince1970: 1))
             XCTAssertEqual((object.value(forKey: "objectCol")! as! SwiftBoolObject).boolCol, false)
             XCTAssert(object.value(forKey: "arrayCol")! is List<SwiftBoolObject>)
+            XCTAssert(object.value(forKey: "setCol")! is MutableSet<SwiftBoolObject>)
         }
 
         test(SwiftObject())
@@ -338,6 +340,47 @@ class ObjectTests: TestCase {
         }
     }
 
+    func testValueForKeyMutableSet() {
+        let test: (SwiftMutableSetObject) -> Void = { object in
+            XCTAssertEqual((object.value(forKey: "int") as! MutableSet<Int>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int8") as! MutableSet<Int8>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int16") as! MutableSet<Int16>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int32") as! MutableSet<Int32>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int64") as! MutableSet<Int64>).count, 0)
+            XCTAssertEqual((object.value(forKey: "float") as! MutableSet<Float>).count, 0)
+            XCTAssertEqual((object.value(forKey: "double") as! MutableSet<Double>).count, 0)
+            XCTAssertEqual((object.value(forKey: "string") as! MutableSet<String>).count, 0)
+            XCTAssertEqual((object.value(forKey: "data") as! MutableSet<Data>).count, 0)
+            XCTAssertEqual((object.value(forKey: "date") as! MutableSet<Date>).count, 0)
+            XCTAssertEqual((object.value(forKey: "decimal") as! MutableSet<Decimal128>).count, 0)
+            XCTAssertEqual((object.value(forKey: "objectId") as! MutableSet<ObjectId>).count, 0)
+            XCTAssertEqual((object.value(forKey: "uuid") as! MutableSet<UUID>).count, 0)
+
+            XCTAssertEqual((object.value(forKey: "intOpt") as! MutableSet<Int?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int8Opt") as! MutableSet<Int8?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int16Opt") as! MutableSet<Int16?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int32Opt") as! MutableSet<Int32?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int64Opt") as! MutableSet<Int64?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "floatOpt") as! MutableSet<Float?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "doubleOpt") as! MutableSet<Double?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "stringOpt") as! MutableSet<String?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "dataOpt") as! MutableSet<Data?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "dateOpt") as! MutableSet<Date?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "decimalOpt") as! MutableSet<Decimal128?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "objectIdOpt") as! MutableSet<ObjectId?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "uuidOpt") as! MutableSet<UUID?>).count, 0)
+        }
+
+        test(SwiftMutableSetObject())
+        let realm = try! Realm()
+        try! realm.write {
+            test(realm.create(SwiftMutableSetObject.self, value: [:]))
+            let addedObj = SwiftMutableSetObject()
+            realm.add(addedObj)
+            test(addedObj)
+        }
+    }
+
     func testValueForKeyLinkingObjects() {
         let test: (SwiftDogObject) -> Void = { object in
             let owners = object.value(forKey: "owners") as! LinkingObjects<SwiftOwnerObject>
@@ -366,12 +409,25 @@ class ObjectTests: TestCase {
         XCTAssertEqual(object.name, "foo")
         XCTAssertEqual(object.array[0].stringCol, "bar")
         XCTAssertEqual(object.intArray[0].intCol, 50)
+
+        let json2: [String: Any] = ["name": "foo", "set": [["stringCol": "bar"]], "intSet": [["intCol": 50]]]
+        let object2 = SwiftMutableSetPropertyObject()
+        json2.keys.forEach { key in
+            object2.setValue(json2[key], forKey: key)
+        }
+        XCTAssertEqual(object2.name, "foo")
+        XCTAssertEqual(object2.set[0].stringCol, "bar")
+        XCTAssertEqual(object2.intSet[0].intCol, 50)
     }
 
     func testSettingUnmanagedObjectValuesWithBadSwiftDictionary() {
         let json: [String: Any] = ["name": "foo", "array": [["stringCol": NSObject()]], "intArray": [["intCol": 50]]]
         let object = SwiftArrayPropertyObject()
         assertThrows({ json.keys.forEach { key in object.setValue(json[key], forKey: key) } }())
+
+        let json2: [String: Any] = ["name": "foo", "set": [["stringCol": NSObject()]], "intSet": [["intCol": 50]]]
+        let object2 = SwiftMutableSetPropertyObject()
+        assertThrows({ json2.keys.forEach { key in object2.setValue(json2[key], forKey: key) } }())
     }
 
     func setAndTestAllTypes(_ setter: (SwiftObject, Any?, String) -> Void,
@@ -423,6 +479,27 @@ class ObjectTests: TestCase {
         setter(object, [boolObject], "arrayCol")
         setter(object, NSNull(), "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 0)
+
+        let set = MutableSet<SwiftBoolObject>()
+        set.insert(boolObject)
+        setter(object, set, "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>).count, 1)
+        assertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>)[0], boolObject)
+
+        set.removeAll()
+        setter(object, set, "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>).count, 0)
+
+        setter(object, [boolObject], "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>).count, 1)
+        assertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>)[0], boolObject)
+
+        setter(object, nil, "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>).count, 0)
+
+        setter(object, [boolObject], "setCol")
+        setter(object, NSNull(), "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>).count, 0)
     }
 
     func dynamicSetAndTestAllTypes(_ setter: (DynamicObject, Any?, String) -> Void,
@@ -469,6 +546,22 @@ class ObjectTests: TestCase {
 
         setter(object, nil, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 0)
+
+        setter(object, [boolObject], "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<DynamicObject>).count, 1)
+        assertEqual((getter(object, "setCol") as! MutableSet<DynamicObject>)[0], boolObject)
+
+        let set = getter(object, "setCol") as! MutableSet<DynamicObject>
+        set.removeAll()
+        setter(object, set, "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<DynamicObject>).count, 0)
+
+        setter(object, [boolObject], "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<DynamicObject>).count, 1)
+        assertEqual((getter(object, "setCol") as! MutableSet<DynamicObject>)[0], boolObject)
+
+        setter(object, nil, "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<DynamicObject>).count, 0)
     }
 
     // Yields a read-write migration `SwiftObject` to the given block
@@ -550,6 +643,29 @@ class ObjectTests: TestCase {
         assertEqual(dynamicArray[1], str2)
         XCTAssertEqual(arrayObject.dynamicList("intArray").count, 0)
         assertThrows(arrayObject.dynamicList("noSuchList"))
+    }
+
+    func testDynamicMutableSet() {
+        let realm = try! Realm()
+        let setObject = SwiftMutableSetPropertyObject()
+        let str1 = SwiftStringObject()
+        let str2 = SwiftStringObject()
+        setObject.set.insert(objectsIn: [str1, str2])
+        try! realm.write {
+            realm.add(setObject)
+        }
+        let dynamicSet = setObject.dynamicMutableSet("set")
+        XCTAssertEqual(dynamicSet.count, 2)
+
+        XCTAssertTrue(dynamicSet.map { (o) in
+            o.isSameObject(as: str1)
+        }.contains(true))
+        XCTAssertTrue(dynamicSet.map { (o) in
+            o.isSameObject(as: str2)
+        }.contains(true))
+
+        XCTAssertEqual(setObject.dynamicMutableSet("intSet").count, 0)
+        assertThrows(setObject.dynamicMutableSet("noSuchSet"))
     }
 
     func testObjectiveCTypeProperties() {
@@ -664,6 +780,25 @@ class ObjectTests: TestCase {
             try! realm.write {
                 let obj = realm.objects(SwiftRecursiveObject.self).first!
                 obj.objects.append(obj)
+            }
+        }
+
+        waitForExpectations(timeout: 2)
+        token.invalidate()
+    }
+
+    func testMutableSetPropertyNotifications() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let object = realm.create(SwiftRecursiveObject.self, value: [[]])
+        try! realm.commitWrite()
+
+        let token = object.observe(expectChange("objectSet", Int?.none, Int?.none))
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write {
+                let obj = realm.objects(SwiftRecursiveObject.self).first!
+                obj.objectSet.insert(obj)
             }
         }
 
@@ -896,12 +1031,14 @@ class ObjectTests: TestCase {
     func testFreezeDynamicObject() {
         let realm = try! Realm()
         try! realm.write {
-            realm.create(SwiftObject.self, value: ["arrayCol": [[true]]])
+            realm.create(SwiftObject.self, value: ["arrayCol": [[true]], "setCol": [[true]]])
         }
         let obj = realm.dynamicObjects("SwiftObject").first!.freeze()
         XCTAssertTrue(obj.isFrozen)
         XCTAssertTrue(obj.dynamicList("arrayCol").isFrozen)
         XCTAssertTrue(obj.dynamicList("arrayCol").first!.isFrozen)
+        XCTAssertTrue(obj.dynamicMutableSet("setCol").isFrozen)
+        XCTAssertTrue(obj.dynamicMutableSet("setCol").first!.isFrozen)
     }
 
     func testFreezeAllPropertyTypes() {

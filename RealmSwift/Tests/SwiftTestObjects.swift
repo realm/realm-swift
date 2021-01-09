@@ -133,7 +133,7 @@ class SwiftListObject: Object {
     let uuidOpt = List<UUID?>()
 }
 
-class SwiftSetObject: Object {
+class SwiftMutableSetObject: Object {
     let int = MutableSet<Int>()
     let int8 = MutableSet<Int8>()
     let int16 = MutableSet<Int16>()
@@ -274,12 +274,19 @@ class SwiftEmployeeObject: Object {
 
 class SwiftCompanyObject: Object {
     let employees = List<SwiftEmployeeObject>()
+    let employeeSet = MutableSet<SwiftEmployeeObject>()
 }
 
 class SwiftArrayPropertyObject: Object {
     @objc dynamic var name = ""
     let array = List<SwiftStringObject>()
     let intArray = List<SwiftIntObject>()
+}
+
+class SwiftMutableSetPropertyObject: Object {
+    @objc dynamic var name = ""
+    let set = MutableSet<SwiftStringObject>()
+    let intSet = MutableSet<SwiftIntObject>()
 }
 
 class SwiftDoubleListOfSwiftObject: Object {
@@ -290,8 +297,16 @@ class SwiftListOfSwiftObject: Object {
     let array = List<SwiftObject>()
 }
 
+class SwiftMutableSetOfSwiftObject: Object {
+    let set = MutableSet<SwiftObject>()
+}
+
 class SwiftListOfSwiftOptionalObject: Object {
     let array = List<SwiftOptionalObject>()
+}
+
+class SwiftMutableSetOfSwiftOptionalObject: Object {
+    let set = MutableSet<SwiftOptionalObject>()
 }
 
 class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
@@ -327,6 +342,7 @@ class SwiftIgnoredPropertiesObject: Object {
 
 class SwiftRecursiveObject: Object {
     let objects = List<SwiftRecursiveObject>()
+    let objectSet = MutableSet<SwiftRecursiveObject>()
 }
 
 protocol SwiftPrimaryKeyObjectType {
@@ -567,6 +583,7 @@ class SwiftGenericPropsOrderingParent: Object {
     var implicitlyIgnoredComputedProperty: Int { return 0 }
     let implicitlyIgnoredReadOnlyProperty: Int = 1
     let parentFirstList = List<SwiftIntObject>()
+    let parentFirstSet = MutableSet<SwiftIntObject>()
     @objc dynamic var parentFirstNumber = 0
     func parentFunction() -> Int { return parentFirstNumber + 1 }
     @objc dynamic var parentSecondNumber = 1
@@ -585,9 +602,11 @@ class SwiftGenericPropsOrderingObject: SwiftGenericPropsOrderingParent {
     var secondIgnored = 999
     lazy var lazyIgnored = 999
     let firstArray = List<SwiftStringObject>()          // Managed property
+    let firstSet = MutableSet<SwiftStringObject>()          // Managed property
     @objc dynamic var secondNumber = 0                  // Managed property
     var computedProp: String { return "\(firstNumber), \(secondNumber), and \(thirdNumber)" }
     let secondArray = List<SwiftStringObject>()         // Managed property
+    let secondSet = MutableSet<SwiftStringObject>()         // Managed property
     override class func ignoredProperties() -> [String] {
         return ["firstIgnored", "dynamicIgnored", "secondIgnored", "thirdIgnored", "lazyIgnored", "dynamicLazyIgnored"]
     }
@@ -634,10 +653,11 @@ class LinkToSwiftRenamedProperties1: Object {
     @objc dynamic var linkA: SwiftRenamedProperties1?
     @objc dynamic var linkB: SwiftRenamedProperties2?
     let array1 = List<SwiftRenamedProperties1>()
+    let set1 = MutableSet<SwiftRenamedProperties1>()
 
     override class func _realmObjectName() -> String { return "Link To Swift Renamed Properties" }
     override class func _realmColumnNames() -> [String: String] {
-        return ["linkA": "link 1", "linkB": "link 2", "array1": "array"]
+        return ["linkA": "link 1", "linkB": "link 2", "array1": "array", "set1": "set"]
     }
 }
 
@@ -645,10 +665,11 @@ class LinkToSwiftRenamedProperties2: Object {
     @objc dynamic var linkC: SwiftRenamedProperties1?
     @objc dynamic var linkD: SwiftRenamedProperties2?
     let array2 = List<SwiftRenamedProperties2>()
+    let set2 = MutableSet<SwiftRenamedProperties2>()
 
     override class func _realmObjectName() -> String { return "Link To Swift Renamed Properties" }
     override class func _realmColumnNames() -> [String: String] {
-        return ["linkC": "link 1", "linkD": "link 2", "array2": "array"]
+        return ["linkC": "link 1", "linkD": "link 2", "array2": "array", "set2": "set"]
     }
 }
 

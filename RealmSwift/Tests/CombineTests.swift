@@ -1249,10 +1249,27 @@ extension List: CombineTestCollection where Element == SwiftIntObject {
     }
 }
 
+extension MutableSet: CombineTestCollection where Element == SwiftIntObject {
+    static func getCollection(_ realm: Realm) -> MutableSet<Element> {
+        return try! realm.write { realm.create(SwiftMutableSetPropertyObject.self, value: []).intSet }
+    }
+
+    func appendObject() {
+        insert(realm!.create(Element.self, value: []))
+    }
+}
+
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class ManagedListPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         return CombineCollectionPublisherTests<List<SwiftIntObject>>.testSuite("List")
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+class ManagedMutableSetPublisherTests: TestCase {
+    override class var defaultTestSuite: XCTestSuite {
+        return CombineCollectionPublisherTests<MutableSet<SwiftIntObject>>.testSuite("MutableSet")
     }
 }
 

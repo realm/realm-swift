@@ -22,18 +22,17 @@ import RealmSwift
 class MutableSetTests: TestCase {
     var str1: SwiftStringObject?
     var str2: SwiftStringObject?
-    var arrayObject: SwiftArrayPropertyObject!
-    var array: List<SwiftStringObject>?
+    var str3: SwiftStringObject?
+    var setObject: SwiftMutableSetPropertyObject!
+    var setObject2: SwiftMutableSetPropertyObject!
+    var set: MutableSet<SwiftStringObject>?
+    var set2: MutableSet<SwiftStringObject>?
 
-    func createArray() -> SwiftArrayPropertyObject {
+    func createSet() -> SwiftMutableSetPropertyObject {
         fatalError("abstract")
     }
 
-    func createArrayWithLinks() -> SwiftListOfSwiftObject {
-        fatalError("abstract")
-    }
-
-    func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
+    func createSetWithLinks() -> SwiftMutableSetOfSwiftObject {
         fatalError("abstract")
     }
 
@@ -48,13 +47,20 @@ class MutableSetTests: TestCase {
         str2.stringCol = "2"
         self.str2 = str2
 
-        arrayObject = createArray()
-        array = arrayObject.array
+        let str3 = SwiftStringObject()
+        str3.stringCol = "3"
+        self.str3 = str3
+
+        setObject = createSet()
+        setObject2 = createSet()
+        set = setObject.set
+        set2 = setObject2.set
 
         let realm = realmWithTestPath()
         try! realm.write {
             realm.add(str1)
             realm.add(str2)
+            realm.add(str3)
         }
 
         realm.beginWrite()
@@ -65,8 +71,11 @@ class MutableSetTests: TestCase {
 
         str1 = nil
         str2 = nil
-        arrayObject = nil
-        array = nil
+        str3 = nil
+        setObject = nil
+        setObject2 = nil
+        set = nil
+        set2 = nil
 
         super.tearDown()
     }
@@ -80,15 +89,12 @@ class MutableSetTests: TestCase {
     }
 
     func testPrimitive() {
-        let obj = SwiftSetObject()
+        let obj = SwiftMutableSetObject()
         obj.int.insert(5)
         XCTAssertEqual(obj.int.first!, 5)
         XCTAssertEqual(obj.int.last!, 5)
         XCTAssertEqual(obj.int[0], 5)
         obj.int.insert(objectsIn: [6, 7, 8] as [Int])
-        XCTAssertEqual(obj.int.index(of: 6), 1)
-        XCTAssertEqual(2, obj.int.index(matching: NSPredicate(format: "self == 7")))
-        XCTAssertNil(obj.int.index(matching: NSPredicate(format: "self == 9")))
         XCTAssertEqual(obj.int.max(), 8)
         XCTAssertEqual(obj.int.sum(), 26)
 
@@ -98,7 +104,7 @@ class MutableSetTests: TestCase {
     }
 
     func testPrimitiveIterationAcrossNil() {
-        let obj = SwiftListObject()
+        let obj = SwiftMutableSetObject()
         XCTAssertFalse(obj.int.contains(5))
         XCTAssertFalse(obj.int8.contains(5))
         XCTAssertFalse(obj.int16.contains(5))
@@ -129,285 +135,151 @@ class MutableSetTests: TestCase {
     }
 
     func testInvalidated() {
-        guard let array = array else {
+        guard let set = set else {
             fatalError("Test precondition failure")
         }
-        XCTAssertFalse(array.isInvalidated)
+        XCTAssertFalse(set.isInvalidated)
 
-        if let realm = arrayObject.realm {
-            realm.delete(arrayObject)
-            XCTAssertTrue(array.isInvalidated)
+        if let realm = setObject.realm {
+            realm.delete(setObject)
+            XCTAssertTrue(set.isInvalidated)
         }
     }
 
     func testFastEnumerationWithMutation() {
-        guard let array = array, let str1 = str1, let str2 = str2 else {
+        guard let set = set, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
 
-        array.append(objectsIn: [str1, str2, str1, str2, str1, str2, str1, str2, str1,
+        set.insert(objectsIn: [str1, str2, str1, str2, str1, str2, str1, str2, str1,
             str2, str1, str2, str1, str2, str1, str2, str1, str2, str1, str2])
         var str = ""
-        for obj in array {
+        for obj in set {
             str += obj.stringCol
-            array.append(objectsIn: [str1])
+            set.insert(objectsIn: [str1])
         }
 
-        XCTAssertEqual(str, "12121212121212121212")
+        XCTAssertTrue(set.contains(str1))
+        XCTAssertTrue(set.contains(str2))
     }
 
     func testAppendObject() {
-        guard let array = array, let str1 = str1, let str2 = str2 else {
+        guard let set = set, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
         for str in [str1, str2, str1] {
-            array.append(str)
+            set.insert(str)
         }
-        XCTAssertEqual(Int(3), array.count)
-        assertEqual(str1, array[0])
-        assertEqual(str2, array[1])
-        assertEqual(str1, array[2])
-    }
-
-    func testAppendArray() {
-        guard let array = array, let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failure")
-        }
-        array.append(objectsIn: [str1, str2, str1])
-        XCTAssertEqual(Int(3), array.count)
-        assertEqual(str1, array[0])
-        assertEqual(str2, array[1])
-        assertEqual(str1, array[2])
-    }
-
-    func testAppendResults() {
-        guard let array = array, let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failure")
-        }
-        array.append(objectsIn: realmWithTestPath().objects(SwiftStringObject.self))
-        XCTAssertEqual(Int(2), array.count)
-        assertEqual(str1, array[0])
-        assertEqual(str2, array[1])
+        XCTAssertEqual(Int(2), set.count)
+        XCTAssertTrue(set.contains(str1))
+        XCTAssertTrue(set.contains(str2))
     }
 
     func testInsert() {
-        guard let array = array, let str1 = str1, let str2 = str2 else {
+        guard let set = set, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
-
-        XCTAssertEqual(Int(0), array.count)
-
-        array.insert(str1, at: 0)
-        XCTAssertEqual(Int(1), array.count)
-        assertEqual(str1, array[0])
-
-        array.insert(str2, at: 0)
-        XCTAssertEqual(Int(2), array.count)
-        assertEqual(str2, array[0])
-        assertEqual(str1, array[1])
-
-        assertThrows(array.insert(str2, at: 200))
-        assertThrows(array.insert(str2, at: -200))
+        set.insert(objectsIn: [str1, str2, str1])
+        XCTAssertEqual(Int(2), set.count)
+        XCTAssertTrue(set.contains(str1))
+        XCTAssertTrue(set.contains(str2))
     }
 
-    func testRemoveAtIndex() {
-        guard let array = array, let str1 = str1, let str2 = str2 else {
+    func testAppendResults() {
+        guard let set = set, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
-
-        array.append(objectsIn: [str1, str2, str1])
-
-        array.remove(at: 1)
-        assertEqual(str1, array[0])
-        assertEqual(str1, array[1])
-
-        assertThrows(array.remove(at: 2))
-        assertThrows(array.remove(at: -2))
-    }
-
-    func testRemoveLast() {
-        guard let array = array, let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failure")
+        set.insert(objectsIn: realmWithTestPath().objects(SwiftStringObject.self))
+        XCTAssertEqual(Int(3), set.count)
+        // The unmanaged NSSet backing object won't work with MutableSet.contains(:)
+        set.forEach {
+            // Ordering is not guaranteed so we can't subscript
+            XCTAssertTrue($0.isSameObject(as: str1) || $0.isSameObject(as: str2) || $0.isSameObject(as: str3))
         }
-
-        array.append(objectsIn: [str1, str2])
-
-        array.removeLast()
-        XCTAssertEqual(Int(1), array.count)
-        assertEqual(str1, array[0])
-
-        array.removeLast()
-        XCTAssertEqual(Int(0), array.count)
-
-        assertThrows(array.removeLast())    // Should throw if already empty
     }
 
     func testRemoveAll() {
-        guard let array = array, let str1 = str1, let str2 = str2 else {
+        guard let set = set, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
 
-        array.append(objectsIn: [str1, str2])
+        set.insert(objectsIn: [str1, str2])
 
-        array.removeAll()
-        XCTAssertEqual(Int(0), array.count)
+        set.removeAll()
+        XCTAssertEqual(Int(0), set.count)
 
-        array.removeAll() // should be a no-op
-        XCTAssertEqual(Int(0), array.count)
+        set.removeAll() // should be a no-op
+        XCTAssertEqual(Int(0), set.count)
     }
 
-    func testReplace() {
-        guard let array = array, let str1 = str1, let str2 = str2 else {
+    func testRemoveObject() {
+        guard let set = set, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
 
-        array.append(objectsIn: [str1, str1])
-
-        array.replace(index: 0, object: str2)
-        XCTAssertEqual(Int(2), array.count)
-        assertEqual(str2, array[0])
-        assertEqual(str1, array[1])
-
-        array.replace(index: 1, object: str2)
-        XCTAssertEqual(Int(2), array.count)
-        assertEqual(str2, array[0])
-        assertEqual(str2, array[1])
-
-        assertThrows(array.replace(index: 200, object: str2))
-        assertThrows(array.replace(index: -200, object: str2))
-    }
-
-    func testMove() {
-        guard let array = array, let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failure")
-        }
-
-        array.append(objectsIn: [str1, str2])
-
-        array.move(from: 1, to: 0)
-
-        XCTAssertEqual(array[0].stringCol, "2")
-        XCTAssertEqual(array[1].stringCol, "1")
-
-        array.move(from: 0, to: 1)
-
-        XCTAssertEqual(array[0].stringCol, "1")
-        XCTAssertEqual(array[1].stringCol, "2")
-
-        array.move(from: 0, to: 0)
-
-        XCTAssertEqual(array[0].stringCol, "1")
-        XCTAssertEqual(array[1].stringCol, "2")
-
-        assertThrows(array.move(from: 0, to: 2))
-        assertThrows(array.move(from: 2, to: 0))
-    }
-
-    func testReplaceRange() {
-        guard let array = array, let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failure")
-        }
-
-        array.append(objectsIn: [str1, str1])
-
-        array.replaceSubrange(0..<1, with: [str2])
-        XCTAssertEqual(Int(2), array.count)
-        assertEqual(str2, array[0])
-        assertEqual(str1, array[1])
-
-        array.replaceSubrange(1..<2, with: [str2])
-        XCTAssertEqual(Int(2), array.count)
-        assertEqual(str2, array[0])
-        assertEqual(str2, array[1])
-
-        array.replaceSubrange(0..<0, with: [str2])
-        XCTAssertEqual(Int(3), array.count)
-        assertEqual(str2, array[0])
-        assertEqual(str2, array[1])
-        assertEqual(str2, array[2])
-
-        array.replaceSubrange(0..<3, with: [])
-        XCTAssertEqual(Int(0), array.count)
-
-        assertThrows(array.replaceSubrange(200..<201, with: [str2]))
-        assertThrows(array.replaceSubrange(-200..<200, with: [str2]))
-        assertThrows(array.replaceSubrange(0..<200, with: [str2]))
-    }
-
-    func testSwapAt() {
-        guard let array = array, let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failure")
-        }
-
-        array.append(objectsIn: [str1, str2])
-
-        array.swapAt(0, 1)
-        XCTAssertEqual(Int(2), array.count)
-        assertEqual(str2, array[0])
-        assertEqual(str1, array[1])
-
-        array.swapAt(1, 1)
-        XCTAssertEqual(Int(2), array.count)
-        assertEqual(str2, array[0])
-        assertEqual(str1, array[1])
-
-        assertThrows(array.swapAt(-1, 0))
-        assertThrows(array.swapAt(0, -1))
-        assertThrows(array.swapAt(1000, 0))
-        assertThrows(array.swapAt(0, 1000))
+        set.insert(objectsIn: [str1, str2])
+        XCTAssertTrue(set.contains(str1))
+        XCTAssertEqual(Int(2), set.count)
+        set.remove(str1)
+        XCTAssertFalse(set.contains(str1))
+        XCTAssertEqual(Int(1), set.count)
+        set.removeAll()
+        XCTAssertEqual(Int(0), set.count)
+        XCTAssertFalse(set.contains(str1))
+        XCTAssertFalse(set.contains(str2))
     }
 
     func testChangesArePersisted() {
-        guard let array = array, let str1 = str1, let str2 = str2 else {
+        guard let set = set, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
-        if let realm = array.realm {
-            array.append(objectsIn: [str1, str2])
+        if let realm = set.realm {
+            set.insert(objectsIn: [str1, str2])
 
-            let otherArray = realm.objects(SwiftArrayPropertyObject.self).first!.array
-            XCTAssertEqual(Int(2), otherArray.count)
+            let otherSet = realm.objects(SwiftMutableSetPropertyObject.self).first!.set
+            XCTAssertEqual(Int(2), otherSet.count)
         }
     }
 
-    func testPopulateEmptyArray() {
-        guard let array = array else {
+    func testPopulateEmptySet() {
+        guard let set = set else {
             fatalError("Test precondition failure")
         }
 
-        XCTAssertEqual(array.count, 0, "Should start with no array elements.")
+        XCTAssertEqual(set.count, 0, "Should start with no set elements.")
 
         let obj = SwiftStringObject()
         obj.stringCol = "a"
-        array.append(obj)
-        array.append(realmWithTestPath().create(SwiftStringObject.self, value: ["b"]))
-        array.append(obj)
+        set.insert(obj)
+        set.insert(realmWithTestPath().create(SwiftStringObject.self, value: ["b"]))
+        set.insert(obj)
 
-        XCTAssertEqual(array.count, 3)
-        XCTAssertEqual(array[0].stringCol, "a")
-        XCTAssertEqual(array[1].stringCol, "b")
-        XCTAssertEqual(array[2].stringCol, "a")
+        XCTAssertEqual(set.count, 2)
+        set.forEach {
+            XCTAssertTrue($0.stringCol == "a" || $0.stringCol == "b")
+        }
 
         // Make sure we can enumerate
-        for obj in array {
+        for obj in set {
             XCTAssertTrue(obj.description.utf16.count > 0, "Object should have description")
         }
     }
 
-    func testEnumeratingListWithListProperties() {
-        let arrayObject = createArrayWithLinks()
+    func testEnumeratingSetWithSetProperties() {
+        let setObject = createSetWithLinks()
 
-        arrayObject.realm?.beginWrite()
+        setObject.realm?.beginWrite()
         for _ in 0..<10 {
-            arrayObject.array.append(SwiftObject())
+            setObject.set.insert(SwiftObject())
         }
-        try! arrayObject.realm?.commitWrite()
+        try! setObject.realm?.commitWrite()
 
-        XCTAssertEqual(10, arrayObject.array.count)
+        XCTAssertEqual(10, setObject.set.count)
 
-        for object in arrayObject.array {
+        for object in setObject.set {
             XCTAssertEqual(123, object.intCol)
             XCTAssertEqual(false, object.objectCol!.boolCol)
-            XCTAssertEqual(0, object.arrayCol.count)
+            XCTAssertEqual(0, object.setCol.count)
         }
     }
 
@@ -415,31 +287,31 @@ class MutableSetTests: TestCase {
         let realm = try! Realm()
         try! realm.write {
             for value in [1, 2] {
-                let listObject = SwiftListOfSwiftObject()
+                let setObject = SwiftMutableSetOfSwiftObject()
                 let object = SwiftObject()
                 object.intCol = value
                 object.doubleCol = Double(value)
                 object.stringCol = String(value)
                 object.decimalCol = Decimal128(number: value as NSNumber)
                 object.objectIdCol = try! ObjectId(string: String(repeating: String(value), count: 24))
-                listObject.array.append(object)
-                realm.add(listObject)
+                setObject.set.insert(object)
+                realm.add(setObject)
             }
         }
 
-        let listObjects = realm.objects(SwiftListOfSwiftObject.self)
-        let listsOfObjects = listObjects.value(forKeyPath: "array") as! [List<SwiftObject>]
+        let setObjects = realm.objects(SwiftMutableSetOfSwiftObject.self)
+        let setsOfObjects = setObjects.value(forKeyPath: "set") as! [MutableSet<SwiftObject>]
         let objects = realm.objects(SwiftObject.self)
 
         func testProperty<T: Equatable>(line: UInt = #line, fn: @escaping (SwiftObject) -> T) {
-            let properties: [T] = Array(listObjects.flatMap { $0.array.map(fn) })
-            let kvcProperties: [T] = Array(listsOfObjects.flatMap { $0.map(fn) })
+            let properties: [T] = Array(setObjects.flatMap { $0.set.map(fn) })
+            let kvcProperties: [T] = Array(setsOfObjects.flatMap { $0.map(fn) })
             XCTAssertEqual(properties, kvcProperties, line: line)
         }
         func testProperty<T: Equatable>(_ name: String, line: UInt = #line, fn: @escaping (SwiftObject) -> T) {
             let properties = Array(objects.compactMap(fn))
-            let listsOfObjects = objects.value(forKeyPath: name) as! [T]
-            let kvcProperties = Array(listsOfObjects.compactMap { $0 })
+            let setsOfObjects = objects.value(forKeyPath: name) as! [T]
+            let kvcProperties = Array(setsOfObjects.compactMap { $0 })
 
             XCTAssertEqual(properties, kvcProperties, line: line)
         }
@@ -461,7 +333,7 @@ class MutableSetTests: TestCase {
         let realm = try! Realm()
         try! realm.write {
             for value in [1, 2] {
-                let listObject = SwiftListOfSwiftOptionalObject()
+                let setObject = SwiftMutableSetOfSwiftOptionalObject()
                 let object = SwiftOptionalObject()
                 object.optIntCol.value = value
                 object.optInt8Col.value = Int8(value)
@@ -470,24 +342,24 @@ class MutableSetTests: TestCase {
                 object.optNSStringCol = NSString(format: "%d", value)
                 object.optDecimalCol = Decimal128(number: value as NSNumber)
                 object.optObjectIdCol = try! ObjectId(string: String(repeating: String(value), count: 24))
-                listObject.array.append(object)
-                realm.add(listObject)
+                setObject.set.insert(object)
+                realm.add(setObject)
             }
         }
 
-        let listObjects = realm.objects(SwiftListOfSwiftOptionalObject.self)
-        let listsOfObjects = listObjects.value(forKeyPath: "array") as! [List<SwiftOptionalObject>]
+        let setObjects = realm.objects(SwiftMutableSetOfSwiftOptionalObject.self)
+        let setOfObjects = setObjects.value(forKeyPath: "set") as! [MutableSet<SwiftOptionalObject>]
         let objects = realm.objects(SwiftOptionalObject.self)
 
         func testProperty<T: Equatable>(line: UInt = #line, fn: @escaping (SwiftOptionalObject) -> T) {
-            let properties: [T] = Array(listObjects.flatMap { $0.array.map(fn) })
-            let kvcProperties: [T] = Array(listsOfObjects.flatMap { $0.map(fn) })
+            let properties: [T] = Array(setObjects.flatMap { $0.set.map(fn) })
+            let kvcProperties: [T] = Array(setOfObjects.flatMap { $0.map(fn) })
             XCTAssertEqual(properties, kvcProperties, line: line)
         }
         func testProperty<T: Equatable>(_ name: String, line: UInt = #line, fn: @escaping (SwiftOptionalObject) -> T) {
             let properties = Array(objects.compactMap(fn))
-            let listsOfObjects = objects.value(forKeyPath: name) as! [T]
-            let kvcProperties = Array(listsOfObjects.compactMap { $0 })
+            let setsOfObjects = objects.value(forKeyPath: name) as! [T]
+            let kvcProperties = Array(setsOfObjects.compactMap { $0 })
 
             XCTAssertEqual(properties, kvcProperties, line: line)
         }
@@ -509,51 +381,7 @@ class MutableSetTests: TestCase {
         testProperty("optObjectCol") { $0.optObjectCol }
     }
 
-    func testAppendEmbedded() {
-        let list = createEmbeddedArray()
-
-        list.realm?.beginWrite()
-        for i in 0..<10 {
-            list.append(EmbeddedTreeObject1(value: [i]))
-        }
-        XCTAssertEqual(10, list.count)
-
-        for (i, object) in list.enumerated() {
-            XCTAssertEqual(i, object.value)
-            XCTAssertEqual(list.realm, object.realm)
-        }
-
-        if list.realm != nil {
-            assertThrows(list.append(list[0]),
-                         reason: "Cannot add an existing managed embedded object to a List.")
-        }
-
-        list.realm?.cancelWrite()
-    }
-
-    func testSetEmbedded() {
-        let list = createEmbeddedArray()
-
-        list.realm?.beginWrite()
-        list.append(EmbeddedTreeObject1(value: [0]))
-
-        let oldObj = list[0]
-        let obj = EmbeddedTreeObject1(value: [1])
-        list[0] = obj
-        XCTAssertTrue(list[0].isSameObject(as: obj))
-        XCTAssertEqual(obj.value, 1)
-        XCTAssertEqual(obj.realm, list.realm)
-
-        if list.realm != nil {
-            XCTAssertTrue(oldObj.isInvalidated)
-            assertThrows(list[0] = obj,
-                         reason: "Cannot add an existing managed embedded object to a List.")
-        }
-
-        list.realm?.cancelWrite()
-    }
-
-    func testUnmanagedListComparison() {
+    func testUnmanagedSetComparison() {
         let obj = SwiftIntObject()
         obj.intCol = 5
         let obj2 = SwiftIntObject()
@@ -564,135 +392,176 @@ class MutableSetTests: TestCase {
         let objects = [obj, obj2, obj3]
         let objects2 = [obj, obj2]
 
-        let list1 = List<SwiftIntObject>()
-        let list2 = List<SwiftIntObject>()
-        XCTAssertEqual(list1, list2, "Empty instances should be equal by `==` operator")
+        let set1 = MutableSet<SwiftIntObject>()
+        let set2 = MutableSet<SwiftIntObject>()
+        XCTAssertEqual(set1, set2, "Empty instances should be equal by `==` operator")
 
-        list1.append(objectsIn: objects)
-        list2.append(objectsIn: objects)
+        set1.insert(objectsIn: objects)
+        set2.insert(objectsIn: objects)
 
-        let list3 = List<SwiftIntObject>()
-        list3.append(objectsIn: objects2)
+        let set3 = MutableSet<SwiftIntObject>()
+        set3.insert(objectsIn: objects2)
 
-        XCTAssertTrue(list1 !== list2, "instances should not be identical")
+        XCTAssertTrue(set1 !== set2, "instances should not be identical")
 
-        XCTAssertEqual(list1, list2, "instances should be equal by `==` operator")
-        XCTAssertNotEqual(list1, list3, "instances should be equal by `==` operator")
+        XCTAssertEqual(set1, set2, "instances should be equal by `==` operator")
+        XCTAssertNotEqual(set1, set3, "instances should be equal by `==` operator")
 
-        XCTAssertTrue(list1.isEqual(list2), "instances should be equal by `isEqual` method")
-        XCTAssertTrue(!list1.isEqual(list3), "instances should be equal by `isEqual` method")
+        XCTAssertTrue(set1.isEqual(set2), "instances should be equal by `isEqual` method")
+        XCTAssertTrue(!set1.isEqual(set3), "instances should be equal by `isEqual` method")
 
-        XCTAssertEqual(Array(list1), Array(list2), "instances converted to Swift.Array should be equal")
-        XCTAssertNotEqual(Array(list1), Array(list3), "instances converted to Swift.Array should be equal")
-        list3.append(obj3)
-        XCTAssertEqual(list1, list3, "instances should be equal by `==` operator")
-    }
-}
-
-class MutableSetStandaloneTests: ListTests {
-    override func createArray() -> SwiftArrayPropertyObject {
-        let array = SwiftArrayPropertyObject()
-        XCTAssertNil(array.realm)
-        return array
+        XCTAssertEqual(Array(set1), Array(set2), "instances converted to Swift.Array should be equal")
+        XCTAssertNotEqual(Array(set1), Array(set3), "instances converted to Swift.Array should be equal")
+        XCTAssertEqual(Set(set1), Set(set2), "instances converted to Swift.Array should be equal")
+        XCTAssertNotEqual(Set(set1), Set(set3), "instances converted to Swift.Array should be equal")
+        set3.insert(obj3)
+        XCTAssertEqual(set1, set3, "instances should be equal by `==` operator")
     }
 
-    override func createArrayWithLinks() -> SwiftListOfSwiftObject {
-        let array = SwiftListOfSwiftObject()
-        XCTAssertNil(array.realm)
-        return array
-    }
-
-    override func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
-        return List<EmbeddedTreeObject1>()
-    }
-}
-
-class MutableSetNewlyAddedTests: ListTests {
-    override func createArray() -> SwiftArrayPropertyObject {
-        let array = SwiftArrayPropertyObject()
-        array.name = "name"
-        let realm = realmWithTestPath()
-        try! realm.write { realm.add(array) }
-
-        XCTAssertNotNil(array.realm)
-        return array
-    }
-
-    override func createArrayWithLinks() -> SwiftListOfSwiftObject {
-        let array = SwiftListOfSwiftObject()
-        let realm = try! Realm()
-        try! realm.write { realm.add(array) }
-
-        XCTAssertNotNil(array.realm)
-        return array
-    }
-
-    override func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
-        let parent = EmbeddedParentObject()
-        let list = parent.array
-        let realm = try! Realm()
-        try! realm.write { realm.add(parent) }
-        return list
-    }
-}
-
-class MutableSetNewlyCreatedTests: ListTests {
-    override func createArray() -> SwiftArrayPropertyObject {
-        let realm = realmWithTestPath()
-        realm.beginWrite()
-        let array = realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
-        try! realm.commitWrite()
-
-        XCTAssertNotNil(array.realm)
-        return array
-    }
-
-    override func createArrayWithLinks() -> SwiftListOfSwiftObject {
-        let realm = try! Realm()
-        realm.beginWrite()
-        let array = realm.create(SwiftListOfSwiftObject.self)
-        try! realm.commitWrite()
-
-        XCTAssertNotNil(array.realm)
-        return array
-    }
-
-    override func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
-        let realm = try! Realm()
-        return try! realm.write {
-            realm.create(EmbeddedParentObject.self, value: []).array
+    func testSubset() {
+        guard let set = set, let set2 = set2, let str1 = str1, let str2 = str2 else {
+            fatalError("Test precondition failure")
         }
+        set.removeAll()
+        set2.removeAll()
+        XCTAssertEqual(Int(0), set.count)
+        XCTAssertEqual(Int(0), set2.count)
+        set.insert(objectsIn: [str1, str2, str1])
+        set2.insert(objectsIn: [str1])
+        XCTAssertEqual(Int(2), set.count)
+        XCTAssertEqual(Int(1), set2.count)
+        XCTAssertTrue(set2.isSubset(of: set))
+        XCTAssertFalse(set.isSubset(of: set2))
+    }
+
+    func testUnion() {
+        guard let set = set, let set2 = set2, let str1 = str1, let str2 = str2 else {
+            fatalError("Test precondition failure")
+        }
+        set.removeAll()
+        set2.removeAll()
+        set.insert(objectsIn: [str1, str2, str1])
+        set2.insert(objectsIn: [str1])
+        XCTAssertEqual(Int(2), set.count)
+        XCTAssertEqual(Int(1), set2.count)
+        XCTAssertTrue(set2.isSubset(of: set))
+        XCTAssertFalse(set.isSubset(of: set2))
+    }
+
+    func testIntersection() {
+        guard let set = set, let set2 = set2, let str1 = str1, let str2 = str2, let str3 = str3 else {
+            fatalError("Test precondition failure")
+        }
+        set.removeAll()
+        set2.removeAll()
+        set.insert(objectsIn: [str1, str2])
+        set2.insert(objectsIn: [str2, str3])
+        XCTAssertEqual(Int(2), set.count)
+        XCTAssertEqual(Int(2), set2.count)
+        XCTAssertTrue(set.intersects(set2))
+        XCTAssertTrue(set2.intersects(set))
+
+        set.formIntersection(set2)
+        XCTAssertTrue(set.intersects(set2))
+        XCTAssertTrue(set2.intersects(set))
+        XCTAssertEqual(Int(1), set.count)
+    }
+
+    func testSubtract() {
+        guard let set = set, let set2 = set2, let str1 = str1, let str2 = str2, let str3 = str3 else {
+            fatalError("Test precondition failure")
+        }
+        set.removeAll()
+        set2.removeAll()
+        set.insert(objectsIn: [str1, str2])
+        set2.insert(objectsIn: [str2, str3])
+        XCTAssertEqual(Int(2), set.count)
+        XCTAssertEqual(Int(2), set2.count)
+
+        set.subtract(set2)
+        XCTAssertEqual(Int(1), set.count)
+        XCTAssertTrue(set.contains(str1))
+
     }
 }
 
-class MutableSetRetrievedTests: ListTests {
-    override func createArray() -> SwiftArrayPropertyObject {
+class MutableSetStandaloneTests: MutableSetTests {
+    override func createSet() -> SwiftMutableSetPropertyObject {
+        let set = SwiftMutableSetPropertyObject()
+        XCTAssertNil(set.realm)
+        return set
+    }
+
+    override func createSetWithLinks() -> SwiftMutableSetOfSwiftObject {
+        let set = SwiftMutableSetOfSwiftObject()
+        XCTAssertNil(set.realm)
+        return set
+    }
+}
+
+class MutableSetNewlyAddedTests: MutableSetTests {
+    override func createSet() -> SwiftMutableSetPropertyObject {
+        let set = SwiftMutableSetPropertyObject()
+        set.name = "name"
+        let realm = realmWithTestPath()
+        try! realm.write { realm.add(set) }
+
+        XCTAssertNotNil(set.realm)
+        return set
+    }
+
+    override func createSetWithLinks() -> SwiftMutableSetOfSwiftObject {
+        let set = SwiftMutableSetOfSwiftObject()
+        let realm = try! Realm()
+        try! realm.write { realm.add(set) }
+
+        XCTAssertNotNil(set.realm)
+        return set
+    }
+}
+
+class MutableSetNewlyCreatedTests: MutableSetTests {
+    override func createSet() -> SwiftMutableSetPropertyObject {
         let realm = realmWithTestPath()
         realm.beginWrite()
-        realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
+        let set = realm.create(SwiftMutableSetPropertyObject.self, value: ["name", [], []])
         try! realm.commitWrite()
-        let array = realm.objects(SwiftArrayPropertyObject.self).first!
 
-        XCTAssertNotNil(array.realm)
-        return array
+        XCTAssertNotNil(set.realm)
+        return set
     }
 
-    override func createArrayWithLinks() -> SwiftListOfSwiftObject {
+    override func createSetWithLinks() -> SwiftMutableSetOfSwiftObject {
         let realm = try! Realm()
         realm.beginWrite()
-        realm.create(SwiftListOfSwiftObject.self)
+        let set = realm.create(SwiftMutableSetOfSwiftObject.self)
         try! realm.commitWrite()
-        let array = realm.objects(SwiftListOfSwiftObject.self).first!
 
-        XCTAssertNotNil(array.realm)
-        return array
+        XCTAssertNotNil(set.realm)
+        return set
+    }
+}
+
+class MutableSetRetrievedTests: MutableSetTests {
+    override func createSet() -> SwiftMutableSetPropertyObject {
+        let realm = realmWithTestPath()
+        realm.beginWrite()
+        realm.create(SwiftMutableSetPropertyObject.self, value: ["name", [], []])
+        try! realm.commitWrite()
+        let set = realm.objects(SwiftMutableSetPropertyObject.self).last!
+
+        XCTAssertNotNil(set.realm)
+        return set
     }
 
-    override func createEmbeddedArray() -> List<EmbeddedTreeObject1> {
+    override func createSetWithLinks() -> SwiftMutableSetOfSwiftObject {
         let realm = try! Realm()
-        try! realm.write {
-            realm.create(EmbeddedParentObject.self, value: [])
-        }
-        return realm.objects(EmbeddedParentObject.self).first!.array
+        realm.beginWrite()
+        realm.create(SwiftMutableSetOfSwiftObject.self)
+        try! realm.commitWrite()
+        let set = realm.objects(SwiftMutableSetOfSwiftObject.self).first!
+
+        XCTAssertNotNil(set.realm)
+        return set
     }
 }

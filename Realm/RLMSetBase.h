@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init;
 - (instancetype)initWithSet:(RLMSet *)set;
+- (id)objectAtIndex:(NSUInteger)index;
 @end
 
 NS_ASSUME_NONNULL_END

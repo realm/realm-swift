@@ -284,6 +284,29 @@ extension Object: RealmCollectionValue {
                                    to: List<DynamicObject>.self)
     }
 
+    // MARK: Dynamic set
+
+    /**
+     Returns a set of `DynamicObject`s for a given property name.
+
+     - warning:  This method is useful only in specialized circumstances, for example, when building
+     components that integrate with Realm. If you are simply building an app on Realm, it is
+     recommended to use instance variables or cast the values returned from key-value coding.
+
+     - parameter propertyName: The name of the property.
+
+     - returns: A set of `DynamicObject`s.
+
+     :nodoc:
+     */
+    public func dynamicMutableSet(_ propertyName: String) -> MutableSet<DynamicObject> {
+        if let dynamic = self as? DynamicObject {
+            return dynamic[propertyName] as! MutableSet<DynamicObject>
+        }
+        return noWarnUnsafeBitCast(dynamicGet(key: propertyName) as! RLMSetBase,
+                                   to: MutableSet<DynamicObject>.self)
+    }
+
     // MARK: Comparison
     /**
      Returns whether two Realm objects are the same.
@@ -390,6 +413,9 @@ public final class DynamicObject: Object {
             let value = RLMDynamicGetByName(self, key)
             if let array = value as? RLMArray<AnyObject> {
                 return List<DynamicObject>(objc: array)
+            }
+            if let set = value as? RLMSet<AnyObject> {
+                return MutableSet<DynamicObject>(objc: set)
             }
             return value
         }

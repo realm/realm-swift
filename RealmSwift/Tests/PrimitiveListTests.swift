@@ -37,7 +37,7 @@ protocol ValueFactory {
     associatedtype W: RealmCollectionValue = T
     associatedtype AverageType: AddableType = Double
     static func array(_ obj: SwiftListObject) -> List<T>
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<T>
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<T>
     static func values() -> [T]
     static func doubleValue(_ value: AverageType) -> Double
     static func doubleValue(t value: T) -> Double
@@ -60,7 +60,7 @@ struct IntFactory: ValueFactory {
         return obj.int
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Int> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int> {
         return obj.int
     }
 
@@ -74,7 +74,7 @@ struct Int8Factory: ValueFactory {
         return obj.int8
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Int8> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int8> {
         return obj.int8
     }
 
@@ -88,7 +88,7 @@ struct Int16Factory: ValueFactory {
         return obj.int16
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Int16> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int16> {
         return obj.int16
     }
 
@@ -102,7 +102,7 @@ struct Int32Factory: ValueFactory {
         return obj.int32
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Int32> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int32> {
         return obj.int32
     }
 
@@ -116,7 +116,7 @@ struct Int64Factory: ValueFactory {
         return obj.int64
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Int64> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int64> {
         return obj.int64
     }
 
@@ -130,7 +130,7 @@ struct FloatFactory: ValueFactory {
         return obj.float
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Float> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Float> {
         return obj.float
     }
 
@@ -144,7 +144,7 @@ struct DoubleFactory: ValueFactory {
         return obj.double
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Double> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Double> {
         return obj.double
     }
 
@@ -158,7 +158,7 @@ struct StringFactory: ValueFactory {
         return obj.string
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<String> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<String> {
         return obj.string
     }
 
@@ -172,7 +172,7 @@ struct DataFactory: ValueFactory {
         return obj.data
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Data> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Data> {
         return obj.data
     }
 
@@ -186,7 +186,7 @@ struct DateFactory: ValueFactory {
         return obj.date
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Date> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Date> {
         return obj.date
     }
 
@@ -202,7 +202,7 @@ struct DecimalFactory: ValueFactory {
         return obj.decimal
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Decimal128> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Decimal128> {
         return obj.decimal
     }
 
@@ -226,7 +226,7 @@ struct ObjectIdFactory: ValueFactory {
         return obj.objectId
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<ObjectId> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<ObjectId> {
         return obj.objectId
     }
 
@@ -241,7 +241,7 @@ struct UUIDFactory: ValueFactory {
         return obj.uuid
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<UUID> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<UUID> {
         return obj.uuid
     }
 
@@ -258,7 +258,7 @@ struct OptionalIntFactory: ValueFactory {
         return obj.intOpt
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Int?> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int?> {
         return obj.intOpt
     }
 
@@ -274,7 +274,7 @@ struct OptionalInt8Factory: ValueFactory {
         return obj.int8Opt
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Int8?> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int8?> {
         return obj.int8Opt
     }
 
@@ -290,7 +290,7 @@ struct OptionalInt16Factory: ValueFactory {
         return obj.int16Opt
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Int16?> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int16?> {
         return obj.int16Opt
     }
 
@@ -306,7 +306,7 @@ struct OptionalInt32Factory: ValueFactory {
         return obj.int32Opt
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Int32?> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int32?> {
         return obj.int32Opt
     }
 
@@ -322,7 +322,7 @@ struct OptionalInt64Factory: ValueFactory {
         return obj.int64Opt
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Int64?> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int64?> {
         return obj.int64Opt
     }
 
@@ -338,7 +338,7 @@ struct OptionalFloatFactory: ValueFactory {
         return obj.floatOpt
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Float?> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Float?> {
         return obj.floatOpt
     }
 
@@ -354,7 +354,7 @@ struct OptionalDoubleFactory: ValueFactory {
         return obj.doubleOpt
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Double?> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Double?> {
         return obj.doubleOpt
     }
 
@@ -370,7 +370,7 @@ struct OptionalStringFactory: ValueFactory {
         return obj.stringOpt
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<String?> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<String?> {
         return obj.stringOpt
     }
 
@@ -386,7 +386,7 @@ struct OptionalDataFactory: ValueFactory {
         return obj.dataOpt
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Data?> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Data?> {
         return obj.dataOpt
     }
 
@@ -402,7 +402,7 @@ struct OptionalDateFactory: ValueFactory {
         return obj.dateOpt
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Date?> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Date?> {
         return obj.dateOpt
     }
 
@@ -419,7 +419,7 @@ struct OptionalDecimalFactory: ValueFactory {
         return obj.decimalOpt
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<Decimal128?> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Decimal128?> {
         return obj.decimalOpt
     }
 
@@ -445,7 +445,7 @@ struct OptionalObjectIdFactory: ValueFactory {
         return obj.objectIdOpt
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<ObjectId?> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<ObjectId?> {
         return obj.objectIdOpt
     }
 
@@ -461,7 +461,7 @@ struct OptionalUUIDFactory: ValueFactory {
         return obj.uuidOpt
     }
 
-    static func mutableSet(_ obj: SwiftSetObject) -> MutableSet<UUID?> {
+    static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<UUID?> {
         return obj.uuidOpt
     }
 

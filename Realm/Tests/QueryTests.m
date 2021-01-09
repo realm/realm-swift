@@ -1811,35 +1811,29 @@
     [SetOfAllTypesObject createInDefaultRealmWithValue:@[@[obj4]]];
 
     [realm commitWriteTransaction];
-//
-//    // simple queries
-//    RLMAssertCount(AllTypesObject, 2U, @"objectCol = %@", stringObj0);
-//    RLMAssertCount(AllTypesObject, 1U, @"objectCol = %@", stringObj1);
-//    RLMAssertCount(AllTypesObject, 1U, @"objectCol = nil");
-//    RLMAssertCount(AllTypesObject, 4U, @"objectCol != nil");
-//    RLMAssertCount(AllTypesObject, 3U, @"objectCol != %@", stringObj0);
-//
-//    // check for ANY object in array
-//    RLMAssertCount(ArrayOfAllTypesObject, 2U, @"ANY array = %@", obj0);
-//    RLMAssertCount(ArrayOfAllTypesObject, 3U, @"ANY array != %@", obj1);
-//    RLMAssertCount(ArrayOfAllTypesObject, 2U, @"NONE array = %@", obj0);
-//    RLMAssertCount(ArrayOfAllTypesObject, 1U, @"NONE array != %@", obj1);
-//    XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"array = %@", obj0].count));
-//    XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"array != %@", obj0].count));
+
+    // simple queries
+    RLMAssertCount(AllTypesObject, 2U, @"objectCol = %@", stringObj0);
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol = %@", stringObj1);
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol = nil");
+    RLMAssertCount(AllTypesObject, 4U, @"objectCol != nil");
+    RLMAssertCount(AllTypesObject, 3U, @"objectCol != %@", stringObj0);
+
+    // check for ANY object in array
+    RLMAssertCount(ArrayOfAllTypesObject, 2U, @"ANY array = %@", obj0);
+    RLMAssertCount(ArrayOfAllTypesObject, 3U, @"ANY array != %@", obj1);
+    RLMAssertCount(ArrayOfAllTypesObject, 2U, @"NONE array = %@", obj0);
+    RLMAssertCount(ArrayOfAllTypesObject, 1U, @"NONE array != %@", obj1);
+    XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"array = %@", obj0].count));
+    XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"array != %@", obj0].count));
 
     // check for ANY object in set
-//    id x = [self evaluate:[SetOfAllTypesObject objectsWhere:@"ANY set = %@", obj0]].count;
-    int a = [ArrayOfAllTypesObject objectsWhere:@"ANY array = %@", obj0].count;
-
-    int x = [SetOfAllTypesObject objectsWhere:@"ANY set = %@", obj0].count;
-//    id y = [SetOfAllTypesObject allObjects];
-//
     RLMAssertCount(SetOfAllTypesObject, 2U, @"ANY set = %@", obj0);
-//    RLMAssertCount(SetOfAllTypesObject, 3U, @"ANY set != %@", obj1);
-//    RLMAssertCount(SetOfAllTypesObject, 2U, @"NONE set = %@", obj0);
-//    RLMAssertCount(SetOfAllTypesObject, 1U, @"NONE set != %@", obj1);
-//    XCTAssertThrows(([SetOfAllTypesObject objectsWhere:@"set = %@", obj0].count));
-//    XCTAssertThrows(([SetOfAllTypesObject objectsWhere:@"set != %@", obj0].count));
+    RLMAssertCount(SetOfAllTypesObject, 3U, @"ANY set != %@", obj1);
+    RLMAssertCount(SetOfAllTypesObject, 2U, @"NONE set = %@", obj0);
+    RLMAssertCount(SetOfAllTypesObject, 1U, @"NONE set != %@", obj1);
+    XCTAssertThrows(([SetOfAllTypesObject objectsWhere:@"set = %@", obj0].count));
+    XCTAssertThrows(([SetOfAllTypesObject objectsWhere:@"set != %@", obj0].count));
 }
 
 - (void)testCompoundOrQuery {

@@ -634,7 +634,7 @@
     XCTAssertEqual(((NSSet *)[company.employeeSet valueForKey:@"name"]).count, 0U);
 
     // managed
-    NSMutableOrderedSet *ages = [NSMutableOrderedSet orderedSet];
+    NSMutableSet *ages = [NSMutableSet set];
     [realm beginWriteTransaction];
     for (int i = 0; i < 30; ++i) {
         [ages addObject:@(i)];
@@ -644,15 +644,13 @@
     [realm commitWriteTransaction];
 
     RLM_GENERIC_SET(EmployeeObject) *employeeObjects = [company valueForKey:@"employeeSet"];
-    NSMutableOrderedSet *kvcAgeProperties = [NSMutableOrderedSet orderedSet];
+    NSMutableSet *kvcAgeProperties = [NSMutableSet set];
     for (EmployeeObject *employee in employeeObjects) {
         [kvcAgeProperties addObject:@(employee.age)];
     }
     XCTAssertEqualObjects(kvcAgeProperties, ages);
 
-    XCTAssertEqualObjects([company.employeeSet valueForKey:@"age"], ages);
-    XCTAssertTrue([company.employeeSet containsObject:[[company.employeeSet valueForKey:@"self"] firstObject]]);
-    XCTAssertTrue([company.employeeSet containsObject:[[company.employeeSet valueForKey:@"self"] lastObject]]);
+    XCTAssertEqualObjects([NSSet setWithSet:[company.employeeSet valueForKey:@"age"]], ages);
 
     XCTAssertEqual([[company.employeeSet valueForKeyPath:@"@count"] integerValue], 30);
     XCTAssertEqual([[company.employeeSet valueForKeyPath:@"@min.age"] integerValue], 0);
@@ -1119,26 +1117,26 @@
     SetPropertyObject *set2 = [SetPropertyObject createInRealm:realm withValue:@[@""]];
 
     set1.intSet = (id)@[io1, io2];
-    XCTAssertEqualObjects([[set1.intSet valueForKey:@"intCol"] allObjects], (@[@1, @2]));
+    XCTAssertEqualObjects([set1.intSet valueForKey:@"intCol"], ([NSSet setWithArray:@[@1, @2]]));
 
     [set1 setValue:@[io3, io1] forKey:@"intSet"];
-    XCTAssertEqualObjects([[set1.intSet valueForKey:@"intCol"] allObjects], (@[@1, @3]));
+    XCTAssertEqualObjects([set1.intSet valueForKey:@"intCol"], ([NSSet setWithArray:@[@1, @3]]));
 
     set1[@"intSet"] = (id)@[io2, io3];
-    XCTAssertEqualObjects([[set1.intSet valueForKey:@"intCol"] allObjects], (@[@2, @3]));
+    XCTAssertEqualObjects([set1.intSet valueForKey:@"intCol"], ([NSSet setWithArray:@[@2, @3]]));
 
     // Assigning RLMSet shallow copies
     set2.intSet = set1.intSet;
-    XCTAssertEqualObjects([[set2.intSet valueForKey:@"intCol"] allObjects], (@[@2, @3]));
+    XCTAssertEqualObjects([set2.intSet valueForKey:@"intCol"], ([NSSet setWithArray:@[@3, @2]]));
 
     [set1.intSet removeAllObjects];
-    XCTAssertEqualObjects([[set2.intSet valueForKey:@"intCol"] allObjects], (@[@2, @3]));
+    XCTAssertEqualObjects([set2.intSet valueForKey:@"intCol"], ([NSSet setWithArray:@[@3, @2]]));
 
     // Self-assignment is a no-op
     set2.intSet = set2.intSet;
-    XCTAssertEqualObjects([[set2.intSet valueForKey:@"intCol"] allObjects], (@[@2, @3]));
+    XCTAssertEqualObjects([set2.intSet valueForKey:@"intCol"], ([NSSet setWithArray:@[@3, @2]]));
     set2[@"intSet"] = set2[@"intSet"];
-    XCTAssertEqualObjects([[set2[@"intSet"] valueForKey:@"intCol"] allObjects], (@[@2, @3]));
+    XCTAssertEqualObjects([set2[@"intSet"] valueForKey:@"intCol"], ([NSSet setWithArray:@[@3, @2]]));
 
     [realm cancelWriteTransaction];
 }

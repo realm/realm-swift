@@ -23,8 +23,8 @@ import RealmSwift
 
 class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
     var realm: Realm?
-    var obj: SwiftSetObject!
-    var obj2: SwiftSetObject!
+    var obj: SwiftMutableSetObject!
+    var obj2: SwiftMutableSetObject!
     var mutableSet: MutableSet<V.T>!
     var otherMutableSet: MutableSet<V.T>!
     var values: [V.T]!
@@ -34,10 +34,10 @@ class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase 
     }
 
     override func setUp() {
-        obj = SwiftSetObject()
-        obj2 = SwiftSetObject()
+        obj = SwiftMutableSetObject()
+        obj2 = SwiftMutableSetObject()
         if O.isManaged() {
-            let config = Realm.Configuration(inMemoryIdentifier: "test", objectTypes: [SwiftSetObject.self])
+            let config = Realm.Configuration(inMemoryIdentifier: "test", objectTypes: [SwiftMutableSetObject.self])
             realm = try! Realm(configuration: config)
             realm!.beginWrite()
             realm!.add(obj)
@@ -162,9 +162,9 @@ class PrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMuta
         otherMutableSet.insert(values[0])
         // Both sets contain values[0]
         mutableSet.formIntersection(otherMutableSet)
-        XCTAssertEqual(Int(1), otherMutableSet.count)
+        XCTAssertEqual(Int(1), mutableSet.count)
         // Fails with PrimitiveMutableSetTests<OF, StringFactory>
-        XCTAssertTrue(mutableSet.contains(values[0]))
+        assertSetContains(mutableSet, keyPath: \.self, items: [values[0]])
     }
     // Fails with PrimitiveMutableSetTests<OF, StringFactory>
     func testFormUnion() {
@@ -176,9 +176,7 @@ class PrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMuta
         otherMutableSet.insert(values[2])
         mutableSet.formUnion(otherMutableSet)
         XCTAssertEqual(Int(3), mutableSet.count)
-        XCTAssertTrue(mutableSet.contains(values[0]))
-        XCTAssertTrue(mutableSet.contains(values[1]))
-        XCTAssertTrue(mutableSet.contains(values[2]))
+        assertSetContains(mutableSet, keyPath: \.self, items: [values[0], values[1], values[2]])
     }
 
     func testSubtract() {

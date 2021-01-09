@@ -38,7 +38,7 @@
 @implementation RLMSetHolder
 @end
 
-@interface RLMSet () <RLMThreadConfined_Private, NSCopying, NSMutableCopying>
+@interface RLMSet () <RLMThreadConfined_Private>
 @end
 
 @implementation RLMSet {
@@ -146,6 +146,13 @@
     return [self isEqual:set];
 }
 
+// For use with MutableSet subscripting, NSSet does not support
+// subscripting while its Swift counterpart `Set` does.
+- (id)objectAtIndex:(NSUInteger)index {
+    validateSetBounds(self, index);
+    return _backingSet.allObjects[index];
+}
+
 - (RLMResults *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending {
     return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:keyPath ascending:ascending]]];
 }
@@ -183,18 +190,11 @@
     @throw RLMException(@"indexOfObjectWithPredicate: is not available on RLMSet");
 }
 
-- (id)objectAtIndex:(NSUInteger)index {
-    @throw RLMException(@"objectAtIndex: is not available on RLMSet");
-}
-
 - (NSUInteger)count {
     return _backingSet.count;
 }
 
 - (NSArray<id> *)allObjects {
-    // RLMManagedSet's have a default sort order of ascending, while unmanaged is decending,
-    // this simply keeps the `allObjects` call in line with the managed counterpart.
-//    return [[_backingSet.allObjects reverseObjectEnumerator] allObjects];
     return _backingSet.allObjects;
 }
 

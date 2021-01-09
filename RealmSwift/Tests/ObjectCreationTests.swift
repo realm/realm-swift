@@ -47,6 +47,7 @@ class ObjectCreationTests: TestCase {
         XCTAssertNil(object.realm)
         XCTAssertNil(object.objectCol!.realm)
         XCTAssertNil(object.arrayCol.realm)
+        XCTAssertNil(object.setCol.realm)
     }
 
     func testInitWithOptionalWithoutDefaults() {
@@ -262,7 +263,7 @@ class ObjectCreationTests: TestCase {
 
         // test with invalid dictionary literals
         for propNum in 0..<props.count {
-            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
+            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, (props[propNum].isArray || props[propNum].isSet)) {
                 // update dict with invalid value and init
                 var values = baselineValues
                 values[props[propNum].name] = invalidValue
@@ -313,7 +314,7 @@ class ObjectCreationTests: TestCase {
 
         // test with invalid array literals
         for propNum in 0..<props.count {
-            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
+            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, (props[propNum].isArray || props[propNum].isSet)) {
                 // update dict with invalid value and init
                 var values = baselineValues
                 values[propNum] = invalidValue
@@ -412,7 +413,8 @@ class ObjectCreationTests: TestCase {
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
-            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "setCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
         ]
 
         realmWithTestPath().beginWrite()
@@ -440,26 +442,45 @@ class ObjectCreationTests: TestCase {
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
-            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "setCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
         ]
 
         let realmA = realmWithTestPath()
         let realmB = try! Realm()
 
-        var realmAObject: SwiftListOfSwiftObject?
+        var realmAListObject: SwiftListOfSwiftObject?
         try! realmA.write {
             let array = [SwiftObject(value: values), SwiftObject(value: values)]
-            realmAObject = realmA.create(SwiftListOfSwiftObject.self, value: ["array": array])
+            realmAListObject = realmA.create(SwiftListOfSwiftObject.self, value: ["array": array])
         }
 
-        var realmBObject: SwiftListOfSwiftObject!
+        var realmBListObject: SwiftListOfSwiftObject!
         try! realmB.write {
-            realmBObject = realmB.create(SwiftListOfSwiftObject.self, value: realmAObject!)
+            realmBListObject = realmB.create(SwiftListOfSwiftObject.self, value: realmAListObject!)
         }
 
-        XCTAssertNotEqual(realmAObject, realmBObject)
-        XCTAssertEqual(realmBObject.array.count, 2)
-        for swiftObject in realmBObject.array {
+        XCTAssertNotEqual(realmAListObject, realmBListObject)
+        XCTAssertEqual(realmBListObject.array.count, 2)
+        for swiftObject in realmBListObject.array {
+            verifySwiftObjectWithDictionaryLiteral(swiftObject, dictionary: values, boolObjectValue: true,
+                boolObjectListValues: [true, false])
+        }
+
+        var realmASetObject: SwiftMutableSetOfSwiftObject?
+        try! realmA.write {
+            let set = [SwiftObject(value: values), SwiftObject(value: values)]
+            realmASetObject = realmA.create(SwiftMutableSetOfSwiftObject.self, value: ["set": set])
+        }
+
+        var realmBSetObject: SwiftMutableSetOfSwiftObject!
+        try! realmB.write {
+            realmBSetObject = realmB.create(SwiftMutableSetOfSwiftObject.self, value: realmASetObject!)
+        }
+
+        XCTAssertNotEqual(realmASetObject, realmBSetObject)
+        XCTAssertEqual(realmBSetObject.set.count, 2)
+        for swiftObject in realmBSetObject.set {
             verifySwiftObjectWithDictionaryLiteral(swiftObject, dictionary: values, boolObjectValue: true,
                 boolObjectListValues: [true, false])
         }
@@ -509,7 +530,8 @@ class ObjectCreationTests: TestCase {
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
             "objectCol": NSNull(),
-            "arrayCol": NSNull()
+            "arrayCol": NSNull(),
+            "setCol": NSNull()
         ]
 
         realmWithTestPath().beginWrite()
@@ -518,6 +540,7 @@ class ObjectCreationTests: TestCase {
 
         XCTAssert(object.objectCol == nil) // XCTAssertNil caused a NULL deref inside _swift_getClass
         XCTAssertEqual(object.arrayCol.count, 0)
+        XCTAssertEqual(object.setCol.count, 0)
     }
 
     func testCreateWithObjcName() {
@@ -1205,12 +1228,15 @@ class ObjectCreationTests: TestCase {
         let v: [Any] = [
             // Superclass's columns
             [["intCol": 42], ["intCol": 9001]],
+            [["intCol": 42], ["intCol": 9001]],
             100,
             200,
             // Class's columns
             1,
             [["stringCol": "hello"], ["stringCol": "world"]],
+            [["stringCol": "hello"], ["stringCol": "world"]],
             2,
+            [["stringCol": "goodbye"], ["stringCol": "cruel"], ["stringCol": "world"]],
             [["stringCol": "goodbye"], ["stringCol": "cruel"], ["stringCol": "world"]],
             NSNull(),
             3,
@@ -1226,6 +1252,10 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.secondArray[0].stringCol, "goodbye")
         XCTAssertEqual(object.secondArray[1].stringCol, "cruel")
         XCTAssertEqual(object.secondArray[2].stringCol, "world")
+        XCTAssertTrue(object.firstSet.count == 2)
+        assertSetContains(object.firstSet, keyPath: \.stringCol, items: ["hello", "world"])
+        XCTAssertTrue(object.secondSet.count == 3)
+        assertSetContains(object.secondSet, keyPath: \.stringCol, items: ["goodbye", "cruel", "world"])
         XCTAssertEqual(object.firstOptionalNumber.value, nil)
         XCTAssertEqual(object.secondOptionalNumber.value, 300)
         XCTAssertTrue(object.parentFirstList.count == 2)
@@ -1284,8 +1314,11 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.objectIdCol, (dictionary["objectIdCol"] as! ObjectId))
         XCTAssertEqual(object.objectCol!.boolCol, boolObjectValue)
         XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
+        XCTAssertEqual(object.setCol.count, boolObjectListValues.count)
+
         for i in 0..<boolObjectListValues.count {
             XCTAssertEqual(object.arrayCol[i].boolCol, boolObjectListValues[i])
+            XCTAssertTrue(boolObjectListValues.contains(object.setCol[i].boolCol))
         }
     }
 
