@@ -36,6 +36,7 @@ class SwiftRLMStringObjectSubclass: SwiftRLMStringObject {
 
 class SwiftRLMSelfRefrencingSubclass: SwiftRLMStringObject {
     @objc dynamic var objects = RLMArray<SwiftRLMSelfRefrencingSubclass>(objectClassName: SwiftRLMSelfRefrencingSubclass.className())
+    @objc dynamic var objectSet = RLMSet<SwiftRLMSelfRefrencingSubclass>(objectClassName: SwiftRLMSelfRefrencingSubclass.className())
 }
 
 
@@ -76,6 +77,7 @@ class SwiftRLMObjectInterfaceTests: RLMTestCase {
         obj.objectCol = SwiftRLMBoolObject()
         obj.objectCol.boolCol = true
         obj.arrayCol.add(obj.objectCol)
+        obj.setCol.add(obj.objectCol)
         obj.uuidCol = UUID(uuidString: "00000000-0000-0000-0000-000000000000")
         try! realm.commitWriteTransaction()
 
@@ -93,6 +95,8 @@ class SwiftRLMObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(firstObj.uuidCol?.uuidString, "00000000-0000-0000-0000-000000000000")
         XCTAssertEqual(obj.arrayCol.count, UInt(1), "array count should be 1")
         XCTAssertEqual(obj.arrayCol.firstObject()!.boolCol, true, "should be true")
+        XCTAssertEqual(obj.setCol.count, UInt(1), "set count should be 1")
+        XCTAssertEqual(obj.setCol.allObjects[0].boolCol, true, "should be true")
     }
 
     func testDefaultValueSwiftRLMObject() {
@@ -113,6 +117,7 @@ class SwiftRLMObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(firstObj.dateCol, Date(timeIntervalSince1970: 1), "should be epoch + 1")
         XCTAssertEqual(firstObj.objectCol.boolCol, false, "should be false")
         XCTAssertEqual(firstObj.arrayCol.count, UInt(0), "array count should be zero")
+        XCTAssertEqual(firstObj.setCol.count, UInt(0), "set count should be zero")
         XCTAssertEqual(firstObj.uuidCol!.uuidString, "00000000-0000-0000-0000-000000000000")
     }
 
@@ -148,6 +153,7 @@ class SwiftRLMObjectInterfaceTests: RLMTestCase {
             let sub = SwiftRLMSelfRefrencingSubclass.createInDefaultRealm(withValue: ["string", []])
             let sub2 = SwiftRLMSelfRefrencingSubclass()
             sub.objects.add(sub2)
+            sub.objectSet.add(sub2)
         }
     }
 
@@ -278,6 +284,37 @@ class SwiftRLMObjectInterfaceTests: RLMTestCase {
         assertThrowsWithReasonMatching(obj.optDataCol.add(str), ".*")
     }
 
+    func testPrimitiveSet() {
+        let obj = SwiftRLMPrimitiveSetObject()
+        let str = "str" as NSString
+        let data = "str".data(using: .utf8)! as Data as NSData
+        let date = NSDate()
+        obj.stringCol.add(str)
+        XCTAssertTrue(obj.stringCol.contains(str))
+
+        obj.dataCol.add(data)
+        XCTAssertTrue(obj.dataCol.contains(data))
+
+        obj.dateCol.add(date)
+        XCTAssertTrue(obj.dateCol.contains(date))
+
+        obj.optStringCol.add(str)
+        XCTAssertTrue(obj.optStringCol.contains(str))
+        obj.optDataCol.add(data)
+        XCTAssertTrue(obj.optDataCol.contains(data))
+        obj.optDateCol.add(date)
+        XCTAssertTrue(obj.optDateCol.contains(date))
+
+        obj.optStringCol.add(NSNull())
+        XCTAssertTrue(obj.optStringCol.contains(NSNull()))
+        obj.optDataCol.add(NSNull())
+        XCTAssertTrue(obj.optDataCol.contains(NSNull()))
+        obj.optDateCol.add(NSNull())
+        XCTAssertTrue(obj.optDateCol.contains(NSNull()))
+
+        assertThrowsWithReasonMatching(obj.optDataCol.add(str), ".*")
+    }
+
     func testUuidPrimitiveArray() {
         let obj = SwiftRLMPrimitiveArrayObject()
         let uuidA = NSUUID(uuidString: "00000000-0000-0000-0000-000000000000")!
@@ -294,6 +331,21 @@ class SwiftRLMObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(obj.optUuidCol[1], uuidA)
         obj.optUuidCol.add(NSNull())
         XCTAssertEqual(obj.optUuidCol[2], NSNull())
+    }
+
+    func testUuidPrimitiveSet() {
+        let obj = SwiftRLMPrimitiveSetObject()
+        let uuidA = NSUUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+
+        obj.uuidCol.add(uuidA)
+        XCTAssertTrue(obj.uuidCol.contains(uuidA))
+
+        obj.optUuidCol.add(NSNull())
+        XCTAssertTrue(obj.optUuidCol.contains(NSNull()))
+        obj.optUuidCol.add(uuidA)
+        XCTAssertTrue(obj.optUuidCol.contains(uuidA))
+        obj.optUuidCol.add(NSNull())
+        XCTAssertTrue(obj.optUuidCol.contains(NSNull()))
     }
 
     // Objective-C models

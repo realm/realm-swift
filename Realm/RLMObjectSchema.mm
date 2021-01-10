@@ -228,7 +228,7 @@ using namespace realm;
     if (auto requiredProperties = [objectClass requiredProperties]) {
         for (RLMProperty *property in propArray) {
             bool required = [requiredProperties containsObject:property.name];
-            if (required && property.type == RLMPropertyTypeObject && !property.array) {
+            if (required && property.type == RLMPropertyTypeObject && !(property.array || property.set)) {
                 @throw RLMException(@"Object properties cannot be made required, "
                                     "but '+[%@ requiredProperties]' included '%@'", objectClass, property.name);
             }

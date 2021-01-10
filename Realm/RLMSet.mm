@@ -483,7 +483,6 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
     }
 }
 
-
 #pragma mark - Methods unsupported on unmanaged RLMSet instances
 
 #pragma clang diagnostic push
