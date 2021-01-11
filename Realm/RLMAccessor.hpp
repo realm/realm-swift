@@ -18,11 +18,11 @@
 
 #import "RLMAccessor.h"
 
-#import "object_accessor.hpp"
-
 #import "RLMDecimal128_Private.hpp"
 #import "RLMObjectId_Private.hpp"
 #import "RLMUtil.hpp"
+
+#import <realm/object-store/object_accessor.hpp>
 
 @class RLMRealm;
 class RLMClassInfo;
@@ -50,6 +50,8 @@ public:
     id box(realm::Results&&);
     id box(realm::Object&&);
     id box(realm::Obj&&);
+    id box(realm::object_store::Dictionary&&) { REALM_COMPILER_HINT_UNREACHABLE(); }
+    id box(realm::object_store::Set&&) { REALM_COMPILER_HINT_UNREACHABLE(); }
 
     id box(bool v) { return @(v); }
     id box(double v) { return @(v); }
@@ -77,13 +79,20 @@ public:
                                              realm::Property const& prop);
 
     bool is_same_list(realm::List const& list, id v) const noexcept;
+    bool is_same_dictionary(realm::object_store::Dictionary const&, id) const noexcept { REALM_COMPILER_HINT_UNREACHABLE(); }
+    bool is_same_set(realm::object_store::Set const&, id) const noexcept { REALM_COMPILER_HINT_UNREACHABLE(); }
 
     template<typename Func>
-    void enumerate_list(__unsafe_unretained const id v, Func&& func) {
+    void enumerate_collection(__unsafe_unretained const id v, Func&& func) {
         id enumerable = RLMAsFastEnumeration(v) ?: v;
         for (id value in enumerable) {
             func(value);
         }
+    }
+
+    template<typename Func>
+    void enumerate_dictionary(__unsafe_unretained const id, Func&&) {
+        REALM_COMPILER_HINT_UNREACHABLE();
     }
 
     template<typename T>

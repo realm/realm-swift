@@ -19,7 +19,10 @@
 import XCTest
 import Realm
 import Realm.Private
+
+#if canImport(RealmTestSupport)
 import RealmTestSupport
+#endif
 
 #if os(macOS)
 

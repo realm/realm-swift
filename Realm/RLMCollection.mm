@@ -26,9 +26,9 @@
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
 
-#import "collection_notifications.hpp"
-#import "list.hpp"
-#import "results.hpp"
+#import <realm/object-store/collection_notifications.hpp>
+#import <realm/object-store/list.hpp>
+#import <realm/object-store/results.hpp>
 
 static const int RLMEnumerationBufferSize = 16;
 

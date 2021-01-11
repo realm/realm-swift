@@ -19,6 +19,11 @@
 import Realm
 
 extension RLMRealm {
+    /**
+     Returns the schema version for a Realm at a given local URL.
+
+     - see: `+ [RLMRealm schemaVersionAtURL:encryptionKey:error:]`
+     */
     @nonobjc public class func schemaVersion(at url: URL, usingEncryptionKey key: Data? = nil) throws -> UInt64 {
         var error: NSError?
         let version = __schemaVersion(at: url, encryptionKey: key, error: &error)
@@ -26,17 +31,33 @@ extension RLMRealm {
         return version
     }
 
+    /**
+     Returns the same object as the one referenced when the `RLMThreadSafeReference` was first created,
+     but resolved for the current Realm for this thread. Returns `nil` if this object was deleted after
+     the reference was created.
+
+     - see `- [RLMRealm resolveThreadSafeReference:]`
+     */
     @nonobjc public func resolve<Confined>(reference: RLMThreadSafeReference<Confined>) -> Confined? {
         return __resolve(reference as! RLMThreadSafeReference<RLMThreadConfined>) as! Confined?
     }
 }
 
 extension RLMObject {
-    // Swift query convenience functions
+    /**
+     Returns all objects of this object type matching the given predicate from the default Realm.
+
+     - see `+ [RLMObject objectsWithPredicate:]`
+     */
     public class func objects(where predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObject> {
         return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args))) as! RLMResults<RLMObject>
     }
 
+    /**
+     Returns all objects of this object type matching the given predicate from the specified Realm.
+
+     - see `+ [RLMObject objectsInRealm:withPredicate:]`
+     */
     public class func objects(in realm: RLMRealm,
                               where predicateFormat: String,
                               _ args: CVarArg...) -> RLMResults<RLMObject> {
@@ -44,7 +65,15 @@ extension RLMObject {
     }
 }
 
-public struct RLMIterator<T>: IteratorProtocol {
+// Sequence conformance for RLMArray and RLMResults is provided by RLMCollection's
+// `makeIterator()` implementation.
+extension RLMArray: Sequence {}
+extension RLMResults: Sequence {}
+
+/**
+ This struct enables sequence-style enumeration for RLMObjects in Swift via `RLMCollection.makeIterator`
+ */
+public struct RLMCollectionIterator<T>: IteratorProtocol {
     private var iteratorBase: NSFastEnumerationIterator
 
     internal init(collection: RLMCollection) {
@@ -56,84 +85,29 @@ public struct RLMIterator<T>: IteratorProtocol {
     }
 }
 
-// Sequence conformance for RLMArray and RLMResults is provided by RLMCollection's
-// `makeIterator()` implementation.
-extension RLMArray: Sequence {}
-extension RLMResults: Sequence {}
-
 extension RLMCollection {
-    // Support Sequence-style enumeration
-    public func makeIterator() -> RLMIterator<RLMObject> {
-        return RLMIterator(collection: self)
+    /**
+     Returns a `RLMCollectionIterator` that yields successive elements in the collection.
+     This enables support for sequence-style enumeration of `RLMObject` subclasses in Swift.
+     */
+    public func makeIterator() -> RLMCollectionIterator<RLMObject> {
+        return RLMCollectionIterator(collection: self)
     }
 }
 
+// Swift query convenience functions
 extension RLMCollection {
-    // Swift query convenience functions
+    /**
+     Returns the index of the first object in the collection matching the predicate.
+     */
     public func indexOfObject(where predicateFormat: String, _ args: CVarArg...) -> UInt {
         return indexOfObject(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 
+    /**
+     Returns all objects matching the given predicate in the collection.
+     */
     public func objects(where predicateFormat: String, _ args: CVarArg...) -> RLMResults<NSObject> {
         return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args))) as! RLMResults<NSObject>
     }
 }
-
-// MARK: - Sync-related
-
-#if REALM_ENABLE_SYNC
-extension RLMSyncManager {
-    public static var shared: RLMSyncManager {
-        return __shared()
-    }
-}
-
-extension RLMUser {
-    public static var current: RLMUser? {
-        return __current()
-    }
-
-    public static var all: [String: RLMUser] {
-        return __allUsers()
-    }
-
-    @nonobjc public var errorHandler: RLMUserErrorReportingBlock? {
-        get {
-            return __errorHandler
-        }
-        set {
-            __errorHandler = newValue
-        }
-    }
-
-    public static func logIn(with credentials: RLMCredentials,
-                             server authServerURL: URL,
-                             timeout: TimeInterval = 30,
-                             callbackQueue queue: DispatchQueue = DispatchQueue.main,
-                             onCompletion completion: @escaping RLMUserCompletionBlock) {
-        return __logIn(with: credentials,
-                       authServerURL: authServerURL,
-                       timeout: timeout,
-                       callbackQueue: queue,
-                       onCompletion: completion)
-    }
-
-    public func configuration(realmURL: URL? = nil, fullSynchronization: Bool = false,
-                              enableSSLValidation: Bool = true, urlPrefix: String? = nil) -> RLMRealmConfiguration {
-        return self.__configuration(with: realmURL,
-                                    fullSynchronization: fullSynchronization,
-                                    enableSSLValidation: enableSSLValidation,
-                                    urlPrefix: urlPrefix)
-    }
-}
-
-extension RLMSyncSession {
-    public func addProgressNotification(for direction: RLMSyncProgressDirection,
-                                        mode: RLMSyncProgressMode,
-                                        block: @escaping RLMProgressNotificationBlock) -> RLMProgressNotificationToken? {
-        return __addProgressNotification(for: direction,
-                                         mode: mode,
-                                         block: block)
-    }
-}
-#endif

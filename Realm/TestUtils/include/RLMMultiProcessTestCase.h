@@ -37,5 +37,5 @@
 #define RLMRunChildAndWait() \
     XCTAssertEqual(0, [self runChildAndWait], @"Tests in child process failed")
 
-#define RLMRunChildAndWaitWithAppIds(appIds) \
-    XCTAssertEqual(0, [self runChildAndWaitWithAppIds:appIds], @"Tests in child process failed")
+#define RLMRunChildAndWaitWithAppIds(...) \
+    XCTAssertEqual(0, [self runChildAndWaitWithAppIds:@[__VA_ARGS__]], @"Tests in child process failed")

@@ -83,7 +83,7 @@
     }
     XCTAssertNotNil(expectedSchema);
 
-    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.fileURL = RLMTestRealmURL();
     config.dynamic = YES;
 

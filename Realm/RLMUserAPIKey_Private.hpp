@@ -18,7 +18,7 @@
 
 #import <Realm/RLMUserAPIKey.h>
 
-#import "sync/app.hpp"
+#import <realm/object-store/sync/app.hpp>
 
 @interface RLMUserAPIKey ()
 - (realm::app::App::UserAPIKey)_apiKey;

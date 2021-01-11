@@ -278,6 +278,7 @@ class Admin {
  A sandboxed server. This singleton launches and maintains all server processes
  and allows for app creation.
  */
+@available(OSX 10.13, *)
 @objc(RealmServer)
 public class RealmServer: NSObject {
     public enum LogLevel {
@@ -285,7 +286,7 @@ public class RealmServer: NSObject {
     }
 
     /// Shared RealmServer. This class only needs to be initialized and torn down once per test suite run.
-    @objc static var shared = RealmServer()
+    @objc public static var shared = RealmServer()
 
     /// Log level for the server and mongo processes.
     public var logLevel = LogLevel.none
@@ -296,25 +297,31 @@ public class RealmServer: NSObject {
     private let serverProcess = Process()
 
     /// The root URL of the project.
-    private lazy var rootUrl = URL(string: #file)!
-        .deletingLastPathComponent()
-        .deletingLastPathComponent()
-        .deletingLastPathComponent()
-
-    /// The directory where mongo binaries and backing files are kept.
-    private lazy var mongoUrl = rootUrl
-        .appendingPathComponent("build")
-        .appendingPathComponent("mongodb-macos-x86_64-4.4.0-rc5")
+    private static let rootUrl = URL(string: #file)!
+        .deletingLastPathComponent() // RealmServer.swift
+        .deletingLastPathComponent() // ObjectServerTests
+        .deletingLastPathComponent() // Realm
+    private static let buildDir = rootUrl.appendingPathComponent("build")
+    private static let binDir = buildDir.appendingPathComponent("bin")
 
     /// The directory where mongo stores its files. This is a unique value so that
     /// we have a fresh mongo each run.
-    private lazy var mongoDataDirectory = ObjectId.generate().stringValue
+    private lazy var tempDir = URL(fileURLWithPath: NSTemporaryDirectory(),
+                                   isDirectory: true).appendingPathComponent("realm-test-\(UUID().uuidString)")
 
     /// Whether or not this is a parent or child process.
     private lazy var isParentProcess = (getenv("RLMProcessIsChild") == nil)
 
     /// The current admin session
     private var session: Admin.AdminSession?
+
+    /// Check if the BaaS files are present and we can run the server
+    @objc public class func haveServer() -> Bool {
+        let goDir = RealmServer.rootUrl
+            .appendingPathComponent("build")
+            .appendingPathComponent("stitch")
+        return FileManager.default.fileExists(atPath: goDir.path)
+    }
 
     private override init() {
         super.init()
@@ -338,9 +345,11 @@ public class RealmServer: NSObject {
     private lazy var tearDown: () = {
         serverProcess.terminate()
 
+        let mongo = RealmServer.binDir.appendingPathComponent("mongo").path
+
         // step down the replica set
         let rsStepDownProcess = Process()
-        rsStepDownProcess.launchPath = mongoUrl.appendingPathComponent("bin").appendingPathComponent("mongo").absoluteString
+        rsStepDownProcess.launchPath = mongo
         rsStepDownProcess.arguments = [
             "admin",
             "--port", "26000",
@@ -350,7 +359,7 @@ public class RealmServer: NSObject {
 
         // step down the replica set
         let mongoShutdownProcess = Process()
-        mongoShutdownProcess.launchPath = mongoUrl.appendingPathComponent("bin").appendingPathComponent("mongo").absoluteString
+        mongoShutdownProcess.launchPath = mongo
         mongoShutdownProcess.arguments = [
             "admin",
             "--port", "26000",
@@ -358,45 +367,55 @@ public class RealmServer: NSObject {
         try? mongoShutdownProcess.run()
         mongoShutdownProcess.waitUntilExit()
 
-        mongoProcess.waitUntilExit()
+        mongoProcess.terminate()
 
-        try? FileManager().removeItem(atPath: mongoUrl.appendingPathComponent(mongoDataDirectory).absoluteString)
-        try? FileManager().removeItem(atPath: "tmp")
+        try? FileManager().removeItem(at: tempDir)
     }()
 
     /// Launch the mongo server in the background.
     /// This process should run until the test suite is complete.
     private func launchMongoProcess() throws {
-        try? FileManager().createDirectory(atPath: mongoUrl.appendingPathComponent(mongoDataDirectory).absoluteString,
+        try! FileManager().createDirectory(at: tempDir,
                                            withIntermediateDirectories: false,
                                            attributes: nil)
 
-        mongoProcess.launchPath = mongoUrl.appendingPathComponent("bin").appendingPathComponent("mongod").absoluteString
+        mongoProcess.launchPath = RealmServer.binDir.appendingPathComponent("mongod").path
         mongoProcess.arguments = [
             "--quiet",
-            "--dbpath", "\(mongoUrl)/\(mongoDataDirectory)",
+            "--dbpath", tempDir.path,
             "--bind_ip", "localhost",
             "--port", "26000",
             "--replSet", "test"
         ]
         mongoProcess.standardOutput = nil
         try mongoProcess.run()
+
+        let initProcess = Process()
+        initProcess.launchPath = RealmServer.binDir.appendingPathComponent("mongo").path
+        initProcess.arguments = [
+            "--port", "26000",
+            "--eval", "rs.initiate()"
+        ]
+        initProcess.standardOutput = nil
+        try initProcess.run()
+        initProcess.waitUntilExit()
     }
 
     private func launchServerProcess() throws {
-        let goRoot = rootUrl.appendingPathComponent("build").appendingPathComponent("go").absoluteString
-        let bundle = Bundle.init(for: RealmServer.self)
-        let serverBinary = bundle.path(forResource: "stitch_server", ofType: nil)
-        let createUserBinary = bundle.path(forResource: "create_user", ofType: nil)
+        let buildDir = RealmServer.rootUrl.appendingPathComponent("build")
+        let binDir = buildDir.appendingPathComponent("bin").path
+        let libDir = buildDir.appendingPathComponent("lib").path
+        let binPath = "$PATH:\(binDir)"
+
+        let stitchRoot = RealmServer.rootUrl.path + "/build/go/src/github.com/10gen/stitch"
 
         // create the admin user
         let userProcess = Process()
         userProcess.environment = [
-            "GOROOT": goRoot,
-            "PATH": "$PATH:\(bundle.resourcePath!)",
-            "LD_LIBRARY_PATH": bundle.resourcePath!
+            "PATH": binPath,
+            "LD_LIBRARY_PATH": libDir
         ]
-        userProcess.launchPath = createUserBinary
+        userProcess.launchPath = "\(binDir)/create_user"
         userProcess.arguments = [
             "addUser",
             "-domainID",
@@ -410,16 +429,17 @@ public class RealmServer: NSObject {
         userProcess.waitUntilExit()
 
         serverProcess.environment = [
-            "GOROOT": goRoot,
-            "PATH": "$PATH:\(bundle.resourcePath!)",
-            "LD_LIBRARY_PATH": bundle.resourcePath!
+            "PATH": binPath,
+            "LD_LIBRARY_PATH": libDir
         ]
         // golang server needs a tmp directory
-        try? FileManager.default.createDirectory(atPath: "tmp", withIntermediateDirectories: false, attributes: nil)
-        serverProcess.launchPath = serverBinary
+        try! FileManager.default.createDirectory(atPath: "\(tempDir.path)/tmp",
+            withIntermediateDirectories: false, attributes: nil)
+        serverProcess.launchPath = "\(binDir)/stitch_server"
+        serverProcess.currentDirectoryPath = tempDir.path
         serverProcess.arguments = [
             "--configFile",
-            bundle.path(forResource: "test_config", ofType: "json")!
+            "\(stitchRoot)/etc/configs/test_config.json"
         ]
 
         let pipe = Pipe()
@@ -487,7 +507,7 @@ public class RealmServer: NSObject {
         }
     }
 
-    typealias AppId = String
+    public typealias AppId = String
 
     private func failOnError<T>(_ result: Result<T, Error>) {
         if case .failure(let error) = result {
@@ -496,7 +516,7 @@ public class RealmServer: NSObject {
     }
 
     /// Create a new server app
-    @objc func createApp() throws -> AppId {
+    @objc public func createApp() throws -> AppId {
         guard let session = session else {
             throw URLError(.unknown)
         }

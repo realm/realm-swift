@@ -86,6 +86,8 @@ let credentials = Credentials.JWT(token: myToken)
     case facebook(accessToken: String)
     /// Credentials from a Google serverAuthCode.
     case google(serverAuthCode: String)
+    /// Credentials from a Google idToken.
+    case googleId(token: String)
     /// Credentials from an Apple id token.
     case apple(idToken: String)
     /// Credentials from an email and password.
@@ -156,6 +158,81 @@ extension App {
 
 #if canImport(Combine)
 import Combine
+
+/// :nodoc:
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+@frozen public struct AppSubscription: Subscription {
+    private let app: App
+    private let token: RLMAppSubscriptionToken
+
+    internal init(app: App, token: RLMAppSubscriptionToken) {
+        self.app = app
+        self.token = token
+    }
+
+    /// A unique identifier for identifying publisher streams.
+    public var combineIdentifier: CombineIdentifier {
+        return CombineIdentifier(NSNumber(value: token.value))
+    }
+
+    /// This function is not implemented.
+    ///
+    /// Realm publishers do not support backpressure and so this function does nothing.
+    public func request(_ demand: Subscribers.Demand) {
+    }
+
+    /// Stop emitting values on this subscription.
+    public func cancel() {
+        app.unsubscribe(token)
+    }
+}
+
+/// :nodoc:
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+public struct AppPublisher: Publisher {
+    /// This publisher cannot fail.
+    public typealias Failure = Never
+    /// This publisher emits App.
+    public typealias Output = App
+
+    private let app: App
+    private let callbackQueue: DispatchQueue
+
+    internal init(_ app: App, callbackQueue: DispatchQueue = .main) {
+        self.app = app
+        self.callbackQueue = callbackQueue
+    }
+
+    /// :nodoc:
+    public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
+        let token = app.subscribe { _ in
+            self.callbackQueue.async {
+                _ = subscriber.receive(self.app)
+            }
+        }
+
+        subscriber.receive(subscription: AppSubscription(app: app, token: token))
+    }
+
+    /// :nodoc:
+    public func receive<S: Scheduler>(on scheduler: S) -> Self {
+        guard let queue = scheduler as? DispatchQueue else {
+            fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
+        }
+
+        return Self(app, callbackQueue: queue)
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+extension App: ObservableObject {
+    /// A publisher that emits Void each time the app changes.
+    ///
+    /// Despite the name, this actually emits *after* the app has changed.
+    public var objectWillChange: AppPublisher {
+        return AppPublisher(self)
+    }
+}
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension EmailPasswordAuth {

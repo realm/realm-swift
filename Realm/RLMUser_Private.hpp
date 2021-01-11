@@ -16,9 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUser.h"
+#import "RLMUser_Private.h"
 
-#import "sync/sync_user.hpp"
+#import "RLMSyncConfiguration.h"
+#import "RLMSyncUtil_Private.h"
+
+#import <realm/object-store/sync/sync_user.hpp>
+#import <realm/sync/config.hpp>
 
 @class RLMSyncConfiguration, RLMSyncSessionRefreshHandle, RLMApp;
 
@@ -41,7 +45,7 @@ private:
 
 @interface RLMUser ()
 - (instancetype)initWithUser:(std::shared_ptr<realm::SyncUser>)user app:(RLMApp *)app;
-- (NSString *)pathForPartitionValue:(id<RLMBSON>)partitionValue;
+- (std::string)pathForPartitionValue:(std::string const&)partitionValue;
 - (std::shared_ptr<realm::SyncUser>)_syncUser;
 + (void)_setUpBindingContextFactory;
 @property (weak, readonly) RLMApp *app;

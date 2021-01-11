@@ -34,10 +34,6 @@
 #import <realm/util/file.hpp>
 #import <realm/db_options.hpp>
 
-@interface RLMRealm ()
-+ (BOOL)isCoreDebug;
-@end
-
 @interface RLMObjectSchema (Private)
 + (instancetype)schemaForObjectClass:(Class)objectClass;
 
@@ -1746,15 +1742,14 @@
 }
 #pragma mark - Write Copy to Path
 
-- (void)testWriteCopyOfRealm
-{
+- (void)testWriteCopyOfRealm {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{
         [IntObject createInRealm:realm withValue:@[@0]];
     }];
 
     NSError *writeError;
-    XCTAssertTrue([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:&writeError]);
+    XCTAssertTrue([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:realm.configuration.encryptionKey error:&writeError]);
     XCTAssertNil(writeError);
     RLMRealm *copy = [self realmWithTestPath];
     XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
@@ -1844,7 +1839,9 @@
         [IntObject createInRealm:realm withValue:@[@0]];
 
         NSError *writeError;
-        XCTAssertTrue([realm writeCopyToURL:RLMTestRealmURL() encryptionKey:nil error:&writeError]);
+        XCTAssertTrue([realm writeCopyToURL:RLMTestRealmURL()
+                              encryptionKey:realm.configuration.encryptionKey
+                                      error:&writeError]);
         XCTAssertNil(writeError);
         RLMRealm *copy = [self realmWithTestPath];
         XCTAssertEqual(1U, [IntObject allObjectsInRealm:copy].count);
@@ -1907,16 +1904,6 @@
 }
 
 #pragma mark - Assorted tests
-
-#ifndef REALM_SPM
-- (void)testCoreDebug {
-#if DEBUG
-    XCTAssertTrue([RLMRealm isCoreDebug], @"Debug version of Realm should use librealm{-ios}-dbg");
-#else
-    XCTAssertFalse([RLMRealm isCoreDebug], @"Release version of Realm should use librealm{-ios}");
-#endif
-}
-#endif
 
 - (void)testIsEmpty {
     RLMRealm *realm = [RLMRealm defaultRealm];

@@ -18,33 +18,45 @@
 
 #import "RLMUser_Private.hpp"
 
-#import "RLMCredentials_Private.hpp"
+#import "RLMAPIKeyAuth.h"
 #import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
-#import "RLMNetworkTransport.h"
-#import "RLMRealmConfiguration+Sync.h"
-#import "RLMRealmConfiguration_Private.hpp"
-#import "RLMRealmUtil.hpp"
-#import "RLMResults_Private.hpp"
-#import "RLMSyncConfiguration.h"
-#import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncManager_Private.hpp"
-#import "RLMSyncSession_Private.hpp"
-#import "RLMSyncUtil_Private.hpp"
-#import "RLMUtil.hpp"
-#import "RLMAPIKeyAuth.h"
+#import "RLMCredentials_Private.hpp"
 #import "RLMMongoClient_Private.hpp"
+#import "RLMRealmConfiguration+Sync.h"
+#import "RLMSyncConfiguration_Private.hpp"
+#import "RLMSyncSession_Private.hpp"
 
-#import "util/bson/bson.hpp"
-#import "sync/sync_manager.hpp"
-#import "sync/sync_session.hpp"
-#import "sync/sync_user.hpp"
+#import <realm/object-store/sync/sync_manager.hpp>
+#import <realm/object-store/sync/sync_session.hpp>
+#import <realm/object-store/sync/sync_user.hpp>
+#import <realm/object-store/util/bson/bson.hpp>
 
 using namespace realm;
 
 @interface RLMUser () {
     std::shared_ptr<SyncUser> _user;
 }
+@end
+
+@implementation RLMUserSubscriptionToken {
+@public
+    std::unique_ptr<realm::Subscribable<SyncUser>::Token> _token;
+}
+
+- (instancetype)initWithToken:(realm::Subscribable<SyncUser>::Token&&)token {
+    if (self = [super init]) {
+        _token = std::make_unique<realm::Subscribable<SyncUser>::Token>(std::move(token));
+        return self;
+    }
+
+    return nil;
+}
+
+- (NSUInteger)value {
+    return _token->value();
+}
+
 @end
 
 @implementation RLMUser
@@ -96,11 +108,27 @@ using namespace realm;
     _user = nullptr;
 }
 
-- (NSString *)pathForPartitionValue:(id<RLMBSON>)partitionValue {
-    std::stringstream s;
-    s << RLMConvertRLMBSONToBson(partitionValue);
-    NSString *encodedPartitionValue = [@(s.str().c_str()) stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
-    return [[NSString alloc] initWithFormat:@"%@/%@", [self identifier], encodedPartitionValue];
+- (std::string)pathForPartitionValue:(std::string const&)partitionValue {
+    if (!_user) {
+        return "";
+    }
+
+    auto path = _user->sync_manager()->path_for_realm(*_user, partitionValue);
+    if ([NSFileManager.defaultManager fileExistsAtPath:@(path.c_str())]) {
+        return path;
+    }
+
+    // Previous versions converted the partition value to a path *twice*,
+    // so if the file resulting from that exists open it instead
+    NSString *encodedPartitionValue = [@(partitionValue.data())
+                                       stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
+    NSString *overEncodedRealmName = [[NSString alloc] initWithFormat:@"%@/%@", self.identifier, encodedPartitionValue];
+    auto legacyPath = _user->sync_manager()->path_for_realm(*_user, overEncodedRealmName.UTF8String);
+    if ([NSFileManager.defaultManager fileExistsAtPath:@(legacyPath.c_str())]) {
+        return legacyPath;
+    }
+
+    return path;
 }
 
 - (nullable RLMSyncSession *)sessionForPartitionValue:(id<RLMBSON>)partitionValue {
@@ -108,7 +136,9 @@ using namespace realm;
         return nil;
     }
 
-    auto path = _user->sync_manager()->path_for_realm(*_user, [[self pathForPartitionValue:partitionValue] UTF8String]);
+    std::stringstream s;
+    s << RLMConvertRLMBSONToBson(partitionValue);
+    auto path = [self pathForPartitionValue:s.str()];
     if (auto session = _user->session_for_on_disk_path(path)) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }
@@ -265,6 +295,16 @@ using namespace realm;
 
 - (std::shared_ptr<SyncUser>)_syncUser {
     return _user;
+}
+
+- (RLMUserSubscriptionToken *)subscribe:(RLMUserNotificationBlock) block {
+    return [[RLMUserSubscriptionToken alloc] initWithToken:_user->subscribe([block, self] (auto&) {
+        block(self);
+    })];
+}
+
+- (void)unsubscribe:(RLMUserSubscriptionToken *)token {
+    _user->unsubscribe(*token->_token);
 }
 
 @end

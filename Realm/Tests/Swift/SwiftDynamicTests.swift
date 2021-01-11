@@ -16,11 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import XCTest
 import Foundation
-import Realm.Private
 import Realm.Dynamic
+import Realm.Private
+import XCTest
+
+#if canImport(RealmTestSupport)
 import RealmTestSupport
+#endif
 
 class SwiftRLMDynamicTests: RLMTestCase {
 

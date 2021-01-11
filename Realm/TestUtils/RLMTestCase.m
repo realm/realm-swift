@@ -130,12 +130,16 @@ static BOOL encryptTests() {
     deleteOrThrow([fileURL URLByAppendingPathExtension:@"note"]);
 }
 
+- (BOOL)encryptTests {
+    return encryptTests();
+}
+
 - (void)invokeTest {
     @autoreleasepool {
         [self deleteFiles];
 
-        if (encryptTests()) {
-            RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+        if (self.encryptTests) {
+            RLMRealmConfiguration *configuration = [RLMRealmConfiguration rawDefaultConfiguration];
             configuration.encryptionKey = RLMGenerateKey();
         }
     }
