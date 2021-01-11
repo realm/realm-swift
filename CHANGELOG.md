@@ -3,6 +3,9 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * Add Xcode 12.3 binary to release package.
 * Add optional NSError in RLMResponse
+* Add support for queries which have nil on the left side and a keypath on the
+  right side (e.g. "nil == name" rather than "name == nil" as was previously
+  required).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
