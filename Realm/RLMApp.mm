@@ -70,8 +70,7 @@ namespace {
                     std::optional<app::AppError> error = app::AppError(errorCode,
                                                                        response.error.description.UTF8String,
                                                                        "",
-                                                                       static_cast<int>(response.httpStatusCode),
-                                                                       std::nullopt
+                                                                       static_cast<int>(response.httpStatusCode)
                                                                        );
                     app::Response appResponse = {
                         app::ResponseStatus::failure,
