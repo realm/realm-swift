@@ -493,7 +493,7 @@ extension MutableSet: RealmCollection {
     }
 }
 
-extension MutableSet : ExpressibleByArrayLiteral {
+extension MutableSet: ExpressibleByArrayLiteral {
     /// Creates a set containing the elements of the given array literal.
     ///
     /// Do not call this initializer directly. It is used by the compiler when

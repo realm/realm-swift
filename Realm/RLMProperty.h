@@ -103,6 +103,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) BOOL set;
 
+/**
+ Indicates whether this property is a collection.
+ */
+@property (nonatomic, readonly) BOOL collection;
+
 #pragma mark - Methods
 
 /**

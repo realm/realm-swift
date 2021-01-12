@@ -113,7 +113,7 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
     }
     if (prop.type == RLMPropertyTypeObject) {
         Class objectClass = schema[prop.objectClassName].objectClass;
-        if (prop.array || prop.set) {
+        if (prop.collection) {
             NSMutableArray *ret = [[NSMutableArray alloc] init];
             for (id el in obj) {
                 [ret addObject:coerceToObjectType(el, objectClass, schema)];
@@ -122,7 +122,7 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
         }
         return coerceToObjectType(obj, objectClass, schema);
     }
-    else if (prop.type == RLMPropertyTypeDecimal128 && !(prop.array || prop.set)) {
+    else if (prop.type == RLMPropertyTypeDecimal128 && !prop.collection) {
         return [[RLMDecimal128 alloc] initWithValue:obj];
     }
     return obj;

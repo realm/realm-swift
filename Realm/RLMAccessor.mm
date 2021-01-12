@@ -181,7 +181,6 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
     auto prop = obj->_info->propertyForTableColumn(key);
     if (prop.array) {
         RLMValidateValueForProperty(value, obj->_info->rlmObjectSchema, prop, true);
-
         realm::List list(obj->_realm->_realm, obj->_row, key);
         RLMClassInfo *info = obj->_info;
         if (list.get_type() == realm::PropertyType::Object) {
@@ -408,7 +407,7 @@ id makeSetter(__unsafe_unretained RLMProperty *const prop) {
 
 // dynamic setter with column closure
 id managedSetter(RLMProperty *prop, const char *type) {
-    if ((prop.array || prop.set) && prop.type != RLMPropertyTypeLinkingObjects) {
+    if (prop.collection && prop.type != RLMPropertyTypeLinkingObjects) {
         return makeSetter<id<NSFastEnumeration>>(prop);
     }
 
@@ -469,7 +468,7 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
     if (prop.type == RLMPropertyTypeLinkingObjects) {
         return ^(RLMObjectBase *) { return [RLMResults emptyDetachedResults]; };
     }
-    if (prop.array || prop.set) {
+    if (prop.collection) {
         NSString *propName = prop.name;
         if (prop.type == RLMPropertyTypeObject) {
             NSString *objectClassName = prop.objectClassName;
@@ -506,7 +505,7 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
 
 id unmanagedSetter(RLMProperty *prop, const char *) {
     // Only RLMArray & RLMSet needs special handling for the unmanaged setter
-    if (!(prop.array || prop.set)) {
+    if (!prop.collection) {
         return nil;
     }
 

@@ -29,6 +29,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMDecimal128.h',
                               'include/**/RLMEmbeddedObject.h',
                               'include/**/RLMListBase.h',
+                              'include/**/RLMSetBase.h',
                               'include/**/RLMMigration.h',
                               'include/**/RLMObject.h',
                               'include/**/RLMObjectBase.h',
@@ -76,6 +77,7 @@ Pod::Spec.new do |s|
                               # Realm.Private module
   private_header_files      = 'include/**/RLMAccessor.h',
                               'include/**/RLMArray_Private.h',
+                              'include/**/RLMSet_Private.h',
                               'include/**/RLMApp_Private.h',
                               'include/**/RLMBSON_Private.h',
                               'include/**/RLMCollection_Private.h',

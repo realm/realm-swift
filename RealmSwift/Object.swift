@@ -196,7 +196,7 @@ extension Object: RealmCollectionValue {
         if let accessor = prop.swiftAccessor {
             return accessor.get(Unmanaged.passUnretained(self).toOpaque() + ivar_getOffset(prop.swiftIvar!))
         }
-        if let ivar = prop.swiftIvar, (prop.array || prop.set) {
+        if let ivar = prop.swiftIvar, prop.collection {
             return object_getIvar(self, ivar)
         }
         return RLMDynamicGet(self, prop)
@@ -628,7 +628,7 @@ extension UUID: _ManagedPropertyType {
 extension Object: _ManagedPropertyType {
     // swiftlint:disable:next identifier_name
     public static func _rlmProperty(_ prop: RLMProperty) {
-        if !prop.optional && !(prop.array || prop.set) {
+        if !prop.optional && !prop.collection {
             throwRealmException("Object property '\(prop.name)' must be marked as optional.")
         }
         if prop.optional && prop.array {

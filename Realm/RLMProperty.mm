@@ -628,6 +628,10 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
             [_linkOriginPropertyName isEqualToString:property->_linkOriginPropertyName]);
 }
 
+- (BOOL)collection {
+    return self.set || self.array;
+}
+
 - (NSString *)description {
     NSString *objectClassName = @"";
     if (self.type == RLMPropertyTypeObject || self.type == RLMPropertyTypeLinkingObjects) {

@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-// swiftlint:disable type_name identifier_name cyclomatic_complexity
+// swiftlint:disable identifier_name
 
 import XCTest
 import RealmSwift

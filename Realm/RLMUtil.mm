@@ -261,7 +261,7 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
                                  bool validateObjects) {
     // This duplicates a lot of the checks in RLMIsObjectValidForProperty()
     // for the sake of more specific error messages
-    if (prop.array || prop.set) {
+    if (prop.collection) {
         // nil is considered equivalent to an empty array for historical reasons
         // since we don't support null arrays (only arrays containing null),
         // it's not worth the BC break to change this

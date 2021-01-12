@@ -19,6 +19,7 @@ identifier_name:
     - _realmColumnNames()
     - _realmObjectName()
     - _rlmArray()
+    - _rlmSet()
     - id
     - pk
     - to
