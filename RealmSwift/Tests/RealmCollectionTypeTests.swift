@@ -314,7 +314,7 @@ class RealmCollectionTypeTests: TestCase {
             assertEqual(e.element, notActuallySorted[e.offset])
         }
 
-        var sorted = collection.sorted(by: [SortDescriptor(keyPath: "intCol", ascending: true)])
+        let sorted = collection.sorted(by: [SortDescriptor(keyPath: "intCol", ascending: true)])
         sorted.enumerated().forEach { (e) in
             XCTAssertEqual(e.offset+1, sorted[e.offset].intCol)
         }
@@ -1117,9 +1117,18 @@ class MutableSetRealmCollectionTypeTests: RealmCollectionTypeTests {
         }
     }
 
+    override func testFastEnumeration() {
+        var str = ""
+        for obj in collection {
+            str += obj.stringCol!
+        }
+
+        XCTAssertTrue((str == "12") || (str == "21"))
+    }
+
     override func testDescription() {
         // swiftlint:disable:next line_length
-//        assertMatches(collection.description, "List<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
+        assertMatches(collection.description, "MutableSet<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
     }
 
     func testObserveDirect() {
