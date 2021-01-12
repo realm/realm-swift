@@ -105,13 +105,6 @@
     });
 }
 
-- (BOOL)intersectsSet:(RLMSet<id> *)set {
-    for (id obj in set) {
-        RLMSetValidateMatchingObjectType(self, obj);
-    }
-    return [_backingSet intersectsSet:set->_backingSet];
-}
-
 - (void)minusSet:(RLMSet<id> *)set {
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
@@ -135,6 +128,13 @@
         RLMSetValidateMatchingObjectType(self, obj);
     }
     return [_backingSet isSubsetOfSet:set->_backingSet];
+}
+
+- (BOOL)intersectsSet:(RLMSet<id> *)set {
+    for (id obj in set) {
+        RLMSetValidateMatchingObjectType(self, obj);
+    }
+    return [_backingSet intersectsSet:set->_backingSet];
 }
 
 - (BOOL)containsObject:(id)obj {
@@ -433,10 +433,6 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
 
 - (id)averageOfProperty:(NSString *)property {
     return [self aggregateProperty:property operation:@"@avg" method:_cmd];
-}
-
-- (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
-    REALM_TERMINATE("objectsAtIndexes: is not available for RLMSet");
 }
 
 - (BOOL)isEqual:(id)object {

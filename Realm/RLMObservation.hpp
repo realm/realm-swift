@@ -144,7 +144,7 @@ void RLMClearTable(RLMClassInfo &realm);
 
 class RLMObservationTracker {
 public:
-    RLMObservationTracker(RLMRealm *realm, bool trackDeletions=false, RLMCollectionType collectionType=RLMCollectionTypeNone);
+    RLMObservationTracker(RLMRealm *realm, bool trackDeletions=false);
     ~RLMObservationTracker();
 
     void trackDeletions();
@@ -162,7 +162,6 @@ private:
 
     NSString *_key;
     NSKeyValueChange _kind = NSKeyValueChangeSetting;
-    NSKeyValueSetMutationKind _setMutationkind;
     NSIndexSet *_indexes;
 
     struct Change {

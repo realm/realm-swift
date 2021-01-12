@@ -49,8 +49,6 @@
     RLMArray *arrayProp = array.array;
     RLMAssertThrowsWithReasonMatching([arrayProp addObject:obj], @"write transaction");
 
-    NSLog(@"%@", [array description]); //TODO: Crashes
-
     // make sure we can fast enumerate
     for (RLMObject *obj in array.array) {
         XCTAssertTrue(obj.description.length, @"Object should have description");
@@ -918,8 +916,8 @@
     EmployeeObject *e2 = [PrimaryEmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
     EmployeeObject *e3 = [PrimaryEmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
     EmployeeObject *e4 = [PrimaryEmployeeObject createInRealm:realm withValue:@{@"name": @"D", @"age": @50, @"hired": @YES}];
-    PrimaryCompanyObject *c1 = [PrimaryCompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employees": @[e1, e2, e3, e2], @"employeesSet": @[]}];
-    PrimaryCompanyObject *c2 = [PrimaryCompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG 2", @"employees": @[e1, e4], @"employeesSet": @[]}];
+    PrimaryCompanyObject *c1 = [PrimaryCompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employees": @[e1, e2, e3, e2], @"employeeSet": @[]}];
+    PrimaryCompanyObject *c2 = [PrimaryCompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG 2", @"employees": @[e1, e4], @"employeeSet": @[]}];
 
     ArrayOfPrimaryCompanies *companies = [ArrayOfPrimaryCompanies createInRealm:realm withValue:@[@[c1, c2]]];
     [realm commitWriteTransaction];

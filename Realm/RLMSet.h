@@ -76,7 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Adding, Removing, and Replacing Objects in a Set
 
 /**
- Adds an object to the end of the set.
+ Adds an object to the set if it is not already present.
 
  @warning This method may only be called during a write transaction.
 
@@ -85,7 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addObject:(RLMObjectType)object;
 
 /**
- Adds an array of objects to the end of the set.
+ Adds an array of distinct objects to the set.
 
  @warning This method may only be called during a write transaction.
 
@@ -113,12 +113,16 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Empties the receiving set, then adds each object contained in another given set.
 
+ @warning This method may only be called during a write transaction.
+
  @param set The RLMSet whose members replace the receiving set's content.
  */
 - (void)setSet:(RLMSet<RLMObjectType> *)set;
 
 /**
  Removes from the receiving set each object that isn’t a member of another given set.
+
+ @warning This method may only be called during a write transaction.
 
  @param set The RLMSet with which to perform the intersection.
  */
@@ -127,12 +131,16 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Removes each object in another given set from the receiving set, if present.
 
+ @warning This method may only be called during a write transaction.
+
  @param set The set of objects to remove from the receiving set.
  */
 - (void)minusSet:(RLMSet<RLMObjectType> *)set;
 
 /**
  Adds each object in another given set to the receiving set, if not present.
+
+ @warning This method may only be called during a write transaction.
 
  @param set The set of objects to add to the receiving set.
  */

@@ -254,7 +254,7 @@ public:
 
     bool has_any_to_many_links() const {
         return std::any_of(begin(m_links), end(m_links),
-                           [](RLMProperty *property) { return property.array || property.set; });
+                           [](RLMProperty *property) { return property.collection; });
     }
 
     ColumnReference last_link_column() const {
@@ -333,7 +333,7 @@ public:
         , m_link_column(std::move(link_column))
         , m_column(std::move(column))
     {
-        RLMPrecondition((m_link_column.property().array || m_link_column.property().set),
+        RLMPrecondition((m_link_column.property().collection),
                         @"Invalid predicate", @"Collection operation can only be applied to a property of type RLMArray / RLMSet.");
 
         switch (m_type) {
@@ -753,7 +753,7 @@ void QueryBuilder::add_link_constraint(NSPredicateOperatorType operatorType,
         // For arrays this effectively checks if there are any objects in the
         // array, while for links it's just always constant true or false
         // (for != and = respectively).
-        if (column.property().array || column.property().set) {
+        if (column.property().collection) {
             add_bool_constraint(RLMPropertyTypeObject, operatorType, column.resolve<Link>(), null());
         }
         else if (operatorType == NSEqualToPredicateOperatorType) {
@@ -978,7 +978,7 @@ KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, N
                         @"Property '%@' not found in object of type '%@'",
                         propertyName, objectSchema.className);
 
-        if (property.array || property.set)
+        if (property.collection)
             keyPathContainsToManyRelationship = true;
 
         if (end != NSNotFound) {

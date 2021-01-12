@@ -59,6 +59,7 @@ class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase 
 }
 
 class PrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> {
+
     func testInvalidated() {
         XCTAssertFalse(mutableSet.isInvalidated)
         if let realm = obj.realm {

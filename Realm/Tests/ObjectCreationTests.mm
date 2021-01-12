@@ -834,7 +834,6 @@
     [realm cancelWriteTransaction];
 }
 
-// FIXME: why is this disabled?
 #if 0
 - (void)testCreateRequiredPrimitiveArraysWithNonNSArrayEnumerable {
     auto realm = RLMRealm.defaultRealm;

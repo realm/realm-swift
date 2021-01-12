@@ -302,6 +302,11 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     return _backingSet.is_subset_of(rhs->_backingSet);
 }
 
+- (BOOL)intersectsSet:(RLMSet<id> *)set {
+    RLMManagedSet *rhs = [self managedObjectFrom:set];
+    return _backingSet.intersects(rhs->_backingSet);
+}
+
 - (BOOL)containsObject:(id)obj {
     RLMSetValidateMatchingObjectType(self, obj);
     RLMAccessorContext context(*_objectInfo);
@@ -329,11 +334,6 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     changeSet(self, ^{
         _backingSet.assign_intersection(rhs->_backingSet);
     });
-}
-
-- (BOOL)intersectsSet:(RLMSet<id> *)set {
-    RLMManagedSet *rhs = [self managedObjectFrom:set];
-    return _backingSet.intersects(rhs->_backingSet);
 }
 
 - (void)unionSet:(RLMSet<id> *)set {
@@ -445,14 +445,14 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
         @throw RLMException(@"Cannot delete objects from RLMSet<%@>: only RLMObjects can be deleted.", RLMTypeToString(_type));
     }
     // delete all target rows from the realm
-    RLMObservationTracker tracker(_realm, true, RLMCollectionTypeSet);
+    RLMObservationTracker tracker(_realm, true);
     translateErrors([&] { _backingSet.delete_all(); });
 }
 
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties {
     return translateErrors([&] {
         return [RLMResults  resultsWithObjectInfo:*_objectInfo
-                                         results:_backingSet.sort(RLMSortDescriptorsToKeypathArray(properties))];
+                                          results:_backingSet.sort(RLMSortDescriptorsToKeypathArray(properties))];
     });
 }
 
@@ -470,12 +470,6 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     auto query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema, _realm.schema, _realm.group);
     auto results = translateErrors([&] { return _backingSet.filter(std::move(query)); });
     return [RLMResults resultsWithObjectInfo:*_objectInfo results:std::move(results)];
-}
-
-- (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes {
-    // FIXME: this is called by KVO when set changes are made. It's not clear
-    // why, and returning nil seems to work fine.
-    return nil;
 }
 
 - (void)addObserver:(id)observer

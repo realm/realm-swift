@@ -792,8 +792,9 @@ id RLMAccessorContext::box(realm::object_store::Set&& s) {
 }
 
 id RLMAccessorContext::box(realm::object_store::Dictionary&& d) {
-//
+    REALM_UNREACHABLE();
 }
+
 id RLMAccessorContext::box(realm::Object&& o) {
     REALM_ASSERT(currentProperty);
     return RLMCreateObjectAccessor(_info.linkTargetType(currentProperty.index), o.obj());
@@ -1039,8 +1040,7 @@ bool RLMAccessorContext::is_same_set(realm::object_store::Set const& set, __unsa
 }
 
 bool RLMAccessorContext::is_same_dictionary(realm::object_store::Dictionary const& dictionary, __unsafe_unretained id const v) const noexcept {
-    // FIXME: Implement
-    return NO;
+    REALM_UNREACHABLE();
 }
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wincomplete-implementation"

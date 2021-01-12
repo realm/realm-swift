@@ -314,7 +314,7 @@ void RLMClearTable(RLMClassInfo &objectSchema) {
     objectSchema.observedObjects.clear();
 }
 
-RLMObservationTracker::RLMObservationTracker(__unsafe_unretained RLMRealm *const realm, bool trackDeletions, RLMCollectionType collectionType)
+RLMObservationTracker::RLMObservationTracker(__unsafe_unretained RLMRealm *const realm, bool trackDeletions)
 : _realm(realm)
 , _group(realm.group)
 {
@@ -517,20 +517,6 @@ static NSKeyValueChange convert(realm::BindingContext::ColumnInfo::Kind kind) {
             return NSKeyValueChangeInsertion;
         case realm::BindingContext::ColumnInfo::Kind::Remove:
             return NSKeyValueChangeRemoval;
-    }
-}
-
-static NSKeyValueSetMutationKind convert_to_set_mutation_kind(realm::BindingContext::ColumnInfo::Kind kind) {
-    switch (kind) {
-        case realm::BindingContext::ColumnInfo::Kind::None:
-        case realm::BindingContext::ColumnInfo::Kind::SetAll:
-            return NSKeyValueSetSetMutation;
-        case realm::BindingContext::ColumnInfo::Kind::Set:
-            return NSKeyValueSetSetMutation;
-        case realm::BindingContext::ColumnInfo::Kind::Insert:
-            return NSKeyValueUnionSetMutation;
-        case realm::BindingContext::ColumnInfo::Kind::Remove:
-            return NSKeyValueMinusSetMutation;
     }
 }
 

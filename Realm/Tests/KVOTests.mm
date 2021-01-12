@@ -433,11 +433,11 @@ public:
 - (void)testRemoveObserver {
     // iOS 14.2 beta 2 has stopped throwing exceptions when a KVO observer is removed that does not exist
     // FIXME: revisit this once 14.2 is out to see if this was an intended change
-//#if REALM_PLATFORM_IOS
-//    if (@available(iOS 14.2, *)) {
-//        return;
-//    }
-//#endif
+    #if REALM_PLATFORM_IOS
+        if (@available(iOS 14.2, *)) {
+            return;
+        }
+    #endif
 
     KVOObject *obj = [self createObject];
     XCTAssertThrowsSpecificNamed([obj removeObserver:self forKeyPath:@"int32Col"], NSException, NSRangeException);

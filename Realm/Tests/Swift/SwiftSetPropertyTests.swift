@@ -130,7 +130,6 @@ class SwiftRLMSetPropertyTests: RLMTestCase {
         XCTAssertEqual((children[1] as! SwiftRLMStringObject).stringCol, "b", "Second child should be 'b'")
     }
 
-    // FIXME: Support unmanaged RLMArray's in Swift-defined models
     func testUnmanaged() {
         let realm = realmWithTestPath()
 

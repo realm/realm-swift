@@ -481,7 +481,6 @@ class MutableSetTests: TestCase {
         set.subtract(set2)
         XCTAssertEqual(Int(1), set.count)
         XCTAssertTrue(set.contains(str1))
-
     }
 }
 

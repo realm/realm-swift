@@ -875,7 +875,7 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     [PrimaryCompanyObject createOrUpdateInRealm:realm withValue:@{
                                                                    @"name": @"Realm",
                                                                    @"employees": @[@{@"name":@"Samuel", @"hired":@NO}],
-                                                                   @"employeesSet": @[@{@"name":@"Samuel", @"hired":@NO}],
+                                                                   @"employeeSet": @[@{@"name":@"Samuel", @"hired":@NO}],
                                                                    @"intern": @{@"name":@"Samuel", @"age":@20},
                                                                    }];
     [realm commitWriteTransaction];

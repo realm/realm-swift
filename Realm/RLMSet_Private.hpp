@@ -25,7 +25,6 @@
 namespace realm {
 class SetBase;
 class CollectionBase;
-
     namespace object_store {
         class Set;
     }

@@ -853,18 +853,16 @@
     XCTAssertEqual([[c1.employeeSet valueForKeyPath:@"@sum.age"] integerValue], 90);
     XCTAssertEqualWithAccuracy([[c1.employeeSet valueForKeyPath:@"@avg.age"] doubleValue], 30, 0.1f);
 
-    //TODO: disallow these calls on RLMSet
     // collection
-//    XCTAssertEqualObjects([c1.employeesSet valueForKeyPath:@"@unionOfObjects.name"],
-//                          (@[@"C", @"A", @"B"]));
-//
-//    XCTAssertEqualObjects([[c1.employeesSet valueForKeyPath:@"@distinctUnionOfObjects.name"] sortedArrayUsingSelector:@selector(compare:)],
-//                          (@[@"A", @"B", @"C"]));
-//    XCTAssertEqualObjects([companies.companies valueForKeyPath:@"@unionOfArrays.employees"],
-//                          (@[e1, e2, e3, e4]));
-//    NSComparator cmp = ^NSComparisonResult(id obj1, id obj2) { return [[obj1 name] compare:[obj2 name]]; };
-//    XCTAssertEqualObjects([[companies.companies valueForKeyPath:@"@distinctUnionOfSets.employees"] sortedArrayUsingComparator:cmp],
-//                          (@[e1, e2, e3, e4]));
+    XCTAssertEqualObjects([c1.employeeSet valueForKeyPath:@"@unionOfObjects.name"],
+                          (@[@"C", @"A", @"B"]));
+
+    XCTAssertEqualObjects([[c1.employeeSet valueForKeyPath:@"@distinctUnionOfObjects.name"] sortedArrayUsingSelector:@selector(compare:)],
+                          (@[@"A", @"B", @"C"]));
+    XCTAssertEqualObjects([NSSet setWithArray:[companies.companies valueForKeyPath:@"@unionOfArrays.employeeSet"]],
+                          ([NSSet setWithArray:@[e1, e2, e3, e4]]));
+    NSComparator cmp = ^NSComparisonResult(id obj1, id obj2) { return [[obj1 name] compare:[obj2 name]]; };
+    XCTAssertThrows([[companies.companies valueForKeyPath:@"@distinctUnionOfSets.employees"] sortedArrayUsingComparator:cmp]);
 
     // invalid key paths
     RLMAssertThrowsWithReasonMatching([c1.employeeSet valueForKeyPath:@"@invalid.name"],

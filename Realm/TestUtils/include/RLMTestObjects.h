@@ -241,6 +241,8 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLMSet<RLMDecimal128> *decimalObj2;
 @property RLMSet<RLMObjectId> *objectIdObj;
 @property RLMSet<RLMObjectId> *objectIdObj2;
+@property RLMSet<RLMUUID> *uuidObj;
+@property RLMSet<RLMUUID> *uuidObj2;
 @end
 
 @interface AllOptionalPrimitiveSets : RLMObject
@@ -262,6 +264,8 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLMSet<RLMDecimal128> *decimalObj2;
 @property RLMSet<RLMObjectId> *objectIdObj;
 @property RLMSet<RLMObjectId> *objectIdObj2;
+@property RLMSet<RLMUUID> *uuidObj;
+@property RLMSet<RLMUUID> *uuidObj2;
 @end
 
 #pragma mark - Real Life Objects
