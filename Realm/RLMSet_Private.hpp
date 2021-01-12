@@ -17,7 +17,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSet_Private.h"
+
 #import "RLMCollection_Private.hpp"
+
 #import "RLMResults_Private.hpp"
 
 namespace realm {
