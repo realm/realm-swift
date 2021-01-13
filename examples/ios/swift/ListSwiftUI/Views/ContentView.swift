@@ -48,17 +48,49 @@ class Person: Object, ObjectKeyIdentifiable {
         "Aoife", "Caoimhe", "Saoirse", "Ciara", "Niamh",
         "Conor", "Seán", "Oisín", "Patrick", "Cian"
     ]
-
+    /// The unique id of this dog
+    @objc dynamic var id = ObjectId.generate()
     /// The name of the person
     @objc dynamic var name = peopleNames.randomElement()!
     /// The dogs this person has
     var dogs = RealmSwift.List<Dog>()
 }
 
+struct DogList: View {
+    @RealmState var dogs: RealmSwift.List<Dog>
+    @State var _filter: String = ""
+    var filter: String {
+        _filter.isEmpty ? "TRUEPREDICATE" : "name BEGINSWITH '\(_filter)'"
+    }
+
+    var body: some View {
+        List {
+            TextField("filter", text: $_filter)
+            // Using the `$` will bind the Dog List to the view.
+            // Each Dog will be be bound as well, and will be
+            // of type `Binding<Dog>`
+            ForEach($dogs.filter(filter)) { dog in
+                // TODO: Think about how to add a conditional for bound vs unbound types
+                // The write transaction for the name property of `Dog`
+                // is implicit here, and will occur on every edit.
+                TextField("dog name", text: bind(dog, \.name))
+            }
+            // the remove method on the dogs list
+            // will implicitly write and remove the dogs
+            // at the offsets from the `onDelete(perform:)` method
+            .onDelete(perform: $dogs.filter(filter).remove)
+            // the move method on the dogs list
+            // will implicitly write and move the dogs
+            // to and from the offsets from the `onMove(perform:)` method
+//            .onMove(perform: $dogs.filter(filter).move)
+        }
+    }
+}
 // MARK: Person View
 struct PersonDetailView: View {
     // bind a Person to the View
     @RealmState var person: Person
+    @State var filter: String = ""
 
     var body: some View {
         VStack {
@@ -66,25 +98,7 @@ struct PersonDetailView: View {
             // is implicit here, and will occur on every edit
             TextField("name", text: $person.name)
                 .font(Font.largeTitle.bold()).padding()
-            List {
-                // Using the `$` will bind the Dog List to the view.
-                // Each Dog will be be bound as well, and will be
-                // of type `Binding<Dog>`
-                ForEach($person.dogs, id: \.id) { dog in
-                    // TODO: Think about how to add a conditional for bound vs unbound types
-                    // The write transaction for the name property of `Dog`
-                    // is implicit here, and will occur on every edit.
-                    TextField("dog name", text: bind(dog, \.name))
-                }
-                // the remove method on the dogs list
-                // will implicitly write and remove the dogs
-                // at the offsets from the `onDelete(perform:)` method
-                .onDelete(perform: $person.dogs.remove)
-                // the move method on the dogs list
-                // will implicitly write and move the dogs
-                // to and from the offsets from the `onMove(perform:)` method
-                .onMove(perform: $person.dogs.move)
-            }
+            DogList(dogs: person.dogs)
         }
         .navigationBarItems(trailing: Button("Add Dog") {
             // appending a dog to the dogs List implicitly
@@ -101,15 +115,19 @@ struct PersonView: View {
     var body: some View {
         return NavigationView {
             List {
-                ForEach($results, id: \.id) { person in
+                ForEach($results) { person in
                     NavigationLink(destination: PersonDetailView(person: person)) {
                         Text(person.name)
                     }
                 }
+                .onDelete(perform: $results.remove)
+                .onAppear {
+                    print("appeared")
+                }
             }
             .navigationBarTitle("People", displayMode: .large)
             .navigationBarItems(trailing: Button("Add") {
-                try! realm.write { realm.add(Person()) }
+                $results.append(Person())
             })
         }
     }

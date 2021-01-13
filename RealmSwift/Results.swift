@@ -60,7 +60,10 @@ extension Int32: AddableType {}
 extension Int64: AddableType {}
 extension Decimal128: AddableType {}
 
-protocol ResultsBase: ObservableCollection where BackingObjcCollection == RLMResults<AnyObject> {
+public protocol AnyResultsBase {
+    associatedtype Element: RealmCollectionValue
+}
+protocol ResultsBase: AnyResultsBase, ObservableCollection where BackingObjcCollection == RLMResults<AnyObject> {
 
     var rlmResults: RLMResults<AnyObject> { get }
 
