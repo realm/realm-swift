@@ -8,7 +8,18 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Timeouts when calling server functions via App would sometimes crash rather
+  than report an error.
+* Fix a race condition which would lead to "uncaught exception in notifier
+  thread: N5realm15InvalidTableRefE: transaction_ended" and a crash when the
+  source Realm was closed or invalidated at a very specific time during the
+  first run of a collection notifier
+  ([#3761](https://github.com/realm/realm-core/issues/3761), since v5.0.0).
+* Deleting and recreating objects with embedded objects may fail.
+  ([Core PR #4240](https://github.com/realm/realm-core/pull/4240), since v10.0.0)
+* Fast-enumerating a List after deleting the parent object would crash with an
+  assertion failure rather than a more appropriate exception.
+  ([Core #4114](https://github.com/realm/realm-core/issues/4114), since v5.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -19,7 +30,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v10.3.2 to v10.3.3
 
 10.5.0 Release notes (2020-12-14)
 =============================================================
