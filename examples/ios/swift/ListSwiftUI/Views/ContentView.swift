@@ -46,7 +46,9 @@ class Dog: EmbeddedObject, ObjectKeyIdentifiable {
 class Person: Object, ObjectKeyIdentifiable {
     private static let peopleNames = [
         "Aoife", "Caoimhe", "Saoirse", "Ciara", "Niamh",
-        "Conor", "Seán", "Oisín", "Patrick", "Cian"
+        "Conor", "Seán", "Oisín", "Patrick", "Cian",
+        "Isabella", "Mateo", "Emilia", "Savannah", "Isla",
+        "Elena", "Maya", "Santiago", "Gabriella", "Leonardo"
     ]
     /// The unique id of this dog
     @objc dynamic var id = ObjectId.generate()
@@ -69,7 +71,7 @@ struct DogList: View {
             // Using the `$` will bind the Dog List to the view.
             // Each Dog will be be bound as well, and will be
             // of type `Binding<Dog>`
-            ForEach($dogs.filter(filter)) { dog in
+            ForEach(dogs) { dog in
                 // TODO: Think about how to add a conditional for bound vs unbound types
                 // The write transaction for the name property of `Dog`
                 // is implicit here, and will occur on every edit.
@@ -78,11 +80,11 @@ struct DogList: View {
             // the remove method on the dogs list
             // will implicitly write and remove the dogs
             // at the offsets from the `onDelete(perform:)` method
-            .onDelete(perform: $dogs.filter(filter).remove)
+            .onDelete(perform: $dogs.remove)
             // the move method on the dogs list
             // will implicitly write and move the dogs
             // to and from the offsets from the `onMove(perform:)` method
-//            .onMove(perform: $dogs.filter(filter).move)
+            .onMove(perform: $dogs.move)
         }
     }
 }
@@ -90,15 +92,36 @@ struct DogList: View {
 struct PersonDetailView: View {
     // bind a Person to the View
     @RealmState var person: Person
-    @State var filter: String = ""
-
+    @State var _filter: String = ""
+    var filter: String {
+        _filter.isEmpty ? "TRUEPREDICATE" : "name BEGINSWITH '\(_filter)'"
+    }
     var body: some View {
         VStack {
             // The write transaction for the name property of `Person`
             // is implicit here, and will occur on every edit
             TextField("name", text: $person.name)
                 .font(Font.largeTitle.bold()).padding()
-            DogList(dogs: person.dogs)
+            List {
+                TextField("filter", text: $_filter)
+                // Using the `$` will bind the Dog List to the view.
+                // Each Dog will be be bound as well, and will be
+                // of type `Binding<Dog>`
+                ForEach(person.dogs) { dog in
+                    // TODO: Think about how to add a conditional for bound vs unbound types
+                    // The write transaction for the name property of `Dog`
+                    // is implicit here, and will occur on every edit.
+                    TextField("dog name", text: bind(dog, \.name))
+                }
+                // the remove method on the dogs list
+                // will implicitly write and remove the dogs
+                // at the offsets from the `onDelete(perform:)` method
+                .onDelete(perform: $person.dogs.remove)
+                // the move method on the dogs list
+                // will implicitly write and move the dogs
+                // to and from the offsets from the `onMove(perform:)` method
+                .onMove(perform: $person.dogs.move)
+            }
         }
         .navigationBarItems(trailing: Button("Add Dog") {
             // appending a dog to the dogs List implicitly
@@ -115,15 +138,13 @@ struct PersonView: View {
     var body: some View {
         return NavigationView {
             List {
-                ForEach($results) { person in
+                ForEach(results) { person in
                     NavigationLink(destination: PersonDetailView(person: person)) {
                         Text(person.name)
                     }
                 }
                 .onDelete(perform: $results.remove)
-                .onAppear {
-                    print("appeared")
-                }
+                .onMove(perform: $results.move)
             }
             .navigationBarTitle("People", displayMode: .large)
             .navigationBarItems(trailing: Button("Add") {
