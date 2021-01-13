@@ -147,9 +147,9 @@
 @implementation AllPrimitiveSets
 + (NSArray *)requiredProperties {
     return @[@"intObj", @"floatObj", @"doubleObj", @"boolObj", @"stringObj",
-             @"dateObj", @"dataObj", @"decimalObj", @"objectIdObj",
+             @"dateObj", @"dataObj", @"decimalObj", @"objectIdObj", @"uuidObj",
              @"intObj2", @"floatObj2", @"doubleObj2", @"boolObj2", @"stringObj2",
-                      @"dateObj2", @"dataObj2", @"decimalObj2", @"objectIdObj2"];
+             @"dateObj2", @"dataObj2", @"decimalObj2", @"objectIdObj2", @"uuidObj2"];
 }
 @end
 

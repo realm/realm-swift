@@ -37,6 +37,9 @@ static RLMObjectId *objectId(NSUInteger i) {
     }
     return objectIds[i];
 }
+static NSUUID *uuid(NSString *uuidString) {
+    return [[NSUUID alloc] initWithUUIDString:uuidString];
+}
 static void count(NSArray *values, double *sum, NSUInteger *count) {
     for (id value in values) {
         if (value != NSNull.null) {
@@ -240,24 +243,24 @@ static double average(NSArray *values) {
 - (void)testIndexOfObjectSorted {
     %man %r [$set addObjects:@[$v0, $v1, $v0, $v1]];
     %man %o [$set addObjects:@[$v0, $v1, NSNull.null, $v1, $v0]];
+    // ordering can't be guaranteed in set, so just verify the indexes are between 0 and 1
+    %man %r XCTAssertTrue([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1] == 0U || ^n [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1] == 1U);
+    %man %r XCTAssertTrue([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0] == 0U || ^n [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0] == 1U);
 
-    %man %r XCTAssertEqual(0U, [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1]);
-    %man %r XCTAssertEqual(1U, [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
-
-    %man %o XCTAssertEqual(0U, [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1]);
-    %man %o XCTAssertEqual(1U, [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
+    %man %o XCTAssertTrue([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1] == 0U || ^n [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1] == 1U);
+    %man %o XCTAssertTrue([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0] == 0U || ^n [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0] == 1U);
 }
 
 - (void)testIndexOfObjectDistinct {
     %man %r [$set addObjects:@[$v0, $v0, $v1]];
     %man %o [$set addObjects:@[$v0, $v0, NSNull.null, $v1, $v0]];
+    // ordering can't be guaranteed in set, so just verify the indexes are between 0 and 1
+    %man %r XCTAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0] == 1U);
+    %man %r XCTAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1] == 1U);
 
-    %man %r XCTAssertEqual(0U, [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
-    %man %r XCTAssertEqual(1U, [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1]);
-
-    %man %o XCTAssertEqual(0U, [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
-    %man %o XCTAssertEqual(1U, [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1]);
-    %man %o XCTAssertEqual(0U, [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
+    %man %o XCTAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0] == 1U);
+    %man %o XCTAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1] == 1U);
+    %man %o XCTAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null] == 1U);
 }
 
 - (void)testIndexOfObjectWhere {
@@ -282,14 +285,14 @@ static double average(NSArray *values) {
     %man %r [$set addObjects:@[$v0, $v1, $v0]];
     %man %o [$set addObjects:@[$v0, $v1, NSNull.null, $v1, $v0]];
 
-    %man %r XCTAssertEqualObjects([[[$set sortedResultsUsingDescriptors:@[]] valueForKey:@"self"] allObjects], ^n (@[$v0, $v1]));
-    %man %o XCTAssertEqualObjects([[[$set sortedResultsUsingDescriptors:@[]] valueForKey:@"self"] allObjects], ^n (@[$v0, $v1]));
+    %man %r XCTAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingDescriptors:@[]] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v0, $v1]]));
+    %man %o XCTAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingDescriptors:@[]] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v0, $v1]]));
 
-    %man %r XCTAssertEqualObjects([[[$set sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"] allObjects], ^n (@[$v1, $v0]));
-    %man %o XCTAssertEqualObjects([[[$set sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"] allObjects], ^n (@[$v1, $v0]));
+    %man %r XCTAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v1, $v0]]));
+    %man %o XCTAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v1, $v0]]));
 
-    %man %r XCTAssertEqualObjects([[[$set sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"] allObjects], ^n (@[$v0, $v1]));
-    %man %o XCTAssertEqualObjects([[[$set sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"] allObjects], ^n (@[NSNull.null, $v1]));
+    %man %r XCTAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v0, $v1]]));
+    %man %o XCTAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[NSNull.null, $v1]]));
 }
 
 - (void)testFilter {
