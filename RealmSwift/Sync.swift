@@ -268,7 +268,7 @@ import Combine
 /// This handler is executed on a non-main global `DispatchQueue`.
 @dynamicMemberLookup
 @frozen public struct Functions {
-    weak var user: User?
+    var user: User?
 
     fileprivate init(user: User) {
         self.user = user
