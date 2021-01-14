@@ -54,14 +54,9 @@ public class Person: Object, ObjectKeyIdentifiable {
 
 struct DogList: View {
     @RealmState var dogs: RealmSwift.List<Dog>
-    @State var _filter: String = ""
-    var filter: String {
-        _filter.isEmpty ? "TRUEPREDICATE" : "name BEGINSWITH '\(_filter)'"
-    }
 
     var body: some View {
         List {
-            TextField("filter", text: $_filter)
             ForEach(dogs) { dog in
                 TextField("dog name", text: bind(dog, \.name))
             }
@@ -74,22 +69,13 @@ struct DogList: View {
 struct PersonDetailView: View {
     // bind a Person to the View
     @RealmState var person: Person
-    @State var _filter: String = ""
-    var filter: String {
-        _filter.isEmpty ? "TRUEPREDICATE" : "name BEGINSWITH '\(_filter)'"
-    }
+
     var body: some View {
         VStack {
             TextField("name", text: $person.name)
                 .font(Font.largeTitle.bold()).padding()
-            List {
-                TextField("filter", text: $_filter)
-                ForEach(person.dogs) { dog in
-                    TextField("dog name", text: bind(dog, \.name))
-                }
-                .onDelete(perform: $person.dogs.remove)
-                .onMove(perform: $person.dogs.move)
-            }
+                .accessibility(identifier: "personName")
+            DogList(dogs: person.dogs)
         }
         .navigationBarItems(trailing: Button("Add Dog") {
             $person.dogs.append(Dog())

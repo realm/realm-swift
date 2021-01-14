@@ -59,8 +59,13 @@ import Realm
                 self.wrappedValue[keyPath: member]
             },
             set: { newValue in
-                try! self.wrappedValue.realm!.write {
-                    self.wrappedValue[keyPath: member] = newValue
+                guard let config = wrappedValue.realm?.configuration,
+                      let realm = try? Realm(configuration: config),
+                      let resolved = wrappedValue.thaw() else {
+                    return
+                }
+                try! realm.write {
+                    resolved[keyPath: member] = newValue
                 }
             })
         }

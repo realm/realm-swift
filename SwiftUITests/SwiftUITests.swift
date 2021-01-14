@@ -31,24 +31,26 @@ public class Person: Object, ObjectKeyIdentifiable {
 
 class SwiftUITests: XCTestCase {
     var realmPath: String?
-    var realm: Realm {
-        try! Realm(configuration: Realm.Configuration(fileURL: URL(string: realmPath!)!))
-    }
+    var realm: Realm!
+    let app = XCUIApplication()
+
     override func setUpWithError() throws {
         continueAfterFailure = false
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        try! realm.write { realm.deleteAll() }
-    }
-
-    func testExample() throws {
-        let app = XCUIApplication()
         app.launch()
         // fetch realm path. ui tests are run separately to the actual
         // app, so we have to fetch the path in this awkward way
-        self.realmPath = app.staticTexts["realmPath"].label
+        self.realm = try! Realm(configuration: Realm.Configuration(fileURL: URL(string: app.staticTexts["realmPath"].label)!))
+        try! realm.write { realm.deleteAll() }
+    }
+
+    override func tearDownWithError() throws {
+    }
+
+    private func deleteString(for string: String) -> String {
+        String(repeating: XCUIKeyboardKey.delete.rawValue, count: string.count)
+    }
+
+    func testSampleApp() throws {
         // assert realm is empty
         XCTAssertEqual(realm.objects(Person.self).count, 0)
 
@@ -78,22 +80,35 @@ class SwiftUITests: XCTestCase {
 
         // add 2 dogs
         app.buttons["Add Dog"].tap()
-        XCTAssertEqual(app.tables.firstMatch.cells.count, 2) // account for filter
+        XCTAssertEqual(app.tables.firstMatch.cells.count, 1)
         app.buttons["Add Dog"].tap()
-        XCTAssertEqual(app.tables.firstMatch.cells.count, 3) // account for filter
+        XCTAssertEqual(app.tables.firstMatch.cells.count, 2)
         XCTAssertEqual(realm.objects(Person.self)[0].dogs.count, 2)
 
         // change the name of the first dog
-        let dogName = app.tables.firstMatch.cells.element(boundBy: 1).textFields.element(boundBy: 0)
+        let dogCell = app.tables.firstMatch.cells.element(boundBy: 0)
+        let dogName = dogCell.textFields.element(boundBy: 0)
         XCTAssert(dogName.exists)
         let initialDogName = dogName.value
         dogName.tap()
-        let deleteString = String(repeating: XCUIKeyboardKey.delete.rawValue, count: (dogName.value as! String).count)
-        dogName.typeText(deleteString)
+        dogName.typeText(deleteString(for: dogName.value as! String))
         XCTAssertEqual(realm.objects(Person.self)[0].dogs[0].name, "")
         dogName.typeText("Test Dog")
         XCTAssertEqual(dogName.value as! String, "Test Dog")
         XCTAssertEqual(realm.objects(Person.self)[0].dogs[0].name, "Test Dog")
         XCTAssertNotEqual(dogName.value as! String, initialDogName as! String)
+
+        // remove dog from list
+        dogCell.swipeLeft()
+        dogCell.buttons["Delete"].tap()
+        XCTAssertEqual(realm.objects(Person.self)[0].dogs.count, 1)
+
+        // change name of person
+        let personNameTextField = app.textFields["personName"]
+        personNameTextField.tap()
+        personNameTextField.typeText(deleteString(for: personNameTextField.value as! String))
+        XCTAssertEqual(realm.objects(Person.self)[0].name, "")
+        personNameTextField.typeText("Test Person")
+        XCTAssertEqual(realm.objects(Person.self)[0].name, "Test Person")
     }
 }
