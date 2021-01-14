@@ -60,21 +60,11 @@ class Person: Object, ObjectKeyIdentifiable {
 
 struct DogList: View {
     @RealmState var dogs: RealmSwift.List<Dog>
-    @State var _filter: String = ""
-    var filter: String {
-        _filter.isEmpty ? "TRUEPREDICATE" : "name BEGINSWITH '\(_filter)'"
-    }
 
     var body: some View {
         List {
-            TextField("filter", text: $_filter)
-            // Using the `$` will bind the Dog List to the view.
-            // Each Dog will be be bound as well, and will be
-            // of type `Binding<Dog>`
+            // Using the `$` will bind the Dog List to the view
             ForEach(dogs) { dog in
-                // TODO: Think about how to add a conditional for bound vs unbound types
-                // The write transaction for the name property of `Dog`
-                // is implicit here, and will occur on every edit.
                 TextField("dog name", text: bind(dog, \.name))
             }
             // the remove method on the dogs list
@@ -92,10 +82,7 @@ struct DogList: View {
 struct PersonDetailView: View {
     // bind a Person to the View
     @RealmState var person: Person
-    @State var _filter: String = ""
-    var filter: String {
-        _filter.isEmpty ? "TRUEPREDICATE" : "name BEGINSWITH '\(_filter)'"
-    }
+
     var body: some View {
         VStack {
             // The write transaction for the name property of `Person`
@@ -103,14 +90,8 @@ struct PersonDetailView: View {
             TextField("name", text: $person.name)
                 .font(Font.largeTitle.bold()).padding()
             List {
-                TextField("filter", text: $_filter)
-                // Using the `$` will bind the Dog List to the view.
-                // Each Dog will be be bound as well, and will be
-                // of type `Binding<Dog>`
+                // Bind the dog list to the view
                 ForEach(person.dogs) { dog in
-                    // TODO: Think about how to add a conditional for bound vs unbound types
-                    // The write transaction for the name property of `Dog`
-                    // is implicit here, and will occur on every edit.
                     TextField("dog name", text: bind(dog, \.name))
                 }
                 // the remove method on the dogs list
