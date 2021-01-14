@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
  //
- // Copyright 2020 Realm Inc.
+ // Copyright 2021 Realm Inc.
  //
  // Licensed under the Apache License, Version 2.0 (the "License");
  // you may not use this file except in compliance with the License.
@@ -29,10 +29,6 @@ class Dog: EmbeddedObject, ObjectKeyIdentifiable {
          "Loki","Moose","George","Samson","Coco","Benny","Thor","Rufus","Prince",
          "Kobe","Chase","Oreo","Frankie","Mac","Benji","Bubba","Champ","Brady",
          "Elvis","Copper","Cash","Archie","Walter"]
-
-    /// The unique id of this dog
-    @objc dynamic var id = ObjectId.generate()
-    /// The name of this dog
     @objc dynamic var name = dogNames.randomElement()!
 
     public static func ==(lhs: Dog, rhs: Dog) -> Bool {
@@ -43,15 +39,13 @@ class Dog: EmbeddedObject, ObjectKeyIdentifiable {
 }
 
 // MARK: Person Model
-class Person: Object, ObjectKeyIdentifiable {
+public class Person: Object, ObjectKeyIdentifiable {
     private static let peopleNames = [
         "Aoife", "Caoimhe", "Saoirse", "Ciara", "Niamh",
         "Conor", "Seán", "Oisín", "Patrick", "Cian",
         "Isabella", "Mateo", "Emilia", "Savannah", "Isla",
         "Elena", "Maya", "Santiago", "Gabriella", "Leonardo"
     ]
-    /// The unique id of this dog
-    @objc dynamic var id = ObjectId.generate()
     /// The name of the person
     @objc dynamic var name = peopleNames.randomElement()!
     /// The dogs this person has
@@ -60,30 +54,13 @@ class Person: Object, ObjectKeyIdentifiable {
 
 struct DogList: View {
     @RealmState var dogs: RealmSwift.List<Dog>
-    @State var _filter: String = ""
-    var filter: String {
-        _filter.isEmpty ? "TRUEPREDICATE" : "name BEGINSWITH '\(_filter)'"
-    }
 
     var body: some View {
         List {
-            TextField("filter", text: $_filter)
-            // Using the `$` will bind the Dog List to the view.
-            // Each Dog will be be bound as well, and will be
-            // of type `Binding<Dog>`
             ForEach(dogs) { dog in
-                // TODO: Think about how to add a conditional for bound vs unbound types
-                // The write transaction for the name property of `Dog`
-                // is implicit here, and will occur on every edit.
                 TextField("dog name", text: bind(dog, \.name))
             }
-            // the remove method on the dogs list
-            // will implicitly write and remove the dogs
-            // at the offsets from the `onDelete(perform:)` method
             .onDelete(perform: $dogs.remove)
-            // the move method on the dogs list
-            // will implicitly write and move the dogs
-            // to and from the offsets from the `onMove(perform:)` method
             .onMove(perform: $dogs.move)
         }
     }
@@ -92,41 +69,15 @@ struct DogList: View {
 struct PersonDetailView: View {
     // bind a Person to the View
     @RealmState var person: Person
-    @State var _filter: String = ""
-    var filter: String {
-        _filter.isEmpty ? "TRUEPREDICATE" : "name BEGINSWITH '\(_filter)'"
-    }
+
     var body: some View {
         VStack {
-            // The write transaction for the name property of `Person`
-            // is implicit here, and will occur on every edit
             TextField("name", text: $person.name)
                 .font(Font.largeTitle.bold()).padding()
-            List {
-                TextField("filter", text: $_filter)
-                // Using the `$` will bind the Dog List to the view.
-                // Each Dog will be be bound as well, and will be
-                // of type `Binding<Dog>`
-                ForEach(person.dogs) { dog in
-                    // TODO: Think about how to add a conditional for bound vs unbound types
-                    // The write transaction for the name property of `Dog`
-                    // is implicit here, and will occur on every edit.
-                    TextField("dog name", text: bind(dog, \.name))
-                }
-                // the remove method on the dogs list
-                // will implicitly write and remove the dogs
-                // at the offsets from the `onDelete(perform:)` method
-                .onDelete(perform: $person.dogs.remove)
-                // the move method on the dogs list
-                // will implicitly write and move the dogs
-                // to and from the offsets from the `onMove(perform:)` method
-                .onMove(perform: $person.dogs.move)
-            }
+                .accessibility(identifier: "personName")
+            DogList(dogs: person.dogs)
         }
         .navigationBarItems(trailing: Button("Add Dog") {
-            // appending a dog to the dogs List implicitly
-            // writes to the Realm, since it has been bound
-            // to the view
             $person.dogs.append(Dog())
         })
     }
@@ -134,21 +85,25 @@ struct PersonDetailView: View {
 
 struct PersonView: View {
     @RealmState(Person.self) var results
+    @Environment(\.realm) var realm
 
     var body: some View {
         return NavigationView {
-            List {
-                ForEach(results) { person in
-                    NavigationLink(destination: PersonDetailView(person: person)) {
-                        Text(person.name)
+            VStack {
+                Text(realm.configuration.fileURL!.absoluteString).accessibility(identifier: "realmPath")
+                List {
+                    ForEach(results) { person in
+                        NavigationLink(destination: PersonDetailView(person: person)) {
+                            Text(person.name)
+                        }
                     }
+                    .onDelete(perform: $results.remove)
                 }
-                .onDelete(perform: $results.remove)
+                .navigationBarTitle("People", displayMode: .large)
+                .navigationBarItems(trailing: Button("Add") {
+                    $results.append(Person())
+                })
             }
-            .navigationBarTitle("People", displayMode: .large)
-            .navigationBarItems(trailing: Button("Add") {
-                $results.append(Person())
-            })
         }
     }
 }
