@@ -164,10 +164,9 @@ class PrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMuta
         // Both sets contain values[0]
         mutableSet.formIntersection(otherMutableSet)
         XCTAssertEqual(Int(1), mutableSet.count)
-        // Fails with PrimitiveMutableSetTests<OF, StringFactory>
         assertSetContains(mutableSet, keyPath: \.self, items: [values[0]])
     }
-    // Fails with PrimitiveMutableSetTests<OF, StringFactory>
+
     func testFormUnion() {
         XCTAssertEqual(Int(0), mutableSet.count)
         XCTAssertEqual(Int(0), otherMutableSet.count)
