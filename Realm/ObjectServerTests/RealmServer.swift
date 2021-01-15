@@ -20,6 +20,12 @@ import Foundation
 import RealmSwift
 import XCTest
 
+private extension URL {
+    var fileURL: URL {
+        URL(fileURLWithPath: self.absoluteString)
+    }
+}
+
 extension URLSession {
     fileprivate func resultDataTask(with request: URLRequest, _ completionHandler: @escaping (Result<Data, Error>) -> Void) {
         URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue()).dataTask(with: request) { (data, response, error) in
@@ -49,6 +55,275 @@ extension URLSession {
     }
 }
 
+struct Dependencies: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case mongoDBVersion = "MONGODB_VERSION",
+             goVersion = "GO_VERSION",
+             nodeVersion = "NODE_VERSION",
+             stitchVersion = "STITCH_VERSION"
+    }
+    var mongoDBVersion: String
+    var goVersion: String
+    var nodeVersion: String
+    var stitchVersion: String
+}
+
+@available(OSX 10.15, *)
+private let dependencies =
+    try! JSONDecoder().decode(Dependencies.self,
+                              from: JSONEncoder().encode(String(data: FileManager.default.contents(atPath: rootUrl.appendingPathComponent("dependencies.list").absoluteString)!, encoding: .utf8)!.components(separatedBy: "\n").dropLast().reduce(into: [String:String](), {
+    let keyValuePair = $1.split(separator: "=")
+    $0[String(keyValuePair[0])] = String(keyValuePair[1])
+})))
+/// The root URL of the project.
+private let rootUrl = URL(string: #file)!
+    .deletingLastPathComponent() // RealmServer.swift
+    .deletingLastPathComponent() // ObjectServerTests
+    .deletingLastPathComponent() // Realm
+private let buildDir = rootUrl.appendingPathComponent(".build")
+private let binDir = buildDir.appendingPathComponent("bin")
+
+@available(OSX 10.15, *)
+class Builder {
+    static let mongoDBURL = URL(string: "https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-\(dependencies.mongoDBVersion).tgz")!
+    static let transpilerTarget = "node10-macos"
+    static let stitchSupportLibURL = "https://s3.amazonaws.com/stitch-artifacts/stitch-support/stitch-support-macos-debug-4.3.2-721-ge791a2e-patch-5e2a6ad2a4cf473ae2e67b09.tgz"
+    static let mongoDir = buildDir.appendingPathComponent("mongodb-macos-x86_64-\(dependencies.mongoDBVersion)")
+    static let mongoExe = binDir.appendingPathComponent("mongo")
+    static let mongodExe = binDir.appendingPathComponent("mongod")
+    static let libDir = buildDir.appendingPathComponent("lib")
+
+    private var path = ["/bin", "/usr/bin"]
+    private var _environment = [String: String]()
+    private var environment: [String: String] {
+        ["PATH": path.joined(separator: ":")].merging(_environment, uniquingKeysWith: { key1, key2 in key1 })
+    }
+
+    @discardableResult
+    func puts(_ commandString: String,
+              currentDirectoryPath: String? = nil) -> (Int32, String) {
+        func createProcesses(_ commandString: String,
+                             process: inout Process,
+                             processes: inout [Process]) {
+            process.currentDirectoryPath = currentDirectoryPath ?? buildDir.absoluteString
+            processes.append(process)
+            var commandAndFlags = commandString.split(separator: " ")
+            process.launchPath = String(commandAndFlags.first!)
+            commandAndFlags.removeFirst()
+            var args = [String]()
+            while commandAndFlags.count > 0 {
+                var argument = commandAndFlags.removeFirst()
+                if argument.starts(with: "\"") {
+                    var nextArg = commandAndFlags.removeFirst()
+                    while nextArg.last != "\"" {
+                        argument += " \(nextArg)"
+                        nextArg = commandAndFlags.removeFirst()
+                    }
+                    argument += " \(nextArg)"
+                }
+                if argument.starts(with: "\'") {
+                    var nextArg = commandAndFlags.removeFirst()
+                    while nextArg.last != "\'" {
+                        argument += " \(nextArg)"
+                        nextArg = commandAndFlags.removeFirst()
+                    }
+                    argument += " \(nextArg)"
+                }
+                if argument != "|" {
+                    args.append(String(argument))
+                } else {
+                    let pipe = Pipe()
+                    let outputPipe = Pipe()
+                    var tailProcess = Process()
+                    createProcesses(commandAndFlags.joined(separator: " "),
+                                    process: &tailProcess,
+                                    processes: &processes)
+                    tailProcess.standardInput = pipe
+                    tailProcess.standardOutput = outputPipe
+                    process.standardOutput = pipe
+                    break
+                }
+            }
+            process.arguments = args
+        }
+        var processes = [Process]()
+        var process = Process()
+        process.environment = environment
+        createProcesses(commandString, process: &process, processes: &processes)
+
+        processes.forEach {
+            $0.launch()
+        }
+        processes.forEach {
+            $0.waitUntilExit()
+        }
+        if let _ = (processes.last!.standardOutput as? Pipe)?.fileHandleForReading.readDataToEndOfFile() {
+
+        }
+        let data = (processes.last!.standardOutput as? Pipe)?.fileHandleForReading.readDataToEndOfFile() ?? Data()
+        return (processes.last!.terminationStatus, String(data: data,
+                                                          encoding: .utf8)!)
+    }
+
+    let fileManager = FileManager.default
+
+    private func setupMongod(server: RealmServer) throws {
+        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("mongo").absoluteString) {
+
+            puts("/usr/bin/curl --silent \(Builder.mongoDBURL.absoluteString) | /usr/bin/tar xz")
+            puts("/bin/mkdir \(binDir.absoluteString)")
+            puts("/bin/cp \(Builder.mongoDir.absoluteString)/bin/mongo \(binDir)/mongo")
+            puts("/bin/cp \(Builder.mongoDir.absoluteString)/bin/mongod \(binDir)/mongod")
+
+            let mongoProcess = Process()
+            mongoProcess.launchPath = binDir.appendingPathComponent("mongod").path
+            mongoProcess.arguments = [
+                "--quiet",
+                "--dbpath", tempDir.path,
+                "--bind_ip", "localhost",
+                "--port", "26000",
+                "--replSet", "test"
+            ]
+            mongoProcess.standardOutput = nil
+            try mongoProcess.run()
+
+            assert(puts("\(binDir)/mongo --port=26000 --eval=\"rs.initiate()\"").0 == 0)
+            assert(puts("""
+                        \(binDir)/mongo --port 26000 --eval 'use admin; db.createUser({user: "test", pwd: "test", roles: [{role: "userAdminAnyDatabase", db: "admin"}]})'
+                        """).0 == 0)
+
+            let shutdownProcess = server.mongoShutdownProcess()
+            shutdownProcess.launch()
+            shutdownProcess.waitUntilExit()
+            mongoProcess.terminate()
+        }
+    }
+
+    private func setupStitch() throws {
+        print("Setting up stitch")
+        let goRoot = buildDir.appendingPathComponent("go")
+
+        try! fileManager.createDirectory(at: Builder.libDir.fileURL, withIntermediateDirectories: true)
+        if !fileManager.fileExists(atPath: "\(goRoot.absoluteString)/bin/go") {
+            print("Downloading golang")
+            puts("/usr/bin/curl --silent https://dl.google.com/go/go\(dependencies.goVersion).darwin-amd64.tar.gz | /usr/bin/tar xz")
+            puts("/bin/mkdir -p \(goRoot.absoluteString)/src/github.com/10gen")
+        }
+
+        var stitchDir = buildDir.appendingPathComponent("stitch")
+        if !fileManager.fileExists(atPath: stitchDir.absoluteString) {
+            print("Cloning stitch")
+            puts("/usr/bin/git clone git@github.com:10gen/baas \(stitchDir.absoluteString)")
+        }
+
+        let stitchWorktree = goRoot
+            .appendingPathComponent("src")
+            .appendingPathComponent("github.com")
+            .appendingPathComponent("10gen")
+            .appendingPathComponent("stitch")
+
+
+        if !FileManager.default.fileExists(atPath: stitchDir.appendingPathComponent(".git").absoluteString) {
+
+
+            // Fetch the BaaS version if we don't have it
+            puts("/usr/bin/git -C \(stitchDir) show-ref --verify --quiet")
+
+            // Set the worktree to the correct version
+            if !fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
+                puts("/usr/bin/git -C \(stitchWorktree) checkout \(dependencies.stitchVersion)")
+            } else {
+                puts("/usr/bin/git -C \(stitchDir) worktree add \(dependencies.stitchVersion)")
+            }
+        } else {
+            // We have a stitch directory with no .get directory, meaning we're
+            // running on CI and just need to copy the files into place
+            if !fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
+                puts("/bin/cp -Rc \(stitchDir) \(stitchWorktree)")
+            }
+        }
+        puts("/bin/mkdir -p go/src/github.com/10gen/stitch/etc/dylib")
+        stitchDir = stitchWorktree
+        if !fileManager.fileExists(atPath: Builder.libDir.appendingPathComponent("libstitch_support.dylib").absoluteString) {
+            print("downloading mongodb dylibs")
+            puts("/usr/bin/curl -s \(Builder.stitchSupportLibURL) | /usr/bin/tar xvfz - --strip-components=1 -C go/src/github.com/10gen/stitch/etc/dylib")
+            puts("/bin/cp go/src/github.com/10gen/stitch/etc/dylib/lib/libstitch_support.dylib lib")
+        }
+
+        let updateDocFilepath = binDir.appendingPathComponent("update_doc")
+        if !fileManager.fileExists(atPath: updateDocFilepath.absoluteString) {
+            print("downloading update_doc")
+            puts("/usr/bin/curl --silent -O https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7a5c9ec4432c400181c_17_10_15_01_19_33/update_doc")
+            puts("/bin/mv update_doc bin/update_doc")
+            puts("/bin/chmod +x \(updateDocFilepath)")
+        }
+
+        let assistedAggFilepath = binDir.appendingPathComponent("assisted_agg")
+        if !fileManager.fileExists(atPath: assistedAggFilepath.absoluteString) {
+            print("downloading assisted_agg")
+            puts("/usr/bin/curl --silent -O https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_b1c679a26ecb975372de41238ea44e4719b8fbf0_5f3d91c10ae6066889184912_20_08_19_20_57_17/assisted_agg")
+            puts("/bin/mv assisted_agg bin/assisted_agg")
+            puts("/bin/chmod +x \(assistedAggFilepath)")
+        }
+
+        if !fileManager.fileExists(atPath: buildDir.appendingPathComponent("node-v\(dependencies.nodeVersion)-darwin-x64").absoluteString) {
+            print("downloading node 🚀")
+            puts("/usr/bin/curl -O https://nodejs.org/dist/v\(dependencies.nodeVersion)/node-v\(dependencies.nodeVersion)-darwin-x64.tar.gz")
+            puts("/usr/bin/tar xzf node-v\(dependencies.nodeVersion)-darwin-x64.tar.gz")
+        }
+        path.append( "\(buildDir)/node-v\(dependencies.nodeVersion)-darwin-x64/bin/")
+
+        if !fileManager.fileExists(atPath: "\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin/yarn") {
+            puts("/bin/rm -rf ~/.yarn")
+            puts("/usr/bin/curl -o- -L https://yarnpkg.com/install.sh | /bin/bash")
+        }
+        path.append("\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin:~/.config/yarn/global/node_modules/.bin")
+
+        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("transpiler").absoluteString) {
+            print("building transpiler")
+            puts("\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin/yarn install",
+                 currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").absoluteString)
+            puts("\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin/yarn run build",
+                 currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").absoluteString)
+            puts("/bin/cp -c bin/transpiler \(buildDir)/bin", currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").absoluteString)
+        }
+
+        _environment["GOROOT"] = goRoot.absoluteString
+        _environment["GOCACHE"] = goRoot.appendingPathComponent("cache").absoluteString
+        _environment["GOPATH"] = goRoot.appendingPathComponent("bin").absoluteString
+        _environment["STITCH_PATH"] = stitchDir.absoluteString
+        _environment["LD_LIBRARY_PATH"] = Builder.libDir.absoluteString
+        path.append(stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").appendingPathComponent("bin").absoluteString)
+
+        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("create_user").absoluteString) {
+            print("build create_user binary")
+
+            puts("\(goRoot)/bin/go build -o create_user cmd/auth/user.go", currentDirectoryPath: stitchDir.absoluteString)
+            puts("/bin/cp -c create_user \(binDir)", currentDirectoryPath: stitchDir.absoluteString)
+
+            print("create_user binary built")
+        }
+
+        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("stitch_server").absoluteString) {
+            print("building server binary")
+
+            puts("\(goRoot)/bin/go build -o stitch_server cmd/server/main.go", currentDirectoryPath: stitchDir.absoluteString)
+            puts("/bin/cp -c stitch_server \(binDir)", currentDirectoryPath: stitchDir.absoluteString)
+
+            print("server binary built")
+        }
+    }
+
+    func buildServer(server: RealmServer) throws {
+        try! fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        if !fileManager.fileExists(atPath: buildDir.absoluteString) {
+            try! FileManager.default.createDirectory(at: URL.init(fileURLWithPath: buildDir.absoluteString, isDirectory: true), withIntermediateDirectories: true)
+        }
+        try setupMongod(server: server)
+
+        try setupStitch()
+    }
+}
 // MARK: - AdminProfile
 struct AdminProfile: Codable {
     struct Role: Codable {
@@ -274,11 +549,16 @@ class Admin {
 
 // MARK: RealmServer
 
+/// The directory where mongo stores its files. This is a unique value so that
+/// we have a fresh mongo each run.
+fileprivate var tempDir = URL(fileURLWithPath: NSTemporaryDirectory(),
+                                   isDirectory: true).appendingPathComponent("realm-test-\(UUID().uuidString)")
+
 /**
  A sandboxed server. This singleton launches and maintains all server processes
  and allows for app creation.
  */
-@available(OSX 10.13, *)
+@available(OSX 10.15, *)
 @objc(RealmServer)
 public class RealmServer: NSObject {
     public enum LogLevel {
@@ -289,25 +569,12 @@ public class RealmServer: NSObject {
     @objc public static var shared = RealmServer()
 
     /// Log level for the server and mongo processes.
-    public var logLevel = LogLevel.none
+    public var logLevel = LogLevel.info
 
     /// Process that runs the local mongo server. Should be terminated on exit.
     private let mongoProcess = Process()
     /// Process that runs the local backend server. Should be terminated on exit.
     private let serverProcess = Process()
-
-    /// The root URL of the project.
-    private static let rootUrl = URL(string: #file)!
-        .deletingLastPathComponent() // RealmServer.swift
-        .deletingLastPathComponent() // ObjectServerTests
-        .deletingLastPathComponent() // Realm
-    private static let buildDir = rootUrl.appendingPathComponent("build")
-    private static let binDir = buildDir.appendingPathComponent("bin")
-
-    /// The directory where mongo stores its files. This is a unique value so that
-    /// we have a fresh mongo each run.
-    private lazy var tempDir = URL(fileURLWithPath: NSTemporaryDirectory(),
-                                   isDirectory: true).appendingPathComponent("realm-test-\(UUID().uuidString)")
 
     /// Whether or not this is a parent or child process.
     private lazy var isParentProcess = (getenv("RLMProcessIsChild") == nil)
@@ -317,10 +584,10 @@ public class RealmServer: NSObject {
 
     /// Check if the BaaS files are present and we can run the server
     @objc public class func haveServer() -> Bool {
-        let goDir = RealmServer.rootUrl
-            .appendingPathComponent("build")
+        _ = buildDir
             .appendingPathComponent("stitch")
-        return FileManager.default.fileExists(atPath: goDir.path)
+//        return FileManager.default.fileExists(atPath: goDir.path)
+        return true
     }
 
     private override init() {
@@ -332,6 +599,8 @@ public class RealmServer: NSObject {
             }
 
             do {
+                let builder = Builder()
+                try! builder.buildServer(server: self)
                 try launchMongoProcess()
                 try launchServerProcess()
                 self.session = try Admin().login()
@@ -341,11 +610,22 @@ public class RealmServer: NSObject {
         }
     }
 
+    fileprivate func mongoShutdownProcess() -> Process {
+        let mongo = binDir.appendingPathComponent("mongo").path
+        // step down the replica set
+        let mongoShutdownProcess = Process()
+        mongoShutdownProcess.launchPath = mongo
+        mongoShutdownProcess.arguments = [
+            "admin",
+            "--port", "26000",
+            "--eval", "'db.shutdownServer({force: true})'"]
+        return mongoShutdownProcess
+    }
     /// Lazy teardown for exit only.
     private lazy var tearDown: () = {
         serverProcess.terminate()
 
-        let mongo = RealmServer.binDir.appendingPathComponent("mongo").path
+        let mongo = binDir.appendingPathComponent("mongo").path
 
         // step down the replica set
         let rsStepDownProcess = Process()
@@ -358,12 +638,7 @@ public class RealmServer: NSObject {
         rsStepDownProcess.waitUntilExit()
 
         // step down the replica set
-        let mongoShutdownProcess = Process()
-        mongoShutdownProcess.launchPath = mongo
-        mongoShutdownProcess.arguments = [
-            "admin",
-            "--port", "26000",
-            "--eval", "'db.shutdownServer({force: true})'"]
+        let mongoShutdownProcess = self.mongoShutdownProcess()
         try? mongoShutdownProcess.run()
         mongoShutdownProcess.waitUntilExit()
 
@@ -374,12 +649,8 @@ public class RealmServer: NSObject {
 
     /// Launch the mongo server in the background.
     /// This process should run until the test suite is complete.
-    private func launchMongoProcess() throws {
-        try! FileManager().createDirectory(at: tempDir,
-                                           withIntermediateDirectories: false,
-                                           attributes: nil)
-
-        mongoProcess.launchPath = RealmServer.binDir.appendingPathComponent("mongod").path
+    fileprivate func launchMongoProcess() throws {
+        mongoProcess.launchPath = binDir.appendingPathComponent("mongod").path
         mongoProcess.arguments = [
             "--quiet",
             "--dbpath", tempDir.path,
@@ -391,7 +662,7 @@ public class RealmServer: NSObject {
         try mongoProcess.run()
 
         let initProcess = Process()
-        initProcess.launchPath = RealmServer.binDir.appendingPathComponent("mongo").path
+        initProcess.launchPath = binDir.appendingPathComponent("mongo").path
         initProcess.arguments = [
             "--port", "26000",
             "--eval", "rs.initiate()"
@@ -402,12 +673,11 @@ public class RealmServer: NSObject {
     }
 
     private func launchServerProcess() throws {
-        let buildDir = RealmServer.rootUrl.appendingPathComponent("build")
         let binDir = buildDir.appendingPathComponent("bin").path
         let libDir = buildDir.appendingPathComponent("lib").path
         let binPath = "$PATH:\(binDir)"
 
-        let stitchRoot = RealmServer.rootUrl.path + "/build/go/src/github.com/10gen/stitch"
+        let stitchRoot = buildDir.path + "/go/src/github.com/10gen/stitch"
 
         // create the admin user
         let userProcess = Process()
@@ -682,6 +952,34 @@ public class RealmServer: NSObject {
             "relationships": [:]
         ]
 
+        let swiftHugeSyncObjectRule: [String: Any] = [
+            "database": "test_data",
+            "collection": "SwiftHugeSyncObject",
+            "roles": [[
+                "name": "default",
+                        "apply_when": [:],
+                "insert": true,
+                "delete": true,
+                        "additional_fields": [:]
+            ]],
+            "schema": [
+                "properties": [
+                    "_id": [
+                        "bsonType": "objectId"
+                    ],
+                    "data": [
+                        "bsonType": "binData"
+                    ],
+                    "realm_id": [
+                        "bsonType": "string"
+                    ]
+                ],
+                "required": ["_id"],
+                "title": "SwiftHugeSyncObject"
+            ],
+            "relationships": [:]
+        ]
+
         let userDataRule: [String: Any] = [
             "database": "test_data",
             "collection": "UserData",
@@ -700,6 +998,7 @@ public class RealmServer: NSObject {
         rules.post(on: group, dogRule, failOnError)
         rules.post(on: group, personRule, failOnError)
         rules.post(on: group, hugeSyncObjectRule, failOnError)
+        rules.post(on: group, swiftHugeSyncObjectRule, failOnError)
         rules.post(on: group, [
             "database": "test_data",
             "collection": "SwiftPerson",
