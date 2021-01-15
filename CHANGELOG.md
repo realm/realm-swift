@@ -1,13 +1,15 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.5.1 Release notes (2021-01-15)
 =============================================================
+
 ### Enhancements
+
 * Add Xcode 12.3 binary to release package.
 * Add support for queries which have nil on the left side and a keypath on the
   right side (e.g. "nil == name" rather than "name == nil" as was previously
   required).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+
 * Timeouts when calling server functions via App would sometimes crash rather
   than report an error.
 * Fix a race condition which would lead to "uncaught exception in notifier
@@ -21,15 +23,15 @@ x.y.z Release notes (yyyy-MM-dd)
   assertion failure rather than a more appropriate exception.
   ([Core #4114](https://github.com/realm/realm-core/issues/4114), since v5.0.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.3.
 * CocoaPods: 1.10 or later.
 
 ### Internal
+
 * Upgraded realm-core from v10.3.2 to v10.3.3
 
 10.5.0 Release notes (2020-12-14)
