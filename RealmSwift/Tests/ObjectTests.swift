@@ -1054,33 +1054,19 @@ class ObjectTests: TestCase {
         let obj = try! Realm().write {
             try! Realm().create(SwiftBoolObject.self, value: ["boolCol": true])
         }
-        let tsr = ThreadSafeReference(to: obj)
-        var frozen: SwiftBoolObject?
+        let frozen = obj.freeze()
+        let thawed = frozen.thaw()!
+        let tsr = ThreadSafeReference(to: thawed)
 
         dispatchSyncNewThread {
-            let obj = try! Realm().resolve(tsr)!
-            try! Realm().write({ obj.boolCol = false })
-            frozen = obj.freeze()
+            let resolved = try! Realm().resolve(tsr)!
+            try! Realm().write({ resolved.boolCol = false })
         }
-        let thawed = frozen!.thaw()!
-        XCTAssert(thawed.boolCol, "Thaw shouldn't reflect background transactions until main thread realm is refreshed")
+
+        XCTAssert(frozen.thaw()!.boolCol)
+        XCTAssert(thawed.boolCol)
         try! Realm().refresh()
+        XCTAssertFalse(frozen.thaw()!.boolCol)
         XCTAssertFalse(thawed.boolCol)
-    }
-
-    func testThawCreatedOnDifferentThread() {
-        var frozen: SwiftBoolObject?
-        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 0)
-
-        dispatchSyncNewThread {
-            let obj = try! Realm().write {
-                try! Realm().create(SwiftBoolObject.self, value: ["boolCol": true])
-            }
-            frozen = obj.freeze()
-        }
-        XCTAssertNil(frozen?.thaw(), "Thaw shouldn't reflect background transactions until main thread realm is refreshed")
-        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 0)
-        try! Realm().refresh()
-        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 1)
     }
 }

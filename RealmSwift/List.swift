@@ -432,7 +432,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
         return List(objc: _rlmArray.freeze())
     }
 
-    public func thaw() -> List {
+    public func thaw() -> List? {
         return List(objc: _rlmArray.thaw())
     }
 

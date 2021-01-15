@@ -334,7 +334,7 @@ import Realm
      This method resolves a reference to a live copy of the same frozen collection.
      If called on a live collection, will return itself.
     */
-    public func thaw() -> LinkingObjects<Element> {
+    public func thaw() -> LinkingObjects<Element>? {
         return LinkingObjects(propertyName: propertyName, handle: handle?.thaw())
     }
 

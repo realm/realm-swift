@@ -62,6 +62,17 @@
     });
 }
 
+//// collection passed in or object passed in, branch to correct RLM thaw
+- (nullable id<RLMThreadConfined>)thaw {
+    if (!_reference) {
+        @throw RLMException(@"Can only resolve a thread safe reference once.");
+    }
+    return RLMTranslateError([&] {
+        return [_type thaw];
+    });
+}
+
+
 - (BOOL)isInvalidated {
     return !_reference;
 }

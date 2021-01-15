@@ -508,7 +508,7 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
      This method resolves a reference to a live copy of the same frozen collection.
      If called on a live collection, will return itself.
     */
-    func thaw() -> Self
+    func thaw() -> Self?
 }
 
 public extension RealmCollection {
@@ -790,7 +790,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     }
 
     override func thaw() -> AnyRealmCollection<Element> {
-        return AnyRealmCollection(base.thaw())
+        return AnyRealmCollection(base.thaw()!)
     }
 }
 
@@ -1096,7 +1096,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      This method resolves a reference to a live copy of the same frozen collection.
      If called on a live collection, will return itself.
     */
-    public func thaw() -> AnyRealmCollection { return base.thaw() }
+    public func thaw() -> AnyRealmCollection? { return base.thaw() }
 }
 
 // MARK: AssistedObjectiveCBridgeable

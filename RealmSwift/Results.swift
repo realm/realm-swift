@@ -362,7 +362,7 @@ extension Decimal128: AddableType {}
         return Results(rlmResults.freeze())
     }
 
-    public func thaw() -> Results {
+    public func thaw() -> Results? {
         return Results(rlmResults.thaw())
     }
 }
