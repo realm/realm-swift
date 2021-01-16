@@ -546,7 +546,7 @@ public class RealmServer: NSObject {
             // We have a stitch directory with no .git directory, meaning we're
             // running on CI and just need to copy the files into place
             if !fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
-                subprocess.popen("/bin/cp -Rc \(stitchDir) \(stitchWorktree)")
+                subprocess.popen("/bin/cp -R \(stitchDir) \(stitchWorktree)")
             }
         }
         subprocess.popen("/bin/mkdir -p \(goRoot)/src/github.com/10gen/stitch/etc/dylib")
@@ -674,7 +674,7 @@ public class RealmServer: NSObject {
 
         mongoProcess.terminate()
 
-        try? FileManager().removeItem(at: tempDir)
+        try! FileManager().removeItem(at: tempDir)
     }()
 
     /// Launch the mongo server in the background.
