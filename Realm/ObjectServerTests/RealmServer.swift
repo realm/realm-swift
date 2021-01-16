@@ -391,7 +391,7 @@ public class RealmServer: NSObject {
     /// Shared RealmServer. This class only needs to be initialized and torn down once per test suite run.
     @objc public static var shared = RealmServer()
     private lazy var dependencies: Dependencies = {
-        guard let data = fileManager.contents(atPath: rootUrl.appendingPathComponent("dependencies.list").absoluteString),
+        guard let data = fileManager.contents(atPath: RealmServer.rootUrl.appendingPathComponent("dependencies.list").absoluteString),
               let dependenciesString = String(data: data, encoding: .utf8) else {
             fatalError("`dependencies.list` missing from root directory")
         }
@@ -408,12 +408,12 @@ public class RealmServer: NSObject {
     }()
 
     /// The root URL of the project.
-    private let rootUrl = URL(string: #file)!
+    private static let rootUrl = URL(string: #file)!
         .deletingLastPathComponent() // RealmServer.swift
         .deletingLastPathComponent() // ObjectServerTests
         .deletingLastPathComponent() // Realm
     /// The build directory where the server source and binaries are stored.
-    private lazy var buildDir = rootUrl.appendingPathComponent("build")
+    private lazy var buildDir = RealmServer.rootUrl.appendingPathComponent("build")
     /// The binary directory where the server binaries are stored.
     private lazy var binDir = buildDir.appendingPathComponent("bin")
     /// The directory where mongo stores its files. This is a unique value so that
@@ -430,7 +430,7 @@ public class RealmServer: NSObject {
 
     let fileManager = FileManager.default
     /// Log level for the server and mongo processes.
-    public var logLevel = LogLevel.none
+    public var logLevel = LogLevel.info
 
     /// Process that runs the local mongo server. Should be terminated on exit.
     private let mongoProcess = Process()
@@ -448,9 +448,11 @@ public class RealmServer: NSObject {
 
     /// Check if the current git user is authorised to use BaaS
     @objc public class func haveServer() -> Bool {
-        // FIXME: Make this dynamic
-        // return Subprocess().popen("/usr/bin/git ls-remote --exit-code --quiet git@github.com:10gen/baas").exitCode == 0
-        return true
+        let stitchDir = rootUrl
+                     .appendingPathComponent("build")
+                     .appendingPathComponent("stitch")
+         return FileManager.default.fileExists(atPath: stitchDir.path) ||
+            Subprocess().popen("/usr/bin/git ls-remote --exit-code --quiet git@github.com:10gen/baas").exitCode == 0
     }
 
     private override init() {
@@ -504,9 +506,11 @@ public class RealmServer: NSObject {
     }
 
     private func setupStitch() throws {
-        print("Setting up stitch")
-        let goRoot = buildDir.appendingPathComponent("go")
 
+        print("Setting up stitch")
+
+        let goRoot = buildDir.appendingPathComponent("go")
+        print("/bin/cp -Rc \(buildDir.appendingPathComponent("stitch")) \(goRoot.appendingPathComponent("src").appendingPathComponent("github.com").appendingPathComponent("10gen").appendingPathComponent("stitch"))")
         if try fileManager.contentsOfDirectory(atPath: binDir.absoluteString).count == 7 {
             return
         }
@@ -519,6 +523,7 @@ public class RealmServer: NSObject {
         }
 
         var stitchDir = buildDir.appendingPathComponent("stitch")
+
         if !fileManager.fileExists(atPath: stitchDir.absoluteString) {
             print("Cloning stitch")
             subprocess.popen("/usr/bin/git clone git@github.com:10gen/baas \(stitchDir.absoluteString)")
@@ -530,6 +535,8 @@ public class RealmServer: NSObject {
             .appendingPathComponent("github.com")
             .appendingPathComponent("10gen")
             .appendingPathComponent("stitch")
+
+
         if FileManager.default.fileExists(atPath: stitchDir.appendingPathComponent(".git").absoluteString) {
             // Fetch the BaaS version if we don't have it
             if subprocess.popen("/usr/bin/git -C \(stitchDir) show-ref --verify --quiet \(dependencies.stitchVersion)").exitCode != 0 {
@@ -543,12 +550,14 @@ public class RealmServer: NSObject {
                 subprocess.popen("/usr/bin/git -C \(stitchDir) worktree add \(stitchWorktree) \(dependencies.stitchVersion)")
             }
         } else {
+            print("Stitch exists without .git directory– copying files from \(stitchDir) to \(stitchWorktree)")
             // We have a stitch directory with no .git directory, meaning we're
             // running on CI and just need to copy the files into place
             if !fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
-                subprocess.popen("/bin/cp -R \(stitchDir) \(stitchWorktree)")
+                subprocess.popen("/bin/cp -Rc '\(stitchDir)' '\(stitchWorktree)'")
             }
         }
+
         subprocess.popen("/bin/mkdir -p \(goRoot)/src/github.com/10gen/stitch/etc/dylib")
         stitchDir = stitchWorktree
         if !fileManager.fileExists(atPath: libDir.appendingPathComponent("libstitch_support.dylib").absoluteString) {
@@ -674,7 +683,7 @@ public class RealmServer: NSObject {
 
         mongoProcess.terminate()
 
-        try! FileManager().removeItem(at: tempDir)
+        try? FileManager().removeItem(at: tempDir)
     }()
 
     /// Launch the mongo server in the background.
