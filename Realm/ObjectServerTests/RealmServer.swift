@@ -413,7 +413,7 @@ public class RealmServer: NSObject {
         .deletingLastPathComponent() // ObjectServerTests
         .deletingLastPathComponent() // Realm
     /// The build directory where the server source and binaries are stored.
-    private lazy var buildDir = rootUrl.appendingPathComponent(".build")
+    private lazy var buildDir = rootUrl.appendingPathComponent("build")
     /// The binary directory where the server binaries are stored.
     private lazy var binDir = buildDir.appendingPathComponent("bin")
     /// The directory where mongo stores its files. This is a unique value so that
