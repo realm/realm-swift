@@ -30,7 +30,7 @@ import RealmTestSupport
 extension User {
     func configuration(testName: String) -> Realm.Configuration {
         var config = self.configuration(partitionValue: testName)
-        config.objectTypes = [SwiftPerson.self, SwiftHugeSyncObject.self]
+        config.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self, SwiftHugeSyncObject.self]
         return config
     }
 }
@@ -301,7 +301,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func populateRealm(user: User, partitionValue: String) {
         do {
-//            let user = try logInUser(for: basicCredentials())
+            assert(user.isLoggedIn)
             let config = user.configuration(testName: partitionValue)
             let realm = try openRealm(configuration: config)
             try! realm.write {
@@ -410,8 +410,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             executeChild()
 
             let ex = expectation(description: "download-realm")
-            var config = user.configuration(testName: #function)
-            config.objectTypes = objectTypes
+            let config = user.configuration(testName: #function)
             let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
             XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
             Realm.asyncOpen(configuration: config) { result in
@@ -452,7 +451,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let ex = expectation(description: "download-realm")
             let customFileURL = realmURLForFile("copy")
             var config = user.configuration(testName: #function)
-            config.objectTypes = objectTypes
             config.fileURL = customFileURL
             let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
             XCTAssertEqual(pathOnDisk, customFileURL.path)
@@ -497,8 +495,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             RLMSetAsyncOpenQueue(DispatchQueue(label: "io.realm.asyncOpen"))
 
             let ex = expectation(description: "async open")
-            var config = user.configuration(testName: #function)
-            config.objectTypes = objectTypes
+            let config = user.configuration(testName: #function)
             Realm.asyncOpen(configuration: config) { result in
                 guard case .failure = result else {
                     XCTFail("No error on cancelled async open")
@@ -528,8 +525,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             executeChild()
             let ex1 = expectation(description: "async open")
             let ex2 = expectation(description: "download progress")
-            var config = user.configuration(testName: #function)
-            config.objectTypes = objectTypes
+            let config = user.configuration(testName: #function)
             let task = Realm.asyncOpen(configuration: config) { result in
                 XCTAssertNotNil(try? result.get())
                 ex1.fulfill()

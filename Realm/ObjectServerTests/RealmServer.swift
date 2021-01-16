@@ -68,13 +68,14 @@ struct Dependencies: Decodable {
     var stitchVersion: String
 }
 
-@available(OSX 10.15, *)
+
 private let dependencies =
     try! JSONDecoder().decode(Dependencies.self,
                               from: JSONEncoder().encode(String(data: FileManager.default.contents(atPath: rootUrl.appendingPathComponent("dependencies.list").absoluteString)!, encoding: .utf8)!.components(separatedBy: "\n").dropLast().reduce(into: [String:String](), {
     let keyValuePair = $1.split(separator: "=")
     $0[String(keyValuePair[0])] = String(keyValuePair[1])
 })))
+
 /// The root URL of the project.
 private let rootUrl = URL(string: #file)!
     .deletingLastPathComponent() // RealmServer.swift
@@ -82,8 +83,13 @@ private let rootUrl = URL(string: #file)!
     .deletingLastPathComponent() // Realm
 private let buildDir = rootUrl.appendingPathComponent(".build")
 private let binDir = buildDir.appendingPathComponent("bin")
+/// The directory where mongo stores its files. This is a unique value so that
+/// we have a fresh mongo each run.
+private var tempDir = URL(fileURLWithPath: NSTemporaryDirectory(),
+                          isDirectory: true).appendingPathComponent("realm-test-\(UUID().uuidString)")
 
-@available(OSX 10.15, *)
+// MARK: Builder
+@available(OSX 10.13, *)
 class Builder {
     static let mongoDBURL = URL(string: "https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-\(dependencies.mongoDBVersion).tgz")!
     static let transpilerTarget = "node10-macos"
@@ -324,6 +330,7 @@ class Builder {
         try setupStitch()
     }
 }
+
 // MARK: - AdminProfile
 struct AdminProfile: Codable {
     struct Role: Codable {
@@ -549,16 +556,11 @@ class Admin {
 
 // MARK: RealmServer
 
-/// The directory where mongo stores its files. This is a unique value so that
-/// we have a fresh mongo each run.
-fileprivate var tempDir = URL(fileURLWithPath: NSTemporaryDirectory(),
-                                   isDirectory: true).appendingPathComponent("realm-test-\(UUID().uuidString)")
-
 /**
  A sandboxed server. This singleton launches and maintains all server processes
  and allows for app creation.
  */
-@available(OSX 10.15, *)
+@available(OSX 10.13, *)
 @objc(RealmServer)
 public class RealmServer: NSObject {
     public enum LogLevel {

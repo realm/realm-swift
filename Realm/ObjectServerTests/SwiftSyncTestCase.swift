@@ -65,7 +65,6 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
     }
 
-    public let objectTypes = [Person.self, Dog.self, HugeSyncObject.self, SwiftHugeSyncObject.self, SwiftPerson.self]
     public func basicCredentials(usernameSuffix: String = "", app: App? = nil) -> Credentials {
         let email = "\(randomString(10))\(usernameSuffix)"
         let password = "abcdef"
@@ -80,8 +79,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     }
 
     public func openRealm(partitionValue: AnyBSON, user: User) throws -> Realm {
-        var config = user.configuration(partitionValue: partitionValue)
-        config.objectTypes = [Person.self, Dog.self, HugeSyncObject.self, SwiftHugeSyncObject.self, SwiftPerson.self]
+        let config = user.configuration(partitionValue: partitionValue)
         return try openRealm(configuration: config)
     }
 
@@ -89,16 +87,13 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
                                    user: User,
                                    file: StaticString = #file,
                                    line: UInt = #line) throws -> Realm {
-        var config = user.configuration(partitionValue: partitionValue)
-        config.objectTypes = [Person.self, Dog.self, HugeSyncObject.self, SwiftHugeSyncObject.self, SwiftPerson.self]
+        let config = user.configuration(partitionValue: partitionValue)
         return try openRealm(configuration: config)
     }
 
     public func openRealm(configuration: Realm.Configuration) throws -> Realm {
         var configuration = configuration
-//        if configuration.objectTypes == nil {
-            configuration.objectTypes = [Person.self, Dog.self, HugeSyncObject.self, SwiftHugeSyncObject.self, SwiftPerson.self]
-//        }
+        configuration.objectTypes =  [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self, SwiftHugeSyncObject.self]
         let realm = try Realm(configuration: configuration)
         waitForDownloads(for: realm)
         return realm
@@ -106,9 +101,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
     public func immediatelyOpenRealm(partitionValue: String, user: User) throws -> Realm {
         var configuration = user.configuration(partitionValue: partitionValue)
-//        if configuration.objectTypes == nil {
-            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self]
-//        }
+        configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self, SwiftHugeSyncObject.self]
         return try Realm(configuration: configuration)
     }
 

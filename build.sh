@@ -423,11 +423,6 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "setup-baas")
-        ruby Realm/ObjectServerTests/setup_baas.rb
-        exit 0
-        ;;
-
     ######################################
     # Swift versioning
     ######################################
@@ -1105,12 +1100,6 @@ case "$COMMAND" in
                 sh build.sh prelaunch-simulator "$target"
             fi
             export REALM_SKIP_PRELAUNCH=1
-
-            if [[ "$target" = *"server"* ]] || [[ "$target" = "swiftpm"* ]]; then
-                source $(brew --prefix nvm)/nvm.sh --no-use
-                nvm install 8.11.2
-                sh build.sh setup-baas
-            fi
 
             # Reset CoreSimulator.log
             mkdir -p ~/Library/Logs/CoreSimulator
