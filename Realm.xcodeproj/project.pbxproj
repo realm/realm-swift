@@ -7,17 +7,6 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
-		49E57A16245C3F31004AF428 /* Download BaaS */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 49E57A17245C3F31004AF428 /* Build configuration list for PBXAggregateTarget "Download BaaS" */;
-			buildPhases = (
-				49E57A1A245C3F36004AF428 /* ShellScript */,
-			);
-			dependencies = (
-			);
-			name = "Download BaaS";
-			productName = "Download BaaS";
-		};
 		C04B4BD71B55C47600FAE58E /* Download Core Library */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Download Core Library" */;
@@ -506,13 +495,6 @@
 			remoteGlobalIDString = 3F1A5E711992EB7400F45F4C;
 			remoteInfo = TestHost;
 		};
-		49E57A1B245C5B0E004AF428 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 49E57A16245C3F31004AF428;
-			remoteInfo = "Download BaaS";
-		};
 		537689AB24A7DD060008E57B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -762,7 +744,6 @@
 		4993221524129E6600A0EC8E /* RLMNetworkTransport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMNetworkTransport.h; sourceTree = "<group>"; };
 		4996EA9D2465BB8A003A1F51 /* BSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSON.swift; sourceTree = "<group>"; };
 		4996EA9F2465C44E003A1F51 /* SwiftBSONTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SwiftBSONTests.swift; path = Realm/ObjectServerTests/SwiftBSONTests.swift; sourceTree = "<group>"; };
-		49D9DFC4246C8E48003AD31D /* setup_baas.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; name = setup_baas.rb; path = Realm/ObjectServerTests/setup_baas.rb; sourceTree = "<group>"; };
 		49E12CEF245DB7CC00359DF1 /* RLMBSON.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMBSON.mm; sourceTree = "<group>"; };
 		49E12CF1245DB7E800359DF1 /* RLMBSON.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMBSON.h; sourceTree = "<group>"; };
 		49E12CF4245DBF8A00359DF1 /* RLMBSON_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMBSON_Private.hpp; sourceTree = "<group>"; };
@@ -1352,7 +1333,6 @@
 				1AA5AE9B1D98A68E00ED8C27 /* RLMSyncTestCase.mm */,
 				3F73BC8A1E3A876600FE80B6 /* RLMTestUtils.h */,
 				3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */,
-				49D9DFC4246C8E48003AD31D /* setup_baas.rb */,
 				4996EA9F2465C44E003A1F51 /* SwiftBSONTests.swift */,
 				1AA5AE9F1D98C99500ED8C27 /* SwiftObjectServerTests.swift */,
 				1AA5AE961D989BE000ED8C27 /* SwiftSyncTestCase.swift */,
@@ -1813,7 +1793,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				49E57A1C245C5B0E004AF428 /* PBXTargetDependency */,
 				E8267FB41D90B79000E001C7 /* PBXTargetDependency */,
 				537689AC24A7DD060008E57B /* PBXTargetDependency */,
 				E8267FB61D90B79000E001C7 /* PBXTargetDependency */,
@@ -1888,11 +1867,6 @@
 						DevelopmentTeam = QX5CR2FTN2;
 						ProvisioningStyle = Automatic;
 					};
-					49E57A16245C3F31004AF428 = {
-						CreatedOnToolsVersion = 11.4.1;
-						DevelopmentTeam = 2Z8M9MTEVV;
-						ProvisioningStyle = Automatic;
-					};
 					5D659E7D1BE04556006515A0 = {
 						LastSwiftMigration = 1170;
 						ProvisioningStyle = Automatic;
@@ -1957,7 +1931,6 @@
 				E83EAC791BED3D880085CCD2 /* SwiftLint */,
 				3F1A5E711992EB7400F45F4C /* TestHost */,
 				3F9D91802152D42F00474F09 /* TestHost static */,
-				49E57A16245C3F31004AF428 /* Download BaaS */,
 			);
 		};
 /* End PBXProject section */
@@ -2031,28 +2004,6 @@
 			shellPath = /bin/sh;
 			shellScript = "# Something that Carthage does results in Xcode skipping the ProcessXCFramework build step in some cases, which results in compilation failing. To work around this, ensure that the modified date on the XCFramework files are always newer than the built files, so that it happens on every build. This breaks incremental compilation, so we only want to do it when building for Carthage.\nif [ -n \"$CARTHAGE\" ]; then\n    find \"${SRCROOT}/core\" -type f -exec touch {} \\;\nfi\n";
 			showEnvVarsInLog = 0;
-		};
-		49E57A1A245C3F36004AF428 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/Realm/ObjectServerTests/setup_baas.rb",
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(SRCROOT)/build/bin/assisted_agg",
-				"$(SRCROOT)/build/bin/create_user",
-				"$(SRCROOT)/build/bin/stitch_server",
-				"$(SRCROOT)/build/bin/update_doc",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "ruby Realm/ObjectServerTests/setup_baas.rb\n";
 		};
 		5D304A2E1BE9AEFB0082C1A6 /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2547,11 +2498,6 @@
 			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
 			targetProxy = 3FC8BF34212B79F4001C2025 /* PBXContainerItemProxy */;
 		};
-		49E57A1C245C5B0E004AF428 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 49E57A16245C3F31004AF428 /* Download BaaS */;
-			targetProxy = 49E57A1B245C5B0E004AF428 /* PBXContainerItemProxy */;
-		};
 		537689AC24A7DD060008E57B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5D660FCB1BE98C560021E04F /* RealmSwift */;
@@ -2644,24 +2590,6 @@
 				DEVELOPMENT_TEAM = QX5CR2FTN2;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-			};
-			name = Release;
-		};
-		49E57A18245C3F31004AF428 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 2Z8M9MTEVV;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		49E57A19245C3F31004AF428 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 2Z8M9MTEVV;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -2856,15 +2784,6 @@
 			buildConfigurations = (
 				3F9D91852152D42F00474F09 /* Debug */,
 				3F9D91862152D42F00474F09 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		49E57A17245C3F31004AF428 /* Build configuration list for PBXAggregateTarget "Download BaaS" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				49E57A18245C3F31004AF428 /* Debug */,
-				49E57A19245C3F31004AF428 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
