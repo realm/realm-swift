@@ -55,278 +55,6 @@ extension URLSession {
     }
 }
 
-struct Dependencies: Decodable {
-    enum CodingKeys: String, CodingKey {
-        case mongoDBVersion = "MONGODB_VERSION",
-             goVersion = "GO_VERSION",
-             nodeVersion = "NODE_VERSION",
-             stitchVersion = "STITCH_VERSION"
-    }
-    var mongoDBVersion: String
-    var goVersion: String
-    var nodeVersion: String
-    var stitchVersion: String
-}
-
-
-private let dependencies =
-    try! JSONDecoder().decode(Dependencies.self,
-                              from: JSONEncoder().encode(String(data: FileManager.default.contents(atPath: rootUrl.appendingPathComponent("dependencies.list").absoluteString)!,
-                                                                encoding: .utf8)!.components(separatedBy: "\n").dropLast().reduce(into: [String: String](), {
-    let keyValuePair = $1.split(separator: "=")
-    $0[String(keyValuePair[0])] = String(keyValuePair[1])
-})))
-
-/// The root URL of the project.
-private let rootUrl = URL(string: #file)!
-    .deletingLastPathComponent() // RealmServer.swift
-    .deletingLastPathComponent() // ObjectServerTests
-    .deletingLastPathComponent() // Realm
-private let buildDir = rootUrl.appendingPathComponent(".build")
-private let binDir = buildDir.appendingPathComponent("bin")
-/// The directory where mongo stores its files. This is a unique value so that
-/// we have a fresh mongo each run.
-private var tempDir = URL(fileURLWithPath: NSTemporaryDirectory(),
-                          isDirectory: true).appendingPathComponent("realm-test-\(UUID().uuidString)")
-
-// MARK: Builder
-@available(OSX 10.13, *)
-class Builder {
-    static let mongoDBURL = URL(string: "https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-\(dependencies.mongoDBVersion).tgz")!
-    static let transpilerTarget = "node10-macos"
-    static let stitchSupportLibURL = "https://s3.amazonaws.com/stitch-artifacts/stitch-support/stitch-support-macos-debug-4.3.2-721-ge791a2e-patch-5e2a6ad2a4cf473ae2e67b09.tgz"
-    static let mongoDir = buildDir.appendingPathComponent("mongodb-macos-x86_64-\(dependencies.mongoDBVersion)")
-    static let mongoExe = binDir.appendingPathComponent("mongo")
-    static let mongodExe = binDir.appendingPathComponent("mongod")
-    static let libDir = buildDir.appendingPathComponent("lib")
-
-    private var path = ["/bin", "/usr/bin"]
-    private var _environment = [String: String]()
-    private var environment: [String: String] {
-        ["PATH": path.joined(separator: ":")].merging(_environment, uniquingKeysWith: { key1, _ in key1 })
-    }
-
-    @discardableResult
-    func puts(_ commandString: String,
-              currentDirectoryPath: String? = nil) -> (Int32, String) {
-        func createProcesses(_ commandString: String,
-                             process: inout Process,
-                             processes: inout [Process]) {
-            process.currentDirectoryPath = currentDirectoryPath ?? buildDir.absoluteString
-            processes.append(process)
-            var commandAndFlags = commandString.split(separator: " ")
-            process.launchPath = String(commandAndFlags.first!)
-            commandAndFlags.removeFirst()
-            var args = [String]()
-            while commandAndFlags.count > 0 {
-                var argument = commandAndFlags.removeFirst()
-                if argument.starts(with: "\"") {
-                    var nextArg = commandAndFlags.removeFirst()
-                    while nextArg.last != "\"" {
-                        argument += " \(nextArg)"
-                        nextArg = commandAndFlags.removeFirst()
-                    }
-                    argument += " \(nextArg)"
-                }
-                if argument.starts(with: "\'") {
-                    var nextArg = commandAndFlags.removeFirst()
-                    while nextArg.last != "\'" {
-                        argument += " \(nextArg)"
-                        nextArg = commandAndFlags.removeFirst()
-                    }
-                    argument += " \(nextArg)"
-                }
-                if argument != "|" {
-                    args.append(String(argument))
-                } else {
-                    let pipe = Pipe()
-                    let outputPipe = Pipe()
-                    var tailProcess = Process()
-                    createProcesses(commandAndFlags.joined(separator: " "),
-                                    process: &tailProcess,
-                                    processes: &processes)
-                    tailProcess.standardInput = pipe
-                    tailProcess.standardOutput = outputPipe
-                    process.standardOutput = pipe
-                    break
-                }
-            }
-            process.arguments = args
-        }
-        var processes = [Process]()
-        var process = Process()
-        process.environment = environment
-        createProcesses(commandString, process: &process, processes: &processes)
-
-        processes.forEach {
-            $0.launch()
-        }
-        processes.forEach {
-            $0.waitUntilExit()
-        }
-        let data = (processes.last!.standardOutput as? Pipe)?.fileHandleForReading.readDataToEndOfFile() ?? Data()
-        return (processes.last!.terminationStatus, String(data: data,
-                                                          encoding: .utf8)!)
-    }
-
-    let fileManager = FileManager.default
-
-    private func setupMongod(server: RealmServer) throws {
-        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("mongo").absoluteString) {
-
-            puts("/usr/bin/curl --silent \(Builder.mongoDBURL.absoluteString) | /usr/bin/tar xz")
-            puts("/bin/mkdir \(binDir.absoluteString)")
-            puts("/bin/cp \(Builder.mongoDir.absoluteString)/bin/mongo \(binDir)/mongo")
-            puts("/bin/cp \(Builder.mongoDir.absoluteString)/bin/mongod \(binDir)/mongod")
-
-            let mongoProcess = Process()
-            mongoProcess.launchPath = binDir.appendingPathComponent("mongod").path
-            mongoProcess.arguments = [
-                "--quiet",
-                "--dbpath", tempDir.path,
-                "--bind_ip", "localhost",
-                "--port", "26000",
-                "--replSet", "test"
-            ]
-            mongoProcess.standardOutput = nil
-            try mongoProcess.run()
-
-            assert(puts("\(binDir)/mongo --port=26000 --eval=\"rs.initiate()\"").0 == 0)
-            assert(puts("""
-                        \(binDir)/mongo --port 26000 --eval 'use admin; db.createUser({user: "test", pwd: "test", roles: [{role: "userAdminAnyDatabase", db: "admin"}]})'
-                        """).0 == 0)
-
-            let shutdownProcess = server.mongoShutdownProcess()
-            shutdownProcess.launch()
-            shutdownProcess.waitUntilExit()
-            mongoProcess.terminate()
-        }
-    }
-
-    private func setupStitch() throws {
-        print("Setting up stitch")
-        let goRoot = buildDir.appendingPathComponent("go")
-
-        try! fileManager.createDirectory(at: Builder.libDir.fileURL, withIntermediateDirectories: true)
-        if !fileManager.fileExists(atPath: "\(goRoot.absoluteString)/bin/go") {
-            print("Downloading golang")
-            puts("/usr/bin/curl --silent https://dl.google.com/go/go\(dependencies.goVersion).darwin-amd64.tar.gz | /usr/bin/tar xz")
-            puts("/bin/mkdir -p \(goRoot.absoluteString)/src/github.com/10gen")
-        }
-
-        var stitchDir = buildDir.appendingPathComponent("stitch")
-        if !fileManager.fileExists(atPath: stitchDir.absoluteString) {
-            print("Cloning stitch")
-            puts("/usr/bin/git clone git@github.com:10gen/baas \(stitchDir.absoluteString)")
-        }
-
-        let stitchWorktree = goRoot
-            .appendingPathComponent("src")
-            .appendingPathComponent("github.com")
-            .appendingPathComponent("10gen")
-            .appendingPathComponent("stitch")
-
-
-        if !FileManager.default.fileExists(atPath: stitchDir.appendingPathComponent(".git").absoluteString) {
-            // Fetch the BaaS version if we don't have it
-            puts("/usr/bin/git -C \(stitchDir) show-ref --verify --quiet")
-
-            // Set the worktree to the correct version
-            if !fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
-                puts("/usr/bin/git -C \(stitchWorktree) checkout \(dependencies.stitchVersion)")
-            } else {
-                puts("/usr/bin/git -C \(stitchDir) worktree add \(dependencies.stitchVersion)")
-            }
-        } else {
-            // We have a stitch directory with no .get directory, meaning we're
-            // running on CI and just need to copy the files into place
-            if !fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
-                puts("/bin/cp -Rc \(stitchDir) \(stitchWorktree)")
-            }
-        }
-        puts("/bin/mkdir -p go/src/github.com/10gen/stitch/etc/dylib")
-        stitchDir = stitchWorktree
-        if !fileManager.fileExists(atPath: Builder.libDir.appendingPathComponent("libstitch_support.dylib").absoluteString) {
-            print("downloading mongodb dylibs")
-            puts("/usr/bin/curl -s \(Builder.stitchSupportLibURL) | /usr/bin/tar xvfz - --strip-components=1 -C go/src/github.com/10gen/stitch/etc/dylib")
-            puts("/bin/cp go/src/github.com/10gen/stitch/etc/dylib/lib/libstitch_support.dylib lib")
-        }
-
-        let updateDocFilepath = binDir.appendingPathComponent("update_doc")
-        if !fileManager.fileExists(atPath: updateDocFilepath.absoluteString) {
-            print("downloading update_doc")
-            puts("/usr/bin/curl --silent -O https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7a5c9ec4432c400181c_17_10_15_01_19_33/update_doc")
-            puts("/bin/mv update_doc bin/update_doc")
-            puts("/bin/chmod +x \(updateDocFilepath)")
-        }
-
-        let assistedAggFilepath = binDir.appendingPathComponent("assisted_agg")
-        if !fileManager.fileExists(atPath: assistedAggFilepath.absoluteString) {
-            print("downloading assisted_agg")
-            puts("/usr/bin/curl --silent -O https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_b1c679a26ecb975372de41238ea44e4719b8fbf0_5f3d91c10ae6066889184912_20_08_19_20_57_17/assisted_agg")
-            puts("/bin/mv assisted_agg bin/assisted_agg")
-            puts("/bin/chmod +x \(assistedAggFilepath)")
-        }
-
-        if !fileManager.fileExists(atPath: buildDir.appendingPathComponent("node-v\(dependencies.nodeVersion)-darwin-x64").absoluteString) {
-            print("downloading node 🚀")
-            puts("/usr/bin/curl -O https://nodejs.org/dist/v\(dependencies.nodeVersion)/node-v\(dependencies.nodeVersion)-darwin-x64.tar.gz")
-            puts("/usr/bin/tar xzf node-v\(dependencies.nodeVersion)-darwin-x64.tar.gz")
-        }
-        path.append( "\(buildDir)/node-v\(dependencies.nodeVersion)-darwin-x64/bin/")
-
-        if !fileManager.fileExists(atPath: "\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin/yarn") {
-            puts("/bin/rm -rf ~/.yarn")
-            puts("/usr/bin/curl -o- -L https://yarnpkg.com/install.sh | /bin/bash")
-        }
-        path.append("\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin:~/.config/yarn/global/node_modules/.bin")
-
-        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("transpiler").absoluteString) {
-            print("building transpiler")
-            puts("\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin/yarn install",
-                 currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").absoluteString)
-            puts("\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin/yarn run build",
-                 currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").absoluteString)
-            puts("/bin/cp -c bin/transpiler \(buildDir)/bin", currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").absoluteString)
-        }
-
-        _environment["GOROOT"] = goRoot.absoluteString
-        _environment["GOCACHE"] = goRoot.appendingPathComponent("cache").absoluteString
-        _environment["GOPATH"] = goRoot.appendingPathComponent("bin").absoluteString
-        _environment["STITCH_PATH"] = stitchDir.absoluteString
-        _environment["LD_LIBRARY_PATH"] = Builder.libDir.absoluteString
-        path.append(stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").appendingPathComponent("bin").absoluteString)
-
-        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("create_user").absoluteString) {
-            print("build create_user binary")
-
-            puts("\(goRoot)/bin/go build -o create_user cmd/auth/user.go", currentDirectoryPath: stitchDir.absoluteString)
-            puts("/bin/cp -c create_user \(binDir)", currentDirectoryPath: stitchDir.absoluteString)
-
-            print("create_user binary built")
-        }
-
-        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("stitch_server").absoluteString) {
-            print("building server binary")
-
-            puts("\(goRoot)/bin/go build -o stitch_server cmd/server/main.go", currentDirectoryPath: stitchDir.absoluteString)
-            puts("/bin/cp -c stitch_server \(binDir)", currentDirectoryPath: stitchDir.absoluteString)
-
-            print("server binary built")
-        }
-    }
-
-    func buildServer(server: RealmServer) throws {
-        try! fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
-        if !fileManager.fileExists(atPath: buildDir.absoluteString) {
-            try! FileManager.default.createDirectory(at: URL.init(fileURLWithPath: buildDir.absoluteString, isDirectory: true), withIntermediateDirectories: true)
-        }
-        try setupMongod(server: server)
-
-        try setupStitch()
-    }
-}
-
 // MARK: - AdminProfile
 struct AdminProfile: Codable {
     struct Role: Codable {
@@ -552,6 +280,90 @@ class Admin {
 
 // MARK: RealmServer
 
+/// Bog standard subprocess abstraction for shell commands.
+private struct Subprocess {
+    var path = ["/bin/", "/usr/bin/"]
+    private var _environment = [String: String]()
+    var environment: [String: String] {
+        get {
+            ["PATH": path.joined(separator: ":")].merging(_environment, uniquingKeysWith: { key1, _ in key1 })
+        } set {
+            _environment = newValue
+        }
+    }
+
+    private let defaultDirectoryPath: String?
+
+    init(defaultDirectoryPath: String? = nil) {
+        self.defaultDirectoryPath = defaultDirectoryPath
+    }
+
+    @discardableResult
+    func popen(_ commandString: String,
+               currentDirectoryPath: String? = nil) -> (exitCode: Int32, output: String) {
+        func createProcesses(_ commandString: String,
+                             process: inout Process,
+                             processes: inout [Process]) {
+            if let currentDirectoryPath = currentDirectoryPath {
+                process.currentDirectoryPath = currentDirectoryPath
+            } else if let defaultDirectoryPath = self.defaultDirectoryPath {
+                process.currentDirectoryPath = defaultDirectoryPath
+            }
+            processes.append(process)
+            var commandAndFlags = commandString.split(separator: " ")
+            process.launchPath = String(commandAndFlags.first!)
+            commandAndFlags.removeFirst()
+            var args = [String]()
+            while commandAndFlags.count > 0 {
+                var argument = commandAndFlags.removeFirst()
+                switch argument.first! {
+                case "|":
+                    let pipe = Pipe()
+                    let outputPipe = Pipe()
+                    var tailProcess = Process()
+                    createProcesses(commandAndFlags.joined(separator: " "),
+                                    process: &tailProcess,
+                                    processes: &processes)
+                    tailProcess.standardInput = pipe
+                    tailProcess.standardOutput = outputPipe
+                    process.standardOutput = pipe
+                    process.arguments = args
+                    return
+                case "\"", "'":
+                    // the argument is guarded by quotes, so we have to rejoin
+                    // the proceeding arguments to retain the intent of the caller
+                    if argument.last != argument.first! {
+                        var nextArg = commandAndFlags.removeFirst()
+                        while nextArg.last != argument.first {
+                            argument += " " + nextArg
+                            nextArg = commandAndFlags.removeFirst()
+                        }
+                        // concat the final part of the quoted arg
+                        argument += " " + nextArg
+                    }
+                    fallthrough
+                default:
+                    args.append(String(argument))
+                }
+            }
+            process.arguments = args
+        }
+        var processes = [Process]()
+        var process = Process()
+        process.environment = environment
+        createProcesses(commandString, process: &process, processes: &processes)
+
+        processes.forEach {
+            $0.launch()
+        }
+        processes.forEach {
+            $0.waitUntilExit()
+        }
+        let data = (processes.last!.standardOutput as? Pipe)?.fileHandleForReading.readDataToEndOfFile() ?? Data()
+        return (processes.last!.terminationStatus, String(data: data,
+                                                          encoding: .utf8)!)
+    }
+}
 /**
  A sandboxed server. This singleton launches and maintains all server processes
  and allows for app creation.
@@ -563,9 +375,60 @@ public class RealmServer: NSObject {
         case none, info, warn, error
     }
 
+    private struct Dependencies: Decodable {
+        enum CodingKeys: String, CodingKey {
+            case mongoDBVersion = "MONGODB_VERSION",
+                 goVersion = "GO_VERSION",
+                 nodeVersion = "NODE_VERSION",
+                 stitchVersion = "STITCH_VERSION"
+        }
+        var mongoDBVersion: String
+        var goVersion: String
+        var nodeVersion: String
+        var stitchVersion: String
+    }
+
     /// Shared RealmServer. This class only needs to be initialized and torn down once per test suite run.
     @objc public static var shared = RealmServer()
+    private lazy var dependencies: Dependencies = {
+        guard let data = fileManager.contents(atPath: rootUrl.appendingPathComponent("dependencies.list").absoluteString),
+              let dependenciesString = String(data: data, encoding: .utf8) else {
+            fatalError("`dependencies.list` missing from root directory")
+        }
 
+        do {
+            return try JSONDecoder().decode(Dependencies.self,
+                                            from: JSONEncoder().encode(dependenciesString.components(separatedBy: "\n").dropLast().reduce(into: [String: String]()) {
+                                                let keyValuePair = $1.split(separator: "=")
+                                                $0[String(keyValuePair[0])] = String(keyValuePair[1])
+                                            }))
+        } catch {
+            fatalError("`dependencies.list` malformed: \(error.localizedDescription)")
+        }
+    }()
+
+    /// The root URL of the project.
+    private let rootUrl = URL(string: #file)!
+        .deletingLastPathComponent() // RealmServer.swift
+        .deletingLastPathComponent() // ObjectServerTests
+        .deletingLastPathComponent() // Realm
+    /// The build directory where the server source and binaries are stored.
+    private lazy var buildDir = rootUrl.appendingPathComponent(".build")
+    /// The binary directory where the server binaries are stored.
+    private lazy var binDir = buildDir.appendingPathComponent("bin")
+    /// The directory where mongo stores its files. This is a unique value so that
+    /// we have a fresh mongo each run.
+    private var tempDir = URL(fileURLWithPath: NSTemporaryDirectory(),
+                              isDirectory: true).appendingPathComponent("realm-test-\(UUID().uuidString)")
+    private lazy var mongoDBURL = URL(string: "https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-\(dependencies.mongoDBVersion).tgz")!
+    private lazy var transpilerTarget = "node10-macos"
+    private lazy var stitchSupportLibURL = "https://s3.amazonaws.com/stitch-artifacts/stitch-support/stitch-support-macos-debug-4.3.2-721-ge791a2e-patch-5e2a6ad2a4cf473ae2e67b09.tgz"
+    private lazy var mongoDir = buildDir.appendingPathComponent("mongodb-macos-x86_64-\(dependencies.mongoDBVersion)")
+    private lazy var mongoExe = binDir.appendingPathComponent("mongo")
+    private lazy var mongodExe = binDir.appendingPathComponent("mongod")
+    private lazy var libDir = buildDir.appendingPathComponent("lib")
+
+    let fileManager = FileManager.default
     /// Log level for the server and mongo processes.
     public var logLevel = LogLevel.info
 
@@ -577,15 +440,15 @@ public class RealmServer: NSObject {
     /// Whether or not this is a parent or child process.
     private lazy var isParentProcess = (getenv("RLMProcessIsChild") == nil)
 
+    /// The "shell" that processes are launched on
+    private lazy var subprocess = Subprocess(defaultDirectoryPath: buildDir.absoluteString)
+
     /// The current admin session
     private var session: Admin.AdminSession?
 
-    /// Check if the BaaS files are present and we can run the server
+    /// Check if the current git user is authorised to use BaaS
     @objc public class func haveServer() -> Bool {
-        _ = buildDir
-            .appendingPathComponent("stitch")
-//        return FileManager.default.fileExists(atPath: goDir.path)
-        return true
+        return Subprocess().popen("/usr/bin/git ls-remote --exit-code --quiet git@github.com:10gen/baas").exitCode == 0
     }
 
     private override init() {
@@ -597,8 +460,7 @@ public class RealmServer: NSObject {
             }
 
             do {
-                let builder = Builder()
-                try! builder.buildServer(server: self)
+                try buildServer()
                 try launchMongoProcess()
                 try launchServerProcess()
                 self.session = try Admin().login()
@@ -606,6 +468,161 @@ public class RealmServer: NSObject {
                 XCTFail("Could not initiate admin session: \(error.localizedDescription)")
             }
         }
+    }
+
+    private func setupMongod() throws {
+        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("mongo").absoluteString) {
+            subprocess.popen("/usr/bin/curl --silent \(mongoDBURL.absoluteString) | /usr/bin/tar xz")
+            subprocess.popen("/bin/mkdir \(binDir.absoluteString)")
+            subprocess.popen("/bin/cp \(mongoDir.absoluteString)/bin/mongo \(binDir)/mongo")
+            subprocess.popen("/bin/cp \(mongoDir.absoluteString)/bin/mongod \(binDir)/mongod")
+
+            let mongoProcess = Process()
+            mongoProcess.launchPath = binDir.appendingPathComponent("mongod").path
+            mongoProcess.arguments = [
+                "--quiet",
+                "--dbpath", tempDir.path,
+                "--bind_ip", "localhost",
+                "--port", "26000",
+                "--replSet", "test"
+            ]
+            mongoProcess.standardOutput = nil
+            try mongoProcess.run()
+
+            subprocess.popen("\(binDir)/mongo --port=26000 --eval=\"rs.initiate()\"")
+            subprocess.popen("""
+                        \(binDir)/mongo --port 26000 --eval 'use admin; db.createUser({user: "test", pwd: "test", roles: [{role: "userAdminAnyDatabase", db: "admin"}]})'
+                        """)
+
+            let shutdownProcess = mongoShutdownProcess()
+            shutdownProcess.launch()
+            shutdownProcess.waitUntilExit()
+            mongoProcess.terminate()
+        }
+    }
+
+    private func setupStitch() throws {
+        print("Setting up stitch")
+        let goRoot = buildDir.appendingPathComponent("go")
+
+        try! fileManager.createDirectory(at: libDir.fileURL, withIntermediateDirectories: true)
+        if !fileManager.fileExists(atPath: "\(goRoot.absoluteString)/bin/go") {
+            print("Downloading golang")
+            subprocess.popen("/usr/bin/curl --silent https://dl.google.com/go/go\(dependencies.goVersion).darwin-amd64.tar.gz | /usr/bin/tar xz")
+            subprocess.popen("/bin/mkdir -p \(goRoot.absoluteString)/src/github.com/10gen")
+        }
+
+        var stitchDir = buildDir.appendingPathComponent("stitch")
+        if !fileManager.fileExists(atPath: stitchDir.absoluteString) {
+            print("Cloning stitch")
+            subprocess.popen("/usr/bin/git clone git@github.com:10gen/baas \(stitchDir.absoluteString)")
+        }
+
+        let stitchWorktree = goRoot
+            .appendingPathComponent("src")
+            .appendingPathComponent("github.com")
+            .appendingPathComponent("10gen")
+            .appendingPathComponent("stitch")
+
+        if !FileManager.default.fileExists(atPath: stitchDir.appendingPathComponent(".git").absoluteString) {
+            // Fetch the BaaS version if we don't have it
+            if subprocess.popen("/usr/bin/git -C \(stitchDir) show-ref --verify --quiet").0 != 0 {
+                subprocess.popen("/usr/bin/git -C \(stitchDir) fetch")
+            }
+
+            // Set the worktree to the correct version
+            if fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
+                subprocess.popen("/usr/bin/git -C \(stitchWorktree) checkout \(dependencies.stitchVersion)")
+            } else {
+                subprocess.popen("/usr/bin/git -C \(stitchDir) worktree add \(dependencies.stitchVersion)")
+            }
+        } else {
+            // We have a stitch directory with no .get directory, meaning we're
+            // running on CI and just need to copy the files into place
+            if !fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
+                subprocess.popen("/bin/cp -Rc \(stitchDir) \(stitchWorktree)")
+            }
+        }
+        subprocess.popen("/bin/mkdir -p go/src/github.com/10gen/stitch/etc/dylib")
+        stitchDir = stitchWorktree
+        if !fileManager.fileExists(atPath: libDir.appendingPathComponent("libstitch_support.dylib").absoluteString) {
+            print("downloading mongodb dylibs")
+            subprocess.popen("/usr/bin/curl -s \(stitchSupportLibURL) | /usr/bin/tar xvfz - --strip-components=1 -C go/src/github.com/10gen/stitch/etc/dylib")
+            subprocess.popen("/bin/cp go/src/github.com/10gen/stitch/etc/dylib/lib/libstitch_support.dylib lib")
+        }
+
+        let updateDocFilepath = binDir.appendingPathComponent("update_doc")
+        if !fileManager.fileExists(atPath: updateDocFilepath.absoluteString) {
+            print("downloading update_doc")
+            subprocess.popen("/usr/bin/curl --silent -O https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7a5c9ec4432c400181c_17_10_15_01_19_33/update_doc")
+            subprocess.popen("/bin/mv update_doc bin/update_doc")
+            subprocess.popen("/bin/chmod +x \(updateDocFilepath)")
+        }
+
+        let assistedAggFilepath = binDir.appendingPathComponent("assisted_agg")
+        if !fileManager.fileExists(atPath: assistedAggFilepath.absoluteString) {
+            print("downloading assisted_agg")
+            subprocess.popen("/usr/bin/curl --silent -O https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_b1c679a26ecb975372de41238ea44e4719b8fbf0_5f3d91c10ae6066889184912_20_08_19_20_57_17/assisted_agg")
+            subprocess.popen("/bin/mv assisted_agg bin/assisted_agg")
+            subprocess.popen("/bin/chmod +x \(assistedAggFilepath)")
+        }
+
+        if !fileManager.fileExists(atPath: buildDir.appendingPathComponent("node-v\(dependencies.nodeVersion)-darwin-x64").absoluteString) {
+            print("downloading node 🚀")
+            subprocess.popen("/usr/bin/curl -O https://nodejs.org/dist/v\(dependencies.nodeVersion)/node-v\(dependencies.nodeVersion)-darwin-x64.tar.gz")
+            subprocess.popen("/usr/bin/tar xzf node-v\(dependencies.nodeVersion)-darwin-x64.tar.gz")
+        }
+        subprocess.path.append( "\(buildDir)/node-v\(dependencies.nodeVersion)-darwin-x64/bin/")
+
+        if !fileManager.fileExists(atPath: "\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin/yarn") {
+            subprocess.popen("/bin/rm -rf ~/.yarn")
+            subprocess.popen("/usr/bin/curl -o- -L https://yarnpkg.com/install.sh | /bin/bash")
+        }
+        subprocess.path.append("\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin:~/.config/yarn/global/node_modules/.bin")
+
+        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("transpiler").absoluteString) {
+            print("building transpiler")
+            subprocess.popen("\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin/yarn install",
+                 currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").absoluteString)
+            subprocess.popen("\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin/yarn run build",
+                 currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").absoluteString)
+            subprocess.popen("/bin/cp -c bin/transpiler \(buildDir)/bin", currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").absoluteString)
+        }
+
+        subprocess.environment["GOROOT"] = goRoot.absoluteString
+        subprocess.environment["GOCACHE"] = goRoot.appendingPathComponent("cache").absoluteString
+        subprocess.environment["GOPATH"] = goRoot.appendingPathComponent("bin").absoluteString
+        subprocess.environment["STITCH_PATH"] = stitchDir.absoluteString
+        subprocess.environment["LD_LIBRARY_PATH"] = libDir.absoluteString
+        subprocess.path.append(stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").appendingPathComponent("bin").absoluteString)
+
+        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("create_user").absoluteString) {
+            print("build create_user binary")
+
+            subprocess.popen("\(goRoot)/bin/go build -o create_user cmd/auth/user.go", currentDirectoryPath: stitchDir.absoluteString)
+            subprocess.popen("/bin/cp -c create_user \(binDir)", currentDirectoryPath: stitchDir.absoluteString)
+
+            print("create_user binary built")
+        }
+
+        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("stitch_server").absoluteString) {
+            print("building server binary")
+
+            subprocess.popen("\(goRoot)/bin/go build -o stitch_server cmd/server/main.go", currentDirectoryPath: stitchDir.absoluteString)
+            subprocess.popen("/bin/cp -c stitch_server \(binDir)", currentDirectoryPath: stitchDir.absoluteString)
+
+            print("server binary built")
+        }
+    }
+
+    private func buildServer() throws {
+        try! fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        if !fileManager.fileExists(atPath: buildDir.absoluteString) {
+            try! FileManager.default.createDirectory(at: URL.init(fileURLWithPath: buildDir.absoluteString,
+                                                                  isDirectory: true), withIntermediateDirectories: true)
+        }
+        try setupMongod()
+        try setupStitch()
     }
 
     fileprivate func mongoShutdownProcess() -> Process {

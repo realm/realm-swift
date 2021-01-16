@@ -428,7 +428,7 @@ static NSURL *syncDirectoryForChildProcess() {
         return [super defaultTestSuite];
 
     }
-    NSLog(@"Skipping sync tests: server is not present. Run `build.sh setup-bass` to install it.");
+    NSLog(@"Skipping sync tests: no server access.");
     return [[XCTestSuite alloc] initWithName:[super defaultTestSuite].name];
 }
 

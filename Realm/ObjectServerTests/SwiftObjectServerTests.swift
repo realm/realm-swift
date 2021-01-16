@@ -554,7 +554,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let app = App(id: appId, configuration: appConfig)
 
         let syncTimeoutOptions = SyncTimeoutOptions()
-        syncTimeoutOptions.connectTimeout = 2000
+        syncTimeoutOptions.connectTimeout = 3000
         app.syncManager.timeoutOptions = syncTimeoutOptions
 
         let user: User
@@ -569,7 +569,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // Two second timeout with a one second delay should work
         autoreleasepool {
-            proxy.delay = 1.0
+            proxy.delay = 0.5
             let ex = expectation(description: "async open")
             Realm.asyncOpen(configuration: config) { result in
                 XCTAssertNotNil(try? result.get())

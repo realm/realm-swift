@@ -78,8 +78,8 @@ public class TimeoutProxyServer: NSObject {
     private func copy(from: NWConnection, to: NWConnection) {
         from.receive(minimumIncompleteLength: 1, maximumLength: 8192) { [weak self] (data, _, _, _) in
             to.send(content: data ?? Data(), completion: .contentProcessed({ [weak self] _ in
-                            self?.copy(from: from, to: to)
-                        }))
+                self?.copy(from: from, to: to)
+            }))
         }
     }
 }
