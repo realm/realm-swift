@@ -354,20 +354,12 @@ private struct Subprocess {
         createProcesses(commandString, process: &process, processes: &processes)
 
         processes.forEach { process in
-            print(
-            """
-            Running subprocess:
-            currentDirectoryPath: \(process.currentDirectoryPath)
-            launchPath: \(process.launchPath ?? "<no launch path>")
-            arguments: \(process.arguments ?? [])
-            """)
             process.launch()
         }
         processes.forEach {
             $0.waitUntilExit()
         }
         let data = (processes.last!.standardOutput as? Pipe)?.fileHandleForReading.readDataToEndOfFile() ?? Data()
-        print("Output: \(String(data: data, encoding: .utf8) ?? "<no output>")")
         return (processes.last!.terminationStatus, String(data: data,
                                                           encoding: .utf8)!)
     }
@@ -438,7 +430,7 @@ public class RealmServer: NSObject {
 
     let fileManager = FileManager.default
     /// Log level for the server and mongo processes.
-    public var logLevel = LogLevel.info
+    public var logLevel = LogLevel.none
 
     /// Process that runs the local mongo server. Should be terminated on exit.
     private let mongoProcess = Process()
@@ -514,7 +506,6 @@ public class RealmServer: NSObject {
     }
 
     private func setupStitch() throws {
-
         print("Setting up stitch")
 
         let goRoot = buildDir.appendingPathComponent("go")
@@ -591,7 +582,6 @@ public class RealmServer: NSObject {
         if !fileManager.fileExists(atPath: buildDir.appendingPathComponent("node-v\(dependencies.nodeVersion)-darwin-x64").absoluteString) {
             print("downloading node 🚀")
             subprocess.popen("/usr/bin/curl --silent https://nodejs.org/dist/v\(dependencies.nodeVersion)/node-v\(dependencies.nodeVersion)-darwin-x64.tar.gz | /usr/bin/tar xz")
-//            subprocess.popen("/usr/bin/tar xzf node-v\(dependencies.nodeVersion)-darwin-x64.tar.gz")
         }
         subprocess.path.append( "\(buildDir)/node-v\(dependencies.nodeVersion)-darwin-x64/bin/")
 

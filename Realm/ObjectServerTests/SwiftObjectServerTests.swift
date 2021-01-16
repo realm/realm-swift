@@ -571,7 +571,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // Two second timeout with a one second delay should work
         autoreleasepool {
-            proxy.delay = 0.5
+            proxy.delay = 1.0
             let ex = expectation(description: "async open")
             Realm.asyncOpen(configuration: config) { result in
                 XCTAssertNotNil(try? result.get())
@@ -582,7 +582,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // Two second timeout with a two second delay should fail
         autoreleasepool {
-            proxy.delay = 3.0
+            proxy.delay = 3.5
             let ex = expectation(description: "async open")
             Realm.asyncOpen(configuration: config) { result in
                 guard case .failure(let error) = result else {
