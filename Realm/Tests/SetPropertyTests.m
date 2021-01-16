@@ -665,7 +665,7 @@
 
     // unmanaged object
     company = [[CompanyObject alloc] init];
-    ages = [NSMutableOrderedSet orderedSet];
+    [ages removeAllObjects];
     for (int i = 0; i < 30; ++i) {
         [ages addObject:@(i)];
         EmployeeObject *eo = [[EmployeeObject alloc] initWithValue:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
