@@ -367,6 +367,7 @@ private struct Subprocess {
             $0.waitUntilExit()
         }
         let data = (processes.last!.standardOutput as? Pipe)?.fileHandleForReading.readDataToEndOfFile() ?? Data()
+        print("Output: \(String(data: data, encoding: .utf8) ?? "<no output>")")
         return (processes.last!.terminationStatus, String(data: data,
                                                           encoding: .utf8)!)
     }
