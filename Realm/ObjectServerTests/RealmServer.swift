@@ -163,9 +163,6 @@ class Builder {
         processes.forEach {
             $0.waitUntilExit()
         }
-        if let _ = (processes.last!.standardOutput as? Pipe)?.fileHandleForReading.readDataToEndOfFile() {
-
-        }
         let data = (processes.last!.standardOutput as? Pipe)?.fileHandleForReading.readDataToEndOfFile() ?? Data()
         return (processes.last!.terminationStatus, String(data: data,
                                                           encoding: .utf8)!)
