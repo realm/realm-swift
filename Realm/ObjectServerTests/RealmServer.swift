@@ -520,13 +520,13 @@ public class RealmServer: NSObject {
             subprocess.popen("/usr/bin/git clone git@github.com:10gen/baas \(stitchDir.absoluteString)")
         }
 
+        print("checking out stitch")
         let stitchWorktree = goRoot
             .appendingPathComponent("src")
             .appendingPathComponent("github.com")
             .appendingPathComponent("10gen")
             .appendingPathComponent("stitch")
-
-        if !FileManager.default.fileExists(atPath: stitchDir.appendingPathComponent(".git").absoluteString) {
+        if FileManager.default.fileExists(atPath: stitchDir.appendingPathComponent(".git").absoluteString) {
             // Fetch the BaaS version if we don't have it
             if subprocess.popen("/usr/bin/git -C \(stitchDir) show-ref --verify --quiet").0 != 0 {
                 subprocess.popen("/usr/bin/git -C \(stitchDir) fetch")
