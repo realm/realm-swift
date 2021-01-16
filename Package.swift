@@ -163,7 +163,8 @@ let package = Package(
             name: "RealmSwiftTests",
             dependencies: ["RealmSwift", "RealmTestSupport"],
             path: "RealmSwift/Tests",
-            exclude: ["TestUtils.mm"]
+            exclude: ["TestUtils.mm"],
+            swiftSettings: combineFlags()
         ),
 
         // Object server tests have support code written in both obj-c and

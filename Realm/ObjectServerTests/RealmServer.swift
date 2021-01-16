@@ -488,7 +488,9 @@ public class RealmServer: NSObject {
                 "--dbpath", tempDir.path,
                 "--bind_ip", "localhost",
                 "--port", "26000",
-                "--replSet", "test"
+                "--replSet", "test",
+                "--fork",
+                "--logpath", "\(buildDir)/mongod.log"
             ]
             mongoProcess.standardOutput = nil
             try mongoProcess.run()
@@ -684,7 +686,9 @@ public class RealmServer: NSObject {
             "--dbpath", tempDir.path,
             "--bind_ip", "localhost",
             "--port", "26000",
-            "--replSet", "test"
+            "--replSet", "test",
+            "--fork",
+            "--logpath", "\(buildDir)/mongod.log"
         ]
         mongoProcess.standardOutput = nil
         try mongoProcess.run()
@@ -1020,12 +1024,7 @@ public class RealmServer: NSObject {
             "relationships": [:]
         ]
 
-        let rules = app.services[serviceId].rules
-        rules.post(on: group, dogRule, failOnError)
-        rules.post(on: group, personRule, failOnError)
-        rules.post(on: group, hugeSyncObjectRule, failOnError)
-        rules.post(on: group, swiftHugeSyncObjectRule, failOnError)
-        rules.post(on: group, [
+        let swiftPersonRule: [String: Any] = [
             "database": "test_data",
             "collection": "SwiftPerson",
             "roles": [[
@@ -1061,7 +1060,19 @@ public class RealmServer: NSObject {
                 "title": "SwiftPerson"
             ],
                 "relationships": [:]
-        ], failOnError)
+        ]
+
+        let rules = app.services[serviceId].rules
+
+        rules.post(on: group, dogRule, failOnError)
+        rules.post(on: group, personRule, failOnError)
+        rules.post(on: group, hugeSyncObjectRule, failOnError)
+        // When running ObjcObjectServerTests,
+        // we do not want to pull in swift schema reqs
+        #if SWIFT_PACKAGE && REALM_HAVE_COMBINE
+        rules.post(on: group, swiftHugeSyncObjectRule, failOnError)
+        rules.post(on: group, swiftPersonRule, failOnError)
+        #endif
 
         app.sync.config.put(on: group, data: [
             "development_mode_enabled": true
