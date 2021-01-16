@@ -71,7 +71,8 @@ struct Dependencies: Decodable {
 
 private let dependencies =
     try! JSONDecoder().decode(Dependencies.self,
-                              from: JSONEncoder().encode(String(data: FileManager.default.contents(atPath: rootUrl.appendingPathComponent("dependencies.list").absoluteString)!, encoding: .utf8)!.components(separatedBy: "\n").dropLast().reduce(into: [String:String](), {
+                              from: JSONEncoder().encode(String(data: FileManager.default.contents(atPath: rootUrl.appendingPathComponent("dependencies.list").absoluteString)!,
+                                                                encoding: .utf8)!.components(separatedBy: "\n").dropLast().reduce(into: [String: String](), {
     let keyValuePair = $1.split(separator: "=")
     $0[String(keyValuePair[0])] = String(keyValuePair[1])
 })))
@@ -102,7 +103,7 @@ class Builder {
     private var path = ["/bin", "/usr/bin"]
     private var _environment = [String: String]()
     private var environment: [String: String] {
-        ["PATH": path.joined(separator: ":")].merging(_environment, uniquingKeysWith: { key1, key2 in key1 })
+        ["PATH": path.joined(separator: ":")].merging(_environment, uniquingKeysWith: { key1, _ in key1 })
     }
 
     @discardableResult
@@ -227,8 +228,6 @@ class Builder {
 
 
         if !FileManager.default.fileExists(atPath: stitchDir.appendingPathComponent(".git").absoluteString) {
-
-
             // Fetch the BaaS version if we don't have it
             puts("/usr/bin/git -C \(stitchDir) show-ref --verify --quiet")
 
