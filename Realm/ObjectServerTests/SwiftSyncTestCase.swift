@@ -93,7 +93,9 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
     public func openRealm(configuration: Realm.Configuration) throws -> Realm {
         var configuration = configuration
-        configuration.objectTypes =  [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self, SwiftHugeSyncObject.self]
+        if configuration.objectTypes == nil {
+            configuration.objectTypes =  [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self, SwiftHugeSyncObject.self]
+        }
         let realm = try Realm(configuration: configuration)
         waitForDownloads(for: realm)
         return realm
@@ -101,7 +103,9 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
     public func immediatelyOpenRealm(partitionValue: String, user: User) throws -> Realm {
         var configuration = user.configuration(partitionValue: partitionValue)
-        configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self, SwiftHugeSyncObject.self]
+        if configuration.objectTypes == nil {
+            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self, SwiftHugeSyncObject.self]
+        }
         return try Realm(configuration: configuration)
     }
 

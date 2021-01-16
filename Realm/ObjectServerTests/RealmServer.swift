@@ -507,7 +507,11 @@ public class RealmServer: NSObject {
         print("Setting up stitch")
         let goRoot = buildDir.appendingPathComponent("go")
 
-        try! fileManager.createDirectory(at: libDir.fileURL, withIntermediateDirectories: true)
+        if try fileManager.contentsOfDirectory(atPath: binDir.absoluteString).count == 7 {
+            return
+        }
+
+        try fileManager.createDirectory(at: libDir.fileURL, withIntermediateDirectories: true)
         if !fileManager.fileExists(atPath: "\(goRoot.absoluteString)/bin/go") {
             print("Downloading golang")
             subprocess.popen("/usr/bin/curl --silent https://dl.google.com/go/go\(dependencies.goVersion).darwin-amd64.tar.gz | /usr/bin/tar xz")
@@ -528,7 +532,7 @@ public class RealmServer: NSObject {
             .appendingPathComponent("stitch")
         if FileManager.default.fileExists(atPath: stitchDir.appendingPathComponent(".git").absoluteString) {
             // Fetch the BaaS version if we don't have it
-            if subprocess.popen("/usr/bin/git -C \(stitchDir) show-ref --verify --quiet").0 != 0 {
+            if subprocess.popen("/usr/bin/git -C \(stitchDir) show-ref --verify --quiet \(dependencies.stitchVersion)").exitCode != 0 {
                 subprocess.popen("/usr/bin/git -C \(stitchDir) fetch")
             }
 
@@ -536,21 +540,21 @@ public class RealmServer: NSObject {
             if fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
                 subprocess.popen("/usr/bin/git -C \(stitchWorktree) checkout \(dependencies.stitchVersion)")
             } else {
-                subprocess.popen("/usr/bin/git -C \(stitchDir) worktree add \(dependencies.stitchVersion)")
+                subprocess.popen("/usr/bin/git -C \(stitchDir) worktree add \(stitchWorktree) \(dependencies.stitchVersion)")
             }
         } else {
-            // We have a stitch directory with no .get directory, meaning we're
+            // We have a stitch directory with no .git directory, meaning we're
             // running on CI and just need to copy the files into place
             if !fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
                 subprocess.popen("/bin/cp -Rc \(stitchDir) \(stitchWorktree)")
             }
         }
-        subprocess.popen("/bin/mkdir -p go/src/github.com/10gen/stitch/etc/dylib")
+        subprocess.popen("/bin/mkdir -p \(goRoot)/src/github.com/10gen/stitch/etc/dylib")
         stitchDir = stitchWorktree
         if !fileManager.fileExists(atPath: libDir.appendingPathComponent("libstitch_support.dylib").absoluteString) {
             print("downloading mongodb dylibs")
-            subprocess.popen("/usr/bin/curl -s \(stitchSupportLibURL) | /usr/bin/tar xvfz - --strip-components=1 -C go/src/github.com/10gen/stitch/etc/dylib")
-            subprocess.popen("/bin/cp go/src/github.com/10gen/stitch/etc/dylib/lib/libstitch_support.dylib lib")
+            subprocess.popen("/usr/bin/curl -s \(stitchSupportLibURL) | /usr/bin/tar xvfz - --strip-components=1 -C \(goRoot)/src/github.com/10gen/stitch/etc/dylib")
+            subprocess.popen("/bin/cp \(goRoot)/src/github.com/10gen/stitch/etc/dylib/lib/libstitch_support.dylib lib")
         }
 
         let updateDocFilepath = binDir.appendingPathComponent("update_doc")
@@ -571,8 +575,8 @@ public class RealmServer: NSObject {
 
         if !fileManager.fileExists(atPath: buildDir.appendingPathComponent("node-v\(dependencies.nodeVersion)-darwin-x64").absoluteString) {
             print("downloading node 🚀")
-            subprocess.popen("/usr/bin/curl -O https://nodejs.org/dist/v\(dependencies.nodeVersion)/node-v\(dependencies.nodeVersion)-darwin-x64.tar.gz")
-            subprocess.popen("/usr/bin/tar xzf node-v\(dependencies.nodeVersion)-darwin-x64.tar.gz")
+            subprocess.popen("/usr/bin/curl --silent https://nodejs.org/dist/v\(dependencies.nodeVersion)/node-v\(dependencies.nodeVersion)-darwin-x64.tar.gz | /usr/bin/tar xz")
+//            subprocess.popen("/usr/bin/tar xzf node-v\(dependencies.nodeVersion)-darwin-x64.tar.gz")
         }
         subprocess.path.append( "\(buildDir)/node-v\(dependencies.nodeVersion)-darwin-x64/bin/")
 
@@ -601,7 +605,7 @@ public class RealmServer: NSObject {
         if !fileManager.fileExists(atPath: binDir.appendingPathComponent("create_user").absoluteString) {
             print("build create_user binary")
 
-            subprocess.popen("\(goRoot)/bin/go build -o create_user cmd/auth/user.go", currentDirectoryPath: stitchDir.absoluteString)
+            subprocess.popen("\(goRoot)/bin/go build -modcacherw -o create_user cmd/auth/user.go", currentDirectoryPath: stitchDir.absoluteString)
             subprocess.popen("/bin/cp -c create_user \(binDir)", currentDirectoryPath: stitchDir.absoluteString)
 
             print("create_user binary built")
@@ -610,15 +614,24 @@ public class RealmServer: NSObject {
         if !fileManager.fileExists(atPath: binDir.appendingPathComponent("stitch_server").absoluteString) {
             print("building server binary")
 
-            subprocess.popen("\(goRoot)/bin/go build -o stitch_server cmd/server/main.go", currentDirectoryPath: stitchDir.absoluteString)
+            subprocess.popen("\(goRoot)/bin/go build -modcacherw -o stitch_server cmd/server/main.go", currentDirectoryPath: stitchDir.absoluteString)
             subprocess.popen("/bin/cp -c stitch_server \(binDir)", currentDirectoryPath: stitchDir.absoluteString)
 
             print("server binary built")
         }
+
+        subprocess.popen("/bin/cp stitch/etc/configs/test_config.json ./")
+        if fileManager.fileExists(atPath: goRoot.absoluteString) {
+            try fileManager.removeItem(at: goRoot.fileURL)
+        }
+        if fileManager.fileExists(atPath: buildDir.appendingPathComponent("node-v\(dependencies.nodeVersion)-darwin-x64").absoluteString) {
+            try fileManager.removeItem(at: buildDir.appendingPathComponent("node-v\(dependencies.nodeVersion)-darwin-x64").fileURL)
+        }
+        if fileManager.fileExists(atPath: mongoDir.absoluteString) { try fileManager.removeItem(at: mongoDir.fileURL) }
     }
 
     private func buildServer() throws {
-        try! fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
         if !fileManager.fileExists(atPath: buildDir.absoluteString) {
             try! FileManager.default.createDirectory(at: URL.init(fileURLWithPath: buildDir.absoluteString,
                                                                   isDirectory: true), withIntermediateDirectories: true)
@@ -694,8 +707,6 @@ public class RealmServer: NSObject {
         let libDir = buildDir.appendingPathComponent("lib").path
         let binPath = "$PATH:\(binDir)"
 
-        let stitchRoot = buildDir.path + "/go/src/github.com/10gen/stitch"
-
         // create the admin user
         let userProcess = Process()
         userProcess.environment = [
@@ -726,7 +737,7 @@ public class RealmServer: NSObject {
         serverProcess.currentDirectoryPath = tempDir.path
         serverProcess.arguments = [
             "--configFile",
-            "\(stitchRoot)/etc/configs/test_config.json"
+            "\(buildDir)/test_config.json"
         ]
 
         let pipe = Pipe()

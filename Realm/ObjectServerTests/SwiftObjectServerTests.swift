@@ -30,7 +30,9 @@ import RealmTestSupport
 extension User {
     func configuration(testName: String) -> Realm.Configuration {
         var config = self.configuration(partitionValue: testName)
-        config.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self, SwiftHugeSyncObject.self]
+        if config.objectTypes == nil {
+            config.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self, SwiftHugeSyncObject.self]
+        }
         return config
     }
 }
