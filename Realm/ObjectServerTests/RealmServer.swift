@@ -353,8 +353,15 @@ private struct Subprocess {
         process.environment = environment
         createProcesses(commandString, process: &process, processes: &processes)
 
-        processes.forEach {
-            $0.launch()
+        processes.forEach { process in
+            print(
+            """
+            Running subprocess:
+            currentDirectoryPath: \(process.currentDirectoryPath)
+            launchPath: \(process.launchPath ?? "<no launch path>")
+            arguments: \(process.arguments ?? [])
+            """)
+            process.launch()
         }
         processes.forEach {
             $0.waitUntilExit()
@@ -510,7 +517,6 @@ public class RealmServer: NSObject {
         print("Setting up stitch")
 
         let goRoot = buildDir.appendingPathComponent("go")
-        print("/bin/cp -Rc \(buildDir.appendingPathComponent("stitch")) \(goRoot.appendingPathComponent("src").appendingPathComponent("github.com").appendingPathComponent("10gen").appendingPathComponent("stitch"))")
         if try fileManager.contentsOfDirectory(atPath: binDir.absoluteString).count == 7 {
             return
         }
@@ -535,8 +541,6 @@ public class RealmServer: NSObject {
             .appendingPathComponent("github.com")
             .appendingPathComponent("10gen")
             .appendingPathComponent("stitch")
-
-
         if FileManager.default.fileExists(atPath: stitchDir.appendingPathComponent(".git").absoluteString) {
             // Fetch the BaaS version if we don't have it
             if subprocess.popen("/usr/bin/git -C \(stitchDir) show-ref --verify --quiet \(dependencies.stitchVersion)").exitCode != 0 {
@@ -551,10 +555,11 @@ public class RealmServer: NSObject {
             }
         } else {
             print("Stitch exists without .git directory– copying files from \(stitchDir) to \(stitchWorktree)")
+            print(fileManager.fileExists(atPath: stitchDir.absoluteString))
             // We have a stitch directory with no .git directory, meaning we're
             // running on CI and just need to copy the files into place
             if !fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
-                subprocess.popen("/bin/cp -Rc '\(stitchDir)' '\(stitchWorktree)'")
+                subprocess.popen("/bin/cp -Rc \(stitchDir) \(stitchWorktree)")
             }
         }
 
@@ -630,13 +635,6 @@ public class RealmServer: NSObject {
         }
 
         subprocess.popen("/bin/cp stitch/etc/configs/test_config.json ./")
-        if fileManager.fileExists(atPath: goRoot.absoluteString) {
-            try fileManager.removeItem(at: goRoot.fileURL)
-        }
-        if fileManager.fileExists(atPath: buildDir.appendingPathComponent("node-v\(dependencies.nodeVersion)-darwin-x64").absoluteString) {
-            try fileManager.removeItem(at: buildDir.appendingPathComponent("node-v\(dependencies.nodeVersion)-darwin-x64").fileURL)
-        }
-        if fileManager.fileExists(atPath: mongoDir.absoluteString) { try fileManager.removeItem(at: mongoDir.fileURL) }
     }
 
     private func buildServer() throws {
