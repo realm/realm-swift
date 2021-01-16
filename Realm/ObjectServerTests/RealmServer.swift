@@ -430,7 +430,7 @@ public class RealmServer: NSObject {
 
     let fileManager = FileManager.default
     /// Log level for the server and mongo processes.
-    public var logLevel = LogLevel.info
+    public var logLevel = LogLevel.none
 
     /// Process that runs the local mongo server. Should be terminated on exit.
     private let mongoProcess = Process()
@@ -448,7 +448,9 @@ public class RealmServer: NSObject {
 
     /// Check if the current git user is authorised to use BaaS
     @objc public class func haveServer() -> Bool {
-        return Subprocess().popen("/usr/bin/git ls-remote --exit-code --quiet git@github.com:10gen/baas").exitCode == 0
+        // FIXME: Make this dynamic
+        // return Subprocess().popen("/usr/bin/git ls-remote --exit-code --quiet git@github.com:10gen/baas").exitCode == 0
+        return true
     }
 
     private override init() {
