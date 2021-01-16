@@ -549,7 +549,6 @@ public class RealmServer: NSObject {
             }
         } else {
             print("Stitch exists without .git directory– copying files from \(stitchDir) to \(stitchWorktree)")
-            print(fileManager.fileExists(atPath: stitchDir.absoluteString))
             // We have a stitch directory with no .git directory, meaning we're
             // running on CI and just need to copy the files into place
             if !fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
