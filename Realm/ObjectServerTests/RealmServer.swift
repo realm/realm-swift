@@ -560,7 +560,7 @@ public class RealmServer: NSObject {
             // We have a stitch directory with no .git directory, meaning we're
             // running on CI and just need to copy the files into place
             if !fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
-                subprocess.popen("/bin/cp -Rc \(stitchDir) \(stitchWorktree)")
+                subprocess.popen("/bin/cp -Rc \(stitchDir.absoluteString) \(stitchWorktree.absoluteString)")
             }
         }
 
