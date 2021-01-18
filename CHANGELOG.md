@@ -22,6 +22,8 @@
 * Fast-enumerating a List after deleting the parent object would crash with an
   assertion failure rather than a more appropriate exception.
   ([Core #4114](https://github.com/realm/realm-core/issues/4114), since v5.0.0).
+* Fix an issue with the user in Functions which can be nil if no strong reference
+  is held due to it being weak.
 
 ### Compatibility
 
