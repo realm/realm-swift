@@ -23,7 +23,6 @@
   assertion failure rather than a more appropriate exception.
   ([Core #4114](https://github.com/realm/realm-core/issues/4114), since v5.0.0).
 * Fix an issue where calling a MongoDB Realm Function would never be performed as the reference to the weak `User` was lost.
-  is held due to it being weak.
 
 ### Compatibility
 
