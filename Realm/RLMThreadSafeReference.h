@@ -79,7 +79,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (instancetype)referenceWithThreadConfined:(Confined)threadConfined;
 
-- (nullable id<RLMThreadConfined>)thaw NS_REFINED_FOR_SWIFT;
 /**
  Indicates if the reference can no longer be resolved because an attempt to resolve it has already
  occurred. References can only be resolved once.
