@@ -890,7 +890,7 @@ class ObjectTests: TestCase {
     }
 
     func testFreezeUnmanaged() {
-        assertThrows(SwiftStringObject().freeze(), reason:"Unmanaged objects cannot be frozen.")
+        assertThrows(SwiftStringObject().freeze(), reason: "Unmanaged objects cannot be frozen.")
     }
 
     func testFreezeDynamicObject() {
@@ -1024,7 +1024,7 @@ class ObjectTests: TestCase {
     }
 
     func testThawUnmanaged() {
-        assertThrows(SwiftBoolObject().thaw(), reason:"Unmanaged objects cannot be thawed.")
+        assertThrows(SwiftBoolObject().thaw(), reason: "Unmanaged objects cannot be thawed.")
     }
 
     func testThawDeleted() {

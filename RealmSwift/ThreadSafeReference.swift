@@ -67,6 +67,10 @@ public protocol ThreadConfined {
     */
     func freeze() -> Self
 
+    /**
+     Returns a live (mutable) reference of this object.
+     Will return self if called on an already live object.
+     */
     func thaw() -> Self?
 }
 
