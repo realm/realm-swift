@@ -62,7 +62,7 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core", .branch("lm/set-missing-methods"))
+        .package(url: "https://github.com/realm/realm-core", .branch("master"))
     ],
     targets: [
       .target(
