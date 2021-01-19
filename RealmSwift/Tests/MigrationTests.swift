@@ -517,6 +517,14 @@ class MigrationTests: TestCase {
                 XCTAssertEqual((newObj!["boolCol"] as! Bool), true)
                 XCTAssertEqual((oldObj!["intCol"] as! Int), 123)
                 XCTAssertEqual((newObj!["intCol"] as! Int), 123)
+                XCTAssertEqual((oldObj!["int8Col"] as! Int), 123)
+                XCTAssertEqual((newObj!["int8Col"] as! Int), 123)
+                XCTAssertEqual((oldObj!["int16Col"] as! Int), 123)
+                XCTAssertEqual((newObj!["int16Col"] as! Int), 123)
+                XCTAssertEqual((oldObj!["int32Col"] as! Int), 123)
+                XCTAssertEqual((newObj!["int32Col"] as! Int), 123)
+                XCTAssertEqual((oldObj!["int64Col"] as! Int), 123)
+                XCTAssertEqual((newObj!["int64Col"] as! Int), 123)
                 XCTAssertEqual((oldObj!["intEnumCol"] as! Int), 1)
                 XCTAssertEqual((newObj!["intEnumCol"] as! Int), 1)
                 XCTAssertEqual((oldObj!["floatCol"] as! Float), 1.23 as Float)
@@ -550,6 +558,10 @@ class MigrationTests: TestCase {
                 // edit all values
                 newObj!["boolCol"] = false
                 newObj!["intCol"] = 1
+                newObj!["int8Col"] = 1
+                newObj!["int16Col"] = 1
+                newObj!["int32Col"] = 1
+                newObj!["int64Col"] = 1
                 newObj!["intEnumCol"] = IntEnum.value2.rawValue
                 newObj!["floatCol"] = 1.0
                 newObj!["doubleCol"] = 10.0
@@ -592,7 +604,7 @@ class MigrationTests: TestCase {
                 XCTAssertEqual(list.count, 1)
                 XCTAssertEqual((list[0]["boolCol"] as! Bool), false)
 
-                self.assertMatches(newObj!.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 1;\n\tintEnumCol = 3;\n\tfloatCol = 1;\n\tdoubleCol = 10;\n\tstringCol = a;\n\tbinaryCol = <.*62.*>;\n\tdateCol = 1970-01-01 00:00:02 \\+0000;\n\tdecimalCol = 5.67E10;\n\tobjectIdCol = abcdef123456abcdef123456;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftBoolObject \\{\n\t\t\tboolCol = 0;\n\t\t\\}\n\t\\);\n\\}")
+                self.assertMatches(newObj!.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 1;\n\tint8Col = 1;\n\tint16Col = 1;\n\tint32Col = 1;\n\tint64Col = 1;\n\tintEnumCol = 3;\n\tfloatCol = 1;\n\tdoubleCol = 10;\n\tstringCol = a;\n\tbinaryCol = <.*62.*>;\n\tdateCol = 1970-01-01 00:00:02 \\+0000;\n\tdecimalCol = 5.67E10;\n\tobjectIdCol = abcdef123456abcdef123456;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftBoolObject \\{\n\t\t\tboolCol = 0;\n\t\t\\}\n\t\\);\n\\}")
 
                 enumerated = true
             })
@@ -600,7 +612,7 @@ class MigrationTests: TestCase {
 
             let newObj = migration.create(SwiftObject.className())
             // swiftlint:next:disable line_length
-            self.assertMatches(newObj.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <.*61.*>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tdecimalCol = 1.23E6;\n\tobjectIdCol = 1234567890ab1234567890ab;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
+            self.assertMatches(newObj.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tint8Col = 123;\n\tint16Col = 123;\n\tint32Col = 123;\n\tint64Col = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <.*61.*>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tdecimalCol = 1.23E6;\n\tobjectIdCol = 1234567890ab1234567890ab;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
         }
 
         // refresh to update realm
@@ -610,6 +622,10 @@ class MigrationTests: TestCase {
         let object = try! Realm().objects(SwiftObject.self).first!
         XCTAssertEqual(object.boolCol, false)
         XCTAssertEqual(object.intCol, 1)
+        XCTAssertEqual(object.int8Col, 1)
+        XCTAssertEqual(object.int16Col, 1)
+        XCTAssertEqual(object.int32Col, 1)
+        XCTAssertEqual(object.int64Col, 1)
         XCTAssertEqual(object.floatCol, 1.0 as Float)
         XCTAssertEqual(object.doubleCol, 10.0)
         XCTAssertEqual(object.binaryCol, Data(bytes: "b", count: 1))

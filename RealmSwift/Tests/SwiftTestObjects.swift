@@ -32,6 +32,22 @@ class SwiftIntObject: Object {
     @objc dynamic var intCol = 0
 }
 
+class SwiftInt8Object: Object {
+    @objc dynamic var int8Col = 0
+}
+
+class SwiftInt16Object: Object {
+    @objc dynamic var int16Col = 0
+}
+
+class SwiftInt32Object: Object {
+    @objc dynamic var int32Col = 0
+}
+
+class SwiftInt64Object: Object {
+    @objc dynamic var intCol = 0
+}
+
 class SwiftLongObject: Object {
     @objc dynamic var longCol: Int64 = 0
 }
@@ -44,6 +60,10 @@ class SwiftLongObject: Object {
 class SwiftObject: Object {
     @objc dynamic var boolCol = false
     @objc dynamic var intCol = 123
+    @objc dynamic var int8Col: Int8 = 123
+    @objc dynamic var int16Col: Int16 = 123
+    @objc dynamic var int32Col: Int32 = 123
+    @objc dynamic var int64Col: Int64 = 123
     @objc dynamic var intEnumCol = IntEnum.value1
     @objc dynamic var floatCol = 1.23 as Float
     @objc dynamic var doubleCol = 12.3
@@ -59,6 +79,10 @@ class SwiftObject: Object {
         return  [
             "boolCol": false,
             "intCol": 123,
+            "int8Col": 123 as Int8,
+            "int16Col": 123 as Int16,
+            "int32Col": 123 as Int32,
+            "int64Col": 123 as Int64,
             "floatCol": 1.23 as Float,
             "doubleCol": 12.3,
             "stringCol": "a",

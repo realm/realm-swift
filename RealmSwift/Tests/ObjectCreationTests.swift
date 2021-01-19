@@ -72,6 +72,10 @@ class ObjectCreationTests: TestCase {
         let baselineValues: [String: Any] =
            ["boolCol": true,
             "intCol": 1,
+            "int8Col": 1 as Int8,
+            "int16Col": 1 as Int16,
+            "int32Col": 1 as Int32,
+            "int64Col": 1 as Int64,
             "floatCol": 1.1 as Float,
             "doubleCol": 11.1,
             "stringCol": "b",
@@ -117,7 +121,7 @@ class ObjectCreationTests: TestCase {
 
     func testInitWithArray() {
         // array with all values specified
-        let baselineValues: [Any] = [true, 1, IntEnum.value1.rawValue, 1.1 as Float,
+        let baselineValues: [Any] = [true, 1, Int8(1), Int16(1), Int32(1), Int64(1), IntEnum.value1.rawValue, 1.1 as Float,
                                      11.1, "b", "b".data(using: String.Encoding.utf8)!,
                                      Date(timeIntervalSince1970: 2), Decimal128(number: 123),
                                      ObjectId.generate(), ["boolCol": true], [[true], [false]]]
@@ -228,6 +232,10 @@ class ObjectCreationTests: TestCase {
         let baselineValues: [String: Any] = [
             "boolCol": true,
             "intCol": 1,
+            "int8Col": 1 as Int8,
+            "int16Col": 1 as Int16,
+            "int32Col": 1 as Int32,
+            "int64Col": 1 as Int64,
             "floatCol": 1.1 as Float,
             "doubleCol": 11.1,
             "stringCol": "b",
@@ -283,7 +291,7 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithArray() {
         // array with all values specified
-        let baselineValues: [Any] = [true, 1, IntEnum.value1.rawValue, 1.1 as Float,
+        let baselineValues: [Any] = [true, 1, Int8(1), Int16(1), Int32(1), Int64(1), IntEnum.value1.rawValue, 1.1 as Float,
                                      11.1, "b", "b".data(using: String.Encoding.utf8)!,
                                      Date(timeIntervalSince1970: 2), Decimal128(number: 123),
                                      ObjectId.generate(), ["boolCol": true], [[true], [false]]]
@@ -398,6 +406,10 @@ class ObjectCreationTests: TestCase {
         let values: [String: Any] = [
             "boolCol": true,
             "intCol": 1,
+            "int8Col": 1 as Int8,
+            "int16Col": 1 as Int16,
+            "int32Col": 1 as Int32,
+            "int64Col": 1 as Int64,
             "floatCol": 1.1 as Float,
             "doubleCol": 11.1,
             "stringCol": "b",
@@ -426,6 +438,10 @@ class ObjectCreationTests: TestCase {
         let values: [String: Any] = [
             "boolCol": true,
             "intCol": 1,
+            "int8Col": 1 as Int8,
+            "int16Col": 1 as Int16,
+            "int32Col": 1 as Int32,
+            "int64Col": 1 as Int64,
             "floatCol": 1.1 as Float,
             "doubleCol": 11.1,
             "stringCol": "b",
@@ -1246,14 +1262,18 @@ class ObjectCreationTests: TestCase {
                                                    boolObjectListValues: [Bool]) {
         XCTAssertEqual(object.boolCol, (array[0] as! Bool))
         XCTAssertEqual(object.intCol, (array[1] as! Int))
-        XCTAssertEqual(object.intEnumCol, IntEnum(rawValue: array[2] as! Int))
-        XCTAssertEqual(object.floatCol, (array[3] as! NSNumber).floatValue)
-        XCTAssertEqual(object.doubleCol, (array[4] as! Double))
-        XCTAssertEqual(object.stringCol, (array[5] as! String))
-        XCTAssertEqual(object.binaryCol, (array[6] as! Data))
-        XCTAssertEqual(object.dateCol, (array[7] as! Date))
-        XCTAssertEqual(object.decimalCol, Decimal128(value: array[8]))
-        XCTAssertEqual(object.objectIdCol, (array[9] as! ObjectId))
+        XCTAssertEqual(object.int8Col, (array[2] as! Int8))
+        XCTAssertEqual(object.int16Col, (array[3] as! Int16))
+        XCTAssertEqual(object.int32Col, (array[4] as! Int32))
+        XCTAssertEqual(object.int64Col, (array[5] as! Int64))
+        XCTAssertEqual(object.intEnumCol, IntEnum(rawValue: array[6] as! Int))
+        XCTAssertEqual(object.floatCol, (array[7] as! NSNumber).floatValue)
+        XCTAssertEqual(object.doubleCol, (array[8] as! Double))
+        XCTAssertEqual(object.stringCol, (array[9] as! String))
+        XCTAssertEqual(object.binaryCol, (array[10] as! Data))
+        XCTAssertEqual(object.dateCol, (array[11] as! Date))
+        XCTAssertEqual(object.decimalCol, Decimal128(value: array[12]))
+        XCTAssertEqual(object.objectIdCol, (array[13] as! ObjectId))
         XCTAssertEqual(object.objectCol!.boolCol, boolObjectValue)
         XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
         for i in 0..<boolObjectListValues.count {
@@ -1264,7 +1284,11 @@ class ObjectCreationTests: TestCase {
     private func verifySwiftObjectWithDictionaryLiteral(_ object: SwiftObject, dictionary: [String: Any],
                                                         boolObjectValue: Bool, boolObjectListValues: [Bool]) {
         XCTAssertEqual(object.boolCol, (dictionary["boolCol"] as! Bool))
-        XCTAssertEqual(object.intCol, (dictionary["intCol"] as! Int))
+        XCTAssertEqual(object.intCol, (dictionary["intCol"] as? Int))
+        XCTAssertEqual(object.int8Col, (dictionary["int8Col"] as? Int8))
+        XCTAssertEqual(object.int16Col, (dictionary["int16Col"] as? Int16))
+        XCTAssertEqual(object.int32Col, (dictionary["int32Col"] as? Int32))
+        XCTAssertEqual(object.int64Col, (dictionary["int64Col"] as? Int64))
         XCTAssertEqual(object.floatCol, (dictionary["floatCol"] as! NSNumber).floatValue)
         XCTAssertEqual(object.doubleCol, (dictionary["doubleCol"] as! Double))
         XCTAssertEqual(object.stringCol, (dictionary["stringCol"] as! String))
