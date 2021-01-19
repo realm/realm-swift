@@ -45,7 +45,7 @@ class SwiftInt32Object: Object {
 }
 
 class SwiftInt64Object: Object {
-    @objc dynamic var intCol = 0
+    @objc dynamic var int64Col = 0
 }
 
 class SwiftLongObject: Object {
@@ -186,10 +186,10 @@ class SwiftOptionalDefaultValuesObject: Object {
             "optDecimalCol": Decimal128("123"),
             "optObjectIdCol": ObjectId("1234567890ab1234567890ab"),
             "optIntCol": 1,
-            "optInt8Col": 1,
-            "optInt16Col": 1,
-            "optInt32Col": 1,
-            "optInt64Col": 1,
+            "optInt8Col": Int8(1),
+            "optInt16Col": Int16(1),
+            "optInt32Col": Int32(1),
+            "optInt64Col": Int64(1),
             "optFloatCol": 2.2 as Float,
             "optDoubleCol": 3.3,
             "optBoolCol": true
@@ -233,6 +233,10 @@ class SwiftOwnerObject: Object {
 
 class SwiftAggregateObject: Object {
     @objc dynamic var intCol = 0
+    @objc dynamic var int8Col: Int8 = 0
+    @objc dynamic var int16Col: Int16 = 0
+    @objc dynamic var int32Col: Int32 = 0
+    @objc dynamic var int64Col: Int64 = 0
     @objc dynamic var floatCol = 0 as Float
     @objc dynamic var doubleCol = 0.0
     @objc dynamic var decimalCol = 0.0 as Decimal128

@@ -245,6 +245,10 @@ class ObjectTests: TestCase {
         let test: (SwiftObject) -> Void = { object in
             XCTAssertEqual(object.value(forKey: "boolCol") as! Bool?, false)
             XCTAssertEqual(object.value(forKey: "intCol") as! Int?, 123)
+            XCTAssertEqual(object.value(forKey: "int8Col") as! Int8?, 123)
+            XCTAssertEqual(object.value(forKey: "int16Col") as! Int16?, 123)
+            XCTAssertEqual(object.value(forKey: "int32Col") as! Int32?, 123)
+            XCTAssertEqual(object.value(forKey: "int64Col") as! Int64?, 123)
             XCTAssertEqual(object.value(forKey: "floatCol") as! Float?, 1.23 as Float)
             XCTAssertEqual(object.value(forKey: "doubleCol") as! Double?, 12.3)
             XCTAssertEqual(object.value(forKey: "stringCol") as! String?, "a")
