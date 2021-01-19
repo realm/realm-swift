@@ -889,6 +889,10 @@ class ObjectTests: TestCase {
         XCTAssertTrue(frozen.isFrozen)
     }
 
+    func testFreezeUnmanaged() {
+        assertThrows(SwiftStringObject().freeze(), reason:"Unmanaged objects cannot be frozen.")
+    }
+
     func testFreezeDynamicObject() {
         let realm = try! Realm()
         try! realm.write {
@@ -1017,6 +1021,10 @@ class ObjectTests: TestCase {
 
         try! liveObj.realm!.write({ liveObj.boolCol = false })
         XCTAssertNotEqual(liveObj.boolCol, frozenObj.boolCol)
+    }
+
+    func testThawUnmanaged() {
+        assertThrows(SwiftBoolObject().thaw(), reason:"Unmanaged objects cannot be thawed.")
     }
 
     func testThawDeleted() {

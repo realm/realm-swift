@@ -838,13 +838,8 @@ import Realm.Private
      This method creates a managed accessor to a live copy of the same frozen object.
      Will return self if called on an already live object.
      */
-//    public func thaw<T: ObjectBase>(_ obj: T) -> T? {
-//        return RLMObjectThaw(obj) as? T
-//    }
-
-    public func thaw<T: ThreadConfined>(_ obj: T) -> T? {
-//        return ThreadSafeReference(to: obj).resolve(in: self.thaw())
-        return ThreadSafeReference(to: obj).thaw(in: self.thaw())
+    public func thaw<T: ObjectBase>(_ obj: T) -> T? {
+        return RLMObjectThaw(obj) as? T
     }
 
     /**
@@ -861,10 +856,6 @@ import Realm.Private
     */
     public func freeze<Collection: RealmCollection>(_ collection: Collection) -> Collection {
         return collection.freeze()
-    }
-
-    public func thaw<Collection: RealmCollection>(_ collection: Collection) -> Collection? {
-        return collection.thaw()
     }
 
     // MARK: Invalidation

@@ -66,6 +66,8 @@ public protocol ThreadConfined {
      `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
     */
     func freeze() -> Self
+
+    func thaw() -> Self?
 }
 
 /**
@@ -113,11 +115,6 @@ public protocol ThreadConfined {
     internal func resolve(in realm: Realm) -> Confined? {
         guard let objectiveCValue = realm.rlmRealm.__resolve(objectiveCReference) else { return nil }
         return ((Confined.self as! AssistedObjectiveCBridgeable.Type).bridging(from: objectiveCValue, with: swiftMetadata) as! Confined)
-    }
-
-    internal func thaw(in realm: Realm) -> Confined? {
-        guard let objectiveCvalue = objectiveCReference.__thaw() else { return nil }
-        return ((Confined.self as! AssistedObjectiveCBridgeable.Type).bridging(from: objectiveCvalue, with: swiftMetadata) as! Confined)
     }
 }
 

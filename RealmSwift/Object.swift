@@ -322,7 +322,8 @@ extension Object: ThreadConfined {
      - warning: This method can only be called on a managed object.
      */
     public func freeze() -> Self {
-        return realm!.freeze(self)
+        guard let realm = realm else { throwRealmException("Unmanaged objects cannot be frozen.") }
+        return realm.freeze(self)
     }
 
     /**
@@ -332,7 +333,8 @@ extension Object: ThreadConfined {
      Will return self if called on an already live object.
      */
     public func thaw() -> Self? {
-        return realm!.thaw(self)
+        guard let realm = realm else { throwRealmException("Unmanaged objects cannot be thawed.") }
+        return realm.thaw(self)
     }
 }
 
