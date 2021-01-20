@@ -28,6 +28,7 @@
 
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/sync/config.hpp>
+//#import <realm/object-store/sync/generic_network_transport.hpp>
 
 #if !defined(REALM_COCOA_VERSION)
 #import "RLMVersion.h"
@@ -65,30 +66,30 @@ namespace {
 
                 // Convert the RLMResponse to an app:Response and pass downstream to
                 // the object store
-                if (response.status == RLMResponseStatusSuccess) {
+                if (response.status == RLMResponseResultSuccess) {
                     auto errorCode = realm::app::make_error_code(realm::app::service_error_code_from_string([response.error.domain UTF8String]));
-                    std::optional<app::AppError> error = app::AppError(errorCode,
-                                                                       response.error.description.UTF8String,
-                                                                       "",
-                                                                       static_cast<int>(response.httpStatusCode)
-                                                                       );
+                    app::AppError error = app::AppError(errorCode,
+                                                        response.error.description.UTF8String,
+                                                        "",
+                                                        static_cast<int>(response.httpStatusCode)
+                                                        );
                     app::Response appResponse = {
-                        app::ResponseStatus::failure,
+                        app::ResponseResult::Failure,
                         static_cast<int>(response.httpStatusCode),
                         static_cast<int>(response.customStatusCode),
                         bridgingHeaders,
-                        error,
-                        std::nullopt
+                        util::Optional<app::AppError>(error),
+                        util::none
                     };
                     completion(appResponse);
                 } else {
                     app::Response appResponse = {
-                        app::ResponseStatus::success,
+                        app::ResponseResult::Success,
                         static_cast<int>(response.httpStatusCode),
                         static_cast<int>(response.customStatusCode),
                         bridgingHeaders,
-                        std::nullopt,
-                        response.body.UTF8String
+                        util::none,
+                        util::Optional<std::string>(response.body.UTF8String)
                     };
                     completion(appResponse);
                 }

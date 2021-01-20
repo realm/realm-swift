@@ -156,10 +156,10 @@ didCompleteWithError:(NSError *)error
     response.httpStatusCode = httpResponse.statusCode;
 
     if (error) {
-        response.status = RLMResponseStatusFailed;
+        response.status = RLMResponseResultFailed;
         response.error = error;
     } else {
-        response.status = RLMResponseStatusSuccess;
+        response.status = RLMResponseResultSuccess;
         response.body = [[NSString alloc] initWithData:_data encoding:NSUTF8StringEncoding];
     }
     _completionBlock(response);

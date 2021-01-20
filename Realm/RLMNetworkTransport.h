@@ -55,15 +55,15 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMHTTPMethod) {
 
 @end
 
-typedef NS_ENUM(NSUInteger, RLMResponseStatus) {
-    RLMResponseStatusSuccess,
-    RLMResponseStatusFailed,
+typedef NS_ENUM(NSUInteger, RLMResponseResult) {
+    RLMResponseResultSuccess,
+    RLMResponseResultFailed,
 };
 
 /// The contents of an HTTP response.
 @interface RLMResponse : NSObject
 
-@property (nonatomic, assign) RLMResponseStatus status;
+@property (nonatomic, assign) RLMResponseResult status;
 
 /// The status code of the HTTP response.
 @property (nonatomic, assign) NSInteger httpStatusCode;

@@ -166,7 +166,7 @@
 - (void)sendRequestToServer:(RLMRequest *)request completion:(RLMNetworkTransportCompletionBlock)completionBlock {
     if ([request.url hasSuffix:@"location"]) {
         RLMResponse *r = [RLMResponse new];
-        r.status = RLMResponseStatusSuccess;
+        r.status = RLMResponseResultSuccess;
         r.httpStatusCode = 200;
         r.body = @"{\"deployment_model\":\"GLOBAL\",\"location\":\"US-VA\",\"hostname\":\"http://localhost:5678\",\"ws_hostname\":\"ws://localhost:5678\"}";
         completionBlock(r);
