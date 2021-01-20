@@ -153,38 +153,22 @@ bool RLMIsSwiftObjectClass(Class cls) {
 BOOL RLMValidateValue(__unsafe_unretained id const value,
                       RLMPropertyType type,
                       bool optional,
-                      RLMCollectionType collectionType,
+                      bool collection,
                       __unsafe_unretained NSString *const objectClassName) {
     if (optional && !RLMCoerceToNil(value)) {
         return YES;
     }
-    if (collectionType == RLMCollectionTypeArray) {
+
+    if (collection) {
         if (auto rlmArray = asRLMArray(value)) {
             return checkArrayType(rlmArray, type, optional, objectClassName);
-        }
-        if (id enumeration = RLMAsFastEnumeration(value)) {
-            // check each element for compliance
-            for (id el in enumeration) {
-                if (!RLMValidateValue(el, type, optional, RLMCollectionTypeNone, objectClassName)) {
-                    return NO;
-                }
-            }
-            return YES;
-        }
-        if (!value || value == NSNull.null) {
-            return YES;
-        }
-        return NO;
-    }
-
-    if (collectionType == RLMCollectionTypeSet) {
-        if (auto rlmSet = asRLMSet(value)) {
+        } else if (auto rlmSet = asRLMSet(value)) {
             return checkSetType(rlmSet, type, optional, objectClassName);
         }
         if (id enumeration = RLMAsFastEnumeration(value)) {
             // check each element for compliance
             for (id el in enumeration) {
-                if (!RLMValidateValue(el, type, optional, RLMCollectionTypeNone, objectClassName)) {
+                if (!RLMValidateValue(el, type, optional, false, objectClassName)) {
                     return NO;
                 }
             }
@@ -300,7 +284,7 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
         }
 
         for (id value in enumeration) {
-            if (!RLMValidateValue(value, prop.type, prop.optional, RLMCollectionTypeNone, prop.objectClassName)) {
+            if (!RLMValidateValue(value, prop.type, prop.optional, false, prop.objectClassName)) {
                 RLMThrowTypeError(value, objectSchema, prop);
             }
         }
@@ -323,12 +307,10 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
 
 BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
                                  __unsafe_unretained RLMProperty *const property) {
-    RLMCollectionType collectionType = property.array ? RLMCollectionTypeArray :
-                                        (property.set ? RLMCollectionTypeSet : RLMCollectionTypeNone);
     return RLMValidateValue(obj,
                             property.type,
                             property.optional,
-                            collectionType,
+                            property.collection,
                             property.objectClassName);
 }
 
