@@ -200,23 +200,14 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     value = RLMCoerceToNil(value);
     RLMProperty *property = _objectSchema[key];
     if (Ivar ivar = property.swiftIvar) {
-        if (property.array) {
+        if (property.collection) {
             value = RLMAsFastEnumeration(value);
-            RLMArray *array = [object_getIvar(self, ivar) _rlmArray];
-            [array removeAllObjects];
+            id collection = property.array ?
+                [object_getIvar(self, ivar) _rlmArray] : [object_getIvar(self, ivar) _rlmSet];
+            [collection removeAllObjects];
 
             if (value) {
-                [array addObjects:validatedObjectForProperty(value, _objectSchema, property,
-                                                             RLMSchema.partialPrivateSharedSchema)];
-            }
-        }
-        else if (property.set) {
-            value = RLMAsFastEnumeration(value);
-            RLMSet *set = [object_getIvar(self, ivar) _rlmSet];
-            [set removeAllObjects];
-
-            if (value) {
-                [set addObjects:validatedObjectForProperty(value, _objectSchema, property,
+                [collection addObjects:validatedObjectForProperty(value, _objectSchema, property,
                                                            RLMSchema.partialPrivateSharedSchema)];
             }
         }
