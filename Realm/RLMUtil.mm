@@ -115,17 +115,17 @@ static inline RLMSet *asRLMSet(__unsafe_unretained id const value) {
 }
 
 static inline bool checkArrayType(__unsafe_unretained RLMArray *const array,
-                                       RLMPropertyType type,
-                                       bool optional,
-                                       __unsafe_unretained NSString *const objectClassName) {
+                                  RLMPropertyType type,
+                                  bool optional,
+                                  __unsafe_unretained NSString *const objectClassName) {
     return array.type == type && array.optional == optional
     && (type != RLMPropertyTypeObject || [array.objectClassName isEqualToString:objectClassName]);
 }
 
 static inline bool checkSetType(__unsafe_unretained RLMSet *const set,
-                                       RLMPropertyType type,
-                                       bool optional,
-                                       __unsafe_unretained NSString *const objectClassName) {
+                                RLMPropertyType type,
+                                bool optional,
+                                __unsafe_unretained NSString *const objectClassName) {
     return set.type == type && set.optional == optional
     && (type != RLMPropertyTypeObject || [set.objectClassName isEqualToString:objectClassName]);
 }
