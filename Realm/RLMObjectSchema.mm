@@ -163,7 +163,7 @@ using namespace realm;
             schema.primaryKeyProperty.type != RLMPropertyTypeString &&
             schema.primaryKeyProperty.type != RLMPropertyTypeObjectId &&
             schema.primaryKeyProperty.type != RLMPropertyTypeUUID) {
-            @throw RLMException(@"Property '%@' cannot be made the primary key of '%@' because it is not a 'string', 'int', or 'objectId' property.",
+            @throw RLMException(@"Property '%@' cannot be made the primary key of '%@' because it is not a 'string', 'int', 'objectId', or 'uuid' property.",
                                 primaryKey, className);
         }
     }
@@ -366,7 +366,7 @@ using namespace realm;
 
     NSMutableArray *genericProperties = [NSMutableArray new];
     for (RLMProperty *prop in _properties) {
-        if (prop->_swiftIvar) {
+        if (prop.swiftAccessor) {
             [genericProperties addObject:prop];
         }
     }

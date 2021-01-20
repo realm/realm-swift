@@ -24,7 +24,6 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObservation.hpp"
-#import "RLMSwiftValueStorage.h"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
@@ -186,11 +185,8 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 // Generic Swift properties can't be dynamic, so KVO doesn't work for them by default
 - (id)valueForUndefinedKey:(NSString *)key {
     RLMProperty *prop = _objectSchema[key];
-    if (Class accessor = prop.swiftAccessor) {
-        return [accessor get:(char *)(__bridge void *)self + ivar_getOffset(prop.swiftIvar)];
-    }
-    if (Ivar ivar = prop.swiftIvar) {
-        return RLMCoerceToNil(object_getIvar(self, ivar));
+    if (Class swiftAccessor = prop.swiftAccessor) {
+        return RLMCoerceToNil([swiftAccessor get:prop on:self]);
     }
     return [super valueForUndefinedKey:key];
 }
@@ -198,23 +194,18 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key {
     value = RLMCoerceToNil(value);
     RLMProperty *property = _objectSchema[key];
-    if (Ivar ivar = property.swiftIvar) {
-        if (property.collection) {
-            value = RLMAsFastEnumeration(value);
-            id collection = [object_getIvar(self, ivar) _rlmCollection];
-            [collection removeAllObjects];
-
-            if (value) {
-                [collection addObjects:validatedObjectForProperty(value, _objectSchema, property,
-                                                                  RLMSchema.partialPrivateSharedSchema)];
-            }
+    if (property.collection) {
+        if (id enumerable = RLMAsFastEnumeration(value)) {
+            value = validatedObjectForProperty(value, _objectSchema, property,
+                                               RLMSchema.partialPrivateSharedSchema);
         }
-        else if (property.optional || (property.type == RLMPropertyTypeAny)) {
-            RLMSetSwiftValueStorage(object_getIvar(self, ivar), value);
-        }
-        return;
     }
-    [super setValue:value forUndefinedKey:key];
+    if (auto swiftAccessor = property.swiftAccessor) {
+        [swiftAccessor set:property on:self to:value];
+    }
+    else {
+        [super setValue:value forUndefinedKey:key];
+    }
 }
 
 // overridden at runtime per-class for performance

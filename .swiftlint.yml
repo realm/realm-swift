@@ -12,6 +12,7 @@ identifier_name:
     warning: 0
     error: 0
   excluded:
+    - _id
     - _nilValue()
     - _nsError
     - _nsErrorDomain
@@ -19,12 +20,15 @@ identifier_name:
     - _realmColumnNames()
     - _realmObjectName()
     - _rlmArray()
-    - _rlmSet()
     - _rlmCollection()
+    - _rlmFromRawValue(_:)
+    - _rlmPopulateProperty(_:)
+    - _rlmRequireObjc()
+    - _rlmSet()
+    - _rlmToRawValue(_:)
     - id
     - pk
     - to
-    - _id
 disabled_rules:
   - block_based_kvo
   # SwiftLint expects a space following a double slash comment: "//".

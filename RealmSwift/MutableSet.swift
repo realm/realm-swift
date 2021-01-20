@@ -380,6 +380,10 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
         return Element._rlmSet()
     }
 
+    @objc public override class func _backingCollectionType() -> AnyClass {
+        return RLMManagedSet.self
+    }
+
     // Printable requires a description property defined in Swift (and not obj-c),
     // and it has to be defined as override, which can't be done in a
     // generic class.
@@ -434,12 +438,6 @@ extension MutableSet: RealmCollection {
     /// Returns a `RLMIterator` that yields successive elements in the `MutableSet`.
     public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: rlmSet)
-    }
-
-    /// :nodoc:
-    // swiftlint:disable:next identifier_name
-    public func _asNSFastEnumerator() -> Any {
-        return rlmSet
     }
 
     /// The position of the first element in a non-empty collection.

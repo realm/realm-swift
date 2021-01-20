@@ -36,15 +36,15 @@ FOUNDATION_EXTERN void RLMSetSwiftValueStorage(RLMSwiftValueStorage *, id _Nulla
 /// Initialises managed accessors on an instance of `RLMSwiftValueStorage`
 /// @param parent The enclosing parent object.
 /// @param prop The property which this class represents.
-void RLMInitializeManagedSwiftValueStorage(RLMSwiftValueStorage *,
-                                           RLMObjectBase *parent,
-                                           RLMProperty *prop);
+FOUNDATION_EXTERN void RLMInitializeManagedSwiftValueStorage(RLMSwiftValueStorage *,
+                                                             RLMObjectBase *parent,
+                                                             RLMProperty *prop);
 
 /// Initialises unmanaged accessors on an instance of `RLMSwiftValueStorage`
 /// @param parent The enclosing parent object.
 /// @param prop The property which this class represents.
-void RLMInitializeUnmanagedSwiftValueStorage(RLMSwiftValueStorage *,
-                                             RLMObjectBase *parent,
-                                             RLMProperty *prop);
+FOUNDATION_EXTERN void RLMInitializeUnmanagedSwiftValueStorage(RLMSwiftValueStorage *,
+                                                               RLMObjectBase *parent,
+                                                               RLMProperty *prop);
 
 NS_ASSUME_NONNULL_END

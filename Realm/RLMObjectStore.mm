@@ -23,7 +23,6 @@
 #import "RLMObservation.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMSwiftValueStorage.h"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
@@ -93,27 +92,7 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
     }
 
     for (RLMProperty *prop in object->_objectSchema.swiftGenericProperties) {
-        if (prop.type == RLMPropertyTypeLinkingObjects) {
-            [prop.swiftAccessor initializeObject:(char *)(__bridge void *)object + ivar_getOffset(prop.swiftIvar)
-                                          parent:object property:prop];
-        }
-        else if (prop.collection) {
-            id ivar = object_getIvar(object, prop.swiftIvar);
-            Class cls;
-            if (prop.array) {
-                cls = [RLMManagedArray class];
-            } else if (prop.set) {
-                cls = [RLMManagedSet class];
-            } else {
-                REALM_UNREACHABLE();
-            }
-            id managedCollection = [[cls alloc] initWithParent:object property:prop];
-            [ivar set_rlmCollection:managedCollection];
-        }
-        else if ([object_getIvar(object, prop.swiftIvar) isKindOfClass:[RLMSwiftValueStorage class]]) {
-            id ivar = object_getIvar(object, prop.swiftIvar);
-            RLMInitializeManagedSwiftValueStorage(ivar, object, prop);
-        }
+        [prop.swiftAccessor initialize:prop on:object];
     }
 }
 

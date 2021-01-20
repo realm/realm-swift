@@ -418,7 +418,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Binding where Value: ObjectBase & ThreadConfined {
     /// :nodoc:
-    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _ManagedPropertyType {
+    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> {
         createBinding(wrappedValue, forKeyPath: member)
     }
 }
@@ -539,7 +539,7 @@ extension ThreadConfined where Self: ObjectBase {
      - parameter keyPath The key path to the member property.
      - returns A `Binding` to the member property.
      */
-    public func bind<V: _ManagedPropertyType>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V> {
+    public func bind<V>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V> {
         createBinding(self.realm != nil ? self.thaw() ?? self : self, forKeyPath: keyPath)
     }
 }

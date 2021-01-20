@@ -64,7 +64,6 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
 @interface RLMProperty () {
 @public
     RLMPropertyType _type;
-    Ivar _swiftIvar;
 }
 
 - (instancetype)initWithName:(NSString *)name
