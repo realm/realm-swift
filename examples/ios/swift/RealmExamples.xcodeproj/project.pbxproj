@@ -237,7 +237,7 @@
 		53454CE624EAC45700678E48 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		53454CE824EAC45700678E48 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		53454CE924EAC45700678E48 /* AppClip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppClip.entitlements; sourceTree = "<group>"; };
-		9C318E8C1CA42C7800879076 /* GettingStarted.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = GettingStarted.playground; sourceTree = "<group>"; };
+		9C318E8C1CA42C7800879076 /* GettingStarted.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = GettingStarted.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		C07E5D791B15001500ED625C /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFEDF00724B72622007FF10A /* AppleAuthentication.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AppleAuthentication.app; sourceTree = BUILT_PRODUCTS_DIR; };

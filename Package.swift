@@ -62,7 +62,7 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core", .branch("em/tv-src-version"))
+        .package(url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
     ],
     targets: [
       .target(
@@ -149,6 +149,7 @@ let package = Package(
             path: "Realm/Tests",
             exclude: [
                 "Swift",
+                "SwiftUITestHost",
                 "TestHost",
                 "PrimitiveArrayPropertyTests.tpl.m",
             ],
@@ -207,6 +208,12 @@ let package = Package(
                 "RLMObjectServerTests.mm",
                 "RLMWatchTestUtility.m"
             ],
+            cxxSettings: testCxxSettings
+        ),
+        .testTarget(
+            name: "SwiftUIIntegrationTests",
+            dependencies: ["RealmSwift"],
+            path: "SwiftUITests",
             cxxSettings: testCxxSettings
         )
     ],

@@ -1,20 +1,20 @@
 ////////////////////////////////////////////////////////////////////////////
- //
- // Copyright 2020 Realm Inc.
- //
- // Licensed under the Apache License, Version 2.0 (the "License");
- // you may not use this file except in compliance with the License.
- // You may obtain a copy of the License at
- //
- // http://www.apache.org/licenses/LICENSE-2.0
- //
- // Unless required by applicable law or agreed to in writing, software
- // distributed under the License is distributed on an "AS IS" BASIS,
- // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- // See the License for the specific language governing permissions and
- // limitations under the License.
- //
- ////////////////////////////////////////////////////////////////////////////
+//
+// Copyright 2020 Realm Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
 
 import RealmSwift
 import SwiftUI
@@ -63,9 +63,10 @@ struct DogList: View {
 
     var body: some View {
         List {
-            // Using the `$` will bind the Dog List to the view
+            // Bind the dogs to the view
             ForEach(dogs) { dog in
-                TextField("dog name", text: bind(dog, \.name))
+                // bind the dog name to the TextField for easy modifications
+                TextField("dog name", text: dog.bind(keyPath: \.name))
             }
             // the remove method on the dogs list
             // will implicitly write and remove the dogs
@@ -92,7 +93,8 @@ struct PersonDetailView: View {
             List {
                 // Bind the dog list to the view
                 ForEach(person.dogs) { dog in
-                    TextField("dog name", text: bind(dog, \.name))
+                    // bind the dog name to view for easy modifying
+                    TextField("dog name", text: dog.bind(keyPath: \.name))
                 }
                 // the remove method on the dogs list
                 // will implicitly write and remove the dogs

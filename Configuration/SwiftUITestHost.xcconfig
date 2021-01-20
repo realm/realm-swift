@@ -1,0 +1,15 @@
+SUPPORTED_PLATFORMS = macosx
+
+CODE_SIGN_IDENTITY = "Don’t Code Sign";
+AD_HOC_CODE_SIGNING_ALLOWED = YES;
+CODE_SIGNING_REQUIRED = NO;
+
+PRODUCT_BUNDLE_IDENTIFIER = io.realm.SwiftUITestHost;
+
+OTHER_LDFLAGS[sdk=macosx*] = -framework $(REALM_UI_FRAMEWORK_$(RESOURCES_UI_FRAMEWORK_FAMILY));
+OTHER_LDFLAGS[sdk=macosx*] = -framework SwiftUI;
+LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks;
+
+MACOS_DEPLOYMENT_TARGET = 11.0;
+
+CODE_SIGNING_ALLOWED=NO

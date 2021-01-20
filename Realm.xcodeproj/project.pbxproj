@@ -235,11 +235,11 @@
 		49E12CF3245DB7E800359DF1 /* RLMBSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 49E12CF1245DB7E800359DF1 /* RLMBSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		49E12CF5245DBF8A00359DF1 /* RLMBSON_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 49E12CF4245DBF8A00359DF1 /* RLMBSON_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		49E12CF6245DBF8A00359DF1 /* RLMBSON_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 49E12CF4245DBF8A00359DF1 /* RLMBSON_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
+		53124ABB25B71AF600771CE4 /* SwiftUITestHostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53124ABA25B71AF600771CE4 /* SwiftUITestHostApp.swift */; };
+		53124AD925B71AF700771CE4 /* SwiftUITestHostUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53124AD825B71AF700771CE4 /* SwiftUITestHostUITests.swift */; };
 		532E916F24AA533A003FD9DB /* TimeoutProxyServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532E916E24AA533A003FD9DB /* TimeoutProxyServer.swift */; };
 		5346E7322487AC9D00595C68 /* RLMBSONTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5346E7312487AC9D00595C68 /* RLMBSONTests.mm */; };
 		535EA9E225B0919800DBF3CD /* SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535EA9E125B0919800DBF3CD /* SwiftUI.swift */; };
-		535EAA1125B0AEF500DBF3CD /* SwiftUITestHostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535EAA1025B0AEF500DBF3CD /* SwiftUITestHostApp.swift */; };
-		535EAA6225B0AFA600DBF3CD /* SwiftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535EAA6125B0AFA600DBF3CD /* SwiftUITests.swift */; };
 		535EAA7525B0B02B00DBF3CD /* SwiftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535EAA7425B0B02B00DBF3CD /* SwiftUITests.swift */; };
 		537130C824A9E417001FDBBC /* RealmServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537130C724A9E417001FDBBC /* RealmServer.swift */; };
 		53CCC6C4257EC8A300A8FC50 /* RLMApp_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53CCC6C3257EC8A300A8FC50 /* RLMApp_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -517,21 +517,21 @@
 			remoteGlobalIDString = 49E57A16245C3F31004AF428;
 			remoteInfo = "Download BaaS";
 		};
-		535EAA4F25B0AF8300DBF3CD /* PBXContainerItemProxy */ = {
+		534DF4CF25B86F3A00655AE2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 53124AB725B71AF600771CE4;
+			remoteInfo = SwiftUITestHost;
+		};
+		537689AB24A7DD060008E57B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 5D660FCB1BE98C560021E04F;
 			remoteInfo = RealmSwift;
 		};
-		535EAA6425B0AFA600DBF3CD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 535EAA0D25B0AEF500DBF3CD;
-			remoteInfo = SwiftUITestHost;
-		};
-		537689AB24A7DD060008E57B /* PBXContainerItemProxy */ = {
+		53BBF08C25B7436F00D225AD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
 			proxyType = 1;
@@ -784,15 +784,16 @@
 		49E12CEF245DB7CC00359DF1 /* RLMBSON.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMBSON.mm; sourceTree = "<group>"; };
 		49E12CF1245DB7E800359DF1 /* RLMBSON.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMBSON.h; sourceTree = "<group>"; };
 		49E12CF4245DBF8A00359DF1 /* RLMBSON_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMBSON_Private.hpp; sourceTree = "<group>"; };
+		53124A4F25B714EC00771CE4 /* SwiftUITestHost.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SwiftUITestHost.xcconfig; sourceTree = "<group>"; };
+		53124AB825B71AF600771CE4 /* SwiftUITestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUITestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		53124ABA25B71AF600771CE4 /* SwiftUITestHostApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUITestHostApp.swift; sourceTree = "<group>"; };
+		53124AC325B71AF700771CE4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		53124AD425B71AF700771CE4 /* SwiftUITestHostUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUITestHostUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		53124AD825B71AF700771CE4 /* SwiftUITestHostUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUITestHostUITests.swift; sourceTree = "<group>"; };
+		53124ADA25B71AF700771CE4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		532E916E24AA533A003FD9DB /* TimeoutProxyServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimeoutProxyServer.swift; path = Realm/ObjectServerTests/TimeoutProxyServer.swift; sourceTree = "<group>"; };
 		5346E7312487AC9D00595C68 /* RLMBSONTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMBSONTests.mm; path = Realm/ObjectServerTests/RLMBSONTests.mm; sourceTree = "<group>"; };
 		535EA9E125B0919800DBF3CD /* SwiftUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUI.swift; sourceTree = "<group>"; };
-		535EAA0E25B0AEF500DBF3CD /* SwiftUITestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUITestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		535EAA1025B0AEF500DBF3CD /* SwiftUITestHostApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUITestHostApp.swift; sourceTree = "<group>"; };
-		535EAA1925B0AEF600DBF3CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		535EAA5F25B0AFA600DBF3CD /* SwiftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		535EAA6125B0AFA600DBF3CD /* SwiftUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUITests.swift; sourceTree = "<group>"; };
-		535EAA6325B0AFA600DBF3CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		535EAA7425B0B02B00DBF3CD /* SwiftUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUITests.swift; sourceTree = "<group>"; };
 		536B7C0B24A4C223006B535D /* dependencies.list */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dependencies.list; sourceTree = "<group>"; };
 		537130C724A9E417001FDBBC /* RealmServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RealmServer.swift; path = Realm/ObjectServerTests/RealmServer.swift; sourceTree = "<group>"; };
@@ -910,7 +911,7 @@
 		E81A1F651955FC9300FDED82 /* RLMArray_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMArray_Private.hpp; sourceTree = "<group>"; };
 		E81A1F661955FC9300FDED82 /* RLMArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMArray.h; sourceTree = "<group>"; };
 		E81A1F671955FC9300FDED82 /* RLMArray.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMArray.mm; sourceTree = "<group>"; };
-		E81A1F691955FC9300FDED82 /* RLMManagedArray.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = RLMManagedArray.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		E81A1F691955FC9300FDED82 /* RLMManagedArray.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = RLMManagedArray.mm; sourceTree = "<group>"; };
 		E81A1F6A1955FC9300FDED82 /* RLMResults.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = RLMResults.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		E81A1F6B1955FC9300FDED82 /* RLMConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMConstants.h; sourceTree = "<group>"; };
 		E81A1F6C1955FC9300FDED82 /* RLMConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMConstants.m; sourceTree = "<group>"; };
@@ -951,7 +952,7 @@
 		E82FA60A195632F20043A3C3 /* SwiftArrayPropertyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SwiftArrayPropertyTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E82FA60B195632F20043A3C3 /* SwiftArrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SwiftArrayTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E82FA60D195632F20043A3C3 /* SwiftLinkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SwiftLinkTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		E82FA60F195632F20043A3C3 /* SwiftObjectInterfaceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SwiftObjectInterfaceTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		E82FA60F195632F20043A3C3 /* SwiftObjectInterfaceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SwiftObjectInterfaceTests.swift; sourceTree = "<group>"; };
 		E83591931B3DF05C0035F2F3 /* RLMAnalytics.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAnalytics.mm; sourceTree = "<group>"; };
 		E83591941B3DF05C0035F2F3 /* RLMAnalytics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMAnalytics.hpp; sourceTree = "<group>"; };
 		E83AF538196DDE58002275B2 /* SwiftDynamicTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftDynamicTests.swift; sourceTree = "<group>"; };
@@ -1004,14 +1005,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		535EAA0B25B0AEF500DBF3CD /* Frameworks */ = {
+		53124AB525B71AF600771CE4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		535EAA5C25B0AFA600DBF3CD /* Frameworks */ = {
+		53124AD125B71AF700771CE4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1167,22 +1168,22 @@
 			name = "Test Utils";
 			sourceTree = "<group>";
 		};
-		535EAA0F25B0AEF500DBF3CD /* SwiftUITestHost */ = {
+		53124AB925B71AF600771CE4 /* SwiftUITestHost */ = {
 			isa = PBXGroup;
 			children = (
-				535EAA1025B0AEF500DBF3CD /* SwiftUITestHostApp.swift */,
-				535EAA1925B0AEF600DBF3CD /* Info.plist */,
+				53124ABA25B71AF600771CE4 /* SwiftUITestHostApp.swift */,
+				53124AC325B71AF700771CE4 /* Info.plist */,
 			);
 			path = SwiftUITestHost;
 			sourceTree = "<group>";
 		};
-		535EAA6025B0AFA600DBF3CD /* SwiftUITests */ = {
+		53124AD725B71AF700771CE4 /* SwiftUITestHostUITests */ = {
 			isa = PBXGroup;
 			children = (
-				535EAA6125B0AFA600DBF3CD /* SwiftUITests.swift */,
-				535EAA6325B0AFA600DBF3CD /* Info.plist */,
+				53124AD825B71AF700771CE4 /* SwiftUITestHostUITests.swift */,
+				53124ADA25B71AF700771CE4 /* Info.plist */,
 			);
-			path = SwiftUITests;
+			path = SwiftUITestHostUITests;
 			sourceTree = "<group>";
 		};
 		5D659E6C1BE03981006515A0 /* Realm */ = {
@@ -1207,6 +1208,7 @@
 				5D659E6F1BE0398E006515A0 /* Release.xcconfig */,
 				3F35027722C43C5200FDC1E5 /* TestHost-static.xcconfig */,
 				5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */,
+				53124A4F25B714EC00771CE4 /* SwiftUITestHost.xcconfig */,
 			);
 			path = Configuration;
 			sourceTree = "<group>";
@@ -1432,7 +1434,8 @@
 			isa = PBXGroup;
 			children = (
 				5D660FB71BE98B770021E04F /* Configuration */,
-				535EAA6025B0AFA600DBF3CD /* SwiftUITests */,
+				53124AB925B71AF600771CE4 /* SwiftUITestHost */,
+				53124AD725B71AF700771CE4 /* SwiftUITestHostUITests */,
 				1A7B82361D51254600750296 /* Frameworks */,
 				E81A1FB41955FCE000FDED82 /* LICENSE */,
 				E8267FEF1D90B7B100E001C7 /* Object Server Tests */,
@@ -1460,8 +1463,8 @@
 				3F9D91872152D42F00474F09 /* TestHost static.app */,
 				3F1A5E721992EB7400F45F4C /* TestHost.app */,
 				E8D89BA31955FC6D00CF2B9A /* Tests.xctest */,
-				535EAA0E25B0AEF500DBF3CD /* SwiftUITestHost.app */,
-				535EAA5F25B0AFA600DBF3CD /* SwiftUITests.xctest */,
+				53124AB825B71AF600771CE4 /* SwiftUITestHost.app */,
+				53124AD425B71AF700771CE4 /* SwiftUITestHostUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1580,7 +1583,6 @@
 				E81A20061955FE1600FDED82 /* Objective-C */,
 				E8D89BA81955FC6D00CF2B9A /* Supporting Files */,
 				E81A1FC81955FE0100FDED82 /* Swift */,
-				535EAA0F25B0AEF500DBF3CD /* SwiftUITestHost */,
 				3F1A5E731992EB7400F45F4C /* TestHost */,
 			);
 			name = "Realm Tests";
@@ -1783,40 +1785,40 @@
 			productReference = 3F9D91872152D42F00474F09 /* TestHost static.app */;
 			productType = "com.apple.product-type.application";
 		};
-		535EAA0D25B0AEF500DBF3CD /* SwiftUITestHost */ = {
+		53124AB725B71AF600771CE4 /* SwiftUITestHost */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 535EAA1A25B0AEF600DBF3CD /* Build configuration list for PBXNativeTarget "SwiftUITestHost" */;
+			buildConfigurationList = 53124ADB25B71AF700771CE4 /* Build configuration list for PBXNativeTarget "SwiftUITestHost" */;
 			buildPhases = (
-				535EAA0A25B0AEF500DBF3CD /* Sources */,
-				535EAA0B25B0AEF500DBF3CD /* Frameworks */,
-				535EAA0C25B0AEF500DBF3CD /* Resources */,
+				53124AB425B71AF600771CE4 /* Sources */,
+				53124AB525B71AF600771CE4 /* Frameworks */,
+				53124AB625B71AF600771CE4 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				535EAA5025B0AF8300DBF3CD /* PBXTargetDependency */,
+				53BBF08D25B7436F00D225AD /* PBXTargetDependency */,
 			);
 			name = SwiftUITestHost;
 			productName = SwiftUITestHost;
-			productReference = 535EAA0E25B0AEF500DBF3CD /* SwiftUITestHost.app */;
+			productReference = 53124AB825B71AF600771CE4 /* SwiftUITestHost.app */;
 			productType = "com.apple.product-type.application";
 		};
-		535EAA5E25B0AFA600DBF3CD /* SwiftUITests */ = {
+		53124AD325B71AF700771CE4 /* SwiftUITestHostUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 535EAA6625B0AFA600DBF3CD /* Build configuration list for PBXNativeTarget "SwiftUITests" */;
+			buildConfigurationList = 53124AE125B71AF700771CE4 /* Build configuration list for PBXNativeTarget "SwiftUITestHostUITests" */;
 			buildPhases = (
-				535EAA5B25B0AFA600DBF3CD /* Sources */,
-				535EAA5C25B0AFA600DBF3CD /* Frameworks */,
-				535EAA5D25B0AFA600DBF3CD /* Resources */,
+				53124AD025B71AF700771CE4 /* Sources */,
+				53124AD125B71AF700771CE4 /* Frameworks */,
+				53124AD225B71AF700771CE4 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				535EAA6525B0AFA600DBF3CD /* PBXTargetDependency */,
+				534DF4D025B86F3A00655AE2 /* PBXTargetDependency */,
 			);
-			name = SwiftUITests;
-			productName = SwiftUITests;
-			productReference = 535EAA5F25B0AFA600DBF3CD /* SwiftUITests.xctest */;
+			name = SwiftUITestHostUITests;
+			productName = SwiftUITestHostUITests;
+			productReference = 53124AD425B71AF700771CE4 /* SwiftUITestHostUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		5D659E7D1BE04556006515A0 /* Realm */ = {
@@ -1993,12 +1995,12 @@
 						DevelopmentTeam = 2Z8M9MTEVV;
 						ProvisioningStyle = Automatic;
 					};
-					535EAA0D25B0AEF500DBF3CD = {
+					53124AB725B71AF600771CE4 = {
 						CreatedOnToolsVersion = 12.3;
 					};
-					535EAA5E25B0AFA600DBF3CD = {
+					53124AD325B71AF700771CE4 = {
 						CreatedOnToolsVersion = 12.3;
-						TestTargetID = 535EAA0D25B0AEF500DBF3CD;
+						TestTargetID = 53124AB725B71AF600771CE4;
 					};
 					5D659E7D1BE04556006515A0 = {
 						LastSwiftMigration = 1170;
@@ -2065,8 +2067,8 @@
 				3F1A5E711992EB7400F45F4C /* TestHost */,
 				3F9D91802152D42F00474F09 /* TestHost static */,
 				49E57A16245C3F31004AF428 /* Download BaaS */,
-				535EAA0D25B0AEF500DBF3CD /* SwiftUITestHost */,
-				535EAA5E25B0AFA600DBF3CD /* SwiftUITests */,
+				53124AB725B71AF600771CE4 /* SwiftUITestHost */,
+				53124AD325B71AF700771CE4 /* SwiftUITestHostUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -2096,14 +2098,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		535EAA0C25B0AEF500DBF3CD /* Resources */ = {
+		53124AB625B71AF600771CE4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		535EAA5D25B0AFA600DBF3CD /* Resources */ = {
+		53124AD225B71AF700771CE4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2321,19 +2323,19 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		535EAA0A25B0AEF500DBF3CD /* Sources */ = {
+		53124AB425B71AF600771CE4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				535EAA1125B0AEF500DBF3CD /* SwiftUITestHostApp.swift in Sources */,
+				53124ABB25B71AF600771CE4 /* SwiftUITestHostApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		535EAA5B25B0AFA600DBF3CD /* Sources */ = {
+		53124AD025B71AF700771CE4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				535EAA6225B0AFA600DBF3CD /* SwiftUITests.swift in Sources */,
+				53124AD925B71AF700771CE4 /* SwiftUITestHostUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2693,20 +2695,20 @@
 			target = 49E57A16245C3F31004AF428 /* Download BaaS */;
 			targetProxy = 49E57A1B245C5B0E004AF428 /* PBXContainerItemProxy */;
 		};
-		535EAA5025B0AF8300DBF3CD /* PBXTargetDependency */ = {
+		534DF4D025B86F3A00655AE2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 5D660FCB1BE98C560021E04F /* RealmSwift */;
-			targetProxy = 535EAA4F25B0AF8300DBF3CD /* PBXContainerItemProxy */;
-		};
-		535EAA6525B0AFA600DBF3CD /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 535EAA0D25B0AEF500DBF3CD /* SwiftUITestHost */;
-			targetProxy = 535EAA6425B0AFA600DBF3CD /* PBXContainerItemProxy */;
+			target = 53124AB725B71AF600771CE4 /* SwiftUITestHost */;
+			targetProxy = 534DF4CF25B86F3A00655AE2 /* PBXContainerItemProxy */;
 		};
 		537689AC24A7DD060008E57B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5D660FCB1BE98C560021E04F /* RealmSwift */;
 			targetProxy = 537689AB24A7DD060008E57B /* PBXContainerItemProxy */;
+		};
+		53BBF08D25B7436F00D225AD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5D660FCB1BE98C560021E04F /* RealmSwift */;
+			targetProxy = 53BBF08C25B7436F00D225AD /* PBXContainerItemProxy */;
 		};
 		5D6157021BE0A3A100A4BD3F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2816,8 +2818,9 @@
 			};
 			name = Release;
 		};
-		535EAA1B25B0AEF600DBF3CD /* Debug */ = {
+		53124ADC25B71AF700771CE4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 53124A4F25B714EC00771CE4 /* SwiftUITestHost.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -2850,9 +2853,15 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_ENTITLEMENTS = SwiftUITestHost/SwiftUITestHost.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -2870,27 +2879,28 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = Realm/Tests/SwiftUITestHost/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				INFOPLIST_FILE = SwiftUITestHost/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
-					"@executable_path/Frameworks",
+					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.SwiftUITestHost;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		535EAA1C25B0AEF600DBF3CD /* Release */ = {
+		53124ADD25B71AF700771CE4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 53124A4F25B714EC00771CE4 /* SwiftUITestHost.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -2923,9 +2933,14 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_ENTITLEMENTS = SwiftUITestHost/SwiftUITestHost.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -2937,28 +2952,27 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = Realm/Tests/SwiftUITestHost/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				INFOPLIST_FILE = SwiftUITestHost/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
-					"@executable_path/Frameworks",
+					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.SwiftUITestHost;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
+				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		535EAA6725B0AFA600DBF3CD /* Debug */ = {
+		53124AE225B71AF700771CE4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -2990,6 +3004,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -3008,30 +3023,30 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = SwiftUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				INFOPLIST_FILE = SwiftUITestHostUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = io.realm.SwiftUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.SwiftUITestHostUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
+				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = SwiftUITestHost;
 			};
 			name = Debug;
 		};
-		535EAA6825B0AFA600DBF3CD /* Release */ = {
+		53124AE325B71AF700771CE4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -3063,6 +3078,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -3075,24 +3091,22 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = SwiftUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				INFOPLIST_FILE = SwiftUITestHostUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = io.realm.SwiftUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.SwiftUITestHostUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
+				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = SwiftUITestHost;
-				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -3300,20 +3314,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		535EAA1A25B0AEF600DBF3CD /* Build configuration list for PBXNativeTarget "SwiftUITestHost" */ = {
+		53124ADB25B71AF700771CE4 /* Build configuration list for PBXNativeTarget "SwiftUITestHost" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				535EAA1B25B0AEF600DBF3CD /* Debug */,
-				535EAA1C25B0AEF600DBF3CD /* Release */,
+				53124ADC25B71AF700771CE4 /* Debug */,
+				53124ADD25B71AF700771CE4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		535EAA6625B0AFA600DBF3CD /* Build configuration list for PBXNativeTarget "SwiftUITests" */ = {
+		53124AE125B71AF700771CE4 /* Build configuration list for PBXNativeTarget "SwiftUITestHostUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				535EAA6725B0AFA600DBF3CD /* Debug */,
-				535EAA6825B0AFA600DBF3CD /* Release */,
+				53124AE225B71AF700771CE4 /* Debug */,
+				53124AE325B71AF700771CE4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

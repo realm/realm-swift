@@ -615,23 +615,33 @@ extension List: MutableCollection {
             remove(at: offset)
         }
     }
-
     /// :nodoc:
     public func move(fromOffsets offsets: IndexSet, toOffset destination: Int) {
-        var tmp = [Element]()
-        for offset in offsets {
-            tmp.append(self[offset])
-        }
-        insert(contentsOf: tmp, at: destination)
-        for offset in offsets.reversed() {
-            var o = offset
-            if o >= destination {
-                o += tmp.count
+        if Element.self is EmbeddedObject.Type {
+            for offset in offsets {
+                var d = destination
+                if destination >= count {
+                    d = count - 1
+                } else if destination > 0 {
+                    d = destination - 1
+                }
+                move(from: offset, to: d)
             }
-            remove(at: o)
+        } else {
+            var tmp = [Element]()
+            for offset in offsets {
+                tmp.append(self[offset])
+            }
+            insert(contentsOf: tmp, at: destination)
+            for offset in offsets.reversed() {
+                var o = offset
+                if o >= destination {
+                    o += tmp.count
+                }
+                remove(at: o)
+            }
         }
     }
-
 }
 
 // MARK: - Codable

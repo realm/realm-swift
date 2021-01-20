@@ -20,16 +20,22 @@ import XCTest
 import RealmSwift
 import SwiftUI
 
-@available(iOS 14.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
 class SwiftUITests: TestCase {
-    struct TestListView {
+    struct TestListView: View {
         @RealmState var list: RealmSwift.List<SwiftBoolObject>
+
+        var body: some View { fatalError() }
     }
-    struct TestObjectView {
+    struct TestObjectView: View {
         @RealmState var object: SwiftObject
+
+        var body: some View { fatalError() }
     }
-    struct TestResultsView {
+    struct TestResultsView: View {
         @RealmState(SwiftObject.self, realm: inMemoryRealm("swiftui-tests")) var results: Results<SwiftObject>
+
+        var body: some View { fatalError() }
     }
 
     func testRealmBindingDynamicPrimitiveColumn() {
@@ -87,5 +93,25 @@ class SwiftUITests: TestCase {
         XCTAssertTrue(listView.$list[1].boolCol.wrappedValue)
         listView.$list.remove(atOffsets: IndexSet([0, 1]))
         XCTAssertEqual(listView.list.count, 0)
+    }
+
+    func testObjectBaseBindUnmanaged() {
+        let object = SwiftObject()
+        let boundInt = object.bind(keyPath: \.intCol)
+        boundInt.wrappedValue = 456
+        XCTAssertEqual(boundInt.wrappedValue, 456)
+        XCTAssertEqual(object.intCol, 456)
+    }
+
+    func testObjectBaseBindManaged() {
+        let object = SwiftObject()
+        let realm = inMemoryRealm("swiftui-tests")
+        try! realm.write {
+            realm.add(object)
+        }
+        let boundInt = object.bind(keyPath: \.intCol)
+        boundInt.wrappedValue = 456
+        XCTAssertEqual(boundInt.wrappedValue, 456)
+        XCTAssertEqual(object.intCol, 456)
     }
 }
