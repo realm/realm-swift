@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMObjectSchema, RLMProperty, RLMObjectBase;
+@class RLMObjectSchema, RLMProperty, RLMObjectBase, RLMArray;
 
 NS_ASSUME_NONNULL_BEGIN
 

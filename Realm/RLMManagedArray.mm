@@ -92,6 +92,15 @@
                                   property:property];
 }
 
+- (RLMManagedArray *)initWithParent:(realm::Obj)parent
+                           property:(__unsafe_unretained RLMProperty *const)property
+                         parentInfo:(RLMClassInfo&)info {
+    auto col = info.tableColumn(property);
+    return [self initWithBackingCollection:realm::List(info.realm->_realm, parent, col)
+                                parentInfo:&info
+                                  property:property];
+}
+
 void RLMValidateArrayObservationKey(__unsafe_unretained NSString *const keyPath,
                                     __unsafe_unretained RLMArray *const array) {
     if (![keyPath isEqualToString:RLMInvalidatedKey]) {

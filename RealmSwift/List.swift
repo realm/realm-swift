@@ -433,6 +433,10 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
         return Element._rlmArray()
     }
 
+    @objc public override class func _backingCollectionType() -> AnyClass {
+        return RLMManagedArray.self
+    }
+
     // Printable requires a description property defined in Swift (and not obj-c),
     // and it has to be defined as override, which can't be done in a
     // generic class.
@@ -478,7 +482,7 @@ extension List where Element: AddableType {
     }
 }
 
-extension List: RealmCollection, UntypedRealmCollection {
+extension List: RealmCollection {
     /// The type of the objects stored within the list.
     public typealias ElementType = Element
 
@@ -487,10 +491,6 @@ extension List: RealmCollection, UntypedRealmCollection {
     /// Returns a `RLMIterator` that yields successive elements in the `List`.
     public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: _rlmCollection)
-    }
-
-    internal func asNSFastEnumerator() -> Any {
-        return _rlmArray
     }
 
     /**

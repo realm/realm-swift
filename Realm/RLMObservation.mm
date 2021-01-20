@@ -183,23 +183,11 @@ void RLMObservationInfo::recordObserver(realm::Obj& objectRow, RLMClassInfo *obj
     NSUInteger sep = [keyPath rangeOfString:@"."].location;
     NSString *key = sep == NSNotFound ? keyPath : [keyPath substringToIndex:sep];
     RLMProperty *prop = objectSchema[key];
-    if (prop && prop.collection) {
-        id value = valueForKey(key);
-        id<RLMCollection> collection = [value isKindOfClass:[RLMSwiftCollectionBase class]] ? [value _rlmCollection] : value;
-        if (prop.array){
-            ((RLMArray *)collection)->_key = key;
-            ((RLMArray *)collection)->_parentObject = object;
-        }
-        else if (prop.set) {
-            ((RLMSet *)collection)->_key = key;
-            ((RLMSet *)collection)->_parentObject = object;
-        } else {
-            REALM_UNREACHABLE();
-        }
+    if (auto swiftAccessor = prop.swiftAccessor) {
+        [swiftAccessor observe:prop on:object];
     }
-    else if (auto swiftIvar = prop.swiftIvar;
-             auto optional = RLMDynamicCast<RLMSwiftValueStorage>(object_getIvar(object, swiftIvar))) {
-        RLMInitializeUnmanagedSwiftValueStorage(optional, object, prop);
+    else if (prop.collection) {
+        [valueForKey(key) setParent:object property:prop];
     }
 }
 

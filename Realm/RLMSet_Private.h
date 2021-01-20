@@ -19,14 +19,21 @@
 #import <Realm/RLMSet.h>
 #import <Realm/RLMConstants.h>
 
+@class RLMObjectBase, RLMProperty;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSet ()
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
+- (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 @end
 
 void RLMSetValidateMatchingObjectType(RLMSet *set, id value);
+
+@interface RLMManagedSet : RLMSet
+- (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
+@end
 
 NS_ASSUME_NONNULL_END

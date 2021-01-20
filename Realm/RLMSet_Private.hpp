@@ -46,9 +46,7 @@ class RLMObservationInfo;
 }
 @end
 
-@interface RLMManagedSet : RLMSet <RLMFastEnumerable>
-
-- (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
+@interface RLMManagedSet () <RLMFastEnumerable>
 
 - (RLMManagedSet *)initWithBackingCollection:(realm::object_store::Set)set
                                   parentInfo:(RLMClassInfo *)parentInfo

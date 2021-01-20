@@ -137,32 +137,11 @@ extension EmbeddedObject: RealmCollectionValue {
     /// Returns or sets the value of the property with the given name.
     @objc open subscript(key: String) -> Any? {
         get {
-            if realm == nil {
-                return value(forKey: key)
-            }
-            return dynamicGet(key: key)
+            return dynamicGet(object: self, key: key)
         }
-        set(value) {
-            if realm == nil {
-                setValue(value, forKey: key)
-            } else {
-                RLMDynamicValidatedSet(self, key, value)
-            }
+        set {
+            dynamicSet(object: self, key: key, value: newValue)
         }
-    }
-
-    private func dynamicGet(key: String) -> Any? {
-        let objectSchema = RLMObjectBaseObjectSchema(self)!
-        guard let prop = objectSchema[key] else {
-            throwRealmException("Invalid property name '\(key) for class \(objectSchema.className)")
-        }
-        if let accessor = prop.swiftAccessor {
-            return accessor.get(Unmanaged.passUnretained(self).toOpaque() + ivar_getOffset(prop.swiftIvar!))
-        }
-        if let ivar = prop.swiftIvar, prop.array {
-            return object_getIvar(self, ivar)
-        }
-        return RLMDynamicGet(self, prop)
     }
 
     // MARK: Notifications
@@ -224,7 +203,7 @@ extension EmbeddedObject: RealmCollectionValue {
      :nodoc:
      */
     public func dynamicList(_ propertyName: String) -> List<DynamicObject> {
-        return noWarnUnsafeBitCast(dynamicGet(key: propertyName) as! RLMSwiftCollectionBase,
+        return noWarnUnsafeBitCast(dynamicGet(object: self, key: propertyName) as! RLMSwiftCollectionBase,
                                    to: List<DynamicObject>.self)
     }
 

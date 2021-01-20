@@ -369,16 +369,12 @@ extension AnyRealmValue: AddableType {}
     }
 }
 
-extension Results: RealmCollection, UntypedRealmCollection {
+extension Results: RealmCollection {
     // MARK: Sequence Support
 
     /// Returns a `RLMIterator` that yields successive elements in the results.
     public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: rlmResults)
-    }
-
-    internal func asNSFastEnumerator() -> Any {
-        return rlmResults
     }
 
     // MARK: Collection Support

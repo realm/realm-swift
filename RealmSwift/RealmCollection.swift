@@ -324,10 +324,6 @@ extension AnyRealmValue: RealmCollectionValue {
     }
 }
 
-internal protocol UntypedRealmCollection {
-    func asNSFastEnumerator() -> Any
-}
-
 /// :nodoc:
 public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined where Element: RealmCollectionValue {
     // This typealias was needed with Swift 3.1. It no longer is, but remains
@@ -822,7 +818,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     }
 
     override func asNSFastEnumerator() -> Any {
-        return (base as! UntypedRealmCollection).asNSFastEnumerator()
+        return (base as! UntypedCollection).asNSFastEnumerator()
     }
 
     // MARK: Collection Support
@@ -881,7 +877,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
  Instances of `RealmCollection` forward operations to an opaque underlying collection having the same `Element` type.
  */
-public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection, UntypedRealmCollection {
+public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection, UntypedCollection {
 
     /// The type of the objects contained within the collection.
     public typealias ElementType = Element
@@ -1042,7 +1038,6 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
     public func makeIterator() -> RLMIterator<Element> { return base.makeIterator() }
 
     internal func asNSFastEnumerator() -> Any { return base.asNSFastEnumerator() }
-
 
     // MARK: Collection Support
 

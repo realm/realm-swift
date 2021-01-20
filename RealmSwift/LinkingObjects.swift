@@ -340,7 +340,7 @@ import Realm
 
     // MARK: Implementation
 
-    private init(propertyName: String, handle: RLMLinkingObjectsHandle?) {
+    internal init(propertyName: String, handle: RLMLinkingObjectsHandle?) {
         self.propertyName = propertyName
         self.handle = handle
     }
@@ -357,16 +357,12 @@ import Realm
     internal var handle: RLMLinkingObjectsHandle?
 }
 
-extension LinkingObjects: RealmCollection, UntypedRealmCollection {
+extension LinkingObjects: RealmCollection {
     // MARK: Sequence Support
 
     /// Returns an iterator that yields successive elements in the linking objects.
     public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: rlmResults)
-    }
-
-    internal func asNSFastEnumerator() -> Any {
-        return rlmResults
     }
 
     // MARK: Collection Support
