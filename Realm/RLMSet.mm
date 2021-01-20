@@ -27,7 +27,6 @@
 #import "RLMSwiftSupport.h"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
-#import "RLMConstants.h"
 
 // See -countByEnumeratingWithState:objects:count
 @interface RLMSetHolder : NSObject {
