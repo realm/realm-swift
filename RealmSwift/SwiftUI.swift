@@ -41,9 +41,10 @@ private func createBinding<T: ThreadConfined, V>(_ getter: @escaping () -> T,
         if parent.isFrozen {
             parent = try! Realm(configuration: parent.realm!.configuration).thaw(parent)!
         }
-        try! parent.realm!.write {
-            parent[keyPath: keyPath] = newValue
-        }
+
+        parent.realm?.beginWrite()
+        parent[keyPath: keyPath] = newValue
+        try! parent.realm?.commitWrite()
     })
 }
 /**

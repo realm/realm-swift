@@ -213,7 +213,7 @@ let package = Package(
         .testTarget(
             name: "SwiftUIIntegrationTests",
             dependencies: ["RealmSwift"],
-            path: "SwiftUITests",
+            path: "SwiftUITestHostUITests",
             cxxSettings: testCxxSettings
         )
     ],
