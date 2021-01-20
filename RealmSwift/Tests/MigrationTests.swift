@@ -320,7 +320,7 @@ class MigrationTests: TestCase {
                 count += 1
             }
             XCTAssertEqual(count, 2)
-            
+
             count = 0
             migration.enumerateObjects(ofType: "SwiftInt8Object") { oldObj, newObj in
                 XCTAssertEqual(newObj!["int8Col"] as! Int8, oldObj!["int8Col"] as! Int8)
@@ -333,7 +333,7 @@ class MigrationTests: TestCase {
                 count += 1
             }
             XCTAssertEqual(count, 2)
-            
+
             count = 0
             migration.enumerateObjects(ofType: "SwiftInt16Object") { oldObj, newObj in
                 XCTAssertEqual(newObj!["int16Col"] as! Int16, oldObj!["int16Col"] as! Int16)
@@ -346,7 +346,7 @@ class MigrationTests: TestCase {
                 count += 1
             }
             XCTAssertEqual(count, 2)
-            
+
             count = 0
             migration.enumerateObjects(ofType: "SwiftInt32Object") { oldObj, newObj in
                 XCTAssertEqual(newObj!["int32Col"] as! Int32, oldObj!["int32Col"] as! Int32)
@@ -359,7 +359,7 @@ class MigrationTests: TestCase {
                 count += 1
             }
             XCTAssertEqual(count, 2)
-            
+
             count = 0
             migration.enumerateObjects(ofType: "SwiftInt64Object") { oldObj, newObj in
                 XCTAssertEqual(newObj!["int64Col"] as! Int64, oldObj!["int64Col"] as! Int64)
@@ -439,7 +439,7 @@ class MigrationTests: TestCase {
                 count += 1
             }
             XCTAssertEqual(count, 2)
-            
+
             count = 0
             migration.enumerateObjects(ofType: "SwiftInt8Object") { oldObj, newObj in
                 XCTAssertEqual(newObj!["int8Col"] as! Int8, oldObj!["int8Col"] as! Int8)
@@ -453,7 +453,7 @@ class MigrationTests: TestCase {
                 count += 1
             }
             XCTAssertEqual(count, 2)
-            
+
             count = 0
             migration.enumerateObjects(ofType: "SwiftInt16Object") { oldObj, newObj in
                 XCTAssertEqual(newObj!["int16Col"] as! Int16, oldObj!["int16Col"] as! Int16)
@@ -467,7 +467,7 @@ class MigrationTests: TestCase {
                 count += 1
             }
             XCTAssertEqual(count, 2)
-            
+
             count = 0
             migration.enumerateObjects(ofType: "SwiftInt32Object") { oldObj, newObj in
                 XCTAssertEqual(newObj!["int32Col"] as! Int32, oldObj!["int32Col"] as! Int32)
@@ -481,7 +481,7 @@ class MigrationTests: TestCase {
                 count += 1
             }
             XCTAssertEqual(count, 2)
-            
+
             count = 0
             migration.enumerateObjects(ofType: "SwiftInt64Object") { oldObj, newObj in
                 XCTAssertEqual(newObj!["int64Col"] as! Int64, oldObj!["int64Col"] as! Int64)

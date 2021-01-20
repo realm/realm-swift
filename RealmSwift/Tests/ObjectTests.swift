@@ -383,16 +383,16 @@ class ObjectTests: TestCase {
 
         setter(object, 321, "intCol")
         XCTAssertEqual(getter(object, "intCol") as! Int?, 321)
-        
+
         setter(object, Int8(1), "int8Col")
         XCTAssertEqual(getter(object, "int8Col") as! Int8?, 1)
-        
+
         setter(object, Int16(321), "int16Col")
         XCTAssertEqual(getter(object, "int16Col") as! Int16?, 321)
-        
+
         setter(object, Int32(321), "int32Col")
         XCTAssertEqual(getter(object, "int32Col") as! Int32?, 321)
-        
+
         setter(object, Int64(321), "int64Col")
         XCTAssertEqual(getter(object, "int64Col") as! Int64?, 321)
 
@@ -447,16 +447,16 @@ class ObjectTests: TestCase {
 
         setter(object, 321, "intCol")
         XCTAssertEqual((getter(object, "intCol") as! Int), 321)
-        
+
         setter(object, Int8(1), "int8Col")
         XCTAssertEqual(getter(object, "int8Col") as! Int8?, 1)
-        
+
         setter(object, Int16(321), "int16Col")
         XCTAssertEqual(getter(object, "int16Col") as! Int16?, 321)
-        
+
         setter(object, Int32(321), "int32Col")
         XCTAssertEqual(getter(object, "int32Col") as! Int32?, 321)
-        
+
         setter(object, Int64(321), "int64Col")
         XCTAssertEqual(getter(object, "int64Col") as! Int64?, 321)
 
