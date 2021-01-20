@@ -176,33 +176,47 @@ RLMArray *getArray(__unsafe_unretained RLMObjectBase *const obj, NSUInteger prop
     return [[RLMManagedArray alloc] initWithParent:obj property:prop];
 }
 
+template <typename T>
+auto get_value(T t) {
+    if constexpr (std::is_pointer_v<T>)
+        return *t;
+    else
+        return t;
+}
+
+template <typename Collection>
+void assign_value(Collection&& collection,
+                  RLMClassInfo *info,
+                  __unsafe_unretained RLMObjectBase *const obj,
+                  __unsafe_unretained RLMProperty *const prop,
+                  __unsafe_unretained id<NSFastEnumeration> const value) {
+    if (collection.get_type() == realm::PropertyType::Object) {
+        info = &obj->_info->linkTargetType(prop.index);
+    }
+    RLMAccessorContext ctx(*info);
+    RLMTranslateError([&] {
+        collection.assign(ctx, value, realm::CreatePolicy::ForceCreate);
+    });
+}
+
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained id<NSFastEnumeration> const value) {
     auto prop = obj->_info->propertyForTableColumn(key);
+    RLMValidateValueForProperty(value, obj->_info->rlmObjectSchema, prop, true);
+
     if (prop.array) {
-        RLMValidateValueForProperty(value, obj->_info->rlmObjectSchema, prop, true);
-        realm::List list(obj->_realm->_realm, obj->_row, key);
-        RLMClassInfo *info = obj->_info;
-        if (list.get_type() == realm::PropertyType::Object) {
-            info = &obj->_info->linkTargetType(prop.index);
-        }
-        RLMAccessorContext ctx(*info);
-        RLMTranslateError([&] {
-            list.assign(ctx, value, realm::CreatePolicy::ForceCreate);
-        });
+        assign_value(realm::List(obj->_realm->_realm, obj->_row, key),
+                     obj->_info,
+                     obj,
+                     prop,
+                     value);
     } else if (prop.set) {
-        RLMValidateValueForProperty(value, obj->_info->rlmObjectSchema, prop, true);
-        realm::object_store::Set set(obj->_realm->_realm, obj->_row, key);
-        RLMClassInfo *info = obj->_info;
-        if (set.get_type() == realm::PropertyType::Object) {
-            info = &obj->_info->linkTargetType(prop.index);
-        }
-        RLMAccessorContext ctx(*info);
-        RLMTranslateError([&] {
-            set.assign(ctx, value, realm::CreatePolicy::ForceCreate);
-        });
-    } else {
-        REALM_TERMINATE("Unrecognized NSFastEnumeration type.");
+        assign_value(realm::object_store::Set(obj->_realm->_realm,
+                                              obj->_row, key),
+                     obj->_info,
+                     obj,
+                     prop,
+                     value);
     }
 }
 
@@ -513,28 +527,24 @@ id unmanagedSetter(RLMProperty *prop, const char *) {
     return ^(RLMObjectBase *obj, id<NSFastEnumeration> values) {
         auto prop = obj->_objectSchema[propName];
         RLMValidateValueForProperty(values, obj->_objectSchema, prop, true);
-
+        id collection;
         if (prop.array) {
             // make copy when setting (as is the case for all other variants)
-            RLMArray *ar;
             if (prop.type == RLMPropertyTypeObject)
-                ar = [[RLMArray alloc] initWithObjectClassName:prop.objectClassName];
+                collection = [[RLMArray alloc] initWithObjectClassName:prop.objectClassName];
             else
-                ar = [[RLMArray alloc] initWithObjectType:prop.type optional:prop.optional];
-            [ar addObjects:values];
-            superSet(obj, propName, ar);
+                collection = [[RLMArray alloc] initWithObjectType:prop.type optional:prop.optional];
         } else if (prop.set) {
             // make copy when setting (as is the case for all other variants)
-            RLMSet *s;
             if (prop.type == RLMPropertyTypeObject)
-                s = [[RLMSet alloc] initWithObjectClassName:prop.objectClassName];
+                collection = [[RLMSet alloc] initWithObjectClassName:prop.objectClassName];
             else
-                s = [[RLMSet alloc] initWithObjectType:prop.type optional:prop.optional];
-            [s addObjects:values];
-            superSet(obj, propName, s);
+                collection = [[RLMSet alloc] initWithObjectType:prop.type optional:prop.optional];
         } else {
             REALM_TERMINATE("Unexpected property type");
         }
+        [collection addObjects:values];
+        superSet(obj, propName, collection);
     };
 }
 
@@ -791,7 +801,7 @@ id RLMAccessorContext::box(realm::object_store::Set&& s) {
                                      property:currentProperty];
 }
 
-id RLMAccessorContext::box(realm::object_store::Dictionary&& d) {
+id RLMAccessorContext::box(realm::object_store::Dictionary&&) {
     REALM_UNREACHABLE();
 }
 
@@ -1039,7 +1049,7 @@ bool RLMAccessorContext::is_same_set(realm::object_store::Set const& set, __unsa
     return [v respondsToSelector:@selector(isBackedBySet:)] && [v isBackedBySet:set];
 }
 
-bool RLMAccessorContext::is_same_dictionary(realm::object_store::Dictionary const& dictionary, __unsafe_unretained id const v) const noexcept {
+bool RLMAccessorContext::is_same_dictionary(realm::object_store::Dictionary const&, __unsafe_unretained id const) const noexcept {
     REALM_UNREACHABLE();
 }
 #pragma clang diagnostic push

@@ -40,7 +40,7 @@
 @property NSString *name;
 @property NSString *type;
 @end
-RLM_ARRAY_TYPE(Pet)
+RLM_COLLECTION_TYPE(Pet)
 
 @interface Person : RLMObject
 @property NSString *fullName;
@@ -63,7 +63,7 @@ typedef NS_ENUM(NSInteger, AnimalType) {
 + (AnimalType)animalTypeForString:(NSString *)typeString;
 
 @end
-RLM_ARRAY_TYPE(Pet)
+RLM_COLLECTION_TYPE(Pet)
 
 @interface Person : RLMObject
 @property NSString *fullName;

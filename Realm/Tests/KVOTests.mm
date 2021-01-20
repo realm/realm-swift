@@ -33,8 +33,8 @@
 #import <objc/runtime.h>
 #import <vector>
 
-RLM_ARRAY_TYPE(KVOObject)
-RLM_ARRAY_TYPE(KVOLinkObject1)
+RLM_COLLECTION_TYPE(KVOObject)
+RLM_COLLECTION_TYPE(KVOLinkObject1)
 
 @interface KVOObject : RLMObject
 @property int pk; // Primary key for isEqual:

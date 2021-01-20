@@ -94,8 +94,8 @@
 @property NSString *stringCol;
 @end
 
-RLM_ARRAY_TYPE(StringObject)
-RLM_ARRAY_TYPE(IntObject)
+RLM_COLLECTION_TYPE(StringObject)
+RLM_COLLECTION_TYPE(IntObject)
 
 @interface LinkStringObject : RLMObject
 @property StringObject *objectCol;
@@ -119,7 +119,7 @@ RLM_ARRAY_TYPE(IntObject)
 @interface EmbeddedIntObject : RLMEmbeddedObject
 @property int intCol;
 @end
-RLM_ARRAY_TYPE(EmbeddedIntObject)
+RLM_COLLECTION_TYPE(EmbeddedIntObject)
 
 @interface EmbeddedIntParentObject : RLMObject
 @property int pk;
@@ -154,7 +154,7 @@ RLM_ARRAY_TYPE(EmbeddedIntObject)
 
 @end
 
-RLM_ARRAY_TYPE(AllTypesObject)
+RLM_COLLECTION_TYPE(AllTypesObject)
 
 @interface LinkToAllTypesObject : RLMObject
 @property AllTypesObject *allTypesCol;
@@ -281,7 +281,7 @@ RLM_ARRAY_TYPE(AllTypesObject)
 
 @end
 
-RLM_ARRAY_TYPE(EmployeeObject)
+RLM_COLLECTION_TYPE(EmployeeObject)
 
 #pragma mark CompanyObject
 
@@ -309,7 +309,7 @@ RLM_ARRAY_TYPE(EmployeeObject)
 @property (readonly) RLMLinkingObjects *owners;
 @end
 
-RLM_ARRAY_TYPE(DogObject)
+RLM_COLLECTION_TYPE(DogObject)
 
 @interface DogArrayObject : RLMObject
 @property RLM_GENERIC_ARRAY(DogObject) *dogs;
@@ -363,7 +363,7 @@ RLM_ARRAY_TYPE(DogObject)
 
 @end
 
-RLM_ARRAY_TYPE(CircleObject);
+RLM_COLLECTION_TYPE(CircleObject);
 
 #pragma mark CircleArrayObject
 
@@ -418,7 +418,7 @@ RLM_ARRAY_TYPE(CircleObject);
 
 @end
 
-RLM_ARRAY_TYPE(AggregateObject)
+RLM_COLLECTION_TYPE(AggregateObject)
 @interface AggregateArrayObject : RLMObject
 @property RLMArray<AggregateObject *><AggregateObject> *array;
 @end
@@ -442,7 +442,7 @@ RLM_ARRAY_TYPE(AggregateObject)
 @interface PrimaryIntObject : RLMObject
 @property int intCol;
 @end
-RLM_ARRAY_TYPE(PrimaryIntObject);
+RLM_COLLECTION_TYPE(PrimaryIntObject);
 
 @interface PrimaryInt64Object : RLMObject
 @property int64_t int64Col;
@@ -508,7 +508,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 #pragma mark PersonObject
 
 @class PersonObject;
-RLM_ARRAY_TYPE(PersonObject);
+RLM_COLLECTION_TYPE(PersonObject);
 
 @interface PersonObject : RLMObject
 @property NSString *name;
@@ -519,7 +519,7 @@ RLM_ARRAY_TYPE(PersonObject);
 
 @interface PrimaryEmployeeObject : EmployeeObject
 @end
-RLM_ARRAY_TYPE(PrimaryEmployeeObject);
+RLM_COLLECTION_TYPE(PrimaryEmployeeObject);
 
 @interface LinkToPrimaryEmployeeObject : RLMObject
 @property PrimaryEmployeeObject *wrapped;
@@ -532,7 +532,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 @property PrimaryEmployeeObject *intern;
 @property LinkToPrimaryEmployeeObject *wrappedIntern;
 @end
-RLM_ARRAY_TYPE(PrimaryCompanyObject);
+RLM_COLLECTION_TYPE(PrimaryCompanyObject);
 
 @interface ArrayOfPrimaryCompanies : RLMObject
 @property RLM_GENERIC_ARRAY(PrimaryCompanyObject) *companies;
@@ -563,8 +563,8 @@ RLM_ARRAY_TYPE(PrimaryCompanyObject);
 @property (readonly, nonatomic) RLMLinkingObjects *linking2;
 @end
 
-RLM_ARRAY_TYPE(RenamedProperties1)
-RLM_ARRAY_TYPE(RenamedProperties2)
+RLM_COLLECTION_TYPE(RenamedProperties1)
+RLM_COLLECTION_TYPE(RenamedProperties2)
 
 @interface LinkToRenamedProperties1 : RLMObject
 @property (nonatomic) RenamedProperties1 *linkA;

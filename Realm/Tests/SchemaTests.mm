@@ -54,9 +54,9 @@
 @implementation SchemaTestClassSecondChild
 @end
 
-RLM_ARRAY_TYPE(SchemaTestClassBase)
-RLM_ARRAY_TYPE(SchemaTestClassFirstChild)
-RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
+RLM_COLLECTION_TYPE(SchemaTestClassBase)
+RLM_COLLECTION_TYPE(SchemaTestClassFirstChild)
+RLM_COLLECTION_TYPE(SchemaTestClassSecondChild)
 
 @interface SchemaTestClassLink : RLMObject
 @property SchemaTestClassBase *base;
@@ -85,7 +85,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 }
 @end
 
-RLM_ARRAY_TYPE(NonDefaultObject);
+RLM_COLLECTION_TYPE(NonDefaultObject);
 
 @interface NonDefaultArrayObject : RLMObject
 @property RLM_GENERIC_ARRAY(NonDefaultObject) *array;
@@ -239,7 +239,7 @@ RLM_ARRAY_TYPE(NonDefaultObject);
 }
 @end
 
-RLM_ARRAY_TYPE(SchemaTestsLinkSource)
+RLM_COLLECTION_TYPE(SchemaTestsLinkSource)
 
 @interface InvalidReadWriteLinkingObjectsProperty : FakeObject
 @property RLMLinkingObjects *linkingObjects;
@@ -273,7 +273,7 @@ RLM_ARRAY_TYPE(SchemaTestsLinkSource)
 
 @end
 
-RLM_ARRAY_TYPE(NotARealClass)
+RLM_COLLECTION_TYPE(NotARealClass)
 
 @interface InvalidLinkingObjectsPropertyProtocol : FakeObject
 @property (readonly) RLMLinkingObjects<NotARealClass> *linkingObjects;

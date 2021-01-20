@@ -18,6 +18,7 @@
 
 #import "RLMArray_Private.hpp"
 
+#import "RLMConstants.h"
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.h"
@@ -27,7 +28,6 @@
 #import "RLMSwiftSupport.h"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
-#import "RLMConstants.h"
 
 // See -countByEnumeratingWithState:objects:count
 @interface RLMArrayHolder : NSObject {

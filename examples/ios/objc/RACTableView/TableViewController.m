@@ -23,8 +23,8 @@
 
 // Data models: GroupParent contains all of the data for a TableView, with a
 // Group per section and an Entry per row in each section
-RLM_ARRAY_TYPE(Entry)
-RLM_ARRAY_TYPE(Group)
+RLM_COLLECTION_TYPE(Entry)
+RLM_COLLECTION_TYPE(Group)
 
 @interface Entry : RLMObject
 @property (nonatomic, strong) NSString *title;

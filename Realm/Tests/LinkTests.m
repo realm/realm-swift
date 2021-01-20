@@ -19,14 +19,14 @@
 #import "RLMTestCase.h"
 #import "RLMRealm_Dynamic.h"
 
-RLM_ARRAY_TYPE(CircularArrayObject)
+RLM_COLLECTION_TYPE(CircularArrayObject)
 @interface CircularArrayObject : RLMObject
 @property RLM_GENERIC_ARRAY(CircularArrayObject) *array;
 @end
 @implementation CircularArrayObject
 @end
 
-RLM_SET_TYPE(CircularSetObject)
+RLM_COLLECTION_TYPE(CircularSetObject)
 @interface CircularSetObject : RLMObject
 @property RLM_GENERIC_SET(CircularSetObject) *set;
 @end

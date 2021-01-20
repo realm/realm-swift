@@ -57,7 +57,7 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
 @property int intCol;
 @property NSString *stringCol;
 @end
-RLM_ARRAY_TYPE(MigrationTestObject);
+RLM_COLLECTION_TYPE(MigrationTestObject);
 
 @implementation MigrationTestObject
 @end

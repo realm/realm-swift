@@ -283,18 +283,14 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
 }
 
 - (RLMManagedSet *)managedObjectFrom:(RLMSet *)set {
-    for (id obj in set) {
-        RLMSetValidateMatchingObjectType(self, obj);
-    }
-    if (!set.realm) {
+    auto managedSet = RLMDynamicCast<RLMManagedSet>(set);
+    if (!managedSet) {
         @throw RLMException(@"Right hand side value must be a managed Set.");
     }
-
-    if (_type != set.type) {
+    if (_type != managedSet->_type || _objectInfo != managedSet->_objectInfo) {
         @throw RLMException(@"Set must match type of \"self\" '%@'", RLMTypeToString(_type));
     }
-
-    return static_cast<RLMManagedSet *>(set);
+    return managedSet;
 }
 
 - (BOOL)isSubsetOfSet:(RLMSet<id> *)set {
@@ -311,7 +307,7 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     RLMSetValidateMatchingObjectType(self, obj);
     RLMAccessorContext context(*_objectInfo);
     auto r = _backingSet.find(context, obj);
-    return (r >= 0) && (r != realm::npos);
+    return r != realm::npos;
 }
 
 - (BOOL)isEqualToSet:(RLMSet<id> *)set {

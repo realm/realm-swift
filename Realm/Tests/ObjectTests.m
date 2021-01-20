@@ -82,7 +82,7 @@
 @end
 
 @class CycleObject;
-RLM_ARRAY_TYPE(CycleObject)
+RLM_COLLECTION_TYPE(CycleObject)
 @interface CycleObject : RLMObject
 @property RLM_GENERIC_ARRAY(CycleObject) *objects;
 @property RLM_GENERIC_SET(CycleObject) *objectSet;
