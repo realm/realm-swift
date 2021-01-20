@@ -232,20 +232,8 @@ id RLMObservationInfo::valueForKey(NSString *key) {
     // We need to return the same object each time for observing over keypaths
     // to work, so we store a cache of them here. We can't just cache them on
     // the object as that leads to retain cycles.
-    if (lastProp.array) {
-        RLMArray *value = cachedObjects[key];
-        if (!value) {
-            value = getSuper();
-            if (!cachedObjects) {
-                cachedObjects = [NSMutableDictionary new];
-            }
-            cachedObjects[key] = value;
-        }
-        return value;
-    }
-
-    if (lastProp.set) {
-        RLMSet *value = cachedObjects[key];
+    if (lastProp.collection) {
+        id value = cachedObjects[key];
         if (!value) {
             value = getSuper();
             if (!cachedObjects) {
