@@ -5,7 +5,9 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Fixed an issue where creating an object after file format upgrade may fail
+  with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
+ ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -16,7 +18,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v10.3.3 to v10.4.0
 
 10.5.1 Release notes (2021-01-15)
 =============================================================
