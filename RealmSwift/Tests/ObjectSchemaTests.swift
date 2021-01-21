@@ -30,7 +30,7 @@ class ObjectSchemaTests: TestCase {
         let objectSchema = swiftObjectSchema
         let propertyNames = objectSchema.properties.map { $0.name }
         XCTAssertEqual(propertyNames,
-                       ["boolCol", "intCol", "intEnumCol", "floatCol", "doubleCol",
+                       ["boolCol", "intCol", "int8Col", "int16Col", "int32Col", "int64Col", "intEnumCol", "floatCol", "doubleCol",
                         "stringCol", "binaryCol", "dateCol", "decimalCol",
                         "objectIdCol", "objectCol", "arrayCol"]
         )
@@ -65,6 +65,34 @@ class ObjectSchemaTests: TestCase {
             "        optional = NO;\n" +
             "    }\n" +
             "    intCol {\n" +
+            "        type = int;\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "    int8Col {\n" +
+            "        type = int;\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "    int16Col {\n" +
+            "        type = int;\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "    int32Col {\n" +
+            "        type = int;\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "    int64Col {\n" +
             "        type = int;\n" +
             "        indexed = NO;\n" +
             "        isPrimary = NO;\n" +

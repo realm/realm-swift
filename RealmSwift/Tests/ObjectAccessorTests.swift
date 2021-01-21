@@ -34,6 +34,34 @@ class ObjectAccessorTests: TestCase {
         object.intCol = 1
         XCTAssertEqual(object.intCol, 1)
 
+        object.int8Col = -1
+        XCTAssertEqual(object.int8Col, -1)
+        object.int8Col = 0
+        XCTAssertEqual(object.int8Col, 0)
+        object.int8Col = 1
+        XCTAssertEqual(object.int8Col, 1)
+
+        object.int16Col = -1
+        XCTAssertEqual(object.int16Col, -1)
+        object.int16Col = 0
+        XCTAssertEqual(object.int16Col, 0)
+        object.int16Col = 1
+        XCTAssertEqual(object.int16Col, 1)
+
+        object.int32Col = -1
+        XCTAssertEqual(object.int32Col, -1)
+        object.int32Col = 0
+        XCTAssertEqual(object.int32Col, 0)
+        object.int32Col = 1
+        XCTAssertEqual(object.int32Col, 1)
+
+        object.int64Col = -1
+        XCTAssertEqual(object.int64Col, -1)
+        object.int64Col = 0
+        XCTAssertEqual(object.int64Col, 0)
+        object.int64Col = 1
+        XCTAssertEqual(object.int64Col, 1)
+
         object.floatCol = 20
         XCTAssertEqual(object.floatCol, 20 as Float)
         object.floatCol = 20.2
