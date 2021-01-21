@@ -324,7 +324,7 @@ Bson RLMConvertRLMBSONToBson(id<RLMBSON> b) {
         case RLMBSONTypeTimestamp:
             return RLMTimestampForNSDate((NSDate *)b);
         case RLMBSONTypeDatetime:
-            return MongoTimestamp(((NSDate *)b).timeIntervalSince1970, 0);
+            return realm::Timestamp(((NSDate *)b).timeIntervalSince1970, 0);
         case RLMBSONTypeDecimal128:
             return [((RLMDecimal128 *)b) decimal128Value];
         case RLMBSONTypeRegularExpression:
