@@ -31,7 +31,6 @@ x.y.z Release notes (yyyy-MM-dd)
   required).
 
 ### Fixed
-
 * Timeouts when calling server functions via App would sometimes crash rather
   than report an error.
 * Fix a race condition which would lead to "uncaught exception in notifier
@@ -45,6 +44,7 @@ x.y.z Release notes (yyyy-MM-dd)
   assertion failure rather than a more appropriate exception.
   ([Core #4114](https://github.com/realm/realm-core/issues/4114), since v5.0.0).
 * Fix an issue where calling a MongoDB Realm Function would never be performed as the reference to the weak `User` was lost.
+* Fix error code propagation to object store.
 
 ### Compatibility
 
