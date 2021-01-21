@@ -276,6 +276,18 @@ class MigrationTests: TestCase {
                 try! Realm().create(SwiftIntObject.self, value: [1])
                 try! Realm().create(SwiftIntObject.self, value: [2])
                 try! Realm().create(SwiftIntObject.self, value: [3])
+                try! Realm().create(SwiftInt8Object.self, value: [Int8(1)])
+                try! Realm().create(SwiftInt8Object.self, value: [Int8(2)])
+                try! Realm().create(SwiftInt8Object.self, value: [Int8(3)])
+                try! Realm().create(SwiftInt16Object.self, value: [Int16(1)])
+                try! Realm().create(SwiftInt16Object.self, value: [Int16(2)])
+                try! Realm().create(SwiftInt16Object.self, value: [Int16(3)])
+                try! Realm().create(SwiftInt32Object.self, value: [Int32(1)])
+                try! Realm().create(SwiftInt32Object.self, value: [Int32(2)])
+                try! Realm().create(SwiftInt32Object.self, value: [Int32(3)])
+                try! Realm().create(SwiftInt64Object.self, value: [Int64(1)])
+                try! Realm().create(SwiftInt64Object.self, value: [Int64(2)])
+                try! Realm().create(SwiftInt64Object.self, value: [Int64(3)])
                 try! Realm().create(SwiftBoolObject.self, value: [true])
                 try! Realm().create(SwiftBoolObject.self, value: [false])
                 try! Realm().create(SwiftBoolObject.self, value: [true])
@@ -309,6 +321,58 @@ class MigrationTests: TestCase {
             }
             XCTAssertEqual(count, 2)
 
+            count = 0
+            migration.enumerateObjects(ofType: "SwiftInt8Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int8Col"] as! Int8, oldObj!["int8Col"] as! Int8)
+                if oldObj!["int8Col"] as! Int8 == 1 {
+                    migration.delete(newObj!)
+                }
+            }
+            migration.enumerateObjects(ofType: "SwiftInt8Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int8Col"] as! Int8, oldObj!["int8Col"] as! Int8)
+                count += 1
+            }
+            XCTAssertEqual(count, 2)
+
+            count = 0
+            migration.enumerateObjects(ofType: "SwiftInt16Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int16Col"] as! Int16, oldObj!["int16Col"] as! Int16)
+                if oldObj!["int16Col"] as! Int16 == 1 {
+                    migration.delete(newObj!)
+                }
+            }
+            migration.enumerateObjects(ofType: "SwiftInt16Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int16Col"] as! Int16, oldObj!["int16Col"] as! Int16)
+                count += 1
+            }
+            XCTAssertEqual(count, 2)
+
+            count = 0
+            migration.enumerateObjects(ofType: "SwiftInt32Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int32Col"] as! Int32, oldObj!["int32Col"] as! Int32)
+                if oldObj!["int32Col"] as! Int32 == 1 {
+                    migration.delete(newObj!)
+                }
+            }
+            migration.enumerateObjects(ofType: "SwiftInt32Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int32Col"] as! Int32, oldObj!["int32Col"] as! Int32)
+                count += 1
+            }
+            XCTAssertEqual(count, 2)
+
+            count = 0
+            migration.enumerateObjects(ofType: "SwiftInt64Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int64Col"] as! Int64, oldObj!["int64Col"] as! Int64)
+                if oldObj!["int64Col"] as! Int64 == 1 {
+                    migration.delete(newObj!)
+                }
+            }
+            migration.enumerateObjects(ofType: "SwiftInt64Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int64Col"] as! Int64, oldObj!["int64Col"] as! Int64)
+                count += 1
+            }
+            XCTAssertEqual(count, 2)
+
             migration.enumerateObjects(ofType: "SwiftBoolObject") { oldObj, newObj in
                 XCTAssertEqual(newObj!["boolCol"] as! Bool, oldObj!["boolCol"] as! Bool)
                 migration.delete(newObj!)
@@ -329,6 +393,18 @@ class MigrationTests: TestCase {
                 try! Realm().create(SwiftIntObject.self, value: [1])
                 try! Realm().create(SwiftIntObject.self, value: [2])
                 try! Realm().create(SwiftIntObject.self, value: [3])
+                try! Realm().create(SwiftInt8Object.self, value: [Int8(1)])
+                try! Realm().create(SwiftInt8Object.self, value: [Int8(2)])
+                try! Realm().create(SwiftInt8Object.self, value: [Int8(3)])
+                try! Realm().create(SwiftInt16Object.self, value: [Int16(1)])
+                try! Realm().create(SwiftInt16Object.self, value: [Int16(2)])
+                try! Realm().create(SwiftInt16Object.self, value: [Int16(3)])
+                try! Realm().create(SwiftInt32Object.self, value: [Int32(1)])
+                try! Realm().create(SwiftInt32Object.self, value: [Int32(2)])
+                try! Realm().create(SwiftInt32Object.self, value: [Int32(3)])
+                try! Realm().create(SwiftInt64Object.self, value: [Int64(1)])
+                try! Realm().create(SwiftInt64Object.self, value: [Int64(2)])
+                try! Realm().create(SwiftInt64Object.self, value: [Int64(3)])
                 try! Realm().create(SwiftBoolObject.self, value: [true])
                 try! Realm().create(SwiftBoolObject.self, value: [false])
                 try! Realm().create(SwiftBoolObject.self, value: [true])
@@ -360,6 +436,62 @@ class MigrationTests: TestCase {
             }
             migration.enumerateObjects(ofType: "SwiftIntObject") { oldObj, newObj in
                 XCTAssertEqual(newObj!["intCol"] as! Int, oldObj!["intCol"] as! Int)
+                count += 1
+            }
+            XCTAssertEqual(count, 2)
+
+            count = 0
+            migration.enumerateObjects(ofType: "SwiftInt8Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int8Col"] as! Int8, oldObj!["int8Col"] as! Int8)
+                if oldObj!["int8Col"] as! Int8 == 1 {
+                    migration.delete(newObj!)
+                    migration.create("SwiftInt8Object", value: [0])
+                }
+            }
+            migration.enumerateObjects(ofType: "SwiftInt8Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int8Col"] as! Int8, oldObj!["int8Col"] as! Int8)
+                count += 1
+            }
+            XCTAssertEqual(count, 2)
+
+            count = 0
+            migration.enumerateObjects(ofType: "SwiftInt16Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int16Col"] as! Int16, oldObj!["int16Col"] as! Int16)
+                if oldObj!["int16Col"] as! Int16 == 1 {
+                    migration.delete(newObj!)
+                    migration.create("SwiftInt16Object", value: [0])
+                }
+            }
+            migration.enumerateObjects(ofType: "SwiftInt16Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int16Col"] as! Int16, oldObj!["int16Col"] as! Int16)
+                count += 1
+            }
+            XCTAssertEqual(count, 2)
+
+            count = 0
+            migration.enumerateObjects(ofType: "SwiftInt32Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int32Col"] as! Int32, oldObj!["int32Col"] as! Int32)
+                if oldObj!["int32Col"] as! Int32 == 1 {
+                    migration.delete(newObj!)
+                    migration.create("SwiftInt32Object", value: [0])
+                }
+            }
+            migration.enumerateObjects(ofType: "SwiftInt32Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int32Col"] as! Int32, oldObj!["int32Col"] as! Int32)
+                count += 1
+            }
+            XCTAssertEqual(count, 2)
+
+            count = 0
+            migration.enumerateObjects(ofType: "SwiftInt64Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int64Col"] as! Int64, oldObj!["int64Col"] as! Int64)
+                if oldObj!["int64Col"] as! Int64 == 1 {
+                    migration.delete(newObj!)
+                    migration.create("SwiftInt64Object", value: [0])
+                }
+            }
+            migration.enumerateObjects(ofType: "SwiftInt64Object") { oldObj, newObj in
+                XCTAssertEqual(newObj!["int64Col"] as! Int64, oldObj!["int64Col"] as! Int64)
                 count += 1
             }
             XCTAssertEqual(count, 2)
@@ -517,6 +649,14 @@ class MigrationTests: TestCase {
                 XCTAssertEqual((newObj!["boolCol"] as! Bool), true)
                 XCTAssertEqual((oldObj!["intCol"] as! Int), 123)
                 XCTAssertEqual((newObj!["intCol"] as! Int), 123)
+                XCTAssertEqual((oldObj!["int8Col"] as! Int8), 123)
+                XCTAssertEqual((newObj!["int8Col"] as! Int8), 123)
+                XCTAssertEqual((oldObj!["int16Col"] as! Int16), 123)
+                XCTAssertEqual((newObj!["int16Col"] as! Int16), 123)
+                XCTAssertEqual((oldObj!["int32Col"] as! Int32), 123)
+                XCTAssertEqual((newObj!["int32Col"] as! Int32), 123)
+                XCTAssertEqual((oldObj!["int64Col"] as! Int64), 123)
+                XCTAssertEqual((newObj!["int64Col"] as! Int64), 123)
                 XCTAssertEqual((oldObj!["intEnumCol"] as! Int), 1)
                 XCTAssertEqual((newObj!["intEnumCol"] as! Int), 1)
                 XCTAssertEqual((oldObj!["floatCol"] as! Float), 1.23 as Float)
@@ -550,6 +690,10 @@ class MigrationTests: TestCase {
                 // edit all values
                 newObj!["boolCol"] = false
                 newObj!["intCol"] = 1
+                newObj!["int8Col"] = Int8(1)
+                newObj!["int16Col"] = Int16(1)
+                newObj!["int32Col"] = Int32(1)
+                newObj!["int64Col"] = Int64(1)
                 newObj!["intEnumCol"] = IntEnum.value2.rawValue
                 newObj!["floatCol"] = 1.0
                 newObj!["doubleCol"] = 10.0
@@ -592,7 +736,7 @@ class MigrationTests: TestCase {
                 XCTAssertEqual(list.count, 1)
                 XCTAssertEqual((list[0]["boolCol"] as! Bool), false)
 
-                self.assertMatches(newObj!.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 1;\n\tintEnumCol = 3;\n\tfloatCol = 1;\n\tdoubleCol = 10;\n\tstringCol = a;\n\tbinaryCol = <.*62.*>;\n\tdateCol = 1970-01-01 00:00:02 \\+0000;\n\tdecimalCol = 5.67E10;\n\tobjectIdCol = abcdef123456abcdef123456;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftBoolObject \\{\n\t\t\tboolCol = 0;\n\t\t\\}\n\t\\);\n\\}")
+                self.assertMatches(newObj!.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 1;\n\tint8Col = 1;\n\tint16Col = 1;\n\tint32Col = 1;\n\tint64Col = 1;\n\tintEnumCol = 3;\n\tfloatCol = 1;\n\tdoubleCol = 10;\n\tstringCol = a;\n\tbinaryCol = <.*62.*>;\n\tdateCol = 1970-01-01 00:00:02 \\+0000;\n\tdecimalCol = 5.67E10;\n\tobjectIdCol = abcdef123456abcdef123456;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftBoolObject \\{\n\t\t\tboolCol = 0;\n\t\t\\}\n\t\\);\n\\}")
 
                 enumerated = true
             })
@@ -600,7 +744,7 @@ class MigrationTests: TestCase {
 
             let newObj = migration.create(SwiftObject.className())
             // swiftlint:next:disable line_length
-            self.assertMatches(newObj.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <.*61.*>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tdecimalCol = 1.23E6;\n\tobjectIdCol = 1234567890ab1234567890ab;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
+            self.assertMatches(newObj.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tint8Col = 123;\n\tint16Col = 123;\n\tint32Col = 123;\n\tint64Col = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <.*61.*>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tdecimalCol = 1.23E6;\n\tobjectIdCol = 1234567890ab1234567890ab;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
         }
 
         // refresh to update realm
@@ -610,6 +754,10 @@ class MigrationTests: TestCase {
         let object = try! Realm().objects(SwiftObject.self).first!
         XCTAssertEqual(object.boolCol, false)
         XCTAssertEqual(object.intCol, 1)
+        XCTAssertEqual(object.int8Col, Int8(1))
+        XCTAssertEqual(object.int16Col, Int16(1))
+        XCTAssertEqual(object.int32Col, Int32(1))
+        XCTAssertEqual(object.int64Col, Int64(1))
         XCTAssertEqual(object.floatCol, 1.0 as Float)
         XCTAssertEqual(object.doubleCol, 10.0)
         XCTAssertEqual(object.binaryCol, Data(bytes: "b", count: 1))

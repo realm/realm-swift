@@ -682,6 +682,54 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(frozen.filter("stringCol = '3'").count, 0)
         XCTAssertTrue(frozen.filter("stringCol = '3'").isFrozen)
     }
+
+    func testFilterWithInt8Property() {
+        _ = makeAggregateableObjects()
+        var results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int8Col = %d", Int8(0))
+        XCTAssertEqual(results.count, 0)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int8Col = %d", Int8(1))
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int8Col = %d", Int8(2))
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int8Col = %d", Int8(3))
+        XCTAssertEqual(results.count, 1)
+    }
+
+    func testFilterWithInt16Property() {
+        _ = makeAggregateableObjects()
+        var results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int16Col = %d", Int16(0))
+        XCTAssertEqual(results.count, 0)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int16Col = %d", Int16(1))
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int16Col = %d", Int16(2))
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int16Col = %d", Int16(3))
+        XCTAssertEqual(results.count, 1)
+    }
+
+    func testFilterWithInt32Property() {
+        _ = makeAggregateableObjects()
+        var results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int32Col = %d", Int32(0))
+        XCTAssertEqual(results.count, 0)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int32Col = %d", Int32(1))
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int32Col = %d", Int32(2))
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int32Col = %d", Int32(3))
+        XCTAssertEqual(results.count, 1)
+    }
+
+    func testFilterWithInt64Property() {
+        _ = makeAggregateableObjects()
+        var results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int64Col = %d", Int64(0))
+        XCTAssertEqual(results.count, 0)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int64Col = %d", Int64(1))
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int64Col = %d", Int64(2))
+        XCTAssertEqual(results.count, 1)
+        results = realmWithTestPath().objects(CTTAggregateObject.self).filter("int64Col = %d", Int64(3))
+        XCTAssertEqual(results.count, 1)
+    }
 }
 
 // MARK: Results
