@@ -24,18 +24,40 @@ import SwiftUI
 class SwiftUITests: TestCase {
     struct TestListView: View {
         @RealmState var list: RealmSwift.List<SwiftBoolObject>
+        @RealmState var optList: RealmSwift.List<SwiftBoolObject>?
 
-        var body: some View { fatalError() }
+        var body: some View {
+            VStack {
+                ForEach(list, id: \.self) { object in
+                    Toggle("toggle", isOn: object.bind(keyPath: \.boolCol))
+                }
+                ForEach(optList!, id: \.self) { object in
+                    Toggle("toggle", isOn: object.bind(keyPath: \.boolCol))
+                }
+            }
+        }
     }
     struct TestObjectView: View {
         @RealmState var object: SwiftObject
+        @RealmState var optObject: SwiftObject?
 
         var body: some View { fatalError() }
     }
+
     struct TestResultsView: View {
         @RealmState(SwiftObject.self, realm: inMemoryRealm("swiftui-tests")) var results: Results<SwiftObject>
+        @RealmState var optResults: Results<SwiftObject>?
 
-        var body: some View { fatalError() }
+        var body: some View {
+            VStack {
+                ForEach(results, id: \.self) { object in
+                    Text(object.stringCol)
+                }
+                ForEach(optResults!, id: \.self) { object in
+                    Text(object.stringCol)
+                }
+            }
+        }
     }
 
     func testRealmBindingDynamicPrimitiveColumn() {
@@ -76,6 +98,22 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(view.results.count, 0)
     }
 
+    func testOptResultsAppendRemove() {
+        let object = SwiftObject()
+
+        var optResults = RealmState<Results<SwiftObject>?>()
+        assertThrows(optResults.projectedValue.append(object))
+
+        // we cannot assign to the wrappedValue due to how StateObject functions,
+        // so we'll unit test the individual methods
+        optResults = RealmState(wrappedValue: inMemoryRealm("swiftui-tests").objects(SwiftObject.self))
+
+        optResults.projectedValue.append(object)
+        XCTAssertEqual(optResults.wrappedValue!.count, 1)
+        optResults.projectedValue.remove(atOffsets: IndexSet(arrayLiteral: 0))
+        XCTAssertEqual(optResults.wrappedValue!.count, 0)
+    }
+
     func testListAppendMoveRemove() {
         let view = TestResultsView()
         let object = SwiftObject()
@@ -93,6 +131,25 @@ class SwiftUITests: TestCase {
         XCTAssertTrue(listView.$list[1].boolCol.wrappedValue)
         listView.$list.remove(atOffsets: IndexSet([0, 1]))
         XCTAssertEqual(listView.list.count, 0)
+    }
+
+    func testOptListAppendMoveRemove() {
+        let view = TestResultsView()
+        let object = SwiftObject()
+        view.$results.append(object)
+        let list = RealmState<RealmSwift.List<SwiftBoolObject>?>(initialValue: object.arrayCol)
+        list.projectedValue.append(SwiftBoolObject())
+        XCTAssertEqual(list.projectedValue.wrappedValue!.count, 1)
+        list.projectedValue.append(SwiftBoolObject())
+        XCTAssertEqual(list.projectedValue.wrappedValue!.count, 2)
+        let realm = inMemoryRealm("swiftui-tests")
+        let obj = list.projectedValue.wrappedValue![0]
+        try! realm.write { obj.thaw()?.boolCol = true }
+        XCTAssertFalse(list.projectedValue.wrappedValue![1].boolCol)
+        list.projectedValue.move(fromOffsets: IndexSet([0]), toOffset: 2)
+        XCTAssertTrue(list.projectedValue.wrappedValue![1].boolCol)
+        list.projectedValue.remove(atOffsets: IndexSet([0, 1]))
+        XCTAssertEqual(list.projectedValue.wrappedValue!.count, 0)
     }
 
     func testObjectBaseBindUnmanaged() {

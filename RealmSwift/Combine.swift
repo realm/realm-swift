@@ -365,6 +365,29 @@ extension Object: RealmSubscribable {
     }
 }
 
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension EmbeddedObject: RealmSubscribable {
+    /// :nodoc:
+    // swiftlint:disable:next identifier_name
+    public func _observe<S: Subscriber>(on queue: DispatchQueue?, _ subscriber: S)
+        -> NotificationToken where S.Input: EmbeddedObject, S.Failure == Error {
+        return observe(on: queue) { (change: ObjectChange<S.Input>) in
+            switch change {
+            case .change(let object, _):
+                _ = subscriber.receive(object)
+            case .deleted:
+                subscriber.receive(completion: .finished)
+            case .error(let error):
+                subscriber.receive(completion: .failure(error))
+            }
+        }
+    }
+
+    /// :nodoc:
+    public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
+        return observe { _ in _ = subscriber.receive() }
+    }
+}
 // MARK: - List
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)

@@ -51,7 +51,7 @@ class Person: Object, ObjectKeyIdentifiable {
 }
 
 struct DogList: View {
-    @RealmState var dogs: RealmSwift.List<Dog>
+    @ObservedRealmObject var dogs: RealmSwift.List<Dog>
     @State var selection: Dog?
 
     var body: some View {
@@ -64,7 +64,6 @@ struct DogList: View {
                     guard let selection = selection,
                           let index = dogs.index(of: selection) else { return }
                     $dogs.remove(at: index)
-                    self.selection = nil
                 }).accessibility(identifier: "deleteDog")
             }
             List(selection: $selection) {
@@ -84,7 +83,7 @@ struct PersonDetailView: View {
     var body: some View {
         VStack {
             HStack {
-                TextField("name", text: $person.name)
+                TextField("name", text: person.bind(keyPath: \.name))
                     .font(Font.largeTitle.bold()).padding()
                     .accessibility(identifier: "personName")
             }
@@ -102,6 +101,7 @@ struct PersonRowView: View {
 }
 
 struct PersonView: View {
+    // test optional type
     @RealmState(Person.self) var results
     @Environment(\.realm) var realm
     @State var selection: Person?
@@ -112,7 +112,7 @@ struct PersonView: View {
                 ForEach(results) { person in
                     NavigationLink(destination: PersonDetailView(person: person)) {
                         PersonRowView(person: person)
-                    }.tag(person)
+                    }.tag(person).onAppear { print(person.isFrozen) }
                 }
             }.navigationTitle("People")
             .frame(minWidth: 300)
@@ -127,9 +127,9 @@ struct PersonView: View {
                 }
                 ToolbarItem {
                     Button(action: {
-                        if let selection = selection, let index = results.index(of: selection) {
+                        if let selection = selection, let index = results.firstIndex(where: {$0.id == selection.id}) {
                             $results.remove(at: index)
-                            self.selection = nil
+//                            self.selection = results.first
                         }
                     }, label: {
                         Image(systemName: selection != nil ? "minus.circle.fill" : "minus.circle")
@@ -143,7 +143,7 @@ struct PersonView: View {
 
 struct ContentView: View {
     var body: some View {
-        PersonView()
+        PersonView(/*results: try! Realm().objects(Person.self)*/)
     }
 }
 

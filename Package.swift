@@ -210,12 +210,12 @@ let package = Package(
             ],
             cxxSettings: testCxxSettings
         ),
-        .testTarget(
-            name: "SwiftUIIntegrationTests",
-            dependencies: ["RealmSwift"],
-            path: "SwiftUITestHostUITests",
-            cxxSettings: testCxxSettings
-        )
+//        .testTarget(
+//            name: "SwiftUIIntegrationTests",
+//            dependencies: ["RealmSwift"],
+//            path: "SwiftUITestHostUITests",
+//            cxxSettings: testCxxSettings
+//        )
     ],
     cxxLanguageStandard: .cxx1z
 )

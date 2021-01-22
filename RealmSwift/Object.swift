@@ -370,7 +370,7 @@ extension Object: ThreadConfined {
  Information about the changes made to an object which is passed to `Object`'s
  notification blocks.
  */
-@frozen public enum ObjectChange<T: Object> {
+@frozen public enum ObjectChange<T: ObjectBase> {
     /**
      If an error occurs, notification blocks are called one time with a `.error`
      result and an `NSError` containing details about the error. Currently the

@@ -59,7 +59,7 @@ class Person: Object, ObjectKeyIdentifiable {
 }
 
 struct DogList: View {
-    @RealmState var dogs: RealmSwift.List<Dog>
+    @ObservedRealmObject var dogs: RealmSwift.List<Dog>
 
     var body: some View {
         List {
@@ -85,7 +85,7 @@ struct PersonDetailView: View {
     @RealmState var person: Person
 
     var body: some View {
-        VStack {
+        return VStack {
             // The write transaction for the name property of `Person`
             // is implicit here, and will occur on every edit
             TextField("name", text: $person.name)
