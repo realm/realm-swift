@@ -24,6 +24,7 @@ Pod::Spec.new do |s|
 
                               # Realm module
                               'include/**/RLMArray.h',
+                              'include/**/RLMSet.h',
                               'include/**/RLMCollection.h',
                               'include/**/RLMConstants.h',
                               'include/**/RLMDecimal128.h',
