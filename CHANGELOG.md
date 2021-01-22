@@ -8,6 +8,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fixed an issue where creating an object after file format upgrade may fail
   with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
  ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
+ * Fix - `RLMResponse` will have a non nil `customStatusCode` in case of error. ([#4188](https://github.com/realm/realm-core/issues/4188))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -44,7 +45,6 @@ x.y.z Release notes (yyyy-MM-dd)
   assertion failure rather than a more appropriate exception.
   ([Core #4114](https://github.com/realm/realm-core/issues/4114), since v5.0.0).
 * Fix an issue where calling a MongoDB Realm Function would never be performed as the reference to the weak `User` was lost.
-* Fix error code propagation to object store.
 
 ### Compatibility
 
