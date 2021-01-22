@@ -59,12 +59,12 @@ class Person: Object, ObjectKeyIdentifiable {
 }
 
 struct DogList: View {
-    @ObservedRealmObject var dogs: RealmSwift.List<Dog>
+    @RealmState var dogs: RealmSwift.List<Dog>? = nil
 
     var body: some View {
         List {
             // Bind the dogs to the view
-            ForEach(dogs) { dog in
+            ForEach(dogs!) { dog in
                 // bind the dog name to the TextField for easy modifications
                 TextField("dog name", text: dog.bind(keyPath: \.name))
             }
@@ -90,21 +90,22 @@ struct PersonDetailView: View {
             // is implicit here, and will occur on every edit
             TextField("name", text: $person.name)
                 .font(Font.largeTitle.bold()).padding()
-            List {
-                // Bind the dog list to the view
-                ForEach(person.dogs) { dog in
-                    // bind the dog name to view for easy modifying
-                    TextField("dog name", text: dog.bind(keyPath: \.name))
-                }
-                // the remove method on the dogs list
-                // will implicitly write and remove the dogs
-                // at the offsets from the `onDelete(perform:)` method
-                .onDelete(perform: $person.dogs.remove)
-                // the move method on the dogs list
-                // will implicitly write and move the dogs
-                // to and from the offsets from the `onMove(perform:)` method
-                .onMove(perform: $person.dogs.move)
-            }
+            DogList(dogs: person.dogs)
+//            List {
+//                // Bind the dog list to the view
+//                ForEach(person.dogs) { dog in
+//                    // bind the dog name to view for easy modifying
+//                    TextField("dog name", text: dog.bind(keyPath: \.name))
+//                }
+//                // the remove method on the dogs list
+//                // will implicitly write and remove the dogs
+//                // at the offsets from the `onDelete(perform:)` method
+//                .onDelete(perform: $person.dogs.remove)
+//                // the move method on the dogs list
+//                // will implicitly write and move the dogs
+//                // to and from the offsets from the `onMove(perform:)` method
+//                .onMove(perform: $person.dogs.move)
+//            }
         }
         .navigationBarItems(trailing: Button("Add Dog") {
             // appending a dog to the dogs List implicitly

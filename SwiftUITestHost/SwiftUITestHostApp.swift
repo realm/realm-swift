@@ -131,7 +131,6 @@ struct PersonView: View {
                     Button(action: {
                         if let selection = selection, let index = results.firstIndex(where: {$0.id == selection.id}) {
                             $results.remove(at: index)
-//                            self.selection = results.first
                         }
                     }, label: {
                         Image(systemName: selection != nil ? "minus.circle.fill" : "minus.circle")

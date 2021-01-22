@@ -42,7 +42,9 @@ private func createBinding<T: ThreadConfined, V>(_ getter: @escaping () -> T,
     },
     set: { newValue in
         var parent = getter()
-        guard !parent.isInvalidated else { return }
+        guard !parent.isInvalidated else {
+            return
+        }
         if parent.isFrozen {
             parent = try! Realm(configuration: parent.realm!.configuration).thaw(parent)!
         }
@@ -56,14 +58,9 @@ private func createBinding<T: ThreadConfined, V>(_ getter: @escaping () -> T,
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Binding where Value: ExpressibleByNilLiteral {
     /// :nodoc:
-    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V?> where Value == Optional<V>, V: ThreadConfined {
+    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where Value == Optional<V>, V: ThreadConfined {
         get {
-            Binding<V?>(get: {
-                return wrappedValue[keyPath: member]
-            }, set: { _ in
-                fatalError()
-            })
-//            createBinding({ wrappedValue }, forKeyPath: member)
+            return createBinding({ wrappedValue }, forKeyPath: member)
         }
     }
 }
@@ -359,27 +356,43 @@ private final class Box<T: RealmSubscribable & ThreadConfined>: ObservableObject
      property wrapper because in certain cases with SwiftUI, the view heirarchy will hold
      onto invalidated references. This acts as a stand in value during those occurences.
      */
-    private let defaultValue: T
+    private var defaultValue: T
     /**
      Initialize a RealmState struct for a given thread confined type.
-     - parameter wrappedValue The RealmSubscribable value to wrap and observe.
+     - parameter wrappedValue The List reference to wrap and observe.
+     */
+    public init(wrappedValue: T) where T: ListBase & RealmCollection {
+        let value = try! Realm(configuration: wrappedValue.realm!.configuration).thaw(wrappedValue)!
+        self._box = StateObject(wrappedValue: Box(value))
+        self.defaultValue = List<T.Element>() as! T
+    }
+    /**
+     Initialize a RealmState struct for a given thread confined type.
+     - parameter wrappedValue The ObjectBase reference to wrap and observe.
      */
     public init(wrappedValue: T) where T: ObjectBase {
         let value = try! Realm(configuration: wrappedValue.realm!.configuration).thaw(wrappedValue)!
         self._box = StateObject(wrappedValue: Box(value))
         self.defaultValue = T()
     }
-
-    public init<V>(wrappedValue: T) where T == List<V> {
-        let value = try! Realm(configuration: wrappedValue.realm!.configuration).thaw(wrappedValue)!
-        self._box = StateObject(wrappedValue: Box(value))
-        self.defaultValue = T()
-    }
+    /**
+     Initialize a RealmState struct for a given thread confined type.
+     - parameter wrappedValue The Results value to wrap and observe.
+     */
     public init<V>(wrappedValue: T) where T == Results<V> {
         let value = try! Realm(configuration: wrappedValue.realm!.configuration).thaw(wrappedValue)!
         self._box = StateObject(wrappedValue: Box(value))
         self.defaultValue = T(wrappedValue.rlmResults.snapshot())
     }
+
+    public init<V>(wrappedValue: T) where T == Optional<V> {
+        self.init()
+        if let unwrapped = wrappedValue {
+            let value = try! Realm(configuration: unwrapped.realm!.configuration).thaw(unwrapped)!
+            self._box = StateObject(wrappedValue: Box(value))
+        }
+    }
+
     /**
      Initialize a RealmState struct for a given Result type.
      - parameter type The Object Type to get results for.
@@ -421,6 +434,7 @@ extension RealmState where T: ExpressibleByNilLiteral {
             })
         }
     }
+    /// The object to observe
     @ObservedObject private var object: ObjectType
     /**
      An empty, zero initialized value of the object type. We create this on initialization of the
@@ -448,7 +462,6 @@ extension RealmState where T: ExpressibleByNilLiteral {
         }
         return Wrapper(wrappedValue: object/*.freeze()*/)
     }
-
     /**
      Initialize a RealmState struct for a given thread confined type.
      - parameter wrappedValue The RealmSubscribable value to wrap and observe.
@@ -480,24 +493,6 @@ extension ObservedRealmObject where ObjectType: ExpressibleByNilLiteral {
     public init() {
         _object = ObservedObject(wrappedValue: nil)
         defaultValue = nil
-    }
-}
-
-@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
-extension ThreadConfined where Self: ObjectBase {
-    /**
-     Create a `Binding` for a given property, allowing for
-     automatically transacted reads and writes behind the scenes.
-
-     This is a convenience method for SwiftUI views (e.g., TextField, DatePicker)
-     that require a `Binding` to be passed in. SwiftUI will automatically read/write
-     from the binding.
-
-     - parameter keyPath The key path to the member property.
-     - returns A `Binding` to the member property.
-     */
-    public func bind<V: _ManagedPropertyType>(keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V>  {
-        createBinding({self}, forKeyPath: keyPath)
     }
 }
 
@@ -537,6 +532,24 @@ extension ObservedRealmObject.Wrapper where ObjectType: RealmCollection {
         try! list.realm!.write {
             list.append(value)
         }
+    }
+}
+
+@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+extension ThreadConfined where Self: ObjectBase {
+    /**
+     Create a `Binding` for a given property, allowing for
+     automatically transacted reads and writes behind the scenes.
+
+     This is a convenience method for SwiftUI views (e.g., TextField, DatePicker)
+     that require a `Binding` to be passed in. SwiftUI will automatically read/write
+     from the binding.
+
+     - parameter keyPath The key path to the member property.
+     - returns A `Binding` to the member property.
+     */
+    public func bind<V: _ManagedPropertyType>(keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V>  {
+        createBinding({self}, forKeyPath: keyPath)
     }
 }
 #endif
