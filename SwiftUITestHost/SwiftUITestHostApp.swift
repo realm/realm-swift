@@ -67,8 +67,10 @@ struct DogList: View {
                 }).accessibility(identifier: "deleteDog")
             }
             List(selection: $selection) {
-                ForEach(dogs, id: \.self) { (dog: Dog) in
-                    TextField("dog name", text: dog.bind(keyPath: \.name)).accessibility(identifier: dog.name)
+                ForEach(dogs) { (dog: Dog) in
+                    TextField("dog name", text: dog.bind(keyPath: \.name))
+                        .tag(dog)
+                        .accessibility(identifier: dog.name)
                 }
                 .onMove(perform: $dogs.move)
             }.accessibility(identifier: "dog table")

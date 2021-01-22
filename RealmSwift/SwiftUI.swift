@@ -347,7 +347,7 @@ private final class Box<T: RealmSubscribable & ThreadConfined>: ObservableObject
             if box.value.isInvalidated {
                 return defaultValue
             }
-            return box.value.freeze()
+            return box.value//.freeze()
         }, set: { newValue in
             try? wrappedValue.realm?.write {
                 wrappedValue = newValue
@@ -374,6 +374,11 @@ private final class Box<T: RealmSubscribable & ThreadConfined>: ObservableObject
         let value = try! Realm(configuration: wrappedValue.realm!.configuration).thaw(wrappedValue)!
         self._box = StateObject(wrappedValue: Box(value))
         self.defaultValue = T()
+    }
+    public init<V>(wrappedValue: T) where T == Results<V> {
+        let value = try! Realm(configuration: wrappedValue.realm!.configuration).thaw(wrappedValue)!
+        self._box = StateObject(wrappedValue: Box(value))
+        self.defaultValue = T(wrappedValue.rlmResults.snapshot())
     }
     /**
      Initialize a RealmState struct for a given Result type.
@@ -441,7 +446,7 @@ extension RealmState where T: ExpressibleByNilLiteral {
         if object.isInvalidated {
             return Wrapper(wrappedValue: defaultValue)
         }
-        return Wrapper(wrappedValue: object.freeze())
+        return Wrapper(wrappedValue: object/*.freeze()*/)
     }
 
     /**
@@ -495,6 +500,7 @@ extension ThreadConfined where Self: ObjectBase {
         createBinding({self}, forKeyPath: keyPath)
     }
 }
+
 @available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
 extension ObservedRealmObject.Wrapper where ObjectType: RealmCollection {
     public typealias Value = ObjectType
