@@ -207,7 +207,6 @@ public extension EnvironmentValues {
         }
     }
 }
-
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Optional: RealmSubscribable where Wrapped: RealmSubscribable {
     struct WrappedSubscriber: Subscriber {
@@ -260,6 +259,10 @@ extension Optional: ThreadConfined where Wrapped: ThreadConfined {
     public func freeze() -> Optional<Wrapped> {
         return self?.freeze()
     }
+
+    public func thaw() -> Optional<Wrapped> {
+        return self.map { $0.realm?.thaw($0) } ?? nil
+    }
 }
 
 // MARK: RealmState
@@ -267,9 +270,22 @@ extension Optional: ThreadConfined where Wrapped: ThreadConfined {
 private final class Box<T: RealmSubscribable & ThreadConfined>: ObservableObject, Subscriber {
     typealias Input = T
     typealias Failure = Error
+    var shouldObserve = false
 
     var value: T {
+        didSet {
+            if shouldObserve {
+                if self.value.isFrozen {
+                    self.value = self.value.realm!.thaw(value)!
+                }
+                self.token = self.value._observe(on: nil, self)
+                shouldObserve = false
+            }
+        }
         willSet {
+            if value.realm == nil {
+                shouldObserve = true
+            }
             objectWillChange.send()
         }
     }
@@ -278,7 +294,9 @@ private final class Box<T: RealmSubscribable & ThreadConfined>: ObservableObject
 
     init(_ value: T) {
         self.value = value.isFrozen ? value.realm!.thaw(value)! : value
-        self.token = self.value._observe(on: nil, self)
+        if value.realm != nil {
+            self.token = self.value._observe(on: nil, self)
+        }
     }
 
     func receive(subscription: Subscription) {
@@ -332,6 +350,9 @@ private final class Box<T: RealmSubscribable & ThreadConfined>: ObservableObject
             if box.value.isInvalidated {
                 return defaultValue
             }
+            if box.value.realm == nil {
+                return box.value
+            }
             return box.value.freeze()
         }
         nonmutating set {
@@ -343,6 +364,9 @@ private final class Box<T: RealmSubscribable & ThreadConfined>: ObservableObject
         Binding(get: {
             if box.value.isInvalidated {
                 return defaultValue
+            }
+            if box.value.realm == nil {
+                return box.value
             }
             return box.value//.freeze()
         }, set: { newValue in
@@ -362,8 +386,12 @@ private final class Box<T: RealmSubscribable & ThreadConfined>: ObservableObject
      - parameter wrappedValue The List reference to wrap and observe.
      */
     public init(wrappedValue: T) where T: ListBase & RealmCollection {
-        let value = try! Realm(configuration: wrappedValue.realm!.configuration).thaw(wrappedValue)!
-        self._box = StateObject(wrappedValue: Box(value))
+        if wrappedValue.isFrozen, let realm = wrappedValue.realm,
+           let value = try? Realm(configuration: realm.configuration).thaw(wrappedValue) {
+            self._box = StateObject(wrappedValue: Box(value))
+        } else {
+            self._box = StateObject(wrappedValue: Box(wrappedValue))
+        }
         self.defaultValue = List<T.Element>() as! T
     }
     /**
@@ -371,8 +399,12 @@ private final class Box<T: RealmSubscribable & ThreadConfined>: ObservableObject
      - parameter wrappedValue The ObjectBase reference to wrap and observe.
      */
     public init(wrappedValue: T) where T: ObjectBase {
-        let value = try! Realm(configuration: wrappedValue.realm!.configuration).thaw(wrappedValue)!
-        self._box = StateObject(wrappedValue: Box(value))
+        if wrappedValue.isFrozen, let realm = wrappedValue.realm,
+           let value = try? Realm(configuration: realm.configuration).thaw(wrappedValue) {
+            self._box = StateObject(wrappedValue: Box(value))
+        } else {
+            self._box = StateObject(wrappedValue: Box(wrappedValue))
+        }
         self.defaultValue = T()
     }
     /**
