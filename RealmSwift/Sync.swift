@@ -268,7 +268,7 @@ import Combine
 /// This handler is executed on a non-main global `DispatchQueue`.
 @dynamicMemberLookup
 @frozen public struct Functions {
-    
+
     private let user: User
 
     fileprivate init(user: User) {
