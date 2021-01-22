@@ -50,7 +50,7 @@
     NSAssert(user.identifier, @"Cannot call this method on a user that doesn't have an identifier.");
     self.config.in_memory = false;
     self.config.sync_config = std::make_shared<realm::SyncConfig>([syncConfiguration rawConfiguration]);
-    self.config.schema_mode = realm::SchemaMode::AdditiveDiscovered;
+    self.config.schema_mode = realm::SchemaMode::Additive;
 
     if (syncConfiguration.customFileURL) {
         self.config.path = syncConfiguration.customFileURL.path.UTF8String;

@@ -210,7 +210,7 @@ static bool isSync(realm::Realm::Config const& config) {
         _config.schema_mode = isSync(_config) ? realm::SchemaMode::ReadOnlyAlternative : realm::SchemaMode::Immutable;
     }
     else if (self.readOnly) {
-        _config.schema_mode = isSync(_config) ? realm::SchemaMode::AdditiveDiscovered : realm::SchemaMode::Automatic;
+        _config.schema_mode = isSync(_config) ? realm::SchemaMode::Additive : realm::SchemaMode::Automatic;
     }
 }
 
