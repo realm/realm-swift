@@ -523,7 +523,7 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testThaw() {
-        let frozen = collection.freeze()
+        let frozen = collection.freeze()!
         XCTAssertTrue(frozen.isFrozen)
 
         let frozenRealm = frozen.realm!
@@ -539,7 +539,7 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testThawFromDifferentThread() {
-        let frozen = collection.freeze()
+        let frozen = collection.freeze()!
         XCTAssertTrue(frozen.isFrozen)
 
         dispatchSyncNewThread {
@@ -555,7 +555,7 @@ class RealmCollectionTypeTests: TestCase {
 
 
     func testThawPreviousVersion() {
-        let frozen = collection.freeze()
+        let frozen = collection.freeze()!
         XCTAssertTrue(frozen.isFrozen)
         XCTAssertEqual(collection.count, frozen.count)
 
@@ -579,7 +579,7 @@ class RealmCollectionTypeTests: TestCase {
 
         dispatchSyncNewThread {
             let realm = try! Realm(configuration: self.collection.realm!.configuration)
-            let collection = realm.resolve(tsr)!
+            let collection = realm.resolve(tsr)!!
             try! realm.write({ collection.first!.stringCol = "3" })
             try! realm.write({ realm.delete(collection.last!) })
 
@@ -662,7 +662,7 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testAccessFrozenCollectionFromDifferentThread() {
-        let frozen = collection.freeze()
+        let frozen = collection.freeze()!
         dispatchSyncNewThread {
             XCTAssertEqual(frozen[0].stringCol, "1")
             XCTAssertEqual(frozen[1].stringCol, "2")
@@ -670,13 +670,13 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testObserveFrozenCollection() {
-        let frozen = collection.freeze()
+        let frozen = collection.freeze()!
         assertThrows(frozen.observe({ _ in }),
                      reason: "Frozen Realms do not change and do not have change notifications.")
     }
 
     func testQueryFrozenCollection() {
-        let frozen = collection.freeze()
+        let frozen = collection.freeze()!
         XCTAssertEqual(frozen.filter("stringCol = '1'").count, 1)
         XCTAssertEqual(frozen.filter("stringCol = '2'").count, 1)
         XCTAssertEqual(frozen.filter("stringCol = '3'").count, 0)

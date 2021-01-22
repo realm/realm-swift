@@ -56,6 +56,96 @@ private func createBinding<T: ThreadConfined, V>(_ getter: @escaping () -> T,
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+@frozen @propertyWrapper @dynamicMemberLookup public struct RealmBinding<Value: ThreadConfined> {
+    /// A wrapper of the underlying observable object that can create bindings to
+    /// its properties using dynamic member lookup.
+    @dynamicMemberLookup @frozen public struct Wrapper {
+        public var wrappedValue: Value
+        /// Returns a binding to the resulting value of a given key path.
+        ///
+        /// - Parameter keyPath  : A key path to a specific resulting value.
+        ///
+        /// - Returns: A new binding.
+        public subscript<Subject>(dynamicMember keyPath: ReferenceWritableKeyPath<Value, Subject>) -> Subject {
+            get {
+                self.wrappedValue[keyPath: keyPath]
+            }
+            set {
+                self.wrappedValue.realm?.beginWrite()
+                self.wrappedValue[keyPath: keyPath] = newValue
+                try? self.wrappedValue.realm?.commitWrite()
+            }
+        }
+        public subscript<Subject>(dynamicMember keyPath: ReferenceWritableKeyPath<Value, Subject>) -> Binding<Subject> where Subject: RealmCollection {
+            get {
+                Binding<Subject>(get: {
+                    self.wrappedValue[keyPath: keyPath]
+                }, set: {
+                    self.wrappedValue.realm?.beginWrite()
+                    self.wrappedValue[keyPath: keyPath] = $0
+                    try? self.wrappedValue.realm?.commitWrite()
+                })
+            } set {
+                
+            }
+        }
+        public subscript<Subject, Wrapped>(dynamicMember keyPath: ReferenceWritableKeyPath<Wrapped, Subject>) -> Subject where Value == Optional<Wrapped> {
+            get {
+                self.wrappedValue.unsafelyUnwrapped[keyPath: keyPath]
+            }
+            set {
+                self.wrappedValue.realm?.beginWrite()
+                self.wrappedValue.unsafelyUnwrapped[keyPath: keyPath] = newValue
+                try? self.wrappedValue.realm?.commitWrite()
+            }
+        }
+    }
+    private var getter: () -> Value
+//    private var setter: (Value) -> ()
+    public var wrappedValue: Value {
+        get {
+            projectedValue.wrappedValue
+        }
+        set {
+            projectedValue.wrappedValue = newValue
+        }
+    }
+
+    public var projectedValue: Wrapper
+
+    public init(wrappedValue: Value) {
+        self.getter = { wrappedValue }
+        self.projectedValue = Wrapper(wrappedValue: wrappedValue)
+    }
+    /// :nodoc:
+    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> V {
+        get {
+            var parent = getter()
+            guard !parent.isInvalidated else {
+                fatalError()
+            }
+            if parent.isFrozen {
+                parent = try! Realm(configuration: parent.realm!.configuration).thaw(parent)!
+            }
+            return parent[keyPath: member]
+        }
+        set {
+            var parent = getter()
+            guard !parent.isInvalidated else {
+                fatalError()
+            }
+            if parent.isFrozen {
+                parent = try! Realm(configuration: parent.realm!.configuration).thaw(parent)!
+            }
+
+            parent.realm?.beginWrite()
+            parent[keyPath: member] = newValue
+            try! parent.realm?.commitWrite()
+        }
+    }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Binding where Value: ExpressibleByNilLiteral {
     /// :nodoc:
     public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where Value == Optional<V>, V: ThreadConfined {
@@ -84,42 +174,54 @@ extension Binding where Value: RealmCollection {
     public typealias Indices = Value.Indices
     /// :nodoc:
     public func remove<V>(at index: Index) where Value == List<V> {
-        let collection = self.wrappedValue.thaw()
+        guard let collection = self.wrappedValue.thaw() else {
+            return
+        }
         try! collection.realm!.write {
             collection.remove(at: index)
         }
     }
     /// :nodoc:
     public func remove<V>(at index: Index) where Value == Results<V>, V: ObjectBase {
-        let results = self.wrappedValue.thaw()
+        guard let results = self.wrappedValue.thaw() else {
+            return
+        }
         try! results.realm!.write {
             results.realm!.delete(results[index])
         }
     }
     /// :nodoc:
     public func remove<V>(atOffsets offsets: IndexSet) where Value == Results<V>, V: ObjectBase {
-        let results = self.wrappedValue.thaw()
+        guard let results = self.wrappedValue.thaw() else {
+            return
+        }
         try! results.realm!.write {
             results.realm!.delete(Array(offsets.map { results[$0] }))
         }
     }
     /// :nodoc:
     public func remove<V>(atOffsets offsets: IndexSet) where Value: List<V> {
-        let list = self.wrappedValue.thaw()
+        guard let list = self.wrappedValue.thaw() else {
+            return
+        }
         try! list.realm!.write {
             list.remove(atOffsets: offsets)
         }
     }
     /// :nodoc:
     public func move<V>(fromOffsets offsets: IndexSet, toOffset destination: Int) where Value: List<V> {
-        let list = self.wrappedValue.thaw()
+        guard let list = self.wrappedValue.thaw() else {
+            return
+        }
         try! list.realm!.write {
             list.move(fromOffsets: offsets, toOffset: destination)
         }
     }
     /// :nodoc:
     public func append<V>(_ value: Value.Element) where Value: List<V> {
-        let list = self.wrappedValue.thaw()
+        guard let list = self.wrappedValue.thaw() else {
+            return
+        }
         try! list.realm!.write {
             list.append(value)
         }
@@ -136,49 +238,63 @@ extension Binding where Value: RealmCollection {
 extension Binding where Value: ExpressibleByNilLiteral {
     /// :nodoc:
     public func remove<V>(at index: List<V>.Index) where Value == Optional<List<V>> {
-        let collection = self.wrappedValue!.thaw()
+        guard let collection = self.wrappedValue?.thaw() else {
+            return
+        }
         try! collection.realm!.write {
             collection.remove(at: index)
         }
     }
     /// :nodoc:
     public func remove<V>(at index: Results<V>.Index) where Value == Optional<Results<V>>, V: ObjectBase {
-        let results = self.wrappedValue!.thaw()
+        guard let results = self.wrappedValue?.thaw() else {
+            return
+        }
         try! results.realm!.write {
             results.realm!.delete(results[index])
         }
     }
     /// :nodoc:
     public func remove<V>(atOffsets offsets: IndexSet) where Value == Optional<Results<V>>, V: ObjectBase {
-        let results = self.wrappedValue!
+        guard let results = self.wrappedValue?.thaw() else {
+            return
+        }
         try! results.realm!.write {
             results.realm!.delete(Array(offsets.map { results[$0] }))
         }
     }
     /// :nodoc:
     public func remove<V>(atOffsets offsets: IndexSet) where Value == Optional<List<V>> {
-        let list = self.wrappedValue!
+        guard let list = self.wrappedValue?.thaw() else {
+            return
+        }
         try! list.realm!.write {
             list.remove(atOffsets: offsets)
         }
     }
     /// :nodoc:
     public func move<V>(fromOffsets offsets: IndexSet, toOffset destination: Int) where Value == Optional<List<V>> {
-        let list = self.wrappedValue!.thaw()
+        guard let list = self.wrappedValue?.thaw() else {
+            return
+        }
         try! list.realm!.write {
             list.move(fromOffsets: offsets, toOffset: destination)
         }
     }
     /// :nodoc:
     public func append<V>(_ value: Value.Wrapped.Element) where Value == Optional<List<V>> {
-        let list = self.wrappedValue!.thaw()
+        guard let list = self.wrappedValue?.thaw() else {
+            return
+        }
         try! list.realm!.write {
             list.append(value)
         }
     }
     /// :nodoc:
     public func append<V>(_ value: Value.Wrapped.Element) where Value == Optional<Results<V>>, V: Object {
-        let collection = self.wrappedValue!.thaw()
+        guard let collection = self.wrappedValue?.thaw() else {
+            return
+        }
         try! collection.realm!.write {
             collection.realm!.add(value)
         }
@@ -260,12 +376,12 @@ extension Optional: ThreadConfined where Wrapped: ThreadConfined {
         return self?.freeze()
     }
 
-    public func thaw() -> Optional<Wrapped> {
+    public func thaw() -> Optional<Wrapped>? {
         return self.map { $0.realm?.thaw($0) } ?? nil
     }
 }
 
-// MARK: RealmState
+// MARK: Box
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 private final class Box<T: RealmSubscribable & ThreadConfined>: ObservableObject, Subscriber {
     typealias Input = T
@@ -276,7 +392,7 @@ private final class Box<T: RealmSubscribable & ThreadConfined>: ObservableObject
         didSet {
             if shouldObserve {
                 if self.value.isFrozen {
-                    self.value = self.value.realm!.thaw(value)!
+                    self.value = value.thaw()!
                 }
                 self.token = self.value._observe(on: nil, self)
                 shouldObserve = false
@@ -447,6 +563,7 @@ extension RealmState where T: ExpressibleByNilLiteral {
     }
 }
 
+// MARK: ObservedRealmObject
 @available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
 @frozen @propertyWrapper public struct ObservedRealmObject<ObjectType: RealmSubscribable & ThreadConfined & ObservableObject>: DynamicProperty {
     /// A wrapper of the underlying observable object that can create bindings to
@@ -539,28 +656,30 @@ extension ObservedRealmObject.Wrapper where ObjectType: RealmCollection {
     public typealias Indices = Value.Indices
     /// :nodoc:
     public func remove<V>(at index: Index) where Value == List<V> {
-        let collection = self.wrappedValue.thaw()
+        guard let collection = self.wrappedValue.thaw() else { return }
         try! collection.realm!.write {
             collection.remove(at: index)
         }
     }
     /// :nodoc:
     public func remove<V>(atOffsets offsets: IndexSet) where Value: List<V> {
-        let list = self.wrappedValue.thaw()
+        guard let list = self.wrappedValue.thaw() else { return }
         try! list.realm!.write {
             list.remove(atOffsets: offsets)
         }
     }
     /// :nodoc:
     public func move<V>(fromOffsets offsets: IndexSet, toOffset destination: Int) where Value: List<V> {
-        let list = self.wrappedValue.thaw()
+        guard let list = self.wrappedValue.thaw() else {
+            return
+        }
         try! list.realm!.write {
             list.move(fromOffsets: offsets, toOffset: destination)
         }
     }
     /// :nodoc:
     public func append<V>(_ value: Value.Element) where Value: List<V> {
-        let list = self.wrappedValue.thaw()
+        guard let list = self.wrappedValue.thaw() else { return }
         try! list.realm!.write {
             list.append(value)
         }

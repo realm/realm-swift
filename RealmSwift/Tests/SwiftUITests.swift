@@ -63,13 +63,17 @@ class SwiftUITests: TestCase {
 
     static let inMemoryIdentifier = "swiftui-tests"
     // We require a struct here to test the property wrapper projections
-    struct ListHolder {
+    struct ListHolder: View {
         @RealmState var list = RealmSwift.List<SwiftBoolObject>()
         @RealmState var listOpt: RealmSwift.List<SwiftBoolObject>?
 
         @RealmState var primitieveList = RealmSwift.List<Int>()
         @RealmState var primitiveListOpt: RealmSwift.List<Int>?
+
+        var body: some View { VStack {} }
     }
+
+
     @RealmState var obj = SwiftObject()
     @RealmState var objOpt: SwiftObject?
 
@@ -78,6 +82,32 @@ class SwiftUITests: TestCase {
 
     @RealmState var results = inMemoryRealm(SwiftUITests.inMemoryIdentifier).objects(SwiftObject.self)
     @RealmState var resultsOpt: Results<SwiftObject>?
+
+
+    struct BindingTest {
+        @RealmBinding var obj: SwiftObject
+        @RealmBinding var objOpt: SwiftObject?
+    }
+
+    func testBinding() throws {
+        var test = BindingTest(obj: SwiftObject())
+        let realm = inMemoryRealm(SwiftUITests.inMemoryIdentifier)
+        try realm.write { realm.add(test.obj) }
+
+        assertThrows(test.obj.boolCol = true)
+        XCTAssertNoThrow(test.$obj.boolCol = true)
+
+        XCTAssertTrue(test.obj.boolCol)
+
+        test.objOpt = SwiftObject()
+        XCTAssertFalse(test.objOpt!.boolCol)
+        try realm.write { realm.add(test.objOpt!) }
+        assertThrows(test.objOpt?.boolCol = true)
+        XCTAssertNoThrow(test.$objOpt.boolCol = true)
+        XCTAssertTrue(test.objOpt!.boolCol)
+
+        test.$obj.arrayCol.append(SwiftBoolObject())
+    }
 
     func testListAppend() throws {
         let listHolder = ListHolder(list: obj.arrayCol, listOpt: nil)
@@ -95,7 +125,9 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(listHolder.listOpt?.count, nil)
 
         listHolder.listOpt = obj.arrayCol
-        assertThrows(listHolder.listOpt?.append(SwiftBoolObject()))
+//        assertThrows(
+//            listHolder.listOpt!.append(SwiftBoolObject())
+//        )
 
         XCTAssertNoThrow(listHolder.$listOpt.append(SwiftBoolObject()))
         XCTAssertEqual(listHolder.listOpt?.count, 3)
