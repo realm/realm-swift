@@ -1538,7 +1538,7 @@ public:
 - (RLMRealm *)getRealm {
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
     configuration.inMemoryIdentifier = @"test";
-    configuration.schemaMode = realm::SchemaMode::Additive;
+    configuration.schemaMode = realm::SchemaMode::AdditiveDiscovered;
     return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
 

@@ -31,7 +31,6 @@
 #import <realm/object-store/results.hpp>
 #import <realm/query_engine.hpp>
 #import <realm/query_expression.hpp>
-#import <realm/query_value.hpp>
 #import <realm/util/cf_ptr.hpp>
 #import <realm/util/overload.hpp>
 
@@ -106,7 +105,7 @@ struct Equal {
     using CaseSensitive = Equal<options & ~kCFCompareCaseInsensitive>;
     using CaseInsensitive = Equal<options | kCFCompareCaseInsensitive>;
 
-    bool operator()(QueryValue v1, QueryValue v2) const
+    bool operator()(Mixed v1, Mixed v2) const
     {
         return equal(options, v1.get_string(), v2.get_string());
     }
@@ -144,7 +143,7 @@ struct ContainsSubstring {
     using CaseSensitive = ContainsSubstring<options & ~kCFCompareCaseInsensitive>;
     using CaseInsensitive = ContainsSubstring<options | kCFCompareCaseInsensitive>;
 
-    bool operator()(QueryValue v1, QueryValue v2) const
+    bool operator()(Mixed v1, Mixed v2) const
     {
         return contains_substring(options, v1.get_string(), v2.get_string());
     }
