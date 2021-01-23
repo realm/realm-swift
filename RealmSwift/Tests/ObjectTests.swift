@@ -72,7 +72,7 @@ class ObjectTests: TestCase {
         XCTAssert(schema.properties as AnyObject is [Property])
         XCTAssertEqual(schema.className, "SwiftObject")
         XCTAssertEqual(schema.properties.map { $0.name },
-                       ["boolCol", "intCol", "intEnumCol", "floatCol", "doubleCol",
+                       ["boolCol", "intCol", "int8Col", "int16Col", "int32Col", "int64Col", "intEnumCol", "floatCol", "doubleCol",
                         "stringCol", "binaryCol", "dateCol", "decimalCol",
                         "objectIdCol", "objectCol", "uuidCol", "arrayCol"]
         )
@@ -118,7 +118,7 @@ class ObjectTests: TestCase {
         let object = SwiftObject()
 
         // swiftlint:disable line_length
-        assertMatches(object.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <.*61.*>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tdecimalCol = 1.23E6;\n\tobjectIdCol = 1234567890ab1234567890ab;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tuuidCol = 137DECC8-B300-4954-A233-F89909F4FD89;\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
+        assertMatches(object.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tint8Col = 123;\n\tint16Col = 123;\n\tint32Col = 123;\n\tint64Col = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <.*61.*>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tdecimalCol = 1.23E6;\n\tobjectIdCol = 1234567890ab1234567890ab;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tuuidCol = 137DECC8-B300-4954-A233-F89909F4FD89;\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
 
         let recursiveObject = SwiftRecursiveObject()
         recursiveObject.objects.append(recursiveObject)
@@ -245,6 +245,10 @@ class ObjectTests: TestCase {
         let test: (SwiftObject) -> Void = { object in
             XCTAssertEqual(object.value(forKey: "boolCol") as! Bool?, false)
             XCTAssertEqual(object.value(forKey: "intCol") as! Int?, 123)
+            XCTAssertEqual(object.value(forKey: "int8Col") as! Int8?, 123)
+            XCTAssertEqual(object.value(forKey: "int16Col") as! Int16?, 123)
+            XCTAssertEqual(object.value(forKey: "int32Col") as! Int32?, 123)
+            XCTAssertEqual(object.value(forKey: "int64Col") as! Int64?, 123)
             XCTAssertEqual(object.value(forKey: "floatCol") as! Float?, 1.23 as Float)
             XCTAssertEqual(object.value(forKey: "doubleCol") as! Double?, 12.3)
             XCTAssertEqual(object.value(forKey: "stringCol") as! String?, "a")
@@ -382,6 +386,18 @@ class ObjectTests: TestCase {
         setter(object, 321, "intCol")
         XCTAssertEqual(getter(object, "intCol") as! Int?, 321)
 
+        setter(object, Int8(1), "int8Col")
+        XCTAssertEqual(getter(object, "int8Col") as! Int8?, 1)
+
+        setter(object, Int16(321), "int16Col")
+        XCTAssertEqual(getter(object, "int16Col") as! Int16?, 321)
+
+        setter(object, Int32(321), "int32Col")
+        XCTAssertEqual(getter(object, "int32Col") as! Int32?, 321)
+
+        setter(object, Int64(321), "int64Col")
+        XCTAssertEqual(getter(object, "int64Col") as! Int64?, 321)
+
         setter(object, NSNumber(value: 32.1 as Float), "floatCol")
         XCTAssertEqual(getter(object, "floatCol") as! Float?, 32.1 as Float)
 
@@ -433,6 +449,18 @@ class ObjectTests: TestCase {
 
         setter(object, 321, "intCol")
         XCTAssertEqual((getter(object, "intCol") as! Int), 321)
+
+        setter(object, Int8(1), "int8Col")
+        XCTAssertEqual(getter(object, "int8Col") as! Int8?, 1)
+
+        setter(object, Int16(321), "int16Col")
+        XCTAssertEqual(getter(object, "int16Col") as! Int16?, 321)
+
+        setter(object, Int32(321), "int32Col")
+        XCTAssertEqual(getter(object, "int32Col") as! Int32?, 321)
+
+        setter(object, Int64(321), "int64Col")
+        XCTAssertEqual(getter(object, "int64Col") as! Int64?, 321)
 
         setter(object, NSNumber(value: 32.1 as Float), "floatCol")
         XCTAssertEqual((getter(object, "floatCol") as! Float), 32.1 as Float)
