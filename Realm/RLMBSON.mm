@@ -322,9 +322,9 @@ Bson RLMConvertRLMBSONToBson(id<RLMBSON> b) {
             return std::vector<char>((char*)((NSData *)b).bytes,
                                      ((char*)((NSData *)b).bytes) + (int)((NSData *)b).length);
         case RLMBSONTypeTimestamp:
-            return RLMTimestampForNSDate((NSDate *)b);
+            return MongoTimestamp(((NSDate *)b).timeIntervalSince1970, 0);
         case RLMBSONTypeDatetime:
-            return realm::Timestamp(((NSDate *)b).timeIntervalSince1970, 0);
+            return RLMTimestampForNSDate((NSDate *)b);
         case RLMBSONTypeDecimal128:
             return [((RLMDecimal128 *)b) decimal128Value];
         case RLMBSONTypeRegularExpression:
