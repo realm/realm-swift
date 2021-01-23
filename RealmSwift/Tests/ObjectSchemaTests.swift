@@ -71,6 +71,13 @@ class ObjectSchemaTests: TestCase {
                 array = NO;
                 optional = NO;
             }
+            int8Col {
+                type = int;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                optional = NO;
+            }
             int16Col {
                 type = int;
                 indexed = NO;
@@ -86,13 +93,6 @@ class ObjectSchemaTests: TestCase {
                 optional = NO;
             }
             int64Col {
-                type = int;
-                indexed = NO;
-                isPrimary = NO;
-                array = NO;
-                optional = NO;
-            }
-            int8Col {
                 type = int;
                 indexed = NO;
                 isPrimary = NO;
