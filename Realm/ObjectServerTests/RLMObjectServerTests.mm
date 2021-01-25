@@ -38,6 +38,8 @@
 #import <realm/object-store/shared_realm.hpp>
 #import <realm/object-store/sync/sync_manager.hpp>
 
+#if TARGET_OS_OSX
+
 #pragma mark - Helpers
 
 // These are defined in Swift. Importing the auto-generated header doesn't work
@@ -124,7 +126,7 @@ static NSString *generateRandomString(int num) {
     RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test1@10gen.com"
                                                                               register:YES]];
 
-    XCTAssertTrue([[self.app currentUser].identifier isEqualTo:secondUser.identifier]);
+    XCTAssertEqualObjects(self.app.currentUser.identifier, secondUser.identifier);
     // `[app currentUser]` will now be `secondUser`, so let's logout firstUser and ensure
     // the state is correct
     XCTestExpectation *expectation = [self expectationWithDescription:@"should log out current user"];
@@ -2526,3 +2528,5 @@ static NSString *oldPathForPartitionValue(RLMUser *user, id<RLMBSON> partitionVa
 }
 
 @end
+
+#endif // TARGET_OS_OSX
