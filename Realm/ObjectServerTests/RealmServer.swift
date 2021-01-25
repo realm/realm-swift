@@ -20,6 +20,8 @@ import Foundation
 import RealmSwift
 import XCTest
 
+#if os(macOS)
+
 extension URLSession {
     fileprivate func resultDataTask(with request: URLRequest, _ completionHandler: @escaping (Result<Data, Error>) -> Void) {
         URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue()).dataTask(with: request) { (data, response, error) in
@@ -805,3 +807,5 @@ public class RealmServer: NSObject {
         return clientAppId
     }
 }
+
+#endif
