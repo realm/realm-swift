@@ -261,36 +261,41 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained id<RLMValue> const value) {
     RLMTranslateError([&] {
         switch (value.valueType) {
-            case RLMValueTypeInt:
+            case RLMPropertyTypeInt:
                 setValue(obj, key, (NSNumber<RLMInt> *)value);
                 break;
-            case RLMValueTypeBool:
+            case RLMPropertyTypeBool:
                 setValue(obj, key, (NSNumber<RLMBool> *)value);
                 break;
-            case RLMValueTypeFloat:
+            case RLMPropertyTypeFloat:
                 setValue(obj, key, (NSNumber<RLMFloat> *)value);
                 break;
-            case RLMValueTypeDouble:
+            case RLMPropertyTypeDouble:
                 setValue(obj, key, (NSNumber<RLMDouble> *)value);
                 break;
-            case RLMValueTypeString:
+            case RLMPropertyTypeUUID:
+                setValue(obj, key, (NSUUID *)value);
+                break;
+            case RLMPropertyTypeString:
                 setValue(obj, key, (NSString *)value);
                 break;
-            case RLMValueTypeData:
+            case RLMPropertyTypeData:
                 setValue(obj, key, (NSData *)value);
                 break;
-            case RLMValueTypeDate:
+            case RLMPropertyTypeDate:
                 setValue(obj, key, (NSDate *)value);
                 break;
-            case RLMValueTypeObject:
+            case RLMPropertyTypeObject:
                 setValue(obj, key, (RLMObjectBase *)value);
                 break;
-            case RLMValueTypeObjectId:
+            case RLMPropertyTypeObjectId:
                 setValue(obj, key, (RLMObjectId *)value);
                 break;
-            case RLMValueTypeDecimal128:
+            case RLMPropertyTypeDecimal128:
                 setValue(obj, key, (RLMDecimal128 *)value);
                 break;
+            default:
+                @throw RLMException(@"Unexpected property type for mixed value type code");
         }
     });
 }
@@ -837,28 +842,7 @@ realm::UUID RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
 }
 template<>
 realm::Mixed RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
-    switch ([(id<RLMValue>)v valueType]) {
-        case RLMValueTypeInt:
-            return realm::Mixed([(NSNumber *)v intValue]);
-        case RLMValueTypeBool:
-            return realm::Mixed([(NSNumber *)v boolValue]);
-        case RLMValueTypeFloat:
-            return realm::Mixed([(NSNumber *)v floatValue]);
-        case RLMValueTypeDouble:
-            return realm::Mixed([(NSNumber *)v doubleValue]);
-        case RLMValueTypeString:
-            return realm::Mixed([(NSString *)v cStringUsingEncoding:NSUTF8StringEncoding]);
-        case RLMValueTypeData:
-            return realm::Mixed([(NSData *)v bytes]);
-        case RLMValueTypeDate:
-            realm::Timestamp([(NSDate *)v timeIntervalSince1970], 0);
-        case RLMValueTypeObject:
-            return realm::Mixed(((RLMObjectBase *)v)->_row.get_key());
-        case RLMValueTypeObjectId:
-            return realm::Mixed([(RLMObjectId *)v value]);
-        case RLMValueTypeDecimal128:
-            return realm::Mixed([(RLMDecimal128 *)v decimal128Value]);
-    }
+    return RLMObjcToMixed(v);
 }
 template<>
 realm::object_store::Set RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {

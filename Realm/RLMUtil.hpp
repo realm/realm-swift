@@ -18,6 +18,8 @@
 
 #import <Realm/RLMConstants.h>
 #import <Realm/RLMOptionalBase.h>
+#import <Realm/RLMValue.h>
+
 #import <objc/runtime.h>
 
 #import <realm/array.hpp>
@@ -190,6 +192,7 @@ static inline void RLMNSStringToStdString(std::string &out, NSString *in) {
     out.resize(size);
 }
 
+realm::Mixed RLMObjcToMixed(id<RLMValue> value);
 id RLMMixedToObjc(realm::Mixed const& value);
 realm::Decimal128 RLMObjcToDecimal128(id value);
 realm::UUID RLMObjcToUUID(__unsafe_unretained id const value);

@@ -18,43 +18,18 @@
 
 #import <Foundation/Foundation.h>
 
+#import "RLMDecimal128.h"
 #import "RLMObject.h"
 #import "RLMObjectId.h"
-#import "RLMDecimal128.h"
+#import "RLMProperty.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark RLMValueType
 
-/**
- Allowed Realm types.
- */
-typedef NS_ENUM(NSUInteger, RLMValueType) {
-    /// Realm Int type
-    RLMValueTypeInt,
-    /// Realm Bool type
-    RLMValueTypeBool,
-    /// Realm Double type
-    RLMValueTypeFloat,
-    /// Realm String type
-    RLMValueTypeDouble,
-    /// Realm Binary type
-    RLMValueTypeString,
-    /// Realm Timestamp type
-    RLMValueTypeData,
-    /// Realm Datetime type
-    RLMValueTypeDate,
-    /// Realm ObjectId type
-    RLMValueTypeObject,
-    /// Realm Decimal128 type
-    RLMValueTypeObjectId,
-    /// Realm RegularExpression type
-    RLMValueTypeDecimal128
-};
-
 @protocol RLMValue
 
-@property (readonly) RLMValueType valueType NS_REFINED_FOR_SWIFT;
+@property (readonly) RLMPropertyType valueType NS_REFINED_FOR_SWIFT;
 
 @end
 

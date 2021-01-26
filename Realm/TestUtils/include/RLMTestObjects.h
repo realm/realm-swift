@@ -129,6 +129,10 @@ RLM_ARRAY_TYPE(EmbeddedIntObject)
 @property NSUUID *uuidCol;
 @end
 
+@interface MixedObject: RLMObject
+@property id<RLMValue> anyCol;
+@end
+
 #pragma mark AllTypesObject
 
 @interface AllTypesObject : RLMObject
@@ -147,7 +151,7 @@ RLM_ARRAY_TYPE(EmbeddedIntObject)
 @property NSUUID       *uuidCol;
 @property StringObject *objectCol;
 @property (readonly) RLMLinkingObjects *linkingObjectsCol;
-@property id<RLMValue> mixedCol;
+@property id<RLMValue> anyCol;
 
 + (NSDictionary *)values:(int)i stringObject:(StringObject *)so;
 

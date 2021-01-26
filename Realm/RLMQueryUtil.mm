@@ -429,6 +429,7 @@ private:
     util::Optional<ColumnReference> m_column;
 };
 
+#pragma mark QueryBuilder
 class QueryBuilder {
 public:
     QueryBuilder(Query& query, Group& group, RLMSchema *schema)
@@ -458,10 +459,10 @@ public:
     template<typename T>
     void add_substring_constraint(const Columns<T>& value, Query condition);
 
-    template <typename T>
+    template <typename T, typename StringOrMixed>
     void add_string_constraint(NSPredicateOperatorType operatorType,
                                NSComparisonPredicateOptions predicateOptions,
-                               Columns<String> &&column,
+                               Columns<StringOrMixed> &&column,
                                T value);
 
     template <typename R>
@@ -484,6 +485,9 @@ public:
     void add_link_constraint(NSPredicateOperatorType operatorType, const ColumnReference& column, RLMObjectBase *obj);
     void add_link_constraint(NSPredicateOperatorType operatorType, const ColumnReference& column, realm::null);
     void add_link_constraint(NSPredicateOperatorType, const ColumnReference&, const ColumnReference&);
+
+    template <typename R>
+    void add_mixed_constraint(NSPredicateOperatorType, NSComparisonPredicateOptions, Columns<Mixed>&& lhs, const R& rhs);
 
     template <CollectionOperation::Type Operation, typename R>
     void add_collection_operation_constraint(RLMPropertyType propertyType, NSPredicateOperatorType operatorType,
@@ -560,6 +564,14 @@ void QueryBuilder::add_substring_constraint(const T& value, Query condition) {
                       ? std::move(condition)
                       : std::unique_ptr<Expression>(new FalseExpression));
 }
+template<>
+void QueryBuilder::add_substring_constraint(const Mixed& value, Query condition) {
+    // Foundation always returns false for substring operations with a RHS of null or "".
+    m_query.and_query(value.get_string().size()
+                      ? std::move(condition)
+                      : std::unique_ptr<Expression>(new FalseExpression));
+}
+
 
 template<typename T>
 void QueryBuilder::add_substring_constraint(const Columns<T>& value, Query condition) {
@@ -567,6 +579,13 @@ void QueryBuilder::add_substring_constraint(const Columns<T>& value, Query condi
     // We don't need to concern ourselves with the possibility of value traversing a link list
     // and producing multiple values per row as such expressions will have been rejected.
     m_query.and_query(const_cast<Columns<String>&>(value).size() != 0 && std::move(condition));
+}
+template<>
+void QueryBuilder::add_substring_constraint(const Columns<Mixed>& value, Query condition) {
+    // Foundation always returns false for substring operations with a RHS of null or "".
+    // We don't need to concern ourselves with the possibility of value traversing a link list
+    // and producing multiple values per row as such expressions will have been rejected.
+//    m_query.and_query(const_cast<Columns<Mixed>&>(value).size() != 0 && std::move(condition));
 }
 
 
@@ -602,10 +621,10 @@ Query make_diacritic_insensitive_constraint(NSPredicateOperatorType operatorType
     }
 }
 
-template <typename T>
+template <typename T, typename StringOrMixed>
 void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
                                          NSComparisonPredicateOptions predicateOptions,
-                                         Columns<String> &&column,
+                                         Columns<StringOrMixed> &&column,
                                          T value) {
     bool caseSensitive = !(predicateOptions & NSCaseInsensitivePredicateOption);
     bool diacriticSensitive = !(predicateOptions & NSDiacriticInsensitivePredicateOption);
@@ -637,8 +656,9 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
     }
 
     auto as_subexpr = util::overload{
-        [](StringData value) { return make_subexpr<ConstantStringValue>(value); },
-        [](const Columns<String>& c) { return c.clone(); }
+        [](Mixed value) { return make_subexpr<ConstantStringValue>(value.get_string()); },
+        [](const Columns<String>& c) { return c.clone(); },
+        [](const Columns<Mixed>& c) { return c.clone(); }
     };
     auto left = as_subexpr(column);
     auto right = as_subexpr(value);
@@ -781,7 +801,6 @@ void QueryBuilder::add_link_constraint(NSPredicateOperatorType, const ColumnRefe
     REALM_COMPILER_HINT_UNREACHABLE();
 }
 
-
 // iterate over an array of subpredicates, using @func to build a query from each
 // one and ORing them together
 template<typename Func>
@@ -865,6 +884,11 @@ ObjectId convert<ObjectId>(id value) {
     @throw RLMException(@"Cannot convert value '%@' of type '%@' to object id", value, [value class]);
 }
 
+template <>
+Mixed convert<Mixed>(id value) {
+    return RLMObjcToMixed(value);
+}
+
 template <typename>
 realm::null value_of_type(realm::null) {
     return realm::null();
@@ -879,7 +903,6 @@ template <typename RequestedType>
 auto value_of_type(const ColumnReference& column) {
     return column.resolve<RequestedType>();
 }
-
 
 template <typename... T>
 void QueryBuilder::do_add_constraint(RLMPropertyType type, NSPredicateOperatorType operatorType,
@@ -922,10 +945,118 @@ void QueryBuilder::do_add_constraint(RLMPropertyType type, NSPredicateOperatorTy
         case RLMPropertyTypeUUID:
             add_bool_constraint(type, operatorType, value_of_type<UUID>(values)...);
             break;
+        case RLMPropertyTypeAny:
+//            add_mixed_constraint(operatorType, predicateOptions, value_of_type<Mixed>(values)...);
+            break;
         default:
             throwException(@"Unsupported predicate value type",
                            @"Object type %@ not supported", RLMTypeToString(type));
     }
+}
+
+#pragma mark AddMixedConstraints
+
+template <>
+void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType, NSComparisonPredicateOptions predicateOptions,
+                                        Columns<Mixed>&& column, const null& rhs) {
+    m_query.equal(column.column_key(), rhs);
+}
+
+template <>
+void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
+                                        NSComparisonPredicateOptions predicateOptions,
+                                        Columns<Mixed>&& column, const Mixed& rhs) {
+    switch (rhs.get_type()) {
+        case realm::type_Int:
+        case realm::type_Timestamp:
+        case realm::type_Double:
+        case realm::type_Float:
+        case realm::type_Decimal:
+            add_numeric_constraint(RLMPropertyTypeAny, operatorType, column, rhs);
+            break;
+        case realm::type_UUID:
+        case realm::type_ObjectId:
+        case realm::type_Bool:
+            add_bool_constraint(RLMPropertyTypeBool, operatorType, column, rhs);
+            break;
+        case realm::type_String:
+        case realm::type_Binary:
+            add_string_constraint(operatorType, predicateOptions, std::move(column), rhs);
+            break;
+        default:
+            @throw RLMException(@"oopsie");
+    }
+}
+template <typename R>
+void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
+                                        NSComparisonPredicateOptions predicateOptions,
+                                        Columns<Mixed>&& column,
+                                        const R& rhs) {
+    switch (operatorType) {
+        case NSLessThanPredicateOperatorType:
+
+            break;
+        case NSLessThanOrEqualToPredicateOperatorType:
+
+            break;
+//        case NSGreaterThanPredicateOperatorType:
+//            <#code#>
+//            break;
+//        case NSGreaterThanOrEqualToPredicateOperatorType:
+//            <#code#>
+//            break;
+//        case NSEqualToPredicateOperatorType:
+//            <#code#>
+//            break;
+//        case NSNotEqualToPredicateOperatorType:
+//            <#code#>
+//            break;
+//        case NSMatchesPredicateOperatorType:
+//            <#code#>
+//            break;
+//        case NSLikePredicateOperatorType:
+//            <#code#>
+//            break;
+//        case NSBeginsWithPredicateOperatorType:
+//            <#code#>
+//            break;
+//        case NSEndsWithPredicateOperatorType:
+//            <#code#>
+//            break;
+//        case NSInPredicateOperatorType:
+//            <#code#>
+//            break;
+//        case NSContainsPredicateOperatorType:
+//            <#code#>
+//            break;
+//        case NSBetweenPredicateOperatorType:
+//            <#code#>
+//            break;
+        default:
+            REALM_TERMINATE("oops");
+    }
+//    const Columns<Mixed> c(std::move(column));
+//    mixed_compare(c, rhs, true);
+//    switch (rhs.get_type()) {
+//        case realm::type_Int:
+//        case realm::type_Timestamp:
+//        case realm::type_Double:
+//        case realm::type_Float:
+//        case realm::type_Decimal:
+//            add_numeric_constraint(RLMPropertyTypeAny, operatorType, column, rhs);
+//            break;
+//        case realm::type_UUID:
+//        case realm::type_ObjectId:
+//        case realm::type_Bool:
+//            add_bool_constraint(RLMPropertyTypeBool, operatorType, column, rhs);
+//            break;
+//        case realm::type_String:
+//        case realm::type_Binary:
+//            add_string_constraint(operatorType, predicateOptions, std::move(column), rhs);
+//            break;
+//        default:
+//            @throw RLMException(@"oopsie");
+//    }
 }
 
 void QueryBuilder::do_add_constraint(RLMPropertyType, NSPredicateOperatorType, NSComparisonPredicateOptions, id, realm::null)

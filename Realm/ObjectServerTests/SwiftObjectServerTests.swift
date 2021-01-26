@@ -2449,9 +2449,9 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    func testAsyncOpenStandaloneCombine() {
-        autoreleasepool {
-            let realm = try! Realm()
+    func testAsyncOpenStandaloneCombine() throws {
+        try autoreleasepool {
+            let realm = try Realm()
             try! realm.write {
                 (0..<10000).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket")) }
             }

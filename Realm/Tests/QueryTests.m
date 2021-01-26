@@ -539,6 +539,20 @@
     RLMAssertCount(UuidObject, 1U, @"uuidCol == '137DECC8-B300-4954-A233-F89909F4FD89'");
 }
 
+- (void)testMixedRealmQuery {
+    RLMRealm *realm = [self realm];
+
+    [realm beginWriteTransaction];
+    [MixedObject createInRealm:realm withValue:@[@"hello world"]];
+    [realm commitWriteTransaction];
+
+    // query on class
+    XCTAssertEqual([MixedObject allObjects].count, 1U);
+    RLMAssertCount(MixedObject, 0U, @"anyCol > 10");
+    RLMAssertCount(MixedObject, 1U, @"anyCol == 'hello world'");
+}
+
+
 - (void)testArrayQuery
 {
     RLMRealm *realm = [self realm];

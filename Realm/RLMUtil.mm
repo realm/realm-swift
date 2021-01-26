@@ -351,6 +351,35 @@ BOOL RLMIsRunningInPlayground() {
     return [[NSBundle mainBundle].bundleIdentifier hasPrefix:@"com.apple.dt.playground."];
 }
 
+realm::Mixed RLMObjcToMixed(id<RLMValue> v) {
+    switch ([(id<RLMValue>)v valueType]) {
+        case RLMPropertyTypeInt:
+            return realm::Mixed([(NSNumber *)v intValue]);
+        case RLMPropertyTypeBool:
+            return realm::Mixed([(NSNumber *)v boolValue]);
+        case RLMPropertyTypeFloat:
+            return realm::Mixed([(NSNumber *)v floatValue]);
+        case RLMPropertyTypeDouble:
+            return realm::Mixed([(NSNumber *)v doubleValue]);
+        case RLMPropertyTypeUUID:
+            return realm::Mixed(RLMObjcToUUID(v));
+        case RLMPropertyTypeString:
+            return realm::Mixed([(NSString *)v cStringUsingEncoding:NSUTF8StringEncoding]);
+        case RLMPropertyTypeData:
+            return realm::Mixed([(NSData *)v bytes]);
+        case RLMPropertyTypeDate:
+            realm::Timestamp([(NSDate *)v timeIntervalSince1970], 0);
+        case RLMPropertyTypeObject:
+            return realm::Mixed(((RLMObjectBase *)v)->_row.get_key());
+        case RLMPropertyTypeObjectId:
+            return realm::Mixed([(RLMObjectId *)v value]);
+        case RLMPropertyTypeDecimal128:
+            return realm::Mixed([(RLMDecimal128 *)v decimal128Value]);
+        default:
+            @throw RLMException(@"Unexpected property type for mixed value type code");
+    }
+}
+
 id RLMMixedToObjc(realm::Mixed const& mixed) {
     switch (mixed.get_type()) {
         case realm::type_String:

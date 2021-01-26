@@ -23,16 +23,24 @@
 
 @implementation NSNumber (RLMValue)
 
-- (RLMValueType)valueType {
+- (RLMPropertyType)valueType {
     if (numberIsInteger(self)) {
-        return RLMValueTypeInt;
+        return RLMPropertyTypeInt;
     } else if (numberIsBool(self)) {
-        return RLMValueTypeBool;
+        return RLMPropertyTypeBool;
     } else if (numberIsFloat(self)) {
-        return RLMValueTypeFloat;
+        return RLMPropertyTypeFloat;
     } else {
-        return RLMValueTypeDouble;
+        return RLMPropertyTypeDouble;
     }
+}
+
+@end
+
+@implementation NSString (RLMValue)
+
+- (RLMPropertyType)valueType {
+    return RLMPropertyTypeString;
 }
 
 @end
