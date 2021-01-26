@@ -1,7 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add support for "thawing" objects. `Realm`, `Results`, `List` and `Object` now
+have `thaw()` methods which return a live copy of the frozen object. This enables app behvaior where a frozen object can be made live again in order to mutate values. For example, first freezing an object passed into UI view, then thawing the object in the view to update values.
 
 ### Fixed
 * Inserting a date into a synced collection via `AnyBSON.datetime(...)` would be of type `Timestamp` and not `Date`. 

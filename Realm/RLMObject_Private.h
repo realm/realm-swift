@@ -72,6 +72,8 @@ FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 
 FOUNDATION_EXTERN id RLMObjectFreeze(RLMObjectBase *obj) NS_RETURNS_RETAINED;
 
+FOUNDATION_EXTERN id RLMObjectThaw(RLMObjectBase *obj);
+
 // Gets an object identifier suitable for use with Combine. This value may
 // change when an unmanaged object is added to the Realm.
 FOUNDATION_EXTERN uint64_t RLMObjectBaseGetCombineId(RLMObjectBase *);
