@@ -156,7 +156,8 @@ didCompleteWithError:(NSError *)error
     response.httpStatusCode = httpResponse.statusCode;
 
     if (error) {
-        response.body = [error localizedDescription];
+        response.body = error.localizedDescription;
+        response.customStatusCode = error.code;
         return _completionBlock(response);
     }
 

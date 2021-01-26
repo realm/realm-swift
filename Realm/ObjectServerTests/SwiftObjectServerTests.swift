@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#if os(macOS)
+
 import Combine
 import Realm
 import RealmSwift
@@ -2784,3 +2786,5 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     }
 }
 #endif
+
+#endif // os(macOS)
