@@ -74,7 +74,7 @@ using namespace realm::bson;
 }
 
 - (void)testDatetimeMongoTimestampRoundTrip {
-    auto bson = Bson(MongoTimestamp(42, 0));
+    auto bson = Bson(realm::Timestamp(42, 0));
     NSDate *rlm = (NSDate *)RLMConvertBsonToRLMBSON(bson);
     NSDate *d = [[NSDate alloc] initWithTimeIntervalSince1970:42];
     XCTAssert([rlm isEqualToDate: d]);
@@ -87,14 +87,14 @@ using namespace realm::bson;
     NSDate *d = [[NSDate alloc] initWithTimeIntervalSince1970:42];
     XCTAssert([rlm isEqualToDate: d]);
     // Not an exact round trip since we ignore Timestamp Cocoa side
-    XCTAssertEqual(RLMConvertRLMBSONToBson(rlm), Bson(MongoTimestamp(42, 0)));
+    XCTAssertEqual(RLMConvertRLMBSONToBson(rlm), Bson(realm::Timestamp(42, 0)));
 }
 
 - (void)testObjectIdRoundTrip {
     auto bson = Bson(realm::ObjectId::gen());
     RLMObjectId *rlm = (RLMObjectId *)RLMConvertBsonToRLMBSON(bson);
     RLMObjectId *d = [[RLMObjectId alloc] initWithString:rlm.stringValue error:nil];
-    XCTAssert([rlm isEqualTo: d]);
+    XCTAssertEqualObjects(rlm, d);
     XCTAssertEqual(RLMConvertRLMBSONToBson(rlm), bson);
 }
 

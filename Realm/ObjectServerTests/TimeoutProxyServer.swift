@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#if os(macOS)
+
 import Foundation
 import Network
 
@@ -88,3 +90,5 @@ public class TimeoutProxyServer: NSObject {
         }
     }
 }
+
+#endif // os(macOS)

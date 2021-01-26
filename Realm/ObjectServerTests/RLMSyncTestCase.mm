@@ -33,6 +33,8 @@
 #import <realm/object-store/sync/sync_session.hpp>
 #import <realm/object-store/sync/sync_user.hpp>
 
+#if TARGET_OS_OSX
+
 @interface RealmServer : NSObject
 + (RealmServer *)shared;
 + (bool)haveServer;
@@ -558,3 +560,5 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 @end
+
+#endif // TARGET_OS_OSX
