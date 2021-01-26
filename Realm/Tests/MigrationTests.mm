@@ -1127,41 +1127,26 @@ RLM_ARRAY_TYPE(MigrationTestObject);
     }];
 }
 
-- (void)testEnumerateObjectsAfterDeleteDataForRemovedType {
+- (void)testEnumerateObjectTypeRemovedFromSchema {
     [self createTestRealmWithClasses:@[IntObject.class] block:^(RLMRealm *realm) {
         [IntObject createInRealm:realm withValue:@[@1]];
         [IntObject createInRealm:realm withValue:@[@2]];
     }];
 
-    RLMRealmConfiguration *config1 = self.config;
-    config1.objectClasses = @[StringObject.class];
-    config1.schemaVersion = 1;
-    __block bool migrationCalled = false;
-    config1.migrationBlock = ^(RLMMigration *migration, uint64_t) {
-        migrationCalled = true;
+    RLMRealmConfiguration *config = self.config;
+    config.objectClasses = @[StringObject.class];
+    config.schemaVersion = 1;
+    __block int enumerateCalls = 0;
+    config.migrationBlock = ^(RLMMigration *migration, uint64_t) {
         [migration enumerateObjects:IntObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
-            // Object must still be accessible during the migration it gets deleted in.
             XCTAssertNotNil(oldObject);
-            XCTAssert([oldObject[@"intCol"] intValue] > 0);
             XCTAssertNil(newObject);
-        }];
-        [migration deleteDataForClassName:IntObject.className];
-    };
-    XCTAssertTrue([RLMRealm performMigrationForConfiguration:config1 error:nil]);
-    XCTAssert(migrationCalled);
-    
-    RLMRealmConfiguration *config2 = self.config;
-    config2.objectClasses = @[StringObject.class];
-    config2.schemaVersion = 2;
-    migrationCalled = false;
-    config2.migrationBlock = ^(RLMMigration *migration, uint64_t) {
-        migrationCalled = true;
-        [migration enumerateObjects:IntObject.className block:^(RLMObject *, RLMObject *) {
-            XCTFail(@"should not have enumerated any objects");
+            ++enumerateCalls;
+            XCTAssertGreaterThan([oldObject[@"intCol"] intValue], 0);
         }];
     };
-    XCTAssertTrue([RLMRealm performMigrationForConfiguration:config2 error:nil]);
-    XCTAssert(migrationCalled);
+    XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]);
+    XCTAssertEqual(enumerateCalls, 2);
 }
 
 - (void)testEnumerateObjectsAfterDeleteData {
