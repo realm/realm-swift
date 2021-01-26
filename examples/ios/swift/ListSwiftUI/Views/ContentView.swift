@@ -59,7 +59,7 @@ class Person: Object, ObjectKeyIdentifiable {
 }
 
 struct DogList: View {
-    @RealmState var dogs: RealmSwift.List<Dog>? = nil
+    @StateRealmObject var dogs: RealmSwift.List<Dog>? = nil
 
     var body: some View {
         List {
@@ -82,7 +82,7 @@ struct DogList: View {
 // MARK: Person View
 struct PersonDetailView: View {
     // bind a Person to the View
-    @RealmState var person: Person
+    @StateRealmObject var person: Person
 
     var body: some View {
         return VStack {

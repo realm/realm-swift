@@ -19,132 +19,197 @@
 import RealmSwift
 import SwiftUI
 
-// MARK: Dog Model
-class Dog: EmbeddedObject, ObjectKeyIdentifiable {
-    private static let dogNames =
-        ["Bella","Lucy","Daisy","Molly","Lola","Sophie","Sadie","Maggie","Chloe","Bailey",
-         "Roxy","Zoey","Lily","Luna","Coco","Stella","Gracie","Abby","Penny","Zoe",
-         "Angel","Belle","Layla","Missy","Cali","Honey","Millie","Harley",
-         "Marley","Holly","Kona","Shelby","Jasmine","Ella","Charlie","Minnie",
-         "Loki","Moose","George","Samson","Coco","Benny","Thor","Rufus","Prince",
-         "Kobe","Chase","Oreo","Frankie","Mac","Benji","Bubba","Champ","Brady",
-         "Elvis","Copper","Cash","Archie","Walter"]
-    @objc dynamic var name = dogNames.randomElement()!
+@objcMembers class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
+    @objc enum Priority: Int, RealmEnum, CaseIterable, Identifiable, CustomStringConvertible {
+        var id: Int { self.rawValue }
+        case low = 0, medium = 1, high = 2
 
-    public static func ==(lhs: Dog, rhs: Dog) -> Bool {
-        return lhs.isSameObject(as: rhs)
+        var description: String {
+            switch self {
+            case .low: return "low"
+            case .medium: return "medium"
+            case .high: return "high"
+            }
+        }
+    }
+    dynamic var title = ""
+    dynamic var notes = ""
+    dynamic var isFlagged = false
+    dynamic var date = Date()
+    dynamic var isComplete = false
+    dynamic var priority: Priority = .low
+}
+
+@objcMembers class ReminderList: Object, ObjectKeyIdentifiable {
+    dynamic var name = "New List"
+    dynamic var icon: String = "list.bullet"
+    var reminders = RealmSwift.List<Reminder>()
+}
+
+struct UnmanagedReminderRowView: View {
+    var body: some View {
+        EmptyView()
     }
 }
 
-// MARK: Person Model
-class Person: Object, ObjectKeyIdentifiable {
-    private static let peopleNames = [
-        "Aoife", "Caoimhe", "Saoirse", "Ciara", "Niamh",
-        "Conor", "Seán", "Oisín", "Patrick", "Cian",
-        "Isabella", "Mateo", "Emilia", "Savannah", "Isla",
-        "Elena", "Maya", "Santiago", "Gabriella", "Leonardo"
-    ]
-    /// The name of the person
-    @objc dynamic var name = peopleNames.randomElement()!
-    /// The dogs this person has
-    var dogs = RealmSwift.List<Dog>()
-}
-
-struct DogList: View {
-    @ObservedRealmObject var dogs: RealmSwift.List<Dog>
-    @State var selection: Dog?
+#if os(macOS)
+struct ReminderRowView: View {
+    @ObservedRealmObject var list: ReminderList
+    @ObservedRealmObject var reminder: Reminder
+    @State var showPopover = false
 
     var body: some View {
-        VStack {
-            HStack {
-                Button("Add Dog") {
-                    $dogs.append(Dog())
-                }.accessibility(identifier: "addDog")
-                Button("Delete Dog", action: {
-                    guard let selection = selection,
-                          let index = dogs.index(of: selection) else { return }
-                    $dogs.remove(at: index)
-                }).accessibility(identifier: "deleteDog")
+        HStack {
+            TextField("title", text: $reminder.title)
+            .popover(isPresented: $showPopover, content: {
+                ReminderFormView(list: list, reminder: reminder, showReminderForm: $showPopover).padding()
+            })
+            Button(action: {
+                showPopover = true
+            }, label: {
+                Image(systemName: "info.circle").buttonStyle(BorderlessButtonStyle())
+            })
+        }
+    }
+}
+#else
+struct ReminderRowView: View {
+    @ObservedRealmObject var list: ReminderList
+    @ObservedRealmObject var reminder: Reminder
+    @State var hasFocus: Bool?
+    @State var showReminderForm = false
+
+
+    var body: some View {
+        NavigationLink(destination: ReminderFormView(list: list,
+                                                     reminder: reminder,
+                                                     showReminderForm: $showReminderForm), isActive: $showReminderForm) {
+            TextField("title", text: reminder.bind(\.title))
+        }.isDetailLink(true)
+    }
+}
+#endif
+
+struct ReminderFormView: View {
+    @ObservedRealmObject var list: ReminderList
+    @ObservedRealmObject var reminder: Reminder
+    @Binding var showReminderForm: Bool
+
+    var body: some View {
+        var view = Form {
+            TextField("title", text: $reminder.title)
+            DatePicker("date", selection: $reminder.date)
+            Picker("priority", selection: $reminder.priority, content: {
+                ForEach(Reminder.Priority.allCases) { priority in
+                    Text(priority.description).tag(priority)
+                }
+            })
+        }
+        #if os(macOS)
+        return view
+        #else
+        return view.navigationBarItems(trailing:
+        Button("Save") {
+            if reminder.realm == nil {
+                $list.reminders.append(reminder)
             }
+
+            showReminderForm.toggle()
+        }.disabled(reminder.title.isEmpty))
+        #endif
+    }
+}
+struct ReminderListView: View {
+    @ObservedRealmObject var list: ReminderList
+    @StateRealmObject var selection: Reminder?
+    @State var showReminderForm: Bool = false
+
+    var body: some View {
+        let view = VStack {
+            Text(list.name).font(.title)
             List(selection: $selection) {
-                ForEach(dogs) { (dog: Dog) in
-                    TextField("dog name", text: dog.bind(keyPath: \.name))
-                        .tag(dog)
-                        .accessibility(identifier: dog.name)
-                }
-                .onMove(perform: $dogs.move)
-            }.accessibility(identifier: "dog table")
-        }
-    }
-}
-// MARK: Person View
-struct PersonDetailView: View {
-    // bind a Person to the View
-    @RealmState var person: Person
-
-    var body: some View {
-        VStack {
-            HStack {
-                TextField("name", text: person.bind(keyPath: \.name))
-                    .font(Font.largeTitle.bold()).padding()
-                    .accessibility(identifier: "personName")
-            }
-            DogList(dogs: person.dogs)
-        }
-    }
-}
-
-struct PersonRowView: View {
-    @RealmState var person: Person
-
-    var body: some View {
-        Text(person.name)
-    }
-}
-
-struct PersonView: View {
-    // test optional type
-    @RealmState(Person.self) var results
-    @Environment(\.realm) var realm
-    @State var selection: Person?
-
-    var body: some View {
-        NavigationView {
-            List(selection: $selection) {
-                ForEach(results) { person in
-                    NavigationLink(destination: PersonDetailView(person: person)) {
-                        PersonRowView(person: person)
-                    }.tag(person).onAppear { print(person.isFrozen) }
-                }
-            }.navigationTitle("People")
-            .frame(minWidth: 300)
-            .toolbar {
-                ToolbarItem {
-                    Button(action: {
-                        $results.append(Person())
-                    }, label: {
-                        Image(systemName: "person.fill.badge.plus")
-                    })
-                    .accessibility(identifier: "addPerson")
-                }
-                ToolbarItem {
-                    Button(action: {
-                        if let selection = selection, let index = results.firstIndex(where: {$0.id == selection.id}) {
-                            $results.remove(at: index)
-                        }
-                    }, label: {
-                        Image(systemName: selection != nil ? "minus.circle.fill" : "minus.circle")
-                    }).disabled(selection == nil)
-                    .accessibility(identifier: "deletePerson")
-                }
+                ForEach(list.reminders) { reminder in
+                    ReminderRowView(list: list, reminder: reminder).tag(reminder)
+                }.onMove(perform: $list.reminders.move)
+                .onDelete(perform: $list.reminders.remove)
             }
         }
+        #if os(iOS)
+        return view.navigationBarItems(trailing: HStack {
+            EditButton()
+            Button("Add") {
+                $list.reminders.append(Reminder())
+            }
+        })
+        #else
+        return view
+        #endif
+    }
+}
+
+struct ReminderListRowView: View {
+    @ObservedRealmObject var list: ReminderList
+
+    var body: some View {
+        HStack {
+            Image(systemName: list.icon)
+            TextField("List Name", text: $list.name)
+            Spacer()
+            Text("\(list.reminders.count)")
+        }.frame(minWidth: 100)
     }
 }
 
 struct ContentView: View {
+    @StateRealmObject(ReminderList.self) var lists
+    @StateRealmObject var selection: ReminderList?
+    @State var searchFilter: String = ""
+    var filter: NSPredicate {
+        searchFilter.isEmpty ? NSPredicate(format: "TRUEPREDICATE") : NSPredicate(format: "name CONTAINS[c] %@",
+                                                                                  searchFilter)
+    }
+
     var body: some View {
-        PersonView(/*results: try! Realm().objects(Person.self)*/)
+        NavigationView {
+            VStack {
+                TextField("􀊫 Search", text: $searchFilter)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.bottom).padding(.trailing).padding(.leading)
+                HStack { Text("My Lists").font(.footnote).padding(); Spacer() }
+                List(selection: $selection) {
+                    ForEach(lists.filter(filter)) { list in
+                        NavigationLink(destination: ReminderListView(list: list).tag(list)) {
+                            ReminderListRowView(list: list)
+                        }
+                        .contextMenu(menuItems: {
+                            Button("Delete") {
+                                $lists.remove(list)
+                            }
+                        })
+                    }
+                }
+                Spacer()
+                HStack {
+                    Button("􀁌 Add List") {
+                        $lists.append(ReminderList())
+                    }.buttonStyle(BorderlessButtonStyle())
+                    .padding()
+                    Spacer()
+                }
+            }.frame(minWidth: 150)
+            if let selection = selection {
+                ReminderListView(list: selection)
+            }
+        }.toolbar {
+            ToolbarItem {
+                Button(action: {
+                    $selection.reminders.append(Reminder())
+                }, label: {
+                    Image(systemName: "plus")
+                })
+                .accessibility(identifier: "add fresh person").disabled(false)
+            }
+        }.navigationTitle("")
     }
 }
 
@@ -157,7 +222,10 @@ struct App: SwiftUI.App {
     var body: some Scene {
         if let realmPath = ProcessInfo.processInfo.environment["REALM_PATH"] {
             Realm.Configuration.defaultConfiguration =
-                Realm.Configuration(fileURL: URL(string: realmPath)!)
+                Realm.Configuration(fileURL: URL(string: realmPath)!, deleteRealmIfMigrationNeeded: true)
+        } else {
+            Realm.Configuration.defaultConfiguration =
+                Realm.Configuration(deleteRealmIfMigrationNeeded: true)
         }
         return WindowGroup {
             view

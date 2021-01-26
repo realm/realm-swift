@@ -24,8 +24,8 @@ import SwiftUI
 @available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
 class SwiftUITests: TestCase {
     struct TestListView: View {
-        @RealmState var list: RealmSwift.List<SwiftBoolObject>
-        @RealmState var optList: RealmSwift.List<SwiftBoolObject>?
+        @StateRealmObject var list: RealmSwift.List<SwiftBoolObject>
+        @StateRealmObject var optList: RealmSwift.List<SwiftBoolObject>?
 
         var body: some View {
             VStack {
@@ -39,15 +39,15 @@ class SwiftUITests: TestCase {
         }
     }
     struct TestObjectView: View {
-        @RealmState var object: SwiftObject
-        @RealmState var optObject: SwiftObject?
+        @StateRealmObject var object: SwiftObject
+        @StateRealmObject var optObject: SwiftObject?
 
         var body: some View { fatalError() }
     }
 
     struct TestResultsView: View {
         @RealmState(SwiftObject.self, realm: inMemoryRealm("swiftui-tests")) var results: Results<SwiftObject>
-        @RealmState var optResults: Results<SwiftObject>?
+        @StateRealmObject var optResults: Results<SwiftObject>?
 
         var body: some View {
             VStack {
@@ -64,24 +64,24 @@ class SwiftUITests: TestCase {
     static let inMemoryIdentifier = "swiftui-tests"
     // We require a struct here to test the property wrapper projections
     struct ListHolder: View {
-        @RealmState var list = RealmSwift.List<SwiftBoolObject>()
-        @RealmState var listOpt: RealmSwift.List<SwiftBoolObject>?
+        @StateRealmObject var list = RealmSwift.List<SwiftBoolObject>()
+        @StateRealmObject var listOpt: RealmSwift.List<SwiftBoolObject>?
 
-        @RealmState var primitieveList = RealmSwift.List<Int>()
-        @RealmState var primitiveListOpt: RealmSwift.List<Int>?
+        @StateRealmObject var primitieveList = RealmSwift.List<Int>()
+        @StateRealmObject var primitiveListOpt: RealmSwift.List<Int>?
 
         var body: some View { VStack {} }
     }
 
 
-    @RealmState var obj = SwiftObject()
-    @RealmState var objOpt: SwiftObject?
+    @StateRealmObject var obj = SwiftObject()
+    @StateRealmObject var objOpt: SwiftObject?
 
-    @RealmState var embedded = EmbeddedTreeObject1()
-    @RealmState var embeddedOpt: EmbeddedTreeObject1?
+    @StateRealmObject var embedded = EmbeddedTreeObject1()
+    @StateRealmObject var embeddedOpt: EmbeddedTreeObject1?
 
-    @RealmState var results = inMemoryRealm(SwiftUITests.inMemoryIdentifier).objects(SwiftObject.self)
-    @RealmState var resultsOpt: Results<SwiftObject>?
+    @StateRealmObject var results = inMemoryRealm(SwiftUITests.inMemoryIdentifier).objects(SwiftObject.self)
+    @StateRealmObject var resultsOpt: Results<SwiftObject>?
 
 
     struct BindingTest {
@@ -106,7 +106,7 @@ class SwiftUITests: TestCase {
         XCTAssertNoThrow(test.$objOpt.boolCol = true)
         XCTAssertTrue(test.objOpt!.boolCol)
 
-        test.$obj.arrayCol.append(SwiftBoolObject())
+//        test.$obj.arrayCol.append(SwiftBoolObject())
     }
 
     func testListAppend() throws {
@@ -125,9 +125,9 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(listHolder.listOpt?.count, nil)
 
         listHolder.listOpt = obj.arrayCol
-//        assertThrows(
-//            listHolder.listOpt!.append(SwiftBoolObject())
-//        )
+        assertThrows(
+            listHolder.listOpt!.append(SwiftBoolObject())
+        )
 
         XCTAssertNoThrow(listHolder.$listOpt.append(SwiftBoolObject()))
         XCTAssertEqual(listHolder.listOpt?.count, 3)

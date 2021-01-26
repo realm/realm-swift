@@ -1,4 +1,4 @@
-SUPPORTED_PLATFORMS = macosx
+SUPPORTED_PLATFORMS = macosx iphonesimulator
 
 CODE_SIGN_IDENTITY = "Don’t Code Sign";
 AD_HOC_CODE_SIGNING_ALLOWED = YES;
@@ -11,5 +11,6 @@ OTHER_LDFLAGS[sdk=macosx*] = -framework SwiftUI;
 LD_RUNPATH_SEARCH_PATHS[sdk=macosx*] = $(inherited) @executable_path/../Frameworks @loader_path/../Frameworks;
 
 MACOS_DEPLOYMENT_TARGET = 11.0;
+IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 
 CODE_SIGNING_ALLOWED=NO
