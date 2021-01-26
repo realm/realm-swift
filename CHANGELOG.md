@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None. 
+* None.
 
 ### Fixed
 * Inserting a date into a synced collection via `AnyBSON.datetime(...)` would be of type `Timestamp` and not `Date`. 
@@ -10,7 +10,7 @@ x.y.z Release notes (yyyy-MM-dd)
   with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
  ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
 * Allows enumerating objects of types which are no longer present in the schema.
- * Fix - `RLMResponse` will have a non nil `customStatusCode` in case of error. ([#4188](https://github.com/realm/realm-core/issues/4188))
+* Add `RLMResponse.customStatusCode`. This fixes timeout exceptions that were occuring with a poor connection. ([#4188](https://github.com/realm/realm-core/issues/4188))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
