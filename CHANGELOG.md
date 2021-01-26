@@ -5,11 +5,6 @@ x.y.z Release notes (yyyy-MM-dd)
 have `thaw()` methods which return a live copy of the frozen object. This enables app behvaior where a frozen object can be made live again in order to mutate values. For example, first freezing an object passed into UI view, then thawing the object in the view to update values.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
-* None.
-
-### Fixed
 * Inserting a date into a synced collection via `AnyBSON.datetime(...)` would be of type `Timestamp` and not `Date`. 
   This could break synced objects with a `Date` property  ([#6654](https://github.com/realm/realm-cocoa/issues/6654), since v10.0.0).
 * Fixed an issue where creating an object after file format upgrade may fail
@@ -26,8 +21,6 @@ have `thaw()` methods which return a live copy of the frozen object. This enable
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-
 * Upgraded realm-core from v10.3.3 to v10.4.0
 
 10.5.1 Release notes (2021-01-15)
