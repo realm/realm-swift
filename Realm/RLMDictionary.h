@@ -1,28 +1,25 @@
 //
-//  RLMDictionary.hpp
+//  RLMDictionary.h
 //  Realm
 //
 //  Created by Pavel Yakimenko on 27/01/2021.
 //  Copyright © 2021 Realm. All rights reserved.
 //
 
-#ifndef RLMDictionary_hpp
-#define RLMDictionary_hpp
+#ifndef RLMDictionary_h
+#define RLMDictionary_h
 
 #import <Foundation/Foundation.h>
-
-namespace realm {
-class Dictionary;
-}
+#import <Realm/RLMCollection.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Key-value collection. Where the key is a string and value is one of the available Realm types.
  */
-@interface RLMDictionary: NSObject // There will be a collection type
+@interface RLMDictionary<RLMObjectType>: NSObject<RLMCollection>
 
 @end
 NS_ASSUME_NONNULL_END
 
-#endif /* RLMDictionary_hpp */
+#endif /* RLMDictionary_h */

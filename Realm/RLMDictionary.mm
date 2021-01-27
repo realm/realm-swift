@@ -6,8 +6,7 @@
 //  Copyright © 2021 Realm. All rights reserved.
 //
 
-#include "RLMDictionary.hpp"
-#include <realm/dictionary.hpp>
+#include "RLMDictionary.h"
 
 @implementation RLMDictionary
 
