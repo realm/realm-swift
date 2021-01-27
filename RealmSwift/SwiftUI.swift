@@ -154,6 +154,7 @@ extension Binding where Value: RealmCollection {
         guard let list = self.wrappedValue.thaw() else {
             return
         }
+        // TODO: This doesn't actually work yet.
         if value.realm == nil {
             observedObjects[value]?.cancel()
         }
@@ -340,7 +341,7 @@ private final class KVO: NSObject {
         super.init()
     }
     func cancel() {
-        print("cancel me")
+        // TODO
     }
 }
 // MARK: - ObservableStorage
@@ -410,15 +411,11 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     @Published var value: ObservedType {
         willSet {
             if newValue != value {
-                print("New Value!")
                 objectWillChange.send()
             }
         }
     }
     var objectWillChange: ObservableStoragePublisher<ObservedType>
-//    {
-//         return ObservableStoragePublisher(self.value)
-//    }
 
     init(_ value: ObservedType) {
         self.value = value.realm != nil ? value.thaw() ?? value : value
