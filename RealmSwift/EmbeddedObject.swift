@@ -238,7 +238,7 @@ extension EmbeddedObject: ThreadConfined {
      Will return self if called on an already live object.
      */
     public func thaw() -> Self? {
-        return realm!.thaw(self)
+        return realm?.thaw(self)
     }
 }
 

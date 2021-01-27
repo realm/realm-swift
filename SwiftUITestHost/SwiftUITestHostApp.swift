@@ -22,7 +22,8 @@ import SwiftUI
 @objcMembers class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
     @objc enum Priority: Int, RealmEnum, CaseIterable, Identifiable, CustomStringConvertible {
         var id: Int { self.rawValue }
-        case low = 0, medium = 1, high = 2
+
+        case low, medium, high
 
         var description: String {
             switch self {
@@ -46,37 +47,54 @@ import SwiftUI
     var reminders = RealmSwift.List<Reminder>()
 }
 
-struct UnmanagedReminderRowView: View {
-    var body: some View {
-        EmptyView()
+struct FocusableTextField: UIViewRepresentable {
+    class Coordinator: NSObject, UITextFieldDelegate {
+        @Binding var text: String
+        var didBecomeFirstResponder = false
+
+        init(text: Binding<String>) {
+            _text = text
+        }
+
+        func textFieldDidChangeSelection(_ textField: UITextField) {
+            text = textField.text ?? ""
+        }
     }
-}
 
-#if os(macOS)
-struct ReminderRowView: View {
-    @ObservedRealmObject var list: ReminderList
-    @ObservedRealmObject var reminder: Reminder
-    @State var showPopover = false
+    let title: String
+    @Binding var text: String
+    @Binding var isFirstResponder: Bool
 
-    var body: some View {
-        HStack {
-            TextField("title", text: $reminder.title)
-            .popover(isPresented: $showPopover, content: {
-                ReminderFormView(list: list, reminder: reminder, showReminderForm: $showPopover).padding()
-            })
-            Button(action: {
-                showPopover = true
-            }, label: {
-                Image(systemName: "info.circle").buttonStyle(BorderlessButtonStyle())
-            })
+    init(_ title: String, text: Binding<String>, isFirstResponder: Binding<Bool>) {
+        self.title = title
+        self._text = text
+        self._isFirstResponder = isFirstResponder
+    }
+
+    func makeUIView(context: UIViewRepresentableContext<Self>) -> UITextField {
+        let textField = UITextField(frame: .zero)
+        textField.placeholder = title
+        textField.delegate = context.coordinator
+        return textField
+    }
+
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(text: $text)
+    }
+
+    func updateUIView(_ uiView: UITextField, context: UIViewRepresentableContext<Self>) {
+        uiView.text = text
+        if isFirstResponder && !context.coordinator.didBecomeFirstResponder  {
+            uiView.becomeFirstResponder()
+            context.coordinator.didBecomeFirstResponder = true
         }
     }
 }
-#else
+
 struct ReminderRowView: View {
     @ObservedRealmObject var list: ReminderList
     @ObservedRealmObject var reminder: Reminder
-    @State var hasFocus: Bool?
+    @State var hasFocus: Bool
     @State var showReminderForm = false
 
 
@@ -84,11 +102,10 @@ struct ReminderRowView: View {
         NavigationLink(destination: ReminderFormView(list: list,
                                                      reminder: reminder,
                                                      showReminderForm: $showReminderForm), isActive: $showReminderForm) {
-            TextField("title", text: reminder.bind(\.title))
+            FocusableTextField("title", text: reminder.bind(\.title), isFirstResponder: $hasFocus).textCase(.lowercase)
         }.isDetailLink(true)
     }
 }
-#endif
 
 struct ReminderFormView: View {
     @ObservedRealmObject var list: ReminderList
@@ -96,7 +113,7 @@ struct ReminderFormView: View {
     @Binding var showReminderForm: Bool
 
     var body: some View {
-        var view = Form {
+        Form {
             TextField("title", text: $reminder.title)
             DatePicker("date", selection: $reminder.date)
             Picker("priority", selection: $reminder.priority, content: {
@@ -105,45 +122,44 @@ struct ReminderFormView: View {
                 }
             })
         }
-        #if os(macOS)
-        return view
-        #else
-        return view.navigationBarItems(trailing:
+        .navigationTitle(reminder.title)
+        .navigationBarItems(trailing:
         Button("Save") {
             if reminder.realm == nil {
                 $list.reminders.append(reminder)
             }
-
             showReminderForm.toggle()
         }.disabled(reminder.title.isEmpty))
-        #endif
     }
 }
+
 struct ReminderListView: View {
     @ObservedRealmObject var list: ReminderList
-    @StateRealmObject var selection: Reminder?
-    @State var showReminderForm: Bool = false
+    @State var newReminderAdded = false
+
+    func shouldFocusReminder(_ reminder: Reminder) -> Bool {
+        return newReminderAdded &&
+            list.reminders.lastIndex(of: reminder) == (list.reminders.count - 1)
+    }
 
     var body: some View {
-        let view = VStack {
-            Text(list.name).font(.title)
-            List(selection: $selection) {
+        VStack {
+            List {
                 ForEach(list.reminders) { reminder in
-                    ReminderRowView(list: list, reminder: reminder).tag(reminder)
+                    ReminderRowView(list: list,
+                                    reminder: reminder,
+                                    hasFocus: shouldFocusReminder(reminder))
                 }.onMove(perform: $list.reminders.move)
                 .onDelete(perform: $list.reminders.remove)
             }
-        }
-        #if os(iOS)
-        return view.navigationBarItems(trailing: HStack {
+        }.navigationTitle(list.name)
+        .navigationBarItems(trailing: HStack {
             EditButton()
-            Button("Add") {
+            Button("add") {
+                newReminderAdded = true
                 $list.reminders.append(Reminder())
             }
         })
-        #else
-        return view
-        #endif
     }
 }
 
@@ -160,56 +176,94 @@ struct ReminderListRowView: View {
     }
 }
 
-struct ContentView: View {
+struct ReminderListResultsView: View {
     @StateRealmObject(ReminderList.self) var lists
-    @StateRealmObject var selection: ReminderList?
-    @State var searchFilter: String = ""
+    @Binding var searchFilter: String
+
     var filter: NSPredicate {
-        searchFilter.isEmpty ? NSPredicate(format: "TRUEPREDICATE") : NSPredicate(format: "name CONTAINS[c] %@",
-                                                                                  searchFilter)
+        searchFilter.isEmpty ? NSPredicate(format: "TRUEPREDICATE") :
+            NSPredicate(format: "name CONTAINS[c] %@", searchFilter)
     }
+
+    var body: some View {
+        List {
+            ForEach(lists.filter(filter)) { list in
+                NavigationLink(destination: ReminderListView(list: list)) {
+                    ReminderListRowView(list: list)
+                }
+            }.onDelete(perform: $lists.remove)
+        }
+    }
+}
+
+public extension Color {
+    static let lightText = Color(UIColor.lightText)
+    static let darkText = Color(UIColor.darkText)
+
+    static let label = Color(UIColor.label)
+    static let secondaryLabel = Color(UIColor.secondaryLabel)
+    static let tertiaryLabel = Color(UIColor.tertiaryLabel)
+    static let quaternaryLabel = Color(UIColor.quaternaryLabel)
+
+    static let systemBackground = Color(UIColor.systemBackground)
+    static let secondarySystemBackground = Color(UIColor.secondarySystemBackground)
+    static let tertiarySystemBackground = Color(UIColor.tertiarySystemBackground)
+}
+
+struct SearchView: View {
+    @Binding var searchFilter: String
+
+    var body: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Image(systemName: "magnifyingglass").foregroundColor(.gray)
+                    .padding(.leading, 7)
+                    .padding(.top, 7)
+                    .padding(.bottom, 7)
+                TextField("search", text: $searchFilter)
+                    .padding(.top, 7)
+                    .padding(.bottom, 7)
+            }.background(RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.secondarySystemBackground))
+            Spacer()
+        }.frame(maxHeight: 40).padding()
+    }
+}
+
+struct Footer: View {
+    @StateRealmObject(ReminderList.self) var lists
+
+    var body: some View {
+        HStack {
+            Button(action: {
+                $lists.append(ReminderList())
+            }, label: {
+                HStack {
+                    Image(systemName: "plus.circle")
+                    Text("Add list")
+                }
+            }).buttonStyle(BorderlessButtonStyle())
+            .padding()
+            Spacer()
+        }
+    }
+}
+
+struct ContentView: View {
+    @State var searchFilter: String = ""
 
     var body: some View {
         NavigationView {
             VStack {
-                TextField("􀊫 Search", text: $searchFilter)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.bottom).padding(.trailing).padding(.leading)
-                HStack { Text("My Lists").font(.footnote).padding(); Spacer() }
-                List(selection: $selection) {
-                    ForEach(lists.filter(filter)) { list in
-                        NavigationLink(destination: ReminderListView(list: list).tag(list)) {
-                            ReminderListRowView(list: list)
-                        }
-                        .contextMenu(menuItems: {
-                            Button("Delete") {
-                                $lists.remove(list)
-                            }
-                        })
-                    }
-                }
+                SearchView(searchFilter: $searchFilter)
+                ReminderListResultsView(searchFilter: $searchFilter)
                 Spacer()
-                HStack {
-                    Button("􀁌 Add List") {
-                        $lists.append(ReminderList())
-                    }.buttonStyle(BorderlessButtonStyle())
-                    .padding()
-                    Spacer()
-                }
-            }.frame(minWidth: 150)
-            if let selection = selection {
-                ReminderListView(list: selection)
+                Footer()
             }
-        }.toolbar {
-            ToolbarItem {
-                Button(action: {
-                    $selection.reminders.append(Reminder())
-                }, label: {
-                    Image(systemName: "plus")
-                })
-                .accessibility(identifier: "add fresh person").disabled(false)
-            }
-        }.navigationTitle("")
+            .navigationBarItems(trailing: EditButton())
+            .navigationTitle("reminders")
+        }
     }
 }
 

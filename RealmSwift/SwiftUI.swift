@@ -40,7 +40,10 @@ private func createBinding<T: ThreadConfined, V>(_ getter: @escaping () -> T,
             return (value is ListBase) ? (value as! ThreadConfined).freeze() as! V : value
         }
         let value = parent[keyPath: keyPath]
-        return (value is ListBase) ? (value as! ThreadConfined).freeze() as! V : value
+        if let value = value as? ThreadConfined, !value.isInvalidated && value.realm != nil {
+            return value.freeze() as! V
+        }
+        return value
     },
     set: { newValue in
         var parent = getter()
@@ -257,12 +260,13 @@ public extension EnvironmentValues {
     }
 }
 
+private final class OptionalNotificationToken: NotificationToken {
+    override func invalidate() {
+    }
+}
+
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Optional: RealmSubscribable where Wrapped: RealmSubscribable & ThreadConfined {
-    private final class OptionalNotificationToken: NotificationToken {
-        override func invalidate() {
-        }
-    }
 
     struct WrappedSubscriber: Subscriber {
         typealias Input = Wrapped
@@ -336,12 +340,12 @@ private final class KVO: NSObject {
         super.init()
     }
     func cancel() {
-        
+        print("cancel me")
     }
 }
 // MARK: - ObservableStorage
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-@frozen public struct ObservableStoragePublisher<ObjectType>: Publisher where ObjectType: ThreadConfined & RealmSubscribable {
+public final class ObservableStoragePublisher<ObjectType>: Publisher where ObjectType: ThreadConfined & RealmSubscribable {
     public typealias Output = Void
     public typealias Failure = Never
 
@@ -365,15 +369,23 @@ private final class KVO: NSObject {
         }
     }
 
+    private var subscribers = [AnySubscriber<Void, Never>]()
     private let value: ObjectType
     internal init(_ value: ObjectType) {
         self.value = value
     }
-    public func receive<S>(subscriber: S) where S : Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
+    func send() {
+        subscribers.forEach {
+            _ = $0.receive()
+        }
+    }
+
+    public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
+        subscribers.append(AnySubscriber(subscriber))
         if value.realm != nil, let value = value.thaw() {
             let token =  value._observe(subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
-        } else if let value = value as? ObjectBase {
+        } else if let value = value as? ObjectBase, !value.isInvalidated {
             var outCount = UInt32(0)
 
             let propertyList = class_copyPropertyList(ObjectType.self as? AnyClass, &outCount)
@@ -388,18 +400,29 @@ private final class KVO: NSObject {
             }
             subscriber.receive(subscription: KVOSubscription(observer: kvo, value: value, keyPaths: keyPaths))
             free(propertyList)
+        } else /* nil value */ {
+            subscriber.receive(subscription: ObservationSubscription(token: OptionalNotificationToken()))
         }
     }
 }
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-private class ObservableStorage<ObservedType>: ObservableObject where ObservedType: RealmSubscribable & ThreadConfined {
-    var value: ObservedType
-    var objectWillChange: ObservableStoragePublisher<ObservedType> {
-         return ObservableStoragePublisher(self.value)
+private class ObservableStorage<ObservedType>: ObservableObject where ObservedType: RealmSubscribable & ThreadConfined & Equatable {
+    @Published var value: ObservedType {
+        willSet {
+            if newValue != value {
+                print("New Value!")
+                objectWillChange.send()
+            }
+        }
     }
+    var objectWillChange: ObservableStoragePublisher<ObservedType>
+//    {
+//         return ObservableStoragePublisher(self.value)
+//    }
 
     init(_ value: ObservedType) {
-        self.value = value
+        self.value = value.realm != nil ? value.thaw() ?? value : value
+        self.objectWillChange = ObservableStoragePublisher(value)
     }
 }
 
@@ -458,7 +481,7 @@ private struct ObserverSubscription: Subscription {
  ```
  */
 @available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
-@frozen @propertyWrapper public struct StateRealmObject<T: RealmSubscribable & ThreadConfined>: DynamicProperty {
+@frozen @propertyWrapper public struct StateRealmObject<T: RealmSubscribable & ThreadConfined & Equatable>: DynamicProperty {
     @StateObject private var storage: ObservableStorage<T>
     private let defaultValue: T
 
@@ -548,7 +571,7 @@ private struct ObserverSubscription: Subscription {
 
 // MARK: ObservedRealmObject
 @available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
-@frozen @propertyWrapper public struct ObservedRealmObject<ObjectType: RealmSubscribable & ThreadConfined & ObservableObject>: DynamicProperty {
+@frozen @propertyWrapper public struct ObservedRealmObject<ObjectType: RealmSubscribable & ThreadConfined & ObservableObject & Equatable>: DynamicProperty {
     /// A wrapper of the underlying observable object that can create bindings to
     /// its properties using dynamic member lookup.
     @dynamicMemberLookup @frozen public struct Wrapper {
