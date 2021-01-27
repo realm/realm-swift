@@ -22,7 +22,6 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Download Core Library" */;
 			buildPhases = (
-				C04B4BDB1B55C47A00FAE58E /* Set Swift Version */,
 				5D659E7F1BE04556006515A0 /* Download Core and Sync */,
 			);
 			dependencies = (
@@ -2133,21 +2132,6 @@
 			shellPath = /bin/sh;
 			shellScript = "sh build.sh download-core\n";
 			showEnvVarsInLog = 0;
-		};
-		C04B4BDB1B55C47A00FAE58E /* Set Swift Version */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Set Swift Version";
-			outputPaths = (
-				"$(SRCROOT)/RealmSwift/SwiftVersion.swift",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "sh build.sh set-swift-version\n";
 		};
 		E8267FB81D90B79000E001C7 /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
