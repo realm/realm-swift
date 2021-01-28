@@ -21,7 +21,7 @@ import RealmSwift
 //    
 //    static func create() {
 //        // Wipe old data
-//        let v0Url = Realms.v0.url(clean: true)
+//        let v0Url = RealmNames.v0.url(clean: true)
 //        
 //        // Create new data
 //        let person1 = Person(value: ["John", "Doe", 42])

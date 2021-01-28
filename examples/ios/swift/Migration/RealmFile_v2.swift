@@ -30,7 +30,7 @@ struct RealmFile {
 
     static func create() {
         // Wipe old data
-        let v2Url = Realms.v2.url(clean: true)
+        let v2Url = RealmNames.v2.url(clean: true)
 
         // Create new data
         let person1 = Person(value: ["John Doe", 42])

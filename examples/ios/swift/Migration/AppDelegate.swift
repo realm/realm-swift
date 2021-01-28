@@ -45,54 +45,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // to the most current version of our data model.
         let migrationBlock: MigrationBlock = createMigrationBlock()
         
-        // print out all migrated objects in the default realm
-        // migration is performed implicitly on Realm access
-//        print("Migrated objects in the default Realm: \(try! Realm().objects(Person.self))")
-        
-        guard let v0URL = bundleURL("default-v0"), let v1URL = bundleURL("default-v1"), let v2URL = bundleURL("default-v2") else {
-            print("Default files could not be found.")
-            return false
+        for realmName in RealmNames.allCases {
+            
+            guard let url = bundleURL(fielName: realmName.rawValue, fileExtension: "realm") else {
+                print("Default files for path \(realmName.rawValue) could not be found.")
+                return false
+            }
+            let defaultURL = Realm.Configuration.defaultConfiguration.fileURL!
+            let defaultParentURL = defaultURL.deletingLastPathComponent()
+            let realmUrl = defaultParentURL.appendingPathComponent(realmName.rawValue + ".realm")
+            do {
+                try FileManager.default.removeItem(at: realmUrl)
+                try FileManager.default.copyItem(at: url, to: realmUrl)
+            } catch let error {
+                print(String(describing: error))
+            }
+
+            // migrate realms at realmv1Path manually, realmv2Path is migrated automatically on access
+            let realmConfiguration = Realm.Configuration(fileURL: realmUrl, schemaVersion: 3, migrationBlock: migrationBlock)
+            try! Realm.performMigration(for: realmConfiguration)
+
+            // print out all migrated objects in the migrated realms
+            let realm = try! Realm(configuration: realmConfiguration)
+            print("Migrated objects in the Realm migrated from v1: \(realm.objects(Person.self))")
         }
-        
-        let defaultURL = Realm.Configuration.defaultConfiguration.fileURL!
-        let defaultParentURL = defaultURL.deletingLastPathComponent()
-        
-        let realmv0URL = defaultParentURL.appendingPathComponent("default-v0.realm")
-        let realmv1URL = defaultParentURL.appendingPathComponent("default-v1.realm")
-        let realmv2URL = defaultParentURL.appendingPathComponent("default-v2.realm")
-        
-        let realmv0Configuration = Realm.Configuration(fileURL: realmv0URL, schemaVersion: 3, migrationBlock: migrationBlock)
-        let realmv1Configuration = Realm.Configuration(fileURL: realmv1URL, schemaVersion: 3, migrationBlock: migrationBlock)
-        let realmv2Configuration = Realm.Configuration(fileURL: realmv2URL, schemaVersion: 3, migrationBlock: migrationBlock)
-        
-        do {
-            try FileManager.default.removeItem(at: realmv0URL)
-            try FileManager.default.copyItem(at: v0URL, to: realmv0URL)
-            try FileManager.default.removeItem(at: realmv1URL)
-            try FileManager.default.copyItem(at: v1URL, to: realmv1URL)
-            try FileManager.default.removeItem(at: realmv2URL)
-            try FileManager.default.copyItem(at: v2URL, to: realmv2URL)
-        } catch let error {
-            print(String(describing: error))
-        }
-        
-        // migrate realms at realmv1Path manually, realmv2Path is migrated automatically on access
-        try! Realm.performMigration(for: realmv1Configuration)
-        
-        // print out all migrated objects in the migrated realms
-        let realmv0 = try! Realm(configuration: realmv0Configuration)
-        print("Migrated objects in the Realm migrated from v1: \(realmv0.objects(Person.self))")
-        let realmv1 = try! Realm(configuration: realmv1Configuration)
-        print("Migrated objects in the Realm migrated from v1: \(realmv1.objects(Person.self))")
-        let realmv2 = try! Realm(configuration: realmv2Configuration)
-        print("Migrated objects in the Realm migrated from v2: \(realmv2.objects(Person.self))")
-        
         
         return true
     }
     
-    func bundleURL(_ name: String) -> URL? {
-        return Bundle.main.url(forResource: name, withExtension: "realm")
+    func bundleURL(fielName: String, fileExtension: String) -> URL? {
+        return Bundle.main.url(forResource: fielName, withExtension: fileExtension)
     }
     
     func createMigrationBlock() -> MigrationBlock {
