@@ -18,29 +18,23 @@ enum RealmVersion: String {
         return [.v0, .v1, .v2]
     }
     
-    func destinationUrl(clean: Bool = false) -> URL? {
+    func destinationUrl(usingTemplate: Bool) -> URL {
         let defaultURL = Realm.Configuration.defaultConfiguration.fileURL!
         let defaultParentURL = defaultURL.deletingLastPathComponent()
         let destinationUrl = defaultParentURL.appendingPathComponent(self.rawValue + ".realm")
+        let bundleUrl = bundleURL(fielName: self.rawValue, fileExtension: "realm")
         
-        guard let bundleUrl = bundleURL(fielName: self.rawValue, fileExtension: "realm") else {
-            print("Default files for path \(self.rawValue) could not be found.")
-            return nil
+        if FileManager.default.fileExists(atPath: destinationUrl.path) {
+            try! FileManager.default.removeItem(at: destinationUrl)
+        }
+        if usingTemplate {
+            try! FileManager.default.copyItem(at: bundleUrl, to: destinationUrl)
         }
         
-        if clean {
-            do {
-                try FileManager.default.removeItem(at: destinationUrl)
-                try FileManager.default.copyItem(at: bundleUrl, to: destinationUrl)
-            } catch let error {
-                print(String(describing: error))
-            }
-        }
-                
         return destinationUrl
     }
     
-    func bundleURL(fielName: String, fileExtension: String) -> URL? {
-        return Bundle.main.url(forResource: fielName, withExtension: fileExtension)
+    func bundleURL(fielName: String, fileExtension: String) -> URL {
+        return Bundle.main.url(forResource: fielName, withExtension: fileExtension)!
     }
 }

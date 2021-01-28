@@ -34,6 +34,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
         
+        // The RealmFile_vx structs are used to create the .realm files which are then used by the app to showcase different migrations.
+        // This line and the corresponding file for schema version x has to be uncommented to create the file.
+        // One .realm file per schema version is already included in the project.
+//        RealmFile.create()
+        
         MigrationExample.execute()
         
         return true

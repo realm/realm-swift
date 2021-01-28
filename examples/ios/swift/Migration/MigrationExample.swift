@@ -11,28 +11,16 @@ import RealmSwift
 
 struct MigrationExample {
     
-    static func execute() {
-        // The RealmFile_vx structs are used to create the .realm files which are then used by the app to showcase different migrations.
-        // This line and the corresponding file for schema version x has to be uncommented to create the file.
-        // One .realm file per schema version is already included in the project.
-        // RealmFile.create()
-        
+    static func execute() {        
         // Define a migration block.
         // You can define this inline, but we will reuse this to migrate realm files from multiple versions
         // to the most current version of our data model.
-        let migrationBlock: MigrationBlock = createMigrationBlock()
+        let migrationBlock = createMigrationBlock()
         
-        for realmName in RealmVersion.allVersions {
-            
-            let realmUrl = realmName.destinationUrl(clean: true)
-            
-            // migrate realms at realmv1Path manually, realmv2Path is migrated automatically on access
+        for realmVersion in RealmVersion.allVersions {
+            let realmUrl = realmVersion.destinationUrl(usingTemplate: true)
             let realmConfiguration = Realm.Configuration(fileURL: realmUrl, schemaVersion: 3, migrationBlock: migrationBlock)
             try! Realm.performMigration(for: realmConfiguration)
-
-            // print out all migrated objects in the migrated realms
-            let realm = try! Realm(configuration: realmConfiguration)
-            print("Migrated objects in the Realm migrated from v1: \(realm.objects(Person.self))")
         }
     }
     
@@ -43,20 +31,19 @@ struct MigrationExample {
                     // combine name fields into a single field
                     let firstName = oldObject!["firstName"] as! String
                     let lastName = oldObject!["lastName"] as! String
-                    newObject?["fullName"] = "\(firstName) \(lastName)"
+                    newObject!["fullName"] = "\(firstName) \(lastName)"
                 }
             }
             if oldSchemaVersion < 2 {
                 migration.enumerateObjects(ofType: Person.className()) { _, newObject in
-                    // give JP a dog
-                    if newObject?["fullName"] as? String == "John Smith" {
-                        let jpsDog = migration.create(Pet.className(), value: ["Jimbo", "dog"])
-                        let dogs = newObject?["pets"] as? List<MigrationObject>
-                        dogs?.append(jpsDog)
+                    // Add a pet to a specific person
+                    if newObject!["fullName"] as! String == "John Smith" {
+                        let johnsDog = migration.create(Dog.className(), value: ["Jimbo"])
+                        let dogs = newObject!["dogs"] as! List<MigrationObject>
+                        dogs.append(johnsDog)
                     }
                 }
             }
-            print("Migration complete.")
         }
         return migrationBlock
     }
