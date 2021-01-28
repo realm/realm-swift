@@ -14,6 +14,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fixed an issue where creating an object after file format upgrade may fail
   with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
  ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
+* Allow enumerating objects of types which are no longer present in the schema.
+* Add `RLMResponse.customStatusCode`. This fixes timeout exceptions that were occuring with a poor connection. ([#4188](https://github.com/realm/realm-core/issues/4188))
  * Fix - `RLMResponse` will have a non nil `customStatusCode` in case of error.
    ([#4188](https://github.com/realm/realm-core/issues/4188))
 
