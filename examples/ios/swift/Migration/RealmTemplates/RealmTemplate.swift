@@ -19,17 +19,19 @@
 import Foundation
 import RealmSwift
 
-enum RealmVersion: Int, CaseIterable {
-    case v0
-    case v1
-    case v2
-//    case v3
-}
-
-extension RealmVersion {
-    static var mostRecentVersion: UInt64 {
-        let allVersions = allCases.map { $0.rawValue }
-        let max = allVersions.max()!
-        return UInt64(max)
+struct RealmTemplate {
+    
+    static func create() {
+        
+        let url = URL(for: schemaVersion, usingTemplate: false)
+        let configuration = Realm.Configuration(fileURL: url, schemaVersion: UInt64(schemaVersion.rawValue))
+        let realm = try! Realm(configuration: configuration)
+        
+        try! realm.write {
+            exampleData(realm)
+        }
+        
+        print("Realm created at: \(String(describing: configuration.fileURL!)).")
     }
+    
 }

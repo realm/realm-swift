@@ -1,0 +1,30 @@
+The Migration project shows several examples of migrations and migration blocks.
+
+Goal is to provide a more indept view of certain problems and pitfalls users might
+face when migrations get more complex and the number of versions increases.
+
+How to use the example:
+You can just build and run the project since this is the default state (see
+`shouldCreateExamples` in `AppDelegate`).
+There is nothing much so see in terms of unit tests, console log or in the app itself.
+If there is no error the migration was successful.
+The files to look at are located in the `Examples` folder. Every file contains an extract
+of everything necessary for this version (schema version, objects, migration).
+
+How to create new examples:
+- Set `shouldCreateExamples` in `AppDelegate` to true.
+- Add a new version to the `RealmVersion` enum.
+- Duplicate the most recent `Example_vx`.
+- Comment out the previous one. Update the current one:
+  - Increment the schema version.
+  - Update the `Object` definitions according to your new example.
+  - Update the migration block.
+  - Create some examples for that specific schema version (they will be used in later schema version).
+- Run the app.
+- The realm file (path printed to console) created by this run must then be added to project.
+
+Important notes:
+- Code in all `Example_vx` files except the most recent one needs to be commented out to avoid
+  name conflicts of already defined symbols.
+- The migration block is repeated in each `RealmFile_vx` since some parts of older migrations might
+  change over time as well when tables or properties get renamed or their internal structure changes.
