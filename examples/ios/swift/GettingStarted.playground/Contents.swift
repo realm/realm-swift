@@ -1,3 +1,4 @@
+// swiftlint:disable comment_spacing
 //: To get this Playground running do the following:
 //:
 //: 1) In the scheme selector choose RealmSwift > iPhone 6s
