@@ -808,6 +808,16 @@ import Realm.Private
     }
 
     /**
+     Returns a live (mutable) reference of this Realm.
+
+     All objects and collections read from the returned Realm reference will no longer be frozen.
+     Will return self if called on a Realm that is not already frozen.
+     */
+    public func thaw() -> Realm {
+        return isFrozen ? Realm(rlmRealm.thaw()) : self
+    }
+
+    /**
      Returns a frozen (immutable) snapshot of the given object.
 
      The frozen copy is an immutable object which contains the same data as the given object
@@ -820,6 +830,16 @@ import Realm.Private
      */
     public func freeze<T: ObjectBase>(_ obj: T) -> T {
         return RLMObjectFreeze(obj) as! T
+    }
+
+    /**
+     Returns a live (mutable) reference of this object.
+
+     This method creates a managed accessor to a live copy of the same frozen object.
+     Will return self if called on an already live object.
+     */
+    public func thaw<T: ObjectBase>(_ obj: T) -> T? {
+        return RLMObjectThaw(obj) as? T
     }
 
     /**
