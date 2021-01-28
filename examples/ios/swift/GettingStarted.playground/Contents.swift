@@ -1,13 +1,13 @@
-// To get this Playground running do the following:
-//
-// 1) In the scheme selector choose RealmSwift > iPhone 6s
-// 2) Press Cmd + B
-// 3) If the Playground didn't already run press the ▶︎ button at the bottom
+//: To get this Playground running do the following:
+//:
+//: 1) In the scheme selector choose RealmSwift > iPhone 6s
+//: 2) Press Cmd + B
+//: 3) If the Playground didn't already run press the ▶︎ button at the bottom
 
 import Foundation
 import RealmSwift
 
-// I. Define the data entities
+//: I. Define the data entities
 
 @objcMembers class Person: Object {
     dynamic var name = ""
@@ -26,11 +26,11 @@ import RealmSwift
     override var description: String { return "Car {\(brand), \(name), \(year)}" }
 }
 
-// II. Init the realm file
+//: II. Init the realm file
 
 let realm = try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: "TemporaryRealm"))
 
-// III. Create the objects
+//: III. Create the objects
 
 let car1 = Car(value: ["brand": "BMW", "year": 1980])
 
@@ -53,13 +53,13 @@ let husband = Person(value: [
 
 wife.spouse = husband
 
-// IV. Write objects to the realm
+//: IV. Write objects to the realm
 
 try! realm.write {
     realm.add(husband)
 }
 
-// V. Read objects back from the realm
+//: V. Read objects back from the realm
 
 let favorites = ["Jennifer"]
 
@@ -77,7 +77,7 @@ for person in favoritePeopleWithSpousesAndCars {
     car.name
     car.brand
 
-// VI. Update objects
+//: VI. Update objects
 
     try! realm.write {
         car.year += 1
@@ -85,11 +85,11 @@ for person in favoritePeopleWithSpousesAndCars {
     car.year
 }
 
-// VII. Delete objects
+//: VII. Delete objects
 
 try! realm.write {
     realm.deleteAll()
 }
 
 realm.objects(Person.self).count
-// Thanks! To learn more about Realm go to https://realm.io
+//: Thanks! To learn more about Realm go to https://realm.io
