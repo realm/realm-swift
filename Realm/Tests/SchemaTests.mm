@@ -1087,7 +1087,7 @@ RLM_ARRAY_TYPE(NotARealClass)
 
 - (void)testInsertingColumnsInBackgroundProcess {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    config.schemaMode = realm::SchemaMode::Additive;
+    config.schemaMode = realm::SchemaMode::AdditiveDiscovered;
     if (!self.isParent) {
         config.dynamic = true;
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];

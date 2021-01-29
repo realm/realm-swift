@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "10.3.2"
-let cocoaVersionStr = "10.5.0"
+let coreVersionStr = "10.4.0"
+let cocoaVersionStr = "10.5.1"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -62,9 +62,10 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(path: "/Users/jason.flax/Documents/realm-core")
+//        .package(path: "/Users/jason.flax/Documents/realm-core")
 //        .package(url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
 //        .package(url: "https://github.com/realm/realm-core", .branch("je/mixed-query"))
+        .package(url: "https://github.com/realm/realm-core", .branch("master"))
     ],
     targets: [
       .target(

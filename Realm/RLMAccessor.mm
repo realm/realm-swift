@@ -260,42 +260,11 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
 void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained id<RLMValue> const value) {
     RLMTranslateError([&] {
-        switch (value.valueType) {
-            case RLMPropertyTypeInt:
-                setValue(obj, key, (NSNumber<RLMInt> *)value);
-                break;
-            case RLMPropertyTypeBool:
-                setValue(obj, key, (NSNumber<RLMBool> *)value);
-                break;
-            case RLMPropertyTypeFloat:
-                setValue(obj, key, (NSNumber<RLMFloat> *)value);
-                break;
-            case RLMPropertyTypeDouble:
-                setValue(obj, key, (NSNumber<RLMDouble> *)value);
-                break;
-            case RLMPropertyTypeUUID:
-                setValue(obj, key, (NSUUID *)value);
-                break;
-            case RLMPropertyTypeString:
-                setValue(obj, key, (NSString *)value);
-                break;
-            case RLMPropertyTypeData:
-                setValue(obj, key, (NSData *)value);
-                break;
-            case RLMPropertyTypeDate:
-                setValue(obj, key, (NSDate *)value);
-                break;
-            case RLMPropertyTypeObject:
-                setValue(obj, key, (RLMObjectBase *)value);
-                break;
-            case RLMPropertyTypeObjectId:
-                setValue(obj, key, (RLMObjectId *)value);
-                break;
-            case RLMPropertyTypeDecimal128:
-                setValue(obj, key, (RLMDecimal128 *)value);
-                break;
-            default:
-                @throw RLMException(@"Unexpected property type for mixed value type code");
+        if (value) {
+            obj->_row.set(key, RLMObjcToMixed(value));
+        }
+        else {
+            setNull(obj->_row, key);
         }
     });
 }

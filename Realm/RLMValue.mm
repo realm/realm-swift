@@ -44,3 +44,19 @@
 }
 
 @end
+
+@implementation NSData (RLMValue)
+
+- (RLMPropertyType)valueType {
+    return RLMPropertyTypeData;
+}
+
+@end
+
+@implementation RLMObjectId (RLMValue)
+
+- (RLMPropertyType)valueType {
+    return RLMPropertyTypeObjectId;
+}
+
+@end

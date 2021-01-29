@@ -51,6 +51,9 @@
 @implementation DecimalObject
 @end
 
+@implementation MixedObject
+@end
+
 @implementation UTF8Object
 @end
 
@@ -90,8 +93,6 @@
 @implementation UuidObject
 @end
 
-@implementation MixedObject
-@end
 
 #pragma mark AllTypesObject
 
@@ -101,7 +102,7 @@
 }
 
 + (NSArray *)requiredProperties {
-    return @[@"stringCol", @"dateCol", @"binaryCol", @"decimalCol", @"objectIdCol", @"uuidCol", @"anyCol"];
+    return @[@"stringCol", @"dateCol", @"binaryCol", @"decimalCol", @"objectIdCol", @"uuidCol"];
 }
 
 + (NSDictionary *)values:(int)i stringObject:(StringObject *)so {
@@ -125,7 +126,7 @@
                               [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"],
                               [[NSUUID alloc] initWithUUIDString:@"b84e8912-a7c2-41cd-8385-86d200d7b31e"]][i] :
             [[NSUUID alloc] initWithUUIDString:@"b9d325b0-3058-4838-8473-8f1aaae410db"],
-        @"anyCol": @(i)
+        @"anyCol": @(i+1)
     };
 }
 @end

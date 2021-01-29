@@ -1,14 +1,25 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add Xcode 12.3 binary to release package.
-* Add support for queries which have nil on the left side and a keypath on the
-  right side (e.g. "nil == name" rather than "name == nil" as was previously
-  required).
+* Add support for some missing query operations on data propertys:
+  - Data properties can be compared to other data properties
+    (e.g. "dataProperty1 == dataProperty2").
+  - Case and diacritic-insensitive queries can be performed on data properties.
+    This will only have meaningful results if the data property contains UTF-8
+    string data.
+  - Data properties on linked objects can be queried
+    (e.g. "link.dataProperty CONTAINS %@")
+* Implement queries which filter on lists other than object links (lists of
+  objects were already supported). All supported operators for normal
+  properties are now supported for lists (e.g. "ANY intList = 5" or "ANY
+  stringList BEGINSWITH 'prefix'"), as well as aggregate operations on the
+  lists (such as "intArray.@sum > 100").
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Fixed an issue where creating an object after file format upgrade may fail
+  with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
+ ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -19,7 +30,44 @@ x.y.z Release notes (yyyy-MM-dd)
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v10.3.3 to v10.4.0
+
+10.5.1 Release notes (2021-01-15)
+=============================================================
+
+### Enhancements
+
+* Add Xcode 12.3 binary to release package.
+* Add support for queries which have nil on the left side and a keypath on the
+  right side (e.g. "nil == name" rather than "name == nil" as was previously
+  required).
+
+### Fixed
+
+* Timeouts when calling server functions via App would sometimes crash rather
+  than report an error.
+* Fix a race condition which would lead to "uncaught exception in notifier
+  thread: N5realm15InvalidTableRefE: transaction_ended" and a crash when the
+  source Realm was closed or invalidated at a very specific time during the
+  first run of a collection notifier
+  ([#3761](https://github.com/realm/realm-core/issues/3761), since v5.0.0).
+* Deleting and recreating objects with embedded objects may fail.
+  ([Core PR #4240](https://github.com/realm/realm-core/pull/4240), since v10.0.0)
+* Fast-enumerating a List after deleting the parent object would crash with an
+  assertion failure rather than a more appropriate exception.
+  ([Core #4114](https://github.com/realm/realm-core/issues/4114), since v5.0.0).
+* Fix an issue where calling a MongoDB Realm Function would never be performed as the reference to the weak `User` was lost.
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.3.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.3.2 to v10.3.3
 
 10.5.0 Release notes (2020-12-14)
 =============================================================

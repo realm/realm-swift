@@ -132,6 +132,7 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
             return [value isKindOfClass:[NSData class]];
         case RLMPropertyTypeAny:
             return [value conformsToProtocol:@protocol(RLMValue)];
+//                || [value isKindOfClass:[NSData class]]; // Required for _NSInlineData
         case RLMPropertyTypeLinkingObjects:
             return YES;
         case RLMPropertyTypeObject: {
