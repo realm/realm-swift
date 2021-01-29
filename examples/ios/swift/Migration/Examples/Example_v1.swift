@@ -26,8 +26,6 @@
 //    case v1
 //}
 //
-//let schemaVersion = RealmVersion.v1
-//
 //// Changes from previous version:
 //// - combine `firstName` and `lastName` into `fullName`
 //

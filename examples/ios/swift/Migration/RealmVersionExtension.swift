@@ -20,9 +20,9 @@ import Foundation
 import RealmSwift
 
 extension RealmVersion {
-    static var mostRecentVersion: UInt64 {
+    static var mostRecentVersion: RealmVersion {
         let allVersions = allCases.map { $0.rawValue }
         let max = allVersions.max()!
-        return UInt64(max)
+        return RealmVersion.init(rawValue: max)!
     }
 }

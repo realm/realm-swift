@@ -25,8 +25,6 @@
 //    case v0
 //}
 //
-//let schemaVersion = RealmVersion.v0
-//
 //class Person: Object {
 //    @objc dynamic var firstName = ""
 //    @objc dynamic var lastName = ""

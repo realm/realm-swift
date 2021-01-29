@@ -26,18 +26,11 @@
 //    case v1
 //    case v2
 //    case v3
+//    case v4
 //}
 //
 //// Changes from previous version:
-//// rename the `Dog` object to `Pet`
-//// add a `kind` property to `Pet`
-//// change the `dogs` property on `Person`:
-//// - rename to `pets`
-//// - change type to `List<Pet>`
-//
-//// Renaming tables is not supported yet: https://github.com/realm/realm-cocoa/issues/2491
-//// The recommended way is to create a new type instead and migrate the old type.
-//// Here we create `Pet` and migrate its data from `Dog` so simulate renaming the table.
+//// Add an `Address` to the `Person`.
 //
 //class Pet: Object {
 //    @objc dynamic var name = ""
@@ -48,6 +41,13 @@
 //    @objc dynamic var fullName = ""
 //    @objc dynamic var age = 0
 //    let pets = List<Pet>()
+//    @objc dynamic var address: Address?
+//}
+//
+//class Address: Object {
+//    @objc dynamic var street = ""
+//    @objc dynamic var city = ""
+//    let residents: LinkingObjects = LinkingObjects(fromType: Person.self, property: "address")
 //}
 //
 //// MARK: - Migration
@@ -114,6 +114,14 @@
 //        // See https://github.com/realm/realm-cocoa/issues/3686
 //        // migration.deleteData(forType: "Dog")
 //    }
+//    if oldSchemaVersion < 4 {
+//        migration.enumerateObjects(ofType: Person.className()) { oldObject, newObject in
+//            if newObject!["fullName"] as! String == "John Doe" {
+//                let address = migration.create(Address.className(), value: ["Broadway", "New York"])
+//                newObject!["address"] = address
+//            }
+//        }
+//    }
 //}
 //
 //// MARK: - Example data
@@ -134,4 +142,6 @@
 //    // pet1, pet2 and pet3 get added automatically by adding them to a list.
 //    // pet4 has to be added manually though since it's not attached to a person yet.
 //    realm.add(pet4)
+//    let address = Address(value: ["Broadway", "New York"])
+//    person1.address = address
 //}

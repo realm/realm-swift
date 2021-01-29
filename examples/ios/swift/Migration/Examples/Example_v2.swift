@@ -27,8 +27,6 @@
 //    case v2
 //}
 //
-//let schemaVersion = RealmVersion.v2
-//
 //// Changes from previous version:
 //// add a `Dog` object
 //// add a list of `dogs` to the `Person` object
