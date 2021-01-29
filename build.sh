@@ -278,7 +278,6 @@ build_docs() {
     local objc="--objc"
 
     if [[ "$language" == "swift" ]]; then
-        sh build.sh set-swift-version
         xcodebuild_arguments="-scheme,RealmSwift"
         module="RealmSwift"
         objc=""
@@ -469,18 +468,6 @@ case "$COMMAND" in
     ######################################
     # Swift versioning
     ######################################
-    "set-swift-version")
-        version=${2:-$REALM_SWIFT_VERSION}
-
-        SWIFT_VERSION_FILE="RealmSwift/SwiftVersion.swift"
-        CONTENTS="let swiftLanguageVersion = \"$version\""
-        if [ ! -f "$SWIFT_VERSION_FILE" ] || ! grep -q "$CONTENTS" "$SWIFT_VERSION_FILE"; then
-            echo "$CONTENTS" > "$SWIFT_VERSION_FILE"
-        fi
-
-        exit 0
-        ;;
-
     "prelaunch-simulator")
         if [ -z "$REALM_SKIP_PRELAUNCH" ]; then
             sh ${source_root}/scripts/reset-simulators.sh "$1"
@@ -1238,8 +1225,6 @@ EOM
 
           echo '' > Realm/RLMPlatform.h
           cp Realm/*.h include
-        else
-          sh build.sh set-swift-version
         fi
         ;;
 
@@ -1260,7 +1245,6 @@ EOM
         fi
 
         if [ "$target" = "docs" ]; then
-            sh build.sh set-swift-version
             sh build.sh verify-docs
         elif [ "$target" = "swiftlint" ]; then
             sh build.sh verify-swiftlint

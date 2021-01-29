@@ -669,14 +669,6 @@ internal class ObjectUtil {
         }
     }()
 
-    private class func swiftVersion() -> NSString {
-#if SWIFT_PACKAGE
-        return "5.1"
-#else
-        return swiftLanguageVersion as NSString
-#endif
-    }
-
     // If the property is a storage property for a lazy Swift property, return
     // the base property name (e.g. `foo.storage` becomes `foo`). Otherwise, nil.
     private static func baseName(forLazySwiftProperty name: String) -> String? {
