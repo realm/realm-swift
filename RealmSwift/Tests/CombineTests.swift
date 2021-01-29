@@ -193,8 +193,12 @@ class CombineRealmTests: CombinePublisherTestCase {
     func testWillChangeOnConnectionStateChange() {
         let session = SyncSession()
         let ex = expectation(description: "should change from publisher")
-        let cancellable = session.objectWillChange.sink {
-            ex.fulfill()
+        var changes = 0
+        let cancellable = session.objectWillChange.sink { _ in
+            changes += 1
+            if changes == 2 { // account for init
+                ex.fulfill()
+            }
         }
         let ex2 = expectation(description: "should change from kvo observer")
         let kvo = session.observe(\.connectionState, changeHandler: { _,_ in

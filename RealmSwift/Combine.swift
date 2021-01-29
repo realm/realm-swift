@@ -435,39 +435,8 @@ extension AnyRealmCollection: RealmSubscribable {
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension SyncSession: ObservableObject {
     /// :nodoc:
-    public struct Subscription: Combine.Subscription {
-        /// :nodoc:
-        fileprivate let kvObservation: NSKeyValueObservation
-        /// :nodoc:
-        public func request(_ demand: Subscribers.Demand) {
-        }
-        /// :nodoc:
-        public func cancel() {
-            kvObservation.invalidate()
-        }
-        /// :nodoc:
-        public var combineIdentifier: CombineIdentifier {
-            CombineIdentifier(kvObservation)
-        }
-    }
-
-    /// :nodoc:
-    public struct Publisher: Combine.Publisher {
-        /// :nodoc:
-        public typealias Output = Void
-        /// :nodoc:
-        public typealias Failure = Never
-        fileprivate let session: SyncSession
-        /// :nodoc:
-        public func receive<S>(subscriber: S) where S : Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
-            subscriber.receive(subscription: Subscription(kvObservation: session.observe(\.connectionState, changeHandler: { _,_ in
-                _ = subscriber.receive()
-            })))
-        }
-    }
-    /// :nodoc:
-    public var objectWillChange: Publisher {
-        Publisher(session: self)
+    public var objectWillChange: NSObject.KeyValueObservingPublisher<RLMSyncSession, RLMSyncConnectionState> {
+        self.publisher(for: \.connectionState)
     }
 }
 
