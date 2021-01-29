@@ -189,6 +189,23 @@ class CombineRealmTests: CombinePublisherTestCase {
         }
         wait(for: [exp], timeout: 1)
     }
+
+    func testWillChangeOnConnectionStateChange() {
+        var changes = 0
+        let session = SyncSession()
+        let ex = expectation(description: "should change")
+        let cancellable = session.objectWillChange.sink {
+            changes += 1
+            ex.fulfill()
+        }
+        let kvo = session.observe(\.connectionState, changeHandler: { _,_ in
+            print("YEAH")
+        })
+        session.setValue(RLMSyncConnectionState.connecting.rawValue, forKey: "connectionState")
+        wait(for: [ex], timeout: 2.0)
+        cancellable.cancel()
+        kvo.invalidate()
+    }
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
