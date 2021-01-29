@@ -88,7 +88,7 @@ let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
         // version, we would not be able to access `dogs` since they did not exist back there.
         // Migration from v0 and v1 to v3 is done in the previous blocks.
         // Related issue: https://github.com/realm/realm-cocoa/issues/6263
-        migration.enumerateObjects(ofType: "Person") { oldObject, newObject in
+        migration.enumerateObjects(ofType: Person.className()) { oldObject, newObject in
             let pets = newObject!["pets"] as! List<MigrationObject>
             for dog in oldObject!["dogs"] as! List<DynamicObject> {
                 let pet = migration.create(Pet.className(), value: [dog["name"], "dog"])
@@ -99,10 +99,23 @@ let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
         // an owner.
         // Related issue: https://github.com/realm/realm-cocoa/issues/6734
         // TODO foo
-        migration.enumerateObjects(ofType: "Dog") { oldObject, _ in
-            migration.delete(oldObject!)
+        migration.enumerateObjects(ofType: "Dog") { oldDogObject, _ in
+            var dogFound = false
+            migration.enumerateObjects(ofType: Person.className()) { oldPersonObject, newObject in
+                for pet in newObject!["pets"] as! List<DynamicObject> {
+                    if pet["name"] as! String == oldDogObject!["name"] as! String {
+                        dogFound = true
+                        break
+                    }
+                }
+            }
+            if !dogFound {
+                migration.create(Pet.className(), value: [oldDogObject!["name"], "dog"])
+            }
         }
-        //        migration.deleteData(forType: "dog")
+        // The data cannot be deleted just yet since the table is target of cross-table link columns.
+        // See https://github.com/realm/realm-cocoa/issues/3686
+        // migration.deleteData(forType: "Dog")
     }
 }
 
