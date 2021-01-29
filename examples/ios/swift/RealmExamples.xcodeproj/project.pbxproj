@@ -45,8 +45,9 @@
 		7D46395425C2E7140089EFD9 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 7D46395325C2E7140089EFD9 /* README */; };
 		7D46395C25C305360089EFD9 /* RealmTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46395B25C305360089EFD9 /* RealmTemplate.swift */; };
 		7D46397825C30C7A0089EFD9 /* URLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46397725C30C7A0089EFD9 /* URLExtension.swift */; };
+		7D46397C25C314630089EFD9 /* default-v3.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7D46397B25C314630089EFD9 /* default-v3.realm */; };
 		7DFFB15E25C19F0700CA8AE5 /* Example_v0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFFB15D25C19F0700CA8AE5 /* Example_v0.swift */; };
-		7DFFB16B25C1B49700CA8AE5 /* RealmVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFFB16A25C1B49700CA8AE5 /* RealmVersion.swift */; };
+		7DFFB16B25C1B49700CA8AE5 /* RealmVersionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFFB16A25C1B49700CA8AE5 /* RealmVersionExtension.swift */; };
 		7DFFB16F25C1B65A00CA8AE5 /* Example_v1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFFB16E25C1B65A00CA8AE5 /* Example_v1.swift */; };
 		7DFFB17725C1B84E00CA8AE5 /* Example_v2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFFB17625C1B84E00CA8AE5 /* Example_v2.swift */; };
 		C07E5D7A1B15003B00ED625C /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; };
@@ -271,8 +272,9 @@
 		7D46395325C2E7140089EFD9 /* README */ = {isa = PBXFileReference; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		7D46395B25C305360089EFD9 /* RealmTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmTemplate.swift; sourceTree = "<group>"; };
 		7D46397725C30C7A0089EFD9 /* URLExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtension.swift; sourceTree = "<group>"; };
+		7D46397B25C314630089EFD9 /* default-v3.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v3.realm"; sourceTree = "<group>"; };
 		7DFFB15D25C19F0700CA8AE5 /* Example_v0.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v0.swift; sourceTree = "<group>"; };
-		7DFFB16A25C1B49700CA8AE5 /* RealmVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmVersion.swift; sourceTree = "<group>"; };
+		7DFFB16A25C1B49700CA8AE5 /* RealmVersionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmVersionExtension.swift; sourceTree = "<group>"; };
 		7DFFB16E25C1B65A00CA8AE5 /* Example_v1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v1.swift; sourceTree = "<group>"; };
 		7DFFB17625C1B84E00CA8AE5 /* Example_v2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v2.swift; sourceTree = "<group>"; };
 		9C318E8C1CA42C7800879076 /* GettingStarted.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = GettingStarted.playground; sourceTree = "<group>"; };
@@ -574,6 +576,7 @@
 				E8CB088619BA6AF70018434A /* default-v0.realm */,
 				E8CB088719BA6AF70018434A /* default-v1.realm */,
 				E8CB088819BA6AF70018434A /* default-v2.realm */,
+				7D46397B25C314630089EFD9 /* default-v3.realm */,
 			);
 			path = RealmTemplates;
 			sourceTree = "<group>";
@@ -672,7 +675,7 @@
 				E8CB088519BA6AF70018434A /* AppDelegate.swift */,
 				7D46394725C2D1400089EFD9 /* MigrationExample.swift */,
 				7D46397725C30C7A0089EFD9 /* URLExtension.swift */,
-				7DFFB16A25C1B49700CA8AE5 /* RealmVersion.swift */,
+				7DFFB16A25C1B49700CA8AE5 /* RealmVersionExtension.swift */,
 				7D46396525C30B580089EFD9 /* Examples */,
 				7D46396A25C30B7F0089EFD9 /* RealmTemplates */,
 				E8CB088919BA6AF70018434A /* Info.plist */,
@@ -1071,6 +1074,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7D46397C25C314630089EFD9 /* default-v3.realm in Resources */,
 				7D46395425C2E7140089EFD9 /* README in Resources */,
 				E8CB088B19BA6AF70018434A /* default-v0.realm in Resources */,
 				E8CB088C19BA6AF70018434A /* default-v1.realm in Resources */,
@@ -1159,7 +1163,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7D46395C25C305360089EFD9 /* RealmTemplate.swift in Sources */,
-				7DFFB16B25C1B49700CA8AE5 /* RealmVersion.swift in Sources */,
+				7DFFB16B25C1B49700CA8AE5 /* RealmVersionExtension.swift in Sources */,
 				7DFFB16F25C1B65A00CA8AE5 /* Example_v1.swift in Sources */,
 				7D46395025C2E2750089EFD9 /* Example_v3.swift in Sources */,
 				7D46394825C2D1400089EFD9 /* MigrationExample.swift in Sources */,

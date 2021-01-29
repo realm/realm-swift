@@ -27,6 +27,18 @@ struct MigrationExample {
             let schemaVersion = RealmVersion.mostRecentVersion
             let realmConfiguration = Realm.Configuration(fileURL: realmUrl, schemaVersion: schemaVersion, migrationBlock: migrationBlock)
             try! Realm.performMigration(for: realmConfiguration)
+            // Print out the results of the migration.
+            print("Migration result (migrating from version \(realmVersion.rawValue) to \(schemaVersion):")
+//            let pets = try! Realm(configuration: realmConfiguration).objects(Pet.self)
+//            let petNames = pets.reduce("") { (result, pet) -> String in
+//                result + " " + pet.name
+//            }
+//            print("Pets:\(petNames)")
+//            let persons = try! Realm(configuration: realmConfiguration).objects(Person.self)
+//            let namesAndDogs = persons.reduce("") { (result, person) -> String in
+//                result + " " + person.fullName + " \(person.pets.count)"
+//            }
+//            print("Persons:\(namesAndDogs)")
         }
     }
     

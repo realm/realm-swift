@@ -21,6 +21,11 @@
 //
 //// MARK: - Schema
 //
+//enum RealmVersion: Int, CaseIterable {
+//    case v0
+//    case v1
+//}
+//
 //let schemaVersion = RealmVersion.v1
 //
 //// Changes from previous version:

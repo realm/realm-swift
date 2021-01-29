@@ -13,9 +13,9 @@ of everything necessary for this version (schema version, objects, migration).
 
 How to create new examples:
 - Set `shouldCreateExamples` in `AppDelegate` to true.
-- Add a new version to the `RealmVersion` enum.
 - Duplicate the most recent `Example_vx`.
 - Comment out the previous one. Update the current one:
+  - Add a new version to the `RealmVersion` enum.
   - Increment the schema version.
   - Update the `Object` definitions according to your new example.
   - Update the migration block.

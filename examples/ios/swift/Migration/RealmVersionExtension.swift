@@ -19,13 +19,6 @@
 import Foundation
 import RealmSwift
 
-enum RealmVersion: Int, CaseIterable {
-    case v0
-    case v1
-    case v2
-//    case v3
-}
-
 extension RealmVersion {
     static var mostRecentVersion: UInt64 {
         let allVersions = allCases.map { $0.rawValue }
