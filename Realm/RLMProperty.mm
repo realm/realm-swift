@@ -19,12 +19,12 @@
 #import "RLMProperty_Private.hpp"
 
 #import "RLMArray_Private.hpp"
-#import "RLMSet_Private.hpp"
-#import "RLMListBase.h"
+//#import "RLMListBase.h"
 #import "RLMObject.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.h"
 #import "RLMSchema_Private.h"
+#import "RLMSet_Private.hpp"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 

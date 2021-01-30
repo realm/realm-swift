@@ -30,9 +30,9 @@
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
 
+#import <realm/collection.hpp>
 #import <realm/object-store/set.hpp>
 #import <realm/set.hpp>
-#import <realm/collection.hpp>
 
 #import <realm/object-store/results.hpp>
 #import <realm/object-store/shared_realm.hpp>

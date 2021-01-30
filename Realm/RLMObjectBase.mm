@@ -20,10 +20,8 @@
 
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
-#import "RLMSet_Private.hpp"
 #import "RLMDecimal128.h"
 #import "RLMListBase.h"
-#import "RLMSetBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObservation.hpp"
@@ -31,6 +29,8 @@
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMSetBase.h"
+#import "RLMSet_Private.hpp"
 #import "RLMSwiftSupport.h"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
@@ -208,7 +208,7 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 
             if (value) {
                 [collection addObjects:validatedObjectForProperty(value, _objectSchema, property,
-                                                           RLMSchema.partialPrivateSharedSchema)];
+                                                                  RLMSchema.partialPrivateSharedSchema)];
             }
         }
         else if (property.optional) {

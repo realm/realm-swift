@@ -18,12 +18,12 @@
 
 #import "RLMSetBase.h"
 
-#import "RLMSet_Private.hpp"
 #import "RLMObjectSchema_Private.h"
 #import "RLMObject_Private.hpp"
 #import "RLMObservation.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
+#import "RLMSet_Private.hpp"
 
 @implementation RLMSetBase {
     std::unique_ptr<RLMObservationInfo> _observationInfo;

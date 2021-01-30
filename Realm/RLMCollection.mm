@@ -20,13 +20,13 @@
 
 #import "RLMAccessor.hpp"
 #import "RLMArray_Private.hpp"
-#import "RLMSet_Private.hpp"
 #import "RLMListBase.h"
-#import "RLMSetBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
+#import "RLMSetBase.h"
+#import "RLMSet_Private.hpp"
 
 #import <realm/object-store/collection_notifications.hpp>
 #import <realm/object-store/list.hpp>

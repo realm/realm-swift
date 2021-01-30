@@ -433,11 +433,11 @@ public:
 - (void)testRemoveObserver {
     // iOS 14.2 beta 2 has stopped throwing exceptions when a KVO observer is removed that does not exist
     // FIXME: revisit this once 14.2 is out to see if this was an intended change
-    #if REALM_PLATFORM_IOS
-        if (@available(iOS 14.2, *)) {
-            return;
-        }
-    #endif
+#if REALM_PLATFORM_IOS
+    if (@available(iOS 14.2, *)) {
+        return;
+    }
+#endif
 
     KVOObject *obj = [self createObject];
     XCTAssertThrowsSpecificNamed([obj removeObserver:self forKeyPath:@"int32Col"], NSException, NSRangeException);
@@ -1322,16 +1322,7 @@ public:
     AssertSetChanged();
     [mutator2 addObject:obj2.obj];
     AssertSetChanged();
-    // This will emit 2 KVO notifications instead of one. It seems that
-    // 2 cascade notifications are being created at the core level.
-    // table::for_each_backlink_column looks suspicious as there is a
-    // fixme comment stating it should be optimised to not itterate through
-    // all backlinks.
-    // The expected count here will be 1, as the first notification will be popped
-//    [mutator setSet:mutator2];
-//    AssertSetChanged();
-    // Doing it the opposite way round however does not.
-    [mutator2 setSet:mutator];
+    [mutator setSet:mutator2];
     AssertSetChanged();
 
     [mutator2 intersectSet:mutator];

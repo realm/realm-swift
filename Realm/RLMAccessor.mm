@@ -19,9 +19,7 @@
 #import "RLMAccessor.hpp"
 
 #import "RLMArray_Private.hpp"
-#import "RLMSet_Private.hpp"
 #import "RLMListBase.h"
-#import "RLMSetBase.h"
 #import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
@@ -31,6 +29,8 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMResults_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMSetBase.h"
+#import "RLMSet_Private.hpp"
 #import "RLMUtil.hpp"
 #import "RLMUUID_Private.hpp"
 
@@ -162,26 +162,12 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
     }
 }
 
-// set getter/setter
-RLMSet *getSet(__unsafe_unretained RLMObjectBase *const obj, NSUInteger propIndex) {
+// collection getter/setter
+id<RLMCollection> getCollection(__unsafe_unretained RLMObjectBase *const obj, NSUInteger propIndex) {
     RLMVerifyAttached(obj);
     auto prop = obj->_info->rlmObjectSchema.properties[propIndex];
-    return [[RLMManagedSet alloc] initWithParent:obj property:prop];
-}
-
-// array getter/setter
-RLMArray *getArray(__unsafe_unretained RLMObjectBase *const obj, NSUInteger propIndex) {
-    RLMVerifyAttached(obj);
-    auto prop = obj->_info->rlmObjectSchema.properties[propIndex];
-    return [[RLMManagedArray alloc] initWithParent:obj property:prop];
-}
-
-template <typename T>
-auto get_value(T t) {
-    if constexpr (std::is_pointer_v<T>)
-        return *t;
-    else
-        return t;
+    return prop.array ? [[RLMManagedArray alloc] initWithParent:obj property:prop]
+                        : [[RLMManagedSet alloc] initWithParent:obj property:prop];
 }
 
 template <typename Collection>
@@ -342,15 +328,9 @@ id makeWrapperGetter(NSUInteger index, bool optional) {
 // dynamic getter with column closure
 id managedGetter(RLMProperty *prop, const char *type) {
     NSUInteger index = prop.index;
-    if (prop.array && prop.type != RLMPropertyTypeLinkingObjects) {
+    if (prop.collection && prop.type != RLMPropertyTypeLinkingObjects) {
         return ^id(__unsafe_unretained RLMObjectBase *const obj) {
-            return getArray(obj, index);
-        };
-    }
-
-    if (prop.set && prop.type != RLMPropertyTypeLinkingObjects) {
-        return ^id(__unsafe_unretained RLMObjectBase *const obj) {
-            return getSet(obj, index);
+            return getCollection(obj, index);
         };
     }
 
@@ -484,16 +464,13 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
     }
     if (prop.collection) {
         NSString *propName = prop.name;
+        Class cls = prop.array ? [RLMArray class] : [RLMSet class];
         if (prop.type == RLMPropertyTypeObject) {
             NSString *objectClassName = prop.objectClassName;
             return ^(RLMObjectBase *obj) {
                 id val = superGet(obj, propName);
                 if (!val) {
-                    if (prop.array) {
-                        val = [[RLMArray alloc] initWithObjectClassName:objectClassName];
-                    } else {
-                        val = [[RLMSet alloc] initWithObjectClassName:objectClassName];
-                    }
+                    val = [[cls alloc] initWithObjectClassName:objectClassName];
                     superSet(obj, propName, val);
                 }
                 return val;
@@ -504,11 +481,7 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
         return ^(RLMObjectBase *obj) {
             id val = superGet(obj, propName);
             if (!val) {
-                if (prop.array) {
-                    val = [[RLMArray alloc] initWithObjectType:type optional:optional];
-                } else {
-                    val = [[RLMSet alloc] initWithObjectType:type optional:optional];
-                }
+                val = [[cls alloc] initWithObjectType:type optional:optional];
                 superSet(obj, propName, val);
             }
             return val;
@@ -527,22 +500,14 @@ id unmanagedSetter(RLMProperty *prop, const char *) {
     return ^(RLMObjectBase *obj, id<NSFastEnumeration> values) {
         auto prop = obj->_objectSchema[propName];
         RLMValidateValueForProperty(values, obj->_objectSchema, prop, true);
+
+        Class cls = prop.array ? [RLMArray class] : [RLMSet class];
         id collection;
-        if (prop.array) {
             // make copy when setting (as is the case for all other variants)
-            if (prop.type == RLMPropertyTypeObject)
-                collection = [[RLMArray alloc] initWithObjectClassName:prop.objectClassName];
-            else
-                collection = [[RLMArray alloc] initWithObjectType:prop.type optional:prop.optional];
-        } else if (prop.set) {
-            // make copy when setting (as is the case for all other variants)
-            if (prop.type == RLMPropertyTypeObject)
-                collection = [[RLMSet alloc] initWithObjectClassName:prop.objectClassName];
-            else
-                collection = [[RLMSet alloc] initWithObjectType:prop.type optional:prop.optional];
-        } else {
-            REALM_TERMINATE("Unexpected property type");
-        }
+        if (prop.type == RLMPropertyTypeObject)
+            collection = [[cls alloc] initWithObjectClassName:prop.objectClassName];
+        else
+            collection = [[cls alloc] initWithObjectType:prop.type optional:prop.optional];
         [collection addObjects:values];
         superSet(obj, propName, collection);
     };

@@ -24,13 +24,11 @@ Pod::Spec.new do |s|
 
                               # Realm module
                               'include/**/RLMArray.h',
-                              'include/**/RLMSet.h',
                               'include/**/RLMCollection.h',
                               'include/**/RLMConstants.h',
                               'include/**/RLMDecimal128.h',
                               'include/**/RLMEmbeddedObject.h',
                               'include/**/RLMListBase.h',
-                              'include/**/RLMSetBase.h',
                               'include/**/RLMMigration.h',
                               'include/**/RLMObject.h',
                               'include/**/RLMObjectBase.h',
@@ -43,6 +41,8 @@ Pod::Spec.new do |s|
                               'include/**/RLMRealmConfiguration.h',
                               'include/**/RLMResults.h',
                               'include/**/RLMSchema.h',
+                              'include/**/RLMSet.h',
+                              'include/**/RLMSetBase.h',
                               'include/**/RLMThreadSafeReference.h',
 
                               # Sync
@@ -78,7 +78,6 @@ Pod::Spec.new do |s|
                               # Realm.Private module
   private_header_files      = 'include/**/RLMAccessor.h',
                               'include/**/RLMArray_Private.h',
-                              'include/**/RLMSet_Private.h',
                               'include/**/RLMApp_Private.h',
                               'include/**/RLMBSON_Private.h',
                               'include/**/RLMCollection_Private.h',
@@ -93,6 +92,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMRealm_Private.h',
                               'include/**/RLMResults_Private.h',
                               'include/**/RLMSchema_Private.h',
+                              'include/**/RLMSet_Private.h',
                               'include/**/RLMSyncConfiguration_Private.h',
                               'include/**/RLMSyncUtil_Private.h',
                               'include/**/RLMFindOneAndModifyOptions_Private.h',

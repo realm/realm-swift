@@ -20,13 +20,13 @@
 
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
-#import "RLMSet_Private.hpp"
 #import "RLMListBase.h"
-#import "RLMSetBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
+#import "RLMSetBase.h"
+#import "RLMSet_Private.hpp"
 
 #import <realm/group.hpp>
 
