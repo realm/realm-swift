@@ -112,12 +112,10 @@ let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
         // Related issue: https://github.com/realm/realm-cocoa/issues/6734
         migration.enumerateObjects(ofType: "Dog") { oldDogObject, _ in
             var dogFound = false
-            migration.enumerateObjects(ofType: Person.className()) { oldPersonObject, newObject in
-                for pet in newObject!["pets"] as! List<DynamicObject> {
-                    if pet["name"] as! String == oldDogObject!["name"] as! String {
-                        dogFound = true
-                        break
-                    }
+            migration.enumerateObjects(ofType: Person.className()) { _, newObject in
+                for pet in newObject!["pets"] as! List<DynamicObject> where pet["name"] as! String == oldDogObject!["name"] as! String {
+                    dogFound = true
+                    break
                 }
             }
             if !dogFound {

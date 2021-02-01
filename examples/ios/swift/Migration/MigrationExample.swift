@@ -41,7 +41,7 @@ struct MigrationExample {
             try! Realm.performMigration(for: realmConfiguration)
         }
     }
-    
+
     private func realmUrl(for schemaVersion: Int, usingTemplate: Bool) -> URL {
         let defaultURL = Realm.Configuration.defaultConfiguration.fileURL!
         let defaultParentURL = defaultURL.deletingLastPathComponent()
