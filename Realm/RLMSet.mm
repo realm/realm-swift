@@ -156,37 +156,10 @@
     return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:keyPath ascending:ascending]]];
 }
 
-- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ... {
-    va_list args;
-    va_start(args, predicateFormat);
-    NSUInteger index = [self indexOfObjectWhere:predicateFormat args:args];
-    va_end(args);
-    return index;
-}
-
-- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args {
-    @throw RLMException(@"indexOfObjectWhere: is not available on RLMSet");
-
-}
-
 #pragma mark - Unmanaged RLMSet implementation
 
 - (RLMRealm *)realm {
     return nil;
-}
-
-// It doesn't make sense for us to expose these methods as NSSet doesn't and
-// we also don't guarantee ordering.
-- (id)firstObject {
-    @throw RLMException(@"firstObject is not available on RLMSet");
-}
-
-- (id)lastObject {
-    @throw RLMException(@"lastObject is not available on RLMSet");
-}
-
-- (NSUInteger)indexOfObjectWithPredicate:(nonnull NSPredicate *)predicate {
-    @throw RLMException(@"indexOfObjectWithPredicate: is not available on RLMSet");
 }
 
 - (NSUInteger)count {
@@ -256,10 +229,6 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
         @throw RLMException(@"Index %llu is out of bounds (must be less than %llu).",
                             (unsigned long long)index, (unsigned long long)max);
     }
-}
-
-- (NSUInteger)indexOfObject:(id)object {
-    @throw RLMException(@"indexOfObject: is not available for RLMSet");
 }
 
 - (void)removeAllObjects {
@@ -510,10 +479,6 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
 
 - (instancetype)freeze {
     @throw RLMException(@"This method may only be called on RLMSet instances retrieved from an RLMRealm");
-}
-
-- (nonnull id)objectAtIndexedSubscript:(NSUInteger)index {
-    @throw RLMException(@"objectAtIndexedSubscript is not supported on RLMSet, use RLMSet.allObjects");
 }
 
 #pragma mark - Thread Confined Protocol Conformance

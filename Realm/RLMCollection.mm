@@ -57,8 +57,7 @@ static const int RLMEnumerationBufferSize = 16;
 
 - (instancetype)initWithList:(realm::List&)list
                   collection:(id)collection
-                   classInfo:(RLMClassInfo&)info
-{
+                   classInfo:(RLMClassInfo&)info {
     self = [super init];
     if (self) {
         _info = &info;
@@ -78,8 +77,7 @@ static const int RLMEnumerationBufferSize = 16;
 
 - (instancetype)initWithSet:(realm::object_store::Set&)set
                  collection:(id)collection
-                  classInfo:(RLMClassInfo&)info
-{
+                  classInfo:(RLMClassInfo&)info {
     self = [super init];
     if (self) {
         _info = &info;
@@ -99,8 +97,7 @@ static const int RLMEnumerationBufferSize = 16;
 
 - (instancetype)initWithResults:(realm::Results&)results
                      collection:(id)collection
-                      classInfo:(RLMClassInfo&)info
-{
+                      classInfo:(RLMClassInfo&)info {
     self = [super init];
     if (self) {
         _info = &info;
@@ -175,7 +172,9 @@ static const int RLMEnumerationBufferSize = 16;
 }
 @end
 
-NSUInteger RLMFastEnumerate(NSFastEnumerationState *state, NSUInteger len, id<RLMFastEnumerable> collection) {
+NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
+                            NSUInteger len,
+                            id<RLMFastEnumerable> collection) {
     __autoreleasing RLMFastEnumerator *enumerator;
     if (state->state == 0) {
         enumerator = collection.fastEnumerator;
@@ -219,12 +218,12 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
     // new List each time
     if (info.rlmObjectSchema.isSwiftClass) {
         auto prop = info.rlmObjectSchema[key];
+        // Grab the actual class for the generic List from an instance of it
+        // so that we can make instances of the List without creating a new
+        // object accessor each time
+        Class cls = [object_getIvar(accessor, prop.swiftIvar) class];
+        RLMAccessorContext context(info);
         if (prop && prop.array && prop.swiftIvar) {
-            // Grab the actual class for the generic List from an instance of it
-            // so that we can make instances of the List without creating a new
-            // object accessor each time
-            Class cls = [object_getIvar(accessor, prop.swiftIvar) class];
-            RLMAccessorContext context(info);
             for (size_t i = 0; i < count; ++i) {
                 RLMListBase *list = [[cls alloc] init];
                 list._rlmArray = [[RLMManagedArray alloc] initWithList:realm::List(info.realm->_realm,
@@ -236,11 +235,6 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
             }
             return array;
         } else if (prop && prop.set && prop.swiftIvar) {
-            // Grab the actual class for the generic Set from an instance of it
-            // so that we can make instances of the Set without creating a new
-            // object accessor each time
-            Class cls = [object_getIvar(accessor, prop.swiftIvar) class];
-            RLMAccessorContext context(info);
             for (size_t i = 0; i < count; ++i) {
                 RLMSetBase *set = [[cls alloc] init];
                 set._rlmSet = [[RLMManagedSet alloc] initWithSet:realm::object_store::Set(info.realm->_realm,

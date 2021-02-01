@@ -22,7 +22,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObject, RLMResults<RLMObjectType>;
 
-/// A collection datatype used for storing distinct objects.
+/**
+ A collection datatype used for storing distinct objects.
+
+ - Note:
+ `RLMSet` supports storing primitive and `RLMObject` types. `RLMSet` does not support storing
+ Embedded Realm Objects.
+ */
 @interface RLMSet<RLMObjectType> : NSObject<RLMCollection, NSFastEnumeration>
 
 #pragma mark - Properties

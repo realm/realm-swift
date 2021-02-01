@@ -191,14 +191,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects([unmanaged.intObj objectAtIndex:0], @1);
 }
 
-- (void)testFirstObject {
-    RLMAssertThrowsWithReason($allSets.firstObject, @"firstObject is not available on RLMSet");
-}
-
-- (void)testLastObject {
-    RLMAssertThrowsWithReason($allSets.lastObject, @"lastObject is not available on RLMSet");
-}
-
 - (void)testContainsObject {
     XCTAssertFalse([$set containsObject:$v0]);
     [$set addObject:$v0];
@@ -236,10 +228,6 @@ static double average(NSArray *values) {
     %o XCTAssertEqual($set.count, 2U);
 }
 
-- (void)testIndexOfObject {
-    RLMAssertThrowsWithReason([$set indexOfObject:$v0], ^n @"indexOfObject: is not available for RLMSet");
-}
-
 - (void)testIndexOfObjectSorted {
     %man %r [$set addObjects:@[$v0, $v1, $v0, $v1]];
     %man %o [$set addObjects:@[$v0, $v1, NSNull.null, $v1, $v0]];
@@ -261,20 +249,6 @@ static double average(NSArray *values) {
     %man %o XCTAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0] == 1U);
     %man %o XCTAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1] == 1U);
     %man %o XCTAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null] == 1U);
-}
-
-- (void)testIndexOfObjectWhere {
-    %man RLMAssertThrowsWithReason([$set indexOfObjectWhere:@"TRUEPREDICATE"], @"not available");
-    %man RLMAssertThrowsWithReason([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
-    %unman RLMAssertThrowsWithReason([$set indexOfObjectWhere:@"TRUEPREDICATE"], @"not available");
-    %unman RLMAssertThrowsWithReason([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  indexOfObjectWhere:@"TRUEPREDICATE"], @"instances");
-}
-
-- (void)testIndexOfObjectWithPredicate {
-    %man RLMAssertThrowsWithReason([$set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"not available");
-    %man RLMAssertThrowsWithReason([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
-    %unman RLMAssertThrowsWithReason([$set indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"not available");
-    %unman RLMAssertThrowsWithReason([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"instances");
 }
 
 - (void)testSort {

@@ -37,8 +37,6 @@
 #import <realm/object-store/results.hpp>
 #import <realm/object-store/shared_realm.hpp>
 
-#import <objc/runtime.h>
-
 @interface RLMManagedSetHandoverMetadata : NSObject
 @property (nonatomic) NSString *parentClassName;
 @property (nonatomic) NSString *key;

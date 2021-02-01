@@ -102,7 +102,10 @@ extension RLMCollection {
      Returns the index of the first object in the collection matching the predicate.
      */
     public func indexOfObject(where predicateFormat: String, _ args: CVarArg...) -> UInt {
-        return indexOfObject(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+        guard let index = indexOfObject?(with: NSPredicate(format: predicateFormat, arguments: getVaList(args))) else {
+            fatalError("This RLMCollection does not support indexOfObject(where:)")
+        }
+        return index
     }
 
     /**
