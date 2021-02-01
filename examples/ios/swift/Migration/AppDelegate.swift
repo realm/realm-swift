@@ -37,9 +37,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Choose to either create example files or execute them.
         let shouldCreateExamples = false
         if shouldCreateExamples {
-            RealmTemplate.create()
+            MigrationExample().addExampleDataToRealm(exampleData)
         } else {
-            MigrationExample.execute()
+            MigrationExample().performMigration()
         }
 
         return true
