@@ -53,10 +53,34 @@
 
 @end
 
+@implementation NSDate (RLMValue)
+
+- (RLMPropertyType)valueType {
+    return RLMPropertyTypeDate;
+}
+
+@end
+
+@implementation RLMObject (RLMValue)
+
+- (RLMPropertyType)valueType {
+    return RLMPropertyTypeObject;
+}
+
+@end
+
 @implementation RLMObjectId (RLMValue)
 
 - (RLMPropertyType)valueType {
     return RLMPropertyTypeObjectId;
+}
+
+@end
+
+@implementation RLMDecimal128 (RLMValue)
+
+- (RLMPropertyType)valueType {
+    return RLMPropertyTypeDecimal128;
 }
 
 @end

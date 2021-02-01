@@ -1426,6 +1426,9 @@
     [DecimalObject createInRealm:realm withValue:@[@"-Inf"]];
     [DecimalObject createInRealm:realm withValue:@[@"Inf"]];
     [DecimalObject createInRealm:realm withValue:@[@"123456789.123456789e12345"]];
+    [MixedObject createInRealm:realm withValue:@[[[RLMDecimal128 alloc] initWithValue:@"-Inf"]]];
+    [MixedObject createInRealm:realm withValue:@[[[RLMDecimal128 alloc] initWithValue:@"Inf"]]];
+    [MixedObject createInRealm:realm withValue:@[[[RLMDecimal128 alloc] initWithValue:@"123456789.123456789e12345"]]];
     [realm commitWriteTransaction];
 
     RLMAssertCount(DecimalObject, 0U, @"decimalCol >  'Inf'");
@@ -1445,6 +1448,25 @@
     RLMAssertCount(DecimalObject, 1U, @"decimalCol == '123456789.123456789e12345'");
     RLMAssertCount(DecimalObject, 2U, @"decimalCol <= '123456789.123456789e12345'");
     RLMAssertCount(DecimalObject, 1U, @"decimalCol <  '123456789.123456789e12345'");
+
+    // RLMValue requires us to be explicit about the rhs, due to 'Inf' being inferred as a string.
+    RLMAssertCount(MixedObject, 0U, @"anyCol >  %@", [[RLMDecimal128 alloc] initWithValue:@"Inf"]);
+    RLMAssertCount(MixedObject, 1U, @"anyCol >= %@", [[RLMDecimal128 alloc] initWithValue:@"Inf"]);
+    RLMAssertCount(MixedObject, 1U, @"anyCol == %@", [[RLMDecimal128 alloc] initWithValue:@"Inf"]);
+    RLMAssertCount(MixedObject, 3U, @"anyCol <= %@", [[RLMDecimal128 alloc] initWithValue:@"Inf"]);
+    RLMAssertCount(MixedObject, 2U, @"anyCol <  %@", [[RLMDecimal128 alloc] initWithValue:@"Inf"]);
+
+    RLMAssertCount(MixedObject, 2U, @"anyCol >  %@", [[RLMDecimal128 alloc] initWithValue:@"-Inf"]);
+    RLMAssertCount(MixedObject, 3U, @"anyCol >= %@", [[RLMDecimal128 alloc] initWithValue:@"-Inf"]);
+    RLMAssertCount(MixedObject, 1U, @"anyCol == %@", [[RLMDecimal128 alloc] initWithValue:@"-Inf"]);
+    RLMAssertCount(MixedObject, 1U, @"anyCol <= %@", [[RLMDecimal128 alloc] initWithValue:@"-Inf"]);
+    RLMAssertCount(MixedObject, 0U, @"anyCol <  %@", [[RLMDecimal128 alloc] initWithValue:@"-Inf"]);
+
+    RLMAssertCount(MixedObject, 1U, @"anyCol >  %@", [[RLMDecimal128 alloc] initWithValue:@"123456789.123456789e12345"]);
+    RLMAssertCount(MixedObject, 2U, @"anyCol >= %@", [[RLMDecimal128 alloc] initWithValue:@"123456789.123456789e12345"]);
+    RLMAssertCount(MixedObject, 1U, @"anyCol == %@", [[RLMDecimal128 alloc] initWithValue:@"123456789.123456789e12345"]);
+    RLMAssertCount(MixedObject, 2U, @"anyCol <= %@", [[RLMDecimal128 alloc] initWithValue:@"123456789.123456789e12345"]);
+    RLMAssertCount(MixedObject, 1U, @"anyCol <  %@", [[RLMDecimal128 alloc] initWithValue:@"123456789.123456789e12345"]);
 }
 
 - (void)testLiveQueriesInsideTransaction
@@ -1984,6 +2006,12 @@
     [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"decimalCol IN {1, 2}"];
     [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"decimalCol IN {'1', '2'}"];
 
+    // RLMValue
+    [self testClass:[AllTypesObject class] withNormalCount:0 notCount:1 where:@"anyCol IN {0, 1, 3}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"anyCol IN {2}"];
+    [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"anyCol IN {1, 2}"];
+    [self testClass:[AllTypesObject class] withNormalCount:0 notCount:1 where:@"anyCol IN {'1', '2'}"];
+
     // RLMObjectId
     // Can't represent RLMObjectId with NSPredicate literal. See format predicates below
 
@@ -2058,6 +2086,11 @@
     [self testClass:[AllTypesObject class] withNormalCount:0 notCount:1 where:@"objectIdCol IN %@", @[otherId]];
     [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"objectIdCol IN %@", @[objectId]];
     [self testClass:[AllTypesObject class] withNormalCount:1 notCount:0 where:@"objectIdCol IN %@", @[objectId, otherId]];
+
+    // RLMValue
+    [self testClass:[AllTypesObject class] withNormalCount:0U notCount:1U where:@"anyCol IN %@", @[@0, @1, @3]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"anyCol IN %@", @[@2]];
+    [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"anyCol IN %@", @[@1, @2]];
 }
 
 - (void)testArrayIn {

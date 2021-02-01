@@ -402,6 +402,7 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
         case realm::type_ObjectId:
             return [[RLMObjectId alloc] initWithValue:mixed.get<realm::ObjectId>()];
         case realm::type_Link:
+            return nil;
         case realm::type_LinkList:
         case realm::type_OldTable:
         case realm::type_OldDateTime:
