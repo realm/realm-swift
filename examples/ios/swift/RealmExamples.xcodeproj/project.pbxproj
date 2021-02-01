@@ -42,7 +42,7 @@
 		53454CEC24EAC45700678E48 /* AppClip.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 53454CDD24EAC45500678E48 /* AppClip.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7D46394825C2D1400089EFD9 /* MigrationExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46394725C2D1400089EFD9 /* MigrationExample.swift */; };
 		7D46395025C2E2750089EFD9 /* Example_v3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46394F25C2E2750089EFD9 /* Example_v3.swift */; };
-		7D46395425C2E7140089EFD9 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 7D46395325C2E7140089EFD9 /* README */; };
+		7D46395425C2E7140089EFD9 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 7D46395325C2E7140089EFD9 /* README.md */; };
 		7D46399825C45FF00089EFD9 /* Example_v4.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46399725C45FF00089EFD9 /* Example_v4.swift */; };
 		7D4639A025C46C660089EFD9 /* Example_v5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46399F25C46C660089EFD9 /* Example_v5.swift */; };
 		7DADCBA525C816B600048287 /* default-v0.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCB9F25C816B500048287 /* default-v0.realm */; };
@@ -51,6 +51,7 @@
 		7DADCBA825C816B600048287 /* default-v4.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBA225C816B500048287 /* default-v4.realm */; };
 		7DADCBA925C816B600048287 /* default-v5.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBA325C816B500048287 /* default-v5.realm */; };
 		7DADCBAA25C816B600048287 /* default-v2.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBA425C816B600048287 /* default-v2.realm */; };
+		7DADCBB225C8284500048287 /* Migration.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBB125C8284500048287 /* Migration.xcconfig */; };
 		7DFFB15E25C19F0700CA8AE5 /* Example_v0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFFB15D25C19F0700CA8AE5 /* Example_v0.swift */; };
 		7DFFB16F25C1B65A00CA8AE5 /* Example_v1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFFB16E25C1B65A00CA8AE5 /* Example_v1.swift */; };
 		7DFFB17725C1B84E00CA8AE5 /* Example_v2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFFB17625C1B84E00CA8AE5 /* Example_v2.swift */; };
@@ -270,7 +271,7 @@
 		53454CE924EAC45700678E48 /* AppClip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppClip.entitlements; sourceTree = "<group>"; };
 		7D46394725C2D1400089EFD9 /* MigrationExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationExample.swift; sourceTree = "<group>"; };
 		7D46394F25C2E2750089EFD9 /* Example_v3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v3.swift; sourceTree = "<group>"; };
-		7D46395325C2E7140089EFD9 /* README */ = {isa = PBXFileReference; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		7D46395325C2E7140089EFD9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.markdown; };
 		7D46399725C45FF00089EFD9 /* Example_v4.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v4.swift; sourceTree = "<group>"; };
 		7D46399F25C46C660089EFD9 /* Example_v5.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v5.swift; sourceTree = "<group>"; };
 		7DADCB9F25C816B500048287 /* default-v0.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v0.realm"; sourceTree = "<group>"; };
@@ -279,6 +280,7 @@
 		7DADCBA225C816B500048287 /* default-v4.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v4.realm"; sourceTree = "<group>"; };
 		7DADCBA325C816B500048287 /* default-v5.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v5.realm"; sourceTree = "<group>"; };
 		7DADCBA425C816B600048287 /* default-v2.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v2.realm"; sourceTree = "<group>"; };
+		7DADCBB125C8284500048287 /* Migration.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Migration.xcconfig; sourceTree = "<group>"; };
 		7DFFB15D25C19F0700CA8AE5 /* Example_v0.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v0.swift; sourceTree = "<group>"; };
 		7DFFB16E25C1B65A00CA8AE5 /* Example_v1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v1.swift; sourceTree = "<group>"; };
 		7DFFB17625C1B84E00CA8AE5 /* Example_v2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v2.swift; sourceTree = "<group>"; };
@@ -676,7 +678,8 @@
 		E8CB088419BA6AF70018434A /* Migration */ = {
 			isa = PBXGroup;
 			children = (
-				7D46395325C2E7140089EFD9 /* README */,
+				7D46395325C2E7140089EFD9 /* README.md */,
+				7DADCBB125C8284500048287 /* Migration.xcconfig */,
 				E8CB088519BA6AF70018434A /* AppDelegate.swift */,
 				7D46394725C2D1400089EFD9 /* MigrationExample.swift */,
 				7D46396525C30B580089EFD9 /* Examples */,
@@ -1079,12 +1082,13 @@
 			files = (
 				7DADCBA625C816B600048287 /* default-v1.realm in Resources */,
 				7DADCBAA25C816B600048287 /* default-v2.realm in Resources */,
-				7D46395425C2E7140089EFD9 /* README in Resources */,
+				7D46395425C2E7140089EFD9 /* README.md in Resources */,
 				7DADCBA525C816B600048287 /* default-v0.realm in Resources */,
 				7DADCBA825C816B600048287 /* default-v4.realm in Resources */,
 				7DADCBA925C816B600048287 /* default-v5.realm in Resources */,
 				227D20F51CB609A1008F641B /* LaunchScreen.xib in Resources */,
 				7DADCBA725C816B600048287 /* default-v3.realm in Resources */,
+				7DADCBB225C8284500048287 /* Migration.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1646,6 +1650,7 @@
 		};
 		E8CB083019BA6ABE0018434A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7DADCBB125C8284500048287 /* Migration.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -1662,6 +1667,7 @@
 		};
 		E8CB083119BA6ABE0018434A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7DADCBB125C8284500048287 /* Migration.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;

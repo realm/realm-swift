@@ -16,31 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import UIKit
+//OTHER_SWIFT_FLAGS = $(inherited) -DCREATE_EXAMPLES;
 
-#if !swift(>=4.2)
-extension UIApplication {
-    typealias LaunchOptionsKey = UIApplicationLaunchOptionsKey
-}
-#endif
-
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-
-    var window: UIWindow?
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-        window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = UIViewController()
-        window?.makeKeyAndVisible()
-
-        #if CREATE_EXAMPLES
-        MigrationExample().addExampleDataToRealm(exampleData)
-        #else
-        MigrationExample().performMigration()
-        #endif
-
-        return true
-    }
-
-}
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_0;
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_1;
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_2;
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_3;
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_4;
+OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_5;

@@ -16,78 +16,87 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-// swiftlint:disable orphaned_doc_comment
-// swiftlint:disable comment_spacing
-// swiftlint:disable mark
+#if SCHEMA_VERSION_2
 
 import Foundation
 import RealmSwift
 
-//// MARK: - Schema
-//
-//let schemaVersion = 2
-//
-//// Changes from previous version:
-//// add a `Dog` object
-//// add a list of `dogs` to the `Person` object
-//
-//class Dog: Object {
-//    @objc dynamic var name = ""
-//}
-//
-//class Person: Object {
-//    @objc dynamic var fullName = ""
-//    @objc dynamic var age = 0
-//    let dogs = List<Dog>()
-//}
-//
-//// MARK: - Migration
-//
-//// Migration block to migrate from *any* previous version to this version.
-//let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
-//    if oldSchemaVersion < 1 {
-//        migration.enumerateObjects(ofType: Person.className()) { oldObject, newObject in
-//            // combine name fields into a single field
-//            let firstName = oldObject!["firstName"] as! String
-//            let lastName = oldObject!["lastName"] as! String
-//            newObject!["fullName"] = "\(firstName) \(lastName)"
-//        }
-//    }
-//    if oldSchemaVersion < 2 {
-//        migration.enumerateObjects(ofType: Person.className()) { _, newObject in
-//            // Add a pet to a specific person
-//            if newObject!["fullName"] as! String == "John Doe" {
-//                let dogs = newObject!["dogs"] as! List<MigrationObject>
-//                let marley = migration.create(Dog.className(), value: ["Marley"])
-//                let lassie = migration.create(Dog.className(), value: ["Lassie"])
-//                dogs.append(marley)
-//                dogs.append(lassie)
-//            } else if newObject!["fullName"] as! String == "Jane Doe" {
-//                let dogs = newObject!["dogs"] as! List<MigrationObject>
-//                let toto = migration.create(Dog.className(), value: ["Toto"])
-//                dogs.append(toto)
-//            }
-//        }
-//        let slinkey = migration.create(Dog.className(), value: ["Slinkey"])
-//    }
-//}
-//
-//// MARK: - Example data
-//
-//// Example data for this schema version.
-//let exampleData: (Realm) -> Void = { realm in
-//    let person1 = Person(value: ["John Doe", 42])
-//    let person2 = Person(value: ["Jane Doe", 43])
-//    let person3 = Person(value: ["John Smith", 44])
-//    let pet1 = Dog(value: ["Marley"])
-//    let pet2 = Dog(value: ["Lassie"])
-//    let pet3 = Dog(value: ["Toto"])
-//    let pet4 = Dog(value: ["Slinkey"])
-//    realm.add([person1, person2, person3])
-//    // pet1, pet2 and pet3 get added automatically by adding them to a list.
-//    // pet4 has to be added manually though since it's not attached to a person yet.
-//    realm.add(pet4)
-//    person1.dogs.append(pet1)
-//    person1.dogs.append(pet2)
-//    person2.dogs.append(pet3)
-//}
+// MARK: - Schema
+
+let schemaVersion = 2
+
+// Changes from previous version:
+// add a `Dog` object
+// add a list of `dogs` to the `Person` object
+
+class Dog: Object {
+    @objc dynamic var name = ""
+    convenience init(name: String) {
+        self.init()
+        self.name = name
+    }
+}
+
+class Person: Object {
+    @objc dynamic var fullName = ""
+    @objc dynamic var age = 0
+    let dogs = List<Dog>()
+    convenience init(fullName: String, age: Int) {
+        self.init()
+        self.fullName = fullName
+        self.age = age
+    }
+}
+
+// MARK: - Migration
+
+// Migration block to migrate from *any* previous version to this version.
+let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
+    if oldSchemaVersion < 1 {
+        migration.enumerateObjects(ofType: Person.className()) { oldObject, newObject in
+            // combine name fields into a single field
+            let firstName = oldObject!["firstName"] as! String
+            let lastName = oldObject!["lastName"] as! String
+            newObject!["fullName"] = "\(firstName) \(lastName)"
+        }
+    }
+    if oldSchemaVersion < 2 {
+        migration.enumerateObjects(ofType: Person.className()) { _, newObject in
+            // Add a pet to a specific person
+            if newObject!["fullName"] as! String == "John Doe" {
+                let dogs = newObject!["dogs"] as! List<MigrationObject>
+                let marley = migration.create(Dog.className(), value: ["Marley"])
+                let lassie = migration.create(Dog.className(), value: ["Lassie"])
+                dogs.append(marley)
+                dogs.append(lassie)
+            } else if newObject!["fullName"] as! String == "Jane Doe" {
+                let dogs = newObject!["dogs"] as! List<MigrationObject>
+                let toto = migration.create(Dog.className(), value: ["Toto"])
+                dogs.append(toto)
+            }
+        }
+        let slinkey = migration.create(Dog.className(), value: ["Slinkey"])
+    }
+}
+
+// MARK: - Example data
+
+// Example data for this schema version.
+let exampleData: (Realm) -> Void = { realm in
+    let person1 = Person(fullName: "John Doe", age: 42)
+    let person2 = Person(fullName: "Jane Doe", age: 43)
+    let person3 = Person(fullName: "John Smith", age: 44)
+    let pet1 = Dog(name: "Marley")
+    let pet2 = Dog(name: "Lassie")
+    let pet3 = Dog(name: "Toto")
+    let pet4 = Dog(name: "Slinkey")
+    realm.add([person1, person2, person3])
+    // pet1, pet2 and pet3 get added automatically by adding them to a list.
+    // pet4 has to be added manually though since it's not attached to a person yet.
+    realm.add(pet4)
+    person1.dogs.append(pet1)
+    person1.dogs.append(pet2)
+    person2.dogs.append(pet3)
+}
+
+#endif

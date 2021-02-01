@@ -16,34 +16,40 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-// swiftlint:disable orphaned_doc_comment
-// swiftlint:disable comment_spacing
-// swiftlint:disable mark
+#if SCHEMA_VERSION_0
 
 import Foundation
 import RealmSwift
 
-//// MARK: - Schema
-//
-//let schemaVersion = 0
-//
-//class Person: Object {
-//    @objc dynamic var firstName = ""
-//    @objc dynamic var lastName = ""
-//    @objc dynamic var age = 0
-//}
-//
-//// MARK: - Migration
-//
-//// Migration block to migrate from *any* previous version to this version.
-//let migrationBlock: MigrationBlock = { _, _ in }
-//
-//// MARK: - Example data
-//
-//// Example data for this schema version.
-//let exampleData: (Realm) -> Void = { realm in
-//    let person1 = Person(value: ["John", "Doe", 42])
-//    let person2 = Person(value: ["Jane", "Doe", 43])
-//    let person3 = Person(value: ["John", "Smith", 44])
-//    realm.add([person1, person2, person3])
-//}
+// MARK: - Schema
+
+let schemaVersion = 0
+
+class Person: Object {
+    @objc dynamic var firstName = ""
+    @objc dynamic var lastName = ""
+    @objc dynamic var age = 0
+    convenience init(firstName: String, lastName: String, age: Int) {
+        self.init()
+        self.firstName = firstName
+        self.lastName = lastName
+        self.age = age
+    }
+}
+
+// MARK: - Migration
+
+// Migration block to migrate from *any* previous version to this version.
+let migrationBlock: MigrationBlock = { _, _ in }
+
+// MARK: - Example data
+
+// Example data for this schema version.
+let exampleData: (Realm) -> Void = { realm in
+    let person1 = Person(firstName: "John", lastName: "Doe", age: 42)
+    let person2 = Person(firstName: "Jane", lastName: "Doe", age: 43)
+    let person3 = Person(firstName: "John", lastName: "Smith", age: 44)
+    realm.add([person1, person2, person3])
+}
+
+#endif

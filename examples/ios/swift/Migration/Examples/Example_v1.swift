@@ -16,45 +16,50 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-// swiftlint:disable orphaned_doc_comment
-// swiftlint:disable comment_spacing
-// swiftlint:disable mark
+#if SCHEMA_VERSION_1
 
 import Foundation
 import RealmSwift
 
-//// MARK: - Schema
-//
-//let schemaVersion = 1
-//
-//// Changes from previous version:
-//// - combine `firstName` and `lastName` into `fullName`
-//
-//class Person: Object {
-//    @objc dynamic var fullName = ""
-//    @objc dynamic var age = 0
-//}
-//
-//// MARK: - Migration
-//
-//// Migration block to migrate from *any* previous version to this version.
-//let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
-//    if oldSchemaVersion < 1 {
-//        migration.enumerateObjects(ofType: Person.className()) { oldObject, newObject in
-//            // combine name fields into a single field
-//            let firstName = oldObject!["firstName"] as! String
-//            let lastName = oldObject!["lastName"] as! String
-//            newObject!["fullName"] = "\(firstName) \(lastName)"
-//        }
-//    }
-//}
-//
-//// MARK: - Example data
-//
-//// Example data for this schema version.
-//let exampleData: (Realm) -> Void = { realm in
-//    let person1 = Person(value: ["John Doe", 42])
-//    let person2 = Person(value: ["Jane Doe", 43])
-//    let person3 = Person(value: ["John Smith", 44])
-//    realm.add([person1, person2, person3])
-//}
+// MARK: - Schema
+
+let schemaVersion = 1
+
+// Changes from previous version:
+// - combine `firstName` and `lastName` into `fullName`
+
+class Person: Object {
+    @objc dynamic var fullName = ""
+    @objc dynamic var age = 0
+    convenience init(fullName: String, age: Int) {
+        self.init()
+        self.fullName = fullName
+        self.age = age
+    }
+}
+
+// MARK: - Migration
+
+// Migration block to migrate from *any* previous version to this version.
+let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
+    if oldSchemaVersion < 1 {
+        migration.enumerateObjects(ofType: Person.className()) { oldObject, newObject in
+            // combine name fields into a single field
+            let firstName = oldObject!["firstName"] as! String
+            let lastName = oldObject!["lastName"] as! String
+            newObject!["fullName"] = "\(firstName) \(lastName)"
+        }
+    }
+}
+
+// MARK: - Example data
+
+// Example data for this schema version.
+let exampleData: (Realm) -> Void = { realm in
+    let person1 = Person(fullName: "John Doe", age: 42)
+    let person2 = Person(fullName: "Jane Doe", age: 43)
+    let person3 = Person(fullName: "John Smith", age: 44)
+    realm.add([person1, person2, person3])
+}
+
+#endif

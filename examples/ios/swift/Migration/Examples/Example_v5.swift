@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#if SCHEMA_VERSION_5
+
 import Foundation
 import RealmSwift
 
@@ -24,7 +26,8 @@ import RealmSwift
 let schemaVersion = 5
 
 // Changes from previous version:
-// Change the `Address` from `Object` to `EmbeddedObject`.
+// - Change the `Address` from `Object` to `EmbeddedObject`.
+//
 // Be aware that this only works if there is only one `LinkingObject` per `Address`.
 // See https://github.com/realm/realm-cocoa/issues/7060
 
@@ -32,22 +35,45 @@ let schemaVersion = 5
 // The recommended way is to create a new type instead and migrate the old type.
 // Here we create `Pet` and migrate its data from `Dog` so simulate renaming the table.
 
+@objc enum PetType: Int, RealmEnum {
+    case unspecified
+    case dog
+    case chicken
+    case cow
+}
+
 class Pet: Object {
     @objc dynamic var name = ""
-    @objc dynamic var kind = ""
+    let type = RealmOptional<PetType>()
+    convenience init(name: String, type: PetType) {
+        self.init()
+        self.name = name
+        self.type.value = type
+    }
 }
 
 class Person: Object {
     @objc dynamic var fullName = ""
     @objc dynamic var age = 0
-    let pets = List<Pet>()
     @objc dynamic var address: Address?
+    let pets = List<Pet>()
+    convenience init(fullName: String, age: Int, address: Address?) {
+        self.init()
+        self.fullName = fullName
+        self.age = age
+        self.address = address
+    }
 }
 
 class Address: EmbeddedObject {
     @objc dynamic var street = ""
     @objc dynamic var city = ""
     let residents: LinkingObjects = LinkingObjects(fromType: Person.self, property: "address")
+    convenience init(street: String, city: String) {
+        self.init()
+        self.street = street
+        self.city = city
+    }
 }
 
 // MARK: - Migration
@@ -66,20 +92,20 @@ let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
         migration.enumerateObjects(ofType: Person.className()) { _, newObject in
             // Add a pet to a specific person
             if newObject!["fullName"] as! String == "John Doe" {
-                // `Dog` was changes to `Pet` in v2 already, but we still need to account for this
+                // `Dog` was changed to `Pet` in v2 already, but we still need to account for this
                 // if upgrading from pre v2 to v3.
                 let dogs = newObject!["pets"] as! List<MigrationObject>
-                let marley = migration.create(Pet.className(), value: ["Marley", "dog"])
-                let lassie = migration.create(Pet.className(), value: ["Lassie", "dog"])
+                let marley = migration.create(Pet.className(), value: ["Marley", PetType.dog.rawValue])
+                let lassie = migration.create(Pet.className(), value: ["Lassie", PetType.dog.rawValue])
                 dogs.append(marley)
                 dogs.append(lassie)
             } else if newObject!["fullName"] as! String == "Jane Doe" {
                 let dogs = newObject!["pets"] as! List<MigrationObject>
-                let toto = migration.create(Pet.className(), value: ["Toto", "dog"])
+                let toto = migration.create(Pet.className(), value: ["Toto", PetType.dog.rawValue])
                 dogs.append(toto)
             }
         }
-        let slinkey = migration.create(Pet.className(), value: ["Slinkey", "dog"])
+        let slinkey = migration.create(Pet.className(), value: ["Slinkey", PetType.dog.rawValue])
     }
     if oldSchemaVersion == 2 {
         // This branch is only relevant for version 2. If we are migration from a previous
@@ -89,7 +115,7 @@ let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
         migration.enumerateObjects(ofType: Person.className()) { oldObject, newObject in
             let pets = newObject!["pets"] as! List<MigrationObject>
             for dog in oldObject!["dogs"] as! List<DynamicObject> {
-                let pet = migration.create(Pet.className(), value: [dog["name"], "dog"])
+                let pet = migration.create(Pet.className(), value: [dog["name"], PetType.dog.rawValue])
                 pets.append(pet)
             }
         }
@@ -105,7 +131,7 @@ let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
                 }
             }
             if !dogFound {
-                migration.create(Pet.className(), value: [oldDogObject!["name"], "dog"])
+                migration.create(Pet.className(), value: [oldDogObject!["name"], PetType.dog.rawValue])
             }
         }
         // The data cannot be deleted just yet since the table is target of cross-table link columns.
@@ -130,13 +156,14 @@ let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
 
 // Example data for this schema version.
 let exampleData: (Realm) -> Void = { realm in
-    let person1 = Person(value: ["John Doe", 42])
-    let person2 = Person(value: ["Jane Doe", 43])
-    let person3 = Person(value: ["John Smith", 44])
-    let pet1 = Pet(value: ["Marley", "dog"])
-    let pet2 = Pet(value: ["Lassie", "dog"])
-    let pet3 = Pet(value: ["Toto", "dog"])
-    let pet4 = Pet(value: ["Slinkey", "dog"])
+    let address = Address(street: "Broadway", city: "New York")
+    let person1 = Person(fullName: "John Doe", age: 42, address: address)
+    let person2 = Person(fullName: "Jane Doe", age: 43, address: nil)
+    let person3 = Person(fullName: "John Smith", age: 44, address: nil)
+    let pet1 = Pet(name: "Marley", type: .dog)
+    let pet2 = Pet(name: "Lassie", type: .dog)
+    let pet3 = Pet(name: "Toto", type: .dog)
+    let pet4 = Pet(name: "Slinkey", type: .dog)
     realm.add([person1, person2, person3])
     person1.pets.append(pet1)
     person1.pets.append(pet2)
@@ -144,6 +171,6 @@ let exampleData: (Realm) -> Void = { realm in
     // pet1, pet2 and pet3 get added automatically by adding them to a list.
     // pet4 has to be added manually though since it's not attached to a person yet.
     realm.add(pet4)
-    let address = Address(value: ["Broadway", "New York"])
-    person1.address = address
 }
+
+#endif
