@@ -24,7 +24,7 @@ extension URL {
             print("bundleUrl: \(bundleUrl)")
             try! FileManager.default.copyItem(at: bundleUrl, to: destinationUrl)
         }
-        
+
         self = destinationUrl
     }
 }

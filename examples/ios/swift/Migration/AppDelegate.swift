@@ -26,14 +26,14 @@ extension UIApplication {
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    
+
     var window: UIWindow?
-    
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
-        
+
         // Choose to either create example files or execute them.
         let shouldCreateExamples = false
         if shouldCreateExamples {
@@ -41,8 +41,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } else {
             MigrationExample.execute()
         }
-        
+
         return true
     }
-    
+
 }

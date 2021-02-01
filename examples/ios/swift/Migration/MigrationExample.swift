@@ -20,7 +20,7 @@ import Foundation
 import RealmSwift
 
 struct MigrationExample {
-    
+
     static func execute() {
         for realmVersion in RealmVersion.allCases {
             let realmUrl = URL(for: realmVersion, usingTemplate: true)
@@ -29,5 +29,5 @@ struct MigrationExample {
             try! Realm.performMigration(for: realmConfiguration)
         }
     }
-    
+
 }

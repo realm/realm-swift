@@ -20,18 +20,18 @@ import Foundation
 import RealmSwift
 
 struct RealmTemplate {
-    
+
     static func create() {
-        
+
         let url = URL(for: RealmVersion.mostRecentVersion, usingTemplate: false)
         let configuration = Realm.Configuration(fileURL: url, schemaVersion: UInt64(RealmVersion.mostRecentVersion.rawValue))
         let realm = try! Realm(configuration: configuration)
-        
+
         try! realm.write {
             exampleData(realm)
         }
-        
+
         print("Realm created at: \(String(describing: configuration.fileURL!)).")
     }
-    
+
 }
