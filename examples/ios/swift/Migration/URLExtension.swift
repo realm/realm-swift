@@ -15,13 +15,11 @@ extension URL {
         let defaultParentURL = defaultURL.deletingLastPathComponent()
         let fileName = "default-v\(version.rawValue)"
         let destinationUrl = defaultParentURL.appendingPathComponent(fileName + ".realm")
-        print("destinationUrl: \(destinationUrl)")
         if FileManager.default.fileExists(atPath: destinationUrl.path) {
             try! FileManager.default.removeItem(at: destinationUrl)
         }
         if usingTemplate {
             let bundleUrl = Bundle.main.url(forResource: fileName, withExtension: "realm")!
-            print("bundleUrl: \(bundleUrl)")
             try! FileManager.default.copyItem(at: bundleUrl, to: destinationUrl)
         }
 
