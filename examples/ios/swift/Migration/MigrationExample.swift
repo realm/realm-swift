@@ -31,7 +31,7 @@ struct MigrationExample {
         }
 
         // Uncomment the following line to print the location of the newly created Realm.
-        print("Realm created at: \(String(describing: configuration.fileURL!)).")
+//        print("Realm created at: \(String(describing: configuration.fileURL!)).")
     }
 
     func performMigration() {
