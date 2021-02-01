@@ -45,12 +45,12 @@
 		7D46395425C2E7140089EFD9 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 7D46395325C2E7140089EFD9 /* README */; };
 		7D46399825C45FF00089EFD9 /* Example_v4.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46399725C45FF00089EFD9 /* Example_v4.swift */; };
 		7D4639A025C46C660089EFD9 /* Example_v5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46399F25C46C660089EFD9 /* Example_v5.swift */; };
-		7DADCB9525C8158400048287 /* default-v4.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCB8F25C8158400048287 /* default-v4.realm */; };
-		7DADCB9625C8158400048287 /* default-v0.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCB9025C8158400048287 /* default-v0.realm */; };
-		7DADCB9725C8158400048287 /* default-v3.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCB9125C8158400048287 /* default-v3.realm */; };
-		7DADCB9825C8158400048287 /* default-v5.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCB9225C8158400048287 /* default-v5.realm */; };
-		7DADCB9925C8158400048287 /* default-v2.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCB9325C8158400048287 /* default-v2.realm */; };
-		7DADCB9A25C8158400048287 /* default-v1.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCB9425C8158400048287 /* default-v1.realm */; };
+		7DADCBA525C816B600048287 /* default-v0.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCB9F25C816B500048287 /* default-v0.realm */; };
+		7DADCBA625C816B600048287 /* default-v1.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBA025C816B500048287 /* default-v1.realm */; };
+		7DADCBA725C816B600048287 /* default-v3.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBA125C816B500048287 /* default-v3.realm */; };
+		7DADCBA825C816B600048287 /* default-v4.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBA225C816B500048287 /* default-v4.realm */; };
+		7DADCBA925C816B600048287 /* default-v5.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBA325C816B500048287 /* default-v5.realm */; };
+		7DADCBAA25C816B600048287 /* default-v2.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBA425C816B600048287 /* default-v2.realm */; };
 		7DFFB15E25C19F0700CA8AE5 /* Example_v0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFFB15D25C19F0700CA8AE5 /* Example_v0.swift */; };
 		7DFFB16B25C1B49700CA8AE5 /* RealmVersionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFFB16A25C1B49700CA8AE5 /* RealmVersionExtension.swift */; };
 		7DFFB16F25C1B65A00CA8AE5 /* Example_v1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFFB16E25C1B65A00CA8AE5 /* Example_v1.swift */; };
@@ -274,12 +274,12 @@
 		7D46395325C2E7140089EFD9 /* README */ = {isa = PBXFileReference; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		7D46399725C45FF00089EFD9 /* Example_v4.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v4.swift; sourceTree = "<group>"; };
 		7D46399F25C46C660089EFD9 /* Example_v5.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v5.swift; sourceTree = "<group>"; };
-		7DADCB8F25C8158400048287 /* default-v4.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v4.realm"; sourceTree = "<group>"; };
-		7DADCB9025C8158400048287 /* default-v0.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v0.realm"; sourceTree = "<group>"; };
-		7DADCB9125C8158400048287 /* default-v3.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v3.realm"; sourceTree = "<group>"; };
-		7DADCB9225C8158400048287 /* default-v5.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v5.realm"; sourceTree = "<group>"; };
-		7DADCB9325C8158400048287 /* default-v2.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v2.realm"; sourceTree = "<group>"; };
-		7DADCB9425C8158400048287 /* default-v1.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v1.realm"; sourceTree = "<group>"; };
+		7DADCB9F25C816B500048287 /* default-v0.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v0.realm"; sourceTree = "<group>"; };
+		7DADCBA025C816B500048287 /* default-v1.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v1.realm"; sourceTree = "<group>"; };
+		7DADCBA125C816B500048287 /* default-v3.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v3.realm"; sourceTree = "<group>"; };
+		7DADCBA225C816B500048287 /* default-v4.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v4.realm"; sourceTree = "<group>"; };
+		7DADCBA325C816B500048287 /* default-v5.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v5.realm"; sourceTree = "<group>"; };
+		7DADCBA425C816B600048287 /* default-v2.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v2.realm"; sourceTree = "<group>"; };
 		7DFFB15D25C19F0700CA8AE5 /* Example_v0.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v0.swift; sourceTree = "<group>"; };
 		7DFFB16A25C1B49700CA8AE5 /* RealmVersionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmVersionExtension.swift; sourceTree = "<group>"; };
 		7DFFB16E25C1B65A00CA8AE5 /* Example_v1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v1.swift; sourceTree = "<group>"; };
@@ -578,12 +578,12 @@
 		7D46396A25C30B7F0089EFD9 /* RealmTemplates */ = {
 			isa = PBXGroup;
 			children = (
-				7DADCB9025C8158400048287 /* default-v0.realm */,
-				7DADCB9425C8158400048287 /* default-v1.realm */,
-				7DADCB9325C8158400048287 /* default-v2.realm */,
-				7DADCB9125C8158400048287 /* default-v3.realm */,
-				7DADCB8F25C8158400048287 /* default-v4.realm */,
-				7DADCB9225C8158400048287 /* default-v5.realm */,
+				7DADCB9F25C816B500048287 /* default-v0.realm */,
+				7DADCBA025C816B500048287 /* default-v1.realm */,
+				7DADCBA425C816B600048287 /* default-v2.realm */,
+				7DADCBA125C816B500048287 /* default-v3.realm */,
+				7DADCBA225C816B500048287 /* default-v4.realm */,
+				7DADCBA325C816B500048287 /* default-v5.realm */,
 			);
 			path = RealmTemplates;
 			sourceTree = "<group>";
@@ -1080,14 +1080,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7DADCB9A25C8158400048287 /* default-v1.realm in Resources */,
-				7DADCB9825C8158400048287 /* default-v5.realm in Resources */,
-				7DADCB9525C8158400048287 /* default-v4.realm in Resources */,
+				7DADCBA625C816B600048287 /* default-v1.realm in Resources */,
+				7DADCBAA25C816B600048287 /* default-v2.realm in Resources */,
 				7D46395425C2E7140089EFD9 /* README in Resources */,
+				7DADCBA525C816B600048287 /* default-v0.realm in Resources */,
+				7DADCBA825C816B600048287 /* default-v4.realm in Resources */,
+				7DADCBA925C816B600048287 /* default-v5.realm in Resources */,
 				227D20F51CB609A1008F641B /* LaunchScreen.xib in Resources */,
-				7DADCB9625C8158400048287 /* default-v0.realm in Resources */,
-				7DADCB9725C8158400048287 /* default-v3.realm in Resources */,
-				7DADCB9925C8158400048287 /* default-v2.realm in Resources */,
+				7DADCBA725C816B600048287 /* default-v3.realm in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
