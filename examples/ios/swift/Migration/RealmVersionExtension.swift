@@ -20,9 +20,27 @@ import Foundation
 import RealmSwift
 
 extension RealmVersion {
+
     static var mostRecentVersion: RealmVersion {
         let allVersions = allCases.map { $0.rawValue }
         let max = allVersions.max()!
         return RealmVersion.init(rawValue: max)!
     }
+
+    func realmUrl(usingTemplate: Bool) -> URL {
+        let defaultURL = Realm.Configuration.defaultConfiguration.fileURL!
+        let defaultParentURL = defaultURL.deletingLastPathComponent()
+        let fileName = "default-v\(self.rawValue)"
+        let destinationUrl = defaultParentURL.appendingPathComponent(fileName + ".realm")
+        if FileManager.default.fileExists(atPath: destinationUrl.path) {
+            try! FileManager.default.removeItem(at: destinationUrl)
+        }
+        if usingTemplate {
+            let bundleUrl = Bundle.main.url(forResource: fileName, withExtension: "realm")!
+            try! FileManager.default.copyItem(at: bundleUrl, to: destinationUrl)
+        }
+
+        return destinationUrl
+    }
+
 }

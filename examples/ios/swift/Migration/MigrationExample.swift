@@ -20,27 +20,27 @@ import Foundation
 import RealmSwift
 
 struct MigrationExample {
-    
+
     func addExampleDataToRealm(_ exampleData: (Realm) -> Void) {
-        let url = URL(for: RealmVersion.mostRecentVersion, usingTemplate: false)
+        let url = RealmVersion.mostRecentVersion.realmUrl(usingTemplate: false)
         let configuration = Realm.Configuration(fileURL: url, schemaVersion: UInt64(RealmVersion.mostRecentVersion.rawValue))
         let realm = try! Realm(configuration: configuration)
 
         try! realm.write {
             exampleData(realm)
         }
-        
+
         // Uncomment the following line to print the location of the newly created Realm.
 //        print("Realm created at: \(String(describing: configuration.fileURL!)).")
     }
 
     func performMigration() {
         for realmVersion in RealmVersion.allCases {
-            let realmUrl = URL(for: realmVersion, usingTemplate: true)
+            let realmUrl = realmVersion.realmUrl(usingTemplate: true)
             let schemaVersion = UInt64(RealmVersion.mostRecentVersion.rawValue)
             let realmConfiguration = Realm.Configuration(fileURL: realmUrl, schemaVersion: schemaVersion, migrationBlock: migrationBlock)
             try! Realm.performMigration(for: realmConfiguration)
         }
     }
-    
+
 }

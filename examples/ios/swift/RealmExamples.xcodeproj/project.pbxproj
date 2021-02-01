@@ -43,7 +43,6 @@
 		7D46394825C2D1400089EFD9 /* MigrationExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46394725C2D1400089EFD9 /* MigrationExample.swift */; };
 		7D46395025C2E2750089EFD9 /* Example_v3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46394F25C2E2750089EFD9 /* Example_v3.swift */; };
 		7D46395425C2E7140089EFD9 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 7D46395325C2E7140089EFD9 /* README */; };
-		7D46397825C30C7A0089EFD9 /* URLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46397725C30C7A0089EFD9 /* URLExtension.swift */; };
 		7D46397C25C314630089EFD9 /* default-v3.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7D46397B25C314630089EFD9 /* default-v3.realm */; };
 		7D46399825C45FF00089EFD9 /* Example_v4.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46399725C45FF00089EFD9 /* Example_v4.swift */; };
 		7D46399C25C4634B0089EFD9 /* default-v4.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7D46399B25C4634B0089EFD9 /* default-v4.realm */; };
@@ -273,7 +272,6 @@
 		7D46394725C2D1400089EFD9 /* MigrationExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationExample.swift; sourceTree = "<group>"; };
 		7D46394F25C2E2750089EFD9 /* Example_v3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v3.swift; sourceTree = "<group>"; };
 		7D46395325C2E7140089EFD9 /* README */ = {isa = PBXFileReference; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
-		7D46397725C30C7A0089EFD9 /* URLExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtension.swift; sourceTree = "<group>"; };
 		7D46397B25C314630089EFD9 /* default-v3.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v3.realm"; sourceTree = "<group>"; };
 		7D46399725C45FF00089EFD9 /* Example_v4.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v4.swift; sourceTree = "<group>"; };
 		7D46399B25C4634B0089EFD9 /* default-v4.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v4.realm"; sourceTree = "<group>"; };
@@ -683,7 +681,6 @@
 				7D46395325C2E7140089EFD9 /* README */,
 				E8CB088519BA6AF70018434A /* AppDelegate.swift */,
 				7D46394725C2D1400089EFD9 /* MigrationExample.swift */,
-				7D46397725C30C7A0089EFD9 /* URLExtension.swift */,
 				7DFFB16A25C1B49700CA8AE5 /* RealmVersionExtension.swift */,
 				7D46396525C30B580089EFD9 /* Examples */,
 				7D46396A25C30B7F0089EFD9 /* RealmTemplates */,
@@ -1177,7 +1174,6 @@
 				7DFFB16F25C1B65A00CA8AE5 /* Example_v1.swift in Sources */,
 				7D46395025C2E2750089EFD9 /* Example_v3.swift in Sources */,
 				7D46394825C2D1400089EFD9 /* MigrationExample.swift in Sources */,
-				7D46397825C30C7A0089EFD9 /* URLExtension.swift in Sources */,
 				7D46399825C45FF00089EFD9 /* Example_v4.swift in Sources */,
 				7D4639A025C46C660089EFD9 /* Example_v5.swift in Sources */,
 				7DFFB17725C1B84E00CA8AE5 /* Example_v2.swift in Sources */,
