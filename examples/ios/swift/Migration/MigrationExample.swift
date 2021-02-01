@@ -22,8 +22,8 @@ import RealmSwift
 struct MigrationExample {
 
     func addExampleDataToRealm(_ exampleData: (Realm) -> Void) {
-        let url = RealmVersion.mostRecentVersion.realmUrl(usingTemplate: false)
-        let configuration = Realm.Configuration(fileURL: url, schemaVersion: UInt64(RealmVersion.mostRecentVersion.rawValue))
+        let url = realmUrl(for: schemaVersion, usingTemplate: false)
+        let configuration = Realm.Configuration(fileURL: url, schemaVersion: UInt64(schemaVersion))
         let realm = try! Realm(configuration: configuration)
 
         try! realm.write {
@@ -35,12 +35,27 @@ struct MigrationExample {
     }
 
     func performMigration() {
-        for realmVersion in RealmVersion.allCases {
-            let realmUrl = realmVersion.realmUrl(usingTemplate: true)
-            let schemaVersion = UInt64(RealmVersion.mostRecentVersion.rawValue)
-            let realmConfiguration = Realm.Configuration(fileURL: realmUrl, schemaVersion: schemaVersion, migrationBlock: migrationBlock)
+        for realmVersion in 0..<schemaVersion {
+            let url = realmUrl(for: realmVersion, usingTemplate: true)
+            let realmConfiguration = Realm.Configuration(fileURL: url, schemaVersion: UInt64(schemaVersion), migrationBlock: migrationBlock)
             try! Realm.performMigration(for: realmConfiguration)
         }
+    }
+    
+    private func realmUrl(for schemaVersion: Int, usingTemplate: Bool) -> URL {
+        let defaultURL = Realm.Configuration.defaultConfiguration.fileURL!
+        let defaultParentURL = defaultURL.deletingLastPathComponent()
+        let fileName = "default-v\(schemaVersion)"
+        let destinationUrl = defaultParentURL.appendingPathComponent(fileName + ".realm")
+        if FileManager.default.fileExists(atPath: destinationUrl.path) {
+            try! FileManager.default.removeItem(at: destinationUrl)
+        }
+        if usingTemplate {
+            let bundleUrl = Bundle.main.url(forResource: fileName, withExtension: "realm")!
+            try! FileManager.default.copyItem(at: bundleUrl, to: destinationUrl)
+        }
+
+        return destinationUrl
     }
 
 }

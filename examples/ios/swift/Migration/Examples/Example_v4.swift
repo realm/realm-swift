@@ -25,14 +25,8 @@ import RealmSwift
 
 //// MARK: - Schema
 //
-//enum RealmVersion: Int, CaseIterable {
-//    case v0
-//    case v1
-//    case v2
-//    case v3
-//    case v4
-//}
-//
+//let schemaVersion = 4
+
 //// Changes from previous version:
 //// Add an `Address` to the `Person`.
 //

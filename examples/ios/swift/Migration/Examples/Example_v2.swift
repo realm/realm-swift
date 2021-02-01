@@ -25,11 +25,7 @@ import RealmSwift
 
 //// MARK: - Schema
 //
-//enum RealmVersion: Int, CaseIterable {
-//    case v0
-//    case v1
-//    case v2
-//}
+//let schemaVersion = 2
 //
 //// Changes from previous version:
 //// add a `Dog` object

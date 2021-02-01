@@ -25,10 +25,7 @@ import RealmSwift
 
 //// MARK: - Schema
 //
-//enum RealmVersion: Int, CaseIterable {
-//    case v0
-//    case v1
-//}
+//let schemaVersion = 1
 //
 //// Changes from previous version:
 //// - combine `firstName` and `lastName` into `fullName`

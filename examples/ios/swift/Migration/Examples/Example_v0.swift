@@ -25,9 +25,7 @@ import RealmSwift
 
 //// MARK: - Schema
 //
-//enum RealmVersion: Int, CaseIterable {
-//    case v0
-//}
+//let schemaVersion = 0
 //
 //class Person: Object {
 //    @objc dynamic var firstName = ""

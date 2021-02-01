@@ -21,14 +21,7 @@ import RealmSwift
 
 // MARK: - Schema
 
-enum RealmVersion: Int, CaseIterable {
-    case v0
-    case v1
-    case v2
-    case v3
-    case v4
-    case v5
-}
+let schemaVersion = 5
 
 // Changes from previous version:
 // Change the `Address` from `Object` to `EmbeddedObject`.
