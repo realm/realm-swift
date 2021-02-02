@@ -94,7 +94,7 @@ using namespace realm::bson;
     auto bson = Bson(realm::ObjectId::gen());
     RLMObjectId *rlm = (RLMObjectId *)RLMConvertBsonToRLMBSON(bson);
     RLMObjectId *d = [[RLMObjectId alloc] initWithString:rlm.stringValue error:nil];
-    XCTAssert([rlm isEqualTo: d]);
+    XCTAssertEqualObjects(rlm, d);
     XCTAssertEqual(RLMConvertRLMBSONToBson(rlm), bson);
 }
 

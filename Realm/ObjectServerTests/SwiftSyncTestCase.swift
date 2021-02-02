@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#if os(macOS)
+
 import XCTest
 import RealmSwift
 
@@ -164,3 +166,5 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         }
     }
 }
+
+#endif // os(macOS)

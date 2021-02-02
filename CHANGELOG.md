@@ -2,6 +2,12 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * None.
+* Add support for "thawing" objects. `Realm`, `Results`, `List` and `Object`
+  now have `thaw()` methods which return a live copy of the frozen object. This
+  enables app behvaior where a frozen object can be made live again in order to
+  mutate values. For example, first freezing an object passed into UI view,
+  then thawing the object in the view to update values.
+* Add Xcode 12.4 binaries to the release package.
 
 ### Fixed
 * Inserting a date into a synced collection via `AnyBSON.datetime(...)` would be of type `Timestamp` and not `Date`. 
@@ -9,6 +15,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fixed an issue where creating an object after file format upgrade may fail
   with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
  ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
+* Allow enumerating objects of types which are no longer present in the schema.
+* Add `RLMResponse.customStatusCode`. This fixes timeout exceptions that were occuring with a poor connection. ([#4188](https://github.com/realm/realm-core/issues/4188))
+ * Fix - `RLMResponse` will have a non nil `customStatusCode` in case of error.
+   ([#4188](https://github.com/realm/realm-core/issues/4188))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -16,6 +26,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.3.
+* Carthage release for Swift is built with Xcode 12.4.
 * CocoaPods: 1.10 or later.
 
 ### Internal

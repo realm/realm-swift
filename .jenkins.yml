@@ -8,7 +8,7 @@ xcode_version:
  - 11.7
  - 12.1
  - 12.2
- - 12.3
+ - 12.4
 target:
  - docs
  - swiftlint
@@ -37,7 +37,6 @@ target:
  - cocoapods-ios
  - cocoapods-ios-dynamic
  - cocoapods-watchos
- - cocoapods-catalyst
 configuration:
  - N/A
 
@@ -267,12 +266,3 @@ exclude:
 
   - xcode_version: 12.2
     target: cocoapods-watchos
-
-  - xcode_version: 11.7
-    target: cocoapods-catalyst
-
-  - xcode_version: 12.1
-    target: cocoapods-catalyst
-
-  - xcode_version: 12.2
-    target: cocoapods-catalyst
