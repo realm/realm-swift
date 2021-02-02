@@ -36,20 +36,22 @@ let schemaVersion = 3
 // The recommended way is to create a new type instead and migrate the old type.
 // Here we create `Pet` and migrate its data from `Dog` so simulate renaming the table.
 
-@objc enum PetType: Int, RealmEnum {
-    case unspecified
-    case dog
-    case chicken
-    case cow
-}
-
 class Pet: Object {
+    
+    @objc enum Kind: Int, RealmEnum {
+        case unspecified
+        case dog
+        case chicken
+        case cow
+    }
+    
     @objc dynamic var name = ""
-    let type = RealmOptional<PetType>()
-    convenience init(name: String, type: PetType) {
+    @objc dynamic var type = Kind.unspecified
+    
+    convenience init(name: String, type: Kind) {
         self.init()
         self.name = name
-        self.type.value = type
+        self.type = type
     }
 }
 
@@ -83,17 +85,17 @@ let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
                 // `Dog` was changed to `Pet` in v2 already, but we still need to account for this
                 // if upgrading from pre v2 to v3.
                 let dogs = newObject!["pets"] as! List<MigrationObject>
-                let marley = migration.create(Pet.className(), value: ["Marley", PetType.dog.rawValue])
-                let lassie = migration.create(Pet.className(), value: ["Lassie", PetType.dog.rawValue])
+                let marley = migration.create(Pet.className(), value: ["Marley", Pet.Kind.dog.rawValue])
+                let lassie = migration.create(Pet.className(), value: ["Lassie", Pet.Kind.dog.rawValue])
                 dogs.append(marley)
                 dogs.append(lassie)
             } else if newObject!["fullName"] as! String == "Jane Doe" {
                 let dogs = newObject!["pets"] as! List<MigrationObject>
-                let toto = migration.create(Pet.className(), value: ["Toto", PetType.dog.rawValue])
+                let toto = migration.create(Pet.className(), value: ["Toto", Pet.Kind.dog.rawValue])
                 dogs.append(toto)
             }
         }
-        let slinkey = migration.create(Pet.className(), value: ["Slinkey", PetType.dog.rawValue])
+        let slinkey = migration.create(Pet.className(), value: ["Slinkey", Pet.Kind.dog.rawValue])
     }
     if oldSchemaVersion == 2 {
         // This branch is only relevant for version 2. If we are migration from a previous
@@ -103,7 +105,7 @@ let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
         migration.enumerateObjects(ofType: Person.className()) { oldObject, newObject in
             let pets = newObject!["pets"] as! List<MigrationObject>
             for dog in oldObject!["dogs"] as! List<DynamicObject> {
-                let pet = migration.create(Pet.className(), value: [dog["name"], PetType.dog.rawValue])
+                let pet = migration.create(Pet.className(), value: [dog["name"], Pet.Kind.dog.rawValue])
                 pets.append(pet)
             }
         }
@@ -119,12 +121,12 @@ let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
                 }
             }
             if !dogFound {
-                migration.create(Pet.className(), value: [oldDogObject!["name"], PetType.dog.rawValue])
+                migration.create(Pet.className(), value: [oldDogObject!["name"], Pet.Kind.dog.rawValue])
             }
         }
         // The data cannot be deleted just yet since the table is target of cross-table link columns.
         // See https://github.com/realm/realm-cocoa/issues/3686
-        // migration.deleteData(forType: PetType.dog)
+        // migration.deleteData(forType: Pet.Kind.dog)
     }
 }
 
