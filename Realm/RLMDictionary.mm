@@ -85,8 +85,4 @@
     @throw RLMException(@"Not implemented in RLMDictionary");
 }
 
-- (NSUInteger)countByEnumeratingWithState:(nonnull NSFastEnumerationState *)state objects:(__unsafe_unretained id  _Nullable * _Nonnull)buffer count:(NSUInteger)len {
-    @throw RLMException(@"Not implemented in RLMDictionary");
-}
-
 @end

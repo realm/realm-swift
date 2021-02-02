@@ -26,9 +26,12 @@ namespace realm {
 class Dictionary;
 }
 
-@interface RLMDictionary () {
+@implementation RLMDictionary ()
 
+- (NSUInteger)countByEnumeratingWithState:(nonnull NSFastEnumerationState *)state objects:(__unsafe_unretained id  _Nullable * _Nonnull)buffer count:(NSUInteger)len {
+    @throw RLMException(@"Not implemented in RLMDictionary");
 }
+
 @end
 
 #endif /* RLMDictionary_Private_hpp */

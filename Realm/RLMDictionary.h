@@ -123,19 +123,14 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSError *_Nullable error))block
 __attribute__((warn_unused_result));
 
-- (NSUInteger)indexOfObject:(nonnull id)object;
-- (NSUInteger)indexOfObjectWhere:(nonnull NSString *)predicateFormat, ...;
-- (NSUInteger)indexOfObjectWhere:(nonnull NSString *)predicateFormat args:(va_list)args;
-- (NSUInteger)indexOfObjectWithPredicate:(nonnull NSPredicate *)predicate;
-- (nonnull id)objectAtIndex:(NSUInteger)index;
-- (nonnull RLMResults *)objectsWhere:(nonnull NSString *)predicateFormat, ...;
-- (nonnull RLMResults *)objectsWhere:(nonnull NSString *)predicateFormat args:(va_list)args;
-- (nonnull RLMResults *)objectsWithPredicate:(nonnull NSPredicate *)predicate;
-- (void)setValue:(nullable id)value forKey:(nonnull NSString *)key;
-- (nonnull RLMResults *)sortedResultsUsingDescriptors:(nonnull NSArray<RLMSortDescriptor *> *)properties;
-- (nonnull RLMResults *)sortedResultsUsingKeyPath:(nonnull NSString *)keyPath ascending:(BOOL)ascending;
+/**
+ Returns the value associated with a given key.
+
+ @param key The name of the property.
+
+ @return A value associated with a given key or `nil`.
+ */
 - (nullable id)valueForKey:(nonnull NSString *)key;
-- (NSUInteger)countByEnumeratingWithState:(nonnull NSFastEnumerationState *)state objects:(__unsafe_unretained id  _Nullable * _Nonnull)buffer count:(NSUInteger)len;
 
 /**
  Indicates if the set can no longer be accessed.
