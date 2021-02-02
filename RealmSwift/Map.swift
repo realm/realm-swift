@@ -13,5 +13,5 @@ import Realm
  * Key-value collection. Where the key is a string and value is one of the available Realm types.
  * We use Map to don't intefere with the native Swift's Dictionary type.
  */
-public final class Map  {
+public final class Map: RLMDictionary<AnyObject> {
 }
