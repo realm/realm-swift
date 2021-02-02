@@ -29,9 +29,6 @@ struct MigrationExample {
         try! realm.write {
             exampleData(realm)
         }
-
-        // Uncomment the following line to print the location of the newly created Realm.
-        print("Realm created at: \(String(describing: configuration.fileURL!)).")
     }
 
     func performMigration() {
