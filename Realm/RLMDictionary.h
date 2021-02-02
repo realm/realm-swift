@@ -118,7 +118,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param block The block to be called each time the set changes.
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMObjectType> *_Nullable set,
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMObjectType> *_Nullable dictionary,
                                                          RLMCollectionChange *_Nullable changes,
                                                          NSError *_Nullable error))block
 __attribute__((warn_unused_result));

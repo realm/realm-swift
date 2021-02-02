@@ -24,7 +24,12 @@
 
 @implementation RLMManagedDictionary
 
-- (nonnull RLMNotificationToken *)addNotificationBlock:(nonnull void (^)(id<RLMCollection> _Nullable, RLMCollectionChange * _Nullable, NSError * _Nullable))block {
+// The compiler complains about the method's argument type not matching due to
+// it not having the generic type attached, but it doesn't seem to be possible
+// to actually include the generic type
+// http://www.openradar.me/radar?id=6135653276319744
+#pragma clang diagnostic ignored "-Wmismatched-parameter-types"
+- (nonnull RLMNotificationToken *)addNotificationBlock:(nonnull void (^)(RLMDictionary *, RLMCollectionChange *, NSError *))block {
     @throw RLMException(@"Not implemented in RLMManagedDictionary");
 }
 
