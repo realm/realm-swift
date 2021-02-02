@@ -57,6 +57,8 @@
 		0C5796A125643D7500744CAE /* RLMUUID_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0C57969E25643D7500744CAE /* RLMUUID_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		0C5796A225643D7500744CAE /* RLMUUID.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C57969F25643D7500744CAE /* RLMUUID.mm */; };
 		0C5796A325643D7500744CAE /* RLMUUID.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C57969F25643D7500744CAE /* RLMUUID.mm */; };
+		0C7CA7C325C311DA0098A636 /* RLMManagedDictionary.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C7CA7C225C311DA0098A636 /* RLMManagedDictionary.mm */; };
+		0C7CA7C425C311DA0098A636 /* RLMManagedDictionary.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C7CA7C225C311DA0098A636 /* RLMManagedDictionary.mm */; };
 		17051FCE1D93DA0A00EF8E67 /* RLMUser.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1ABDCDAF1D793008003489E3 /* RLMUser.mm */; };
 		1A0512721D873F3300806AEC /* RLMSyncConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A3623661D8384BA00945A54 /* RLMSyncConfiguration.mm */; };
 		1A0512761D8746CD00806AEC /* RLMSyncConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A3623651D8384BA00945A54 /* RLMSyncConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -681,6 +683,7 @@
 		0C3BD50125C1DE6F007CFDD3 /* RLMDictionary_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMDictionary_Private.hpp; sourceTree = "<group>"; };
 		0C57969E25643D7500744CAE /* RLMUUID_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMUUID_Private.hpp; sourceTree = "<group>"; };
 		0C57969F25643D7500744CAE /* RLMUUID.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUUID.mm; sourceTree = "<group>"; };
+		0C7CA7C225C311DA0098A636 /* RLMManagedDictionary.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMManagedDictionary.mm; sourceTree = "<group>"; };
 		1A0512731D87413000806AEC /* RLMSyncUtil_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSyncUtil_Private.hpp; sourceTree = "<group>"; };
 		1A1C6E241D3FFCF70077B6E7 /* RLMSyncUtil_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMSyncUtil_Private.h; sourceTree = "<group>"; };
 		1A1EBF861F269E8E00F47698 /* RLMResults_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMResults_Private.hpp; sourceTree = "<group>"; };
@@ -1593,14 +1596,18 @@
 				3F4F3AD323F71C790048DB43 /* RLMDecimal128.h */,
 				3F4F3ACF23F71C790048DB43 /* RLMDecimal128.mm */,
 				3F4F3AD123F71C790048DB43 /* RLMDecimal128_Private.hpp */,
+				0C3BD4B225C1BDF1007CFDD3 /* RLMDictionary.h */,
 				0C3BD4B225C1BDF1007CFDD3 /* RLMDictionary.hpp */,
 				0C3BD4B225C1BDF1007CFDD3 /* RLMDictionary.hpp */,
 				0C3BD4B125C1BDF1007CFDD3 /* RLMDictionary.mm */,
 				0C3BD4B125C1BDF1007CFDD3 /* RLMDictionary.mm */,
+				0C3BD4B125C1BDF1007CFDD3 /* RLMDictionary.mm */,
+				0C3BD50125C1DE6F007CFDD3 /* RLMDictionary_Private.hpp */,
 				0C3BD50125C1DE6F007CFDD3 /* RLMDictionary_Private.hpp */,
 				3FC3F910241808B300E27322 /* RLMEmbeddedObject.h */,
 				3FC3F911241808B300E27322 /* RLMEmbeddedObject.mm */,
 				E81A1F691955FC9300FDED82 /* RLMManagedArray.mm */,
+				0C7CA7C225C311DA0098A636 /* RLMManagedDictionary.mm */,
 				CFD8D11F25BB0B8B0037FE4D /* RLMManagedSet.mm */,
 				0207AB7D195DF9FB007EFB12 /* RLMMigration.h */,
 				0207AB7E195DF9FB007EFB12 /* RLMMigration.mm */,
@@ -1671,9 +1678,6 @@
 				E81A1F811955FC9300FDED82 /* RLMUtil.hpp */,
 				E81A1F821955FC9300FDED82 /* RLMUtil.mm */,
 				0C57969F25643D7500744CAE /* RLMUUID.mm */,
-				0C57969E25643D7500744CAE /* RLMUUID_Private.hpp */,
-				681EE2FE25EE8D8800A9DEC5 /* RLMValue.h */,
-				681EE2FF25EE8D8800A9DEC5 /* RLMValue.mm */,
 			);
 			path = Realm;
 			sourceTree = "<group>";
@@ -2455,6 +2459,7 @@
 				CF76F7FD24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm in Sources */,
 				CF76F7E724816AAB00890DD2 /* RLMFindOptions.mm in Sources */,
 				5D659E881BE04556006515A0 /* RLMManagedArray.mm in Sources */,
+				0C7CA7C325C311DA0098A636 /* RLMManagedDictionary.mm in Sources */,
 				CFD8D12025BB0B8B0037FE4D /* RLMManagedSet.mm in Sources */,
 				5D659E8B1BE04556006515A0 /* RLMMigration.mm in Sources */,
 				CF76F7F124816AAB00890DD2 /* RLMMongoClient.mm in Sources */,
@@ -2609,6 +2614,7 @@
 				CF76F7FE24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm in Sources */,
 				CF76F7E824816AAB00890DD2 /* RLMFindOptions.mm in Sources */,
 				5DD755861BE056DE002800DA /* RLMManagedArray.mm in Sources */,
+				0C7CA7C425C311DA0098A636 /* RLMManagedDictionary.mm in Sources */,
 				CFD8D13325BB0B900037FE4D /* RLMManagedSet.mm in Sources */,
 				5DD755891BE056DE002800DA /* RLMMigration.mm in Sources */,
 				CF76F7F224816AAB00890DD2 /* RLMMongoClient.mm in Sources */,
