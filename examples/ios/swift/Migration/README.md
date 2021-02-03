@@ -16,18 +16,21 @@ migration was successful.
 The files to look at are located in the `Examples` folder. Every file contains an extract of everything necessary for
 this version (schema version, objects, migration).
 
-How to create new examples:
+## How to create new schema versions
 
-1. Uncomment out the `-DCREATE_EXAMPLES` line in `Migration.xcconfig`.
-2. Duplicate `OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_5;` and increase the version by 1.
-3. Duplicate the most recent `Example_v`x`.swift` file.
-4. Comment out the previous one. Update the current one:
-   - Increase the `schemaVersion`.
+(the example shows going from schema version 5 to version 6 - changes version numbers depending on your schema version)
+
+1. Uncomment the `-DCREATE_EXAMPLES` line in `Migration.xcconfig` which activates the creation of new `.realm` files.
+2. Comment `OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_5;` since version `5` already exists.
+3. Add a new line `OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_6;` to create version `6`.
+4. Duplicate the `Example_v5.swift` file to create a new schema version:
+   - Change `SCHEMA_VERSION_5` to `SCHEMA_VERSION_6`.   
+   - Change `let schemaVersion = 5` to `let schemaVersion = 6`.
    - Update the `Object` definitions according to your new example.
-   - Update the migration block.
-   - Create some examples for that specific schema version (they will be used in later schema version).
-5. Run the app.
-6. The realm file created by this run must then be added to project (`Examples` folder).
+   - Update the `migrationBlock` and the `migrationCheck`.
+   - Create some `exampleData` for this specific schema version (they will be used in later schema version).
+6. Run the app.
+7. The realm file created by this run must then be added to project (`Examples` folder).
 
 ## Important notes
 
