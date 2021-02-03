@@ -28,6 +28,7 @@ namespace realm {
     class Schema;
     struct Property;
     struct ColKey;
+    struct TableKey;
 }
 
 class RLMObservationInfo;
@@ -101,6 +102,8 @@ public:
 
     // Look up by name, throwing if it's not present
     RLMClassInfo& operator[](NSString *name);
+    // Look up by table key, throwing if it's not present
+    RLMClassInfo& operator[](realm::TableKey const& tableKey);
 
     impl::iterator begin() noexcept;
     impl::iterator end() noexcept;

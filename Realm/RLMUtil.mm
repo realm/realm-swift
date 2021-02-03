@@ -132,7 +132,6 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
             return [value isKindOfClass:[NSData class]];
         case RLMPropertyTypeAny:
             return [value conformsToProtocol:@protocol(RLMValue)];
-//                || [value isKindOfClass:[NSData class]]; // Required for _NSInlineData
         case RLMPropertyTypeLinkingObjects:
             return YES;
         case RLMPropertyTypeObject: {
@@ -367,11 +366,12 @@ realm::Mixed RLMObjcToMixed(id<RLMValue> v) {
         case RLMPropertyTypeString:
             return realm::Mixed([(NSString *)v cStringUsingEncoding:NSUTF8StringEncoding]);
         case RLMPropertyTypeData:
-            return realm::Mixed([(NSData *)v bytes]);
+            return realm::Mixed(realm::BinaryData((const char*)[(NSData *)v bytes],
+                                                  (size_t)[(NSData *)v length]));
         case RLMPropertyTypeDate:
             realm::Timestamp([(NSDate *)v timeIntervalSince1970], 0);
         case RLMPropertyTypeObject:
-            return realm::Mixed(((RLMObjectBase *)v)->_row.get_key());
+            return ((RLMObjectBase *)v)->_row.get_link();
         case RLMPropertyTypeObjectId:
             return realm::Mixed([(RLMObjectId *)v value]);
         case RLMPropertyTypeDecimal128:
@@ -381,7 +381,7 @@ realm::Mixed RLMObjcToMixed(id<RLMValue> v) {
     }
 }
 
-id RLMMixedToObjc(realm::Mixed const& mixed) {
+id RLMMixedToObjc(realm::Mixed const& mixed, RLMRealm *realm) {
     switch (mixed.get_type()) {
         case realm::type_String:
             return RLMStringDataToNSString(mixed.get_string());
@@ -401,8 +401,9 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
             return [[RLMDecimal128 alloc] initWithDecimal128:mixed.get<realm::Decimal128>()];
         case realm::type_ObjectId:
             return [[RLMObjectId alloc] initWithValue:mixed.get<realm::ObjectId>()];
+        case realm::type_TypedLink:
+            return RLMObjectFromObjLink(realm, std::move(mixed.get<realm::ObjLink>()));
         case realm::type_Link:
-            return nil;
         case realm::type_LinkList:
         case realm::type_OldTable:
         case realm::type_OldDateTime:

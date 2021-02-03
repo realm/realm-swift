@@ -28,8 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark RLMValueType
 
 @protocol RLMValue
-
+/// Describes the type of property stored.
 @property (readonly) RLMPropertyType valueType NS_REFINED_FOR_SWIFT;
+@property (nullable, readonly) id value NS_REFINED_FOR_SWIFT;
 
 @end
 

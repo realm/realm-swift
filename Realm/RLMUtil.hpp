@@ -193,7 +193,8 @@ static inline void RLMNSStringToStdString(std::string &out, NSString *in) {
 }
 
 realm::Mixed RLMObjcToMixed(id<RLMValue> value);
-id RLMMixedToObjc(realm::Mixed const& value);
+id RLMMixedToObjc(realm::Mixed const& value, RLMRealm *realm=nil);
+
 realm::Decimal128 RLMObjcToDecimal128(id value);
 realm::UUID RLMObjcToUUID(__unsafe_unretained id const value);
 

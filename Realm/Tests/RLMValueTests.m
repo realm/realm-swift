@@ -177,7 +177,7 @@
     XCTAssertNotEqual(v1, [RLMDecimal128 decimalWithNumber:@456.123]);
 }
 
-#pragma mark - Miscellaneous
+#pragma mark - Managed Values
 
 - (void)testManagedObject {
     RLMRealm *r = [self realmWithTestPath];
@@ -185,9 +185,50 @@
     StringObject *so = [StringObject createInRealm:r withValue:@[@"hello"]];
     MixedObject *mo = [MixedObject createInRealm:r withValue:@[so, @[]]];
     [r commitWriteTransaction];
-
-    XCTAssertEqual(mo.anyCol, so);
+    XCTAssertTrue([((StringObject *)mo.anyCol).stringCol isEqualToString:so.stringCol]);
     XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeObject);
+}
+
+- (void)testManagedInt {
+    RLMRealm *r = [self realmWithTestPath];
+    [r beginWriteTransaction];
+    MixedObject *mo = [MixedObject createInRealm:r withValue:@[@123456789, @[@123456, @67890]]];
+    [r commitWriteTransaction];
+    XCTAssertTrue([mo.anyCol.value isEqualToNumber:@123456789]);
+    XCTAssertTrue([((NSNumber *)mo.anyCol) isEqualToNumber:@123456789]);
+    XCTAssertTrue([mo.anyArray[0] isEqualToNumber: @123456]);
+    XCTAssertTrue([mo.anyArray[1] isEqualToNumber: @67890]);
+    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeInt);
+}
+
+- (void)testManagedString {
+    RLMRealm *r = [self realmWithTestPath];
+    [r beginWriteTransaction];
+    MixedObject *mo = [MixedObject createInRealm:r withValue:@[@"hello", @[@"over", @"there"]]];
+    [r commitWriteTransaction];
+    XCTAssertTrue([mo.anyCol.value isEqualToString:@"hello"]);
+    XCTAssertTrue([((NSString *)mo.anyCol) isEqualToString:@"hello"]);
+    XCTAssertTrue([mo.anyArray[0] isEqualToString: @"over"]);
+    XCTAssertTrue([mo.anyArray[1] isEqualToString: @"there"]);
+    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeString);
+}
+
+- (void)testManagedData {
+    RLMRealm *r = [self realmWithTestPath];
+    NSData *d1 = [NSData dataWithBytes:"hey" length:3];
+    NSData *d2 = [NSData dataWithBytes:"you" length:3];
+
+    [r beginWriteTransaction];
+    MixedObject *mo = [MixedObject createInRealm:r withValue:@[d1, @[d1, d2]]];
+    [r commitWriteTransaction];
+
+    XCTAssertTrue([[[NSString alloc] initWithData:mo.anyCol.value
+                                         encoding:NSUTF8StringEncoding] isEqualToString:@"hey"]);
+    XCTAssertTrue([[[NSString alloc] initWithData:mo.anyArray[0]
+                                         encoding:NSUTF8StringEncoding] isEqualToString:@"hey"]);
+    XCTAssertTrue([[[NSString alloc] initWithData:mo.anyArray[1]
+                                         encoding:NSUTF8StringEncoding] isEqualToString:@"you"]);
+    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeData);
 }
 
 @end
