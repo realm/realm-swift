@@ -47,62 +47,17 @@ import SwiftUI
     var reminders = RealmSwift.List<Reminder>()
 }
 
-struct FocusableTextField: UIViewRepresentable {
-    class Coordinator: NSObject, UITextFieldDelegate {
-        @Binding var text: String
-        var didBecomeFirstResponder = false
-
-        init(text: Binding<String>) {
-            _text = text
-        }
-
-        func textFieldDidChangeSelection(_ textField: UITextField) {
-            text = textField.text ?? ""
-        }
-    }
-
-    let title: String
-    @Binding var text: String
-    @Binding var isFirstResponder: Bool
-
-    init(_ title: String, text: Binding<String>, isFirstResponder: Binding<Bool>) {
-        self.title = title
-        self._text = text
-        self._isFirstResponder = isFirstResponder
-    }
-
-    func makeUIView(context: UIViewRepresentableContext<Self>) -> UITextField {
-        let textField = UITextField(frame: .zero)
-        textField.placeholder = title
-        textField.delegate = context.coordinator
-        return textField
-    }
-
-    func makeCoordinator() -> Coordinator {
-        return Coordinator(text: $text)
-    }
-
-    func updateUIView(_ uiView: UITextField, context: UIViewRepresentableContext<Self>) {
-        uiView.text = text
-        if isFirstResponder && !context.coordinator.didBecomeFirstResponder  {
-            uiView.becomeFirstResponder()
-            context.coordinator.didBecomeFirstResponder = true
-        }
-    }
-}
-
 struct ReminderRowView: View {
     @ObservedRealmObject var list: ReminderList
     @ObservedRealmObject var reminder: Reminder
     @State var hasFocus: Bool
     @State var showReminderForm = false
 
-
     var body: some View {
         NavigationLink(destination: ReminderFormView(list: list,
                                                      reminder: reminder,
                                                      showReminderForm: $showReminderForm), isActive: $showReminderForm) {
-            FocusableTextField("title", text: reminder.bind(\.title), isFirstResponder: $hasFocus).textCase(.lowercase)
+            Text(reminder.title)
         }.isDetailLink(true)
     }
 }
@@ -114,13 +69,13 @@ struct ReminderFormView: View {
 
     var body: some View {
         Form {
-            TextField("title", text: $reminder.title)
+            TextField("title", text: $reminder.title).accessibility(identifier: "formTitle")
             DatePicker("date", selection: $reminder.date)
             Picker("priority", selection: $reminder.priority, content: {
                 ForEach(Reminder.Priority.allCases) { priority in
                     Text(priority.description).tag(priority)
                 }
-            })
+            }).accessibilityIdentifier("picker")
         }
         .navigationTitle(reminder.title)
         .navigationBarItems(trailing:
@@ -136,6 +91,7 @@ struct ReminderFormView: View {
 struct ReminderListView: View {
     @ObservedRealmObject var list: ReminderList
     @State var newReminderAdded = false
+    @State var showReminderForm = false
 
     func shouldFocusReminder(_ reminder: Reminder) -> Bool {
         return newReminderAdded &&
@@ -149,7 +105,8 @@ struct ReminderListView: View {
                     ReminderRowView(list: list,
                                     reminder: reminder,
                                     hasFocus: shouldFocusReminder(reminder))
-                }.onMove(perform: $list.reminders.move)
+                }
+                .onMove(perform: $list.reminders.move)
                 .onDelete(perform: $list.reminders.remove)
             }
         }.navigationTitle(list.name)
@@ -158,7 +115,7 @@ struct ReminderListView: View {
             Button("add") {
                 newReminderAdded = true
                 $list.reminders.append(Reminder())
-            }
+            }.accessibility(identifier: "addReminder")
         })
     }
 }
@@ -169,29 +126,26 @@ struct ReminderListRowView: View {
     var body: some View {
         HStack {
             Image(systemName: list.icon)
-            TextField("List Name", text: $list.name)
+            TextField("List Name", text: $list.name).accessibility(identifier: "listRow")
             Spacer()
             Text("\(list.reminders.count)")
-        }.frame(minWidth: 100)
+        }.frame(minWidth: 100).accessibility(identifier: "hstack")
     }
 }
 
 struct ReminderListResultsView: View {
-    @StateRealmObject(ReminderList.self) var lists
+    @FetchRealmResults(ReminderList.self) var reminders
     @Binding var searchFilter: String
-
-    var filter: NSPredicate {
-        searchFilter.isEmpty ? NSPredicate(format: "TRUEPREDICATE") :
-            NSPredicate(format: "name CONTAINS[c] %@", searchFilter)
-    }
 
     var body: some View {
         List {
-            ForEach(lists.filter(filter)) { list in
+            ForEach(reminders) { list in
                 NavigationLink(destination: ReminderListView(list: list)) {
-                    ReminderListRowView(list: list)
-                }
-            }.onDelete(perform: $lists.remove)
+                    ReminderListRowView(list: list).tag(list)
+                }.accessibilityIdentifier(list.name)
+            }.onDelete(perform: $reminders.remove)
+        }.onChange(of: searchFilter) { value in
+            $reminders.filter = value.isEmpty ? nil : NSPredicate(format: "name CONTAINS[c] %@", value)
         }
     }
 }
@@ -232,7 +186,7 @@ struct SearchView: View {
 }
 
 struct Footer: View {
-    @StateRealmObject(ReminderList.self) var lists
+    @FetchRealmResults(ReminderList.self) var lists
 
     var body: some View {
         HStack {
@@ -245,6 +199,7 @@ struct Footer: View {
                 }
             }).buttonStyle(BorderlessButtonStyle())
             .padding()
+            .accessibility(identifier: "addList")
             Spacer()
         }
     }
@@ -267,22 +222,10 @@ struct ContentView: View {
     }
 }
 
-@main
-struct App: SwiftUI.App {
-    var view: some View {
+#if DEBUG
+struct Content_Preview: PreviewProvider {
+    static var previews: some View {
         ContentView()
     }
-
-    var body: some Scene {
-        if let realmPath = ProcessInfo.processInfo.environment["REALM_PATH"] {
-            Realm.Configuration.defaultConfiguration =
-                Realm.Configuration(fileURL: URL(string: realmPath)!, deleteRealmIfMigrationNeeded: true)
-        } else {
-            Realm.Configuration.defaultConfiguration =
-                Realm.Configuration(deleteRealmIfMigrationNeeded: true)
-        }
-        return WindowGroup {
-            view
-        }
-    }
 }
+#endif

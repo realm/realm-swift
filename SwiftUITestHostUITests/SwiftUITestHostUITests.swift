@@ -20,19 +20,32 @@
 import XCTest
 import RealmSwift
 
-class Dog: EmbeddedObject, ObjectKeyIdentifiable {
-    @objc dynamic var name = ""
+@objcMembers class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
+    @objc enum Priority: Int, RealmEnum, CaseIterable, Identifiable, CustomStringConvertible {
+        var id: Int { self.rawValue }
 
-    public static func ==(lhs: Dog, rhs: Dog) -> Bool {
-        return lhs.isSameObject(as: rhs)
+        case low, medium, high
+
+        var description: String {
+            switch self {
+            case .low: return "low"
+            case .medium: return "medium"
+            case .high: return "high"
+            }
+        }
     }
+    dynamic var title = ""
+    dynamic var notes = ""
+    dynamic var isFlagged = false
+    dynamic var date = Date()
+    dynamic var isComplete = false
+    dynamic var priority: Priority = .low
 }
 
-class Person: Object, ObjectKeyIdentifiable {
-    /// The name of the person
-    @objc dynamic var name = ""
-    /// The dogs this person has
-    var dogs = RealmSwift.List<Dog>()
+@objcMembers class ReminderList: Object, ObjectKeyIdentifiable {
+    dynamic var name = "New List"
+    dynamic var icon: String = "list.bullet"
+    var reminders = RealmSwift.List<Reminder>()
 }
 
 class SwiftUITests: XCTestCase {
@@ -75,57 +88,72 @@ class SwiftUITests: XCTestCase {
 
     func testSampleApp() throws {
         // assert realm is empty
-        XCTAssertEqual(realm.objects(Person.self).count, 0)
+        XCTAssertEqual(realm.objects(ReminderList.self).count, 0)
 
-        // add 3 persons, and assert that they have been added to
+        // add 3 lists, and assert that they have been added to
         // the UI and Realm
-        let addButton = app.buttons["addPerson"]
-        addButton.click()
-        addButton.click()
-        addButton.click()
-        XCTAssertEqual(realm.objects(Person.self).count, 3)
+        let addButton = app.buttons["addList"]
+        addButton.tap()
+        addButton.tap()
+        addButton.tap()
+        XCTAssertEqual(realm.objects(ReminderList.self).count, 3)
         XCTAssertEqual(app.tables.firstMatch.cells.count, 3)
 
         // delete each person, operating from the zeroeth index
         for _ in 0..<app.tables.firstMatch.cells.count {
             let row = app.tables.firstMatch.cells.element(boundBy: 0)
-            row.tap()
-            app.buttons["deletePerson"].tap()
+            row.swipeLeft()
+            app.buttons["Delete"].tap()
         }
 
-        XCTAssertEqual(realm.objects(Person.self).count, 0)
+        XCTAssertEqual(realm.objects(ReminderList.self).count, 0)
         XCTAssertEqual(app.tables.firstMatch.cells.count, 0)
 
-        // add another person, and tap into the PersonDetailView
+        // add another list, and tap into the ReminderView
         addButton.tap()
-        XCTAssertEqual(app.tables.firstMatch.cells.count, 1)
-        XCTAssertEqual(realm.objects(Person.self).count, 1)
-        app.tables.firstMatch.cells.element(boundBy: 0).tap()
+        app.tables.firstMatch.cells.buttons.firstMatch.tap()
+        app.buttons["addReminder"].tap()
+        // type in a name
+        app.tables.cells.firstMatch.buttons.firstMatch.tap()
+        app.textFields["title"].tap()
+        app.textFields["title"].typeText("My Reminder")
+        // check to see if it is reflected live in the title view
+        XCTAssert(app.navigationBars.staticTexts["My Reminder"].waitForExistence(timeout: 1.0))
+        let myReminder = realm.objects(ReminderList.self).first!.reminders.first!
+        XCTAssertEqual(myReminder.priority, .low)
+        app.buttons["picker"].tap()
+        app.buttons["medium"].tap()
+        XCTAssertEqual(myReminder.priority, .medium)
 
-        // add 2 dogs
-        app.buttons["addDog"].click()
-        let firstDogTf = app.textFields[realm.objects(Person.self)[0].dogs[0].name]
-        XCTAssertEqual(firstDogTf.value as? String, realm.objects(Person.self)[0].dogs[0].name)
-        app.buttons["addDog"].click()
-        let secondDogTf = app.textFields[realm.objects(Person.self)[0].dogs[1].name]
+        app.navigationBars.buttons.element(boundBy: 0).tap()
 
-        XCTAssertEqual(secondDogTf.value as? String, realm.objects(Person.self)[0].dogs[1].name)
-        XCTAssertEqual(realm.objects(Person.self)[0].dogs.count, 2)
+        // MARK: Test Move
+        app.buttons["addReminder"].tap()
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.first!.title, "My Reminder")
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders[1].title, "")
 
-        // test moving elements on a list
-        let initialDogName = firstDogTf.value
-        secondDogTf.click(forDuration: 0.5, thenDragTo: firstDogTf)
-        XCTAssertEqual(initialDogName as? String, realm.objects(Person.self)[0].dogs[1].name)
+        app.buttons["Edit"].tap()
+        app.buttons.matching(identifier: "Reorder").firstMatch.press(forDuration: 0.5, thenDragTo: app.tables.cells.element(boundBy: 1))
 
-        firstDogTf.click(forDuration: 0.5, thenDragTo: secondDogTf)
-        XCTAssertEqual(initialDogName as? String, realm.objects(Person.self)[0].dogs[0].name)
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.first!.title, "")
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders[1].title, "My Reminder")
 
-        // change name of person
-        let personNameTextField = app.textFields["personName"]
-        personNameTextField.tap()
-        personNameTextField.typeText(deleteString(for: personNameTextField.value as! String))
-        XCTAssertEqual(realm.objects(Person.self)[0].name, "")
-        personNameTextField.typeText("Test Person")
-        XCTAssertEqual(realm.objects(Person.self)[0].name, "Test Person")
+        // MARK: Test Delete
+        // potentially brittle, but these are the hooks swiftUI gives us. when editing a list,
+        // a cancel button appears on the left and a drag icon appears on the right. the label
+        // for the cancel button is "Delete ", which when tapped, reveals the actual delete button
+        // labeled "Delete"
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.count, 2)
+        app.buttons.matching(identifier: "Delete ").firstMatch.tap()
+        app.buttons.matching(identifier: "Delete").firstMatch.tap()
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.count, 1)
+        app.buttons.matching(identifier: "Delete ").firstMatch.tap()
+        app.buttons.matching(identifier: "Delete").firstMatch.tap()
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.count, 0)
+
+        app.navigationBars.buttons.firstMatch.tap()
+        app.tables.cells.firstMatch.swipeLeft()
+        app.buttons.matching(identifier: "Delete").firstMatch.tap()
+        XCTAssertEqual(realm.objects(ReminderList.self).count, 0)
     }
 }

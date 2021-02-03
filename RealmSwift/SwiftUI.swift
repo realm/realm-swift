@@ -24,241 +24,32 @@ import Realm.Private
 import Foundation
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-private func createBinding<T: ThreadConfined, V>(_ getter: @escaping () -> T,
+private func createBinding<T: ThreadConfined, V>(_ value: T,
                                                  forKeyPath keyPath: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
-    let lastValue = getter()[keyPath: keyPath]
+    if value.isFrozen {
+        throwRealmException("Should not bind frozen value")
+    }
+    // store last known value outside of the binding so that we can reference it if the parent
+    // is invalidated
+    let lastValue = value[keyPath: keyPath]
     return Binding(get: {
-        let parent = getter()
-        guard !parent.isInvalidated else {
+        guard !value.isInvalidated else {
             return lastValue
         }
-        if parent.isFrozen {
-            guard let thawed = parent.thaw() else {
-                return lastValue
-            }
-            let value = thawed[keyPath: keyPath]
-            return (value is ListBase) ? (value as! ThreadConfined).freeze() as! V : value
-        }
-        let value = parent[keyPath: keyPath]
-        if let value = value as? ThreadConfined, !value.isInvalidated && value.realm != nil {
+        let value = value[keyPath: keyPath]
+        if let value = value as? ListBase & ThreadConfined, !value.isInvalidated && value.realm != nil {
             return value.freeze() as! V
         }
         return value
     },
     set: { newValue in
-        var parent = getter()
-        guard !parent.isInvalidated else {
+        guard !value.isInvalidated else {
             return
         }
-        if parent.isFrozen {
-            guard let thawed = parent.thaw() else {
-                return
-            }
-            parent = thawed
-        }
-
-        parent.realm?.beginWrite()
-        parent[keyPath: keyPath] = newValue
-        try! parent.realm?.commitWrite()
+        value.realm?.beginWrite()
+        value[keyPath: keyPath] = newValue
+        try! value.realm?.commitWrite()
     })
-}
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-extension Binding where Value: ExpressibleByNilLiteral {
-    /// :nodoc:
-    public subscript<V, T>(dynamicMember member: ReferenceWritableKeyPath<V, T>) -> Binding<T> where Value == Optional<V>, V: ThreadConfined {
-        get {
-            createBinding({ wrappedValue! }, forKeyPath: member)
-        }
-    }
-}
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-extension Binding where Value: ObjectBase & ThreadConfined {
-    /// :nodoc:
-    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _ManagedPropertyType {
-        get {
-            createBinding({ wrappedValue }, forKeyPath: member)
-        }
-    }
-}
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-extension Binding where Value: RealmCollection {
-    /// :nodoc:
-    public typealias Element = Value.Element
-    /// :nodoc:
-    public typealias Index = Value.Index
-    /// :nodoc:
-    public typealias Indices = Value.Indices
-    /// :nodoc:
-    public func filter(_ predicate: NSPredicate) -> Self {
-        return Self(get: { wrappedValue.filter(predicate).freeze() as! Value }, set: { _ in })
-    }
-    /// :nodoc:
-    public func remove<V>(at index: Index) where Value == List<V> {
-        guard let collection = self.wrappedValue.thaw() else {
-            return
-        }
-        try! collection.realm!.write {
-            collection.remove(at: index)
-        }
-    }
-    /// :nodoc:
-    public func remove<V>(_ object: V) where Value == Results<V>, V: ObjectBase & ThreadConfined {
-        guard let results = self.wrappedValue.thaw(),
-              let thawed = object.thaw(),
-              let index = results.index(of: thawed) else {
-            return
-        }
-        try! results.realm!.write {
-            results.realm!.delete(results[index])
-        }
-    }
-    /// :nodoc:
-    public func remove<V>(atOffsets offsets: IndexSet) where Value == Results<V>, V: ObjectBase {
-        guard let results = self.wrappedValue.thaw() else {
-            return
-        }
-        try! results.realm!.write {
-            results.realm!.delete(Array(offsets.map { results[$0] }))
-        }
-    }
-    /// :nodoc:
-    public func remove<V>(atOffsets offsets: IndexSet) where Value: List<V> {
-        guard let list = self.wrappedValue.thaw() else {
-            return
-        }
-        try! list.realm!.write {
-            list.remove(atOffsets: offsets)
-        }
-    }
-    /// :nodoc:
-    public func move<V>(fromOffsets offsets: IndexSet, toOffset destination: Int) where Value: List<V> {
-        guard let list = self.wrappedValue.thaw() else {
-            return
-        }
-        try! list.realm!.write {
-            list.move(fromOffsets: offsets, toOffset: destination)
-        }
-    }
-    /// :nodoc:
-    public func append<V>(_ value: Value.Element) where Value: List<V>, Value.Element: RealmCollectionValue {
-        guard let list = self.wrappedValue.thaw() else {
-            return
-        }
-        try! list.realm!.write {
-            list.append(value)
-        }
-    }
-    /// :nodoc:
-    public func append<V>(_ value: Value.Element) where Value: List<V>, Value.Element: ObjectBase & ThreadConfined {
-        guard let list = self.wrappedValue.thaw() else {
-            return
-        }
-        // TODO: This doesn't actually work yet.
-        if value.realm == nil {
-            observedObjects[value]?.cancel()
-        }
-        try! list.realm!.write {
-            list.append(value)
-        }
-    }
-    /// :nodoc:
-    public func append<V>(_ value: Value.Element) where Value == Results<V>, V: Object {
-        let collection = self.wrappedValue.thaw()
-        try! collection.realm!.write {
-            collection.realm!.add(value)
-        }
-    }
-}
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-extension Binding where Value: ExpressibleByNilLiteral {
-    /// :nodoc:
-    public func remove<V>(at index: List<V>.Index) where Value == Optional<List<V>> {
-        guard let collection = self.wrappedValue?.thaw() else {
-            return
-        }
-        try! collection.realm!.write {
-            collection.remove(at: index)
-        }
-    }
-    /// :nodoc:
-    public func remove<V>(at index: Results<V>.Index) where Value == Optional<Results<V>>, V: ObjectBase {
-        guard let results = self.wrappedValue?.thaw() else {
-            return
-        }
-        try! results.realm!.write {
-            results.realm!.delete(results[index])
-        }
-    }
-    /// :nodoc:
-    public func remove<V>(atOffsets offsets: IndexSet) where Value == Optional<Results<V>>, V: ObjectBase {
-        guard let results = self.wrappedValue?.thaw() else {
-            return
-        }
-        try! results.realm!.write {
-            results.realm!.delete(Array(offsets.map { results[$0] }))
-        }
-    }
-    /// :nodoc:
-    public func remove<V>(atOffsets offsets: IndexSet) where Value == Optional<List<V>> {
-        guard let list = self.wrappedValue?.thaw() else {
-            return
-        }
-        try! list.realm!.write {
-            list.remove(atOffsets: offsets)
-        }
-    }
-    /// :nodoc:
-    public func move<V>(fromOffsets offsets: IndexSet, toOffset destination: Int) where Value == Optional<List<V>> {
-        guard let list = self.wrappedValue?.thaw() else {
-            return
-        }
-        try! list.realm!.write {
-            list.move(fromOffsets: offsets, toOffset: destination)
-        }
-    }
-    /// :nodoc:
-    public func append<V>(_ value: Value.Wrapped.Element) where Value == Optional<List<V>> {
-        guard let list = self.wrappedValue?.thaw() else {
-            return
-        }
-        try! list.realm!.write {
-            list.append(value)
-        }
-    }
-    /// :nodoc:
-    public func append<V>(_ value: Value.Wrapped.Element) where Value == Optional<Results<V>>, V: Object {
-        guard let collection = self.wrappedValue?.thaw() else {
-            return
-        }
-        try! collection.realm!.write {
-            collection.realm!.add(value)
-        }
-    }
-    /// :nodoc:
-    public func index<V>(of value: V) -> Results<V>.Index? where Value == Optional<Results<V>>, V: Object {
-        guard let collection = wrappedValue?.thaw() else {
-            throwRealmException("Attempting to get index of value \(value) from nil Results")
-        }
-        return !value.thaw().isInvalidated ? collection.firstIndex(of: value.thaw()!) : nil
-    }
-}
-
-// MARK: Realm Environment
-
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public extension EnvironmentValues {
-    /// The preferred Realm for the environment.
-    /// If not set, this will be a Realm with the default configuration.
-    var realm: Realm {
-        get {
-            try! Realm(configuration: Realm.Configuration.defaultConfiguration)
-        }
-        set {
-            Realm.Configuration.defaultConfiguration = newValue.configuration
-        }
-    }
 }
 
 private final class OptionalNotificationToken: NotificationToken {
@@ -266,9 +57,10 @@ private final class OptionalNotificationToken: NotificationToken {
     }
 }
 
+// MARK: Optional Conformances
+
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Optional: RealmSubscribable where Wrapped: RealmSubscribable & ThreadConfined {
-
     struct WrappedSubscriber: Subscriber {
         typealias Input = Wrapped
 
@@ -329,29 +121,18 @@ extension Optional: ThreadConfined where Wrapped: ThreadConfined {
         return self?.thaw()
     }
 }
+
+// MARK: KVO
+
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 private final class KVO: NSObject {
-    private let _receive: () -> ()
-
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        _receive()
-    }
-    init<S>(subscriber: S) where S: Subscriber, S.Input == Void {
-        _receive = { _ = subscriber.receive() }
-        super.init()
-    }
-    func cancel() {
-        // TODO
-    }
-}
-// MARK: - ObservableStorage
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public final class ObservableStoragePublisher<ObjectType>: Publisher where ObjectType: ThreadConfined & RealmSubscribable {
-    public typealias Output = Void
-    public typealias Failure = Never
+    /// Objects must have observers removed before being added to a realm.
+    /// They are stored here so that if they are appended through the Bound Property
+    /// system, they can be de-observed before hand.
+    fileprivate static var observedObjects = [NSObject: KVO.Subscription]()
 
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-    private struct KVOSubscription: Subscription {
+    fileprivate struct Subscription: Combine.Subscription {
         let observer: NSObject
         let value: NSObject
         let keyPaths: [String]
@@ -369,12 +150,31 @@ public final class ObservableStoragePublisher<ObjectType>: Publisher where Objec
             }
         }
     }
+    private let _receive: () -> ()
+
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        _receive()
+    }
+
+    init<S>(subscriber: S) where S: Subscriber, S.Input == Void {
+        _receive = { _ = subscriber.receive() }
+        super.init()
+    }
+}
+
+// MARK: - ObservableStorage
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+private final class ObservableStoragePublisher<ObjectType>: Publisher where ObjectType: ThreadConfined & RealmSubscribable {
+    public typealias Output = Void
+    public typealias Failure = Never
 
     private var subscribers = [AnySubscriber<Void, Never>]()
     private let value: ObjectType
-    internal init(_ value: ObjectType) {
+
+    init(_ value: ObjectType) {
         self.value = value
     }
+
     func send() {
         subscribers.forEach {
             _ = $0.receive()
@@ -384,11 +184,12 @@ public final class ObservableStoragePublisher<ObjectType>: Publisher where Objec
     public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
         subscribers.append(AnySubscriber(subscriber))
         if value.realm != nil, let value = value.thaw() {
+            // if the value is managed
             let token =  value._observe(subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
         } else if let value = value as? ObjectBase, !value.isInvalidated {
+            // else if the value is unmanaged
             var outCount = UInt32(0)
-
             let propertyList = class_copyPropertyList(ObjectType.self as? AnyClass, &outCount)
             let kvo = KVO(subscriber: subscriber)
             var keyPaths = [String]()
@@ -399,9 +200,12 @@ public final class ObservableStoragePublisher<ObjectType>: Publisher where Objec
                 keyPaths.append(name)
                 value.addObserver(kvo, forKeyPath: name, options: .new, context: nil)
             }
-            subscriber.receive(subscription: KVOSubscription(observer: kvo, value: value, keyPaths: keyPaths))
+            let subscription = KVO.Subscription(observer: kvo, value: value, keyPaths: keyPaths)
+            subscriber.receive(subscription: subscription)
+            KVO.observedObjects[value] = subscription
             free(propertyList)
-        } else /* nil value */ {
+        } else {
+            // else the value is nil
             subscriber.receive(subscription: ObservationSubscription(token: OptionalNotificationToken()))
         }
     }
@@ -412,73 +216,54 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         willSet {
             if newValue != value {
                 objectWillChange.send()
+                self.objectWillChange = ObservableStoragePublisher(newValue)
             }
         }
     }
+
     var objectWillChange: ObservableStoragePublisher<ObservedType>
 
     init(_ value: ObservedType) {
-        self.value = value.realm != nil ? value.thaw() ?? value : value
+        self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
         self.objectWillChange = ObservableStoragePublisher(value)
     }
 }
 
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-private var observedObjects = [NSObject: KVO]()
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-private struct ObserverSubscription: Subscription {
-    let observer: NSObject
-    let value: NSObject
-    let keyPaths: [String]
-    var combineIdentifier: CombineIdentifier {
-        CombineIdentifier(value)
-    }
-
-    func request(_ demand: Subscribers.Demand) {
-    }
-
-    func cancel() {
-        keyPaths.forEach {
-            value.removeObserver(observer, forKeyPath: $0)
-        }
-    }
-}
-
 // MARK: - StateRealmObject
-/**
- RealmState is a property wrapper that abstracts Realm's unique functionality away from the user and SwiftUI
- to enable simpler realm writes, collection freezes/thaws, and observation.
 
- SwiftUI will update views automatically when a wrapped value changes.
-
- Example usage:
- 
- ```swift
- struct PersonView: View {
-     @RealmState(Person.self) var results
-
-     var body: some View {
-         return NavigationView {
-             List {
-                 ForEach(results) { person in
-                     NavigationLink(destination: PersonDetailView(person: person)) {
-                         Text(person.name)
-                     }
-                 }
-                 .onDelete(perform: $results.remove)
-             }
-             .navigationBarTitle("People", displayMode: .large)
-             .navigationBarItems(trailing: Button("Add") {
-                 $results.append(Person())
-             })
-         }
-     }
- }
- ```
- */
+/// A property wrapper type that instantiates an observable object.
+///
+/// Create a state realm object in a ``SwiftUI/View``, ``SwiftUI/App``, or
+/// ``SwiftUI/Scene`` by applying the `@StateRealmObject` attribute to a property
+/// declaration and providing an initial value that conforms to the
+/// <doc://com.apple.documentation/documentation/Combine/ObservableObject>
+/// protocol:
+///
+///     @StateRealmObject var model = DataModel()
+///
+/// SwiftUI creates a new instance of the object only once for each instance of
+/// the structure that declares the object. When published properties of the
+/// observable realm object change, SwiftUI updates the parts of any view that depend
+/// on those properties. If unmanaged, the property will be read from the object itself,
+/// otherwise, it will be read from the underlying Realm. Changes to the value will update
+/// the view asynchronously:
+///
+///     Text(model.title) // Updates the view any time `title` changes.
+///
+/// You can pass the state object into a property that has the
+/// ``SwiftUI/ObservedRealmObject`` attribute.
+///
+/// Get a ``SwiftUI/Binding`` to one of the state object's properties using the
+/// `$` operator. Use a binding when you want to create a two-way connection to
+/// one of the object's properties. For example, you can let a
+/// ``SwiftUI/Toggle`` control a Boolean value called `isEnabled` stored in the
+/// model:
+///
+///     Toggle("Enabled", isOn: $model.isEnabled)
+///
+/// This will write the modified `isEnabled` property to the `model` object's Realm.
 @available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
-@frozen @propertyWrapper public struct StateRealmObject<T: RealmSubscribable & ThreadConfined & Equatable>: DynamicProperty {
+@propertyWrapper public struct StateRealmObject<T: RealmSubscribable & ThreadConfined & Equatable>: DynamicProperty {
     @StateObject private var storage: ObservableStorage<T>
     private let defaultValue: T
 
@@ -486,13 +271,18 @@ private struct ObserverSubscription: Subscription {
     public var wrappedValue: T {
         get {
             if storage.value.realm == nil {
+                // if unmanaged return the unmanaged value
                 return storage.value
             } else if storage.value.isInvalidated {
+                // if invalidated, return the default value
                 return defaultValue
             }
-            if T.self is ObjectBase.Type {
-                return storage.value
-            }
+            // else return the frozen value. the frozen value
+            // will be consumed by SwiftUI, which requires
+            // the ability to cache and diff objects and collections
+            // during some timeframe. The ObjectType is frozen so that
+            // SwiftUI can cache state. other access points will thaw
+            // the ObjectType
             return storage.value.freeze()
         }
         nonmutating set {
@@ -502,13 +292,10 @@ private struct ObserverSubscription: Subscription {
     /// :nodoc:
     public var projectedValue: Binding<T> {
         Binding(get: {
-            if storage.value.realm == nil {
-                return storage.value
-            }
             if storage.value.isInvalidated {
                 return defaultValue
             }
-            return storage.value.freeze()
+            return storage.value
         }, set: { newValue in
             storage.value = newValue
         })
@@ -525,73 +312,177 @@ private struct ObserverSubscription: Subscription {
      Initialize a RealmState struct for a given thread confined type.
      - parameter wrappedValue The ObjectBase reference to wrap and observe.
      */
-    public init(wrappedValue: T) where T: ObjectBase {
+    public init(wrappedValue: T) where T: ObjectKeyIdentifiable {
         self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
         defaultValue = T()
-    }
-    /**
-     Initialize a RealmState struct for a given thread confined type.
-     - parameter wrappedValue The Results value to wrap and observe.
-     */
-    public init<V>(wrappedValue: T) where T == Results<V>, V: ObjectBase {
-        self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
-        defaultValue = wrappedValue
     }
     /**
      Initialize a StateRealmObject wrapper for a given optional value.
      - parameter wrappedValue The optional value to wrap.
      */
-    public init<Wrapped>(wrappedValue: T) where T == Optional<Wrapped>, Wrapped: ThreadConfined & RealmSubscribable {
-//        self.init()
+    public init<Wrapped>(wrappedValue: T) where T == Optional<List<Wrapped>> {
         self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
         self.defaultValue = nil
     }
-
     /**
-     Initialize a RealmState struct for a given Result type.
-     - parameter type The Object Type to get results for.
-     - parameter filter An optional filter to filter the results on.
-     - parameter realm An optional realm to get the results from. If not provided, it will use the default Realm.
+     Initialize a StateRealmObject wrapper for a given optional value.
+     - parameter wrappedValue The optional value to wrap.
      */
-    public init<U: Object>(_ type: U.Type, filter: NSPredicate? = nil, realm: Realm? = nil) where T == Results<U> {
-        let actualRealm = realm == nil ? try! Realm(configuration: Realm.Configuration.defaultConfiguration) : realm!
-        let results = filter == nil ? actualRealm.objects(U.self) : actualRealm.objects(U.self).filter(filter!)
-        self._storage = StateObject(wrappedValue: ObservableStorage(results))
-        self.defaultValue = results
+    public init<Wrapped>(wrappedValue: T) where T == Optional<Wrapped>, Wrapped: ObjectKeyIdentifiable {
+        self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
+        self.defaultValue = nil
     }
-
-    public init<Wrapped>() where T == Optional<Wrapped>, Wrapped: ThreadConfined & RealmSubscribable {
+    /// :nodoc:
+    public init<Wrapped>() where T == Optional<Wrapped>, Wrapped: ObjectKeyIdentifiable {
         self._storage = StateObject(wrappedValue: ObservableStorage(nil))
         self.defaultValue = nil
     }
 }
 
-// MARK: ObservedRealmObject
+// MARK: FetchRealmResults
+
+
+/// A property wrapper type that retrieves results from a Realm.
+///
+/// The results use the realm configuration provided by
+/// the environment value `EnvironmentValues/realmConfiguration`.
 @available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
-@frozen @propertyWrapper public struct ObservedRealmObject<ObjectType: RealmSubscribable & ThreadConfined & ObservableObject & Equatable>: DynamicProperty {
+@propertyWrapper public struct FetchRealmResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & ObjectKeyIdentifiable {
+    public typealias Value = Results<ResultType>
+
+    private class Storage: ObservableStorage<Results<ResultType>> {
+        var sortDescriptor: SortDescriptor? {
+            willSet {
+                if let sortDescriptor = newValue {
+                    value = baseValue.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
+                    if let filter = filter {
+                        value = value.filter(filter)
+                    }
+                } else {
+                    value = baseValue.sorted(by: [])
+                    if let filter = filter {
+                        value = value.filter(filter)
+                    }
+                }
+            }
+        }
+        var filter: NSPredicate? {
+            willSet {
+                if let filter = newValue {
+                    value = baseValue.filter(filter)
+                    if let sortDescriptor = sortDescriptor {
+                        value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
+                    }
+                } else {
+                    value = baseValue.filter(NSPredicate(format: "TRUEPREDICATE"))
+                    if let sortDescriptor = sortDescriptor {
+                        value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
+                    }
+                }
+            }
+        }
+
+        /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
+        private var baseValue: Results<ResultType> {
+            if let configuration = configuration {
+                return try! Realm(configuration: configuration).objects(ResultType.self)
+            } else {
+                return Results(RLMResults.emptyDetached())
+            }
+        }
+
+        var configuration: Realm.Configuration? {
+            didSet {
+                var value = try! Realm(configuration: configuration!).objects(ResultType.self)
+                if let sortDescriptor = sortDescriptor {
+                    value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
+                }
+                if let filter = filter {
+                    value = value.filter(filter)
+                }
+                self.value = value
+            }
+        }
+    }
+
+    @Environment(\.realmConfiguration) var configuration
+    @ObservedObject private var storage = Storage(Results(RLMResults.emptyDetached()))
+    @State public var filter: NSPredicate? {
+        willSet {
+            storage.filter = newValue
+        }
+    }
+    @State public var sortDescriptor: SortDescriptor? {
+        willSet {
+            storage.sortDescriptor = newValue
+        }
+    }
+
+    public var wrappedValue: Value {
+        get {
+            storage.configuration != nil ? storage.value.freeze() : storage.value
+        }
+        set {
+            print("trying to set")
+        }
+    }
+
+    public var projectedValue: Self {
+        return self
+    }
+
+    public typealias SortDescriptor = (keyPath: String, ascending: Bool)
+
+    public init(_ type: ResultType.Type,
+                configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration,
+                filter: NSPredicate? = nil,
+                sortDescriptor: SortDescriptor? = nil) {
+        self.filter = filter
+        self.sortDescriptor = sortDescriptor
+        let defaultRealm = try? Realm(configuration: configuration)
+        if defaultRealm?.schema.objectSchema.contains(where: { $0.objectClass == type }) ?? false, let configuration = defaultRealm?.configuration {
+            storage.configuration = configuration
+        }
+    }
+
+    public mutating func update() {
+        // When the view updates, it will inject the @Environment
+        // into the propertyWrapper
+        if storage.configuration == nil {
+            storage.configuration = configuration
+        }
+    }
+}
+
+// MARK: ObservedRealmObject
+
+/// A property wrapper type that subscribes to an observable Realm `Object` or `List` and
+/// invalidates a view whenever the observable object changes.
+@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@propertyWrapper public struct ObservedRealmObject<ObjectType>: DynamicProperty where ObjectType: RealmSubscribable & ThreadConfined & ObservableObject & Equatable {
     /// A wrapper of the underlying observable object that can create bindings to
     /// its properties using dynamic member lookup.
     @dynamicMemberLookup @frozen public struct Wrapper {
-        fileprivate var wrappedValue: ObjectType
+        public var wrappedValue: ObjectType
         /// Returns a binding to the resulting value of a given key path.
         ///
         /// - Parameter keyPath  : A key path to a specific resulting value.
         ///
         /// - Returns: A new binding.
         public subscript<Subject>(dynamicMember keyPath: ReferenceWritableKeyPath<ObjectType, Subject>) -> Binding<Subject> {
-            createBinding({wrappedValue}, forKeyPath: keyPath)
+            createBinding(wrappedValue, forKeyPath: keyPath)
         }
     }
     /// The object to observe.
     @ObservedObject private var storage: ObservableStorage<ObjectType>
-    /// A default value to avoid invalidated access
+    /// A default value to avoid invalidated access.
     private let defaultValue: ObjectType
 
     /// :nodoc:
     public var wrappedValue: ObjectType {
         get {
             if storage.value.realm == nil {
-                // if unmangaged, return the unmanaged value
+                // if unmanaged return the unmanaged value
                 return storage.value
             } else if storage.value.isInvalidated {
                 // if invalidated, return the default value
@@ -600,7 +491,7 @@ private struct ObserverSubscription: Subscription {
             // else return the frozen value. the frozen value
             // will be consumed by SwiftUI, which requires
             // the ability to cache and diff objects and collections
-            // during some timeframe. the ObjectType is frozen so that
+            // during some timeframe. The ObjectType is frozen so that
             // SwiftUI can cache state. other access points will thaw
             // the ObjectType
             return storage.value.freeze()
@@ -611,15 +502,7 @@ private struct ObserverSubscription: Subscription {
     }
     /// :nodoc:
     public var projectedValue: Wrapper {
-        if storage.value.realm == nil {
-            return Wrapper(wrappedValue: storage.value)
-        } else if storage.value.isInvalidated {
-            return Wrapper(wrappedValue: defaultValue)
-        }
-        if ObjectType.self is ObjectBase.Type {
-            return Wrapper(wrappedValue: storage.value)
-        }
-        return Wrapper(wrappedValue: storage.value.freeze())
+        return Wrapper(wrappedValue: storage.value.isInvalidated ? defaultValue : storage.value)
     }
     /**
      Initialize a RealmState struct for a given thread confined type.
@@ -639,47 +522,135 @@ private struct ObserverSubscription: Subscription {
     }
 }
 
-@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
-extension ObservedRealmObject.Wrapper where ObjectType: RealmCollection {
-    public typealias Value = ObjectType
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension Binding where Value: ExpressibleByNilLiteral {
     /// :nodoc:
-    public typealias Element = Value.Element
+    public subscript<V, T>(dynamicMember member: ReferenceWritableKeyPath<V, T>) -> Binding<T> where Value == Optional<V>, V: ThreadConfined {
+        createBinding(wrappedValue!, forKeyPath: member)
+    }
+}
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension Binding where Value: ObjectBase & ThreadConfined {
     /// :nodoc:
-    public typealias Index = Value.Index
+    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _ManagedPropertyType {
+        createBinding(wrappedValue, forKeyPath: member)
+    }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public protocol BoundCollection {
+    associatedtype Value
+
+    var wrappedValue: Value { get set }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension BoundCollection where Value: RealmCollection {
     /// :nodoc:
-    public typealias Indices = Value.Indices
+    typealias Element = Value.Element
     /// :nodoc:
-    public func remove<V>(at index: Index) where Value == List<V> {
-        guard let collection = self.wrappedValue.thaw() else { return }
-        try! collection.realm!.write {
-            collection.remove(at: index)
-        }
+    typealias Index = Value.Index
+    /// :nodoc:
+    typealias Indices = Value.Indices
+    /// :nodoc:
+    func remove<V>(at index: Index) where Value == List<V> {
+        let list = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
+        list.realm?.beginWrite()
+        list.remove(at: index)
+        try? list.realm?.commitWrite()
     }
     /// :nodoc:
-    public func remove<V>(atOffsets offsets: IndexSet) where Value: List<V> {
-        guard let list = self.wrappedValue.thaw() else { return }
-        try! list.realm!.write {
-            list.remove(atOffsets: offsets)
-        }
-    }
-    /// :nodoc:
-    public func move<V>(fromOffsets offsets: IndexSet, toOffset destination: Int) where Value: List<V> {
-        guard let list = self.wrappedValue.thaw() else {
+    func remove<V>(_ object: V) where Value == Results<V>, V: ObjectBase & ThreadConfined {
+        guard let results = self.wrappedValue.thaw(),
+              let thawed = object.thaw(),
+              let index = results.index(of: thawed),
+              let realm = results.realm else {
             return
         }
-        try! list.realm!.write {
-            list.move(fromOffsets: offsets, toOffset: destination)
+        try? realm.write {
+            realm.delete(results[index])
         }
     }
     /// :nodoc:
-    public func append<V>(_ value: Value.Element) where Value: List<V> {
-        guard let list = self.wrappedValue.thaw() else { return }
-        try! list.realm!.write {
-            list.append(value)
+    func remove<V>(atOffsets offsets: IndexSet) where Value == Results<V>, V: ObjectBase {
+        guard let results = self.wrappedValue.thaw() else {
+            return
+        }
+        try! results.realm!.write {
+            results.realm!.delete(Array(offsets.map { results[$0] }))
+        }
+    }
+    /// :nodoc:
+    func remove<V>(atOffsets offsets: IndexSet) where Value: List<V> {
+        let list = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
+        list.realm?.beginWrite()
+        list.remove(atOffsets: offsets)
+        try? list.realm?.commitWrite()
+    }
+    /// :nodoc:
+    func move<V>(fromOffsets offsets: IndexSet, toOffset destination: Int) where Value: List<V> {
+        let list = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
+        list.realm?.beginWrite()
+        list.move(fromOffsets: offsets, toOffset: destination)
+        try? list.realm?.commitWrite()
+    }
+    /// :nodoc:
+    func append<V>(_ value: Value.Element) where Value: List<V>, Value.Element: RealmCollectionValue {
+        let list = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
+        list.realm?.beginWrite()
+        list.append(value)
+        try? list.realm?.commitWrite()
+    }
+    /// :nodoc:
+    func append<V>(_ value: Value.Element) where Value: List<V>, Value.Element: ObjectBase & ThreadConfined {
+        let list = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
+        // if the value is unmanaged but the list is managed, we are adding this value to the realm
+        if value.realm == nil && list.realm != nil {
+            KVO.observedObjects[value]?.cancel()
+        }
+        list.realm?.beginWrite()
+        list.append(value)
+        try? list.realm?.commitWrite()
+    }
+    /// :nodoc:
+    func append<V>(_ value: Value.Element) where Value == Results<V>, V: Object {
+        let results = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
+        if value.realm == nil && results.realm != nil {
+            KVO.observedObjects[value]?.cancel()
+        }
+        try! results.realm!.write {
+            results.realm!.add(value)
+        }
+    }
+}
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension Binding: BoundCollection where Value: RealmCollection {
+}
+
+@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+extension Binding where Value: ObjectKeyIdentifiable & ThreadConfined {
+    public func delete() {
+        guard let realm = self.wrappedValue.realm else {
+            return
+        }
+        try? realm.write {
+            realm.delete(self.wrappedValue)
+        }
+    }
+}
+@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+extension ObservedRealmObject.Wrapper where ObjectType: ObjectBase {
+    public func delete() {
+        guard let realm = self.wrappedValue.realm else {
+            return
+        }
+        try? realm.write {
+            realm.delete(self.wrappedValue)
         }
     }
 }
 
+#if swift(<5.5)
 @available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
 extension ThreadConfined where Self: ObjectBase {
     /**
@@ -694,7 +665,24 @@ extension ThreadConfined where Self: ObjectBase {
      - returns A `Binding` to the member property.
      */
     public func bind<V: _ManagedPropertyType>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V>  {
-        createBinding({self}, forKeyPath: keyPath)
+        createBinding(self.realm != nil ? self.thaw() ?? self : self, forKeyPath: keyPath)
+    }
+}
+#endif
+
+struct RealmEnvironmentKey: EnvironmentKey {
+    static let defaultValue = Realm.Configuration()
+}
+
+@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+extension EnvironmentValues {
+    var realmConfiguration: Realm.Configuration {
+        get {
+            return self[RealmEnvironmentKey]
+        }
+        set {
+            self[RealmEnvironmentKey] = newValue
+        }
     }
 }
 #endif
