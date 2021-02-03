@@ -137,7 +137,80 @@ __attribute__((warn_unused_result));
  */
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
+/**
+ Returns a frozen (immutable) snapshot of a dictionary.
+
+ The frozen copy is an immutable dictionary which contains the same data as this
+ dictionary currently contains, but will not update when writes are made to the
+ containing Realm. Unlike live dictionaries, frozen dictionaries can be accessed from any
+ thread.
+
+ @warning This method cannot be called during a write transaction, or when the
+          containing Realm is read-only.
+ @warning This method may only be called on a managed dictionary.
+ @warning Holding onto a frozen dictionary for an extended period while performing
+          write transaction on the Realm may result in the Realm file growing
+          to large sizes. See `RLMRealmConfiguration.maximumNumberOfActiveVersions`
+          for more information.
+ */
 - (instancetype)freeze;
+
+//- (instancetype)thaw;
+
+/**
+ Returns an array containing the dictionary’s keys.
+ */
+@property(readonly, copy) NSArray<NSString *> *allKeys;
+
+/**
+ Returns an array containing the dictionary’s values.
+ */
+@property(readonly, copy) NSArray<RLMObjectType> *allValues;
+
+/**
+ Returns an array of the dictionary's keys.
+ */
+- (nullable RLMObjectType)objectForKey:(NSString *)key;
+
+/// :nodoc:
+- (nullable RLMObjectType)objectForKeyedSubscript:(NSString *)key;
+
+/**
+ Applies a given block object to the each key-value pair of the dictionary
+ */
+- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(NSString *key, RLMObjectType obj, BOOL *stop))block;
+
+/**
+ Returns an enumerator object that lets you access each value in the dictionary
+ */
+- (NSEnumerator<RLMObjectType> *)objectEnumerator;
+
+/**
+ Replace the data
+ */
+- (void)setDictionary:(NSDictionary<NSString *, RLMObjectType> *)otherDictionary;
+
+/**
+ Delete all dictionary's keys and values.
+ */
+- (void)removeAllObjects;
+
+/**
+ Delete dictionary's values for a given keys.
+ */
+- (void)removeObjectsForKeys:(NSArray<NSString *> *)keyArray;
+
+#pragma mark - Unavailable Methods
+/**
+ `-[RLMDictionary init]` is not available because `RLMDictionary`s cannot be created directly.
+ `RLMDictionary` properties on `RLMObject`s are lazily created when accessed.
+ */
+- (instancetype)init __attribute__((unavailable("RLMDictionary cannot be created directly")));
+/**
+ `+[RLMDictionary new]` is not available because `RLMDictionary`s cannot be created directly.
+ `RLMDictionary` properties on `RLMObject`s are lazily created when accessed.
+ */
++ (instancetype)new __attribute__((unavailable("RLMDictionary cannot be created directly")));
 
 @end
 NS_ASSUME_NONNULL_END
