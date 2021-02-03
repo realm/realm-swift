@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # A script to generate the .jenkins.yml file for the CI pull request job
-XCODE_VERSIONS = %w(11.3 11.7 12.1 12.2 12.3)
+XCODE_VERSIONS = %w(11.3 11.7 12.1 12.2 12.4)
 
 all = ->(v) { true }
 latest_only = ->(v) { v == XCODE_VERSIONS.last }
@@ -46,7 +46,7 @@ targets = {
   'cocoapods-ios' => oldest_and_latest,
   'cocoapods-ios-dynamic' => oldest_and_latest,
   'cocoapods-watchos' => oldest_and_latest,
-  'cocoapods-catalyst' => oldest_and_latest,
+  # 'cocoapods-catalyst' => oldest_and_latest,
 }
 
 output_file = """

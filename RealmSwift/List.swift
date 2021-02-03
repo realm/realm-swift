@@ -432,6 +432,10 @@ public final class List<Element: RealmCollectionValue>: ListBase {
         return List(objc: _rlmArray.freeze())
     }
 
+    public func thaw() -> List? {
+        return List(objc: _rlmArray.thaw())
+    }
+
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedArray() -> RLMArray<AnyObject> {
         return Element._rlmArray()

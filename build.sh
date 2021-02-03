@@ -246,7 +246,6 @@ build_docs() {
     local objc="--objc"
 
     if [[ "$language" == "swift" ]]; then
-        sh build.sh set-swift-version
         xcodebuild_arguments="-scheme,RealmSwift"
         module="RealmSwift"
         objc=""
@@ -425,21 +424,6 @@ case "$COMMAND" in
 
     "setup-baas")
         ruby Realm/ObjectServerTests/setup_baas.rb
-        exit 0
-        ;;
-
-    ######################################
-    # Swift versioning
-    ######################################
-    "set-swift-version")
-        version=${2:-$REALM_SWIFT_VERSION}
-
-        SWIFT_VERSION_FILE="RealmSwift/SwiftVersion.swift"
-        CONTENTS="let swiftLanguageVersion = \"$version\""
-        if [ ! -f "$SWIFT_VERSION_FILE" ] || ! grep -q "$CONTENTS" "$SWIFT_VERSION_FILE"; then
-            echo "$CONTENTS" > "$SWIFT_VERSION_FILE"
-        fi
-
         exit 0
         ;;
 
@@ -1057,21 +1041,17 @@ case "$COMMAND" in
     # CocoaPods
     ######################################
     "cocoapods-setup")
-        if [[ "$2" != "swift" ]]; then
-          if [ ! -f core/version.txt ]; then
-            sh build.sh download-core
-          fi
-
-          rm -rf include
-          mkdir -p include
-          cp -R core/realm-monorepo.xcframework/ios-armv7_arm64/Headers include/core
-
-          mkdir -p include
-          echo '' > Realm/RLMPlatform.h
-          cp Realm/*.h Realm/*.hpp include
-        else
-          sh build.sh set-swift-version
+        if [ ! -f core/version.txt ]; then
+          sh build.sh download-core
         fi
+
+        rm -rf include
+        mkdir -p include
+        cp -R core/realm-monorepo.xcframework/ios-armv7_arm64/Headers include/core
+
+        mkdir -p include
+        echo '' > Realm/RLMPlatform.h
+        cp Realm/*.h Realm/*.hpp include
         ;;
 
     ######################################
@@ -1094,7 +1074,6 @@ case "$COMMAND" in
         fi
 
         if [ "$target" = "docs" ]; then
-            sh build.sh set-swift-version
             sh build.sh verify-docs
         elif [ "$target" = "swiftlint" ]; then
             sh build.sh verify-swiftlint
@@ -1362,7 +1341,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 12.3.
+* Carthage release for Swift is built with Xcode 12.4.
 * CocoaPods: 1.10 or later.
 
 ### Internal
