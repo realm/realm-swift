@@ -369,7 +369,7 @@ realm::Mixed RLMObjcToMixed(id<RLMValue> v) {
             return realm::Mixed(realm::BinaryData((const char*)[(NSData *)v bytes],
                                                   (size_t)[(NSData *)v length]));
         case RLMPropertyTypeDate:
-            realm::Timestamp([(NSDate *)v timeIntervalSince1970], 0);
+            return realm::Mixed(realm::Timestamp([(NSDate *)v timeIntervalSince1970], 0));
         case RLMPropertyTypeObject:
             return ((RLMObjectBase *)v)->_row.get_link();
         case RLMPropertyTypeObjectId:

@@ -35,10 +35,6 @@
     }
 }
 
-- (nullable id)value {
-    return (NSNumber *)self;
-}
-
 @end
 
 @implementation NSString (RLMValue)
@@ -47,20 +43,12 @@
     return RLMPropertyTypeString;
 }
 
-- (nullable id)value {
-    return (NSString *)self;
-}
-
 @end
 
 @implementation NSData (RLMValue)
 
 - (RLMPropertyType)valueType {
     return RLMPropertyTypeData;
-}
-
-- (nullable id)value {
-    return (NSData *)self;
 }
 
 @end

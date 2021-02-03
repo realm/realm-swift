@@ -26,13 +26,22 @@
 
 #pragma mark - Initialization
 
-- (void)testNumberInitialization {
+- (void)testIntInitialization {
     id<RLMValue> v = @123;
     XCTAssertEqual(v, @123);
     XCTAssertEqual(v.valueType, RLMPropertyTypeInt);
     v = @456;
     XCTAssertEqual(v, @456);
     XCTAssertEqual(v.valueType, RLMPropertyTypeInt);
+}
+
+- (void)testFloatInitialization {
+    id<RLMValue> v = @123.456;
+    XCTAssertTrue([(NSNumber *)v isEqualToNumber:@123.456]);
+    XCTAssertEqual(v.valueType, RLMPropertyTypeFloat);
+    v = @456.789;
+    XCTAssertTrue([(NSNumber *)v isEqualToNumber:@456.789]);
+    XCTAssertEqual(v.valueType, RLMPropertyTypeFloat);
 }
 
 - (void)testStringInitialization {
@@ -194,11 +203,21 @@
     [r beginWriteTransaction];
     MixedObject *mo = [MixedObject createInRealm:r withValue:@[@123456789, @[@123456, @67890]]];
     [r commitWriteTransaction];
-    XCTAssertTrue([mo.anyCol.value isEqualToNumber:@123456789]);
-    XCTAssertTrue([((NSNumber *)mo.anyCol) isEqualToNumber:@123456789]);
-    XCTAssertTrue([mo.anyArray[0] isEqualToNumber: @123456]);
-    XCTAssertTrue([mo.anyArray[1] isEqualToNumber: @67890]);
+    XCTAssertTrue([(NSNumber *)mo.anyCol isEqualToNumber:@123456789]);
+    XCTAssertTrue([mo.anyArray[0] isEqualToNumber:@123456]);
+    XCTAssertTrue([mo.anyArray[1] isEqualToNumber:@67890]);
     XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeInt);
+}
+
+- (void)testManagedFloat {
+    RLMRealm *r = [self realmWithTestPath];
+    [r beginWriteTransaction];
+    MixedObject *mo = [MixedObject createInRealm:r withValue:@[@1234.5, @[@12345.6, @678.9]]];
+    [r commitWriteTransaction];
+    XCTAssertTrue([(NSNumber *)mo.anyCol isEqualToNumber:@1234.5]);
+    XCTAssertTrue([mo.anyArray[0] isEqualToNumber:[NSNumber numberWithFloat:12345.6]]);
+    XCTAssertTrue([mo.anyArray[1] isEqualToNumber:[NSNumber numberWithFloat:678.9]]);
+    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeFloat);
 }
 
 - (void)testManagedString {
@@ -206,10 +225,9 @@
     [r beginWriteTransaction];
     MixedObject *mo = [MixedObject createInRealm:r withValue:@[@"hello", @[@"over", @"there"]]];
     [r commitWriteTransaction];
-    XCTAssertTrue([mo.anyCol.value isEqualToString:@"hello"]);
-    XCTAssertTrue([((NSString *)mo.anyCol) isEqualToString:@"hello"]);
-    XCTAssertTrue([mo.anyArray[0] isEqualToString: @"over"]);
-    XCTAssertTrue([mo.anyArray[1] isEqualToString: @"there"]);
+    XCTAssertTrue([(NSString *)mo.anyCol isEqualToString:@"hello"]);
+    XCTAssertTrue([mo.anyArray[0] isEqualToString:@"over"]);
+    XCTAssertTrue([mo.anyArray[1] isEqualToString:@"there"]);
     XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeString);
 }
 
@@ -222,13 +240,59 @@
     MixedObject *mo = [MixedObject createInRealm:r withValue:@[d1, @[d1, d2]]];
     [r commitWriteTransaction];
 
-    XCTAssertTrue([[[NSString alloc] initWithData:mo.anyCol.value
+    XCTAssertTrue([[[NSString alloc] initWithData:(NSData *)mo.anyCol
                                          encoding:NSUTF8StringEncoding] isEqualToString:@"hey"]);
     XCTAssertTrue([[[NSString alloc] initWithData:mo.anyArray[0]
                                          encoding:NSUTF8StringEncoding] isEqualToString:@"hey"]);
     XCTAssertTrue([[[NSString alloc] initWithData:mo.anyArray[1]
                                          encoding:NSUTF8StringEncoding] isEqualToString:@"you"]);
     XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeData);
+}
+
+- (void)testManagedDate {
+    RLMRealm *r = [self realmWithTestPath];
+    NSDate *d1 = [NSDate now];
+    NSDate *d2 = [NSDate now];
+
+    [r beginWriteTransaction];
+    MixedObject *mo = [MixedObject createInRealm:r withValue:@[d1, @[d1, d2]]];
+    [r commitWriteTransaction];
+
+    // handle lossy margin of error.
+    XCTAssertNotEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyCol).timeIntervalSince1970, .1);
+    XCTAssertNotEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyArray[0]).timeIntervalSince1970, .1);
+    XCTAssertNotEqualWithAccuracy(d2.timeIntervalSince1970, ((NSDate *)mo.anyArray[1]).timeIntervalSince1970, .1);
+    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeDate);
+}
+
+- (void)testManagedObjectId {
+    RLMRealm *r = [self realmWithTestPath];
+    RLMObjectId *oid1 = [RLMObjectId objectId];
+    RLMObjectId *oid2 = [RLMObjectId objectId];
+
+    [r beginWriteTransaction];
+    MixedObject *mo = [MixedObject createInRealm:r withValue:@[oid1, @[oid1, oid2]]];
+    [r commitWriteTransaction];
+
+    XCTAssertTrue([(RLMObjectId *)mo.anyCol isEqualTo:oid1]);
+    XCTAssertTrue([(RLMObjectId *)mo.anyArray[0] isEqualTo:oid1]);
+    XCTAssertTrue([(RLMObjectId *)mo.anyArray[1] isEqualTo:oid2]);
+    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeObjectId);
+}
+
+- (void)testManagedDecimal128 {
+    RLMRealm *r = [self realmWithTestPath];
+    RLMDecimal128 *d1 = [RLMDecimal128 decimalWithNumber:@123.456];
+    RLMDecimal128 *d2 = [RLMDecimal128 decimalWithNumber:@890.456];
+
+    [r beginWriteTransaction];
+    MixedObject *mo = [MixedObject createInRealm:r withValue:@[d1, @[d1, d2]]];
+    [r commitWriteTransaction];
+
+    XCTAssertTrue([(RLMDecimal128 *)mo.anyCol isEqualTo:d1]);
+    XCTAssertTrue([(RLMDecimal128 *)mo.anyArray[0] isEqualTo:d1]);
+    XCTAssertTrue([(RLMDecimal128 *)mo.anyArray[1] isEqualTo:d2]);
+    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeDecimal128);
 }
 
 @end
