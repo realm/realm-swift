@@ -37,7 +37,6 @@ let schemaVersion = 3
 // Here we create `Pet` and migrate its data from `Dog` so simulate renaming the table.
 
 class Pet: Object {
-
     @objc enum Kind: Int, RealmEnum {
         case unspecified
         case dog

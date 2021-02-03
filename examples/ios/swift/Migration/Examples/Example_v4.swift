@@ -29,7 +29,6 @@ let schemaVersion = 4
 // Add an `Address` to the `Person`.
 
 class Pet: Object {
-
     @objc enum Kind: Int, RealmEnum {
         case unspecified
         case dog
