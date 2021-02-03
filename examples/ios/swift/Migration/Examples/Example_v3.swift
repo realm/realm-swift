@@ -37,17 +37,17 @@ let schemaVersion = 3
 // Here we create `Pet` and migrate its data from `Dog` so simulate renaming the table.
 
 class Pet: Object {
-    
+
     @objc enum Kind: Int, RealmEnum {
         case unspecified
         case dog
         case chicken
         case cow
     }
-    
+
     @objc dynamic var name = ""
     @objc dynamic var kind = Kind.unspecified
-    
+
     convenience init(name: String, kind: Kind) {
         self.init()
         self.name = name
@@ -151,7 +151,7 @@ let migrationCheck: (Realm) -> Void = { realm in
     assert(persons[2].age == 44)
     let pets = realm.objects(Pet.self)
     assert(pets.count == 4)
-    assert(pets.contains { $0.name == "Slinkey" && $0.kind.rawValue == Pet.Kind.dog.rawValue } )
+    assert(pets.contains { $0.name == "Slinkey" && $0.kind.rawValue == Pet.Kind.dog.rawValue })
 }
 
 // MARK: - Example data

@@ -97,7 +97,7 @@ let migrationCheck: (Realm) -> Void = { realm in
     assert(persons[2].age == 44)
     let dogs = realm.objects(Dog.self)
     assert(dogs.count == 4)
-    assert(dogs.contains { $0.name == "Slinkey" } )
+    assert(dogs.contains { $0.name == "Slinkey" })
 }
 
 // MARK: - Example data

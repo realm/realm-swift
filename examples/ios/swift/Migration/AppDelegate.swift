@@ -37,7 +37,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         return true
     }
-    
+
     private func addExampleDataToRealm(_ exampleData: (Realm) -> Void) {
         let url = realmUrl(for: schemaVersion, usingTemplate: false)
         let configuration = Realm.Configuration(fileURL: url, schemaVersion: UInt64(schemaVersion))
