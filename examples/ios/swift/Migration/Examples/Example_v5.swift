@@ -45,12 +45,12 @@ class Pet: Object {
     }
     
     @objc dynamic var name = ""
-    @objc dynamic var type = Kind.unspecified
+    @objc dynamic var kind = Kind.unspecified
     
-    convenience init(name: String, type: Kind) {
+    convenience init(name: String, kind: Kind) {
         self.init()
         self.name = name
-        self.type = type
+        self.kind = kind
     }
 }
 
@@ -121,8 +121,7 @@ let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
                 pets.append(pet)
             }
         }
-        // We migrate over the old dog list to make sure all dogs get added, even those without
-        // an owner.
+        // We enumerate the old dog list to make sure all dogs get added, even those without an owner.
         // Related issue: https://github.com/realm/realm-cocoa/issues/6734
         migration.enumerateObjects(ofType: "Dog") { oldDogObject, _ in
             var dogFound = false
@@ -154,6 +153,35 @@ let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
     }
 }
 
+// This block checks if the migration led to the expected result.
+// All older versions should have been migrated to the below stated `exampleData`.
+let migrationCheck: (Realm) -> Void = { realm in
+    let persons = realm.objects(Person.self)
+    assert(persons.count == 3)
+    assert(persons[0].fullName == "John Doe")
+    assert(persons[0].age == 42)
+    assert(persons[0].address != nil)
+    assert(persons[0].address?.city == "New York")
+    assert(persons[0].address?.street == "Broadway")
+    assert(persons[0].pets.count == 2)
+    assert(persons[0].pets[0].name == "Marley")
+    assert(persons[0].pets[0].kind.rawValue == Pet.Kind.dog.rawValue)
+    assert(persons[0].pets[1].name == "Lassie")
+    assert(persons[0].pets[1].kind.rawValue == Pet.Kind.dog.rawValue)
+    assert(persons[1].fullName == "Jane Doe")
+    assert(persons[1].age == 43)
+    assert(persons[1].address == nil)
+    assert(persons[1].pets.count == 1)
+    assert(persons[1].pets[0].name == "Toto")
+    assert(persons[1].pets[0].kind.rawValue == Pet.Kind.dog.rawValue)
+    assert(persons[2].fullName == "John Smith")
+    assert(persons[2].age == 44)
+    assert(persons[2].address == nil)
+    let pets = realm.objects(Pet.self)
+    assert(pets.count == 4)
+    assert(pets.contains { $0.name == "Slinkey" && $0.kind.rawValue == Pet.Kind.dog.rawValue } )
+}
+
 // MARK: - Example data
 
 // Example data for this schema version.
@@ -162,10 +190,10 @@ let exampleData: (Realm) -> Void = { realm in
     let person1 = Person(fullName: "John Doe", age: 42, address: address)
     let person2 = Person(fullName: "Jane Doe", age: 43, address: nil)
     let person3 = Person(fullName: "John Smith", age: 44, address: nil)
-    let pet1 = Pet(name: "Marley", type: .dog)
-    let pet2 = Pet(name: "Lassie", type: .dog)
-    let pet3 = Pet(name: "Toto", type: .dog)
-    let pet4 = Pet(name: "Slinkey", type: .dog)
+    let pet1 = Pet(name: "Marley", kind: .dog)
+    let pet2 = Pet(name: "Lassie", kind: .dog)
+    let pet3 = Pet(name: "Toto", kind: .dog)
+    let pet4 = Pet(name: "Slinkey", kind: .dog)
     realm.add([person1, person2, person3])
     person1.pets.append(pet1)
     person1.pets.append(pet2)

@@ -52,6 +52,19 @@ let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
     }
 }
 
+// This block checks if the migration led to the expected result.
+// All older versions should have been migrated to the below stated `exampleData`.
+let migrationCheck: (Realm) -> Void = { realm in
+    let persons = realm.objects(Person.self)
+    assert(persons.count == 3)
+    assert(persons[0].fullName == "John Doe")
+    assert(persons[0].age == 42)
+    assert(persons[1].fullName == "Jane Doe")
+    assert(persons[1].age == 43)
+    assert(persons[2].fullName == "John Smith")
+    assert(persons[2].age == 44)
+}
+
 // MARK: - Example data
 
 // Example data for this schema version.

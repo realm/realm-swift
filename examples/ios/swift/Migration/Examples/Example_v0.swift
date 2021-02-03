@@ -42,6 +42,22 @@ class Person: Object {
 // Migration block to migrate from *any* previous version to this version.
 let migrationBlock: MigrationBlock = { _, _ in }
 
+// This block checks if the migration led to the expected result.
+// All older versions should have been migrated to the below stated `exampleData`.
+let migrationCheck: (Realm) -> Void = { realm in
+    let persons = realm.objects(Person.self)
+    assert(persons.count == 3)
+    assert(persons[0].firstName == "John")
+    assert(persons[0].lastName == "Doe")
+    assert(persons[0].age == 42)
+    assert(persons[1].firstName == "Jane")
+    assert(persons[1].lastName == "Doe")
+    assert(persons[1].age == 43)
+    assert(persons[2].firstName == "John")
+    assert(persons[2].lastName == "Smith")
+    assert(persons[2].age == 44)
+}
+
 // MARK: - Example data
 
 // Example data for this schema version.

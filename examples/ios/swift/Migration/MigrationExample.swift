@@ -36,6 +36,8 @@ struct MigrationExample {
             let url = realmUrl(for: realmVersion, usingTemplate: true)
             let realmConfiguration = Realm.Configuration(fileURL: url, schemaVersion: UInt64(schemaVersion), migrationBlock: migrationBlock)
             try! Realm.performMigration(for: realmConfiguration)
+            let realm = try! Realm(configuration: realmConfiguration)
+            migrationCheck(realm)
         }
     }
 
