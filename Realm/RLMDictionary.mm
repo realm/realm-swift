@@ -90,4 +90,44 @@
     @throw RLMException(@"Not implemented in RLMDictionary");
 }
 
+- (NSUInteger)countByEnumeratingWithState:(nonnull NSFastEnumerationState *)state objects:(__unsafe_unretained id  _Nullable * _Nonnull)buffer count:(NSUInteger)len {
+    @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
+- (NSArray *)allKeys {
+    @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
+- (NSArray *)allValues {
+    @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
+- (nullable id)objectForKey:(NSString *)key {
+    @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
+- (nullable id)objectForKeyedSubscript:(NSString *)key {
+    @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
+- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(NSString *key, id obj, BOOL *stop))block {
+    @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
+- (NSEnumerator *)objectEnumerator {
+    @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
+- (void)setDictionary:(NSDictionary<NSString *, id> *)otherDictionary {
+    @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
+- (void)removeAllObjects {
+    @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
+- (void)removeObjectsForKeys:(NSArray<NSString *> *)keyArray {
+    @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
 @end

@@ -19,7 +19,6 @@
 #ifndef RLMDictionary_h
 #define RLMDictionary_h
 
-#import <Foundation/Foundation.h>
 #import <Realm/RLMCollection.h>
 
 NS_ASSUME_NONNULL_BEGIN
