@@ -40,7 +40,6 @@
 		53454CE424EAC45700678E48 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53454CE324EAC45700678E48 /* Assets.xcassets */; };
 		53454CE724EAC45700678E48 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53454CE624EAC45700678E48 /* Preview Assets.xcassets */; };
 		53454CEC24EAC45700678E48 /* AppClip.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 53454CDD24EAC45500678E48 /* AppClip.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		7D46394825C2D1400089EFD9 /* MigrationExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46394725C2D1400089EFD9 /* MigrationExample.swift */; };
 		7D46395025C2E2750089EFD9 /* Example_v3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46394F25C2E2750089EFD9 /* Example_v3.swift */; };
 		7D46395425C2E7140089EFD9 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 7D46395325C2E7140089EFD9 /* README.md */; };
 		7D46399825C45FF00089EFD9 /* Example_v4.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46399725C45FF00089EFD9 /* Example_v4.swift */; };
@@ -269,7 +268,6 @@
 		53454CE624EAC45700678E48 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		53454CE824EAC45700678E48 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		53454CE924EAC45700678E48 /* AppClip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppClip.entitlements; sourceTree = "<group>"; };
-		7D46394725C2D1400089EFD9 /* MigrationExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationExample.swift; sourceTree = "<group>"; };
 		7D46394F25C2E2750089EFD9 /* Example_v3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v3.swift; sourceTree = "<group>"; };
 		7D46395325C2E7140089EFD9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.markdown; };
 		7D46399725C45FF00089EFD9 /* Example_v4.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v4.swift; sourceTree = "<group>"; };
@@ -681,7 +679,6 @@
 				7D46395325C2E7140089EFD9 /* README.md */,
 				7DADCBB125C8284500048287 /* Migration.xcconfig */,
 				E8CB088519BA6AF70018434A /* AppDelegate.swift */,
-				7D46394725C2D1400089EFD9 /* MigrationExample.swift */,
 				7D46396525C30B580089EFD9 /* Examples */,
 				7D46396A25C30B7F0089EFD9 /* RealmTemplates */,
 				E8CB088919BA6AF70018434A /* Info.plist */,
@@ -1173,7 +1170,6 @@
 			files = (
 				7DFFB16F25C1B65A00CA8AE5 /* Example_v1.swift in Sources */,
 				7D46395025C2E2750089EFD9 /* Example_v3.swift in Sources */,
-				7D46394825C2D1400089EFD9 /* MigrationExample.swift in Sources */,
 				7D46399825C45FF00089EFD9 /* Example_v4.swift in Sources */,
 				7D4639A025C46C660089EFD9 /* Example_v5.swift in Sources */,
 				7DFFB17725C1B84E00CA8AE5 /* Example_v2.swift in Sources */,
