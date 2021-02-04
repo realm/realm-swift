@@ -239,6 +239,16 @@ static NSString *randomEmail() {
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 }
 
+- (void)testRetryCustomConfirmation {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should try retry confirmation email and fail"];
+
+    [self.app.emailPasswordAuth retryCustomConfirmation:randomEmail() completion:^(NSError *error) {
+        XCTAssertEqual(error.code, RLMAppErrorUserNotFound);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
+
 - (void)testResendConfirmationEmail {
     XCTestExpectation *expectation = [self expectationWithDescription:@"should try resend confirmation email and fail"];
 
