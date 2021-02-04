@@ -92,7 +92,18 @@ using namespace realm;
         }
         return;
     }
-
+    
+    // If a table will be deleted it can still be enumerated during the migration
+    // so that data can be saved or transfered to other tables if necessary.
+    if (!objects && oldObjects) {
+        for (RLMObject *oldObject in oldObjects) {
+            @autoreleasepool {
+                block(oldObject, nil);
+            }
+        }
+        return;
+    }
+    
     if (oldObjects.count == 0 || objects.count == 0) {
         return;
     }
