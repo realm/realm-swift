@@ -17,6 +17,8 @@
  ////////////////////////////////////////////////////////////////////////////
 
 #if canImport(SwiftUI)
+#if canImport(Combine)
+#if swift(>=5.2)
 import SwiftUI
 import Combine
 import Realm
@@ -50,73 +52,6 @@ private func createBinding<T: ThreadConfined, V>(_ value: T,
         value[keyPath: keyPath] = newValue
         try! value.realm?.commitWrite()
     })
-}
-
-private final class OptionalNotificationToken: NotificationToken {
-    override func invalidate() {
-    }
-}
-
-// MARK: Optional Conformances
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-extension Optional: RealmSubscribable where Wrapped: RealmSubscribable & ThreadConfined {
-    struct WrappedSubscriber: Subscriber {
-        typealias Input = Wrapped
-
-        typealias Failure = Error
-
-        var combineIdentifier: CombineIdentifier {
-            subscriber.combineIdentifier
-        }
-
-        var subscriber: AnySubscriber<Optional<Wrapped>, Error>
-
-        func receive(subscription: Subscription) {
-            subscriber.receive(subscription: subscription)
-        }
-
-        func receive(_ input: Wrapped) -> Subscribers.Demand {
-            subscriber.receive(input)
-        }
-
-        func receive(completion: Subscribers.Completion<Error>) {
-            subscriber.receive(completion: completion)
-        }
-    }
-    public func _observe<S>(on queue: DispatchQueue?,
-                            _ subscriber: S) -> NotificationToken where Self == S.Input, S: Subscriber, S.Failure == Error {
-        return self?._observe(on: queue, WrappedSubscriber(subscriber: AnySubscriber(subscriber))) ?? OptionalNotificationToken()
-    }
-    public func _observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Failure == Never, S.Input == Void {
-        if self?.realm != nil {
-            return self?._observe(subscriber) ?? OptionalNotificationToken()
-        } else {
-            return OptionalNotificationToken()
-        }
-    }
-}
-
-extension Optional: ThreadConfined where Wrapped: ThreadConfined {
-    public var realm: Realm? {
-        return self?.realm
-    }
-
-    public var isInvalidated: Bool {
-        return self.map { $0.isInvalidated } ?? true
-    }
-
-    public var isFrozen: Bool {
-        return self.map { $0.isFrozen } ?? false
-    }
-
-    public func freeze() -> Optional<Wrapped> {
-        return self?.freeze()
-    }
-
-    public func thaw() -> Optional<Wrapped>? {
-        return self?.thaw()
-    }
 }
 
 // MARK: KVO
@@ -201,9 +136,6 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
             subscriber.receive(subscription: subscription)
             KVO.observedObjects[value] = subscription
             free(propertyList)
-        } else {
-            // else the value is nil
-            subscriber.receive(subscription: ObservationSubscription(token: OptionalNotificationToken()))
         }
     }
 }
@@ -259,7 +191,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 ///     Toggle("Enabled", isOn: $model.isEnabled)
 ///
 /// This will write the modified `isEnabled` property to the `model` object's Realm.
-@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @propertyWrapper public struct StateRealmObject<T: RealmSubscribable & ThreadConfined & Equatable>: DynamicProperty {
     @StateObject private var storage: ObservableStorage<T>
     private let defaultValue: T
@@ -289,12 +221,12 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     /// :nodoc:
     public var projectedValue: Binding<T> {
         Binding(get: {
-            if storage.value.isInvalidated {
-                return defaultValue
+            if self.storage.value.isInvalidated {
+                return self.defaultValue
             }
-            return storage.value
+            return self.storage.value
         }, set: { newValue in
-            storage.value = newValue
+            self.storage.value = newValue
         })
     }
     /**
@@ -313,27 +245,6 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
         defaultValue = T()
     }
-    /**
-     Initialize a StateRealmObject wrapper for a given optional value.
-     - parameter wrappedValue The optional value to wrap.
-     */
-    public init<Wrapped>(wrappedValue: T) where T == Optional<List<Wrapped>> {
-        self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
-        self.defaultValue = nil
-    }
-    /**
-     Initialize a StateRealmObject wrapper for a given optional value.
-     - parameter wrappedValue The optional value to wrap.
-     */
-    public init<Wrapped>(wrappedValue: T) where T == Optional<Wrapped>, Wrapped: ObjectKeyIdentifiable {
-        self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
-        self.defaultValue = nil
-    }
-    /// :nodoc:
-    public init<Wrapped>() where T == Optional<Wrapped>, Wrapped: ObjectKeyIdentifiable {
-        self._storage = StateObject(wrappedValue: ObservableStorage(nil))
-        self.defaultValue = nil
-    }
 }
 
 // MARK: FetchRealmResults
@@ -343,8 +254,9 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 ///
 /// The results use the realm configuration provided by
 /// the environment value `EnvironmentValues/realmConfiguration`.
-@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @propertyWrapper public struct FetchRealmResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & ObjectKeyIdentifiable {
+    /// :nodoc:
     public typealias Value = Results<ResultType>
 
     private class Storage: ObservableStorage<Results<ResultType>> {
@@ -404,27 +316,31 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 
     @Environment(\.realmConfiguration) var configuration
     @ObservedObject private var storage = Storage(Results(RLMResults.emptyDetached()))
+    /// :nodoc:
     @State public var filter: NSPredicate? {
         willSet {
             storage.filter = newValue
         }
     }
+    /// :nodoc:
     @State public var sortDescriptor: SortDescriptor? {
         willSet {
             storage.sortDescriptor = newValue
         }
     }
-
+    /// :nodoc:
     public var wrappedValue: Value {
         storage.configuration != nil ? storage.value.freeze() : storage.value
     }
-
+    /// :nodoc:
     public var projectedValue: Self {
         return self
     }
 
+    /// :nodoc:
     public typealias SortDescriptor = (keyPath: String, ascending: Bool)
 
+    /// :nodoc:
     public init(_ type: ResultType.Type,
                 configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration,
                 filter: NSPredicate? = nil,
@@ -450,7 +366,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 
 /// A property wrapper type that subscribes to an observable Realm `Object` or `List` and
 /// invalidates a view whenever the observable object changes.
-@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @propertyWrapper public struct ObservedRealmObject<ObjectType>: DynamicProperty where ObjectType: RealmSubscribable & ThreadConfined & ObservableObject & Equatable {
     /// A wrapper of the underlying observable object that can create bindings to
     /// its properties using dynamic member lookup.
@@ -514,7 +430,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     }
 }
 
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension Binding where Value: ExpressibleByNilLiteral {
     /// :nodoc:
     public subscript<V, T>(dynamicMember member: ReferenceWritableKeyPath<V, T>) -> Binding<T> where Value == Optional<V>, V: ThreadConfined {
@@ -615,11 +531,11 @@ public extension BoundCollection where Value: RealmCollection {
         }
     }
 }
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension Binding: BoundCollection where Value: RealmCollection {
 }
 
-@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension Binding where Value: ObjectKeyIdentifiable & ThreadConfined {
     /// :nodoc:
     public func delete() {
@@ -632,8 +548,9 @@ extension Binding where Value: ObjectKeyIdentifiable & ThreadConfined {
     }
 }
 
-@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension ObservedRealmObject.Wrapper where ObjectType: ObjectBase {
+    /// :nodoc:
     public func delete() {
         guard let realm = self.wrappedValue.realm else {
             return
@@ -644,7 +561,7 @@ extension ObservedRealmObject.Wrapper where ObjectType: ObjectBase {
     }
 }
 
-@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension ThreadConfined where Self: ObjectBase {
     /**
      Create a `Binding` for a given property, allowing for
@@ -666,7 +583,7 @@ struct RealmEnvironmentKey: EnvironmentKey {
     static let defaultValue = Realm.Configuration()
 }
 
-@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension EnvironmentValues {
     /// The current `Realm.Configuration` that the view should use.
     public var realmConfiguration: Realm.Configuration {
@@ -687,4 +604,6 @@ extension EnvironmentValues {
         }
     }
 }
+#endif
+#endif
 #endif

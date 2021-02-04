@@ -17,6 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #if canImport(SwiftUI)
+#if canImport(Combine)
+#if swift(>=5.2)
 import XCTest
 import RealmSwift
 import SwiftUI
@@ -215,16 +217,6 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(results.wrappedValue.count, 1)
         state.projectedValue.delete()
     }
-    // MARK: Optional Operations
-    func testOptionalObject() throws {
-        let object: SwiftUIObject? = nil
-        let state = StateRealmObject(wrappedValue: object)
-        XCTAssertNil(state.projectedValue.wrappedValue)
-        XCTAssertNil(state.wrappedValue)
-        // it's not possible to test StateRealmObject's wrapped values
-        // mutability without a View, as we would be testing on a copy
-    }
-
     // MARK: Bind
     func testUnmanagedManagedObjectBind() {
         let object = SwiftUIObject()
@@ -245,4 +237,6 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(binding.wrappedValue, "baz")
     }
 }
+#endif
+#endif
 #endif
