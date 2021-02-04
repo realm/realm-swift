@@ -411,6 +411,12 @@
 }
 @end
 
+@implementation EmbeddedChildObject
+@end
+
+@implementation EmbeddedParentObject
+@end
+
 #pragma mark FakeObject
 
 @implementation FakeObject

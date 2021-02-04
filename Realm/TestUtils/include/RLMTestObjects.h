@@ -484,6 +484,14 @@ RLM_ARRAY_TYPE(RenamedProperties2)
 @property (nonatomic) int value;
 @end
 
+@interface EmbeddedChildObject : RLMObject
+@property (nonatomic) int intCol;
+@end
+
+@interface EmbeddedParentObject : RLMObject
+@property (nonatomic) EmbeddedChildObject *embeddedObject;
+@end
+
 #pragma mark FakeObject
 
 @interface FakeObject : RLMObject
