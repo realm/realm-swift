@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Key-value collection. Where the key is a string and value is one of the available Realm types.
  */
-@interface RLMDictionary<RLMObjectType>: NSObject<RLMCollection>
+@interface RLMDictionary<RLMObjectType>: NSObject<RLMCollection, NSFastEnumeration>
 
 /**
  Indicates if the dictionary is frozen.
