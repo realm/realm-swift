@@ -68,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, getter = isFrozen) BOOL frozen;
 
-#pragma mark - Accessing Objects from an Array
+#pragma mark - Accessing Objects from an Dictionary
 
 /**
  Returns the value associated with a given key.
