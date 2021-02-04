@@ -46,6 +46,13 @@
     });
 }
 
+- (void)retryCustomConfirmation:(NSString *)email
+                     completion:(RLMEmailPasswordAuthOptionalErrorBlock)completion {
+    self.client.retry_custom_confirmation(email.UTF8String, ^(realm::util::Optional<realm::app::AppError> error) {
+        [self handleResponse:error completion:completion];
+    });
+}
+
 - (void)resendConfirmationEmail:(NSString *)email
                      completion:(RLMEmailPasswordAuthOptionalErrorBlock)completion {
     self.client.resend_confirmation_email(email.UTF8String, ^(realm::util::Optional<realm::app::AppError> error) {

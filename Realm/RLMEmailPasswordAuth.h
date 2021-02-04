@@ -56,6 +56,9 @@ NS_ASSUME_NONNULL_BEGIN
             tokenId:(NSString *)tokenId
          completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
+- (void)retryCustomConfimation:(NSString *)email
+                    completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
+
 /**
  Re-sends a confirmation email to a user that has registered but
  not yet confirmed their email address.
