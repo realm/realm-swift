@@ -465,8 +465,6 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
             return [[RLMObjectId alloc] initWithValue:mixed.get<realm::ObjectId>()];
         case realm::type_Link:
         case realm::type_LinkList:
-        case realm::type_OldTable:
-        case realm::type_OldDateTime:
             REALM_UNREACHABLE();
         case realm::type_UUID:
             return [[NSUUID alloc] initWithRealmUUID:mixed.get<realm::UUID>()];

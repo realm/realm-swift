@@ -481,6 +481,10 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
     @throw RLMException(@"This method may only be called on RLMSet instances retrieved from an RLMRealm");
 }
 
+- (instancetype)thaw {
+    @throw RLMException(@"This method may only be called on RLMSet instances retrieved from an RLMRealm");
+}
+
 #pragma mark - Thread Confined Protocol Conformance
 
 - (realm::ThreadSafeReference)makeThreadSafeReference {

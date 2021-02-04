@@ -381,6 +381,10 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
         return MutableSet(objc: _rlmSet.freeze())
     }
 
+    public func thaw() -> MutableSet? {
+        return MutableSet(objc: _rlmSet.thaw())
+    }
+
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedSet() -> RLMSet<AnyObject> {
         return Element._rlmSet()

@@ -502,9 +502,23 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     }
 
     RLMRealm *frozenRealm = [_realm freeze];
-    auto& parentInfo = _ownerInfo->freeze(frozenRealm);
+    auto& parentInfo = _ownerInfo->resolve(frozenRealm);
     return translateRLMResultsErrors([&] {
         return [[self.class alloc] initWithSet:_backingSet.freeze(frozenRealm->_realm)
+                                    parentInfo:&parentInfo
+                                      property:parentInfo.rlmObjectSchema[_key]];
+    });
+}
+
+- (instancetype)thaw {
+    if (!self.frozen) {
+        return self;
+    }
+
+    RLMRealm *liveRealm = [_realm thaw];
+    auto& parentInfo = _ownerInfo->resolve(liveRealm);
+    return translateRLMResultsErrors([&] {
+        return [[self.class alloc] initWithSet:_backingSet.freeze(liveRealm->_realm)
                                     parentInfo:&parentInfo
                                       property:parentInfo.rlmObjectSchema[_key]];
     });

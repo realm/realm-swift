@@ -655,6 +655,14 @@ typedef void (^RLMObjectChangeBlock)(BOOL deleted,
  */
 - (instancetype)freeze NS_RETURNS_RETAINED;
 
+/**
+ Returns a live (mutable) reference of this object.
+
+ This method creates a managed accessor to a live copy of the same frozen object.
+ Will return self if called on an already live object.
+ */
+- (instancetype)thaw;
+
 #pragma mark - Dynamic Accessors
 
 /// :nodoc:

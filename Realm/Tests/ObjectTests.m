@@ -1407,6 +1407,9 @@ static IntObject *managedObject() {
 - (void)testMutateFrozenObject {
     IntObject *obj = managedObject();
     IntObject *frozen = obj.freeze;
+
+    RLMRealm *realm = frozen.realm;
+    RLMAssertThrowsWithReason([realm beginWriteTransaction], @"Can't perform transactions on a frozen Realm");
     XCTAssertThrows(frozen.intCol = 1);
 }
 
@@ -1476,6 +1479,84 @@ static IntObject *managedObject() {
     // Frozen objects have the value of the object at the start of the transaction
     XCTAssertEqual(obj.freeze.intCol, 1);
     [realm cancelWriteTransaction];
+}
+
+- (void)testThaw {
+    IntObject *frozen = [managedObject() freeze];
+    XCTAssertTrue([frozen isFrozen]);
+
+    IntObject *live = [frozen thaw];
+    XCTAssertFalse([live isFrozen]);
+
+    RLMRealm *liveRealm = live.realm;
+    [liveRealm beginWriteTransaction];
+    live.intCol = 1;
+    [liveRealm commitWriteTransaction];
+    XCTAssertNotEqual(live.intCol, frozen.intCol);
+}
+
+- (void)testThawDeleted {
+    IntObject *obj = managedObject();
+    IntObject *frozen = [obj freeze];
+    XCTAssertTrue([frozen isFrozen]);
+
+    RLMRealm *realm = obj.realm;
+    [realm beginWriteTransaction];
+    [realm deleteObject:obj];
+    [realm commitWriteTransaction];
+    
+    IntObject *thawed = [frozen thaw];
+    XCTAssertNil(thawed, @"Thaw should return nil when object was deleted");
+}
+
+- (void)testThawPreviousVersion {
+    IntObject *obj = managedObject();
+    IntObject *frozen = [obj freeze];
+    XCTAssertTrue([frozen isFrozen]);
+    XCTAssertEqual(obj.intCol, frozen.intCol);
+    
+    RLMRealm *realm = obj.realm;
+    [realm beginWriteTransaction];
+    obj.intCol = 1;
+    [realm commitWriteTransaction];
+    XCTAssertNotEqual(obj.intCol, frozen.intCol, @"Frozen object shouldn't mutate");
+    
+    IntObject *thawed = [frozen thaw];
+    XCTAssertFalse(thawed.frozen);
+    XCTAssertEqual(thawed.intCol, obj.intCol, @"Thawed object should reflect transactions since the original reference was frozen.");
+}
+
+- (void)testThawUpdatedOnDifferentThread {
+    IntObject *obj = managedObject();
+    RLMThreadSafeReference *tsr = [RLMThreadSafeReference referenceWithThreadConfined:obj];
+
+    __block IntObject *frozen;
+    [self dispatchAsyncAndWait:^{
+        IntObject *obj = [RLMRealm.defaultRealm resolveThreadSafeReference:tsr];
+        [RLMRealm.defaultRealm beginWriteTransaction];
+        obj.intCol = 1;
+        [RLMRealm.defaultRealm commitWriteTransaction];
+        frozen = [obj freeze];
+    }];
+
+    IntObject* thawed = [frozen thaw];
+    XCTAssertEqual(thawed.intCol, 0, @"Thaw shouldn't reflect background transactions until main thread realm is refreshed");
+    [RLMRealm.defaultRealm refresh];
+    XCTAssertEqual(thawed.intCol, 1);
+}
+
+- (void)testThawCreatedOnDifferentThread {
+    XCTAssertEqual([[IntObject allObjects] count], 0);
+
+    __block IntObject *frozen;
+    [self dispatchAsyncAndWait:^{
+        IntObject *obj = managedObject();
+        frozen = [obj freeze];
+    }];
+    XCTAssertNil([frozen thaw]);
+    XCTAssertEqual([[IntObject allObjects] count], 0);
+    [RLMRealm.defaultRealm refresh];
+    XCTAssertEqual([[IntObject allObjects] count], 1);
 }
 
 @end

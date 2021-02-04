@@ -39,9 +39,7 @@ class SwiftDynamicDefaultObject: Object {
 }
 
 class ObjectTests: TestCase {
-
     // init() Tests are in ObjectCreationTests.swift
-
     // init(value:) tests are in ObjectCreationTests.swift
 
     func testRealm() {
@@ -1056,6 +1054,10 @@ class ObjectTests: TestCase {
         XCTAssertTrue(frozen.isFrozen)
     }
 
+    func testFreezeUnmanaged() {
+        assertThrows(SwiftStringObject().freeze(), reason: "Unmanaged objects cannot be frozen.")
+    }
+
     func testFreezeDynamicObject() {
         let realm = try! Realm()
         try! realm.write {
@@ -1173,5 +1175,78 @@ class ObjectTests: TestCase {
         XCTAssertEqual(Array(listObj.dateOpt), Array(frozenListObj.dateOpt))
         XCTAssertEqual(Array(listObj.uuid), Array(frozenListObj.uuid))
         XCTAssertEqual(Array(listObj.uuidOpt), Array(frozenListObj.uuidOpt))
+    }
+
+    func testThaw() {
+        let realm = try! Realm()
+        let obj = try! realm.write {
+            realm.create(SwiftBoolObject.self, value: ["boolCol": true])
+        }
+
+        let frozenObj = obj.freeze()
+        XCTAssertTrue(frozenObj.isFrozen)
+        assertThrows(try! frozenObj.realm!.write {}, reason: "Can't perform transactions on a frozen Realm")
+
+        let liveObj = frozenObj.thaw()!
+        XCTAssertFalse(liveObj.isFrozen)
+        XCTAssertEqual(liveObj.boolCol, frozenObj.boolCol)
+
+        try! liveObj.realm!.write({ liveObj.boolCol = false })
+        XCTAssertNotEqual(liveObj.boolCol, frozenObj.boolCol)
+    }
+
+    func testThawUnmanaged() {
+        assertThrows(SwiftBoolObject().thaw(), reason: "Unmanaged objects cannot be thawed.")
+    }
+
+    func testThawDeleted() {
+        let realm = try! Realm()
+        let obj = try! realm.write {
+            realm.create(SwiftBoolObject.self, value: ["boolCol": true])
+        }
+
+        let frozen = obj.freeze()
+        try! realm.write { realm.delete(obj) }
+        XCTAssertNotNil(frozen)
+
+        let thawed = frozen.thaw()
+        XCTAssertNil(thawed, "Thaw should return nil when object was deleted")
+    }
+
+    func testThawPreviousVersion() {
+        let realm = try! Realm()
+        let obj = try! realm.write {
+            realm.create(SwiftBoolObject.self, value: ["boolCol": true])
+        }
+
+        let frozen = obj.freeze()
+        XCTAssertTrue(frozen.isFrozen)
+
+        try! obj.realm!.write({ obj.boolCol = false })
+        XCTAssert(frozen.boolCol, "Frozen objects shouldn't mutate")
+
+        let thawed = frozen.thaw()!
+        XCTAssertFalse(thawed.isFrozen)
+        XCTAssertFalse(thawed.boolCol, "Thaw should reflect transactions since the original reference was frozen")
+    }
+
+    func testThawUpdatedOnDifferentThread() {
+        let obj = try! Realm().write {
+            try! Realm().create(SwiftBoolObject.self, value: ["boolCol": true])
+        }
+        let frozen = obj.freeze()
+        let thawed = frozen.thaw()!
+        let tsr = ThreadSafeReference(to: thawed)
+
+        dispatchSyncNewThread {
+            let resolved = try! Realm().resolve(tsr)!
+            try! Realm().write({ resolved.boolCol = false })
+        }
+
+        XCTAssert(frozen.thaw()!.boolCol)
+        XCTAssert(thawed.boolCol)
+        try! Realm().refresh()
+        XCTAssertFalse(frozen.thaw()!.boolCol)
+        XCTAssertFalse(thawed.boolCol)
     }
 }

@@ -1169,7 +1169,7 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
     }];
 }
 
-- (void)testEnumerateObjectsAfterDeleteDataForRemovedType {
+- (void)testEnumerateObjectTypeRemovedFromSchema {
     [self createTestRealmWithClasses:@[IntObject.class] block:^(RLMRealm *realm) {
         [IntObject createInRealm:realm withValue:@[@1]];
         [IntObject createInRealm:realm withValue:@[@2]];
@@ -1178,18 +1178,17 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
     RLMRealmConfiguration *config = self.config;
     config.objectClasses = @[StringObject.class];
     config.schemaVersion = 1;
+    __block int enumerateCalls = 0;
     config.migrationBlock = ^(RLMMigration *migration, uint64_t) {
         [migration enumerateObjects:IntObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
             XCTAssertNotNil(oldObject);
             XCTAssertNil(newObject);
+            ++enumerateCalls;
+            XCTAssertGreaterThan([oldObject[@"intCol"] intValue], 0);
         }];
-        [migration deleteDataForClassName:IntObject.className];
-        [migration enumerateObjects:IntObject.className block:^(RLMObject *, RLMObject *) {
-            XCTFail(@"should not have enumerated any objects");
-        }];
-        [migration deleteDataForClassName:IntObject.className];
     };
     XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]);
+    XCTAssertEqual(enumerateCalls, 2);
 }
 
 - (void)testEnumerateObjectsAfterDeleteData {

@@ -928,4 +928,22 @@ class RealmTests: TestCase {
         XCTAssertTrue(try! Realm.deleteFiles(for: config))
         XCTAssertFalse(Realm.fileExists(for: config))
     }
+
+    func testThaw() {
+        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 0)
+        let realm = try! Realm()
+        let frozenRealm = realm.freeze()
+        XCTAssert(frozenRealm.isFrozen)
+
+        dispatchSyncNewThread {
+            let thawedRealm = frozenRealm.thaw()
+            XCTAssertFalse(thawedRealm.isFrozen)
+            try! thawedRealm.write {
+                try! Realm().create(SwiftBoolObject.self, value: ["boolCol": true])
+            }
+        }
+        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 0)
+        realm.refresh()
+        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 1)
+    }
 }
