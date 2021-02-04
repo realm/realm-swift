@@ -16,9 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef RLMDictionary_h
-#define RLMDictionary_h
-
 #import <Realm/RLMCollection.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -28,21 +25,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface RLMDictionary<RLMObjectType>: NSObject<RLMCollection, NSFastEnumeration>
 
-/**
- Indicates if the dictionary is frozen.
-
- Frozen dictionaries are immutable and can be accessed from any thread. Frozen dictionaries
- are created by calling `-freeze` on a managed live dictionary. Unmanaged dictionaries are
- never frozen.
- */
-@property (nonatomic, readonly, getter = isFrozen) BOOL frozen;
+#pragma mark - Properties
 
 /**
- The class name of the objects contained in the dictionary.
-
- Will be `nil` if `type` is not RLMPropertyTypeObject.
+ The number of (key, value) pairs in the dictionary.
  */
-@property (nonatomic, readonly, copy, nullable) NSString *objectClassName;
+@property (nonatomic, readonly, assign) NSUInteger count;
 
 /**
  The type of the value objects in the dictionary.
@@ -55,14 +43,88 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, getter = isOptional) BOOL optional;
 
 /**
+ The class name of the objects contained in the dictionary.
+
+ Will be `nil` if `type` is not RLMPropertyTypeObject.
+ */
+@property (nonatomic, readonly, copy, nullable) NSString *objectClassName;
+
+/**
  The Realm which manages the dictionary. Returns `nil` for unmanaged set.
  */
 @property (nonatomic, readonly, nullable) RLMRealm *realm;
 
 /**
- The number of (key, value) pairs in the dictionary.
+ Indicates if the set can no longer be accessed.
  */
-@property (nonatomic, readonly, assign) NSUInteger count;
+@property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
+
+/**
+ Indicates if the dictionary is frozen.
+
+ Frozen dictionaries are immutable and can be accessed from any thread. Frozen dictionaries
+ are created by calling `-freeze` on a managed live dictionary. Unmanaged dictionaries are
+ never frozen.
+ */
+@property (nonatomic, readonly, getter = isFrozen) BOOL frozen;
+
+#pragma mark - Accessing Objects from an Array
+
+/**
+ Returns the value associated with a given key.
+
+ @param key The name of the property.
+
+ @return A value associated with a given key or `nil`.
+ */
+- (nullable id)valueForKey:(nonnull NSString *)key;
+
+/**
+ Returns an array of the dictionary's keys.
+ */
+- (nullable RLMObjectType)objectForKey:(NSString *)key;
+
+/**
+ Returns an array containing the dictionary’s keys.
+ */
+@property(readonly, copy) NSArray<NSString *> *allKeys;
+
+/**
+ Returns an array containing the dictionary’s values.
+ */
+@property(readonly, copy) NSArray<RLMObjectType> *allValues;
+
+/// :nodoc:
+- (nullable RLMObjectType)objectForKeyedSubscript:(NSString *)key;
+
+/**
+ Applies a given block object to the each key-value pair of the dictionary
+ */
+- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(NSString *key, RLMObjectType obj, BOOL *stop))block;
+
+/**
+ Returns an enumerator object that lets you access each value in the dictionary
+ */
+- (NSEnumerator<RLMObjectType> *)objectEnumerator;
+
+#pragma mark - Adding, Removing, and Replacing Objects in an Array
+
+/**
+ Replace the data
+ */
+- (void)setDictionary:(NSDictionary<NSString *, RLMObjectType> *)otherDictionary;
+
+/**
+ Delete all dictionary's keys and values.
+ */
+- (void)removeAllObjects;
+
+/**
+ Delete dictionary's values for a given keys.
+ */
+- (void)removeObjectsForKeys:(NSArray<NSString *> *)keyArray;
+
+#pragma mark - Notifications
 
 /**
  Registers a block to be called each time the dictionary changes.
@@ -122,19 +184,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          NSError *_Nullable error))block
 __attribute__((warn_unused_result));
 
-/**
- Returns the value associated with a given key.
-
- @param key The name of the property.
-
- @return A value associated with a given key or `nil`.
- */
-- (nullable id)valueForKey:(nonnull NSString *)key;
-
-/**
- Indicates if the set can no longer be accessed.
- */
-@property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
+#pragma mark - Freeze
 
 /**
  Returns a frozen (immutable) snapshot of a dictionary.
@@ -156,49 +206,6 @@ __attribute__((warn_unused_result));
 
 //- (instancetype)thaw;
 
-/**
- Returns an array containing the dictionary’s keys.
- */
-@property(readonly, copy) NSArray<NSString *> *allKeys;
-
-/**
- Returns an array containing the dictionary’s values.
- */
-@property(readonly, copy) NSArray<RLMObjectType> *allValues;
-
-/**
- Returns an array of the dictionary's keys.
- */
-- (nullable RLMObjectType)objectForKey:(NSString *)key;
-
-/// :nodoc:
-- (nullable RLMObjectType)objectForKeyedSubscript:(NSString *)key;
-
-/**
- Applies a given block object to the each key-value pair of the dictionary
- */
-- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(NSString *key, RLMObjectType obj, BOOL *stop))block;
-
-/**
- Returns an enumerator object that lets you access each value in the dictionary
- */
-- (NSEnumerator<RLMObjectType> *)objectEnumerator;
-
-/**
- Replace the data
- */
-- (void)setDictionary:(NSDictionary<NSString *, RLMObjectType> *)otherDictionary;
-
-/**
- Delete all dictionary's keys and values.
- */
-- (void)removeAllObjects;
-
-/**
- Delete dictionary's values for a given keys.
- */
-- (void)removeObjectsForKeys:(NSArray<NSString *> *)keyArray;
-
 #pragma mark - Unavailable Methods
 /**
  `-[RLMDictionary init]` is not available because `RLMDictionary`s cannot be created directly.
@@ -213,5 +220,3 @@ __attribute__((warn_unused_result));
 
 @end
 NS_ASSUME_NONNULL_END
-
-#endif /* RLMDictionary_h */

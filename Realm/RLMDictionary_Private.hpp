@@ -16,9 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef RLMDictionary_Private_hpp
-#define RLMDictionary_Private_hpp
-
 #import <Realm/RLMDictionary.h>
 #include <realm/dictionary.hpp>
 
@@ -33,5 +30,3 @@ class Dictionary;
 }
 
 @end
-
-#endif /* RLMDictionary_Private_hpp */
