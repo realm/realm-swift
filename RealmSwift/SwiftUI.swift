@@ -84,12 +84,10 @@ extension Optional: RealmSubscribable where Wrapped: RealmSubscribable & ThreadC
             subscriber.receive(completion: completion)
         }
     }
-    // swiftlint:disable identifier_name
     public func _observe<S>(on queue: DispatchQueue?,
                             _ subscriber: S) -> NotificationToken where Self == S.Input, S: Subscriber, S.Failure == Error {
         return self?._observe(on: queue, WrappedSubscriber(subscriber: AnySubscriber(subscriber))) ?? OptionalNotificationToken()
     }
-    // swiftlint:disable identifier_name
     public func _observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Failure == Never, S.Input == Void {
         if self?.realm != nil {
             return self?._observe(subscriber) ?? OptionalNotificationToken()
