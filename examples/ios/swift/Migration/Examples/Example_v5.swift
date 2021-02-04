@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#if SCHEMA_VERSION_5
+#if !SCHEMA_VERSION_1 && !SCHEMA_VERSION_2 && !SCHEMA_VERSION_3 && !SCHEMA_VERSION_4
 
 import Foundation
 import RealmSwift
