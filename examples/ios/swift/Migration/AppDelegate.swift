@@ -50,8 +50,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     // Any version before the current versions will be migrated to check if all version combinations work.
     private func performMigration() {
-        for realmVersion in 0..<schemaVersion {
-            let url = realmUrl(for: realmVersion, usingTemplate: true)
+        for oldSchemaVersion in 0..<schemaVersion {
+            let url = realmUrl(for: oldSchemaVersion, usingTemplate: true)
             let realmConfiguration = Realm.Configuration(fileURL: url, schemaVersion: UInt64(schemaVersion), migrationBlock: migrationBlock)
             try! Realm.performMigration(for: realmConfiguration)
             let realm = try! Realm(configuration: realmConfiguration)
@@ -74,5 +74,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         return destinationUrl
     }
-
 }
