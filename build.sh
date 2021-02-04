@@ -284,12 +284,8 @@ fi
 
 copy_core() {
     local src="$1"
-    if [ -e .git ]; then
-        git clean -xfdq core
-    else
-        rm -r core
-        mkdir core
-    fi
+    rm -rf core
+    mkdir core
     ditto "$src" core
 
     # XCFramework processing only copies the "realm" headers, so put the third-party ones in a known location
@@ -306,17 +302,19 @@ download_common() {
     url="${REALM_BASE_URL}/core/realm-monorepo-xcframework-v${version}.tar.xz"
 
     # First check if we need to do anything
-    if [ -e core/version.txt ]; then
-        if [ "$(cat core/version.txt)" == "$version" ]; then
-            echo "Version ${version} already present"
-            exit 0
+    if [ -e core ]; then
+        if [ -e core/version.txt ]; then
+            if [ "$(cat core/version.txt)" == "$version" ]; then
+                echo "Version ${version} already present"
+                exit 0
+            else
+                echo "Switching from version $(cat core/version.txt) to ${version}"
+            fi
         else
-            echo "Switching from version $(cat core/version.txt) to ${version}"
-        fi
-    else
-        if [ "$(find core -name librealm-monorepo.a)" ]; then
-            echo 'Using existing custom core build without checking version'
-            exit 0
+            if [ "$(find core -name librealm-monorepo.a)" ]; then
+                echo 'Using existing custom core build without checking version'
+                exit 0
+            fi
         fi
     fi
 

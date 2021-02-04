@@ -18,17 +18,6 @@
 			name = "Download BaaS";
 			productName = "Download BaaS";
 		};
-		C04B4BD71B55C47600FAE58E /* Download Core Library */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Download Core Library" */;
-			buildPhases = (
-				5D659E7F1BE04556006515A0 /* Download Core and Sync */,
-			);
-			dependencies = (
-			);
-			name = "Download Core Library";
-			productName = "Swift Version";
-		};
 		E83EAC791BED3D880085CCD2 /* SwiftLint */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = E83EAC7C1BED3D880085CCD2 /* Build configuration list for PBXAggregateTarget "SwiftLint" */;
@@ -469,20 +458,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3F8F3578212B6FAE0035E7B8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
-			remoteInfo = "Prepare Generated Files";
-		};
-		3F8F357A212B6FB40035E7B8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
-			remoteInfo = "Prepare Generated Files";
-		};
 		3F9D917E2152D41A00474F09 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -552,20 +527,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 5DD7557B1BE056DE002800DA;
 			remoteInfo = "Realm iOS static";
-		};
-		5DD755DE1BE05B26002800DA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
-			remoteInfo = "Set Swift Version";
-		};
-		C04B4BDC1B55C51500FAE58E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
-			remoteInfo = "Swift Version";
 		};
 		E8267FB51D90B79000E001C7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1732,7 +1693,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				3F8F357B212B6FB40035E7B8 /* PBXTargetDependency */,
 			);
 			name = Realm;
 			productName = Realm;
@@ -1791,7 +1751,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				3F8F3579212B6FAE0035E7B8 /* PBXTargetDependency */,
 			);
 			name = "Realm iOS static";
 			productName = Realm;
@@ -1833,7 +1792,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				C04B4BDD1B55C51500FAE58E /* PBXTargetDependency */,
 				5DD755D41BE0582A002800DA /* PBXTargetDependency */,
 				3F9D917F2152D41A00474F09 /* PBXTargetDependency */,
 				3F9D918A2152D47B00474F09 /* PBXTargetDependency */,
@@ -1856,7 +1814,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				5DD755DF1BE05B26002800DA /* PBXTargetDependency */,
 				5DD755D21BE05828002800DA /* PBXTargetDependency */,
 				5D6157021BE0A3A100A4BD3F /* PBXTargetDependency */,
 			);
@@ -1908,10 +1865,6 @@
 					5DD7557B1BE056DE002800DA = {
 						ProvisioningStyle = Automatic;
 					};
-					C04B4BD71B55C47600FAE58E = {
-						CreatedOnToolsVersion = 6.4;
-						LastSwiftMigration = 0900;
-					};
 					E8267FB11D90B79000E001C7 = {
 						LastSwiftMigration = 1020;
 					};
@@ -1951,7 +1904,6 @@
 				5D660FD71BE98C7C0021E04F /* RealmSwift Tests */,
 				E8267FB11D90B79000E001C7 /* ObjectServerTests */,
 				E856D1DE195614A400FB2FCF /* iOS static tests */,
-				C04B4BD71B55C47600FAE58E /* Download Core Library */,
 				E83EAC791BED3D880085CCD2 /* SwiftLint */,
 				3F1A5E711992EB7400F45F4C /* TestHost */,
 				3F9D91802152D42F00474F09 /* TestHost static */,
@@ -2115,21 +2067,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "exec \"${SRCROOT}/scripts/generate-rlmversion.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		5D659E7F1BE04556006515A0 /* Download Core and Sync */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Download Core and Sync";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "sh build.sh download-core\n";
 			showEnvVarsInLog = 0;
 		};
 		E8267FB81D90B79000E001C7 /* Get Version Number */ = {
@@ -2504,16 +2441,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		3F8F3579212B6FAE0035E7B8 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C04B4BD71B55C47600FAE58E /* Download Core Library */;
-			targetProxy = 3F8F3578212B6FAE0035E7B8 /* PBXContainerItemProxy */;
-		};
-		3F8F357B212B6FB40035E7B8 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C04B4BD71B55C47600FAE58E /* Download Core Library */;
-			targetProxy = 3F8F357A212B6FB40035E7B8 /* PBXContainerItemProxy */;
-		};
 		3F9D917F2152D41A00474F09 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
@@ -2563,16 +2490,6 @@
 			isa = PBXTargetDependency;
 			target = 5DD7557B1BE056DE002800DA /* Realm iOS static */;
 			targetProxy = 5DD755D31BE0582A002800DA /* PBXContainerItemProxy */;
-		};
-		5DD755DF1BE05B26002800DA /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C04B4BD71B55C47600FAE58E /* Download Core Library */;
-			targetProxy = 5DD755DE1BE05B26002800DA /* PBXContainerItemProxy */;
-		};
-		C04B4BDD1B55C51500FAE58E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C04B4BD71B55C47600FAE58E /* Download Core Library */;
-			targetProxy = C04B4BDC1B55C51500FAE58E /* PBXContainerItemProxy */;
 		};
 		E8267FB41D90B79000E001C7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2716,22 +2633,6 @@
 			baseConfigurationReference = 5D659E741BE03E0D006515A0 /* Realm iOS static.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULE_DEBUGGING = NO;
-			};
-			name = Release;
-		};
-		C04B4BD81B55C47600FAE58E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = "";
-			};
-			name = Debug;
-		};
-		C04B4BD91B55C47600FAE58E /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = "";
 			};
 			name = Release;
 		};
@@ -2883,15 +2784,6 @@
 			buildConfigurations = (
 				5DD755CD1BE056DE002800DA /* Debug */,
 				5DD755CE1BE056DE002800DA /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Download Core Library" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C04B4BD81B55C47600FAE58E /* Debug */,
-				C04B4BD91B55C47600FAE58E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
