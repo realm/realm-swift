@@ -187,6 +187,7 @@ struct SearchView: View {
 
 struct Footer: View {
     @FetchRealmResults(ReminderList.self) var lists
+    @Environment(\.realm) var realm
 
     var body: some View {
         HStack {
@@ -222,10 +223,38 @@ struct ContentView: View {
     }
 }
 
-#if DEBUG
-struct Content_Preview: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+struct MultiRealmContentView: View {
+    struct RealmView: View {
+        @Environment(\.realm) var realm
+        var body: some View {
+            Text(realm.configuration.inMemoryIdentifier ?? "no memory identifier")
+                .accessibilityIdentifier("test_text_view")
+        }
+    }
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                NavigationLink("Realm A", destination: RealmView().environment(\.realmConfiguration, Realm.Configuration(inMemoryIdentifier: "realm_a")))
+                NavigationLink("Realm B", destination: RealmView().environment(\.realmConfiguration, Realm.Configuration(inMemoryIdentifier: "realm_b")))
+            }
+        }
     }
 }
-#endif
+
+@main
+struct App: SwiftUI.App {
+    var body: some Scene {
+        if let realmPath = ProcessInfo.processInfo.environment["REALM_PATH"] {
+            Realm.Configuration.defaultConfiguration =
+                Realm.Configuration(fileURL: URL(string: realmPath)!, deleteRealmIfMigrationNeeded: true)
+        } else {
+            Realm.Configuration.defaultConfiguration =
+                Realm.Configuration(deleteRealmIfMigrationNeeded: true)
+        }
+        return WindowGroup {
+            ProcessInfo.processInfo.environment["test_type"] == "multi_realm_test" ? AnyView(MultiRealmContentView()) : AnyView(ContentView())
+        }
+    }
+}
+

@@ -64,13 +64,9 @@ class SwiftUITests: XCTestCase {
         app.launchEnvironment = [
             "REALM_PATH": realmPath.absoluteString
         ]
-        app.launch()
 
         try realm.write {
             realm.deleteAll()
-        }
-        realm.schema.objectSchema.forEach {
-            print($0.className)
         }
     }
 
@@ -87,6 +83,7 @@ class SwiftUITests: XCTestCase {
     }
 
     func testSampleApp() throws {
+        app.launch()
         // assert realm is empty
         XCTAssertEqual(realm.objects(ReminderList.self).count, 0)
 
@@ -155,5 +152,17 @@ class SwiftUITests: XCTestCase {
         app.tables.cells.firstMatch.swipeLeft()
         app.buttons.matching(identifier: "Delete").firstMatch.tap()
         XCTAssertEqual(realm.objects(ReminderList.self).count, 0)
+    }
+
+    func testMultipleEnvironmentRealms() {
+        app.launchEnvironment["test_type"] = "multi_realm_test"
+        app.launch()
+
+        app.buttons["Realm A"].tap()
+        XCTAssertEqual(app.staticTexts["test_text_view"].label, "realm_a")
+        app.buttons["Back"].tap()
+
+        app.buttons["Realm B"].tap()
+        XCTAssertEqual(app.staticTexts["test_text_view"].label, "realm_b")
     }
 }

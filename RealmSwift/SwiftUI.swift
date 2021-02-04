@@ -676,12 +676,22 @@ struct RealmEnvironmentKey: EnvironmentKey {
 
 @available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
 extension EnvironmentValues {
-    var realmConfiguration: Realm.Configuration {
+    /// The current `Realm.Configuration` that the view should use.
+    public var realmConfiguration: Realm.Configuration {
         get {
             return self[RealmEnvironmentKey]
         }
         set {
             self[RealmEnvironmentKey] = newValue
+        }
+    }
+    /// The current `Realm` that the view should use.
+    public var realm: Realm {
+        get {
+            return try! Realm(configuration: self[RealmEnvironmentKey])
+        }
+        set {
+            self[RealmEnvironmentKey] = newValue.configuration
         }
     }
 }
