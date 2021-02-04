@@ -48,6 +48,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
+    // Any version before the current versions will be migrated to check if all version combinations work.
     private func performMigration() {
         for realmVersion in 0..<schemaVersion {
             let url = realmUrl(for: realmVersion, usingTemplate: true)

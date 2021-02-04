@@ -149,6 +149,7 @@ let migrationBlock: MigrationBlock = { migration, oldSchemaVersion in
     if oldSchemaVersion < 5 {
         // Nothing to do here. The `Address` gets migrated to a `LinkingObject` automatically if
         // it has only one linked object.
+        // See https://github.com/realm/realm-cocoa/issues/7060
     }
 }
 
