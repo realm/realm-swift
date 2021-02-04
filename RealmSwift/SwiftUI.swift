@@ -84,13 +84,13 @@ extension Optional: RealmSubscribable where Wrapped: RealmSubscribable & ThreadC
             subscriber.receive(completion: completion)
         }
     }
-
+    // swiftlint:disable identifier_name
     public func _observe<S>(on queue: DispatchQueue?,
-                            _ subscriber: S) -> NotificationToken where Self == S.Input, S : Subscriber, S.Failure == Error {
+                            _ subscriber: S) -> NotificationToken where Self == S.Input, S: Subscriber, S.Failure == Error {
         return self?._observe(on: queue, WrappedSubscriber(subscriber: AnySubscriber(subscriber))) ?? OptionalNotificationToken()
     }
-
-    public func _observe<S>(_ subscriber: S) -> NotificationToken where S : Subscriber, S.Failure == Never, S.Input == Void {
+    // swiftlint:disable identifier_name
+    public func _observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Failure == Never, S.Input == Void {
         if self?.realm != nil {
             return self?._observe(subscriber) ?? OptionalNotificationToken()
         } else {
@@ -99,7 +99,6 @@ extension Optional: RealmSubscribable where Wrapped: RealmSubscribable & ThreadC
     }
 }
 
-@available(iOS 9.0, macOS 10.9, tvOS 13.0, watchOS 6.0, *)
 extension Optional: ThreadConfined where Wrapped: ThreadConfined {
     public var realm: Realm? {
         return self?.realm
@@ -150,9 +149,9 @@ private final class KVO: NSObject {
             }
         }
     }
-    private let _receive: () -> ()
+    private let _receive: () -> Void
 
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         _receive()
     }
 
@@ -181,7 +180,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
         }
     }
 
-    public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
+    public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
         subscribers.append(AnySubscriber(subscriber))
         if value.realm != nil, let value = value.thaw() {
             // if the value is managed
@@ -660,7 +659,7 @@ extension ThreadConfined where Self: ObjectBase {
      - parameter keyPath The key path to the member property.
      - returns A `Binding` to the member property.
      */
-    public func bind<V: _ManagedPropertyType>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V>  {
+    public func bind<V: _ManagedPropertyType>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V> {
         createBinding(self.realm != nil ? self.thaw() ?? self : self, forKeyPath: keyPath)
     }
 }

@@ -84,7 +84,7 @@ struct FocusableTextField: UIViewRepresentable {
 
     func updateUIView(_ uiView: UITextField, context: UIViewRepresentableContext<Self>) {
         uiView.text = text
-        if isFirstResponder && !context.coordinator.didBecomeFirstResponder  {
+        if isFirstResponder && !context.coordinator.didBecomeFirstResponder {
             uiView.becomeFirstResponder()
             context.coordinator.didBecomeFirstResponder = true
         }
@@ -170,7 +170,7 @@ struct ReminderListRowView: View {
     var body: some View {
         HStack {
             Image(systemName: list.icon)
-            TextField("List Name", text: $list.name)//.accessibility(identifier: "listRow")
+            TextField("List Name", text: $list.name)
             Spacer()
             Text("\(list.reminders.count)")
         }.frame(minWidth: 100)
@@ -267,6 +267,7 @@ struct ContentView: View {
 }
 
 #if DEBUG
+// swiftlint:disable type_name
 struct Content_Preview: PreviewProvider {
     static var previews: some View {
         ContentView()
