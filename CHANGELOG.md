@@ -3,6 +3,12 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * Add support for "thawing" objects. `Realm`, `Results`, `List` and `Object` now
 have `thaw()` methods which return a live copy of the frozen object. This enables app behvaior where a frozen object can be made live again in order to mutate values. For example, first freezing an object passed into UI view, then thawing the object in the view to update values.
+* Add `@StateRealmObject` for SwiftUI support. This property wrapper type instantiates an observable object on a View. Use in place of `SwiftUI.StateObject` for Realm `Object`, `List`, and `EmbeddedObject` types.
+* Add `@ObservedObject` for SwiftUI support. This property wrapper type subscribes to an observable object and invalidates a view whenever the observable object changes. Use in place of `SwiftUI.ObservedObject` for Realm `Object`, `List`, or `EmbeddedObject` types.
+* Add `@FetchRealmResults` for SwiftUI support. This property wrapper type retrieves results from a Realm. The results use the realm configuration provided by the environment value `EnvironmentValues.realmConfiguration`.
+* Add `EnvironmentValues.realm` and `EnvironmentValues.realmConfiguration` for `Realm` and `Realm.Configuration` types respectively. Values can be injected into views using the `View.environment` method, e.g., `MyView().environment(\.realmConfiguration, Realm.Configuration(fileURL: URL(fileURLWithPath: "myRealmPath.realm")))`. The value can then be declared on the example `MyView` as `@Environment(\.realm) var realm`.
+* Add `SwiftUI.Binding` extensions where `Value` is of type `Object`, `List`, or `EmbeddedObject`. These extensions expose methods for wrapped write transactions, to avoid boilerplate within views, e.g., `TextField("name", $personObject.name)` or `$personList.append(Person())`.
+* Add `Object.bind` and `EmbeddedObject.bind` for SwiftUI support. This allows you to create bindings of realm properties when a propertyWrapper is not available for you to do so, e.g., `TextField("name", personObject.bind(\.name))`.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)

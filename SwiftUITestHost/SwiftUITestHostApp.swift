@@ -187,7 +187,6 @@ struct SearchView: View {
 
 struct Footer: View {
     @FetchRealmResults(ReminderList.self) var lists
-    @Environment(\.realm) var realm
 
     var body: some View {
         HStack {
@@ -257,4 +256,3 @@ struct App: SwiftUI.App {
         }
     }
 }
-

@@ -419,12 +419,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     }
 
     public var wrappedValue: Value {
-        get {
-            storage.configuration != nil ? storage.value.freeze() : storage.value
-        }
-        set {
-            print("trying to set")
-        }
+        storage.configuration != nil ? storage.value.freeze() : storage.value
     }
 
     public var projectedValue: Self {
@@ -541,7 +536,7 @@ extension Binding where Value: ObjectBase & ThreadConfined {
 public protocol BoundCollection {
     associatedtype Value
 
-    var wrappedValue: Value { get set }
+    var wrappedValue: Value { get }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
@@ -573,11 +568,11 @@ public extension BoundCollection where Value: RealmCollection {
     }
     /// :nodoc:
     func remove<V>(atOffsets offsets: IndexSet) where Value == Results<V>, V: ObjectBase {
-        guard let results = self.wrappedValue.thaw() else {
+        guard let results = self.wrappedValue.thaw(), let realm = results.realm else {
             return
         }
-        try! results.realm!.write {
-            results.realm!.delete(Array(offsets.map { results[$0] }))
+        try? realm.write {
+            realm.delete(Array(offsets.map { results[$0] }))
         }
     }
     /// :nodoc:
@@ -629,6 +624,7 @@ extension Binding: BoundCollection where Value: RealmCollection {
 
 @available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
 extension Binding where Value: ObjectKeyIdentifiable & ThreadConfined {
+    /// :nodoc:
     public func delete() {
         guard let realm = self.wrappedValue.realm else {
             return
@@ -638,6 +634,7 @@ extension Binding where Value: ObjectKeyIdentifiable & ThreadConfined {
         }
     }
 }
+
 @available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
 extension ObservedRealmObject.Wrapper where ObjectType: ObjectBase {
     public func delete() {
@@ -650,7 +647,6 @@ extension ObservedRealmObject.Wrapper where ObjectType: ObjectBase {
     }
 }
 
-#if swift(<5.5)
 @available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
 extension ThreadConfined where Self: ObjectBase {
     /**
@@ -668,7 +664,6 @@ extension ThreadConfined where Self: ObjectBase {
         createBinding(self.realm != nil ? self.thaw() ?? self : self, forKeyPath: keyPath)
     }
 }
-#endif
 
 struct RealmEnvironmentKey: EnvironmentKey {
     static let defaultValue = Realm.Configuration()
