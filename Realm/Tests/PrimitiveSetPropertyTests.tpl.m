@@ -520,7 +520,7 @@ static double average(NSArray *values) {
         [self addObjects];
     }
 
-    { ^nl NSUInteger i = 0; ^nl NSArray *values = $values; ^nl for (id value in $set) { ^nl XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); ^nl } ^nl } ^nl
+    { ^nl NSArray *values = $values; ^nl for (id value in $set) { ^nl XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); ^nl } ^nl } ^nl
 }
 
 - (void)testValueForKeySelf {

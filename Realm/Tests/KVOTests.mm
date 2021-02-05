@@ -1304,7 +1304,6 @@ public:
 }
 
 - (void)testSetKVO {
-    NSDictionary *note;
     KVOLinkObject2 *obj = [self createLinkObject];
     KVOLinkObject2 *obj2 = [self createLinkObject];
     KVORecorder r(self, obj, @"set");

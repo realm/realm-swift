@@ -588,7 +588,6 @@
     obj = results[0];
     XCTAssertEqualObjects(obj[column], val, @"%@", column);
 
-    RLMSet *s = [(SetPropertyObject *)[[SetOfAllTypesObject allObjectsInRealm:realm] firstObject] set];
     results = [ar sortedResultsUsingKeyPath:column ascending:ascending];
     obj = results[0];
     XCTAssertEqualObjects(obj[column], val, @"%@", column);

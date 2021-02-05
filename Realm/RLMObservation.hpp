@@ -21,7 +21,6 @@
 #import <realm/obj.hpp>
 #import <realm/object-store/binding_context.hpp>
 #import <realm/table.hpp>
-#import <Realm/RLMConstants.h>
 
 @class RLMObjectBase, RLMRealm, RLMSchema, RLMProperty, RLMObjectSchema;
 class RLMClassInfo;

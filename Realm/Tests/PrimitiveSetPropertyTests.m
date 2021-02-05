@@ -3183,7 +3183,6 @@ static double average(NSArray *values) {
     }
 
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[@NO, @YES]; 
      for (id value in unmanaged.boolObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3191,7 +3190,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[@2, @3]; 
      for (id value in unmanaged.intObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3199,7 +3197,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[@2.2f, @3.3f]; 
      for (id value in unmanaged.floatObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3207,7 +3204,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[@2.2, @3.3]; 
      for (id value in unmanaged.doubleObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3215,7 +3211,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[@"a", @"bc"]; 
      for (id value in unmanaged.stringObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3223,7 +3218,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[data(1), data(2)]; 
      for (id value in unmanaged.dataObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3231,7 +3225,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[date(1), date(2)]; 
      for (id value in unmanaged.dateObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3239,7 +3232,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[decimal128(1), decimal128(2)]; 
      for (id value in unmanaged.decimalObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3247,7 +3239,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[objectId(1), objectId(2)]; 
      for (id value in unmanaged.objectIdObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3255,7 +3246,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]; 
      for (id value in unmanaged.uuidObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3263,7 +3253,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, @NO, @YES]; 
      for (id value in optUnmanaged.boolObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3271,7 +3260,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, @2, @3]; 
      for (id value in optUnmanaged.intObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3279,7 +3267,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, @2.2f, @3.3f]; 
      for (id value in optUnmanaged.floatObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3287,7 +3274,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, @2.2, @3.3]; 
      for (id value in optUnmanaged.doubleObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3295,7 +3281,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, @"a", @"bc"]; 
      for (id value in optUnmanaged.stringObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3303,7 +3288,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, data(1), data(2)]; 
      for (id value in optUnmanaged.dataObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3311,7 +3295,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, date(1), date(2)]; 
      for (id value in optUnmanaged.dateObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3319,7 +3302,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, decimal128(1), decimal128(2)]; 
      for (id value in optUnmanaged.decimalObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3327,7 +3309,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, objectId(1), objectId(2)]; 
      for (id value in optUnmanaged.objectIdObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3335,7 +3316,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000")]; 
      for (id value in optUnmanaged.uuidObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3343,7 +3323,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[@NO, @YES]; 
      for (id value in managed.boolObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3351,7 +3330,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[@2, @3]; 
      for (id value in managed.intObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3359,7 +3337,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[@2.2f, @3.3f]; 
      for (id value in managed.floatObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3367,7 +3344,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[@2.2, @3.3]; 
      for (id value in managed.doubleObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3375,7 +3351,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[@"a", @"bc"]; 
      for (id value in managed.stringObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3383,7 +3358,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[data(1), data(2)]; 
      for (id value in managed.dataObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3391,7 +3365,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[date(1), date(2)]; 
      for (id value in managed.dateObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3399,7 +3372,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[decimal128(1), decimal128(2)]; 
      for (id value in managed.decimalObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3407,7 +3379,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[objectId(1), objectId(2)]; 
      for (id value in managed.objectIdObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3415,7 +3386,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000")]; 
      for (id value in managed.uuidObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3423,7 +3393,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, @NO, @YES]; 
      for (id value in optManaged.boolObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3431,7 +3400,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, @2, @3]; 
      for (id value in optManaged.intObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3439,7 +3407,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, @2.2f, @3.3f]; 
      for (id value in optManaged.floatObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3447,7 +3414,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, @2.2, @3.3]; 
      for (id value in optManaged.doubleObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3455,7 +3421,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, @"a", @"bc"]; 
      for (id value in optManaged.stringObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3463,7 +3428,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, data(1), data(2)]; 
      for (id value in optManaged.dataObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3471,7 +3435,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, date(1), date(2)]; 
      for (id value in optManaged.dateObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3479,7 +3442,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, decimal128(1), decimal128(2)]; 
      for (id value in optManaged.decimalObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3487,7 +3449,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, objectId(1), objectId(2)]; 
      for (id value in optManaged.objectIdObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 
@@ -3495,7 +3456,6 @@ static double average(NSArray *values) {
      } 
     
     { 
-     NSUInteger i = 0; 
      NSArray *values = @[NSNull.null, uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000")]; 
      for (id value in optManaged.uuidObj) { 
      XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); 

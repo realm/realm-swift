@@ -935,7 +935,6 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
         [[IntObject objectsInRealm:realm where:@"intCol = 1"] setValue:@10 forKey:@"intCol"];
     });
     ExpectNoChange(self, ^(RLMRealm *realm) {
-        RLMSet *set = [[[SetPropertyObject allObjectsInRealm:realm] firstObject] intSet];
         [[IntObject objectsInRealm:realm where:@"intCol = 9"] setValue:@11 forKey:@"intCol"];
     });
 }

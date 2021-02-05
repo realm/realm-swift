@@ -139,7 +139,6 @@
     [setObj2.stringObj addObjects:@[@"one", @"two", @"three"]];
     [setObj3.stringObj addObjects:@[@"one", @"two", @"three", @"four", @"five"]];
     [realm commitWriteTransaction];
-    AllPrimitiveSets *unman = [AllPrimitiveSets new];
 
     XCTAssertThrows([setObj1.stringObj unionSet:setObj2.stringObj]);
     XCTAssertThrows([setObj2.stringObj unionSet:setObj1.stringObj]);
@@ -164,7 +163,6 @@
     [setObj2.stringObj addObjects:@[@"one", @"two", @"three"]];
     [setObj3.stringObj addObjects:@[@"one", @"two", @"three", @"four", @"five"]];
     [realm commitWriteTransaction];
-    AllPrimitiveSets *unman = [AllPrimitiveSets new];
 
     XCTAssertThrows([setObj1.stringObj minusSet:setObj2.stringObj]);
     XCTAssertThrows([setObj2.stringObj minusSet:setObj1.stringObj]);

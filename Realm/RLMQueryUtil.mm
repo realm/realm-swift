@@ -1093,7 +1093,6 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
         return;
     }
 
-    auto col = collectionOperation.column().column();
     auto type = collectionOperation.column().type();
     switch (collectionOperation.type()) {
         case CollectionOperation::Count:

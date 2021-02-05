@@ -310,7 +310,7 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
 
 - (BOOL)isEqualToSet:(RLMSet<id> *)set {
     RLMManagedSet *rhs = [self managedObjectFrom:set];
-    return [self isEqual:set];
+    return [self isEqual:rhs];
 }
 
 - (void)setSet:(RLMSet<id> *)set {

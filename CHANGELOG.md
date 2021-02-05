@@ -2,8 +2,6 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add `RLMSet`/`MutableSet<>` datatype. This is a Set collection type used for storing distinct values in a collection.
-
-* None.
 * Add support for "thawing" objects. `Realm`, `Results`, `List` and `Object`
   now have `thaw()` methods which return a live copy of the frozen object. This
   enables app behvaior where a frozen object can be made live again in order to
@@ -12,7 +10,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add Xcode 12.4 binaries to the release package.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * Inserting a date into a synced collection via `AnyBSON.datetime(...)` would be of type `Timestamp` and not `Date`. 
   This could break synced objects with a `Date` property  ([#6654](https://github.com/realm/realm-cocoa/issues/6654), since v10.0.0).
 * Fixed an issue where creating an object after file format upgrade may fail
