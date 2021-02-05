@@ -46,9 +46,11 @@ private func createBinding<T: ThreadConfined, V>(_ value: T,
         guard !value.isInvalidated else {
             return
         }
-        value.realm?.beginWrite()
+        if value.realm?.isInWriteTransaction == false {
+            value.realm?.beginWrite()
+        }
         value[keyPath: keyPath] = newValue
-        try! value.realm?.commitWrite()
+        try? value.realm?.commitWrite()
     })
 }
 
@@ -454,12 +456,21 @@ public extension BoundCollection where Value: RealmCollection {
     typealias Index = Value.Index
     /// :nodoc:
     typealias Indices = Value.Indices
+
+    private func safeWrite(_ value: Value, _ block: () -> Void) {
+        if value.realm?.isInWriteTransaction == false {
+            value.realm?.beginWrite()
+        }
+        block()
+        try? value.realm?.commitWrite()
+    }
     /// :nodoc:
     func remove<V>(at index: Index) where Value == List<V> {
-        let list = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
-        list.realm?.beginWrite()
-        list.remove(at: index)
-        try? list.realm?.commitWrite()
+        let list = self.wrappedValue.realm != nil ?
+            self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
+        safeWrite(list) {
+            list.remove(at: index)
+        }
     }
     /// :nodoc:
     func remove<V>(_ object: V) where Value == Results<V>, V: ObjectBase & ThreadConfined {
@@ -469,7 +480,7 @@ public extension BoundCollection where Value: RealmCollection {
               let realm = results.realm else {
             return
         }
-        try? realm.write {
+        safeWrite(results) {
             realm.delete(results[index])
         }
     }
@@ -478,50 +489,53 @@ public extension BoundCollection where Value: RealmCollection {
         guard let results = self.wrappedValue.thaw(), let realm = results.realm else {
             return
         }
-        try? realm.write {
+        safeWrite(results) {
             realm.delete(Array(offsets.map { results[$0] }))
         }
     }
     /// :nodoc:
-    func remove<V>(atOffsets offsets: IndexSet) where Value: List<V> {
+    func remove<V>(atOffsets offsets: IndexSet) where Value == List<V> {
         let list = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
-        list.realm?.beginWrite()
-        list.remove(atOffsets: offsets)
-        try? list.realm?.commitWrite()
+        safeWrite(list) {
+            list.remove(atOffsets: offsets)
+        }
     }
     /// :nodoc:
-    func move<V>(fromOffsets offsets: IndexSet, toOffset destination: Int) where Value: List<V> {
-        let list = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
-        list.realm?.beginWrite()
-        list.move(fromOffsets: offsets, toOffset: destination)
-        try? list.realm?.commitWrite()
+    func move<V>(fromOffsets offsets: IndexSet, toOffset destination: Int) where Value == List<V> {
+        let list = self.wrappedValue.realm != nil ?
+            self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
+        safeWrite(list) {
+            list.move(fromOffsets: offsets, toOffset: destination)
+        }
     }
     /// :nodoc:
-    func append<V>(_ value: Value.Element) where Value: List<V>, Value.Element: RealmCollectionValue {
-        let list = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
-        list.realm?.beginWrite()
-        list.append(value)
-        try? list.realm?.commitWrite()
+    func append<V>(_ value: Value.Element) where Value == List<V>, Value.Element: RealmCollectionValue {
+        let list = self.wrappedValue.realm != nil ?
+            self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
+        safeWrite(list) {
+            list.append(value)
+        }
     }
     /// :nodoc:
-    func append<V>(_ value: Value.Element) where Value: List<V>, Value.Element: ObjectBase & ThreadConfined {
+    func append<V>(_ value: Value.Element) where Value == List<V>, Value.Element: ObjectBase & ThreadConfined {
         let list = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
         // if the value is unmanaged but the list is managed, we are adding this value to the realm
         if value.realm == nil && list.realm != nil {
             KVO.observedObjects[value]?.cancel()
         }
-        list.realm?.beginWrite()
-        list.append(value)
-        try? list.realm?.commitWrite()
+        safeWrite(list) {
+            list.append(value)
+        }
     }
     /// :nodoc:
     func append<V>(_ value: Value.Element) where Value == Results<V>, V: Object {
-        let results = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
+        let results = self.wrappedValue.realm != nil ?
+            self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
         if value.realm == nil && results.realm != nil {
             KVO.observedObjects[value]?.cancel()
         }
-        try! results.realm!.write {
-            results.realm!.add(value)
+        safeWrite(results) {
+            results.realm?.add(value)
         }
     }
 }
@@ -536,9 +550,11 @@ extension Binding where Value: ObjectKeyIdentifiable & ThreadConfined {
         guard let realm = self.wrappedValue.realm else {
             return
         }
-        try? realm.write {
-            realm.delete(self.wrappedValue)
+        if !realm.isInWriteTransaction {
+            realm.beginWrite()
         }
+        realm.delete(self.wrappedValue)
+        try? realm.commitWrite()
     }
 }
 
@@ -549,9 +565,11 @@ extension ObservedRealmObject.Wrapper where ObjectType: ObjectBase {
         guard let realm = self.wrappedValue.realm else {
             return
         }
-        try? realm.write {
-            realm.delete(self.wrappedValue)
+        if !realm.isInWriteTransaction {
+            realm.beginWrite()
         }
+        realm.delete(self.wrappedValue)
+        try? realm.commitWrite()
     }
 }
 
