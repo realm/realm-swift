@@ -31,7 +31,7 @@
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
 #import "RLMUUID_Private.hpp"
-#import "RLMValue.h"
+#import "RLMValueBase.h"
 
 #import <realm/object-store/results.hpp>
 #import <realm/object-store/property.hpp>
@@ -720,7 +720,9 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
         if (prop.array) {
             return static_cast<RLMListBase *>(object_getIvar(obj, prop.swiftIvar))._rlmArray;
         }
-        else { // optional
+        else if (prop.type == RLMPropertyTypeAny) { // mixed
+            value = static_cast<RLMValueBase *>(object_getIvar(obj, prop.swiftIvar)).rlmValue;
+        } else { // optional
             value = RLMGetOptional(static_cast<RLMOptionalBase *>(object_getIvar(obj, prop.swiftIvar)));
         }
     }
@@ -941,6 +943,7 @@ RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
         object_setClass(objBase, _info.rlmObjectSchema.accessorClass);
         RLMInitializeSwiftAccessorGenerics(objBase);
     }
+
     return {*outObj, false};
 }
 

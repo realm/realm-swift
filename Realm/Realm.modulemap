@@ -24,6 +24,7 @@ framework module Realm {
         header "RLMSyncConfiguration_Private.h"
         header "RLMSyncUtil_Private.h"
         header "RLMUser_Private.h"
+        header "RLMValueBase.h"
     }
 
     explicit module Dynamic {

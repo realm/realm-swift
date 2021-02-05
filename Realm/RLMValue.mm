@@ -69,6 +69,14 @@
 
 @end
 
+@implementation RLMObjectBase (RLMValue)
+
+- (RLMPropertyType)valueType {
+    return RLMPropertyTypeObject;
+}
+
+@end
+
 @implementation RLMObjectId (RLMValue)
 
 - (RLMPropertyType)valueType {

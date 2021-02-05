@@ -31,6 +31,7 @@
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
+#import "RLMValueBase.h"
 
 #import <realm/object-store/object_store.hpp>
 #import <realm/object-store/results.hpp>
@@ -99,8 +100,11 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
             id ivar = object_getIvar(object, prop.swiftIvar);
             RLMArray *array = [[RLMManagedArray alloc] initWithParent:object property:prop];
             [ivar set_rlmArray:array];
+        } else if (prop.type == RLMPropertyTypeAny) {
+            id ivar = object_getIvar(object, prop.swiftIvar);
+            [ivar attachWithParent:object property:prop managed:YES];
         }
-        else {
+        else if (prop.optional) {
             id ivar = object_getIvar(object, prop.swiftIvar);
             RLMInitializeManagedOptional(ivar, object, prop);
         }

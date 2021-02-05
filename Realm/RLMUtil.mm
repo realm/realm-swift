@@ -19,6 +19,7 @@
 #import "RLMUtil.hpp"
 
 #import "RLMArray_Private.hpp"
+#import "RLMAccessor.hpp"
 #import "RLMDecimal128_Private.hpp"
 #import "RLMListBase.h"
 #import "RLMObjectId_Private.hpp"
@@ -370,8 +371,12 @@ realm::Mixed RLMObjcToMixed(id<RLMValue> v) {
                                                   (size_t)[(NSData *)v length]));
         case RLMPropertyTypeDate:
             return realm::Mixed(realm::Timestamp([(NSDate *)v timeIntervalSince1970], 0));
-        case RLMPropertyTypeObject:
-            return ((RLMObjectBase *)v)->_row.get_link();
+        case RLMPropertyTypeObject: {
+            if (((RLMObjectBase *)v)->_row) {
+                return ((RLMObjectBase *)v)->_row.get_link();
+            }
+            return realm::none;
+        }
         case RLMPropertyTypeObjectId:
             return realm::Mixed([(RLMObjectId *)v value]);
         case RLMPropertyTypeDecimal128:

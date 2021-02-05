@@ -32,6 +32,7 @@
 #import "RLMSwiftSupport.h"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
+#import "RLMValueBase.h"
 
 #import <realm/object-store/object.hpp>
 #import <realm/object-store/object_schema.hpp>
@@ -210,6 +211,9 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
         }
         else if (property.optional) {
             RLMSetOptional(object_getIvar(self, ivar), value);
+        }
+        else if (auto valueBase = RLMDynamicCast<RLMValueBase>(object_getIvar(self, ivar))) {
+            valueBase.rlmValue = value;
         }
         return;
     }

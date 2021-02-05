@@ -678,6 +678,17 @@ extension RealmOptional: _ManagedPropertyType where Value: _ManagedPropertyType 
 }
 
 /// :nodoc:
+extension AnyRealmValue: _ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
+    public static func _rlmProperty(_ prop: RLMProperty) {
+        prop.type = .any
+        prop.optional = true
+    }
+    // swiftlint:disable:next identifier_name
+    public static func _rlmRequireObjc() -> Bool { return false }
+}
+
+/// :nodoc:
 internal class ObjectUtil {
     private static let runOnce: Void = {
         RLMSwiftAsFastEnumeration = { (obj: Any) -> Any? in
@@ -767,6 +778,8 @@ internal class ObjectUtil {
                 }
                 if prop.value as? RealmOptionalProtocol != nil {
                     throwRealmException("Property \(cls).\(label) has unsupported RealmOptional type \(type(of: prop.value)). Extending RealmOptionalType with custom types is not currently supported. ")
+                } else if prop.value as? RLMValueBase != nil {
+                    throwRealmException("Property \(cls).\(label) has unsupported AnyRealmType type \(type(of: prop.value)). Extending _AnyRealmType with custom types is not currently supported. ")
                 }
                 return nil
             }

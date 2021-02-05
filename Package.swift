@@ -62,9 +62,6 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-//        .package(path: "/Users/jason.flax/Documents/realm-core")
-//        .package(url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
-//        .package(url: "https://github.com/realm/realm-core", .branch("je/mixed-query"))
         .package(url: "https://github.com/realm/realm-core", .branch("master"))
     ],
     targets: [
@@ -105,6 +102,7 @@ let package = Package(
                 "Realm/RLMUtil.mm",
                 "Realm/RLMUUID.mm",
                 "Realm/RLMValue.mm",
+                "Realm/RLMValueBase.mm",
 
                 // Sync source files
                 "Realm/NSError+RLMSync.m",

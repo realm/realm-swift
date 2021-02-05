@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2020 Realm Inc.
+// Copyright 2021 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,45 +18,19 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMDecimal128.h"
-#import "RLMObject.h"
-#import "RLMObjectBase.h"
-#import "RLMObjectId.h"
-#import "RLMProperty.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
-#pragma mark RLMValueType
+@class RLMObjectBase, RLMProperty;
+@protocol RLMValue;
 
-@protocol RLMValue
-/// Describes the type of property stored.
-@property (readonly) RLMPropertyType valueType NS_REFINED_FOR_SWIFT;
+@interface RLMValueBase : NSObject
 
-@end
+@property (nonatomic, nullable) id<RLMValue> rlmValue;
 
-@interface NSNumber (RLMValue)<RLMValue>
-@end
+- (void)attachWithParent:(RLMObjectBase *)parent
+                property:(RLMProperty *)property
+                 managed:(BOOL)managed;
 
-@interface NSString (RLMValue)<RLMValue>
-@end
-
-@interface NSData (RLMValue)<RLMValue>
-@end
-
-@interface NSDate (RLMValue)<RLMValue>
-@end
-
-@interface RLMObject (RLMValue)<RLMValue>
-@end
-
-@interface RLMObjectBase (RLMValue)<RLMValue>
-@end
-
-@interface RLMObjectId (RLMValue)<RLMValue>
-@end
-
-@interface RLMDecimal128 (RLMValue)<RLMValue>
 @end
 
 NS_ASSUME_NONNULL_END
-
