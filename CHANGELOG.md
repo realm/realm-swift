@@ -17,9 +17,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Allow enumerating objects of types which are no longer present in the schema.
 * Add `RLMResponse.customStatusCode`. This fixes timeout exceptions that were occuring with a poor connection. ([#4188](https://github.com/realm/realm-core/issues/4188))
 * Fix - `RLMResponse` will have a non nil `customStatusCode` in case of error.
-   ([#4188](https://github.com/realm/realm-core/issues/4188))
-* Make ObjectKeyIdentifiable available for macOS 10.15, iOS 13, tvOS 13, watchOS 6 and above
-
+([#4188](https://github.com/realm/realm-core/issues/4188))
+* Limit availability of ObjectKeyIdentifiable to platforms which support Combine to match the change made in the Xcode 12.5 SDK. ([#7083](https://github.com/realm/realm-cocoa/issues/7083))
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
