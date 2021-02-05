@@ -16,8 +16,7 @@
  //
  ////////////////////////////////////////////////////////////////////////////
 
-#if canImport(SwiftUI) && canImport(Combine)
-#if swift(>=5.2)
+#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.2)
 import SwiftUI
 import Combine
 import Realm
@@ -122,6 +121,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
             // else if the value is unmanaged
             var outCount = UInt32(0)
             let propertyList = class_copyPropertyList(ObjectType.self as? AnyClass, &outCount)
+            defer { free(propertyList) }
             let kvo = KVO(subscriber: subscriber)
             var keyPaths = [String]()
             for index in 0..<outCount {
@@ -134,7 +134,6 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
             let subscription = KVO.Subscription(observer: kvo, value: value, keyPaths: keyPaths)
             subscriber.receive(subscription: subscription)
             KVO.observedObjects[value] = subscription
-            free(propertyList)
         }
     }
 }
@@ -248,16 +247,12 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 
 // MARK: FetchRealmResults
 
-
 /// A property wrapper type that retrieves results from a Realm.
 ///
 /// The results use the realm configuration provided by
 /// the environment value `EnvironmentValues/realmConfiguration`.
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @propertyWrapper public struct FetchRealmResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & ObjectKeyIdentifiable {
-    /// :nodoc:
-    public typealias Value = Results<ResultType>
-
     private class Storage: ObservableStorage<Results<ResultType>> {
         var sortDescriptor: SortDescriptor? {
             willSet {
@@ -328,17 +323,13 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         }
     }
     /// :nodoc:
-    public var wrappedValue: Value {
+    public var wrappedValue: Results<ResultType> {
         storage.configuration != nil ? storage.value.freeze() : storage.value
     }
     /// :nodoc:
     public var projectedValue: Self {
         return self
     }
-
-    /// :nodoc:
-    public typealias SortDescriptor = (keyPath: String, ascending: Bool)
-
     /// :nodoc:
     public init(_ type: ResultType.Type,
                 configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration,
@@ -582,7 +573,7 @@ extension ThreadConfined where Self: ObjectBase {
     }
 }
 
-struct RealmEnvironmentKey: EnvironmentKey {
+private struct RealmEnvironmentKey: EnvironmentKey {
     static let defaultValue = Realm.Configuration()
 }
 
@@ -607,5 +598,4 @@ extension EnvironmentValues {
         }
     }
 }
-#endif
 #endif

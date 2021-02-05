@@ -151,14 +151,14 @@ class SwiftUITests: TestCase {
         var sortedResults = FetchRealmResults(SwiftUIObject.self,
                                               configuration: inMemoryRealm(inMemoryIdentifier).configuration,
                                               filter: NSPredicate(format: "int >= 0"),
-                                              sortDescriptor: ("int", true))
+                                              sortDescriptor: SortDescriptor(keyPath: "int", ascending: true))
         XCTAssertEqual(sortedResults.wrappedValue.count, 2)
         XCTAssertEqual(sortedResults.wrappedValue[0].int, 0)
         XCTAssertEqual(sortedResults.wrappedValue[1].int, 1)
         sortedResults = FetchRealmResults(SwiftUIObject.self,
                                           configuration: inMemoryRealm(inMemoryIdentifier).configuration,
                                           filter: NSPredicate(format: "int >= 0"),
-                                          sortDescriptor: ("int", false))
+                                          sortDescriptor: SortDescriptor(keyPath: "int", ascending: false))
         XCTAssertEqual(sortedResults.wrappedValue.count, 2)
         XCTAssertEqual(sortedResults.wrappedValue[0].int, 1)
         XCTAssertEqual(sortedResults.wrappedValue[1].int, 0)
