@@ -516,6 +516,20 @@ public class RealmServer: NSObject {
             XCTFail(error.localizedDescription)
         }
     }
+    
+    // TODO: AppInfo struct, codable
+    @objc public class AppInfo: NSObject, Codable {
+        var client_app_id: String
+        var last_modified: Int
+        var product: String
+        var name: String
+        var location: String
+        var domain_id: String
+        var _id: String
+        var group_id: String
+        var last_used: Int
+        var deployment_model: String
+    }
 
     /// Create a new server app
     @objc public func createApp() throws -> AppId {
@@ -804,6 +818,8 @@ public class RealmServer: NSObject {
             throw URLError(.badServerResponse)
         }
 
+        let jsonData = try JSONSerialization.data(withJSONObject: info!, options: [])
+        let ai = try! JSONDecoder().decode(AppInfo.self, from: jsonData)
         return clientAppId
     }
 }
