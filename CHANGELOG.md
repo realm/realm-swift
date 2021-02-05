@@ -9,15 +9,16 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add Xcode 12.4 binaries to the release package.
 
 ### Fixed
-* Inserting a date into a synced collection via `AnyBSON.datetime(...)` would be of type `Timestamp` and not `Date`. 
+* Inserting a date into a synced collection via `AnyBSON.datetime(...)` would be of type `Timestamp` and not `Date`.
   This could break synced objects with a `Date` property  ([#6654](https://github.com/realm/realm-cocoa/issues/6654), since v10.0.0).
 * Fixed an issue where creating an object after file format upgrade may fail
   with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
  ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
 * Allow enumerating objects of types which are no longer present in the schema.
 * Add `RLMResponse.customStatusCode`. This fixes timeout exceptions that were occuring with a poor connection. ([#4188](https://github.com/realm/realm-core/issues/4188))
- * Fix - `RLMResponse` will have a non nil `customStatusCode` in case of error.
+* Fix - `RLMResponse` will have a non nil `customStatusCode` in case of error.
    ([#4188](https://github.com/realm/realm-core/issues/4188))
+* Make ObjectKeyIdentifiable available for macOS 10.15, iOS 13, tvOS 13, watchOS 6 and above
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
