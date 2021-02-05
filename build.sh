@@ -1091,15 +1091,6 @@ case "$COMMAND" in
             mkdir -p ~/Library/Logs/CoreSimulator
             echo > ~/Library/Logs/CoreSimulator/CoreSimulator.log
 
-            if [ -d ~/Library/Developer/CoreSimulator/Devices/ ]; then
-                # Verify that no Realm files still exist
-                if find ~/Library/Developer/CoreSimulator/Devices/ -name '*.realm' | grep -q .; then
-                    echo 'Found pre-existing Realm files:'
-                    find ~/Library/Developer/CoreSimulator/Devices/ -name '*.realm'
-                    exit 1
-                fi
-            fi
-
             failed=0
             sh build.sh "verify-$target" 2>&1 | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || failed=1
             if [ "$failed" = "1" ] && grep -E 'DTXProxyChannel|DTXChannel|out of date and needs to be rebuilt|operation never finished bootstrapping' build/build.log ; then
