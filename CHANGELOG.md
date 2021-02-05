@@ -32,6 +32,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * Null values in a `List<Float?>` or `List<Double?>` were incorrectly treated
   as non-null in some places. It is unknown if this caused any functional
   problems when using the public API. ([Core PR #3987](https://github.com/realm/realm-core/pull/3987), since v5.0.0).
+* Limit availability of ObjectKeyIdentifiable to platforms which support
+  Combine to match the change made in the Xcode 12.5 SDK.
+  ([#7083](https://github.com/realm/realm-cocoa/issues/7083))
 
 ### Compatibility
 
