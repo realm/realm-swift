@@ -691,6 +691,12 @@
 		3F73BC931E3A878500FE80B6 /* NSError+RLMSync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSError+RLMSync.h"; sourceTree = "<group>"; };
 		3F73BC941E3A878500FE80B6 /* NSError+RLMSync.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSError+RLMSync.m"; sourceTree = "<group>"; };
 		3F7556731BE95A050058BC7E /* AsyncTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AsyncTests.mm; sourceTree = "<group>"; };
+		3F8C9D0E25CDC739003DA7F6 /* RealmXcode11.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = RealmXcode11.xctestplan; sourceTree = "<group>"; };
+		3F8C9D0F25CDC971003DA7F6 /* RealmSwiftXcode11.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = RealmSwiftXcode11.xctestplan; sourceTree = "<group>"; };
+		3F8C9D1025CDC98F003DA7F6 /* ObjectServerTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = ObjectServerTests.xctestplan; sourceTree = "<group>"; };
+		3F8C9D1125CDC99D003DA7F6 /* ObjectServerTestsXcode11.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = ObjectServerTestsXcode11.xctestplan; sourceTree = "<group>"; };
+		3F8C9D1225CDD301003DA7F6 /* RealmiOSstatic.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = RealmiOSstatic.xctestplan; path = Configuration/RealmiOSstatic.xctestplan; sourceTree = "<group>"; };
+		3F8C9D1325CDD314003DA7F6 /* RealmiOSstaticXcode11.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = RealmiOSstaticXcode11.xctestplan; path = Configuration/RealmiOSstaticXcode11.xctestplan; sourceTree = "<group>"; };
 		3F9816292317763000C3543D /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		3F9863B91D36876B00641C98 /* RLMClassInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMClassInfo.mm; sourceTree = "<group>"; };
 		3F9863BA1D36876B00641C98 /* RLMClassInfo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMClassInfo.hpp; sourceTree = "<group>"; };
@@ -711,6 +717,8 @@
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
 		3FEB383C1E70AC6900F22712 /* ObjectCreationTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ObjectCreationTests.mm; sourceTree = "<group>"; };
 		3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftSchemaTests.swift; sourceTree = "<group>"; };
+		3FED692E25CDC40100F29B99 /* RealmSwift.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = RealmSwift.xctestplan; sourceTree = "<group>"; };
+		3FED692F25CDC46800F29B99 /* Realm.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Realm.xctestplan; sourceTree = "<group>"; };
 		494566A8246E8C59000FD07F /* ObjectiveCSupport+BSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ObjectiveCSupport+BSON.swift"; sourceTree = "<group>"; };
 		4993220224129DCD00A0EC8E /* RLMCredentials_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMCredentials_Private.hpp; sourceTree = "<group>"; };
 		4993220324129DCD00A0EC8E /* RLMCredentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMCredentials.h; sourceTree = "<group>"; };
@@ -1105,6 +1113,12 @@
 				5D659E6D1BE0398E006515A0 /* Base.xcconfig */,
 				5D659E6E1BE0398E006515A0 /* Debug.xcconfig */,
 				3FB56E7E250D457A00A6216B /* ObjectServerTests.xcconfig */,
+				3F8C9D1025CDC98F003DA7F6 /* ObjectServerTests.xctestplan */,
+				3F8C9D1125CDC99D003DA7F6 /* ObjectServerTestsXcode11.xctestplan */,
+				3FED692F25CDC46800F29B99 /* Realm.xctestplan */,
+				3FED692E25CDC40100F29B99 /* RealmSwift.xctestplan */,
+				3F8C9D0F25CDC971003DA7F6 /* RealmSwiftXcode11.xctestplan */,
+				3F8C9D0E25CDC739003DA7F6 /* RealmXcode11.xctestplan */,
 				5D659E6F1BE0398E006515A0 /* Release.xcconfig */,
 				3F35027722C43C5200FDC1E5 /* TestHost-static.xcconfig */,
 				5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */,
@@ -1341,6 +1355,8 @@
 				5D660FD91BE98C7C0021E04F /* RealmSwift Tests */,
 				3F558C7D22C299DB002F0F30 /* Test Utils */,
 				E81A1FB31955FCE000FDED82 /* CHANGELOG.md */,
+				3F8C9D1225CDD301003DA7F6 /* RealmiOSstatic.xctestplan */,
+				3F8C9D1325CDD314003DA7F6 /* RealmiOSstaticXcode11.xctestplan */,
 			);
 			indentWidth = 4;
 			sourceTree = "<group>";
