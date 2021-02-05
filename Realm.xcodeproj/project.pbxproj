@@ -2748,7 +2748,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
 				SUPPORTS_MACCATALYST = YES;
 			};
 			name = Debug;
@@ -2757,7 +2756,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
 				SUPPORTS_MACCATALYST = YES;
 			};
 			name = Release;
@@ -2766,7 +2764,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3F35027722C43C5200FDC1E5 /* TestHost-static.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = QX5CR2FTN2;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2778,7 +2775,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3F35027722C43C5200FDC1E5 /* TestHost-static.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = QX5CR2FTN2;
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -16,8 +16,7 @@
  //
  ////////////////////////////////////////////////////////////////////////////
 
-#if canImport(SwiftUI)
-#if canImport(Combine)
+#if canImport(SwiftUI) && canImport(Combine)
 #if swift(>=5.2)
 import SwiftUI
 import Combine
@@ -371,6 +370,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     /// A wrapper of the underlying observable object that can create bindings to
     /// its properties using dynamic member lookup.
     @dynamicMemberLookup @frozen public struct Wrapper {
+        /// :nodoc:
         public var wrappedValue: ObjectType
         /// Returns a binding to the resulting value of a given key path.
         ///
@@ -445,10 +445,13 @@ extension Binding where Value: ObjectBase & ThreadConfined {
     }
 }
 
+/// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public protocol BoundCollection {
+    /// :nodoc:
     associatedtype Value
 
+    /// :nodoc:
     var wrappedValue: Value { get }
 }
 
@@ -604,6 +607,5 @@ extension EnvironmentValues {
         }
     }
 }
-#endif
 #endif
 #endif
