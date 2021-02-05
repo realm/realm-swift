@@ -14,4 +14,5 @@ import Realm
  * We use Map to don't intefere with the native Swift's Dictionary type.
  */
 public final class Map: RLMDictionary<AnyObject> {
+
 }

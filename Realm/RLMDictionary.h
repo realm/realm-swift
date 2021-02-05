@@ -124,6 +124,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)removeObjectsForKeys:(NSArray<NSString *> *)keyArray;
 
+/**
+ Delete dictionary's value for a given key.
+ */
+- (void)removeObjectForKey:(NSString *)key;
+
 #pragma mark - Notifications
 
 /**

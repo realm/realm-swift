@@ -16,8 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "RLMDictionary.h"
-#include "RLMUtil.hpp"
+#import "RLMDictionary.h"
+#import "RLMUtil.hpp"
 
 @implementation RLMDictionary
 
@@ -127,6 +127,10 @@
 }
 
 - (void)removeObjectsForKeys:(NSArray<NSString *> *)keyArray {
+    @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
+- (void)removeObjectForKey:(NSString *)key {
     @throw RLMException(@"Not implemented in RLMDictionary");
 }
 
