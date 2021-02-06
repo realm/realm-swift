@@ -617,29 +617,12 @@ extension List: MutableCollection {
     }
     /// :nodoc:
     public func move(fromOffsets offsets: IndexSet, toOffset destination: Int) {
-        if Element.self is EmbeddedObject.Type {
-            for offset in offsets {
-                var d = destination
-                if destination >= count {
-                    d = count - 1
-                } else if destination > 0 {
-                    d = destination - 1
-                }
-                move(from: offset, to: d)
+        for offset in offsets {
+            var d = destination
+            if destination >= count {
+                d = destination - 1
             }
-        } else {
-            var tmp = [Element]()
-            for offset in offsets {
-                tmp.append(self[offset])
-            }
-            insert(contentsOf: tmp, at: destination)
-            for offset in offsets.reversed() {
-                var o = offset
-                if o >= destination {
-                    o += tmp.count
-                }
-                remove(at: o)
-            }
+            move(from: offset, to: d)
         }
     }
 }
