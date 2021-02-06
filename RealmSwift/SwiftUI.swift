@@ -16,7 +16,7 @@
  //
  ////////////////////////////////////////////////////////////////////////////
 
-#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.2)
+#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.3)
 import SwiftUI
 import Combine
 import Realm
