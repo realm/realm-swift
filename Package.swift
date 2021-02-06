@@ -150,6 +150,7 @@ let package = Package(
             exclude: [
                 "Swift",
                 "SwiftUITestHost",
+                "SwiftUITestHostUITests",
                 "TestHost",
                 "PrimitiveArrayPropertyTests.tpl.m",
             ],
