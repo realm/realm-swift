@@ -40,7 +40,8 @@ class EmbeddedTreeSwiftUIObject1: EmbeddedObject, EmbeddedTreeObject, ObjectKeyI
 }
 
 private let inMemoryIdentifier = "swiftui-tests"
-@available(iOS 14.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 class SwiftUITests: TestCase {
     // MARK: - List Operations
     func testManagedUnmanagedListAppendPrimitive() throws {
