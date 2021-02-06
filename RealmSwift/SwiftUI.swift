@@ -253,7 +253,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 ///
 /// The results use the realm configuration provided by
 /// the environment value `EnvironmentValues/realmConfiguration`.
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct FetchRealmResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & ObjectKeyIdentifiable {
     private class Storage: ObservableStorage<Results<ResultType>> {
         var sortDescriptor: SortDescriptor? {
@@ -358,7 +358,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 
 /// A property wrapper type that subscribes to an observable Realm `Object` or `List` and
 /// invalidates a view whenever the observable object changes.
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct ObservedRealmObject<ObjectType>: DynamicProperty where ObjectType: RealmSubscribable & ThreadConfined & ObservableObject & Equatable {
     /// A wrapper of the underlying observable object that can create bindings to
     /// its properties using dynamic member lookup.
@@ -423,7 +423,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     }
 }
 
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Binding where Value: ExpressibleByNilLiteral {
     /// :nodoc:
     public subscript<V, T>(dynamicMember member: ReferenceWritableKeyPath<V, T>) -> Binding<T> where Value == Optional<V>, V: ThreadConfined {
@@ -558,7 +558,7 @@ extension Binding where Value: ObjectKeyIdentifiable & ThreadConfined {
     }
 }
 
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension ObservedRealmObject.Wrapper where ObjectType: ObjectBase {
     /// :nodoc:
     public func delete() {
@@ -573,7 +573,7 @@ extension ObservedRealmObject.Wrapper where ObjectType: ObjectBase {
     }
 }
 
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension ThreadConfined where Self: ObjectBase {
     /**
      Create a `Binding` for a given property, allowing for
@@ -595,7 +595,7 @@ private struct RealmEnvironmentKey: EnvironmentKey {
     static let defaultValue = Realm.Configuration()
 }
 
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension EnvironmentValues {
     /// The current `Realm.Configuration` that the view should use.
     public var realmConfiguration: Realm.Configuration {
