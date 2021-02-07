@@ -28,6 +28,7 @@ namespace realm {
     struct NotificationToken;
     namespace object_store {
         class Set;
+        class Collection;
     }
 }
 class RLMClassInfo;
@@ -43,15 +44,14 @@ class RLMClassInfo;
 @end
 
 // An object which encapulates the shared logic for fast-enumerating RLMArray
-// and RLMResults, and has a buffer to store strong references to the current
+// RLMSet and RLMResults, and has a buffer to store strong references to the current
 // set of enumerated items
 @interface RLMFastEnumerator : NSObject
-- (instancetype)initWithList:(realm::List&)list
-                  collection:(id)collection
-                   classInfo:(RLMClassInfo&)info;
-- (instancetype)initWithSet:(realm::object_store::Set&)set
-                 collection:(id)collection
-                  classInfo:(RLMClassInfo&)info;
+
+- (instancetype)initWithBackingCollection:(realm::object_store::Collection const&)backingCollection
+                               collection:(id)collection
+                                classInfo:(RLMClassInfo&)info;
+
 - (instancetype)initWithResults:(realm::Results&)results
                      collection:(id)collection
                       classInfo:(RLMClassInfo&)info;

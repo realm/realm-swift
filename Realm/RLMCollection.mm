@@ -55,38 +55,19 @@ static const int RLMEnumerationBufferSize = 16;
     id _collection;
 }
 
-- (instancetype)initWithList:(realm::List&)list
-                  collection:(id)collection
-                   classInfo:(RLMClassInfo&)info {
+- (instancetype)initWithBackingCollection:(realm::object_store::Collection const&)backingCollection
+                               collection:(id)collection
+                                classInfo:(RLMClassInfo&)info {
     self = [super init];
     if (self) {
         _info = &info;
         _realm = _info->realm;
-        if (_realm.inWriteTransaction) {
-            _snapshot = list.snapshot();
-        }
-        else {
-            _snapshot = list.as_results();
-            _collection = collection;
-            [_realm registerEnumerator:self];
-        }
-        _results = &_snapshot;
-    }
-    return self;
-}
 
-- (instancetype)initWithSet:(realm::object_store::Set&)set
-                 collection:(id)collection
-                  classInfo:(RLMClassInfo&)info {
-    self = [super init];
-    if (self) {
-        _info = &info;
-        _realm = _info->realm;
         if (_realm.inWriteTransaction) {
-            _snapshot = set.snapshot();
+            _snapshot = backingCollection.as_results().snapshot();
         }
         else {
-            _snapshot = set.as_results();
+            _snapshot = backingCollection.as_results();
             _collection = collection;
             [_realm registerEnumerator:self];
         }

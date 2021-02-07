@@ -490,8 +490,9 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
 
 - (RLMFastEnumerator *)fastEnumerator {
     return translateErrors([&] {
-        return [[RLMFastEnumerator alloc] initWithList:_backingList collection:self
-                                             classInfo:*_objectInfo];
+        return [[RLMFastEnumerator alloc] initWithBackingCollection:_backingList
+                                                         collection:self
+                                                          classInfo:*_objectInfo];
     });
 }
 

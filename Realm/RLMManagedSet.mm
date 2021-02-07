@@ -482,9 +482,9 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
 
 - (RLMFastEnumerator *)fastEnumerator {
     return translateErrors([&] {
-        return [[RLMFastEnumerator alloc] initWithSet:_backingSet
-                                           collection:self
-                                            classInfo:*_objectInfo];
+        return [[RLMFastEnumerator alloc] initWithBackingCollection:_backingSet
+                                                         collection:self
+                                                          classInfo:*_objectInfo];
     });
 }
 
