@@ -114,20 +114,12 @@ static inline RLMSet *asRLMSet(__unsafe_unretained id const value) {
     return RLMDynamicCast<RLMSet>(value) ?: RLMDynamicCast<RLMSetBase>(value)._rlmSet;
 }
 
-static inline bool checkArrayType(__unsafe_unretained RLMArray *const array,
+static inline bool checkCollectionType(__unsafe_unretained id<RLMCollection> const collection,
                                   RLMPropertyType type,
                                   bool optional,
                                   __unsafe_unretained NSString *const objectClassName) {
-    return array.type == type && array.optional == optional
-    && (type != RLMPropertyTypeObject || [array.objectClassName isEqualToString:objectClassName]);
-}
-
-static inline bool checkSetType(__unsafe_unretained RLMSet *const set,
-                                RLMPropertyType type,
-                                bool optional,
-                                __unsafe_unretained NSString *const objectClassName) {
-    return set.type == type && set.optional == optional
-    && (type != RLMPropertyTypeObject || [set.objectClassName isEqualToString:objectClassName]);
+    return collection.type == type && collection.optional == optional
+        && (type != RLMPropertyTypeObject || [collection.objectClassName isEqualToString:objectClassName]);
 }
 
 id (*RLMSwiftAsFastEnumeration)(id);
@@ -161,9 +153,10 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
 
     if (collection) {
         if (auto rlmArray = asRLMArray(value)) {
-            return checkArrayType(rlmArray, type, optional, objectClassName);
-        } else if (auto rlmSet = asRLMSet(value)) {
-            return checkSetType(rlmSet, type, optional, objectClassName);
+            return checkCollectionType(rlmArray, type, optional, objectClassName);
+        }
+        else if (auto rlmSet = asRLMSet(value)) {
+            return checkCollectionType(rlmSet, type, optional, objectClassName);
         }
         if (id enumeration = RLMAsFastEnumeration(value)) {
             // check each element for compliance
@@ -266,15 +259,16 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
         }
 
         if (RLMArray *array = asRLMArray(obj)) {
-            if (!checkArrayType(array, prop.type, prop.optional, prop.objectClassName)) {
+            if (!checkCollectionType(array, prop.type, prop.optional, prop.objectClassName)) {
                 @throw RLMException(@"RLMArray<%@%s> does not match expected type '%@%s' for property '%@.%@'.",
                                     array.objectClassName ?: RLMTypeToString(array.type), array.optional ? "?" : "",
                                     prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
                                     objectSchema.className, prop.name);
             }
             return;
-        } else if (RLMSet *set = asRLMSet(obj)) {
-            if (!checkSetType(set, prop.type, prop.optional, prop.objectClassName)) {
+        }
+        else if (RLMSet *set = asRLMSet(obj)) {
+            if (!checkCollectionType(set, prop.type, prop.optional, prop.objectClassName)) {
                 @throw RLMException(@"RLMSet<%@%s> does not match expected type '%@%s' for property '%@.%@'.",
                                     set.objectClassName ?: RLMTypeToString(set.type), set.optional ? "?" : "",
                                     prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",

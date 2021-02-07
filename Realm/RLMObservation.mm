@@ -531,7 +531,8 @@ void RLMWillChange(std::vector<realm::BindingContext::ObserverState> const& obse
             forEach(o, [&](realm::ColKey colKey, auto const& change, RLMObservationInfo *info) {
                 if (colKey.is_set()) {
                     info->willChange(info->columnName(colKey));
-                } else {
+                }
+                else {
                     info->willChange(info->columnName(colKey),
                                      convert(change.kind), convert(change.indices, indexes));
                 }
@@ -552,7 +553,8 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
             forEach(o, [&](realm::ColKey col, auto const& change, RLMObservationInfo *info) {
                 if (col.is_set()) {
                     info->willChange(info->columnName(col));
-                } else {
+                }
+                else {
                     info->didChange(info->columnName(col), convert(change.kind), convert(change.indices, indexes));
                 }
             });
