@@ -11,11 +11,7 @@ have `thaw()` methods which return a live copy of the frozen object. This enable
 * Add `Object.bind` and `EmbeddedObject.bind` for SwiftUI support. This allows you to create bindings of realm properties when a propertyWrapper is not available for you to do so, e.g., `TextField("name", personObject.bind(\.name))`.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
 * Add Xcode 12.4 binaries to the release package.
-
-### Fixed
 * Inserting a date into a synced collection via `AnyBSON.datetime(...)` would be of type `Timestamp` and not `Date`.
   This could break synced objects with a `Date` property  ([#6654](https://github.com/realm/realm-cocoa/issues/6654), since v10.0.0).
 * Fixed an issue where creating an object after file format upgrade may fail
