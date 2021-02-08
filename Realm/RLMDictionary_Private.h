@@ -22,5 +22,6 @@
 
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;
+- (id)objectAtIndex:(NSUInteger)index;
 
 @end

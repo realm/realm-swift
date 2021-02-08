@@ -55,4 +55,8 @@
     return [self._rlmDictionary objectForKey:key];
 }
 
+- (id)objectAtIndex:(NSUInteger)index {
+    @throw RLMException(@"Not implemented in RLMDictionaryBase");
+}
+
 @end

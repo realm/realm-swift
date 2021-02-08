@@ -59,10 +59,10 @@
 		0C5796A325643D7500744CAE /* RLMUUID.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C57969F25643D7500744CAE /* RLMUUID.mm */; };
 		0C7CA7C325C311DA0098A636 /* RLMManagedDictionary.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C7CA7C225C311DA0098A636 /* RLMManagedDictionary.mm */; };
 		0C7CA7C425C311DA0098A636 /* RLMManagedDictionary.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C7CA7C225C311DA0098A636 /* RLMManagedDictionary.mm */; };
-		0CBD3A0A25CC424B00D586D5 /* RLMDictionaryBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 0CBD3A0825CC424B00D586D5 /* RLMDictionaryBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		0CBD3A0B25CC424B00D586D5 /* RLMDictionaryBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 0CBD3A0825CC424B00D586D5 /* RLMDictionaryBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0CBD3A0C25CC424B00D586D5 /* RLMDictionaryBase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0CBD3A0925CC424B00D586D5 /* RLMDictionaryBase.mm */; };
 		0CBD3A0D25CC424B00D586D5 /* RLMDictionaryBase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0CBD3A0925CC424B00D586D5 /* RLMDictionaryBase.mm */; };
+		0CBD3A8F25D154C500D586D5 /* RLMDictionaryBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 0CBD3A0825CC424B00D586D5 /* RLMDictionaryBase.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		0CBD3A9025D154C600D586D5 /* RLMDictionaryBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 0CBD3A0825CC424B00D586D5 /* RLMDictionaryBase.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		17051FCE1D93DA0A00EF8E67 /* RLMUser.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1ABDCDAF1D793008003489E3 /* RLMUser.mm */; };
 		1A0512721D873F3300806AEC /* RLMSyncConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A3623661D8384BA00945A54 /* RLMSyncConfiguration.mm */; };
 		1A0512761D8746CD00806AEC /* RLMSyncConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A3623651D8384BA00945A54 /* RLMSyncConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1730,7 +1730,7 @@
 				5D659EA51BE04556006515A0 /* Realm.h in Headers */,
 				5D659EA71BE04556006515A0 /* RLMAccessor.h in Headers */,
 				CFAEF761242B5F9A00EAF721 /* RLMAPIKeyAuth.h in Headers */,
-				0CBD3A0A25CC424B00D586D5 /* RLMDictionaryBase.h in Headers */,
+				0CBD3A9025D154C600D586D5 /* RLMDictionaryBase.h in Headers */,
 				4993221224129DCE00A0EC8E /* RLMApp.h in Headers */,
 				53CCC6C4257EC8A300A8FC50 /* RLMApp_Private.h in Headers */,
 				5D659EA91BE04556006515A0 /* RLMArray.h in Headers */,
@@ -1818,7 +1818,7 @@
 				5DD755A31BE056DE002800DA /* Realm.h in Headers */,
 				5DD755A51BE056DE002800DA /* RLMAccessor.h in Headers */,
 				3F275EC12433AB3900161E7F /* RLMAPIKeyAuth.h in Headers */,
-				0CBD3A0B25CC424B00D586D5 /* RLMDictionaryBase.h in Headers */,
+				0CBD3A8F25D154C500D586D5 /* RLMDictionaryBase.h in Headers */,
 				4993221324129DCE00A0EC8E /* RLMApp.h in Headers */,
 				53CCC6C5257EC8A300A8FC50 /* RLMApp_Private.h in Headers */,
 				5DD755A71BE056DE002800DA /* RLMArray.h in Headers */,

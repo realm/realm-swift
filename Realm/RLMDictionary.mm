@@ -17,7 +17,15 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMDictionary.h"
+#import "RLMDictionary_Private.h"
 #import "RLMUtil.hpp"
+
+@interface RLMDictionary () {
+@public
+    // Backing dictionary when this instance is unmanaged
+    NSMutableDictionary *_backingDictionary;
+}
+@end
 
 @implementation RLMDictionary
 

@@ -37,6 +37,86 @@ public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
         super.init(dictionary: _rlmDictionary)
     }
 
+    // MARK: Aggregate Operations
+
+    /**
+     Returns the minimum (lowest) value of the given property among all the objects in the collection, or `nil` if the
+     collection is empty.
+
+     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+
+     - parameter property: The name of a property whose minimum value is desired.
+     */
+    public func min<T: MinMaxType>(ofProperty property: String) -> T? {
+        return _rlmDictionary.min(ofProperty: property).map(dynamicBridgeCast)
+    }
+
+    /**
+     Returns the maximum (highest) value of the given property among all the objects in the collection, or `nil` if the
+     collection is empty.
+
+     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+
+     - parameter property: The name of a property whose minimum value is desired.
+     */
+    public func max<T: MinMaxType>(ofProperty property: String) -> T? {
+        return _rlmDictionary.max(ofProperty: property).map(dynamicBridgeCast)
+    }
+
+    /**
+    Returns the sum of the given property for objects in the collection, or `nil` if the collection is empty.
+
+    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
+    */
+    public func sum<T: AddableType>(ofProperty property: String) -> T {
+        return dynamicBridgeCast(fromObjectiveC: _rlmDictionary.sum(ofProperty: property))
+    }
+
+    /**
+     Returns the average value of a given property over all the objects in the collection, or `nil` if
+     the collection is empty.
+
+     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
+
+     - parameter property: The name of a property whose values should be summed.
+     */
+    public func average<T: AddableType>(ofProperty property: String) -> T? {
+        return _rlmDictionary.average(ofProperty: property).map(dynamicBridgeCast)
+    }
+    
+//    // MARK: KVC
+//
+//    /**
+//     Returns an `Array` containing the results of invoking `valueForKey(_:)` using `key` on each of the collection's
+//     objects.
+//     */
+//    @nonobjc public func value(forKey key: String) -> [AnyObject] {
+//        return (_rlmDictionary.value(forKeyPath: key)! as! NSSet).allObjects as [AnyObject]
+//    }
+//
+//    /**
+//     Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` using `keyPath` on each of the
+//     collection's objects.
+//
+//     - parameter keyPath: The key path to the property whose values are desired.
+//     */
+//    @nonobjc public func value(forKeyPath keyPath: String) -> [AnyObject] {
+//        return (_rlmDictionary.value(forKeyPath: keyPath)! as! NSSet).allObjects as [AnyObject]
+//    }
+//
+//    /**
+//     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified `value` and `key`.
+//
+//     - warning: This method can only be called during a write transaction.
+//
+//     - parameter value: The object value.
+//     - parameter key:   The name of the property whose value should be set on each object.
+//    */
+//    public override func setValue(_ value: Any?, forKey key: String) {
+//        return _rlmDictionary.setValue(value, forKeyPath: key)
+//    }
 
     // MARK: Filtering
 
@@ -188,5 +268,110 @@ public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedDictionary() -> RLMDictionary<AnyObject> {
         return Element._rlmDictionary()
+    }
+}
+
+extension Map where Element: MinMaxType {
+    /**
+     Returns the minimum (lowest) value in the map, or `nil` if the map is empty.
+     */
+    public func min() -> Element? {
+        return _rlmDictionary.min(ofProperty: "self").map(dynamicBridgeCast)
+    }
+
+    /**
+     Returns the maximum (highest) value in the map, or `nil` if the map is empty.
+     */
+    public func max() -> Element? {
+        return _rlmDictionary.max(ofProperty: "self").map(dynamicBridgeCast)
+    }
+}
+
+extension Map where Element: AddableType {
+    /**
+     Returns the sum of the values in the map.
+     */
+    public func sum() -> Element {
+        return sum(ofProperty: "self")
+    }
+
+    /**
+     Returns the average of the values in the map, or `nil` if the map is empty.
+     */
+    public func average<T: AddableType>() -> T? {
+        return average(ofProperty: "self")
+    }
+}
+
+extension Map: RealmCollection {
+    /// The type of the objects stored within the set.
+    public typealias ElementType = Element
+
+    // MARK: Sequence Support
+
+    /// Returns a `RLMIterator` that yields successive elements in the `Map`.
+    public func makeIterator() -> RLMIterator<Element> {
+        return RLMIterator(collection: _rlmDictionary)
+    }
+
+    /// :nodoc:
+    public func asNSFastEnumerator() -> Any {
+        return _rlmDictionary
+    }
+
+    /// The position of the first element in a non-empty collection.
+    /// Identical to endIndex in an empty collection.
+    public var startIndex: Int { return 0 }
+
+    /// The collection's "past the end" position.
+    /// endIndex is not a valid argument to subscript, and is always reachable from startIndex by
+    /// zero or more applications of successor().
+    public var endIndex: Int { return count }
+
+    public func index(after i: Int) -> Int { return i + 1 }
+    public func index(before i: Int) -> Int { return i - 1 }
+
+    /// :nodoc:
+    // swiftlint:disable:next identifier_name
+    public func _observe(_ queue: DispatchQueue?,
+                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
+        -> NotificationToken {
+            return _rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
+    }
+
+    // MARK: Object Retrieval
+
+    /**
+     - warning: Ordering is not guaranteed on a Dictionary. Subscripting is implemented for
+                convenience should not be relied on.
+     */
+    public subscript(position: Int) -> Element {
+        return dynamicBridgeCast(fromObjectiveC: self.object(at: UInt(position)))
+    }
+
+    /// :nodoc:
+    public func index(of object: Element) -> Int? {
+        fatalError("index(of:) is not available on Map")
+    }
+
+    /// :nodoc:
+    public func index(matching predicate: NSPredicate) -> Int? {
+        fatalError("index(matching:) is not available on Map")
+    }
+
+    /**
+     - warning: Ordering is not guaranteed on a Map. `first` is implemented for
+                convenience should not be relied on.
+     */
+    public var first: Element? {
+        return self[0]
+    }
+
+    /**
+     - warning: Ordering is not guaranteed on a Map. `last` is implemented for
+                convenience should not be relied on.
+     */
+    public var last: Element? {
+        return self[count-1]
     }
 }

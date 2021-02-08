@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import "RLMDictionary_Private.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -31,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (instancetype)initWithDictionary:(RLMDictionary *)dictionary;
 - (id)objectForKey:(NSString *)key;
+- (id)objectAtIndex:(NSUInteger)index;
 
 @end
 
