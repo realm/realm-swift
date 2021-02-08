@@ -100,33 +100,19 @@ public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
     // MARK: Sorting
 
     /**
-     Returns a `Results` containing the objects in the set, but sorted.
+     Returns a `Results` containing the objects in the dictionary, but sorted.
 
-     Objects are sorted based on the values of the given key path. For example, to sort a set of `Student`s from
-     youngest to oldest based on their `age` property, you might call
-     `students.sorted(byKeyPath: "age", ascending: true)`.
+     Pairs are sorted based on the given keyPath for a value.
 
-     - warning: MutableSets may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
-
-     - parameter keyPath:  The key path to sort by.
+     - parameter byKeyPath: a value's key path predicate.
      - parameter ascending: The direction to sort in.
      */
-    public func sorted(byKeyPath keyPath: String, ascending: Bool = true) -> Results<Element> {
-        return sorted(by: [SortDescriptor(keyPath: keyPath, ascending: ascending)])
+    public func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element> {
+        fatalError("Not implemented in Map")
     }
 
-    /**
-     Returns a `Results` containing the objects in the set, but sorted.
-
-     - warning: MutableSets may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
-
-     - see: `sorted(byKeyPath:ascending:)`
-    */
-    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element>
-        where S.Iterator.Element == SortDescriptor {
-            return Results<Element>(_rlmDictionary.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
+    public func sorted<S>(by sortDescriptors: S) -> Results<Element> where S : Sequence, S.Element == SortDescriptor {
+        fatalError("Not implemented in Map")
     }
 
     // MARK: Mutation
@@ -146,7 +132,7 @@ public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
     }
 
     /**
-     Removes all objects from the set. The objects are not removed from the Realm that manages them.
+     Removes all objects from the dictionary. The objects are not removed from the Realm that manages them.
 
      - warning: This method may only be called during a write transaction.
      */
@@ -272,7 +258,7 @@ extension Map where Element: AddableType {
 }
 
 extension Map: RealmCollection {
-    /// The type of the objects stored within the set.
+    /// The type of the objects stored within the dictionary.
     public typealias ElementType = Element
 
     // MARK: Sequence Support

@@ -50,12 +50,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy, nullable) NSString *objectClassName;
 
 /**
- The Realm which manages the dictionary. Returns `nil` for unmanaged set.
+ The Realm which manages the dictionary. Returns `nil` for unmanaged dictionary.
  */
 @property (nonatomic, readonly, nullable) RLMRealm *realm;
 
 /**
- Indicates if the set can no longer be accessed.
+ Indicates if the dictionary can no longer be accessed.
  */
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
@@ -155,8 +155,8 @@ NS_ASSUME_NONNULL_BEGIN
 
  The `changes` parameter will be `nil` the first time the block is called.
  For each call after that, it will contain information about
- which rows in the set were added, removed or modified. If a write transaction
- did not modify any objects in the set, the block is not called at all.
+ which rows in the dictionary were added, removed or modified. If a write transaction
+ did not modify any objects in the dictionary, the block is not called at all.
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
@@ -194,9 +194,9 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning This method cannot be called during a write transaction, or when the
           containing Realm is read-only.
- @warning This method may only be called on a non-frozen managed set.
+ @warning This method may only be called on a non-frozen managed dictionary.
 
- @param block The block to be called each time the set changes.
+ @param block The block to be called each time the dictionary changes.
  @return A token which must be held for as long as you want updates to be delivered.
  */
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMObjectType> *_Nullable dictionary,
@@ -213,8 +213,8 @@ __attribute__((warn_unused_result));
 
  The `changes` parameter will be `nil` the first time the block is called.
  For each call after that, it will contain information about
- which rows in the set were added, removed or modified. If a write transaction
- did not modify any objects in the set, the block is not called at all.
+ which rows in the dictionary were added, removed or modified. If a write transaction
+ did not modify any objects in the dictionary, the block is not called at all.
  See the `RLMCollectionChange` documentation for information on how the changes
  are reported and an example of updating a `UITableView`.
 
