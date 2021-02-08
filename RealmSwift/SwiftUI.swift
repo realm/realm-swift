@@ -351,7 +351,8 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     public mutating func update() {
         // When the view updates, it will inject the @Environment
         // into the propertyWrapper
-        if storage.configuration?.encryptionKey != configuration.encryptionKey ||
+        if storage.configuration == nil ||
+            storage.configuration?.encryptionKey != configuration.encryptionKey ||
             storage.configuration?.fileURL != configuration.fileURL ||
             storage.configuration?.syncConfiguration?.partitionValue != configuration.syncConfiguration?.partitionValue ||
             storage.configuration?.inMemoryIdentifier != configuration.inMemoryIdentifier {
