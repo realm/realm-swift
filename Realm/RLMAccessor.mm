@@ -19,7 +19,6 @@
 #import "RLMAccessor.hpp"
 
 #import "RLMArray_Private.hpp"
-#import "RLMListBase.h"
 #import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
@@ -29,8 +28,8 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMResults_Private.hpp"
 #import "RLMSchema_Private.h"
-#import "RLMSetBase.h"
 #import "RLMSet_Private.hpp"
+#import "RLMSwiftCollectionBase.h"
 #import "RLMUtil.hpp"
 #import "RLMUUID_Private.hpp"
 
@@ -726,10 +725,8 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
     // Property value from an instance of this object type
     id value;
     if ([obj isKindOfClass:_info.rlmObjectSchema.objectClass] && prop.swiftIvar) {
-        if (prop.array) {
-            return static_cast<RLMListBase *>(object_getIvar(obj, prop.swiftIvar))._rlmCollection;
-        } else if (prop.set) {
-            return static_cast<RLMSetBase *>(object_getIvar(obj, prop.swiftIvar))._rlmCollection;
+        if (prop.collection) {
+            return static_cast<RLMSwiftCollectionBase *>(object_getIvar(obj, prop.swiftIvar))._rlmCollection;
         }
         else { // optional
             value = RLMGetOptional(static_cast<RLMOptionalBase *>(object_getIvar(obj, prop.swiftIvar)));

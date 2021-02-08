@@ -43,7 +43,7 @@
 @implementation RLMSet {
 @public
     // Backing set when this instance is unmanaged
-    NSMutableSet *_backingSet;
+    NSMutableSet *_backingCollection;
 }
 
 #pragma mark - Initializers
@@ -78,7 +78,7 @@
 - (void)addObject:(id)object {
     RLMSetValidateMatchingObjectType(self, object);
     changeSet(self, ^{
-        [_backingSet addObject:object];
+        [_backingCollection addObject:object];
     });
 }
 
@@ -91,7 +91,7 @@
         RLMSetValidateMatchingObjectType(self, obj);
     }
     changeSet(self, ^{
-        [_backingSet setSet:set->_backingSet];
+        [_backingCollection setSet:set->_backingCollection];
     });
 }
 
@@ -100,7 +100,7 @@
         RLMSetValidateMatchingObjectType(self, obj);
     }
     changeSet(self, ^{
-        [_backingSet intersectSet:set->_backingSet];
+        [_backingCollection intersectSet:set->_backingCollection];
     });
 }
 
@@ -109,7 +109,7 @@
         RLMSetValidateMatchingObjectType(self, obj);
     }
     changeSet(self, ^{
-        [_backingSet minusSet:set->_backingSet];
+        [_backingCollection minusSet:set->_backingCollection];
     });
 }
 
@@ -118,7 +118,7 @@
         RLMSetValidateMatchingObjectType(self, obj);
     }
     changeSet(self, ^{
-        [_backingSet unionSet:set->_backingSet];
+        [_backingCollection unionSet:set->_backingCollection];
     });
 }
 
@@ -126,19 +126,19 @@
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    return [_backingSet isSubsetOfSet:set->_backingSet];
+    return [_backingCollection isSubsetOfSet:set->_backingCollection];
 }
 
 - (BOOL)intersectsSet:(RLMSet<id> *)set {
     for (id obj in set) {
         RLMSetValidateMatchingObjectType(self, obj);
     }
-    return [_backingSet intersectsSet:set->_backingSet];
+    return [_backingCollection intersectsSet:set->_backingCollection];
 }
 
 - (BOOL)containsObject:(id)obj {
     RLMSetValidateMatchingObjectType(self, obj);
-    return [_backingSet containsObject:obj];
+    return [_backingCollection containsObject:obj];
 }
 
 - (BOOL)isEqualToSet:(RLMSet<id> *)set {
@@ -149,7 +149,7 @@
 // subscripting while its Swift counterpart `Set` does.
 - (id)objectAtIndex:(NSUInteger)index {
     validateSetBounds(self, index);
-    return _backingSet.allObjects[index];
+    return _backingCollection.allObjects[index];
 }
 
 - (RLMResults *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending {
@@ -163,11 +163,11 @@
 }
 
 - (NSUInteger)count {
-    return _backingSet.count;
+    return _backingCollection.count;
 }
 
 - (NSArray<id> *)allObjects {
-    return _backingSet.allObjects;
+    return _backingCollection.allObjects;
 }
 
 - (BOOL)isInvalidated {
@@ -192,7 +192,7 @@
     copy->items = std::make_unique<id[]>(self.count);
 
     NSUInteger i = 0;
-    for (id object in _backingSet) {
+    for (id object in _backingCollection) {
         copy->items[i++] = object;
     }
 
@@ -207,8 +207,8 @@
 
 static void changeSet(__unsafe_unretained RLMSet *const set,
                       dispatch_block_t f) {
-    if (!set->_backingSet) {
-        set->_backingSet = [NSMutableSet new];
+    if (!set->_backingCollection) {
+        set->_backingCollection = [NSMutableSet new];
     }
 
     if (RLMObjectBase *parent = set->_parentObject) {
@@ -224,7 +224,7 @@ static void changeSet(__unsafe_unretained RLMSet *const set,
 static void validateSetBounds(__unsafe_unretained RLMSet *const set,
                               NSUInteger index,
                               bool allowOnePastEnd=false) {
-    NSUInteger max = set->_backingSet.count + allowOnePastEnd;
+    NSUInteger max = set->_backingCollection.count + allowOnePastEnd;
     if (index >= max) {
         @throw RLMException(@"Index %llu is out of bounds (must be less than %llu).",
                             (unsigned long long)index, (unsigned long long)max);
@@ -233,14 +233,14 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
 
 - (void)removeAllObjects {
     changeSet(self, ^{
-        [_backingSet removeAllObjects];
+        [_backingCollection removeAllObjects];
     });
 }
 
 - (void)removeObject:(id)object {
     RLMSetValidateMatchingObjectType(self, object);
     changeSet(self, ^{
-        [_backingSet removeObject:object];
+        [_backingCollection removeObject:object];
     });
 }
 
@@ -276,8 +276,8 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     }
 
     RLMObjectSchema *objectSchema;
-    if (_backingSet.count) {
-        objectSchema = [_backingSet.allObjects[0] objectSchema];
+    if (_backingCollection.count) {
+        objectSchema = [_backingCollection.allObjects[0] objectSchema];
     }
     else {
         objectSchema = [RLMSchema.partialPrivateSharedSchema schemaForClassName:_objectClassName];
@@ -308,7 +308,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     }
     else if (![op isEqualToString:@"@avg"]) {
         // Just delegate to NSSet for all other operators
-        return [_backingSet valueForKeyPath:[op stringByAppendingPathExtension:key]];
+        return [_backingCollection valueForKeyPath:[op stringByAppendingPathExtension:key]];
     }
 
     RLMPropertyType type = [self typeForProperty:key];
@@ -328,7 +328,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     // issue as the realm::object_store::Set aggregate methods will calculate
     // the result based on each element of a property regardless of uniqueness.
     // To get around this we will need to use the `array` property of the NSMutableOrderedSet
-    NSArray *values = [key isEqualToString:@"self"] ? _backingSet.allObjects : [_backingSet.allObjects valueForKey:key];
+    NSArray *values = [key isEqualToString:@"self"] ? _backingCollection.allObjects : [_backingCollection.allObjects valueForKey:key];
     if (_optional) {
         // Filter out NSNull values to match our behavior on managed arrays
         NSIndexSet *nonnull = [values indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger, BOOL *) {
@@ -345,16 +345,16 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
 
 - (id)valueForKeyPath:(NSString *)keyPath {
     if ([keyPath characterAtIndex:0] != '@') {
-        return _backingSet ? [_backingSet valueForKeyPath:keyPath] : [super valueForKeyPath:keyPath];
+        return _backingCollection ? [_backingCollection valueForKeyPath:keyPath] : [super valueForKeyPath:keyPath];
     }
 
-    if (!_backingSet) {
-        _backingSet = [NSMutableSet new];
+    if (!_backingCollection) {
+        _backingCollection = [NSMutableSet new];
     }
 
     NSUInteger dot = [keyPath rangeOfString:@"."].location;
     if (dot == NSNotFound) {
-        return [_backingSet valueForKeyPath:keyPath];
+        return [_backingCollection valueForKeyPath:keyPath];
     }
 
     NSString *op = [keyPath substringToIndex:dot];
@@ -366,21 +366,21 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     if ([key isEqualToString:RLMInvalidatedKey]) {
         return @NO; // Unmanaged sets are never invalidated
     }
-    if (!_backingSet) {
-        _backingSet = [NSMutableSet new];
+    if (!_backingCollection) {
+        _backingCollection = [NSMutableSet new];
     }
-    return [_backingSet valueForKey:key];
+    return [_backingCollection valueForKey:key];
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {
     if ([key isEqualToString:@"self"]) {
         RLMSetValidateMatchingObjectType(self, value);
-        [_backingSet removeAllObjects];
-        [_backingSet addObject:value];
+        [_backingCollection removeAllObjects];
+        [_backingCollection addObject:value];
         return;
     }
     else if (_type == RLMPropertyTypeObject) {
-        [_backingSet setValue:value forKey:key];
+        [_backingCollection setValue:value forKey:key];
     }
     else {
         [self setValue:value forUndefinedKey:key];
@@ -406,8 +406,8 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
 - (BOOL)isEqual:(id)object {
     if (auto set = RLMDynamicCast<RLMSet>(object)) {
         return !set.realm
-        && ((_backingSet.count == 0 && set->_backingSet.count == 0)
-            || [_backingSet isEqual:set->_backingSet]);
+        && ((_backingCollection.count == 0 && set->_backingCollection.count == 0)
+            || [_backingCollection isEqual:set->_backingCollection]);
     }
     return NO;
 }

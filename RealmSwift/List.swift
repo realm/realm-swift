@@ -20,25 +20,6 @@ import Foundation
 import Realm
 import Realm.Private
 
-/// :nodoc:
-/// Internal class. Do not use directly.
-public class ListBase: RLMListBase {
-    // Printable requires a description property defined in Swift (and not obj-c),
-    // and it has to be defined as override, which can't be done in a
-    // generic class.
-    /// Returns a human-readable description of the objects contained in the List.
-    @objc public override var description: String {
-        return descriptionWithMaxDepth(RLMDescriptionMaxDepth)
-    }
-
-    @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
-        return RLMDescriptionWithMaxDepth("List", _rlmCollection, depth)
-    }
-
-    /// Returns the number of objects in this List.
-    public var count: Int { return Int(_rlmCollection.count) }
-}
-
 /**
  `List` is the container type in Realm used to define to-many relationships.
 
@@ -53,7 +34,7 @@ public class ListBase: RLMListBase {
 
  Properties of `List` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
  */
-public final class List<Element: RealmCollectionValue>: ListBase {
+public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
 
     // MARK: Properties
 
@@ -65,6 +46,10 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     /// Indicates if the list can no longer be accessed.
     public var isInvalidated: Bool { return _rlmCollection.isInvalidated }
 
+    internal var rlmArray: RLMArray<AnyObject> {
+        _rlmCollection as! RLMArray
+    }
+
     // MARK: Initializers
 
     /// Creates a `List` that holds Realm model objects of type `Element`.
@@ -73,8 +58,13 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     }
 
     internal init(objc rlmArray: RLMArray<AnyObject>) {
-        super.init(array: rlmArray)
+        super.init(collection: rlmArray)
     }
+
+    // MARK: Count
+
+    /// Returns the number of objects in this List.
+    public var count: Int { return Int(_rlmCollection.count) }
 
     // MARK: Index Retrieval
 
@@ -84,7 +74,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      - parameter object: An object to find.
      */
     public func index(of object: Element) -> Int? {
-        return notFoundToNil(index: _rlmCollection.index(of: dynamicBridgeCast(fromSwift: object) as AnyObject))
+        return notFoundToNil(index: rlmArray.index(of: dynamicBridgeCast(fromSwift: object) as AnyObject))
     }
 
     /**
@@ -93,7 +83,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      - parameter predicate: The predicate with which to filter the objects.
     */
     public func index(matching predicate: NSPredicate) -> Int? {
-        return notFoundToNil(index: _rlmCollection.indexOfObject(with: predicate))
+        return notFoundToNil(index: rlmArray.indexOfObject(with: predicate))
     }
 
     // MARK: Object Retrieval
@@ -112,15 +102,15 @@ public final class List<Element: RealmCollectionValue>: ListBase {
         }
         set {
             throwForNegativeIndex(position)
-            _rlmCollection.replaceObject(at: UInt(position), with: dynamicBridgeCast(fromSwift: newValue) as AnyObject)
+            rlmArray.replaceObject(at: UInt(position), with: dynamicBridgeCast(fromSwift: newValue) as AnyObject)
         }
     }
 
     /// Returns the first object in the list, or `nil` if the list is empty.
-    public var first: Element? { return _rlmCollection.firstObject().map(dynamicBridgeCast) }
+    public var first: Element? { return rlmArray.firstObject().map(dynamicBridgeCast) }
 
     /// Returns the last object in the list, or `nil` if the list is empty.
-    public var last: Element? { return _rlmCollection.lastObject().map(dynamicBridgeCast) }
+    public var last: Element? { return rlmArray.lastObject().map(dynamicBridgeCast) }
 
     // MARK: KVC
 
@@ -129,7 +119,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      objects.
      */
     @nonobjc public func value(forKey key: String) -> [AnyObject] {
-        return _rlmCollection.value(forKeyPath: key)! as! [AnyObject]
+        return rlmArray.value(forKeyPath: key)! as! [AnyObject]
     }
 
     /**
@@ -139,7 +129,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      - parameter keyPath: The key path to the property whose values are desired.
      */
     @nonobjc public func value(forKeyPath keyPath: String) -> [AnyObject] {
-        return _rlmCollection.value(forKeyPath: keyPath) as! [AnyObject]
+        return rlmArray.value(forKeyPath: keyPath) as! [AnyObject]
     }
 
     /**
@@ -151,7 +141,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      - parameter key:   The name of the property whose value should be set on each object.
     */
     public override func setValue(_ value: Any?, forKey key: String) {
-        return _rlmCollection.setValue(value, forKeyPath: key)
+        return rlmArray.setValue(value, forKeyPath: key)
     }
 
     // MARK: Filtering
@@ -258,7 +248,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      - parameter object: An object.
      */
     public func append(_ object: Element) {
-        _rlmCollection.add(dynamicBridgeCast(fromSwift: object) as AnyObject)
+        rlmArray.add(dynamicBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**
@@ -268,7 +258,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     */
     public func append<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == Element {
         for obj in objects {
-            _rlmCollection.add(dynamicBridgeCast(fromSwift: obj) as AnyObject)
+            rlmArray.add(dynamicBridgeCast(fromSwift: obj) as AnyObject)
         }
     }
 
@@ -284,7 +274,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      */
     public func insert(_ object: Element, at index: Int) {
         throwForNegativeIndex(index)
-        _rlmCollection.insert(dynamicBridgeCast(fromSwift: object) as AnyObject, at: UInt(index))
+        rlmArray.insert(dynamicBridgeCast(fromSwift: object) as AnyObject, at: UInt(index))
     }
 
     /**
@@ -298,7 +288,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      */
     public func remove(at index: Int) {
         throwForNegativeIndex(index)
-        _rlmCollection.removeObject(at: UInt(index))
+        rlmArray.removeObject(at: UInt(index))
     }
 
     /**
@@ -307,7 +297,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      - warning: This method may only be called during a write transaction.
      */
     public func removeAll() {
-        _rlmCollection.removeAllObjects()
+        rlmArray.removeAllObjects()
     }
 
     /**
@@ -322,7 +312,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      */
     public func replace(index: Int, object: Element) {
         throwForNegativeIndex(index)
-        _rlmCollection.replaceObject(at: UInt(index), with: dynamicBridgeCast(fromSwift: object) as AnyObject)
+        rlmArray.replaceObject(at: UInt(index), with: dynamicBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**
@@ -338,7 +328,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     public func move(from: Int, to: Int) {
         throwForNegativeIndex(from)
         throwForNegativeIndex(to)
-        _rlmCollection.moveObject(at: UInt(from), to: UInt(to))
+        rlmArray.moveObject(at: UInt(from), to: UInt(to))
     }
 
     /**
@@ -354,7 +344,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     public func swapAt(_ index1: Int, _ index2: Int) {
         throwForNegativeIndex(index1, parameterName: "index1")
         throwForNegativeIndex(index2, parameterName: "index2")
-        _rlmCollection.exchangeObject(at: UInt(index1), withObjectAt: UInt(index2))
+        rlmArray.exchangeObject(at: UInt(index1), withObjectAt: UInt(index2))
     }
 
     // MARK: Notifications
@@ -419,7 +409,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      */
     public func observe(on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<List>) -> Void) -> NotificationToken {
-        return _rlmCollection.addNotificationBlock(wrapObserveBlock(block), queue: queue)
+        return rlmArray.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Frozen Objects
@@ -429,16 +419,28 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     }
 
     public func freeze() -> List {
-        return List(objc: _rlmCollection.freeze())
+        return List(objc: rlmArray.freeze())
     }
 
     public func thaw() -> List? {
-        return List(objc: _rlmCollection.thaw())
+        return List(objc: rlmArray.thaw())
     }
 
     // swiftlint:disable:next identifier_name
-    @objc class func _unmanagedArray() -> RLMArray<AnyObject> {
+    @objc class func _unmanagedCollection() -> RLMArray<AnyObject> {
         return Element._rlmCollection()
+    }
+
+    // Printable requires a description property defined in Swift (and not obj-c),
+    // and it has to be defined as override, which can't be done in a
+    // generic class.
+    /// Returns a human-readable description of the objects contained in the List.
+    @objc public override var description: String {
+        return descriptionWithMaxDepth(RLMDescriptionMaxDepth)
+    }
+
+    @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
+        return RLMDescriptionWithMaxDepth("List", _rlmCollection, depth)
     }
 }
 
@@ -525,7 +527,7 @@ extension List: RealmCollection {
     public func _observe(_ queue: DispatchQueue?,
                          _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
         -> NotificationToken {
-            return _rlmCollection.addNotificationBlock(wrapObserveBlock(block), queue: queue)
+            return rlmArray.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 }
 
@@ -564,7 +566,7 @@ extension List: MutableCollection {
                 + " than it already contains (\(count)).")
         }
         for _ in 0..<number {
-            _rlmCollection.removeObject(at: 0)
+            rlmArray.removeObject(at: 0)
         }
     }
 
@@ -582,7 +584,7 @@ extension List: MutableCollection {
                 + " than it already contains (\(count)).")
         }
         for _ in 0..<number {
-            _rlmCollection.removeLastObject()
+            rlmArray.removeLastObject()
         }
     }
 

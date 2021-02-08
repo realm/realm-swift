@@ -55,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
  object. Instead, you can call the mutation methods on the `RLMArray` directly.
  */
 
-@interface RLMArray<RLMObjectType> : NSObject<RLMCollection, NSFastEnumeration>
+@interface RLMArray<RLMObjectType> : NSObject<RLMCollection>
 
 #pragma mark - Properties
 

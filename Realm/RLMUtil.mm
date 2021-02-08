@@ -20,15 +20,14 @@
 
 #import "RLMArray_Private.hpp"
 #import "RLMDecimal128_Private.hpp"
-#import "RLMListBase.h"
 #import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
-#import "RLMSetBase.h"
 #import "RLMSet_Private.hpp"
+#import "RLMSwiftCollectionBase.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUUID_Private.hpp"
 
@@ -107,11 +106,11 @@ static inline bool numberIsDouble(__unsafe_unretained NSNumber *const obj) {
 }
 
 static inline RLMArray *asRLMArray(__unsafe_unretained id const value) {
-    return RLMDynamicCast<RLMArray>(value) ?: RLMDynamicCast<RLMListBase>(value)._rlmCollection;
+    return RLMDynamicCast<RLMArray>(value) ?: RLMDynamicCast<RLMSwiftCollectionBase>(value)._rlmCollection;
 }
 
 static inline RLMSet *asRLMSet(__unsafe_unretained id const value) {
-    return RLMDynamicCast<RLMSet>(value) ?: RLMDynamicCast<RLMSetBase>(value)._rlmCollection;
+    return RLMDynamicCast<RLMSet>(value) ?: RLMDynamicCast<RLMSwiftCollectionBase>(value)._rlmCollection;
 }
 
 static inline bool checkCollectionType(__unsafe_unretained id<RLMCollection> const collection,

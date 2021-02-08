@@ -20,12 +20,12 @@
 
 #import "RLMArray.h"
 #import "RLMEmbeddedObject.h"
-#import "RLMListBase.h"
 #import "RLMObject_Private.h"
 #import "RLMProperty_Private.hpp"
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMSwiftCollectionBase.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 

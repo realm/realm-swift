@@ -427,13 +427,4 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType);
 - (NSArray<NSIndexPath *> *)modificationsInSection:(NSUInteger)section;
 @end
 
-/**
- Used for constructing the base type of Swift Realm collection types. Examples
- include `RLMListBase` & `RLMSetBase`.
- */
-@protocol RLMCollectionBase
-/// A homogeneous Realm collection type.
-@property (nonatomic, strong) id _Nonnull _rlmCollection;
-@end
-
 NS_ASSUME_NONNULL_END

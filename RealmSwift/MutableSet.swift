@@ -20,25 +20,6 @@ import Foundation
 import Realm
 import Realm.Private
 
-/// :nodoc:
-/// Internal class. Do not use directly.
-public class MutableSetBase: RLMSetBase {
-    // Printable requires a description property defined in Swift (and not obj-c),
-    // and it has to be defined as override, which can't be done in a
-    // generic class.
-    /// Returns a human-readable description of the objects contained in the MutableSet.
-    @objc public override var description: String {
-        return descriptionWithMaxDepth(RLMDescriptionMaxDepth)
-    }
-
-    @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
-        return RLMDescriptionWithMaxDepth("MutableSet", _rlmCollection, depth)
-    }
-
-    /// Returns the number of objects in this MutableSet.
-    public var count: Int { return Int(_rlmCollection.count) }
-}
-
 /**
  `MutableSet` is the container type in Realm used to define to-many relationships with distinct values as objects.
 
@@ -53,7 +34,7 @@ public class MutableSetBase: RLMSetBase {
 
  Properties of `MutableSet` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
  */
-public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
+public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
 
     // MARK: Properties
 
@@ -65,6 +46,10 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
     /// Indicates if the set can no longer be accessed.
     public var isInvalidated: Bool { return _rlmCollection.isInvalidated }
 
+    internal var rlmSet: RLMSet<AnyObject> {
+        _rlmCollection as! RLMSet
+    }
+
     // MARK: Initializers
 
     /// Creates a `MutableSet` that holds Realm model objects of type `Element`.
@@ -73,8 +58,13 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
     }
 
     internal init(objc rlmSet: RLMSet<AnyObject>) {
-        super.init(set: rlmSet)
+        super.init(collection: rlmSet)
     }
+
+    // MARK: Count
+
+    /// Returns the number of objects in this MutableSet.
+    public var count: Int { return Int(_rlmCollection.count) }
 
     // MARK: KVC
 
@@ -83,7 +73,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      objects.
      */
     @nonobjc public func value(forKey key: String) -> [AnyObject] {
-        return (_rlmCollection.value(forKeyPath: key)! as! NSSet).allObjects as [AnyObject]
+        return (rlmSet.value(forKeyPath: key)! as! NSSet).allObjects as [AnyObject]
     }
 
     /**
@@ -93,7 +83,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter keyPath: The key path to the property whose values are desired.
      */
     @nonobjc public func value(forKeyPath keyPath: String) -> [AnyObject] {
-        return (_rlmCollection.value(forKeyPath: keyPath)! as! NSSet).allObjects as [AnyObject]
+        return (rlmSet.value(forKeyPath: keyPath)! as! NSSet).allObjects as [AnyObject]
     }
 
     /**
@@ -105,7 +95,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter key:   The name of the property whose value should be set on each object.
     */
     public override func setValue(_ value: Any?, forKey key: String) {
-        return _rlmCollection.setValue(value, forKeyPath: key)
+        return rlmSet.setValue(value, forKeyPath: key)
     }
 
     // MARK: Filtering
@@ -126,7 +116,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter object: The element to find in the MutableSet.
      */
     public func contains(_ object: Element) -> Bool {
-        return _rlmCollection.contains(dynamicBridgeCast(fromSwift: object) as AnyObject)
+        return rlmSet.contains(dynamicBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**
@@ -136,7 +126,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - Parameter object: Another MutableSet to compare.
      */
     public func isSubset(of possibleSuperset: MutableSet<Element>) -> Bool {
-        return _rlmCollection.isSubset(of: possibleSuperset._rlmCollection)
+        return rlmSet.isSubset(of: possibleSuperset.rlmSet)
     }
 
     /**
@@ -146,7 +136,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - Parameter object: Another MutableSet to compare.
      */
     public func intersects(_ otherSet: MutableSet<Element>) -> Bool {
-        return _rlmCollection.intersects(otherSet._rlmCollection)
+        return rlmSet.intersects(otherSet.rlmSet)
     }
 
     // MARK: Sorting
@@ -239,7 +229,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter object: An object.
      */
     public func insert(_ object: Element) {
-        _rlmCollection.add(dynamicBridgeCast(fromSwift: object) as AnyObject)
+        rlmSet.add(dynamicBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**
@@ -249,7 +239,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
     */
     public func insert<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == Element {
         for obj in objects {
-            _rlmCollection.add(dynamicBridgeCast(fromSwift: obj) as AnyObject)
+            rlmSet.add(dynamicBridgeCast(fromSwift: obj) as AnyObject)
         }
     }
 
@@ -261,7 +251,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter object: The object to remove.
      */
     public func remove(_ object: Element) {
-        _rlmCollection.remove(dynamicBridgeCast(fromSwift: object) as AnyObject)
+        rlmSet.remove(dynamicBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**
@@ -270,7 +260,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - warning: This method may only be called during a write transaction.
      */
     public func removeAll() {
-        _rlmCollection.removeAllObjects()
+        rlmSet.removeAllObjects()
     }
 
     /**
@@ -281,7 +271,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter other: Another set.
      */
     public func formIntersection(_ other: MutableSet<Element>) {
-        _rlmCollection.intersect(other._rlmCollection)
+        rlmSet.intersect(other.rlmSet)
     }
 
     /**
@@ -292,7 +282,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter other: Another set.
      */
     public func subtract(_ other: MutableSet<Element>) {
-        _rlmCollection.minus(other._rlmCollection)
+        rlmSet.minus(other.rlmSet)
     }
 
     /**
@@ -303,7 +293,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter other: Another set.
      */
     public func formUnion(_ other: MutableSet<Element>) {
-        _rlmCollection.union(other._rlmCollection)
+        rlmSet.union(other.rlmSet)
     }
 
     // MARK: Notifications
@@ -368,7 +358,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      */
     public func observe(on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<MutableSet>) -> Void) -> NotificationToken {
-        return _rlmCollection.addNotificationBlock(wrapObserveBlock(block), queue: queue)
+        return rlmSet.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Frozen Objects
@@ -378,16 +368,28 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
     }
 
     public func freeze() -> MutableSet {
-        return MutableSet(objc: _rlmCollection.freeze())
+        return MutableSet(objc: rlmSet.freeze())
     }
 
     public func thaw() -> MutableSet? {
-        return MutableSet(objc: _rlmCollection.thaw())
+        return MutableSet(objc: rlmSet.thaw())
     }
 
     // swiftlint:disable:next identifier_name
-    @objc class func _unmanagedSet() -> RLMSet<AnyObject> {
+    @objc class func _unmanagedCollection() -> RLMSet<AnyObject> {
         return Element._rlmCollection()
+    }
+
+    // Printable requires a description property defined in Swift (and not obj-c),
+    // and it has to be defined as override, which can't be done in a
+    // generic class.
+    /// Returns a human-readable description of the objects contained in the MutableSet.
+    @objc public override var description: String {
+        return descriptionWithMaxDepth(RLMDescriptionMaxDepth)
+    }
+
+    @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
+        return RLMDescriptionWithMaxDepth("MutableSet", _rlmCollection, depth)
     }
 }
 
@@ -457,7 +459,7 @@ extension MutableSet: RealmCollection {
     public func _observe(_ queue: DispatchQueue?,
                          _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
         -> NotificationToken {
-            return _rlmCollection.addNotificationBlock(wrapObserveBlock(block), queue: queue)
+            return rlmSet.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Object Retrieval
@@ -467,7 +469,9 @@ extension MutableSet: RealmCollection {
                 convenience should not be relied on.
      */
     public subscript(position: Int) -> Element {
-        return dynamicBridgeCast(fromObjectiveC: self.object(at: UInt(position)))
+        throwForNegativeIndex(position)
+        return dynamicBridgeCast(fromObjectiveC: _rlmCollection.object(at: UInt(position)))
+        //return self.rlmSet.object(at: UInt(position))
     }
 
     /// :nodoc:
@@ -485,6 +489,9 @@ extension MutableSet: RealmCollection {
                 convenience should not be relied on.
      */
     public var first: Element? {
+        guard count > 0 else {
+            return nil
+        }
         return self[0]
     }
 
@@ -493,6 +500,9 @@ extension MutableSet: RealmCollection {
                 convenience should not be relied on.
      */
     public var last: Element? {
+        guard count > 0 else {
+            return nil
+        }
         return self[count-1]
     }
 }

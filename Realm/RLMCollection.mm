@@ -20,13 +20,12 @@
 
 #import "RLMAccessor.hpp"
 #import "RLMArray_Private.hpp"
-#import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
-#import "RLMSetBase.h"
 #import "RLMSet_Private.hpp"
+#import "RLMSwiftCollectionBase.h"
 
 #import <realm/object-store/collection_notifications.hpp>
 #import <realm/object-store/list.hpp>
@@ -205,9 +204,9 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
         Class cls = [object_getIvar(accessor, prop.swiftIvar) class];
         RLMAccessorContext context(info);
         if (prop && prop.collection && prop.swiftIvar) {
-            get_collection_type(prop, [&](auto t) {
+            RLMGetCollectionType(prop, [&](auto t) {
                 for (size_t i = 0; i < count; ++i) {
-                    id<RLMCollectionBase> base = [[cls alloc] init];
+                    RLMSwiftCollectionBase *base = [[cls alloc] init];
                     base._rlmCollection = RLMManagedCollectionFromCollection<std::decay_t<decltype(*t)>>(info, collection.get(i), prop);
                     [array addObject:base];
                 }
@@ -225,7 +224,7 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
 }
 
 template<typename Fn>
-void get_collection_type(RLMProperty *prop, Fn&& func) {
+void RLMGetCollectionType(RLMProperty *prop, Fn&& func) {
     if (prop.array) {
         func(((realm::List *)0));
     }

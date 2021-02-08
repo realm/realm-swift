@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2021 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,18 +18,16 @@
 
 #import <Realm/RLMCollection.h>
 
-@class RLMArray, RLMObjectBase, RLMResults, RLMProperty, RLMLinkingObjects;
-@protocol RLMCollectionBase;
+@class RLMObjectBase, RLMResults, RLMProperty, RLMLinkingObjects;
 
 NS_ASSUME_NONNULL_BEGIN
 
-// A base class for Swift generic Lists to make it possible to interact with
-// them from obj-c
-@interface RLMListBase : NSObject <RLMCollectionBase, NSFastEnumeration>
-@property (nonatomic, strong) RLMArray *_rlmCollection;
+@interface RLMSwiftCollectionBase : NSObject <NSFastEnumeration>
+@property (nonatomic, strong) id<RLMCollection> _rlmCollection;
 
 - (instancetype)init;
-- (instancetype)initWithArray:(RLMArray *)array;
+- (instancetype)initWithCollection:(id<RLMCollection>)collection;
+//- (id)objectAtIndex:(NSUInteger)index;
 @end
 
 @interface RLMLinkingObjectsHandle : NSObject

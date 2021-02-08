@@ -20,7 +20,6 @@
 
 #import "RLMAccessor.hpp"
 #import "RLMArray_Private.hpp"
-#import "RLMListBase.h"
 #import "RLMObservation.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
@@ -29,8 +28,8 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
-#import "RLMSetBase.h"
 #import "RLMSet_Private.hpp"
+#import "RLMSwiftCollectionBase.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 

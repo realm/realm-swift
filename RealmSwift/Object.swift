@@ -280,7 +280,7 @@ extension Object: RealmCollectionValue {
         if let dynamic = self as? DynamicObject {
             return dynamic[propertyName] as! List<DynamicObject>
         }
-        return noWarnUnsafeBitCast(dynamicGet(key: propertyName) as! RLMListBase,
+        return noWarnUnsafeBitCast(dynamicGet(key: propertyName) as! RLMSwiftCollectionBase,
                                    to: List<DynamicObject>.self)
     }
 
@@ -303,7 +303,7 @@ extension Object: RealmCollectionValue {
         if let dynamic = self as? DynamicObject {
             return dynamic[propertyName] as! MutableSet<DynamicObject>
         }
-        return noWarnUnsafeBitCast(dynamicGet(key: propertyName) as! RLMSetBase,
+        return noWarnUnsafeBitCast(dynamicGet(key: propertyName) as! RLMSwiftCollectionBase,
                                    to: MutableSet<DynamicObject>.self)
     }
 

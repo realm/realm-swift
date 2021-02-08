@@ -25,8 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
-// NSSet does not support subscripting, but Swift Set does.
-- (id)objectAtIndex:(NSUInteger)index;
 @end
 
 void RLMSetValidateMatchingObjectType(RLMSet *set, id value);

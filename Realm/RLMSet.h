@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
  `RLMSet` supports storing primitive and `RLMObject` types. `RLMSet` does not support storing
  Embedded Realm Objects.
  */
-@interface RLMSet<RLMObjectType> : NSObject<RLMCollection, NSFastEnumeration>
+@interface RLMSet<RLMObjectType> : NSObject<RLMCollection>
 
 #pragma mark - Properties
 

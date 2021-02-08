@@ -33,7 +33,7 @@ namespace realm {
     }
 }
 class RLMClassInfo;
-@class RLMFastEnumerator, RLMManagedArray, RLMManagedSet, RLMProperty;
+@class RLMFastEnumerator, RLMManagedArray, RLMManagedSet, RLMProperty, RLMObjectBase;
 
 @protocol RLMFastEnumerable
 @property (nonatomic, readonly) RLMRealm *realm;
@@ -92,4 +92,4 @@ std::vector<std::pair<std::string, bool>> RLMSortDescriptorsToKeypathArray(NSArr
 template<typename Collection, typename RLMCollection>
 id RLMManagedCollectionFromCollection(RLMClassInfo* info, realm::Obj&& obj, RLMProperty *prop);
 template<typename Fn>
-void get_collection_type(RLMProperty *prop, Fn&& func);
+void RLMGetCollectionType(RLMProperty *prop, Fn&& func);

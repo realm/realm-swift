@@ -42,12 +42,12 @@ import Realm
 
     /// Convert a `List` to a `RLMArray`.
     public static func convert<T>(object: List<T>) -> RLMArray<AnyObject> {
-        return object._rlmCollection
+        return object.rlmArray
     }
 
     /// Convert a `MutableSet` to a `RLMSet`.
     public static func convert<T>(object: MutableSet<T>) -> RLMSet<AnyObject> {
-        return object._rlmCollection
+        return object.rlmSet
     }
 
     /// Convert a `RLMArray` to a `List`.

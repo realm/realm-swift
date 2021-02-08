@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2015 Realm Inc.
+// Copyright 2021 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMListBase.h"
+#import "RLMSwiftCollectionBase.h"
 
 #import "RLMArray_Private.hpp"
 #import "RLMObjectSchema_Private.h"
@@ -24,16 +24,15 @@
 #import "RLMObservation.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
+#import "RLMSet_Private.hpp"
 
 @interface RLMArray (KVO)
 - (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes;
 @end
 
-@implementation RLMListBase {
-    std::unique_ptr<RLMObservationInfo> _observationInfo;
-}
+@implementation RLMSwiftCollectionBase
 
-+ (RLMArray *)_unmanagedArray {
++ (id<RLMCollection>)_unmanagedCollection {
     return nil;
 }
 
@@ -41,17 +40,17 @@
     return self = [super init];
 }
 
-- (instancetype)initWithArray:(RLMArray *)array {
+- (instancetype)initWithCollection:(id<RLMCollection>)collection {
     self = [super init];
     if (self) {
-        __rlmCollection = array;
+        __rlmCollection = collection;
     }
     return self;
 }
 
-- (RLMArray *)_rlmCollection {
+- (id<RLMCollection>)_rlmCollection {
     if (!__rlmCollection) {
-        __rlmCollection = self.class._unmanagedArray;
+        __rlmCollection = self.class._unmanagedCollection;
     }
     return __rlmCollection;
 }
@@ -61,7 +60,7 @@
 }
 
 - (id)valueForKeyPath:(NSString *)keyPath {
-    return [self._rlmCollection valueForKeyPath:keyPath];
+    return [(NSObject *)self._rlmCollection valueForKeyPath:keyPath];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
@@ -70,23 +69,16 @@
     return [self._rlmCollection countByEnumeratingWithState:state objects:buffer count:len];
 }
 
+// Only in use for RLMArray
 - (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
-    return [self._rlmCollection objectsAtIndexes:indexes];
-}
-
-- (void)addObserver:(id)observer
-         forKeyPath:(NSString *)keyPath
-            options:(NSKeyValueObservingOptions)options
-            context:(void *)context {
-    RLMEnsureArrayObservationInfo(_observationInfo, keyPath, self._rlmCollection, self);
-    [super addObserver:observer forKeyPath:keyPath options:options context:context];
+    return [(RLMArray *)self._rlmCollection objectsAtIndexes:indexes];
 }
 
 - (BOOL)isEqual:(id)object {
-    if (auto array = RLMDynamicCast<RLMListBase>(object)) {
-        return !array._rlmCollection.realm
-        && ((self._rlmCollection.count == 0 && array._rlmCollection.count == 0) ||
-            [self._rlmCollection isEqual:array._rlmCollection]);
+    if (auto base = RLMDynamicCast<RLMSwiftCollectionBase>(object)) {
+        return !base._rlmCollection.realm
+        && ((self._rlmCollection.count == 0 && base._rlmCollection.count == 0) ||
+            [self._rlmCollection isEqual:base._rlmCollection]);
     }
     return NO;
 }
