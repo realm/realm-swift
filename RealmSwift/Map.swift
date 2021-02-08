@@ -86,38 +86,6 @@ public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
         return _rlmDictionary.average(ofProperty: property).map(dynamicBridgeCast)
     }
     
-//    // MARK: KVC
-//
-//    /**
-//     Returns an `Array` containing the results of invoking `valueForKey(_:)` using `key` on each of the collection's
-//     objects.
-//     */
-//    @nonobjc public func value(forKey key: String) -> [AnyObject] {
-//        return (_rlmDictionary.value(forKeyPath: key)! as! NSSet).allObjects as [AnyObject]
-//    }
-//
-//    /**
-//     Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` using `keyPath` on each of the
-//     collection's objects.
-//
-//     - parameter keyPath: The key path to the property whose values are desired.
-//     */
-//    @nonobjc public func value(forKeyPath keyPath: String) -> [AnyObject] {
-//        return (_rlmDictionary.value(forKeyPath: keyPath)! as! NSSet).allObjects as [AnyObject]
-//    }
-//
-//    /**
-//     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified `value` and `key`.
-//
-//     - warning: This method can only be called during a write transaction.
-//
-//     - parameter value: The object value.
-//     - parameter key:   The name of the property whose value should be set on each object.
-//    */
-//    public override func setValue(_ value: Any?, forKey key: String) {
-//        return _rlmDictionary.setValue(value, forKeyPath: key)
-//    }
-
     // MARK: Filtering
 
     /**
