@@ -1454,11 +1454,9 @@ RLM_ARRAY_TYPE(MigrationTestObject);
     XCTAssertEqual(parentObjects.count, 2);
     EmbeddedParentObject *firstParentObject = (EmbeddedParentObject *)parentObjects[0];
     EmbeddedChildObject *firstParentsChild = firstParentObject.embeddedObject;
-    XCTAssert([firstParentsChild isKindOfClass:[RLMEmbeddedObject class]]);
     XCTAssertEqual(firstParentsChild.intCol, 42);
     EmbeddedParentObject *secondParentObject = (EmbeddedParentObject *)parentObjects[1];
     EmbeddedChildObject *secondParentsChild = secondParentObject.embeddedObject;
-    XCTAssert([secondParentsChild isKindOfClass:[RLMEmbeddedObject class]]);
     XCTAssertEqual(secondParentsChild.intCol, 43);
 }
 
@@ -1479,7 +1477,6 @@ RLM_ARRAY_TYPE(MigrationTestObject);
         [migration enumerateObjects:EmbeddedChildObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
             childEnumerateCalls++;
             XCTAssertNotNil(oldObject);
-            XCTAssertNil(newObject);
         }];
     };
     XCTAssertTrue([RLMRealm performMigrationForConfiguration:realmConfiguration error:nil]);
@@ -1528,8 +1525,7 @@ RLM_ARRAY_TYPE(MigrationTestObject);
             parentEnumerateCalls++;
             XCTAssertNotNil(oldObject);
             XCTAssertNotNil(newObject);
-            RLMObject *newChild = [migration createObject:EmbeddedChildObject.className withValue:@[newObject[@"embeddedObject"][@"intCol"]]];
-            newObject[@"embeddedObject"] = newChild;
+            newObject[@"embeddedObject"] = nil;
         }];
     };
     XCTAssertTrue([RLMRealm performMigrationForConfiguration:realmConfiguration error:nil]);
@@ -1541,12 +1537,12 @@ RLM_ARRAY_TYPE(MigrationTestObject);
     XCTAssertEqual(parentObjects.count, 2);
     EmbeddedParentObject *firstParentObject = (EmbeddedParentObject *)parentObjects[0];
     EmbeddedChildObject *firstParentsChild = firstParentObject.embeddedObject;
-    XCTAssert([firstParentsChild isKindOfClass:[RLMEmbeddedObject class]]);
-    XCTAssertEqual(firstParentsChild.intCol, 42);
+    XCTAssertNil(firstParentsChild);
     EmbeddedParentObject *secondParentObject = (EmbeddedParentObject *)parentObjects[1];
     EmbeddedChildObject *secondParentsChild = secondParentObject.embeddedObject;
-    XCTAssert([secondParentsChild isKindOfClass:[RLMEmbeddedObject class]]);
-    XCTAssertEqual(secondParentsChild.intCol, 42);
+    XCTAssertNil(secondParentsChild);
+    RLMResults *childObjects = RLMGetObjects(realm, EmbeddedChildObject.className, nil);
+    XCTAssertEqual(childObjects.count, 0);
 }
 
 - (void)testConvertToEmbeddedAddingMoreLinks {
