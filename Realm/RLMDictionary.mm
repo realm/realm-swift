@@ -21,6 +21,27 @@
 
 @implementation RLMDictionary
 
+#pragma mark Initializers
+
+- (instancetype)initWithObjectClassName:(__unsafe_unretained NSString *const)objectClassName {
+    REALM_ASSERT([objectClassName length] > 0);
+    self = [super init];
+    if (self) {
+        _objectClassName = objectClassName;
+        _type = RLMPropertyTypeObject;
+    }
+    return self;
+}
+
+- (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional {
+    self = [super init];
+    if (self) {
+        _type = type;
+        _optional = optional;
+    }
+    return self;
+}
+
 - (BOOL)isInvalidated {
     @throw RLMException(@"Not implemented in RLMDictionary");
 }
@@ -38,11 +59,20 @@
     @throw RLMException(@"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
 }
 
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary *, RLMCollectionChange *, NSError *))block
+                                         queue:(nullable dispatch_queue_t)queue {
+    @throw RLMException(@"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+}
+
 - (nullable NSNumber *)averageOfProperty:(nonnull NSString *)property {
     @throw RLMException(@"Not implemented in RLMDictionary");
 }
 
 - (instancetype)freeze {
+    @throw RLMException(@"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+}
+
+- (instancetype)thaw {
     @throw RLMException(@"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
 }
 
@@ -131,6 +161,18 @@
 }
 
 - (void)removeObjectForKey:(NSString *)key {
+    @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
+- (void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
+    @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
+- (void)setObject:(id)obj forKey:(NSString *)key {
+    @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
+- (void)addEntriesFromDictionary:(NSDictionary *)otherDictionary {
     @throw RLMException(@"Not implemented in RLMDictionary");
 }
 

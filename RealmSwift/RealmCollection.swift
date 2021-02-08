@@ -1101,6 +1101,13 @@ extension MutableSet: ObservableCollection {
     }
 }
 
+extension Map: ObservableCollection {
+    internal typealias BackingObjcCollection = RLMDictionary<AnyObject>
+    internal func isSameObjcCollection(_ rlmDictionary: BackingObjcCollection) -> Bool {
+        return _rlmDictionary === rlmDictionary
+    }
+}
+
 extension Results: ObservableCollection {
     internal typealias BackingObjcCollection = RLMResults<AnyObject>
     internal func isSameObjcCollection(_ objc: RLMResults<AnyObject>) -> Bool {

@@ -17,16 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMDictionary.h>
-#include <realm/dictionary.hpp>
 
-namespace realm {
-class Dictionary;
-}
+@interface RLMDictionary ()
 
-@implementation RLMDictionary ()
-
-- (NSUInteger)countByEnumeratingWithState:(nonnull NSFastEnumerationState *)state objects:(__unsafe_unretained id  _Nullable * _Nonnull)buffer count:(NSUInteger)len {
-    @throw RLMException(@"Not implemented in RLMDictionary");
-}
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+- (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;
 
 @end

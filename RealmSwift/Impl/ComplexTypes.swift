@@ -64,6 +64,17 @@ extension MutableSet: _RealmSchemaDiscoverable where Element: _RealmSchemaDiscov
     }
 }
 
+extension Map: _RealmSchemaDiscoverable where Element: _RealmSchemaDiscoverable {
+    public static var _rlmType: PropertyType { Element._rlmType }
+    public static var _rlmOptional: Bool { Element._rlmOptional }
+    public static var _rlmRequireObjc: Bool { false }
+    public static func _rlmPopulateProperty(_ prop: RLMProperty) {
+        prop.dictionary = true
+        prop.swiftAccessor = MapAccessor<Element>.self
+        Element._rlmPopulateProperty(prop)
+    }
+}
+
 extension LinkingObjects: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { .linkingObjects }
     public static var _rlmRequireObjc: Bool { false }
