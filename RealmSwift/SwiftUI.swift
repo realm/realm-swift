@@ -193,6 +193,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 /// This will write the modified `isEnabled` property to the `model` object's Realm.
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @propertyWrapper public struct StateRealmObject<T: RealmSubscribable & ThreadConfined & Equatable>: DynamicProperty {
+    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
     @StateObject private var storage: ObservableStorage<T>
     private let defaultValue: T
 
@@ -233,6 +234,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
      Initialize a RealmState struct for a given thread confined type.
      - parameter wrappedValue The List reference to wrap and observe.
      */
+    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
     public init<Value>(wrappedValue: T) where T == List<Value> {
         self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
         defaultValue = T()
@@ -241,6 +243,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
      Initialize a RealmState struct for a given thread confined type.
      - parameter wrappedValue The ObjectBase reference to wrap and observe.
      */
+    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
     public init(wrappedValue: T) where T: ObjectKeyIdentifiable {
         self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
         defaultValue = T()
@@ -348,7 +351,10 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     public mutating func update() {
         // When the view updates, it will inject the @Environment
         // into the propertyWrapper
-        if storage.configuration == nil {
+        if storage.configuration?.encryptionKey != configuration.encryptionKey ||
+            storage.configuration?.fileURL != configuration.fileURL ||
+            storage.configuration?.syncConfiguration?.partitionValue != configuration.syncConfiguration?.partitionValue ||
+            storage.configuration?.inMemoryIdentifier != configuration.inMemoryIdentifier {
             storage.configuration = configuration
         }
     }
@@ -423,13 +429,6 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     }
 }
 
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-extension Binding where Value: ExpressibleByNilLiteral {
-    /// :nodoc:
-    public subscript<V, T>(dynamicMember member: ReferenceWritableKeyPath<V, T>) -> Binding<T> where Value == Optional<V>, V: ThreadConfined {
-        createBinding(wrappedValue!, forKeyPath: member)
-    }
-}
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Binding where Value: ObjectBase & ThreadConfined {
     /// :nodoc:
