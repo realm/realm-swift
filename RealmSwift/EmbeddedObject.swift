@@ -58,7 +58,7 @@ import Realm.Private
 public typealias EmbeddedObject = RealmSwiftEmbeddedObject
 extension EmbeddedObject: RealmCollectionValue {
     /// :nodoc:
-    public static func _rlmArray() -> RLMArray<AnyObject> {
+    public static func _rlmCollection() -> RLMArray<AnyObject> {
         return RLMArray(objectClassName: className())
     }
     /// :nodoc:

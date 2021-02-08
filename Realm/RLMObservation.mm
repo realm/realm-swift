@@ -185,13 +185,13 @@ void RLMObservationInfo::recordObserver(realm::Obj& objectRow, RLMClassInfo *obj
     RLMProperty *prop = objectSchema[key];
     if (prop && prop.array) {
         id value = valueForKey(key);
-        RLMArray *array = [value isKindOfClass:[RLMListBase class]] ? [value _rlmArray] : value;
+        RLMArray *array = [value isKindOfClass:[RLMListBase class]] ? [value _rlmCollection] : value;
         array->_key = key;
         array->_parentObject = object;
     }
     else if (prop && prop.set) {
         id value = valueForKey(key);
-        RLMSet *set = [value isKindOfClass:[RLMSetBase class]] ? [value _rlmSet] : value;
+        RLMSet *set = [value isKindOfClass:[RLMSetBase class]] ? [value _rlmCollection] : value;
         set->_key = key;
         set->_parentObject = object;
     }

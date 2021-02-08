@@ -727,9 +727,9 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
     id value;
     if ([obj isKindOfClass:_info.rlmObjectSchema.objectClass] && prop.swiftIvar) {
         if (prop.array) {
-            return static_cast<RLMListBase *>(object_getIvar(obj, prop.swiftIvar))._rlmArray;
+            return static_cast<RLMListBase *>(object_getIvar(obj, prop.swiftIvar))._rlmCollection;
         } else if (prop.set) {
-            return static_cast<RLMSetBase *>(object_getIvar(obj, prop.swiftIvar))._rlmSet;
+            return static_cast<RLMSetBase *>(object_getIvar(obj, prop.swiftIvar))._rlmCollection;
         }
         else { // optional
             value = RLMGetOptional(static_cast<RLMOptionalBase *>(object_getIvar(obj, prop.swiftIvar)));
@@ -753,17 +753,17 @@ realm::Obj RLMAccessorContext::create_embedded_object() {
 id RLMAccessorContext::box(realm::List&& l) {
     REALM_ASSERT(_parentObjectInfo);
     REALM_ASSERT(currentProperty);
-    return [[RLMManagedArray alloc] initWithList:std::move(l)
-                                      parentInfo:_parentObjectInfo
-                                        property:currentProperty];
+    return [[RLMManagedArray alloc] initWithBackingCollection:std::move(l)
+                                                   parentInfo:_parentObjectInfo
+                                                     property:currentProperty];
 }
 
 id RLMAccessorContext::box(realm::object_store::Set&& s) {
     REALM_ASSERT(_parentObjectInfo);
     REALM_ASSERT(currentProperty);
-    return [[RLMManagedSet alloc] initWithSet:std::move(s)
-                                   parentInfo:_parentObjectInfo
-                                     property:currentProperty];
+    return [[RLMManagedSet alloc] initWithBackingCollection:std::move(s)
+                                                 parentInfo:_parentObjectInfo
+                                                   property:currentProperty];
 }
 
 id RLMAccessorContext::box(realm::object_store::Dictionary&&) {

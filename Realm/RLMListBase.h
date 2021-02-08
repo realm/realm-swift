@@ -16,16 +16,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import <Realm/RLMCollection.h>
 
 @class RLMArray, RLMObjectBase, RLMResults, RLMProperty, RLMLinkingObjects;
+@protocol RLMCollectionBase;
 
 NS_ASSUME_NONNULL_BEGIN
 
 // A base class for Swift generic Lists to make it possible to interact with
 // them from obj-c
-@interface RLMListBase : NSObject <NSFastEnumeration>
-@property (nonatomic, strong) RLMArray *_rlmArray;
+@interface RLMListBase : NSObject <RLMCollectionBase, NSFastEnumeration>
+@property (nonatomic, strong) RLMArray *_rlmCollection;
 
 - (instancetype)init;
 - (instancetype)initWithArray:(RLMArray *)array;

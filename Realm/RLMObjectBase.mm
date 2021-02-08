@@ -202,8 +202,7 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     if (Ivar ivar = property.swiftIvar) {
         if (property.collection) {
             value = RLMAsFastEnumeration(value);
-            id collection = property.array ?
-                [object_getIvar(self, ivar) _rlmArray] : [object_getIvar(self, ivar) _rlmSet];
+            id collection = [object_getIvar(self, ivar) _rlmCollection];
             [collection removeAllObjects];
 
             if (value) {

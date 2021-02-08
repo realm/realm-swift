@@ -16,16 +16,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import <Realm/RLMCollection.h>
 
 @class RLMSet, RLMObjectBase, RLMResults, RLMProperty;
+@protocol RLMCollectionBase;
 
 NS_ASSUME_NONNULL_BEGIN
 
 // A base class for Swift generic MutableSets to make it possible to interact with
 // them from obj-c
-@interface RLMSetBase : NSObject <NSFastEnumeration>
-@property (nonatomic, strong) RLMSet *_rlmSet;
+@interface RLMSetBase : NSObject <RLMCollectionBase, NSFastEnumeration>
+@property (nonatomic, strong) RLMSet *_rlmCollection;
 
 - (instancetype)init;
 - (instancetype)initWithSet:(RLMSet *)set;

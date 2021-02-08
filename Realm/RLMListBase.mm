@@ -44,49 +44,49 @@
 - (instancetype)initWithArray:(RLMArray *)array {
     self = [super init];
     if (self) {
-        __rlmArray = array;
+        __rlmCollection = array;
     }
     return self;
 }
 
-- (RLMArray *)_rlmArray {
-    if (!__rlmArray) {
-        __rlmArray = self.class._unmanagedArray;
+- (RLMArray *)_rlmCollection {
+    if (!__rlmCollection) {
+        __rlmCollection = self.class._unmanagedArray;
     }
-    return __rlmArray;
+    return __rlmCollection;
 }
 
 - (id)valueForKey:(NSString *)key {
-    return [self._rlmArray valueForKey:key];
+    return [self._rlmCollection valueForKey:key];
 }
 
 - (id)valueForKeyPath:(NSString *)keyPath {
-    return [self._rlmArray valueForKeyPath:keyPath];
+    return [self._rlmCollection valueForKeyPath:keyPath];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
                                   objects:(id __unsafe_unretained [])buffer
                                     count:(NSUInteger)len {
-    return [self._rlmArray countByEnumeratingWithState:state objects:buffer count:len];
+    return [self._rlmCollection countByEnumeratingWithState:state objects:buffer count:len];
 }
 
 - (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
-    return [self._rlmArray objectsAtIndexes:indexes];
+    return [self._rlmCollection objectsAtIndexes:indexes];
 }
 
 - (void)addObserver:(id)observer
          forKeyPath:(NSString *)keyPath
             options:(NSKeyValueObservingOptions)options
             context:(void *)context {
-    RLMEnsureArrayObservationInfo(_observationInfo, keyPath, self._rlmArray, self);
+    RLMEnsureArrayObservationInfo(_observationInfo, keyPath, self._rlmCollection, self);
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
 - (BOOL)isEqual:(id)object {
     if (auto array = RLMDynamicCast<RLMListBase>(object)) {
-        return !array._rlmArray.realm
-        && ((self._rlmArray.count == 0 && array._rlmArray.count == 0) ||
-            [self._rlmArray isEqual:array._rlmArray]);
+        return !array._rlmCollection.realm
+        && ((self._rlmCollection.count == 0 && array._rlmCollection.count == 0) ||
+            [self._rlmCollection isEqual:array._rlmCollection]);
     }
     return NO;
 }

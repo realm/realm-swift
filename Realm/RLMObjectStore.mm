@@ -97,15 +97,18 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
             [prop.swiftAccessor initializeObject:(char *)(__bridge void *)object + ivar_getOffset(prop.swiftIvar)
                                           parent:object property:prop];
         }
-        else if (prop.array) {
+        else if (prop.collection) {
             id ivar = object_getIvar(object, prop.swiftIvar);
-            RLMArray *array = [[RLMManagedArray alloc] initWithParent:object property:prop];
-            [ivar set_rlmArray:array];
-        }
-        else if (prop.set) {
-            id ivar = object_getIvar(object, prop.swiftIvar);
-            RLMSet *set = [[RLMManagedSet alloc] initWithParent:object property:prop];
-            [ivar set_rlmSet:set];
+            Class cls;
+            if (prop.array) {
+                cls = [RLMManagedArray class];
+            } else if (prop.set) {
+                cls = [RLMManagedSet class];
+            } else {
+                REALM_UNREACHABLE();
+            }
+            id managedCollection = [[cls alloc] initWithParent:object property:prop];
+            [ivar set_rlmCollection:managedCollection];
         }
         else {
             id ivar = object_getIvar(object, prop.swiftIvar);

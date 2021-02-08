@@ -22,6 +22,7 @@
 
 namespace realm {
     class List;
+    class Obj;
     class Results;
     class TableView;
     struct CollectionChangeSet;
@@ -32,7 +33,7 @@ namespace realm {
     }
 }
 class RLMClassInfo;
-@class RLMFastEnumerator, RLMManagedArray, RLMManagedSet;
+@class RLMFastEnumerator, RLMManagedArray, RLMManagedSet, RLMProperty;
 
 @protocol RLMFastEnumerable
 @property (nonatomic, readonly) RLMRealm *realm;
@@ -87,3 +88,8 @@ template<typename Collection>
 NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClassInfo& info);
 
 std::vector<std::pair<std::string, bool>> RLMSortDescriptorsToKeypathArray(NSArray<RLMSortDescriptor *> *properties);
+
+template<typename Collection, typename RLMCollection>
+id RLMManagedCollectionFromCollection(RLMClassInfo* info, realm::Obj&& obj, RLMProperty *prop);
+template<typename Fn>
+void get_collection_type(RLMProperty *prop, Fn&& func);

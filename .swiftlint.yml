@@ -20,6 +20,7 @@ identifier_name:
     - _realmObjectName()
     - _rlmArray()
     - _rlmSet()
+    - _rlmCollection()
     - id
     - pk
     - to

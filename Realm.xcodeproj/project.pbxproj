@@ -936,7 +936,7 @@
 		E81A1F701955FC9300FDED82 /* RLMObjectSchema_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMObjectSchema_Private.hpp; sourceTree = "<group>"; };
 		E81A1F711955FC9300FDED82 /* RLMObjectSchema.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectSchema.h; sourceTree = "<group>"; };
 		E81A1F721955FC9300FDED82 /* RLMObjectSchema.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMObjectSchema.mm; sourceTree = "<group>"; };
-		E81A1F741955FC9300FDED82 /* RLMObjectStore.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = RLMObjectStore.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		E81A1F741955FC9300FDED82 /* RLMObjectStore.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = RLMObjectStore.mm; sourceTree = "<group>"; };
 		E81A1F751955FC9300FDED82 /* RLMProperty_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMProperty_Private.h; sourceTree = "<group>"; };
 		E81A1F761955FC9300FDED82 /* RLMProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMProperty.h; sourceTree = "<group>"; };
 		E81A1F771955FC9300FDED82 /* RLMProperty.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMProperty.mm; sourceTree = "<group>"; };
@@ -2343,7 +2343,7 @@
 				68A7B91D2543538B00C703BC /* RLMSupport.swift in Sources */,
 				5D660FFC1BE98D670021E04F /* Schema.swift in Sources */,
 				5D660FFD1BE98D670021E04F /* SortDescriptor.swift in Sources */,
-                CF986D8F25AE3C980039D287 /* MutableSet.swift in Sources */,
+				CF986D8F25AE3C980039D287 /* MutableSet.swift in Sources */,
 				1AFEF8431D52D2C900495005 /* Sync.swift in Sources */,
 				3F222C4E1E26F51300CA0713 /* ThreadSafeReference.swift in Sources */,
 				5D660FFE1BE98D670021E04F /* Util.swift in Sources */,

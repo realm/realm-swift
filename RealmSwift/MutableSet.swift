@@ -32,11 +32,11 @@ public class MutableSetBase: RLMSetBase {
     }
 
     @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
-        return RLMDescriptionWithMaxDepth("MutableSet", _rlmSet, depth)
+        return RLMDescriptionWithMaxDepth("MutableSet", _rlmCollection, depth)
     }
 
     /// Returns the number of objects in this MutableSet.
-    public var count: Int { return Int(_rlmSet.count) }
+    public var count: Int { return Int(_rlmCollection.count) }
 }
 
 /**
@@ -59,11 +59,11 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
 
     /// The Realm which manages the set, or `nil` if the set is unmanaged.
     public var realm: Realm? {
-        return _rlmSet.realm.map { Realm($0) }
+        return _rlmCollection.realm.map { Realm($0) }
     }
 
     /// Indicates if the set can no longer be accessed.
-    public var isInvalidated: Bool { return _rlmSet.isInvalidated }
+    public var isInvalidated: Bool { return _rlmCollection.isInvalidated }
 
     // MARK: Initializers
 
@@ -83,7 +83,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      objects.
      */
     @nonobjc public func value(forKey key: String) -> [AnyObject] {
-        return (_rlmSet.value(forKeyPath: key)! as! NSSet).allObjects as [AnyObject]
+        return (_rlmCollection.value(forKeyPath: key)! as! NSSet).allObjects as [AnyObject]
     }
 
     /**
@@ -93,7 +93,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter keyPath: The key path to the property whose values are desired.
      */
     @nonobjc public func value(forKeyPath keyPath: String) -> [AnyObject] {
-        return (_rlmSet.value(forKeyPath: keyPath)! as! NSSet).allObjects as [AnyObject]
+        return (_rlmCollection.value(forKeyPath: keyPath)! as! NSSet).allObjects as [AnyObject]
     }
 
     /**
@@ -105,7 +105,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter key:   The name of the property whose value should be set on each object.
     */
     public override func setValue(_ value: Any?, forKey key: String) {
-        return _rlmSet.setValue(value, forKeyPath: key)
+        return _rlmCollection.setValue(value, forKeyPath: key)
     }
 
     // MARK: Filtering
@@ -116,7 +116,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter predicate: The predicate with which to filter the objects.
      */
     public func filter(_ predicate: NSPredicate) -> Results<Element> {
-        return Results<Element>(_rlmSet.objects(with: predicate))
+        return Results<Element>(_rlmCollection.objects(with: predicate))
     }
 
     /**
@@ -126,7 +126,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter object: The element to find in the MutableSet.
      */
     public func contains(_ object: Element) -> Bool {
-        return _rlmSet.contains(dynamicBridgeCast(fromSwift: object) as AnyObject)
+        return _rlmCollection.contains(dynamicBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**
@@ -136,7 +136,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - Parameter object: Another MutableSet to compare.
      */
     public func isSubset(of possibleSuperset: MutableSet<Element>) -> Bool {
-        return _rlmSet.isSubset(of: possibleSuperset._rlmSet)
+        return _rlmCollection.isSubset(of: possibleSuperset._rlmCollection)
     }
 
     /**
@@ -146,7 +146,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - Parameter object: Another MutableSet to compare.
      */
     public func intersects(_ otherSet: MutableSet<Element>) -> Bool {
-        return _rlmSet.intersects(otherSet._rlmSet)
+        return _rlmCollection.intersects(otherSet._rlmCollection)
     }
 
     // MARK: Sorting
@@ -178,7 +178,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
     */
     public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element>
         where S.Iterator.Element == SortDescriptor {
-            return Results<Element>(_rlmSet.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
+            return Results<Element>(_rlmCollection.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
     // MARK: Aggregate Operations
@@ -192,7 +192,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter property: The name of a property whose minimum value is desired.
      */
     public func min<T: MinMaxType>(ofProperty property: String) -> T? {
-        return _rlmSet.min(ofProperty: property).map(dynamicBridgeCast)
+        return _rlmCollection.min(ofProperty: property).map(dynamicBridgeCast)
     }
 
     /**
@@ -204,7 +204,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter property: The name of a property whose maximum value is desired.
      */
     public func max<T: MinMaxType>(ofProperty property: String) -> T? {
-        return _rlmSet.max(ofProperty: property).map(dynamicBridgeCast)
+        return _rlmCollection.max(ofProperty: property).map(dynamicBridgeCast)
     }
 
     /**
@@ -215,7 +215,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter property: The name of a property whose values should be summed.
      */
     public func sum<T: AddableType>(ofProperty property: String) -> T {
-        return dynamicBridgeCast(fromObjectiveC: _rlmSet.sum(ofProperty: property))
+        return dynamicBridgeCast(fromObjectiveC: _rlmCollection.sum(ofProperty: property))
     }
 
     /**
@@ -226,7 +226,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter property: The name of a property whose average value should be calculated.
      */
     public func average<T: AddableType>(ofProperty property: String) -> T? {
-        return _rlmSet.average(ofProperty: property).map(dynamicBridgeCast)
+        return _rlmCollection.average(ofProperty: property).map(dynamicBridgeCast)
     }
 
     // MARK: Mutation
@@ -239,7 +239,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter object: An object.
      */
     public func insert(_ object: Element) {
-        _rlmSet.add(dynamicBridgeCast(fromSwift: object) as AnyObject)
+        _rlmCollection.add(dynamicBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**
@@ -249,7 +249,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
     */
     public func insert<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == Element {
         for obj in objects {
-            _rlmSet.add(dynamicBridgeCast(fromSwift: obj) as AnyObject)
+            _rlmCollection.add(dynamicBridgeCast(fromSwift: obj) as AnyObject)
         }
     }
 
@@ -261,7 +261,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter object: The object to remove.
      */
     public func remove(_ object: Element) {
-        _rlmSet.remove(dynamicBridgeCast(fromSwift: object) as AnyObject)
+        _rlmCollection.remove(dynamicBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**
@@ -270,7 +270,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - warning: This method may only be called during a write transaction.
      */
     public func removeAll() {
-        _rlmSet.removeAllObjects()
+        _rlmCollection.removeAllObjects()
     }
 
     /**
@@ -281,7 +281,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter other: Another set.
      */
     public func formIntersection(_ other: MutableSet<Element>) {
-        _rlmSet.intersect(other._rlmSet)
+        _rlmCollection.intersect(other._rlmCollection)
     }
 
     /**
@@ -292,7 +292,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter other: Another set.
      */
     public func subtract(_ other: MutableSet<Element>) {
-        _rlmSet.minus(other._rlmSet)
+        _rlmCollection.minus(other._rlmCollection)
     }
 
     /**
@@ -303,7 +303,7 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      - parameter other: Another set.
      */
     public func formUnion(_ other: MutableSet<Element>) {
-        _rlmSet.union(other._rlmSet)
+        _rlmCollection.union(other._rlmCollection)
     }
 
     // MARK: Notifications
@@ -368,26 +368,26 @@ public final class MutableSet<Element: RealmCollectionValue>: MutableSetBase {
      */
     public func observe(on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<MutableSet>) -> Void) -> NotificationToken {
-        return _rlmSet.addNotificationBlock(wrapObserveBlock(block), queue: queue)
+        return _rlmCollection.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Frozen Objects
 
     public var isFrozen: Bool {
-        return _rlmSet.isFrozen
+        return _rlmCollection.isFrozen
     }
 
     public func freeze() -> MutableSet {
-        return MutableSet(objc: _rlmSet.freeze())
+        return MutableSet(objc: _rlmCollection.freeze())
     }
 
     public func thaw() -> MutableSet? {
-        return MutableSet(objc: _rlmSet.thaw())
+        return MutableSet(objc: _rlmCollection.thaw())
     }
 
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedSet() -> RLMSet<AnyObject> {
-        return Element._rlmSet()
+        return Element._rlmCollection()
     }
 }
 
@@ -396,14 +396,14 @@ extension MutableSet where Element: MinMaxType {
      Returns the minimum (lowest) value in the set, or `nil` if the set is empty.
      */
     public func min() -> Element? {
-        return _rlmSet.min(ofProperty: "self").map(dynamicBridgeCast)
+        return _rlmCollection.min(ofProperty: "self").map(dynamicBridgeCast)
     }
 
     /**
      Returns the maximum (highest) value in the set, or `nil` if the set is empty.
      */
     public func max() -> Element? {
-        return _rlmSet.max(ofProperty: "self").map(dynamicBridgeCast)
+        return _rlmCollection.max(ofProperty: "self").map(dynamicBridgeCast)
     }
 }
 
@@ -431,13 +431,13 @@ extension MutableSet: RealmCollection {
 
     /// Returns a `RLMIterator` that yields successive elements in the `MutableSet`.
     public func makeIterator() -> RLMIterator<Element> {
-        return RLMIterator(collection: _rlmSet)
+        return RLMIterator(collection: _rlmCollection)
     }
 
     /// :nodoc:
     // swiftlint:disable:next identifier_name
     public func _asNSFastEnumerator() -> Any {
-        return _rlmSet
+        return _rlmCollection
     }
 
     /// The position of the first element in a non-empty collection.
@@ -457,7 +457,7 @@ extension MutableSet: RealmCollection {
     public func _observe(_ queue: DispatchQueue?,
                          _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
         -> NotificationToken {
-            return _rlmSet.addNotificationBlock(wrapObserveBlock(block), queue: queue)
+            return _rlmCollection.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Object Retrieval
@@ -543,6 +543,6 @@ extension MutableSet: AssistedObjectiveCBridgeable {
     }
 
     internal var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: _rlmSet, metadata: nil)
+        return (objectiveCValue: _rlmCollection, metadata: nil)
     }
 }

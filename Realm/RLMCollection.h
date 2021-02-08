@@ -28,7 +28,7 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType);
 
 /**
  A homogenous collection of Realm-managed objects. Examples of conforming types
- include `RLMArray`, `RLMResults`, and `RLMLinkingObjects`.
+ include `RLMArray`, `RLMSet`, `RLMResults`, and `RLMLinkingObjects`.
  */
 @protocol RLMCollection <NSFastEnumeration, RLMThreadConfined>
 
@@ -425,6 +425,15 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType);
 
 /// Returns the index paths of the modification indices in the given section.
 - (NSArray<NSIndexPath *> *)modificationsInSection:(NSUInteger)section;
+@end
+
+/**
+ Used for constructing the base type of Swift Realm collection types. Examples
+ include `RLMListBase` & `RLMSetBase`.
+ */
+@protocol RLMCollectionBase
+/// A homogeneous Realm collection type.
+@property (nonatomic, strong) id _Nonnull _rlmCollection;
 @end
 
 NS_ASSUME_NONNULL_END

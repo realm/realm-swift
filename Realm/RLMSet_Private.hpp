@@ -50,9 +50,9 @@ class RLMObservationInfo;
 
 - (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 
-- (RLMManagedSet *)initWithSet:(realm::object_store::Set)set
-                    parentInfo:(RLMClassInfo *)parentInfo
-                      property:(__unsafe_unretained RLMProperty *const)property;
+- (RLMManagedSet *)initWithBackingCollection:(realm::object_store::Set)set
+                                  parentInfo:(RLMClassInfo *)parentInfo
+                                    property:(__unsafe_unretained RLMProperty *const)property;
 
 - (bool)isBackedBySet:(realm::object_store::Set const&)set;
 

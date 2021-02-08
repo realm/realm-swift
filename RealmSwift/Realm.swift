@@ -603,7 +603,7 @@ import Realm.Private
      :nodoc:
      */
     public func delete<Element: ObjectBase>(_ objects: List<Element>) {
-        rlmRealm.deleteObjects(objects._rlmArray)
+        rlmRealm.deleteObjects(objects._rlmCollection)
     }
 
     /**

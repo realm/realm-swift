@@ -61,9 +61,9 @@
     std::unique_ptr<RLMObservationInfo> _observationInfo;
 }
 
-- (RLMManagedArray *)initWithList:(realm::List)list
-                       parentInfo:(RLMClassInfo *)parentInfo
-                         property:(__unsafe_unretained RLMProperty *const)property {
+- (RLMManagedArray *)initWithBackingCollection:(realm::List)list
+                                    parentInfo:(RLMClassInfo *)parentInfo
+                                      property:(__unsafe_unretained RLMProperty *const)property {
     if (property.type == RLMPropertyTypeObject)
         self = [self initWithObjectClassName:property.objectClassName];
     else
@@ -86,7 +86,7 @@
                            property:(__unsafe_unretained RLMProperty *const)property {
     __unsafe_unretained RLMRealm *const realm = parentObject->_realm;
     auto col = parentObject->_info->tableColumn(property);
-    return [self initWithList:realm::List(realm->_realm, parentObject->_row, col)
+    return [self initWithBackingCollection:realm::List(realm->_realm, parentObject->_row, col)
                    parentInfo:parentObject->_info
                      property:property];
 }
@@ -508,7 +508,7 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     RLMRealm *frozenRealm = [_realm freeze];
     auto& parentInfo = _ownerInfo->resolve(frozenRealm);
     return translateRLMResultsErrors([&] {
-        return [[self.class alloc] initWithList:_backingList.freeze(frozenRealm->_realm)
+        return [[self.class alloc] initWithBackingCollection:_backingList.freeze(frozenRealm->_realm)
                                      parentInfo:&parentInfo
                                        property:parentInfo.rlmObjectSchema[_key]];
     });
@@ -522,7 +522,7 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     RLMRealm *liveRealm = [_realm thaw];
     auto& parentInfo = _ownerInfo->resolve(liveRealm);
     return translateRLMResultsErrors([&] {
-        return [[self.class alloc] initWithList:_backingList.freeze(liveRealm->_realm)
+        return [[self.class alloc] initWithBackingCollection:_backingList.freeze(liveRealm->_realm)
                                      parentInfo:&parentInfo
                                        property:parentInfo.rlmObjectSchema[_key]];
     });
@@ -567,7 +567,7 @@ realm::List& RLMGetBackingCollection(RLMManagedArray *self) {
         return nil;
     }
     RLMClassInfo *parentInfo = &realm->_info[metadata.parentClassName];
-    return [[RLMManagedArray alloc] initWithList:std::move(list)
+    return [[RLMManagedArray alloc] initWithBackingCollection:std::move(list)
                                        parentInfo:parentInfo
                                          property:parentInfo->rlmObjectSchema[metadata.key]];
 }

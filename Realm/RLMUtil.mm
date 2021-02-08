@@ -107,11 +107,11 @@ static inline bool numberIsDouble(__unsafe_unretained NSNumber *const obj) {
 }
 
 static inline RLMArray *asRLMArray(__unsafe_unretained id const value) {
-    return RLMDynamicCast<RLMArray>(value) ?: RLMDynamicCast<RLMListBase>(value)._rlmArray;
+    return RLMDynamicCast<RLMArray>(value) ?: RLMDynamicCast<RLMListBase>(value)._rlmCollection;
 }
 
 static inline RLMSet *asRLMSet(__unsafe_unretained id const value) {
-    return RLMDynamicCast<RLMSet>(value) ?: RLMDynamicCast<RLMSetBase>(value)._rlmSet;
+    return RLMDynamicCast<RLMSet>(value) ?: RLMDynamicCast<RLMSetBase>(value)._rlmCollection;
 }
 
 static inline bool checkCollectionType(__unsafe_unretained id<RLMCollection> const collection,

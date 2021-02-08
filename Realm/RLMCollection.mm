@@ -204,27 +204,14 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
         // object accessor each time
         Class cls = [object_getIvar(accessor, prop.swiftIvar) class];
         RLMAccessorContext context(info);
-        if (prop && prop.array && prop.swiftIvar) {
-            for (size_t i = 0; i < count; ++i) {
-                RLMListBase *list = [[cls alloc] init];
-                list._rlmArray = [[RLMManagedArray alloc] initWithList:realm::List(info.realm->_realm,
-                                                                                   collection.get(i),
-                                                                                   info.tableColumn(prop))
-                                                            parentInfo:&info
-                                                              property:prop];
-                [array addObject:list];
-            }
-            return array;
-        } else if (prop && prop.set && prop.swiftIvar) {
-            for (size_t i = 0; i < count; ++i) {
-                RLMSetBase *set = [[cls alloc] init];
-                set._rlmSet = [[RLMManagedSet alloc] initWithSet:realm::object_store::Set(info.realm->_realm,
-                                                                                          collection.get(i),
-                                                                                          info.tableColumn(prop))
-                                                      parentInfo:&info
-                                                        property:prop];
-                [array addObject:set];
-            }
+        if (prop && prop.collection && prop.swiftIvar) {
+            get_collection_type(prop, [&](auto t) {
+                for (size_t i = 0; i < count; ++i) {
+                    id<RLMCollectionBase> base = [[cls alloc] init];
+                    base._rlmCollection = RLMManagedCollectionFromCollection<std::decay_t<decltype(*t)>>(info, collection.get(i), prop);
+                    [array addObject:base];
+                }
+            });
             return array;
         }
     }
@@ -235,6 +222,40 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
         [array addObject:[accessor valueForKey:key] ?: NSNull.null];
     }
     return array;
+}
+
+template<typename Fn>
+void get_collection_type(RLMProperty *prop, Fn&& func) {
+    if (prop.array) {
+        func(((realm::List *)0));
+    }
+    else if (prop.set) {
+        func(((realm::object_store::Set *)0));
+    }
+    else {
+        REALM_UNREACHABLE();
+    }
+}
+
+template<typename Collection>
+id RLMManagedCollectionFromCollection(RLMClassInfo& info, realm::Obj&& obj, RLMProperty *prop) {
+    if constexpr(std::is_same_v<Collection, realm::object_store::Set>) {
+        return [[RLMManagedSet alloc] initWithBackingCollection:Collection(info.realm->_realm,
+                                                                           obj,
+                                                                           info.tableColumn(prop))
+                                                     parentInfo:&info
+                                                       property:prop];
+    }
+    else if constexpr(std::is_same_v<Collection, realm::List>) {
+        return [[RLMManagedArray alloc] initWithBackingCollection:Collection(info.realm->_realm,
+                                                                             obj,
+                                                                             info.tableColumn(prop))
+                                                       parentInfo:&info
+                                                         property:prop];
+    }
+    else {
+        REALM_UNREACHABLE();
+    }
 }
 
 template NSArray *RLMCollectionValueForKey(realm::Results&, NSString *, RLMClassInfo&);
