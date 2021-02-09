@@ -57,9 +57,14 @@ NS_ASSUME_NONNULL_BEGIN
 @interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport
 @end
 
+@interface AppInfo : NSObject <NSCoding>
+@property NSString* client_app_id;
+@end
+
 @interface RLMSyncTestCase : RLMMultiProcessTestCase
 
 @property (nonatomic, readonly) NSString *appId;
+@property (nonatomic, readonly) AppInfo *appInfo;
 @property (nonatomic, readonly) RLMApp *app;
 @property (nonatomic, readonly) RLMUser *anonymousUser;
 @property (nonatomic, readonly) RLMAppConfiguration *defaultAppConfiguration;

@@ -46,7 +46,8 @@
 // when building with SPM, so just redeclare the bits we need.
 @interface RealmServer : NSObject
 + (RealmServer *)shared;
-- (NSString *)createAppAndReturnError:(NSError **)error;
+- (AppInfo *)createAppAndReturnError:(NSError **)error;
+- (void)setAutoConfirm:(AppInfo *)appInfo enabled:(bool)enabled;
 @end
 
 @interface TimeoutProxyServer : NSObject
@@ -242,10 +243,12 @@ static NSString *randomEmail() {
 - (void)testRetryCustomConfirmation {
     XCTestExpectation *expectation = [self expectationWithDescription:@"should try retry confirmation email and fail"];
 
+    [RealmServer.shared setAutoConfirm:self.appInfo enabled:false];
     [self.app.emailPasswordAuth retryCustomConfirmation:randomEmail() completion:^(NSError *error) {
         XCTAssertEqual(error.code, RLMAppErrorUserNotFound);
         [expectation fulfill];
     }];
+    [RealmServer.shared setAutoConfirm:self.appInfo enabled:true];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 }
 
@@ -618,8 +621,8 @@ static NSString *randomEmail() {
     NSString *appId1;
     NSString *appId2;
     if (self.isParent) {
-        appId1 = [RealmServer.shared createAppAndReturnError:nil];
-        appId2 = [RealmServer.shared createAppAndReturnError:nil];
+        appId1 = [RealmServer.shared createAppAndReturnError:nil].client_app_id;
+        appId2 = [RealmServer.shared createAppAndReturnError:nil].client_app_id;
 
     } else {
         appId1 = self.appIds[0];
@@ -1572,7 +1575,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                                   localAppName:nil
                                                                localAppVersion:nil
                                                        defaultRequestTimeoutMS:60];
-    NSString *appId = [RealmServer.shared createAppAndReturnError:nil];
+    NSString *appId = [RealmServer.shared createAppAndReturnError:nil].client_app_id;
     RLMApp *app = [RLMApp appWithId:appId configuration:config];
     RLMUser *user = [self logInUserForCredentials:[RLMCredentials anonymousCredentials] app:app];
 

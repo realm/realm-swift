@@ -38,7 +38,7 @@
 @interface RealmServer : NSObject
 + (RealmServer *)shared;
 + (bool)haveServer;
-- (NSString *)createAppAndReturnError:(NSError **)error;
+- (AppInfo *)createAppAndReturnError:(NSError **)error;
 @end
 
 // Set this to 1 if you want the test ROS instance to log its debug messages to console.
@@ -189,6 +189,7 @@ static NSURL *syncDirectoryForChildProcess() {
 #pragma mark RLMSyncTestCase
 
 @implementation RLMSyncTestCase {
+    AppInfo *_appInfo;
     NSString *_appId;
     RLMApp *_app;
 }
@@ -459,20 +460,32 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)setupSyncManager {
+    static AppInfo *s_appInfo;
     static NSString *s_appId;
     if (self.isParent && s_appId) {
         _appId = s_appId;
+        _appInfo = s_appInfo;
     }
     else {
         NSError *error;
-        _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmServer.shared createAppAndReturnError:&error];
-        if (error) {
-            NSLog(@"Failed to create app: %@", error);
-            abort();
+        if ((_appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"])) {
+            // break
         }
+        else {
+            _appInfo = [RealmServer.shared createAppAndReturnError:&error];
+            
+            if (error) {
+                NSLog(@"Failed to create app: %@", error);
+                abort();
+            }
+            
+            _appId = _appInfo.client_app_id;
 
+        }
+//        _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmServer.shared createAppAndReturnError:&error].client_app_id;
         if (self.isParent) {
             s_appId = _appId;
+            s_appInfo = _appInfo;
         }
     }
 
@@ -488,6 +501,13 @@ static NSURL *syncDirectoryForChildProcess() {
         [self setupSyncManager];
     }
     return _appId;
+}
+
+- (AppInfo *)appInfo {
+    if (!_appInfo) {
+        [self setupSyncManager];
+    }
+    return _appInfo;
 }
 
 - (RLMApp *)app {
