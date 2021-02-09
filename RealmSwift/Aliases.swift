@@ -99,6 +99,7 @@ extension ObjectBase {
      - parameter block: The block to call with information about changes to the object.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
+    // swiftlint:disable:next identifier_name
     internal func _observe<T: ObjectBase>(on queue: DispatchQueue? = nil,
                                           _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
         return RLMObjectBaseAddNotificationBlock(self, queue) { object, names, oldValues, newValues, error in
