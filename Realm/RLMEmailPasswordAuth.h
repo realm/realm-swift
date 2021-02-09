@@ -56,8 +56,14 @@ NS_ASSUME_NONNULL_BEGIN
             tokenId:(NSString *)tokenId
          completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
+/**
+ Retries custom confirmation function for a given email address.
+
+ @param email The email address of the user to retry custom confirmation logic.
+ @param completion A callback to be invoked once the call is complete.
+ */
 - (void)retryCustomConfirmation:(NSString *)email
-                     completion:(RLMEmailPasswordAuthOptionalErrorBlock)completion;
+                     completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
 /**
  Re-sends a confirmation email to a user that has registered but
@@ -90,7 +96,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resetPasswordTo:(NSString *)password
                   token:(NSString *)token
                 tokenId:(NSString *)tokenId
-      completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
+             completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
 /**
  Resets the password of an email identity using the
