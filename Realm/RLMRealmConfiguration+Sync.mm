@@ -50,7 +50,6 @@
     NSAssert(user.identifier, @"Cannot call this method on a user that doesn't have an identifier.");
     self.config.in_memory = false;
     self.config.sync_config = std::make_shared<realm::SyncConfig>([syncConfiguration rawConfiguration]);
-    self.config.schema_mode = realm::SchemaMode::Additive;
 
     if (syncConfiguration.customFileURL) {
         self.config.path = syncConfiguration.customFileURL.path.UTF8String;
@@ -63,6 +62,8 @@
         sync_encryption_key = std::array<char, 64>();
         std::copy_n(self.config.encryption_key.begin(), 64, sync_encryption_key->begin());
     }
+
+    [self updateSchemaMode];
 }
 
 - (RLMSyncConfiguration *)syncConfiguration {

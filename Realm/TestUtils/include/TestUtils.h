@@ -19,9 +19,15 @@
 #import <Foundation/Foundation.h>
 #import <XCTest/XCTestCase.h>
 
+@class RLMUser;
+
 FOUNDATION_EXTERN void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,
                                                               __attribute__((noescape)) dispatch_block_t block,
                                                               NSString *regexString,
                                                               NSString *message,
                                                               NSString *fileName,
                                                               NSUInteger lineNumber);
+
+// Return a fake sync user which can be used to create sync configurations
+// for tests which don't actually need to talk to the server
+FOUNDATION_EXTERN RLMUser *RLMDummyUser(void);

@@ -1,13 +1,28 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* The Sync client now logs error messages received from server rather than just
+  the size of the error message.
+* Errors returned from the server when sync WebSockets get closed are now
+  captured and surfaced as a SyncError.
+* Improve performance of sequential reads on a Results backed directly by a
+  Table (i.e. `realm.object(ClasSName.self)` with no filter/sort/etc.) by 50x.
+* Orphaned embedded object types which are not linked to by any top-level types
+  are now better handled. Previously the server would reject the schema,
+  resulting in delayed and confusing error reporting. Explicitly including an
+  orphan in `objectTypes` is now immediately reported as an error when opening
+  the Realm, and orphans are automatically excluded from the auto-discovered
+  schema when `objectTypes` is not specified.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Reading from a Results backed directly by a Table (i.e.
+  `realm.object(ClasSName.self)` with no filter/sort/etc.) would give incorrect
+  results if the Results was constructed and accessed before creating a new
+  object with a primary key less than the smallest primary key which previously
+  existed. ([#7014](https://github.com/realm/realm-cocoa/issues/7014), since v5.0.0).
+* During synchronization you might experience crash with
+  "Assertion failed: ref + size <= next->first".
+  ([Core #4388](https://github.com/realm/realm-core/issues/4388))
 
 ### Compatibility
 * Realm Studio: 10.0.0 or later.
@@ -16,11 +31,13 @@ x.y.z Release notes (yyyy-MM-dd)
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v10.4.0 to v10.5.0
 
 10.5.2 Release notes (2021-02-09)
 =============================================================
+
 ### Enhancements
+
 * Add support for "thawing" objects. `Realm`, `Results`, `List` and `Object`
   now have `thaw()` methods which return a live copy of the frozen object. This
   enables app behvaior where a frozen object can be made live again in order to
@@ -29,24 +46,31 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add Xcode 12.4 binaries to the release package.
 
 ### Fixed
-* Inserting a date into a synced collection via `AnyBSON.datetime(...)` would be of type `Timestamp` and not `Date`.
-  This could break synced objects with a `Date` property  ([#6654](https://github.com/realm/realm-cocoa/issues/6654), since v10.0.0).
+
+* Inserting a date into a synced collection via `AnyBSON.datetime(...)` would
+  be of type `Timestamp` and not `Date`. This could break synced objects with a
+  `Date` property.
+  ([#6654](https://github.com/realm/realm-cocoa/issues/6654), since v10.0.0).
 * Fixed an issue where creating an object after file format upgrade may fail
   with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
- ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
-* Allow enumerating objects of types which are no longer present in the schema.
-* Add `RLMResponse.customStatusCode`. This fixes timeout exceptions that were occuring with a poor connection. ([#4188](https://github.com/realm/realm-core/issues/4188))
-* Fix - `RLMResponse` will have a non nil `customStatusCode` in case of error.
-([#4188](https://github.com/realm/realm-core/issues/4188))
-* Limit availability of ObjectKeyIdentifiable to platforms which support Combine to match the change made in the Xcode 12.5 SDK. ([#7083](https://github.com/realm/realm-cocoa/issues/7083))
+  ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
+* Allow enumerating objects in migrations with types which are no longer
+  present in the schema.
+* Add `RLMResponse.customStatusCode`. This fixes timeout exceptions that were
+  occuring with a poor connection. ([#4188](https://github.com/realm/realm-core/issues/4188))
+* Limit availability of ObjectKeyIdentifiable to platforms which support
+  Combine to match the change made in the Xcode 12.5 SDK.
+  ([#7083](https://github.com/realm/realm-cocoa/issues/7083))
 
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.4.
 * CocoaPods: 1.10 or later.
 
 ### Internal
+
 * Upgraded realm-core from v10.3.3 to v10.4.0
 
 10.5.1 Release notes (2021-01-15)
