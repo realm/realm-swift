@@ -242,8 +242,8 @@ static NSString *randomEmail() {
 - (void)testRetryCustomConfirmation {
     XCTestExpectation *expectation = [self expectationWithDescription:@"should try retry confirmation email and fail"];
 
-    [self.app.emailPasswordAuth retryCustomConfirmation:randomEmail() completion:^(NSError *error) {
-        XCTAssertEqual(error.code, RLMAppErrorUserNotFound);
+    [self.app.emailPasswordAuth retryCustomConfirmation:@"some-email@email.com" completion:^(NSError *error) {
+        XCTAssertTrue([error.userInfo[@"NSLocalizedDescription"] isEqualToString:@"cannot run confirmation for some-email@email.com: automatic confirmation is enabled"]);
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];

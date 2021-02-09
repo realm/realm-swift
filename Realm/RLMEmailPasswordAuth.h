@@ -57,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
          completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
 - (void)retryCustomConfirmation:(NSString *)email
-                    completion:(RLMEmailPasswordAuthOptionalErrorBlock)completion;
+                     completion:(RLMEmailPasswordAuthOptionalErrorBlock)completion;
 
 /**
  Re-sends a confirmation email to a user that has registered but
