@@ -19,34 +19,6 @@
 import RealmSwift
 import SwiftUI
 
-@objcMembers class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
-    @objc enum Priority: Int, RealmEnum, CaseIterable, Identifiable, CustomStringConvertible {
-        var id: Int { self.rawValue }
-
-        case low, medium, high
-
-        var description: String {
-            switch self {
-            case .low: return "low"
-            case .medium: return "medium"
-            case .high: return "high"
-            }
-        }
-    }
-    dynamic var title = ""
-    dynamic var notes = ""
-    dynamic var isFlagged = false
-    dynamic var date = Date()
-    dynamic var isComplete = false
-    dynamic var priority: Priority = .low
-}
-
-@objcMembers class ReminderList: Object, ObjectKeyIdentifiable {
-    dynamic var name = "New List"
-    dynamic var icon: String = "list.bullet"
-    var reminders = RealmSwift.List<Reminder>()
-}
-
 struct ReminderRowView: View {
     @ObservedRealmObject var list: ReminderList
     @ObservedRealmObject var reminder: Reminder
@@ -241,6 +213,21 @@ struct MultiRealmContentView: View {
     }
 }
 
+struct UnmanagedObjectTestView: View {
+    @StateRealmObject var reminderList = ReminderList()
+    @Environment(\.realm) var realm
+
+    var body: some View {
+        NavigationView {
+            Form {
+                TextField("name", text: $reminderList.name).accessibilityIdentifier("name")
+            }.navigationBarItems(trailing: Button("Add", action: {
+                try! realm.write { realm.add(reminderList) }
+            }).accessibility(identifier: "addReminder"))
+        }
+    }
+}
+
 @main
 struct App: SwiftUI.App {
     var body: some Scene {
@@ -251,8 +238,18 @@ struct App: SwiftUI.App {
             Realm.Configuration.defaultConfiguration =
                 Realm.Configuration(deleteRealmIfMigrationNeeded: true)
         }
+        let view: AnyView = {
+            switch ProcessInfo.processInfo.environment["test_type"] {
+            case "multi_realm_test":
+                return AnyView(MultiRealmContentView())
+            case "unmanaged_object_test":
+                return AnyView(UnmanagedObjectTestView())
+            default:
+                return AnyView(ContentView())
+            }
+        }()
         return WindowGroup {
-            ProcessInfo.processInfo.environment["test_type"] == "multi_realm_test" ? AnyView(MultiRealmContentView()) : AnyView(ContentView())
+            view
         }
     }
 }

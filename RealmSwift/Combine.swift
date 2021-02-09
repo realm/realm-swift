@@ -356,8 +356,9 @@ extension EmbeddedObject: ObservableObject {
 extension ObjectBase: RealmSubscribable {
     /// :nodoc:
     // swiftlint:disable:next identifier_name
-    public func _observe<S>(on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken where S.Input: ObjectBase, S: Subscriber, S.Failure == Error {
-        return observe(on: queue) { (change: ObjectChange<S.Input>) in
+    public func _observe<S>(on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken
+        where S.Input: ObjectBase, S: Subscriber, S.Failure == Error {
+        return _observe(on: queue) { (change: ObjectChange<S.Input>) in
             switch change {
             case .change(let object, _):
                 _ = subscriber.receive(object)
@@ -371,7 +372,7 @@ extension ObjectBase: RealmSubscribable {
 
     /// :nodoc:
     public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
-        return observe { _ in _ = subscriber.receive() }
+        return _observe { _ in _ = subscriber.receive() }
     }
 }
 

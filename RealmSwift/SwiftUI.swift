@@ -23,6 +23,18 @@ import Realm
 import Realm.Private
 import Foundation
 
+private func safeWrite<Value>(_ value: Value, _ block: () -> Void) where Value: ThreadConfined {
+    var didStartWrite = false
+    if value.realm?.isInWriteTransaction == false {
+        didStartWrite = true
+        value.realm?.beginWrite()
+    }
+    block()
+    if didStartWrite {
+        try! value.realm?.commitWrite()
+    }
+}
+
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 private func createBinding<T: ThreadConfined, V>(_ value: T,
                                                  forKeyPath keyPath: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
@@ -46,25 +58,23 @@ private func createBinding<T: ThreadConfined, V>(_ value: T,
         guard !value.isInvalidated else {
             return
         }
-        if value.realm?.isInWriteTransaction == false {
-            value.realm?.beginWrite()
+        safeWrite(value) {
+            value[keyPath: keyPath] = newValue
         }
-        value[keyPath: keyPath] = newValue
-        try? value.realm?.commitWrite()
     })
 }
 
 // MARK: KVO
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-private final class KVO: NSObject {
+internal final class KVO: NSObject {
     /// Objects must have observers removed before being added to a realm.
     /// They are stored here so that if they are appended through the Bound Property
     /// system, they can be de-observed before hand.
-    fileprivate static var observedObjects = [NSObject: KVO.Subscription]()
+    static var observedObjects = [NSObject: KVO.Subscription]()
 
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-    fileprivate struct Subscription: Combine.Subscription {
+    struct Subscription: Combine.Subscription {
         let observer: NSObject
         let value: NSObject
         let keyPaths: [String]
@@ -80,16 +90,17 @@ private final class KVO: NSObject {
             keyPaths.forEach {
                 value.removeObserver(observer, forKeyPath: $0)
             }
+            KVO.observedObjects.removeValue(forKey: value)
         }
     }
-    private let _receive: () -> Void
+    private let receive: () -> Void
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-        _receive()
+        receive()
     }
 
     init<S>(subscriber: S) where S: Subscriber, S.Input == Void {
-        _receive = { _ = subscriber.receive() }
+        receive = { _ = subscriber.receive() }
         super.init()
     }
 }
@@ -121,17 +132,12 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
             subscriber.receive(subscription: ObservationSubscription(token: token))
         } else if let value = value as? ObjectBase, !value.isInvalidated {
             // else if the value is unmanaged
-            var outCount = UInt32(0)
-            let propertyList = class_copyPropertyList(ObjectType.self as? AnyClass, &outCount)
-            defer { free(propertyList) }
+            let schema = RLMObjectSchema(forObjectClass: ObjectType.self as! AnyClass)
             let kvo = KVO(subscriber: subscriber)
             var keyPaths = [String]()
-            for index in 0..<outCount {
-                let property = class_getProperty(ObjectType.self as? AnyClass,
-                                                 property_getName(propertyList!.advanced(by: Int(index)).pointee))
-                let name = String(cString: property_getName(property!))
-                keyPaths.append(name)
-                value.addObserver(kvo, forKeyPath: name, options: .new, context: nil)
+            for property in schema.properties {
+                keyPaths.append(property.name)
+                value.addObserver(kvo, forKeyPath: property.name, options: .new, context: nil)
             }
             let subscription = KVO.Subscription(observer: kvo, value: value, keyPaths: keyPaths)
             subscriber.receive(subscription: subscription)
@@ -259,56 +265,37 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct FetchRealmResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & ObjectKeyIdentifiable {
     private class Storage: ObservableStorage<Results<ResultType>> {
-        var sortDescriptor: SortDescriptor? {
-            willSet {
-                if let sortDescriptor = newValue {
-                    value = baseValue.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
-                    if let filter = filter {
-                        value = value.filter(filter)
-                    }
-                } else {
-                    value = baseValue.sorted(by: [])
-                    if let filter = filter {
-                        value = value.filter(filter)
-                    }
-                }
+        private func didSet() {
+            /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
+            value = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration).objects(ResultType.self)
+
+            if let sortDescriptor = sortDescriptor {
+                value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
+            } else {
+                value = value.sorted(by: [])
             }
-        }
-        var filter: NSPredicate? {
-            willSet {
-                if let filter = newValue {
-                    value = baseValue.filter(filter)
-                    if let sortDescriptor = sortDescriptor {
-                        value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
-                    }
-                } else {
-                    value = baseValue.filter(NSPredicate(format: "TRUEPREDICATE"))
-                    if let sortDescriptor = sortDescriptor {
-                        value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
-                    }
-                }
+            if let filter = filter {
+                value = value.filter(filter)
+            } else {
+                value = value.filter(NSPredicate(format: "TRUEPREDICATE"))
             }
         }
 
-        /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
-        private var baseValue: Results<ResultType> {
-            if let configuration = configuration {
-                return try! Realm(configuration: configuration).objects(ResultType.self)
-            } else {
-                return Results(RLMResults.emptyDetached())
+        var sortDescriptor: SortDescriptor? {
+            didSet {
+                didSet()
+            }
+        }
+
+        var filter: NSPredicate? {
+            didSet {
+                didSet()
             }
         }
 
         var configuration: Realm.Configuration? {
             didSet {
-                var value = try! Realm(configuration: configuration!).objects(ResultType.self)
-                if let sortDescriptor = sortDescriptor {
-                    value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
-                }
-                if let filter = filter {
-                    value = value.filter(filter)
-                }
-                self.value = value
+                didSet()
             }
         }
     }
@@ -337,15 +324,12 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     }
     /// :nodoc:
     public init(_ type: ResultType.Type,
-                configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration,
+                configuration: Realm.Configuration? = nil,
                 filter: NSPredicate? = nil,
                 sortDescriptor: SortDescriptor? = nil) {
+        self.storage.configuration = configuration
         self.filter = filter
         self.sortDescriptor = sortDescriptor
-        let defaultRealm = try? Realm(configuration: configuration)
-        if defaultRealm?.schema.objectSchema.contains(where: { $0.objectClass == type }) ?? false, let configuration = defaultRealm?.configuration {
-            storage.configuration = configuration
-        }
     }
 
     public mutating func update() {
@@ -457,13 +441,6 @@ public extension BoundCollection where Value: RealmCollection {
     /// :nodoc:
     typealias Indices = Value.Indices
 
-    private func safeWrite(_ value: Value, _ block: () -> Void) {
-        if value.realm?.isInWriteTransaction == false {
-            value.realm?.beginWrite()
-        }
-        block()
-        try? value.realm?.commitWrite()
-    }
     /// :nodoc:
     func remove<V>(at index: Index) where Value == List<V> {
         let list = self.wrappedValue.realm != nil ?
@@ -547,14 +524,9 @@ extension Binding: BoundCollection where Value: RealmCollection {
 extension Binding where Value: ObjectKeyIdentifiable & ThreadConfined {
     /// :nodoc:
     public func delete() {
-        guard let realm = self.wrappedValue.realm else {
-            return
+        safeWrite(wrappedValue) {
+            wrappedValue.realm?.delete(self.wrappedValue)
         }
-        if !realm.isInWriteTransaction {
-            realm.beginWrite()
-        }
-        realm.delete(self.wrappedValue)
-        try? realm.commitWrite()
     }
 }
 
@@ -562,14 +534,9 @@ extension Binding where Value: ObjectKeyIdentifiable & ThreadConfined {
 extension ObservedRealmObject.Wrapper where ObjectType: ObjectBase {
     /// :nodoc:
     public func delete() {
-        guard let realm = self.wrappedValue.realm else {
-            return
+        safeWrite(wrappedValue) {
+            wrappedValue.realm?.delete(self.wrappedValue)
         }
-        if !realm.isInWriteTransaction {
-            realm.beginWrite()
-        }
-        realm.delete(self.wrappedValue)
-        try? realm.commitWrite()
     }
 }
 
@@ -592,7 +559,7 @@ extension ThreadConfined where Self: ObjectBase {
 }
 
 private struct RealmEnvironmentKey: EnvironmentKey {
-    static let defaultValue = Realm.Configuration()
+    static let defaultValue = Realm.Configuration.defaultConfiguration
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)

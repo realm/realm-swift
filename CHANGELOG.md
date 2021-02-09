@@ -1,8 +1,11 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add support for "thawing" objects. `Realm`, `Results`, `List` and `Object` now
-have `thaw()` methods which return a live copy of the frozen object. This enables app behvaior where a frozen object can be made live again in order to mutate values. For example, first freezing an object passed into UI view, then thawing the object in the view to update values.
+* Add support for "thawing" objects. `Realm`, `Results`, `List` and `Object`
+   now have `thaw()` methods which return a live copy of the frozen object. This
+   enables app behvaior where a frozen object can be made live again in order to
+   mutate values. For example, first freezing an object passed into UI view,
+   then thawing the object in the view to update values.
 * Add `@StateRealmObject` for SwiftUI support. This property wrapper type instantiates an observable object on a View. Use in place of `SwiftUI.StateObject` for Realm `Object`, `List`, and `EmbeddedObject` types.
 * Add `@ObservedRealmObject` for SwiftUI support. This property wrapper type subscribes to an observable object and invalidates a view whenever the observable object changes. Use in place of `SwiftUI.ObservedObject` for Realm `Object`, `List`, or `EmbeddedObject` types.
 * Add `@FetchRealmResults` for SwiftUI support. This property wrapper type retrieves results from a Realm. The results use the realm configuration provided by the environment value `EnvironmentValues.realmConfiguration`.

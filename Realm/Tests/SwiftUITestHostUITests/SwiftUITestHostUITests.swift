@@ -19,35 +19,8 @@
 
 import XCTest
 import RealmSwift
-
-@objcMembers class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
-    @objc enum Priority: Int, RealmEnum, CaseIterable, Identifiable, CustomStringConvertible {
-        var id: Int { self.rawValue }
-
-        case low, medium, high
-
-        var description: String {
-            switch self {
-            case .low: return "low"
-            case .medium: return "medium"
-            case .high: return "high"
-            }
-        }
-    }
-    dynamic var title = ""
-    dynamic var notes = ""
-    dynamic var isFlagged = false
-    dynamic var date = Date()
-    dynamic var isComplete = false
-    dynamic var priority: Priority = .low
-}
-
-@objcMembers class ReminderList: Object, ObjectKeyIdentifiable {
-    dynamic var name = "New List"
-    dynamic var icon: String = "list.bullet"
-    var reminders = RealmSwift.List<Reminder>()
-}
-
+#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.3)
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 class SwiftUITests: XCTestCase {
     var realm: Realm!
     let app = XCUIApplication()
@@ -165,4 +138,17 @@ class SwiftUITests: XCTestCase {
         app.buttons["Realm B"].tap()
         XCTAssertEqual(app.staticTexts["test_text_view"].label, "realm_b")
     }
+
+    func testUnmanagedObjectState() {
+        app.launchEnvironment["test_type"] = "unmanaged_object_test"
+        app.launch()
+
+        app.textFields["name"].tap()
+        app.textFields["name"].typeText(deleteString(for: "New List"))
+        app.textFields["name"].typeText("test name")
+        app.navigationBars.firstMatch.tap()
+        app.buttons["addReminder"].tap()
+        XCTAssertEqual(realm.objects(ReminderList.self).first!.name, "test name")
+    }
 }
+#endif
