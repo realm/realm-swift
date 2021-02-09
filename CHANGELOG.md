@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.5.2 Release notes (2021-02-09)
 =============================================================
 ### Enhancements
 * Add support for "thawing" objects. `Realm`, `Results`, `List` and `Object`
@@ -19,7 +19,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fix - `RLMResponse` will have a non nil `customStatusCode` in case of error.
 ([#4188](https://github.com/realm/realm-core/issues/4188))
 * Limit availability of ObjectKeyIdentifiable to platforms which support Combine to match the change made in the Xcode 12.5 SDK. ([#7083](https://github.com/realm/realm-cocoa/issues/7083))
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 * Realm Studio: 10.0.0 or later.
