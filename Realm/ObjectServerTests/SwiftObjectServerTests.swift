@@ -563,11 +563,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
         try! proxy.start()
 
-        let appInfo = try! RealmServer.shared.createApp()
+        let appId = try! RealmServer.shared.createApp()
         let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
                                          transport: AsyncOpenConnectionTimeoutTransport(),
                                          localAppName: nil, localAppVersion: nil)
-        let app = App(id: appInfo.client_app_id, configuration: appConfig)
+        let app = App(id: appId, configuration: appConfig)
 
         let syncTimeoutOptions = SyncTimeoutOptions()
         syncTimeoutOptions.connectTimeout = 2000
@@ -889,14 +889,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [confirmUserEx], timeout: 4.0)
 
-        let retryCustomEx = expectation(description: "Retry custom confirmation")
-        
-        app.emailPasswordAuth.retryCustomConfirmation("atoken") { (error) in
-            XCTAssertNotNil(error)
-            retryCustomEx.fulfill()
-        }
-        wait(for: [retryCustomEx], timeout: 4.0)
-        
         let resendEmailEx = expectation(description: "Resend email confirmation")
 
         app.emailPasswordAuth.resendConfirmationEmail("atoken") { (error) in
@@ -923,8 +915,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let callResetFunctionEx = expectation(description: "Reset password function")
         app.emailPasswordAuth.callResetPasswordFunction(email: email,
-                                                        password: randomString(10),
-                                                        args: [[:]]) { (error) in
+                                                                       password: randomString(10),
+                                                                       args: [[:]]) { (error) in
             XCTAssertNotNil(error)
             callResetFunctionEx.fulfill()
         }
@@ -2372,7 +2364,6 @@ class CombineObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - Combine promises
 
-    // TODO: retry custom combine
     func testEmailPasswordAuthenticationCombine() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)

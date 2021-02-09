@@ -516,22 +516,9 @@ public class RealmServer: NSObject {
             XCTFail(error.localizedDescription)
         }
     }
-    
-    @objc public class AppInfo: NSObject, Codable {
-        @objc public let client_app_id: String
-        @objc public let last_modified: Int
-        @objc public let product: String
-        @objc public let name: String
-        @objc public let location: String
-        @objc public let domain_id: String
-        @objc public let _id: String
-        @objc public let group_id: String
-        @objc public let last_used: Int
-        @objc public let deployment_model: String
-    }
 
     /// Create a new server app
-    @objc public func createApp() throws -> AppInfo {
+    @objc public func createApp() throws -> AppId {
         guard let session = session else {
             throw URLError(.unknown)
         }
@@ -817,51 +804,7 @@ public class RealmServer: NSObject {
             throw URLError(.badServerResponse)
         }
 
-        let jsonData = try JSONSerialization.data(withJSONObject: info!, options: [])
-        let ai = try! JSONDecoder().decode(AppInfo.self, from: jsonData)
-        return ai
-    }
-    
-    @objc public func setAutoConfirm(_ appInfo: AppInfo, enabled: Bool) -> Void {
-        let providerId = try! getLocalUserPassId(domainId: appInfo._id)
-        guard let session = session else { fatalError() }
-        let app = session.apps[appInfo._id]
-        let group = DispatchGroup()
-        app.authProviders[providerId].patch(on: group, [
-            "config": ["autoConfirm": enabled]
-        ], failOnError)
-        
-        guard case .success = group.wait(timeout: .now() + 4.0) else {
-//            throw URLError(.badServerResponse)
-            fatalError()
-        }
-    }
-    
-    private func getLocalUserPassId(domainId: String) throws -> String {
-        guard let session = session else { fatalError() }
-        let app = session.apps[domainId]
-        var providerId: String? = nil
-
-        let group = DispatchGroup()
-        app.authProviders.get(on: group) { authProviders in
-            do {
-                guard let authProviders = try authProviders.get() as? [[String: Any]] else {
-                    return XCTFail("Bad formatting for authProviders")
-                }
-                guard let provider = authProviders.first(where: { $0["type"] as? String == "local-userpass" }) else {
-                    return XCTFail("Did not find local-userpass provider")
-                }
-                providerId = provider["_id"] as? String
-            }
-            catch {
-                XCTFail(error.localizedDescription)
-            }
-        }
-        
-        guard case .success = group.wait(timeout: .now() + 4.0), let ret = providerId else {
-            throw URLError(.badServerResponse)
-        }
-        return ret
+        return clientAppId
     }
 }
 
