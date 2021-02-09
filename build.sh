@@ -934,7 +934,7 @@ case "$COMMAND" in
         examples="Simple TableView Migration Backlink GroupedTableView Encryption"
         versions="0 1 2 3 4 5"
         for example in $examples; do
-           if [ "$example" = "Migration" ]; then
+            if [ "$example" = "Migration" ]; then
                 # The migration example needs to be built for each schema version to ensure each compiles.
                 for version in $versions; do
                     xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk iphonesimulator build ARCHS=x86_64 "${CODESIGN_PARAMS[@]}" OTHER_SWIFT_FLAGS="\$(OTHER_SWIFT_FLAGS) -DSCHEMA_VERSION_$version"
