@@ -588,7 +588,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             proxy.delay = 1.0
             let ex = expectation(description: "async open")
             Realm.asyncOpen(configuration: config) { result in
-                XCTAssertNotNil(try? result.get())
+                let realm = try? result.get()
+                XCTAssertNotNil(realm)
+                realm?.syncSession?.suspend()
                 ex.fulfill()
             }
             waitForExpectations(timeout: 10.0, handler: nil)
