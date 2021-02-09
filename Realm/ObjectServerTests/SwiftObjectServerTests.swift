@@ -898,13 +898,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [resendEmailEx], timeout: 4.0)
 
         let retryCustomEx = expectation(description: "Retry custom confirmation")
-        
+
         app.emailPasswordAuth.retryCustomConfirmation("atoken") { (error) in
             XCTAssertNotNil(error)
             retryCustomEx.fulfill()
         }
         wait(for: [retryCustomEx], timeout: 4.0)
-        
+
         let resendResetPasswordEx = expectation(description: "Resend reset password email")
 
         app.emailPasswordAuth.sendResetPasswordEmail("atoken") { (error) in
