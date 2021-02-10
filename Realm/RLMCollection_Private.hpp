@@ -89,7 +89,7 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
 
 std::vector<std::pair<std::string, bool>> RLMSortDescriptorsToKeypathArray(NSArray<RLMSortDescriptor *> *properties);
 
-template<typename Collection, typename RLMCollection>
+template<typename Collection, typename ObjcCollection>
 id RLMManagedCollectionFromCollection(RLMClassInfo* info, realm::Obj&& obj, RLMProperty *prop);
 template<typename Fn>
 void RLMGetCollectionType(RLMProperty *prop, Fn&& func);

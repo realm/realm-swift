@@ -88,8 +88,8 @@
     __unsafe_unretained RLMRealm *const realm = parentObject->_realm;
     auto col = parentObject->_info->tableColumn(property);
     return [self initWithBackingCollection:realm::List(realm->_realm, parentObject->_row, col)
-                   parentInfo:parentObject->_info
-                     property:property];
+                                parentInfo:parentObject->_info
+                                  property:property];
 }
 
 void RLMValidateArrayObservationKey(__unsafe_unretained NSString *const keyPath,
@@ -510,8 +510,8 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     auto& parentInfo = _ownerInfo->resolve(frozenRealm);
     return translateRLMResultsErrors([&] {
         return [[self.class alloc] initWithBackingCollection:_backingList.freeze(frozenRealm->_realm)
-                                     parentInfo:&parentInfo
-                                       property:parentInfo.rlmObjectSchema[_key]];
+                                                  parentInfo:&parentInfo
+                                                    property:parentInfo.rlmObjectSchema[_key]];
     });
 }
 
@@ -524,8 +524,8 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     auto& parentInfo = _ownerInfo->resolve(liveRealm);
     return translateRLMResultsErrors([&] {
         return [[self.class alloc] initWithBackingCollection:_backingList.freeze(liveRealm->_realm)
-                                     parentInfo:&parentInfo
-                                       property:parentInfo.rlmObjectSchema[_key]];
+                                                  parentInfo:&parentInfo
+                                                    property:parentInfo.rlmObjectSchema[_key]];
     });
 }
 
@@ -569,8 +569,8 @@ realm::List& RLMGetBackingCollection(RLMManagedArray *self) {
     }
     RLMClassInfo *parentInfo = &realm->_info[metadata.parentClassName];
     return [[RLMManagedArray alloc] initWithBackingCollection:std::move(list)
-                                       parentInfo:parentInfo
-                                         property:parentInfo->rlmObjectSchema[metadata.key]];
+                                                   parentInfo:parentInfo
+                                                     property:parentInfo->rlmObjectSchema[metadata.key]];
 }
 
 @end

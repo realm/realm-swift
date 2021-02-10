@@ -86,8 +86,8 @@
     __unsafe_unretained RLMRealm *const realm = parentObject->_realm;
     auto col = parentObject->_info->tableColumn(property);
     return [self initWithBackingCollection:realm::object_store::Set(realm->_realm, parentObject->_row, col)
-                  parentInfo:parentObject->_info
-                    property:property];
+                                parentInfo:parentObject->_info
+                                  property:property];
 }
 
 void RLMValidateSetObservationKey(__unsafe_unretained NSString *const keyPath,
@@ -505,8 +505,8 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     auto& parentInfo = _ownerInfo->resolve(frozenRealm);
     return translateRLMResultsErrors([&] {
         return [[self.class alloc] initWithBackingCollection:_backingSet.freeze(frozenRealm->_realm)
-                                    parentInfo:&parentInfo
-                                      property:parentInfo.rlmObjectSchema[_key]];
+                                                  parentInfo:&parentInfo
+                                                    property:parentInfo.rlmObjectSchema[_key]];
     });
 }
 
@@ -519,8 +519,8 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     auto& parentInfo = _ownerInfo->resolve(liveRealm);
     return translateRLMResultsErrors([&] {
         return [[self.class alloc] initWithBackingCollection:_backingSet.freeze(liveRealm->_realm)
-                                    parentInfo:&parentInfo
-                                      property:parentInfo.rlmObjectSchema[_key]];
+                                                  parentInfo:&parentInfo
+                                                    property:parentInfo.rlmObjectSchema[_key]];
     });
 }
 
@@ -564,8 +564,8 @@ realm::object_store::Set& RLMGetBackingCollection(RLMManagedSet *self) {
     }
     RLMClassInfo *parentInfo = &realm->_info[metadata.parentClassName];
     return [[RLMManagedSet alloc] initWithBackingCollection:std::move(set)
-                                   parentInfo:parentInfo
-                                     property:parentInfo->rlmObjectSchema[metadata.key]];
+                                                 parentInfo:parentInfo
+                                                   property:parentInfo->rlmObjectSchema[metadata.key]];
 }
 
 @end
