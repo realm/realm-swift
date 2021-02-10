@@ -471,7 +471,6 @@ extension MutableSet: RealmCollection {
     public subscript(position: Int) -> Element {
         throwForNegativeIndex(position)
         return dynamicBridgeCast(fromObjectiveC: _rlmCollection.object(at: UInt(position)))
-        //return self.rlmSet.object(at: UInt(position))
     }
 
     /// :nodoc:
