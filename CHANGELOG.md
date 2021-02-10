@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.5.2 Release notes (2021-02-09)
 =============================================================
 ### Enhancements
 * None.
@@ -11,6 +11,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * Inserting a date into a synced collection via `AnyBSON.datetime(...)` would be of type `Timestamp` and not `Date`. 
+* Inserting a date into a synced collection via `AnyBSON.datetime(...)` would be of type `Timestamp` and not `Date`.
   This could break synced objects with a `Date` property  ([#6654](https://github.com/realm/realm-cocoa/issues/6654), since v10.0.0).
 * Fixed an issue where creating an object after file format upgrade may fail
   with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
@@ -21,6 +22,9 @@ x.y.z Release notes (yyyy-MM-dd)
    ([#4188](https://github.com/realm/realm-core/issues/4188))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Fix - `RLMResponse` will have a non nil `customStatusCode` in case of error.
+([#4188](https://github.com/realm/realm-core/issues/4188))
+* Limit availability of ObjectKeyIdentifiable to platforms which support Combine to match the change made in the Xcode 12.5 SDK. ([#7083](https://github.com/realm/realm-cocoa/issues/7083))
 
 ### Compatibility
 * Realm Studio: 10.0.0 or later.
