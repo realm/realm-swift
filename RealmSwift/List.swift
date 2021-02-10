@@ -428,7 +428,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
 
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedCollection() -> RLMArray<AnyObject> {
-        return Element._rlmCollection()
+        return Element._rlmArray()
     }
 
     // Printable requires a description property defined in Swift (and not obj-c),

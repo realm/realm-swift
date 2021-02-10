@@ -75,11 +75,11 @@ import Realm.Private
 public typealias Object = RealmSwiftObject
 extension Object: RealmCollectionValue {
     /// :nodoc:
-    public static func _rlmCollection() -> RLMArray<AnyObject> {
+    public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectClassName: className())
     }
     /// :nodoc:
-    public static func _rlmCollection() -> RLMSet<AnyObject> {
+    public static func _rlmSet() -> RLMSet<AnyObject> {
         return RLMSet(objectClassName: className())
     }
 

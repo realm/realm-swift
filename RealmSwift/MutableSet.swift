@@ -377,7 +377,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
 
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedCollection() -> RLMSet<AnyObject> {
-        return Element._rlmCollection()
+        return Element._rlmSet()
     }
 
     // Printable requires a description property defined in Swift (and not obj-c),
@@ -493,17 +493,6 @@ extension MutableSet: RealmCollection {
             return nil
         }
         return self[0]
-    }
-
-    /**
-     - warning: Ordering is not guaranteed on a MutableSet. `last` is implemented for
-                convenience should not be relied on.
-     */
-    public var last: Element? {
-        guard count > 0 else {
-            return nil
-        }
-        return self[count-1]
     }
 }
 

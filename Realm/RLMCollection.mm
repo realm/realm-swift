@@ -204,10 +204,13 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
         Class cls = [object_getIvar(accessor, prop.swiftIvar) class];
         RLMAccessorContext context(info);
         if (prop && prop.collection && prop.swiftIvar) {
-            RLMGetCollectionType(prop, [&](auto t) {
+            RLMGetCollectionType(prop, [&](auto type, auto objcType) {
                 for (size_t i = 0; i < count; ++i) {
                     RLMSwiftCollectionBase *base = [[cls alloc] init];
-                    base._rlmCollection = RLMManagedCollectionFromCollection<std::decay_t<decltype(*t)>>(info, collection.get(i), prop);
+                    base._rlmCollection =
+                        RLMManagedCollectionFromCollection<std::decay_t<decltype(*type)>,
+                                                           std::decay_t<decltype(*objcType)>>
+                                                           (info, collection.get(i), prop);
                     [array addObject:base];
                 }
             });
@@ -226,35 +229,23 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
 template<typename Fn>
 void RLMGetCollectionType(RLMProperty *prop, Fn&& func) {
     if (prop.array) {
-        func(((realm::List *)0));
+        func(((realm::List *)0), ((RLMManagedArray *)0));
     }
     else if (prop.set) {
-        func(((realm::object_store::Set *)0));
+        func(((realm::object_store::Set *)0), ((RLMManagedSet *)0));
     }
     else {
         REALM_UNREACHABLE();
     }
 }
 
-template<typename Collection>
+template<typename Collection, typename ObjcCollection>
 id RLMManagedCollectionFromCollection(RLMClassInfo& info, realm::Obj&& obj, RLMProperty *prop) {
-    if constexpr(std::is_same_v<Collection, realm::object_store::Set>) {
-        return [[RLMManagedSet alloc] initWithBackingCollection:Collection(info.realm->_realm,
-                                                                           obj,
-                                                                           info.tableColumn(prop))
-                                                     parentInfo:&info
-                                                       property:prop];
-    }
-    else if constexpr(std::is_same_v<Collection, realm::List>) {
-        return [[RLMManagedArray alloc] initWithBackingCollection:Collection(info.realm->_realm,
-                                                                             obj,
-                                                                             info.tableColumn(prop))
-                                                       parentInfo:&info
-                                                         property:prop];
-    }
-    else {
-        REALM_UNREACHABLE();
-    }
+    return [[ObjcCollection alloc] initWithBackingCollection:Collection(info.realm->_realm,
+                                                                        obj,
+                                                                        info.tableColumn(prop))
+                                                  parentInfo:&info
+                                                    property:prop];
 }
 
 template NSArray *RLMCollectionValueForKey(realm::Results&, NSString *, RLMClassInfo&);
