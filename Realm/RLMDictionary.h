@@ -176,7 +176,7 @@ NS_ASSUME_NONNULL_BEGIN
 
      Person *person = [[Person allObjectsInRealm:realm] firstObject];
      NSLog(@"person.dogs.count: %zu", person.dogs.count); // => 0
-     self.token = [person.dogs addNotificationBlock(RLMSet<Dog *> *dogs,
+     self.token = [person.dogs addNotificationBlock(RLMDictionary<Dog *> *dogs,
                                                     RLMCollectionChange *changes,
                                                     NSError *error) {
          // Only fired once for the example
@@ -262,6 +262,12 @@ __attribute__((warn_unused_result));
  */
 - (instancetype)freeze;
 
+/**
+ Returns a live version of this frozen collection.
+
+ This method resolves a reference to a live copy of the same frozen collection.
+ If called on a live collection, will return itself.
+*/
 - (instancetype)thaw;
 
 #pragma mark - Unavailable Methods

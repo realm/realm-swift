@@ -11,20 +11,36 @@ import Realm
 import Realm.Private
 
 /**
- * Key-value collection. Where the key is a string and value is one of the available Realm types.
- * We use Map to don't intefere with the native Swift's Dictionary type.
- */
-public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
+ Map is a key-value storage container used to store supported Realm types.
+ 
+ Map is a generic type that is parameterized on the type it stores. This can be either an Object
+ subclass or one of the following types: Bool, Int, Int8, Int16, Int32, Int64, Float, Double,
+ String, Data, Date, Decimal128, and ObjectId (and their optional versions)
+ 
+ Map only supports String as a key.
+ 
+ Unlike Swift's native collections, Map is a reference types, and are only immutable if the Realm that manages them
+ is opened as read-only.
+ 
+ A Map can be filtered and sorted with the same predicates as Results<Element>.
+ 
+ Properties of Map type defined on Object subclasses must be declared as let and cannot be dynamic.
+*/
+public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
 
     // MARK: Properties
 
-    /// The Realm which manages the dictionary, or `nil` if the dictionary is unmanaged.
+    /// The Realm which manages the map, or `nil` if the map is unmanaged.
     public var realm: Realm? {
-        return _rlmDictionary.realm.map { Realm($0) }
+        return _rlmCollection.realm.map { Realm($0) }
     }
 
-    /// Indicates if the dictionary can no longer be accessed.
-    public var isInvalidated: Bool { return _rlmDictionary.isInvalidated }
+    /// Indicates if the map can no longer be accessed.
+    public var isInvalidated: Bool { return _rlmCollection.isInvalidated }
+
+    internal var rlmDictionary: RLMDictionary<AnyObject> {
+        _rlmCollection as! RLMDictionary
+    }
 
     // MARK: Initializers
 
@@ -33,9 +49,14 @@ public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
         super.init()
     }
 
-    internal init(objc _rlmDictionary: RLMDictionary<AnyObject>) {
-        super.init(dictionary: _rlmDictionary)
+    internal init(objc _dictionary: RLMDictionary<AnyObject>) {
+        super.init(collection: _dictionary)
     }
+
+    // MARK: Count
+
+    /// Returns the number of key-value pairs in this map.
+    public var count: Int { return Int(_rlmCollection.count) }
 
     // MARK: Aggregate Operations
 
@@ -48,7 +69,7 @@ public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
      - parameter property: The name of a property whose minimum value is desired.
      */
     public func min<T: MinMaxType>(ofProperty property: String) -> T? {
-        return _rlmDictionary.min(ofProperty: property).map(dynamicBridgeCast)
+        return _rlmCollection.min(ofProperty: property).map(dynamicBridgeCast)
     }
 
     /**
@@ -60,7 +81,7 @@ public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
      - parameter property: The name of a property whose minimum value is desired.
      */
     public func max<T: MinMaxType>(ofProperty property: String) -> T? {
-        return _rlmDictionary.max(ofProperty: property).map(dynamicBridgeCast)
+        return _rlmCollection.max(ofProperty: property).map(dynamicBridgeCast)
     }
 
     /**
@@ -71,7 +92,7 @@ public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
     - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
     */
     public func sum<T: AddableType>(ofProperty property: String) -> T {
-        return dynamicBridgeCast(fromObjectiveC: _rlmDictionary.sum(ofProperty: property))
+        return dynamicBridgeCast(fromObjectiveC: _rlmCollection.sum(ofProperty: property))
     }
 
     /**
@@ -83,7 +104,7 @@ public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
      - parameter property: The name of a property whose values should be summed.
      */
     public func average<T: AddableType>(ofProperty property: String) -> T? {
-        return _rlmDictionary.average(ofProperty: property).map(dynamicBridgeCast)
+        return _rlmCollection.average(ofProperty: property).map(dynamicBridgeCast)
     }
     
     // MARK: Filtering
@@ -94,7 +115,7 @@ public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
      - parameter predicate: The predicate with which to filter the objects.
      */
     public func filter(_ predicate: NSPredicate) -> Results<Element> {
-        return Results<Element>(_rlmDictionary.objects(with: predicate))
+        return Results<Element>(_rlmCollection.objects(with: predicate))
     }
 
     // MARK: Sorting
@@ -119,16 +140,19 @@ public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
 
     /**
      Updates the value stored in the dictionary for the given key, or adds a new key-value pair if the key does not exist.
+
+     - parameter value: a value's key path predicate.
+     - parameter forKey: The direction to sort in.
      */
     func updateValue(_ value: Element, forKey key: String) {
-        _rlmDictionary[key] = dynamicBridgeCast(fromSwift: value) as AnyObject
+        _rlmCollection[key] = dynamicBridgeCast(fromSwift: value) as AnyObject
     }
 
     /**
      Removes the given key and its associated object.
      */
     public func removeValue(for key: String) {
-        _rlmDictionary.removeObject(forKey: key)
+        _rlmCollection.removeObject(forKey: key)
     }
 
     /**
@@ -137,7 +161,7 @@ public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
      - warning: This method may only be called during a write transaction.
      */
     public func removeAll() {
-        _rlmDictionary.removeAllObjects()
+        _rlmCollection.removeAllObjects()
     }
 
     // MARK: Notifications
@@ -202,26 +226,26 @@ public final class Map<Element: RealmCollectionValue>: RLMDictionaryBase {
      */
     public func observe(on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<Map>) -> Void) -> NotificationToken {
-        return _rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
+        return rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Frozen Objects
 
     public var isFrozen: Bool {
-        return _rlmDictionary.isFrozen
+        return _rlmCollection.isFrozen
     }
 
     public func freeze() -> Map {
-        return Map(objc: _rlmDictionary.freeze())
+        return Map(objc: rlmDictionary.freeze())
     }
 
     public func thaw() -> Map? {
-        return Map(objc: _rlmDictionary.thaw())
+        return Map(objc: rlmDictionary.thaw())
     }
 
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedDictionary() -> RLMDictionary<AnyObject> {
-        return Element._rlmDictionary()
+        return Element._rlmCollection()
     }
 }
 
@@ -230,14 +254,14 @@ extension Map where Element: MinMaxType {
      Returns the minimum (lowest) value in the map, or `nil` if the map is empty.
      */
     public func min() -> Element? {
-        return _rlmDictionary.min(ofProperty: "self").map(dynamicBridgeCast)
+        return _rlmCollection.min(ofProperty: "self").map(dynamicBridgeCast)
     }
 
     /**
      Returns the maximum (highest) value in the map, or `nil` if the map is empty.
      */
     public func max() -> Element? {
-        return _rlmDictionary.max(ofProperty: "self").map(dynamicBridgeCast)
+        return _rlmCollection.max(ofProperty: "self").map(dynamicBridgeCast)
     }
 }
 
@@ -265,12 +289,12 @@ extension Map: RealmCollection {
 
     /// Returns a `RLMIterator` that yields successive elements in the `Map`.
     public func makeIterator() -> RLMIterator<Element> {
-        return RLMIterator(collection: _rlmDictionary)
+        return RLMIterator(collection: _rlmCollection)
     }
 
     /// :nodoc:
     public func asNSFastEnumerator() -> Any {
-        return _rlmDictionary
+        return _rlmCollection
     }
 
     /// The position of the first element in a non-empty collection.
@@ -290,17 +314,16 @@ extension Map: RealmCollection {
     public func _observe(_ queue: DispatchQueue?,
                          _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
         -> NotificationToken {
-            return _rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
+        return rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Object Retrieval
 
-    /**
-     - warning: Ordering is not guaranteed on a Dictionary. Subscripting is implemented for
-                convenience should not be relied on.
-     */
-    public subscript(position: Int) -> Element {
-        return dynamicBridgeCast(fromObjectiveC: self.object(at: UInt(position)))
+    public subscript(key: String) -> Element? {
+        guard let value = rlmDictionary[key] else {
+            return nil
+        }
+        return dynamicBridgeCast(fromObjectiveC: value)
     }
 
     /// :nodoc:
@@ -318,14 +341,9 @@ extension Map: RealmCollection {
                 convenience should not be relied on.
      */
     public var first: Element? {
-        return self[0]
-    }
-
-    /**
-     - warning: Ordering is not guaranteed on a Map. `last` is implemented for
-                convenience should not be relied on.
-     */
-    public var last: Element? {
-        return self[count-1]
+        guard let firstObject = rlmDictionary.firstObject() else {
+            return nil
+        }
+        return dynamicBridgeCast(fromObjectiveC: firstObject)
     }
 }

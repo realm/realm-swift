@@ -424,6 +424,18 @@ extension Results: RealmSubscribable {
     }
 }
 
+// MARK: - Map
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension Map: ObservableObject, RealmSubscribable {
+    /// A publisher that emits Void each time the collection changes.
+    ///
+    /// Despite the name, this actually emits *after* the collection has changed.
+    public var objectWillChange: RealmPublishers.WillChange<Map> {
+        RealmPublishers.WillChange(self)
+    }
+}
+
 // MARK: RealmCollection
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
