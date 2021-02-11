@@ -184,7 +184,7 @@
     // We need to enumerate a copy of the backing set so that it doesn't
     // reflect changes made during enumeration. This copy has to be autoreleased
     // (since there's nowhere for us to store a strong reference), and uses
-    // RLMArrayHolder rather than an NSArray because NSArray doesn't guarantee
+    // RLMSetHolder rather than an NSArray because NSArray doesn't guarantee
     // that it'll use a single contiguous block of memory, and if it doesn't
     // we'd need to forward multiple calls to this method to the same NSArray,
     // which would require holding a reference to it somewhere.
@@ -472,7 +472,7 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSet *, RLMCollectionChange *, NSError *))block {
     return [self addNotificationBlock:block queue:nil];
 }
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSet *, RLMCollectionChange *, NSError *))block
                                          queue:(nullable dispatch_queue_t)queue {
     @throw RLMException(@"This method may only be called on RLMSet instances retrieved from an RLMRealm");
 }

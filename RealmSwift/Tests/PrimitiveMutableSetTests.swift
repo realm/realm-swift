@@ -191,6 +191,13 @@ class PrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMuta
         XCTAssertFalse(mutableSet.contains(values[0]))
         XCTAssertTrue(mutableSet.contains(values[1]))
     }
+
+    func testSubscript() {
+        mutableSet.insert(objectsIn: values)
+        XCTAssertTrue(values.contains(mutableSet[0]))
+        XCTAssertTrue(values.contains(mutableSet[1]))
+        XCTAssertTrue(values.contains(mutableSet[2]))
+    }
 }
 
 class MinMaxPrimitiveMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T: MinMaxType {
