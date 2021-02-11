@@ -1,10 +1,20 @@
+////////////////////////////////////////////////////////////////////////////
 //
-//  File.swift
-//  RealmSwift
+// Copyright 2021 Realm Inc.
 //
-//  Created by Pavel Yakimenko on 27/01/2021.
-//  Copyright © 2021 Realm. All rights reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
 
 import Foundation
 import Realm
@@ -49,8 +59,8 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
         super.init()
     }
 
-    internal init(objc _dictionary: RLMDictionary<AnyObject>) {
-        super.init(collection: _dictionary)
+    internal init(objc rlmDictionary: RLMDictionary<AnyObject>) {
+        super.init(collection: rlmDictionary)
     }
 
     // MARK: Count
@@ -58,6 +68,77 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
     /// Returns the number of key-value pairs in this map.
     public var count: Int { return Int(_rlmCollection.count) }
 
+    // MARK: KVC
+
+    /**
+     Returns an `Array` containing the results of invoking `valueForKey(_:)` using `key` on each of the collection's
+     objects.
+     */
+    @nonobjc public func value(forKey key: String) -> [AnyObject] {
+        return (rlmDictionary.value(forKeyPath: key)! as! NSSet).allObjects as [AnyObject]
+    }
+
+    /**
+     Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` using `keyPath` on each of the
+     collection's objects.
+
+     - parameter keyPath: The key path to the property whose values are desired.
+     */
+    @nonobjc public func value(forKeyPath keyPath: String) -> [AnyObject] {
+        return (rlmDictionary.value(forKeyPath: keyPath)! as! NSSet).allObjects as [AnyObject]
+    }
+
+    /**
+     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified `value` and `key`.
+
+     - warning: This method can only be called during a write transaction.
+
+     - parameter value: The object value.
+     - parameter key:   The name of the property whose value should be set on each object.
+    */
+    public override func setValue(_ value: Any?, forKey key: String) {
+        return rlmDictionary.setValue(value, forKey: key)
+    }
+
+    // MARK: Filtering
+
+    /**
+     Returns a `Results` containing all objects matching the given predicate in the Map.
+
+     - parameter predicate: The predicate with which to filter the objects.
+     */
+    public func filter(_ predicate: NSPredicate) -> Results<Element> {
+        return Results<Element>(_rlmCollection.objects(with: predicate))
+    }
+    
+    /**
+     Returns a Boolean value indicating whether the Map contains the
+     given object.
+
+     - parameter object: The element to find in the Map.
+     */
+    public func contains(_ object: Element) -> Bool {
+        fatalError("Not implemented in Map")
+    }
+
+    // MARK: Sorting
+
+    /**
+     Returns a `Results` containing the objects in the dictionary, but sorted.
+
+     Pairs are sorted based on the given keyPath for a value.
+
+     - parameter byKeyPath: a value's key path predicate.
+     - parameter ascending: The direction to sort in.
+     */
+    public func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element> {
+        fatalError("Not implemented in Map")
+    }
+
+    public func sorted<S>(by sortDescriptors: S) -> Results<Element> where S : Sequence, S.Element == SortDescriptor {
+        fatalError("Not implemented in Map")
+    }
+    
     // MARK: Aggregate Operations
 
     /**
@@ -107,34 +188,6 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
         return _rlmCollection.average(ofProperty: property).map(dynamicBridgeCast)
     }
     
-    // MARK: Filtering
-
-    /**
-     Returns a `Results` containing all objects matching the given predicate in the dictionary.
-
-     - parameter predicate: The predicate with which to filter the objects.
-     */
-    public func filter(_ predicate: NSPredicate) -> Results<Element> {
-        return Results<Element>(_rlmCollection.objects(with: predicate))
-    }
-
-    // MARK: Sorting
-
-    /**
-     Returns a `Results` containing the objects in the dictionary, but sorted.
-
-     Pairs are sorted based on the given keyPath for a value.
-
-     - parameter byKeyPath: a value's key path predicate.
-     - parameter ascending: The direction to sort in.
-     */
-    public func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element> {
-        fatalError("Not implemented in Map")
-    }
-
-    public func sorted<S>(by sortDescriptors: S) -> Results<Element> where S : Sequence, S.Element == SortDescriptor {
-        fatalError("Not implemented in Map")
-    }
 
     // MARK: Mutation
 
@@ -145,14 +198,14 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      - parameter forKey: The direction to sort in.
      */
     func updateValue(_ value: Element, forKey key: String) {
-        _rlmCollection[key] = dynamicBridgeCast(fromSwift: value) as AnyObject
+        rlmDictionary[key] = dynamicBridgeCast(fromSwift: value) as AnyObject
     }
 
     /**
      Removes the given key and its associated object.
      */
     public func removeValue(for key: String) {
-        _rlmCollection.removeObject(forKey: key)
+        rlmDictionary.removeObject(forKey: key)
     }
 
     /**
@@ -161,7 +214,7 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      - warning: This method may only be called during a write transaction.
      */
     public func removeAll() {
-        _rlmCollection.removeAllObjects()
+        rlmDictionary.removeAllObjects()
     }
 
     // MARK: Notifications
@@ -247,6 +300,17 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
     @objc class func _unmanagedDictionary() -> RLMDictionary<AnyObject> {
         return Element._rlmCollection()
     }
+    
+    /**
+     Returns a human-readable description of the objects contained in the Map.
+     */
+    @objc public override var description: String {
+        return descriptionWithMaxDepth(RLMDescriptionMaxDepth)
+    }
+
+    @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
+        return RLMDescriptionWithMaxDepth("Map", _rlmCollection, depth)
+    }
 }
 
 extension Map where Element: MinMaxType {
@@ -324,6 +388,10 @@ extension Map: RealmCollection {
             return nil
         }
         return dynamicBridgeCast(fromObjectiveC: value)
+    }
+    
+    public subscript(position: UInt) -> Element? {
+        return dynamicBridgeCast(fromObjectiveC: rlmDictionary.object(at: position))
     }
 
     /// :nodoc:
