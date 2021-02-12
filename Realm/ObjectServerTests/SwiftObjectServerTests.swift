@@ -676,7 +676,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             manuallySetRefreshToken(for: user, value: badAccessToken())
             // Try to open a Realm with the user; this will cause our errorHandler block defined above to be fired.
             XCTAssertFalse(blockCalled)
-            _ = try immediatelyOpenRealm(partitionValue: "realm_id", user: user)
+            _ = try immediatelyOpenRealm(partitionValue: #function, user: user)
 
             waitForExpectations(timeout: 10.0, handler: nil)
         } catch {
