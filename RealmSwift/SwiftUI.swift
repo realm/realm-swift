@@ -18,7 +18,7 @@
 
 import Foundation
 
-#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.3) && (REALM_HAVE_COMBINE || !SWIFT_PACKAGE)
+#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.3.1) && (REALM_HAVE_COMBINE || !SWIFT_PACKAGE)
 import SwiftUI
 import Combine
 import Realm
@@ -133,7 +133,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
             subscriber.receive(subscription: ObservationSubscription(token: token))
         } else if let value = value as? ObjectBase, !value.isInvalidated {
             // else if the value is unmanaged
-            let schema = value._objectSchema
+            let schema = ObjectSchema(RLMObjectBaseObjectSchema(value)!)
             let kvo = SwiftUIKVO(subscriber: subscriber)
 
             var keyPaths = [String]()

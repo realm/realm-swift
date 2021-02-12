@@ -113,7 +113,7 @@ extension Object: RealmCollectionValue {
 
     /// The object schema which lists the managed properties for the object.
     public var objectSchema: ObjectSchema {
-        return _objectSchema
+        return ObjectSchema(RLMObjectBaseObjectSchema(self)!)
     }
 
     /// Indicates if the object can no longer be accessed because it is now invalid.
