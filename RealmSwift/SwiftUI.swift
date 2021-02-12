@@ -65,14 +65,14 @@ private func createBinding<T: ThreadConfined, V>(_ value: T,
     })
 }
 
-// MARK: KVO
+// MARK: SwiftUIKVO
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-internal final class KVO: NSObject {
+internal final class SwiftUIKVO: NSObject {
     /// Objects must have observers removed before being added to a realm.
     /// They are stored here so that if they are appended through the Bound Property
     /// system, they can be de-observed before hand.
-    fileprivate static var observedObjects = [NSObject: KVO.Subscription]()
+    fileprivate static var observedObjects = [NSObject: SwiftUIKVO.Subscription]()
 
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
     struct Subscription: Combine.Subscription {
@@ -91,7 +91,7 @@ internal final class KVO: NSObject {
             keyPaths.forEach {
                 value.removeObserver(observer, forKeyPath: $0)
             }
-            KVO.observedObjects.removeValue(forKey: value)
+            SwiftUIKVO.observedObjects.removeValue(forKey: value)
         }
     }
     private let receive: () -> Void
@@ -134,15 +134,15 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
         } else if let value = value as? ObjectBase, !value.isInvalidated {
             // else if the value is unmanaged
             let schema = RLMObjectSchema(forObjectClass: ObjectType.self as! AnyClass)
-            let kvo = KVO(subscriber: subscriber)
+            let kvo = SwiftUIKVO(subscriber: subscriber)
             var keyPaths = [String]()
             for property in schema.properties {
                 keyPaths.append(property.name)
-                value.addObserver(kvo, forKeyPath: property.name, options: .new, context: nil)
+                value.addObserver(kvo, forKeyPath: property.name, options: .initial, context: nil)
             }
-            let subscription = KVO.Subscription(observer: kvo, value: value, keyPaths: keyPaths)
+            let subscription = SwiftUIKVO.Subscription(observer: kvo, value: value, keyPaths: keyPaths)
             subscriber.receive(subscription: subscription)
-            KVO.observedObjects[value] = subscription
+            SwiftUIKVO.observedObjects[value] = subscription
         }
     }
 }
@@ -257,14 +257,14 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     }
 }
 
-// MARK: FetchRealmResults
+// MARK: ObservedResults
 
 /// A property wrapper type that retrieves results from a Realm.
 ///
 /// The results use the realm configuration provided by
 /// the environment value `EnvironmentValues/realmConfiguration`.
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-@propertyWrapper public struct FetchRealmResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & ObjectKeyIdentifiable {
+@propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & ObjectKeyIdentifiable {
     private class Storage: ObservableStorage<Results<ResultType>> {
         private func didSet() {
             /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
@@ -272,13 +272,9 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 
             if let sortDescriptor = sortDescriptor {
                 value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
-            } else {
-                value = value.sorted(by: [])
             }
             if let filter = filter {
                 value = value.filter(filter)
-            } else {
-                value = value.filter(NSPredicate(format: "TRUEPREDICATE"))
             }
         }
 
@@ -499,7 +495,7 @@ public extension BoundCollection where Value: RealmCollection {
         let list = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
         // if the value is unmanaged but the list is managed, we are adding this value to the realm
         if value.realm == nil && list.realm != nil {
-            KVO.observedObjects[value]?.cancel()
+            SwiftUIKVO.observedObjects[value]?.cancel()
         }
         safeWrite(list) {
             list.append(value)
@@ -510,7 +506,7 @@ public extension BoundCollection where Value: RealmCollection {
         let results = self.wrappedValue.realm != nil ?
             self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
         if value.realm == nil && results.realm != nil {
-            KVO.observedObjects[value]?.cancel()
+            SwiftUIKVO.observedObjects[value]?.cancel()
         }
         safeWrite(results) {
             results.realm?.add(value)
@@ -586,15 +582,15 @@ extension EnvironmentValues {
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-extension KVO {
+extension SwiftUIKVO {
     static func removeObservers(object: NSObject) {
-        if let subscription = KVO.observedObjects[object] {
+        if let subscription = SwiftUIKVO.observedObjects[object] {
             subscription.cancel()
         }
     }
 }
 #else
-internal final class KVO {
+internal final class SwiftUIKVO {
     static func removeObservers(object: NSObject) {
         // noop
     }

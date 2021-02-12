@@ -127,10 +127,10 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(state.wrappedValue.count, 0)
     }
 
-    // MARK: - FetchRealmResults Operations
+    // MARK: - ObservedResults Operations
     func testResultsAppendUnmanagedObject() throws {
         let object = SwiftUIObject()
-        let fullResults = FetchRealmResults(SwiftUIObject.self,
+        let fullResults = ObservedResults(SwiftUIObject.self,
                                         configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         XCTAssertEqual(fullResults.wrappedValue.count, 0)
         fullResults.projectedValue.append(object)
@@ -142,19 +142,19 @@ class SwiftUITests: TestCase {
         // add another default inited object for filter comparison
         realm.add(SwiftUIObject())
         try realm.commitWrite()
-        let filteredResults = FetchRealmResults(SwiftUIObject.self,
+        let filteredResults = ObservedResults(SwiftUIObject.self,
                                                 configuration: inMemoryRealm(inMemoryIdentifier).configuration,
                                                 filter: NSPredicate(format: "str = %@", "abc"))
         XCTAssertEqual(fullResults.wrappedValue.count, 2)
         XCTAssertEqual(filteredResults.wrappedValue.count, 1)
-        var sortedResults = FetchRealmResults(SwiftUIObject.self,
+        var sortedResults = ObservedResults(SwiftUIObject.self,
                                               configuration: inMemoryRealm(inMemoryIdentifier).configuration,
                                               filter: NSPredicate(format: "int >= 0"),
                                               sortDescriptor: SortDescriptor(keyPath: "int", ascending: true))
         XCTAssertEqual(sortedResults.wrappedValue.count, 2)
         XCTAssertEqual(sortedResults.wrappedValue[0].int, 0)
         XCTAssertEqual(sortedResults.wrappedValue[1].int, 1)
-        sortedResults = FetchRealmResults(SwiftUIObject.self,
+        sortedResults = ObservedResults(SwiftUIObject.self,
                                           configuration: inMemoryRealm(inMemoryIdentifier).configuration,
                                           filter: NSPredicate(format: "int >= 0"),
                                           sortDescriptor: SortDescriptor(keyPath: "int", ascending: false))
@@ -163,7 +163,7 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(sortedResults.wrappedValue[1].int, 0)
     }
     func testResultsAppendManagedObject() throws {
-        let state = FetchRealmResults(SwiftUIObject.self, configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        let state = ObservedResults(SwiftUIObject.self, configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         let object = SwiftUIObject()
         XCTAssertEqual(state.wrappedValue.count, 0)
         state.projectedValue.append(object)
@@ -172,7 +172,7 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(state.wrappedValue.count, 1)
     }
     func testResultsRemoveUnmanagedObject() throws {
-        let state = FetchRealmResults(SwiftUIObject.self,
+        let state = ObservedResults(SwiftUIObject.self,
                                       configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         let object = SwiftUIObject()
         XCTAssertEqual(state.wrappedValue.count, 0)
@@ -180,7 +180,7 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(state.wrappedValue.count, 0)
     }
     func testResultsRemoveManagedObject() throws {
-        let state = FetchRealmResults(SwiftUIObject.self,
+        let state = ObservedResults(SwiftUIObject.self,
                                       configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         let object = SwiftUIObject()
         XCTAssertEqual(state.wrappedValue.count, 0)
@@ -198,7 +198,7 @@ class SwiftUITests: TestCase {
     }
     func testManagedObjectModification() throws {
         let state = StateRealmObject(wrappedValue: SwiftUIObject())
-        FetchRealmResults(SwiftUIObject.self,
+        ObservedResults(SwiftUIObject.self,
                           configuration: inMemoryRealm(inMemoryIdentifier).configuration)
             .projectedValue.append(state.wrappedValue)
         assertThrows(state.wrappedValue.str = "bar")
@@ -206,7 +206,7 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(state.projectedValue.wrappedValue.str, "bar")
     }
     func testManagedObjectDelete() throws {
-        let results = FetchRealmResults(SwiftUIObject.self,
+        let results = ObservedResults(SwiftUIObject.self,
                                         configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         let state = StateRealmObject(wrappedValue: SwiftUIObject())
         XCTAssertEqual(results.wrappedValue.count, 0)

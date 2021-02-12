@@ -178,7 +178,7 @@ struct ReminderListRowView: View {
 }
 
 struct ReminderListResultsView: View {
-    @FetchRealmResults(ReminderList.self) var reminders
+    @ObservedResults(ReminderList.self) var reminders
     @Binding var searchFilter: String
 
     var body: some View {
@@ -230,7 +230,7 @@ struct SearchView: View {
 }
 
 struct Footer: View {
-    @FetchRealmResults(ReminderList.self) var lists
+    @ObservedResults(ReminderList.self) var lists
 
     var body: some View {
         HStack {
