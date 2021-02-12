@@ -106,7 +106,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     public func immediatelyOpenRealm(partitionValue: String, user: User) throws -> Realm {
         var configuration = user.configuration(partitionValue: partitionValue)
         if configuration.objectTypes == nil {
-            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self, SwiftHugeSyncObject.self]
+            configuration.objectTypes = [SwiftPerson.self, SwiftHugeSyncObject.self]
         }
         return try Realm(configuration: configuration)
     }
