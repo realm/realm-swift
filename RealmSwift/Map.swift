@@ -20,6 +20,9 @@ import Foundation
 import Realm
 import Realm.Private
 
+public protocol MapKeyType { }
+extension String: MapKeyType { }
+
 /**
  Map is a key-value storage container used to store supported Realm types.
  
@@ -32,11 +35,11 @@ import Realm.Private
  Unlike Swift's native collections, Map is a reference types, and are only immutable if the Realm that manages them
  is opened as read-only.
  
- A Map can be filtered and sorted with the same predicates as Results<Element>.
+ A Map can be filtered and sorted with the same predicates as Results<Value>.
  
  Properties of Map type defined on Object subclasses must be declared as let and cannot be dynamic.
 */
-public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
+public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase where Key: MapKeyType {
 
     // MARK: Properties
 
@@ -54,7 +57,7 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
 
     // MARK: Initializers
 
-    /// Creates a `Map` that holds Realm model objects of type `Element`.
+    /// Creates a `Map` that holds Realm model objects of type `Value`.
     public override init() {
         super.init()
     }
@@ -71,11 +74,11 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
     // MARK: KVC
 
     /**
-     Returns a type of `Element` for a specified key if it exists in the map.
+     Returns a type of `Value` for a specified key if it exists in the map.
 
      - parameter key: The key to the property whose values are desired.
      */
-    @nonobjc public func value(forKey key: String) -> Element? {
+    @nonobjc public func value(forKey key: String) -> Value? {
         guard let value = rlmDictionary.value(forKey: key) else {
             return nil
         }
@@ -83,11 +86,11 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
     }
 
     /**
-     Returns a type of `Element` for a specified key if it exists in the map.
+     Returns a type of `Value` for a specified key if it exists in the map.
 
      - parameter keyPath: The key to the property whose values are desired.
      */
-    @nonobjc public func value(forKeyPath keyPath: String) -> Element? {
+    @nonobjc public func value(forKeyPath keyPath: String) -> Value? {
         guard let value = rlmDictionary.value(forKeyPath: keyPath) else {
             return nil
         }
@@ -113,17 +116,17 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
 
      - parameter predicate: The predicate with which to filter the objects.
      */
-    public func filter(_ predicate: NSPredicate) -> Results<Element> {
-        return Results<Element>(_rlmCollection.objects(with: predicate))
+    public func filter(_ predicate: NSPredicate) -> Results<Value> {
+        return Results<Value>(_rlmCollection.objects(with: predicate))
     }
     
     /**
      Returns a Boolean value indicating whether the Map contains the
      given object.
 
-     - parameter object: The element to find in the Map.
+     - parameter object: The value to find in the Map.
      */
-    public func contains(_ object: Element) -> Bool {
+    public func contains(_ object: Value) -> Bool {
         fatalError("Not implemented in Map")
     }
 
@@ -137,11 +140,11 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      - parameter byKeyPath: a value's key path predicate.
      - parameter ascending: The direction to sort in.
      */
-    public func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element> {
+    public func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Value> {
         fatalError("Not implemented in Map")
     }
 
-    public func sorted<S>(by sortDescriptors: S) -> Results<Element> where S : Sequence, S.Element == SortDescriptor {
+    public func sorted<S>(by sortDescriptors: S) -> Results<Value> where S : Sequence, S.Element == SortDescriptor {
         fatalError("Not implemented in Map")
     }
     
@@ -203,7 +206,7 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      - parameter value: a value's key path predicate.
      - parameter forKey: The direction to sort in.
      */
-    public func updateValue(_ value: Element, forKey key: String) {
+    public func updateValue(_ value: Value, forKey key: String) {
         rlmDictionary[key] = dynamicBridgeCast(fromSwift: value) as AnyObject
     }
 
@@ -223,7 +226,7 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
         rlmDictionary.removeAllObjects()
     }
 
-    public subscript(key: String) -> Element? {
+    public subscript(key: String) -> Value? {
         get {
             return value(forKey: key)
         }
@@ -313,7 +316,7 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
 
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedDictionary() -> RLMDictionary<AnyObject> {
-        return Element._rlmDictionary()
+        return Value._rlmDictionary()
     }
     
     /**
@@ -328,27 +331,27 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
     }
 }
 
-extension Map where Element: MinMaxType {
+extension Map where Value: MinMaxType {
     /**
      Returns the minimum (lowest) value in the map, or `nil` if the map is empty.
      */
-    public func min() -> Element? {
+    public func min() -> Value? {
         return _rlmCollection.min(ofProperty: "self").map(dynamicBridgeCast)
     }
 
     /**
      Returns the maximum (highest) value in the map, or `nil` if the map is empty.
      */
-    public func max() -> Element? {
+    public func max() -> Value? {
         return _rlmCollection.max(ofProperty: "self").map(dynamicBridgeCast)
     }
 }
 
-extension Map where Element: AddableType {
+extension Map where Value: AddableType {
     /**
      Returns the sum of the values in the map.
      */
-    public func sum() -> Element {
+    public func sum() -> Value {
         return sum(ofProperty: "self")
     }
 
@@ -361,13 +364,13 @@ extension Map where Element: AddableType {
 }
 
 extension Map: RealmCollection {
-    /// The type of the objects stored within the map.
-    public typealias ElementType = Element
+//    /// The type of the objects stored within the map.
+//    public typealias ElementType = Value
 
     // MARK: Sequence Support
 
     /// Returns a `RLMIterator` that yields successive elements in the `Map`.
-    public func makeIterator() -> RLMIterator<Element> {
+    public func makeIterator() -> RLMIterator<Value> {
         return RLMIterator(collection: _rlmCollection)
     }
 
@@ -391,19 +394,19 @@ extension Map: RealmCollection {
     /// :nodoc:
     // swiftlint:disable:next identifier_name
     public func _observe(_ queue: DispatchQueue?,
-                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
+                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Value>>) -> Void)
         -> NotificationToken {
             return rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Object Retrieval
 
-    public subscript(position: Int) -> Element {
+    public subscript(position: Int) -> Value {
         fatalError("subscript(position:) is not available on Map")
     }
 
     /// :nodoc:
-    public func index(of object: Element) -> Int? {
+    public func index(of object: Value) -> Int? {
         fatalError("index(of:) is not available on Map")
     }
 
