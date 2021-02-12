@@ -197,7 +197,7 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      - parameter value: a value's key path predicate.
      - parameter forKey: The direction to sort in.
      */
-    func updateValue(_ value: Element, forKey key: String) {
+    public func updateValue(_ value: Element, forKey key: String) {
         rlmDictionary[key] = dynamicBridgeCast(fromSwift: value) as AnyObject
     }
 
@@ -390,7 +390,7 @@ extension Map: RealmCollection {
         return dynamicBridgeCast(fromObjectiveC: value)
     }
     
-    public subscript(position: UInt) -> Element? {
+    public subscript(position: UInt) -> Element {
         return dynamicBridgeCast(fromObjectiveC: rlmDictionary.object(at: position))
     }
 
