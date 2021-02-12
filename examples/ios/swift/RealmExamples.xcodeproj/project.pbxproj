@@ -40,6 +40,20 @@
 		53454CE424EAC45700678E48 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53454CE324EAC45700678E48 /* Assets.xcassets */; };
 		53454CE724EAC45700678E48 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53454CE624EAC45700678E48 /* Preview Assets.xcassets */; };
 		53454CEC24EAC45700678E48 /* AppClip.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 53454CDD24EAC45500678E48 /* AppClip.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7D46395025C2E2750089EFD9 /* Example_v3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46394F25C2E2750089EFD9 /* Example_v3.swift */; };
+		7D46395425C2E7140089EFD9 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 7D46395325C2E7140089EFD9 /* README.md */; };
+		7D46399825C45FF00089EFD9 /* Example_v4.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46399725C45FF00089EFD9 /* Example_v4.swift */; };
+		7D4639A025C46C660089EFD9 /* Example_v5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D46399F25C46C660089EFD9 /* Example_v5.swift */; };
+		7DADCBA525C816B600048287 /* default-v0.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCB9F25C816B500048287 /* default-v0.realm */; };
+		7DADCBA625C816B600048287 /* default-v1.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBA025C816B500048287 /* default-v1.realm */; };
+		7DADCBA725C816B600048287 /* default-v3.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBA125C816B500048287 /* default-v3.realm */; };
+		7DADCBA825C816B600048287 /* default-v4.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBA225C816B500048287 /* default-v4.realm */; };
+		7DADCBA925C816B600048287 /* default-v5.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBA325C816B500048287 /* default-v5.realm */; };
+		7DADCBAA25C816B600048287 /* default-v2.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBA425C816B600048287 /* default-v2.realm */; };
+		7DADCBB225C8284500048287 /* Migration.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 7DADCBB125C8284500048287 /* Migration.xcconfig */; };
+		7DFFB15E25C19F0700CA8AE5 /* Example_v0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFFB15D25C19F0700CA8AE5 /* Example_v0.swift */; };
+		7DFFB16F25C1B65A00CA8AE5 /* Example_v1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFFB16E25C1B65A00CA8AE5 /* Example_v1.swift */; };
+		7DFFB17725C1B84E00CA8AE5 /* Example_v2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DFFB17625C1B84E00CA8AE5 /* Example_v2.swift */; };
 		C07E5D7A1B15003B00ED625C /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; };
 		C07E5D7B1B15003B00ED625C /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C07E5D7C1B15004800ED625C /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; };
@@ -71,9 +85,6 @@
 		E8CA270E1CF9031600FF203A /* RealmSwift.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C09C490F1A605A4800638C9F /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E8CB088219BA6AEE0018434A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8CB088019BA6AEE0018434A /* AppDelegate.swift */; };
 		E8CB088A19BA6AF70018434A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8CB088519BA6AF70018434A /* AppDelegate.swift */; };
-		E8CB088B19BA6AF70018434A /* default-v0.realm in Resources */ = {isa = PBXBuildFile; fileRef = E8CB088619BA6AF70018434A /* default-v0.realm */; };
-		E8CB088C19BA6AF70018434A /* default-v1.realm in Resources */ = {isa = PBXBuildFile; fileRef = E8CB088719BA6AF70018434A /* default-v1.realm */; };
-		E8CB088D19BA6AF70018434A /* default-v2.realm in Resources */ = {isa = PBXBuildFile; fileRef = E8CB088819BA6AF70018434A /* default-v2.realm */; };
 		E8CB089219BA6B000018434A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8CB089019BA6B000018434A /* AppDelegate.swift */; };
 		E8CB089919BA6B080018434A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8CB089519BA6B080018434A /* AppDelegate.swift */; };
 		E8CB089A19BA6B080018434A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E8CB089619BA6B080018434A /* Images.xcassets */; };
@@ -257,6 +268,20 @@
 		53454CE624EAC45700678E48 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		53454CE824EAC45700678E48 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		53454CE924EAC45700678E48 /* AppClip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppClip.entitlements; sourceTree = "<group>"; };
+		7D46394F25C2E2750089EFD9 /* Example_v3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v3.swift; sourceTree = "<group>"; };
+		7D46395325C2E7140089EFD9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.markdown; };
+		7D46399725C45FF00089EFD9 /* Example_v4.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v4.swift; sourceTree = "<group>"; };
+		7D46399F25C46C660089EFD9 /* Example_v5.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v5.swift; sourceTree = "<group>"; };
+		7DADCB9F25C816B500048287 /* default-v0.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v0.realm"; sourceTree = "<group>"; };
+		7DADCBA025C816B500048287 /* default-v1.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v1.realm"; sourceTree = "<group>"; };
+		7DADCBA125C816B500048287 /* default-v3.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v3.realm"; sourceTree = "<group>"; };
+		7DADCBA225C816B500048287 /* default-v4.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v4.realm"; sourceTree = "<group>"; };
+		7DADCBA325C816B500048287 /* default-v5.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v5.realm"; sourceTree = "<group>"; };
+		7DADCBA425C816B600048287 /* default-v2.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v2.realm"; sourceTree = "<group>"; };
+		7DADCBB125C8284500048287 /* Migration.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Migration.xcconfig; sourceTree = "<group>"; };
+		7DFFB15D25C19F0700CA8AE5 /* Example_v0.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v0.swift; sourceTree = "<group>"; };
+		7DFFB16E25C1B65A00CA8AE5 /* Example_v1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v1.swift; sourceTree = "<group>"; };
+		7DFFB17625C1B84E00CA8AE5 /* Example_v2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Example_v2.swift; sourceTree = "<group>"; };
 		9C318E8C1CA42C7800879076 /* GettingStarted.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = GettingStarted.playground; sourceTree = "<group>"; };
 		C07E5D791B15001500ED625C /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -286,9 +311,6 @@
 		E8CB088019BA6AEE0018434A /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E8CB088119BA6AEE0018434A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E8CB088519BA6AF70018434A /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		E8CB088619BA6AF70018434A /* default-v0.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v0.realm"; sourceTree = "<group>"; };
-		E8CB088719BA6AF70018434A /* default-v1.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v1.realm"; sourceTree = "<group>"; };
-		E8CB088819BA6AF70018434A /* default-v2.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v2.realm"; sourceTree = "<group>"; };
 		E8CB088919BA6AF70018434A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E8CB089019BA6B000018434A /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E8CB089119BA6B000018434A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -538,6 +560,32 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		7D46396525C30B580089EFD9 /* Examples */ = {
+			isa = PBXGroup;
+			children = (
+				7DFFB15D25C19F0700CA8AE5 /* Example_v0.swift */,
+				7DFFB16E25C1B65A00CA8AE5 /* Example_v1.swift */,
+				7DFFB17625C1B84E00CA8AE5 /* Example_v2.swift */,
+				7D46394F25C2E2750089EFD9 /* Example_v3.swift */,
+				7D46399725C45FF00089EFD9 /* Example_v4.swift */,
+				7D46399F25C46C660089EFD9 /* Example_v5.swift */,
+			);
+			path = Examples;
+			sourceTree = "<group>";
+		};
+		7D46396A25C30B7F0089EFD9 /* RealmTemplates */ = {
+			isa = PBXGroup;
+			children = (
+				7DADCB9F25C816B500048287 /* default-v0.realm */,
+				7DADCBA025C816B500048287 /* default-v1.realm */,
+				7DADCBA425C816B600048287 /* default-v2.realm */,
+				7DADCBA125C816B500048287 /* default-v3.realm */,
+				7DADCBA225C816B500048287 /* default-v4.realm */,
+				7DADCBA325C816B500048287 /* default-v5.realm */,
+			);
+			path = RealmTemplates;
+			sourceTree = "<group>";
+		};
 		CFEDF00824B72622007FF10A /* AppleAuthentication */ = {
 			isa = PBXGroup;
 			children = (
@@ -628,10 +676,11 @@
 		E8CB088419BA6AF70018434A /* Migration */ = {
 			isa = PBXGroup;
 			children = (
+				7D46395325C2E7140089EFD9 /* README.md */,
+				7DADCBB125C8284500048287 /* Migration.xcconfig */,
 				E8CB088519BA6AF70018434A /* AppDelegate.swift */,
-				E8CB088619BA6AF70018434A /* default-v0.realm */,
-				E8CB088719BA6AF70018434A /* default-v1.realm */,
-				E8CB088819BA6AF70018434A /* default-v2.realm */,
+				7D46396525C30B580089EFD9 /* Examples */,
+				7D46396A25C30B7F0089EFD9 /* RealmTemplates */,
 				E8CB088919BA6AF70018434A /* Info.plist */,
 			);
 			path = Migration;
@@ -1028,10 +1077,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8CB088B19BA6AF70018434A /* default-v0.realm in Resources */,
-				E8CB088C19BA6AF70018434A /* default-v1.realm in Resources */,
-				E8CB088D19BA6AF70018434A /* default-v2.realm in Resources */,
+				7DADCBA625C816B600048287 /* default-v1.realm in Resources */,
+				7DADCBAA25C816B600048287 /* default-v2.realm in Resources */,
+				7D46395425C2E7140089EFD9 /* README.md in Resources */,
+				7DADCBA525C816B600048287 /* default-v0.realm in Resources */,
+				7DADCBA825C816B600048287 /* default-v4.realm in Resources */,
+				7DADCBA925C816B600048287 /* default-v5.realm in Resources */,
 				227D20F51CB609A1008F641B /* LaunchScreen.xib in Resources */,
+				7DADCBA725C816B600048287 /* default-v3.realm in Resources */,
+				7DADCBB225C8284500048287 /* Migration.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1114,6 +1168,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7DFFB16F25C1B65A00CA8AE5 /* Example_v1.swift in Sources */,
+				7D46395025C2E2750089EFD9 /* Example_v3.swift in Sources */,
+				7D46399825C45FF00089EFD9 /* Example_v4.swift in Sources */,
+				7D4639A025C46C660089EFD9 /* Example_v5.swift in Sources */,
+				7DFFB17725C1B84E00CA8AE5 /* Example_v2.swift in Sources */,
+				7DFFB15E25C19F0700CA8AE5 /* Example_v0.swift in Sources */,
 				E8CB088A19BA6AF70018434A /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1586,6 +1646,7 @@
 		};
 		E8CB083019BA6ABE0018434A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7DADCBB125C8284500048287 /* Migration.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -1602,6 +1663,7 @@
 		};
 		E8CB083119BA6ABE0018434A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7DADCBB125C8284500048287 /* Migration.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;

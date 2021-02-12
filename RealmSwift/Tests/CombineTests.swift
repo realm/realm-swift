@@ -47,6 +47,7 @@ func hasCombine() -> Bool {
     return false
 }
 
+@available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 class ObjectIdentifiableTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         if hasCombine() {
