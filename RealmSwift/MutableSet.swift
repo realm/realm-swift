@@ -495,22 +495,6 @@ extension MutableSet: RealmCollection {
     }
 }
 
-extension MutableSet: ExpressibleByArrayLiteral {
-    /// Creates a set containing the elements of the given array literal.
-    ///
-    /// Do not call this initializer directly. It is used by the compiler when
-    /// you use an array literal. Instead, create a new set using an array
-    /// literal as its value by enclosing a comma-separated list of values in
-    /// square brackets. You can use an array literal anywhere a set is expected
-    /// by the type context.
-    ///
-    /// - Parameter elements: A variadic list of elements of the new set.
-    @inlinable public convenience init(arrayLiteral elements: Element...) {
-        self.init()
-        insert(objectsIn: elements)
-    }
-}
-
 // MARK: - Codable
 
 extension MutableSet: Decodable where Element: Decodable {

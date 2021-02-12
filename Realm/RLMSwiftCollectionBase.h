@@ -27,7 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init;
 - (instancetype)initWithCollection:(id<RLMCollection>)collection;
-//- (id)objectAtIndex:(NSUInteger)index;
 @end
 
 @interface RLMLinkingObjectsHandle : NSObject
