@@ -20,11 +20,7 @@ import Foundation
 import RealmSwift
 import XCTest
 
-private extension URL {
-    var fileURL: URL {
-        URL(fileURLWithPath: self.absoluteString)
-    }
-}
+#if os(macOS)
 
 extension URLSession {
     fileprivate func resultDataTask(with request: URLRequest, _ completionHandler: @escaping (Result<Data, Error>) -> Void) {
@@ -391,24 +387,26 @@ public class RealmServer: NSObject {
     /// Shared RealmServer. This class only needs to be initialized and torn down once per test suite run.
     @objc public static var shared = RealmServer()
     private lazy var dependencies: Dependencies = {
-        guard let data = fileManager.contents(atPath: RealmServer.rootUrl.appendingPathComponent("dependencies.list").absoluteString),
+        guard let data = fileManager.contents(atPath: RealmServer.rootUrl.appendingPathComponent("dependencies.list").path),
               let dependenciesString = String(data: data, encoding: .utf8) else {
             fatalError("`dependencies.list` missing from root directory")
         }
 
         do {
+            let dependenciesMap = dependenciesString.components(separatedBy: "\n").dropLast().reduce(into: [String: String]()) {
+                let keyValuePair = $1.split(separator: "=")
+                $0[String(keyValuePair[0])] = String(keyValuePair[1])
+            }
+            let dependenciesJSON = try JSONEncoder().encode(dependenciesMap)
             return try JSONDecoder().decode(Dependencies.self,
-                                            from: JSONEncoder().encode(dependenciesString.components(separatedBy: "\n").dropLast().reduce(into: [String: String]()) {
-                                                let keyValuePair = $1.split(separator: "=")
-                                                $0[String(keyValuePair[0])] = String(keyValuePair[1])
-                                            }))
+                                            from: dependenciesJSON)
         } catch {
             fatalError("`dependencies.list` malformed: \(error.localizedDescription)")
         }
     }()
 
     /// The root URL of the project.
-    private static let rootUrl = URL(string: #file)!
+    private static let rootUrl = URL(fileURLWithPath: #file)
         .deletingLastPathComponent() // RealmServer.swift
         .deletingLastPathComponent() // ObjectServerTests
         .deletingLastPathComponent() // Realm
@@ -441,7 +439,7 @@ public class RealmServer: NSObject {
     private lazy var isParentProcess = (getenv("RLMProcessIsChild") == nil)
 
     /// The "shell" that processes are launched on
-    private lazy var subprocess = Subprocess(defaultDirectoryPath: buildDir.absoluteString)
+    private lazy var subprocess = Subprocess(defaultDirectoryPath: buildDir.path)
 
     /// The current admin session
     private var session: Admin.AdminSession?
@@ -475,11 +473,11 @@ public class RealmServer: NSObject {
     }
 
     private func setupMongod() throws {
-        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("mongo").absoluteString) {
-            subprocess.popen("/usr/bin/curl --silent \(mongoDBURL.absoluteString) | /usr/bin/tar xz")
-            subprocess.popen("/bin/mkdir \(binDir.absoluteString)")
-            subprocess.popen("/bin/cp \(mongoDir.absoluteString)/bin/mongo \(binDir)/mongo")
-            subprocess.popen("/bin/cp \(mongoDir.absoluteString)/bin/mongod \(binDir)/mongod")
+        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("mongo").path) {
+            subprocess.popen("/usr/bin/curl --silent \(mongoDBURL) | /usr/bin/tar xz")
+            subprocess.popen("/bin/mkdir \(binDir.path)")
+            subprocess.popen("/bin/cp \(mongoDir.appendingPathComponent("/bin/mongo").path) \(binDir.appendingPathComponent("mongo").path)")
+            subprocess.popen("/bin/cp \(mongoDir.appendingPathComponent("/bin/mongod").path) \(binDir.appendingPathComponent("mongod").path)")
 
             let mongoProcess = Process()
             mongoProcess.launchPath = binDir.appendingPathComponent("mongod").path
@@ -490,14 +488,14 @@ public class RealmServer: NSObject {
                 "--port", "26000",
                 "--replSet", "test",
                 "--fork",
-                "--logpath", "\(buildDir)/mongod.log"
+                "--logpath", "\(buildDir.appendingPathComponent("mongod.log"))"
             ]
             mongoProcess.standardOutput = nil
             try mongoProcess.run()
 
-            subprocess.popen("\(binDir)/mongo --port=26000 --eval=\"rs.initiate()\"")
+            subprocess.popen("\(binDir.appendingPathComponent("mongo").path) --port=26000 --eval=\"rs.initiate()\"")
             subprocess.popen("""
-                        \(binDir)/mongo --port 26000 --eval 'use admin; db.createUser({user: "test", pwd: "test", roles: [{role: "userAdminAnyDatabase", db: "admin"}]})'
+                        \(binDir.appendingPathComponent("mongo").path) --port 26000 --eval 'use admin; db.createUser({user: "test", pwd: "test", roles: [{role: "userAdminAnyDatabase", db: "admin"}]})'
                         """)
 
             let shutdownProcess = mongoShutdownProcess()
@@ -511,22 +509,35 @@ public class RealmServer: NSObject {
         print("Setting up stitch")
 
         let goRoot = buildDir.appendingPathComponent("go")
-        if try fileManager.contentsOfDirectory(atPath: binDir.absoluteString).count == 7 {
+        var stitchDir = buildDir.appendingPathComponent("stitch")
+        let updateDocFilepath = binDir.appendingPathComponent("update_doc")
+        let assistedAggFilepath = binDir.appendingPathComponent("assisted_agg")
+
+        if fileManager.fileExists(atPath: "\(goRoot.path)/bin/go")
+            && fileManager.fileExists(atPath: stitchDir.path)
+            && fileManager.fileExists(atPath: libDir.appendingPathComponent("libstitch_support.dylib").path)
+            && fileManager.fileExists(atPath: updateDocFilepath.path)
+            && fileManager.fileExists(atPath: assistedAggFilepath.path)
+            && fileManager.fileExists(atPath: buildDir
+                                        .appendingPathComponent("node-v\(dependencies.nodeVersion)-darwin-x64").path)
+            && fileManager.fileExists(atPath: binDir.appendingPathComponent("transpiler").path)
+            && fileManager.fileExists(atPath: binDir.appendingPathComponent("create_user").path)
+            && fileManager.fileExists(atPath: binDir.appendingPathComponent("stitch_server").path) {
             return
         }
 
-        try fileManager.createDirectory(at: libDir.fileURL, withIntermediateDirectories: true)
-        if !fileManager.fileExists(atPath: "\(goRoot.absoluteString)/bin/go") {
+        try fileManager.createDirectory(at: libDir, withIntermediateDirectories: true)
+        if !fileManager.fileExists(atPath: goRoot.appendingPathComponent("bin/go").path) {
             print("Downloading golang")
             subprocess.popen("/usr/bin/curl --silent https://dl.google.com/go/go\(dependencies.goVersion).darwin-amd64.tar.gz | /usr/bin/tar xz")
-            subprocess.popen("/bin/mkdir -p \(goRoot.absoluteString)/src/github.com/10gen")
+            subprocess.popen("/bin/mkdir -p \(goRoot.appendingPathComponent("src/github.com/10gen").path)")
         }
 
-        var stitchDir = buildDir.appendingPathComponent("stitch")
 
-        if !fileManager.fileExists(atPath: stitchDir.absoluteString) {
+
+        if !fileManager.fileExists(atPath: stitchDir.path) {
             print("Cloning stitch")
-            subprocess.popen("/usr/bin/git clone git@github.com:10gen/baas \(stitchDir.absoluteString)")
+            subprocess.popen("/usr/bin/git clone git@github.com:10gen/baas \(stitchDir.path)")
         }
 
         print("checking out stitch")
@@ -535,93 +546,91 @@ public class RealmServer: NSObject {
             .appendingPathComponent("github.com")
             .appendingPathComponent("10gen")
             .appendingPathComponent("stitch")
-        if FileManager.default.fileExists(atPath: stitchDir.appendingPathComponent(".git").absoluteString) {
+        if FileManager.default.fileExists(atPath: stitchDir.appendingPathComponent(".git").path) {
             // Fetch the BaaS version if we don't have it
-            if subprocess.popen("/usr/bin/git -C \(stitchDir) show-ref --verify --quiet \(dependencies.stitchVersion)").exitCode != 0 {
-                subprocess.popen("/usr/bin/git -C \(stitchDir) fetch")
+            if subprocess.popen("/usr/bin/git -C \(stitchDir.path) show-ref --verify --quiet \(dependencies.stitchVersion)").exitCode != 0 {
+                subprocess.popen("/usr/bin/git -C \(stitchDir.path) fetch")
             }
 
             // Set the worktree to the correct version
-            if fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
-                subprocess.popen("/usr/bin/git -C \(stitchWorktree) checkout \(dependencies.stitchVersion)")
+            if fileManager.fileExists(atPath: stitchWorktree.path) {
+                subprocess.popen("/usr/bin/git -C \(stitchWorktree.path) checkout \(dependencies.stitchVersion)")
             } else {
-                subprocess.popen("/usr/bin/git -C \(stitchDir) worktree add \(stitchWorktree) \(dependencies.stitchVersion)")
+                subprocess.popen("/usr/bin/git -C \(stitchDir.path) worktree add \(stitchWorktree.path) \(dependencies.stitchVersion)")
             }
         } else {
             print("Stitch exists without .git directory– copying files from \(stitchDir) to \(stitchWorktree)")
             // We have a stitch directory with no .git directory, meaning we're
             // running on CI and just need to copy the files into place
-            if !fileManager.fileExists(atPath: stitchWorktree.absoluteString) {
-                subprocess.popen("/bin/cp -Rc \(stitchDir.absoluteString) \(stitchWorktree.absoluteString)")
+            if !fileManager.fileExists(atPath: stitchWorktree.path) {
+                subprocess.popen("/bin/cp -Rc \(stitchDir.path) \(stitchWorktree.path)")
             }
         }
 
-        subprocess.popen("/bin/mkdir -p \(goRoot)/src/github.com/10gen/stitch/etc/dylib")
+        subprocess.popen("/bin/mkdir -p \(goRoot.appendingPathComponent("src/github.com/10gen/stitch/etc/dylib").path)")
         stitchDir = stitchWorktree
-        if !fileManager.fileExists(atPath: libDir.appendingPathComponent("libstitch_support.dylib").absoluteString) {
+        if !fileManager.fileExists(atPath: libDir.appendingPathComponent("libstitch_support.dylib").path) {
             print("downloading mongodb dylibs")
-            subprocess.popen("/usr/bin/curl -s \(stitchSupportLibURL) | /usr/bin/tar xvfz - --strip-components=1 -C \(goRoot)/src/github.com/10gen/stitch/etc/dylib")
-            subprocess.popen("/bin/cp \(goRoot)/src/github.com/10gen/stitch/etc/dylib/lib/libstitch_support.dylib lib")
+            subprocess.popen("/usr/bin/curl -s \(stitchSupportLibURL) | /usr/bin/tar xvfz - --strip-components=1 -C \(goRoot.appendingPathComponent("src/github.com/10gen/stitch/etc/dylib").path)")
+            subprocess.popen("/bin/cp \(goRoot.appendingPathComponent("src/github.com/10gen/stitch/etc/dylib/lib/libstitch_support.dylib").path) lib")
         }
 
-        let updateDocFilepath = binDir.appendingPathComponent("update_doc")
-        if !fileManager.fileExists(atPath: updateDocFilepath.absoluteString) {
+        if !fileManager.fileExists(atPath: updateDocFilepath.path) {
             print("downloading update_doc")
             subprocess.popen("/usr/bin/curl --silent -O https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7a5c9ec4432c400181c_17_10_15_01_19_33/update_doc")
             subprocess.popen("/bin/mv update_doc bin/update_doc")
-            subprocess.popen("/bin/chmod +x \(updateDocFilepath)")
+            subprocess.popen("/bin/chmod +x \(updateDocFilepath.path)")
         }
 
-        let assistedAggFilepath = binDir.appendingPathComponent("assisted_agg")
-        if !fileManager.fileExists(atPath: assistedAggFilepath.absoluteString) {
+        if !fileManager.fileExists(atPath: assistedAggFilepath.path) {
             print("downloading assisted_agg")
             subprocess.popen("/usr/bin/curl --silent -O https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_b1c679a26ecb975372de41238ea44e4719b8fbf0_5f3d91c10ae6066889184912_20_08_19_20_57_17/assisted_agg")
             subprocess.popen("/bin/mv assisted_agg bin/assisted_agg")
-            subprocess.popen("/bin/chmod +x \(assistedAggFilepath)")
+            subprocess.popen("/bin/chmod +x \(assistedAggFilepath.path)")
         }
 
-        if !fileManager.fileExists(atPath: buildDir.appendingPathComponent("node-v\(dependencies.nodeVersion)-darwin-x64").absoluteString) {
+        if !fileManager.fileExists(atPath: buildDir.appendingPathComponent("node-v\(dependencies.nodeVersion)-darwin-x64").path) {
             print("downloading node 🚀")
             subprocess.popen("/usr/bin/curl --silent https://nodejs.org/dist/v\(dependencies.nodeVersion)/node-v\(dependencies.nodeVersion)-darwin-x64.tar.gz | /usr/bin/tar xz")
         }
-        subprocess.path.append( "\(buildDir)/node-v\(dependencies.nodeVersion)-darwin-x64/bin/")
+        subprocess.path.append("\(buildDir.appendingPathComponent("node-v\(dependencies.nodeVersion)-darwin-x64/bin/").path)")
 
-        if !fileManager.fileExists(atPath: "\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin/yarn") {
+        if !fileManager.fileExists(atPath: fileManager.homeDirectoryForCurrentUser.appendingPathComponent(".yarn/bin/yarn").path) {
             subprocess.popen("/bin/rm -rf ~/.yarn")
             subprocess.popen("/usr/bin/curl -o- -L https://yarnpkg.com/install.sh | /bin/bash")
         }
-        subprocess.path.append("\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin:~/.config/yarn/global/node_modules/.bin")
+        subprocess.path.append(fileManager.homeDirectoryForCurrentUser.appendingPathComponent(".yarn/bin:~/.config/yarn/global/node_modules/.bin").path)
 
-        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("transpiler").absoluteString) {
+        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("transpiler").path) {
             print("building transpiler")
-            subprocess.popen("\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin/yarn install",
-                 currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").absoluteString)
-            subprocess.popen("\(fileManager.homeDirectoryForCurrentUser.path)/.yarn/bin/yarn run build",
-                 currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").absoluteString)
-            subprocess.popen("/bin/cp -c bin/transpiler \(buildDir)/bin", currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").absoluteString)
+            subprocess.popen("\(fileManager.homeDirectoryForCurrentUser.appendingPathComponent(".yarn/bin/yarn").path) install",
+                 currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").path)
+            subprocess.popen("\(fileManager.homeDirectoryForCurrentUser.appendingPathComponent(".yarn/bin/yarn").path) run build",
+                 currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").path)
+            subprocess.popen("/bin/cp -c bin/transpiler \(buildDir.appendingPathComponent("bin").path)", currentDirectoryPath: stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").path)
         }
 
-        subprocess.environment["GOROOT"] = goRoot.absoluteString
-        subprocess.environment["GOCACHE"] = goRoot.appendingPathComponent("cache").absoluteString
-        subprocess.environment["GOPATH"] = goRoot.appendingPathComponent("bin").absoluteString
-        subprocess.environment["STITCH_PATH"] = stitchDir.absoluteString
-        subprocess.environment["LD_LIBRARY_PATH"] = libDir.absoluteString
-        subprocess.path.append(stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").appendingPathComponent("bin").absoluteString)
+        subprocess.environment["GOROOT"] = goRoot.path
+        subprocess.environment["GOCACHE"] = goRoot.appendingPathComponent("cache").path
+        subprocess.environment["GOPATH"] = goRoot.appendingPathComponent("bin").path
+        subprocess.environment["STITCH_PATH"] = stitchDir.path
+        subprocess.environment["LD_LIBRARY_PATH"] = libDir.path
+        subprocess.path.append(stitchDir.appendingPathComponent("etc").appendingPathComponent("transpiler").appendingPathComponent("bin").path)
 
-        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("create_user").absoluteString) {
+        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("create_user").path) {
             print("build create_user binary")
 
-            subprocess.popen("\(goRoot)/bin/go build -modcacherw -o create_user cmd/auth/user.go", currentDirectoryPath: stitchDir.absoluteString)
-            subprocess.popen("/bin/cp -c create_user \(binDir)", currentDirectoryPath: stitchDir.absoluteString)
+            subprocess.popen("\(goRoot.appendingPathComponent("bin/go").path) build -modcacherw -o create_user cmd/auth/user.go", currentDirectoryPath: stitchDir.path)
+            subprocess.popen("/bin/cp -c create_user \(binDir.path)", currentDirectoryPath: stitchDir.path)
 
             print("create_user binary built")
         }
 
-        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("stitch_server").absoluteString) {
+        if !fileManager.fileExists(atPath: binDir.appendingPathComponent("stitch_server").path) {
             print("building server binary")
 
-            subprocess.popen("\(goRoot)/bin/go build -modcacherw -o stitch_server cmd/server/main.go", currentDirectoryPath: stitchDir.absoluteString)
-            subprocess.popen("/bin/cp -c stitch_server \(binDir)", currentDirectoryPath: stitchDir.absoluteString)
+            subprocess.popen("\(goRoot.appendingPathComponent("bin/go").path) build -modcacherw -o stitch_server cmd/server/main.go", currentDirectoryPath: stitchDir.path)
+            subprocess.popen("/bin/cp -c stitch_server \(binDir.path)", currentDirectoryPath: stitchDir.path)
 
             print("server binary built")
         }
@@ -631,9 +640,8 @@ public class RealmServer: NSObject {
 
     private func buildServer() throws {
         try fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true)
-        if !fileManager.fileExists(atPath: buildDir.absoluteString) {
-            try! FileManager.default.createDirectory(at: URL.init(fileURLWithPath: buildDir.absoluteString,
-                                                                  isDirectory: true), withIntermediateDirectories: true)
+        if !fileManager.fileExists(atPath: buildDir.path) {
+            try! FileManager.default.createDirectory(at: buildDir, withIntermediateDirectories: true)
         }
         try setupMongod()
         try setupStitch()
@@ -687,7 +695,7 @@ public class RealmServer: NSObject {
             "--port", "26000",
             "--replSet", "test",
             "--fork",
-            "--logpath", "\(buildDir)/mongod.log"
+            "--logpath", buildDir.appendingPathComponent("mongod.log").path
         ]
         mongoProcess.standardOutput = nil
         try mongoProcess.run()
@@ -732,13 +740,13 @@ public class RealmServer: NSObject {
             "LD_LIBRARY_PATH": libDir
         ]
         // golang server needs a tmp directory
-        try! FileManager.default.createDirectory(atPath: "\(tempDir.path)/tmp",
+        try! FileManager.default.createDirectory(atPath: tempDir.appendingPathComponent("tmp").path,
             withIntermediateDirectories: false, attributes: nil)
         serverProcess.launchPath = "\(binDir)/stitch_server"
         serverProcess.currentDirectoryPath = tempDir.path
         serverProcess.arguments = [
             "--configFile",
-            "\(buildDir)/test_config.json"
+            buildDir.appendingPathComponent("test_config.json").path
         ]
 
         let pipe = Pipe()
@@ -1140,3 +1148,5 @@ public class RealmServer: NSObject {
         return clientAppId
     }
 }
+
+#endif

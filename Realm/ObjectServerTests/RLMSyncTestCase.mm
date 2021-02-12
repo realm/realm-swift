@@ -33,6 +33,8 @@
 #import <realm/object-store/sync/sync_session.hpp>
 #import <realm/object-store/sync/sync_user.hpp>
 
+#if TARGET_OS_OSX
+
 @interface RealmServer : NSObject
 + (RealmServer *)shared;
 + (bool)haveServer;
@@ -428,6 +430,7 @@ static NSURL *syncDirectoryForChildProcess() {
         return [super defaultTestSuite];
 
     }
+
     NSLog(@"Skipping sync tests: no server access.");
     return [[XCTestSuite alloc] initWithName:[super defaultTestSuite].name];
 }
@@ -449,6 +452,7 @@ static NSURL *syncDirectoryForChildProcess() {
     [NSFileManager.defaultManager removeItemAtURL:self.clientDataRoot error:nil];
     [NSFileManager.defaultManager createDirectoryAtURL:self.clientDataRoot
                            withIntermediateDirectories:YES attributes:nil error:nil];
+//    [[RealmServer shared] dropTestData];
 }
 
 - (void)tearDown {
@@ -558,3 +562,5 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 @end
+
+#endif // TARGET_OS_OSX

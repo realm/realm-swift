@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#if os(macOS)
+
 import Combine
 import Realm
 import RealmSwift
@@ -1060,11 +1062,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let loginEx = expectation(description: "Login user")
 
         let credentials = Credentials.emailPassword(email: email, password: password)
-        var syncUser: User?
         app.login(credentials: credentials) { result in
             switch result {
             case .success(let user):
-                syncUser = user
+                XCTAssertNotNil(user)
             case .failure:
                 XCTFail("Should link user")
             }
@@ -1073,7 +1074,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [loginEx], timeout: 4.0)
 
         let callFunctionEx = expectation(description: "Call function")
-        syncUser?.functions.sum([1, 2, 3, 4, 5]) { bson, error in
+        app.currentUser?.functions.sum([1, 2, 3, 4, 5]) { bson, error in
             guard let bson = bson else {
                 XCTFail(error!.localizedDescription)
                 return
@@ -1144,11 +1145,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let loginEx = expectation(description: "Login user")
         let credentials = Credentials.emailPassword(email: email, password: password)
-        var syncUser: User?
         app.login(credentials: credentials) { result in
             switch result {
             case .success(let user):
-                syncUser = user
+                XCTAssertNotNil(user)
             case .failure:
                 XCTFail("Should link user")
             }
@@ -1157,14 +1157,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [loginEx], timeout: 4.0)
 
         let userDataEx = expectation(description: "Update user data")
-        syncUser?.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
+        app.currentUser?.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
             XCTAssertNil(error)
             userDataEx.fulfill()
         }
         wait(for: [userDataEx], timeout: 4.0)
 
         let refreshDataEx = expectation(description: "Refresh user data")
-        syncUser?.refreshCustomData { customData, error in
+        app.currentUser?.refreshCustomData { customData, error in
             XCTAssertNil(error)
             XCTAssertNotNil(customData)
             XCTAssertEqual(customData?["apples"] as! Int, 10)
@@ -2458,20 +2458,19 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         app.emailPasswordAuth.registerUser(email: email, password: password).await(self)
 
         let credentials = Credentials.emailPassword(email: email, password: password)
-        var syncUser: User!
         app.login(credentials: credentials)
             .await(self) { user in
-                syncUser = user
+                XCTAssertNotNil(user)
             }
 
         let userDataEx = expectation(description: "Update user data")
-        syncUser.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
+        app.currentUser?.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
             XCTAssertNil(error)
             userDataEx.fulfill()
         }
         wait(for: [userDataEx], timeout: 4.0)
 
-        syncUser.refreshCustomData()
+        app.currentUser?.refreshCustomData()
             .await(self) { customData in
                 XCTAssertEqual(customData["apples"] as! Int, 10)
                 XCTAssertEqual(customData["favourite_colour"] as! String, "green")
@@ -2708,12 +2707,11 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         app.emailPasswordAuth.registerUser(email: email, password: password).await(self)
 
         let credentials = Credentials.emailPassword(email: email, password: password)
-        var syncUser: User!
         app.login(credentials: credentials).await(self) { user in
-            syncUser = user
+            XCTAssertNotNil(user)
         }
 
-        syncUser.functions.sum([1, 2, 3, 4, 5]).await(self) { bson in
+        app.currentUser?.functions.sum([1, 2, 3, 4, 5]).await(self) { bson in
             guard case let .int64(sum) = bson else {
                 XCTFail("Should be int64")
                 return
@@ -2721,7 +2719,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(sum, 15)
         }
 
-        syncUser.functions.updateUserData([["favourite_colour": "green", "apples": 10]]).await(self) { bson in
+        app.currentUser?.functions.updateUserData([["favourite_colour": "green", "apples": 10]]).await(self) { bson in
             guard case let .bool(upd) = bson else {
                 XCTFail("Should be bool")
                 return
@@ -2774,3 +2772,5 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     }
 }
 #endif
+
+#endif // os(macOS)

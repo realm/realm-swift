@@ -501,6 +501,14 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
      `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
     */
     func freeze() -> Self
+
+    /**
+     Returns a live (mutable) version of this frozen collection.
+
+     This method resolves a reference to a live copy of the same frozen collection.
+     If called on a live collection, will return itself.
+    */
+    func thaw() -> Self?
 }
 
 public extension RealmCollection {
@@ -661,6 +669,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func _asNSFastEnumerator() -> Any { fatalError() }
     var isFrozen: Bool { fatalError() }
     func freeze() -> AnyRealmCollection<T> { fatalError() }
+    func thaw() -> AnyRealmCollection<T> { fatalError() }
 }
 
 private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollectionBase<C.Element> {
@@ -778,6 +787,10 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     override func freeze() -> AnyRealmCollection<Element> {
         return AnyRealmCollection(base.freeze())
+    }
+
+    override func thaw() -> AnyRealmCollection<Element> {
+        return AnyRealmCollection(base.thaw()!)
     }
 }
 
@@ -1066,8 +1079,8 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      Returns a frozen (immutable) snapshot of this collection.
 
      The frozen copy is an immutable collection which contains the same data as this collection
-    currently contains, but will not update when writes are made to the containing Realm. Unlike
-    live collections, frozen collections can be accessed from any thread.
+     currently contains, but will not update when writes are made to the containing Realm. Unlike
+     live collections, frozen collections can be accessed from any thread.
 
      - warning: This method cannot be called during a write transaction, or when the containing
     Realm is read-only.
@@ -1076,6 +1089,14 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
     */
     public func freeze() -> AnyRealmCollection { return base.freeze() }
+
+    /**
+     Returns a live version of this frozen collection.
+
+     This method resolves a reference to a live copy of the same frozen collection.
+     If called on a live collection, will return itself.
+    */
+    public func thaw() -> AnyRealmCollection? { return base.thaw() }
 }
 
 // MARK: AssistedObjectiveCBridgeable

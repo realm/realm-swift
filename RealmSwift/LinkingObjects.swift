@@ -328,6 +328,16 @@ import Realm
         return LinkingObjects(propertyName: propertyName, handle: handle?.freeze())
     }
 
+    /**
+     Returns a live version of this frozen collection.
+
+     This method resolves a reference to a live copy of the same frozen collection.
+     If called on a live collection, will return itself.
+    */
+    public func thaw() -> LinkingObjects<Element>? {
+        return LinkingObjects(propertyName: propertyName, handle: handle?.thaw())
+    }
+
     // MARK: Implementation
 
     private init(propertyName: String, handle: RLMLinkingObjectsHandle?) {

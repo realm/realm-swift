@@ -106,11 +106,8 @@ struct Equal {
     using CaseSensitive = Equal<options & ~kCFCompareCaseInsensitive>;
     using CaseInsensitive = Equal<options | kCFCompareCaseInsensitive>;
 
-    bool operator()(Mixed v1, Mixed v2, bool v1_null, bool v2_null) const
+    bool operator()(Mixed v1, Mixed v2) const
     {
-        REALM_ASSERT_DEBUG(v1_null == v1.is_null());
-        REALM_ASSERT_DEBUG(v2_null == v2.is_null());
-
         return equal(options, v1.get_string(), v2.get_string());
     }
 
@@ -147,11 +144,8 @@ struct ContainsSubstring {
     using CaseSensitive = ContainsSubstring<options & ~kCFCompareCaseInsensitive>;
     using CaseInsensitive = ContainsSubstring<options | kCFCompareCaseInsensitive>;
 
-    bool operator()(Mixed v1, Mixed v2, bool v1_null, bool v2_null) const
+    bool operator()(Mixed v1, Mixed v2) const
     {
-        REALM_ASSERT_DEBUG(v1_null == v1.is_null());
-        REALM_ASSERT_DEBUG(v2_null == v2.is_null());
-
         return contains_substring(options, v1.get_string(), v2.get_string());
     }
 
@@ -1092,7 +1086,6 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
         return;
     }
 
-    auto col = collectionOperation.column().column();
     auto type = collectionOperation.column().type();
     switch (collectionOperation.type()) {
         case CollectionOperation::Count:
