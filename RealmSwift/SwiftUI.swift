@@ -16,12 +16,13 @@
  //
  ////////////////////////////////////////////////////////////////////////////
 
-#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.3)
+import Foundation
+
+#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.3) && (REALM_HAVE_COMBINE || !SWIFT_PACKAGE)
 import SwiftUI
 import Combine
 import Realm
 import Realm.Private
-import Foundation
 
 private func safeWrite<Value>(_ value: Value, _ block: () -> Void) where Value: ThreadConfined {
     var didStartWrite = false
@@ -71,7 +72,7 @@ internal final class KVO: NSObject {
     /// Objects must have observers removed before being added to a realm.
     /// They are stored here so that if they are appended through the Bound Property
     /// system, they can be de-observed before hand.
-    static var observedObjects = [NSObject: KVO.Subscription]()
+    fileprivate static var observedObjects = [NSObject: KVO.Subscription]()
 
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
     struct Subscription: Combine.Subscription {
@@ -581,6 +582,21 @@ extension EnvironmentValues {
         set {
             self[RealmEnvironmentKey] = newValue.configuration
         }
+    }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension KVO {
+    static func removeObservers(object: NSObject) {
+        if let subscription = KVO.observedObjects[object] {
+            subscription.cancel()
+        }
+    }
+}
+#else
+internal final class KVO {
+    static func removeObservers(object: NSObject) {
+        // noop
     }
 }
 #endif
