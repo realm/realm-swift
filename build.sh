@@ -668,6 +668,7 @@ case "$COMMAND" in
         ;;
 
     "test-swiftui")
+        sh build.sh download-core
         xctest 'SwiftUITestHost' -sdk iphonesimulator -destination 'name=iPhone 12'
         exit 0
         ;;
