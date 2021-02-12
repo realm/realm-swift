@@ -1,6 +1,26 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* None.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
+10.5.2 Release notes (2021-02-09)
+=============================================================
+### Enhancements
 * Add support for "thawing" objects. `Realm`, `Results`, `List` and `Object`
    now have `thaw()` methods which return a live copy of the frozen object. This
    enables app behvaior where a frozen object can be made live again in order to
@@ -25,7 +45,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fix - `RLMResponse` will have a non nil `customStatusCode` in case of error.
 ([#4188](https://github.com/realm/realm-core/issues/4188))
 * Limit availability of ObjectKeyIdentifiable to platforms which support Combine to match the change made in the Xcode 12.5 SDK. ([#7083](https://github.com/realm/realm-cocoa/issues/7083))
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 * Realm Studio: 10.0.0 or later.
