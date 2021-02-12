@@ -668,7 +668,8 @@ case "$COMMAND" in
         ;;
 
     "test-swiftui")
-        xctest "-scheme SwiftUITestHost -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 12'"
+        xctest 'SwiftUITestHost' -sdk iphonesimulator -destination 'name=iPhone 12'
+        exit 0
         ;;
 
     "test-catalyst")
@@ -782,6 +783,11 @@ case "$COMMAND" in
 
     "verify-osx-swift")
         sh build.sh test-osx-swift
+        exit 0
+        ;;
+
+    "verify-swiftui")
+        sh build.sh test-swiftui
         exit 0
         ;;
 
