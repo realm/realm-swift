@@ -422,18 +422,6 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    ######################################
-    # Swift versioning
-    ######################################
-    "set-swift-version")
-        version=${2:-$REALM_SWIFT_VERSION}
-
-        SWIFT_VERSION_FILE="RealmSwift/SwiftVersion.swift"
-        CONTENTS="let swiftLanguageVersion = \"$version\""
-        if [ ! -f "$SWIFT_VERSION_FILE" ] || ! grep -q "$CONTENTS" "$SWIFT_VERSION_FILE"; then
-            echo "$CONTENTS" > "$SWIFT_VERSION_FILE"
-        fi
-
     "prelaunch-simulator")
         if [ -z "$REALM_SKIP_PRELAUNCH" ]; then
             sh "${source_root}/scripts/reset-simulators.sh" "$1"
