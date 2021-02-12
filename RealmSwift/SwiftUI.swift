@@ -133,8 +133,9 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
             subscriber.receive(subscription: ObservationSubscription(token: token))
         } else if let value = value as? ObjectBase, !value.isInvalidated {
             // else if the value is unmanaged
-            let schema = RLMObjectSchema(forObjectClass: ObjectType.self as! AnyClass)
+            let schema = value._objectSchema
             let kvo = SwiftUIKVO(subscriber: subscriber)
+
             var keyPaths = [String]()
             for property in schema.properties {
                 keyPaths.append(property.name)

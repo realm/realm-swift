@@ -117,4 +117,10 @@ extension ObjectBase {
             }))
         }
     }
+
+    /// The object schema which lists the managed properties for the object.
+    // swiftlint:disable:next identifier_name
+    internal var _objectSchema: ObjectSchema {
+        return ObjectSchema(RLMObjectBaseObjectSchema(self)!)
+    }
 }
