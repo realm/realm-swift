@@ -71,21 +71,27 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
     // MARK: KVC
 
     /**
-     Returns an `Array` containing the results of invoking `valueForKey(_:)` using `key` on each of the collection's
-     objects.
+     Returns a type of `Element` for a specified key if it exists in the map.
+
+     - parameter key: The key to the property whose values are desired.
      */
-    @nonobjc public func value(forKey key: String) -> [AnyObject] {
-        return (rlmDictionary.value(forKeyPath: key)! as! NSSet).allObjects as [AnyObject]
+    @nonobjc public func value(forKey key: String) -> Element? {
+        guard let value = rlmDictionary.value(forKey: key) else {
+            return nil
+        }
+        return dynamicBridgeCast(fromObjectiveC: value)
     }
 
     /**
-     Returns an `Array` containing the results of invoking `valueForKeyPath(_:)` using `keyPath` on each of the
-     collection's objects.
+     Returns a type of `Element` for a specified key if it exists in the map.
 
-     - parameter keyPath: The key path to the property whose values are desired.
+     - parameter keyPath: The key to the property whose values are desired.
      */
-    @nonobjc public func value(forKeyPath keyPath: String) -> [AnyObject] {
-        return (rlmDictionary.value(forKeyPath: keyPath)! as! NSSet).allObjects as [AnyObject]
+    @nonobjc public func value(forKeyPath keyPath: String) -> Element? {
+        guard let value = rlmDictionary.value(forKeyPath: keyPath) else {
+            return nil
+        }
+        return dynamicBridgeCast(fromObjectiveC: value)
     }
 
     /**
@@ -217,6 +223,15 @@ public final class Map<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
         rlmDictionary.removeAllObjects()
     }
 
+    public subscript(key: String) -> Element? {
+        get {
+            return value(forKey: key)
+        }
+        set {
+            setValue(newValue, forKey: key)
+        }
+    }
+
     // MARK: Notifications
 
     /**
@@ -346,7 +361,7 @@ extension Map where Element: AddableType {
 }
 
 extension Map: RealmCollection {
-    /// The type of the objects stored within the dictionary.
+    /// The type of the objects stored within the map.
     public typealias ElementType = Element
 
     // MARK: Sequence Support
@@ -378,20 +393,13 @@ extension Map: RealmCollection {
     public func _observe(_ queue: DispatchQueue?,
                          _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
         -> NotificationToken {
-        return rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
+            return rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Object Retrieval
 
-    public subscript(key: String) -> Element? {
-        guard let value = rlmDictionary[key] else {
-            return nil
-        }
-        return dynamicBridgeCast(fromObjectiveC: value)
-    }
-    
-    public subscript(position: UInt) -> Element {
-        return dynamicBridgeCast(fromObjectiveC: rlmDictionary.object(at: position))
+    public subscript(position: Int) -> Element {
+        fatalError("subscript(position:) is not available on Map")
     }
 
     /// :nodoc:
@@ -402,16 +410,5 @@ extension Map: RealmCollection {
     /// :nodoc:
     public func index(matching predicate: NSPredicate) -> Int? {
         fatalError("index(matching:) is not available on Map")
-    }
-
-    /**
-     - warning: Ordering is not guaranteed on a Map. `first` is implemented for
-                convenience should not be relied on.
-     */
-    public var first: Element? {
-        guard let firstObject = rlmDictionary.firstObject() else {
-            return nil
-        }
-        return dynamicBridgeCast(fromObjectiveC: firstObject)
     }
 }
