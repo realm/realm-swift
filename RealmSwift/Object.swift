@@ -212,10 +212,11 @@ extension Object: RealmCollectionValue {
      transactions it will be called at some point in the future after the write
      transaction is committed.
 
-     Notifications are delivered via the standard run loop, and so can't be
-     delivered while the run loop is blocked by other activity. When
-     notifications can't be delivered instantly, multiple notifications may be
-     coalesced into a single notification.
+     If no queue is given, notifications are delivered via the standard run
+     loop, and so can't be delivered while the run loop is blocked by other
+     activity. If a queue is given, notifications are delivered to that queue
+     instead. When notifications can't be delivered instantly, multiple
+     notifications may be coalesced into a single notification.
 
      Unlike with `List` and `Results`, there is no "initial" callback made after
      you add a new notification block.

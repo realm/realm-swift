@@ -24,42 +24,42 @@ import Combine
 import Realm
 import Realm.Private
 
-private func safeWrite<Value>(_ value: Value, _ block: () -> Void) where Value: ThreadConfined {
+private func safeWrite<Value>(_ value: Value, _ block: (Value) -> Void) where Value: ThreadConfined {
+    let thawed = value.realm == nil ? value : value.thaw() ?? value
     var didStartWrite = false
-    if value.realm?.isInWriteTransaction == false {
+    if thawed.realm?.isInWriteTransaction == false {
         didStartWrite = true
-        value.realm?.beginWrite()
+        thawed.realm?.beginWrite()
     }
-    block()
+    block(thawed)
     if didStartWrite {
-        try! value.realm?.commitWrite()
+        try! thawed.realm?.commitWrite()
     }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 private func createBinding<T: ThreadConfined, V>(_ value: T,
                                                  forKeyPath keyPath: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
-    if value.isFrozen {
-        throwRealmException("Should not bind frozen value")
-    }
+    precondition(!value.isFrozen, "Should not bind frozen value")
+
     // store last known value outside of the binding so that we can reference it if the parent
     // is invalidated
-    let lastValue = value[keyPath: keyPath]
+    var lastValue = value[keyPath: keyPath]
     return Binding(get: {
         guard !value.isInvalidated else {
             return lastValue
         }
-        let value = value[keyPath: keyPath]
-        if let value = value as? ListBase & ThreadConfined, !value.isInvalidated && value.realm != nil {
+        lastValue = value[keyPath: keyPath]
+        if let value = lastValue as? ListBase & ThreadConfined, !value.isInvalidated && value.realm != nil {
             return value.freeze() as! V
         }
-        return value
+        return lastValue
     },
     set: { newValue in
         guard !value.isInvalidated else {
             return
         }
-        safeWrite(value) {
+        safeWrite(value) { value in
             value[keyPath: keyPath] = newValue
         }
     })
@@ -333,11 +333,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     public mutating func update() {
         // When the view updates, it will inject the @Environment
         // into the propertyWrapper
-        if storage.configuration == nil ||
-            storage.configuration?.encryptionKey != configuration.encryptionKey ||
-            storage.configuration?.fileURL != configuration.fileURL ||
-            storage.configuration?.syncConfiguration?.partitionValue != configuration.syncConfiguration?.partitionValue ||
-            storage.configuration?.inMemoryIdentifier != configuration.inMemoryIdentifier {
+        if storage.configuration == nil || storage.configuration != configuration {
             storage.configuration = configuration
         }
     }
@@ -441,75 +437,60 @@ public extension BoundCollection where Value: RealmCollection {
 
     /// :nodoc:
     func remove<V>(at index: Index) where Value == List<V> {
-        let list = self.wrappedValue.realm != nil ?
-            self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
-        safeWrite(list) {
+        safeWrite(self.wrappedValue) { list in
             list.remove(at: index)
         }
     }
     /// :nodoc:
     func remove<V>(_ object: V) where Value == Results<V>, V: ObjectBase & ThreadConfined {
-        guard let results = self.wrappedValue.thaw(),
-              let thawed = object.thaw(),
-              let index = results.index(of: thawed),
-              let realm = results.realm else {
+        guard let thawed = object.thaw(),
+              let index = wrappedValue.thaw()?.index(of: thawed) else {
             return
         }
-        safeWrite(results) {
-            realm.delete(results[index])
+        safeWrite(self.wrappedValue) { results in
+            results.realm?.delete(results[index])
         }
     }
     /// :nodoc:
     func remove<V>(atOffsets offsets: IndexSet) where Value == Results<V>, V: ObjectBase {
-        guard let results = self.wrappedValue.thaw(), let realm = results.realm else {
-            return
-        }
-        safeWrite(results) {
-            realm.delete(Array(offsets.map { results[$0] }))
+        safeWrite(self.wrappedValue) { results in
+            results.realm?.delete(Array(offsets.map { results[$0] }))
         }
     }
     /// :nodoc:
     func remove<V>(atOffsets offsets: IndexSet) where Value == List<V> {
-        let list = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
-        safeWrite(list) {
+        safeWrite(self.wrappedValue) { list in
             list.remove(atOffsets: offsets)
         }
     }
     /// :nodoc:
     func move<V>(fromOffsets offsets: IndexSet, toOffset destination: Int) where Value == List<V> {
-        let list = self.wrappedValue.realm != nil ?
-            self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
-        safeWrite(list) {
+        safeWrite(self.wrappedValue) { list in
             list.move(fromOffsets: offsets, toOffset: destination)
         }
     }
     /// :nodoc:
     func append<V>(_ value: Value.Element) where Value == List<V>, Value.Element: RealmCollectionValue {
-        let list = self.wrappedValue.realm != nil ?
-            self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
-        safeWrite(list) {
+        safeWrite(self.wrappedValue) { list in
             list.append(value)
         }
     }
     /// :nodoc:
     func append<V>(_ value: Value.Element) where Value == List<V>, Value.Element: ObjectBase & ThreadConfined {
-        let list = self.wrappedValue.realm != nil ? self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
         // if the value is unmanaged but the list is managed, we are adding this value to the realm
-        if value.realm == nil && list.realm != nil {
+        if value.realm == nil && self.wrappedValue.realm != nil {
             SwiftUIKVO.observedObjects[value]?.cancel()
         }
-        safeWrite(list) {
+        safeWrite(self.wrappedValue) { list in
             list.append(value)
         }
     }
     /// :nodoc:
     func append<V>(_ value: Value.Element) where Value == Results<V>, V: Object {
-        let results = self.wrappedValue.realm != nil ?
-            self.wrappedValue.thaw() ?? self.wrappedValue : self.wrappedValue
-        if value.realm == nil && results.realm != nil {
+        if value.realm == nil && self.wrappedValue.realm != nil {
             SwiftUIKVO.observedObjects[value]?.cancel()
         }
-        safeWrite(results) {
+        safeWrite(self.wrappedValue) { results in
             results.realm?.add(value)
         }
     }
@@ -522,8 +503,8 @@ extension Binding: BoundCollection where Value: RealmCollection {
 extension Binding where Value: ObjectKeyIdentifiable & ThreadConfined {
     /// :nodoc:
     public func delete() {
-        safeWrite(wrappedValue) {
-            wrappedValue.realm?.delete(self.wrappedValue)
+        safeWrite(wrappedValue) { object in
+            object.realm?.delete(self.wrappedValue)
         }
     }
 }
@@ -532,8 +513,8 @@ extension Binding where Value: ObjectKeyIdentifiable & ThreadConfined {
 extension ObservedRealmObject.Wrapper where ObjectType: ObjectBase {
     /// :nodoc:
     public func delete() {
-        safeWrite(wrappedValue) {
-            wrappedValue.realm?.delete(self.wrappedValue)
+        safeWrite(wrappedValue) { object in
+            object.realm?.delete(self.wrappedValue)
         }
     }
 }
