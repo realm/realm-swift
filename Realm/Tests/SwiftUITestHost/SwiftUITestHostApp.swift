@@ -50,8 +50,7 @@ struct ReminderFormView: View {
             }).accessibilityIdentifier("picker")
         }
         .navigationTitle(reminder.title)
-        .navigationBarItems(trailing:
-        Button("Save") {
+        .navigationBarItems(trailing: Button("Save") {
             if reminder.realm == nil {
                 $list.reminders.append(reminder)
             }
@@ -66,8 +65,7 @@ struct ReminderListView: View {
     @State var showReminderForm = false
 
     func shouldFocusReminder(_ reminder: Reminder) -> Bool {
-        return newReminderAdded &&
-            list.reminders.lastIndex(of: reminder) == (list.reminders.count - 1)
+        return newReminderAdded && list.reminders.last == reminder
     }
 
     var body: some View {
