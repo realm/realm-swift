@@ -327,8 +327,7 @@ public:
 } while (false)
 
 #define AssertSetChanged(s) do { \
-    (r).refresh(); \
-    r.pop_front(); \
+    AssertNotification(r); \
     XCTAssertTrue(r.empty()); \
 } while (false)
 
@@ -1313,22 +1312,19 @@ public:
 
     [mutator addObject:obj.obj];
     AssertSetChanged();
-    [mutator2 addObject:obj2.obj];
-    AssertSetChanged();
     [mutator removeObject:obj.obj];
     AssertSetChanged();
     [mutator addObject:obj.obj];
     AssertSetChanged();
     [mutator2 addObject:obj2.obj];
-    AssertSetChanged();
     [mutator setSet:mutator2];
     AssertSetChanged();
 
-    [mutator2 intersectSet:mutator];
+    [mutator intersectSet:mutator2];
     AssertSetChanged();
-    [mutator2 minusSet:mutator];
+    [mutator minusSet:mutator2];
     AssertSetChanged();
-    [mutator2 unionSet:mutator];
+    [mutator unionSet:mutator2];
     AssertSetChanged();
 }
 
@@ -1341,13 +1337,12 @@ public:
     id mutator2 = [obj2 mutableSetValueForKey:@"intSet"];
 
     [mutator addObject:@1];
-    [mutator2 addObject:@2];
     AssertSetChanged();
     [mutator removeObject:@1];
     AssertSetChanged();
     [mutator addObject:@1];
-    [mutator2 addObject:@2];
     AssertSetChanged();
+    [mutator2 addObject:@2];
     [mutator setSet:mutator2];
     AssertSetChanged();
 
