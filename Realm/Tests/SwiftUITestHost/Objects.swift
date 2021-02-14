@@ -44,5 +44,5 @@ import Foundation
 @objcMembers class ReminderList: Object, ObjectKeyIdentifiable {
     dynamic var name = "New List"
     dynamic var icon: String = "list.bullet"
-    let reminders = RealmSwift.List<Reminder>()
+    var reminders = RealmSwift.List<Reminder>()
 }
