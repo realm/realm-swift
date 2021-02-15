@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMProperty.h"
-#import <Foundation/Foundation.h>
 
 namespace realm {
 class UUID;

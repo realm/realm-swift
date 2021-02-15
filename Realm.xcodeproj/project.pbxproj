@@ -2767,6 +2767,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */;
 			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_MODULE_NAME = Tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
@@ -2777,6 +2778,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */;
 			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_MODULE_NAME = Tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
