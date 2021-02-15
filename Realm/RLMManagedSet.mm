@@ -474,12 +474,6 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
-- (RLMManagedSet *)copyWithBackingSet:(realm::object_store::Set)otherSet {
-    RLMManagedSet *s = [self mutableCopy];
-    s->_backingSet = otherSet;
-    return s;
-}
-
 - (RLMFastEnumerator *)fastEnumerator {
     return translateErrors([&] {
         return [[RLMFastEnumerator alloc] initWithBackingCollection:_backingSet

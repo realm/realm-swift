@@ -59,11 +59,6 @@ class RLMObservationInfo;
 // deletes all objects in the RLMSet from their containing realms
 - (void)deleteObjectsFromRealm;
 
-// Convenience method for swapping out the underlying backing set with another.
-// This is used when producing a RLMManagedSet that contains changes when using KVO
-// with multiple Realm instances.
-- (RLMManagedSet *)copyWithBackingSet:(realm::object_store::Set)otherSet;
-
 @end
 
 void RLMValidateSetObservationKey(NSString *keyPath, RLMSet *set);
