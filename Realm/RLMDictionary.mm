@@ -56,7 +56,7 @@
 }
 
 - (BOOL)isInvalidated {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+    return NO;
 }
 
 - (NSUInteger)count {
@@ -199,8 +199,31 @@
     @throw RLMException(@"Not implemented in RLMDictionary");
 }
 
+- (id)valueForKeyPath:(NSString *)keyPath {
+    if ([keyPath characterAtIndex:0] != '@') {
+        return _backingCollection ? [_backingCollection valueForKeyPath:keyPath] : [super valueForKeyPath:keyPath];
+    }
+    if (!_backingCollection) {
+        _backingCollection = [NSMutableDictionary new];
+    }
+    NSUInteger dot = [keyPath rangeOfString:@"."].location;
+    if (dot == NSNotFound) {
+        return [_backingCollection valueForKeyPath:keyPath];
+    }
+
+    NSString *op = [keyPath substringToIndex:dot];
+    NSString *key = [keyPath substringFromIndex:dot + 1];
+    return [self aggregateProperty:key operation:op method:nil];
+}
+
 - (nullable id)valueForKey:(nonnull NSString *)key {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+    if ([key isEqualToString:RLMInvalidatedKey]) {
+        return @NO; // Unmanaged dictionaries are never invalidated
+    }
+    if (!_backingCollection) {
+        _backingCollection = [NSMutableDictionary new];
+    }
+    return [_backingCollection valueForKey:key];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(nonnull NSFastEnumerationState *)state objects:(__unsafe_unretained id  _Nullable * _Nonnull)buffer count:(NSUInteger)len {
@@ -224,7 +247,7 @@
 }
 
 - (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id key, id obj, BOOL *stop))block {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+    [_backingCollection enumerateKeysAndObjectsUsingBlock:block];
 }
 
 - (NSEnumerator *)objectEnumerator {
@@ -247,7 +270,9 @@
 }
 
 - (void)removeObjectsForKeys:(NSArray *)keyArray {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+    changeDictionary(self, ^{
+        [_backingCollection removeObjectsForKeys:keyArray];
+    });
 }
 
 - (void)removeObjectForKey:(id)key {
@@ -257,14 +282,27 @@
 }
 
 - (void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+    RLMDictionaryValidateMatchingObjectType(self, key, obj);
+    changeDictionary(self, ^{
+        [_backingCollection setObject:obj forKey:key];
+    });
 }
 
 - (void)setObject:(id)obj forKey:(NSString *)key {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+    RLMDictionaryValidateMatchingObjectType(self, key, obj);
+    changeDictionary(self, ^{
+        [_backingCollection setObject:obj forKey:key];
+    });
 }
 
-- (void)addEntriesFromDictionary:(NSDictionary *)otherDictionary {
+- (void)addEntriesFromDictionary:(RLMDictionary *)otherDictionary {
+    [otherDictionary enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull value, BOOL *) {
+        RLMDictionaryValidateMatchingObjectType(self, key, value);
+    }];
+    changeDictionary(self, ^{
+        [_backingCollection addEntriesFromDictionary:otherDictionary->_backingCollection];
+    });
+
     @throw RLMException(@"Not implemented in RLMDictionary");
 }
 

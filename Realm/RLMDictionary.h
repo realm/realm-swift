@@ -147,7 +147,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Adds to the receiving dictionary the entries from another dictionary.
  */
-- (void)addEntriesFromDictionary:(NSDictionary<NSString *, RLMObjectType> *)otherDictionary;
+- (void)addEntriesFromDictionary:(RLMDictionary<NSString *, RLMObjectType> *)otherDictionary;
 
 #pragma mark - Notifications
 
