@@ -1631,6 +1631,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         [realm commitWriteTransaction];
         [self waitForUploadsForRealm:realm];
         [self waitForDownloadsForRealm:realm];
+        [realm.syncSession suspend];
 
         path = realm.configuration.pathOnDisk;
     }
