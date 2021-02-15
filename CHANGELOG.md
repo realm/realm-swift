@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.6.0 Release notes (2021-02-15)
 =============================================================
+
 ### Enhancements
+
 * The Sync client now logs error messages received from server rather than just
   the size of the error message.
 * Errors returned from the server when sync WebSockets get closed are now
@@ -15,6 +17,7 @@ x.y.z Release notes (yyyy-MM-dd)
   schema when `objectTypes` is not specified.
 
 ### Fixed
+
 * Reading from a Results backed directly by a Table (i.e.
   `realm.object(ClasSName.self)` with no filter/sort/etc.) would give incorrect
   results if the Results was constructed and accessed before creating a new
@@ -25,12 +28,14 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Core #4388](https://github.com/realm/realm-core/issues/4388))
 
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.4.
 * CocoaPods: 1.10 or later.
 
 ### Internal
+
 * Upgraded realm-core from v10.4.0 to v10.5.0
 
 10.5.2 Release notes (2021-02-09)
