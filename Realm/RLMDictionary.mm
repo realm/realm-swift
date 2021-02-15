@@ -18,12 +18,17 @@
 
 #import "RLMDictionary.h"
 #import "RLMDictionary_Private.h"
+#import "RLMObject_Private.h"
+#import "RLMObjectSchema.h"
+#import "RLMProperty_Private.h"
+#import "RLMQueryUtil.hpp"
+#import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
 
 @interface RLMDictionary () {
 @public
     // Backing dictionary when this instance is unmanaged
-    NSMutableDictionary *_backingDictionary;
+    NSMutableDictionary *_backingCollection;
 }
 @end
 
@@ -72,10 +77,6 @@
     @throw RLMException(@"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
 }
 
-- (nullable NSNumber *)averageOfProperty:(nonnull NSString *)property {
-    @throw RLMException(@"Not implemented in RLMDictionary");
-}
-
 - (instancetype)freeze {
     @throw RLMException(@"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
 }
@@ -84,16 +85,94 @@
     @throw RLMException(@"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
 }
 
-- (nullable id)maxOfProperty:(nonnull NSString *)property {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+- (id)minOfProperty:(NSString *)property {
+    return [self aggregateProperty:property operation:@"@min" method:_cmd];
 }
 
-- (nullable id)minOfProperty:(nonnull NSString *)property {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+- (id)maxOfProperty:(NSString *)property {
+    return [self aggregateProperty:property operation:@"@max" method:_cmd];
+}
+
+- (id)sumOfProperty:(NSString *)property {
+    return [self aggregateProperty:property operation:@"@sum" method:_cmd];
+}
+
+- (id)averageOfProperty:(NSString *)property {
+    return [self aggregateProperty:property operation:@"@avg" method:_cmd];
+}
+
+- (RLMPropertyType)typeForProperty:(NSString *)propertyName {
+    if ([propertyName isEqualToString:@"self"]) {
+        return _type;
+    }
+
+    RLMObjectSchema *objectSchema;
+    if (_backingCollection.count) {
+        objectSchema = [_backingCollection.allValues[0] objectSchema];
+    }
+    else {
+        objectSchema = [RLMSchema.partialPrivateSharedSchema schemaForClassName:_objectClassName];
+    }
+
+    return RLMValidatedProperty(objectSchema, propertyName).type;
+}
+
+- (id)aggregateProperty:(NSString *)key operation:(NSString *)op method:(SEL)sel {
+    // Although delegating to valueForKeyPath: here would allow to support
+    // nested key paths as well, limiting functionality gives consistency
+    // between unmanaged and managed arrays.
+    if ([key rangeOfString:@"."].location != NSNotFound) {
+        @throw RLMException(@"Nested key paths are not supported yet for KVC collection operators.");
+    }
+
+    if ([op isEqualToString:@"@distinctUnionOfObjects"]) {
+        @throw RLMException(@"this class does not implement the distinctUnionOfObjects");
+    }
+
+    bool allowDate = false;
+    bool sum = false;
+    if ([op isEqualToString:@"@min"] || [op isEqualToString:@"@max"]) {
+        allowDate = true;
+    }
+    else if ([op isEqualToString:@"@sum"]) {
+        sum = true;
+    }
+    else if (![op isEqualToString:@"@avg"]) {
+        // Just delegate to NSDictionary for all other operators
+        return [_backingCollection valueForKeyPath:[op stringByAppendingPathExtension:key]];
+    }
+
+    RLMPropertyType type = [self typeForProperty:key];
+    if (!canAggregate(type, allowDate)) {
+        NSString *method = sel ? NSStringFromSelector(sel) : op;
+        if (_type == RLMPropertyTypeObject) {
+            @throw RLMException(@"%@: is not supported for %@ property '%@.%@'",
+                                method, RLMTypeToString(type), _objectClassName, key);
+        }
+        else {
+            @throw RLMException(@"%@ is not supported for %@%s set",
+                                method, RLMTypeToString(_type), _optional ? "?" : "");
+        }
+    }
+
+    NSArray *values = [key isEqualToString:@"self"] ? _backingCollection : [_backingCollection valueForKey:key];
+    if (_optional) {
+        // Filter out NSNull values to match our behavior on managed arrays
+        NSIndexSet *nonnull = [values indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger, BOOL *) {
+            return obj != NSNull.null;
+        }];
+        if (nonnull.count < values.count) {
+            values = [values objectsAtIndexes:nonnull];
+        }
+    }
+    id result = [values valueForKeyPath:[op stringByAppendingString:@".self"]];
+    return sum && !result ? @0 : result;
 }
 
 - (nonnull id)objectAtIndex:(NSUInteger)index {
+    validateDictionaryBounds(self, index);
     @throw RLMException(@"Not implemented in RLMDictionary");
+//    return [_backingCollection objectAtIndex:index];
 }
 
 - (nonnull RLMResults *)objectsWhere:(nonnull NSString *)predicateFormat, ... {
@@ -120,10 +199,6 @@
     @throw RLMException(@"Not implemented in RLMDictionary");
 }
 
-- (nonnull NSNumber *)sumOfProperty:(nonnull NSString *)property {
-    @throw RLMException(@"Not implemented in RLMDictionary");
-}
-
 - (nullable id)valueForKey:(nonnull NSString *)key {
     @throw RLMException(@"Not implemented in RLMDictionary");
 }
@@ -133,22 +208,22 @@
 }
 
 - (NSArray *)allKeys {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+    return _backingCollection.allKeys;
 }
 
 - (NSArray *)allValues {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+    return _backingCollection.allValues;
 }
 
 - (nullable id)objectForKey:(NSString *)key {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+    return [_backingCollection objectForKey:key];
 }
 
 - (nullable id)objectForKeyedSubscript:(NSString *)key {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+    return [_backingCollection objectForKey:key];
 }
 
-- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(NSString *key, id obj, BOOL *stop))block {
+- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id key, id obj, BOOL *stop))block {
     @throw RLMException(@"Not implemented in RLMDictionary");
 }
 
@@ -156,20 +231,29 @@
     @throw RLMException(@"Not implemented in RLMDictionary");
 }
 
-- (void)setDictionary:(NSDictionary<NSString *, id> *)otherDictionary {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+- (void)setDictionary:(RLMDictionary *)dictionary {
+    [dictionary enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull value, BOOL *) {
+        RLMDictionaryValidateMatchingObjectType(self, key, value);
+    }];
+    changeDictionary(self, ^{
+        [_backingCollection setDictionary: dictionary->_backingCollection];
+    });
 }
 
 - (void)removeAllObjects {
+    changeDictionary(self, ^{
+        [_backingCollection removeAllObjects];
+    });
+}
+
+- (void)removeObjectsForKeys:(NSArray *)keyArray {
     @throw RLMException(@"Not implemented in RLMDictionary");
 }
 
-- (void)removeObjectsForKeys:(NSArray<NSString *> *)keyArray {
-    @throw RLMException(@"Not implemented in RLMDictionary");
-}
-
-- (void)removeObjectForKey:(NSString *)key {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+- (void)removeObjectForKey:(id)key {
+    changeDictionary(self, ^{
+        [_backingCollection removeObjectForKey:key];
+    });
 }
 
 - (void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
@@ -182,6 +266,80 @@
 
 - (void)addEntriesFromDictionary:(NSDictionary *)otherDictionary {
     @throw RLMException(@"Not implemented in RLMDictionary");
+}
+
+static void validateDictionaryBounds(__unsafe_unretained RLMDictionary *const dictionary,
+                              NSUInteger index,
+                              bool allowOnePastEnd=false) {
+    NSUInteger max = dictionary->_backingCollection.count + allowOnePastEnd;
+    if (index >= max) {
+        @throw RLMException(@"Index %llu is out of bounds (must be less than %llu).",
+                            (unsigned long long)index, (unsigned long long)max);
+    }
+}
+
+static bool canAggregate(RLMPropertyType type, bool allowDate) {
+    switch (type) {
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
+        case RLMPropertyTypeDecimal128:
+            return true;
+        case RLMPropertyTypeDate:
+            return allowDate;
+        default:
+            return false;
+    }
+}
+
+void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *const dictionary, __unsafe_unretained id const key, __unsafe_unretained id const value) {
+    if (!key) {
+        @throw RLMException(@"Invalid nil key for dictionary of '%@'.",
+                            dictionary->_objectClassName ?: RLMTypeToString(dictionary->_keyType));
+    }
+    if (!value && !dictionary->_optional) {
+        @throw RLMException(@"Invalid nil value for dictionary of '%@'.",
+                            dictionary->_objectClassName ?: RLMTypeToString(dictionary->_type));
+    }
+    if (dictionary->_type != RLMPropertyTypeObject) {
+        if (!RLMValidateValue(value, dictionary->_type, dictionary->_optional, false, nil)) {
+            @throw RLMException(@"Invalid value '%@' of type '%@' for expected type '%@%s'.",
+                                value, [value class], RLMTypeToString(dictionary->_type),
+                                dictionary->_optional ? "?" : "");
+        }
+        return;
+    }
+    if (dictionary->_keyType != RLMPropertyTypeObject) {
+        if (!RLMValidateValue(key, dictionary->_keyType, false, false, nil)) {
+            @throw RLMException(@"Invalid key '%@' of type '%@' for expected type '%@'.",
+                                key, [key class], RLMTypeToString(dictionary->_keyType));
+        }
+        return;
+    }
+    auto keyObject = RLMDynamicCast<RLMObjectBase>(key);
+    auto valueObject = RLMDynamicCast<RLMObjectBase>(value);
+    if (!keyObject || !valueObject) {
+        return;
+    }
+    if (!keyObject->_objectSchema || !valueObject->_objectSchema) {
+        @throw RLMException(@"Object cannot be inserted unless the schema is initialized. "
+                            "This can happen if you try to insert objects into a RLMDictionary / Map from a default value or from an overriden unmanaged initializer (`init()`) or if the key is uninitialized.");
+    }
+}
+
+static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary,
+                      dispatch_block_t f) {
+    if (!dictionary->_backingCollection) {
+        dictionary->_backingCollection = [NSMutableDictionary new];
+    }
+    if (RLMObjectBase *parent = dictionary->_parentObject) {
+        [parent willChangeValueForKey:dictionary->_key];
+        f();
+        [parent didChangeValueForKey:dictionary->_key];
+    }
+    else {
+        f();
+    }
 }
 
 @end

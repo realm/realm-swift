@@ -51,7 +51,7 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
     /// Indicates if the map can no longer be accessed.
     public var isInvalidated: Bool { return _rlmCollection.isInvalidated }
 
-    internal var rlmDictionary: RLMDictionary<AnyObject> {
+    internal var rlmDictionary: RLMDictionary<NSString, AnyObject> {
         _rlmCollection as! RLMDictionary
     }
 
@@ -62,7 +62,7 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
         super.init()
     }
 
-    internal init(objc rlmDictionary: RLMDictionary<AnyObject>) {
+    internal init(objc rlmDictionary: RLMDictionary<NSString, AnyObject>) {
         super.init(collection: rlmDictionary)
     }
 
@@ -200,6 +200,28 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
 
     // MARK: Mutation
 
+//    /**
+//     Inserts an object to the set if not already present.
+//
+//     - warning: This method may only be called during a write transaction.
+//
+//     - parameter object: An object.
+//     */
+//    public func insert(_ object: Element) {
+//        rlmDictionary.add(dynamicBridgeCast(fromSwift: object) as AnyObject)
+//    }
+
+//    /**
+//     Inserts the given sequence of objects into the set if not already present.
+//
+//     - warning: This method may only be called during a write transaction.
+//    */
+//    public func insert<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == Element {
+//        for obj in objects {
+//            rlmDictionary.add(dynamicBridgeCast(fromSwift: obj) as AnyObject)
+//        }
+//    }
+
     /**
      Updates the value stored in the dictionary for the given key, or adds a new key-value pair if the key does not exist.
 
@@ -315,7 +337,7 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
     }
 
     // swiftlint:disable:next identifier_name
-    @objc class func _unmanagedDictionary() -> RLMDictionary<AnyObject> {
+    @objc class func _unmanagedDictionary() -> RLMDictionary<NSString, AnyObject> {
         return Value._rlmDictionary()
     }
     

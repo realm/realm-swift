@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Key-value collection. Where the key is a string and value is one of the available Realm types.
  */
-@interface RLMDictionary<RLMObjectType>: NSObject<RLMCollection, NSFastEnumeration>
+@interface RLMDictionary<RLMKeyType: NSString *, RLMObjectType>: NSObject<RLMCollection, NSFastEnumeration>
 
 #pragma mark - Properties
 
@@ -36,6 +36,11 @@ NS_ASSUME_NONNULL_BEGIN
  The type of the value objects in the dictionary.
  */
 @property (nonatomic, readonly, assign) RLMPropertyType type;
+
+/**
+ The type of the key object in the dictionary.
+ */
+@property (nonatomic, readonly, assign) RLMPropertyType keyType;
 
 /**
  Indicates whether the objects in the collection can be `nil`.
@@ -100,7 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Applies a given block object to the each key-value pair of the dictionary
  */
-- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(NSString *key, RLMObjectType obj, BOOL *stop))block;
+- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(RLMKeyType key, RLMObjectType obj, BOOL *stop))block;
 
 /**
  Returns an enumerator object that lets you access each value in the dictionary
@@ -110,9 +115,9 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Adding, Removing, and Replacing Objects in an Array
 
 /**
- Replace the data
+ Replace the data of a dictionary with the data of another dictionary.
  */
-- (void)setDictionary:(NSDictionary<NSString *, RLMObjectType> *)otherDictionary;
+- (void)setDictionary:(RLMDictionary<RLMKeyType, RLMObjectType> *)otherDictionary;
 
 /**
  Delete all dictionary's keys and values.
@@ -199,7 +204,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param block The block to be called each time the dictionary changes.
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMObjectType> *_Nullable dictionary,
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMKeyType, RLMObjectType> *_Nullable dictionary,
                                                          RLMCollectionChange *_Nullable changes,
                                                          NSError *_Nullable error))block
 __attribute__((warn_unused_result));
@@ -236,7 +241,7 @@ __attribute__((warn_unused_result));
  @param queue The serial queue to deliver notifications to.
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMObjectType> *_Nullable dictionary,
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMKeyType, RLMObjectType> *_Nullable dictionary,
                                                          RLMCollectionChange *_Nullable changes,
                                                          NSError *_Nullable error))block
                                          queue:(nullable dispatch_queue_t)queue

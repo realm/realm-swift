@@ -18,9 +18,18 @@
 
 #import <Realm/RLMDictionary.h>
 
-@interface RLMDictionary ()
+#import "RLMObjectBase.h"
+
+@interface RLMDictionary () {
+@public
+    // The name of the property which this RLMArray represents
+    NSString *_key;
+    __weak RLMObjectBase *_parentObject;
+}
 
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;
+
+void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *const dictionary, __unsafe_unretained id const key, __unsafe_unretained id const value);
 
 @end
