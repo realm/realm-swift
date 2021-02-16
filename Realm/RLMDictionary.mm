@@ -202,10 +202,7 @@
 - (void)setValue:(nullable id)value forKey:(nonnull NSString *)key {
     if ([key isEqualToString:@"self"]) {
         RLMDictionaryValidateMatchingObjectType(self, key, value);
-        for (NSUInteger i = 0, count = _backingCollection.count; i < count; ++i) {
-            _backingCollection[i] = value;
-        }
-        return;
+        _backingCollection[key] = value;
     }
     else if (_type == RLMPropertyTypeObject) {
         [_backingCollection setValue:value forKey:key];
