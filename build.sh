@@ -930,8 +930,16 @@ case "$COMMAND" in
         workspace="examples/ios/objc/RealmExamples.xcworkspace"
         pod install --project-directory="$workspace/.." --no-repo-update
         examples="Simple TableView Migration Backlink GroupedTableView RACTableView Encryption Draw"
+        versions="0 1 2 3 4 5"
         for example in $examples; do
-            xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk iphonesimulator build ARCHS=x86_64 "${CODESIGN_PARAMS[@]}"
+            if [ "$example" = "Migration" ]; then
+                # The migration example needs to be built for each schema version to ensure each compiles.
+                for version in $versions; do
+                    xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk iphonesimulator build ARCHS=x86_64 "${CODESIGN_PARAMS[@]}" GCC_PREPROCESSOR_DEFINITIONS="\$(GCC_PREPROCESSOR_DEFINITIONS) SCHEMA_VERSION_$version"
+                done
+            else
+                xc -workspace "$workspace" -scheme "$example" -configuration "$CONFIGURATION" -sdk iphonesimulator build ARCHS=x86_64 "${CODESIGN_PARAMS[@]}"
+            fi
         done
         if [ -n "${JENKINS_HOME}" ]; then
             xc -workspace "$workspace" -scheme Extension -configuration "$CONFIGURATION" -sdk iphonesimulator build ARCHS=x86_64 "${CODESIGN_PARAMS[@]}"
