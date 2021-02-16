@@ -80,6 +80,7 @@ let package = Package(
                 "Realm/RLMDictionary.mm",
                 "Realm/RLMEmbeddedObject.mm",
                 "Realm/RLMManagedArray.mm",
+                "Realm/RLMManagedDictionary.mm",
                 "Realm/RLMManagedSet.mm",
                 "Realm/RLMMigration.mm",
                 "Realm/RLMObject.mm",

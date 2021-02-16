@@ -20,12 +20,7 @@
 
 #import "RLMObjectBase.h"
 
-@interface RLMDictionary () {
-@public
-    // The name of the property which this RLMArray represents
-    NSString *_key;
-    __weak RLMObjectBase *_parentObject;
-}
+@interface RLMDictionary ()
 
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;

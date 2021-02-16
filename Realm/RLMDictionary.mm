@@ -16,13 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMDictionary.h"
-#import "RLMDictionary_Private.h"
+#import "RLMDictionary_Private.hpp"
 #import "RLMObject_Private.h"
 #import "RLMObjectSchema.h"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
 
 // See -countByEnumeratingWithState:objects:count
@@ -34,14 +34,14 @@
 @implementation RLMDictionaryHolder
 @end
 
-@interface RLMDictionary () {
+@interface RLMDictionary () <RLMThreadConfined_Private>
+@end
+
+@implementation RLMDictionary {
 @public
     // Backing dictionary when this instance is unmanaged
     NSMutableDictionary *_backingCollection;
 }
-@end
-
-@implementation RLMDictionary
 
 #pragma mark Initializers
 

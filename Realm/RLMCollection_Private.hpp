@@ -28,12 +28,13 @@ namespace realm {
     struct CollectionChangeSet;
     struct NotificationToken;
     namespace object_store {
-        class Set;
         class Collection;
+        class Dictionary;
+        class Set;
     }
 }
 class RLMClassInfo;
-@class RLMFastEnumerator, RLMManagedArray, RLMManagedSet, RLMProperty, RLMObjectBase;
+@class RLMFastEnumerator, RLMManagedArray, RLMManagedSet, RLMManagedDictionary, RLMProperty, RLMObjectBase;
 
 @protocol RLMFastEnumerable
 @property (nonatomic, readonly) RLMRealm *realm;
