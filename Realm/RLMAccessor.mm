@@ -813,6 +813,13 @@ realm::UUID RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
 }
 template<>
 realm::Mixed RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+    // If we are unboxing an object and it is unmanaged, we need to
+    // add it to the Realm.
+    if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(v)) {
+        if (!objBase->_realm && !objBase.invalidated) {
+            RLMAddObjectToRealm(objBase, _realm, RLMUpdatePolicyError);
+        }
+    }
     return RLMObjcToMixed(v);
 }
 template<>

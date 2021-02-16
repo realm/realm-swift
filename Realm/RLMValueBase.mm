@@ -38,15 +38,6 @@
             RLMAccessorContext ctx(*_parent->_info);
             auto object = realm::Object(_parent->_realm->_realm,
                                         *_parent->_info->objectSchema, _parent->_row);
-            // If an `Object` is assigned to this mixed container and it is
-            // not managed, we need to manually add it to the Realm so that it
-            // becomes managed.
-            if (auto obj = RLMDynamicCast<RLMObjectBase>(value)) {
-                REALM_ASSERT(!obj.invalidated);
-                if (!obj->_realm) {
-                    RLMAddObjectToRealm(obj, _parent->_realm, RLMUpdatePolicyError);
-                }
-            }
             object.set_property_value(ctx, _propertyName.UTF8String, value);
         }
         catch (std::exception const& err) {
