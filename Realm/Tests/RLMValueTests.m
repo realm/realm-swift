@@ -195,23 +195,26 @@
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
     [r addObject:so];
-    MixedObject *mo0 = [MixedObject createInRealm:r withValue:@[so, @[so]]]; // ???: No warning, see mo0.anyArray.
+    MixedObject *mo0 = [MixedObject createInRealm:r withValue:@[so, @[so]]];
     
     MixedObject *mo1 = [[MixedObject alloc] init];
     mo1.anyCol = so;
-    mo1.anyArray = @[so]; // ???: Incompatible pointer types assigning to 'RLMArray<RLMValue> *' from 'NSArray *', expect no warning on array literal?
+    [mo1.anyArray addObject:so];
     [r commitWriteTransaction];
     
     XCTAssertNotNil(mo0.anyCol);
-    XCTAssertNotNil(mo1.anyCol);
     XCTAssertTrue([((StringObject *)mo0.anyCol).stringCol isEqualToString:so.stringCol]);
-    XCTAssertTrue([((StringObject *)mo1.anyCol).stringCol isEqualToString:so.stringCol]);
     XCTAssertEqual(mo0.anyCol.valueType, RLMPropertyTypeObject);
-    XCTAssertEqual(mo1.anyCol.valueType, RLMPropertyTypeObject);
-    
-    // ???: First object has no stringCol
+//    ???: First object has no stringCol
 //    XCTAssertTrue([mo0.anyArray.firstObject.stringCol isEqualToString:so.stringCol]);
-//    XCTAssertTrue([mo1.anyArray.firstObject.stringCol isEqualToString:so.stringCol]);
+
+
+    XCTAssertNotNil(mo1.anyCol);
+    XCTAssertTrue([((StringObject *)mo1.anyCol).stringCol isEqualToString:so.stringCol]);
+    XCTAssertEqual(mo1.anyCol.valueType, RLMPropertyTypeObject);
+    //    XCTAssertTrue([mo1.anyArray.firstObject.stringCol isEqualToString:so.stringCol]);
+
+    
 }
 
 // Different behavior
@@ -221,23 +224,31 @@
     
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
-    MixedObject *mo0 = [MixedObject createInRealm:r withValue:@[so, @[so]]]; // ???: No warning, see mo0.anyArray.
+    // Attempt to create a managed mixed object whose object property is unmanaged.
+    MixedObject *mo0 = [MixedObject createInRealm:r withValue:@[so, @[so]]];
     
+    // Test another kind of initialization too.
     MixedObject *mo1 = [[MixedObject alloc] init];
     mo1.anyCol = so;
-    mo1.anyArray = @[so]; // ???: Incompatible pointer types assigning to 'RLMArray<RLMValue> *' from 'NSArray *', expect no warning on array literal?
+    [mo1.anyArray addObject:so];
     [r commitWriteTransaction];
     
-    XCTAssertNotNil(mo0.anyCol); // Fails when the parent is managed, but property is unmanaged. Not sure what the expectation should be, but I'm surprised it's inconsistent with the other managed Parent. Perhaps an exception in the write transaction when attempting to write with unmanaged child?
-    XCTAssertNotNil(mo1.anyCol);
-    XCTAssertTrue([((StringObject *)mo0.anyCol).stringCol isEqualToString:so.stringCol]); // Fails when the parent is managed, but property is unmanaged. Not sure what the expectation should be, but I'm surprised it's inconsistent with the other managed Parent.
-    XCTAssertTrue([((StringObject *)mo1.anyCol).stringCol isEqualToString:so.stringCol]);
-    XCTAssertEqual(mo0.anyCol.valueType, RLMPropertyTypeObject); // Fails when the parent is managed, but property is unmanaged
-    XCTAssertEqual(mo1.anyCol.valueType, RLMPropertyTypeObject);
-    
+    // Initialization via createInRealm fails
+    // Not sure what the expectation should be, but I'm surprised it's inconsistent with the other initialization.
+    // Perhaps an exception in the write transaction when attempting to write with unmanaged child?
+    XCTAssertNotNil(mo0.anyCol);
+    XCTAssertTrue([((StringObject *)mo0.anyCol).stringCol isEqualToString:so.stringCol]);
+    XCTAssertEqual(mo0.anyCol.valueType, RLMPropertyTypeObject);
     // ???: Subscripted so has no stringCol
-//    XCTAssertTrue([mo0.anyArray[0].stringCol isEqualToString:so.stringCol]);
-//    XCTAssertTrue([mo1.anyArray[0].stringCol isEqualToString:so.stringCol]);
+    //    XCTAssertTrue([mo0.anyArray[0].stringCol isEqualToString:so.stringCol]);
+
+
+
+    XCTAssertNotNil(mo1.anyCol); // pass
+    XCTAssertTrue([((StringObject *)mo1.anyCol).stringCol isEqualToString:so.stringCol]); // pass
+    XCTAssertEqual(mo1.anyCol.valueType, RLMPropertyTypeObject); // pass
+    //    XCTAssertTrue([mo1.anyArray[0].stringCol isEqualToString:so.stringCol]);
+    
 }
 
 // difference between adding object and not!
@@ -355,7 +366,7 @@
     so.stringCol = @"hello";
     MixedObject *mo1 = [[MixedObject alloc] init];
     mo1.anyCol = so;
-    mo1.anyArray = @[so]; // ???: Incompatible pointer types assigning to 'RLMArray<RLMValue> *' from 'NSArray *'
+    [mo1.anyArray addObject:so];
     
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
@@ -371,7 +382,7 @@
 - (void)testAddManagedInt {
     MixedObject *mo = [[MixedObject alloc] init];
     mo.anyCol = @123456789;
-    mo.anyArray = @[@123456, @67890]; // ???: Incompatible pointer types assigning to 'RLMArray<RLMValue> *' from 'NSArray *'
+    [mo.anyArray addObjects:@[@123456, @67890]];
     
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
@@ -387,7 +398,7 @@
 - (void)testAddManagedFloat {
     MixedObject *mo = [[MixedObject alloc] init];
     mo.anyCol = @1234.5;
-    mo.anyArray = @[@12345.6, @678.9]; // ???: Incompatible pointer types assigning to 'RLMArray<RLMValue> *' from 'NSArray *'
+    [mo.anyArray addObjects:@[@12345.6, @678.9]];
     
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
@@ -402,7 +413,7 @@
 - (void)testAddManagedString {
     MixedObject *mo = [[MixedObject alloc] init];
     mo.anyCol = @"hello";
-    mo.anyArray = @[@"over", @"there"]; // ???: Incompatible pointer types assigning to 'RLMArray<RLMValue> *' from 'NSArray *'
+    [mo.anyArray addObjects:@[@"over", @"there"]];
     
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
@@ -419,7 +430,7 @@
     NSData *d2 = [NSData dataWithBytes:"you" length:3];
     MixedObject *mo = [[MixedObject alloc] init];
     mo.anyCol = d1;
-    mo.anyArray = @[d1, d2]; // ???: Incompatible pointer types assigning to 'RLMArray<RLMValue> *' from 'NSArray *'
+    [mo.anyArray addObjects:@[d1, d2]];
     
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
@@ -440,7 +451,7 @@
     NSDate *d2 = [NSDate now];
     MixedObject *mo = [[MixedObject alloc] init];
     mo.anyCol = d1;
-    mo.anyArray = @[d1, d2]; // ???: Incompatible pointer types assigning to 'RLMArray<RLMValue> *' from 'NSArray *'
+    [mo.anyArray addObjects:@[d1, d2]];
     
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
@@ -459,7 +470,7 @@
     RLMObjectId *oid2 = [RLMObjectId objectId];
     MixedObject *mo = [[MixedObject alloc] init];
     mo.anyCol = oid1;
-    mo.anyArray = @[oid1, oid2]; // ???: Incompatible pointer types assigning to 'RLMArray<RLMValue> *' from 'NSArray *'
+    [mo.anyArray addObjects:@[oid1, oid2]];
     
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
@@ -477,7 +488,7 @@
     RLMDecimal128 *d2 = [RLMDecimal128 decimalWithNumber:@890.456];
     MixedObject *mo = [[MixedObject alloc] init];
     mo.anyCol = d1;
-    mo.anyArray = @[d1, d2]; // ???: Incompatible pointer types assigning to 'RLMArray<RLMValue> *' from 'NSArray *'
+    [mo.anyArray addObjects:@[d1, d2]];
     
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
