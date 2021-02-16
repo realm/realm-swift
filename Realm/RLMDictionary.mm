@@ -25,6 +25,15 @@
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
 
+// See -countByEnumeratingWithState:objects:count
+@interface RLMDictionaryHolder : NSObject {
+@public
+    std::unique_ptr<id[]> items;
+}
+@end
+@implementation RLMDictionaryHolder
+@end
+
 @interface RLMDictionary () {
 @public
     // Backing dictionary when this instance is unmanaged
@@ -169,26 +178,41 @@
     return sum && !result ? @0 : result;
 }
 
-- (nonnull id)objectAtIndex:(NSUInteger)index {
+- (id)objectAtIndex:(NSUInteger)index {
     validateDictionaryBounds(self, index);
-    @throw RLMException(@"Not implemented in RLMDictionary");
-//    return [_backingCollection objectAtIndex:index];
+    return _backingCollection.allValues[index];
 }
 
 - (nonnull RLMResults *)objectsWhere:(nonnull NSString *)predicateFormat, ... {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+    va_list args;
+    va_start(args, predicateFormat);
+    RLMResults *results = [self objectsWhere:predicateFormat args:args];
+    va_end(args);
+    return results;
 }
 
 - (nonnull RLMResults *)objectsWhere:(nonnull NSString *)predicateFormat args:(va_list)args {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+    return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
 - (nonnull RLMResults *)objectsWithPredicate:(nonnull NSPredicate *)predicate {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+    @throw RLMException(@"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
 }
 
 - (void)setValue:(nullable id)value forKey:(nonnull NSString *)key {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+    if ([key isEqualToString:@"self"]) {
+        RLMDictionaryValidateMatchingObjectType(self, key, value);
+        for (NSUInteger i = 0, count = _backingCollection.count; i < count; ++i) {
+            _backingCollection[i] = value;
+        }
+        return;
+    }
+    else if (_type == RLMPropertyTypeObject) {
+        [_backingCollection setValue:value forKey:key];
+    }
+    else {
+        [self setValue:value forUndefinedKey:key];
+    }
 }
 
 - (nonnull RLMResults *)sortedResultsUsingDescriptors:(nonnull NSArray<RLMSortDescriptor *> *)properties {
@@ -226,8 +250,35 @@
     return [_backingCollection valueForKey:key];
 }
 
-- (NSUInteger)countByEnumeratingWithState:(nonnull NSFastEnumerationState *)state objects:(__unsafe_unretained id  _Nullable * _Nonnull)buffer count:(NSUInteger)len {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+- (NSUInteger)countByEnumeratingWithState:(nonnull NSFastEnumerationState *)state
+                                  objects:(__unsafe_unretained id  _Nullable * _Nonnull)buffer
+                                    count:(NSUInteger)len {
+    if (state->state != 0) {
+        return 0;
+    }
+
+    // We need to enumerate a copy of the backing dictionary so that it doesn't
+    // reflect changes made during enumeration. This copy has to be autoreleased
+    // (since there's nowhere for us to store a strong reference), and uses
+    // RLMDictionaryHolder rather than an NSDictionary because NSDictionary doesn't guarantee
+    // that it'll use a single contiguous block of memory, and if it doesn't
+    // we'd need to forward multiple calls to this method to the same NSArray,
+    // which would require holding a reference to it somewhere.
+    __autoreleasing RLMDictionaryHolder *copy = [[RLMDictionaryHolder alloc] init];
+    copy->items = std::make_unique<id[]>(_backingCollection.count);
+
+    NSUInteger i = 0;
+    for (id object in _backingCollection.allKeys) {
+        copy->items[i++] = object;
+    }
+
+    state->itemsPtr = (__unsafe_unretained id *)(void *)copy->items.get();
+    // needs to point to something valid, but the whole point of this is so
+    // that it can't be changed
+    state->mutationsPtr = state->extra;
+    state->state = i;
+
+    return i;
 }
 
 - (NSArray *)allKeys {
