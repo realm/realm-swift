@@ -14,8 +14,7 @@ Pod::Spec.new do |s|
   s.author                    = { 'Realm' => 'help@realm.io' }
   s.requires_arc              = true
   s.social_media_url          = 'https://twitter.com/realm'
-  has_versioned_docs          = !(version =~ /alpha|beta|rc/)
-  s.documentation_url         = "https://realm.io/docs/swift/#{has_versioned_docs ? s.version : 'latest'}"
+  s.documentation_url         = "https://realm.io/docs/swift/latest"
   s.license                   = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
   s.dependency 'Realm', "= #{s.version}"

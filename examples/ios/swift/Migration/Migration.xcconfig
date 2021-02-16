@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2020 Realm Inc.
+// Copyright 2014 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,19 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import SwiftUI
+// This file is used to create new examples.
+// To create a new example for a specific version you have to uncomment the
+// following line and the corresponding line with the schema version you
+// want to create (v5 being the default).
+//OTHER_SWIFT_FLAGS = $(inherited) -DCREATE_EXAMPLES;
 
-struct SearchBar: View {
-    @Binding var text: String
-
-    var body: some View {
-        ZStack {
-            HStack {
-                Image(systemName: "magnifyingglass")
-                TextField("recipe or ingredient", text: $text).scaledToFill()
-            }.padding()
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Color(red: 0.9, green: 0.9, blue: 0.9), lineWidth: 3)
-        }
-    }
-}
+// If you want to test older versions, uncommene the corresponding version.
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_0;
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_1;
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_2;
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_3;
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_4;

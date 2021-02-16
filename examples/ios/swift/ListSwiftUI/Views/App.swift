@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2020 Realm Inc.
+// Copyright 2021 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,11 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import UIKit
+import Foundation
+import SwiftUI
+import RealmSwift
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+@main
+struct App: SwiftUI.App {
+    var view: some View {
+        ContentView()
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            view
+        }
     }
 }

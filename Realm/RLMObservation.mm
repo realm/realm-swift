@@ -274,6 +274,13 @@ RLMObservationInfo *RLMGetObservationInfo(RLMObservationInfo *info, realm::ObjKe
 }
 
 void RLMClearTable(RLMClassInfo &objectSchema) {
+    if (!objectSchema.table()) {
+        // Orphaned embedded object types are included in the schema but do not
+        // create a table at all, so we may not have a table here and just
+        // don't need to do anything
+        return;
+    }
+
     for (auto info : objectSchema.observedObjects) {
         info->willChange(RLMInvalidatedKey);
     }
