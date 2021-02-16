@@ -68,6 +68,7 @@ command:
   test-catalyst:        tests Mac Catalyst framework
   test-catalyst-swift:  tests RealmSwift Mac Catalyst framework
   test-swiftpm:         tests ObjC and Swift macOS frameworks via SwiftPM
+  test-swiftui:         tests SwiftUI framework UI tests
   verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device in both Debug and Release configurations, swiftlint
   verify-osx-object-server:  downloads the Realm Object Server and runs the Objective-C and Swift integration tests
   docs:                 builds docs in docs/output
@@ -505,6 +506,10 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "swiftui")
+        xc "-scheme SwiftUITestHost -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 12' build-for-testing"
+        ;;
+
     "catalyst")
         export REALM_SDKROOT=iphoneos
         xc -scheme Realm -configuration "$CONFIGURATION" -destination variant='Mac Catalyst'
@@ -662,6 +667,11 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "test-swiftui")
+        xctest 'SwiftUITestHost' -sdk iphonesimulator -destination 'name=iPhone 12'
+        exit 0
+        ;;
+
     "test-catalyst")
         export REALM_SDKROOT=iphoneos
         xctest Realm -configuration "$CONFIGURATION" -destination 'platform=macOS,variant=Mac Catalyst' CODE_SIGN_IDENTITY=''
@@ -773,6 +783,11 @@ case "$COMMAND" in
 
     "verify-osx-swift")
         sh build.sh test-osx-swift
+        exit 0
+        ;;
+
+    "verify-swiftui")
+        sh build.sh test-swiftui
         exit 0
         ;;
 

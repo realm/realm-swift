@@ -47,6 +47,7 @@ targets = {
   'cocoapods-ios-dynamic' => oldest_and_latest,
   'cocoapods-watchos' => oldest_and_latest,
   # 'cocoapods-catalyst' => oldest_and_latest,
+  'swiftui' => latest_only,
 }
 
 output_file = """

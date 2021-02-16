@@ -52,6 +52,7 @@ extension User {
 }
 
 @available(OSX 10.14, *)
+@objc(SwiftObjectServerTests)
 class SwiftObjectServerTests: SwiftSyncTestCase {
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
@@ -588,7 +589,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             proxy.delay = 1.0
             let ex = expectation(description: "async open")
             Realm.asyncOpen(configuration: config) { result in
-                XCTAssertNotNil(try? result.get())
+                let realm = try? result.get()
+                XCTAssertNotNil(realm)
+                realm?.syncSession?.suspend()
                 ex.fulfill()
             }
             waitForExpectations(timeout: 10.0, handler: nil)
@@ -1193,6 +1196,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 }
 
     // MARK: - Mongo Client
+@objc(SwiftMongoClientTests)
 class SwiftMongoClientTests: SwiftSyncTestCase {
     override func tearDown() {
         _ = setupMongoCollection()
@@ -2082,6 +2086,7 @@ extension Publisher {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+@objc(CombineObjectServerTests)
 class CombineObjectServerTests: SwiftSyncTestCase {
     override class var defaultTestSuite: XCTestSuite {
         if hasCombine() {
