@@ -19,6 +19,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
 10.6.0 Release notes (2021-02-15)
 =============================================================
 
