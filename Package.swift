@@ -154,6 +154,7 @@ let package = Package(
                 "Swift",
                 "TestHost",
                 "PrimitiveArrayPropertyTests.tpl.m",
+                "PrimitiveValuePropertyTests.tpl.m",
             ],
             cxxSettings: testCxxSettings
         ),

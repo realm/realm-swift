@@ -224,6 +224,32 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLMArray<RLMUUID> *uuidObj;
 @end
 
+@interface AllPrimitiveValues : RLMObject
+@property id<RLMValue> intObj;
+@property id<RLMValue> floatObj;
+@property id<RLMValue> doubleObj;
+@property id<RLMValue> boolObj;
+@property id<RLMValue> stringObj;
+@property id<RLMValue> dateObj;
+@property id<RLMValue> dataObj;
+@property id<RLMValue> decimalObj;
+@property id<RLMValue> objectIdObj;
+@property id<RLMValue> uuidObj;
+@end
+
+@interface AllOptionalPrimitiveValues : RLMObject
+@property id<RLMValue> intObj;
+@property id<RLMValue> floatObj;
+@property id<RLMValue> doubleObj;
+@property id<RLMValue> boolObj;
+@property id<RLMValue> stringObj;
+@property id<RLMValue> dateObj;
+@property id<RLMValue> dataObj;
+@property id<RLMValue> decimalObj;
+@property id<RLMValue> objectIdObj;
+@property id<RLMValue> uuidObj;
+@end
+
 #pragma mark - Real Life Objects
 #pragma mark -
 
