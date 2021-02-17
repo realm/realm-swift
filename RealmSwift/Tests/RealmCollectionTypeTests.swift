@@ -441,7 +441,7 @@ class RealmCollectionTypeTests: TestCase {
         let collection = getAggregateableCollection()
 
         // Should not throw a type error.
-        _ = collection.filter("ANY stringListCol == %@", CTTNullableStringObjectWithLink())
+        XCTAssertEqual(0, collection.filter("ANY stringListCol == %@", CTTNullableStringObjectWithLink()).count)
     }
 
     func testObserve() {

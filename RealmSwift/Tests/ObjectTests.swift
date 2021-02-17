@@ -738,7 +738,7 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
 
-    func checkChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ change: ObjectChange<Object>) {
+    func checkChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ change: ObjectChange<ObjectBase>) {
         if case .change(_, let properties) = change {
             XCTAssertEqual(properties.count, 1)
             if let prop = properties.first {
@@ -752,7 +752,7 @@ class ObjectTests: TestCase {
 
     }
 
-    func expectChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?) -> ((ObjectChange<Object>) -> Void) {
+    func expectChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?) -> ((ObjectChange<ObjectBase>) -> Void) {
         let exp = expectation(description: "change from \(String(describing: old)) to \(String(describing: new))")
         return { change in
             self.checkChange(name, old, new, change)

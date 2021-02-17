@@ -19,6 +19,7 @@
 #import <XCTest/XCTest.h>
 
 #import "RLMMultiProcessTestCase.h"
+#import "TestUtils.h"
 
 #import "RLMAccessor.h"
 #import "RLMObjectSchema_Private.hpp"
@@ -330,6 +331,12 @@ RLM_COLLECTION_TYPE(NotARealClass)
                                                                propertyName:@"link"] };
 }
 
+@end
+
+@interface OrphanObject : RLMEmbeddedObject
+@property int value;
+@end
+@implementation OrphanObject
 @end
 
 
@@ -1110,7 +1117,7 @@ RLM_COLLECTION_TYPE(NotARealClass)
 
 - (void)testInsertingColumnsInBackgroundProcess {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    config.schemaMode = realm::SchemaMode::Additive;
+    config.schemaMode = realm::SchemaMode::AdditiveDiscovered;
     if (!self.isParent) {
         config.dynamic = true;
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
@@ -1158,6 +1165,35 @@ RLM_COLLECTION_TYPE(NotARealClass)
     (void)[query lastObject];
     RLMRunChildAndWait();
     XCTAssertEqual(query.count, 3U);
+}
+
+- (void)testExplicitlyIncludedEmbeddedOrphanIsRejectedForSyncRealm {
+    RLMUser *user = RLMDummyUser();
+
+    // Test each different order of setting properties because there's a bunch of awkward state involved
+    RLMRealmConfiguration *config = [user configurationWithPartitionValue:@"dummy"];
+    config.objectClasses = @[OrphanObject.class];
+    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
+                              @"Embedded object 'OrphanObject' is unreachable by any link path from top level objects.");
+
+    config = [RLMRealmConfiguration defaultConfiguration];
+    config.syncConfiguration = [user configurationWithPartitionValue:@"dummy"].syncConfiguration;
+    config.objectClasses = @[OrphanObject.class];
+    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
+                              @"Embedded object 'OrphanObject' is unreachable by any link path from top level objects.");
+
+    config = [RLMRealmConfiguration defaultConfiguration];
+    config.objectClasses = @[OrphanObject.class];
+    config.syncConfiguration = [user configurationWithPartitionValue:@"dummy"].syncConfiguration;
+    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
+                              @"Embedded object 'OrphanObject' is unreachable by any link path from top level objects.");
+}
+
+- (void)testExplicitlyIncludedEmbeddedOrphanIsAllowedForLocalRealm {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.objectClasses = @[OrphanObject.class];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    XCTAssertNotNil([realm.schema schemaForClassName:@"OrphanObject"]);
 }
 #endif
 

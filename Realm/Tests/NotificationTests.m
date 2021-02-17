@@ -733,8 +733,36 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 
 - (void)testDeleteArray {
     ExpectChange(self, @[@0, @1, @2, @3], @[], @[], ^(RLMRealm *realm) {
-                      [realm deleteObjects:[ArrayPropertyObject allObjectsInRealm:realm]];
+        [realm deleteObjects:[ArrayPropertyObject allObjectsInRealm:realm]];
     });
+}
+
+- (void)testDeleteAlreadyEmptyArray {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [ArrayPropertyObject createInRealm:realm withValue:@[]];
+    }];
+    RLMArray *array = [[ArrayPropertyObject allObjectsInRealm:realm].firstObject intArray];
+    __block RLMCollectionChange *changes;
+    __block int calls = 0;
+    id token = [array addNotificationBlock:^(RLMArray *results, RLMCollectionChange *c, NSError *error) {
+        XCTAssertNotNil(results);
+        XCTAssertNil(error);
+        changes = c;
+        ++calls;
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    }];
+    CFRunLoopRun();
+
+    [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [realm deleteObjects:[ArrayPropertyObject allObjectsInRealm:realm]];
+        }];
+    }];
+
+    [(RLMNotificationToken *)token invalidate];
+    XCTAssertEqual(calls, 1);
 }
 
 - (void)testModifyObjectShiftedByInsertsAndDeletions {

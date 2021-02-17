@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2020 Realm Inc.
+// Copyright 2021 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,19 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+import Foundation
 import SwiftUI
+import RealmSwift
 
-struct SearchBar: View {
-    @Binding var text: String
+@main
+struct App: SwiftUI.App {
+    var view: some View {
+        ContentView()
+    }
 
-    var body: some View {
-        ZStack {
-            HStack {
-                Image(systemName: "magnifyingglass")
-                TextField("recipe or ingredient", text: $text).scaledToFill()
-            }.padding()
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Color(red: 0.9, green: 0.9, blue: 0.9), lineWidth: 3)
+    var body: some Scene {
+        WindowGroup {
+            view
         }
     }
 }

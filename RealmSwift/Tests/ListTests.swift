@@ -303,6 +303,54 @@ class ListTests: TestCase {
         assertThrows(array.move(from: 2, to: 0))
     }
 
+    func testMoveFromOffsets() {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
+            fatalError("Test precondition failure")
+        }
+        let str3 = SwiftStringObject(value: ["3"])
+
+        array.append(objectsIn: [str1, str2, str3])
+
+        array.move(fromOffsets: IndexSet([1]), toOffset: 0)
+        // [2, 1, 3]
+        XCTAssertEqual(array[0].stringCol, "2")
+        XCTAssertEqual(array[1].stringCol, "1")
+        XCTAssertEqual(array[2].stringCol, "3")
+
+        array.move(fromOffsets: IndexSet([0]), toOffset: 3)
+        // [1, 3, 2]
+        XCTAssertEqual(array[0].stringCol, "1")
+        XCTAssertEqual(array[1].stringCol, "3")
+        XCTAssertEqual(array[2].stringCol, "2")
+
+        array.move(fromOffsets: IndexSet([0]), toOffset: 0)
+        // [1, 3, 2]
+        XCTAssertEqual(array[0].stringCol, "1")
+        XCTAssertEqual(array[1].stringCol, "3")
+        XCTAssertEqual(array[2].stringCol, "2")
+
+        array.move(fromOffsets: IndexSet([2]), toOffset: 1)
+        // [1, 2, 3]
+        XCTAssertEqual(array[0].stringCol, "1")
+        XCTAssertEqual(array[1].stringCol, "2")
+        XCTAssertEqual(array[2].stringCol, "3")
+
+        assertThrows(array.move(fromOffsets: IndexSet([0]), toOffset: 4))
+        assertThrows(array.move(fromOffsets: IndexSet([4]), toOffset: 0))
+
+        array.move(fromOffsets: IndexSet([]), toOffset: 1)
+        // [1, 2, 3]
+        XCTAssertEqual(array[0].stringCol, "1")
+        XCTAssertEqual(array[1].stringCol, "2")
+        XCTAssertEqual(array[2].stringCol, "3")
+
+        array.move(fromOffsets: IndexSet([0, 2]), toOffset: 1)
+        // [2, 3, 1]
+        XCTAssertEqual(array[0].stringCol, "2")
+        XCTAssertEqual(array[1].stringCol, "3")
+        XCTAssertEqual(array[2].stringCol, "1")
+    }
+
     func testReplaceRange() {
         guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
