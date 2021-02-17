@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "10.4.0"
-let cocoaVersionStr = "10.5.2"
+let coreVersionStr = "10.5.1"
+let cocoaVersionStr = "10.6.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -136,7 +136,8 @@ let package = Package(
             exclude: [
                 "Tests",
                 "Nonsync.swift"
-            ]
+            ],
+            swiftSettings: combineFlags()
         ),
         .target(
             name: "RealmTestSupport",
@@ -150,6 +151,8 @@ let package = Package(
             path: "Realm/Tests",
             exclude: [
                 "Swift",
+                "SwiftUITestHost",
+                "SwiftUITestHostUITests",
                 "TestHost",
                 "PrimitiveArrayPropertyTests.tpl.m",
             ],
@@ -164,7 +167,8 @@ let package = Package(
             name: "RealmSwiftTests",
             dependencies: ["RealmSwift", "RealmTestSupport"],
             path: "RealmSwift/Tests",
-            exclude: ["TestUtils.mm"]
+            exclude: ["TestUtils.mm"],
+            swiftSettings: combineFlags()
         ),
 
         // Object server tests have support code written in both obj-c and

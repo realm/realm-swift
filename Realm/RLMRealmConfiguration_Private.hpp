@@ -24,4 +24,5 @@
 - (realm::Realm::Config&)config;
 
 @property (nonatomic) realm::SchemaMode schemaMode;
+- (void)updateSchemaMode;
 @end

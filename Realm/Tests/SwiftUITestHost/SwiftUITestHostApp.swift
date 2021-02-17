@@ -19,78 +19,6 @@
 import RealmSwift
 import SwiftUI
 
-@objcMembers class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
-    @objc enum Priority: Int, RealmEnum, CaseIterable, Identifiable, CustomStringConvertible {
-        var id: Int { self.rawValue }
-
-        case low, medium, high
-
-        var description: String {
-            switch self {
-            case .low: return "low"
-            case .medium: return "medium"
-            case .high: return "high"
-            }
-        }
-    }
-    dynamic var title = ""
-    dynamic var notes = ""
-    dynamic var isFlagged = false
-    dynamic var date = Date()
-    dynamic var isComplete = false
-    dynamic var priority: Priority = .low
-}
-
-@objcMembers class ReminderList: Object, ObjectKeyIdentifiable {
-    dynamic var name = "New List"
-    dynamic var icon: String = "list.bullet"
-    var reminders = RealmSwift.List<Reminder>()
-}
-
-struct FocusableTextField: UIViewRepresentable {
-    class Coordinator: NSObject, UITextFieldDelegate {
-        @Binding var text: String
-        var didBecomeFirstResponder = false
-
-        init(text: Binding<String>) {
-            _text = text
-        }
-
-        func textFieldDidChangeSelection(_ textField: UITextField) {
-            text = textField.text ?? ""
-        }
-    }
-
-    let title: String
-    @Binding var text: String
-    @Binding var isFirstResponder: Bool
-
-    init(_ title: String, text: Binding<String>, isFirstResponder: Binding<Bool>) {
-        self.title = title
-        self._text = text
-        self._isFirstResponder = isFirstResponder
-    }
-
-    func makeUIView(context: UIViewRepresentableContext<Self>) -> UITextField {
-        let textField = UITextField(frame: .zero)
-        textField.placeholder = title
-        textField.delegate = context.coordinator
-        return textField
-    }
-
-    func makeCoordinator() -> Coordinator {
-        return Coordinator(text: $text)
-    }
-
-    func updateUIView(_ uiView: UITextField, context: UIViewRepresentableContext<Self>) {
-        uiView.text = text
-        if isFirstResponder && !context.coordinator.didBecomeFirstResponder {
-            uiView.becomeFirstResponder()
-            context.coordinator.didBecomeFirstResponder = true
-        }
-    }
-}
-
 struct ReminderRowView: View {
     @ObservedRealmObject var list: ReminderList
     @ObservedRealmObject var reminder: Reminder
@@ -101,7 +29,7 @@ struct ReminderRowView: View {
         NavigationLink(destination: ReminderFormView(list: list,
                                                      reminder: reminder,
                                                      showReminderForm: $showReminderForm), isActive: $showReminderForm) {
-            FocusableTextField("title", text: reminder.bind(\.title), isFirstResponder: $hasFocus).textCase(.lowercase)
+            Text(reminder.title)
         }.isDetailLink(true)
     }
 }
@@ -113,17 +41,16 @@ struct ReminderFormView: View {
 
     var body: some View {
         Form {
-            TextField("title", text: $reminder.title)
+            TextField("title", text: $reminder.title).accessibility(identifier: "formTitle")
             DatePicker("date", selection: $reminder.date)
             Picker("priority", selection: $reminder.priority, content: {
                 ForEach(Reminder.Priority.allCases) { priority in
                     Text(priority.description).tag(priority)
                 }
-            })
+            }).accessibilityIdentifier("picker")
         }
         .navigationTitle(reminder.title)
-        .navigationBarItems(trailing:
-        Button("Save") {
+        .navigationBarItems(trailing: Button("Save") {
             if reminder.realm == nil {
                 $list.reminders.append(reminder)
             }
@@ -138,8 +65,7 @@ struct ReminderListView: View {
     @State var showReminderForm = false
 
     func shouldFocusReminder(_ reminder: Reminder) -> Bool {
-        return newReminderAdded &&
-            list.reminders.lastIndex(of: reminder) == (list.reminders.count - 1)
+        return newReminderAdded && list.reminders.last == reminder
     }
 
     var body: some View {
@@ -170,10 +96,10 @@ struct ReminderListRowView: View {
     var body: some View {
         HStack {
             Image(systemName: list.icon)
-            TextField("List Name", text: $list.name)
+            TextField("List Name", text: $list.name).accessibility(identifier: "listRow")
             Spacer()
             Text("\(list.reminders.count)")
-        }.frame(minWidth: 100)
+        }.frame(minWidth: 100).accessibility(identifier: "hstack")
     }
 }
 
@@ -266,11 +192,62 @@ struct ContentView: View {
     }
 }
 
-#if DEBUG
-// swiftlint:disable type_name
-struct Content_Preview: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+struct MultiRealmContentView: View {
+    struct RealmView: View {
+        @Environment(\.realm) var realm
+        var body: some View {
+            Text(realm.configuration.inMemoryIdentifier ?? "no memory identifier")
+                .accessibilityIdentifier("test_text_view")
+        }
+    }
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                NavigationLink("Realm A", destination: RealmView().environment(\.realmConfiguration, Realm.Configuration(inMemoryIdentifier: "realm_a")))
+                NavigationLink("Realm B", destination: RealmView().environment(\.realmConfiguration, Realm.Configuration(inMemoryIdentifier: "realm_b")))
+            }
+        }
     }
 }
-#endif
+
+struct UnmanagedObjectTestView: View {
+    @StateRealmObject var reminderList = ReminderList()
+    @Environment(\.realm) var realm
+
+    var body: some View {
+        NavigationView {
+            Form {
+                TextField("name", text: $reminderList.name).accessibilityIdentifier("name")
+            }.navigationBarItems(trailing: Button("Add", action: {
+                try! realm.write { realm.add(reminderList) }
+            }).accessibility(identifier: "addReminder"))
+        }
+    }
+}
+
+@main
+struct App: SwiftUI.App {
+    var body: some Scene {
+        if let realmPath = ProcessInfo.processInfo.environment["REALM_PATH"] {
+            Realm.Configuration.defaultConfiguration =
+                Realm.Configuration(fileURL: URL(string: realmPath)!, deleteRealmIfMigrationNeeded: true)
+        } else {
+            Realm.Configuration.defaultConfiguration =
+                Realm.Configuration(deleteRealmIfMigrationNeeded: true)
+        }
+        let view: AnyView = {
+            switch ProcessInfo.processInfo.environment["test_type"] {
+            case "multi_realm_test":
+                return AnyView(MultiRealmContentView())
+            case "unmanaged_object_test":
+                return AnyView(UnmanagedObjectTestView())
+            default:
+                return AnyView(ContentView())
+            }
+        }()
+        return WindowGroup {
+            view
+        }
+    }
+}
