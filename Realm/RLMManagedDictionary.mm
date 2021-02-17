@@ -282,14 +282,14 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     // changes occur, and can't be sent explicitly, but works normally when it's
     // the entire key path), and an RLMManagedArray *can't* have objects where
     // invalidated is true, so we're not losing much.
-    return translateErrors<RLMManagedDictionary>([&]() -> id {
-        if ([key isEqualToString:RLMInvalidatedKey]) {
-            return @(!_backingCollection.is_valid());
-        }
-
-        _backingCollection.verify_attached();
-        return RLMCollectionValueForKey(_backingCollection, key, *_objectInfo);
-    });
+//    return translateErrors<RLMManagedDictionary>([&]() -> id {
+//        if ([key isEqualToString:RLMInvalidatedKey]) {
+//            return @(!_backingCollection.is_valid());
+//        }
+//
+//        _backingCollection.verify_attached();
+//        return RLMCollectionValueForKey(_backingCollection, key, *_objectInfo);
+//    });
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {
