@@ -280,6 +280,11 @@
 @implementation SetPropertyObject
 @end
 
+#pragma mark DictionaryPropertyObject
+
+@implementation DictionaryPropertyObject
+@end
+
 #pragma mark DynamicTestObject
 
 @implementation DynamicTestObject

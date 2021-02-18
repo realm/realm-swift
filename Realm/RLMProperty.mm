@@ -19,7 +19,7 @@
 #import "RLMProperty_Private.hpp"
 
 #import "RLMArray_Private.hpp"
-#import "RLMDictionary_Private.h"
+#import "RLMDictionary_Private.hpp"
 #import "RLMObject.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.h"
@@ -270,8 +270,6 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     }
     else if (strcmp(code, "@\"NSUUID\"") == 0) {
         _type = RLMPropertyTypeUUID;
-    } else if (isCollection()) {
-
     }
     else if (strcmp(code, "@\"<RLMValue>\"") == 0) {
         _type = RLMPropertyTypeAny;
@@ -387,7 +385,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
 
         if (!cls) {
             @throw RLMException(@"Property '%@' is declared as '%@', which is not a supported RLMObject property type. "
-                                @"All properties must be primitives, NSString, NSDate, NSData, NSNumber, RLMArray, RLMSet, RLMLinkingObjects, RLMDecimal128, RLMObjectId, or subclasses of RLMObject. "
+                                @"All properties must be primitives, NSString, NSDate, NSData, NSNumber, RLMArray, RLMSet, RLMDictionary, RLMLinkingObjects, RLMDecimal128, RLMObjectId, or subclasses of RLMObject. "
                                 @"See https://realm.io/docs/objc/latest/api/Classes/RLMObject.html for more information.", _name, className);
         }
 
@@ -516,7 +514,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
         }
     }
 
-    // convert array / set types to objc variant
+    // convert array / set / dictionary types to objc variant
     if ([rawType isEqualToString:@"@\"RLMArray\""]) {
         RLMArray *value = propertyValue;
         _type = value.type;
@@ -548,8 +546,8 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
         _dictionary = true;
         _objectClassName = value.objectClassName;
         if (_type == RLMPropertyTypeObject && ![RLMSchema classForString:_objectClassName]) {
-            @throw RLMException(@"Property '%@' is of type 'RLMDictionary<%@>' which is not a supported RLMDictionary object type. "
-                                @"RLMDictionary can only contain instances of RLMObject subclasses. "
+            @throw RLMException(@"Property '%@' is of type 'RLMDictionary<KeyType, %@>' which is not a supported RLMDictionary object type. "
+                                @"RLMDictionarys can only contain instances of RLMObject subclasses. "
                                 @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);
         }
     }

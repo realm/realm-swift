@@ -21,11 +21,11 @@
 #if __has_extension(objc_generics)
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS *><CLASS>
 #define RLM_GENERIC_SET(CLASS) RLMSet<CLASS *><CLASS>
-#define RLM_GENERIC_DICTIONARY(CLASS) RLMDictionary<CLASS *><CLASS>
+#define RLM_GENERIC_DICTIONARY(KEY, CLASS) RLMDictionary<KEY *, CLASS *><CLASS>
 #else
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS>
 #define RLM_GENERIC_SET(CLASS) RLMSet<CLASS>
-#define RLM_GENERIC_DICTIONARY(CLASS) RLMDictionary<CLASS>
+#define RLM_GENERIC_DICTIONARY(KEY, CLASS) RLMDictionary<KEY, CLASS>
 #endif
 
 #pragma mark - Abstract Objects
@@ -450,6 +450,15 @@ RLM_COLLECTION_TYPE(CircleObject);
 @property NSString *name;
 @property RLM_GENERIC_SET(StringObject) *set;
 @property RLM_GENERIC_SET(IntObject) *intSet;
+
+@end
+
+#pragma mark DictionaryPropertyObject
+
+@interface DictionaryPropertyObject : RLMObject
+
+@property RLM_GENERIC_DICTIONARY(NSString, StringObject) *stringDictionary;
+@property RLM_GENERIC_DICTIONARY(NSString, IntObject) *intDictionary;
 
 @end
 

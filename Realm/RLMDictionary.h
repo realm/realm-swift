@@ -20,10 +20,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol RLMDictionaryKey
+@end
+
+@interface NSString (RLMDictionaryKey)<RLMDictionaryKey>
+@end
+
 /**
  * Key-value collection. Where the key is a string and value is one of the available Realm types.
  */
-@interface RLMDictionary<RLMKeyType: NSString *, RLMObjectType>: NSObject<RLMCollection, NSFastEnumeration>
+@interface RLMDictionary<RLMDictionaryKey, RLMObjectType>: NSObject<RLMCollection, NSFastEnumeration>
 
 #pragma mark - Properties
 
@@ -55,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy, nullable) NSString *objectClassName;
 
 /**
- The Realm which manages the dictionary. Returns `nil` for unmanaged dictionary.
+ The Realm which manages the dictionary. Returns `nil` for unmanaged dictionary.RLMDictionaryKey
  */
 @property (nonatomic, readonly, nullable) RLMRealm *realm;
 
@@ -82,12 +88,12 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A value associated with a given key or `nil`.
  */
-- (nullable id)valueForKey:(nonnull NSString *)key;
+- (nullable id)valueForKey:(nonnull id<RLMDictionaryKey>)key;
 
 /**
  Returns an array of the dictionary's keys.
  */
-- (nullable RLMObjectType)objectForKey:(NSString *)key;
+- (nullable RLMObjectType)objectForKey:(nonnull id<RLMDictionaryKey>)key;
 
 /**
  Returns an array containing the dictionary’s keys.
@@ -105,7 +111,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Applies a given block object to the each key-value pair of the dictionary
  */
-- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(RLMKeyType key, RLMObjectType obj, BOOL *stop))block;
+- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id<RLMDictionaryKey> key, RLMObjectType obj, BOOL *stop))block;
 
 /**
  Returns an enumerator object that lets you access each value in the dictionary
@@ -117,7 +123,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Replace the data of a dictionary with the data of another dictionary.
  */
-- (void)setDictionary:(RLMDictionary<RLMKeyType, RLMObjectType> *)otherDictionary;
+- (void)setDictionary:(RLMDictionary<RLMDictionaryKey, RLMObjectType> *)otherDictionary;
 
 /**
  Delete all dictionary's keys and values.
@@ -147,7 +153,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Adds to the receiving dictionary the entries from another dictionary.
  */
-- (void)addEntriesFromDictionary:(RLMDictionary<NSString *, RLMObjectType> *)otherDictionary;
+- (void)addEntriesFromDictionary:(RLMDictionary<RLMDictionaryKey, RLMObjectType> *)otherDictionary;
 
 #pragma mark - Notifications
 
@@ -204,7 +210,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param block The block to be called each time the dictionary changes.
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMKeyType, RLMObjectType> *_Nullable dictionary,
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMDictionaryKey, RLMObjectType> *_Nullable dictionary,
                                                          RLMCollectionChange *_Nullable changes,
                                                          NSError *_Nullable error))block
 __attribute__((warn_unused_result));
@@ -241,7 +247,7 @@ __attribute__((warn_unused_result));
  @param queue The serial queue to deliver notifications to.
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMKeyType, RLMObjectType> *_Nullable dictionary,
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMDictionaryKey, RLMObjectType> *_Nullable dictionary,
                                                          RLMCollectionChange *_Nullable changes,
                                                          NSError *_Nullable error))block
                                          queue:(nullable dispatch_queue_t)queue

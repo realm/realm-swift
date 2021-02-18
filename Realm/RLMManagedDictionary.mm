@@ -290,6 +290,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 //        _backingCollection.verify_attached();
 //        return RLMCollectionValueForKey(_backingCollection, key, *_objectInfo);
 //    });
+    return nil;
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {
@@ -333,17 +334,20 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 //    auto column = [self columnForProperty:property];
 //    auto value = translateErrors<RLMManagedDictionary>(self, [&] { return _backingCollection.max(column); }, @"maxOfProperty");
 //    return value ? RLMMixedToObjc(*value) : nil;
+    return nil;
 }
 
 - (id)sumOfProperty:(NSString *)property {
 //    auto column = [self columnForProperty:property];
 //    return RLMMixedToObjc(translateErrors(self, [&] { return _backingList.sum(column); }, @"sumOfProperty"));
+    return nil;
 }
 
 - (id)averageOfProperty:(NSString *)property {
 //    auto column = [self columnForProperty:property];
 //    auto value = translateErrors(self, [&] { return _backingList.average(column); }, @"averageOfProperty");
 //    return value ? RLMMixedToObjc(*value) : nil;
+    return nil;
 }
 
 - (void)deleteObjectsFromRealm {
@@ -402,6 +406,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (realm::TableView)tableView {
 //    return translateErrors<RLMManagedDictionary>([&] { return _backingCollection.get_query(); }).find_all();
+    return {};
 }
 
 - (RLMFastEnumerator *)fastEnumerator {
