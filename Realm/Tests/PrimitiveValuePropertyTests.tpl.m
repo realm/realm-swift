@@ -135,31 +135,51 @@ static double average(NSArray *values) {
 //}
 
 // @Lee, I need to double that the concept of "invlaidation" doesn't extend to RLMValue?
-//- (void)testInvalidated {
-//    id<RLMValue> *value;
-//    @autoreleasepool {
-//        AllPrimitiveValues *obj = [[AllPrimitiveValues alloc] init];
-//        value = obj.intObj;
-//        XCTAssertFalse(value.invalidated); // Property 'invalidated' not found on object of type '__strong id<RLMValue>'
-//    }
-//    XCTAssertFalse(value.invalidated); // Property 'invalidated' not found on object of type '__strong id<RLMValue>'
-//}
 
+// Update to new value of existing type
 - (void)testUpdateValue {
-    %b XCTAssert([(NSNumber *)$rlmValue.boolValue isEqual:$value0]);
     %n XCTAssert([(NSNumber *)$rlmValue isEqual:$value0]);
+    %s XCTAssert([(NSString *)$rlmValue isEqual:$value0]);
+    %dc XCTAssert([(RLMDecimal128 *)$rlmValue isEqual:$value0]);
+    %dt XCTAssert([(NSDate *)$rlmValue isEqual:$value0]);
+    %da XCTAssert([(NSData *)$rlmValue isEqual:$value0]);
     
-    $rlmValue = $value1);
+    $rlmValue = $value1;
     
-    %b XCTAssert([$rlmValue isEqual:$value0]);
     %n XCTAssert([(NSNumber *)$rlmValue isEqual:$value1]);
+    %s XCTAssert([(NSString *)$rlmValue isEqual:$value1]);
+    %dc XCTAssert([(RLMDecimal128 *)$rlmValue isEqual:$value1]);
+    %dt XCTAssert([(NSDate *)$rlmValue isEqual:$value1]);
+    %da XCTAssert([(NSData *)$rlmValue isEqual:$value1]);
 }
 
-//- (void)testContainsValue {
-//    XCTAssertFalse($value == $v0);
-//    $value = $v0;
-//    XCTAssertTrue($value == $v0);
-//}
+// Update value to null
+- (void)testUpdateValueNull {
+    %n XCTAssert([(NSNumber *)$rlmValue isEqual:$value0]);
+    %s XCTAssert([(NSString *)$rlmValue isEqual:$value0]);
+    %dc XCTAssert([(RLMDecimal128 *)$rlmValue isEqual:$value0]);
+    %dt XCTAssert([(NSDate *)$rlmValue isEqual:$value0]);
+    %da XCTAssert([(NSData *)$rlmValue isEqual:$value0]);
+
+    /*%noman*/ $rlmValue = NULL;
+    
+    XCTAssertNil($rlmValue);
+    
+    $rlmValue = $value0;
+    
+    %n XCTAssert([(NSNumber *)$rlmValue isEqual:$value0]);
+    %s XCTAssert([(NSString *)$rlmValue isEqual:$value0]);
+    %dc XCTAssert([(RLMDecimal128 *)$rlmValue isEqual:$value0]);
+    %dt XCTAssert([(NSDate *)$rlmValue isEqual:$value0]);
+    %da XCTAssert([(NSData *)$rlmValue isEqual:$value0]);
+    
+//    // Fails on managed, ask @Lee. No selector
+////    %man $rlmValue = NSNull.null;
 //
+//    %noman %n XCTAssert([(NSNumber *)$rlmValue isEqual:NSNull.null]);
+}
+
+//- (void)testUpdateValueDifferentType
+
 
 @end
