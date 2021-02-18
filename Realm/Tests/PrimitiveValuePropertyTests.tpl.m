@@ -59,22 +59,27 @@ static double average(NSArray *values) {
 @implementation RLMValuePropertyTests {
     AllPrimitiveValues *unmanaged;
     AllPrimitiveValues *managed;
-    AllOptionalPrimitiveValues *unmanaged;
-    AllOptionalPrimitiveValues *managed;
+    AllOptionalPrimitiveValues *optUnmanaged;
+    AllOptionalPrimitiveValues *optManaged;
     RLMRealm *realm;
-    NSArray<RLMValue *> allValues;
+    RLMArray<RLMValue> *allValues;
+//    NSArray<RLMValue> *allValues;
 }
 
--(void)setUp {
+- (void)setUp {
     unmanaged = [[AllPrimitiveValues alloc] init];
     optUnmanaged = [[AllOptionalPrimitiveValues alloc] init];
     realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     managed = [AllPrimitiveValues createInRealm:realm withValue:@[]];
     optManaged = [AllOptionalPrimitiveValues createInRealm:realm withValue:@[]];
-    allValues = @[
+    [self assignValues];
+//    anyarray = @[
+//        $rlmValue,
+//    ];
+    [allValues addObjects:@[
         $rlmValue,
-    ];
+    ]];
 }
 
 - (void)tearDown {
@@ -83,148 +88,78 @@ static double average(NSArray *values) {
     }
 }
 
-- (void)addObjects {
-    [$array addObjects:$values];
+- (void)assignValues {
+    $rlmValue = $value0;
 }
 
-- (void)testCount {
-    XCTAssertEqual(unmanaged.intObj.count, 0U);
-    [unmanaged.intObj addObject:@1];
-    XCTAssertEqual(unmanaged.intObj.count, 1U);
+// !!! don't forget to add count of rlmValue in array tests
+
+// Dummy test
+- (void)testTrue {
+    XCTAssert(true);
 }
 
 - (void)testType {
-    XCTAssertEqual(unmanaged.boolObj.type, RLMPropertyTypeBool);
-    XCTAssertEqual(unmanaged.intObj.type, RLMPropertyTypeInt);
-    XCTAssertEqual(unmanaged.floatObj.type, RLMPropertyTypeFloat);
-    XCTAssertEqual(unmanaged.doubleObj.type, RLMPropertyTypeDouble);
-    XCTAssertEqual(unmanaged.stringObj.type, RLMPropertyTypeString);
-    XCTAssertEqual(unmanaged.dataObj.type, RLMPropertyTypeData);
-    XCTAssertEqual(unmanaged.dateObj.type, RLMPropertyTypeDate);
-    XCTAssertEqual(optUnmanaged.boolObj.type, RLMPropertyTypeBool);
-    XCTAssertEqual(optUnmanaged.intObj.type, RLMPropertyTypeInt);
-    XCTAssertEqual(optUnmanaged.floatObj.type, RLMPropertyTypeFloat);
-    XCTAssertEqual(optUnmanaged.doubleObj.type, RLMPropertyTypeDouble);
-    XCTAssertEqual(optUnmanaged.stringObj.type, RLMPropertyTypeString);
-    XCTAssertEqual(optUnmanaged.dataObj.type, RLMPropertyTypeData);
-    XCTAssertEqual(optUnmanaged.dateObj.type, RLMPropertyTypeDate);
+    XCTAssertEqual(unmanaged.boolObj.valueType, RLMPropertyTypeBool);
+    XCTAssertEqual(unmanaged.intObj.valueType, RLMPropertyTypeInt);
+    XCTAssertEqual(unmanaged.floatObj.valueType, RLMPropertyTypeFloat);
+    XCTAssertEqual(unmanaged.doubleObj.valueType, RLMPropertyTypeDouble);
+    XCTAssertEqual(unmanaged.stringObj.valueType, RLMPropertyTypeString);
+    XCTAssertEqual(unmanaged.dataObj.valueType, RLMPropertyTypeData);
+    XCTAssertEqual(unmanaged.dateObj.valueType, RLMPropertyTypeDate);
+    XCTAssertEqual(optUnmanaged.boolObj.valueType, RLMPropertyTypeBool);
+    XCTAssertEqual(optUnmanaged.intObj.valueType, RLMPropertyTypeInt);
+    XCTAssertEqual(optUnmanaged.floatObj.valueType, RLMPropertyTypeFloat);
+    XCTAssertEqual(optUnmanaged.doubleObj.valueType, RLMPropertyTypeDouble);
+    XCTAssertEqual(optUnmanaged.stringObj.valueType, RLMPropertyTypeString);
+    XCTAssertEqual(optUnmanaged.dataObj.valueType, RLMPropertyTypeData);
+    XCTAssertEqual(optUnmanaged.dateObj.valueType, RLMPropertyTypeDate);
 }
 
-- (void)testOptional {
-    XCTAssertFalse(unmanaged.boolObj.optional);
-    XCTAssertFalse(unmanaged.intObj.optional);
-    XCTAssertFalse(unmanaged.floatObj.optional);
-    XCTAssertFalse(unmanaged.doubleObj.optional);
-    XCTAssertFalse(unmanaged.stringObj.optional);
-    XCTAssertFalse(unmanaged.dataObj.optional);
-    XCTAssertFalse(unmanaged.dateObj.optional);
-    XCTAssertTrue(optUnmanaged.boolObj.optional);
-    XCTAssertTrue(optUnmanaged.intObj.optional);
-    XCTAssertTrue(optUnmanaged.floatObj.optional);
-    XCTAssertTrue(optUnmanaged.doubleObj.optional);
-    XCTAssertTrue(optUnmanaged.stringObj.optional);
-    XCTAssertTrue(optUnmanaged.dataObj.optional);
-    XCTAssertTrue(optUnmanaged.dateObj.optional);
+// @Lee How is nullability with RLMValue supposed to work?
+//- (void)testOptional {
+//    XCTAssertFalse(unmanaged.boolObj.optional);
+//    XCTAssertFalse(unmanaged.intObj.optional);
+//    XCTAssertFalse(unmanaged.floatObj.optional);
+//    XCTAssertFalse(unmanaged.doubleObj.optional);
+//    XCTAssertFalse(unmanaged.stringObj.optional);
+//    XCTAssertFalse(unmanaged.dataObj.optional);
+//    XCTAssertFalse(unmanaged.dateObj.optional);
+//    XCTAssertTrue(optUnmanaged.boolObj.optional);
+//    XCTAssertTrue(optUnmanaged.intObj.optional);
+//    XCTAssertTrue(optUnmanaged.floatObj.optional);
+//    XCTAssertTrue(optUnmanaged.doubleObj.optional);
+//    XCTAssertTrue(optUnmanaged.stringObj.optional);
+//    XCTAssertTrue(optUnmanaged.dataObj.optional);
+//    XCTAssertTrue(optUnmanaged.dateObj.optional);
+//}
+
+// @Lee, I need to double that the concept of "invlaidation" doesn't extend to RLMValue?
+//- (void)testInvalidated {
+//    id<RLMValue> *value;
+//    @autoreleasepool {
+//        AllPrimitiveValues *obj = [[AllPrimitiveValues alloc] init];
+//        value = obj.intObj;
+//        XCTAssertFalse(value.invalidated); // Property 'invalidated' not found on object of type '__strong id<RLMValue>'
+//    }
+//    XCTAssertFalse(value.invalidated); // Property 'invalidated' not found on object of type '__strong id<RLMValue>'
+//}
+
+- (void)testUpdateValue {
+    %b XCTAssert([(NSNumber *)$rlmValue.boolValue isEqual:$value0]);
+    %n XCTAssert([(NSNumber *)$rlmValue isEqual:$value0]);
+    
+    $rlmValue = $value1);
+    
+    %b XCTAssert([$rlmValue isEqual:$value0]);
+    %n XCTAssert([(NSNumber *)$rlmValue isEqual:$value1]);
 }
 
-- (void)testObjectClassName {
-    XCTAssertNil(unmanaged.boolObj.objectClassName);
-    XCTAssertNil(unmanaged.intObj.objectClassName);
-    XCTAssertNil(unmanaged.floatObj.objectClassName);
-    XCTAssertNil(unmanaged.doubleObj.objectClassName);
-    XCTAssertNil(unmanaged.stringObj.objectClassName);
-    XCTAssertNil(unmanaged.dataObj.objectClassName);
-    XCTAssertNil(unmanaged.dateObj.objectClassName);
-    XCTAssertNil(optUnmanaged.boolObj.objectClassName);
-    XCTAssertNil(optUnmanaged.intObj.objectClassName);
-    XCTAssertNil(optUnmanaged.floatObj.objectClassName);
-    XCTAssertNil(optUnmanaged.doubleObj.objectClassName);
-    XCTAssertNil(optUnmanaged.stringObj.objectClassName);
-    XCTAssertNil(optUnmanaged.dataObj.objectClassName);
-    XCTAssertNil(optUnmanaged.dateObj.objectClassName);
-}
-
-- (void)testRealm {
-    XCTAssertNil(unmanaged.boolObj.realm);
-    XCTAssertNil(unmanaged.intObj.realm);
-    XCTAssertNil(unmanaged.floatObj.realm);
-    XCTAssertNil(unmanaged.doubleObj.realm);
-    XCTAssertNil(unmanaged.stringObj.realm);
-    XCTAssertNil(unmanaged.dataObj.realm);
-    XCTAssertNil(unmanaged.dateObj.realm);
-    XCTAssertNil(optUnmanaged.boolObj.realm);
-    XCTAssertNil(optUnmanaged.intObj.realm);
-    XCTAssertNil(optUnmanaged.floatObj.realm);
-    XCTAssertNil(optUnmanaged.doubleObj.realm);
-    XCTAssertNil(optUnmanaged.stringObj.realm);
-    XCTAssertNil(optUnmanaged.dataObj.realm);
-    XCTAssertNil(optUnmanaged.dateObj.realm);
-}
-
-- (void)testInvalidated {
-    RLMValue *value;
-    @autoreleasepool {
-        AllPrimitiveValues *obj = [[AllPrimitiveValues alloc] init];
-        value = obj.intObj;
-        XCTAssertFalse(value.invalidated);
-    }
-    XCTAssertFalse(value.invalidated);
-}
-
-- (void)testContainsValue {
-    XCTAssertFalse($value == $v0);
-    $value = $v0;
-    XCTAssertTrue($value == $v0);
-}
-
-- (void)testNotifications {
-    %unman RLMAssertThrowsWithReason([$value addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }], ^n @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
-}
-
-- (void)testMin {
-    %nominmax %unman RLMAssertThrowsWithReason([$array minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type array");
-    %nominmax %man RLMAssertThrowsWithReason([$array minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type array '$class.$prop'");
-
-    %minmax XCTAssertNil([$array minOfProperty:@"self"]);
-
-    [self addObjects];
-
-    %minmax XCTAssertEqualObjects([$array minOfProperty:@"self"], $v0);
-}
-
-- (void)testMax {
-    %nominmax %unman RLMAssertThrowsWithReason([$array maxOfProperty:@"self"], ^n @"maxOfProperty: is not supported for $type array");
-    %nominmax %man RLMAssertThrowsWithReason([$array maxOfProperty:@"self"], ^n @"maxOfProperty: is not supported for $type array '$class.$prop'");
-
-    %minmax XCTAssertNil([$array maxOfProperty:@"self"]);
-
-    [self addObjects];
-
-    %minmax XCTAssertEqualObjects([$array maxOfProperty:@"self"], $v1);
-}
-
-- (void)testSum {
-    %nosum %unman RLMAssertThrowsWithReason([$array sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type array");
-    %nosum %man RLMAssertThrowsWithReason([$array sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type array '$class.$prop'");
-
-    %sum XCTAssertEqualObjects([$array sumOfProperty:@"self"], @0);
-
-    [self addObjects];
-
-    %sum XCTAssertEqualWithAccuracy([$array sumOfProperty:@"self"].doubleValue, sum($values), .001);
-}
-
-- (void)testAverage {
-    %noavg %unman RLMAssertThrowsWithReason([$array averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type array");
-    %noavg %man RLMAssertThrowsWithReason([$array averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type array '$class.$prop'");
-
-    %avg XCTAssertNil([$array averageOfProperty:@"self"]);
-
-    [self addObjects];
-
-    %avg XCTAssertEqualWithAccuracy([$array averageOfProperty:@"self"].doubleValue, average($values), .001);
-}
-
-- (void)testCon
+//- (void)testContainsValue {
+//    XCTAssertFalse($value == $v0);
+//    $value = $v0;
+//    XCTAssertTrue($value == $v0);
+//}
+//
 
 @end

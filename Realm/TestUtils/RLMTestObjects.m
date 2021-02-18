@@ -148,6 +148,11 @@
 @implementation AllOptionalPrimitiveArrays
 @end
 
+@implementation AllPrimitiveValues
+@end
+@implementation AllOptionalPrimitiveValues
+@end
+
 @implementation AllOptionalTypesPK
 + (NSString *)primaryKey {
     return @"pk";
