@@ -212,12 +212,16 @@
     }
 }
 
-- (nonnull RLMResults *)sortedResultsUsingDescriptors:(nonnull NSArray<RLMSortDescriptor *> *)properties {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+- (RLMResults *)sortedResultsUsingDescriptors:(nonnull NSArray<RLMSortDescriptor *> *)properties {
+    @throw RLMException(@"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
 }
 
-- (nonnull RLMResults *)sortedResultsUsingKeyPath:(nonnull NSString *)keyPath ascending:(BOOL)ascending {
-    @throw RLMException(@"Not implemented in RLMDictionary");
+- (RLMResults *)sortedResultsUsingKeyPath:(nonnull NSString *)keyPath ascending:(BOOL)ascending {
+    @throw RLMException(@"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+}
+
+- (RLMResults *)distinctResultsUsingKeyPaths:(NSArray<NSString *> *)keyPaths {
+    @throw RLMException(@"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
 }
 
 - (id)valueForKeyPath:(NSString *)keyPath {
@@ -298,10 +302,6 @@
     [_backingCollection enumerateKeysAndObjectsUsingBlock:block];
 }
 
-- (NSEnumerator *)objectEnumerator {
-    @throw RLMException(@"Not implemented in RLMDictionary");
-}
-
 - (void)setDictionary:(RLMDictionary *)dictionary {
     [dictionary enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull value, BOOL *) {
         RLMDictionaryValidateMatchingObjectType(self, key, value);
@@ -350,8 +350,6 @@
     changeDictionary(self, ^{
         [_backingCollection addEntriesFromDictionary:otherDictionary->_backingCollection];
     });
-
-    @throw RLMException(@"Not implemented in RLMDictionary");
 }
 
 static void validateDictionaryBounds(__unsafe_unretained RLMDictionary *const dictionary,
@@ -426,6 +424,22 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
     else {
         f();
     }
+}
+
+#pragma mark - Thread Confined Protocol Conformance
+
+- (realm::ThreadSafeReference)makeThreadSafeReference {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMDictionary`");
+}
+
+- (id)objectiveCMetadata {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMDictionary`");
+}
+
++ (instancetype)objectWithThreadSafeReference:(realm::ThreadSafeReference)reference
+                                     metadata:(id)metadata
+                                        realm:(RLMRealm *)realm {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMDictionary`");
 }
 
 @end

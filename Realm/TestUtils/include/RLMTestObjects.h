@@ -21,9 +21,11 @@
 #if __has_extension(objc_generics)
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS *><CLASS>
 #define RLM_GENERIC_SET(CLASS) RLMSet<CLASS *><CLASS>
+#define RLM_GENERIC_DICTIONARY(CLASS) RLMDictionary<CLASS *><CLASS>
 #else
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS>
 #define RLM_GENERIC_SET(CLASS) RLMSet<CLASS>
+#define RLM_GENERIC_DICTIONARY(CLASS) RLMDictionary<CLASS>
 #endif
 
 #pragma mark - Abstract Objects

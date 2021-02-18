@@ -19,6 +19,7 @@
 #import "RLMProperty_Private.hpp"
 
 #import "RLMArray_Private.hpp"
+#import "RLMDictionary_Private.h"
 #import "RLMObject.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.h"
@@ -540,6 +541,18 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
                                 @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);
         }
     }
+    else if ([rawType isEqualToString:@"@\"RLMDictionary\""]) {
+        RLMDictionary *value = propertyValue;
+        _type = value.type;
+        _optional = value.optional;
+        _dictionary = true;
+        _objectClassName = value.objectClassName;
+        if (_type == RLMPropertyTypeObject && ![RLMSchema classForString:_objectClassName]) {
+            @throw RLMException(@"Property '%@' is of type 'RLMDictionary<%@>' which is not a supported RLMDictionary object type. "
+                                @"RLMDictionary can only contain instances of RLMObject subclasses. "
+                                @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);
+        }
+    }
     else if ([rawType isEqualToString:@"@\"NSNumber\""]) {
         const char *numberType = [propertyValue objCType];
         if (!numberType) {
@@ -634,6 +647,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     prop->_objectClassName = _objectClassName;
     prop->_array = _array;
     prop->_set = _set;
+    prop->_dictionary = _dictionary;
     prop->_indexed = _indexed;
     prop->_getterName = _getterName;
     prop->_setterName = _setterName;
@@ -673,7 +687,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
 }
 
 - (BOOL)collection {
-    return self.set || self.array;
+    return self.set || self.array || self.dictionary;
 }
 
 - (NSString *)description {
@@ -692,6 +706,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
              "\tisPrimary = %@;\n"
              "\tarray = %@;\n"
              "\tset = %@;\n"
+             "\tdictionary = %@;\n"
              "\toptional = %@;\n"
              "}",
             self.name, RLMTypeToString(self.type),
@@ -700,6 +715,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
             self.isPrimary ? @"YES" : @"NO",
             self.array ? @"YES" : @"NO",
             self.set ? @"YES" : @"NO",
+            self.dictionary ? @"YES" : @"NO",
             self.optional ? @"YES" : @"NO"];
 }
 
@@ -725,7 +741,10 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     if (_set) {
         p.type |= realm::PropertyType::Set;
     }
-    if (_optional || (p.type == realm::PropertyType::Mixed)) {
+    if (_dictionary) {
+        p.type |= realm::PropertyType::Dictionary;
+    }
+    if (_optional || p.type == realm::PropertyType::Mixed) {
         p.type |= realm::PropertyType::Nullable;
     }
     return p;

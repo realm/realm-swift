@@ -21,6 +21,7 @@
 #import "RLMArray_Private.hpp"
 #import "RLMAccessor.hpp"
 #import "RLMDecimal128_Private.hpp"
+#import "RLMDictionary_Private.h"
 #import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
@@ -57,6 +58,10 @@ static inline RLMArray *asRLMArray(__unsafe_unretained id const value) {
 
 static inline RLMSet *asRLMSet(__unsafe_unretained id const value) {
     return RLMDynamicCast<RLMSet>(value) ?: RLMDynamicCast<RLMSwiftCollectionBase>(value)._rlmCollection;
+}
+
+static inline RLMDictionary *asRLMDictionary(__unsafe_unretained id const value) {
+    return RLMDynamicCast<RLMDictionary>(value) ?: RLMDynamicCast<RLMSwiftCollectionBase>(value)._rlmCollection;
 }
 
 static inline bool checkCollectionType(__unsafe_unretained id<RLMCollection> const collection,
@@ -218,6 +223,15 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
             if (!checkCollectionType(set, prop.type, prop.optional, prop.objectClassName)) {
                 @throw RLMException(@"RLMSet<%@%s> does not match expected type '%@%s' for property '%@.%@'.",
                                     set.objectClassName ?: RLMTypeToString(set.type), set.optional ? "?" : "",
+                                    prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
+                                    objectSchema.className, prop.name);
+            }
+            return;
+        }
+        else if (RLMDictionary *dictionary = asRLMDictionary(obj)) {
+            if (!checkCollectionType(dictionary, prop.type, prop.optional, prop.objectClassName)) {
+                @throw RLMException(@"RLMDictionary<%@%s> does not match expected type '%@%s' for property '%@.%@'.",
+                                    dictionary.objectClassName ?: RLMTypeToString(dictionary.type), dictionary.optional ? "?" : "",
                                     prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
                                     objectSchema.className, prop.name);
             }
