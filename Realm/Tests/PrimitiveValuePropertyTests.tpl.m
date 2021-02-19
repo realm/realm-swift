@@ -57,6 +57,14 @@ static double average(NSArray *values) {
     return sum / c;
 }
 
+static NSArray *shiftArray(NSArray *array, NSInteger pos)
+{
+    NSInteger length = [array count];
+    NSArray *post = [array subarrayWithRange:(NSRange){ .location = length - pos, .length = pos }];
+    NSArray *pre = [array subarrayWithRange:(NSRange){ .location = 0, .length = length - pos}];
+    return [post arrayByAddingObjectsFromArray:pre];
+}
+
 @interface RLMValuePropertyTests : RLMTestCase
 @end
 
@@ -84,6 +92,20 @@ static double average(NSArray *values) {
     }
 }
 
+<<<<<<< HEAD
+=======
+- (void)assignValue:(id)value {
+    $rlmValue = value;
+}
+
+- (void)resetValues:(AllPrimitiveRLMValues *)mixed {
+    $rlmValue = $value0;
+    
+    XCTAssert([$cast$rlmValue isEqual:$value0]);
+    XCTAssert([$cast$rlmValue isEqual:$value0]);
+}
+
+>>>>>>> 64c90c77b3c1a56e82d73a167d681bcca557e323
 // !!! don't forget to add count of rlmValue in array tests
 
 // Dummy test
@@ -146,6 +168,7 @@ static double average(NSArray *values) {
     XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeInt);
 }
 
+<<<<<<< HEAD
 - (void)testUpdateFloatType {
     $rlmValue = @2.2f;
     XCTAssert([(NSNumber *)$rlmValue isEqual:@2.2f]);
