@@ -92,20 +92,6 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
     }
 }
 
-<<<<<<< HEAD
-=======
-- (void)assignValue:(id)value {
-    $rlmValue = value;
-}
-
-- (void)resetValues:(AllPrimitiveRLMValues *)mixed {
-    $rlmValue = $value0;
-    
-    XCTAssert([$cast$rlmValue isEqual:$value0]);
-    XCTAssert([$cast$rlmValue isEqual:$value0]);
-}
-
->>>>>>> 64c90c77b3c1a56e82d73a167d681bcca557e323
 // !!! don't forget to add count of rlmValue in array tests
 
 // Dummy test
@@ -168,7 +154,6 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
     XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeInt);
 }
 
-<<<<<<< HEAD
 - (void)testUpdateFloatType {
     $rlmValue = @2.2f;
     XCTAssert([(NSNumber *)$rlmValue isEqual:@2.2f]);
