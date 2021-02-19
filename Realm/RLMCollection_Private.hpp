@@ -77,6 +77,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state, NSUInteger len, id<RL
 @end
 
 realm::object_store::Set& RLMGetBackingCollection(RLMManagedSet *);
+realm::object_store::Dictionary& RLMGetBackingCollection(RLMManagedDictionary *);
 realm::List& RLMGetBackingCollection(RLMManagedArray *);
 realm::Results& RLMGetBackingCollection(RLMResults *);
 

@@ -191,7 +191,7 @@ static auto translateErrors(__unsafe_unretained ObjcCollection *const collection
         return f();
     }
     catch (...) {
-        throwError(collection, aggregateMethod);
+        throwError<ObjcCollection>(collection, aggregateMethod);
     }
 }
 
@@ -240,7 +240,6 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     return _objectInfo;
 }
 
-
 - (bool)isBackedByDictionary:(realm::object_store::Dictionary const&)dictionary {
     return _backingCollection == dictionary;
 }
@@ -268,7 +267,8 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     if ([keyPath hasPrefix:@"@"]) {
         // Delegate KVC collection operators to RLMResults
         return translateErrors<RLMManagedDictionary>([&] {
-            auto results = [RLMResults resultsWithObjectInfo:*_objectInfo results:_backingCollection.as_results()];
+            auto results = [RLMResults resultsWithObjectInfo:*_objectInfo
+                                                     results:_backingCollection.as_results()];
             return [results valueForKeyPath:keyPath];
         });
     }
@@ -282,14 +282,15 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     // changes occur, and can't be sent explicitly, but works normally when it's
     // the entire key path), and an RLMManagedArray *can't* have objects where
     // invalidated is true, so we're not losing much.
-//    return translateErrors<RLMManagedDictionary>([&]() -> id {
-//        if ([key isEqualToString:RLMInvalidatedKey]) {
-//            return @(!_backingCollection.is_valid());
-//        }
-//
-//        _backingCollection.verify_attached();
-//        return RLMCollectionValueForKey(_backingCollection, key, *_objectInfo);
-//    });
+    return translateErrors<RLMManagedDictionary>([&]() -> id {
+        if ([key isEqualToString:RLMInvalidatedKey]) {
+            return @(!_backingCollection.is_valid());
+        }
+
+        _backingCollection.verify_attached();
+        auto results = _backingCollection.as_results();
+        return RLMCollectionValueForKey(results, key, *_objectInfo);
+    });
     return nil;
 }
 
@@ -325,29 +326,34 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (id)minOfProperty:(NSString *)property {
     auto column = [self columnForProperty:property];
-//    auto value = translateErrors<RLMManagedDictionary>(self, [&] { return _backingCollection.as_results().min(column); }, @"minOfProperty");
-//    return value ? RLMMixedToObjc(*value) : nil;
-    return nil;
+    auto value = translateErrors<RLMManagedDictionary>(self, [&] {
+        return _backingCollection.as_results().min(column);
+    }, @"minOfProperty");
+    return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)maxOfProperty:(NSString *)property {
-//    auto column = [self columnForProperty:property];
-//    auto value = translateErrors<RLMManagedDictionary>(self, [&] { return _backingCollection.max(column); }, @"maxOfProperty");
-//    return value ? RLMMixedToObjc(*value) : nil;
-    return nil;
+    auto column = [self columnForProperty:property];
+    auto value = translateErrors<RLMManagedDictionary>(self, [&] {
+        return _backingCollection.as_results().max(column);
+    }, @"maxOfProperty");
+    return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)sumOfProperty:(NSString *)property {
-//    auto column = [self columnForProperty:property];
-//    return RLMMixedToObjc(translateErrors(self, [&] { return _backingList.sum(column); }, @"sumOfProperty"));
-    return nil;
+    auto column = [self columnForProperty:property];
+    auto value = translateErrors<RLMManagedDictionary>(self, [&] {
+        return _backingCollection.as_results().sum(column);
+    }, @"sumOfProperty");
+    return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)averageOfProperty:(NSString *)property {
-//    auto column = [self columnForProperty:property];
-//    auto value = translateErrors(self, [&] { return _backingList.average(column); }, @"averageOfProperty");
-//    return value ? RLMMixedToObjc(*value) : nil;
-    return nil;
+    auto column = [self columnForProperty:property];
+    auto value = translateErrors<RLMManagedDictionary>(self, [&] {
+        return _backingCollection.as_results().average(column);
+    }, @"averageOfProperty");
+    return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (void)deleteObjectsFromRealm {
@@ -375,25 +381,13 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {
     if (_type != RLMPropertyTypeObject) {
-        @throw RLMException(@"Querying is currently only implemented for arrays of Realm Objects");
+        @throw RLMException(@"Querying is currently only implemented for dictionaries of Realm Objects");
     }
     auto query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema, _realm.schema, _realm.group);
-//    auto results = translateErrors<RLMManagedDictionary>([&] { return _backingCollection.filter(std::move(query)); });
-//    return [RLMResults resultsWithObjectInfo:*_objectInfo results:std::move(results)];
-    return nil;
-}
-
-- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
-    if (_type != RLMPropertyTypeObject) {
-        @throw RLMException(@"Querying is currently only implemented for arrays of Realm Objects");
-    }
-    realm::Query query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema,
-                                             _realm.schema, _realm.group);
-
-    return translateErrors<RLMManagedDictionary>([&] {
-//        return RLMConvertNotFound(_backingCollection.find(std::move(query)));
-        return 0;
+    auto results = translateErrors<RLMManagedDictionary>([&] {
+        return _backingCollection.as_results().filter(std::move(query));
     });
+    return [RLMResults resultsWithObjectInfo:*_objectInfo results:std::move(results)];
 }
 
 - (void)addObserver:(id)observer
@@ -417,6 +411,11 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     });
 }
 
+realm::object_store::Dictionary& RLMGetBackingCollection(RLMManagedDictionary *self) {
+    return self->_backingCollection;
+}
+
+
 - (BOOL)isFrozen {
     return _realm.isFrozen;
 }
@@ -435,9 +434,6 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     });
 }
 
-
-
-
 - (instancetype)thaw {
     if (!self.frozen) {
         return self;
@@ -451,6 +447,5 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
                                                     property:parentInfo.rlmObjectSchema[_key]];
     });
 }
-
 
 @end
