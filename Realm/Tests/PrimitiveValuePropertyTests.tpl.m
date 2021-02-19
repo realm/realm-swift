@@ -63,20 +63,14 @@ static double average(NSArray *values) {
     AllOptionalPrimitiveValues *optManaged;
     RLMRealm *realm;
     RLMArray<RLMValue> *allValues;
-//    NSArray<RLMValue> *allValues;
 }
 
 - (void)setUp {
     unmanaged = [[AllPrimitiveValues alloc] init];
-    optUnmanaged = [[AllOptionalPrimitiveValues alloc] init];
     realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     managed = [AllPrimitiveValues createInRealm:realm withValue:@[]];
-    optManaged = [AllOptionalPrimitiveValues createInRealm:realm withValue:@[]];
     [self assignValues];
-//    anyarray = @[
-//        $rlmValue,
-//    ];
     [allValues addObjects:@[
         $rlmValue,
     ]];
@@ -116,27 +110,38 @@ static double average(NSArray *values) {
     XCTAssertEqual(optUnmanaged.dateObj.valueType, RLMPropertyTypeDate);
 }
 
-// @Lee How is nullability with RLMValue supposed to work?
-//- (void)testOptional {
-//    XCTAssertFalse(unmanaged.boolObj.optional);
-//    XCTAssertFalse(unmanaged.intObj.optional);
-//    XCTAssertFalse(unmanaged.floatObj.optional);
-//    XCTAssertFalse(unmanaged.doubleObj.optional);
-//    XCTAssertFalse(unmanaged.stringObj.optional);
-//    XCTAssertFalse(unmanaged.dataObj.optional);
-//    XCTAssertFalse(unmanaged.dateObj.optional);
-//    XCTAssertTrue(optUnmanaged.boolObj.optional);
-//    XCTAssertTrue(optUnmanaged.intObj.optional);
-//    XCTAssertTrue(optUnmanaged.floatObj.optional);
-//    XCTAssertTrue(optUnmanaged.doubleObj.optional);
-//    XCTAssertTrue(optUnmanaged.stringObj.optional);
-//    XCTAssertTrue(optUnmanaged.dataObj.optional);
-//    XCTAssertTrue(optUnmanaged.dateObj.optional);
+// @Lee - ask about how invalidation should work. No memeber found.
+//- (void)testInvalidated {
+//    AllPrimitiveValues *obj;
+//    @autoreleasepool {
+//        AllPrimitiveSets *obj = [[AllPrimitiveSets alloc] init];
+//        XCTAssertFalse(obj.$member.invalidated);
+//    }
+//    XCTAssertFalse(obj.$member.invalidated);
 //}
 
-// @Lee, I need to double that the concept of "invlaidation" doesn't extend to RLMValue?
+- (void)testInitNull {
+    AllPrimitiveValues *unman = [[AllPrimitiveValues alloc] init];
+    AllPrimitiveValues *man = [AllPrimitiveValues createInRealm:realm withValue:@[]];
+    
+    %unman XCTAssertNil(unman.$member, @"RLMValue should be able to initialize as null");
+    %man XCTAssertNil(man.$member, @"RLMValue should be able to initialize as null");
+}
 
-// Update to new value of existing type
+// Duck *duck =  [[Duck alloc] initWithValue:@{@"animal" : @{@"age" : @(3)}, @"name" : @"Gustav" }];
+- (void)testInitValue {
+    AllPrimitiveValues *man = [AllPrimitiveValues createInRealm:realm withValue:@{
+        @"$member": $value0,
+    }];
+    
+    AllPrimitiveValues *unman = [[AllPrimitiveValues alloc] initWithValue:@{
+        @"$member": $value0,
+    }];
+    
+    XCTAssert([$cast$rlmValue isEqual:$value0]);
+    XCTAssert([$cast$rlmValue isEqual:$value0]);
+}
+
 - (void)testUpdateValue {
     %n XCTAssert([(NSNumber *)$rlmValue isEqual:$value0]);
     %s XCTAssert([(NSString *)$rlmValue isEqual:$value0]);
@@ -155,28 +160,15 @@ static double average(NSArray *values) {
 
 // Update value to null
 - (void)testUpdateValueNull {
-    %n XCTAssert([(NSNumber *)$rlmValue isEqual:$value0]);
-    %s XCTAssert([(NSString *)$rlmValue isEqual:$value0]);
-    %dc XCTAssert([(RLMDecimal128 *)$rlmValue isEqual:$value0]);
-    %dt XCTAssert([(NSDate *)$rlmValue isEqual:$value0]);
-    %da XCTAssert([(NSData *)$rlmValue isEqual:$value0]);
+    XCTAssert([$cast$rlmValue isEqual:$value0]);
 
-    /*%noman*/ $rlmValue = NULL;
+    $rlmValue = [NSNull null];
     
     XCTAssertNil($rlmValue);
     
     $rlmValue = $value0;
     
-    %n XCTAssert([(NSNumber *)$rlmValue isEqual:$value0]);
-    %s XCTAssert([(NSString *)$rlmValue isEqual:$value0]);
-    %dc XCTAssert([(RLMDecimal128 *)$rlmValue isEqual:$value0]);
-    %dt XCTAssert([(NSDate *)$rlmValue isEqual:$value0]);
-    %da XCTAssert([(NSData *)$rlmValue isEqual:$value0]);
-    
-//    // Fails on managed, ask @Lee. No selector
-////    %man $rlmValue = NSNull.null;
-//
-//    %noman %n XCTAssert([(NSNumber *)$rlmValue isEqual:NSNull.null]);
+    XCTAssert([$cast$rlmValue isEqual:$value0]);
 }
 
 //- (void)testUpdateValueDifferentType
