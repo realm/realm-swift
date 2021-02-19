@@ -224,30 +224,18 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLMArray<RLMUUID> *uuidObj;
 @end
 
-@interface AllPrimitiveValues : RLMObject
-@property id<RLMValue> intObj;
-@property id<RLMValue> floatObj;
-@property id<RLMValue> doubleObj;
-@property id<RLMValue> boolObj;
-@property id<RLMValue> stringObj;
-@property id<RLMValue> dateObj;
-@property id<RLMValue> dataObj;
-@property id<RLMValue> decimalObj;
-@property id<RLMValue> objectIdObj;
-@property id<RLMValue> uuidObj;
-@end
-
-@interface AllOptionalPrimitiveValues : RLMObject
-@property id<RLMValue> intObj;
-@property id<RLMValue> floatObj;
-@property id<RLMValue> doubleObj;
-@property id<RLMValue> boolObj;
-@property id<RLMValue> stringObj;
-@property id<RLMValue> dateObj;
-@property id<RLMValue> dataObj;
-@property id<RLMValue> decimalObj;
-@property id<RLMValue> objectIdObj;
-@property id<RLMValue> uuidObj;
+@interface AllPrimitiveRLMValues : RLMObject
+@property id<RLMValue> intVal;
+@property id<RLMValue> floatVal;
+@property id<RLMValue> doubleVal;
+@property id<RLMValue> boolVal;
+@property id<RLMValue> stringVal;
+@property id<RLMValue> dateVal;
+@property id<RLMValue> dataVal;
+@property id<RLMValue> decimalVal;
+@property id<RLMValue> objectIdVal;
+@property id<RLMValue> uuidVal;
+@property id<RLMValue> nullVal;
 @end
 
 #pragma mark - Real Life Objects

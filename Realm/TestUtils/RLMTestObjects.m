@@ -148,9 +148,7 @@
 @implementation AllOptionalPrimitiveArrays
 @end
 
-@implementation AllPrimitiveValues
-@end
-@implementation AllOptionalPrimitiveValues
+@implementation AllPrimitiveRLMValues
 @end
 
 @implementation AllOptionalTypesPK

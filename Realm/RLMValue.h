@@ -34,6 +34,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+// !!! Alphabetize later
+@interface NSNull (RLMValue)<RLMValue>
+@end
+
 @interface NSNumber (RLMValue)<RLMValue>
 @end
 
