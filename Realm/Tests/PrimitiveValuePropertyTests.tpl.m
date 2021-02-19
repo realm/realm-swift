@@ -57,23 +57,20 @@ static double average(NSArray *values) {
 @end
 
 @implementation RLMValuePropertyTests {
-    AllPrimitiveValues *unmanaged;
-    AllPrimitiveValues *managed;
-    AllOptionalPrimitiveValues *optUnmanaged;
-    AllOptionalPrimitiveValues *optManaged;
+    AllPrimitiveRLMValues *unmanaged;
+    AllPrimitiveRLMValues *managed;
     RLMRealm *realm;
     RLMArray<RLMValue> *allValues;
 }
 
 - (void)setUp {
-    unmanaged = [[AllPrimitiveValues alloc] init];
     realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    managed = [AllPrimitiveValues createInRealm:realm withValue:@[]];
-    [self assignValues];
-    [allValues addObjects:@[
-        $rlmValue,
-    ]];
+    [self initValues];
+//    [self assignValues];
+//    [allValues addObjects:@[
+//        $rlmValue,
+//    ]];
 }
 
 - (void)tearDown {
@@ -93,82 +90,67 @@ static double average(NSArray *values) {
     XCTAssert(true);
 }
 
-- (void)testType {
-    XCTAssertEqual(unmanaged.boolObj.valueType, RLMPropertyTypeBool);
-    XCTAssertEqual(unmanaged.intObj.valueType, RLMPropertyTypeInt);
-    XCTAssertEqual(unmanaged.floatObj.valueType, RLMPropertyTypeFloat);
-    XCTAssertEqual(unmanaged.doubleObj.valueType, RLMPropertyTypeDouble);
-    XCTAssertEqual(unmanaged.stringObj.valueType, RLMPropertyTypeString);
-    XCTAssertEqual(unmanaged.dataObj.valueType, RLMPropertyTypeData);
-    XCTAssertEqual(unmanaged.dateObj.valueType, RLMPropertyTypeDate);
-    XCTAssertEqual(optUnmanaged.boolObj.valueType, RLMPropertyTypeBool);
-    XCTAssertEqual(optUnmanaged.intObj.valueType, RLMPropertyTypeInt);
-    XCTAssertEqual(optUnmanaged.floatObj.valueType, RLMPropertyTypeFloat);
-    XCTAssertEqual(optUnmanaged.doubleObj.valueType, RLMPropertyTypeDouble);
-    XCTAssertEqual(optUnmanaged.stringObj.valueType, RLMPropertyTypeString);
-    XCTAssertEqual(optUnmanaged.dataObj.valueType, RLMPropertyTypeData);
-    XCTAssertEqual(optUnmanaged.dateObj.valueType, RLMPropertyTypeDate);
+- (void)initValues {
+    unmanaged = [[AllPrimitiveRLMValues alloc] initWithValue:@{
+        %unman @"$member": $value0,
+    }];
+    XCTAssertNil(unmanaged.realm);
+    
+    managed = [AllPrimitiveRLMValues createInRealm:realm withValue:@{
+        %man @"$member": $value0,
+    }];
+    XCTAssertNotNil(managed.realm);
+    
+    %unman XCTAssert([$cast$rlmValue isEqual:$value0]);
+    %man XCTAssert([$cast$rlmValue isEqual:$value0]);
 }
 
-// @Lee - ask about how invalidation should work. No memeber found.
-//- (void)testInvalidated {
-//    AllPrimitiveValues *obj;
-//    @autoreleasepool {
-//        AllPrimitiveSets *obj = [[AllPrimitiveSets alloc] init];
-//        XCTAssertFalse(obj.$member.invalidated);
-//    }
-//    XCTAssertFalse(obj.$member.invalidated);
-//}
+- (void)testType {
+    XCTAssertEqual(unmanaged.boolVal.valueType, RLMPropertyTypeBool);
+    XCTAssertEqual(unmanaged.intVal.valueType, RLMPropertyTypeInt);
+    XCTAssertEqual(unmanaged.floatVal.valueType, RLMPropertyTypeFloat);
+    XCTAssertEqual(unmanaged.doubleVal.valueType, RLMPropertyTypeDouble);
+    XCTAssertEqual(unmanaged.stringVal.valueType, RLMPropertyTypeString);
+    XCTAssertEqual(unmanaged.dataVal.valueType, RLMPropertyTypeData);
+    XCTAssertEqual(unmanaged.dateVal.valueType, RLMPropertyTypeDate);
+    XCTAssertEqual(managed.boolVal.valueType, RLMPropertyTypeBool);
+    XCTAssertEqual(managed.intVal.valueType, RLMPropertyTypeInt);
+    XCTAssertEqual(managed.floatVal.valueType, RLMPropertyTypeFloat);
+    XCTAssertEqual(managed.doubleVal.valueType, RLMPropertyTypeDouble);
+    XCTAssertEqual(managed.stringVal.valueType, RLMPropertyTypeString);
+    XCTAssertEqual(managed.dataVal.valueType, RLMPropertyTypeData);
+    XCTAssertEqual(managed.dateVal.valueType, RLMPropertyTypeDate);
+}
 
 - (void)testInitNull {
-    AllPrimitiveValues *unman = [[AllPrimitiveValues alloc] init];
-    AllPrimitiveValues *man = [AllPrimitiveValues createInRealm:realm withValue:@[]];
+    AllPrimitiveRLMValues *unman = [[AllPrimitiveRLMValues alloc] init];
+    AllPrimitiveRLMValues *man = [AllPrimitiveRLMValues createInRealm:realm withValue:@[]];
     
     %unman XCTAssertNil(unman.$member, @"RLMValue should be able to initialize as null");
     %man XCTAssertNil(man.$member, @"RLMValue should be able to initialize as null");
+    
+    // @Lee, nil initialized RLMValues are all valueType "0" == RLMPropertyTypeInt
+    XCTAssertEqual(unman.$member.valueType, $valueType);
 }
 
-// Duck *duck =  [[Duck alloc] initWithValue:@{@"animal" : @{@"age" : @(3)}, @"name" : @"Gustav" }];
-- (void)testInitValue {
-    AllPrimitiveValues *man = [AllPrimitiveValues createInRealm:realm withValue:@{
-        @"$member": $value0,
-    }];
-    
-    AllPrimitiveValues *unman = [[AllPrimitiveValues alloc] initWithValue:@{
-        @"$member": $value0,
-    }];
-    
-    XCTAssert([$cast$rlmValue isEqual:$value0]);
-    XCTAssert([$cast$rlmValue isEqual:$value0]);
-}
-
-- (void)testUpdateValue {
-    %n XCTAssert([(NSNumber *)$rlmValue isEqual:$value0]);
-    %s XCTAssert([(NSString *)$rlmValue isEqual:$value0]);
-    %dc XCTAssert([(RLMDecimal128 *)$rlmValue isEqual:$value0]);
-    %dt XCTAssert([(NSDate *)$rlmValue isEqual:$value0]);
-    %da XCTAssert([(NSData *)$rlmValue isEqual:$value0]);
-    
+- (void)testUpdateValueSameType {
     $rlmValue = $value1;
+
+    XCTAssert([$cast$rlmValue isEqual:$value1]);
+}
+
+- (void)testUpdateValueDifferentType {
     
-    %n XCTAssert([(NSNumber *)$rlmValue isEqual:$value1]);
-    %s XCTAssert([(NSString *)$rlmValue isEqual:$value1]);
-    %dc XCTAssert([(RLMDecimal128 *)$rlmValue isEqual:$value1]);
-    %dt XCTAssert([(NSDate *)$rlmValue isEqual:$value1]);
-    %da XCTAssert([(NSData *)$rlmValue isEqual:$value1]);
 }
 
 // Update value to null
 - (void)testUpdateValueNull {
-    XCTAssert([$cast$rlmValue isEqual:$value0]);
-
     $rlmValue = [NSNull null];
     
     XCTAssertNil($rlmValue);
     
-    $rlmValue = $value0;
-    
-    XCTAssert([$cast$rlmValue isEqual:$value0]);
+    // @Lee - unmanaged don't have valueType selector, managed are set to "0" == RLMPropertyTypeInt
+    XCTAssertEqual($rlmValue.valueType, $valueType);
 }
 
 //- (void)testUpdateValueDifferentType
