@@ -417,6 +417,7 @@
     
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
+    MixedObject *uo = [[MixedObject alloc] init];
     [r addObject:mo];
     [r commitWriteTransaction];
     XCTAssertTrue([(NSString *)mo.anyCol isEqualToString:@"hello"]);

@@ -353,6 +353,9 @@ BOOL RLMIsRunningInPlayground() {
 }
 
 realm::Mixed RLMObjcToMixed(id<RLMValue> v) {
+    if (!v || v == NSNull.null) {
+        return realm::Mixed();
+    }
     switch ([(id<RLMValue>)v valueType]) {
         case RLMPropertyTypeInt:
             return realm::Mixed([(NSNumber *)v intValue]);
@@ -384,6 +387,9 @@ realm::Mixed RLMObjcToMixed(id<RLMValue> v) {
 }
 
 id RLMMixedToObjc(realm::Mixed const& mixed, RLMRealm *realm) {
+    if (mixed.is_null()) {
+        return nil;
+    }
     switch (mixed.get_type()) {
         case realm::type_String:
             return RLMStringDataToNSString(mixed.get_string());
@@ -392,7 +398,7 @@ id RLMMixedToObjc(realm::Mixed const& mixed, RLMRealm *realm) {
         case realm::type_Float:
             return @(mixed.get_float());
         case realm::type_Double:
-            return @(mixed.get_double());
+            return [NSNumber numberWithDouble:mixed.get_double()];
         case realm::type_Bool:
             return @(mixed.get_bool());
         case realm::type_Timestamp:

@@ -17,6 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
+#include <objc/runtime.h>
+
+#define objc_dynamic_cast(obj, cls) \
+    ([obj isKindOfClass:(Class)objc_getClass(#cls)] ? (cls *)obj : NULL)
 
 static NSDate *date(int i) {
     return [NSDate dateWithTimeIntervalSince1970:i];
@@ -60,7 +64,8 @@ static double average(NSArray *values) {
     AllPrimitiveRLMValues *unmanaged;
     AllPrimitiveRLMValues *managed;
     RLMRealm *realm;
-    RLMArray<RLMValue> *allValues;
+    RLMArray<RLMValue> *allMixed;
+    NSArray *allVals;
 }
 
 - (void)setUp {
@@ -68,19 +73,15 @@ static double average(NSArray *values) {
     [realm beginWriteTransaction];
     [self initValues];
 //    [self assignValues];
-//    [allValues addObjects:@[
-//        $rlmValue,
-//    ]];
+    [allMixed addObjects:@[
+        $rlmValue,
+    ]];
 }
 
 - (void)tearDown {
     if (realm.inWriteTransaction) {
         [realm cancelWriteTransaction];
     }
-}
-
-- (void)assignValues {
-    $rlmValue = $value0;
 }
 
 // !!! don't forget to add count of rlmValue in array tests
@@ -133,14 +134,54 @@ static double average(NSArray *values) {
     XCTAssertEqual(unman.$member.valueType, $valueType);
 }
 
-- (void)testUpdateValueSameType {
-    $rlmValue = $value1;
-
-    XCTAssert([$cast$rlmValue isEqual:$value1]);
+- (void)testUpdateBoolType {
+    $rlmValue = @NO;
+    XCTAssert([(NSNumber *)$rlmValue isEqual:@NO]);
+    XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeBool);
 }
 
-- (void)testUpdateValueDifferentType {
-    
+- (void)testUpdateIntType {
+    $rlmValue = @1;
+    XCTAssert([(NSNumber *)$rlmValue isEqual:@1]);
+    XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeInt);
+}
+
+- (void)testUpdateFloatType {
+    $rlmValue = @2.2f;
+    XCTAssert([(NSNumber *)$rlmValue isEqual:@2.2f]);
+    XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeFloat);
+}
+
+- (void)testUpdateDoubleType {
+    $rlmValue = @3.3;
+    XCTAssert([(NSNumber *)$rlmValue isEqual:@3.3f]);
+    XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeDouble);
+}
+- (void)testUpdateStringType {
+    $rlmValue = @"four";
+    XCTAssert([(NSNumber *)$rlmValue isEqual:@"four"]);
+    XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeString);
+}
+- (void)testUpdateDataType {
+    $rlmValue = data(5);
+    XCTAssert([(NSNumber *)$rlmValue isEqual:data(5)]);
+    XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeData);
+}
+- (void)testUpdateDateType {
+    $rlmValue = date(6);
+    XCTAssert([(NSNumber *)$rlmValue isEqual:date(6)]);
+    XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeDate);
+}
+- (void)testUpdateDecimal {
+    $rlmValue = decimal128(7);
+    XCTAssert([(NSNumber *)$rlmValue isEqual:decimal128(7)]);
+    XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeDecimal128);
+}
+- (void)testUpdateUuidType {
+    XCTAssert(false);
+}
+- (void)testUpdateObjectIdType {
+    XCTAssert(false);
 }
 
 // Update value to null
@@ -152,8 +193,5 @@ static double average(NSArray *values) {
     // @Lee - unmanaged don't have valueType selector, managed are set to "0" == RLMPropertyTypeInt
     XCTAssertEqual($rlmValue.valueType, $valueType);
 }
-
-//- (void)testUpdateValueDifferentType
-
 
 @end
