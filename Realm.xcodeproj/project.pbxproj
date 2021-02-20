@@ -59,6 +59,8 @@
 		0C5796A325643D7500744CAE /* RLMUUID.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C57969F25643D7500744CAE /* RLMUUID.mm */; };
 		0C7CA7C325C311DA0098A636 /* RLMManagedDictionary.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C7CA7C225C311DA0098A636 /* RLMManagedDictionary.mm */; };
 		0C7CA7C425C311DA0098A636 /* RLMManagedDictionary.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C7CA7C225C311DA0098A636 /* RLMManagedDictionary.mm */; };
+		0C86B33925E15B6000775FED /* PrimitiveDictionaryPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 0C86B33825E15B6000775FED /* PrimitiveDictionaryPropertyTests.m */; };
+		0C86B33A25E15B6000775FED /* PrimitiveDictionaryPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 0C86B33825E15B6000775FED /* PrimitiveDictionaryPropertyTests.m */; };
 		17051FCE1D93DA0A00EF8E67 /* RLMUser.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1ABDCDAF1D793008003489E3 /* RLMUser.mm */; };
 		1A0512721D873F3300806AEC /* RLMSyncConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A3623661D8384BA00945A54 /* RLMSyncConfiguration.mm */; };
 		1A0512761D8746CD00806AEC /* RLMSyncConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A3623651D8384BA00945A54 /* RLMSyncConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -688,6 +690,7 @@
 		0C57969E25643D7500744CAE /* RLMUUID_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMUUID_Private.hpp; sourceTree = "<group>"; };
 		0C57969F25643D7500744CAE /* RLMUUID.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUUID.mm; sourceTree = "<group>"; };
 		0C7CA7C225C311DA0098A636 /* RLMManagedDictionary.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMManagedDictionary.mm; sourceTree = "<group>"; };
+		0C86B33825E15B6000775FED /* PrimitiveDictionaryPropertyTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrimitiveDictionaryPropertyTests.m; sourceTree = "<group>"; };
 		1A0512731D87413000806AEC /* RLMSyncUtil_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSyncUtil_Private.hpp; sourceTree = "<group>"; };
 		1A1C6E241D3FFCF70077B6E7 /* RLMSyncUtil_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMSyncUtil_Private.h; sourceTree = "<group>"; };
 		1A1EBF861F269E8E00F47698 /* RLMResults_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMResults_Private.hpp; sourceTree = "<group>"; };
@@ -1494,6 +1497,7 @@
 				E81A1FC11955FE0100FDED82 /* QueryTests.m */,
 				C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */,
 				E81A1FC31955FE0100FDED82 /* RealmTests.mm */,
+				0C86B33825E15B6000775FED /* PrimitiveDictionaryPropertyTests.m */,
 				02AFB4621A80343600E11938 /* ResultsTests.m */,
 				0207AB86195DFA15007EFB12 /* SchemaTests.mm */,
 				CF986D3025AE3BD40039D287 /* SetPropertyTests.m */,
@@ -2716,6 +2720,7 @@
 				021A88371AAFB5CE00EEAC84 /* ObjectSchemaTests.m in Sources */,
 				E856D21B195615A900FB2FCF /* ObjectTests.m in Sources */,
 				5D6156FB1BE08E7E00A4BD3F /* PerformanceTests.m in Sources */,
+				0C86B33A25E15B6000775FED /* PrimitiveDictionaryPropertyTests.m in Sources */,
 				5D03FB201E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */,
 				3F572C961F2BDAB100F6C9AB /* PrimitiveArrayPropertyTests.m in Sources */,
 				CF986D3225AE3BD40039D287 /* PrimitiveSetPropertyTests.m in Sources */,
@@ -2782,6 +2787,7 @@
 				C042A48D1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */,
 				E81A1FEB1955FE0100FDED82 /* RealmTests.mm in Sources */,
 				02AFB4671A80343600E11938 /* ResultsTests.m in Sources */,
+				0C86B33925E15B6000775FED /* PrimitiveDictionaryPropertyTests.m in Sources */,
 				3F558C9322C29A03002F0F30 /* RLMMultiProcessTestCase.m in Sources */,
 				3FDCFEB619F6A8D3005E414A /* RLMSupport.swift in Sources */,
 				3F558C8F22C29A03002F0F30 /* RLMTestCase.m in Sources */,

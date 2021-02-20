@@ -52,8 +52,7 @@ types = [
 ]
 types = [{'class': t[0], 'obj': t[1], 'prop': t[2], 'v0': t[3][0], 'v1': t[3][1],
           'dictionary': t[1] + '.' + t[2],
-          'values2': '@[' + ', '.join(t[3] * 2) + ']',
-          'values': '@[' + ', '.join(t[3]) + ']',
+          'values': '@{' + ', '.join('@"{}": {}'.format(k, v) for k, v in enumerate(t[3])) + '}',
           'first': t[3][0], 'last': t[3][2] if len(t[3]) == 3 else t[3][1],
           'wrong': '@"a"', 'wdesc': 'a', 'wtype': '__NSCFConstantString',
           'type': t[2].replace('Obj', '') + ('?' if 'opt' in t[1] else ''),

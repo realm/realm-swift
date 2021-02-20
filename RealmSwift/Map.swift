@@ -51,7 +51,7 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
     /// Indicates if the map can no longer be accessed.
     public var isInvalidated: Bool { return _rlmCollection.isInvalidated }
 
-    internal var rlmDictionary: RLMDictionary<NSString, AnyObject> {
+    internal var rlmDictionary: RLMDictionary<AnyObject, AnyObject> {
         _rlmCollection as! RLMDictionary
     }
 

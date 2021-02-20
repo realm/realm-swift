@@ -64,6 +64,14 @@
     return self;
 }
 
+#pragma mark - Convenience wrappers used for all RLMDictionary types
+
+- (void)addObjectsFrom:(NSDictionary *)dictionary {
+    for (id key in dictionary) {
+        self[key] = dictionary[key];
+    }
+}
+
 - (BOOL)isInvalidated {
     return NO;
 }
@@ -290,11 +298,11 @@
     return _backingCollection.allValues;
 }
 
-- (nullable id)objectForKey:(NSString *)key {
+- (nullable id)objectForKey:(id)key {
     return [_backingCollection objectForKey:key];
 }
 
-- (nullable id)objectForKeyedSubscript:(NSString *)key {
+- (nullable id)objectForKeyedSubscript:(id)key {
     return [_backingCollection objectForKey:key];
 }
 
@@ -329,14 +337,14 @@
     });
 }
 
-- (void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
+- (void)setObject:(id)obj forKeyedSubscript:(id)key {
     RLMDictionaryValidateMatchingObjectType(self, key, obj);
     changeDictionary(self, ^{
         [_backingCollection setObject:obj forKey:key];
     });
 }
 
-- (void)setObject:(id)obj forKey:(NSString *)key {
+- (void)setObject:(id)obj forKey:(id)key {
     RLMDictionaryValidateMatchingObjectType(self, key, obj);
     changeDictionary(self, ^{
         [_backingCollection setObject:obj forKey:key];

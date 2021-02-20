@@ -88,17 +88,17 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A value associated with a given key or `nil`.
  */
-- (nullable id)valueForKey:(nonnull id<RLMDictionaryKey>)key;
+- (nullable id)valueForKey:(nonnull NSString *)key;
 
 /**
  Returns an array of the dictionary's keys.
  */
-- (nullable RLMObjectType)objectForKey:(nonnull id<RLMDictionaryKey>)key;
+- (nullable RLMObjectType)objectForKey:(nonnull RLMDictionaryKey)key;
 
 /**
  Returns an array containing the dictionary’s keys.
  */
-@property(readonly, copy) NSArray<NSString *> *allKeys;
+@property(readonly, copy) NSArray<RLMDictionaryKey> *allKeys;
 
 /**
  Returns an array containing the dictionary’s values.
@@ -106,19 +106,24 @@ NS_ASSUME_NONNULL_BEGIN
 @property(readonly, copy) NSArray<RLMObjectType> *allValues;
 
 /// :nodoc:
-- (nullable RLMObjectType)objectForKeyedSubscript:(NSString *)key;
+- (nullable RLMObjectType)objectForKeyedSubscript:(RLMDictionaryKey)key;
 
 /**
  Applies a given block object to the each key-value pair of the dictionary
  */
 - (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id<RLMDictionaryKey> key, RLMObjectType obj, BOOL *stop))block;
 
-/**
- Returns an enumerator object that lets you access each value in the dictionary
- */
-- (NSEnumerator<RLMObjectType> *)objectEnumerator;
-
 #pragma mark - Adding, Removing, and Replacing Objects in an Array
+
+/**
+ Adds elements from one dictionary to another.
+
+ @warning This method may only be called during a write transaction.
+ @warning This actiobn can replace existing values.
+
+ @param dictionary  A dictionary of the same type as self.
+ */
+- (void)addObjectsFrom:(NSDictionary *)dictionary;
 
 /**
  Replace the data of a dictionary with the data of another dictionary.
@@ -133,22 +138,22 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Delete dictionary's values for a given keys.
  */
-- (void)removeObjectsForKeys:(NSArray<NSString *> *)keyArray;
+- (void)removeObjectsForKeys:(NSArray<RLMDictionaryKey> *)keyArray;
 
 /**
  Delete dictionary's value for a given key.
  */
-- (void)removeObjectForKey:(NSString *)key;
+- (void)removeObjectForKey:(RLMDictionaryKey)key;
 
 /**
  Add a value for a given key indictioanry.
  */
-- (void)setObject:(RLMObjectType)obj forKeyedSubscript:(NSString *)key;
+- (void)setObject:(RLMObjectType)obj forKeyedSubscript:(RLMDictionaryKey)key;
 
 /**
  Adds a given key-value pair to the dictionary.
  */
-- (void)setObject:(RLMObjectType)anObject forKey:(nonnull NSString *)aKey;
+- (void)setObject:(RLMObjectType)anObject forKey:(nonnull RLMDictionaryKey)aKey;
 
 /**
  Adds to the receiving dictionary the entries from another dictionary.

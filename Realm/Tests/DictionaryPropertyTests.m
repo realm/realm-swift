@@ -30,7 +30,7 @@
     [realm beginWriteTransaction];
     DictionaryPropertyObject *dictionary =
         [DictionaryPropertyObject createInRealm:realm withValue:@[@{@"aKey": obj, @"anotherKey": obj}, @{}]];
-    dictionary.stringDictionary;
+    XCTAssertNil(dictionary.stringDictionary);
 
 }
 

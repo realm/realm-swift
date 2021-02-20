@@ -160,8 +160,9 @@ let package = Package(
                 "SwiftUITestHostUITests",
                 "TestHost",
                 "PrimitiveArrayPropertyTests.tpl.m",
-                "PrimitiveSetPropertyTests.tpl.m",
-                "PrimitiveRLMValuePropertyTests.tpl.m"
+                "PrimitiveDictionaryPropertyTests.tpl.m",
+                "PrimitiveRLMValuePropertyTests.tpl.m",
+                "PrimitiveSetPropertyTests.tpl.m"
             ],
             cxxSettings: testCxxSettings
         ),
