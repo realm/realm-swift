@@ -88,6 +88,9 @@ internal final class SwiftUIKVO: NSObject {
         }
 
         func cancel() {
+            guard SwiftUIKVO.observedObjects.keys.contains(value) else {
+                return
+            }
             keyPaths.forEach {
                 value.removeObserver(observer, forKeyPath: $0)
             }
