@@ -37,6 +37,14 @@
 
 @end
 
+@implementation NSNull (RLMValue)
+
+- (RLMPropertyType)valueType {
+    return RLMPropertyTypeAny;
+}
+
+@end
+
 @implementation NSString (RLMValue)
 
 - (RLMPropertyType)valueType {

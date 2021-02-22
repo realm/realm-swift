@@ -129,6 +129,12 @@
         @"anyCol": @(i+1)
     };
 }
+
++ (NSDictionary *)values:(int)i stringObject:(StringObject *)so mixedObject:(MixedObject *)mo {
+    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:[self values:i stringObject:so]];
+    dict[@"mixedObjectCol"] = mo ?: NSNull.null;
+    return dict;
+}
 @end
 
 @implementation ArrayOfAllTypesObject

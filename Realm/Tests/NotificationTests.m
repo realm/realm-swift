@@ -733,8 +733,36 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 
 - (void)testDeleteArray {
     ExpectChange(self, @[@0, @1, @2, @3], @[], @[], ^(RLMRealm *realm) {
-                      [realm deleteObjects:[ArrayPropertyObject allObjectsInRealm:realm]];
+        [realm deleteObjects:[ArrayPropertyObject allObjectsInRealm:realm]];
     });
+}
+
+- (void)testDeleteAlreadyEmptyArray {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [ArrayPropertyObject createInRealm:realm withValue:@[]];
+    }];
+    RLMArray *array = [[ArrayPropertyObject allObjectsInRealm:realm].firstObject intArray];
+    __block RLMCollectionChange *changes;
+    __block int calls = 0;
+    id token = [array addNotificationBlock:^(RLMArray *results, RLMCollectionChange *c, NSError *error) {
+        XCTAssertNotNil(results);
+        XCTAssertNil(error);
+        changes = c;
+        ++calls;
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    }];
+    CFRunLoopRun();
+
+    [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [realm deleteObjects:[ArrayPropertyObject allObjectsInRealm:realm]];
+        }];
+    }];
+
+    [(RLMNotificationToken *)token invalidate];
+    XCTAssertEqual(calls, 1);
 }
 
 - (void)testModifyObjectShiftedByInsertsAndDeletions {
@@ -898,6 +926,8 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 @property RLMDecimal128 *decimalCol;
 @property StringObject *objectCol;
 @property NSUUID *uuidCol;
+@property id<RLMValue> anyCol;
+@property MixedObject *mixedObjectCol;
 
 @property (nonatomic) int pk;
 @end
@@ -922,8 +952,10 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 - (void)setUp {
     StringObject *so = [[StringObject alloc] init];
     so.stringCol = @"string";
-    _initialValues = [AllTypesObject values:1 stringObject:nil];
-    _values = [AllTypesObject values:2 stringObject:so];
+    MixedObject *mo = [[MixedObject alloc] init];
+    mo.anyCol = @"string";
+    _initialValues = [AllTypesObject values:1 stringObject:nil mixedObject:nil];
+    _values = [AllTypesObject values:2 stringObject:so mixedObject:mo];
 
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
@@ -972,6 +1004,10 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
             XCTAssertTrue([prop.value isEqualToObject:_values[property]],
                           @"%@: %@ %@", property, prop.value, _values[property]);
         }
+        else if ([prop.name isEqualToString:@"mixedObjectCol"]) {
+            XCTAssertEqualObjects(((MixedObject *)prop.value).anyCol,
+                                  ((MixedObject *)_values[property]).anyCol);
+        }
         else {
             XCTAssertEqualObjects(prop.value, _values[property]);
         }
@@ -993,6 +1029,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 
 - (void)testChangeAllPropertyTypesFromBackground {
     __block NSString *propertyName;
+    __block RLMThreadSafeReference *mixedObject;
     RLMNotificationToken *token = [_obj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
         XCTAssertFalse(deleted);
         XCTAssertNil(error);
@@ -1002,6 +1039,13 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
         if ([prop.name isEqualToString:@"objectCol"]) {
             XCTAssertNil(prop.previousValue);
             XCTAssertNotNil(prop.value);
+        }
+        else if ([prop.name isEqualToString:@"mixedObjectCol"]) {
+            XCTAssertNil(prop.previousValue);
+            RLMRealm *realm = [RLMRealm defaultRealm];
+            MixedObject *mo = [realm resolveThreadSafeReference:mixedObject];
+            XCTAssertEqualObjects(((MixedObject *)prop.value).anyCol,
+                                  mo.anyCol);
         }
         else {
             XCTAssertEqualObjects(prop.previousValue, _initialValues[prop.name]);
@@ -1015,6 +1059,9 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
             AllTypesObject *obj = [[AllTypesObject allObjectsInRealm:realm] firstObject];
             [realm beginWriteTransaction];
             obj[propertyName] = _values[propertyName];
+            if ([propertyName isEqualToString:@"mixedObjectCol"]) {
+                mixedObject = [RLMThreadSafeReference referenceWithThreadConfined:_values[@"mixedObjectCol"]];
+            }
             [realm commitWriteTransaction];
         }];
         [_obj.realm refresh];
@@ -1034,6 +1081,10 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
             XCTAssertEqualObjects(prop.name, _propertyNames[i]);
             if ([prop.name isEqualToString:@"objectCol"]) {
                 XCTAssertTrue([prop.value isEqualToObject:_values[prop.name]]);
+            }
+            else if ([prop.name isEqualToString:@"mixedObjectCol"]) {
+                XCTAssertEqualObjects(((MixedObject *)prop.value).anyCol,
+                                      ((MixedObject *)_values[prop.name]).anyCol);
             }
             else {
                 XCTAssertEqualObjects(prop.value, _values[prop.name]);
@@ -1147,6 +1198,10 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
         if ([prop.name isEqualToString:@"objectCol"]) {
             XCTAssertTrue([prop.value isEqualToObject:_values[prop.name]],
                           @"%@: %@ %@", prop.name, prop.value, _values[prop.name]);
+        }
+        else if ([prop.name isEqualToString:@"mixedObjectCol"]) {
+            XCTAssertEqualObjects(((MixedObject *)prop.value).anyCol,
+                                  ((MixedObject *)_values[prop.name]).anyCol);
         }
         else {
             XCTAssertEqualObjects(prop.value, _values[prop.name]);

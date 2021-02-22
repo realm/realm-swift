@@ -6228,6 +6228,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"dateObj": [@[date(1), date(2)] subarrayWithRange:range],
         @"decimalObj": [@[decimal128(2), decimal128(3)] subarrayWithRange:range],
         @"objectIdObj": [@[objectId(1), objectId(2)] subarrayWithRange:range],
+        @"uuidObj": [@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")] subarrayWithRange:range],
     }];
     [LinkToAllPrimitiveArrays createInRealm:realm withValue:@[obj]];
     obj = [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
@@ -6240,6 +6241,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"dateObj": [@[date(1), date(2), NSNull.null] subarrayWithRange:range],
         @"decimalObj": [@[decimal128(2), decimal128(3), NSNull.null] subarrayWithRange:range],
         @"objectIdObj": [@[objectId(1), objectId(2), NSNull.null] subarrayWithRange:range],
+        @"uuidObj": [@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), NSNull.null] subarrayWithRange:range],
     }];
     [LinkToAllOptionalPrimitiveArrays createInRealm:realm withValue:@[obj]];
 }
@@ -6256,6 +6258,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj = %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj = %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj = %@", objectId(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj = %@", @NO);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj = %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj = %@", @2.2f);
@@ -6265,24 +6268,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj = %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj = %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY objectIdObj = %@", objectId(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY boolObj = %@", @NO);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj = %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj = %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj = %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY stringObj = %@", @"a");
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dataObj = %@", data(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj = %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj = %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj = %@", objectId(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj = %@", @NO);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj = %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj = %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj = %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY stringObj = %@", @"a");
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dataObj = %@", data(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj = %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj = %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY objectIdObj = %@", objectId(1));
+    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY boolObj != %@", @NO);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj != %@", @2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj != %@", @2.2f);
@@ -6292,6 +6278,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj != %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj != %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj != %@", objectId(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj != %@", @NO);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj != %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj != %@", @2.2f);
@@ -6301,34 +6288,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj != %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj != %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY objectIdObj != %@", objectId(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY boolObj != %@", @NO);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj != %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj != %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj != %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY stringObj != %@", @"a");
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dataObj != %@", data(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj != %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj != %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj != %@", objectId(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj != %@", @NO);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj != %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj != %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj != %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY stringObj != %@", @"a");
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dataObj != %@", data(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj != %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj != %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY objectIdObj != %@", objectId(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj > %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj > %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj > %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj > %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj > %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj > %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj > %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj > %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj > %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj > %@", decimal128(2));
+    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj > %@", @2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj > %@", @2.2f);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj > %@", @2.2);
@@ -6349,16 +6309,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj >= %@", @2.2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj >= %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj >= %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj >= %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj >= %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj >= %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj >= %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj >= %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj >= %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj >= %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj >= %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj >= %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj >= %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj < %@", @2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj < %@", @2.2f);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
@@ -6369,26 +6319,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj < %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj < %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj < %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj < %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj < %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj < %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj < %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj < %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj < %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj < %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj <= %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj <= %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj <= %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj <= %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj <= %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj <= %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj <= %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj <= %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj <= %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj <= %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj <= %@", @2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj <= %@", @2.2f);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj <= %@", @2.2);
@@ -6411,6 +6341,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj = %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj = %@", decimal128(3));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj = %@", objectId(2));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj = %@", @YES);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj = %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj = %@", @3.3f);
@@ -6420,24 +6351,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj = %@", date(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj = %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY objectIdObj = %@", objectId(2));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY boolObj = %@", @YES);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj = %@", @3);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj = %@", @3.3f);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj = %@", @3.3);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY stringObj = %@", @"b");
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dataObj = %@", data(2));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj = %@", date(2));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj = %@", decimal128(3));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj = %@", objectId(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj = %@", @YES);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj = %@", @3);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj = %@", @3.3f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj = %@", @3.3);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY stringObj = %@", @"b");
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dataObj = %@", data(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj = %@", date(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj = %@", decimal128(3));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY objectIdObj = %@", objectId(2));
+    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY boolObj = %@", @NO);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj = %@", @2);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj = %@", @2.2f);
@@ -6447,6 +6361,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj = %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj = %@", @NO);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj = %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj = %@", @2.2f);
@@ -6456,24 +6371,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj = %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(1));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY boolObj = %@", @NO);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj = %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj = %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj = %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY stringObj = %@", @"a");
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dataObj = %@", data(1));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj = %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj = %@", @NO);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj = %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj = %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj = %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY stringObj = %@", @"a");
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dataObj = %@", data(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj = %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(1));
+    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY boolObj != %@", @NO);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj != %@", @2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj != %@", @2.2f);
@@ -6483,6 +6381,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj != %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj != %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj != %@", objectId(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj != %@", @NO);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj != %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj != %@", @2.2f);
@@ -6492,24 +6391,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj != %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj != %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY objectIdObj != %@", objectId(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY boolObj != %@", @NO);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj != %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj != %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj != %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY stringObj != %@", @"a");
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dataObj != %@", data(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj != %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj != %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj != %@", objectId(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj != %@", @NO);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj != %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj != %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj != %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY stringObj != %@", @"a");
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dataObj != %@", data(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj != %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj != %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY objectIdObj != %@", objectId(1));
+    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY boolObj != %@", @YES);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj != %@", @3);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj != %@", @3.3f);
@@ -6519,6 +6401,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj != %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(3));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj != %@", @YES);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj != %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj != %@", @3.3f);
@@ -6528,34 +6411,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj != %@", date(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY boolObj != %@", @YES);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj != %@", @3);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj != %@", @3.3f);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj != %@", @3.3);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY stringObj != %@", @"b");
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dataObj != %@", data(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj != %@", date(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(3));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj != %@", @YES);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj != %@", @3);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj != %@", @3.3f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj != %@", @3.3);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY stringObj != %@", @"b");
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dataObj != %@", data(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj != %@", date(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(3));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(2));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj > %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj > %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj > %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj > %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj > %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj > %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj > %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj > %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj > %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj > %@", decimal128(2));
+    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj > %@", @2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj > %@", @2.2f);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj > %@", @2.2);
@@ -6576,26 +6432,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj >= %@", @2.2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj >= %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj >= %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj >= %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj >= %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj >= %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj >= %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj >= %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj >= %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj >= %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj >= %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj >= %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj >= %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj < %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj < %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj < %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj < %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj < %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj < %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj < %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj < %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj < %@", @2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj < %@", @2.2f);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
@@ -6616,26 +6452,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj < %@", @3.3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj < %@", date(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj < %@", decimal128(3));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj < %@", @3);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj < %@", @3.3f);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj < %@", @3.3);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj < %@", date(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj < %@", decimal128(3));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj < %@", @3);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj < %@", @3.3f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj < %@", @3.3);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj < %@", date(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj < %@", decimal128(3));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj <= %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj <= %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj <= %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj <= %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj <= %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj <= %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj <= %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj <= %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj <= %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj <= %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj <= %@", @2);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj <= %@", @2.2f);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj <= %@", @2.2);
@@ -6658,6 +6474,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj = %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj = %@", @NO);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj = %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj = %@", @2.2f);
@@ -6667,24 +6484,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj = %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(1));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY boolObj = %@", @NO);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj = %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj = %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj = %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY stringObj = %@", @"a");
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dataObj = %@", data(1));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj = %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj = %@", @NO);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj = %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj = %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj = %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY stringObj = %@", @"a");
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dataObj = %@", data(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj = %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(1));
+    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY boolObj = %@", @YES);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj = %@", @3);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj = %@", @3.3f);
@@ -6694,6 +6494,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj = %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(3));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj = %@", @YES);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj = %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj = %@", @3.3f);
@@ -6703,24 +6504,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj = %@", date(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY boolObj = %@", @YES);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj = %@", @3);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj = %@", @3.3f);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj = %@", @3.3);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY stringObj = %@", @"b");
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dataObj = %@", data(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj = %@", date(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(3));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj = %@", @YES);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj = %@", @3);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj = %@", @3.3f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj = %@", @3.3);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY stringObj = %@", @"b");
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dataObj = %@", data(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj = %@", date(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(3));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(2));
+    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY boolObj != %@", @NO);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj != %@", @2);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj != %@", @2.2f);
@@ -6730,6 +6514,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj != %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj != %@", @NO);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj != %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj != %@", @2.2f);
@@ -6739,24 +6524,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj != %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(1));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY boolObj != %@", @NO);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj != %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj != %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj != %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY stringObj != %@", @"a");
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dataObj != %@", data(1));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj != %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj != %@", @NO);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj != %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj != %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj != %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY stringObj != %@", @"a");
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dataObj != %@", data(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj != %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(1));
+    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY boolObj != %@", @YES);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj != %@", @3);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj != %@", @3.3f);
@@ -6766,6 +6534,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj != %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(3));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj != %@", @YES);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj != %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj != %@", @3.3f);
@@ -6775,34 +6544,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj != %@", date(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY boolObj != %@", @YES);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj != %@", @3);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj != %@", @3.3f);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj != %@", @3.3);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY stringObj != %@", @"b");
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dataObj != %@", data(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj != %@", date(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(3));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj != %@", @YES);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj != %@", @3);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj != %@", @3.3f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj != %@", @3.3);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY stringObj != %@", @"b");
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dataObj != %@", data(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj != %@", date(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(3));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj > %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj > %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj > %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj > %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj > %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj > %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj > %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj > %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj > %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj > %@", decimal128(2));
+    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj > %@", @2);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj > %@", @2.2f);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj > %@", @2.2);
@@ -6823,26 +6565,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY doubleObj >= %@", @2.2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY dateObj >= %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY decimalObj >= %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY intObj >= %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY floatObj >= %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY doubleObj >= %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY dateObj >= %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY decimalObj >= %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY intObj >= %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY floatObj >= %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY doubleObj >= %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY dateObj >= %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY decimalObj >= %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj < %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj < %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj < %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj < %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj < %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj < %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj < %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj < %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj < %@", @2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj < %@", @2.2f);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
@@ -6863,16 +6585,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj < %@", @3.3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj < %@", date(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj < %@", decimal128(3));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj < %@", @3);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj < %@", @3.3f);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj < %@", @3.3);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj < %@", date(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj < %@", decimal128(3));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj < %@", @3);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj < %@", @3.3f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj < %@", @3.3);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj < %@", date(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj < %@", decimal128(3));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj <= %@", @2);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj <= %@", @2.2f);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj <= %@", @2.2);
@@ -6883,26 +6595,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj <= %@", @2.2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj <= %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj <= %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj <= %@", @2);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj <= %@", @2.2f);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj <= %@", @2.2);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj <= %@", date(1));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj <= %@", decimal128(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj <= %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj <= %@", @2.2f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj <= %@", @2.2);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj <= %@", date(1));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj <= %@", decimal128(2));
-    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY intObj <= %@", @3);
-    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY floatObj <= %@", @3.3f);
-    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY doubleObj <= %@", @3.3);
-    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY dateObj <= %@", date(2));
-    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY decimalObj <= %@", decimal128(3));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY intObj <= %@", @3);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY floatObj <= %@", @3.3f);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY doubleObj <= %@", @3.3);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY dateObj <= %@", date(2));
-    RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY decimalObj <= %@", decimal128(3));
     RLMAssertCount(AllPrimitiveArrays, 2, @"ANY intObj <= %@", @3);
     RLMAssertCount(AllPrimitiveArrays, 2, @"ANY floatObj <= %@", @3.3f);
     RLMAssertCount(AllPrimitiveArrays, 2, @"ANY doubleObj <= %@", @3.3);
@@ -6922,6 +6614,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Operator '>' not supported for type 'data'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY objectIdObj > %@", objectId(1)]),
                               @"Operator '>' not supported for type 'object id'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY uuidObj > %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
+                              @"Operator '>' not supported for type 'uuid'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY boolObj > %@", @NO]),
                               @"Operator '>' not supported for type 'bool'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY stringObj > %@", @"a"]),
@@ -6930,22 +6624,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Operator '>' not supported for type 'data'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY objectIdObj > %@", objectId(1)]),
                               @"Operator '>' not supported for type 'object id'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY boolObj > %@", @NO]),
-                              @"Operator '>' not supported for type 'bool'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY stringObj > %@", @"a"]),
-                              @"Operator '>' not supported for type 'string'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY dataObj > %@", data(1)]),
-                              @"Operator '>' not supported for type 'data'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY objectIdObj > %@", objectId(1)]),
-                              @"Operator '>' not supported for type 'object id'");
-    RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY boolObj > %@", @NO]),
-                              @"Operator '>' not supported for type 'bool'");
-    RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY stringObj > %@", @"a"]),
-                              @"Operator '>' not supported for type 'string'");
-    RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY dataObj > %@", data(1)]),
-                              @"Operator '>' not supported for type 'data'");
-    RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY objectIdObj > %@", objectId(1)]),
-                              @"Operator '>' not supported for type 'object id'");
+    RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY uuidObj > %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
+                              @"Operator '>' not supported for type 'uuid'");
 }
 
 - (void)testQueryBetween {
@@ -6959,6 +6639,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Operator 'BETWEEN' not supported for type 'data'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY objectIdObj BETWEEN %@", @[objectId(1), objectId(2)]]),
                               @"Operator 'BETWEEN' not supported for type 'object id'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY uuidObj BETWEEN %@", @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]]),
+                              @"Operator 'BETWEEN' not supported for type 'uuid'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY boolObj BETWEEN %@", @[@NO, @YES]]),
                               @"Operator 'BETWEEN' not supported for type 'bool'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY stringObj BETWEEN %@", @[@"a", @"b"]]),
@@ -6967,33 +6649,9 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Operator 'BETWEEN' not supported for type 'data'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY objectIdObj BETWEEN %@", @[objectId(1), objectId(2)]]),
                               @"Operator 'BETWEEN' not supported for type 'object id'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY boolObj BETWEEN %@", @[@NO, @YES]]),
-                              @"Operator 'BETWEEN' not supported for type 'bool'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY stringObj BETWEEN %@", @[@"a", @"b"]]),
-                              @"Operator 'BETWEEN' not supported for type 'string'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY dataObj BETWEEN %@", @[data(1), data(2)]]),
-                              @"Operator 'BETWEEN' not supported for type 'data'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY objectIdObj BETWEEN %@", @[objectId(1), objectId(2)]]),
-                              @"Operator 'BETWEEN' not supported for type 'object id'");
-    RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY boolObj BETWEEN %@", @[@NO, @YES]]),
-                              @"Operator 'BETWEEN' not supported for type 'bool'");
-    RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY stringObj BETWEEN %@", @[@"a", @"b"]]),
-                              @"Operator 'BETWEEN' not supported for type 'string'");
-    RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY dataObj BETWEEN %@", @[data(1), data(2)]]),
-                              @"Operator 'BETWEEN' not supported for type 'data'");
-    RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY objectIdObj BETWEEN %@", @[objectId(1), objectId(2)]]),
-                              @"Operator 'BETWEEN' not supported for type 'object id'");
+    RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY uuidObj BETWEEN %@", @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]]),
+                              @"Operator 'BETWEEN' not supported for type 'uuid'");
 
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj BETWEEN %@", @[@2, @3]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj BETWEEN %@", @[@2.2f, @3.3f]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj BETWEEN %@", @[@2.2, @3.3]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj BETWEEN %@", @[date(1), date(2)]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj BETWEEN %@", @[decimal128(2), decimal128(3)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj BETWEEN %@", @[@2, @3]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj BETWEEN %@", @[@2.2f, @3.3f]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj BETWEEN %@", @[@2.2, @3.3]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj BETWEEN %@", @[date(1), date(2)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj BETWEEN %@", @[decimal128(2), decimal128(3)]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj BETWEEN %@", @[@2, @3]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj BETWEEN %@", @[@2.2f, @3.3f]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj BETWEEN %@", @[@2.2, @3.3]);
@@ -7017,16 +6675,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj BETWEEN %@", @[@2.2, @2.2]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj BETWEEN %@", @[date(1), date(1)]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj BETWEEN %@", @[decimal128(2), decimal128(2)]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj BETWEEN %@", @[@2, @2]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj BETWEEN %@", @[@2.2f, @2.2f]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj BETWEEN %@", @[@2.2, @2.2]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj BETWEEN %@", @[date(1), date(1)]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj BETWEEN %@", @[decimal128(2), decimal128(2)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj BETWEEN %@", @[@2, @2]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj BETWEEN %@", @[@2.2f, @2.2f]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj BETWEEN %@", @[@2.2, @2.2]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj BETWEEN %@", @[date(1), date(1)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj BETWEEN %@", @[decimal128(2), decimal128(2)]);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj BETWEEN %@", @[@2, @3]);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj BETWEEN %@", @[@2.2f, @3.3f]);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj BETWEEN %@", @[@2.2, @3.3]);
@@ -7037,26 +6685,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj BETWEEN %@", @[@2.2, @3.3]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj BETWEEN %@", @[date(1), date(2)]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj BETWEEN %@", @[decimal128(2), decimal128(3)]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj BETWEEN %@", @[@2, @3]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj BETWEEN %@", @[@2.2f, @3.3f]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj BETWEEN %@", @[@2.2, @3.3]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj BETWEEN %@", @[date(1), date(2)]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj BETWEEN %@", @[decimal128(2), decimal128(3)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj BETWEEN %@", @[@2, @3]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj BETWEEN %@", @[@2.2f, @3.3f]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj BETWEEN %@", @[@2.2, @3.3]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj BETWEEN %@", @[date(1), date(2)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj BETWEEN %@", @[decimal128(2), decimal128(3)]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj BETWEEN %@", @[@3, @3]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj BETWEEN %@", @[@3.3f, @3.3f]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj BETWEEN %@", @[@3.3, @3.3]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj BETWEEN %@", @[date(2), date(2)]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj BETWEEN %@", @[decimal128(3), decimal128(3)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj BETWEEN %@", @[@3, @3]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj BETWEEN %@", @[@3.3f, @3.3f]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj BETWEEN %@", @[@3.3, @3.3]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj BETWEEN %@", @[date(2), date(2)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj BETWEEN %@", @[decimal128(3), decimal128(3)]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj BETWEEN %@", @[@3, @3]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj BETWEEN %@", @[@3.3f, @3.3f]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj BETWEEN %@", @[@3.3, @3.3]);
@@ -7081,6 +6709,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj IN %@", @[date(1), date(2)]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj IN %@", @[decimal128(2), decimal128(3)]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj IN %@", @[objectId(1), objectId(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY uuidObj IN %@", @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj IN %@", @[@NO, @YES]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj IN %@", @[@2, @3]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj IN %@", @[@2.2f, @3.3f]);
@@ -7090,24 +6719,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj IN %@", @[date(1), date(2)]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj IN %@", @[decimal128(2), decimal128(3)]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY objectIdObj IN %@", @[objectId(1), objectId(2)]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY boolObj IN %@", @[@NO, @YES]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj IN %@", @[@2, @3]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj IN %@", @[@2.2f, @3.3f]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj IN %@", @[@2.2, @3.3]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY stringObj IN %@", @[@"a", @"b"]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dataObj IN %@", @[data(1), data(2)]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj IN %@", @[date(1), date(2)]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj IN %@", @[decimal128(2), decimal128(3)]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj IN %@", @[objectId(1), objectId(2)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj IN %@", @[@NO, @YES]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj IN %@", @[@2, @3]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj IN %@", @[@2.2f, @3.3f]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj IN %@", @[@2.2, @3.3]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY stringObj IN %@", @[@"a", @"b"]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dataObj IN %@", @[data(1), data(2)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj IN %@", @[date(1), date(2)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj IN %@", @[decimal128(2), decimal128(3)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY objectIdObj IN %@", @[objectId(1), objectId(2)]);
+    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY uuidObj IN %@", @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
 
     [self createObjectWithValueIndex:0];
 
@@ -7120,6 +6732,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj IN %@", @[date(2)]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj IN %@", @[decimal128(3)]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj IN %@", @[objectId(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY uuidObj IN %@", @[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj IN %@", @[@YES]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj IN %@", @[@3]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj IN %@", @[@3.3f]);
@@ -7129,24 +6742,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj IN %@", @[date(2)]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj IN %@", @[decimal128(3)]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY objectIdObj IN %@", @[objectId(2)]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY boolObj IN %@", @[@YES]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY intObj IN %@", @[@3]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY floatObj IN %@", @[@3.3f]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj IN %@", @[@3.3]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY stringObj IN %@", @[@"b"]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dataObj IN %@", @[data(2)]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj IN %@", @[date(2)]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj IN %@", @[decimal128(3)]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj IN %@", @[objectId(2)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj IN %@", @[@YES]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj IN %@", @[@3]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj IN %@", @[@3.3f]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj IN %@", @[@3.3]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY stringObj IN %@", @[@"b"]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dataObj IN %@", @[data(2)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY dateObj IN %@", @[date(2)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY decimalObj IN %@", @[decimal128(3)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY objectIdObj IN %@", @[objectId(2)]);
+    RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY uuidObj IN %@", @[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY boolObj IN %@", @[@NO, @YES]);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj IN %@", @[@2, @3]);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj IN %@", @[@2.2f, @3.3f]);
@@ -7156,6 +6752,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj IN %@", @[date(1), date(2)]);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj IN %@", @[decimal128(2), decimal128(3)]);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj IN %@", @[objectId(1), objectId(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY uuidObj IN %@", @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj IN %@", @[@NO, @YES]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj IN %@", @[@2, @3]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj IN %@", @[@2.2f, @3.3f]);
@@ -7165,24 +6762,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj IN %@", @[date(1), date(2)]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj IN %@", @[decimal128(2), decimal128(3)]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY objectIdObj IN %@", @[objectId(1), objectId(2)]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY boolObj IN %@", @[@NO, @YES]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY intObj IN %@", @[@2, @3]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY floatObj IN %@", @[@2.2f, @3.3f]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj IN %@", @[@2.2, @3.3]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY stringObj IN %@", @[@"a", @"b"]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dataObj IN %@", @[data(1), data(2)]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj IN %@", @[date(1), date(2)]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj IN %@", @[decimal128(2), decimal128(3)]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj IN %@", @[objectId(1), objectId(2)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj IN %@", @[@NO, @YES]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj IN %@", @[@2, @3]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj IN %@", @[@2.2f, @3.3f]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj IN %@", @[@2.2, @3.3]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY stringObj IN %@", @[@"a", @"b"]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dataObj IN %@", @[data(1), data(2)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY dateObj IN %@", @[date(1), date(2)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY decimalObj IN %@", @[decimal128(2), decimal128(3)]);
-    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY objectIdObj IN %@", @[objectId(1), objectId(2)]);
+    RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY uuidObj IN %@", @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
 }
 
 - (void)testQueryCount {
@@ -7198,6 +6778,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"dateObj": @[],
         @"decimalObj": @[],
         @"objectIdObj": @[],
+        @"uuidObj": @[],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
         @"boolObj": @[],
@@ -7209,6 +6790,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"dateObj": @[],
         @"decimalObj": @[],
         @"objectIdObj": @[],
+        @"uuidObj": @[],
     }];
     [AllPrimitiveArrays createInRealm:realm withValue:@{
         @"boolObj": @[@NO],
@@ -7220,6 +6802,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"dateObj": @[date(1)],
         @"decimalObj": @[decimal128(2)],
         @"objectIdObj": @[objectId(1)],
+        @"uuidObj": @[uuid(@"00000000-0000-0000-0000-000000000000")],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
         @"boolObj": @[@NO],
@@ -7231,6 +6814,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"dateObj": @[date(1)],
         @"decimalObj": @[decimal128(2)],
         @"objectIdObj": @[objectId(1)],
+        @"uuidObj": @[uuid(@"00000000-0000-0000-0000-000000000000")],
     }];
     [AllPrimitiveArrays createInRealm:realm withValue:@{
         @"boolObj": @[@NO, @NO],
@@ -7242,6 +6826,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"dateObj": @[date(1), date(1)],
         @"decimalObj": @[decimal128(2), decimal128(2)],
         @"objectIdObj": @[objectId(1), objectId(1)],
+        @"uuidObj": @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000")],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
         @"boolObj": @[@NO, @NO],
@@ -7253,6 +6838,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"dateObj": @[date(1), date(1)],
         @"decimalObj": @[decimal128(2), decimal128(2)],
         @"objectIdObj": @[objectId(1), objectId(1)],
+        @"uuidObj": @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000")],
     }];
 
     for (unsigned int i = 0; i < 3; ++i) {
@@ -7265,6 +6851,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllPrimitiveArrays, 1U, @"dateObj.@count == %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 1U, @"decimalObj.@count == %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 1U, @"objectIdObj.@count == %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 1U, @"uuidObj.@count == %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"boolObj.@count == %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"intObj.@count == %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"floatObj.@count == %@", @(i));
@@ -7274,6 +6861,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"dateObj.@count == %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"decimalObj.@count == %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"objectIdObj.@count == %@", @(i));
+        RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"uuidObj.@count == %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 2U, @"boolObj.@count != %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 2U, @"intObj.@count != %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 2U, @"floatObj.@count != %@", @(i));
@@ -7283,6 +6871,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllPrimitiveArrays, 2U, @"dateObj.@count != %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 2U, @"decimalObj.@count != %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 2U, @"objectIdObj.@count != %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2U, @"uuidObj.@count != %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"boolObj.@count != %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"intObj.@count != %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"floatObj.@count != %@", @(i));
@@ -7292,6 +6881,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"dateObj.@count != %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"decimalObj.@count != %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"objectIdObj.@count != %@", @(i));
+        RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"uuidObj.@count != %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 2 - i, @"boolObj.@count > %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 2 - i, @"intObj.@count > %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 2 - i, @"floatObj.@count > %@", @(i));
@@ -7301,6 +6891,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllPrimitiveArrays, 2 - i, @"dateObj.@count > %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 2 - i, @"decimalObj.@count > %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 2 - i, @"objectIdObj.@count > %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2 - i, @"uuidObj.@count > %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2 - i, @"boolObj.@count > %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2 - i, @"intObj.@count > %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2 - i, @"floatObj.@count > %@", @(i));
@@ -7310,6 +6901,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllOptionalPrimitiveArrays, 2 - i, @"dateObj.@count > %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2 - i, @"decimalObj.@count > %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2 - i, @"objectIdObj.@count > %@", @(i));
+        RLMAssertCount(AllOptionalPrimitiveArrays, 2 - i, @"uuidObj.@count > %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 3 - i, @"boolObj.@count >= %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 3 - i, @"intObj.@count >= %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 3 - i, @"floatObj.@count >= %@", @(i));
@@ -7319,6 +6911,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllPrimitiveArrays, 3 - i, @"dateObj.@count >= %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 3 - i, @"decimalObj.@count >= %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 3 - i, @"objectIdObj.@count >= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 3 - i, @"uuidObj.@count >= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 3 - i, @"boolObj.@count >= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 3 - i, @"intObj.@count >= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 3 - i, @"floatObj.@count >= %@", @(i));
@@ -7328,6 +6921,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllOptionalPrimitiveArrays, 3 - i, @"dateObj.@count >= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 3 - i, @"decimalObj.@count >= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 3 - i, @"objectIdObj.@count >= %@", @(i));
+        RLMAssertCount(AllOptionalPrimitiveArrays, 3 - i, @"uuidObj.@count >= %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, i, @"boolObj.@count < %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, i, @"intObj.@count < %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, i, @"floatObj.@count < %@", @(i));
@@ -7337,6 +6931,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllPrimitiveArrays, i, @"dateObj.@count < %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, i, @"decimalObj.@count < %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, i, @"objectIdObj.@count < %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i, @"uuidObj.@count < %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i, @"boolObj.@count < %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i, @"intObj.@count < %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i, @"floatObj.@count < %@", @(i));
@@ -7346,6 +6941,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllOptionalPrimitiveArrays, i, @"dateObj.@count < %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i, @"decimalObj.@count < %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i, @"objectIdObj.@count < %@", @(i));
+        RLMAssertCount(AllOptionalPrimitiveArrays, i, @"uuidObj.@count < %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, i + 1, @"boolObj.@count <= %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, i + 1, @"intObj.@count <= %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, i + 1, @"floatObj.@count <= %@", @(i));
@@ -7355,6 +6951,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllPrimitiveArrays, i + 1, @"dateObj.@count <= %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, i + 1, @"decimalObj.@count <= %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, i + 1, @"objectIdObj.@count <= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i + 1, @"uuidObj.@count <= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i + 1, @"boolObj.@count <= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i + 1, @"intObj.@count <= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i + 1, @"floatObj.@count <= %@", @(i));
@@ -7364,6 +6961,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllOptionalPrimitiveArrays, i + 1, @"dateObj.@count <= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i + 1, @"decimalObj.@count <= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i + 1, @"objectIdObj.@count <= %@", @(i));
+        RLMAssertCount(AllOptionalPrimitiveArrays, i + 1, @"uuidObj.@count <= %@", @(i));
     }
 }
 
@@ -7378,6 +6976,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@sum can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"objectIdObj.@sum = %@", objectId(1)]),
                               @"@sum can only be applied to a numeric property.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@sum = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
+                              @"@sum can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"boolObj.@sum = %@", @NO]),
                               @"@sum can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"stringObj.@sum = %@", @"a"]),
@@ -7385,6 +6985,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"dataObj.@sum = %@", data(1)]),
                               @"@sum can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"objectIdObj.@sum = %@", objectId(1)]),
+                              @"@sum can only be applied to a numeric property.");
+    RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@sum = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"@sum can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"dateObj.@sum = %@", date(1)]),
                               @"Cannot sum or average date properties");
@@ -7445,16 +7047,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"floatObj": @[],
         @"doubleObj": @[],
         @"decimalObj": @[],
-        @"intObj": @[],
-        @"floatObj": @[],
-        @"doubleObj": @[],
-        @"decimalObj": @[],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
-        @"intObj": @[],
-        @"floatObj": @[],
-        @"doubleObj": @[],
-        @"decimalObj": @[],
         @"intObj": @[],
         @"floatObj": @[],
         @"doubleObj": @[],
@@ -7465,16 +7059,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"floatObj": @[@2.2f],
         @"doubleObj": @[@2.2],
         @"decimalObj": @[decimal128(2)],
-        @"intObj": @[@2],
-        @"floatObj": @[@2.2f],
-        @"doubleObj": @[@2.2],
-        @"decimalObj": @[decimal128(2)],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
-        @"intObj": @[@2],
-        @"floatObj": @[@2.2f],
-        @"doubleObj": @[@2.2],
-        @"decimalObj": @[decimal128(2)],
         @"intObj": @[@2],
         @"floatObj": @[@2.2f],
         @"doubleObj": @[@2.2],
@@ -7485,16 +7071,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"floatObj": @[@2.2f, @2.2f],
         @"doubleObj": @[@2.2, @2.2],
         @"decimalObj": @[decimal128(2), decimal128(2)],
-        @"intObj": @[@2, @2],
-        @"floatObj": @[@2.2f, @2.2f],
-        @"doubleObj": @[@2.2, @2.2],
-        @"decimalObj": @[decimal128(2), decimal128(2)],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
-        @"intObj": @[@2, @2],
-        @"floatObj": @[@2.2f, @2.2f],
-        @"doubleObj": @[@2.2, @2.2],
-        @"decimalObj": @[decimal128(2), decimal128(2)],
         @"intObj": @[@2, @2],
         @"floatObj": @[@2.2f, @2.2f],
         @"doubleObj": @[@2.2, @2.2],
@@ -7505,16 +7083,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"floatObj": @[@2.2f, @2.2f, @2.2f],
         @"doubleObj": @[@2.2, @2.2, @2.2],
         @"decimalObj": @[decimal128(2), decimal128(2), decimal128(2)],
-        @"intObj": @[@2, @2, @2],
-        @"floatObj": @[@2.2f, @2.2f, @2.2f],
-        @"doubleObj": @[@2.2, @2.2, @2.2],
-        @"decimalObj": @[decimal128(2), decimal128(2), decimal128(2)],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
-        @"intObj": @[@2, @2, @2],
-        @"floatObj": @[@2.2f, @2.2f, @2.2f],
-        @"doubleObj": @[@2.2, @2.2, @2.2],
-        @"decimalObj": @[decimal128(2), decimal128(2), decimal128(2)],
         @"intObj": @[@2, @2, @2],
         @"floatObj": @[@2.2f, @2.2f, @2.2f],
         @"doubleObj": @[@2.2, @2.2, @2.2],
@@ -7590,6 +7160,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@avg can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"objectIdObj.@avg = %@", objectId(1)]),
                               @"@avg can only be applied to a numeric property.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@avg = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
+                              @"@avg can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"boolObj.@avg = %@", @NO]),
                               @"@avg can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"stringObj.@avg = %@", @"a"]),
@@ -7597,6 +7169,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"dataObj.@avg = %@", data(1)]),
                               @"@avg can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"objectIdObj.@avg = %@", objectId(1)]),
+                              @"@avg can only be applied to a numeric property.");
+    RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@avg = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"@avg can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"dateObj.@avg = %@", date(1)]),
                               @"Cannot sum or average date properties");
@@ -7641,16 +7215,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"floatObj": @[],
         @"doubleObj": @[],
         @"decimalObj": @[],
-        @"intObj": @[],
-        @"floatObj": @[],
-        @"doubleObj": @[],
-        @"decimalObj": @[],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
-        @"intObj": @[],
-        @"floatObj": @[],
-        @"doubleObj": @[],
-        @"decimalObj": @[],
         @"intObj": @[],
         @"floatObj": @[],
         @"doubleObj": @[],
@@ -7661,16 +7227,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"floatObj": @[@2.2f],
         @"doubleObj": @[@2.2],
         @"decimalObj": @[decimal128(2)],
-        @"intObj": @[@2],
-        @"floatObj": @[@2.2f],
-        @"doubleObj": @[@2.2],
-        @"decimalObj": @[decimal128(2)],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
-        @"intObj": @[@2],
-        @"floatObj": @[@2.2f],
-        @"doubleObj": @[@2.2],
-        @"decimalObj": @[decimal128(2)],
         @"intObj": @[@2],
         @"floatObj": @[@2.2f],
         @"doubleObj": @[@2.2],
@@ -7681,16 +7239,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"floatObj": @[@2.2f, @3.3f],
         @"doubleObj": @[@2.2, @3.3],
         @"decimalObj": @[decimal128(2), decimal128(3)],
-        @"intObj": @[@2, @3],
-        @"floatObj": @[@2.2f, @3.3f],
-        @"doubleObj": @[@2.2, @3.3],
-        @"decimalObj": @[decimal128(2), decimal128(3)],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
-        @"intObj": @[@2, @3],
-        @"floatObj": @[@2.2f, @3.3f],
-        @"doubleObj": @[@2.2, @3.3],
-        @"decimalObj": @[decimal128(2), decimal128(3)],
         @"intObj": @[@2, @3],
         @"floatObj": @[@2.2f, @3.3f],
         @"doubleObj": @[@2.2, @3.3],
@@ -7701,16 +7251,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"floatObj": @[@3.3f],
         @"doubleObj": @[@3.3],
         @"decimalObj": @[decimal128(3)],
-        @"intObj": @[@3],
-        @"floatObj": @[@3.3f],
-        @"doubleObj": @[@3.3],
-        @"decimalObj": @[decimal128(3)],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
-        @"intObj": @[@3],
-        @"floatObj": @[@3.3f],
-        @"doubleObj": @[@3.3],
-        @"decimalObj": @[decimal128(3)],
         @"intObj": @[@3],
         @"floatObj": @[@3.3f],
         @"doubleObj": @[@3.3],
@@ -7786,6 +7328,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@min can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"objectIdObj.@min = %@", objectId(1)]),
                               @"@min can only be applied to a numeric property.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@min = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
+                              @"@min can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"boolObj.@min = %@", @NO]),
                               @"@min can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"stringObj.@min = %@", @"a"]),
@@ -7793,6 +7337,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"dataObj.@min = %@", data(1)]),
                               @"@min can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"objectIdObj.@min = %@", objectId(1)]),
+                              @"@min can only be applied to a numeric property.");
+    RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@min = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"@min can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@min = %@", @"a"]),
                               @"@min on a property of type int cannot be compared with 'a'");
@@ -7990,6 +7536,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@max can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"objectIdObj.@max = %@", objectId(1)]),
                               @"@max can only be applied to a numeric property.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@max = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
+                              @"@max can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"boolObj.@max = %@", @NO]),
                               @"@max can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"stringObj.@max = %@", @"a"]),
@@ -7997,6 +7545,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"dataObj.@max = %@", data(1)]),
                               @"@max can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"objectIdObj.@max = %@", objectId(1)]),
+                              @"@max can only be applied to a numeric property.");
+    RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@max = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"@max can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@max = %@", @"a"]),
                               @"@max on a property of type int cannot be compared with 'a'");
@@ -8195,6 +7745,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj = %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj = %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.objectIdObj = %@", objectId(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.boolObj = %@", @NO);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj = %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj = %@", @2.2f);
@@ -8204,24 +7755,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj = %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj = %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.objectIdObj = %@", objectId(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.boolObj = %@", @NO);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj = %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj = %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj = %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.stringObj = %@", @"a");
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dataObj = %@", data(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj = %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj = %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.objectIdObj = %@", objectId(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.boolObj = %@", @NO);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj = %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj = %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj = %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.stringObj = %@", @"a");
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dataObj = %@", data(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj = %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj = %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.objectIdObj = %@", objectId(1));
+    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.boolObj != %@", @NO);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj != %@", @2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj != %@", @2.2f);
@@ -8231,6 +7765,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj != %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj != %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.objectIdObj != %@", objectId(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.boolObj != %@", @NO);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj != %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj != %@", @2.2f);
@@ -8240,34 +7775,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj != %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj != %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.objectIdObj != %@", objectId(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.boolObj != %@", @NO);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj != %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj != %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj != %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.stringObj != %@", @"a");
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dataObj != %@", data(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj != %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj != %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.objectIdObj != %@", objectId(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.boolObj != %@", @NO);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj != %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj != %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj != %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.stringObj != %@", @"a");
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dataObj != %@", data(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj != %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj != %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.objectIdObj != %@", objectId(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj > %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj > %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj > %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj > %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj > %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj > %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj > %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj > %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj > %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj > %@", decimal128(2));
+    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj > %@", @2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj > %@", @2.2f);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj > %@", @2.2);
@@ -8288,16 +7796,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj >= %@", @2.2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj >= %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj >= %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj >= %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj >= %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj >= %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj >= %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj >= %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj >= %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj >= %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj >= %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj >= %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj >= %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj < %@", @2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj < %@", @2.2f);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
@@ -8308,26 +7806,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj < %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj < %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj < %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj < %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj < %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj < %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj < %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj < %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj < %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj < %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj <= %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj <= %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj <= %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj <= %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj <= %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj <= %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj <= %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj <= %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj <= %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj <= %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj <= %@", @2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj <= %@", @2.2f);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj <= %@", @2.2);
@@ -8350,6 +7828,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj = %@", date(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj = %@", decimal128(3));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.objectIdObj = %@", objectId(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.boolObj = %@", @YES);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj = %@", @3);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj = %@", @3.3f);
@@ -8359,24 +7838,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj = %@", date(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj = %@", decimal128(3));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.objectIdObj = %@", objectId(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.boolObj = %@", @YES);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj = %@", @3);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj = %@", @3.3f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj = %@", @3.3);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.stringObj = %@", @"b");
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dataObj = %@", data(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj = %@", date(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj = %@", decimal128(3));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.objectIdObj = %@", objectId(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.boolObj = %@", @YES);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj = %@", @3);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj = %@", @3.3f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj = %@", @3.3);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.stringObj = %@", @"b");
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dataObj = %@", data(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj = %@", date(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj = %@", decimal128(3));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.objectIdObj = %@", objectId(2));
+    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.boolObj = %@", @NO);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj = %@", @2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj = %@", @2.2f);
@@ -8386,6 +7848,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj = %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj = %@", @NO);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj = %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj = %@", @2.2f);
@@ -8395,24 +7858,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj = %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.boolObj = %@", @NO);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj = %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj = %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj = %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.stringObj = %@", @"a");
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dataObj = %@", data(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj = %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj = %@", @NO);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj = %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj = %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj = %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.stringObj = %@", @"a");
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dataObj = %@", data(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj = %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(1));
+    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.boolObj != %@", @NO);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj != %@", @2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj != %@", @2.2f);
@@ -8422,6 +7868,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj != %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj != %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.objectIdObj != %@", objectId(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.boolObj != %@", @NO);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj != %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj != %@", @2.2f);
@@ -8431,24 +7878,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj != %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj != %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.objectIdObj != %@", objectId(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.boolObj != %@", @NO);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj != %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj != %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj != %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.stringObj != %@", @"a");
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dataObj != %@", data(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj != %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj != %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.objectIdObj != %@", objectId(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.boolObj != %@", @NO);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj != %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj != %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj != %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.stringObj != %@", @"a");
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dataObj != %@", data(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj != %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj != %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.objectIdObj != %@", objectId(1));
+    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.boolObj != %@", @YES);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj != %@", @3);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj != %@", @3.3f);
@@ -8458,6 +7888,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj != %@", date(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(3));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj != %@", @YES);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj != %@", @3);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj != %@", @3.3f);
@@ -8467,34 +7898,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj != %@", date(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(3));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.boolObj != %@", @YES);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj != %@", @3);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj != %@", @3.3f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj != %@", @3.3);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.stringObj != %@", @"b");
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dataObj != %@", data(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj != %@", date(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(3));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj != %@", @YES);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj != %@", @3);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj != %@", @3.3f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj != %@", @3.3);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.stringObj != %@", @"b");
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dataObj != %@", data(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj != %@", date(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(3));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj > %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj > %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj > %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj > %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj > %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj > %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj > %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj > %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj > %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj > %@", decimal128(2));
+    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj > %@", @2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj > %@", @2.2f);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj > %@", @2.2);
@@ -8515,26 +7919,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj >= %@", @2.2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj >= %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj >= %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj >= %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj >= %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj >= %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj >= %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj >= %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj >= %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj >= %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj >= %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj >= %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj >= %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj < %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj < %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj < %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj < %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj < %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj < %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj < %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj < %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj < %@", @2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj < %@", @2.2f);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
@@ -8555,26 +7939,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj < %@", @3.3);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj < %@", date(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj < %@", decimal128(3));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj < %@", @3);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj < %@", @3.3f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj < %@", @3.3);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj < %@", date(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj < %@", decimal128(3));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj < %@", @3);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj < %@", @3.3f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj < %@", @3.3);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj < %@", date(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj < %@", decimal128(3));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj <= %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj <= %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj <= %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj <= %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj <= %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj <= %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj <= %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj <= %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj <= %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj <= %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj <= %@", @2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj <= %@", @2.2f);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj <= %@", @2.2);
@@ -8597,6 +7961,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj = %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj = %@", @NO);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj = %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj = %@", @2.2f);
@@ -8606,24 +7971,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj = %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.boolObj = %@", @NO);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj = %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj = %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj = %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.stringObj = %@", @"a");
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dataObj = %@", data(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj = %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj = %@", @NO);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj = %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj = %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj = %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.stringObj = %@", @"a");
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dataObj = %@", data(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj = %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(1));
+    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.boolObj = %@", @YES);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj = %@", @3);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj = %@", @3.3f);
@@ -8633,6 +7981,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj = %@", date(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(3));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj = %@", @YES);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj = %@", @3);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj = %@", @3.3f);
@@ -8642,24 +7991,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj = %@", date(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(3));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.boolObj = %@", @YES);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj = %@", @3);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj = %@", @3.3f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj = %@", @3.3);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.stringObj = %@", @"b");
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dataObj = %@", data(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj = %@", date(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(3));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj = %@", @YES);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj = %@", @3);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj = %@", @3.3f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj = %@", @3.3);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.stringObj = %@", @"b");
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dataObj = %@", data(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj = %@", date(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(3));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(2));
+    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.boolObj != %@", @NO);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj != %@", @2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj != %@", @2.2f);
@@ -8669,6 +8001,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj != %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj != %@", @NO);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj != %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj != %@", @2.2f);
@@ -8678,24 +8011,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj != %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.boolObj != %@", @NO);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj != %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj != %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj != %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.stringObj != %@", @"a");
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dataObj != %@", data(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj != %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj != %@", @NO);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj != %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj != %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj != %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.stringObj != %@", @"a");
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dataObj != %@", data(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj != %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(1));
+    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.boolObj != %@", @YES);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj != %@", @3);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj != %@", @3.3f);
@@ -8705,6 +8021,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj != %@", date(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(3));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj != %@", @YES);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj != %@", @3);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj != %@", @3.3f);
@@ -8714,34 +8031,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj != %@", date(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(3));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.boolObj != %@", @YES);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj != %@", @3);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj != %@", @3.3f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj != %@", @3.3);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.stringObj != %@", @"b");
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dataObj != %@", data(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj != %@", date(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(3));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj != %@", @YES);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj != %@", @3);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj != %@", @3.3f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj != %@", @3.3);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.stringObj != %@", @"b");
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dataObj != %@", data(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj != %@", date(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(3));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj > %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj > %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj > %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj > %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj > %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj > %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj > %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj > %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj > %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj > %@", decimal128(2));
+    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj > %@", @2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj > %@", @2.2f);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj > %@", @2.2);
@@ -8762,26 +8052,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.doubleObj >= %@", @2.2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.dateObj >= %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.decimalObj >= %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.intObj >= %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.floatObj >= %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.doubleObj >= %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.dateObj >= %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.decimalObj >= %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.intObj >= %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.floatObj >= %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.doubleObj >= %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.dateObj >= %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.decimalObj >= %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj < %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj < %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj < %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj < %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj < %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj < %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.dateObj < %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.decimalObj < %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.intObj < %@", @2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.floatObj < %@", @2.2f);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
@@ -8802,16 +8072,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj < %@", @3.3);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj < %@", date(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj < %@", decimal128(3));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj < %@", @3);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj < %@", @3.3f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj < %@", @3.3);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj < %@", date(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj < %@", decimal128(3));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj < %@", @3);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj < %@", @3.3f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj < %@", @3.3);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj < %@", date(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj < %@", decimal128(3));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj <= %@", @2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj <= %@", @2.2f);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj <= %@", @2.2);
@@ -8822,26 +8082,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj <= %@", @2.2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj <= %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj <= %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.intObj <= %@", @2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.floatObj <= %@", @2.2f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj <= %@", @2.2);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj <= %@", date(1));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj <= %@", decimal128(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj <= %@", @2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj <= %@", @2.2f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj <= %@", @2.2);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.dateObj <= %@", date(1));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.decimalObj <= %@", decimal128(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.intObj <= %@", @3);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.floatObj <= %@", @3.3f);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.doubleObj <= %@", @3.3);
-    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.dateObj <= %@", date(2));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.decimalObj <= %@", decimal128(3));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.intObj <= %@", @3);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.floatObj <= %@", @3.3f);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.doubleObj <= %@", @3.3);
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.dateObj <= %@", date(2));
-    RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.decimalObj <= %@", decimal128(3));
     RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.intObj <= %@", @3);
     RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.floatObj <= %@", @3.3f);
     RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.doubleObj <= %@", @3.3);
@@ -8861,6 +8101,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Operator '>' not supported for type 'data'");
     RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.objectIdObj > %@", objectId(1)]),
                               @"Operator '>' not supported for type 'object id'");
+    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.uuidObj > %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
+                              @"Operator '>' not supported for type 'uuid'");
     RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY link.boolObj > %@", @NO]),
                               @"Operator '>' not supported for type 'bool'");
     RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY link.stringObj > %@", @"a"]),
@@ -8869,22 +8111,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Operator '>' not supported for type 'data'");
     RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY link.objectIdObj > %@", objectId(1)]),
                               @"Operator '>' not supported for type 'object id'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.boolObj > %@", @NO]),
-                              @"Operator '>' not supported for type 'bool'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.stringObj > %@", @"a"]),
-                              @"Operator '>' not supported for type 'string'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.dataObj > %@", data(1)]),
-                              @"Operator '>' not supported for type 'data'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.objectIdObj > %@", objectId(1)]),
-                              @"Operator '>' not supported for type 'object id'");
-    RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY link.boolObj > %@", @NO]),
-                              @"Operator '>' not supported for type 'bool'");
-    RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY link.stringObj > %@", @"a"]),
-                              @"Operator '>' not supported for type 'string'");
-    RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY link.dataObj > %@", data(1)]),
-                              @"Operator '>' not supported for type 'data'");
-    RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY link.objectIdObj > %@", objectId(1)]),
-                              @"Operator '>' not supported for type 'object id'");
+    RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY link.uuidObj > %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
+                              @"Operator '>' not supported for type 'uuid'");
 }
 
 - (void)testSubstringQueries {

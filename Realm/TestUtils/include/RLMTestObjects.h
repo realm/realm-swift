@@ -157,6 +157,9 @@ RLM_ARRAY_TYPE(EmbeddedIntObject)
 @property id<RLMValue> anyCol;
 
 + (NSDictionary *)values:(int)i stringObject:(StringObject *)so;
++ (NSDictionary *)values:(int)i
+            stringObject:(StringObject *)so
+             mixedObject:(MixedObject *)mo;
 
 @end
 

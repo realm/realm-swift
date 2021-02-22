@@ -50,7 +50,6 @@ NS_ASSUME_NONNULL_BEGIN
 typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
 
 #pragma mark - Primitive types
-
     /** Integers: `NSInteger`, `int`, `long`, `Int` (Swift) */
     RLMPropertyTypeInt    = 0,
     /** Booleans: `BOOL`, `bool`, `Bool` (Swift) */
@@ -68,7 +67,7 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeString = 2,
     /** Binary data: `NSData` */
     RLMPropertyTypeData   = 3,
-    /** Any type: `id<RLMValue>`, `AnyRLMValue. */
+    /** Any type: `id<RLMValue>`, `AnyRLMValue` (Swift) */
     RLMPropertyTypeAny    = 9,
     /** Dates: `NSDate` */
     RLMPropertyTypeDate   = 4,

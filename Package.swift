@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "10.4.0"
-let cocoaVersionStr = "10.5.1"
+let coreVersionStr = "10.5.1"
+let cocoaVersionStr = "10.6.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -62,7 +62,7 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core", .branch("master"))
+        .package(url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
     ],
     targets: [
       .target(
@@ -138,7 +138,8 @@ let package = Package(
             exclude: [
                 "Tests",
                 "Nonsync.swift"
-            ]
+            ],
+            swiftSettings: combineFlags()
         ),
         .target(
             name: "RealmTestSupport",
@@ -152,9 +153,11 @@ let package = Package(
             path: "Realm/Tests",
             exclude: [
                 "Swift",
+                "SwiftUITestHost",
+                "SwiftUITestHostUITests",
                 "TestHost",
                 "PrimitiveArrayPropertyTests.tpl.m",
-                "PrimitiveValuePropertyTests.tpl.m",
+                "PrimitiveValuePropertyTests.tpl.m"
             ],
             cxxSettings: testCxxSettings
         ),
@@ -167,7 +170,8 @@ let package = Package(
             name: "RealmSwiftTests",
             dependencies: ["RealmSwift", "RealmTestSupport"],
             path: "RealmSwift/Tests",
-            exclude: ["TestUtils.mm"]
+            exclude: ["TestUtils.mm"],
+            swiftSettings: combineFlags()
         ),
 
         // Object server tests have support code written in both obj-c and

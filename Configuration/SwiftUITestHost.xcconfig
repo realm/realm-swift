@@ -1,0 +1,7 @@
+#include "TestHost.xcconfig"
+
+SUPPORTED_PLATFORMS = iphonesimulator iphoneos;
+
+INFOPLIST_FILE = Realm/Tests/SwiftUITestHost/Info.plist;
+
+IPHONEOS_DEPLOYMENT_TARGET = 14.0;

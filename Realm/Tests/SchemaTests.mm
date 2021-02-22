@@ -19,6 +19,7 @@
 #import <XCTest/XCTest.h>
 
 #import "RLMMultiProcessTestCase.h"
+#import "TestUtils.h"
 
 #import "RLMAccessor.h"
 #import "RLMObjectSchema_Private.hpp"
@@ -327,6 +328,12 @@ RLM_ARRAY_TYPE(NotARealClass)
 
 @end
 
+@interface OrphanObject : RLMEmbeddedObject
+@property int value;
+@end
+@implementation OrphanObject
+@end
+
 
 @interface SchemaTests : RLMMultiProcessTestCase
 @end
@@ -453,6 +460,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     NSArray *expectedTypes = @[@"AllTypesObject",
                                @"LinkToAllTypesObject",
                                @"StringObject",
+                               @"MixedObject",
                                @"IntObject"];
 
     NSString *unexpectedType = @"__$ThisTypeShouldNotOccur$__";
@@ -622,6 +630,22 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\ttype = object;\n"
                                               @"\t\t\tobjectClassName = StringObject;\n"
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
+                                              @"\t\t\toptional = YES;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tmixedObjectCol {\n"
+                                              @"\t\t\ttype = object;\n"
+                                              @"\t\t\tobjectClassName = MixedObject;\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
+                                              @"\t\t\toptional = YES;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tanyCol {\n"
+                                              @"\t\t\ttype = any;\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
@@ -1135,6 +1159,35 @@ RLM_ARRAY_TYPE(NotARealClass)
     (void)[query lastObject];
     RLMRunChildAndWait();
     XCTAssertEqual(query.count, 3U);
+}
+
+- (void)testExplicitlyIncludedEmbeddedOrphanIsRejectedForSyncRealm {
+    RLMUser *user = RLMDummyUser();
+
+    // Test each different order of setting properties because there's a bunch of awkward state involved
+    RLMRealmConfiguration *config = [user configurationWithPartitionValue:@"dummy"];
+    config.objectClasses = @[OrphanObject.class];
+    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
+                              @"Embedded object 'OrphanObject' is unreachable by any link path from top level objects.");
+
+    config = [RLMRealmConfiguration defaultConfiguration];
+    config.syncConfiguration = [user configurationWithPartitionValue:@"dummy"].syncConfiguration;
+    config.objectClasses = @[OrphanObject.class];
+    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
+                              @"Embedded object 'OrphanObject' is unreachable by any link path from top level objects.");
+
+    config = [RLMRealmConfiguration defaultConfiguration];
+    config.objectClasses = @[OrphanObject.class];
+    config.syncConfiguration = [user configurationWithPartitionValue:@"dummy"].syncConfiguration;
+    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
+                              @"Embedded object 'OrphanObject' is unreachable by any link path from top level objects.");
+}
+
+- (void)testExplicitlyIncludedEmbeddedOrphanIsAllowedForLocalRealm {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.objectClasses = @[OrphanObject.class];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    XCTAssertNotNil([realm.schema schemaForClassName:@"OrphanObject"]);
 }
 #endif
 

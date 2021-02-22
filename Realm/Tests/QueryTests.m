@@ -603,6 +603,7 @@
     RLMRealm *realm = [self realm];
     MixedObject *value;
     [realm beginWriteTransaction];
+
     value = [MixedObject createInRealm:realm withValue:@[@"hello world", @[@"one", @2, @3.14]]];
     [realm commitWriteTransaction];
 
@@ -1029,11 +1030,11 @@
     RLMAssertCount(self.queryObjectClass, 1U, @"object1 != object2");
 
     RLMAssertCount(self.queryObjectClass, 7U, @"any1 == any1");
-    RLMAssertCount(self.queryObjectClass, 1U, @"any1 == any2");
-    RLMAssertCount(self.queryObjectClass, 6U, @"any1 != any2");
+    RLMAssertCount(self.queryObjectClass, 0U, @"any1 == any2");
+    RLMAssertCount(self.queryObjectClass, 7U, @"any1 != any2");
 
     RLMAssertCount(self.queryObjectClass, 7U, @"any1 ==[c] any1");
-    RLMAssertCount(self.queryObjectClass, 1U, @"any1 ==[c] any2");
+    RLMAssertCount(self.queryObjectClass, 0U, @"any1 ==[c] any2");
     RLMAssertCount(self.queryObjectClass, 0U, @"any1 !=[c] any1");
 
     RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"int1 == float1"],
@@ -1351,24 +1352,24 @@
     [realm commitWriteTransaction];
 
     void (^testBlock)(NSString *, NSString *, Class) = ^(NSString *objectCol, NSString *colName, Class cls) {
-        RLMAssertCount(StringObject, 1U, [NSString stringWithFormat:@"%@ == 'abc'", colName]);
-        RLMAssertCount(StringObject, 4U, [NSString stringWithFormat:@"%@ != 'def'", colName]);
-        RLMAssertCount(StringObject, 1U, [NSString stringWithFormat:@"%@ ==[c] 'abc'", colName]);
-        RLMAssertCount(StringObject, 1U, [NSString stringWithFormat:@"%@ ==[c] 'ABC'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ == 'abc'", colName]);
+        RLMAssertCount(cls, 4U, [NSString stringWithFormat:@"%@ != 'def'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ ==[c] 'abc'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ ==[c] 'ABC'", colName]);
 
-        RLMAssertCount(StringObject, 3U, [NSString stringWithFormat:@"%@ != 'abc'", colName]);
-        RLMAssertCount(StringObject, 0U, [NSString stringWithFormat:@"%@ == 'def'", colName]);
-        RLMAssertCount(StringObject, 0U, [NSString stringWithFormat:@"%@ == 'ABC'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ != 'abc'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ == 'def'", colName]);
+        RLMAssertCount(cls, 0U, [NSString stringWithFormat:@"%@ == 'ABC'", colName]);
 
-        RLMAssertCount(StringObject, 1U, [NSString stringWithFormat:@"%@ == 'tuv'", colName]);
-        RLMAssertCount(StringObject, 1U, [NSString stringWithFormat:@"%@ ==[c] 'TUV'", colName]);
-        RLMAssertCount(StringObject, 3U, [NSString stringWithFormat:@"%@ ==[d] 'tuv'", colName]);
-        RLMAssertCount(StringObject, 3U, [NSString stringWithFormat:@"%@ ==[cd] 'TUV'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ == 'tuv'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ ==[c] 'TUV'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ ==[d] 'tuv'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ ==[cd] 'TUV'", colName]);
 
-        RLMAssertCount(StringObject, 3U, [NSString stringWithFormat:@"%@ != 'tuv'", colName]);
-        RLMAssertCount(StringObject, 3U, [NSString stringWithFormat:@"%@ !=[c] 'TUV'", colName]);
-        RLMAssertCount(StringObject, 1U, [NSString stringWithFormat:@"%@ !=[d] 'tuv'", colName]);
-        RLMAssertCount(StringObject, 1U, [NSString stringWithFormat:@"%@ !=[cd] 'TUV'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ != 'tuv'", colName]);
+        RLMAssertCount(cls, 3U, [NSString stringWithFormat:@"%@ !=[c] 'TUV'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ !=[d] 'tuv'", colName]);
+        RLMAssertCount(cls, 1U, [NSString stringWithFormat:@"%@ !=[cd] 'TUV'", colName]);
 
         RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ == 'abc'", objectCol, colName]);
         RLMAssertCount(AllTypesObject, 1U, [NSString stringWithFormat:@"%@.%@ != 'def'", objectCol, colName]);
@@ -2319,18 +2320,18 @@ NSData *data(const char *str) {
     RLMAssertCount(self.queryObjectClass, 3U, @"2 >= decimal1");
     RLMAssertCount(self.queryObjectClass, 5U, @"2 <= decimal1");
 
-    RLMAssertCount(self.queryObjectClass, 4U, @"1 == any1");
-    RLMAssertCount(self.queryObjectClass, 4U, @"1.0 == any1");
+    RLMAssertCount(self.queryObjectClass, 3U, @"1 == any1");
+    RLMAssertCount(self.queryObjectClass, 3U, @"1.0 == any1");
     RLMAssertCount(self.queryObjectClass, 1U, @"'one' == any1");
     RLMAssertCount(self.queryObjectClass, 6U, @"'one' != any1");
-    RLMAssertCount(self.queryObjectClass, 4U, @"TRUE == any1");
-    RLMAssertCount(self.queryObjectClass, 3U, @"TRUE != any1");
+    RLMAssertCount(self.queryObjectClass, 3U, @"TRUE == any1");
+    RLMAssertCount(self.queryObjectClass, 4U, @"TRUE != any1");
     RLMAssertCount(self.queryObjectClass, 1U, @"%@ == any1", oid1);
     RLMAssertCount(self.queryObjectClass, 6U, @"%@ != any1", oid1);
     RLMAssertCount(self.queryObjectClass, 5U, @"2 != any2");
-    RLMAssertCount(self.queryObjectClass, 4U, @"2 > any1");
+    RLMAssertCount(self.queryObjectClass, 3U, @"2 > any1");
     RLMAssertCount(self.queryObjectClass, 0U, @"2 < any1");
-    RLMAssertCount(self.queryObjectClass, 4U, @"2 >= any1");
+    RLMAssertCount(self.queryObjectClass, 3U, @"2 >= any1");
     RLMAssertCount(self.queryObjectClass, 0U, @"2 <= any1");
 
     RLMAssertCount(self.queryObjectClass, 4U, @"%@ == objectId1", oid1);

@@ -564,6 +564,10 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
 }
 
+- (instancetype)thaw {
+    @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+}
+
 #pragma mark - Thread Confined Protocol Conformance
 
 - (realm::ThreadSafeReference)makeThreadSafeReference {

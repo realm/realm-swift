@@ -240,7 +240,6 @@ bool isNSNull(T) {
     return false;
 }
 
-
 Table& get_table(Group& group, RLMObjectSchema *objectSchema)
 {
     return *ObjectStore::table_for_object_type(group, objectSchema.objectName.UTF8String);
@@ -476,7 +475,6 @@ private:
     util::Optional<ColumnReference> m_column;
 };
 
-#pragma mark QueryBuilder
 class QueryBuilder {
 public:
     QueryBuilder(Query& query, Group& group, RLMSchema *schema)
@@ -500,12 +498,6 @@ public:
     template <typename A, typename B>
     void add_bool_constraint(RLMPropertyType, NSPredicateOperatorType operatorType, A&& lhs, B&& rhs);
 
-    void add_substring_constraint(null, Query);
-    template<typename T>
-    void add_substring_constraint(const T& value, Query condition);
-    template<typename T>
-    void add_substring_constraint(const Columns<T>& value, Query condition);
-
     void add_mixed_constraint(NSPredicateOperatorType operatorType,
                               NSComparisonPredicateOptions predicateOptions,
                               Columns<Mixed>&& column,
@@ -524,6 +516,11 @@ public:
                               NSComparisonPredicateOptions predicateOptions,
                               Columns<Mixed>&& column,
                               T value);
+
+    template<typename T>
+    void add_substring_constraint(const T& value, Query condition);
+    template<typename T>
+    void add_substring_constraint(const Columns<T>& value, Query condition);
 
     template <typename C, typename T>
     void add_string_constraint(NSPredicateOperatorType operatorType,
@@ -617,11 +614,6 @@ void QueryBuilder::add_bool_constraint(RLMPropertyType datatype,
     }
 }
 
-void QueryBuilder::add_substring_constraint(null, Query) {
-    // Foundation always returns false for substring operations with a RHS of null or "".
-    m_query.and_query(std::unique_ptr<Expression>(new FalseExpression));
-}
-
 template<typename T>
 void QueryBuilder::add_substring_constraint(const T& value, Query condition) {
     // Foundation always returns false for substring operations with a RHS of null or "".
@@ -645,14 +637,6 @@ void QueryBuilder::add_substring_constraint(const Columns<T>& value, Query condi
     // and producing multiple values per row as such expressions will have been rejected.
     m_query.and_query(const_cast<Columns<T>&>(value).size() != 0 && std::move(condition));
 }
-template<>
-void QueryBuilder::add_substring_constraint(const Columns<Mixed>& value, Query condition) {
-    // Foundation always returns false for substring operations with a RHS of null or "".
-    // We don't need to concern ourselves with the possibility of value traversing a link list
-    // and producing multiple values per row as such expressions will have been rejected.
-//    m_query.and_query(const_cast<Columns<Mixed>&>(value).size() != 0 && std::move(condition));
-}
-
 
 template<typename Comparator>
 Query make_diacritic_insensitive_constraint(bool caseSensitive, std::unique_ptr<Subexpr> left, std::unique_ptr<Subexpr> right) {
@@ -908,7 +892,6 @@ Binary convert<Binary>(id value) {
     return isNSNull(value) ? BinaryData() : RLMBinaryDataForNSData(value);
 }
 
-
 template <>
 Decimal128 convert<Decimal128>(id value) {
     return RLMObjcToDecimal128(value);
@@ -1085,10 +1068,6 @@ void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
                           Columns<Mixed>&& column,
                           const ColumnReference& value) {
     add_bool_constraint(RLMPropertyTypeObject, operatorType, column, value.resolve<Mixed>());
-}
-
-bool is_nsnull(id value) {
-    return !value || value == NSNull.null;
 }
 
 template<typename T>
@@ -1313,6 +1292,9 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
                 case RLMPropertyTypeObject:
                 case RLMPropertyTypeLinkingObjects:
                     add_numeric_constraint(type, operatorType, column.resolve<Link>().count(), rhsValue);
+                    return;
+                case RLMPropertyTypeUUID:
+                    add_numeric_constraint(type, operatorType, column.resolve<Lst<UUID>>().size(), rhsValue);
                     return;
                 case RLMPropertyTypeAny:
                     throwException(@"Unsupported predicate value type",

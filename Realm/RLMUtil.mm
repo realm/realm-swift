@@ -413,8 +413,6 @@ id RLMMixedToObjc(realm::Mixed const& mixed, RLMRealm *realm) {
             return RLMObjectFromObjLink(realm, std::move(mixed.get<realm::ObjLink>()));
         case realm::type_Link:
         case realm::type_LinkList:
-        case realm::type_OldTable:
-        case realm::type_OldDateTime:
             REALM_UNREACHABLE();
         case realm::type_UUID:
             return [[NSUUID alloc] initWithRealmUUID:mixed.get<realm::UUID>()];

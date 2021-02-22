@@ -210,6 +210,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (RLMRealm *)freeze NS_RETURNS_RETAINED;
 
+/**
+ Returns a live reference of this Realm.
+
+ All objects and collections read from the returned Realm will no longer be frozen.
+ This method will return `self` if it is not already frozen.
+ */
+- (RLMRealm *)thaw;
+
 #pragma mark - File Management
 
 /**

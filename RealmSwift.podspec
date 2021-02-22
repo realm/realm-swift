@@ -14,15 +14,13 @@ Pod::Spec.new do |s|
   s.author                    = { 'Realm' => 'help@realm.io' }
   s.requires_arc              = true
   s.social_media_url          = 'https://twitter.com/realm'
-  has_versioned_docs          = !(version =~ /alpha|beta|rc/)
-  s.documentation_url         = "https://realm.io/docs/swift/#{has_versioned_docs ? s.version : 'latest'}"
+  s.documentation_url         = "https://realm.io/docs/swift/latest"
   s.license                   = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
   s.dependency 'Realm', "= #{s.version}"
   s.source_files = 'RealmSwift/*.swift'
   s.exclude_files = 'RealmSwift/Nonsync.swift'
 
-  s.prepare_command           = 'sh build.sh cocoapods-setup swift'
   s.preserve_paths            = %w(build.sh)
 
   s.pod_target_xcconfig = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES' }

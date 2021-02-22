@@ -118,8 +118,10 @@ class SwiftRLMDynamicTests: RLMTestCase {
     }
 
     func testDynamicTypes_objc() {
-        let obj1 = AllTypesObject.values(1, stringObject: nil)!
-        let obj2 = AllTypesObject.values(2, stringObject: StringObject(value: ["string"]))!
+        let obj1 = AllTypesObject.values(1, stringObject: nil, mixedObject: nil)!
+        let obj2 = AllTypesObject.values(2,
+                                         stringObject: StringObject(value: ["string"]),
+                                         mixedObject: MixedObject(value: ["string"]))!
 
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
@@ -145,9 +147,12 @@ class SwiftRLMDynamicTests: RLMTestCase {
 
         // check sub object type
         XCTAssertTrue(schema.properties[12].objectClassName! == "StringObject")
+        XCTAssertTrue(schema.properties[13].objectClassName! == "MixedObject")
 
         // check object equality
         XCTAssertNil(robj1["objectCol"], "object should be nil")
+        XCTAssertNil(robj1["mixedObjectCol"], "object should be nil")
         XCTAssertTrue((robj2["objectCol"] as! RLMObject)["stringCol"] as! String == "string")
+        XCTAssertTrue((robj2["mixedObjectCol"] as! RLMObject)["anyCol"] as! String == "string")
     }
 }

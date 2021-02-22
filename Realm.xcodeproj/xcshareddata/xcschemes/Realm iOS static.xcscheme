@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "1220"
-   version = "1.3">
+   version = "1.7">
    <BuildAction
       parallelizeBuildables = "NO"
       buildImplicitDependencies = "YES">
+      <PreActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "Run Script"
+               scriptText = "cd &quot;${PROJECT_DIR}&quot;&#10;sh build.sh download-core&#10;">
+               <EnvironmentBuildable>
+                  <BuildableReference
+                     BuildableIdentifier = "primary"
+                     BlueprintIdentifier = "5DD7557B1BE056DE002800DA"
+                     BuildableName = "Realm.framework"
+                     BlueprintName = "Realm iOS static"
+                     ReferencedContainer = "container:Realm.xcodeproj">
+                  </BuildableReference>
+               </EnvironmentBuildable>
+            </ActionContent>
+         </ExecutionAction>
+      </PreActions>
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -50,6 +68,15 @@
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
+      <TestPlans>
+         <TestPlanReference
+            reference = "container:Configuration/RealmiOSstatic.xctestplan"
+            default = "YES">
+         </TestPlanReference>
+         <TestPlanReference
+            reference = "container:Configuration/RealmiOSstaticXcode11.xctestplan">
+         </TestPlanReference>
+      </TestPlans>
       <Testables>
          <TestableReference
             skipped = "NO">
