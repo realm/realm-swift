@@ -604,16 +604,96 @@
     MixedObject *value;
     [realm beginWriteTransaction];
 
+    NSArray *allValues = @[NSNull.null,
+                           @"0",
+                           @"1",
+                           [NSData dataWithBytes:"0" length:1],
+                           [NSData dataWithBytes:"1" length:1],
+                           @0,
+                           @1,
+                           @0.0,
+                           @1.0,
+                           @0.0f,
+                           @1.0f,
+                           [[RLMDecimal128 alloc] initWithNumber:@(0)],
+                           [[RLMDecimal128 alloc] initWithNumber:@(1)],
+                           @YES,
+                           @NO,
+                           @true,
+                           @false,
+                           @TRUE,
+                           @FALSE,
+                           [NSDate dateWithTimeIntervalSince1970:0],
+                           [NSDate dateWithTimeIntervalSince1970:1],
+                           [RLMObjectId objectId],
+//                           [[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"],
+    ];
+
+    StringObject *stringObj = [StringObject new];
+    stringObj.stringCol = @"required-string";
+    ArrayOfAllTypesObject *arrayOfAll = [ArrayOfAllTypesObject createInRealm:realm withValue:@{}];
+
+    for (int i = 0; i < allValues.count; i++) {
+        AllTypesObject *obj = [AllTypesObject createInRealm:realm withValue:[AllTypesObject values:i stringObject:stringObj]];
+        obj.anyCol = allValues[i];
+        [arrayOfAll.array addObject:obj];
+    }
+
     value = [MixedObject createInRealm:realm withValue:@[@"hello world", @[@"one", @2, @3.14]]];
     [realm commitWriteTransaction];
 
-    // query on class
-    XCTAssertEqual([MixedObject allObjects].count, 1U);
-    RLMAssertCount(MixedObject, 0U, @"anyCol > 10");
-    RLMAssertCount(MixedObject, 1U, @"anyCol == 'hello world'");
-    RLMAssertCount(MixedObject, 0U, @"anyCol != 'hello world'");
-    XCTAssert(value.anyArray.count == 3);
-    XCTAssertTrue([value.anyArray.firstObject isEqualToString:value.anyArray.firstObject]);
+    // Expect (7) matches for int, double, float, decimal, 3 bools.
+    RLMAssertCount(AllTypesObject, 7U, @"anyCol BETWEEN %@", @[@1, @2]);
+    RLMAssertCount(AllTypesObject, 7U, @"anyCol BETWEEN {1, 2}");
+    RLMAssertCount(AllTypesObject, 7U, @"anyCol < 1");
+    RLMAssertCount(AllTypesObject, 0U, @"anyCol > 1");
+    RLMAssertCount(AllTypesObject, 7U, @"anyCol <= 0");
+    RLMAssertCount(AllTypesObject, 14U, @"anyCol >= 0");
+    RLMAssertCount(AllTypesObject, 7U, @"anyCol == 0");
+    RLMAssertCount(AllTypesObject, 15U, @"anyCol != 0");
+    
+    RLMAssertCount(AllTypesObject, 7U, @"anyCol == FALSE");
+    RLMAssertCount(AllTypesObject, 14U, @"anyCol >= FALSE");
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol == NULL");
+    RLMAssertCount(AllTypesObject, allValues.count-1, @"anyCol != NULL");
+
+    XCTAssertThrowsSpecificNamed([MixedObject objectsWhere:@"anyCol BETWEEN TRUE"],
+                                 NSException,
+                                 @"Invalid operator type",
+                                 @"Invalid operator in bool predicate.");
+
+    // Expect (2) matches for string and data.
+    RLMAssertCount(AllTypesObject, 2U, @"anyCol == '0'");
+    // @Lee -- is expectation to retrun with non-matching types? ie. below query returns all numeric types
+    RLMAssertCount(AllTypesObject, allValues.count-2, @"anyCol != '0'");
+    RLMAssertCount(AllTypesObject, 2U, @"anyCol BEGINSWITH '1'");
+    RLMAssertCount(AllTypesObject, 0U, @"anyCol BEGINSWITH 'a'");
+    RLMAssertCount(AllTypesObject, 2U, @"anyCol ENDSWITH '1'");
+    RLMAssertCount(AllTypesObject, 0U, @"anyCol ENDSWITH 'a'");
+    RLMAssertCount(AllTypesObject, 2U, @"anyCol CONTAINS '1'");
+    RLMAssertCount(AllTypesObject, 0U, @"anyCol CONTAINS 'a'");
+    XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol BEGINSWITH 0"],
+                                 NSException,
+                                 @"Invalid operator type",
+                                 @"Invalid operator in anyCol predicate.");
+    XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol ENDSWITH 0"],
+                                 NSException,
+                                 @"Invalid operator type",
+                                 @"Invalid operator in anyCol predicate.");
+    XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol CONATINS 0"],
+                                 NSException,
+                                 @"Invalid operator type",
+                                 @"Invalid operator in anyCol predicate.");
+
+    RLMResults *dateRes = [MixedObject objectsWhere:@"anyCol == %@", [NSDate dateWithTimeIntervalSince1970:0]];
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol == %@", [NSDate dateWithTimeIntervalSince1970:0]);
+    // @Lee - expect that it would return date based RLMValues that !=. Currently returns everything that isn't a date also, like strings.
+    RLMAssertCount(AllTypesObject, 0U, @"anyCol != %@", [NSDate dateWithTimeIntervalSince1970:0]);
+    
+//    nulls < strings, binaries < numerics < timestamps < objectId < uuid
+    RLMResults *toSort = [AllTypesObject allObjects];
+    [self verifySort:realm column:@"anyCol" ascending:YES expected:NSNull.null];
+    [self verifySort:realm column:@"anyCol" ascending:NO expected:allValues.lastObject];
 }
 
 - (void)testArrayQuery
