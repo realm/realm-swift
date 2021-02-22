@@ -244,6 +244,12 @@ extension UUID: RealmCollectionValue {
         return RLMArray(objectType: .UUID, optional: false)
     }
 }
+extension AnyRealmValue: RealmCollectionValue {
+    /// :nodoc:
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        return RLMArray(objectType: .any, optional: false)
+    }
+}
 
 /// :nodoc:
 public protocol _RealmCollectionEnumerator {

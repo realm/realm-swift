@@ -139,6 +139,7 @@ class SwiftListObject: Object {
     let decimal = List<Decimal128>()
     let objectId = List<ObjectId>()
     let uuid = List<UUID>()
+    let any = List<AnyRealmValue>()
 
     let intOpt = List<Int?>()
     let int8Opt = List<Int8?>()
