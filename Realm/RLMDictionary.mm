@@ -66,7 +66,7 @@
 
 #pragma mark - Convenience wrappers used for all RLMDictionary types
 
-- (void)addObjectsFrom:(NSDictionary *)dictionary {
+- (void)addObjects:(NSDictionary *)dictionary {
     for (id key in dictionary) {
         self[key] = dictionary[key];
     }

@@ -20,6 +20,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class RLMResults<RLMObjectType>;
+
 @protocol RLMDictionaryKey
 @end
 
@@ -123,7 +125,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param dictionary  A dictionary of the same type as self.
  */
-- (void)addObjectsFrom:(NSDictionary *)dictionary;
+- (void)addObjects:(NSDictionary *)dictionary;
 
 /**
  Replace the data of a dictionary with the data of another dictionary.
@@ -159,6 +161,26 @@ NS_ASSUME_NONNULL_BEGIN
  Adds to the receiving dictionary the entries from another dictionary.
  */
 - (void)addEntriesFromDictionary:(RLMDictionary<RLMDictionaryKey, RLMObjectType> *)otherDictionary;
+
+#pragma mark - Querying a Set
+
+/// :nodoc:
+- (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat, ...;
+
+/// :nodoc:
+- (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
+
+/// :nodoc:
+- (RLMResults<RLMObjectType> *)objectsWithPredicate:(NSPredicate *)predicate;
+
+/// :nodoc:
+- (RLMResults<RLMObjectType> *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending;
+
+/// :nodoc:
+- (RLMResults<RLMObjectType> *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties;
+
+/// :nodoc:
+- (RLMResults<RLMObjectType> *)distinctResultsUsingKeyPaths:(NSArray<NSString *> *)keyPaths;
 
 #pragma mark - Notifications
 

@@ -112,7 +112,7 @@ static double average(NSArray *values) {
 }
 
 - (void)addObjects {
-    [$dictionary addObjectsFrom:$values];
+    [$dictionary addObjects:$values];
 }
 
 - (void)testCount {
@@ -234,27 +234,34 @@ static double average(NSArray *values) {
 }
 */
 
-- (void)testAddObject {
-    RLMAssertThrowsWithReason([$dictionary addObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
-    %r RLMAssertThrowsWithReason([$dictionary addObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
 
-    [$dictionary addObject:$v0];
-    XCTAssertEqualObjects($dictionary[0], $v0);
+- (void)testSetObject {
+    RLMAssertThrowsWithReason([$dictionary setObject:$first forKey:nil], ^n @"Should fail on nil key '$wdesc' of type '$wtype' for expected type '$type'");
+    %r RLMAssertThrowsWithReason([$dictionary setObject:NSNull.null forKey: @"testVal"], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
-    %o [$dictionary addObject:NSNull.null];
-    %o XCTAssertEqualObjects($dictionary[1], NSNull.null);
+    RLMAssertThrowsWithReason([$dictionary setObject:$wrong forKey: @"wrongVal"], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %r RLMAssertThrowsWithReason([$dictionary setObject:NSNull.null forKey: @"nullVal"], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
+
+    $dictionary[@"val"] = $v0;
+    XCTAssertEqualObjects($dictionary[@"val"], $v0);
+
+    %o $dictionary[@"val"] = NSNull.null;
+    %o XCTAssertEqualObjects($dictionary[@"val"], NSNull.null);
 }
+#pragma clang diagnostic pop
 
 - (void)testAddObjects {
-    RLMAssertThrowsWithReason([$dictionary addObjects:@[$wrong]], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
-    %r RLMAssertThrowsWithReason([$dictionary addObjects:@[NSNull.null]], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
+    RLMAssertThrowsWithReason([$dictionary addObjects:@{@"wrongVal": $wrong}], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %r RLMAssertThrowsWithReason([$dictionary addObjects:@{@"nullVal": NSNull.null}], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
-    XCTAssertEqualObjects($dictionary[0], $v0);
-    XCTAssertEqualObjects($dictionary[1], $v1);
-    %o XCTAssertEqualObjects($dictionary[2], NSNull.null);
+    XCTAssertEqualObjects($dictionary[@"0"], $v0);
+    XCTAssertEqualObjects($dictionary[@"1"], $v1);
+    %o XCTAssertEqualObjects($dictionary[@"2"], NSNull.null);
 }
-
+/**
 - (void)testInsertObject {
     RLMAssertThrowsWithReason([$dictionary insertObject:$wrong atIndex:0], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
     %r RLMAssertThrowsWithReason([$dictionary insertObject:NSNull.null atIndex:0], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
@@ -272,18 +279,13 @@ static double average(NSArray *values) {
     %o XCTAssertEqualObjects($dictionary[1], NSNull.null);
     %o XCTAssertEqualObjects($dictionary[2], $v0);
 }
-
+ */
 - (void)testRemoveObject {
-    RLMAssertThrowsWithReason([$allDictionaries removeObjectAtIndex:0], ^n @"Index 0 is out of bounds (must be less than 0).");
-
     [self addObjects];
     %r XCTAssertEqual($dictionary.count, 2U);
     %o XCTAssertEqual($dictionary.count, 3U);
 
-    %r RLMAssertThrowsWithReason([$dictionary removeObjectAtIndex:2], ^n @"Index 2 is out of bounds (must be less than 2).");
-    %o RLMAssertThrowsWithReason([$dictionary removeObjectAtIndex:3], ^n @"Index 3 is out of bounds (must be less than 3).");
-
-    [$allDictionaries removeObjectAtIndex:0];
+    [$allDictionaries removeObjectForKey:@"0"];
     %r XCTAssertEqual($dictionary.count, 1U);
     %o XCTAssertEqual($dictionary.count, 2U);
 
@@ -291,52 +293,32 @@ static double average(NSArray *values) {
     %o XCTAssertEqualObjects($dictionary[1], NSNull.null);
 }
 
-- (void)testRemoveLastObject {
-    XCTAssertNoThrow([$allDictionaries removeLastObject]);
-
+- (void)testRemoveObjects {
     [self addObjects];
     %r XCTAssertEqual($dictionary.count, 2U);
     %o XCTAssertEqual($dictionary.count, 3U);
 
-    [$allDictionaries removeLastObject];
+    [$allDictionaries removeObjectsForKeys:@[@"0"]];
     %r XCTAssertEqual($dictionary.count, 1U);
     %o XCTAssertEqual($dictionary.count, 2U);
 
-    XCTAssertEqualObjects($dictionary[0], $v0);
-    %o XCTAssertEqualObjects($dictionary[1], $v1);
+    XCTAssertEqualObjects($dictionary[0], $v1);
+    %o XCTAssertEqualObjects($dictionary[1], NSNull.null);
 }
 
-- (void)testReplace {
-    RLMAssertThrowsWithReason([$dictionary replaceObjectAtIndex:0 withObject:$v0], ^n @"Index 0 is out of bounds (must be less than 0).");
+- (void)testUpdateObjects {
+    [self addObjects];
+    %r XCTAssertEqual($dictionary.count, 2U);
+    %o XCTAssertEqual($dictionary.count, 3U);
 
-    [$dictionary addObject:$v0]; ^nl [$dictionary replaceObjectAtIndex:0 withObject:$v1]; ^nl XCTAssertEqualObjects($dictionary[0], $v1); ^nl
+    %r XCTAssertEqualObjects($dictionary[@"1"], $v1);
+    %o XCTAssertEqualObjects($dictionary[@"2"], NSNull.null);
 
-    %o [$dictionary replaceObjectAtIndex:0 withObject:NSNull.null]; ^nl XCTAssertEqualObjects($dictionary[0], NSNull.null);
+    %r $dictionary[@"1"] = $dictionary[@"0"];
+    %o $dictionary[@"2"] = $dictionary[@"1"];
 
-    RLMAssertThrowsWithReason([$dictionary replaceObjectAtIndex:0 withObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
-    %r RLMAssertThrowsWithReason([$dictionary replaceObjectAtIndex:0 withObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
-}
-
-- (void)testMove {
-    RLMAssertThrowsWithReason([$allDictionaries moveObjectAtIndex:0 toIndex:1], ^n @"Index 0 is out of bounds (must be less than 0).");
-    RLMAssertThrowsWithReason([$allDictionaries moveObjectAtIndex:1 toIndex:0], ^n @"Index 1 is out of bounds (must be less than 0).");
-
-    [$dictionary addObjects:@[$v0, $v1, $v0, $v1]];
-
-    [$allDictionaries moveObjectAtIndex:2 toIndex:0];
-
-    XCTAssertEqualObjects([$dictionary valueForKey:@"self"], ^n (@[$v0, $v0, $v1, $v1]));
-}
-
-- (void)testExchange {
-    RLMAssertThrowsWithReason([$allDictionaries exchangeObjectAtIndex:0 withObjectAtIndex:1], ^n @"Index 0 is out of bounds (must be less than 0).");
-    RLMAssertThrowsWithReason([$allDictionaries exchangeObjectAtIndex:1 withObjectAtIndex:0], ^n @"Index 1 is out of bounds (must be less than 0).");
-
-    [$dictionary addObjects:@[$v0, $v1, $v0, $v1]];
-
-    [$allDictionaries exchangeObjectAtIndex:2 withObjectAtIndex:1];
-
-    XCTAssertEqualObjects([$dictionary valueForKey:@"self"], ^n (@[$v0, $v0, $v1, $v1]));
+    %r XCTAssertNotEqualObjects($dictionary[@"1"], $v1);
+    %o XCTAssertNotEqualObjects($dictionary[@"2"], NSNull.null);
 }
 
 - (void)testIndexOfObject {
@@ -353,20 +335,20 @@ static double average(NSArray *values) {
 }
 
 - (void)testIndexOfObjectSorted {
-    %man %r [$dictionary addObjects:@[$v0, $v1, $v0, $v1]];
-    %man %o [$dictionary addObjects:@[$v0, $v1, NSNull.null, $v1, $v0]];
+    %man %r [$dictionary addObjects:@{@"2": $v0, @"3": $v1, @"4": $v0, @"5": $v1}];
+    %man %o [$dictionary addObjects:@{@"2": $v0, @"3": $v1, @"4": NSNull.null, @"5": $v1, @"6": $v0}];
 
-    %man %r XCTAssertEqual(0U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1]);
-    %man %r XCTAssertEqual(2U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
+    %man %r XCTAssertEqual(0U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@"1"]);
+    %man %r XCTAssertEqual(2U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@"0"]);
 
-    %man %o XCTAssertEqual(0U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1]);
-    %man %o XCTAssertEqual(2U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
+    %man %o XCTAssertEqual(0U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@"1"]);
+    %man %o XCTAssertEqual(2U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@"0"]);
     %man %o XCTAssertEqual(4U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
 }
 
 - (void)testIndexOfObjectDistinct {
-    %man %r [$dictionary addObjects:@[$v0, $v0, $v1]];
-    %man %o [$dictionary addObjects:@[$v0, $v0, NSNull.null, $v1, $v0]];
+    %man %r [$dictionary addObjects:@{@"2": $v0, @"3": $v0, @"4": $v1}];
+    %man %o [$dictionary addObjects:@{@"2": $v0, @"3": $v0, @"4": NSNull.null, @"5": $v1, @"6": $v0}];
 
     %man %r XCTAssertEqual(0U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
     %man %r XCTAssertEqual(1U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1]);
@@ -401,12 +383,12 @@ static double average(NSArray *values) {
 }
 
 - (void)testSort {
-    %unman RLMAssertThrowsWithReason([$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO], ^n @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
-    %unman RLMAssertThrowsWithReason([$dictionary sortedResultsUsingDescriptors:@[]], ^n @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    %unman RLMAssertThrowsWithReason([$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO], ^n @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+    %unman RLMAssertThrowsWithReason([$dictionary sortedResultsUsingDescriptors:@[]], ^n @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
     %man RLMAssertThrowsWithReason([$dictionary sortedResultsUsingKeyPath:@"not self" ascending:NO], ^n @"can only be sorted on 'self'");
 
-    %man %r [$dictionary addObjects:@[$v0, $v1, $v0]];
-    %man %o [$dictionary addObjects:@[$v0, $v1, NSNull.null, $v1, $v0]];
+    %man %r [$dictionary addObjects:@{@"2": $v0, @"3": $v1, @"4": $v0}];
+    %man %o [$dictionary addObjects:@{@"2": $v0, @"3": $v1, @"4": NSNull.null, @"5": $v1, @"6": $v0}];
 
     %man %r XCTAssertEqualObjects([[$dictionary sortedResultsUsingDescriptors:@[]] valueForKey:@"self"], ^n (@[$v0, $v1, $v0]));
     %man %o XCTAssertEqualObjects([[$dictionary sortedResultsUsingDescriptors:@[]] valueForKey:@"self"], ^n (@[$v0, $v1, NSNull.null, $v1, $v0]));
@@ -482,7 +464,7 @@ static double average(NSArray *values) {
         [self addObjects];
     }
 
-    { ^nl NSUInteger i = 0; ^nl NSArray *values = $values; ^nl for (id value in $dictionary) { ^nl XCTAssertEqualObjects(values[i++ % values.count], value); ^nl } ^nl XCTAssertEqual(i, $dictionary.count); ^nl } ^nl
+    { ^nl NSUInteger i = 0; ^nl NSArray *values = $values; ^nl for (id value in $dictionary) { ^nl XCTAssertEqualObjects(values[i++ % values.count], value); ^nl } ^nl XCTAssertEqual(i, $dictionary.count); ^nl } ^nl 
 }
 
 - (void)testValueForKeySelf {
