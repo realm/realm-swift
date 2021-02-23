@@ -1060,7 +1060,16 @@ void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
 void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
                           NSComparisonPredicateOptions predicateOptions,
                           Columns<Mixed>&& column, null rhs) {
-    m_query.and_query(column == rhs);
+    switch (operatorType) {
+        case NSEqualToPredicateOperatorType:
+            m_query.and_query(column == rhs);
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            m_query.and_query(column != rhs);
+            break;
+        default:
+            @throw RLMException(@"Unsupported NSPredicateOperatorType type.");
+    }
 }
 
 void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,

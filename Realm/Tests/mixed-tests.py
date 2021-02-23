@@ -14,7 +14,6 @@ import os, re
 
 types = [
   # Class, Object, Property, Values, Tags
-#  ['AllPrimitiveValues', 'unmanaged', 'objectIdObj', ['objectId(1)', 'objectId(2)'], {'r', 'unman'}],
   ['AllPrimitiveRLMValues', 'unmanaged', 'boolVal', ['@NO', '@YES', 'NSNull.null'], {'n', 'o', 'unman'}, '(NSNumber *)', 'RLMPropertyTypeBool'],
   ['AllPrimitiveRLMValues', 'unmanaged', 'intVal', ['@2', '@3', 'NSNull.null'], {'n', 'o', 'minmax', 'sum', 'avg', 'unman'}, '(NSNumber *)', 'RLMPropertyTypeInt'],
   ['AllPrimitiveRLMValues', 'unmanaged', 'floatVal', ['@2.2f', '@3.3f', 'NSNull.null'], {'n', 'o', 'minmax', 'sum', 'avg', 'unman'}, '(NSNumber *)', 'RLMPropertyTypeFloat'],
@@ -23,8 +22,8 @@ types = [
   ['AllPrimitiveRLMValues', 'unmanaged', 'dataVal', ['data(1)', 'data(2)', 'NSNull.null'], {'da', 'o', 'unman'}, '(NSData *)', 'RLMPropertyTypeData'],
   ['AllPrimitiveRLMValues', 'unmanaged', 'dateVal', ['date(1)', 'date(2)', 'NSNull.null'], {'dt', 'o', 'minmax', 'unman', 'date'}, '(NSDate *)', 'RLMPropertyTypeDate'],
   ['AllPrimitiveRLMValues', 'unmanaged', 'decimalVal', ['decimal128(2)', 'decimal128(3)', 'NSNull.null'], {'dc', 'o', 'minmax', 'sum', 'avg', 'unman'}, '(RLMDecimal128 *)', 'RLMPropertyTypeDecimal128'],
-#  ['AllPrimitiveRLMValues', 'unmanaged', 'nullVal', ['NSNull.null', 'NSNull.null'], {'r', 'unman'}, ''],
-#  ['AllOptionalPrimitiveValues', 'optUnmanaged', 'objectIdObj', ['objectId(1)', 'objectId(2)', 'NSNull.null'], {'o', 'unman'}],
+#  ['AllPrimitiveRLMValues', 'unmanaged', 'objectIdObj', ['objectId(1)', 'objectId(2)', 'NSNull.null'], {'o', 'unman'}, '(RLMObjectId *)', 'RLMPropertyTypeObjectId'],
+#  ['AllPrimitiveRLMValues', 'unmanaged', 'uuidObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")', 'NSNull.null'], {'o', 'man'}, '(UUID *)', 'RLMPropertyTypeUUID'],
   ['AllPrimitiveRLMValues', 'managed', 'boolVal', ['@NO', '@YES'], {'n', 'r', 'man'}, '(NSNumber *)', 'RLMPropertyTypeBool'],
   ['AllPrimitiveRLMValues', 'managed', 'intVal', ['@2', '@3'], {'n', 'r', 'minmax', 'sum', 'avg', 'man'}, '(NSNumber *)', 'RLMPropertyTypeBool'],
   ['AllPrimitiveRLMValues', 'managed', 'floatVal', ['@2.2f', '@3.3f'], {'n', 'r', 'minmax', 'sum', 'avg', 'man'}, '(NSNumber *)', 'RLMPropertyTypeInt'],
@@ -33,10 +32,9 @@ types = [
   ['AllPrimitiveRLMValues', 'managed', 'dataVal', ['data(1)', 'data(2)'], {'da', 'r', 'man'}, '(NSData *)', 'RLMPropertyTypeData'],
   ['AllPrimitiveRLMValues', 'managed', 'dateVal', ['date(1)', 'date(2)'], {'dt', 'r', 'minmax', 'man', 'date'}, '(NSDate *)', 'RLMPropertyTypeDate'],
   ['AllPrimitiveRLMValues', 'managed', 'decimalVal', ['decimal128(2)', 'decimal128(3)'], {'dc', 'r', 'minmax', 'sum', 'avg', 'man'}, '(RLMDecimal128 *)', 'RLMPropertyTypeDecimal128'],
-#  ['AllPrimitiveRLMValues', 'unmanaged', 'nullVal', ['NSNull.null', 'NSNull.null'], {'r', 'unman'}, ''],
+#  ['AllPrimitiveRLMValues', 'managed', 'objectIdObj', ['objectId(1)', 'objectId(2)', 'NSNull.null'], {'o', 'unman'}, '(RLMObjectId *)', 'RLMPropertyTypeObjectId'],
+#  ['AllPrimitiveRLMValues', 'managed', 'uuidObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")', 'NSNull.null'], {'o', 'man'}, '(UUID *)', 'RLMPropertyTypeUUID'],
 
-#  ['AllPrimitiveValues', 'managed', 'objectIdObj', ['objectId(1)', 'objectId(2)'], {'r', 'man'}],
-#  ['AllOptionalPrimitiveValues', 'optManaged', 'objectIdObj', ['objectId(1)', 'objectId(2)', 'NSNull.null'], {'o', 'man'}],
 ]
 types = [{'class': t[0], 'obj': t[1], 'prop': t[2], 'v0': t[3][0], 'v1': t[3][1],
           'rlmValue': t[1] + '.' + t[2],

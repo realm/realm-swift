@@ -32,6 +32,7 @@ public final class AnyRealmValue: RLMValueBase {
         case object(Object)
         case objectId(ObjectId)
         case decimal128(Decimal128)
+        case uuid(UUID)
 
         public var intValue: Int? {
             guard case let .int(i) = self else {
@@ -82,6 +83,13 @@ public final class AnyRealmValue: RLMValueBase {
             return d
         }
 
+        public var uuidValue: UUID? {
+            guard case let .uuid(u) = self else {
+                return nil
+            }
+            return u
+        }
+
         public func objectValue<T: Object>(_ objectType: T.Type) -> T? {
             guard case let .object(o) = self else {
                 return nil
@@ -100,6 +108,7 @@ public final class AnyRealmValue: RLMValueBase {
     }
 }
 
+// !!!: @Eric move to own objc support file
 //ObjectiveCSupport+AnyRealmType
 
 public extension ObjectiveCSupport {
@@ -120,8 +129,11 @@ public extension ObjectiveCSupport {
                 return o as RLMObjectId
             case let .decimal128(o):
                 return o as RLMDecimal128
+            case let .uuid(u):
+                return u as NSUUID
             case let .object(o):
                 return o.unsafeCastToRLMObject()
+
             default:
                 return nil
         }
@@ -168,6 +180,11 @@ public extension ObjectiveCSupport {
                     return .none
                 }
                 return .decimal128(val)
+            case RLMPropertyType.UUID:
+                guard let val = value as? UUID else {
+                    return .none
+                }
+                return .uuid(val)
             case RLMPropertyType.object:
                 guard let val = value as? RLMObjectBase else {
                     return .none

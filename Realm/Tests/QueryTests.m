@@ -626,7 +626,7 @@
                            [NSDate dateWithTimeIntervalSince1970:0],
                            [NSDate dateWithTimeIntervalSince1970:1],
                            [RLMObjectId objectId],
-//                           [[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"],
+                           [[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"],
     ];
 
     StringObject *stringObj = [StringObject new];
@@ -651,12 +651,16 @@
     RLMAssertCount(AllTypesObject, 14U, @"anyCol >= 0");
     RLMAssertCount(AllTypesObject, 7U, @"anyCol == 0");
     RLMAssertCount(AllTypesObject, 15U, @"anyCol != 0");
+    // add in query for uuid
     
     RLMAssertCount(AllTypesObject, 7U, @"anyCol == FALSE");
     RLMAssertCount(AllTypesObject, 14U, @"anyCol >= FALSE");
     RLMAssertCount(AllTypesObject, 1U, @"anyCol == NULL");
+    RLMResults *allRes = [AllTypesObject allObjects]; // expect every alltypes object except the one with null
+    RLMResults *res = [AllTypesObject objectsWhere:@"anyCol != NULL"]; // expect every alltypes object except the one with null
     RLMAssertCount(AllTypesObject, allValues.count-1, @"anyCol != NULL");
 
+    // @Eric change test
     XCTAssertThrowsSpecificNamed([MixedObject objectsWhere:@"anyCol BETWEEN TRUE"],
                                  NSException,
                                  @"Invalid operator type",
@@ -680,6 +684,7 @@
                                  NSException,
                                  @"Invalid operator type",
                                  @"Invalid operator in anyCol predicate.");
+    // @eric change test
     XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol CONATINS 0"],
                                  NSException,
                                  @"Invalid operator type",
@@ -691,8 +696,7 @@
     RLMAssertCount(AllTypesObject, 0U, @"anyCol != %@", [NSDate dateWithTimeIntervalSince1970:0]);
     
 //    nulls < strings, binaries < numerics < timestamps < objectId < uuid
-    RLMResults *toSort = [AllTypesObject allObjects];
-    [self verifySort:realm column:@"anyCol" ascending:YES expected:NSNull.null];
+    [self verifySort:realm column:@"anyCol" ascending:YES expected:nil];
     [self verifySort:realm column:@"anyCol" ascending:NO expected:allValues.lastObject];
 }
 

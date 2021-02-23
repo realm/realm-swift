@@ -159,6 +159,28 @@ class AnyRealmValueTests: TestCase {
         XCTAssertEqual(o.anyValue.value.decimal128Value, d3)
     }
 
+    func testUuid() {
+        let o = AnyRealmTypeObject()
+        let u1 = UUID()
+        let u2 = UUID()
+        let u3 = UUID()
+
+        o.anyValue.value = .uuid(u1)
+        XCTAssertEqual(o.anyValue.value.uuidValue, u1)
+
+        o.anyValue.value = .uuid(u2)
+        XCTAssertEqual(o.anyValue.value.uuidValue, u2)
+        let realm = realmWithTestPath()
+        try! realm.write {
+            realm.add(o)
+        }
+        XCTAssertEqual(o.anyValue.value.uuidValue, u2)
+        try! realm.write {
+            o.anyValue.value = .uuid(u3)
+        }
+        XCTAssertEqual(o.anyValue.value.uuidValue, u3)
+    }
+
     func testObject() {
         let o = AnyRealmTypeObject()
         let so = SwiftStringObject()

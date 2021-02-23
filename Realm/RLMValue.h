@@ -62,5 +62,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMDecimal128 (RLMValue)<RLMValue>
 @end
 
+@interface NSUUID (RLMValue)<RLMValue>
+@end
+
 NS_ASSUME_NONNULL_END
 

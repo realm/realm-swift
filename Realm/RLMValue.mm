@@ -37,6 +37,14 @@
 
 @end
 
+@implementation NSUUID (RLMValue)
+
+- (RLMPropertyType)valueType {
+    return RLMPropertyTypeUUID;
+}
+
+@end
+
 @implementation NSNull (RLMValue)
 
 - (RLMPropertyType)valueType {
