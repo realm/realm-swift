@@ -298,11 +298,11 @@
     return _backingCollection.allValues;
 }
 
-- (nullable id)objectForKey:(id)key {
+- (nullable id)objectForKey:(id<RLMDictionaryKey>)key {
     return [_backingCollection objectForKey:key];
 }
 
-- (nullable id)objectForKeyedSubscript:(id)key {
+- (nullable id)objectForKeyedSubscript:(id<RLMDictionaryKey>)key {
     return [_backingCollection objectForKey:key];
 }
 
@@ -313,6 +313,7 @@
 - (void)setDictionary:(RLMDictionary *)dictionary {
     [dictionary enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull value, BOOL *) {
         RLMDictionaryValidateMatchingObjectType(self, key, value);
+        // TODO: This operation seems a bit redundant.
     }];
     changeDictionary(self, ^{
         [_backingCollection setDictionary: dictionary->_backingCollection];
@@ -331,20 +332,20 @@
     });
 }
 
-- (void)removeObjectForKey:(id)key {
+- (void)removeObjectForKey:(id<RLMDictionaryKey>)key {
     changeDictionary(self, ^{
         [_backingCollection removeObjectForKey:key];
     });
 }
 
-- (void)setObject:(id)obj forKeyedSubscript:(id)key {
+- (void)setObject:(id)obj forKeyedSubscript:(id<RLMDictionaryKey>)key {
     RLMDictionaryValidateMatchingObjectType(self, key, obj);
     changeDictionary(self, ^{
-        [_backingCollection setObject:obj forKey:key];
+        [_backingCollection setObject:obj forKey:(id)key];
     });
 }
 
-- (void)setObject:(id)obj forKey:(id)key {
+- (void)setObject:(id)obj forKey:(id<RLMDictionaryKey>)key {
     RLMDictionaryValidateMatchingObjectType(self, key, obj);
     changeDictionary(self, ^{
         [_backingCollection setObject:obj forKey:key];
@@ -384,13 +385,15 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     }
 }
 
-void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *const dictionary, __unsafe_unretained id const key, __unsafe_unretained id const value) {
+void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *const dictionary,
+                                             __unsafe_unretained id const key,
+                                             __unsafe_unretained id const value) {
     if (!key) {
-        @throw RLMException(@"Invalid nil key for dictionary of '%@'.",
+        @throw RLMException(@"Invalid nil key for dictionary expecting key of type '%@'.",
                             dictionary->_objectClassName ?: RLMTypeToString(dictionary->_keyType));
     }
     if (!value && !dictionary->_optional) {
-        @throw RLMException(@"Invalid nil value for dictionary of '%@'.",
+        @throw RLMException(@"Invalid nil value for dictionary of expected type '%@'.",
                             dictionary->_objectClassName ?: RLMTypeToString(dictionary->_type));
     }
     if (dictionary->_type != RLMPropertyTypeObject) {

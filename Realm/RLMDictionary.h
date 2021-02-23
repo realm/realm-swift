@@ -20,9 +20,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMResults<RLMObjectType>;
+@class RLMObject, RLMResults<RLMObjectType>;
 
-@protocol RLMDictionaryKey
+@protocol RLMDictionaryKey <NSCopying>
 @end
 
 @interface NSString (RLMDictionaryKey)<RLMDictionaryKey>
@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Key-value collection. Where the key is a string and value is one of the available Realm types.
  */
-@interface RLMDictionary<RLMDictionaryKey, RLMObjectType>: NSObject<RLMCollection, NSFastEnumeration>
+@interface RLMDictionary<RLMKeyType, RLMObjectType>: NSObject<RLMCollection>
 
 #pragma mark - Properties
 
@@ -90,17 +90,17 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A value associated with a given key or `nil`.
  */
-- (nullable id)valueForKey:(nonnull NSString *)key;
+- (nullable id)valueForKey:(nonnull RLMKeyType <RLMDictionaryKey>)key;
 
 /**
- Returns an array of the dictionary's keys.
+ Returns an object, if present, for a given key in the dictionary.
  */
-- (nullable RLMObjectType)objectForKey:(nonnull RLMDictionaryKey)key;
+- (nullable RLMObjectType)objectForKey:(nonnull RLMKeyType <RLMDictionaryKey>)key;
 
 /**
  Returns an array containing the dictionary’s keys.
  */
-@property(readonly, copy) NSArray<RLMDictionaryKey> *allKeys;
+@property(readonly, copy) NSArray<RLMKeyType <RLMDictionaryKey>> *allKeys;
 
 /**
  Returns an array containing the dictionary’s values.
@@ -108,29 +108,24 @@ NS_ASSUME_NONNULL_BEGIN
 @property(readonly, copy) NSArray<RLMObjectType> *allValues;
 
 /// :nodoc:
-- (nullable RLMObjectType)objectForKeyedSubscript:(RLMDictionaryKey)key;
+- (nullable RLMObjectType)objectForKeyedSubscript:(RLMKeyType <RLMDictionaryKey>)key;
 
 /**
  Applies a given block object to the each key-value pair of the dictionary
  */
-- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id<RLMDictionaryKey> key, RLMObjectType obj, BOOL *stop))block;
+- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(RLMKeyType <RLMDictionaryKey> key, RLMObjectType obj, BOOL *stop))block;
+
+/**
+ Returns an enumerator object that lets you access each value in the dictionary
+ */
+- (NSEnumerator<RLMObjectType> *)objectEnumerator;
 
 #pragma mark - Adding, Removing, and Replacing Objects in an Array
 
 /**
- Adds elements from one dictionary to another.
-
- @warning This method may only be called during a write transaction.
- @warning This actiobn can replace existing values.
-
- @param dictionary  A dictionary of the same type as self.
- */
-- (void)addObjects:(NSDictionary *)dictionary;
-
-/**
  Replace the data of a dictionary with the data of another dictionary.
  */
-- (void)setDictionary:(RLMDictionary<RLMDictionaryKey, RLMObjectType> *)otherDictionary;
+- (void)setDictionary:(RLMDictionary<RLMKeyType <RLMDictionaryKey>, RLMObjectType> *)otherDictionary;
 
 /**
  Delete all dictionary's keys and values.
@@ -140,29 +135,29 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Delete dictionary's values for a given keys.
  */
-- (void)removeObjectsForKeys:(NSArray<RLMDictionaryKey> *)keyArray;
+- (void)removeObjectsForKeys:(NSArray<RLMKeyType> *)keyArray;
 
 /**
  Delete dictionary's value for a given key.
  */
-- (void)removeObjectForKey:(RLMDictionaryKey)key;
+- (void)removeObjectForKey:(RLMKeyType <RLMDictionaryKey>)key;
 
 /**
  Add a value for a given key indictioanry.
  */
-- (void)setObject:(RLMObjectType)obj forKeyedSubscript:(RLMDictionaryKey)key;
+- (void)setObject:(RLMObjectType)obj forKeyedSubscript:(RLMKeyType <RLMDictionaryKey>)key;
 
 /**
  Adds a given key-value pair to the dictionary.
  */
-- (void)setObject:(RLMObjectType)anObject forKey:(nonnull RLMDictionaryKey)aKey;
+- (void)setObject:(RLMObjectType)anObject forKey:(RLMKeyType <RLMDictionaryKey>)aKey;
 
 /**
  Adds to the receiving dictionary the entries from another dictionary.
  */
-- (void)addEntriesFromDictionary:(RLMDictionary<RLMDictionaryKey, RLMObjectType> *)otherDictionary;
+- (void)addEntriesFromDictionary:(RLMDictionary<RLMKeyType <RLMDictionaryKey>, RLMObjectType> *)otherDictionary;
 
-#pragma mark - Querying a Set
+#pragma mark - Querying a Dictionary
 
 /// :nodoc:
 - (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat, ...;
@@ -237,7 +232,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param block The block to be called each time the dictionary changes.
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMDictionaryKey, RLMObjectType> *_Nullable dictionary,
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMKeyType <RLMDictionaryKey>, RLMObjectType> *_Nullable dictionary,
                                                          RLMCollectionChange *_Nullable changes,
                                                          NSError *_Nullable error))block
 __attribute__((warn_unused_result));
@@ -274,7 +269,7 @@ __attribute__((warn_unused_result));
  @param queue The serial queue to deliver notifications to.
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMDictionaryKey, RLMObjectType> *_Nullable dictionary,
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMKeyType <RLMDictionaryKey>, RLMObjectType> *_Nullable dictionary,
                                                          RLMCollectionChange *_Nullable changes,
                                                          NSError *_Nullable error))block
                                          queue:(nullable dispatch_queue_t)queue
@@ -319,6 +314,11 @@ __attribute__((warn_unused_result));
  `RLMDictionary` properties on `RLMObject`s are lazily created when accessed.
  */
 + (instancetype)new __attribute__((unavailable("RLMDictionary cannot be created directly")));
+
+// TODO: Remove
+
+- (void)addObjects:(NSDictionary *)dictionary;
+
 
 @end
 NS_ASSUME_NONNULL_END

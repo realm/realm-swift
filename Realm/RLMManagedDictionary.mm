@@ -37,12 +37,12 @@
 #import <realm/object-store/shared_realm.hpp>
 #import <realm/table_view.hpp>
 
-@interface RLMManagedDictionaryHandoverMetadata : NSObject
+@interface RLMManagedCollectionHandoverMetadata : NSObject
 @property (nonatomic) NSString *parentClassName;
 @property (nonatomic) NSString *key;
 @end
 
-@implementation RLMManagedDictionaryHandoverMetadata
+@implementation RLMManagedCollectionHandoverMetadata
 @end
 
 @interface RLMManagedDictionary () <RLMThreadConfined_Private>
@@ -245,7 +245,8 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (BOOL)isEqual:(id)object {
-    return [object respondsToSelector:@selector(isBackedByDictionary:)] && [object isBackedByDictionary:_backingCollection];
+    return [object respondsToSelector:@selector(isBackedByDictionary:)] &&
+           [object isBackedByDictionary:_backingCollection];
 }
 
 - (NSUInteger)hash {
@@ -260,8 +261,47 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     return RLMFastEnumerate(state, len, self);
 }
 
-#pragma mark - KVC
+#pragma mark - Object Retrieval
 
+- (nullable id)objectForKey:(id<RLMDictionaryKey>)key {
+    try {
+        RLMAccessorContext context(*_objectInfo);
+        return _backingCollection.get(context,
+                                      context.unbox<realm::StringData>(key));
+    }
+    catch (realm::KeyNotFound const&) {
+        return nil;
+    }
+    catch (...) {
+        throwError<RLMManagedDictionary>(nil, nil);
+    }
+}
+
+- (nullable id)objectForKeyedSubscript:(id<RLMDictionaryKey>)key {
+    return [self objectForKey:key];
+}
+
+- (void)setObject:(id)obj forKey:(id<RLMDictionaryKey>)key {
+    RLMCollectionValidateMatchingObjectType<RLMManagedDictionary>(self, obj);
+    changeDictionary(self, ^{
+        RLMAccessorContext context(*_objectInfo);
+        _backingCollection.insert(context,
+                                  context.unbox<realm::StringData>(key),
+                                  obj);
+    });
+}
+
+- (void)setObject:(id)obj forKeyedSubscript:(id<RLMDictionaryKey>)key {
+    RLMCollectionValidateMatchingObjectType<RLMManagedDictionary>(self, obj);
+    changeDictionary(self, ^{
+        RLMAccessorContext context(*_objectInfo);
+        _backingCollection.insert(context,
+                                  context.unbox<realm::StringData>(key),
+                                  obj);
+    });
+}
+
+#pragma mark - KVC
 
 - (id)valueForKeyPath:(NSString *)keyPath {
     if ([keyPath hasPrefix:@"@"]) {
@@ -291,11 +331,11 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
         auto results = _backingCollection.as_results();
         return RLMCollectionValueForKey(results, key, *_objectInfo);
     });
-    return nil;
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {
     if ([key isEqualToString:@"self"]) {
+        RLMCollectionValidateMatchingObjectType<RLMDictionary>(self, value);
         RLMAccessorContext context(*_objectInfo);
         translateErrors<RLMManagedDictionary>([&] {
             _backingCollection.remove_all();
@@ -319,7 +359,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
         return _objectInfo->tableColumn(propertyName);
     }
     if (![propertyName isEqualToString:@"self"]) {
-        @throw RLMException(@"Arrays of '%@' can only be aggregated on \"self\"", RLMTypeToString(_type));
+        @throw RLMException(@"Dictionaries of '%@' can only be aggregated on \"self\"", RLMTypeToString(_type));
     }
     return {};
 }
@@ -358,7 +398,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (void)deleteObjectsFromRealm {
     if (_type != RLMPropertyTypeObject) {
-        @throw RLMException(@"Cannot delete objects from RLMArray<%@>: only RLMObjects can be deleted.", RLMTypeToString(_type));
+        @throw RLMException(@"Cannot delete objects from RLMManagedDictionary<RLMString, %@>: only RLMObjects can be deleted.", RLMTypeToString(_type));
     }
     // delete all target rows from the realm
     RLMObservationTracker tracker(_realm, true);
@@ -399,8 +439,9 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (realm::TableView)tableView {
-//    return translateErrors<RLMManagedDictionary>([&] { return _backingCollection.get_query(); }).find_all();
-    return {};
+    return translateErrors<RLMManagedDictionary>([&] {
+        return _backingCollection.as_results().get_query();
+    }).find_all();
 }
 
 - (RLMFastEnumerator *)fastEnumerator {
@@ -410,11 +451,6 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
                                                           classInfo:*_objectInfo];
     });
 }
-
-realm::object_store::Dictionary& RLMGetBackingCollection(RLMManagedDictionary *self) {
-    return self->_backingCollection;
-}
-
 
 - (BOOL)isFrozen {
     return _realm.isFrozen;
@@ -446,6 +482,50 @@ realm::object_store::Dictionary& RLMGetBackingCollection(RLMManagedDictionary *s
                                                   parentInfo:&parentInfo
                                                     property:parentInfo.rlmObjectSchema[_key]];
     });
+}
+
+// The compiler complains about the method's argument type not matching due to
+// it not having the generic type attached, but it doesn't seem to be possible
+// to actually include the generic type
+// http://www.openradar.me/radar?id=6135653276319744
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmismatched-parameter-types"
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
+    return RLMAddNotificationBlock(self, block, nil);
+}
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block queue:(dispatch_queue_t)queue {
+    return RLMAddNotificationBlock(self, block, queue);
+}
+#pragma clang diagnostic pop
+
+realm::object_store::Dictionary& RLMGetBackingCollection(RLMManagedDictionary *self) {
+    return self->_backingCollection;
+}
+
+#pragma mark - Thread Confined Protocol Conformance
+
+- (realm::ThreadSafeReference)makeThreadSafeReference {
+    return _backingCollection;
+}
+
+- (RLMManagedCollectionHandoverMetadata *)objectiveCMetadata {
+    RLMManagedCollectionHandoverMetadata *metadata = [[RLMManagedCollectionHandoverMetadata alloc] init];
+    metadata.parentClassName = _ownerInfo->rlmObjectSchema.className;
+    metadata.key = _key;
+    return metadata;
+}
+
++ (instancetype)objectWithThreadSafeReference:(realm::ThreadSafeReference)reference
+                                     metadata:(RLMManagedCollectionHandoverMetadata *)metadata
+                                        realm:(RLMRealm *)realm {
+    auto dictionary = reference.resolve<realm::object_store::Dictionary>(realm->_realm);
+    if (!dictionary.is_valid()) {
+        return nil;
+    }
+    RLMClassInfo *parentInfo = &realm->_info[metadata.parentClassName];
+    return [[RLMManagedDictionary alloc] initWithBackingCollection:std::move(dictionary)
+                                                        parentInfo:parentInfo
+                                                          property:parentInfo->rlmObjectSchema[metadata.key]];
 }
 
 @end

@@ -62,7 +62,7 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
         super.init()
     }
 
-    internal init(objc rlmDictionary: RLMDictionary<NSString, AnyObject>) {
+    internal init(objc rlmDictionary: RLMDictionary<AnyObject, AnyObject>) {
         super.init(collection: rlmDictionary)
     }
 
@@ -79,7 +79,7 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
      - parameter key: The key to the property whose values are desired.
      */
     @nonobjc public func value(forKey key: String) -> Value? {
-        guard let value = rlmDictionary.value(forKey: key) else {
+        guard let value = RLMDictionary<AnyObject, AnyObject>.value(forKey: key) else {
             return nil
         }
         return dynamicBridgeCast(fromObjectiveC: value)
@@ -229,14 +229,14 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
      - parameter forKey: The direction to sort in.
      */
     public func updateValue(_ value: Value, forKey key: String) {
-        rlmDictionary[key] = dynamicBridgeCast(fromSwift: value) as AnyObject
+        rlmDictionary[key as RLMDictionaryKey] = dynamicBridgeCast(fromSwift: value) as AnyObject
     }
 
     /**
      Removes the given key and its associated object.
      */
     public func removeValue(for key: String) {
-        rlmDictionary.removeObject(forKey: key)
+        rlmDictionary.removeObject(for: key as RLMDictionaryKey)
     }
 
     /**
@@ -319,7 +319,8 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
      */
     public func observe(on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<Map>) -> Void) -> NotificationToken {
-        return rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
+        fatalError()
+//        return rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Frozen Objects
@@ -337,7 +338,7 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
     }
 
     // swiftlint:disable:next identifier_name
-    @objc class func _unmanagedDictionary() -> RLMDictionary<NSString, AnyObject> {
+    @objc class func _unmanagedDictionary() -> RLMDictionary<AnyObject, AnyObject> {
         return Value._rlmDictionary()
     }
     
@@ -418,7 +419,8 @@ extension Map: RealmCollection {
     public func _observe(_ queue: DispatchQueue?,
                          _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Value>>) -> Void)
         -> NotificationToken {
-            return rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
+        fatalError()
+        //return rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Object Retrieval

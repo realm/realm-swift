@@ -108,6 +108,9 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
         else if (auto rlmSet = asRLMSet(value)) {
             return checkCollectionType(rlmSet, type, optional, objectClassName);
         }
+        else if (auto rlmDictionary = asRLMDictionary(value)) {
+            return checkCollectionType(rlmDictionary, type, optional, objectClassName);
+        }
         if (id enumeration = RLMAsFastEnumeration(value)) {
             // check each element for compliance
             for (id el in enumeration) {

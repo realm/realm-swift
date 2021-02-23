@@ -458,5 +458,6 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
 
 // Explicitly instantiate the templated function for the two types we'll use it on
 template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedArray *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
+template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedDictionary *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
 template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedSet *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
 template RLMNotificationToken *RLMAddNotificationBlock<>(RLMResults *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);

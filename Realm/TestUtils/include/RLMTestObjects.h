@@ -21,7 +21,7 @@
 #if __has_extension(objc_generics)
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS *><CLASS>
 #define RLM_GENERIC_SET(CLASS) RLMSet<CLASS *><CLASS>
-#define RLM_GENERIC_DICTIONARY(KEY, CLASS) RLMDictionary<KEY *, CLASS *><CLASS>
+#define RLM_GENERIC_DICTIONARY(KEY, CLASS) RLMDictionary<KEY, CLASS>
 #else
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS>
 #define RLM_GENERIC_SET(CLASS) RLMSet<CLASS>
@@ -503,8 +503,9 @@ RLM_COLLECTION_TYPE(CircleObject);
 
 @interface DictionaryPropertyObject : RLMObject
 
-@property RLM_GENERIC_DICTIONARY(NSString, StringObject) *stringDictionary;
-@property RLM_GENERIC_DICTIONARY(NSString, IntObject) *intDictionary;
+@property RLM_GENERIC_DICTIONARY(RLMString, StringObject) *stringDictionary;
+@property RLM_GENERIC_DICTIONARY(RLMString, IntObject) *intDictionary;
+@property RLM_GENERIC_DICTIONARY(RLMString, RLMString) *primitiveStringDictionary;
 
 @end
 
