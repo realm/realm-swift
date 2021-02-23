@@ -81,10 +81,10 @@ static double average(NSArray *values) {
 @implementation LinkToAllOptionalPrimitiveDictionaries
 @end
 
-@interface PrimitiveArrayPropertyTests : RLMTestCase
+@interface PrimitiveDictionaryPropertyTests : RLMTestCase
 @end
 
-@implementation PrimitiveArrayPropertyTests {
+@implementation PrimitiveDictionaryPropertyTests {
     AllPrimitiveDictionaries *unmanaged;
     AllPrimitiveDictionaries *managed;
     AllOptionalPrimitiveDictionaries *optUnmanaged;
@@ -3278,7 +3278,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMRealm *r = [RLMRealm defaultRealm];
         [r transactionWithBlock:^{
             RLMDictionary *dictionary = [(AllPrimitiveDictionaries *)[AllPrimitiveDictionaries allObjectsInRealm:r].firstObject intObj];
-            [dictionary setObject:@"testKey" forKey:@0];
+            dictionary[@"testKey"] = @0;
         }];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
@@ -3314,8 +3314,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     [realm commitWriteTransaction];
 
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [managed.intObj addNotificationBlock:^(RLMArray *array, __unused RLMCollectionChange *change, NSError *error) {
-        XCTAssertNotNil(array);
+    id token = [managed.intObj addNotificationBlock:^(RLMDictionary *dictionary, __unused RLMCollectionChange *change, NSError *error) {
+        XCTAssertNotNil(dictionary);
         XCTAssertNil(error);
         // will throw if it's called a second time before we create the new
         // expectation object immediately before manually refreshing
@@ -3332,8 +3332,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         [self dispatchAsyncAndWait:^{
             RLMRealm *r = [RLMRealm defaultRealm];
             [r transactionWithBlock:^{
-                RLMArray *array = [(AllPrimitiveDictionaries *)[AllPrimitiveDictionaries allObjectsInRealm:r].firstObject intObj];
-                [array addObject:@0];
+                RLMDictionary *dictionary = [(AllPrimitiveDictionaries *)[AllPrimitiveDictionaries allObjectsInRealm:r].firstObject intObj];
+                dictionary[@"testKey"] = @0;
             }];
         }];
     }];
@@ -3346,13 +3346,13 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 }
 
 - (void)testDeletingObjectWithNotificationsRegistered {
-    [managed.intObj addObjects:@[@10, @20]];
+    [managed.intObj addObjects:@{@"a": @10, @"b": @20}];
     [realm commitWriteTransaction];
 
     __block bool first = true;
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [managed.intObj addNotificationBlock:^(RLMArray *array, RLMCollectionChange *change, NSError *error) {
-        XCTAssertNotNil(array);
+    id token = [managed.intObj addNotificationBlock:^(RLMDictionary *dictionary, RLMCollectionChange *change, NSError *error) {
+        XCTAssertNotNil(dictionary);
         XCTAssertNil(error);
         if (first) {
             XCTAssertNil(change);
