@@ -464,7 +464,7 @@ static double average(NSArray *values) {
         [self addObjects];
     }
 
-    { ^nl NSUInteger i = 0; ^nl NSArray *values = $values; ^nl for (id value in $dictionary) { ^nl XCTAssertEqualObjects(values[i++ % values.count], value); ^nl } ^nl XCTAssertEqual(i, $dictionary.count); ^nl } ^nl 
+    { ^nl NSUInteger i = 0; ^nl NSDictionary *values = $values; ^nl for (id key in $dictionary) { ^nl id value = $dictionary[key]; ^nl XCTAssertEqualObjects(values[key], value); ^nl } ^nl XCTAssertEqual(i, $dictionary.count); ^nl } ^nl 
 }
 
 - (void)testValueForKeySelf {
@@ -584,13 +584,13 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 }
 
 - (void)testAssignment {
-    $dictionary = (id)@[$v1]; ^nl XCTAssertEqualObjects($dictionary[0], $v1);
+    $dictionary = (id)@{@"testKey": $v1}; ^nl XCTAssertEqualObjects($dictionary[@"testKey"], $v1);
 
     // Should replace and not append
-    $dictionary = (id)$values; ^nl XCTAssertEqualObjects([$dictionary valueForKey:@"self"], ($values)); ^nl
+    $dictionary = (id)$values; ^nl XCTAssertEqualObjects([$dictionary valueForKey:@"self"], ($values)); ^nl 
 
     // Should not clear the array
-    $dictionary = $dictionary; ^nl XCTAssertEqualObjects([$dictionary valueForKey:@"self"], ($values)); ^nl
+    $dictionary = $dictionary; ^nl XCTAssertEqualObjects([$dictionary valueForKey:@"self"], ($values)); ^nl 
 
     [unmanaged.intObj removeAllObjects];
     unmanaged.intObj = managed.intObj;
@@ -620,155 +620,145 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 }
 
 - (void)testInvalidAssignment {
-    RLMAssertThrowsWithReason(unmanaged.intObj = (id)@[NSNull.null],
-                              @"Invalid value '<null>' of type 'NSNull' for 'int' array property 'AllPrimitiveDictionaries.intObj'.");
-    RLMAssertThrowsWithReason(unmanaged.intObj = (id)@[@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' array property 'AllPrimitiveDictionaries.intObj'.");
-    RLMAssertThrowsWithReason(unmanaged.intObj = (id)(@[@1, @"a"]),
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' array property 'AllPrimitiveDictionaries.intObj'.");
+    RLMAssertThrowsWithReason(unmanaged.intObj = (id)@{@"0": NSNull.null},
+                              @"Invalid value '<null>' of type 'NSNull' for RLMDictionary<string, int> property 'AllPrimitiveDictionaries.intObj'.");
+    RLMAssertThrowsWithReason(unmanaged.intObj = (id)@{@"0": @"a"},
+                              @"Invalid value 'a' of type '__NSCFConstantString' for RLMDictionary<string, int> property 'AllPrimitiveDictionaries.intObj'.");
+    RLMAssertThrowsWithReason(unmanaged.intObj = (id)(@{@"0": @1, @"1": @"a"}),
+                              @"Invalid value 'a' of type '__NSCFConstantString' for RLMDictionary<string, int> property 'AllPrimitiveDictionaries.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)unmanaged.floatObj,
-                              @"RLMArray<float> does not match expected type 'int' for property 'AllPrimitiveDictionaries.intObj'.");
+                              @"RLMDictionary<string, float> does not match expected type RLMDictionary<string, int> for property 'AllPrimitiveDictionaries.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)optUnmanaged.intObj,
-                              @"RLMArray<int?> does not match expected type 'int' for property 'AllPrimitiveDictionaries.intObj'.");
+                              @"RLMDictionary<string, int?> does not match expected type RLMDictionary<string, int> for property 'AllPrimitiveDictionaries.intObj'.");
     RLMAssertThrowsWithReason(unmanaged[@"intObj"] = unmanaged[@"floatObj"],
-                              @"RLMArray<float> does not match expected type 'int' for property 'AllPrimitiveDictionaries.intObj'.");
+                              @"RLMDictionary<string, float> does not match expected type RLMDictionary<string, int> for property 'AllPrimitiveDictionaries.intObj'.");
     RLMAssertThrowsWithReason(unmanaged[@"intObj"] = optUnmanaged[@"intObj"],
-                              @"RLMArray<int?> does not match expected type 'int' for property 'AllPrimitiveDictionaries.intObj'.");
+                              @"RLMDictionary<string, int?> does not match expected type RLMDictionary<string, int> for property 'AllPrimitiveDictionaries.intObj'.");
 
-    RLMAssertThrowsWithReason(managed.intObj = (id)@[NSNull.null],
-                              @"Invalid value '<null>' of type 'NSNull' for 'int' array property 'AllPrimitiveDictionaries.intObj'.");
-    RLMAssertThrowsWithReason(managed.intObj = (id)@[@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' array property 'AllPrimitiveDictionaries.intObj'.");
-    RLMAssertThrowsWithReason(managed.intObj = (id)(@[@1, @"a"]),
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' array property 'AllPrimitiveDictionaries.intObj'.");
+    RLMAssertThrowsWithReason(managed.intObj = (id)@{@"0": NSNull.null},
+                              @"Invalid value '<null>' of type 'NSNull' for RLMDictionary<string, int> property 'AllPrimitiveDictionaries.intObj'.");
+    RLMAssertThrowsWithReason(managed.intObj = (id)@{@"0": @"a"},
+                              @"Invalid value 'a' of type '__NSCFConstantString' for RLMDictionary<string, int> property 'AllPrimitiveDictionaries.intObj'.");
+    RLMAssertThrowsWithReason(managed.intObj = (id)(@{@"0": @1, @"0": @"a"}),
+                              @"Invalid value 'a' of type '__NSCFConstantString' for RLMDictionary<string, int> property 'AllPrimitiveDictionaries.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)managed.floatObj,
-                              @"RLMArray<float> does not match expected type 'int' for property 'AllPrimitiveDictionaries.intObj'.");
+                              @"RLMDictionary<string, float> does not match expected type RLMDictionary<string, int> for property 'AllPrimitiveDictionaries.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)optManaged.intObj,
-                              @"RLMArray<int?> does not match expected type 'int' for property 'AllPrimitiveDictionaries.intObj'.");
+                              @"RLMDictionary<string, int?> does not match expected type RLMDictionary<string, int> for property 'AllPrimitiveDictionaries.intObj'.");
     RLMAssertThrowsWithReason(managed[@"intObj"] = (id)managed[@"floatObj"],
-                              @"RLMArray<float> does not match expected type 'int' for property 'AllPrimitiveDictionaries.intObj'.");
+                              @"RLMDictionary<string, float> does not match expected type RLMDictionary<string, int> for property 'AllPrimitiveDictionaries.intObj'.");
     RLMAssertThrowsWithReason(managed[@"intObj"] = (id)optManaged[@"intObj"],
-                              @"RLMArray<int?> does not match expected type 'int' for property 'AllPrimitiveDictionaries.intObj'.");
+                              @"RLMDictionary<string, int?> does not match expected type RLMDictionary<string, int> for property 'AllPrimitiveDictionaries.intObj'.");
 }
 
 - (void)testAllMethodsCheckThread {
-    RLMArray *array = managed.intObj;
+    RLMDictionary *dictionary = managed.intObj;
     [self dispatchAsyncAndWait:^{
-        RLMAssertThrowsWithReason([array count], @"thread");
-        RLMAssertThrowsWithReason([array objectAtIndex:0], @"thread");
-        RLMAssertThrowsWithReason([array firstObject], @"thread");
-        RLMAssertThrowsWithReason([array lastObject], @"thread");
+        RLMAssertThrowsWithReason([dictionary count], @"thread");
+        RLMAssertThrowsWithReason([dictionary objectAtIndex:0], @"thread");
+        RLMAssertThrowsWithReason([dictionary firstObject], @"thread");
+        RLMAssertThrowsWithReason([dictionary lastObject], @"thread");
 
-        RLMAssertThrowsWithReason([array addObject:@0], @"thread");
-        RLMAssertThrowsWithReason([array addObjects:@[@0]], @"thread");
-        RLMAssertThrowsWithReason([array insertObject:@0 atIndex:0], @"thread");
-        RLMAssertThrowsWithReason([array removeObjectAtIndex:0], @"thread");
-        RLMAssertThrowsWithReason([array removeLastObject], @"thread");
-        RLMAssertThrowsWithReason([array removeAllObjects], @"thread");
-        RLMAssertThrowsWithReason([array replaceObjectAtIndex:0 withObject:@0], @"thread");
-        RLMAssertThrowsWithReason([array moveObjectAtIndex:0 toIndex:1], @"thread");
-        RLMAssertThrowsWithReason([array exchangeObjectAtIndex:0 withObjectAtIndex:1], @"thread");
+        RLMAssertThrowsWithReason([dictionary setObject:@0 forKey:@"thread"], @"thread");
+        RLMAssertThrowsWithReason([dictionary addObjects:@{@"thread": @0}], @"thread");
+        RLMAssertThrowsWithReason([dictionary removeObjectForKey:@"thread"], @"thread");
+        RLMAssertThrowsWithReason([dictionary removeObjectsForKeys:(id)@[@"thread"]], @"thread");
+        RLMAssertThrowsWithReason([dictionary removeAllObjects], @"thread");
+        RLMAssertThrowsWithReason([dictionary setObject:NSNull.null forKey:@"thread"], @"thread");
 
-        RLMAssertThrowsWithReason([array indexOfObject:@1], @"thread");
-        /* RLMAssertThrowsWithReason([array indexOfObjectWhere:@"TRUEPREDICATE"], @"thread"); */
-        /* RLMAssertThrowsWithReason([array indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]], @"thread"); */
-        /* RLMAssertThrowsWithReason([array objectsWhere:@"TRUEPREDICATE"], @"thread"); */
-        /* RLMAssertThrowsWithReason([array objectsWithPredicate:[NSPredicate predicateWithValue:NO]], @"thread"); */
-        RLMAssertThrowsWithReason([array sortedResultsUsingKeyPath:@"self" ascending:YES], @"thread");
-        RLMAssertThrowsWithReason([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]], @"thread");
-        RLMAssertThrowsWithReason(array[0], @"thread");
-        RLMAssertThrowsWithReason(array[0] = @0, @"thread");
-        RLMAssertThrowsWithReason([array valueForKey:@"self"], @"thread");
-        RLMAssertThrowsWithReason([array setValue:@1 forKey:@"self"], @"thread");
-        RLMAssertThrowsWithReason({for (__unused id obj in array);}, @"thread");
+        RLMAssertThrowsWithReason([dictionary indexOfObject:@1], @"thread");
+        /* RLMAssertThrowsWithReason([dictionary indexOfObjectWhere:@"TRUEPREDICATE"], @"thread"); */
+        /* RLMAssertThrowsWithReason([dictionary indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]], @"thread"); */
+        /* RLMAssertThrowsWithReason([dictionary objectsWhere:@"TRUEPREDICATE"], @"thread"); */
+        /* RLMAssertThrowsWithReason([dictionary objectsWithPredicate:[NSPredicate predicateWithValue:NO]], @"thread"); */
+        RLMAssertThrowsWithReason([dictionary sortedResultsUsingKeyPath:@"self" ascending:YES], @"thread");
+        RLMAssertThrowsWithReason([dictionary sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]], @"thread");
+        RLMAssertThrowsWithReason(dictionary[@"thread"], @"thread");
+        RLMAssertThrowsWithReason(dictionary[@"thread"] = @0, @"thread");
+        RLMAssertThrowsWithReason([dictionary valueForKey:@"self"], @"thread");
+        RLMAssertThrowsWithReason([dictionary setValue:@1 forKey:@"self"], @"thread");
+        RLMAssertThrowsWithReason({for (__unused id obj in dictionary);}, @"thread");
     }];
 }
 
 - (void)testAllMethodsCheckForInvalidation {
-    RLMArray *array = managed.intObj;
+    RLMDictionary *dictionary = managed.intObj;
     [realm cancelWriteTransaction];
     [realm invalidate];
 
-    XCTAssertNoThrow([array objectClassName]);
-    XCTAssertNoThrow([array realm]);
-    XCTAssertNoThrow([array isInvalidated]);
+    XCTAssertNoThrow([dictionary objectClassName]);
+    XCTAssertNoThrow([dictionary realm]);
+    XCTAssertNoThrow([dictionary isInvalidated]);
+    
+    RLMAssertThrowsWithReason([dictionary count], @"invalidated");
+    RLMAssertThrowsWithReason([dictionary objectAtIndex:0], @"invalidated");
+    RLMAssertThrowsWithReason([dictionary firstObject], @"invalidated");
+    RLMAssertThrowsWithReason([dictionary lastObject], @"invalidated");
 
-    RLMAssertThrowsWithReason([array count], @"invalidated");
-    RLMAssertThrowsWithReason([array objectAtIndex:0], @"invalidated");
-    RLMAssertThrowsWithReason([array firstObject], @"invalidated");
-    RLMAssertThrowsWithReason([array lastObject], @"invalidated");
+    RLMAssertThrowsWithReason([dictionary setObject:@0 forKey:@"thread"], @"invalidated");
+    RLMAssertThrowsWithReason([dictionary addObjects:@{@"invalidated": @0}], @"invalidated");
+    RLMAssertThrowsWithReason([dictionary removeObjectForKey:@"invalidated"], @"invalidated");
+    RLMAssertThrowsWithReason([dictionary removeObjectsForKeys:(id)@[@"invalidated"]], @"invalidated");
+    RLMAssertThrowsWithReason([dictionary removeAllObjects], @"invalidated");
+    RLMAssertThrowsWithReason([dictionary setObject:NSNull.null forKey:@"invalidated"], @"invalidated");
 
-    RLMAssertThrowsWithReason([array addObject:@0], @"invalidated");
-    RLMAssertThrowsWithReason([array addObjects:@[@0]], @"invalidated");
-    RLMAssertThrowsWithReason([array insertObject:@0 atIndex:0], @"invalidated");
-    RLMAssertThrowsWithReason([array removeObjectAtIndex:0], @"invalidated");
-    RLMAssertThrowsWithReason([array removeLastObject], @"invalidated");
-    RLMAssertThrowsWithReason([array removeAllObjects], @"invalidated");
-    RLMAssertThrowsWithReason([array replaceObjectAtIndex:0 withObject:@0], @"invalidated");
-    RLMAssertThrowsWithReason([array moveObjectAtIndex:0 toIndex:1], @"invalidated");
-    RLMAssertThrowsWithReason([array exchangeObjectAtIndex:0 withObjectAtIndex:1], @"invalidated");
-
-    RLMAssertThrowsWithReason([array indexOfObject:@1], @"invalidated");
-    /* RLMAssertThrowsWithReason([array indexOfObjectWhere:@"TRUEPREDICATE"], @"invalidated"); */
-    /* RLMAssertThrowsWithReason([array indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"invalidated"); */
-    /* RLMAssertThrowsWithReason([array objectsWhere:@"TRUEPREDICATE"], @"invalidated"); */
-    /* RLMAssertThrowsWithReason([array objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"invalidated"); */
-    RLMAssertThrowsWithReason([array sortedResultsUsingKeyPath:@"self" ascending:YES], @"invalidated");
-    RLMAssertThrowsWithReason([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]], @"invalidated");
-    RLMAssertThrowsWithReason(array[0], @"invalidated");
-    RLMAssertThrowsWithReason(array[0] = @0, @"invalidated");
-    RLMAssertThrowsWithReason([array valueForKey:@"self"], @"invalidated");
-    RLMAssertThrowsWithReason([array setValue:@1 forKey:@"self"], @"invalidated");
-    RLMAssertThrowsWithReason({for (__unused id obj in array);}, @"invalidated");
+    RLMAssertThrowsWithReason([dictionary indexOfObject:@1], @"invalidated");
+    /* RLMAssertThrowsWithReason([dictionary indexOfObjectWhere:@"TRUEPREDICATE"], @"invalidated"); */
+    /* RLMAssertThrowsWithReason([dictionary indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]], @"invalidated"); */
+    /* RLMAssertThrowsWithReason([dictionary objectsWhere:@"TRUEPREDICATE"], @"invalidated"); */
+    /* RLMAssertThrowsWithReason([dictionary objectsWithPredicate:[NSPredicate predicateWithValue:NO]], @"invalidated"); */
+    RLMAssertThrowsWithReason([dictionary sortedResultsUsingKeyPath:@"self" ascending:YES], @"invalidated");
+    RLMAssertThrowsWithReason([dictionary sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]], @"invalidated");
+    RLMAssertThrowsWithReason(dictionary[@"invalidated"], @"invalidated");
+    RLMAssertThrowsWithReason(dictionary[@"invalidated"] = @0, @"invalidated");
+    RLMAssertThrowsWithReason([dictionary valueForKey:@"self"], @"invalidated");
+    RLMAssertThrowsWithReason([dictionary setValue:@1 forKey:@"self"], @"invalidated");
+    RLMAssertThrowsWithReason({for (__unused id obj in dictionary);}, @"invalidated");
 
     [realm beginWriteTransaction];
 }
 
 - (void)testMutatingMethodsCheckForWriteTransaction {
-    RLMArray *array = managed.intObj;
-    [array addObject:@0];
+    RLMDictionary *dictionary = managed.intObj;
+    [dictionary setObject:@0 forKey:@"testKey"];
     [realm commitWriteTransaction];
 
-    XCTAssertNoThrow([array objectClassName]);
-    XCTAssertNoThrow([array realm]);
-    XCTAssertNoThrow([array isInvalidated]);
+    XCTAssertNoThrow([dictionary objectClassName]);
+    XCTAssertNoThrow([dictionary realm]);
+    XCTAssertNoThrow([dictionary isInvalidated]);
 
-    XCTAssertNoThrow([array count]);
-    XCTAssertNoThrow([array objectAtIndex:0]);
-    XCTAssertNoThrow([array firstObject]);
-    XCTAssertNoThrow([array lastObject]);
+    XCTAssertNoThrow([dictionary count]);
+    XCTAssertNoThrow([dictionary objectAtIndex:0]);
+    XCTAssertNoThrow([dictionary firstObject]);
+    XCTAssertNoThrow([dictionary lastObject]);
 
-    XCTAssertNoThrow([array indexOfObject:@1]);
-    /* XCTAssertNoThrow([array indexOfObjectWhere:@"TRUEPREDICATE"]); */
-    /* XCTAssertNoThrow([array indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]); */
-    /* XCTAssertNoThrow([array objectsWhere:@"TRUEPREDICATE"]); */
-    /* XCTAssertNoThrow([array objectsWithPredicate:[NSPredicate predicateWithValue:YES]]); */
-    XCTAssertNoThrow([array sortedResultsUsingKeyPath:@"self" ascending:YES]);
-    XCTAssertNoThrow([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]]);
-    XCTAssertNoThrow(array[0]);
-    XCTAssertNoThrow([array valueForKey:@"self"]);
-    XCTAssertNoThrow({for (__unused id obj in array);});
+    XCTAssertNoThrow([dictionary indexOfObject:@1]);
+    /* XCTAssertNoThrow([dictionary indexOfObjectWhere:@"TRUEPREDICATE"]); */
+    /* XCTAssertNoThrow([dictionary indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]); */
+    /* XCTAssertNoThrow([dictionary objectsWhere:@"TRUEPREDICATE"]); */
+    /* XCTAssertNoThrow([dictionary objectsWithPredicate:[NSPredicate predicateWithValue:YES]]); */
+    XCTAssertNoThrow([dictionary sortedResultsUsingKeyPath:@"self" ascending:YES]);
+    XCTAssertNoThrow([dictionary sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]]);
+    XCTAssertNoThrow(dictionary[0]);
+    XCTAssertNoThrow([dictionary valueForKey:@"self"]);
+    XCTAssertNoThrow({for (__unused id obj in dictionary);});
+    
+    RLMAssertThrowsWithReason([dictionary setObject:@0 forKey:@"testKey"], @"write transaction");
+    RLMAssertThrowsWithReason([dictionary addObjects:@{@"testKey": @0}], @"write transaction");
+    RLMAssertThrowsWithReason([dictionary removeObjectForKey:@"testKey"], @"write transaction");
+    RLMAssertThrowsWithReason([dictionary removeObjectsForKeys:(id)@[@"testKey"]], @"write transaction");
+    RLMAssertThrowsWithReason([dictionary removeAllObjects], @"write transaction");
+    RLMAssertThrowsWithReason([dictionary setObject:NSNull.null forKey:@"testKey"], @"write transaction");
 
-
-    RLMAssertThrowsWithReason([array addObject:@0], @"write transaction");
-    RLMAssertThrowsWithReason([array addObjects:@[@0]], @"write transaction");
-    RLMAssertThrowsWithReason([array insertObject:@0 atIndex:0], @"write transaction");
-    RLMAssertThrowsWithReason([array removeObjectAtIndex:0], @"write transaction");
-    RLMAssertThrowsWithReason([array removeLastObject], @"write transaction");
-    RLMAssertThrowsWithReason([array removeAllObjects], @"write transaction");
-    RLMAssertThrowsWithReason([array replaceObjectAtIndex:0 withObject:@0], @"write transaction");
-    RLMAssertThrowsWithReason([array moveObjectAtIndex:0 toIndex:1], @"write transaction");
-    RLMAssertThrowsWithReason([array exchangeObjectAtIndex:0 withObjectAtIndex:1], @"write transaction");
-
-    RLMAssertThrowsWithReason(array[0] = @0, @"write transaction");
-    RLMAssertThrowsWithReason([array setValue:@1 forKey:@"self"], @"write transaction");
+    RLMAssertThrowsWithReason(dictionary[@"testKey"] = @0, @"write transaction");
+    RLMAssertThrowsWithReason([dictionary setValue:@1 forKey:@"self"], @"write transaction");
 }
 
 - (void)testDeleteOwningObject {
-    RLMArray *array = managed.intObj;
-    XCTAssertFalse(array.isInvalidated);
+    RLMDictionary *dictionary = managed.intObj;
+    XCTAssertFalse(dictionary.isInvalidated);
     [realm deleteObject:managed];
-    XCTAssertTrue(array.isInvalidated);
+    XCTAssertTrue(dictionary.isInvalidated);
 }
 
 #pragma clang diagnostic ignored "-Warc-retain-cycles"
@@ -777,8 +767,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     [realm commitWriteTransaction];
 
     id expectation = [self expectationWithDescription:@""];
-    id token = [managed.intObj addNotificationBlock:^(RLMArray *array, RLMCollectionChange *change, NSError *error) {
-        XCTAssertNotNil(array);
+    id token = [managed.intObj addNotificationBlock:^(RLMDictionary *dictionary, RLMCollectionChange *change, NSError *error) {
+        XCTAssertNotNil(dictionary);
         XCTAssertNil(change);
         XCTAssertNil(error);
         [expectation fulfill];
@@ -793,8 +783,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 
     __block bool first = true;
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [managed.intObj addNotificationBlock:^(RLMArray *array, RLMCollectionChange *change, NSError *error) {
-        XCTAssertNotNil(array);
+    id token = [managed.intObj addNotificationBlock:^(RLMDictionary *dictionary, RLMCollectionChange *change, NSError *error) {
+        XCTAssertNotNil(dictionary);
         XCTAssertNil(error);
         if (first) {
             XCTAssertNil(change);
@@ -812,8 +802,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     [self dispatchAsyncAndWait:^{
         RLMRealm *r = [RLMRealm defaultRealm];
         [r transactionWithBlock:^{
-            RLMArray *array = [(AllPrimitiveDictionaries *)[AllPrimitiveDictionaries allObjectsInRealm:r].firstObject intObj];
-            [array addObject:@0];
+            RLMDictionary *dictionary = [(AllPrimitiveDictionaries *)[AllPrimitiveDictionaries allObjectsInRealm:r].firstObject intObj];
+            [dictionary setObject:@"testKey" forKey:@0];
         }];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
@@ -825,7 +815,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     [realm commitWriteTransaction];
 
     id expectation = [self expectationWithDescription:@""];
-    id token = [managed.intObj addNotificationBlock:^(__unused RLMArray *array, __unused RLMCollectionChange *change, __unused NSError *error) {
+    id token = [managed.intObj addNotificationBlock:^(__unused RLMDictionary *dictionary, __unused RLMCollectionChange *change, __unused NSError *error) {
         // will throw if it's incorrectly called a second time due to the
         // unrelated write transaction
         [expectation fulfill];
