@@ -1,6 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////
 //
+<<<<<<< HEAD:examples/ios/swift/ListSwiftUI/Views/App.swift
+// Copyright 2021 Realm Inc.
+=======
 // Copyright 2014 Realm Inc.
+>>>>>>> f0af9a11038c44d0de3aac11ba6b7e27d7432660:examples/ios/swift/Migration/Migration.xcconfig
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +20,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+<<<<<<< HEAD:examples/ios/swift/ListSwiftUI/Views/App.swift
+import Foundation
+import SwiftUI
+import RealmSwift
+
+@main
+struct App: SwiftUI.App {
+    var view: some View {
+        ContentView()
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            view
+        }
+    }
+}
+=======
 // This file is used to create new examples.
 // To create a new example for a specific version you have to uncomment the
 // following line and the corresponding line with the schema version you
@@ -28,3 +50,4 @@
 //OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_2;
 //OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_3;
 //OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_4;
+>>>>>>> f0af9a11038c44d0de3aac11ba6b7e27d7432660:examples/ios/swift/Migration/Migration.xcconfig
