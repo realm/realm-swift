@@ -679,7 +679,7 @@ extension AnyRealmValue: _ManagedPropertyType {
     // swiftlint:disable:next identifier_name
     public static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .any
-        prop.optional = true
+        prop.optional = false
     }
     // swiftlint:disable:next identifier_name
     public static func _rlmRequireObjc() -> Bool { return false }

@@ -169,6 +169,7 @@ private func arrayType<T>(_ type: T.Type) -> RLMArray<AnyObject> {
     case is Decimal128.Type: return RLMArray(objectType: .decimal128, optional: true)
     case is ObjectId.Type:   return RLMArray(objectType: .objectId, optional: true)
     case is UUID.Type:       return RLMArray(objectType: .UUID, optional: true)
+    case is AnyRealmValue.Type: return RLMArray(objectType: .any, optional: true)
     default: fatalError("Unsupported type for List: \(type)?")
     }
 }

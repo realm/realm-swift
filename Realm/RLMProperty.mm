@@ -635,7 +635,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     if (_array) {
         p.type |= realm::PropertyType::Array;
     }
-    if (_optional) {
+    if (_optional || (p.type == realm::PropertyType::Mixed)) {
         p.type |= realm::PropertyType::Nullable;
     }
     return p;
