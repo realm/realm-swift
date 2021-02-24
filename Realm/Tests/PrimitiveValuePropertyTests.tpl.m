@@ -25,15 +25,28 @@
 static NSDate *date(int i) {
     return [NSDate dateWithTimeIntervalSince1970:i];
 }
+
 static NSData *data(int i) {
     return [NSData dataWithBytesNoCopy:calloc(i, 1) length:i freeWhenDone:YES];
 }
+
 static RLMDecimal128 *decimal128(int i) {
     return [RLMDecimal128 decimalWithNumber:@(i)];
 }
 
 static NSUUID *uuid(NSString *uuidString) {
     return [[NSUUID alloc] initWithUUIDString:uuidString];
+}
+
+static NSMutableArray *objectIds;
+static RLMObjectId *objectId(NSUInteger i) {
+    if (!objectIds) {
+        objectIds = [NSMutableArray new];
+    }
+    while (i >= objectIds.count) {
+        [objectIds addObject:RLMObjectId.objectId];
+    }
+    return objectIds[i];
 }
 
 static void count(NSArray *values, double *sum, NSUInteger *count) {
@@ -44,6 +57,7 @@ static void count(NSArray *values, double *sum, NSUInteger *count) {
         }
     }
 }
+
 static double sum(NSArray *values) {
     double sum = 0;
     NSUInteger c = 0;
@@ -139,7 +153,7 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
     %man XCTAssertNil(man.$member, @"RLMValue should be able to initialize as null");
     
     // @Lee, nil initialized RLMValues are all valueType "0" == RLMPropertyTypeInt
-    XCTAssertEqual(unman.$member.valueType, $valueType);
+    XCTAssertEqual(unman.$member.valueType, RLMPropertyTypeAny);
 }
 
 - (void)testUpdateBoolType {
@@ -162,7 +176,7 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
 
 - (void)testUpdateDoubleType {
     $rlmValue = @3.3;
-    XCTAssert([(NSNumber *)$rlmValue isEqual:@3.3f]);
+    XCTAssert([(NSNumber *)$rlmValue isEqual:@3.3]);
     XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeDouble);
 }
 - (void)testUpdateStringType {
@@ -196,10 +210,10 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
 - (void)testUpdateValueNull {
     $rlmValue = [NSNull null];
     
-    XCTAssertNil($rlmValue);
+    XCTAssertEqual($rlmValue, [NSNull null]);
     
     // @Lee - unmanaged don't have valueType selector, managed are set to "0" == RLMPropertyTypeInt
-    XCTAssertEqual($rlmValue.valueType, $valueType);
+    XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeAny);
 }
 
 @end

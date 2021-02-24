@@ -228,6 +228,7 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @end
 
 @interface AllPrimitiveRLMValues : RLMObject
+@property id<RLMValue> nullVal;
 @property id<RLMValue> intVal;
 @property id<RLMValue> floatVal;
 @property id<RLMValue> doubleVal;
@@ -238,7 +239,6 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property id<RLMValue> decimalVal;
 @property id<RLMValue> objectIdVal;
 @property id<RLMValue> uuidVal;
-@property id<RLMValue> nullVal;
 @end
 
 #pragma mark - Real Life Objects

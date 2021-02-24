@@ -36,11 +36,11 @@
 }
 
 - (void)testFloatInitialization {
-    id<RLMValue> v = @123.456;
-    XCTAssertTrue([(NSNumber *)v isEqualToNumber:@123.456]);
+    id<RLMValue> v = @123.456f;
+    XCTAssertTrue([(NSNumber *)v isEqualToNumber:@123.456f]);
     XCTAssertEqual(v.valueType, RLMPropertyTypeFloat);
-    v = @456.789;
-    XCTAssertTrue([(NSNumber *)v isEqualToNumber:@456.789]);
+    v = @456.789f;
+    XCTAssertTrue([(NSNumber *)v isEqualToNumber:@456.789f]);
     XCTAssertEqual(v.valueType, RLMPropertyTypeFloat);
 }
 
@@ -217,7 +217,6 @@
     
 }
 
-// Different behavior
 - (void)testCreateManagedObjectUnmanagedChild {
     StringObject *so = [[StringObject alloc] init];
     so.stringCol = @"hello";
@@ -276,12 +275,23 @@
 - (void)testCreateManagedFloat {
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
+    MixedObject *mo = [MixedObject createInRealm:r withValue:@[@1234.5f, @[@12345.6f, @678.9f]]];
+    [r commitWriteTransaction];
+    XCTAssertTrue([(NSNumber *)mo.anyCol isEqualToNumber:@1234.5f]);
+    XCTAssertTrue([mo.anyArray[0] isEqualToNumber:[NSNumber numberWithFloat:12345.6f]]);
+    XCTAssertTrue([mo.anyArray[1] isEqualToNumber:[NSNumber numberWithFloat:678.9f]]);
+    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeFloat);
+}
+
+- (void)testCreateManagedDouble {
+    RLMRealm *r = [self realmWithTestPath];
+    [r beginWriteTransaction];
     MixedObject *mo = [MixedObject createInRealm:r withValue:@[@1234.5, @[@12345.6, @678.9]]];
     [r commitWriteTransaction];
     XCTAssertTrue([(NSNumber *)mo.anyCol isEqualToNumber:@1234.5]);
-    XCTAssertTrue([mo.anyArray[0] isEqualToNumber:[NSNumber numberWithFloat:12345.6]]);
-    XCTAssertTrue([mo.anyArray[1] isEqualToNumber:[NSNumber numberWithFloat:678.9]]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeFloat);
+    XCTAssertTrue([mo.anyArray[0] isEqualToNumber:[NSNumber numberWithDouble:12345.6]]);
+    XCTAssertTrue([mo.anyArray[1] isEqualToNumber:[NSNumber numberWithDouble:678.9]]);
+    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeDouble);
 }
 
 - (void)testCreateManagedString {
@@ -397,16 +407,16 @@
 
 - (void)testAddManagedFloat {
     MixedObject *mo = [[MixedObject alloc] init];
-    mo.anyCol = @1234.5;
-    [mo.anyArray addObjects:@[@12345.6, @678.9]];
+    mo.anyCol = @1234.5f;
+    [mo.anyArray addObjects:@[@12345.6f, @678.9f]];
     
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
     [r addObject:mo];
     [r commitWriteTransaction];
-    XCTAssertTrue([(NSNumber *)mo.anyCol isEqualToNumber:@1234.5]);
-    XCTAssertTrue([mo.anyArray[0] isEqualToNumber:[NSNumber numberWithFloat:12345.6]]);
-    XCTAssertTrue([mo.anyArray[1] isEqualToNumber:[NSNumber numberWithFloat:678.9]]);
+    XCTAssertTrue([(NSNumber *)mo.anyCol isEqualToNumber:@1234.5f]);
+    XCTAssertTrue([mo.anyArray[0] isEqualToNumber:[NSNumber numberWithFloat:12345.6f]]);
+    XCTAssertTrue([mo.anyArray[1] isEqualToNumber:[NSNumber numberWithFloat:678.9f]]);
     XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeFloat);
 }
 
