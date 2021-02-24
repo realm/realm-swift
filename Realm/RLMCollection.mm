@@ -381,7 +381,9 @@ struct CollectionCallbackWrapper {
         else if (changes.empty()) {
             block(collection, nil, nil);
         }
-        else if (!changes.collection_root_was_deleted || !changes.deletions.empty()) {
+        else {
+//            FIXME: Renable once core v11 is up to date.
+//        else if (!changes.collection_root_was_deleted || !changes.deletions.empty()) {
             block(collection, [[RLMCollectionChange alloc] initWithChanges:changes], nil);
         }
     }
