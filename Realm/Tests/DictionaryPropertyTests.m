@@ -146,35 +146,28 @@
     // reassign
     obj.stringDictionary[@"two"] = child3;
     XCTAssertTrue([[obj.stringDictionary[@"two"] stringCol] isEqualToString:@"c"]);
-
-
-
     [realm commitWriteTransaction];
-
-
     [realm beginWriteTransaction];
-
-    NSLog(@"%@", obj.stringDictionary[@"one"]);
+    [obj.stringDictionary removeObjectForKey:@"one"];
+    XCTAssertNil(obj.stringDictionary[@"one"]);
     [obj.stringDictionary removeObjectForKey:@"two"];
     XCTAssertNil(obj.stringDictionary[@"two"]);
-    
+    obj.stringDictionary[@"three"] = child3;
+    XCTAssertTrue([[obj.stringDictionary[@"three"] stringCol] isEqualToString:@"c"]);
+    [obj.stringDictionary removeAllObjects];
+    XCTAssertNil(obj.stringDictionary[@"three"]);
     [realm commitWriteTransaction];
-
 }
 
 -(void)testAddInvalidated {
     RLMRealm *realm = [RLMRealm defaultRealm];
-
     [realm beginWriteTransaction];
     CompanyObject *company = [CompanyObject createInDefaultRealmWithValue:@[@"company", @[]]];
-
     EmployeeObject *person = [[EmployeeObject alloc] init];
     person.name = @"Mary";
     [realm addObject:person];
     [realm deleteObjects:[EmployeeObject allObjects]];
-
     RLMAssertThrowsWithReasonMatching([company.employeeDict setObject:person forKey:@"person1"], @"invalidated");
-
     [realm cancelWriteTransaction];
 }
 
@@ -182,7 +175,6 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     CompanyObject *company = [CompanyObject createInDefaultRealmWithValue:@[@"company", @[]]];
-
     RLMAssertThrowsWithReason([company.employeeDict setObject:self.nonLiteralNil forKey:@"blah"],
                               @"Invalid nil value for dictionary of 'EmployeeObject'.");
     [realm cancelWriteTransaction];
@@ -245,12 +237,6 @@
     XCTAssertThrows([intDictionary.intDictionary objectsWhere:@"intCol == 1"], @"Should throw on unmanaged RLMDictionary");
     XCTAssertThrows(([intDictionary.intDictionary objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on unmanaged RLMDictionary");
     XCTAssertThrows([intDictionary.intDictionary sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"Should throw on unmanaged RLMDictionary");
-
-    XCTAssertEqual(0U, [intDictionary.intDictionary indexOfObjectWhere:@"intCol == 1"]);
-    XCTAssertEqual(0U, ([intDictionary.intDictionary indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]));
-
-    XCTAssertEqual([intDictionary.intDictionary indexOfObject:intObj], 0U, @"Should be first element");
-    XCTAssertEqual([intDictionary.intDictionary indexOfObject:intObj], 0U, @"Should be first element");
 
     // test unmanaged with literals
     __unused DictionaryPropertyObject *obj = [[DictionaryPropertyObject alloc] initWithValue:@[@{}, @{@"one": [[IntObject alloc] initWithValue:@[@1]]}]];
