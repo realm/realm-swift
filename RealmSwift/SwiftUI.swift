@@ -130,7 +130,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
 
     public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
         subscribers.append(AnySubscriber(subscriber))
-        if value.realm != nil, let value = value.thaw() {
+        if value.realm != nil && !value.isInvalidated, let value = value.thaw() {
             // if the value is managed
             let token =  value._observe(subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
