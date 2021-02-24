@@ -37,6 +37,9 @@
 @interface RLMDictionary () <RLMThreadConfined_Private>
 @end
 
+@implementation NSString (RLMDictionaryKey)
+@end
+
 @implementation RLMDictionary {
 @public
     // Backing dictionary when this instance is unmanaged
@@ -404,19 +407,15 @@ void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *
         }
         return;
     }
-    if (dictionary->_keyType != RLMPropertyTypeObject) {
-        if (!RLMValidateValue(key, dictionary->_keyType, false, false, nil)) {
-            @throw RLMException(@"Invalid key '%@' of type '%@' for expected type '%@'.",
-                                key, [key class], RLMTypeToString(dictionary->_keyType));
-        }
-        return;
+    if (![key conformsToProtocol:@protocol(RLMDictionaryKey)]) {
+        @throw RLMException(@"Invalid key '%@' of type '%@' for expected type '%@'.",
+                            key, [key class], RLMTypeToString(dictionary->_keyType));
     }
-    auto keyObject = RLMDynamicCast<RLMObjectBase>(key);
     auto valueObject = RLMDynamicCast<RLMObjectBase>(value);
-    if (!keyObject || !valueObject) {
+    if (!valueObject) {
         return;
     }
-    if (!keyObject->_objectSchema || !valueObject->_objectSchema) {
+    if (!valueObject->_objectSchema) {
         @throw RLMException(@"Object cannot be inserted unless the schema is initialized. "
                             "This can happen if you try to insert objects into a RLMDictionary / Map from a default value or from an overriden unmanaged initializer (`init()`) or if the key is uninitialized.");
     }

@@ -229,7 +229,25 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (NSUInteger)count {
-    return translateErrors<RLMManagedDictionary>([&] { return _backingCollection.size(); });
+    return translateErrors<RLMManagedDictionary>([&] {
+        return _backingCollection.size();
+    });
+}
+
+- (NSArray *)allKeys {
+    NSMutableArray<id<RLMDictionaryKey>> *keys = [NSMutableArray array];
+//    return translateErrors<RLMManagedDictionary>([&] {
+//        return _backingCollection.size();
+//    });
+    return keys;
+}
+
+- (NSArray *)allValues {
+    NSMutableArray<id<RLMDictionaryKey>> *values = [NSMutableArray array];
+//    return translateErrors<RLMManagedDictionary>([&] {
+//        return _backingCollection.size();
+//    });
+    return values;
 }
 
 - (BOOL)isInvalidated {
@@ -267,7 +285,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     try {
         RLMAccessorContext context(*_objectInfo);
         return _backingCollection.get(context,
-                                      context.unbox<realm::StringData>(key));
+                                      keyFromRLMDictionaryKey(key, context));
     }
     catch (realm::KeyNotFound const&) {
         return nil;
@@ -286,7 +304,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     changeDictionary(self, ^{
         RLMAccessorContext context(*_objectInfo);
         _backingCollection.insert(context,
-                                  context.unbox<realm::StringData>(key),
+                                  keyFromRLMDictionaryKey(key, context),
                                   obj);
     });
 }
@@ -296,9 +314,39 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     changeDictionary(self, ^{
         RLMAccessorContext context(*_objectInfo);
         _backingCollection.insert(context,
-                                  context.unbox<realm::StringData>(key),
+                                  keyFromRLMDictionaryKey(key, context),
                                   obj);
     });
+}
+
+- (void)removeAllObjects {
+    changeDictionary(self, ^{
+        _backingCollection.remove_all();
+    });
+}
+
+- (void)removeObjectsForKeys:(NSArray *)keyArray {
+    changeDictionary(self, ^{
+        RLMAccessorContext context(*_objectInfo);
+        for (id key in keyArray) {
+            _backingCollection.erase(keyFromRLMDictionaryKey(key, context));
+        }
+    });
+}
+
+- (void)removeObjectForKey:(id<RLMDictionaryKey>)key {
+    changeDictionary(self, ^{
+        RLMAccessorContext context(*_objectInfo);
+        _backingCollection.erase(keyFromRLMDictionaryKey(key, context));
+    });
+}
+
+inline realm::StringData keyFromRLMDictionaryKey(id<RLMDictionaryKey> key, RLMAccessorContext &context) {
+    if (auto *k = RLMDynamicCast<NSString>(key)) {
+        return context.unbox<realm::StringData>(k);
+    } else {
+        @throw RLMException(@"Unsupported key type %@ in key array", key);
+    }
 }
 
 #pragma mark - KVC

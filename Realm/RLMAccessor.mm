@@ -472,7 +472,19 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
     }
     if (prop.collection) {
         NSString *propName = prop.name;
-        Class cls = prop.array ? [RLMArray class] : [RLMSet class];
+        Class cls;
+        if (prop.array) {
+            cls = [RLMArray class];
+        }
+        else if (prop.set) {
+            cls = [RLMSet class];
+        }
+        else if (prop.dictionary) {
+            cls = [RLMDictionary class];
+        }
+        else {
+            REALM_UNREACHABLE();
+        }
         if (prop.type == RLMPropertyTypeObject) {
             NSString *objectClassName = prop.objectClassName;
             return ^(RLMObjectBase *obj) {

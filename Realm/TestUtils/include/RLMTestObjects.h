@@ -392,6 +392,7 @@ RLM_COLLECTION_TYPE(EmployeeObject)
 @property NSString *name;
 @property RLM_GENERIC_ARRAY(EmployeeObject) *employees;
 @property RLM_GENERIC_SET(EmployeeObject) *employeeSet;
+@property RLM_GENERIC_DICTIONARY(RLMString, EmployeeObject) *employeeDict;
 
 @end
 
