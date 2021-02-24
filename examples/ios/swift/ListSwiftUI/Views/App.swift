@@ -15,21 +15,6 @@
 // limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
-
-<<<<<<< HEAD:Realm/RLMUUID.mm
-#import "RLMUUID_Private.hpp"
-#import <realm/uuid.hpp>
-
-@implementation NSUUID (RLMUUIDSupport)
-
-- (instancetype)initWithRealmUUID:(realm::UUID)rUuid {
-    self = [self initWithUUIDBytes:rUuid.to_bytes().data()];
-    return self;
-}
-
-- (realm::UUID)rlm_uuidValue {
-    return realm::UUID(self.UUIDString.UTF8String);
-=======
 import Foundation
 import SwiftUI
 import RealmSwift
@@ -45,7 +30,4 @@ struct App: SwiftUI.App {
             view
         }
     }
->>>>>>> f0af9a11038c44d0de3aac11ba6b7e27d7432660:examples/ios/swift/ListSwiftUI/Views/App.swift
 }
-
-@end
