@@ -179,31 +179,41 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
     XCTAssert([(NSNumber *)$rlmValue isEqual:@3.3]);
     XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeDouble);
 }
+
 - (void)testUpdateStringType {
     $rlmValue = @"four";
     XCTAssert([(NSNumber *)$rlmValue isEqual:@"four"]);
     XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeString);
 }
+
 - (void)testUpdateDataType {
     $rlmValue = data(5);
     XCTAssert([(NSNumber *)$rlmValue isEqual:data(5)]);
     XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeData);
 }
+
 - (void)testUpdateDateType {
     $rlmValue = date(6);
     XCTAssert([(NSNumber *)$rlmValue isEqual:date(6)]);
     XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeDate);
 }
+
 - (void)testUpdateDecimal {
     $rlmValue = decimal128(7);
     XCTAssert([(NSNumber *)$rlmValue isEqual:decimal128(7)]);
     XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeDecimal128);
 }
-- (void)testUpdateUuidType {
-    XCTAssert(false);
-}
+
 - (void)testUpdateObjectIdType {
-    XCTAssert(false);
+    $rlmValue = objectId(8);
+    XCTAssert([(NSUUID *)$rlmValue isEqual:objectId(8)]);
+    XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeObjectId);
+}
+
+- (void)testUpdateUuidType {
+    $rlmValue = uuid(@"137DECC8-B300-4954-A233-F89909F4FD89");
+    XCTAssert([(NSUUID *)$rlmValue isEqual:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
+    XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeUUID);
 }
 
 // Update value to null
