@@ -210,17 +210,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects([unmanaged.intObj objectAtIndex:0], @1);
 }
 
-- (void)testFirstObject {
-    XCTAssertNil($allDictionaries.firstObject);
-
-    [self addObjects];
-    XCTAssertEqualObjects($dictionary.firstObject, $first);
-
-    [$allDictionaries removeAllObjects];
-
-    %o $dictionary[@"0"] = NSNull.null;
-    %o XCTAssertEqualObjects($dictionary.firstObject, NSNull.null);
-}
 /**
 - (void)testLastObject {
     XCTAssertNil($allDictionaries.lastObject);

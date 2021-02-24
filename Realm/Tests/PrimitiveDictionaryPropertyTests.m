@@ -290,58 +290,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects([unmanaged.intObj objectAtIndex:0], @1);
 }
 
-- (void)testFirstObject {
-    for (RLMDictionary *dictionary in allDictionaries) {
-        XCTAssertNil(dictionary.firstObject);
-    }
-
-    [self addObjects];
-    XCTAssertEqualObjects(unmanaged.boolObj.firstObject, @NO);
-    XCTAssertEqualObjects(unmanaged.intObj.firstObject, @2);
-    XCTAssertEqualObjects(unmanaged.floatObj.firstObject, @2.2f);
-    XCTAssertEqualObjects(unmanaged.doubleObj.firstObject, @2.2);
-    XCTAssertEqualObjects(unmanaged.stringObj.firstObject, @"a");
-    XCTAssertEqualObjects(unmanaged.dataObj.firstObject, data(1));
-    XCTAssertEqualObjects(unmanaged.dateObj.firstObject, date(1));
-    XCTAssertEqualObjects(unmanaged.decimalObj.firstObject, decimal128(2));
-    XCTAssertEqualObjects(unmanaged.objectIdObj.firstObject, objectId(1));
-    XCTAssertEqualObjects(unmanaged.uuidObj.firstObject, uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(optUnmanaged.boolObj.firstObject, @NO);
-    XCTAssertEqualObjects(optUnmanaged.intObj.firstObject, @2);
-    XCTAssertEqualObjects(optUnmanaged.floatObj.firstObject, @2.2f);
-    XCTAssertEqualObjects(optUnmanaged.doubleObj.firstObject, @2.2);
-    XCTAssertEqualObjects(optUnmanaged.stringObj.firstObject, @"a");
-    XCTAssertEqualObjects(optUnmanaged.dataObj.firstObject, data(1));
-    XCTAssertEqualObjects(optUnmanaged.dateObj.firstObject, date(1));
-    XCTAssertEqualObjects(optUnmanaged.decimalObj.firstObject, decimal128(2));
-    XCTAssertEqualObjects(optUnmanaged.objectIdObj.firstObject, objectId(1));
-    XCTAssertEqualObjects(optUnmanaged.uuidObj.firstObject, uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(managed.boolObj.firstObject, @NO);
-    XCTAssertEqualObjects(managed.intObj.firstObject, @2);
-    XCTAssertEqualObjects(managed.floatObj.firstObject, @2.2f);
-    XCTAssertEqualObjects(managed.doubleObj.firstObject, @2.2);
-    XCTAssertEqualObjects(managed.stringObj.firstObject, @"a");
-    XCTAssertEqualObjects(managed.dataObj.firstObject, data(1));
-    XCTAssertEqualObjects(managed.dateObj.firstObject, date(1));
-    XCTAssertEqualObjects(managed.decimalObj.firstObject, decimal128(2));
-    XCTAssertEqualObjects(managed.objectIdObj.firstObject, objectId(1));
-    XCTAssertEqualObjects(managed.uuidObj.firstObject, uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(optManaged.boolObj.firstObject, @NO);
-    XCTAssertEqualObjects(optManaged.intObj.firstObject, @2);
-    XCTAssertEqualObjects(optManaged.floatObj.firstObject, @2.2f);
-    XCTAssertEqualObjects(optManaged.doubleObj.firstObject, @2.2);
-    XCTAssertEqualObjects(optManaged.stringObj.firstObject, @"a");
-    XCTAssertEqualObjects(optManaged.dataObj.firstObject, data(1));
-    XCTAssertEqualObjects(optManaged.dateObj.firstObject, date(1));
-    XCTAssertEqualObjects(optManaged.decimalObj.firstObject, decimal128(2));
-    XCTAssertEqualObjects(optManaged.objectIdObj.firstObject, objectId(1));
-    XCTAssertEqualObjects(optManaged.uuidObj.firstObject, uuid(@"00000000-0000-0000-0000-000000000000"));
-
-    for (RLMDictionary *dictionary in allDictionaries) {
-        [dictionary removeAllObjects];
-    }
-
-}
 /**
 - (void)testLastObject {
     for (RLMDictionary *dictionary in allDictionaries) {
