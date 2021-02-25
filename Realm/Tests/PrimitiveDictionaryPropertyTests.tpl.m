@@ -200,7 +200,7 @@ static double average(NSArray *values) {
 }
 
 - (void)testDeleteObjectsInRealm {
-    RLMAssertThrowsWithReason([realm deleteObjects:$allDictionaries], @"Cannot delete objects from RLMArray");
+    RLMAssertThrowsWithReason([realm deleteObjects:$allDictionaries], @"Cannot delete objects from RLMDictionary");
 }
 
 - (void)testObjectAtIndex {
@@ -227,9 +227,17 @@ static double average(NSArray *values) {
 #pragma clang diagnostic ignored "-Wnonnull"
 
 - (void)testSetObject {
-    RLMAssertThrowsWithReason([$dictionary setObject:$first forKey:nil], ^n @"Should fail on nil key '$wdesc' of type '$wtype' for expected type '$type'");
+    // Fail with nil key on unmanaged
+    %unman RLMAssertThrowsWithReason([$dictionary setObject:$first forKey:nil], ^n @"Invalid nil key for dictionary expecting key of type 'string'.");
+    // Fail with nil key on managed
+    %man RLMAssertThrowsWithReason([$dictionary setObject:$first forKey:nil], ^n @"Unsupported key type (null) in key array");
+    // c
     %r RLMAssertThrowsWithReason([$dictionary setObject:NSNull.null forKey: @"testVal"], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
-
+    // d
+    %unman RLMAssertThrowsWithReason([$dictionary setObject:$first forKey:(id)$first], ^n @"Invalid key '$cVal' of type '$cType' for expected type 'string'");
+    // e
+    %man RLMAssertThrowsWithReason([$dictionary setObject:$first forKey:(id)$first], ^n @"Invalid key '$cVal' of type '$cType' for expected type 'string'");
+    // f
     RLMAssertThrowsWithReason([$dictionary setObject:$wrong forKey: @"wrongVal"], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
     %r RLMAssertThrowsWithReason([$dictionary setObject:NSNull.null forKey: @"nullVal"], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
@@ -390,8 +398,8 @@ static double average(NSArray *values) {
 }
 
 - (void)testFilter {
-    %unman RLMAssertThrowsWithReason([$dictionary objectsWhere:@"TRUEPREDICATE"], ^n @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
-    %unman RLMAssertThrowsWithReason([$dictionary objectsWithPredicate:[NSPredicate predicateWithValue:YES]], ^n @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    %unman RLMAssertThrowsWithReason([$dictionary objectsWhere:@"TRUEPREDICATE"], ^n @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+    %unman RLMAssertThrowsWithReason([$dictionary objectsWithPredicate:[NSPredicate predicateWithValue:YES]], ^n @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
 
     %man RLMAssertThrowsWithReason([$dictionary objectsWhere:@"TRUEPREDICATE"], ^n @"implemented");
     %man RLMAssertThrowsWithReason([$dictionary objectsWithPredicate:[NSPredicate predicateWithValue:YES]], ^n @"implemented");
@@ -401,7 +409,7 @@ static double average(NSArray *values) {
 }
 
 - (void)testNotifications {
-    %unman RLMAssertThrowsWithReason([$dictionary addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }], ^n @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    %unman RLMAssertThrowsWithReason([$dictionary addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }], ^n @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
 }
 
 - (void)testMin {
@@ -895,15 +903,15 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqual(expectedCount, ([cls objectsInRealm:realm where:__VA_ARGS__].count))
 
 - (void)createObjectWithValueIndex:(NSUInteger)index {
-    NSRange range = {index, 1};
-    id obj = [AllPrimitiveDictionaries createInRealm:realm withValue:@{
-        %r %man @"$prop": [$values subarrayWithRange:range],
-    }];
-    [LinkToAllPrimitiveDictionaries createInRealm:realm withValue:@[obj]];
-    obj = [AllOptionalPrimitiveDictionaries createInRealm:realm withValue:@{
-        %o %man @"$prop": [$values subarrayWithRange:range],
-    }];
-    [LinkToAllOptionalPrimitiveDictionaries createInRealm:realm withValue:@[obj]];
+//    NSRange range = {index, 1};
+//    id obj = [AllPrimitiveDictionaries createInRealm:realm withValue:@{
+//        %r %man @"$prop": [$values subarrayWithRange:range],
+//    }];
+//    [LinkToAllPrimitiveDictionaries createInRealm:realm withValue:@[obj]];
+//    obj = [AllOptionalPrimitiveDictionaries createInRealm:realm withValue:@{
+//        %o %man @"$prop": [$values subarrayWithRange:range],
+//    }];
+//    [LinkToAllOptionalPrimitiveDictionaries createInRealm:realm withValue:@[obj]];
 }
 
 - (void)testQueryBasicOperators {
