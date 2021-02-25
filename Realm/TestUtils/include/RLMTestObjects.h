@@ -212,6 +212,7 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLMArray<RLMDecimal128> *decimalObj;
 @property RLMArray<RLMObjectId> *objectIdObj;
 @property RLMArray<RLMUUID> *uuidObj;
+@property RLMArray<RLMValue> *anyObj;
 @end
 
 @interface AllOptionalPrimitiveArrays : RLMObject

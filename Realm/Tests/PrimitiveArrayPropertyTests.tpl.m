@@ -129,6 +129,7 @@ static double average(NSArray *values) {
     XCTAssertEqual(unmanaged.stringObj.type, RLMPropertyTypeString);
     XCTAssertEqual(unmanaged.dataObj.type, RLMPropertyTypeData);
     XCTAssertEqual(unmanaged.dateObj.type, RLMPropertyTypeDate);
+    XCTAssertEqual(unmanaged.anyObj.type, RLMPropertyTypeAny);
     XCTAssertEqual(optUnmanaged.boolObj.type, RLMPropertyTypeBool);
     XCTAssertEqual(optUnmanaged.intObj.type, RLMPropertyTypeInt);
     XCTAssertEqual(optUnmanaged.floatObj.type, RLMPropertyTypeFloat);
@@ -146,6 +147,7 @@ static double average(NSArray *values) {
     XCTAssertFalse(unmanaged.stringObj.optional);
     XCTAssertFalse(unmanaged.dataObj.optional);
     XCTAssertFalse(unmanaged.dateObj.optional);
+    XCTAssertFalse(unmanaged.anyObj.optional);
     XCTAssertTrue(optUnmanaged.boolObj.optional);
     XCTAssertTrue(optUnmanaged.intObj.optional);
     XCTAssertTrue(optUnmanaged.floatObj.optional);
@@ -163,6 +165,7 @@ static double average(NSArray *values) {
     XCTAssertNil(unmanaged.stringObj.objectClassName);
     XCTAssertNil(unmanaged.dataObj.objectClassName);
     XCTAssertNil(unmanaged.dateObj.objectClassName);
+    XCTAssertNil(unmanaged.anyObj.objectClassName);
     XCTAssertNil(optUnmanaged.boolObj.objectClassName);
     XCTAssertNil(optUnmanaged.intObj.objectClassName);
     XCTAssertNil(optUnmanaged.floatObj.objectClassName);
@@ -180,6 +183,7 @@ static double average(NSArray *values) {
     XCTAssertNil(unmanaged.stringObj.realm);
     XCTAssertNil(unmanaged.dataObj.realm);
     XCTAssertNil(unmanaged.dateObj.realm);
+    XCTAssertNil(unmanaged.anyObj.realm);
     XCTAssertNil(optUnmanaged.boolObj.realm);
     XCTAssertNil(optUnmanaged.intObj.realm);
     XCTAssertNil(optUnmanaged.floatObj.realm);
@@ -228,6 +232,7 @@ static double average(NSArray *values) {
 
     [self addObjects];
 
+    // @Lee - exception thrown when last element of RLMArray<RLMValue> is null. mixed.hpp:167
     XCTAssertEqualObjects($array.lastObject, $last);
 
     [$allArrays removeLastObject];
@@ -235,8 +240,8 @@ static double average(NSArray *values) {
 }
 
 - (void)testAddObject {
-    RLMAssertThrowsWithReason([$array addObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
-    %r RLMAssertThrowsWithReason([$array addObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
+    %noany RLMAssertThrowsWithReason([$array addObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %noany %r RLMAssertThrowsWithReason([$array addObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [$array addObject:$v0];
     XCTAssertEqualObjects($array[0], $v0);
@@ -246,8 +251,8 @@ static double average(NSArray *values) {
 }
 
 - (void)testAddObjects {
-    RLMAssertThrowsWithReason([$array addObjects:@[$wrong]], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
-    %r RLMAssertThrowsWithReason([$array addObjects:@[NSNull.null]], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
+    %noany RLMAssertThrowsWithReason([$array addObjects:@[$wrong]], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %noany %r RLMAssertThrowsWithReason([$array addObjects:@[NSNull.null]], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
     XCTAssertEqualObjects($array[0], $v0);
@@ -256,8 +261,8 @@ static double average(NSArray *values) {
 }
 
 - (void)testInsertObject {
-    RLMAssertThrowsWithReason([$array insertObject:$wrong atIndex:0], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
-    %r RLMAssertThrowsWithReason([$array insertObject:NSNull.null atIndex:0], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
+    %noany RLMAssertThrowsWithReason([$array insertObject:$wrong atIndex:0], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %noany %r RLMAssertThrowsWithReason([$array insertObject:NSNull.null atIndex:0], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
     RLMAssertThrowsWithReason([$array insertObject:$v0 atIndex:1], ^n @"Index 1 is out of bounds (must be less than 1).");
 
     [$array insertObject:$v0 atIndex:0];
@@ -298,6 +303,7 @@ static double average(NSArray *values) {
     %r XCTAssertEqual($array.count, 2U);
     %o XCTAssertEqual($array.count, 3U);
 
+    // @Lee - exception thrown when last element of RLMArray<RLMValue> is null. mixed.hpp:167
     [$allArrays removeLastObject];
     %r XCTAssertEqual($array.count, 1U);
     %o XCTAssertEqual($array.count, 2U);
@@ -313,8 +319,8 @@ static double average(NSArray *values) {
 
     %o [$array replaceObjectAtIndex:0 withObject:NSNull.null]; ^nl XCTAssertEqualObjects($array[0], NSNull.null);
 
-    RLMAssertThrowsWithReason([$array replaceObjectAtIndex:0 withObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
-    %r RLMAssertThrowsWithReason([$array replaceObjectAtIndex:0 withObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
+    %noany RLMAssertThrowsWithReason([$array replaceObjectAtIndex:0 withObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %noany %r RLMAssertThrowsWithReason([$array replaceObjectAtIndex:0 withObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 }
 
 - (void)testMove {
@@ -342,9 +348,9 @@ static double average(NSArray *values) {
 - (void)testIndexOfObject {
     XCTAssertEqual(NSNotFound, [$array indexOfObject:$v0]);
 
-    RLMAssertThrowsWithReason([$array indexOfObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %noany RLMAssertThrowsWithReason([$array indexOfObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
 
-    %r RLMAssertThrowsWithReason([$array indexOfObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
+    %noany %r RLMAssertThrowsWithReason([$array indexOfObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
     %o XCTAssertEqual(NSNotFound, [$array indexOfObject:NSNull.null]);
 
     [self addObjects];
@@ -586,8 +592,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 
 - (void)testSetValueForKey {
     RLMAssertThrowsWithReason([$allArrays setValue:@0 forKey:@"not self"], ^n @"this class is not key value coding-compliant for the key not self.");
-    RLMAssertThrowsWithReason([$array setValue:$wrong forKey:@"self"], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
-    %r RLMAssertThrowsWithReason([$array setValue:NSNull.null forKey:@"self"], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
+    %noany RLMAssertThrowsWithReason([$array setValue:$wrong forKey:@"self"], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %noany %r RLMAssertThrowsWithReason([$array setValue:NSNull.null forKey:@"self"], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
 
