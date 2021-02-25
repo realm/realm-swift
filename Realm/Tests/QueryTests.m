@@ -545,9 +545,13 @@
 - (void)testQueryWithDates {
     RLMRealm *realm = [self realm];
     [realm beginWriteTransaction];
-    [AllTypesObject createInRealm:realm withValue:[AllTypesObject values:1 stringObject:nil]];
-    [AllTypesObject createInRealm:realm withValue:[AllTypesObject values:2 stringObject:nil]];
-    [AllTypesObject createInRealm:realm withValue:[AllTypesObject values:3 stringObject:nil]];
+    AllTypesObject *all0 = [AllTypesObject createInRealm:realm withValue:[AllTypesObject values:1 stringObject:nil]];
+    AllTypesObject *all1 = [AllTypesObject createInRealm:realm withValue:[AllTypesObject values:2 stringObject:nil]];
+    AllTypesObject *all2 = [AllTypesObject createInRealm:realm withValue:[AllTypesObject values:3 stringObject:nil]];
+    all0.anyCol = all0.dateCol;
+    all1.anyCol = all1.dateCol;
+    all2.anyCol = all2.dateCol;
+
     [realm commitWriteTransaction];
 
     NSArray<NSDate *> *dates = [[AllTypesObject allObjectsInRealm:realm] valueForKey:@"dateCol"];
@@ -565,6 +569,20 @@
     RLMAssertCount(AllTypesObject, 3U, @"%@ >= dateCol", dates[2]);
     RLMAssertCount(AllTypesObject, 1U, @"%@ == dateCol", dates[0]);
     RLMAssertCount(AllTypesObject, 2U, @"%@ != dateCol", dates[0]);
+
+    RLMAssertCount(AllTypesObject, 2U, @"anyCol < %@", dates[2]);
+    RLMAssertCount(AllTypesObject, 3U, @"anyCol <= %@", dates[2]);
+    RLMAssertCount(AllTypesObject, 2U, @"anyCol > %@", dates[0]);
+    RLMAssertCount(AllTypesObject, 3U, @"anyCol >= %@", dates[0]);
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol == %@", dates[0]);
+    RLMAssertCount(AllTypesObject, 2U, @"anyCol != %@", dates[0]);
+
+    RLMAssertCount(AllTypesObject, 2U, @"%@ < anyCol", dates[0]);
+    RLMAssertCount(AllTypesObject, 3U, @"%@ <= anyCol", dates[0]);
+    RLMAssertCount(AllTypesObject, 2U, @"%@ > anyCol", dates[2]);
+    RLMAssertCount(AllTypesObject, 3U, @"%@ >= anyCol", dates[2]);
+    RLMAssertCount(AllTypesObject, 1U, @"%@ == anyCol", dates[0]);
+    RLMAssertCount(AllTypesObject, 2U, @"%@ != anyCol", dates[0]);
 }
 
 - (void)testDefaultRealmQuery {
@@ -592,11 +610,16 @@
     [realm beginWriteTransaction];
     [UuidObject createInRealm:realm withValue:@[[[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"]]];
     [UuidObject createInRealm:realm withValue:@[[[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"]]];
+
+    [MixedObject createInRealm:realm withValue:@[[[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"]]];
+    [MixedObject createInRealm:realm withValue:@[[[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"]]];
     [realm commitWriteTransaction];
 
     // query on class
     XCTAssertEqual([UuidObject allObjects].count, 2U);
     RLMAssertCount(UuidObject, 1U, @"uuidCol == '137DECC8-B300-4954-A233-F89909F4FD89'");
+    XCTAssertEqual([MixedObject allObjects].count, 2U);
+    RLMAssertCount(MixedObject, 1U, @"anyCol == '137DECC8-B300-4954-A233-F89909F4FD89'");
 }
 
 - (void)testMixedRealmQuery {
@@ -604,10 +627,14 @@
     MixedObject *value;
     [realm beginWriteTransaction];
 
-    NSArray *allValues = @[@"0",
+    NSArray *allValues = @[@YES,
+                           @NO,
+                           @true,
+                           @false,
+                           @TRUE,
+                           @FALSE,
+                           @"0",
                            @"1",
-                           [NSData dataWithBytes:"0" length:1],
-                           [NSData dataWithBytes:"1" length:1],
                            @0,
                            @1,
                            @0.0,
@@ -616,12 +643,8 @@
                            @1.0f,
                            [[RLMDecimal128 alloc] initWithNumber:@(0)],
                            [[RLMDecimal128 alloc] initWithNumber:@(1)],
-                           @YES,
-                           @NO,
-                           @true,
-                           @false,
-                           @TRUE,
-                           @FALSE,
+                           [NSData dataWithBytes:"0" length:1],
+                           [NSData dataWithBytes:"1" length:1],
                            [NSDate dateWithTimeIntervalSince1970:0],
                            [NSDate dateWithTimeIntervalSince1970:1],
                            [RLMObjectId objectId],
@@ -638,34 +661,33 @@
         obj.anyCol = allValues[i];
         [arrayOfAll.array addObject:obj];
     }
-
-    value = [MixedObject createInRealm:realm withValue:@[@"hello world", @[@"one", @2, @3.14]]];
     [realm commitWriteTransaction];
 
+    // Numeric based comparability
     // Expect (7) matches for int, double, float, decimal, 3 bools.
     RLMAssertCount(AllTypesObject, 7U, @"anyCol BETWEEN %@", @[@1, @2]);
     RLMAssertCount(AllTypesObject, 7U, @"anyCol BETWEEN {1, 2}");
     RLMAssertCount(AllTypesObject, 7U, @"anyCol == FALSE");
     RLMAssertCount(AllTypesObject, 7U, @"anyCol == 0");
+    RLMAssertCount(AllTypesObject, allValues.count-7, @"anyCol != FALSE");
     RLMAssertCount(AllTypesObject, allValues.count-7, @"anyCol != 0");
     RLMAssertCount(AllTypesObject, 7U, @"anyCol < 1");
+    RLMAssertCount(AllTypesObject, 7U, @"anyCol < TRUE");
     RLMAssertCount(AllTypesObject, 0U, @"anyCol > 1");
+    RLMAssertCount(AllTypesObject, 0U, @"anyCol > TRUE");
     RLMAssertCount(AllTypesObject, 7U, @"anyCol >= 1");
-    RLMAssertCount(AllTypesObject, 7U, @"anyCol <= 0");
-    RLMAssertCount(AllTypesObject, 14U, @"anyCol >= FALSE");
-    RLMAssertCount(AllTypesObject, 14U, @"anyCol >= 0");
+    RLMAssertCount(AllTypesObject, 7U, @"anyCol >= TRUE");
+    RLMAssertCount(AllTypesObject, 14U, @"anyCol <= 1");
+    RLMAssertCount(AllTypesObject, 14U, @"anyCol <= TRUE");
 
-    RLMAssertCount(AllTypesObject, 1U, @"anyCol == NULL");
-    RLMAssertCount(AllTypesObject, allValues.count-1, @"anyCol != NULL");
-    
     XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol BETWEEN TRUE"],
                                  NSException,
                                  @"Invalid value",
                                  @"object must be of type NSArray for BETWEEN operations");
 
+    // Binary based comparability
     // Expect (2) matches for string and data.
     RLMAssertCount(AllTypesObject, 2U, @"anyCol == '0'");
-    // @Lee -- is expectation to retrun with non-matching types? ie. below query returns all numeric types
     RLMAssertCount(AllTypesObject, allValues.count-2, @"anyCol != '0'");
     RLMAssertCount(AllTypesObject, 2U, @"anyCol BEGINSWITH '1'");
     RLMAssertCount(AllTypesObject, 0U, @"anyCol BEGINSWITH 'a'");
@@ -673,6 +695,7 @@
     RLMAssertCount(AllTypesObject, 0U, @"anyCol ENDSWITH 'a'");
     RLMAssertCount(AllTypesObject, 2U, @"anyCol CONTAINS '1'");
     RLMAssertCount(AllTypesObject, 0U, @"anyCol CONTAINS 'a'");
+
     XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol BEGINSWITH 0"],
                                  NSException,
                                  @"Invalid operator type",
@@ -685,27 +708,25 @@
                                  NSException,
                                  NSInvalidArgumentException,
                                  @"Unable to parse the format string \"anyCol CONATINS 0\"");
-
-    RLMAssertCount(AllTypesObject, 1U, @"anyCol == %@", [NSDate dateWithTimeIntervalSince1970:0]);
-    // @Lee - expect that it would return date based RLMValues that !=. Currently returns everything that isn't a date also, like strings.
-    RLMAssertCount(AllTypesObject, 0U, @"anyCol != %@", [NSDate dateWithTimeIntervalSince1970:123]);
-
-    // Expect (1) uuid match
-    RLMAssertCount(AllTypesObject, 1U, @"anyCol == '85d4fbee-6ec6-47df-bfa1-615931903d7e'");
-    RLMAssertCount(AllTypesObject, allValues.count-1, @"anyCol != '85d4fbee-6ec6-47df-bfa1-615931903d7e'");
-    RLMAssertCount(AllTypesObject, 1U, @"anyCol CONTAINS '85d4fbee-6ec6-47df-bfa1-615931903d7e'");
-    
-    XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol >= '85d4fbee-6ec6-47df-bfa1-615931903d7e'"],
+    XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol >= '0'"],
                                  NSException,
                                  @"Invalid operator type",
                                  @"Operator '>=' not supported for type 'data'");
+
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol == %@", [NSDate dateWithTimeIntervalSince1970:0]);
+    RLMAssertCount(AllTypesObject, allValues.count, @"anyCol != %@", [NSDate dateWithTimeIntervalSince1970:123]);
+
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol == '85d4fbee-6ec6-47df-bfa1-615931903d7e'");
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol CONTAINS '85d4fbee-6ec6-47df-bfa1-615931903d7e'");
+    RLMAssertCount(AllTypesObject, allValues.count-1, @"anyCol != '85d4fbee-6ec6-47df-bfa1-615931903d7e'");
+
     XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol BETWEEN '85d4fbee-6ec6-47df-bfa1-615931903d7e'"],
                                  NSException,
                                  @"Invalid value",
                                  @"object must be of type NSArray for BETWEEN operations");
-    
-    [self verifySort:realm column:@"anyCol" ascending:YES expected:nil];
-    [self verifySort:realm column:@"anyCol" ascending:NO expected:[[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"]];
+
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol == NULL");
+    RLMAssertCount(AllTypesObject, allValues.count-1, @"anyCol != NULL");
 }
 
 - (void)testArrayQuery
@@ -789,6 +810,10 @@
         [AllTypesObject values:3 stringObject:stringObj],
         [AllTypesObject values:4 stringObject:stringObj],
     ]];
+    arrayOfAll.array[0].anyCol = @NO;
+    arrayOfAll.array[1].anyCol = [NSNull null];
+    arrayOfAll.array[2].anyCol = @1;
+    arrayOfAll.array[3].anyCol = [[NSUUID alloc] initWithUUIDString:@"B9D325B0-3058-4838-8473-8F1AAAE410DB"];
     [realm commitWriteTransaction];
 
 
@@ -823,6 +848,11 @@
     //////////// sort by uuidCol
     [self verifySort:realm column:@"uuidCol" ascending:YES expected:[[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"]];
     [self verifySort:realm column:@"uuidCol" ascending:NO expected:[[NSUUID alloc] initWithUUIDString:@"B9D325B0-3058-4838-8473-8F1AAAE410DB"]];
+
+    //////////// sort by anyCol
+    //////////// nulls < strings, binaries < numerics < timestamps < objectId < uuid.
+    [self verifySort:realm column:@"anyCol" ascending:YES expected:[NSNull null]];
+    [self verifySort:realm column:@"anyCol" ascending:NO expected:[[NSUUID alloc] initWithUUIDString:@"B9D325B0-3058-4838-8473-8F1AAAE410DB"]];
 
     // sort invalid name
     RLMAssertThrowsWithReason([[AllTypesObject allObjects] sortedResultsUsingKeyPath:@"invalidCol" ascending:YES],

@@ -24,21 +24,11 @@
 @implementation NSNumber (RLMValue)
 
 - (RLMPropertyType)valueType {
-    char dataType = [self objCType][0];
-    
-    if (dataType == *@encode(bool) ||
-        dataType == *@encode(char)) {
+    if (numberIsBool(self)) {
         return RLMPropertyTypeBool;
-    } else if (dataType == *@encode(int) ||
-               dataType == *@encode(short) ||
-               dataType == *@encode(unsigned short) ||
-               dataType == *@encode(unsigned int) ||
-               dataType == *@encode(long) ||
-               dataType == *@encode(long long) ||
-               dataType == *@encode(unsigned long) ||
-               dataType == *@encode(unsigned long long)) {
+    } else if (numberIsInteger(self)) {
         return RLMPropertyTypeInt;
-    } else if (dataType == *@encode(float)) {
+    } else if (numberIsFloat(self)) {
         return RLMPropertyTypeFloat;
     } else {
         return RLMPropertyTypeDouble;

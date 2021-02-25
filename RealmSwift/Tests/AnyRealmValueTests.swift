@@ -26,13 +26,12 @@ class AnyRealmTypeObject: Object {
 
 class AnyRealmValueTests: TestCase {
 
-    func testList() {
-        let listObj = SwiftListObject()
-        let realm = try! Realm()
-        try! realm.write({
-            realm.add(listObj)
-        })
-    }
+//    func testInit() {
+//        let o = AnyRealmTypeObject()
+//        o.anyValue = AnyRealmValue(1)
+//        o.anyValue = AnyRealmValue(1.2)
+//        o.anyValue = AnyRealmValue(true)
+//    }
     
     func testInt() {
         let o = AnyRealmTypeObject()
