@@ -49,36 +49,6 @@ static RLMObjectId *objectId(NSUInteger i) {
     return objectIds[i];
 }
 
-static void count(NSArray *values, double *sum, NSUInteger *count) {
-    for (id value in values) {
-        if (value != NSNull.null) {
-            ++*count;
-            *sum += [value doubleValue];
-        }
-    }
-}
-
-static double sum(NSArray *values) {
-    double sum = 0;
-    NSUInteger c = 0;
-    count(values, &sum, &c);
-    return sum;
-}
-static double average(NSArray *values) {
-    double sum = 0;
-    NSUInteger c = 0;
-    count(values, &sum, &c);
-    return sum / c;
-}
-
-static NSArray *shiftArray(NSArray *array, NSInteger pos)
-{
-    NSInteger length = [array count];
-    NSArray *post = [array subarrayWithRange:(NSRange){ .location = length - pos, .length = pos }];
-    NSArray *pre = [array subarrayWithRange:(NSRange){ .location = 0, .length = length - pos}];
-    return [post arrayByAddingObjectsFromArray:pre];
-}
-
 @interface RLMValuePropertyTests : RLMTestCase
 @end
 
@@ -105,8 +75,6 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
         [realm cancelWriteTransaction];
     }
 }
-
-// !!! don't forget to add count of rlmValue in array tests
 
 // Dummy test
 - (void)testTrue {
