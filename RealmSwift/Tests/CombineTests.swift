@@ -858,6 +858,25 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         }
     }
 
+    func testChangeSetWithoutNotifyingAfterDelivery() {
+        var calls = 0
+        let ex = expectation(description: "sink init")
+        cancellable = collection
+            .changesetPublisher
+            .saveToken(on: self, at: \.notificationToken)
+            .sink { _ in
+                calls += 1
+                ex.fulfill()
+            }
+        XCTAssertNotNil(notificationToken)
+        for _ in 0..<10 {
+            try! realm.write(withoutNotifying: [notificationToken!]) { collection.appendObject() }
+
+        }
+        waitForExpectations(timeout: 2.0, handler: nil)
+        XCTAssertEqual(calls, 1) // 1 for the initial observation
+    }
+
     func testSubscribeOn() {
         let sema = DispatchSemaphore(value: 0)
         var calls = 0
