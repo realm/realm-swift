@@ -338,33 +338,41 @@ extension Realm {
 extension Object: ObservableObject {
     /// A publisher that emits Void each time the object changes.
     ///
-    /// Despite the name, this actually emits *after* the collection has changed.
+    /// Despite the name, this actually emits *after* the object has changed.
     public var objectWillChange: RealmPublishers.WillChange<Object> {
         return RealmPublishers.WillChange(self)
     }
 }
-
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension Object: RealmSubscribable {
+extension EmbeddedObject: ObservableObject {
+    /// A publisher that emits Void each time the object changes.
+    ///
+    /// Despite the name, this actually emits *after* the embedded object has changed.
+    public var objectWillChange: RealmPublishers.WillChange<EmbeddedObject> {
+        return RealmPublishers.WillChange(self)
+    }
+}
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension ObjectBase: RealmSubscribable {
     /// :nodoc:
     // swiftlint:disable:next identifier_name
-    public func _observe<S: Subscriber>(on queue: DispatchQueue?, _ subscriber: S)
-        -> NotificationToken where S.Input: Object, S.Failure == Error {
-            return observe(on: queue) { (change: ObjectChange<S.Input>) in
-                switch change {
-                case .change(let object, _):
-                    _ = subscriber.receive(object)
-                case .deleted:
-                    subscriber.receive(completion: .finished)
-                case .error(let error):
-                    subscriber.receive(completion: .failure(error))
-                }
+    public func _observe<S>(on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken
+        where S.Input: ObjectBase, S: Subscriber, S.Failure == Error {
+        return _observe(on: queue) { (change: ObjectChange<S.Input>) in
+            switch change {
+            case .change(let object, _):
+                _ = subscriber.receive(object)
+            case .deleted:
+                subscriber.receive(completion: .finished)
+            case .error(let error):
+                subscriber.receive(completion: .failure(error))
             }
+        }
     }
 
     /// :nodoc:
     public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
-        return observe { _ in _ = subscriber.receive() }
+        return _observe { _ in _ = subscriber.receive() }
     }
 }
 
