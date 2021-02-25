@@ -5,7 +5,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 
-* Fixed a crash that would occur when observing unmanaged Objects in multple views. 
+* Fixed a crash that would occur when observing unmanaged Objects in multiple views in SwiftUI. We now correctly remove KVOs only once.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
