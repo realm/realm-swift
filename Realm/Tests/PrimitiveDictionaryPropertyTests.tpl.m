@@ -200,7 +200,8 @@ static double average(NSArray *values) {
 }
 
 - (void)testDeleteObjectsInRealm {
-    RLMAssertThrowsWithReason([realm deleteObjects:$allDictionaries], @"Cannot delete objects from RLMDictionary");
+    RLMAssertThrowsWithReason([realm deleteObjects:$dictionary], @"Cannot delete objects from RLMDictionary");
+//    RLMAssertThrowsWithReason([realm deleteObjects:$allDictionaries], @"Cannot delete objects from RLMDictionary");
 }
 
 - (void)testObjectAtIndex {

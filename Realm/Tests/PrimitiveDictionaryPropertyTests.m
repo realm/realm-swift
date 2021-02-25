@@ -214,8 +214,16 @@ static double average(NSArray *values) {
 }
 
 - (void)testDeleteObjectsInRealm {
+    RLMAssertThrowsWithReason([realm deleteObjects:unmanaged.boolObj], @"Cannot delete objects from RLMDictionary");
+    RLMAssertThrowsWithReason([realm deleteObjects:unmanaged.intObj], @"Cannot delete objects from RLMDictionary");
+    RLMAssertThrowsWithReason([realm deleteObjects:optUnmanaged.boolObj], @"Cannot delete objects from RLMDictionary");
+    RLMAssertThrowsWithReason([realm deleteObjects:optUnmanaged.intObj], @"Cannot delete objects from RLMDictionary");
+    RLMAssertThrowsWithReason([realm deleteObjects:managed.boolObj], @"Cannot delete objects from RLMDictionary");
+    RLMAssertThrowsWithReason([realm deleteObjects:managed.intObj], @"Cannot delete objects from RLMDictionary");
+    RLMAssertThrowsWithReason([realm deleteObjects:optManaged.boolObj], @"Cannot delete objects from RLMDictionary");
+    RLMAssertThrowsWithReason([realm deleteObjects:optManaged.intObj], @"Cannot delete objects from RLMDictionary");
     for (RLMDictionary *dictionary in allDictionaries) {
-        RLMAssertThrowsWithReason([realm deleteObjects:dictionary], @"Cannot delete objects from RLMDictionary");
+    //    RLMAssertThrowsWithReason([realm deleteObjects:dictionary], @"Cannot delete objects from RLMDictionary");
     }
 }
 
@@ -1773,99 +1781,100 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 #define RLMAssertCount(cls, expectedCount, ...) \
     XCTAssertEqual(expectedCount, ([cls objectsInRealm:realm where:__VA_ARGS__].count))
 
-- (void)createObjectWithValueIndex:(NSUInteger)index {
-//    NSRange range = {index, 1};
-//    id obj = [AllPrimitiveDictionaries createInRealm:realm withValue:@{
-//        @"boolObj": [@{@"0": @NO, @"1": @YES} subarrayWithRange:range],
-//        @"intObj": [@{@"0": @2, @"1": @3} subarrayWithRange:range],
-//    }];
-//    [LinkToAllPrimitiveDictionaries createInRealm:realm withValue:@[obj]];
-//    obj = [AllOptionalPrimitiveDictionaries createInRealm:realm withValue:@{
-//        @"boolObj": [@{@"0": @NO, @"1": @YES, @"2": NSNull.null} subarrayWithRange:range],
-//        @"intObj": [@{@"0": @2, @"1": @3, @"2": NSNull.null} subarrayWithRange:range],
-//    }];
-//    [LinkToAllOptionalPrimitiveDictionaries createInRealm:realm withValue:@[obj]];
+- (void)createObjectWithKey:(NSString *)key {
+    id boolVals = [@{@"0": @NO, @"1": @YES} dictionaryWithValuesForKeys:@[key]];
+    id intVals = [@{@"0": @2, @"1": @3} dictionaryWithValuesForKeys:@[key]];
+    id obj = [AllPrimitiveDictionaries createInRealm:realm withValue:@{
+        @"boolObj": boolVals,
+        @"intObj": intVals,
+    }];
+    [LinkToAllPrimitiveDictionaries createInRealm:realm withValue:@[obj]];
+    obj = [AllOptionalPrimitiveDictionaries createInRealm:realm withValue:@{
+        @"boolObj": boolVals,
+        @"intObj": intVals,
+    }];
+    [LinkToAllOptionalPrimitiveDictionaries createInRealm:realm withValue:@[obj]];
 }
 
 - (void)testQueryBasicOperators {
     [realm deleteAllObjects];
 
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY boolObj = %@", @NO);
-    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj = %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj = %@", @2);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY boolObj = %@", @NO);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj = %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj = %@", @2);
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY boolObj != %@", @NO);
-    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj != %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj != %@", @2);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY boolObj != %@", @NO);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj != %@", @2);
-    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj > %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj > %@", @2);
-    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj >= %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj >= %@", @2);
-    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
-    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj <= %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj <= %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj != %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj > %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj > %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj >= %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj >= %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj <= %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj <= %@", @2);
 
-    [self createObjectWithValueIndex:0];
+    [self createObjectWithKey:@"0"];
 
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY boolObj = %@", @YES);
-    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj = %@", @3);
+//    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj = %@", @3);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY boolObj = %@", @YES);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj = %@", @3);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj = %@", @3);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY boolObj = %@", @NO);
-    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj = %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj = %@", @2);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY boolObj = %@", @NO);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj = %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj = %@", @2);
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY boolObj != %@", @NO);
-    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj != %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj != %@", @2);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY boolObj != %@", @NO);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj != %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj != %@", @2);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY boolObj != %@", @YES);
-    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj != %@", @3);
+//    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj != %@", @3);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY boolObj != %@", @YES);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj != %@", @3);
-    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj > %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj > %@", @2);
-    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj >= %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj >= %@", @2);
-    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
-    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj < %@", @3);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj < %@", @3);
-    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj <= %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj <= %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj != %@", @3);
+//    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj > %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj > %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj >= %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj >= %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj < %@", @3);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj < %@", @3);
+//    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj <= %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj <= %@", @2);
 
-    [self createObjectWithValueIndex:1];
+    [self createObjectWithKey:@"1"];
 
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY boolObj = %@", @NO);
-    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj = %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj = %@", @2);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY boolObj = %@", @NO);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj = %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj = %@", @2);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY boolObj = %@", @YES);
-    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj = %@", @3);
+//    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj = %@", @3);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY boolObj = %@", @YES);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj = %@", @3);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj = %@", @3);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY boolObj != %@", @NO);
-    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj != %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj != %@", @2);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY boolObj != %@", @NO);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj != %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj != %@", @2);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY boolObj != %@", @YES);
-    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj != %@", @3);
+//    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj != %@", @3);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY boolObj != %@", @YES);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj != %@", @3);
-    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj > %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj > %@", @2);
-    RLMAssertCount(AllPrimitiveDictionaries, 2, @"ANY intObj >= %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 2, @"ANY intObj >= %@", @2);
-    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
-    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj < %@", @3);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj < %@", @3);
-    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj <= %@", @2);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj <= %@", @2);
-    RLMAssertCount(AllPrimitiveDictionaries, 2, @"ANY intObj <= %@", @3);
-    RLMAssertCount(AllOptionalPrimitiveDictionaries, 2, @"ANY intObj <= %@", @3);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj != %@", @3);
+//    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj > %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj > %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 2, @"ANY intObj >= %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 2, @"ANY intObj >= %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj < %@", @3);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj < %@", @3);
+//    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj <= %@", @2);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj <= %@", @2);
+//    RLMAssertCount(AllPrimitiveDictionaries, 2, @"ANY intObj <= %@", @3);
+//    RLMAssertCount(AllOptionalPrimitiveDictionaries, 2, @"ANY intObj <= %@", @3);
 
     RLMAssertThrowsWithReason(([AllPrimitiveDictionaries objectsInRealm:realm where:@"ANY boolObj > %@", @NO]),
                               @"Operator '>' not supported for type 'bool'");
@@ -1884,7 +1893,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj BETWEEN %@", @[@2, @3]);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj BETWEEN %@", @[@2, @3]);
 
-    [self createObjectWithValueIndex:0];
+    [self createObjectWithKey:@"0"];
 
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj BETWEEN %@", @[@2, @2]);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj BETWEEN %@", @[@2, @2]);
@@ -1902,7 +1911,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY boolObj IN %@", @[@NO, @YES]);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj IN %@", @[@2, @3]);
 
-    [self createObjectWithValueIndex:0];
+    [self createObjectWithKey:@"0"];
 
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY boolObj IN %@", @[@YES]);
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj IN %@", @[@3]);
@@ -2116,7 +2125,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"intObj.@min == %@", NSNull.null);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"intObj.@min == %@", NSNull.null);
 
-    [self createObjectWithValueIndex:0];
+    [self createObjectWithKey:@"0"];
 
     // One object where v0 is min and zero with v1
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"intObj.@min == %@", @2);
@@ -2124,7 +2133,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"intObj.@min == %@", @3);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0U, @"intObj.@min == %@", @3);
 
-    [self createObjectWithValueIndex:1];
+    [self createObjectWithKey:@"1"];
 
     // One object where v0 is min and one with v1
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"intObj.@min == %@", @2);
@@ -2180,7 +2189,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"intObj.@max == %@", NSNull.null);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"intObj.@max == %@", NSNull.null);
 
-    [self createObjectWithValueIndex:0];
+    [self createObjectWithKey:@"0"];
 
     // One object where v0 is min and zero with v1
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"intObj.@max == %@", @2);
@@ -2188,7 +2197,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"intObj.@max == %@", @3);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0U, @"intObj.@max == %@", @3);
 
-    [self createObjectWithValueIndex:1];
+    [self createObjectWithKey:@"1"];
 
     // One object where v0 is min and one with v1
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"intObj.@max == %@", @2);
@@ -2230,7 +2239,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.intObj <= %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.intObj <= %@", @2);
 
-    [self createObjectWithValueIndex:0];
+    [self createObjectWithKey:@"0"];
 
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.boolObj = %@", @YES);
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.intObj = %@", @3);
@@ -2259,7 +2268,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.intObj <= %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 1, @"ANY link.intObj <= %@", @2);
 
-    [self createObjectWithValueIndex:1];
+    [self createObjectWithKey:@"1"];
 
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.boolObj = %@", @NO);
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.intObj = %@", @2);
