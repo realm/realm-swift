@@ -388,7 +388,7 @@ realm::Mixed RLMObjcToMixed(id<RLMValue> v) {
 
 id RLMMixedToObjc(realm::Mixed const& mixed, RLMRealm *realm) {
     if (mixed.is_null()) {
-        return nil;
+        return NSNull.null;
     }
     switch (mixed.get_type()) {
         case realm::type_String:

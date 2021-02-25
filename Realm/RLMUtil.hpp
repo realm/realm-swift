@@ -254,15 +254,12 @@ static inline bool numberIsFloat(__unsafe_unretained NSNumber *const obj) {
            data_type == *@encode(unsigned short) ||
            data_type == *@encode(unsigned int) ||
            data_type == *@encode(unsigned long) ||
-           data_type == *@encode(unsigned long long) ||
-           // A double is like float if it fits within float bounds or is NaN.
-           (data_type == *@encode(double) && (ABS([obj doubleValue]) <= FLT_MAX || isnan([obj doubleValue])));
+           data_type == *@encode(unsigned long long);
 }
 
 static inline bool numberIsDouble(__unsafe_unretained NSNumber *const obj) {
     char data_type = [obj objCType][0];
-    return data_type == *@encode(double) ||
-           data_type == *@encode(float) ||
+    return data_type == *@encode(float) ||
            data_type == *@encode(short) ||
            data_type == *@encode(int) ||
            data_type == *@encode(long) ||

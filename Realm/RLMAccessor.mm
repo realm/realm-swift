@@ -101,7 +101,11 @@ id getBoxed(__unsafe_unretained RLMObjectBase *const obj, NSUInteger index) {
     auto& prop = get_property(obj, index);
     RLMAccessorContext ctx(obj, &prop);
     auto value = obj->_row.get<T>(prop.column_key);
-    return is_null(value) ? nil : ctx.box(std::move(value));
+    if constexpr(std::is_same_v<T, realm::Mixed>) {
+        return ctx.box(std::move(value));
+    } else {
+        return is_null(value) ? nil : ctx.box(std::move(value));
+    }
 }
 
 template<typename T>
