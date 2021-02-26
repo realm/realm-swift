@@ -537,13 +537,8 @@ void RLMWillChange(std::vector<realm::BindingContext::ObserverState> const& obse
         NSMutableIndexSet *indexes = [NSMutableIndexSet new];
         for (auto const& o : observed) {
             forEach(o, [&](realm::ColKey colKey, auto const& change, RLMObservationInfo *info) {
-                if (colKey.is_set()) {
-                    info->willChange(info->columnName(colKey));
-                }
-                else {
                     info->willChange(info->columnName(colKey),
                                      convert(change.kind), convert(change.indices, indexes));
-                }
             });
         }
     }
@@ -559,12 +554,7 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
         NSMutableIndexSet *indexes = [NSMutableIndexSet new];
         for (auto const& o : reverse(observed)) {
             forEach(o, [&](realm::ColKey col, auto const& change, RLMObservationInfo *info) {
-                if (col.is_set()) {
-                    info->didChange(info->columnName(col));
-                }
-                else {
                     info->didChange(info->columnName(col), convert(change.kind), convert(change.indices, indexes));
-                }
             });
         }
     }

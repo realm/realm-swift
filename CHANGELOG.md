@@ -2,6 +2,28 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add `RLMSet`/`MutableSet<>` datatype. This is a Set collection type used for storing distinct values in a collection.
+* None.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
+10.7.0 Release notes (2021-02-23)
+=============================================================
+
+### Enhancements
+
 * Add support for some missing query operations on data propertys:
   - Data properties can be compared to other data properties
     (e.g. "dataProperty1 == dataProperty2").
@@ -23,6 +45,27 @@ x.y.z Release notes (yyyy-MM-dd)
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
+* Performance of sorting on more than one property has been improved.
+  Especially important if many elements match on the first property. Mitigates
+  ([#7092](https://github.com/realm/realm-cocoa/issues/7092))
+
+### Fixed
+
+* Fixed a bug that prevented an object type with incoming links from being
+  marked as embedded during migrations. ([Core #4414](https://github.com/realm/realm-core/pull/4414))
+* The Realm notification listener thread could sometimes hit the assertion
+  failure "!skip_version.version" if a write transaction was committed at a
+  very specific time (since v10.5.0).
+* Added workaround for a case where upgrading an old file with illegal string
+  would crash ([#7111](https://github.com/realm/realm-cocoa/issues/7111))
+* Fixed a conflict resolution bug related to the ArrayMove instruction, which
+  could sometimes cause an "Invalid prior_size" exception to prevent
+  synchronization (since v10.5.0).
+* Skipping a change notification in the first write transaction after the
+  observer was added could potentially fail to skip the notification (since v10.5.1).
+
+### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.4.
@@ -30,6 +73,8 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Upgraded realm-core from v10.5.0 to v10.5.1
+
+* Upgraded realm-core from v10.5.0 to v10.5.3
 
 10.6.0 Release notes (2021-02-15)
 =============================================================
@@ -111,6 +156,7 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * None.
+
 * Add support for "thawing" objects. `Realm`, `Results`, `List` and `Object`
   now have `thaw()` methods which return a live copy of the frozen object. This
   enables app behvaior where a frozen object can be made live again in order to
