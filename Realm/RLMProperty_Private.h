@@ -45,7 +45,7 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
         case RLMPropertyTypeFloat:
             return @"float";
         case RLMPropertyTypeAny:
-            return @"any";
+            return @"mixed";
         case RLMPropertyTypeObject:
             return @"object";
         case RLMPropertyTypeLinkingObjects:

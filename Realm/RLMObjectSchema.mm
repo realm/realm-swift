@@ -232,6 +232,11 @@ using namespace realm;
                 @throw RLMException(@"Object properties cannot be made required, "
                                     "but '+[%@ requiredProperties]' included '%@'", objectClass, property.name);
             }
+            if (property.type == RLMPropertyTypeAny) {
+                // A Mixed type can represent null, but it cannot be optional.
+                property.optional = NO;
+                continue;
+            }
             property.optional &= !required;
         }
     }

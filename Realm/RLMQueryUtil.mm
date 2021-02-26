@@ -489,7 +489,6 @@ public:
     void apply_function_expression(RLMObjectSchema *objectSchema, NSExpression *functionExpression,
                                    NSPredicateOperatorType operatorType, NSExpression *right);
 
-
     template <typename A, typename B>
     void add_numeric_constraint(RLMPropertyType datatype,
                                 NSPredicateOperatorType operatorType,
@@ -498,24 +497,29 @@ public:
     template <typename A, typename B>
     void add_bool_constraint(RLMPropertyType, NSPredicateOperatorType operatorType, A&& lhs, B&& rhs);
 
+    template <typename C, typename T>
     void add_mixed_constraint(NSPredicateOperatorType operatorType,
                               NSComparisonPredicateOptions predicateOptions,
-                              Columns<Mixed>&& column,
+                              Columns<C>&& column,
+                              T value);
+
+    template <typename C>
+    void add_mixed_constraint(NSPredicateOperatorType operatorType,
+                              NSComparisonPredicateOptions predicateOptions,
+                              Columns<C>&& column,
                               const ColumnReference& c);
 
+    template <typename C>
     void add_mixed_constraint(NSPredicateOperatorType operatorType,
                               NSComparisonPredicateOptions predicateOptions,
-                              Columns<Mixed>&& column, realm::null);
+                              Columns<C>&& column,
+                              Mixed&& value);
 
+    template <typename C>
     void add_mixed_constraint(NSPredicateOperatorType operatorType,
                               NSComparisonPredicateOptions predicateOptions,
-                              Columns<Mixed>&& column,
-                              Mixed value);
-    template<typename T>
-    void add_mixed_constraint(NSPredicateOperatorType operatorType,
-                              NSComparisonPredicateOptions predicateOptions,
-                              Columns<Mixed>&& column,
-                              T value);
+                              Columns<C>&& column,
+                              realm::null);
 
     template<typename T>
     void add_substring_constraint(const T& value, Query condition);
@@ -720,6 +724,7 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
         [](const Columns<BinaryData>& c) { return c.clone(); },
         [](const Columns<Lst<BinaryData>>& c) { return c.clone(); },
         [](const Columns<Mixed>& c) { return c.clone(); },
+        [](const Columns<Lst<Mixed>>& c) { return c.clone(); },
         [](Mixed value) { return make_subexpr<ConstantStringValue>(value.get_string()); },
     };
     auto left = as_subexpr(column);
@@ -1012,7 +1017,9 @@ void QueryBuilder::do_add_constraint(RLMPropertyType type, NSPredicateOperatorTy
             break;
         case RLMPropertyTypeAny:
             convert_null(value, [&](auto&& value) {
-                add_mixed_constraint(operatorType, predicateOptions, column.resolve<Mixed>(),
+                add_mixed_constraint(operatorType,
+                                     predicateOptions,
+                                     column.resolve<W<Mixed>>(),
                                      value);
             });
     }
@@ -1020,21 +1027,33 @@ void QueryBuilder::do_add_constraint(RLMPropertyType type, NSPredicateOperatorTy
 
 #pragma mark AddMixedConstraints
 
-template<typename T>
+template<typename C, typename T>
 void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
                                         NSComparisonPredicateOptions predicateOptions,
-                                        Columns<Mixed>&& column,
-                                        T value) {
+                                        Columns<C>&& column,
+                                        T value)
+{
     add_mixed_constraint(operatorType,
                          predicateOptions,
                          std::move(column),
-                         value_of_type<Mixed>(std::move(value)));
+                         value_of_type<Mixed>(value));
 }
 
+template<typename C>
 void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
                                         NSComparisonPredicateOptions predicateOptions,
-                                        Columns<Mixed>&& column,
-                                        Mixed value) {
+                                        Columns<C>&& column,
+                                        const ColumnReference& value)
+{
+    add_bool_constraint(RLMPropertyTypeObject, operatorType, column, value.resolve<Mixed>());
+}
+
+template<typename C>
+void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
+                                        NSComparisonPredicateOptions predicateOptions,
+                                        Columns<C>&& column,
+                                        Mixed&& value)
+{
     switch (value.get_type()) {
         case realm::type_Int:
         case realm::type_Timestamp:
@@ -1057,9 +1076,12 @@ void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
     }
 }
 
+template<typename C>
 void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
-                          NSComparisonPredicateOptions predicateOptions,
-                          Columns<Mixed>&& column, null rhs) {
+                                        NSComparisonPredicateOptions predicateOptions,
+                                        Columns<C>&& column,
+                                        null rhs)
+{
     switch (operatorType) {
         case NSEqualToPredicateOperatorType:
             m_query.and_query(column == rhs);
@@ -1068,15 +1090,11 @@ void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
             m_query.and_query(column != rhs);
             break;
         default:
-            @throw RLMException(@"Unsupported NSPredicateOperatorType type.");
+            // Here to handle edge cases there the rhs is NULL and the predicate may
+            // be something such as BEGINSWITH
+            m_query.and_query(column == rhs);
+            break;
     }
-}
-
-void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
-                          NSComparisonPredicateOptions predicateOptions,
-                          Columns<Mixed>&& column,
-                          const ColumnReference& value) {
-    add_bool_constraint(RLMPropertyTypeObject, operatorType, column, value.resolve<Mixed>());
 }
 
 template<typename T>
@@ -1240,6 +1258,17 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
                 add_numeric_constraint(type, operatorType,
                                        collection_operation_expr<Timestamp, Operation, IsLinkCollection>(collectionOperation),
                                        value_of_type<Timestamp>(rhs));
+            }
+            break;
+        case RLMPropertyTypeAny:
+            if constexpr (Operation == CollectionOperation::Sum || Operation == CollectionOperation::Average) {
+                throwException(@"Unsupported predicate value type",
+                               @"Cannot sum or average 'any' properties");
+            }
+            else {
+                add_numeric_constraint(type, operatorType,
+                                       collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
+                                       value_of_type<Mixed>(rhs));
             }
             break;
         default:

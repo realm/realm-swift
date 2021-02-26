@@ -617,9 +617,9 @@
 
     // query on class
     XCTAssertEqual([UuidObject allObjects].count, 2U);
-    RLMAssertCount(UuidObject, 1U, @"uuidCol == '137DECC8-B300-4954-A233-F89909F4FD89'");
+    RLMAssertCount(UuidObject, 1U, @"uuidCol == %@", [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"]);
     XCTAssertEqual([MixedObject allObjects].count, 2U);
-    RLMAssertCount(MixedObject, 1U, @"anyCol == '137DECC8-B300-4954-A233-F89909F4FD89'");
+    RLMAssertCount(MixedObject, 1U, @"anyCol == %@", [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"]);
 }
 
 - (void)testMixedRealmQuery {
@@ -716,9 +716,8 @@
     RLMAssertCount(AllTypesObject, 1U, @"anyCol == %@", [NSDate dateWithTimeIntervalSince1970:0]);
     RLMAssertCount(AllTypesObject, allValues.count, @"anyCol != %@", [NSDate dateWithTimeIntervalSince1970:123]);
 
-    RLMAssertCount(AllTypesObject, 1U, @"anyCol == '85d4fbee-6ec6-47df-bfa1-615931903d7e'");
-    RLMAssertCount(AllTypesObject, 1U, @"anyCol CONTAINS '85d4fbee-6ec6-47df-bfa1-615931903d7e'");
-    RLMAssertCount(AllTypesObject, allValues.count-1, @"anyCol != '85d4fbee-6ec6-47df-bfa1-615931903d7e'");
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol == %@", [[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"]);
+    RLMAssertCount(AllTypesObject, allValues.count-1, @"anyCol != %@", [[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"]);
 
     XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol BETWEEN '85d4fbee-6ec6-47df-bfa1-615931903d7e'"],
                                  NSException,
@@ -851,7 +850,7 @@
 
     //////////// sort by anyCol
     //////////// nulls < strings, binaries < numerics < timestamps < objectId < uuid.
-    [self verifySort:realm column:@"anyCol" ascending:YES expected:[NSNull null]];
+    [self verifySort:realm column:@"anyCol" ascending:YES expected:nil];
     [self verifySort:realm column:@"anyCol" ascending:NO expected:[[NSUUID alloc] initWithUUIDString:@"B9D325B0-3058-4838-8473-8F1AAAE410DB"]];
 
     // sort invalid name

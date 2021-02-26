@@ -94,7 +94,6 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
     realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     [self initValues];
-//    [self assignValues];
     [allMixed addObjects:@[
         unmanaged.boolVal,
         unmanaged.intVal,
@@ -123,11 +122,6 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
     if (realm.inWriteTransaction) {
         [realm cancelWriteTransaction];
     }
-}
-
-// Dummy test
-- (void)testTrue {
-    XCTAssert(true);
 }
 
 - (void)initValues {
@@ -213,38 +207,16 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
     XCTAssertNil(unman.decimalVal, @"RLMValue should be able to initialize as null");
     XCTAssertNil(unman.objectIdVal, @"RLMValue should be able to initialize as null");
     XCTAssertNil(unman.uuidVal, @"RLMValue should be able to initialize as null");
-    XCTAssertEqual(man.boolVal, NSNull.null, @"RLMValue should be NSNull.null once managed");
-    XCTAssertEqual(man.intVal, NSNull.null, @"RLMValue should be NSNull.null once managed");
-    XCTAssertEqual(man.floatVal, NSNull.null, @"RLMValue should be NSNull.null once managed");
-    XCTAssertEqual(man.doubleVal, NSNull.null, @"RLMValue should be NSNull.null once managed");
-    XCTAssertEqual(man.stringVal, NSNull.null, @"RLMValue should be NSNull.null once managed");
-    XCTAssertEqual(man.dataVal, NSNull.null, @"RLMValue should be NSNull.null once managed");
-    XCTAssertEqual(man.dateVal, NSNull.null, @"RLMValue should be NSNull.null once managed");
-    XCTAssertEqual(man.decimalVal, NSNull.null, @"RLMValue should be NSNull.null once managed");
-    XCTAssertEqual(man.objectIdVal, NSNull.null, @"RLMValue should be NSNull.null once managed");
-    XCTAssertEqual(man.uuidVal, NSNull.null, @"RLMValue should be NSNull.null once managed");
-    
-    // @Lee, nil initialized RLMValues are all valueType "0" == RLMPropertyTypeInt
-//    XCTAssertEqual(unman.boolVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.intVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.floatVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.doubleVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.stringVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.dataVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.dateVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.decimalVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.objectIdVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.uuidVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.boolVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.intVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.floatVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.doubleVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.stringVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.dataVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.dateVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.decimalVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.objectIdVal.valueType, RLMPropertyTypeAny);
-//    XCTAssertEqual(unman.uuidVal.valueType, RLMPropertyTypeAny);
+    XCTAssertNil(man.boolVal, @"RLMValue should be nil once managed");
+    XCTAssertNil(man.intVal, @"RLMValue should be nil once managed");
+    XCTAssertNil(man.floatVal, @"RLMValue should be nil once managed");
+    XCTAssertNil(man.doubleVal, @"RLMValue should be nil once managed");
+    XCTAssertNil(man.stringVal, @"RLMValue should be nil once managed");
+    XCTAssertNil(man.dataVal, @"RLMValue should be nil once managed");
+    XCTAssertNil(man.dateVal, @"RLMValue should be nil once managed");
+    XCTAssertNil(man.decimalVal, @"RLMValue should be nil once managed");
+    XCTAssertNil(man.objectIdVal, @"RLMValue should be nil once managed");
+    XCTAssertNil(man.uuidVal, @"RLMValue should be nil once managed");
 }
 
 - (void)testUpdateBoolType {
@@ -910,38 +882,16 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
     XCTAssertEqual(unmanaged.decimalVal, [NSNull null]);
     XCTAssertEqual(unmanaged.objectIdVal, [NSNull null]);
     XCTAssertEqual(unmanaged.uuidVal, [NSNull null]);
-    XCTAssertEqual(managed.boolVal, [NSNull null]);
-    XCTAssertEqual(managed.intVal, [NSNull null]);
-    XCTAssertEqual(managed.floatVal, [NSNull null]);
-    XCTAssertEqual(managed.doubleVal, [NSNull null]);
-    XCTAssertEqual(managed.stringVal, [NSNull null]);
-    XCTAssertEqual(managed.dataVal, [NSNull null]);
-    XCTAssertEqual(managed.dateVal, [NSNull null]);
-    XCTAssertEqual(managed.decimalVal, [NSNull null]);
-    XCTAssertEqual(managed.objectIdVal, [NSNull null]);
-    XCTAssertEqual(managed.uuidVal, [NSNull null]);
-    
-    // @Lee - unmanaged don't have valueType selector, managed are set to "0" == RLMPropertyTypeInt
-    XCTAssertEqual(unmanaged.boolVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(unmanaged.intVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(unmanaged.floatVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(unmanaged.doubleVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(unmanaged.stringVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(unmanaged.dataVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(unmanaged.dateVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(unmanaged.decimalVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(unmanaged.objectIdVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(unmanaged.uuidVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(managed.boolVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(managed.intVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(managed.floatVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(managed.doubleVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(managed.stringVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(managed.dataVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(managed.dateVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(managed.decimalVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(managed.objectIdVal.valueType, RLMPropertyTypeAny);
-    XCTAssertEqual(managed.uuidVal.valueType, RLMPropertyTypeAny);
+    XCTAssertNil(managed.boolVal);
+    XCTAssertNil(managed.intVal);
+    XCTAssertNil(managed.floatVal);
+    XCTAssertNil(managed.doubleVal);
+    XCTAssertNil(managed.stringVal);
+    XCTAssertNil(managed.dataVal);
+    XCTAssertNil(managed.dateVal);
+    XCTAssertNil(managed.decimalVal);
+    XCTAssertNil(managed.objectIdVal);
+    XCTAssertNil(managed.uuidVal);
 }
 
 @end

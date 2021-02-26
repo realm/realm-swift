@@ -141,6 +141,7 @@ class SwiftRLMDynamicTests: RLMTestCase {
 
         let schema = dyrealm.schema[AllTypesObject.className()]
         for prop in schema.properties.dropLast() {
+            // get_property_value_impl mixed is commented out
             XCTAssertTrue((obj1[prop.name] as AnyObject).isEqual(robj1[prop.name]))
             XCTAssertTrue((obj2[prop.name] as AnyObject).isEqual(robj2[prop.name]))
         }
