@@ -51,7 +51,7 @@
     NSError *error;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
     if (error) {
-        abort();
+        @throw [NSException exceptionWithName:@"RLMExampleException" reason:@"Could not open realm." userInfo:nil];
     }
     [realm beginWriteTransaction];
     exampleData(realm);
@@ -70,11 +70,11 @@
         NSError *error;
         [RLMRealm performMigrationForConfiguration:realmConfiguration error:&error];
         if (error) {
-            abort();
+            @throw [NSException exceptionWithName:@"RLMExampleException" reason:@"Could not migrate realm." userInfo:nil];
         }
         RLMRealm *realm = [RLMRealm realmWithConfiguration:realmConfiguration error:&error];
         if (error) {
-            abort();
+            @throw [NSException exceptionWithName:@"RLMExampleException" reason:@"Could not open realm." userInfo:nil];
         }
         migrationCheck(realm);
     }
@@ -91,7 +91,7 @@
         NSError *error;
         [[NSFileManager defaultManager] removeItemAtPath:destinationUrl.path error:&error];
         if (error) {
-            abort();
+            @throw [NSException exceptionWithName:@"RLMExampleException" reason:@"Could not remove realm file." userInfo:nil];
         }
     }
     if (usingTemplate) {
@@ -99,7 +99,7 @@
         NSError *error;
         [[NSFileManager defaultManager] copyItemAtPath:bundleUrl.path toPath:destinationUrl.path error:&error];
         if (error) {
-            abort();
+            @throw [NSException exceptionWithName:@"RLMExampleException" reason:@"Could not copy realm template to new path." userInfo:nil];
         }
     }
 
