@@ -20,15 +20,17 @@
 
 #import "RLMAccessor.hpp"
 #import "RLMArray_Private.hpp"
-#import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
+#import "RLMSet_Private.hpp"
+#import "RLMSwiftCollectionBase.h"
 
 #import <realm/object-store/collection_notifications.hpp>
 #import <realm/object-store/list.hpp>
 #import <realm/object-store/results.hpp>
+#import <realm/object-store/set.hpp>
 
 static const int RLMEnumerationBufferSize = 16;
 
@@ -52,19 +54,19 @@ static const int RLMEnumerationBufferSize = 16;
     id _collection;
 }
 
-- (instancetype)initWithList:(realm::List&)list
-                  collection:(id)collection
-                   classInfo:(RLMClassInfo&)info
-{
+- (instancetype)initWithBackingCollection:(realm::object_store::Collection const&)backingCollection
+                               collection:(id)collection
+                                classInfo:(RLMClassInfo&)info {
     self = [super init];
     if (self) {
         _info = &info;
         _realm = _info->realm;
+
         if (_realm.inWriteTransaction) {
-            _snapshot = list.snapshot();
+            _snapshot = backingCollection.as_results().snapshot();
         }
         else {
-            _snapshot = list.as_results();
+            _snapshot = backingCollection.as_results();
             _collection = collection;
             [_realm registerEnumerator:self];
         }
@@ -75,8 +77,7 @@ static const int RLMEnumerationBufferSize = 16;
 
 - (instancetype)initWithResults:(realm::Results&)results
                      collection:(id)collection
-                      classInfo:(RLMClassInfo&)info
-{
+                      classInfo:(RLMClassInfo&)info {
     self = [super init];
     if (self) {
         _info = &info;
@@ -151,7 +152,9 @@ static const int RLMEnumerationBufferSize = 16;
 }
 @end
 
-NSUInteger RLMFastEnumerate(NSFastEnumerationState *state, NSUInteger len, id<RLMFastEnumerable> collection) {
+NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
+                            NSUInteger len,
+                            id<RLMFastEnumerable> collection) {
     __autoreleasing RLMFastEnumerator *enumerator;
     if (state->state == 0) {
         enumerator = collection.fastEnumerator;
@@ -195,21 +198,22 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
     // new List each time
     if (info.rlmObjectSchema.isSwiftClass) {
         auto prop = info.rlmObjectSchema[key];
-        if (prop && prop.array && prop.swiftIvar) {
-            // Grab the actual class for the generic List from an instance of it
-            // so that we can make instances of the List without creating a new
-            // object accessor each time
-            Class cls = [object_getIvar(accessor, prop.swiftIvar) class];
-            RLMAccessorContext context(info);
-            for (size_t i = 0; i < count; ++i) {
-                RLMListBase *list = [[cls alloc] init];
-                list._rlmArray = [[RLMManagedArray alloc] initWithList:realm::List(info.realm->_realm,
-                                                                                   collection.get(i),
-                                                                                   info.tableColumn(prop))
-                                                            parentInfo:&info
-                                                              property:prop];
-                [array addObject:list];
-            }
+        // Grab the actual class for the generic List from an instance of it
+        // so that we can make instances of the List without creating a new
+        // object accessor each time
+        Class cls = [object_getIvar(accessor, prop.swiftIvar) class];
+        RLMAccessorContext context(info);
+        if (prop && prop.collection && prop.swiftIvar) {
+            RLMGetCollectionType(prop, [&](auto type, auto objcType) {
+                for (size_t i = 0; i < count; ++i) {
+                    RLMSwiftCollectionBase *base = [[cls alloc] init];
+                    base._rlmCollection =
+                        RLMManagedCollectionFromCollection<std::decay_t<decltype(*type)>,
+                                                           std::decay_t<decltype(*objcType)>>
+                                                           (info, collection.get(i), prop);
+                    [array addObject:base];
+                }
+            });
             return array;
         }
     }
@@ -222,8 +226,31 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
     return array;
 }
 
+template<typename Fn>
+void RLMGetCollectionType(RLMProperty *prop, Fn&& func) {
+    if (prop.array) {
+        func(((realm::List *)0), ((RLMManagedArray *)0));
+    }
+    else if (prop.set) {
+        func(((realm::object_store::Set *)0), ((RLMManagedSet *)0));
+    }
+    else {
+        REALM_UNREACHABLE();
+    }
+}
+
+template<typename Collection, typename ObjcCollection>
+id RLMManagedCollectionFromCollection(RLMClassInfo& info, realm::Obj&& obj, RLMProperty *prop) {
+    return [[ObjcCollection alloc] initWithBackingCollection:Collection(info.realm->_realm,
+                                                                        obj,
+                                                                        info.tableColumn(prop))
+                                                  parentInfo:&info
+                                                    property:prop];
+}
+
 template NSArray *RLMCollectionValueForKey(realm::Results&, NSString *, RLMClassInfo&);
 template NSArray *RLMCollectionValueForKey(realm::List&, NSString *, RLMClassInfo&);
+template NSArray *RLMCollectionValueForKey(realm::object_store::Set&, NSString *, RLMClassInfo&);
 
 void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id value) {
     realm::TableView tv = [collection tableView];
@@ -457,4 +484,5 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
 
 // Explicitly instantiate the templated function for the two types we'll use it on
 template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedArray *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
+template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedSet *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
 template RLMNotificationToken *RLMAddNotificationBlock<>(RLMResults *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);

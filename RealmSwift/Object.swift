@@ -78,6 +78,10 @@ extension Object: RealmCollectionValue {
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectClassName: className())
     }
+    /// :nodoc:
+    public static func _rlmSet() -> RLMSet<AnyObject> {
+        return RLMSet(objectClassName: className())
+    }
 
     // MARK: Initializers
 
@@ -192,7 +196,7 @@ extension Object: RealmCollectionValue {
         if let accessor = prop.swiftAccessor {
             return accessor.get(Unmanaged.passUnretained(self).toOpaque() + ivar_getOffset(prop.swiftIvar!))
         }
-        if let ivar = prop.swiftIvar, prop.array {
+        if let ivar = prop.swiftIvar, prop.collection {
             return object_getIvar(self, ivar)
         }
         return RLMDynamicGet(self, prop)
@@ -261,8 +265,31 @@ extension Object: RealmCollectionValue {
         if let dynamic = self as? DynamicObject {
             return dynamic[propertyName] as! List<DynamicObject>
         }
-        return noWarnUnsafeBitCast(dynamicGet(key: propertyName) as! RLMListBase,
+        return noWarnUnsafeBitCast(dynamicGet(key: propertyName) as! RLMSwiftCollectionBase,
                                    to: List<DynamicObject>.self)
+    }
+
+    // MARK: Dynamic set
+
+    /**
+     Returns a set of `DynamicObject`s for a given property name.
+
+     - warning:  This method is useful only in specialized circumstances, for example, when building
+     components that integrate with Realm. If you are simply building an app on Realm, it is
+     recommended to use instance variables or cast the values returned from key-value coding.
+
+     - parameter propertyName: The name of the property.
+
+     - returns: A set of `DynamicObject`s.
+
+     :nodoc:
+     */
+    public func dynamicMutableSet(_ propertyName: String) -> MutableSet<DynamicObject> {
+        if let dynamic = self as? DynamicObject {
+            return dynamic[propertyName] as! MutableSet<DynamicObject>
+        }
+        return noWarnUnsafeBitCast(dynamicGet(key: propertyName) as! RLMSwiftCollectionBase,
+                                   to: MutableSet<DynamicObject>.self)
     }
 
     // MARK: Comparison
@@ -383,6 +410,9 @@ public final class DynamicObject: Object {
             let value = RLMDynamicGetByName(self, key)
             if let array = value as? RLMArray<AnyObject> {
                 return List<DynamicObject>(objc: array)
+            }
+            if let set = value as? RLMSet<AnyObject> {
+                return MutableSet<DynamicObject>(objc: set)
             }
             return value
         }
@@ -595,11 +625,14 @@ extension UUID: _ManagedPropertyType {
 extension Object: _ManagedPropertyType {
     // swiftlint:disable:next identifier_name
     public static func _rlmProperty(_ prop: RLMProperty) {
-        if !prop.optional && !prop.array {
+        if !prop.optional && !prop.collection {
             throwRealmException("Object property '\(prop.name)' must be marked as optional.")
         }
         if prop.optional && prop.array {
             throwRealmException("List<\(className())> property '\(prop.name)' must not be marked as optional.")
+        }
+        if prop.optional && prop.set {
+            throwRealmException("MutableSet<\(className())> property '\(prop.name)' must not be marked as optional.")
         }
         prop.type = .object
         prop.objectClassName = className()
@@ -620,6 +653,17 @@ extension List: _ManagedPropertyType where Element: _ManagedPropertyType {
     // swiftlint:disable:next identifier_name
     public static func _rlmProperty(_ prop: RLMProperty) {
         prop.array = true
+        Element._rlmProperty(prop)
+    }
+    // swiftlint:disable:next identifier_name
+    public static func _rlmRequireObjc() -> Bool { return false }
+}
+
+/// :nodoc:
+extension MutableSet: _ManagedPropertyType where Element: _ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
+    public static func _rlmProperty(_ prop: RLMProperty) {
+        prop.set = true
         Element._rlmProperty(prop)
     }
     // swiftlint:disable:next identifier_name

@@ -129,6 +129,9 @@
 @implementation ArrayOfAllTypesObject
 @end
 
+@implementation SetOfAllTypesObject
+@end
+
 @implementation LinkToAllTypesObject
 @end
 
@@ -140,7 +143,20 @@
              @"dateObj", @"dataObj", @"decimalObj", @"objectIdObj", @"uuidObj"];
 }
 @end
+
+@implementation AllPrimitiveSets
++ (NSArray *)requiredProperties {
+    return @[@"intObj", @"floatObj", @"doubleObj", @"boolObj", @"stringObj",
+             @"dateObj", @"dataObj", @"decimalObj", @"objectIdObj", @"uuidObj",
+             @"intObj2", @"floatObj2", @"doubleObj2", @"boolObj2", @"stringObj2",
+             @"dateObj2", @"dataObj2", @"decimalObj2", @"objectIdObj2", @"uuidObj2"];
+}
+@end
+
 @implementation AllOptionalPrimitiveArrays
+@end
+
+@implementation AllOptionalPrimitiveSets
 @end
 
 @implementation AllOptionalTypesPK
@@ -181,6 +197,9 @@
 @end
 
 @implementation ArrayOfPrimaryCompanies
+@end
+
+@implementation SetOfPrimaryCompanies
 @end
 
 #pragma mark LinkToCompanyObject
@@ -233,9 +252,19 @@
 @implementation CircleArrayObject
 @end
 
+#pragma mark CircleSetObject
+
+@implementation CircleSetObject
+@end
+
 #pragma mark ArrayPropertyObject
 
 @implementation ArrayPropertyObject
+@end
+
+#pragma mark SetPropertyObject
+
+@implementation SetPropertyObject
 @end
 
 #pragma mark DynamicTestObject
@@ -248,6 +277,8 @@
 @implementation AggregateObject
 @end
 @implementation AggregateArrayObject
+@end
+@implementation AggregateSetObject
 @end
 
 #pragma mark PrimaryStringObject
@@ -302,6 +333,12 @@
 
 @implementation IntegerArrayPropertyObject
 @end
+
+#pragma mark IntegerSetPropertyObject
+
+@implementation IntegerSetPropertyObject
+@end
+
 
 @implementation NumberObject
 @end

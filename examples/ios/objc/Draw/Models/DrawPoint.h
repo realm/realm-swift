@@ -28,4 +28,4 @@
 
 @end
 
-RLM_ARRAY_TYPE(DrawPoint)
+RLM_COLLECTION_TYPE(DrawPoint)

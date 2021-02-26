@@ -518,10 +518,10 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 
 @end
 
-@interface LinkViewChangesetTests : RLMTestCase <ChangesetTestCase>
+@interface LinkViewArrayChangesetTests : RLMTestCase <ChangesetTestCase>
 @end
 
-@implementation LinkViewChangesetTests
+@implementation LinkViewArrayChangesetTests
 - (void)prepare {
     @autoreleasepool {
         RLMRealm *realm = [RLMRealm defaultRealm];
@@ -777,6 +777,198 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     });
 }
 @end
+
+@interface LinkViewSetChangesetTests : RLMTestCase <ChangesetTestCase>
+@end
+
+@implementation LinkViewSetChangesetTests
+- (void)prepare {
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [realm deleteAllObjects];
+            for (int i = 0; i < 10; ++i) {
+                [IntObject createInDefaultRealmWithValue:@[@(i)]];
+            }
+            [SetPropertyObject createInDefaultRealmWithValue:@[@"", @[], [IntObject allObjectsInRealm:realm]]];
+        }];
+    }
+}
+
+- (RLMResults *)query {
+    return [[[SetPropertyObject.allObjects firstObject] intSet]
+            objectsWhere:@"intCol > 0 AND intCol < 5"];
+}
+
+- (void)testDeleteMultiple {
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol > 4"]];
+    });
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol > 5"]];
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 0"]];
+    });
+
+    ExpectChange(self, @[@1, @2, @3], @[], @[], ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol > 1"]];
+    });
+    ExpectChange(self, @[@1, @2, @3], @[], @[], ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 2"]];
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 3"]];
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 4"]];
+    });
+    ExpectChange(self, @[@1, @2, @3], @[], @[], ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 4"]];
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 3"]];
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 2"]];
+    });
+
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol > 4"]];
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol < 1"]];
+    });
+}
+
+- (void)testModifyObjectMatchingQuery {
+    ExpectChange(self, @[], @[], @[@2], ^(RLMRealm *realm) {
+        [[IntObject objectsInRealm:realm where:@"intCol = 3"] setValue:@4 forKey:@"intCol"];
+    });
+}
+
+- (void)testModifyObjectToNoLongerMatchQuery {
+    ExpectChange(self, @[@2], @[], @[], ^(RLMRealm *realm) {
+        [[IntObject objectsInRealm:realm where:@"intCol = 3"] setValue:@5 forKey:@"intCol"];
+    });
+}
+
+- (void)testModifyObjectNotMatchingQuery {
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        [[IntObject objectsInRealm:realm where:@"intCol = 5"] setValue:@6 forKey:@"intCol"];
+    });
+}
+
+- (void)testModifyObjectToMatchQuery {
+    ExpectChange(self, @[], @[@4], @[], ^(RLMRealm *realm) {
+        [[IntObject objectsInRealm:realm where:@"intCol = 5"] setValue:@4 forKey:@"intCol"];
+    });
+}
+
+- (void)testDeleteObjectMatchingQuery {
+    ExpectChange(self, @[@0], @[], @[], ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 1"]];
+    });
+    ExpectChange(self, @[@3], @[], @[], ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 4"]];
+    });
+}
+
+- (void)testDeleteNonMatchingBeforeMatches {
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 0"]];
+    });
+}
+
+- (void)testDeleteNonMatchingAfterMatches {
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 5"]];
+    });
+}
+
+- (void)testMoveMatchingObjectDueToDeletionOfNonMatchingObject {
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        // Make a matching object be the last row
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol >= 5"]];
+        // Delete a non-last, non-match row so that a matched row is moved
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 0"]];
+    });
+}
+
+- (void)testNonMatchingObjectMovedToIndexOfMatchingRowAndMadeMatching {
+    ExpectChange(self, @[@1], @[@3], @[], ^(RLMRealm *realm) {
+        // Make the last object match the query
+        [[[IntObject allObjectsInRealm:realm] lastObject] setIntCol:3];
+        // Move the now-matching object over a previously matching object
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 2"]];
+    });
+}
+
+- (void)testDeleteNewlyInsertedRowMatchingQuery {
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        RLMSet *set = [[[SetPropertyObject allObjectsInRealm:realm] firstObject] intSet];
+        [set addObject:[IntObject createInRealm:realm withValue:@[@3]]];
+        [realm deleteObject:[IntObject allObjectsInRealm:realm].lastObject];
+    });
+}
+
+- (void)testInsertObjectMatchingQuery {
+    ExpectChange(self, @[], @[@4], @[], ^(RLMRealm *realm) {
+        RLMSet *set = [[[SetPropertyObject allObjectsInRealm:realm] firstObject] intSet];
+        [set addObject:[IntObject createInRealm:realm withValue:@[@3]]];
+    });
+}
+
+- (void)testInsertObjectNotMatchingQuery {
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        RLMArray *array = [[[ArrayPropertyObject allObjectsInRealm:realm] firstObject] intArray];
+        [array addObject:[IntObject createInRealm:realm withValue:@[@5]]];
+    });
+}
+
+- (void)testInsertBothMatchingAndNonMatching {
+    ExpectChange(self, @[], @[@4], @[], ^(RLMRealm *realm) {
+        RLMSet *set = [[[SetPropertyObject allObjectsInRealm:realm] firstObject] intSet];
+        [set addObject:[IntObject createInRealm:realm withValue:@[@5]]];
+        [set addObject:[IntObject createInRealm:realm withValue:@[@3]]];
+    });
+}
+
+- (void)testInsertMultipleMatching {
+    ExpectChange(self, @[], @[@4, @5], @[], ^(RLMRealm *realm) {
+        RLMSet *set = [[[SetPropertyObject allObjectsInRealm:realm] firstObject] intSet];
+        [set addObject:[IntObject createInRealm:realm withValue:@[@5]]];
+        [set addObject:[IntObject createInRealm:realm withValue:@[@3]]];
+        [set addObject:[IntObject createInRealm:realm withValue:@[@5]]];
+        [set addObject:[IntObject createInRealm:realm withValue:@[@2]]];
+    });
+}
+
+- (void)testRemoveFromSet {
+    ExpectChange(self, @[@0], @[], @[], ^(RLMRealm *realm) {
+        RLMSet *set = [[[SetPropertyObject allObjectsInRealm:realm] firstObject] intSet];
+        [set removeObject:set.allObjects[1]];
+    });
+
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        RLMSet *set = [[[SetPropertyObject allObjectsInRealm:realm] firstObject] intSet];
+        [set removeObject:set.allObjects[0]];
+    });
+}
+
+- (void)testClearSet {
+    ExpectChange(self, @[@0, @1, @2, @3], @[], @[], ^(RLMRealm *realm) {
+        RLMSet *set = [[[SetPropertyObject allObjectsInRealm:realm] firstObject] intSet];
+        [set removeAllObjects];
+    });
+}
+
+- (void)testDeleteSet {
+    ExpectChange(self, @[@0, @1, @2, @3], @[], @[], ^(RLMRealm *realm) {
+        [realm deleteObjects:[SetPropertyObject allObjectsInRealm:realm]];
+    });
+}
+
+- (void)testModifyObjectShiftedByInsertsAndDeletions {
+    ExpectChange(self, @[@0, @1], @[], @[], ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 2"]];
+        [[IntObject objectsInRealm:realm where:@"intCol = 1"] setValue:@10 forKey:@"intCol"];
+    });
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        [[IntObject objectsInRealm:realm where:@"intCol = 9"] setValue:@11 forKey:@"intCol"];
+    });
+}
+@end
+
+
 
 @interface LinkedObjectChangesetTests : RLMTestCase <ChangesetTestCase>
 @end

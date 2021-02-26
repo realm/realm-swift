@@ -220,7 +220,7 @@ class ObjectAccessorTests: TestCase {
         XCTAssertEqual(objects[0].longCol, updatedLongNumber, "After update: 2 ^ 33 expected")
     }
 
-    func testListsDuringResultsFastEnumeration() {
+    func testCollectionsDuringResultsFastEnumeration() {
         let realm = realmWithTestPath()
 
         let object1 = SwiftObject()
@@ -238,6 +238,12 @@ class ObjectAccessorTests: TestCase {
         object2.arrayCol.append(trueObject)
         object2.arrayCol.append(falseObject)
 
+        object1.setCol.insert(trueObject)
+        object1.setCol.insert(falseObject)
+
+        object2.setCol.insert(trueObject)
+        object2.setCol.insert(falseObject)
+
         try! realm.write {
             realm.add(object1)
             realm.add(object2)
@@ -247,16 +253,20 @@ class ObjectAccessorTests: TestCase {
 
         let firstObject = objects.first
         XCTAssertEqual(2, firstObject!.arrayCol.count)
+        XCTAssertEqual(2, firstObject!.setCol.count)
 
         let lastObject = objects.last
         XCTAssertEqual(2, lastObject!.arrayCol.count)
+        XCTAssertEqual(2, lastObject!.setCol.count)
 
         var iterator = objects.makeIterator()
         let next = iterator.next()!
         XCTAssertEqual(next.arrayCol.count, 2)
+        XCTAssertEqual(next.setCol.count, 2)
 
         for obj in objects {
             XCTAssertEqual(2, obj.arrayCol.count)
+            XCTAssertEqual(2, obj.setCol.count)
         }
     }
 
@@ -419,6 +429,7 @@ class ObjectAccessorTests: TestCase {
         let link = LinkToSwiftRenamedProperties1()
         link.linkA = obj
         link.array1.append(obj)
+        link.set1.insert(obj)
 
         let realm = try! Realm()
         try! realm.write {
@@ -429,15 +440,18 @@ class ObjectAccessorTests: TestCase {
         XCTAssertEqual(obj.propB, "a")
         XCTAssertTrue(link.linkA!.isSameObject(as: obj))
         XCTAssertTrue(link.array1[0].isSameObject(as: obj))
+        XCTAssertTrue(link.set1.contains(obj))
         XCTAssertTrue(obj.linking1[0].isSameObject(as: link))
 
         XCTAssertEqual(obj["propA"]! as! Int, 5)
         XCTAssertEqual(obj["propB"]! as! String, "a")
         XCTAssertTrue((link["linkA"]! as! SwiftRenamedProperties1).isSameObject(as: obj))
         XCTAssertTrue((link["array1"]! as! List<SwiftRenamedProperties1>)[0].isSameObject(as: obj))
+        XCTAssertTrue((link["set1"]! as! MutableSet<SwiftRenamedProperties1>).contains(obj))
         XCTAssertTrue((obj["linking1"]! as! LinkingObjects<LinkToSwiftRenamedProperties1>)[0].isSameObject(as: link))
 
         XCTAssertTrue(link.dynamicList("array1")[0].isSameObject(as: obj))
+        XCTAssertTrue(link.dynamicMutableSet("set1")[0].isSameObject(as: obj))
 
         let obj2 = realm.objects(SwiftRenamedProperties2.self).first!
         let link2 = realm.objects(LinkToSwiftRenamedProperties2.self).first!
@@ -446,26 +460,32 @@ class ObjectAccessorTests: TestCase {
         XCTAssertEqual(obj2.propD, "a")
         XCTAssertTrue(link2.linkC!.isSameObject(as: obj))
         XCTAssertTrue(link2.array2[0].isSameObject(as: obj))
+        XCTAssertTrue(link2.set2[0].isSameObject(as: obj))
+
         XCTAssertTrue(obj2.linking1[0].isSameObject(as: link))
 
         XCTAssertEqual(obj2["propC"]! as! Int, 5)
         XCTAssertEqual(obj2["propD"]! as! String, "a")
         XCTAssertTrue((link2["linkC"]! as! SwiftRenamedProperties1).isSameObject(as: obj))
         XCTAssertTrue((link2["array2"]! as! List<SwiftRenamedProperties2>)[0].isSameObject(as: obj))
+        XCTAssertTrue((link2["set2"]! as! MutableSet<SwiftRenamedProperties2>)[0].isSameObject(as: obj))
+
         XCTAssertTrue((obj2["linking1"]! as! LinkingObjects<LinkToSwiftRenamedProperties1>)[0].isSameObject(as: link))
 
         XCTAssertTrue(link2.dynamicList("array2")[0].isSameObject(as: obj))
+        XCTAssertTrue(link2.dynamicMutableSet("set2")[0].isSameObject(as: obj))
     }
 
     func testPropertiesOutlivingParentObject() {
         var optional: RealmOptional<Int>!
         var list: List<Int>!
-
+        var set: MutableSet<Int>!
         let realm = try! Realm()
         try! realm.write {
             autoreleasepool {
                 optional = realm.create(SwiftOptionalObject.self, value: ["optIntCol": 1]).optIntCol
                 list = realm.create(SwiftListObject.self, value: ["int": [1]]).int
+                set = realm.create(SwiftMutableSetObject.self, value: ["int": [1]]).int
             }
         }
 
@@ -473,35 +493,45 @@ class ObjectAccessorTests: TestCase {
         XCTAssertEqual(optional.value, 1)
         XCTAssertEqual(list.count, 1)
         XCTAssertEqual(list[0], 1)
+        XCTAssertEqual(set.count, 1)
+        XCTAssertEqual(set[0], 1)
 
         // Verify that we can modify the values via the standalone property objects and
         // have it properly update the parent
         try! realm.write {
             optional.value = 2
             list.append(2)
+            set.insert(2)
         }
 
         XCTAssertEqual(optional.value, 2)
         XCTAssertEqual(list.count, 2)
         XCTAssertEqual(list[0], 1)
         XCTAssertEqual(list[1], 2)
+        XCTAssertEqual(set.count, 2)
+        XCTAssertEqual(set[0], 1)
+        XCTAssertEqual(set[1], 2)
 
         autoreleasepool {
             XCTAssertEqual(realm.objects(SwiftOptionalObject.self).first!.optIntCol.value, 2)
             XCTAssertEqual(Array(realm.objects(SwiftListObject.self).first!.int), [1, 2])
+            XCTAssertEqual(Array(realm.objects(SwiftMutableSetObject.self).first!.int), [1, 2])
         }
 
         try! realm.write {
             optional.value = nil
             list.removeAll()
+            set.removeAll()
         }
 
         XCTAssertEqual(optional.value, nil)
         XCTAssertEqual(list.count, 0)
+        XCTAssertEqual(set.count, 0)
 
         autoreleasepool {
             XCTAssertEqual(realm.objects(SwiftOptionalObject.self).first!.optIntCol.value, nil)
             XCTAssertEqual(Array(realm.objects(SwiftListObject.self).first!.int), [])
+            XCTAssertEqual(Array(realm.objects(SwiftMutableSetObject.self).first!.int), [])
         }
     }
 

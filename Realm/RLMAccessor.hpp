@@ -47,13 +47,12 @@ public:
     // Accessor context interface
     RLMAccessorContext(RLMAccessorContext& parent, realm::Obj const& parent_obj, realm::Property const& property);
 
+    id box(realm::object_store::Dictionary&&);
+    id box(realm::object_store::Set&&);
     id box(realm::List&&);
     id box(realm::Results&&);
     id box(realm::Object&&);
     id box(realm::Obj&&);
-    id box(realm::object_store::Dictionary&&) { REALM_COMPILER_HINT_UNREACHABLE(); }
-    id box(realm::object_store::Set&&) { REALM_COMPILER_HINT_UNREACHABLE(); }
-
     id box(bool v) { return @(v); }
     id box(double v) { return @(v); }
     id box(float v) { return @(v); }
@@ -82,8 +81,8 @@ public:
                                              realm::Property const& prop);
 
     bool is_same_list(realm::List const& list, id v) const noexcept;
-    bool is_same_dictionary(realm::object_store::Dictionary const&, id) const noexcept { REALM_COMPILER_HINT_UNREACHABLE(); }
-    bool is_same_set(realm::object_store::Set const&, id) const noexcept { REALM_COMPILER_HINT_UNREACHABLE(); }
+    bool is_same_set(realm::object_store::Set const& set, id v) const noexcept;
+    bool is_same_dictionary(realm::object_store::Dictionary const& dictionary, id const v) const noexcept;
 
     template<typename Func>
     void enumerate_collection(__unsafe_unretained const id v, Func&& func) {

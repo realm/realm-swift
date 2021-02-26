@@ -32,7 +32,7 @@ class ObjectSchemaTests: TestCase {
         XCTAssertEqual(propertyNames,
                        ["boolCol", "intCol", "int8Col", "int16Col", "int32Col", "int64Col", "intEnumCol", "floatCol", "doubleCol",
                         "stringCol", "binaryCol", "dateCol", "decimalCol",
-                        "objectIdCol", "objectCol", "uuidCol", "arrayCol"]
+                        "objectIdCol", "objectCol", "uuidCol", "arrayCol", "setCol"]
         )
     }
 
@@ -62,6 +62,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             intCol {
@@ -69,6 +70,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             int8Col {
@@ -76,6 +78,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             int16Col {
@@ -83,6 +86,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             int32Col {
@@ -90,6 +94,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             int64Col {
@@ -97,6 +102,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             intEnumCol {
@@ -104,6 +110,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             floatCol {
@@ -111,6 +118,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             doubleCol {
@@ -118,6 +126,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             stringCol {
@@ -125,6 +134,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             binaryCol {
@@ -132,6 +142,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             dateCol {
@@ -139,6 +150,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             decimalCol {
@@ -146,6 +158,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             objectIdCol {
@@ -153,6 +166,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             objectCol {
@@ -162,6 +176,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = YES;
             }
             uuidCol {
@@ -169,6 +184,7 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = NO;
+                set = NO;
                 optional = NO;
             }
             arrayCol {
@@ -178,6 +194,17 @@ class ObjectSchemaTests: TestCase {
                 indexed = NO;
                 isPrimary = NO;
                 array = YES;
+                set = NO;
+                optional = NO;
+            }
+            setCol {
+                type = object;
+                objectClassName = SwiftBoolObject;
+                linkOriginPropertyName = (null);
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = YES;
                 optional = NO;
             }
         }

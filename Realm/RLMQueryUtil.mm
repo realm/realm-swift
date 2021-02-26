@@ -18,7 +18,6 @@
 
 #import "RLMQueryUtil.hpp"
 
-#import "RLMArray.h"
 #import "RLMDecimal128_Private.hpp"
 #import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.h"
@@ -86,7 +85,7 @@ BOOL propertyTypeIsNumeric(RLMPropertyType propertyType) {
 }
 
 bool isObjectValidForProperty(id value, RLMProperty *prop) {
-    if (prop.array) {
+    if (prop.collection) {
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeLinkingObjects) {
             return [RLMObjectBaseObjectSchema(RLMDynamicCast<RLMObjectBase>(value)).className isEqualToString:prop.objectClassName];
         }
@@ -289,7 +288,7 @@ public:
 
     bool has_any_to_many_links() const {
         return std::any_of(begin(m_links), end(m_links),
-                           [](RLMProperty *property) { return property.array; });
+                           [](RLMProperty *property) { return property.collection; });
     }
 
     ColumnReference last_link_column() const {
@@ -368,8 +367,8 @@ public:
         , m_link_column(std::move(link_column))
         , m_column(std::move(column))
     {
-        RLMPrecondition(m_link_column.property().array,
-                        @"Invalid predicate", @"Collection operation can only be applied to a property of type RLMArray.");
+        RLMPrecondition((m_link_column.property().collection),
+                        @"Invalid predicate", @"Collection operation can only be applied to a property of type RLMArray / RLMSet.");
 
         switch (m_type) {
             case Count:
@@ -688,9 +687,11 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
         [](StringData value) { return make_subexpr<ConstantStringValue>(value); },
         [](const Columns<String>& c) { return c.clone(); },
         [](const Columns<Lst<String>>& c) { return c.clone(); },
+        [](const Columns<Set<String>>& c) { return c.clone(); },
         [](BinaryData value) { return make_subexpr<ConstantStringValue>(StringData(value.data(), value.size())); },
         [](const Columns<BinaryData>& c) { return c.clone(); },
-        [](const Columns<Lst<BinaryData>>& c) { return c.clone(); }
+        [](const Columns<Lst<BinaryData>>& c) { return c.clone(); },
+        [](const Columns<Set<BinaryData>>& c) { return c.clone(); }
     };
     auto left = as_subexpr(column);
     auto right = as_subexpr(value);
@@ -991,6 +992,9 @@ void QueryBuilder::add_constraint(NSPredicateOperatorType operatorType,
     if (column.property().array) {
         do_add_constraint<Lst>(type, operatorType, predicateOptions, column, rhs);
     }
+    else if (column.property().set) {
+        do_add_constraint<Set>(type, operatorType, predicateOptions, column, rhs);
+    }
     else {
         do_add_constraint<Identity>(type, operatorType, predicateOptions, column, rhs);
     }
@@ -1018,7 +1022,7 @@ KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, N
                         @"Property '%@' not found in object of type '%@'",
                         propertyName, objectSchema.className);
 
-        if (property.array)
+        if (property.collection)
             keyPathContainsToManyRelationship = true;
 
         if (end != NSNotFound) {
@@ -1047,7 +1051,7 @@ ColumnReference QueryBuilder::column_reference_from_key_path(RLMObjectSchema *ob
                        @"Aggregate operations can only be used on key paths that include an array property");
     } else if (!isAggregate && keyPath.containsToManyRelationship) {
         throwException(@"Invalid predicate",
-                       @"Key paths that include an array property must use aggregate operations");
+                       @"Key paths that include a collection property must use aggregate operations");
     }
 
     return ColumnReference(m_query, m_group, m_schema, keyPath.property, std::move(keyPath.links));

@@ -20,7 +20,6 @@
 
 #import "RLMAccessor.hpp"
 #import "RLMArray_Private.hpp"
-#import "RLMListBase.h"
 #import "RLMObservation.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
@@ -29,6 +28,8 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMSet_Private.hpp"
+#import "RLMSwiftCollectionBase.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
@@ -95,10 +96,18 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
             [prop.swiftAccessor initializeObject:(char *)(__bridge void *)object + ivar_getOffset(prop.swiftIvar)
                                           parent:object property:prop];
         }
-        else if (prop.array) {
+        else if (prop.collection) {
             id ivar = object_getIvar(object, prop.swiftIvar);
-            RLMArray *array = [[RLMManagedArray alloc] initWithParent:object property:prop];
-            [ivar set_rlmArray:array];
+            Class cls;
+            if (prop.array) {
+                cls = [RLMManagedArray class];
+            } else if (prop.set) {
+                cls = [RLMManagedSet class];
+            } else {
+                REALM_UNREACHABLE();
+            }
+            id managedCollection = [[cls alloc] initWithParent:object property:prop];
+            [ivar set_rlmCollection:managedCollection];
         }
         else {
             id ivar = object_getIvar(object, prop.swiftIvar);

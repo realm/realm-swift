@@ -62,6 +62,7 @@
                                                     @"\t\tindexed = YES;\n"
                                                     @"\t\tisPrimary = YES;\n"
                                                     @"\t\tarray = NO;\n"
+                                                    @"\t\tset = NO;\n"
                                                     @"\t\toptional = NO;\n"
                                                     @"\t}\n"
                                                     @"\tintCol {\n"
@@ -69,6 +70,7 @@
                                                     @"\t\tindexed = NO;\n"
                                                     @"\t\tisPrimary = NO;\n"
                                                     @"\t\tarray = NO;\n"
+                                                    @"\t\tset = NO;\n"
                                                     @"\t\toptional = NO;\n"
                                                     @"\t}\n"
                                                     @"}");
@@ -80,6 +82,7 @@
                           @"\t\tindexed = NO;\n"
                           @"\t\tisPrimary = NO;\n"
                           @"\t\tarray = NO;\n"
+                          @"\t\tset = NO;\n"
                           @"\t\toptional = NO;\n"
                           @"\t}\n"
                           @"}");

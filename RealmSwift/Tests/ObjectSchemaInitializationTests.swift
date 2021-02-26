@@ -103,14 +103,32 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertFalse(arrayCol!.isOptional)
         XCTAssertEqual(objectCol!.objectClassName!, "SwiftBoolObject")
 
+        let setCol = objectSchema["setCol"]
+        XCTAssertNotNil(setCol)
+        XCTAssertEqual(setCol!.name, "setCol")
+        XCTAssertEqual(setCol!.type, PropertyType.object)
+        XCTAssertTrue(setCol!.isSet)
+        XCTAssertFalse(setCol!.isIndexed)
+        XCTAssertFalse(setCol!.isOptional)
+        XCTAssertEqual(setCol!.objectClassName!, "SwiftBoolObject")
+
         let dynamicArrayCol = SwiftCompanyObject().objectSchema["employees"]
         XCTAssertNotNil(dynamicArrayCol)
         XCTAssertEqual(dynamicArrayCol!.name, "employees")
         XCTAssertEqual(dynamicArrayCol!.type, PropertyType.object)
         XCTAssertTrue(dynamicArrayCol!.isArray)
         XCTAssertFalse(dynamicArrayCol!.isIndexed)
-        XCTAssertFalse(arrayCol!.isOptional)
+        XCTAssertFalse(dynamicArrayCol!.isOptional)
         XCTAssertEqual(dynamicArrayCol!.objectClassName!, "SwiftEmployeeObject")
+
+        let dynamicSetCol = SwiftCompanyObject().objectSchema["employeeSet"]
+        XCTAssertNotNil(dynamicSetCol)
+        XCTAssertEqual(dynamicSetCol!.name, "employeeSet")
+        XCTAssertEqual(dynamicSetCol!.type, PropertyType.object)
+        XCTAssertTrue(dynamicSetCol!.isSet)
+        XCTAssertFalse(dynamicSetCol!.isIndexed)
+        XCTAssertFalse(dynamicSetCol!.isOptional)
+        XCTAssertEqual(dynamicSetCol!.objectClassName!, "SwiftEmployeeObject")
     }
 
     func testInvalidObjects() {
