@@ -27,7 +27,6 @@ Pod::Spec.new do |s|
                               'include/**/RLMConstants.h',
                               'include/**/RLMDecimal128.h',
                               'include/**/RLMEmbeddedObject.h',
-                              'include/**/RLMListBase.h',
                               'include/**/RLMMigration.h',
                               'include/**/RLMObject.h',
                               'include/**/RLMObjectBase.h',
@@ -40,6 +39,8 @@ Pod::Spec.new do |s|
                               'include/**/RLMRealmConfiguration.h',
                               'include/**/RLMResults.h',
                               'include/**/RLMSchema.h',
+                              'include/**/RLMSet.h',
+                              'include/**/RLMSwiftCollectionBase.h',
                               'include/**/RLMThreadSafeReference.h',
 
                               # Sync
@@ -78,7 +79,6 @@ Pod::Spec.new do |s|
                               'include/**/RLMApp_Private.h',
                               'include/**/RLMBSON_Private.h',
                               'include/**/RLMCollection_Private.h',
-                              'include/**/RLMListBase.h',
                               'include/**/RLMObjectBase_Private.h',
                               'include/**/RLMObjectSchema_Private.h',
                               'include/**/RLMObjectStore.h',
@@ -89,6 +89,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMRealm_Private.h',
                               'include/**/RLMResults_Private.h',
                               'include/**/RLMSchema_Private.h',
+                              'include/**/RLMSet_Private.h',
                               'include/**/RLMSyncConfiguration_Private.h',
                               'include/**/RLMSyncUtil_Private.h',
                               'include/**/RLMFindOneAndModifyOptions_Private.h',

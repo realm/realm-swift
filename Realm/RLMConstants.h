@@ -86,7 +86,7 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeLinkingObjects = 8,
 
     RLMPropertyTypeObjectId = 10,
-    RLMPropertyTypeDecimal128 = 11,
+    RLMPropertyTypeDecimal128 = 11
 };
 
 /** An error domain identifying Realm-specific errors. */

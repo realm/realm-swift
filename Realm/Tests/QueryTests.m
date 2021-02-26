@@ -396,8 +396,9 @@
 
     XCTAssertThrows([LinkToAllTypesObject objectsWhere:@"allTypesCol.longCol = 'a'"], @"Wrong data type should throw");
 
-    RLMAssertThrowsWithReasonMatching([ArrayPropertyObject objectsWhere:@"intArray.intCol > 5"], @"Key paths.*array property.*aggregate operations");
-    RLMAssertThrowsWithReasonMatching([LinkToCompanyObject objectsWhere:@"company.employees.age > 5"], @"Key paths.*array property.*aggregate operations");
+    RLMAssertThrowsWithReasonMatching([ArrayPropertyObject objectsWhere:@"intArray.intCol > 5"], @"Key paths that include a collection property must use aggregate operations");
+    RLMAssertThrowsWithReasonMatching([SetPropertyObject objectsWhere:@"intSet.intCol > 5"], @"Key paths that include a collection property must use aggregate operations");
+    RLMAssertThrowsWithReasonMatching([LinkToCompanyObject objectsWhere:@"company.employees.age > 5"], @"Key paths that include a collection property must use aggregate operations");
 
     RLMAssertThrowsWithReasonMatching([LinkToAllTypesObject objectsWhere:@"allTypesCol.intCol = allTypesCol.doubleCol"], @"Property type mismatch");
 }
@@ -486,6 +487,8 @@
 
     [ArrayOfAllTypesObject createInRealm:realm withValue:@[@[a, c]]];
     [ArrayOfAllTypesObject createInRealm:realm withValue:@[@[b, d]]];
+    [SetOfAllTypesObject createInRealm:realm withValue:@[@[a, c]]];
+    [SetOfAllTypesObject createInRealm:realm withValue:@[@[b, d]]];
 
     [realm commitWriteTransaction];
 
@@ -493,23 +496,28 @@
     RLMAssertCount(AllTypesObject, 2U, @"intCol BETWEEN %@", @[@2, @3]);
     RLMAssertCount(AllTypesObject, 2U, @"intCol BETWEEN {2, 3}");
     RLMAssertCount(ArrayOfAllTypesObject, 1U, @"ANY array.intCol BETWEEN %@", @[@4, @5]);
+    RLMAssertCount(SetOfAllTypesObject, 1U, @"ANY set.intCol BETWEEN %@", @[@4, @5]);
 
     RLMAssertCount(AllTypesObject, 4U, @"floatCol BETWEEN %@", @[@1.0f, @5.0f]);
     RLMAssertCount(AllTypesObject, 2U, @"floatCol BETWEEN %@", @[@2.0f, @4.0f]);
     RLMAssertCount(AllTypesObject, 2U, @"floatCol BETWEEN {2, 4}");
     RLMAssertCount(ArrayOfAllTypesObject, 0U, @"ANY array.floatCol BETWEEN %@", @[@3.1, @3.2]);
+    RLMAssertCount(SetOfAllTypesObject, 0U, @"ANY set.floatCol BETWEEN %@", @[@3.1, @3.2]);
 
     RLMAssertCount(AllTypesObject, 4U, @"doubleCol BETWEEN %@", @[@1.0, @5.0]);
     RLMAssertCount(AllTypesObject, 2U, @"doubleCol BETWEEN %@", @[@2.0, @4.0]);
     RLMAssertCount(AllTypesObject, 2U, @"doubleCol BETWEEN {3.0, 7.0}");
     RLMAssertCount(ArrayOfAllTypesObject, 0U, @"ANY array.doubleCol BETWEEN %@", @[@3.1, @3.2]);
+    RLMAssertCount(SetOfAllTypesObject, 0U, @"ANY set.doubleCol BETWEEN %@", @[@3.1, @3.2]);
 
     RLMAssertCount(AllTypesObject, 2U, @"dateCol BETWEEN %@", @[[b dateCol], [c dateCol]]);
     RLMAssertCount(ArrayOfAllTypesObject, 2U, @"ANY array.dateCol BETWEEN %@", @[[b dateCol], [c dateCol]]);
+    RLMAssertCount(SetOfAllTypesObject, 2U, @"ANY set.dateCol BETWEEN %@", @[[b dateCol], [c dateCol]]);
 
     RLMAssertCount(AllTypesObject, 1U, @"longCol BETWEEN %@", @[@5000000000LL, @7000000000LL]);
     RLMAssertCount(AllTypesObject, 1U, @"longCol BETWEEN {5000000000, 7000000000}");
     RLMAssertCount(ArrayOfAllTypesObject, 1U, @"ANY array.longCol BETWEEN %@", @[@5000000000LL, @7000000000LL]);
+    RLMAssertCount(SetOfAllTypesObject, 1U, @"ANY set.longCol BETWEEN %@", @[@5000000000LL, @7000000000LL]);
 
     RLMAssertCount(AllTypesObject, 4U, @"decimalCol BETWEEN %@", @[@0, @5]);
     RLMAssertCount(AllTypesObject, 4U, @"decimalCol BETWEEN %@", @[[[RLMDecimal128 alloc] initWithNumber:@0],
@@ -620,6 +628,10 @@
     results = [ar sortedResultsUsingKeyPath:column ascending:ascending];
     obj = results[0];
     XCTAssertEqualObjects(obj[column], val, @"%@", column);
+
+    results = [ar sortedResultsUsingKeyPath:column ascending:ascending];
+    obj = results[0];
+    XCTAssertEqualObjects(obj[column], val, @"%@", column);
 }
 
 - (void)testEmbeddedObjectQuery {
@@ -660,6 +672,7 @@
 
     [realm beginWriteTransaction];
     ArrayOfAllTypesObject *arrayOfAll = [ArrayOfAllTypesObject createInRealm:realm withValue:@{}];
+    SetOfAllTypesObject *setOfAll = [SetOfAllTypesObject createInRealm:realm withValue:@{}];
 
     StringObject *stringObj = [StringObject new];
     stringObj.stringCol = @"string";
@@ -669,8 +682,13 @@
         [AllTypesObject values:3 stringObject:stringObj],
         [AllTypesObject values:4 stringObject:stringObj],
     ]];
+    [setOfAll.set addObjects:@[
+        [AllTypesObject values:1 stringObject:stringObj],
+        [AllTypesObject values:2 stringObject:stringObj],
+        [AllTypesObject values:3 stringObject:stringObj],
+        [AllTypesObject values:4 stringObject:stringObj],
+    ]];
     [realm commitWriteTransaction];
-
 
     //////////// sort by boolCol
     [self verifySort:realm column:@"boolCol" ascending:YES expected:@NO];
@@ -708,6 +726,8 @@
     RLMAssertThrowsWithReason([[AllTypesObject allObjects] sortedResultsUsingKeyPath:@"invalidCol" ascending:YES],
                               @"Cannot sort on key path 'invalidCol': property 'AllTypesObject.invalidCol' does not exist.");
     RLMAssertThrowsWithReason([arrayOfAll.array sortedResultsUsingKeyPath:@"invalidCol" ascending:NO],
+                              @"Cannot sort on key path 'invalidCol': property 'AllTypesObject.invalidCol' does not exist.");
+    RLMAssertThrowsWithReason([setOfAll.set sortedResultsUsingKeyPath:@"invalidCol" ascending:NO],
                               @"Cannot sort on key path 'invalidCol': property 'AllTypesObject.invalidCol' does not exist.");
 }
 
@@ -815,6 +835,7 @@
 
     [realm beginWriteTransaction];
     ArrayOfAllTypesObject *arrayOfAll = [ArrayOfAllTypesObject createInRealm:realm withValue:@{}];
+    SetOfAllTypesObject *setOfAll = [SetOfAllTypesObject createInRealm:realm withValue:@{}];
 
     StringObject *stringObj = [StringObject new];
     stringObj.stringCol = @"string";
@@ -826,24 +847,40 @@
         [AllTypesObject values:4 stringObject:stringObj],
     ]];
 
+    [setOfAll.set addObjects:@[
+        [AllTypesObject values:1 stringObject:stringObj],
+        [AllTypesObject values:2 stringObject:stringObj],
+        [AllTypesObject values:3 stringObject:stringObj],
+        [AllTypesObject values:4 stringObject:stringObj],
+    ]];
+
     [realm commitWriteTransaction];
 
     RLMResults *results = [arrayOfAll.array sortedResultsUsingKeyPath:@"stringCol" ascending:NO];
     XCTAssertEqualObjects([results[0] stringCol], @"d");
 
+    RLMResults *results2 = [setOfAll.set sortedResultsUsingKeyPath:@"stringCol" ascending:NO];
+    XCTAssertEqualObjects([results2[0] stringCol], @"d");
+
     // delete d, add e results should update
     [realm transactionWithBlock:^{
         [arrayOfAll.array removeObjectAtIndex:3];
+        [setOfAll.set removeObject:setOfAll.set.allObjects[3]];
         [arrayOfAll.array addObject:(id)[AllTypesObject values:5 stringObject:stringObj]];
+        [setOfAll.set addObject:(id)[AllTypesObject values:5 stringObject:stringObj]];
     }];
     XCTAssertEqualObjects([results[0] stringCol], @"e");
     XCTAssertEqualObjects([results[1] stringCol], @"c");
+    XCTAssertEqualObjects([results2[0] stringCol], @"e");
+    XCTAssertEqualObjects([results2[1] stringCol], @"c");
 
     // delete from realm should be removed from results
     [realm transactionWithBlock:^{
         [realm deleteObject:arrayOfAll.array.lastObject];
+        [realm deleteObject:setOfAll.set.allObjects.lastObject];
     }];
     XCTAssertEqualObjects([results[0] stringCol], @"c");
+    XCTAssertEqualObjects([results2[0] stringCol], @"c");
 }
 
 - (void)testQueryingSortedQueryPreservesOrder {
@@ -855,6 +892,8 @@
     }
 
     ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"name", @[], [IntObject allObjects]]];
+    SetPropertyObject *set = [SetPropertyObject createInRealm:realm withValue:@[@"name", @[], [IntObject allObjects]]];
+
     [realm commitWriteTransaction];
 
     RLMResults *asc = [IntObject.allObjects sortedResultsUsingKeyPath:@"intCol" ascending:YES];
@@ -870,6 +909,13 @@
     // same thing but on an linkview
     asc = [array.intArray sortedResultsUsingKeyPath:@"intCol" ascending:YES];
     desc = [array.intArray sortedResultsUsingKeyPath:@"intCol" ascending:NO];
+
+    XCTAssertEqual(2, [[[asc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
+    XCTAssertEqual(4, [[[desc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
+    XCTAssertEqual(3, [[[[desc objectsWhere:@"intCol >= 2"] objectsWhere:@"intCol < 4"] firstObject] intCol]);
+
+    asc = [set.intSet sortedResultsUsingKeyPath:@"intCol" ascending:YES];
+    desc = [set.intSet sortedResultsUsingKeyPath:@"intCol" ascending:NO];
 
     XCTAssertEqual(2, [[[asc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
     XCTAssertEqual(4, [[[desc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
@@ -1607,7 +1653,7 @@
     RLMAssertCount(LinkToAllTypesObject, 0U, @"allTypesCol.dateCol != %@", linkToAllTypes.allTypesCol.dateCol);
 }
 
-- (void)testLinkQueryMany
+- (void)testLinkQueryManyArray
 {
     RLMRealm *realm = [self realm];
 
@@ -1650,6 +1696,51 @@
     RLMAssertCount(ArrayPropertyObject, 2U, @"ANY intArray.intCol > 2");
     RLMAssertCount(ArrayPropertyObject, 1U, @"NONE intArray.intCol == 5");
     RLMAssertCount(ArrayPropertyObject, 2U, @"NONE intArray.intCol > 10");
+}
+
+- (void)testLinkQueryManySet
+{
+    RLMRealm *realm = [self realm];
+
+    SetPropertyObject *setPropObj1 = [[SetPropertyObject alloc] init];
+    setPropObj1.name = @"Test";
+    for(NSUInteger i=0; i<10; i++) {
+        StringObject *sobj = [[StringObject alloc] init];
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
+        [setPropObj1.set addObject:sobj];
+        IntObject *iobj = [[IntObject alloc] init];
+        iobj.intCol = (int)i;
+        [setPropObj1.intSet addObject:iobj];
+    }
+    [realm beginWriteTransaction];
+    [realm addObject:setPropObj1];
+    [realm commitWriteTransaction];
+
+    RLMAssertCount(SetPropertyObject, 0U, @"ANY intSet.intCol > 10");
+    RLMAssertCount(SetPropertyObject, 0U, @"ANY intSet.intCol > 10");
+    RLMAssertCount(SetPropertyObject, 1U, @"ANY intSet.intCol > 5");
+    RLMAssertCount(SetPropertyObject, 1U, @"ANY set.stringCol = '1'");
+    RLMAssertCount(SetPropertyObject, 0U, @"NONE intSet.intCol == 5");
+    RLMAssertCount(SetPropertyObject, 1U, @"NONE intSet.intCol > 10");
+
+    SetPropertyObject *setPropObj2 = [[SetPropertyObject alloc] init];
+    setPropObj2.name = @"Test";
+    for(NSUInteger i=0; i<4; i++) {
+        StringObject *sobj = [[StringObject alloc] init];
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
+        [setPropObj2.set addObject:sobj];
+        IntObject *iobj = [[IntObject alloc] init];
+        iobj.intCol = (int)i;
+        [setPropObj2.intSet addObject:iobj];
+    }
+    [realm beginWriteTransaction];
+    [realm addObject:setPropObj2];
+    [realm commitWriteTransaction];
+    RLMAssertCount(SetPropertyObject, 0U, @"ANY intSet.intCol > 10");
+    RLMAssertCount(SetPropertyObject, 1U, @"ANY intSet.intCol > 5");
+    RLMAssertCount(SetPropertyObject, 2U, @"ANY intSet.intCol > 2");
+    RLMAssertCount(SetPropertyObject, 1U, @"NONE intSet.intCol == 5");
+    RLMAssertCount(SetPropertyObject, 2U, @"NONE intSet.intCol > 10");
 }
 
 - (void)testMultiLevelLinkQuery
@@ -1711,6 +1802,38 @@
     XCTAssertThrows([CircleArrayObject objectsInRealm:realm where:@"NONE data.circles = '2'"]);
 }
 
+- (void)testSetMultiLevelLinkQuery
+{
+    RLMRealm *realm = [self realm];
+
+    [realm beginWriteTransaction];
+    CircleObject *circle = nil;
+    for (int i = 0; i < 5; ++i) {
+        circle = [CircleObject createInRealm:realm withValue:@{@"data": [NSString stringWithFormat:@"%d", i],
+                                                                @"next": circle ?: NSNull.null}];
+    }
+    [CircleSetObject createInRealm:realm withValue:@[[CircleObject allObjectsInRealm:realm]]];
+    [realm commitWriteTransaction];
+
+    RLMAssertCount(CircleSetObject, 1U, @"ANY circles.data = '4'");
+    RLMAssertCount(CircleSetObject, 0U, @"ANY circles.next.data = '4'");
+    RLMAssertCount(CircleSetObject, 1U, @"ANY circles.next.data = '3'");
+    RLMAssertCount(CircleSetObject, 1U, @"ANY circles.data = '3'");
+    RLMAssertCount(CircleSetObject, 1U, @"NONE circles.next.data = '4'");
+
+    RLMAssertCount(CircleSetObject, 0U, @"ANY circles.next.next.data = '3'");
+    RLMAssertCount(CircleSetObject, 1U, @"ANY circles.next.next.data = '2'");
+    RLMAssertCount(CircleSetObject, 1U, @"ANY circles.next.data = '2'");
+    RLMAssertCount(CircleSetObject, 1U, @"ANY circles.data = '2'");
+    RLMAssertCount(CircleSetObject, 1U, @"NONE circles.next.next.data = '3'");
+
+    XCTAssertThrows([CircleSetObject objectsInRealm:realm where:@"ANY data = '2'"]);
+    XCTAssertThrows([CircleSetObject objectsInRealm:realm where:@"ANY circles.next = '2'"]);
+    XCTAssertThrows([CircleSetObject objectsInRealm:realm where:@"ANY data.circles = '2'"]);
+    XCTAssertThrows([CircleSetObject objectsInRealm:realm where:@"circles.data = '2'"]);
+    XCTAssertThrows([CircleSetObject objectsInRealm:realm where:@"NONE data.circles = '2'"]);
+}
+
 - (void)testMultiLevelBackLinkQuery
 {
     RLMRealm *realm = [self realm];
@@ -1752,6 +1875,11 @@
     [ArrayOfAllTypesObject createInDefaultRealmWithValue:@[@[obj0, obj2, obj3]]];
     [ArrayOfAllTypesObject createInDefaultRealmWithValue:@[@[obj4]]];
 
+    [SetOfAllTypesObject createInDefaultRealmWithValue:@[@[obj0, obj1]]];
+    [SetOfAllTypesObject createInDefaultRealmWithValue:@[@[obj1]]];
+    [SetOfAllTypesObject createInDefaultRealmWithValue:@[@[obj0, obj2, obj3]]];
+    [SetOfAllTypesObject createInDefaultRealmWithValue:@[@[obj4]]];
+
     [realm commitWriteTransaction];
 
     // simple queries
@@ -1768,6 +1896,14 @@
     RLMAssertCount(ArrayOfAllTypesObject, 1U, @"NONE array != %@", obj1);
     XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"array = %@", obj0].count));
     XCTAssertThrows(([ArrayOfAllTypesObject objectsWhere:@"array != %@", obj0].count));
+
+    // check for ANY object in set
+    RLMAssertCount(SetOfAllTypesObject, 2U, @"ANY set = %@", obj0);
+    RLMAssertCount(SetOfAllTypesObject, 2U, @"ANY set != %@", obj1);
+    RLMAssertCount(SetOfAllTypesObject, 2U, @"NONE set = %@", obj0);
+    RLMAssertCount(SetOfAllTypesObject, 2U, @"NONE set != %@", obj1);
+    XCTAssertThrows(([SetOfAllTypesObject objectsWhere:@"set = %@", obj0].count));
+    XCTAssertThrows(([SetOfAllTypesObject objectsWhere:@"set != %@", obj0].count));
 }
 
 - (void)testCompoundOrQuery {
@@ -1984,6 +2120,31 @@
     RLMAssertCount(ArrayPropertyObject, 0U, @"%@ IN array", otherStringObject);
 }
 
+- (void)testSetIn {
+    RLMRealm *realm = [self realm];
+    [realm beginWriteTransaction];
+
+    SetPropertyObject *s = [SetPropertyObject createInRealm:realm withValue:@[@"name", @[], @[]]];
+    [s.set addObject:[StringObject createInRealm:realm withValue:@[@"value"]]];
+    StringObject *otherStringObject = [StringObject createInRealm:realm withValue:@[@"some other value"]];
+    [realm commitWriteTransaction];
+
+
+    RLMAssertCount(SetPropertyObject, 0U, @"ANY set.stringCol IN %@", @[@"missing"]);
+    RLMAssertCount(SetPropertyObject, 1U, @"ANY set.stringCol IN %@", @[@"value"]);
+    RLMAssertCount(SetPropertyObject, 1U, @"NONE set.stringCol IN %@", @[@"missing"]);
+    RLMAssertCount(SetPropertyObject, 0U, @"NONE set.stringCol IN %@", @[@"value"]);
+
+    RLMAssertCount(SetPropertyObject, 0U, @"ANY set IN %@", [StringObject objectsWhere:@"stringCol = 'missing'"]);
+    RLMAssertCount(SetPropertyObject, 1U, @"ANY set IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]);
+    RLMAssertCount(SetPropertyObject, 1U, @"NONE set IN %@", [StringObject objectsWhere:@"stringCol = 'missing'"]);
+    RLMAssertCount(SetPropertyObject, 0U, @"NONE set IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]);
+
+    StringObject *stringObject = [[StringObject allObjectsInRealm:realm] firstObject];
+    RLMAssertCount(SetPropertyObject, 1U, @"%@ IN set", stringObject);
+    RLMAssertCount(SetPropertyObject, 0U, @"%@ IN set", otherStringObject);
+}
+
 - (void)testQueryChaining {
     RLMRealm *realm = [self realm];
 
@@ -2001,10 +2162,11 @@
     RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
+    NSArray *employees = @[@{@"name": @"John", @"age": @30, @"hired": @NO},
+                           @{@"name": @"Joe",  @"age": @40, @"hired": @YES},
+                           @{@"name": @"Jill",  @"age": @50, @"hired": @YES}];
     [CompanyObject createInRealm:realm
-                      withValue:@[@"company name", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
-                                                      @{@"name": @"Joe",  @"age": @40, @"hired": @YES},
-                                                      @{@"name": @"Jill",  @"age": @50, @"hired": @YES}]]];
+                      withValue:@[@"company name", employees, employees]];
     [realm commitWriteTransaction];
 
     CompanyObject *co = [CompanyObject allObjects][0];
@@ -2014,43 +2176,57 @@
     RLMAssertCount(co.employees, 0U, @"hired = YES AND age = 30");
     RLMAssertCount(co.employees, 3U, @"hired = YES OR age = 30");
     RLMAssertCount([co.employees, 1U, @"hired = YES"] objectsWhere:@"name = 'Joe'");
+    RLMAssertCount(co.employeeSet, 1U, @"hired = NO");
+    RLMAssertCount(co.employeeSet, 2U, @"hired = YES");
+    RLMAssertCount(co.employeeSet, 1U, @"hired = YES AND age = 40");
+    RLMAssertCount(co.employeeSet, 0U, @"hired = YES AND age = 30");
+    RLMAssertCount(co.employeeSet, 3U, @"hired = YES OR age = 30");
+    RLMAssertCount([co.employeeSet, 1U, @"hired = YES"] objectsWhere:@"name = 'Joe'");
 }
 
 - (void)testLinkViewQueryLifetime {
     RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
+    NSArray *employees = @[@{@"name": @"John", @"age": @30, @"hired": @NO},
+                           @{@"name": @"Jill",  @"age": @50, @"hired": @YES}];
     [CompanyObject createInRealm:realm
-                      withValue:@[@"company name", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
-                                                      @{@"name": @"Jill",  @"age": @50, @"hired": @YES}]]];
+                      withValue:@[@"company name", employees, employees]];
     [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
     [realm commitWriteTransaction];
 
     RLMResults<EmployeeObject *> *subarray = nil;
+    RLMResults<EmployeeObject *> *subarray2 = nil;
     @autoreleasepool {
         __attribute((objc_precise_lifetime)) CompanyObject *co = [CompanyObject allObjects][0];
         subarray = [co.employees objectsWhere:@"age = 40"];
+        subarray2 = [co.employeeSet objectsWhere:@"age = 40"];
         XCTAssertEqual(0U, subarray.count);
+        XCTAssertEqual(0U, subarray2.count);
     }
 
     [realm beginWriteTransaction];
     @autoreleasepool {
         __attribute((objc_precise_lifetime)) CompanyObject *co = [CompanyObject allObjects][0];
         [co.employees addObject:[EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}]];
+        [co.employeeSet addObject:[EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}]];
     }
     [realm commitWriteTransaction];
 
     XCTAssertEqual(1U, subarray.count);
     XCTAssertEqualObjects(@"Joe", subarray[0][@"name"]);
+    XCTAssertEqual(1U, subarray2.count);
+    XCTAssertEqualObjects(@"Joe", subarray2[0][@"name"]);
 }
 
 - (void)testLinkViewQueryLiveUpdate {
     RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
+    NSArray *employees = @[@{@"name": @"John", @"age": @30, @"hired": @NO},
+                           @{@"name": @"Jill",  @"age": @40, @"hired": @YES}];
     [CompanyObject createInRealm:realm
-                      withValue:@[@"company name", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
-                                                      @{@"name": @"Jill",  @"age": @40, @"hired": @YES}]]];
+                      withValue:@[@"company name", employees, employees]];
     EmployeeObject *eo = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
     [realm commitWriteTransaction];
 
@@ -2059,18 +2235,32 @@
     RLMResults *sort = [co.employees sortedResultsUsingKeyPath:@"name" ascending:YES];
     RLMResults *sortQuery = [[co.employees sortedResultsUsingKeyPath:@"name" ascending:YES] objectsWhere:@"age = 40"];
     RLMResults *querySort = [[co.employees objectsWhere:@"age = 40"] sortedResultsUsingKeyPath:@"name" ascending:YES];
+    RLMResults *basic2 = [co.employeeSet objectsWhere:@"age = 40"];
+    RLMResults *sort2 = [co.employeeSet sortedResultsUsingKeyPath:@"name" ascending:YES];
+    RLMResults *sortQuery2 = [[co.employeeSet sortedResultsUsingKeyPath:@"name" ascending:YES] objectsWhere:@"age = 40"];
+    RLMResults *querySort2 = [[co.employeeSet objectsWhere:@"age = 40"] sortedResultsUsingKeyPath:@"name" ascending:YES];
 
     XCTAssertEqual(1U, basic.count);
     XCTAssertEqual(2U, sort.count);
     XCTAssertEqual(1U, sortQuery.count);
     XCTAssertEqual(1U, querySort.count);
 
+    XCTAssertEqual(1U, basic2.count);
+    XCTAssertEqual(2U, sort2.count);
+    XCTAssertEqual(1U, sortQuery2.count);
+    XCTAssertEqual(1U, querySort2.count);
+
     XCTAssertEqualObjects(@"Jill", [[basic lastObject] name]);
     XCTAssertEqualObjects(@"Jill", [[sortQuery lastObject] name]);
     XCTAssertEqualObjects(@"Jill", [[querySort lastObject] name]);
 
+    XCTAssertEqualObjects(@"Jill", [[basic2 lastObject] name]);
+    XCTAssertEqualObjects(@"Jill", [[sortQuery2 lastObject] name]);
+    XCTAssertEqualObjects(@"Jill", [[querySort2 lastObject] name]);
+
     [realm beginWriteTransaction];
     [co.employees addObject:eo];
+    [co.employeeSet addObject:eo];
     [realm commitWriteTransaction];
 
     XCTAssertEqual(2U, basic.count);
@@ -2078,9 +2268,18 @@
     XCTAssertEqual(2U, sortQuery.count);
     XCTAssertEqual(2U, querySort.count);
 
+    XCTAssertEqual(2U, basic2.count);
+    XCTAssertEqual(3U, sort2.count);
+    XCTAssertEqual(2U, sortQuery2.count);
+    XCTAssertEqual(2U, querySort2.count);
+
     XCTAssertEqualObjects(@"Joe", [[basic lastObject] name]);
     XCTAssertEqualObjects(@"Joe", [[sortQuery lastObject] name]);
     XCTAssertEqualObjects(@"Joe", [[querySort lastObject] name]);
+
+    XCTAssertEqualObjects(@"Joe", [[basic2 lastObject] name]);
+    XCTAssertEqualObjects(@"Joe", [[sortQuery2 lastObject] name]);
+    XCTAssertEqualObjects(@"Joe", [[querySort2 lastObject] name]);
 }
 
 - (void)testConstantPredicates
@@ -2252,19 +2451,42 @@ static NSData *data(const char *str) {
     XCTAssertNil(results.firstObject);
 }
 
+- (void)testQueryOnDeletedSetProperty
+{
+    RLMRealm *realm = [self realm];
+    [realm beginWriteTransaction];
+    IntObject *io = [IntObject createInRealm:realm withValue:@[@0]];
+    SetPropertyObject *set = [SetPropertyObject createInRealm:realm withValue:@[@"", @[], @[io]]];
+    [realm commitWriteTransaction];
+
+    RLMResults *results = [set.intSet objectsWhere:@"TRUEPREDICATE"];
+    XCTAssertEqual(1U, results.count);
+
+    [realm beginWriteTransaction];
+    [realm deleteObject:set];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqual(0U, results.count);
+    XCTAssertNil(results.firstObject);
+}
+
 - (void)testSubqueries
 {
     RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
+
+    NSArray *employees = @[@{@"name": @"John", @"age": @30, @"hired": @NO},
+                           @{@"name": @"Jill",  @"age": @40, @"hired": @YES},
+                           @{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+
+    NSArray *employees2 = @[@{@"name": @"Bill", @"age": @35, @"hired": @YES},
+                            @{@"name": @"Don",  @"age": @45, @"hired": @NO},
+                            @{@"name": @"Tim",  @"age": @60, @"hired": @NO}];
     CompanyObject *first = [CompanyObject createInRealm:realm
-                                              withValue:@[@"first company", @[@{@"name": @"John", @"age": @30, @"hired": @NO},
-                                                                              @{@"name": @"Jill",  @"age": @40, @"hired": @YES},
-                                                                              @{@"name": @"Joe",  @"age": @40, @"hired": @YES}]]];
+                                              withValue:@[@"first company", employees, employees]];
     CompanyObject *second = [CompanyObject createInRealm:realm
-                                               withValue:@[@"second company", @[@{@"name": @"Bill", @"age": @35, @"hired": @YES},
-                                                                                @{@"name": @"Don",  @"age": @45, @"hired": @NO},
-                                                                                @{@"name": @"Tim",  @"age": @60, @"hired": @NO}]]];
+                                               withValue:@[@"second company", employees2, employees2]];
 
     [LinkToCompanyObject createInRealm:realm withValue:@[ first ]];
     [LinkToCompanyObject createInRealm:realm withValue:@[ second ]];
@@ -2272,9 +2494,14 @@ static NSData *data(const char *str) {
 
     RLMAssertCount(CompanyObject, 1U, @"SUBQUERY(employees, $employee, $employee.age > 30 AND $employee.hired = FALSE).@count > 0");
     RLMAssertCount(CompanyObject, 2U, @"SUBQUERY(employees, $employee, $employee.age < 30 AND $employee.hired = TRUE).@count == 0");
+    RLMAssertCount(CompanyObject, 1U, @"SUBQUERY(employeeSet, $employee, $employee.age > 30 AND $employee.hired = FALSE).@count > 0");
+    RLMAssertCount(CompanyObject, 2U, @"SUBQUERY(employeeSet, $employee, $employee.age < 30 AND $employee.hired = TRUE).@count == 0");
 
     RLMAssertCount(LinkToCompanyObject, 1U, @"SUBQUERY(company.employees, $employee, $employee.age > 30 AND $employee.hired = FALSE).@count > 0");
     RLMAssertCount(LinkToCompanyObject, 2U, @"SUBQUERY(company.employees, $employee, $employee.age < 30 AND $employee.hired = TRUE).@count == 0");
+    // FIXME: this unexpectedly throws 'No such object'
+//    RLMAssertCount(LinkToCompanyObject, 1U, @"SUBQUERY(company.employeeSet, $employee, $employee.age > 30 AND $employee.hired = FALSE).@count > 0");
+//    RLMAssertCount(LinkToCompanyObject, 2U, @"SUBQUERY(company.employeeSet, $employee, $employee.age < 30 AND $employee.hired = TRUE).@count == 0");
 }
 
 - (void)testLinkingObjects {
@@ -2414,7 +2641,7 @@ static NSData *data(const char *str) {
     XCTAssertEqualObjects(asArray(r14), (@[ hannah ]));
 }
 
-- (void)testCountOnCollection {
+- (void)testCountOnArrayCollection {
     RLMRealm *realm = [self realm];
     [realm beginWriteTransaction];
 
@@ -2453,7 +2680,46 @@ static NSData *data(const char *str) {
                                       @"@count can only be compared with a numeric value");
 }
 
-- (void)testAggregateCollectionOperators {
+- (void)testCountOnSetCollection {
+    RLMRealm *realm = [self realm];
+    [realm beginWriteTransaction];
+
+    IntegerSetPropertyObject *set = [IntegerSetPropertyObject createInRealm:realm withValue:@[ @1, @[]]];
+    [set.set addObject:[IntObject createInRealm:realm withValue:@[ @456 ]]];
+
+    set = [IntegerSetPropertyObject createInRealm:realm withValue:@[ @2, @[]]];
+    [set.set addObject:[IntObject createInRealm:realm withValue:@[ @1 ]]];
+    [set.set addObject:[IntObject createInRealm:realm withValue:@[ @2 ]]];
+    [set.set addObject:[IntObject createInRealm:realm withValue:@[ @3 ]]];
+
+    set = [IntegerSetPropertyObject createInRealm:realm withValue:@[ @0, @[]]];
+
+    [realm commitWriteTransaction];
+
+    RLMAssertCount(IntegerSetPropertyObject, 2U, @"set.@count > 0");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@count == 3");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@count < 1");
+    RLMAssertCount(IntegerSetPropertyObject, 2U, @"0 < set.@count");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"3 == set.@count");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"1 >  set.@count");
+
+    RLMAssertCount(IntegerSetPropertyObject, 2U, @"set.@count == number");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@count > number");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"number < set.@count");
+
+    // We do not yet handle collection operations on both sides of the comparison.
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@count == set.@count"]),
+                                      @"aggregate operations cannot be compared with other aggregate operations");
+
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@count.foo.bar != 0"]),
+                                      @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@count.intCol > 0"]),
+                                      @"@count does not have any properties");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@count != 'Hello'"]),
+                                      @"@count can only be compared with a numeric value");
+}
+
+- (void)testAggregateArrayCollectionOperators {
     RLMRealm *realm = [self realm];
     [realm beginWriteTransaction];
 
@@ -2512,6 +2778,67 @@ static NSData *data(const char *str) {
     RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@min.intCol == 1.23"]), @"@min.*type int cannot be compared");
     RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@max.intCol == 1.23"]), @"@max.*type int cannot be compared");
     RLMAssertThrowsWithReasonMatching(([IntegerArrayPropertyObject objectsWhere:@"array.@sum.intCol == 1.23"]), @"@sum.*type int cannot be compared");
+}
+
+- (void)testAggregateSetCollectionOperators {
+    RLMRealm *realm = [self realm];
+    [realm beginWriteTransaction];
+
+    IntegerSetPropertyObject *set = [IntegerSetPropertyObject createInRealm:realm withValue:@[ @1111, @[] ]];
+    [set.set addObject:[IntObject createInRealm:realm withValue:@[ @1234 ]]];
+    [set.set addObject:[IntObject createInRealm:realm withValue:@[ @2 ]]];
+    [set.set addObject:[IntObject createInRealm:realm withValue:@[ @-12345 ]]];
+
+    set = [IntegerSetPropertyObject createInRealm:realm withValue:@[ @2222, @[] ]];
+    [set.set addObject:[IntObject createInRealm:realm withValue:@[ @100 ]]];
+
+    set = [IntegerSetPropertyObject createInRealm:realm withValue:@[ @3333, @[] ]];
+
+    [realm commitWriteTransaction];
+
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@min.intCol == -12345");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@min.intCol == 100");
+    RLMAssertCount(IntegerSetPropertyObject, 2U, @"set.@min.intCol < 1000");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@min.intCol > -1000");
+
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@max.intCol == 1234");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@max.intCol == 100");
+    RLMAssertCount(IntegerSetPropertyObject, 2U, @"set.@max.intCol > -1000");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@max.intCol > 1000");
+
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@sum.intCol == 100");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@sum.intCol == -11109");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@sum.intCol == 0");
+    RLMAssertCount(IntegerSetPropertyObject, 2U, @"set.@sum.intCol > -50");
+    RLMAssertCount(IntegerSetPropertyObject, 2U, @"set.@sum.intCol < 50");
+
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@avg.intCol == 100");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@avg.intCol == -3703");
+    RLMAssertCount(IntegerSetPropertyObject, 0U, @"set.@avg.intCol == 0");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@avg.intCol < -50");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@avg.intCol > 50");
+
+    RLMAssertCount(IntegerSetPropertyObject, 2U, @"set.@min.intCol < number");
+    RLMAssertCount(IntegerSetPropertyObject, 2U, @"number > set.@min.intCol");
+
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"set.@max.intCol < number");
+    RLMAssertCount(IntegerSetPropertyObject, 1U, @"number > set.@max.intCol");
+
+    RLMAssertCount(IntegerSetPropertyObject, 2U, @"set.@avg.intCol < number");
+    RLMAssertCount(IntegerSetPropertyObject, 2U, @"number > set.@avg.intCol");
+
+    // We do not yet handle collection operations on both sides of the comparison.
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@min.intCol == set.@min.intCol"]), @"aggregate operations cannot be compared with other aggregate operations");
+
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@min.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@max.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@sum.intCol.foo.bar == 1.23"]), @"single level key");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@avg.intCol.foo.bar == 1.23"]), @"single level key");
+
+    // Average is omitted from this test as its result is always a double.
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@min.intCol == 1.23"]), @"@min.*type int cannot be compared");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@max.intCol == 1.23"]), @"@max.*type int cannot be compared");
+    RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@sum.intCol == 1.23"]), @"@sum.*type int cannot be compared");
 }
 
 @end
@@ -3126,8 +3453,8 @@ struct NullTestData {
     [realm beginWriteTransaction];
     id obj1 = [RenamedProperties1 createInRealm:realm withValue:@[@1, @"a"]];
     id obj2 = [RenamedProperties2 createInRealm:realm withValue:@[@2, @"b"]];
-    [LinkToRenamedProperties1 createInRealm:realm withValue:@[obj1, NSNull.null, @[obj1]]];
-    [LinkToRenamedProperties2 createInRealm:realm withValue:@[obj2, NSNull.null, @[obj2]]];
+    [LinkToRenamedProperties1 createInRealm:realm withValue:@[obj1, NSNull.null, @[obj1], @[obj1]]];
+    [LinkToRenamedProperties2 createInRealm:realm withValue:@[obj2, NSNull.null, @[obj2], @[obj2]]];
     [realm commitWriteTransaction];
 
     [self testClass:[LinkToRenamedProperties1 class] withNormalCount:2 notCount:0 where:@"linkA.propA != 0"];
@@ -3149,6 +3476,16 @@ struct NullTestData {
     [self testClass:[LinkToRenamedProperties2 class] withNormalCount:1 notCount:1 where:@"ANY array.propC = 1"];
     [self testClass:[LinkToRenamedProperties2 class] withNormalCount:1 notCount:1 where:@"ANY array.propC = 2"];
     [self testClass:[LinkToRenamedProperties2 class] withNormalCount:0 notCount:2 where:@"ANY array.propC = 3"];
+
+    [self testClass:[LinkToRenamedProperties1 class] withNormalCount:2 notCount:0 where:@"ANY set.propA != 0"];
+    [self testClass:[LinkToRenamedProperties1 class] withNormalCount:1 notCount:1 where:@"ANY set.propA = 1"];
+    [self testClass:[LinkToRenamedProperties1 class] withNormalCount:1 notCount:1 where:@"ANY set.propA = 2"];
+    [self testClass:[LinkToRenamedProperties1 class] withNormalCount:0 notCount:2 where:@"ANY set.propA = 3"];
+
+    [self testClass:[LinkToRenamedProperties2 class] withNormalCount:2 notCount:0 where:@"ANY set.propC != 0"];
+    [self testClass:[LinkToRenamedProperties2 class] withNormalCount:1 notCount:1 where:@"ANY set.propC = 1"];
+    [self testClass:[LinkToRenamedProperties2 class] withNormalCount:1 notCount:1 where:@"ANY set.propC = 2"];
+    [self testClass:[LinkToRenamedProperties2 class] withNormalCount:0 notCount:2 where:@"ANY set.propC = 3"];
 }
 
 - (void)testQueryOverRenamedBacklinks {

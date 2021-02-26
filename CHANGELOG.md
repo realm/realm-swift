@@ -1,6 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Add `RLMSet`/`MutableSet<>` datatype. This is a Set collection type used for storing distinct values in a collection.
 * None.
 
 ### Fixed

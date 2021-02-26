@@ -55,6 +55,8 @@
 @property PrimaryStringObject *primaryString;
 @property RLM_GENERIC_ARRAY(IntObject) *intArray;
 @property RLM_GENERIC_ARRAY(PrimaryIntObject) *primaryIntArray;
+@property RLM_GENERIC_SET(IntObject) *intSet;
+@property RLM_GENERIC_SET(PrimaryIntObject) *primaryIntSet;
 @end
 
 @implementation AllLinks
@@ -66,6 +68,8 @@
 @property PrimaryStringObject *primaryString;
 @property RLM_GENERIC_ARRAY(IntObject) *intArray;
 @property RLM_GENERIC_ARRAY(PrimaryIntObject) *primaryIntArray;
+@property RLM_GENERIC_SET(IntObject) *intSet;
+@property RLM_GENERIC_SET(PrimaryIntObject) *primaryIntSet;
 @end
 
 @implementation AllLinksWithPrimary
@@ -141,12 +145,59 @@
     XCTAssertEqual(eo.hired, YES);
 }
 
+- (void)testInitWithSet {
+    auto co = [[CompanyObject alloc] initWithValue:@[]];
+    XCTAssertNil(co.name);
+    XCTAssertEqual(co.employeeSet.count, 0U);
+
+    co = [[CompanyObject alloc] initWithValue:@[@"empty company"]];
+    XCTAssertEqualObjects(co.name, @"empty company");
+    XCTAssertEqual(co.employeeSet.count, 0U);
+
+    co = [[CompanyObject alloc] initWithValue:@[@"empty company", NSNull.null]];
+    XCTAssertEqualObjects(co.name, @"empty company");
+    XCTAssertEqual(co.employeeSet.count, 0U);
+
+    co = [[CompanyObject alloc] initWithValue:@[@"empty company", @[]]];
+    XCTAssertEqualObjects(co.name, @"empty company");
+    XCTAssertEqual(co.employeeSet.count, 0U);
+
+    co = [[CompanyObject alloc] initWithValue:@[@"one employee",
+                                                @[@[@"name", @2, @YES]],
+                                                @[@[@"name", @2, @YES]]]];
+    XCTAssertEqualObjects(co.name, @"one employee");
+    XCTAssertEqual(co.employeeSet.count, 1U);
+    EmployeeObject *eo = co.employeeSet.allObjects[0];
+    XCTAssertEqualObjects(eo.name, @"name");
+    XCTAssertEqual(eo.age, 2);
+    XCTAssertEqual(eo.hired, YES);
+
+    co = [[CompanyObject alloc] initWithValue:@[@"one employee", @[eo], @[eo]]];
+    XCTAssertEqualObjects(co.name, @"one employee");
+    XCTAssertEqual(co.employeeSet.count, 1U);
+    eo = co.employeeSet.allObjects[0];
+    XCTAssertEqualObjects(eo.name, @"name");
+    XCTAssertEqual(eo.age, 2);
+    XCTAssertEqual(eo.hired, YES);
+}
+
 - (void)testWithNonArrayEnumerableForRLMArrayProperty {
     auto employees = @[@[@"name", @2, @YES], @[@"name 2", @3, @NO]];
     auto co = [[CompanyObject alloc] initWithValue:@[@"one employee", employees.reverseObjectEnumerator]];
     XCTAssertEqual(2U, co.employees.count);
     XCTAssertEqualObjects(@"name 2", co.employees[0].name);
     XCTAssertEqualObjects(@"name", co.employees[1].name);
+}
+
+- (void)testWithNonSetEnumerableForRLMSetProperty {
+    auto employees = @[@[@"name", @2, @YES], @[@"name 2", @3, @NO]];
+    auto co = [[CompanyObject alloc] initWithValue:@[@"one employee",
+                                                     employees.reverseObjectEnumerator,
+                                                     employees.reverseObjectEnumerator]];
+    XCTAssertEqual(2U, co.employeeSet.count);
+
+    XCTAssertTrue([[co.employeeSet valueForKey:@"name"] containsObject:@"name"]);
+    XCTAssertTrue([[co.employeeSet valueForKey:@"name"] containsObject:@"name 2"]);
 }
 
 - (void)testInitWithArrayUsesDefaultValuesForMissingFields {
@@ -186,39 +237,58 @@
     XCTAssertEqual(co.employees.count, 0U);
 
     co = [[CompanyObject alloc] initWithValue:@{@"name": @"empty company",
-                                                @"employees": NSNull.null}];
+                                                @"employees": NSNull.null,
+                                                @"employeeSet": NSNull.null}];
     XCTAssertEqualObjects(co.name, @"empty company");
     XCTAssertEqual(co.employees.count, 0U);
+    XCTAssertEqual(co.employeeSet.count, 0U);
 
     co = [[CompanyObject alloc] initWithValue:@{@"name": @"empty company",
-                                                @"employees": @[]}];
+                                                @"employees": @[],
+                                                @"employeeSet": @[]}];
     XCTAssertEqualObjects(co.name, @"empty company");
     XCTAssertEqual(co.employees.count, 0U);
+    XCTAssertEqual(co.employeeSet.count, 0U);
 
     co = [[CompanyObject alloc] initWithValue:@{@"name": @"one employee",
-                                                @"employees": @[@[@"name", @2, @YES]]}];
+                                                @"employees": @[@[@"name", @2, @YES]],
+                                                @"employeeSet": @[@[@"name", @2, @YES]]}];
     XCTAssertEqualObjects(co.name, @"one employee");
     XCTAssertEqual(co.employees.count, 1U);
+    XCTAssertEqual(co.employeeSet.count, 1U);
     EmployeeObject *eo = co.employees.firstObject;
+    EmployeeObject *eo2 = co.employeeSet.allObjects[0];
     XCTAssertEqualObjects(eo.name, @"name");
+    XCTAssertEqualObjects(eo2.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
+    XCTAssertEqual(eo2.age, 2);
+    XCTAssertEqual(eo2.hired, YES);
 
     co = [[CompanyObject alloc] initWithValue:@{@"name": @"one employee",
                                                 @"employees": @[@{@"name": @"name",
                                                                   @"age": @2,
+                                                                  @"hired": @YES}],
+                                                @"employeeSet": @[@{@"name": @"name",
+                                                                  @"age": @2,
                                                                   @"hired": @YES}]}];
     XCTAssertEqualObjects(co.name, @"one employee");
     XCTAssertEqual(co.employees.count, 1U);
+    XCTAssertEqual(co.employeeSet.count, 1U);
     eo = co.employees.firstObject;
+    eo2 = co.employeeSet.allObjects[0];
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
+    XCTAssertEqualObjects(eo2.name, @"name");
+    XCTAssertEqual(eo2.age, 2);
+    XCTAssertEqual(eo2.hired, YES);
 
     co = [[CompanyObject alloc] initWithValue:@{@"name": @"no employees",
                                                 @"extra fields": @"are okay"}];
     XCTAssertEqualObjects(co.name, @"no employees");
     XCTAssertEqual(co.employees.count, 0U);
+    XCTAssertEqual(co.employeeSet.count, 0U);
 }
 
 - (void)testInitWithInvalidDictionary {
@@ -269,6 +339,12 @@
     auto array2 = [[AllPrimitiveArrays alloc] initWithValue:array1];
     XCTAssertEqual(array2.intObj.count, 1U);
     XCTAssertEqualObjects(array2.intObj.firstObject, @2);
+
+    auto set1 = [[AllPrimitiveSets alloc] init];
+    [set1.intObj addObject:@2];
+    auto set2 = [[AllPrimitiveSets alloc] initWithValue:set1];
+    XCTAssertEqual(set2.intObj.count, 1U);
+    XCTAssertEqualObjects(set2.intObj.allObjects[0], @2);
 }
 
 - (void)testInitWithInvalidObject {
@@ -294,6 +370,17 @@
                              @"Invalid value '0' of type '__NSCFConstantString' for 'int' array property 'AllPrimitiveArrays.intObj'.");
     RLMAssertThrowsWithReason([[AllPrimitiveArrays alloc] initWithValue:@{@"intObj": @1}],
                              @"Invalid value (1) for 'int' array property 'AllPrimitiveArrays.intObj': value is not enumerable.");
+}
+
+- (void)testInitPrimitiveSetsWithInvalidValues {
+    RLMAssertThrowsWithReason([[AllPrimitiveSets alloc] initWithValue:@{@"intObj": @[NSNull.null]}],
+                             @"Invalid value '<null>' of type 'NSNull' for 'int' property 'AllPrimitiveSets.intObj'.");
+    RLMAssertThrowsWithReason([[AllPrimitiveSets alloc] initWithValue:@{@"intObj": @[@1.1]}],
+                             @"Invalid value '1.1' of type '__NSCFNumber' for 'int' property 'AllPrimitiveSets.intObj'.");
+    RLMAssertThrowsWithReason([[AllPrimitiveSets alloc] initWithValue:@{@"intObj": @[@"0"]}],
+                             @"Invalid value '0' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
+    RLMAssertThrowsWithReason([[AllPrimitiveSets alloc] initWithValue:@{@"intObj": @1}],
+                             @"Invalid value (1) for 'int' set property 'AllPrimitiveSets.intObj': value is not enumerable.");
 }
 
 - (void)testInitWithCustomAccessors {
@@ -391,6 +478,29 @@
     XCTAssertEqualObjects([arrays.stringObj valueForKey:@"self"], (@[@"a", @"b"]));
     XCTAssertEqualObjects([arrays.dateObj valueForKey:@"self"], (@[now]));
     XCTAssertEqualObjects([arrays.dataObj valueForKey:@"self"], (@[bytes]));
+
+    auto sets = [[AllPrimitiveSets alloc] initWithValue:@{@"intObj": @[@1, @2, @3],
+                                                          @"boolObj": @[@YES, @NO],
+                                                          @"floatObj": @[@1.1f, @2.2f],
+                                                          @"doubleObj": @[@3.3, @4.4],
+                                                          @"stringObj": @[@"a", @"b"],
+                                                          @"dateObj": @[now],
+                                                          @"dataObj": @[bytes]}];
+    XCTAssertEqual(3U, sets.intObj.count);
+    XCTAssertEqual(2U, sets.boolObj.count);
+    XCTAssertEqual(2U, sets.floatObj.count);
+    XCTAssertEqual(2U, sets.doubleObj.count);
+    XCTAssertEqual(2U, sets.stringObj.count);
+    XCTAssertEqual(1U, sets.dateObj.count);
+    XCTAssertEqual(1U, sets.dataObj.count);
+
+    XCTAssertTrue([[NSSet setWithArray:[[sets.intObj valueForKey:@"self"] allObjects]] isEqualToSet:[NSSet setWithArray:(@[@1, @2, @3])]]);
+    XCTAssertTrue([[NSSet setWithArray:[[sets.boolObj valueForKey:@"self"] allObjects]] isEqualToSet:[NSSet setWithArray:(@[@YES, @NO])]]);
+    XCTAssertTrue([[NSSet setWithArray:[[sets.floatObj valueForKey:@"self"] allObjects]] isEqualToSet:[NSSet setWithArray:(@[@1.1f, @2.2f])]]);
+    XCTAssertTrue([[NSSet setWithArray:[[sets.doubleObj valueForKey:@"self"] allObjects]] isEqualToSet:[NSSet setWithArray:(@[@3.3, @4.4])]]);
+    XCTAssertTrue([[NSSet setWithArray:[[sets.stringObj valueForKey:@"self"] allObjects]] isEqualToSet:[NSSet setWithArray:(@[@"a", @"b"])]]);
+    XCTAssertTrue([[NSSet setWithArray:[[sets.dateObj valueForKey:@"self"] allObjects]] isEqualToSet:[NSSet setWithArray:(@[now])]]);
+    XCTAssertTrue([[NSSet setWithArray:[[sets.dataObj valueForKey:@"self"] allObjects]] isEqualToSet:[NSSet setWithArray:(@[bytes])]]);
 }
 
 - (void)testInitValidatesNumberTypes {
@@ -424,19 +534,27 @@
     auto realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];
 
-    auto co = [CompanyObject createInRealm:realm withValue:@[@"empty company", NSNull.null]];
+    auto co = [CompanyObject createInRealm:realm withValue:@[@"empty company", NSNull.null, NSNull.null]];
     XCTAssertEqualObjects(co.name, @"empty company");
     XCTAssertEqual(co.employees.count, 0U);
+    XCTAssertEqual(co.employeeSet.count, 0U);
 
-    co = [CompanyObject createInRealm:realm withValue:@[@"empty company", @[]]];
+    co = [CompanyObject createInRealm:realm withValue:@[@"empty company", @[], @[]]];
     XCTAssertEqualObjects(co.name, @"empty company");
     XCTAssertEqual(co.employees.count, 0U);
+    XCTAssertEqual(co.employeeSet.count, 0U);
 
     co = [CompanyObject createInRealm:realm withValue:@[@"one employee",
+                                                        @[@[@"name", @2, @YES]],
                                                         @[@[@"name", @2, @YES]]]];
     XCTAssertEqualObjects(co.name, @"one employee");
     XCTAssertEqual(co.employees.count, 1U);
+    XCTAssertEqual(co.employeeSet.count, 1U);
     EmployeeObject *eo = co.employees.firstObject;
+    XCTAssertEqualObjects(eo.name, @"name");
+    XCTAssertEqual(eo.age, 2);
+    XCTAssertEqual(eo.hired, YES);
+    eo = co.employeeSet.allObjects[0];
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
@@ -477,20 +595,30 @@
     XCTAssertEqual(co.employees.count, 0U);
 
     co = [CompanyObject createInRealm:realm withValue:@{@"name": @"empty company",
-                                                        @"employees": NSNull.null}];
+                                                        @"employees": NSNull.null,
+                                                        @"employeeSet": NSNull.null}];
     XCTAssertEqualObjects(co.name, @"empty company");
     XCTAssertEqual(co.employees.count, 0U);
+    XCTAssertEqual(co.employeeSet.count, 0U);
 
     co = [CompanyObject createInRealm:realm withValue:@{@"name": @"empty company",
-                                                        @"employees": @[]}];
+                                                        @"employees": @[],
+                                                        @"employeeSet": @[]}];
     XCTAssertEqualObjects(co.name, @"empty company");
     XCTAssertEqual(co.employees.count, 0U);
+    XCTAssertEqual(co.employeeSet.count, 0U);
 
     co = [CompanyObject createInRealm:realm withValue:@{@"name": @"one employee",
-                                                        @"employees": @[@[@"name", @2, @YES]]}];
+                                                        @"employees": @[@[@"name", @2, @YES]],
+                                                        @"employeeSet": @[@[@"name", @2, @YES]]}];
     XCTAssertEqualObjects(co.name, @"one employee");
     XCTAssertEqual(co.employees.count, 1U);
+    XCTAssertEqual(co.employeeSet.count, 1U);
     EmployeeObject *eo = co.employees.firstObject;
+    XCTAssertEqualObjects(eo.name, @"name");
+    XCTAssertEqual(eo.age, 2);
+    XCTAssertEqual(eo.hired, YES);
+    eo = co.employeeSet.allObjects[0];
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
@@ -498,10 +626,18 @@
     co = [CompanyObject createInRealm:realm withValue:@{@"name": @"one employee",
                                                         @"employees": @[@{@"name": @"name",
                                                                           @"age": @2,
+                                                                          @"hired": @YES}],
+                                                        @"employeeSet": @[@{@"name": @"name",
+                                                                          @"age": @2,
                                                                           @"hired": @YES}]}];
     XCTAssertEqualObjects(co.name, @"one employee");
     XCTAssertEqual(co.employees.count, 1U);
+    XCTAssertEqual(co.employeeSet.count, 1U);
     eo = co.employees.firstObject;
+    XCTAssertEqualObjects(eo.name, @"name");
+    XCTAssertEqual(eo.age, 2);
+    XCTAssertEqual(eo.hired, YES);
+    eo = co.employeeSet.allObjects[0];
     XCTAssertEqualObjects(eo.name, @"name");
     XCTAssertEqual(eo.age, 2);
     XCTAssertEqual(eo.hired, YES);
@@ -510,6 +646,7 @@
                                                         @"extra fields": @"are okay"}];
     XCTAssertEqualObjects(co.name, @"no employees");
     XCTAssertEqual(co.employees.count, 0U);
+    XCTAssertEqual(co.employeeSet.count, 0U);
 
     [realm cancelWriteTransaction];
 }
@@ -537,12 +674,15 @@
     auto co = [[CompanyObject alloc] init];
     co.name = @"name";
     [co.employees addObject:eo];
+    [co.employeeSet addObject:eo];
 
     auto co2 = [CompanyObject createInRealm:realm withValue:co];
     XCTAssertEqualObjects(co.name, co2.name);
     // Deep copy, so it's a different object
     XCTAssertFalse([co.employees[0] isEqualToObject:co2.employees[0]]);
     XCTAssertEqualObjects(co.employees[0].name, co2.employees[0].name);
+    XCTAssertFalse([co.employeeSet.allObjects[0] isEqualToObject:co2.employeeSet.allObjects[0]]);
+    XCTAssertEqualObjects(co.employeeSet.allObjects[0].name, co2.employeeSet.allObjects[0].name);
 
     auto dogExt = [DogExtraObject createInRealm:realm withValue:@[@"Fido", @12, @"Poodle"]];
     auto dog = [DogObject createInRealm:realm withValue:dogExt];
@@ -661,6 +801,39 @@
     [realm cancelWriteTransaction];
 }
 
+- (void)testCreateRequiredPrimitiveSets {
+    auto realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+
+    auto now = [NSDate date];
+    auto bytes = [NSData dataWithBytes:"a" length:1];
+    auto req = [AllPrimitiveSets createInRealm:realm
+                                     withValue:@{@"intObj": @[@1, @2, @3],
+                                                 @"boolObj": @[@YES, @NO],
+                                                 @"floatObj": @[@1.1f, @2.2f],
+                                                 @"doubleObj": @[@3.3, @4.4],
+                                                 @"stringObj": @[@"a", @"b"],
+                                                 @"dateObj": @[now],
+                                                 @"dataObj": @[bytes]}];
+    XCTAssertEqual(3U, req.intObj.count);
+    XCTAssertEqual(2U, req.boolObj.count);
+    XCTAssertEqual(2U, req.floatObj.count);
+    XCTAssertEqual(2U, req.doubleObj.count);
+    XCTAssertEqual(2U, req.stringObj.count);
+    XCTAssertEqual(1U, req.dateObj.count);
+    XCTAssertEqual(1U, req.dataObj.count);
+
+    XCTAssertEqualObjects([req.intObj valueForKey:@"self"], ([NSSet setWithArray:@[@1, @2, @3]]));
+    XCTAssertEqualObjects([req.boolObj valueForKey:@"self"], ([NSSet setWithArray:@[@NO, @YES]]));
+    XCTAssertEqualObjects([req.floatObj valueForKey:@"self"], ([NSSet setWithArray:@[@1.1f, @2.2f]]));
+    XCTAssertEqualObjects([req.doubleObj valueForKey:@"self"], ([NSSet setWithArray:@[@3.3, @4.4]]));
+    XCTAssertEqualObjects([req.stringObj valueForKey:@"self"], ([NSSet setWithArray:@[@"a", @"b"]]));
+    XCTAssertEqualObjects([req.dateObj valueForKey:@"self"], ([NSSet setWithArray:@[now]]));
+    XCTAssertEqualObjects([req.dataObj valueForKey:@"self"], ([NSSet setWithArray:@[bytes]]));
+
+    [realm cancelWriteTransaction];
+}
+
 #if 0
 - (void)testCreateRequiredPrimitiveArraysWithNonNSArrayEnumerable {
     auto realm = RLMRealm.defaultRealm;
@@ -717,6 +890,27 @@
     XCTAssertEqual(0U, req.dataObj.count);
 }
 
+- (void)testCreatePrimitiveSetsWithNSNull {
+    auto realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+
+    auto req = [AllPrimitiveSets createInRealm:realm
+                                     withValue:@{@"intObj": NSNull.null,
+                                                 @"boolObj": NSNull.null,
+                                                 @"floatObj": NSNull.null,
+                                                 @"doubleObj": NSNull.null,
+                                                 @"stringObj": NSNull.null,
+                                                 @"dateObj": NSNull.null,
+                                                 @"dataObj": NSNull.null}];
+    XCTAssertEqual(0U, req.intObj.count);
+    XCTAssertEqual(0U, req.boolObj.count);
+    XCTAssertEqual(0U, req.floatObj.count);
+    XCTAssertEqual(0U, req.doubleObj.count);
+    XCTAssertEqual(0U, req.stringObj.count);
+    XCTAssertEqual(0U, req.dateObj.count);
+    XCTAssertEqual(0U, req.dataObj.count);
+}
+
 - (void)testCreatePrimitiveArraysWithMissingKeys {
     auto realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];
@@ -725,6 +919,22 @@
                                        withValue:@{@"intObj": @[@1, @2, @2],
                                                    @"dataObj": NSNull.null}];
     XCTAssertEqual(3U, req.intObj.count);
+    XCTAssertEqual(0U, req.boolObj.count);
+    XCTAssertEqual(0U, req.floatObj.count);
+    XCTAssertEqual(0U, req.doubleObj.count);
+    XCTAssertEqual(0U, req.stringObj.count);
+    XCTAssertEqual(0U, req.dateObj.count);
+    XCTAssertEqual(0U, req.dataObj.count);
+}
+
+- (void)testCreatePrimitiveSetsWithMissingKeys {
+    auto realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+
+    auto req = [AllPrimitiveSets createInRealm:realm
+                                     withValue:@{@"intObj": @[@1, @2, @2],
+                                                 @"dataObj": NSNull.null}];
+    XCTAssertEqual(2U, req.intObj.count);
     XCTAssertEqual(0U, req.boolObj.count);
     XCTAssertEqual(0U, req.floatObj.count);
     XCTAssertEqual(0U, req.doubleObj.count);
@@ -749,6 +959,26 @@
     RLMAssertThrowsWithReason([AllPrimitiveArrays createInRealm:realm
                                        withValue:@{@"intObj": @1}],
                              @"Invalid value (1) for 'int' array property 'AllPrimitiveArrays.intObj': value is not enumerable.");
+
+    [realm cancelWriteTransaction];
+}
+
+- (void)testCreateRequiredPrimitiveSetsWithInvalidValues {
+    auto realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+
+    RLMAssertThrowsWithReason([AllPrimitiveSets createInRealm:realm
+                                       withValue:@{@"intObj": @[NSNull.null]}],
+                             @"Invalid value '<null>' of type 'NSNull' for 'int' property 'AllPrimitiveSets.intObj'.");
+    RLMAssertThrowsWithReason([AllPrimitiveSets createInRealm:realm
+                                       withValue:@{@"intObj": @[@1.1]}],
+                             @"Invalid value '1.1' of type '__NSCFNumber' for 'int' property 'AllPrimitiveSets.intObj'.");
+    RLMAssertThrowsWithReason([AllPrimitiveSets createInRealm:realm
+                                       withValue:@{@"intObj": @[@"0"]}],
+                             @"Invalid value '0' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
+    RLMAssertThrowsWithReason([AllPrimitiveSets createInRealm:realm
+                                       withValue:@{@"intObj": @1}],
+                             @"Invalid value (1) for 'int' set property 'AllPrimitiveSets.intObj': value is not enumerable.");
 
     [realm cancelWriteTransaction];
 }
@@ -787,19 +1017,67 @@
     [realm cancelWriteTransaction];
 }
 
+- (void)testCreateOptionalPrimitiveSets {
+    auto realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+
+    auto now = [NSDate date];
+    auto bytes = [NSData dataWithBytes:"a" length:1];
+    auto req = [AllOptionalPrimitiveSets createInRealm:realm
+                                             withValue:@{@"intObj": @[@1, @2, @3, NSNull.null],
+                                                         @"boolObj": @[@YES, @NO, NSNull.null],
+                                                         @"floatObj": @[@1.1f, @2.2f, NSNull.null],
+                                                         @"doubleObj": @[@3.3, @4.4, NSNull.null],
+                                                         @"stringObj": @[@"a", @"b", NSNull.null],
+                                                         @"dateObj": @[now, NSNull.null],
+                                                         @"dataObj": @[bytes, NSNull.null]}];
+    XCTAssertEqual(4U, req.intObj.count);
+    XCTAssertEqual(3U, req.boolObj.count);
+    XCTAssertEqual(3U, req.floatObj.count);
+    XCTAssertEqual(3U, req.doubleObj.count);
+    XCTAssertEqual(3U, req.stringObj.count);
+    XCTAssertEqual(2U, req.dateObj.count);
+    XCTAssertEqual(2U, req.dataObj.count);
+
+    XCTAssertEqualObjects([req.intObj valueForKey:@"self"], ([NSSet setWithArray:@[NSNull.null, @1, @2, @3]]));
+    XCTAssertEqualObjects([req.boolObj valueForKey:@"self"], ([NSSet setWithArray:@[NSNull.null, @NO, @YES]]));
+    XCTAssertEqualObjects([req.floatObj valueForKey:@"self"], ([NSSet setWithArray:@[NSNull.null, @1.1f, @2.2f]]));
+    XCTAssertEqualObjects([req.doubleObj valueForKey:@"self"], ([NSSet setWithArray:@[NSNull.null, @3.3, @4.4]]));
+    XCTAssertEqualObjects([req.stringObj valueForKey:@"self"], ([NSSet setWithArray:@[NSNull.null, @"a", @"b"]]));
+    XCTAssertEqualObjects([req.dateObj valueForKey:@"self"], ([NSSet setWithArray:@[NSNull.null, now]]));
+    XCTAssertEqualObjects([req.dataObj valueForKey:@"self"], ([NSSet setWithArray:@[NSNull.null, bytes]]));
+
+    [realm cancelWriteTransaction];
+}
+
 - (void)testCreateOptionalPrimitiveArraysWithInvalidValues {
     auto realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];
 
     RLMAssertThrowsWithReason([AllOptionalPrimitiveArrays createInRealm:realm
-                                       withValue:@{@"intObj": @[@1.1]}],
-                             @"Invalid value '1.1' of type '__NSCFNumber' for 'int?' array property 'AllOptionalPrimitiveArrays.intObj'.");
+                                                              withValue:@{@"intObj": @[@1.1]}],
+                              @"Invalid value '1.1' of type '__NSCFNumber' for 'int?' array property 'AllOptionalPrimitiveArrays.intObj'.");
     RLMAssertThrowsWithReason([AllOptionalPrimitiveArrays createInRealm:realm
-                                       withValue:@{@"intObj": @[@"0"]}],
-                             @"Invalid value '0' of type '__NSCFConstantString' for 'int?' array property 'AllOptionalPrimitiveArrays.intObj'.");
+                                                              withValue:@{@"intObj": @[@"0"]}],
+                              @"Invalid value '0' of type '__NSCFConstantString' for 'int?' array property 'AllOptionalPrimitiveArrays.intObj'.");
     RLMAssertThrowsWithReason([AllOptionalPrimitiveArrays createInRealm:realm
-                                       withValue:@{@"intObj": @1}],
-                             @"Invalid value (1) for 'int?' array property 'AllOptionalPrimitiveArrays.intObj': value is not enumerable.");
+                                                              withValue:@{@"intObj": @1}],
+                              @"Invalid value (1) for 'int?' array property 'AllOptionalPrimitiveArrays.intObj': value is not enumerable.");
+}
+
+- (void)testCreateOptionalPrimitiveSetsWithInvalidValues {
+    auto realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+
+    RLMAssertThrowsWithReason([AllOptionalPrimitiveSets createInRealm:realm
+                                                            withValue:@{@"intObj": @[@1.1]}],
+                              @"Invalid value '1.1' of type '__NSCFNumber' for 'int?' property 'AllOptionalPrimitiveSets.intObj'.");
+    RLMAssertThrowsWithReason([AllOptionalPrimitiveSets createInRealm:realm
+                                                            withValue:@{@"intObj": @[@"0"]}],
+                              @"Invalid value '0' of type '__NSCFConstantString' for 'int?' property 'AllOptionalPrimitiveSets.intObj'.");
+    RLMAssertThrowsWithReason([AllOptionalPrimitiveSets createInRealm:realm
+                                                            withValue:@{@"intObj": @1}],
+                              @"Invalid value (1) for 'int?' set property 'AllOptionalPrimitiveSets.intObj': value is not enumerable.");
 }
 
 - (void)testCreateUsesDefaultValuesForMissingDictionaryKeys {
@@ -935,6 +1213,8 @@
     [realm beginWriteTransaction];
     RLMAssertThrowsWithReason(([CompanyObject createInRealm:realm withValue:@[@"one employee", @1]]),
                               @"Invalid value (1) for 'EmployeeObject' array property 'CompanyObject.employees': value is not enumerable.");
+    RLMAssertThrowsWithReason(([CompanyObject createInRealm:realm withValue:@[@"one employee", @[], @1]]),
+                              @"Invalid value (1) for 'EmployeeObject' set property 'CompanyObject.employeeSet': value is not enumerable.");
     [realm cancelWriteTransaction];
 }
 
@@ -943,10 +1223,15 @@
     [realm beginWriteTransaction];
 
     auto employees = @[@[@"name", @2, @YES], @[@"name 2", @3, @NO]];
-    auto co = [CompanyObject createInRealm:realm withValue:@[@"one employee", employees.reverseObjectEnumerator]];
+    auto co = [CompanyObject createInRealm:realm withValue:@[@"one employee",
+                                                             employees.reverseObjectEnumerator,
+                                                             employees.reverseObjectEnumerator]];
     XCTAssertEqual(2U, co.employees.count);
     XCTAssertEqualObjects(@"name 2", co.employees[0].name);
     XCTAssertEqualObjects(@"name", co.employees[1].name);
+    XCTAssertEqual(2U, co.employeeSet.count);
+    XCTAssertTrue([[co.employeeSet valueForKey:@"name"] containsObject:@"name 2"]);
+    XCTAssertTrue([[co.employeeSet valueForKey:@"name"] containsObject:@"name"]);
 
     [realm cancelWriteTransaction];
 }
@@ -1502,12 +1787,16 @@
     auto company = [[PrimaryCompanyObject alloc] init];
     [company.employees addObject:[[PrimaryEmployeeObject alloc] initWithValue:@[@"a", @1, @NO]]];
     [company.employees addObject:[[PrimaryEmployeeObject alloc] initWithValue:@[@"a", @2, @NO]]];
+    [company.employeeSet addObject:[[PrimaryEmployeeObject alloc] initWithValue:@[@"a", @1, @NO]]];
+    [company.employeeSet addObject:[[PrimaryEmployeeObject alloc] initWithValue:@[@"a", @2, @NO]]];
     [realm addOrUpdateObject:company];
 
     XCTAssertEqual(1U, [PrimaryEmployeeObject allObjectsInRealm:realm].count);
     XCTAssertEqual(2, company.employees[0].age);
     XCTAssertEqual(2, company.employees[1].age);
     XCTAssertEqualObjects(company.employees[0], company.employees[1]);
+    XCTAssertEqual(2, company.employeeSet.allObjects[0].age);
+    XCTAssertEqualObjects(company.employeeSet.allObjects[0], company.employeeSet.allObjects.lastObject);
 }
 
 - (void)testAddOrUpdateReplacesExistingArrayPropertiesAndDoesNotMergeThem {
@@ -1516,14 +1805,20 @@
 
     auto obj1 = [[AllLinksWithPrimary alloc] initWithValue:@[@"pk", @[@"str"],
                                                              @[@"str pk", @5],
+                                                             @[@[@1], @[@2], @[@3]],
+                                                             @[],
                                                              @[@[@1], @[@2], @[@3]]]];
     auto obj2 = [[AllLinksWithPrimary alloc] initWithValue:@[@"pk", @[@"str"],
                                                              @[@"str pk", @6],
+                                                             @[@[@4]],
+                                                             @[],
                                                              @[@[@4]]]];
     [realm addOrUpdateObject:obj1];
     [realm addOrUpdateObject:obj2];
     XCTAssertEqual(1U, obj1.intArray.count);
     XCTAssertEqual(4, obj1.intArray[0].intCol);
+    XCTAssertEqual(1U, obj1.intSet.count);
+    XCTAssertEqual(4, obj1.intSet.allObjects[0].intCol);
     XCTAssertEqual(6, obj1.primaryString.intCol);
 
     [realm cancelWriteTransaction];

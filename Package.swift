@@ -62,7 +62,7 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
+        .package(url: "https://github.com/realm/realm-core", .branch("master"))
     ],
     targets: [
       .target(
@@ -78,8 +78,8 @@ let package = Package(
                 "Realm/RLMConstants.m",
                 "Realm/RLMDecimal128.mm",
                 "Realm/RLMEmbeddedObject.mm",
-                "Realm/RLMListBase.mm",
                 "Realm/RLMManagedArray.mm",
+                "Realm/RLMManagedSet.mm",
                 "Realm/RLMMigration.mm",
                 "Realm/RLMObject.mm",
                 "Realm/RLMObjectBase.mm",
@@ -96,6 +96,8 @@ let package = Package(
                 "Realm/RLMRealmUtil.mm",
                 "Realm/RLMResults.mm",
                 "Realm/RLMSchema.mm",
+                "Realm/RLMSet.mm",
+                "Realm/RLMSwiftCollectionBase.mm",
                 "Realm/RLMSwiftSupport.m",
                 "Realm/RLMThreadSafeReference.mm",
                 "Realm/RLMUpdateChecker.mm",
@@ -155,6 +157,7 @@ let package = Package(
                 "SwiftUITestHostUITests",
                 "TestHost",
                 "PrimitiveArrayPropertyTests.tpl.m",
+                "PrimitiveSetPropertyTests.tpl.m",
             ],
             cxxSettings: testCxxSettings
         ),

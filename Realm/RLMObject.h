@@ -714,6 +714,21 @@ typedef void (^RLMObjectChangeBlock)(BOOL deleted,
      @property RLMArray<ObjectType *><ObjectType> *arrayOfObjectTypes;
   */
 #define RLM_ARRAY_TYPE(RLM_OBJECT_SUBCLASS)\
+__attribute__((deprecated("RLM_ARRAY_TYPE has been deprecated. Use RLM_COLLECTION_TYPE instead."))) \
+@protocol RLM_OBJECT_SUBCLASS <NSObject>  \
+@end
+
+/**
+ Properties on `RLMObject`s of type `RLMSet`  /  `RLMArray` must have an associated type. A type is associated
+ with an `RLMSet`  /  `RLMArray` property by defining a protocol for the object type that the array should contain.
+ To define the protocol for an object, you can use the macro RLM_COLLECTION_TYPE:
+
+     RLM_COLLECTION_TYPE(ObjectType)
+     ...
+     @property RLMSet<ObjectType *><ObjectType> *setOfObjectTypes;
+     @property RLMArray<ObjectType *><ObjectType> *arrayOfObjectTypes;
+  */
+#define RLM_COLLECTION_TYPE(RLM_OBJECT_SUBCLASS)\
 @protocol RLM_OBJECT_SUBCLASS <NSObject>   \
 @end
 

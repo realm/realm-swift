@@ -20,13 +20,14 @@
 
 #import "RLMArray_Private.hpp"
 #import "RLMDecimal128_Private.hpp"
-#import "RLMListBase.h"
 #import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMSchema_Private.h"
+#import "RLMSet_Private.hpp"
+#import "RLMSwiftCollectionBase.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUUID_Private.hpp"
 
@@ -105,14 +106,19 @@ static inline bool numberIsDouble(__unsafe_unretained NSNumber *const obj) {
 }
 
 static inline RLMArray *asRLMArray(__unsafe_unretained id const value) {
-    return RLMDynamicCast<RLMArray>(value) ?: RLMDynamicCast<RLMListBase>(value)._rlmArray;
+    return RLMDynamicCast<RLMArray>(value) ?: RLMDynamicCast<RLMSwiftCollectionBase>(value)._rlmCollection;
 }
 
-static inline bool checkArrayType(__unsafe_unretained RLMArray *const array,
-                                  RLMPropertyType type, bool optional,
+static inline RLMSet *asRLMSet(__unsafe_unretained id const value) {
+    return RLMDynamicCast<RLMSet>(value) ?: RLMDynamicCast<RLMSwiftCollectionBase>(value)._rlmCollection;
+}
+
+static inline bool checkCollectionType(__unsafe_unretained id<RLMCollection> const collection,
+                                  RLMPropertyType type,
+                                  bool optional,
                                   __unsafe_unretained NSString *const objectClassName) {
-    return array.type == type && array.optional == optional
-        && (type != RLMPropertyTypeObject || [array.objectClassName isEqualToString:objectClassName]);
+    return collection.type == type && collection.optional == optional
+        && (type != RLMPropertyTypeObject || [collection.objectClassName isEqualToString:objectClassName]);
 }
 
 id (*RLMSwiftAsFastEnumeration)(id);
@@ -136,14 +142,20 @@ bool RLMIsSwiftObjectClass(Class cls) {
 }
 
 BOOL RLMValidateValue(__unsafe_unretained id const value,
-                      RLMPropertyType type, bool optional, bool array,
+                      RLMPropertyType type,
+                      bool optional,
+                      bool collection,
                       __unsafe_unretained NSString *const objectClassName) {
     if (optional && !RLMCoerceToNil(value)) {
         return YES;
     }
-    if (array) {
+
+    if (collection) {
         if (auto rlmArray = asRLMArray(value)) {
-            return checkArrayType(rlmArray, type, optional, objectClassName);
+            return checkCollectionType(rlmArray, type, optional, objectClassName);
+        }
+        else if (auto rlmSet = asRLMSet(value)) {
+            return checkCollectionType(rlmSet, type, optional, objectClassName);
         }
         if (id enumeration = RLMAsFastEnumeration(value)) {
             // check each element for compliance
@@ -225,7 +237,7 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
                                  bool validateObjects) {
     // This duplicates a lot of the checks in RLMIsObjectValidForProperty()
     // for the sake of more specific error messages
-    if (prop.array) {
+    if (prop.collection) {
         // nil is considered equivalent to an empty array for historical reasons
         // since we don't support null arrays (only arrays containing null),
         // it's not worth the BC break to change this
@@ -234,8 +246,11 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
         }
         id enumeration = RLMAsFastEnumeration(obj);
         if (!enumeration) {
-            @throw RLMException(@"Invalid value (%@) for '%@%s' array property '%@.%@': value is not enumerable.",
-                                obj, prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
+            @throw RLMException(@"Invalid value (%@) for '%@%s' %@ property '%@.%@': value is not enumerable.",
+                                obj,
+                                prop.objectClassName ?: RLMTypeToString(prop.type),
+                                prop.optional ? "?" : "",
+                                prop.array ? @"array" : @"set",
                                 objectSchema.className, prop.name);
         }
         if (!validateObjects && prop.type == RLMPropertyTypeObject) {
@@ -243,9 +258,18 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
         }
 
         if (RLMArray *array = asRLMArray(obj)) {
-            if (!checkArrayType(array, prop.type, prop.optional, prop.objectClassName)) {
+            if (!checkCollectionType(array, prop.type, prop.optional, prop.objectClassName)) {
                 @throw RLMException(@"RLMArray<%@%s> does not match expected type '%@%s' for property '%@.%@'.",
                                     array.objectClassName ?: RLMTypeToString(array.type), array.optional ? "?" : "",
+                                    prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
+                                    objectSchema.className, prop.name);
+            }
+            return;
+        }
+        else if (RLMSet *set = asRLMSet(obj)) {
+            if (!checkCollectionType(set, prop.type, prop.optional, prop.objectClassName)) {
+                @throw RLMException(@"RLMSet<%@%s> does not match expected type '%@%s' for property '%@.%@'.",
+                                    set.objectClassName ?: RLMTypeToString(set.type), set.optional ? "?" : "",
                                     prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
                                     objectSchema.className, prop.name);
             }
@@ -276,7 +300,11 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
 
 BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
                                  __unsafe_unretained RLMProperty *const property) {
-    return RLMValidateValue(obj, property.type, property.optional, property.array, property.objectClassName);
+    return RLMValidateValue(obj,
+                            property.type,
+                            property.optional,
+                            property.collection,
+                            property.objectClassName);
 }
 
 NSDictionary *RLMDefaultValuesForObjectSchema(__unsafe_unretained RLMObjectSchema *const objectSchema) {

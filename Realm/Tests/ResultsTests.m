@@ -380,15 +380,15 @@
     EmployeeObject *c1e1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
     EmployeeObject *c1e2 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"John", @"age": @30, @"hired": @NO}];
     EmployeeObject *c1e3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
-    [CompanyObject createInRealm:realm withValue:@{@"name": @"InspiringNames LLC", @"employees": @[c1e1, c1e2, c1e3]}];
+    [CompanyObject createInRealm:realm withValue:@{@"name": @"InspiringNames LLC", @"employees": @[c1e1, c1e2, c1e3], @"employeeSet": @[c1e1, c1e2, c1e3]}];
 
     EmployeeObject *c2e1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"A", @"age": @20, @"hired": @YES}];
     EmployeeObject *c2e2 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
     EmployeeObject *c2e3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
-    [CompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employees": @[c2e1, c2e2, c2e3]}];
+    [CompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employees": @[c2e1, c2e2, c2e3], @"employeeSet": @[c2e1, c2e2, c2e3]}];
 
     EmployeeObject *c3e1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"A", @"age": @21, @"hired": @YES}];
-    [CompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employees": @[c3e1]}];
+    [CompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employees": @[c3e1], @"employeeSet": @[c3e1]}];
     [realm commitWriteTransaction];
 
     RLMResults *allCompanies = [CompanyObject allObjects];
@@ -936,29 +936,49 @@ static vm_size_t get_resident_size() {
 
 - (void)testResultsDependingOnDeletedLinkView {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    __block IntegerArrayPropertyObject *object;
+    __block IntegerArrayPropertyObject *arrayObject;
+    __block IntegerSetPropertyObject *setObject;
     [realm transactionWithBlock:^{
         IntObject* intObject = [IntObject createInDefaultRealmWithValue:@[@0]];
-        object = [IntegerArrayPropertyObject createInDefaultRealmWithValue:@[ @0, @[ intObject ] ]];
+        arrayObject = [IntegerArrayPropertyObject createInDefaultRealmWithValue:@[ @0, @[ intObject ] ]];
+        setObject = [IntegerSetPropertyObject createInDefaultRealmWithValue:@[ @0, @[ intObject ] ]];
     }];
 
-    RLMResults *results = [object.array sortedResultsUsingKeyPath:@"intCol" ascending:YES];
-    [results firstObject];
+    RLMResults *arrayResults = [arrayObject.array sortedResultsUsingKeyPath:@"intCol" ascending:YES];
+    [arrayResults firstObject];
 
-    RLMResults *unevaluatedResults = [object.array sortedResultsUsingKeyPath:@"intCol" ascending:YES];
+    RLMResults *unevaluatedResults = [arrayObject.array sortedResultsUsingKeyPath:@"intCol" ascending:YES];
 
     [realm transactionWithBlock:^{
-        [realm deleteObject:object];
+        [realm deleteObject:arrayObject];
     }];
 
-    XCTAssertFalse(results.isInvalidated);
+    XCTAssertFalse(arrayResults.isInvalidated);
     XCTAssertFalse(unevaluatedResults.isInvalidated);
 
-    XCTAssertEqual(0u, results.count);
+    XCTAssertEqual(0u, arrayResults.count);
     XCTAssertEqual(0u, unevaluatedResults.count);
 
-    XCTAssertEqualObjects(nil, results.firstObject);
+    XCTAssertEqualObjects(nil, arrayResults.firstObject);
     XCTAssertEqualObjects(nil, unevaluatedResults.firstObject);
+
+    RLMResults *setResults = [setObject.set sortedResultsUsingKeyPath:@"intCol" ascending:YES];
+    [setResults firstObject];
+
+    RLMResults *unevaluatedResults2 = [setObject.set sortedResultsUsingKeyPath:@"intCol" ascending:YES];
+
+    [realm transactionWithBlock:^{
+        [realm deleteObject:setObject];
+    }];
+
+    XCTAssertFalse(setResults.isInvalidated);
+    XCTAssertFalse(unevaluatedResults2.isInvalidated);
+
+    XCTAssertEqual(0u, setResults.count);
+    XCTAssertEqual(0u, unevaluatedResults2.count);
+
+    XCTAssertEqualObjects(nil, setResults.firstObject);
+    XCTAssertEqualObjects(nil, unevaluatedResults2.firstObject);
 }
 
 - (void)testResultsDependingOnDeletedTableView {
@@ -1105,6 +1125,7 @@ static vm_size_t get_resident_size() {
         AggregateObject *ao1 = [AggregateObject createInDefaultRealmWithValue:@[ @0 ]];
         AggregateObject *ao2 = [AggregateObject createInDefaultRealmWithValue:@[ @0 ]];
         [AggregateArrayObject createInDefaultRealmWithValue:@[@[ao1, ao2]]];
+        [AggregateSetObject createInDefaultRealmWithValue:@[@[ao1, ao2]]];
         [AllTypesObject createInDefaultRealmWithValue:@[]];
     }];
     
@@ -1118,6 +1139,7 @@ static vm_size_t get_resident_size() {
     XCTAssertThrows([[AllTypesObject allObjects] distinctResultsUsingKeyPaths:@[@"linkingObjectsCol"]]);
     XCTAssertThrows([[AllTypesObject allObjects] distinctResultsUsingKeyPaths:@[@"objectCol"]]);
     XCTAssertThrows([[AggregateArrayObject allObjects] distinctResultsUsingKeyPaths:@[@"array"]]);
+    XCTAssertThrows([[AggregateSetObject allObjects] distinctResultsUsingKeyPaths:@[@"set"]]);
 }
 
 #pragma mark - Frozen Results
