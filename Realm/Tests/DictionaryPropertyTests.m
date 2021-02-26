@@ -128,6 +128,7 @@
     [realm commitWriteTransaction];
 }
 
+// TODO: = nil erase value for key
 -(void)testRemoveObject {
     RLMRealm *realm = [self realmWithTestPath];
 

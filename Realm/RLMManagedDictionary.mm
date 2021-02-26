@@ -310,6 +310,11 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (void)setObject:(id)obj forKeyedSubscript:(id<RLMDictionaryKey>)key {
+    // passing `nil` to the subscript should delete the object.
+    if (!obj) {
+        [self removeObjectForKey:key];
+        return;
+    }
     RLMCollectionValidateMatchingObjectType<RLMManagedDictionary>(self, obj);
     changeDictionary(self, ^{
         RLMAccessorContext context(*_objectInfo);
