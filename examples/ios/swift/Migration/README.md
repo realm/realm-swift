@@ -14,8 +14,14 @@ You can build and run the project as is. Migrations from all prior version to th
    - v3 -> v5
    - v4 -> v5
 
-If you want to compare older versions among each other (i.e. v2 -> v3) you can do so by uncommenting the
-target version in `Migration.xcconfig`. 
+If you want to compare older versions among each other (i.e. v2 -> v3) you can do so by editing the `Preprocessor Macros` in the build settings.
+Valid entries are:
+- SCHEMA_VERSION_0
+- SCHEMA_VERSION_1
+- SCHEMA_VERSION_2
+- SCHEMA_VERSION_4
+- SCHEMA_VERSION_5
+- SCHEMA_VERSION_6
 
 The files to look at are located in the `Examples` folder. Every file contains an extract of everything necessary for
 this version (schema version, objects, migration and migration checks).

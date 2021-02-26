@@ -174,7 +174,6 @@
 		7D56427725DD6A860079F4C2 /* Example_v3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Example_v3.h; sourceTree = "<group>"; };
 		7D56427825DD6A8B0079F4C2 /* Example_v4.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Example_v4.h; sourceTree = "<group>"; };
 		7D56427925DD6A920079F4C2 /* Example_v5.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Example_v5.h; sourceTree = "<group>"; };
-		7D56429025DD6C4B0079F4C2 /* Migration.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Migration.xcconfig; sourceTree = "<group>"; };
 		7D718BC825DAADB500A74FDD /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../swift/Migration/README.md; sourceTree = "<group>"; };
 		7DD1D7D025DC2C7400E63229 /* default-v1.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v1.realm"; sourceTree = "<group>"; };
 		7DD1D7D125DC2C7400E63229 /* default-v4.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v4.realm"; sourceTree = "<group>"; };
@@ -625,7 +624,6 @@
 				7D718BC825DAADB500A74FDD /* README.md */,
 				E8F70EB619BA50A3006F60D5 /* AppDelegate.h */,
 				E8F70EB719BA50A3006F60D5 /* AppDelegate.m */,
-				7D56429025DD6C4B0079F4C2 /* Migration.xcconfig */,
 				7D718BED25DAADE400A74FDD /* Examples */,
 				7DD1D7D625DC2CC000E63229 /* RealmTemplates */,
 				E8F70EB419BA50A3006F60D5 /* main.m */,
@@ -1519,7 +1517,6 @@
 		};
 		E8AB722F19BA503B00F3EDB4 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7D56429025DD6C4B0079F4C2 /* Migration.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -1528,6 +1525,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
+					SCHEMA_VERSION_5,
 				);
 				INFOPLIST_FILE = "Migration/Migration-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
@@ -1538,7 +1536,6 @@
 		};
 		E8AB723019BA503B00F3EDB4 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7D56429025DD6C4B0079F4C2 /* Migration.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;

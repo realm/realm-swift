@@ -16,7 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifdef SCHEMA_VERSION_0
+#ifndef SCHEMA_VERSION_0
+#define SCHEMA_VERSION_0 0
+#endif
+
+#if SCHEMA_VERSION_0
 
 #import <Foundation/Foundation.h>
 #import <Realm/Realm.h>
