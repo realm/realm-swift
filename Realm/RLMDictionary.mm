@@ -82,7 +82,7 @@
 }
 
 - (NSUInteger)count {
-    return 0;
+    return _backingCollection.count;
 }
 
 // The compiler complains about the method's argument type not matching due to

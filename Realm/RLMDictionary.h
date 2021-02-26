@@ -115,11 +115,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)enumerateKeysAndObjectsUsingBlock:(void (^)(RLMKeyType <RLMDictionaryKey> key, RLMObjectType obj, BOOL *stop))block;
 
-/**
- Returns an enumerator object that lets you access each value in the dictionary
- */
-- (NSEnumerator<RLMObjectType> *)objectEnumerator;
-
 #pragma mark - Adding, Removing, and Replacing Objects in an Array
 
 /**
