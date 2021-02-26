@@ -60,7 +60,7 @@
 
 // Any version before the current versions will be migrated to check if all version combinations work.
 - (void)performMigration {
-    for (NSInteger oldSchemaVersion=0; oldSchemaVersion<schemaVersion; oldSchemaVersion++) {
+    for (NSInteger oldSchemaVersion = 0; oldSchemaVersion < schemaVersion; oldSchemaVersion++) {
         NSURL *realmUrl = [self realmUrlFor:oldSchemaVersion usingTemplate:true];
         RLMRealmConfiguration *realmConfiguration = [RLMRealmConfiguration defaultConfiguration];
         realmConfiguration.fileURL = realmUrl;
