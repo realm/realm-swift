@@ -23,14 +23,14 @@
 
 #pragma mark - Schema
 
-int schemaVersion = 1;
+NSInteger schemaVersion = 1;
 
 // Changes from previous version:
 // - combine `firstName` and `lastName` into `fullName`
 
 @interface Person : RLMObject
 @property NSString *fullName;
-@property int age;
+@property NSInteger age;
 + (Person* )personWithFullName:(NSString *)fullName age:(int)age;
 @end
 

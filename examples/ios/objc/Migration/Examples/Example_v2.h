@@ -23,7 +23,7 @@
 
 #pragma mark - Schema
 
-int schemaVersion = 2;
+NSInteger schemaVersion = 2;
 
 // Changes from previous version:
 // add a `Dog` object
@@ -48,7 +48,7 @@ RLM_ARRAY_TYPE(Dog)
 
 @interface Person : RLMObject
 @property NSString *fullName;
-@property int age;
+@property NSInteger age;
 @property RLMArray<Dog *><Dog> *dogs;
 + (Person* )personWithFullName:(NSString *)fullName age:(int)age;
 @end

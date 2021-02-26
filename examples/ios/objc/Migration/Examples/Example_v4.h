@@ -23,7 +23,7 @@
 
 #pragma mark - Schema
 
-int schemaVersion = 4;
+NSInteger schemaVersion = 4;
 
 // Changes from previous version:
 // Add an `Address` to the `Person`.
@@ -36,7 +36,7 @@ typedef NS_ENUM(int, Kind) {
     cow
 };
 @property NSString *name;
-@property int kindValue;
+@property NSInteger kindValue;
 @property enum Kind kind;
 + (Pet* )petWithName:(NSString *)name kind:(enum Kind)kind;
 @end
@@ -66,7 +66,7 @@ RLM_ARRAY_TYPE(Pet)
 @class Address;
 @interface Person : RLMObject
 @property NSString *fullName;
-@property int age;
+@property NSInteger age;
 @property Address *address;
 @property RLMArray<Pet *><Pet> *pets;
 + (Person* )personWithFullName:(NSString *)fullName age:(int)age;

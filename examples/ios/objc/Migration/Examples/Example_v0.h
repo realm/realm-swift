@@ -23,12 +23,12 @@
 
 #pragma mark - Schema
 
-int schemaVersion = 0;
+NSInteger schemaVersion = 0;
 
 @interface Person : RLMObject
 @property NSString *firstName;
 @property NSString *lastName;
-@property int age;
+@property NSInteger age;
 + (Person* )personWithFirstName:(NSString *)firstName lastName:(NSString *)lastName age:(int)age;
 @end
 

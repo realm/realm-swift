@@ -60,7 +60,7 @@
 
 // Any version before the current versions will be migrated to check if all version combinations work.
 - (void)performMigration {
-    for (int oldSchemaVersion=0; oldSchemaVersion<schemaVersion; oldSchemaVersion++) {
+    for (NSInteger oldSchemaVersion=0; oldSchemaVersion<schemaVersion; oldSchemaVersion++) {
         NSURL *realmUrl = [self realmUrlFor:oldSchemaVersion usingTemplate:true];
         RLMRealmConfiguration *realmConfiguration = [RLMRealmConfiguration defaultConfiguration];
         realmConfiguration.fileURL = realmUrl;
@@ -80,10 +80,10 @@
     }
 }
 
-- (NSURL*)realmUrlFor:(int)schemaVersion usingTemplate:(BOOL)usingTemplate {
+- (NSURL*)realmUrlFor:(NSInteger)schemaVersion usingTemplate:(BOOL)usingTemplate {
     NSURL *defaultRealmURL = [RLMRealmConfiguration defaultConfiguration].fileURL;
     NSURL *defaultRealmParentURL = [defaultRealmURL URLByDeletingLastPathComponent];
-    NSString *fileName = [NSString stringWithFormat:@"default-v%d", schemaVersion];
+    NSString *fileName = [NSString stringWithFormat:@"default-v%ld", schemaVersion];
     NSString *fileExtension = @"realm";
     NSString *fileNameWithExtension = [NSString stringWithFormat:@"%@.%@", fileName, fileExtension];
     NSURL *destinationUrl = [defaultRealmParentURL URLByAppendingPathComponent:fileNameWithExtension];
