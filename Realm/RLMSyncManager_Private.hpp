@@ -38,16 +38,16 @@ class Logger;
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RLMSyncManager ()
-- (std::weak_ptr<realm::app::App>)app;
-- (std::shared_ptr<realm::SyncManager>)syncManager;
-- (instancetype)initWithSyncManager:(std::shared_ptr<realm::SyncManager>)syncManager;
+@property (nonatomic, readonly, direct) std::weak_ptr<realm::app::App> app;
+@property (nonatomic, readonly, direct) std::shared_ptr<realm::SyncManager> syncManager;
 
+- (instancetype)initWithSyncManager:(std::shared_ptr<realm::SyncManager>)syncManager RLM_DIRECT;
 + (realm::SyncClientConfig)configurationWithRootDirectory:(nullable NSURL *)rootDirectory
                                                     appId:(nonnull NSString *)appId;
 
 - (void)resetForTesting;
 - (void)waitForSessionTermination;
-- (void)populateConfig:(realm::SyncConfig&)config;
+- (void)populateConfig:(realm::SyncConfig&)config RLM_DIRECT;
 @end
 
 std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction);

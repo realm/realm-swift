@@ -18,6 +18,8 @@
 
 #import <Realm/RLMObjectId.h>
 
+#import <Realm/RLMConstants.h>
+
 namespace realm {
 class ObjectId;
 }

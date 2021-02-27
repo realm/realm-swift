@@ -26,11 +26,11 @@ namespace realm {
 @class RLMSchema;
 
 @interface RLMObjectSchema ()
-- (std::string const&)objectStoreName;
+@property (nonatomic, readonly) std::string const& objectStoreName;
 
 // create realm::ObjectSchema copy
-- (realm::ObjectSchema)objectStoreCopy:(RLMSchema *)schema;
+- (realm::ObjectSchema)objectStoreCopy:(RLMSchema *)schema RLM_DIRECT;
 
 // initialize with realm::ObjectSchema
-+ (instancetype)objectSchemaForObjectStoreSchema:(realm::ObjectSchema const&)objectSchema;
++ (instancetype)objectSchemaForObjectStoreSchema:(realm::ObjectSchema const&)objectSchema RLM_DIRECT;
 @end

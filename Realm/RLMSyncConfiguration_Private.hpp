@@ -31,13 +31,13 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RLMSyncConfiguration ()
 - (instancetype)initWithRawConfig:(realm::SyncConfig)config path:(std::string const&)path;
-- (realm::SyncConfig&)rawConfiguration;
 
 // Pass the RLMRealmConfiguration to it's sync configuration so client reset callbacks
 // can access schema, dynamic, and path properties.
 void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMRealmConfiguration *config);
 
 @property (nonatomic, direct) std::string path;
+@property (nonatomic, readonly) realm::SyncConfig& rawConfiguration;
 @end
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

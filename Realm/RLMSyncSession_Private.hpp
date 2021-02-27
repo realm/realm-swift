@@ -35,7 +35,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly")));
 + (instancetype)new __attribute__((unavailable("This type cannot be created directly")));
 
-- (instancetype)initWithSyncSession:(std::shared_ptr<realm::SyncSession> const&)session;
+- (instancetype)initWithSyncSession:(std::shared_ptr<realm::SyncSession> const&)session RLM_DIRECT;
 
 /// Wait for pending uploads to complete or the session to expire, and dispatch the callback onto the specified queue.
 - (BOOL)waitForUploadCompletionOnQueue:(nullable dispatch_queue_t)queue callback:(void(^)(NSError * _Nullable))callback;

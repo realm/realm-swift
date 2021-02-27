@@ -23,7 +23,7 @@
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RLMFindOptions ()
-- (realm::app::MongoCollection::FindOptions)_findOptions;
+@property (nonatomic, readonly, direct) realm::app::MongoCollection::FindOptions _findOptions;
 @end
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

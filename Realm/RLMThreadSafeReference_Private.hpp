@@ -18,6 +18,8 @@
 
 #import "RLMThreadSafeReference.h"
 
+#import <Realm/RLMConstants.h>
+
 #import <realm/object-store/thread_safe_reference.hpp>
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)

@@ -136,7 +136,7 @@ __attribute__((objc_direct_members))
 - (void)findWhere:(NSDictionary<NSString *, id<RLMBSON>> *)document
           options:(RLMFindOptions *)options
        completion:(RLMMongoFindBlock)completion {
-    self.collection.find(toBsonDocument(document), [options _findOptions],
+    self.collection.find(toBsonDocument(document), options._findOptions,
                          [completion](std::optional<realm::bson::BsonArray> documents,
                                       std::optional<realm::app::AppError> error) {
         if (error) {
@@ -154,7 +154,7 @@ __attribute__((objc_direct_members))
 - (void)findOneDocumentWhere:(NSDictionary<NSString *, id<RLMBSON>> *)document
                      options:(RLMFindOptions *)options
                   completion:(RLMMongoFindOneBlock)completion {
-    self.collection.find_one(toBsonDocument(document), [options _findOptions],
+    self.collection.find_one(toBsonDocument(document), options._findOptions,
                              [completion](std::optional<realm::bson::BsonDocument> document,
                                           std::optional<realm::app::AppError> error) {
         if (error) {
