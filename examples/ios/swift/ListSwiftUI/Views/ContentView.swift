@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2020 Realm Inc.
+// Copyright 2021 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,111 +16,261 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import SwiftUI
 import RealmSwift
+import SwiftUI
 
-struct RecipeRow: View {
-    var recipe: Recipe
-    @EnvironmentObject var state: ContentViewState
+@objcMembers class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
+    @objc enum Priority: Int, RealmEnum, CaseIterable, Identifiable, CustomStringConvertible {
+        var id: Int { self.rawValue }
 
-    init(_ recipe: Recipe) {
-        self.recipe = recipe
+        case low, medium, high
+
+        var description: String {
+            switch self {
+            case .low: return "low"
+            case .medium: return "medium"
+            case .high: return "high"
+            }
+        }
     }
+    dynamic var title = ""
+    dynamic var notes = ""
+    dynamic var isFlagged = false
+    dynamic var date = Date()
+    dynamic var isComplete = false
+    dynamic var priority: Priority = .low
+}
+
+@objcMembers class ReminderList: Object, ObjectKeyIdentifiable {
+    dynamic var name = "New List"
+    dynamic var icon: String = "list.bullet"
+    var reminders = RealmSwift.List<Reminder>()
+}
+
+struct FocusableTextField: UIViewRepresentable {
+    class Coordinator: NSObject, UITextFieldDelegate {
+        @Binding var text: String
+        var didBecomeFirstResponder = false
+
+        init(text: Binding<String>) {
+            _text = text
+        }
+
+        func textFieldDidChangeSelection(_ textField: UITextField) {
+            text = textField.text ?? ""
+        }
+    }
+
+    let title: String
+    @Binding var text: String
+    @Binding var isFirstResponder: Bool
+
+    init(_ title: String, text: Binding<String>, isFirstResponder: Binding<Bool>) {
+        self.title = title
+        self._text = text
+        self._isFirstResponder = isFirstResponder
+    }
+
+    func makeUIView(context: UIViewRepresentableContext<Self>) -> UITextField {
+        let textField = UITextField(frame: .zero)
+        textField.placeholder = title
+        textField.delegate = context.coordinator
+        return textField
+    }
+
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(text: $text)
+    }
+
+    func updateUIView(_ uiView: UITextField, context: UIViewRepresentableContext<Self>) {
+        uiView.text = text
+        if isFirstResponder && !context.coordinator.didBecomeFirstResponder {
+            uiView.becomeFirstResponder()
+            context.coordinator.didBecomeFirstResponder = true
+        }
+    }
+}
+
+struct ReminderRowView: View {
+    @ObservedRealmObject var list: ReminderList
+    @ObservedRealmObject var reminder: Reminder
+    @State var hasFocus: Bool
+    @State var showReminderForm = false
+
+    var body: some View {
+        NavigationLink(destination: ReminderFormView(list: list,
+                                                     reminder: reminder,
+                                                     showReminderForm: $showReminderForm), isActive: $showReminderForm) {
+            FocusableTextField("title", text: reminder.bind(\.title), isFirstResponder: $hasFocus).textCase(.lowercase)
+        }.isDetailLink(true)
+    }
+}
+
+struct ReminderFormView: View {
+    @ObservedRealmObject var list: ReminderList
+    @ObservedRealmObject var reminder: Reminder
+    @Binding var showReminderForm: Bool
+
+    var body: some View {
+        Form {
+            TextField("title", text: $reminder.title)
+            DatePicker("date", selection: $reminder.date)
+            Picker("priority", selection: $reminder.priority, content: {
+                ForEach(Reminder.Priority.allCases) { priority in
+                    Text(priority.description).tag(priority)
+                }
+            })
+        }
+        .navigationTitle(reminder.title)
+        .navigationBarItems(trailing:
+        Button("Save") {
+            if reminder.realm == nil {
+                $list.reminders.append(reminder)
+            }
+            showReminderForm.toggle()
+        }.disabled(reminder.title.isEmpty))
+    }
+}
+
+struct ReminderListView: View {
+    @ObservedRealmObject var list: ReminderList
+    @State var newReminderAdded = false
+    @State var showReminderForm = false
+
+    func shouldFocusReminder(_ reminder: Reminder) -> Bool {
+        return newReminderAdded &&
+            list.reminders.lastIndex(of: reminder) == (list.reminders.count - 1)
+    }
+
+    var body: some View {
+        VStack {
+            List {
+                ForEach(list.reminders) { reminder in
+                    ReminderRowView(list: list,
+                                    reminder: reminder,
+                                    hasFocus: shouldFocusReminder(reminder))
+                }
+                .onMove(perform: $list.reminders.move)
+                .onDelete(perform: $list.reminders.remove)
+            }
+        }.navigationTitle(list.name)
+        .navigationBarItems(trailing: HStack {
+            EditButton()
+            Button("add") {
+                newReminderAdded = true
+                $list.reminders.append(Reminder())
+            }.accessibility(identifier: "addReminder")
+        })
+    }
+}
+
+struct ReminderListRowView: View {
+    @ObservedRealmObject var list: ReminderList
 
     var body: some View {
         HStack {
-            VStack(alignment: .leading) {
-                Text(recipe.name).onTapGesture {
-                    self.state.sectionState[self.recipe] = !self.isExpanded(self.recipe)
-                }.animation(.interactiveSpring())
-                if self.isExpanded(recipe) {
-                    ForEach(recipe.ingredients) { ingredient in
-                        HStack {
-                            URLImage(ingredient.foodType!.imgUrl)
-                            Text(ingredient.name!)
-                        }.padding(.leading, 5)
-                    }.animation(.interactiveSpring())
+            Image(systemName: list.icon)
+            TextField("List Name", text: $list.name)
+            Spacer()
+            Text("\(list.reminders.count)")
+        }.frame(minWidth: 100)
+    }
+}
+
+struct ReminderListResultsView: View {
+    @ObservedResults(ReminderList.self) var reminders
+    @Binding var searchFilter: String
+
+    var body: some View {
+        List {
+            ForEach(reminders) { list in
+                NavigationLink(destination: ReminderListView(list: list)) {
+                    ReminderListRowView(list: list).tag(list)
+                }.accessibilityIdentifier(list.name)
+            }.onDelete(perform: $reminders.remove)
+        }.onChange(of: searchFilter) { value in
+            $reminders.filter = value.isEmpty ? nil : NSPredicate(format: "name CONTAINS[c] %@", value)
+        }
+    }
+}
+
+public extension Color {
+    static let lightText = Color(UIColor.lightText)
+    static let darkText = Color(UIColor.darkText)
+
+    static let label = Color(UIColor.label)
+    static let secondaryLabel = Color(UIColor.secondaryLabel)
+    static let tertiaryLabel = Color(UIColor.tertiaryLabel)
+    static let quaternaryLabel = Color(UIColor.quaternaryLabel)
+
+    static let systemBackground = Color(UIColor.systemBackground)
+    static let secondarySystemBackground = Color(UIColor.secondarySystemBackground)
+    static let tertiarySystemBackground = Color(UIColor.tertiarySystemBackground)
+}
+
+struct SearchView: View {
+    @Binding var searchFilter: String
+
+    var body: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Image(systemName: "magnifyingglass").foregroundColor(.gray)
+                    .padding(.leading, 7)
+                    .padding(.top, 7)
+                    .padding(.bottom, 7)
+                TextField("search", text: $searchFilter)
+                    .padding(.top, 7)
+                    .padding(.bottom, 7)
+            }.background(RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.secondarySystemBackground))
+            Spacer()
+        }.frame(maxHeight: 40).padding()
+    }
+}
+
+struct Footer: View {
+    @ObservedResults(ReminderList.self) var lists
+
+    var body: some View {
+        HStack {
+            Button(action: {
+                $lists.append(ReminderList())
+            }, label: {
+                HStack {
+                    Image(systemName: "plus.circle")
+                    Text("Add list")
                 }
-            }
+            }).buttonStyle(BorderlessButtonStyle())
+            .padding()
+            .accessibility(identifier: "addList")
             Spacer()
         }
     }
-
-    private func isExpanded(_ section: Recipe) -> Bool {
-        self.state.sectionState[section] ?? false
-    }
-}
-
-final class ContentViewState: ObservableObject {
-    /// This dict will allow us to store state on the expansion and contraction of rows.
-    @Published var sectionState: [Recipe: Bool] = [:]
 }
 
 struct ContentView: View {
-    @State private var searchTerm: String = ""
-    @State private var showRecipeFormView = false
-    @ObservedObject var state = ContentViewState()
-    @ObservedObject var recipes: RealmSwift.List<Recipe>
+    @State var searchFilter: String = ""
 
     var body: some View {
         NavigationView {
-            List {
-                Section(header:
-                    HStack {
-                        SearchBar(text: self.$searchTerm)
-                            .frame(width: 300, alignment: .leading)
-                            .padding(5)
-                        NavigationLink(destination: RecipeFormView(recipes: self.recipes, showRecipeFormView: self.$showRecipeFormView),
-                                       isActive: self.$showRecipeFormView,
-                                       label: {
-                                        Button("add recipe") {
-                                            self.showRecipeFormView = true
-                                        }
-                        })
-                }) {
-                    ForEach(filteredCollection().freeze()) { recipe in
-                        RecipeRow(recipe).environmentObject(self.state)
-                    }
-                    .onDelete(perform: delete)
-                    .onMove(perform: move)
-                }
-            }.listStyle(GroupedListStyle())
-                .navigationBarTitle("recipes", displayMode: .large)
-                .navigationBarBackButtonHidden(true)
-                .navigationBarHidden(false)
-                .navigationBarItems(trailing: EditButton())
-        }
-    }
-
-    func filteredCollection() -> AnyRealmCollection<Recipe> {
-        if self.searchTerm.isEmpty {
-            return AnyRealmCollection(self.recipes)
-        } else {
-            return AnyRealmCollection(self.recipes.filter("name CONTAINS[c] %@", searchTerm))
-        }
-    }
-
-    func delete(at offsets: IndexSet) {
-        if let realm = recipes.realm {
-            try! realm.write {
-                realm.delete(recipes[offsets.first!])
+            VStack {
+                SearchView(searchFilter: $searchFilter)
+                ReminderListResultsView(searchFilter: $searchFilter)
+                Spacer()
+                Footer()
             }
-        } else {
-            recipes.remove(at: offsets.first!)
+            .navigationBarItems(trailing: EditButton())
+            .navigationTitle("reminders")
         }
-    }
-
-    func move(fromOffsets offsets: IndexSet, toOffset to: Int) {
-        recipes.realm?.beginWrite()
-        recipes.move(fromOffsets: offsets, toOffset: to)
-        try! recipes.realm?.commitWrite()
     }
 }
 
 #if DEBUG
-struct ContentViewPreviews: PreviewProvider {
+// swiftlint:disable type_name
+struct Content_Preview: PreviewProvider {
     static var previews: some View {
-        return ContentView(recipes: .init())
+        ContentView()
     }
 }
 #endif

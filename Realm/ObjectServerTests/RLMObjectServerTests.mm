@@ -37,6 +37,7 @@
 
 #import <realm/object-store/shared_realm.hpp>
 #import <realm/object-store/sync/sync_manager.hpp>
+#import <realm/util/file.hpp>
 
 #if TARGET_OS_OSX
 
@@ -1630,6 +1631,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         [realm commitWriteTransaction];
         [self waitForUploadsForRealm:realm];
         [self waitForDownloadsForRealm:realm];
+        [realm.syncSession suspend];
 
         path = realm.configuration.pathOnDisk;
     }
@@ -1655,7 +1657,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     auto finalSize = [[fileManager attributesOfItemAtPath:path error:nil][NSFileSize] unsignedLongLongValue];
     XCTAssertLessThan(finalSize, initialSize);
-    XCTAssertLessThanOrEqual(finalSize, usedSize + 4096U);
+    XCTAssertLessThanOrEqual(finalSize, usedSize + realm::util::page_size());
 }
 
 #pragma mark - Read Only

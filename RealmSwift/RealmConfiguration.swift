@@ -316,3 +316,16 @@ extension Realm.Configuration: CustomStringConvertible {
                     string: rlmConfiguration.description) ?? ""
     }
 }
+
+// MARK: Equatable
+
+extension Realm.Configuration: Equatable {
+    public static func == (lhs: Realm.Configuration, rhs: Realm.Configuration) -> Bool {
+        lhs.encryptionKey == rhs.encryptionKey &&
+            lhs.fileURL == rhs.fileURL &&
+            lhs.syncConfiguration?.partitionValue == rhs.syncConfiguration?.partitionValue &&
+            lhs.inMemoryIdentifier == rhs.inMemoryIdentifier &&
+            lhs.readOnly == rhs.readOnly &&
+            lhs.schemaVersion == rhs.schemaVersion
+    }
+}

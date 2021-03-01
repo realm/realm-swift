@@ -1,0 +1,30 @@
+////////////////////////////////////////////////////////////////////////////
+//
+// Copyright 2014 Realm Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
+
+// This file is used to create new examples.
+// To create a new example for a specific version you have to uncomment the
+// following line and the corresponding line with the schema version you
+// want to create (v5 being the default).
+//OTHER_SWIFT_FLAGS = $(inherited) -DCREATE_EXAMPLES;
+
+// If you want to test older versions, uncommene the corresponding version.
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_0;
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_1;
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_2;
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_3;
+//OTHER_SWIFT_FLAGS = $(inherited) -DSCHEMA_VERSION_4;

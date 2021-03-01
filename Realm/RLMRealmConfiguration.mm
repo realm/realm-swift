@@ -200,6 +200,28 @@ static bool isSync(realm::Realm::Config const& config) {
     return false;
 }
 
+- (void)updateSchemaMode {
+    if (self.deleteRealmIfMigrationNeeded) {
+        if (isSync(_config)) {
+            @throw RLMException(@"Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('syncConfig' is set).");
+        }
+    }
+    else if (self.readOnly) {
+        _config.schema_mode = isSync(_config) ? realm::SchemaMode::ReadOnlyAlternative : realm::SchemaMode::Immutable;
+    }
+    else if (isSync(_config)) {
+        if (_customSchema) {
+            _config.schema_mode = realm::SchemaMode::AdditiveExplicit;
+        }
+        else {
+            _config.schema_mode = realm::SchemaMode::AdditiveDiscovered;
+        }
+    }
+    else {
+        _config.schema_mode = realm::SchemaMode::Automatic;
+    }
+}
+
 - (void)setReadOnly:(BOOL)readOnly {
     if (readOnly) {
         if (self.deleteRealmIfMigrationNeeded) {
@@ -210,7 +232,8 @@ static bool isSync(realm::Realm::Config const& config) {
         _config.schema_mode = isSync(_config) ? realm::SchemaMode::ReadOnlyAlternative : realm::SchemaMode::Immutable;
     }
     else if (self.readOnly) {
-        _config.schema_mode = isSync(_config) ? realm::SchemaMode::Additive : realm::SchemaMode::Automatic;
+        _config.schema_mode = realm::SchemaMode::Automatic;
+        [self updateSchemaMode];
     }
 }
 
@@ -249,7 +272,8 @@ static bool isSync(realm::Realm::Config const& config) {
 }
 
 - (void)setObjectClasses:(NSArray *)objectClasses {
-    self.customSchema = [RLMSchema schemaWithObjectClasses:objectClasses];
+    self.customSchema = objectClasses ? [RLMSchema schemaWithObjectClasses:objectClasses] : nil;
+    [self updateSchemaMode];
 }
 
 - (NSUInteger)maximumNumberOfActiveVersions {
