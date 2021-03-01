@@ -33,11 +33,11 @@ NSInteger schemaVersion = 0;
 @property NSString *firstName;
 @property NSString *lastName;
 @property NSInteger age;
-+ (Person* )personWithFirstName:(NSString *)firstName lastName:(NSString *)lastName age:(int)age;
++ (Person *)personWithFirstName:(NSString *)firstName lastName:(NSString *)lastName age:(int)age;
 @end
 
 @implementation Person
-+ (Person* )personWithFirstName:(NSString *)firstName lastName:(NSString *)lastName age:(int)age {
++ (Person *)personWithFirstName:(NSString *)firstName lastName:(NSString *)lastName age:(int)age {
     Person *person = [[self alloc] init];
     person.firstName = firstName;
     person.lastName = lastName;

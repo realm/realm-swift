@@ -35,12 +35,12 @@ NSInteger schemaVersion = 2;
 
 @interface Dog : RLMObject
 @property NSString *name;
-+ (Dog* )dogWithName:(NSString *)name;
++ (Dog *)dogWithName:(NSString *)name;
 @end
 RLM_ARRAY_TYPE(Dog)
 
 @implementation Dog
-+ (Dog* )dogWithName:(NSString *)name {
++ (Dog *)dogWithName:(NSString *)name {
     Dog *dog = [[self alloc] init];
     dog.name = name;
     return dog;
@@ -54,11 +54,11 @@ RLM_ARRAY_TYPE(Dog)
 @property NSString *fullName;
 @property NSInteger age;
 @property RLMArray<Dog *><Dog> *dogs;
-+ (Person* )personWithFullName:(NSString *)fullName age:(int)age;
++ (Person *)personWithFullName:(NSString *)fullName age:(int)age;
 @end
 
 @implementation Person
-+ (Person* )personWithFullName:(NSString *)fullName age:(int)age {
++ (Person *)personWithFullName:(NSString *)fullName age:(int)age {
     Person *person = [[self alloc] init];
     person.fullName = fullName;
     person.age = age;

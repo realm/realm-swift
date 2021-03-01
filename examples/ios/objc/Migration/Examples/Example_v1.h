@@ -35,11 +35,11 @@ NSInteger schemaVersion = 1;
 @interface Person : RLMObject
 @property NSString *fullName;
 @property NSInteger age;
-+ (Person* )personWithFullName:(NSString *)fullName age:(int)age;
++ (Person *)personWithFullName:(NSString *)fullName age:(int)age;
 @end
 
 @implementation Person
-+ (Person* )personWithFullName:(NSString *)fullName age:(int)age {
++ (Person *)personWithFullName:(NSString *)fullName age:(int)age {
     Person *person = [[self alloc] init];
     person.fullName = fullName;
     person.age = age;

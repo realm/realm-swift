@@ -42,12 +42,12 @@ typedef NS_ENUM(int, Kind) {
 @property NSString *name;
 @property NSInteger kindValue;
 @property enum Kind kind;
-+ (Pet* )petWithName:(NSString *)name kind:(enum Kind)kind;
++ (Pet *)petWithName:(NSString *)name kind:(enum Kind)kind;
 @end
 RLM_ARRAY_TYPE(Pet)
 
 @implementation Pet
-+ (Pet* )petWithName:(NSString *)name kind:(enum Kind)kind {
++ (Pet *)petWithName:(NSString *)name kind:(enum Kind)kind {
     Pet *pet = [[self alloc] init];
     pet.name = name;
     pet.kind = kind;
@@ -73,11 +73,11 @@ RLM_ARRAY_TYPE(Pet)
 @property NSInteger age;
 @property Address *address;
 @property RLMArray<Pet *><Pet> *pets;
-+ (Person* )personWithFullName:(NSString *)fullName age:(int)age;
++ (Person *)personWithFullName:(NSString *)fullName age:(int)age;
 @end
 
 @implementation Person
-+ (Person* )personWithFullName:(NSString *)fullName age:(int)age {
++ (Person *)personWithFullName:(NSString *)fullName age:(int)age {
     Person *person = [[self alloc] init];
     person.fullName = fullName;
     person.age = age;
@@ -92,11 +92,11 @@ RLM_ARRAY_TYPE(Pet)
 @property NSString *street;
 @property NSString *city;
 @property (readonly) RLMLinkingObjects *residents;
-+ (Address* )addressWithStreet:(NSString *)street city:(NSString *)city;
++ (Address *)addressWithStreet:(NSString *)street city:(NSString *)city;
 @end
 
 @implementation Address
-+ (Address* )addressWithStreet:(NSString *)street city:(NSString *)city {
++ (Address *)addressWithStreet:(NSString *)street city:(NSString *)city {
     Address *address = [[self alloc] init];
     address.street = street;
     address.city = city;
