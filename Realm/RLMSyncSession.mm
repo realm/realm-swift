@@ -201,6 +201,17 @@ static util::UniqueFunction<void(Status)> wrapCompletion(dispatch_queue_t queue,
     return NO;
 }
 
+static std::function<void(uint64_t, uint64_t)> wrapCallback(dispatch_queue_t queue, RLMProgressNotificationBlock block) {
+    return [=](uint64_t transferred, uint64_t transferrable) {
+        dispatch_async(queue, ^{
+            @autoreleasepool {
+                block(static_cast<NSUInteger>(transferred),
+                      static_cast<NSUInteger>(transferrable));
+            }
+        });
+    };
+}
+
 - (RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
                                                                  mode:(RLMSyncProgressMode)mode
                                                                 block:(RLMProgressNotificationBlock)block {
@@ -210,12 +221,9 @@ static util::UniqueFunction<void(Status)> wrapCompletion(dispatch_queue_t queue,
                                    ? SyncSession::ProgressDirection::upload
                                    : SyncSession::ProgressDirection::download);
         bool is_streaming = (mode == RLMSyncProgressModeReportIndefinitely);
-        uint64_t token = session->register_progress_notifier([=](uint64_t transferred, uint64_t transferrable) {
-            dispatch_async(queue, ^{
-                block((NSUInteger)transferred, (NSUInteger)transferrable);
-            });
-        }, notifier_direction, is_streaming);
-        return [[RLMProgressNotificationToken alloc] initWithTokenValue:token session:session];
+        uint64_t token = session->register_progress_notifier(wrapCallback(queue, block),
+                                                             notifier_direction, is_streaming);
+        return [[RLMProgressNotificationToken alloc] initWithTokenValue:token session:std::move(session)];
     }
     return nil;
 }
