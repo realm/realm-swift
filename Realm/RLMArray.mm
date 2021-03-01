@@ -366,6 +366,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
         case RLMPropertyTypeFloat:
         case RLMPropertyTypeDouble:
         case RLMPropertyTypeDecimal128:
+        case RLMPropertyTypeAny:
             return true;
         case RLMPropertyTypeDate:
             return allowDate;
