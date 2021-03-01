@@ -68,7 +68,7 @@ for type in types:
     type['type'] = type['type'].replace('objectId', 'object id').replace('decimal', 'decimal128')
     type['basetype'] = type['type'].replace('?', '')
     
-file = open(os.path.dirname(__file__) + '/PrimitiveValuePropertyTests.tpl.m', 'rt')
+file = open(os.path.dirname(__file__) + '/PrimitiveRLMValuePropertyTests.tpl.m', 'rt')
 for line in file:
     # Lines without anything to expand just appear as-is
     if not '$' in line:

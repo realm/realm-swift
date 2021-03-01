@@ -129,7 +129,16 @@ static double average(NSArray *values) {
     XCTAssertEqual(unmanaged.stringObj.type, RLMPropertyTypeString);
     XCTAssertEqual(unmanaged.dataObj.type, RLMPropertyTypeData);
     XCTAssertEqual(unmanaged.dateObj.type, RLMPropertyTypeDate);
-    XCTAssertEqual(unmanaged.anyObj.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj1.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj2.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj3.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj4.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj5.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj6.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj7.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj8.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj9.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj10.type, RLMPropertyTypeAny);
     XCTAssertEqual(optUnmanaged.boolObj.type, RLMPropertyTypeBool);
     XCTAssertEqual(optUnmanaged.intObj.type, RLMPropertyTypeInt);
     XCTAssertEqual(optUnmanaged.floatObj.type, RLMPropertyTypeFloat);
@@ -147,7 +156,16 @@ static double average(NSArray *values) {
     XCTAssertFalse(unmanaged.stringObj.optional);
     XCTAssertFalse(unmanaged.dataObj.optional);
     XCTAssertFalse(unmanaged.dateObj.optional);
-    XCTAssertFalse(unmanaged.anyObj.optional);
+    XCTAssertFalse(unmanaged.anyObj1.optional);
+    XCTAssertFalse(unmanaged.anyObj2.optional);
+    XCTAssertFalse(unmanaged.anyObj3.optional);
+    XCTAssertFalse(unmanaged.anyObj4.optional);
+    XCTAssertFalse(unmanaged.anyObj5.optional);
+    XCTAssertFalse(unmanaged.anyObj6.optional);
+    XCTAssertFalse(unmanaged.anyObj7.optional);
+    XCTAssertFalse(unmanaged.anyObj8.optional);
+    XCTAssertFalse(unmanaged.anyObj9.optional);
+    XCTAssertFalse(unmanaged.anyObj10.optional);
     XCTAssertTrue(optUnmanaged.boolObj.optional);
     XCTAssertTrue(optUnmanaged.intObj.optional);
     XCTAssertTrue(optUnmanaged.floatObj.optional);
@@ -165,7 +183,16 @@ static double average(NSArray *values) {
     XCTAssertNil(unmanaged.stringObj.objectClassName);
     XCTAssertNil(unmanaged.dataObj.objectClassName);
     XCTAssertNil(unmanaged.dateObj.objectClassName);
-    XCTAssertNil(unmanaged.anyObj.objectClassName);
+    XCTAssertNil(unmanaged.anyObj1.objectClassName);
+    XCTAssertNil(unmanaged.anyObj2.objectClassName);
+    XCTAssertNil(unmanaged.anyObj3.objectClassName);
+    XCTAssertNil(unmanaged.anyObj4.objectClassName);
+    XCTAssertNil(unmanaged.anyObj5.objectClassName);
+    XCTAssertNil(unmanaged.anyObj6.objectClassName);
+    XCTAssertNil(unmanaged.anyObj7.objectClassName);
+    XCTAssertNil(unmanaged.anyObj8.objectClassName);
+    XCTAssertNil(unmanaged.anyObj9.objectClassName);
+    XCTAssertNil(unmanaged.anyObj10.objectClassName);
     XCTAssertNil(optUnmanaged.boolObj.objectClassName);
     XCTAssertNil(optUnmanaged.intObj.objectClassName);
     XCTAssertNil(optUnmanaged.floatObj.objectClassName);
@@ -183,7 +210,16 @@ static double average(NSArray *values) {
     XCTAssertNil(unmanaged.stringObj.realm);
     XCTAssertNil(unmanaged.dataObj.realm);
     XCTAssertNil(unmanaged.dateObj.realm);
-    XCTAssertNil(unmanaged.anyObj.realm);
+    XCTAssertNil(unmanaged.anyObj1.realm);
+    XCTAssertNil(unmanaged.anyObj2.realm);
+    XCTAssertNil(unmanaged.anyObj3.realm);
+    XCTAssertNil(unmanaged.anyObj4.realm);
+    XCTAssertNil(unmanaged.anyObj5.realm);
+    XCTAssertNil(unmanaged.anyObj6.realm);
+    XCTAssertNil(unmanaged.anyObj7.realm);
+    XCTAssertNil(unmanaged.anyObj8.realm);
+    XCTAssertNil(unmanaged.anyObj9.realm);
+    XCTAssertNil(unmanaged.anyObj10.realm);
     XCTAssertNil(optUnmanaged.boolObj.realm);
     XCTAssertNil(optUnmanaged.intObj.realm);
     XCTAssertNil(optUnmanaged.floatObj.realm);
@@ -465,22 +501,22 @@ static double average(NSArray *values) {
     %nosum %unman RLMAssertThrowsWithReason([$array sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type array");
     %nosum %man RLMAssertThrowsWithReason([$array sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type array '$class.$prop'");
 
-    %sum XCTAssertEqualObjects([$array sumOfProperty:@"self"], @0);
+    %noany %sum XCTAssertEqualObjects([$array sumOfProperty:@"self"], @0);
 
     [self addObjects];
 
-    %sum XCTAssertEqualWithAccuracy([$array sumOfProperty:@"self"].doubleValue, sum($values), .001);
+    %noany %sum XCTAssertEqualWithAccuracy([$array sumOfProperty:@"self"].doubleValue, sum($values), .001);
 }
 
 - (void)testAverage {
     %noavg %unman RLMAssertThrowsWithReason([$array averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type array");
     %noavg %man RLMAssertThrowsWithReason([$array averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type array '$class.$prop'");
 
-    %avg XCTAssertNil([$array averageOfProperty:@"self"]);
+    %noany %avg XCTAssertNil([$array averageOfProperty:@"self"]);
 
     [self addObjects];
 
-    %avg XCTAssertEqualWithAccuracy([$array averageOfProperty:@"self"].doubleValue, average($values), .001);
+    %noany %avg XCTAssertEqualWithAccuracy([$array averageOfProperty:@"self"].doubleValue, average($values), .001);
 }
 
 - (void)testFastEnumeration {
@@ -500,17 +536,17 @@ static double average(NSArray *values) {
 }
 
 - (void)testValueForKeyNumericAggregates {
-    %minmax XCTAssertNil([$array valueForKeyPath:@"@min.self"]);
-    %minmax XCTAssertNil([$array valueForKeyPath:@"@max.self"]);
-    %sum XCTAssertEqualObjects([$array valueForKeyPath:@"@sum.self"], @0);
-    %avg XCTAssertNil([$array valueForKeyPath:@"@avg.self"]);
+    %noany %minmax XCTAssertNil([$array valueForKeyPath:@"@min.self"]);
+    %noany %minmax XCTAssertNil([$array valueForKeyPath:@"@max.self"]);
+    %noany %sum XCTAssertEqualObjects([$array valueForKeyPath:@"@sum.self"], @0);
+    %noany %avg XCTAssertNil([$array valueForKeyPath:@"@avg.self"]);
 
     [self addObjects];
 
-    %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@min.self"], $v0);
-    %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@max.self"], $v1);
-    %sum XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@sum.self"] doubleValue], sum($values), .001);
-    %avg XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@avg.self"] doubleValue], average($values), .001);
+    %noany %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@min.self"], $v0);
+    %noany %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@max.self"], $v1);
+    %noany %sum XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@sum.self"] doubleValue], sum($values), .001);
+    %noany %avg XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@avg.self"] doubleValue], average($values), .001);
 }
 
 - (void)testValueForKeyLength {
@@ -555,7 +591,18 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                     return idx1 - idx2;
                 }
 
-                return [a compare:b];
+                if ([a respondsToSelector:@selector(objCType)]
+                    && [b respondsToSelector:@selector(objCType)]) {
+                    return [a compare:b];
+                } else {
+                    if ([a isKindOfClass:[RLMDecimal128 class]]) {
+                        a = [NSNumber numberWithDouble:[(RLMDecimal128 *)a doubleValue]];
+                    }
+                    if ([b isKindOfClass:[RLMDecimal128 class]]) {
+                        b = [NSNumber numberWithDouble:[(RLMDecimal128 *)b doubleValue]];
+                    }
+                    return [a compare:b];
+                }
             }];
 }
 
@@ -579,6 +626,10 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     %man %r XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.$prop"], @[]);
     %man %o XCTAssertEqualObjects([allOptional valueForKeyPath:@"@distinctUnionOfArrays.$prop"], @[]);
 
+    %man %any XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.$prop"], @[]);
+    %man %any XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.$prop"], @[]);
+
+
     [self addObjects];
 
     [AllPrimitiveArrays createInRealm:realm withValue:managed];
@@ -588,6 +639,9 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     %man %o XCTAssertEqualObjects([allOptional valueForKeyPath:@"@unionOfArrays.$prop"], ^n ($values2));
     %man %r XCTAssertEqualObjects(sortedDistinctUnion(allRequired, @"Arrays", @"$prop"), ^n ($values));
     %man %o XCTAssertEqualObjects(sortedDistinctUnion(allOptional, @"Arrays", @"$prop"), ^n ($values));
+
+    %man %any XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.$prop"], ^n ($values2));
+    %man %any XCTAssertEqualObjects(sortedDistinctUnion(allRequired, @"Arrays", @"$prop"), ^n ($values));
 }
 
 - (void)testSetValueForKey {
@@ -943,6 +997,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     NSRange range = {index, 1};
     id obj = [AllPrimitiveArrays createInRealm:realm withValue:@{
         %r %man @"$prop": [$values subarrayWithRange:range],
+        %any %man @"$prop": [$values subarrayWithRange:range],
     }];
     [LinkToAllPrimitiveArrays createInRealm:realm withValue:@[obj]];
     obj = [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
@@ -992,7 +1047,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 - (void)testQueryBetween {
     [realm deleteAllObjects];
 
-    %man %nominmax RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"ANY $prop BETWEEN %@", @[$v0, $v1]]), ^n @"Operator 'BETWEEN' not supported for type '$basetype'");
+    %noany %man %nominmax RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"ANY $prop BETWEEN %@", @[$v0, $v1]]), ^n @"Operator 'BETWEEN' not supported for type '$basetype'");
 
     %man %minmax RLMAssertCount($class, 0, @"ANY $prop BETWEEN %@", @[$v0, $v1]);
 
@@ -1019,18 +1074,21 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 
     [AllPrimitiveArrays createInRealm:realm withValue:@{
         %r %man @"$prop": @[],
+        %any %man @"$prop": @[],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
         %o %man @"$prop": @[],
     }];
     [AllPrimitiveArrays createInRealm:realm withValue:@{
         %r %man @"$prop": @[$v0],
+        %any %man @"$prop": @[$v0],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
         %o %man @"$prop": @[$v0],
     }];
     [AllPrimitiveArrays createInRealm:realm withValue:@{
         %r %man @"$prop": @[$v0, $v0],
+        %any %man @"$prop": @[$v0, $v0],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
         %o %man @"$prop": @[$v0, $v0],
@@ -1049,10 +1107,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 - (void)testQuerySum {
     [realm deleteAllObjects];
 
-    %nodate %nosum %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@sum = %@", $v0]), ^n @"@sum can only be applied to a numeric property.");
-    %date %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@sum = %@", $v0]), ^n @"Cannot sum or average date properties");
+    %noany %nodate %nosum %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@sum = %@", $v0]), ^n @"@sum can only be applied to a numeric property.");
+    %noany %date %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@sum = %@", $v0]), ^n @"Cannot sum or average date properties");
+    %any %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@sum = %@", $v0]), ^n @"Cannot sum or average mixed properties");
 
-    %sum %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@sum = %@", $wrong]), ^n @"@sum on a property of type $basetype cannot be compared with '$wdesc'");
+    %noany %sum %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@sum = %@", $wrong]), ^n @"@sum on a property of type $basetype cannot be compared with '$wdesc'");
     %sum %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@sum.prop = %@", $wrong]), ^n @"Property '$prop' is not a link in object of type '$class'");
     %sum %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@sum = %@", NSNull.null]), ^n @"@sum on a property of type $basetype cannot be compared with '<null>'");
 
@@ -1081,23 +1140,24 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         %man %o %sum @"$prop": @[$v0, $v0, $v0],
     }];
 
-    %sum %man RLMAssertCount($class, 1U, @"$prop.@sum == %@", @0);
-    %sum %man RLMAssertCount($class, 1U, @"$prop.@sum == %@", $v0);
-    %sum %man RLMAssertCount($class, 3U, @"$prop.@sum != %@", $v0);
-    %sum %man RLMAssertCount($class, 3U, @"$prop.@sum >= %@", $v0);
-    %sum %man RLMAssertCount($class, 2U, @"$prop.@sum > %@", $v0);
-    %sum %man RLMAssertCount($class, 2U, @"$prop.@sum < %@", $v1);
-    %sum %man RLMAssertCount($class, 2U, @"$prop.@sum <= %@", $v1);
+    %noany %sum %man RLMAssertCount($class, 1U, @"$prop.@sum == %@", @0);
+    %noany %sum %man RLMAssertCount($class, 1U, @"$prop.@sum == %@", $v0);
+    %noany %sum %man RLMAssertCount($class, 3U, @"$prop.@sum != %@", $v0);
+    %noany %sum %man RLMAssertCount($class, 3U, @"$prop.@sum >= %@", $v0);
+    %noany %sum %man RLMAssertCount($class, 2U, @"$prop.@sum > %@", $v0);
+    %noany %sum %man RLMAssertCount($class, 2U, @"$prop.@sum < %@", $v1);
+    %noany %sum %man RLMAssertCount($class, 2U, @"$prop.@sum <= %@", $v1);
 }
 
 - (void)testQueryAverage {
     [realm deleteAllObjects];
 
-    %nodate %noavg %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@avg = %@", $v0]), ^n @"@avg can only be applied to a numeric property.");
-    %date %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@avg = %@", $v0]), ^n @"Cannot sum or average date properties");
+    %noany %nodate %noavg %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@avg = %@", $v0]), ^n @"@avg can only be applied to a numeric property.");
+    %noany %date %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@avg = %@", $v0]), ^n @"Cannot sum or average date properties");
+    %any %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@avg = %@", $v0]), ^n @"Cannot sum or average mixed properties");
 
-    %avg %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@avg = %@", $wrong]), ^n @"@avg on a property of type $basetype cannot be compared with '$wdesc'");
-    %avg %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@avg.prop = %@", $wrong]), ^n @"Property '$prop' is not a link in object of type '$class'");
+    %noany %avg %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@avg = %@", $wrong]), ^n @"@avg on a property of type $basetype cannot be compared with '$wdesc'");
+    %noany %avg %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@avg.prop = %@", $wrong]), ^n @"Property '$prop' is not a link in object of type '$class'");
 
     [AllPrimitiveArrays createInRealm:realm withValue:@{
         %man %r %avg @"$prop": @[],
@@ -1124,20 +1184,22 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         %man %o %avg @"$prop": @[$v1],
     }];
 
-    %avg %man RLMAssertCount($class, 1U, @"$prop.@avg == %@", NSNull.null);
-    %avg %man RLMAssertCount($class, 1U, @"$prop.@avg == %@", $v0);
-    %avg %man RLMAssertCount($class, 3U, @"$prop.@avg != %@", $v0);
-    %avg %man RLMAssertCount($class, 3U, @"$prop.@avg >= %@", $v0);
-    %avg %man RLMAssertCount($class, 2U, @"$prop.@avg > %@", $v0);
-    %avg %man RLMAssertCount($class, 2U, @"$prop.@avg < %@", $v1);
-    %avg %man RLMAssertCount($class, 3U, @"$prop.@avg <= %@", $v1);
+    %noany %avg %man RLMAssertCount($class, 1U, @"$prop.@avg == %@", NSNull.null);
+    %noany %avg %man RLMAssertCount($class, 1U, @"$prop.@avg == %@", $v0);
+    %noany %avg %man RLMAssertCount($class, 3U, @"$prop.@avg != %@", $v0);
+    %noany %avg %man RLMAssertCount($class, 3U, @"$prop.@avg >= %@", $v0);
+    %noany %avg %man RLMAssertCount($class, 2U, @"$prop.@avg > %@", $v0);
+    %noany %avg %man RLMAssertCount($class, 2U, @"$prop.@avg < %@", $v1);
+    %noany %avg %man RLMAssertCount($class, 3U, @"$prop.@avg <= %@", $v1);
 }
 
 - (void)testQueryMin {
     [realm deleteAllObjects];
 
-    %nominmax %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@min = %@", $v0]), ^n @"@min can only be applied to a numeric property.");
-    %minmax %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@min = %@", $wrong]), ^n @"@min on a property of type $basetype cannot be compared with '$wdesc'");
+    %noany %nominmax %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@min = %@", $v0]), ^n @"@min can only be applied to a numeric property.");
+    %any %nominmax %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@min = %@", $v0]), ^n @"Unsupported comparision value type for mixed. Value must be numeric.");
+    %noany %minmax %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@min = %@", $wrong]), ^n @"@min on a property of type $basetype cannot be compared with '$wdesc'");
+    %any %minmax %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@min = %@", $wrong]), ^n @"Unsupported comparision value type for mixed. Value must be numeric.");
     %minmax %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@min.prop = %@", $wrong]), ^n @"Property '$prop' is not a link in object of type '$class'");
 
     // No objects, so count is zero
@@ -1167,6 +1229,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 
     [AllPrimitiveArrays createInRealm:realm withValue:@{
         %minmax %r %man @"$prop": @[$v1, $v0],
+        %minmax %any %man @"$prop": @[$v1, $v0],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
         %minmax %o %man @"$prop": @[$v1, $v0],
@@ -1180,8 +1243,10 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 - (void)testQueryMax {
     [realm deleteAllObjects];
 
-    %nominmax %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@max = %@", $v0]), ^n @"@max can only be applied to a numeric property.");
-    %minmax %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@max = %@", $wrong]), ^n @"@max on a property of type $basetype cannot be compared with '$wdesc'");
+    %noany %nominmax %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@max = %@", $v0]), ^n @"@max can only be applied to a numeric property.");
+    %any %nominmax %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@max = %@", $v0]), ^n @"Unsupported comparision value type for mixed. Value must be numeric.");
+    %noany %minmax %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@max = %@", $wrong]), ^n @"@max on a property of type $basetype cannot be compared with '$wdesc'");
+    %any %minmax %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@max = %@", $wrong]), ^n @"Unsupported comparision value type for mixed. Value must be numeric.");
     %minmax %man RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"$prop.@max.prop = %@", $wrong]), ^n @"Property '$prop' is not a link in object of type '$class'");
 
     // No objects, so count is zero
@@ -1211,6 +1276,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 
     [AllPrimitiveArrays createInRealm:realm withValue:@{
         %minmax %r %man @"$prop": @[$v1, $v0],
+        %any %minmax %man @"$prop": @[$v1, $v0],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
         %minmax %o %man @"$prop": @[$v1, $v0],

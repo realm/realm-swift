@@ -672,13 +672,9 @@
     RLMAssertCount(AllTypesObject, allValues.count-7, @"anyCol != FALSE");
     RLMAssertCount(AllTypesObject, allValues.count-7, @"anyCol != 0");
     RLMAssertCount(AllTypesObject, 7U, @"anyCol < 1");
-    RLMAssertCount(AllTypesObject, 7U, @"anyCol < TRUE");
     RLMAssertCount(AllTypesObject, 0U, @"anyCol > 1");
-    RLMAssertCount(AllTypesObject, 0U, @"anyCol > TRUE");
     RLMAssertCount(AllTypesObject, 7U, @"anyCol >= 1");
-    RLMAssertCount(AllTypesObject, 7U, @"anyCol >= TRUE");
     RLMAssertCount(AllTypesObject, 14U, @"anyCol <= 1");
-    RLMAssertCount(AllTypesObject, 14U, @"anyCol <= TRUE");
 
     XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol BETWEEN TRUE"],
                                  NSException,

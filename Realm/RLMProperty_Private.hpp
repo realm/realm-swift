@@ -18,9 +18,12 @@
 
 #import <Realm/RLMProperty_Private.h>
 
-namespace realm {
-    struct Property;
-}
+// FIXME: forward PropertyType class enum instead
+#import <realm/object-store/property.hpp>
+
+//namespace realm {
+//    struct Property;
+//}
 
 @class RLMSchema;
 
@@ -31,3 +34,11 @@ namespace realm {
 - (realm::Property)objectStoreCopy:(RLMSchema *)schema;
 
 @end
+
+static inline bool isNullable(const realm::PropertyType& t) {
+    if (t == realm::PropertyType::Mixed) {
+        return false;
+    } else {
+        return is_nullable(t);
+    }
+}

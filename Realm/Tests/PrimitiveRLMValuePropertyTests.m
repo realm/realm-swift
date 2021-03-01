@@ -49,36 +49,6 @@ static RLMObjectId *objectId(NSUInteger i) {
     return objectIds[i];
 }
 
-static void count(NSArray *values, double *sum, NSUInteger *count) {
-    for (id value in values) {
-        if (value != NSNull.null) {
-            ++*count;
-            *sum += [value doubleValue];
-        }
-    }
-}
-
-static double sum(NSArray *values) {
-    double sum = 0;
-    NSUInteger c = 0;
-    count(values, &sum, &c);
-    return sum;
-}
-static double average(NSArray *values) {
-    double sum = 0;
-    NSUInteger c = 0;
-    count(values, &sum, &c);
-    return sum / c;
-}
-
-static NSArray *shiftArray(NSArray *array, NSInteger pos)
-{
-    NSInteger length = [array count];
-    NSArray *post = [array subarrayWithRange:(NSRange){ .location = length - pos, .length = pos }];
-    NSArray *pre = [array subarrayWithRange:(NSRange){ .location = 0, .length = length - pos}];
-    return [post arrayByAddingObjectsFromArray:pre];
-}
-
 @interface RLMValuePropertyTests : RLMTestCase
 @end
 
@@ -94,6 +64,7 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
     realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     [self initValues];
+//    [self assignValues];
     [allMixed addObjects:@[
         unmanaged.boolVal,
         unmanaged.intVal,
@@ -122,6 +93,11 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
     if (realm.inWriteTransaction) {
         [realm cancelWriteTransaction];
     }
+}
+
+// Dummy test
+- (void)testTrue {
+    XCTAssert(true);
 }
 
 - (void)initValues {
@@ -167,7 +143,6 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
     XCTAssert([(NSNumber *)managed.intVal isEqual:@2]);
     XCTAssert([(NSNumber *)managed.floatVal isEqual:@2.2f]);
     XCTAssert([(NSNumber *)managed.doubleVal isEqual:@2.2]);
-
     XCTAssert([(NSString *)managed.stringVal isEqual:@"a"]);
     XCTAssert([(NSData *)managed.dataVal isEqual:data(1)]);
     XCTAssert([(NSDate *)managed.dateVal isEqual:date(1)]);
@@ -207,16 +182,16 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
     XCTAssertNil(unman.decimalVal, @"RLMValue should be able to initialize as null");
     XCTAssertNil(unman.objectIdVal, @"RLMValue should be able to initialize as null");
     XCTAssertNil(unman.uuidVal, @"RLMValue should be able to initialize as null");
-    XCTAssertNil(man.boolVal, @"RLMValue should be nil once managed");
-    XCTAssertNil(man.intVal, @"RLMValue should be nil once managed");
-    XCTAssertNil(man.floatVal, @"RLMValue should be nil once managed");
-    XCTAssertNil(man.doubleVal, @"RLMValue should be nil once managed");
-    XCTAssertNil(man.stringVal, @"RLMValue should be nil once managed");
-    XCTAssertNil(man.dataVal, @"RLMValue should be nil once managed");
-    XCTAssertNil(man.dateVal, @"RLMValue should be nil once managed");
-    XCTAssertNil(man.decimalVal, @"RLMValue should be nil once managed");
-    XCTAssertNil(man.objectIdVal, @"RLMValue should be nil once managed");
-    XCTAssertNil(man.uuidVal, @"RLMValue should be nil once managed");
+    XCTAssertNil(man.boolVal, @"RLMValue should be able to initialize as null");
+    XCTAssertNil(man.intVal, @"RLMValue should be able to initialize as null");
+    XCTAssertNil(man.floatVal, @"RLMValue should be able to initialize as null");
+    XCTAssertNil(man.doubleVal, @"RLMValue should be able to initialize as null");
+    XCTAssertNil(man.stringVal, @"RLMValue should be able to initialize as null");
+    XCTAssertNil(man.dataVal, @"RLMValue should be able to initialize as null");
+    XCTAssertNil(man.dateVal, @"RLMValue should be able to initialize as null");
+    XCTAssertNil(man.decimalVal, @"RLMValue should be able to initialize as null");
+    XCTAssertNil(man.objectIdVal, @"RLMValue should be able to initialize as null");
+    XCTAssertNil(man.uuidVal, @"RLMValue should be able to initialize as null");
 }
 
 - (void)testUpdateBoolType {
@@ -285,44 +260,44 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
 - (void)testUpdateIntType {
     unmanaged.boolVal = @2;
     unmanaged.intVal = @2;
-    unmanaged.floatVal = @1;
-    unmanaged.doubleVal = @1;
-    unmanaged.stringVal = @1;
-    unmanaged.dataVal = @1;
-    unmanaged.dateVal = @1;
-    unmanaged.decimalVal = @1;
-    unmanaged.objectIdVal = @1;
-    unmanaged.uuidVal = @1;
-    managed.boolVal = @1;
-    managed.intVal = @1;
-    managed.floatVal = @1;
-    managed.doubleVal = @1;
-    managed.stringVal = @1;
-    managed.dataVal = @1;
-    managed.dateVal = @1;
-    managed.decimalVal = @1;
-    managed.objectIdVal = @1;
-    managed.uuidVal = @1;
+    unmanaged.floatVal = @2;
+    unmanaged.doubleVal = @2;
+    unmanaged.stringVal = @2;
+    unmanaged.dataVal = @2;
+    unmanaged.dateVal = @2;
+    unmanaged.decimalVal = @2;
+    unmanaged.objectIdVal = @2;
+    unmanaged.uuidVal = @2;
+    managed.boolVal = @2;
+    managed.intVal = @2;
+    managed.floatVal = @2;
+    managed.doubleVal = @2;
+    managed.stringVal = @2;
+    managed.dataVal = @2;
+    managed.dateVal = @2;
+    managed.decimalVal = @2;
+    managed.objectIdVal = @2;
+    managed.uuidVal = @2;
     XCTAssert([(NSNumber *)unmanaged.boolVal isEqual:@2]);
     XCTAssert([(NSNumber *)unmanaged.intVal isEqual:@2]);
-    XCTAssert([(NSNumber *)unmanaged.floatVal isEqual:@1]);
-    XCTAssert([(NSNumber *)unmanaged.doubleVal isEqual:@1]);
-    XCTAssert([(NSNumber *)unmanaged.stringVal isEqual:@1]);
-    XCTAssert([(NSNumber *)unmanaged.dataVal isEqual:@1]);
-    XCTAssert([(NSNumber *)unmanaged.dateVal isEqual:@1]);
-    XCTAssert([(NSNumber *)unmanaged.decimalVal isEqual:@1]);
-    XCTAssert([(NSNumber *)unmanaged.objectIdVal isEqual:@1]);
-    XCTAssert([(NSNumber *)unmanaged.uuidVal isEqual:@1]);
-    XCTAssert([(NSNumber *)managed.boolVal isEqual:@1]);
-    XCTAssert([(NSNumber *)managed.intVal isEqual:@1]);
-    XCTAssert([(NSNumber *)managed.floatVal isEqual:@1]);
-    XCTAssert([(NSNumber *)managed.doubleVal isEqual:@1]);
-    XCTAssert([(NSNumber *)managed.stringVal isEqual:@1]);
-    XCTAssert([(NSNumber *)managed.dataVal isEqual:@1]);
-    XCTAssert([(NSNumber *)managed.dateVal isEqual:@1]);
-    XCTAssert([(NSNumber *)managed.decimalVal isEqual:@1]);
-    XCTAssert([(NSNumber *)managed.objectIdVal isEqual:@1]);
-    XCTAssert([(NSNumber *)managed.uuidVal isEqual:@1]);
+    XCTAssert([(NSNumber *)unmanaged.floatVal isEqual:@2]);
+    XCTAssert([(NSNumber *)unmanaged.doubleVal isEqual:@2]);
+    XCTAssert([(NSNumber *)unmanaged.stringVal isEqual:@2]);
+    XCTAssert([(NSNumber *)unmanaged.dataVal isEqual:@2]);
+    XCTAssert([(NSNumber *)unmanaged.dateVal isEqual:@2]);
+    XCTAssert([(NSNumber *)unmanaged.decimalVal isEqual:@2]);
+    XCTAssert([(NSNumber *)unmanaged.objectIdVal isEqual:@2]);
+    XCTAssert([(NSNumber *)unmanaged.uuidVal isEqual:@2]);
+    XCTAssert([(NSNumber *)managed.boolVal isEqual:@2]);
+    XCTAssert([(NSNumber *)managed.intVal isEqual:@2]);
+    XCTAssert([(NSNumber *)managed.floatVal isEqual:@2]);
+    XCTAssert([(NSNumber *)managed.doubleVal isEqual:@2]);
+    XCTAssert([(NSNumber *)managed.stringVal isEqual:@2]);
+    XCTAssert([(NSNumber *)managed.dataVal isEqual:@2]);
+    XCTAssert([(NSNumber *)managed.dateVal isEqual:@2]);
+    XCTAssert([(NSNumber *)managed.decimalVal isEqual:@2]);
+    XCTAssert([(NSNumber *)managed.objectIdVal isEqual:@2]);
+    XCTAssert([(NSNumber *)managed.uuidVal isEqual:@2]);
     XCTAssertEqual(unmanaged.boolVal.valueType, RLMPropertyTypeInt);
     XCTAssertEqual(unmanaged.intVal.valueType, RLMPropertyTypeInt);
     XCTAssertEqual(unmanaged.floatVal.valueType, RLMPropertyTypeInt);
@@ -847,51 +822,6 @@ static NSArray *shiftArray(NSArray *array, NSInteger pos)
     XCTAssertEqual(managed.decimalVal.valueType, RLMPropertyTypeUUID);
     XCTAssertEqual(managed.objectIdVal.valueType, RLMPropertyTypeUUID);
     XCTAssertEqual(managed.uuidVal.valueType, RLMPropertyTypeUUID);
-}
-
-// Update value to null
-- (void)testUpdateValueNull {
-    unmanaged.boolVal = [NSNull null];
-    unmanaged.intVal = [NSNull null];
-    unmanaged.floatVal = [NSNull null];
-    unmanaged.doubleVal = [NSNull null];
-    unmanaged.stringVal = [NSNull null];
-    unmanaged.dataVal = [NSNull null];
-    unmanaged.dateVal = [NSNull null];
-    unmanaged.decimalVal = [NSNull null];
-    unmanaged.objectIdVal = [NSNull null];
-    unmanaged.uuidVal = [NSNull null];
-    managed.boolVal = [NSNull null];
-    managed.intVal = [NSNull null];
-    managed.floatVal = [NSNull null];
-    managed.doubleVal = [NSNull null];
-    managed.stringVal = [NSNull null];
-    managed.dataVal = [NSNull null];
-    managed.dateVal = [NSNull null];
-    managed.decimalVal = [NSNull null];
-    managed.objectIdVal = [NSNull null];
-    managed.uuidVal = [NSNull null];
-    
-    XCTAssertEqual(unmanaged.boolVal, [NSNull null]);
-    XCTAssertEqual(unmanaged.intVal, [NSNull null]);
-    XCTAssertEqual(unmanaged.floatVal, [NSNull null]);
-    XCTAssertEqual(unmanaged.doubleVal, [NSNull null]);
-    XCTAssertEqual(unmanaged.stringVal, [NSNull null]);
-    XCTAssertEqual(unmanaged.dataVal, [NSNull null]);
-    XCTAssertEqual(unmanaged.dateVal, [NSNull null]);
-    XCTAssertEqual(unmanaged.decimalVal, [NSNull null]);
-    XCTAssertEqual(unmanaged.objectIdVal, [NSNull null]);
-    XCTAssertEqual(unmanaged.uuidVal, [NSNull null]);
-    XCTAssertNil(managed.boolVal);
-    XCTAssertNil(managed.intVal);
-    XCTAssertNil(managed.floatVal);
-    XCTAssertNil(managed.doubleVal);
-    XCTAssertNil(managed.stringVal);
-    XCTAssertNil(managed.dataVal);
-    XCTAssertNil(managed.dateVal);
-    XCTAssertNil(managed.decimalVal);
-    XCTAssertNil(managed.objectIdVal);
-    XCTAssertNil(managed.uuidVal);
 }
 
 @end

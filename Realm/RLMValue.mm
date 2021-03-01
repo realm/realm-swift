@@ -26,12 +26,18 @@
 - (RLMPropertyType)valueType {
     if (numberIsBool(self)) {
         return RLMPropertyTypeBool;
-    } else if (numberIsInteger(self)) {
+    }
+    else if (numberIsInteger(self)) {
         return RLMPropertyTypeInt;
-    } else if (numberIsFloat(self)) {
+    }
+    else if (*@encode(float) == [self objCType][0]) {
         return RLMPropertyTypeFloat;
-    } else {
+    }
+    else if (*@encode(double) == [self objCType][0]) {
         return RLMPropertyTypeDouble;
+    }
+    else {
+        @throw RLMException(@"Unknown numeric type on type RLMValue.");
     }
 }
 

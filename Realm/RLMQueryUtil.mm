@@ -399,7 +399,6 @@ public:
     Type type() const { return m_type; }
     const ColumnReference& link_column() const { return m_link_column; }
     const ColumnReference& column() const { return *m_column; }
-
     void validate_comparison(id value) const {
         bool valid = true;
         switch (m_type) {
@@ -566,6 +565,9 @@ public:
     CollectionOperation collection_operation_from_key_path(RLMObjectSchema *desc, NSString *keyPath);
     ColumnReference column_reference_from_key_path(RLMObjectSchema *objectSchema, NSString *keyPath, bool isAggregate);
 
+    template<typename Fn>
+    void get_numeric_type(id, Fn&&) const;
+
 private:
     Query& m_query;
     Group& m_group;
@@ -700,8 +702,15 @@ void QueryBuilder::add_diacritic_sensitive_string_constraint(NSPredicateOperator
             m_query.and_query(column.like(value, caseSensitive));
             break;
         default: {
-            constexpr auto propertyType = is_any_v<C, String, Lst<String>> ? RLMPropertyTypeString : RLMPropertyTypeData;
-            unsupportedOperator(propertyType, operatorType);
+            if constexpr (is_any_v<C, String, Lst<String>>) {
+                unsupportedOperator(RLMPropertyTypeString, operatorType);
+            }
+            else if constexpr (is_any_v<C, Binary, Lst<Binary>>) {
+                unsupportedOperator(RLMPropertyTypeData, operatorType);
+            }
+            else if constexpr (is_any_v<C, Mixed, Lst<Mixed>>) {
+                unsupportedOperator(RLMPropertyTypeAny, operatorType);
+            }
         }
     }
 }
@@ -1033,10 +1042,26 @@ void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
                                         Columns<C>&& column,
                                         T value)
 {
-    add_mixed_constraint(operatorType,
-                         predicateOptions,
-                         std::move(column),
-                         value_of_type<Mixed>(value));
+    if (auto i = RLMDynamicCast<NSNumber>(value)) {
+        if ([value objCType][0] == 'c') {
+            add_bool_constraint(RLMPropertyTypeAny, operatorType, column, value_of_type<Bool>(value));
+        }
+        else if (numberIsInteger(i)) {
+            add_numeric_constraint(RLMPropertyTypeAny, operatorType, column, value_of_type<Int>(value));
+        }
+        else if ([value objCType][0] == *@encode(float)) {
+            add_numeric_constraint(RLMPropertyTypeAny, operatorType, column, value_of_type<Float>(value));
+        }
+        else if ([value objCType][0] == *@encode(double)) {
+            add_numeric_constraint(RLMPropertyTypeAny, operatorType, column, value_of_type<Double>(value));
+        }
+    }
+    else {
+        add_mixed_constraint(operatorType,
+                             predicateOptions,
+                             std::move(column),
+                             value_of_type<Mixed>(value));
+    }
 }
 
 template<typename C>
@@ -1065,7 +1090,7 @@ void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
         case realm::type_UUID:
         case realm::type_ObjectId:
         case realm::type_Bool:
-            add_bool_constraint(RLMPropertyTypeBool, operatorType, column, value);
+            add_bool_constraint(RLMPropertyTypeAny, operatorType, column, value);
             break;
         case realm::type_String:
         case realm::type_Binary:
@@ -1263,17 +1288,79 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
         case RLMPropertyTypeAny:
             if constexpr (Operation == CollectionOperation::Sum || Operation == CollectionOperation::Average) {
                 throwException(@"Unsupported predicate value type",
-                               @"Cannot sum or average 'any' properties");
+                               @"Cannot sum or average mixed properties");
             }
-            else {
+            else if constexpr (std::is_same_v<R, id>) {
+                if (auto i = RLMDynamicCast<NSNumber>(rhs)) {
+                    if ([rhs objCType][0] == 'c') {
+                        // Bools are not supported
+                        throwException(@"Unsupported predicate value type",
+                                       @"Unsupported comparision value type for mixed. Value must be numeric.");
+                    }
+                    else if (numberIsInteger(i)) {
+                        add_numeric_constraint(type, operatorType,
+                                               collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
+                                               Mixed([i intValue]));
+                    }
+                    else if ([rhs objCType][0] == *@encode(float)) {
+                        add_numeric_constraint(type, operatorType,
+                                               collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
+                                               Mixed([i floatValue]));
+                    }
+                    else if ([rhs objCType][0] == *@encode(double)) {
+                        add_numeric_constraint(type, operatorType,
+                                               collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
+                                               Mixed([i doubleValue]));
+                    }
+                }
+                else if ([rhs isKindOfClass:[NSDate class]]) {
+                    add_numeric_constraint(type, operatorType,
+                                           collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
+                                           Mixed(value_of_type<Timestamp>(rhs)));
+                }
+                else if ([rhs isKindOfClass:[RLMDecimal128 class]]) {
+                    add_numeric_constraint(type, operatorType,
+                                           collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
+                                           Mixed(value_of_type<Decimal128>(rhs)));
+                }
+                else {
+                    throwException(@"Unsupported predicate value type",
+                                   @"Unsupported comparision value type for mixed. Value must be numeric.");
+                }
+            }
+            else if constexpr (std::is_empty_v<R>) {
                 add_numeric_constraint(type, operatorType,
                                        collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
-                                       value_of_type<Mixed>(rhs));
+                                       Mixed());
             }
             break;
         default:
             REALM_ASSERT(false && "Only numeric property types should hit this path.");
     }
+}
+
+template<typename Fn>
+void QueryBuilder::get_numeric_type(id obj, Fn&& fn) const {
+    if (auto i = RLMDynamicCast<NSNumber>(obj)) {
+        if (numberIsInteger(i)) {
+            fn(value_of_type<Int>(i), (Int *)0);
+            return;
+        }
+        else if (numberIsFloat(i)) {
+            fn(value_of_type<Float>(i), (Float *)0);
+            return;
+        }
+        else if (numberIsDouble(i)) {
+            fn(value_of_type<Double>(i), (Double *)0);
+            return;
+        }
+        else if (numberIsBool(i)) {
+            fn(value_of_type<Bool>(i), (Bool *)0);
+            return;
+        }
+    }
+    throwException(@"Unsupported predicate value type",
+                   @"Cannot cast value to NSNumber");
 }
 
 template <CollectionOperation::Type Operation, typename R>
@@ -1335,8 +1422,8 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
                     add_numeric_constraint(type, operatorType, column.resolve<Lst<UUID>>().size(), rhsValue);
                     return;
                 case RLMPropertyTypeAny:
-                    throwException(@"Unsupported predicate value type",
-                                   @"Object type %@ not supported", RLMTypeToString(type));
+                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Mixed>>().size(), rhsValue);
+                    return;
             }
         }
         case CollectionOperation::Minimum:

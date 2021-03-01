@@ -92,7 +92,7 @@ static bool rawTypeShouldBeTreatedAsComputedProperty(NSString *rawType) {
                                  objectClassName:prop.object_type.length() ? @(prop.object_type.c_str()) : nil
                           linkOriginPropertyName:prop.link_origin_property_name.length() ? @(prop.link_origin_property_name.c_str()) : nil
                                          indexed:prop.is_indexed
-                                        optional:is_nullable(prop.type)];
+                                        optional:isNullable(prop.type)];
     if (is_array(prop.type)) {
         ret->_array = true;
     }
@@ -243,10 +243,15 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     }
     else if (strcmp(code, "@\"<RLMValue>\"") == 0) {
         _type = RLMPropertyTypeAny;
+        // Mixed can represent a null type but can't explicitly be an optional type.
+        _optional = false;
     }
     else if (strncmp(code, arrayPrefix, arrayPrefixLen) == 0) {
         _array = true;
         if (auto type = typeFromProtocolString(code + arrayPrefixLen)) {
+            if (*type == RLMPropertyTypeAny) {
+                _optional = false;
+            }
             _type = *type;
             return YES;
         }

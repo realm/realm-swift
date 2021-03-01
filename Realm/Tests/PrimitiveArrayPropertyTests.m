@@ -111,7 +111,16 @@ static double average(NSArray *values) {
         unmanaged.decimalObj,
         unmanaged.objectIdObj,
         unmanaged.uuidObj,
-        unmanaged.anyObj,
+        unmanaged.anyObj1,
+        unmanaged.anyObj2,
+        unmanaged.anyObj3,
+        unmanaged.anyObj4,
+        unmanaged.anyObj5,
+        unmanaged.anyObj6,
+        unmanaged.anyObj7,
+        unmanaged.anyObj8,
+        unmanaged.anyObj9,
+        unmanaged.anyObj10,
         optUnmanaged.boolObj,
         optUnmanaged.intObj,
         optUnmanaged.floatObj,
@@ -132,7 +141,16 @@ static double average(NSArray *values) {
         managed.decimalObj,
         managed.objectIdObj,
         managed.uuidObj,
-        managed.anyObj,
+        managed.anyObj1,
+        managed.anyObj2,
+        managed.anyObj3,
+        managed.anyObj4,
+        managed.anyObj5,
+        managed.anyObj6,
+        managed.anyObj7,
+        managed.anyObj8,
+        managed.anyObj9,
+        managed.anyObj10,
         optManaged.boolObj,
         optManaged.intObj,
         optManaged.floatObj,
@@ -163,7 +181,16 @@ static double average(NSArray *values) {
     [unmanaged.decimalObj addObjects:@[decimal128(2), decimal128(3)]];
     [unmanaged.objectIdObj addObjects:@[objectId(1), objectId(2)]];
     [unmanaged.uuidObj addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]];
-    [unmanaged.anyObj addObjects:@[@NO, decimal128(1), NSNull.null]];
+    [unmanaged.anyObj1 addObjects:@[@NO, @YES]];
+    [unmanaged.anyObj2 addObjects:@[@2, @3]];
+    [unmanaged.anyObj3 addObjects:@[@2.2f, @3.3f]];
+    [unmanaged.anyObj4 addObjects:@[@2.2, @3.3]];
+    [unmanaged.anyObj5 addObjects:@[@"a", @"b"]];
+    [unmanaged.anyObj6 addObjects:@[data(1), data(2)]];
+    [unmanaged.anyObj7 addObjects:@[date(1), date(2)]];
+    [unmanaged.anyObj8 addObjects:@[decimal128(2), decimal128(3)]];
+    [unmanaged.anyObj9 addObjects:@[objectId(1), objectId(2)]];
+    [unmanaged.anyObj10 addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]];
     [optUnmanaged.boolObj addObjects:@[@NO, @YES, NSNull.null]];
     [optUnmanaged.intObj addObjects:@[@2, @3, NSNull.null]];
     [optUnmanaged.floatObj addObjects:@[@2.2f, @3.3f, NSNull.null]];
@@ -184,7 +211,16 @@ static double average(NSArray *values) {
     [managed.decimalObj addObjects:@[decimal128(2), decimal128(3)]];
     [managed.objectIdObj addObjects:@[objectId(1), objectId(2)]];
     [managed.uuidObj addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]];
-    [managed.anyObj addObjects:@[@NO, decimal128(1), NSNull.null]];
+    [managed.anyObj1 addObjects:@[@NO, @YES]];
+    [managed.anyObj2 addObjects:@[@2, @3]];
+    [managed.anyObj3 addObjects:@[@2.2f, @3.3f]];
+    [managed.anyObj4 addObjects:@[@2.2, @3.3]];
+    [managed.anyObj5 addObjects:@[@"a", @"b"]];
+    [managed.anyObj6 addObjects:@[data(1), data(2)]];
+    [managed.anyObj7 addObjects:@[date(1), date(2)]];
+    [managed.anyObj8 addObjects:@[decimal128(2), decimal128(3)]];
+    [managed.anyObj9 addObjects:@[objectId(1), objectId(2)]];
+    [managed.anyObj10 addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]];
     [optManaged.boolObj addObjects:@[@NO, @YES, NSNull.null]];
     [optManaged.intObj addObjects:@[@2, @3, NSNull.null]];
     [optManaged.floatObj addObjects:@[@2.2f, @3.3f, NSNull.null]];
@@ -211,7 +247,16 @@ static double average(NSArray *values) {
     XCTAssertEqual(unmanaged.stringObj.type, RLMPropertyTypeString);
     XCTAssertEqual(unmanaged.dataObj.type, RLMPropertyTypeData);
     XCTAssertEqual(unmanaged.dateObj.type, RLMPropertyTypeDate);
-    XCTAssertEqual(unmanaged.anyObj.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj1.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj2.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj3.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj4.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj5.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj6.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj7.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj8.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj9.type, RLMPropertyTypeAny);
+    XCTAssertEqual(unmanaged.anyObj10.type, RLMPropertyTypeAny);
     XCTAssertEqual(optUnmanaged.boolObj.type, RLMPropertyTypeBool);
     XCTAssertEqual(optUnmanaged.intObj.type, RLMPropertyTypeInt);
     XCTAssertEqual(optUnmanaged.floatObj.type, RLMPropertyTypeFloat);
@@ -229,7 +274,16 @@ static double average(NSArray *values) {
     XCTAssertFalse(unmanaged.stringObj.optional);
     XCTAssertFalse(unmanaged.dataObj.optional);
     XCTAssertFalse(unmanaged.dateObj.optional);
-    XCTAssertFalse(unmanaged.anyObj.optional);
+    XCTAssertFalse(unmanaged.anyObj1.optional);
+    XCTAssertFalse(unmanaged.anyObj2.optional);
+    XCTAssertFalse(unmanaged.anyObj3.optional);
+    XCTAssertFalse(unmanaged.anyObj4.optional);
+    XCTAssertFalse(unmanaged.anyObj5.optional);
+    XCTAssertFalse(unmanaged.anyObj6.optional);
+    XCTAssertFalse(unmanaged.anyObj7.optional);
+    XCTAssertFalse(unmanaged.anyObj8.optional);
+    XCTAssertFalse(unmanaged.anyObj9.optional);
+    XCTAssertFalse(unmanaged.anyObj10.optional);
     XCTAssertTrue(optUnmanaged.boolObj.optional);
     XCTAssertTrue(optUnmanaged.intObj.optional);
     XCTAssertTrue(optUnmanaged.floatObj.optional);
@@ -247,7 +301,16 @@ static double average(NSArray *values) {
     XCTAssertNil(unmanaged.stringObj.objectClassName);
     XCTAssertNil(unmanaged.dataObj.objectClassName);
     XCTAssertNil(unmanaged.dateObj.objectClassName);
-    XCTAssertNil(unmanaged.anyObj.objectClassName);
+    XCTAssertNil(unmanaged.anyObj1.objectClassName);
+    XCTAssertNil(unmanaged.anyObj2.objectClassName);
+    XCTAssertNil(unmanaged.anyObj3.objectClassName);
+    XCTAssertNil(unmanaged.anyObj4.objectClassName);
+    XCTAssertNil(unmanaged.anyObj5.objectClassName);
+    XCTAssertNil(unmanaged.anyObj6.objectClassName);
+    XCTAssertNil(unmanaged.anyObj7.objectClassName);
+    XCTAssertNil(unmanaged.anyObj8.objectClassName);
+    XCTAssertNil(unmanaged.anyObj9.objectClassName);
+    XCTAssertNil(unmanaged.anyObj10.objectClassName);
     XCTAssertNil(optUnmanaged.boolObj.objectClassName);
     XCTAssertNil(optUnmanaged.intObj.objectClassName);
     XCTAssertNil(optUnmanaged.floatObj.objectClassName);
@@ -265,7 +328,16 @@ static double average(NSArray *values) {
     XCTAssertNil(unmanaged.stringObj.realm);
     XCTAssertNil(unmanaged.dataObj.realm);
     XCTAssertNil(unmanaged.dateObj.realm);
-    XCTAssertNil(unmanaged.anyObj.realm);
+    XCTAssertNil(unmanaged.anyObj1.realm);
+    XCTAssertNil(unmanaged.anyObj2.realm);
+    XCTAssertNil(unmanaged.anyObj3.realm);
+    XCTAssertNil(unmanaged.anyObj4.realm);
+    XCTAssertNil(unmanaged.anyObj5.realm);
+    XCTAssertNil(unmanaged.anyObj6.realm);
+    XCTAssertNil(unmanaged.anyObj7.realm);
+    XCTAssertNil(unmanaged.anyObj8.realm);
+    XCTAssertNil(unmanaged.anyObj9.realm);
+    XCTAssertNil(unmanaged.anyObj10.realm);
     XCTAssertNil(optUnmanaged.boolObj.realm);
     XCTAssertNil(optUnmanaged.intObj.realm);
     XCTAssertNil(optUnmanaged.floatObj.realm);
@@ -315,7 +387,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(unmanaged.decimalObj.firstObject, decimal128(2));
     XCTAssertEqualObjects(unmanaged.objectIdObj.firstObject, objectId(1));
     XCTAssertEqualObjects(unmanaged.uuidObj.firstObject, uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(unmanaged.anyObj.firstObject, @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj1.firstObject, @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj2.firstObject, @2);
+    XCTAssertEqualObjects(unmanaged.anyObj3.firstObject, @2.2f);
+    XCTAssertEqualObjects(unmanaged.anyObj4.firstObject, @2.2);
+    XCTAssertEqualObjects(unmanaged.anyObj5.firstObject, @"a");
+    XCTAssertEqualObjects(unmanaged.anyObj6.firstObject, data(1));
+    XCTAssertEqualObjects(unmanaged.anyObj7.firstObject, date(1));
+    XCTAssertEqualObjects(unmanaged.anyObj8.firstObject, decimal128(2));
+    XCTAssertEqualObjects(unmanaged.anyObj9.firstObject, objectId(1));
+    XCTAssertEqualObjects(unmanaged.anyObj10.firstObject, uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optUnmanaged.boolObj.firstObject, @NO);
     XCTAssertEqualObjects(optUnmanaged.intObj.firstObject, @2);
     XCTAssertEqualObjects(optUnmanaged.floatObj.firstObject, @2.2f);
@@ -336,7 +417,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(managed.decimalObj.firstObject, decimal128(2));
     XCTAssertEqualObjects(managed.objectIdObj.firstObject, objectId(1));
     XCTAssertEqualObjects(managed.uuidObj.firstObject, uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(managed.anyObj.firstObject, @NO);
+    XCTAssertEqualObjects(managed.anyObj1.firstObject, @NO);
+    XCTAssertEqualObjects(managed.anyObj2.firstObject, @2);
+    XCTAssertEqualObjects(managed.anyObj3.firstObject, @2.2f);
+    XCTAssertEqualObjects(managed.anyObj4.firstObject, @2.2);
+    XCTAssertEqualObjects(managed.anyObj5.firstObject, @"a");
+    XCTAssertEqualObjects(managed.anyObj6.firstObject, data(1));
+    XCTAssertEqualObjects(managed.anyObj7.firstObject, date(1));
+    XCTAssertEqualObjects(managed.anyObj8.firstObject, decimal128(2));
+    XCTAssertEqualObjects(managed.anyObj9.firstObject, objectId(1));
+    XCTAssertEqualObjects(managed.anyObj10.firstObject, uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optManaged.boolObj.firstObject, @NO);
     XCTAssertEqualObjects(optManaged.intObj.firstObject, @2);
     XCTAssertEqualObjects(optManaged.floatObj.firstObject, @2.2f);
@@ -352,7 +442,6 @@ static double average(NSArray *values) {
         [array removeAllObjects];
     }
 
-    [unmanaged.anyObj addObject:NSNull.null];
     [optUnmanaged.boolObj addObject:NSNull.null];
     [optUnmanaged.intObj addObject:NSNull.null];
     [optUnmanaged.floatObj addObject:NSNull.null];
@@ -363,7 +452,6 @@ static double average(NSArray *values) {
     [optUnmanaged.decimalObj addObject:NSNull.null];
     [optUnmanaged.objectIdObj addObject:NSNull.null];
     [optUnmanaged.uuidObj addObject:NSNull.null];
-    [managed.anyObj addObject:NSNull.null];
     [optManaged.boolObj addObject:NSNull.null];
     [optManaged.intObj addObject:NSNull.null];
     [optManaged.floatObj addObject:NSNull.null];
@@ -374,7 +462,6 @@ static double average(NSArray *values) {
     [optManaged.decimalObj addObject:NSNull.null];
     [optManaged.objectIdObj addObject:NSNull.null];
     [optManaged.uuidObj addObject:NSNull.null];
-    XCTAssertEqualObjects(unmanaged.anyObj.firstObject, NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.boolObj.firstObject, NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.intObj.firstObject, NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.floatObj.firstObject, NSNull.null);
@@ -385,7 +472,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optUnmanaged.decimalObj.firstObject, NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.objectIdObj.firstObject, NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.uuidObj.firstObject, NSNull.null);
-    XCTAssertEqualObjects(managed.anyObj.firstObject, NSNull.null);
     XCTAssertEqualObjects(optManaged.boolObj.firstObject, NSNull.null);
     XCTAssertEqualObjects(optManaged.intObj.firstObject, NSNull.null);
     XCTAssertEqualObjects(optManaged.floatObj.firstObject, NSNull.null);
@@ -416,7 +502,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(unmanaged.decimalObj.lastObject, decimal128(3));
     XCTAssertEqualObjects(unmanaged.objectIdObj.lastObject, objectId(2));
     XCTAssertEqualObjects(unmanaged.uuidObj.lastObject, uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    XCTAssertEqualObjects(unmanaged.anyObj.lastObject, NSNull.null);
+    XCTAssertEqualObjects(unmanaged.anyObj1.lastObject, @YES);
+    XCTAssertEqualObjects(unmanaged.anyObj2.lastObject, @3);
+    XCTAssertEqualObjects(unmanaged.anyObj3.lastObject, @3.3f);
+    XCTAssertEqualObjects(unmanaged.anyObj4.lastObject, @3.3);
+    XCTAssertEqualObjects(unmanaged.anyObj5.lastObject, @"b");
+    XCTAssertEqualObjects(unmanaged.anyObj6.lastObject, data(2));
+    XCTAssertEqualObjects(unmanaged.anyObj7.lastObject, date(2));
+    XCTAssertEqualObjects(unmanaged.anyObj8.lastObject, decimal128(3));
+    XCTAssertEqualObjects(unmanaged.anyObj9.lastObject, objectId(2));
+    XCTAssertEqualObjects(unmanaged.anyObj10.lastObject, uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     XCTAssertEqualObjects(optUnmanaged.boolObj.lastObject, NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.intObj.lastObject, NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.floatObj.lastObject, NSNull.null);
@@ -437,7 +532,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(managed.decimalObj.lastObject, decimal128(3));
     XCTAssertEqualObjects(managed.objectIdObj.lastObject, objectId(2));
     XCTAssertEqualObjects(managed.uuidObj.lastObject, uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    XCTAssertEqualObjects(managed.anyObj.lastObject, NSNull.null);
+    XCTAssertEqualObjects(managed.anyObj1.lastObject, @YES);
+    XCTAssertEqualObjects(managed.anyObj2.lastObject, @3);
+    XCTAssertEqualObjects(managed.anyObj3.lastObject, @3.3f);
+    XCTAssertEqualObjects(managed.anyObj4.lastObject, @3.3);
+    XCTAssertEqualObjects(managed.anyObj5.lastObject, @"b");
+    XCTAssertEqualObjects(managed.anyObj6.lastObject, data(2));
+    XCTAssertEqualObjects(managed.anyObj7.lastObject, date(2));
+    XCTAssertEqualObjects(managed.anyObj8.lastObject, decimal128(3));
+    XCTAssertEqualObjects(managed.anyObj9.lastObject, objectId(2));
+    XCTAssertEqualObjects(managed.anyObj10.lastObject, uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     XCTAssertEqualObjects(optManaged.boolObj.lastObject, NSNull.null);
     XCTAssertEqualObjects(optManaged.intObj.lastObject, NSNull.null);
     XCTAssertEqualObjects(optManaged.floatObj.lastObject, NSNull.null);
@@ -452,7 +556,6 @@ static double average(NSArray *values) {
     for (RLMArray *array in allArrays) {
         [array removeLastObject];
     }
-    XCTAssertEqualObjects(unmanaged.anyObj.lastObject, decimal128(1));
     XCTAssertEqualObjects(optUnmanaged.boolObj.lastObject, @YES);
     XCTAssertEqualObjects(optUnmanaged.intObj.lastObject, @3);
     XCTAssertEqualObjects(optUnmanaged.floatObj.lastObject, @3.3f);
@@ -463,7 +566,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optUnmanaged.decimalObj.lastObject, decimal128(3));
     XCTAssertEqualObjects(optUnmanaged.objectIdObj.lastObject, objectId(2));
     XCTAssertEqualObjects(optUnmanaged.uuidObj.lastObject, uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    XCTAssertEqualObjects(managed.anyObj.lastObject, decimal128(1));
     XCTAssertEqualObjects(optManaged.boolObj.lastObject, @YES);
     XCTAssertEqualObjects(optManaged.intObj.lastObject, @3);
     XCTAssertEqualObjects(optManaged.floatObj.lastObject, @3.3f);
@@ -608,7 +710,16 @@ static double average(NSArray *values) {
     [unmanaged.decimalObj addObject:decimal128(2)];
     [unmanaged.objectIdObj addObject:objectId(1)];
     [unmanaged.uuidObj addObject:uuid(@"00000000-0000-0000-0000-000000000000")];
-    [unmanaged.anyObj addObject:@NO];
+    [unmanaged.anyObj1 addObject:@NO];
+    [unmanaged.anyObj2 addObject:@2];
+    [unmanaged.anyObj3 addObject:@2.2f];
+    [unmanaged.anyObj4 addObject:@2.2];
+    [unmanaged.anyObj5 addObject:@"a"];
+    [unmanaged.anyObj6 addObject:data(1)];
+    [unmanaged.anyObj7 addObject:date(1)];
+    [unmanaged.anyObj8 addObject:decimal128(2)];
+    [unmanaged.anyObj9 addObject:objectId(1)];
+    [unmanaged.anyObj10 addObject:uuid(@"00000000-0000-0000-0000-000000000000")];
     [optUnmanaged.boolObj addObject:@NO];
     [optUnmanaged.intObj addObject:@2];
     [optUnmanaged.floatObj addObject:@2.2f];
@@ -629,7 +740,16 @@ static double average(NSArray *values) {
     [managed.decimalObj addObject:decimal128(2)];
     [managed.objectIdObj addObject:objectId(1)];
     [managed.uuidObj addObject:uuid(@"00000000-0000-0000-0000-000000000000")];
-    [managed.anyObj addObject:@NO];
+    [managed.anyObj1 addObject:@NO];
+    [managed.anyObj2 addObject:@2];
+    [managed.anyObj3 addObject:@2.2f];
+    [managed.anyObj4 addObject:@2.2];
+    [managed.anyObj5 addObject:@"a"];
+    [managed.anyObj6 addObject:data(1)];
+    [managed.anyObj7 addObject:date(1)];
+    [managed.anyObj8 addObject:decimal128(2)];
+    [managed.anyObj9 addObject:objectId(1)];
+    [managed.anyObj10 addObject:uuid(@"00000000-0000-0000-0000-000000000000")];
     [optManaged.boolObj addObject:@NO];
     [optManaged.intObj addObject:@2];
     [optManaged.floatObj addObject:@2.2f];
@@ -650,7 +770,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(unmanaged.decimalObj[0], decimal128(2));
     XCTAssertEqualObjects(unmanaged.objectIdObj[0], objectId(1));
     XCTAssertEqualObjects(unmanaged.uuidObj[0], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(unmanaged.anyObj[0], @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj1[0], @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj2[0], @2);
+    XCTAssertEqualObjects(unmanaged.anyObj3[0], @2.2f);
+    XCTAssertEqualObjects(unmanaged.anyObj4[0], @2.2);
+    XCTAssertEqualObjects(unmanaged.anyObj5[0], @"a");
+    XCTAssertEqualObjects(unmanaged.anyObj6[0], data(1));
+    XCTAssertEqualObjects(unmanaged.anyObj7[0], date(1));
+    XCTAssertEqualObjects(unmanaged.anyObj8[0], decimal128(2));
+    XCTAssertEqualObjects(unmanaged.anyObj9[0], objectId(1));
+    XCTAssertEqualObjects(unmanaged.anyObj10[0], uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optUnmanaged.boolObj[0], @NO);
     XCTAssertEqualObjects(optUnmanaged.intObj[0], @2);
     XCTAssertEqualObjects(optUnmanaged.floatObj[0], @2.2f);
@@ -671,7 +800,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(managed.decimalObj[0], decimal128(2));
     XCTAssertEqualObjects(managed.objectIdObj[0], objectId(1));
     XCTAssertEqualObjects(managed.uuidObj[0], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(managed.anyObj[0], @NO);
+    XCTAssertEqualObjects(managed.anyObj1[0], @NO);
+    XCTAssertEqualObjects(managed.anyObj2[0], @2);
+    XCTAssertEqualObjects(managed.anyObj3[0], @2.2f);
+    XCTAssertEqualObjects(managed.anyObj4[0], @2.2);
+    XCTAssertEqualObjects(managed.anyObj5[0], @"a");
+    XCTAssertEqualObjects(managed.anyObj6[0], data(1));
+    XCTAssertEqualObjects(managed.anyObj7[0], date(1));
+    XCTAssertEqualObjects(managed.anyObj8[0], decimal128(2));
+    XCTAssertEqualObjects(managed.anyObj9[0], objectId(1));
+    XCTAssertEqualObjects(managed.anyObj10[0], uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optManaged.boolObj[0], @NO);
     XCTAssertEqualObjects(optManaged.intObj[0], @2);
     XCTAssertEqualObjects(optManaged.floatObj[0], @2.2f);
@@ -683,7 +821,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optManaged.objectIdObj[0], objectId(1));
     XCTAssertEqualObjects(optManaged.uuidObj[0], uuid(@"00000000-0000-0000-0000-000000000000"));
 
-    [unmanaged.anyObj addObject:NSNull.null];
     [optUnmanaged.boolObj addObject:NSNull.null];
     [optUnmanaged.intObj addObject:NSNull.null];
     [optUnmanaged.floatObj addObject:NSNull.null];
@@ -694,7 +831,6 @@ static double average(NSArray *values) {
     [optUnmanaged.decimalObj addObject:NSNull.null];
     [optUnmanaged.objectIdObj addObject:NSNull.null];
     [optUnmanaged.uuidObj addObject:NSNull.null];
-    [managed.anyObj addObject:NSNull.null];
     [optManaged.boolObj addObject:NSNull.null];
     [optManaged.intObj addObject:NSNull.null];
     [optManaged.floatObj addObject:NSNull.null];
@@ -705,7 +841,6 @@ static double average(NSArray *values) {
     [optManaged.decimalObj addObject:NSNull.null];
     [optManaged.objectIdObj addObject:NSNull.null];
     [optManaged.uuidObj addObject:NSNull.null];
-    XCTAssertEqualObjects(unmanaged.anyObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.boolObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.intObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.floatObj[1], NSNull.null);
@@ -716,7 +851,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optUnmanaged.decimalObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.objectIdObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.uuidObj[1], NSNull.null);
-    XCTAssertEqualObjects(managed.anyObj[1], NSNull.null);
     XCTAssertEqualObjects(optManaged.boolObj[1], NSNull.null);
     XCTAssertEqualObjects(optManaged.intObj[1], NSNull.null);
     XCTAssertEqualObjects(optManaged.floatObj[1], NSNull.null);
@@ -862,7 +996,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(unmanaged.decimalObj[0], decimal128(2));
     XCTAssertEqualObjects(unmanaged.objectIdObj[0], objectId(1));
     XCTAssertEqualObjects(unmanaged.uuidObj[0], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(unmanaged.anyObj[0], @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj1[0], @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj2[0], @2);
+    XCTAssertEqualObjects(unmanaged.anyObj3[0], @2.2f);
+    XCTAssertEqualObjects(unmanaged.anyObj4[0], @2.2);
+    XCTAssertEqualObjects(unmanaged.anyObj5[0], @"a");
+    XCTAssertEqualObjects(unmanaged.anyObj6[0], data(1));
+    XCTAssertEqualObjects(unmanaged.anyObj7[0], date(1));
+    XCTAssertEqualObjects(unmanaged.anyObj8[0], decimal128(2));
+    XCTAssertEqualObjects(unmanaged.anyObj9[0], objectId(1));
+    XCTAssertEqualObjects(unmanaged.anyObj10[0], uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optUnmanaged.boolObj[0], @NO);
     XCTAssertEqualObjects(optUnmanaged.intObj[0], @2);
     XCTAssertEqualObjects(optUnmanaged.floatObj[0], @2.2f);
@@ -883,7 +1026,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(managed.decimalObj[0], decimal128(2));
     XCTAssertEqualObjects(managed.objectIdObj[0], objectId(1));
     XCTAssertEqualObjects(managed.uuidObj[0], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(managed.anyObj[0], @NO);
+    XCTAssertEqualObjects(managed.anyObj1[0], @NO);
+    XCTAssertEqualObjects(managed.anyObj2[0], @2);
+    XCTAssertEqualObjects(managed.anyObj3[0], @2.2f);
+    XCTAssertEqualObjects(managed.anyObj4[0], @2.2);
+    XCTAssertEqualObjects(managed.anyObj5[0], @"a");
+    XCTAssertEqualObjects(managed.anyObj6[0], data(1));
+    XCTAssertEqualObjects(managed.anyObj7[0], date(1));
+    XCTAssertEqualObjects(managed.anyObj8[0], decimal128(2));
+    XCTAssertEqualObjects(managed.anyObj9[0], objectId(1));
+    XCTAssertEqualObjects(managed.anyObj10[0], uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optManaged.boolObj[0], @NO);
     XCTAssertEqualObjects(optManaged.intObj[0], @2);
     XCTAssertEqualObjects(optManaged.floatObj[0], @2.2f);
@@ -904,7 +1056,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(unmanaged.decimalObj[1], decimal128(3));
     XCTAssertEqualObjects(unmanaged.objectIdObj[1], objectId(2));
     XCTAssertEqualObjects(unmanaged.uuidObj[1], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    XCTAssertEqualObjects(unmanaged.anyObj[1], decimal128(1));
+    XCTAssertEqualObjects(unmanaged.anyObj1[1], @YES);
+    XCTAssertEqualObjects(unmanaged.anyObj2[1], @3);
+    XCTAssertEqualObjects(unmanaged.anyObj3[1], @3.3f);
+    XCTAssertEqualObjects(unmanaged.anyObj4[1], @3.3);
+    XCTAssertEqualObjects(unmanaged.anyObj5[1], @"b");
+    XCTAssertEqualObjects(unmanaged.anyObj6[1], data(2));
+    XCTAssertEqualObjects(unmanaged.anyObj7[1], date(2));
+    XCTAssertEqualObjects(unmanaged.anyObj8[1], decimal128(3));
+    XCTAssertEqualObjects(unmanaged.anyObj9[1], objectId(2));
+    XCTAssertEqualObjects(unmanaged.anyObj10[1], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     XCTAssertEqualObjects(optUnmanaged.boolObj[1], @YES);
     XCTAssertEqualObjects(optUnmanaged.intObj[1], @3);
     XCTAssertEqualObjects(optUnmanaged.floatObj[1], @3.3f);
@@ -925,7 +1086,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(managed.decimalObj[1], decimal128(3));
     XCTAssertEqualObjects(managed.objectIdObj[1], objectId(2));
     XCTAssertEqualObjects(managed.uuidObj[1], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    XCTAssertEqualObjects(managed.anyObj[1], decimal128(1));
+    XCTAssertEqualObjects(managed.anyObj1[1], @YES);
+    XCTAssertEqualObjects(managed.anyObj2[1], @3);
+    XCTAssertEqualObjects(managed.anyObj3[1], @3.3f);
+    XCTAssertEqualObjects(managed.anyObj4[1], @3.3);
+    XCTAssertEqualObjects(managed.anyObj5[1], @"b");
+    XCTAssertEqualObjects(managed.anyObj6[1], data(2));
+    XCTAssertEqualObjects(managed.anyObj7[1], date(2));
+    XCTAssertEqualObjects(managed.anyObj8[1], decimal128(3));
+    XCTAssertEqualObjects(managed.anyObj9[1], objectId(2));
+    XCTAssertEqualObjects(managed.anyObj10[1], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     XCTAssertEqualObjects(optManaged.boolObj[1], @YES);
     XCTAssertEqualObjects(optManaged.intObj[1], @3);
     XCTAssertEqualObjects(optManaged.floatObj[1], @3.3f);
@@ -936,7 +1106,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optManaged.decimalObj[1], decimal128(3));
     XCTAssertEqualObjects(optManaged.objectIdObj[1], objectId(2));
     XCTAssertEqualObjects(optManaged.uuidObj[1], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    XCTAssertEqualObjects(unmanaged.anyObj[2], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.boolObj[2], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.intObj[2], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.floatObj[2], NSNull.null);
@@ -947,7 +1116,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optUnmanaged.decimalObj[2], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.objectIdObj[2], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.uuidObj[2], NSNull.null);
-    XCTAssertEqualObjects(managed.anyObj[2], NSNull.null);
     XCTAssertEqualObjects(optManaged.boolObj[2], NSNull.null);
     XCTAssertEqualObjects(optManaged.intObj[2], NSNull.null);
     XCTAssertEqualObjects(optManaged.floatObj[2], NSNull.null);
@@ -1101,7 +1269,25 @@ static double average(NSArray *values) {
                               @"Index 1 is out of bounds (must be less than 1).");
     RLMAssertThrowsWithReason([unmanaged.uuidObj insertObject:uuid(@"00000000-0000-0000-0000-000000000000") atIndex:1],
                               @"Index 1 is out of bounds (must be less than 1).");
-    RLMAssertThrowsWithReason([unmanaged.anyObj insertObject:@NO atIndex:1],
+    RLMAssertThrowsWithReason([unmanaged.anyObj1 insertObject:@NO atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj2 insertObject:@2 atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj3 insertObject:@2.2f atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj4 insertObject:@2.2 atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj5 insertObject:@"a" atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj6 insertObject:data(1) atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj7 insertObject:date(1) atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj8 insertObject:decimal128(2) atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj9 insertObject:objectId(1) atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj10 insertObject:uuid(@"00000000-0000-0000-0000-000000000000") atIndex:1],
                               @"Index 1 is out of bounds (must be less than 1).");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj insertObject:@NO atIndex:1],
                               @"Index 1 is out of bounds (must be less than 1).");
@@ -1143,7 +1329,25 @@ static double average(NSArray *values) {
                               @"Index 1 is out of bounds (must be less than 1).");
     RLMAssertThrowsWithReason([managed.uuidObj insertObject:uuid(@"00000000-0000-0000-0000-000000000000") atIndex:1],
                               @"Index 1 is out of bounds (must be less than 1).");
-    RLMAssertThrowsWithReason([managed.anyObj insertObject:@NO atIndex:1],
+    RLMAssertThrowsWithReason([managed.anyObj1 insertObject:@NO atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([managed.anyObj2 insertObject:@2 atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([managed.anyObj3 insertObject:@2.2f atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([managed.anyObj4 insertObject:@2.2 atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([managed.anyObj5 insertObject:@"a" atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([managed.anyObj6 insertObject:data(1) atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([managed.anyObj7 insertObject:date(1) atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([managed.anyObj8 insertObject:decimal128(2) atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([managed.anyObj9 insertObject:objectId(1) atIndex:1],
+                              @"Index 1 is out of bounds (must be less than 1).");
+    RLMAssertThrowsWithReason([managed.anyObj10 insertObject:uuid(@"00000000-0000-0000-0000-000000000000") atIndex:1],
                               @"Index 1 is out of bounds (must be less than 1).");
     RLMAssertThrowsWithReason([optManaged.boolObj insertObject:@NO atIndex:1],
                               @"Index 1 is out of bounds (must be less than 1).");
@@ -1176,7 +1380,16 @@ static double average(NSArray *values) {
     [unmanaged.decimalObj insertObject:decimal128(2) atIndex:0];
     [unmanaged.objectIdObj insertObject:objectId(1) atIndex:0];
     [unmanaged.uuidObj insertObject:uuid(@"00000000-0000-0000-0000-000000000000") atIndex:0];
-    [unmanaged.anyObj insertObject:@NO atIndex:0];
+    [unmanaged.anyObj1 insertObject:@NO atIndex:0];
+    [unmanaged.anyObj2 insertObject:@2 atIndex:0];
+    [unmanaged.anyObj3 insertObject:@2.2f atIndex:0];
+    [unmanaged.anyObj4 insertObject:@2.2 atIndex:0];
+    [unmanaged.anyObj5 insertObject:@"a" atIndex:0];
+    [unmanaged.anyObj6 insertObject:data(1) atIndex:0];
+    [unmanaged.anyObj7 insertObject:date(1) atIndex:0];
+    [unmanaged.anyObj8 insertObject:decimal128(2) atIndex:0];
+    [unmanaged.anyObj9 insertObject:objectId(1) atIndex:0];
+    [unmanaged.anyObj10 insertObject:uuid(@"00000000-0000-0000-0000-000000000000") atIndex:0];
     [optUnmanaged.boolObj insertObject:@NO atIndex:0];
     [optUnmanaged.intObj insertObject:@2 atIndex:0];
     [optUnmanaged.floatObj insertObject:@2.2f atIndex:0];
@@ -1197,7 +1410,16 @@ static double average(NSArray *values) {
     [managed.decimalObj insertObject:decimal128(2) atIndex:0];
     [managed.objectIdObj insertObject:objectId(1) atIndex:0];
     [managed.uuidObj insertObject:uuid(@"00000000-0000-0000-0000-000000000000") atIndex:0];
-    [managed.anyObj insertObject:@NO atIndex:0];
+    [managed.anyObj1 insertObject:@NO atIndex:0];
+    [managed.anyObj2 insertObject:@2 atIndex:0];
+    [managed.anyObj3 insertObject:@2.2f atIndex:0];
+    [managed.anyObj4 insertObject:@2.2 atIndex:0];
+    [managed.anyObj5 insertObject:@"a" atIndex:0];
+    [managed.anyObj6 insertObject:data(1) atIndex:0];
+    [managed.anyObj7 insertObject:date(1) atIndex:0];
+    [managed.anyObj8 insertObject:decimal128(2) atIndex:0];
+    [managed.anyObj9 insertObject:objectId(1) atIndex:0];
+    [managed.anyObj10 insertObject:uuid(@"00000000-0000-0000-0000-000000000000") atIndex:0];
     [optManaged.boolObj insertObject:@NO atIndex:0];
     [optManaged.intObj insertObject:@2 atIndex:0];
     [optManaged.floatObj insertObject:@2.2f atIndex:0];
@@ -1218,7 +1440,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(unmanaged.decimalObj[0], decimal128(2));
     XCTAssertEqualObjects(unmanaged.objectIdObj[0], objectId(1));
     XCTAssertEqualObjects(unmanaged.uuidObj[0], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(unmanaged.anyObj[0], @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj1[0], @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj2[0], @2);
+    XCTAssertEqualObjects(unmanaged.anyObj3[0], @2.2f);
+    XCTAssertEqualObjects(unmanaged.anyObj4[0], @2.2);
+    XCTAssertEqualObjects(unmanaged.anyObj5[0], @"a");
+    XCTAssertEqualObjects(unmanaged.anyObj6[0], data(1));
+    XCTAssertEqualObjects(unmanaged.anyObj7[0], date(1));
+    XCTAssertEqualObjects(unmanaged.anyObj8[0], decimal128(2));
+    XCTAssertEqualObjects(unmanaged.anyObj9[0], objectId(1));
+    XCTAssertEqualObjects(unmanaged.anyObj10[0], uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optUnmanaged.boolObj[0], @NO);
     XCTAssertEqualObjects(optUnmanaged.intObj[0], @2);
     XCTAssertEqualObjects(optUnmanaged.floatObj[0], @2.2f);
@@ -1239,7 +1470,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(managed.decimalObj[0], decimal128(2));
     XCTAssertEqualObjects(managed.objectIdObj[0], objectId(1));
     XCTAssertEqualObjects(managed.uuidObj[0], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(managed.anyObj[0], @NO);
+    XCTAssertEqualObjects(managed.anyObj1[0], @NO);
+    XCTAssertEqualObjects(managed.anyObj2[0], @2);
+    XCTAssertEqualObjects(managed.anyObj3[0], @2.2f);
+    XCTAssertEqualObjects(managed.anyObj4[0], @2.2);
+    XCTAssertEqualObjects(managed.anyObj5[0], @"a");
+    XCTAssertEqualObjects(managed.anyObj6[0], data(1));
+    XCTAssertEqualObjects(managed.anyObj7[0], date(1));
+    XCTAssertEqualObjects(managed.anyObj8[0], decimal128(2));
+    XCTAssertEqualObjects(managed.anyObj9[0], objectId(1));
+    XCTAssertEqualObjects(managed.anyObj10[0], uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optManaged.boolObj[0], @NO);
     XCTAssertEqualObjects(optManaged.intObj[0], @2);
     XCTAssertEqualObjects(optManaged.floatObj[0], @2.2f);
@@ -1261,7 +1501,16 @@ static double average(NSArray *values) {
     [unmanaged.decimalObj insertObject:decimal128(3) atIndex:0];
     [unmanaged.objectIdObj insertObject:objectId(2) atIndex:0];
     [unmanaged.uuidObj insertObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89") atIndex:0];
-    [unmanaged.anyObj insertObject:decimal128(1) atIndex:0];
+    [unmanaged.anyObj1 insertObject:@YES atIndex:0];
+    [unmanaged.anyObj2 insertObject:@3 atIndex:0];
+    [unmanaged.anyObj3 insertObject:@3.3f atIndex:0];
+    [unmanaged.anyObj4 insertObject:@3.3 atIndex:0];
+    [unmanaged.anyObj5 insertObject:@"b" atIndex:0];
+    [unmanaged.anyObj6 insertObject:data(2) atIndex:0];
+    [unmanaged.anyObj7 insertObject:date(2) atIndex:0];
+    [unmanaged.anyObj8 insertObject:decimal128(3) atIndex:0];
+    [unmanaged.anyObj9 insertObject:objectId(2) atIndex:0];
+    [unmanaged.anyObj10 insertObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89") atIndex:0];
     [optUnmanaged.boolObj insertObject:@YES atIndex:0];
     [optUnmanaged.intObj insertObject:@3 atIndex:0];
     [optUnmanaged.floatObj insertObject:@3.3f atIndex:0];
@@ -1282,7 +1531,16 @@ static double average(NSArray *values) {
     [managed.decimalObj insertObject:decimal128(3) atIndex:0];
     [managed.objectIdObj insertObject:objectId(2) atIndex:0];
     [managed.uuidObj insertObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89") atIndex:0];
-    [managed.anyObj insertObject:decimal128(1) atIndex:0];
+    [managed.anyObj1 insertObject:@YES atIndex:0];
+    [managed.anyObj2 insertObject:@3 atIndex:0];
+    [managed.anyObj3 insertObject:@3.3f atIndex:0];
+    [managed.anyObj4 insertObject:@3.3 atIndex:0];
+    [managed.anyObj5 insertObject:@"b" atIndex:0];
+    [managed.anyObj6 insertObject:data(2) atIndex:0];
+    [managed.anyObj7 insertObject:date(2) atIndex:0];
+    [managed.anyObj8 insertObject:decimal128(3) atIndex:0];
+    [managed.anyObj9 insertObject:objectId(2) atIndex:0];
+    [managed.anyObj10 insertObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89") atIndex:0];
     [optManaged.boolObj insertObject:@YES atIndex:0];
     [optManaged.intObj insertObject:@3 atIndex:0];
     [optManaged.floatObj insertObject:@3.3f atIndex:0];
@@ -1303,7 +1561,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(unmanaged.decimalObj[0], decimal128(3));
     XCTAssertEqualObjects(unmanaged.objectIdObj[0], objectId(2));
     XCTAssertEqualObjects(unmanaged.uuidObj[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    XCTAssertEqualObjects(unmanaged.anyObj[0], decimal128(1));
+    XCTAssertEqualObjects(unmanaged.anyObj1[0], @YES);
+    XCTAssertEqualObjects(unmanaged.anyObj2[0], @3);
+    XCTAssertEqualObjects(unmanaged.anyObj3[0], @3.3f);
+    XCTAssertEqualObjects(unmanaged.anyObj4[0], @3.3);
+    XCTAssertEqualObjects(unmanaged.anyObj5[0], @"b");
+    XCTAssertEqualObjects(unmanaged.anyObj6[0], data(2));
+    XCTAssertEqualObjects(unmanaged.anyObj7[0], date(2));
+    XCTAssertEqualObjects(unmanaged.anyObj8[0], decimal128(3));
+    XCTAssertEqualObjects(unmanaged.anyObj9[0], objectId(2));
+    XCTAssertEqualObjects(unmanaged.anyObj10[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     XCTAssertEqualObjects(optUnmanaged.boolObj[0], @YES);
     XCTAssertEqualObjects(optUnmanaged.intObj[0], @3);
     XCTAssertEqualObjects(optUnmanaged.floatObj[0], @3.3f);
@@ -1324,7 +1591,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(managed.decimalObj[0], decimal128(3));
     XCTAssertEqualObjects(managed.objectIdObj[0], objectId(2));
     XCTAssertEqualObjects(managed.uuidObj[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    XCTAssertEqualObjects(managed.anyObj[0], decimal128(1));
+    XCTAssertEqualObjects(managed.anyObj1[0], @YES);
+    XCTAssertEqualObjects(managed.anyObj2[0], @3);
+    XCTAssertEqualObjects(managed.anyObj3[0], @3.3f);
+    XCTAssertEqualObjects(managed.anyObj4[0], @3.3);
+    XCTAssertEqualObjects(managed.anyObj5[0], @"b");
+    XCTAssertEqualObjects(managed.anyObj6[0], data(2));
+    XCTAssertEqualObjects(managed.anyObj7[0], date(2));
+    XCTAssertEqualObjects(managed.anyObj8[0], decimal128(3));
+    XCTAssertEqualObjects(managed.anyObj9[0], objectId(2));
+    XCTAssertEqualObjects(managed.anyObj10[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     XCTAssertEqualObjects(optManaged.boolObj[0], @YES);
     XCTAssertEqualObjects(optManaged.intObj[0], @3);
     XCTAssertEqualObjects(optManaged.floatObj[0], @3.3f);
@@ -1345,7 +1621,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(unmanaged.decimalObj[1], decimal128(2));
     XCTAssertEqualObjects(unmanaged.objectIdObj[1], objectId(1));
     XCTAssertEqualObjects(unmanaged.uuidObj[1], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(unmanaged.anyObj[1], @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj1[1], @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj2[1], @2);
+    XCTAssertEqualObjects(unmanaged.anyObj3[1], @2.2f);
+    XCTAssertEqualObjects(unmanaged.anyObj4[1], @2.2);
+    XCTAssertEqualObjects(unmanaged.anyObj5[1], @"a");
+    XCTAssertEqualObjects(unmanaged.anyObj6[1], data(1));
+    XCTAssertEqualObjects(unmanaged.anyObj7[1], date(1));
+    XCTAssertEqualObjects(unmanaged.anyObj8[1], decimal128(2));
+    XCTAssertEqualObjects(unmanaged.anyObj9[1], objectId(1));
+    XCTAssertEqualObjects(unmanaged.anyObj10[1], uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optUnmanaged.boolObj[1], @NO);
     XCTAssertEqualObjects(optUnmanaged.intObj[1], @2);
     XCTAssertEqualObjects(optUnmanaged.floatObj[1], @2.2f);
@@ -1366,7 +1651,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(managed.decimalObj[1], decimal128(2));
     XCTAssertEqualObjects(managed.objectIdObj[1], objectId(1));
     XCTAssertEqualObjects(managed.uuidObj[1], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(managed.anyObj[1], @NO);
+    XCTAssertEqualObjects(managed.anyObj1[1], @NO);
+    XCTAssertEqualObjects(managed.anyObj2[1], @2);
+    XCTAssertEqualObjects(managed.anyObj3[1], @2.2f);
+    XCTAssertEqualObjects(managed.anyObj4[1], @2.2);
+    XCTAssertEqualObjects(managed.anyObj5[1], @"a");
+    XCTAssertEqualObjects(managed.anyObj6[1], data(1));
+    XCTAssertEqualObjects(managed.anyObj7[1], date(1));
+    XCTAssertEqualObjects(managed.anyObj8[1], decimal128(2));
+    XCTAssertEqualObjects(managed.anyObj9[1], objectId(1));
+    XCTAssertEqualObjects(managed.anyObj10[1], uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optManaged.boolObj[1], @NO);
     XCTAssertEqualObjects(optManaged.intObj[1], @2);
     XCTAssertEqualObjects(optManaged.floatObj[1], @2.2f);
@@ -1378,7 +1672,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optManaged.objectIdObj[1], objectId(1));
     XCTAssertEqualObjects(optManaged.uuidObj[1], uuid(@"00000000-0000-0000-0000-000000000000"));
 
-    [unmanaged.anyObj insertObject:NSNull.null atIndex:1];
     [optUnmanaged.boolObj insertObject:NSNull.null atIndex:1];
     [optUnmanaged.intObj insertObject:NSNull.null atIndex:1];
     [optUnmanaged.floatObj insertObject:NSNull.null atIndex:1];
@@ -1389,7 +1682,6 @@ static double average(NSArray *values) {
     [optUnmanaged.decimalObj insertObject:NSNull.null atIndex:1];
     [optUnmanaged.objectIdObj insertObject:NSNull.null atIndex:1];
     [optUnmanaged.uuidObj insertObject:NSNull.null atIndex:1];
-    [managed.anyObj insertObject:NSNull.null atIndex:1];
     [optManaged.boolObj insertObject:NSNull.null atIndex:1];
     [optManaged.intObj insertObject:NSNull.null atIndex:1];
     [optManaged.floatObj insertObject:NSNull.null atIndex:1];
@@ -1400,7 +1692,6 @@ static double average(NSArray *values) {
     [optManaged.decimalObj insertObject:NSNull.null atIndex:1];
     [optManaged.objectIdObj insertObject:NSNull.null atIndex:1];
     [optManaged.uuidObj insertObject:NSNull.null atIndex:1];
-    XCTAssertEqualObjects(unmanaged.anyObj[0], decimal128(1));
     XCTAssertEqualObjects(optUnmanaged.boolObj[0], @YES);
     XCTAssertEqualObjects(optUnmanaged.intObj[0], @3);
     XCTAssertEqualObjects(optUnmanaged.floatObj[0], @3.3f);
@@ -1411,7 +1702,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optUnmanaged.decimalObj[0], decimal128(3));
     XCTAssertEqualObjects(optUnmanaged.objectIdObj[0], objectId(2));
     XCTAssertEqualObjects(optUnmanaged.uuidObj[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    XCTAssertEqualObjects(managed.anyObj[0], decimal128(1));
     XCTAssertEqualObjects(optManaged.boolObj[0], @YES);
     XCTAssertEqualObjects(optManaged.intObj[0], @3);
     XCTAssertEqualObjects(optManaged.floatObj[0], @3.3f);
@@ -1422,7 +1712,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optManaged.decimalObj[0], decimal128(3));
     XCTAssertEqualObjects(optManaged.objectIdObj[0], objectId(2));
     XCTAssertEqualObjects(optManaged.uuidObj[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    XCTAssertEqualObjects(unmanaged.anyObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.boolObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.intObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.floatObj[1], NSNull.null);
@@ -1433,7 +1722,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optUnmanaged.decimalObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.objectIdObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.uuidObj[1], NSNull.null);
-    XCTAssertEqualObjects(managed.anyObj[1], NSNull.null);
     XCTAssertEqualObjects(optManaged.boolObj[1], NSNull.null);
     XCTAssertEqualObjects(optManaged.intObj[1], NSNull.null);
     XCTAssertEqualObjects(optManaged.floatObj[1], NSNull.null);
@@ -1444,7 +1732,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optManaged.decimalObj[1], NSNull.null);
     XCTAssertEqualObjects(optManaged.objectIdObj[1], NSNull.null);
     XCTAssertEqualObjects(optManaged.uuidObj[1], NSNull.null);
-    XCTAssertEqualObjects(unmanaged.anyObj[2], @NO);
     XCTAssertEqualObjects(optUnmanaged.boolObj[2], @NO);
     XCTAssertEqualObjects(optUnmanaged.intObj[2], @2);
     XCTAssertEqualObjects(optUnmanaged.floatObj[2], @2.2f);
@@ -1455,7 +1742,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optUnmanaged.decimalObj[2], decimal128(2));
     XCTAssertEqualObjects(optUnmanaged.objectIdObj[2], objectId(1));
     XCTAssertEqualObjects(optUnmanaged.uuidObj[2], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(managed.anyObj[2], @NO);
     XCTAssertEqualObjects(optManaged.boolObj[2], @NO);
     XCTAssertEqualObjects(optManaged.intObj[2], @2);
     XCTAssertEqualObjects(optManaged.floatObj[2], @2.2f);
@@ -1495,7 +1781,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(managed.decimalObj.count, 2U);
     XCTAssertEqual(managed.objectIdObj.count, 2U);
     XCTAssertEqual(managed.uuidObj.count, 2U);
-    XCTAssertEqual(unmanaged.anyObj.count, 3U);
     XCTAssertEqual(optUnmanaged.boolObj.count, 3U);
     XCTAssertEqual(optUnmanaged.intObj.count, 3U);
     XCTAssertEqual(optUnmanaged.floatObj.count, 3U);
@@ -1506,7 +1791,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(optUnmanaged.decimalObj.count, 3U);
     XCTAssertEqual(optUnmanaged.objectIdObj.count, 3U);
     XCTAssertEqual(optUnmanaged.uuidObj.count, 3U);
-    XCTAssertEqual(managed.anyObj.count, 3U);
     XCTAssertEqual(optManaged.boolObj.count, 3U);
     XCTAssertEqual(optManaged.intObj.count, 3U);
     XCTAssertEqual(optManaged.floatObj.count, 3U);
@@ -1558,8 +1842,6 @@ static double average(NSArray *values) {
                               @"Index 2 is out of bounds (must be less than 2).");
     RLMAssertThrowsWithReason([managed.uuidObj removeObjectAtIndex:2],
                               @"Index 2 is out of bounds (must be less than 2).");
-    RLMAssertThrowsWithReason([unmanaged.anyObj removeObjectAtIndex:3],
-                              @"Index 3 is out of bounds (must be less than 3).");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj removeObjectAtIndex:3],
                               @"Index 3 is out of bounds (must be less than 3).");
     RLMAssertThrowsWithReason([optUnmanaged.intObj removeObjectAtIndex:3],
@@ -1579,8 +1861,6 @@ static double average(NSArray *values) {
     RLMAssertThrowsWithReason([optUnmanaged.objectIdObj removeObjectAtIndex:3],
                               @"Index 3 is out of bounds (must be less than 3).");
     RLMAssertThrowsWithReason([optUnmanaged.uuidObj removeObjectAtIndex:3],
-                              @"Index 3 is out of bounds (must be less than 3).");
-    RLMAssertThrowsWithReason([managed.anyObj removeObjectAtIndex:3],
                               @"Index 3 is out of bounds (must be less than 3).");
     RLMAssertThrowsWithReason([optManaged.boolObj removeObjectAtIndex:3],
                               @"Index 3 is out of bounds (must be less than 3).");
@@ -1626,7 +1906,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(managed.decimalObj.count, 1U);
     XCTAssertEqual(managed.objectIdObj.count, 1U);
     XCTAssertEqual(managed.uuidObj.count, 1U);
-    XCTAssertEqual(unmanaged.anyObj.count, 2U);
     XCTAssertEqual(optUnmanaged.boolObj.count, 2U);
     XCTAssertEqual(optUnmanaged.intObj.count, 2U);
     XCTAssertEqual(optUnmanaged.floatObj.count, 2U);
@@ -1637,7 +1916,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(optUnmanaged.decimalObj.count, 2U);
     XCTAssertEqual(optUnmanaged.objectIdObj.count, 2U);
     XCTAssertEqual(optUnmanaged.uuidObj.count, 2U);
-    XCTAssertEqual(managed.anyObj.count, 2U);
     XCTAssertEqual(optManaged.boolObj.count, 2U);
     XCTAssertEqual(optManaged.intObj.count, 2U);
     XCTAssertEqual(optManaged.floatObj.count, 2U);
@@ -1659,7 +1937,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(unmanaged.decimalObj[0], decimal128(3));
     XCTAssertEqualObjects(unmanaged.objectIdObj[0], objectId(2));
     XCTAssertEqualObjects(unmanaged.uuidObj[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    XCTAssertEqualObjects(unmanaged.anyObj[0], decimal128(1));
+    XCTAssertEqualObjects(unmanaged.anyObj1[0], @YES);
+    XCTAssertEqualObjects(unmanaged.anyObj2[0], @3);
+    XCTAssertEqualObjects(unmanaged.anyObj3[0], @3.3f);
+    XCTAssertEqualObjects(unmanaged.anyObj4[0], @3.3);
+    XCTAssertEqualObjects(unmanaged.anyObj5[0], @"b");
+    XCTAssertEqualObjects(unmanaged.anyObj6[0], data(2));
+    XCTAssertEqualObjects(unmanaged.anyObj7[0], date(2));
+    XCTAssertEqualObjects(unmanaged.anyObj8[0], decimal128(3));
+    XCTAssertEqualObjects(unmanaged.anyObj9[0], objectId(2));
+    XCTAssertEqualObjects(unmanaged.anyObj10[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     XCTAssertEqualObjects(optUnmanaged.boolObj[0], @YES);
     XCTAssertEqualObjects(optUnmanaged.intObj[0], @3);
     XCTAssertEqualObjects(optUnmanaged.floatObj[0], @3.3f);
@@ -1680,7 +1967,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(managed.decimalObj[0], decimal128(3));
     XCTAssertEqualObjects(managed.objectIdObj[0], objectId(2));
     XCTAssertEqualObjects(managed.uuidObj[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    XCTAssertEqualObjects(managed.anyObj[0], decimal128(1));
+    XCTAssertEqualObjects(managed.anyObj1[0], @YES);
+    XCTAssertEqualObjects(managed.anyObj2[0], @3);
+    XCTAssertEqualObjects(managed.anyObj3[0], @3.3f);
+    XCTAssertEqualObjects(managed.anyObj4[0], @3.3);
+    XCTAssertEqualObjects(managed.anyObj5[0], @"b");
+    XCTAssertEqualObjects(managed.anyObj6[0], data(2));
+    XCTAssertEqualObjects(managed.anyObj7[0], date(2));
+    XCTAssertEqualObjects(managed.anyObj8[0], decimal128(3));
+    XCTAssertEqualObjects(managed.anyObj9[0], objectId(2));
+    XCTAssertEqualObjects(managed.anyObj10[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     XCTAssertEqualObjects(optManaged.boolObj[0], @YES);
     XCTAssertEqualObjects(optManaged.intObj[0], @3);
     XCTAssertEqualObjects(optManaged.floatObj[0], @3.3f);
@@ -1691,7 +1987,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optManaged.decimalObj[0], decimal128(3));
     XCTAssertEqualObjects(optManaged.objectIdObj[0], objectId(2));
     XCTAssertEqualObjects(optManaged.uuidObj[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    XCTAssertEqualObjects(unmanaged.anyObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.boolObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.intObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.floatObj[1], NSNull.null);
@@ -1702,7 +1997,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optUnmanaged.decimalObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.objectIdObj[1], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.uuidObj[1], NSNull.null);
-    XCTAssertEqualObjects(managed.anyObj[1], NSNull.null);
     XCTAssertEqualObjects(optManaged.boolObj[1], NSNull.null);
     XCTAssertEqualObjects(optManaged.intObj[1], NSNull.null);
     XCTAssertEqualObjects(optManaged.floatObj[1], NSNull.null);
@@ -1741,7 +2035,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(managed.decimalObj.count, 2U);
     XCTAssertEqual(managed.objectIdObj.count, 2U);
     XCTAssertEqual(managed.uuidObj.count, 2U);
-    XCTAssertEqual(unmanaged.anyObj.count, 3U);
     XCTAssertEqual(optUnmanaged.boolObj.count, 3U);
     XCTAssertEqual(optUnmanaged.intObj.count, 3U);
     XCTAssertEqual(optUnmanaged.floatObj.count, 3U);
@@ -1752,7 +2045,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(optUnmanaged.decimalObj.count, 3U);
     XCTAssertEqual(optUnmanaged.objectIdObj.count, 3U);
     XCTAssertEqual(optUnmanaged.uuidObj.count, 3U);
-    XCTAssertEqual(managed.anyObj.count, 3U);
     XCTAssertEqual(optManaged.boolObj.count, 3U);
     XCTAssertEqual(optManaged.intObj.count, 3U);
     XCTAssertEqual(optManaged.floatObj.count, 3U);
@@ -1788,7 +2080,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(managed.decimalObj.count, 1U);
     XCTAssertEqual(managed.objectIdObj.count, 1U);
     XCTAssertEqual(managed.uuidObj.count, 1U);
-    XCTAssertEqual(unmanaged.anyObj.count, 2U);
     XCTAssertEqual(optUnmanaged.boolObj.count, 2U);
     XCTAssertEqual(optUnmanaged.intObj.count, 2U);
     XCTAssertEqual(optUnmanaged.floatObj.count, 2U);
@@ -1799,7 +2090,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(optUnmanaged.decimalObj.count, 2U);
     XCTAssertEqual(optUnmanaged.objectIdObj.count, 2U);
     XCTAssertEqual(optUnmanaged.uuidObj.count, 2U);
-    XCTAssertEqual(managed.anyObj.count, 2U);
     XCTAssertEqual(optManaged.boolObj.count, 2U);
     XCTAssertEqual(optManaged.intObj.count, 2U);
     XCTAssertEqual(optManaged.floatObj.count, 2U);
@@ -1821,7 +2111,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(unmanaged.decimalObj[0], decimal128(2));
     XCTAssertEqualObjects(unmanaged.objectIdObj[0], objectId(1));
     XCTAssertEqualObjects(unmanaged.uuidObj[0], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(unmanaged.anyObj[0], @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj1[0], @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj2[0], @2);
+    XCTAssertEqualObjects(unmanaged.anyObj3[0], @2.2f);
+    XCTAssertEqualObjects(unmanaged.anyObj4[0], @2.2);
+    XCTAssertEqualObjects(unmanaged.anyObj5[0], @"a");
+    XCTAssertEqualObjects(unmanaged.anyObj6[0], data(1));
+    XCTAssertEqualObjects(unmanaged.anyObj7[0], date(1));
+    XCTAssertEqualObjects(unmanaged.anyObj8[0], decimal128(2));
+    XCTAssertEqualObjects(unmanaged.anyObj9[0], objectId(1));
+    XCTAssertEqualObjects(unmanaged.anyObj10[0], uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optUnmanaged.boolObj[0], @NO);
     XCTAssertEqualObjects(optUnmanaged.intObj[0], @2);
     XCTAssertEqualObjects(optUnmanaged.floatObj[0], @2.2f);
@@ -1842,7 +2141,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(managed.decimalObj[0], decimal128(2));
     XCTAssertEqualObjects(managed.objectIdObj[0], objectId(1));
     XCTAssertEqualObjects(managed.uuidObj[0], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(managed.anyObj[0], @NO);
+    XCTAssertEqualObjects(managed.anyObj1[0], @NO);
+    XCTAssertEqualObjects(managed.anyObj2[0], @2);
+    XCTAssertEqualObjects(managed.anyObj3[0], @2.2f);
+    XCTAssertEqualObjects(managed.anyObj4[0], @2.2);
+    XCTAssertEqualObjects(managed.anyObj5[0], @"a");
+    XCTAssertEqualObjects(managed.anyObj6[0], data(1));
+    XCTAssertEqualObjects(managed.anyObj7[0], date(1));
+    XCTAssertEqualObjects(managed.anyObj8[0], decimal128(2));
+    XCTAssertEqualObjects(managed.anyObj9[0], objectId(1));
+    XCTAssertEqualObjects(managed.anyObj10[0], uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optManaged.boolObj[0], @NO);
     XCTAssertEqualObjects(optManaged.intObj[0], @2);
     XCTAssertEqualObjects(optManaged.floatObj[0], @2.2f);
@@ -1853,7 +2161,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optManaged.decimalObj[0], decimal128(2));
     XCTAssertEqualObjects(optManaged.objectIdObj[0], objectId(1));
     XCTAssertEqualObjects(optManaged.uuidObj[0], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(unmanaged.anyObj[1], decimal128(1));
     XCTAssertEqualObjects(optUnmanaged.boolObj[1], @YES);
     XCTAssertEqualObjects(optUnmanaged.intObj[1], @3);
     XCTAssertEqualObjects(optUnmanaged.floatObj[1], @3.3f);
@@ -1864,7 +2171,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optUnmanaged.decimalObj[1], decimal128(3));
     XCTAssertEqualObjects(optUnmanaged.objectIdObj[1], objectId(2));
     XCTAssertEqualObjects(optUnmanaged.uuidObj[1], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    XCTAssertEqualObjects(managed.anyObj[1], decimal128(1));
     XCTAssertEqualObjects(optManaged.boolObj[1], @YES);
     XCTAssertEqualObjects(optManaged.intObj[1], @3);
     XCTAssertEqualObjects(optManaged.floatObj[1], @3.3f);
@@ -1898,7 +2204,25 @@ static double average(NSArray *values) {
                               @"Index 0 is out of bounds (must be less than 0).");
     RLMAssertThrowsWithReason([unmanaged.uuidObj replaceObjectAtIndex:0 withObject:uuid(@"00000000-0000-0000-0000-000000000000")],
                               @"Index 0 is out of bounds (must be less than 0).");
-    RLMAssertThrowsWithReason([unmanaged.anyObj replaceObjectAtIndex:0 withObject:@NO],
+    RLMAssertThrowsWithReason([unmanaged.anyObj1 replaceObjectAtIndex:0 withObject:@NO],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj2 replaceObjectAtIndex:0 withObject:@2],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj3 replaceObjectAtIndex:0 withObject:@2.2f],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj4 replaceObjectAtIndex:0 withObject:@2.2],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj5 replaceObjectAtIndex:0 withObject:@"a"],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj6 replaceObjectAtIndex:0 withObject:data(1)],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj7 replaceObjectAtIndex:0 withObject:date(1)],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj8 replaceObjectAtIndex:0 withObject:decimal128(2)],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj9 replaceObjectAtIndex:0 withObject:objectId(1)],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([unmanaged.anyObj10 replaceObjectAtIndex:0 withObject:uuid(@"00000000-0000-0000-0000-000000000000")],
                               @"Index 0 is out of bounds (must be less than 0).");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj replaceObjectAtIndex:0 withObject:@NO],
                               @"Index 0 is out of bounds (must be less than 0).");
@@ -1940,7 +2264,25 @@ static double average(NSArray *values) {
                               @"Index 0 is out of bounds (must be less than 0).");
     RLMAssertThrowsWithReason([managed.uuidObj replaceObjectAtIndex:0 withObject:uuid(@"00000000-0000-0000-0000-000000000000")],
                               @"Index 0 is out of bounds (must be less than 0).");
-    RLMAssertThrowsWithReason([managed.anyObj replaceObjectAtIndex:0 withObject:@NO],
+    RLMAssertThrowsWithReason([managed.anyObj1 replaceObjectAtIndex:0 withObject:@NO],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([managed.anyObj2 replaceObjectAtIndex:0 withObject:@2],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([managed.anyObj3 replaceObjectAtIndex:0 withObject:@2.2f],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([managed.anyObj4 replaceObjectAtIndex:0 withObject:@2.2],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([managed.anyObj5 replaceObjectAtIndex:0 withObject:@"a"],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([managed.anyObj6 replaceObjectAtIndex:0 withObject:data(1)],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([managed.anyObj7 replaceObjectAtIndex:0 withObject:date(1)],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([managed.anyObj8 replaceObjectAtIndex:0 withObject:decimal128(2)],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([managed.anyObj9 replaceObjectAtIndex:0 withObject:objectId(1)],
+                              @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([managed.anyObj10 replaceObjectAtIndex:0 withObject:uuid(@"00000000-0000-0000-0000-000000000000")],
                               @"Index 0 is out of bounds (must be less than 0).");
     RLMAssertThrowsWithReason([optManaged.boolObj replaceObjectAtIndex:0 withObject:@NO],
                               @"Index 0 is out of bounds (must be less than 0).");
@@ -2003,9 +2345,45 @@ static double average(NSArray *values) {
     [unmanaged.uuidObj replaceObjectAtIndex:0 withObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
     XCTAssertEqualObjects(unmanaged.uuidObj[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     
-    [unmanaged.anyObj addObject:@NO];
-    [unmanaged.anyObj replaceObjectAtIndex:0 withObject:decimal128(1)];
-    XCTAssertEqualObjects(unmanaged.anyObj[0], decimal128(1));
+    [unmanaged.anyObj1 addObject:@NO];
+    [unmanaged.anyObj1 replaceObjectAtIndex:0 withObject:@YES];
+    XCTAssertEqualObjects(unmanaged.anyObj1[0], @YES);
+    
+    [unmanaged.anyObj2 addObject:@2];
+    [unmanaged.anyObj2 replaceObjectAtIndex:0 withObject:@3];
+    XCTAssertEqualObjects(unmanaged.anyObj2[0], @3);
+    
+    [unmanaged.anyObj3 addObject:@2.2f];
+    [unmanaged.anyObj3 replaceObjectAtIndex:0 withObject:@3.3f];
+    XCTAssertEqualObjects(unmanaged.anyObj3[0], @3.3f);
+    
+    [unmanaged.anyObj4 addObject:@2.2];
+    [unmanaged.anyObj4 replaceObjectAtIndex:0 withObject:@3.3];
+    XCTAssertEqualObjects(unmanaged.anyObj4[0], @3.3);
+    
+    [unmanaged.anyObj5 addObject:@"a"];
+    [unmanaged.anyObj5 replaceObjectAtIndex:0 withObject:@"b"];
+    XCTAssertEqualObjects(unmanaged.anyObj5[0], @"b");
+    
+    [unmanaged.anyObj6 addObject:data(1)];
+    [unmanaged.anyObj6 replaceObjectAtIndex:0 withObject:data(2)];
+    XCTAssertEqualObjects(unmanaged.anyObj6[0], data(2));
+    
+    [unmanaged.anyObj7 addObject:date(1)];
+    [unmanaged.anyObj7 replaceObjectAtIndex:0 withObject:date(2)];
+    XCTAssertEqualObjects(unmanaged.anyObj7[0], date(2));
+    
+    [unmanaged.anyObj8 addObject:decimal128(2)];
+    [unmanaged.anyObj8 replaceObjectAtIndex:0 withObject:decimal128(3)];
+    XCTAssertEqualObjects(unmanaged.anyObj8[0], decimal128(3));
+    
+    [unmanaged.anyObj9 addObject:objectId(1)];
+    [unmanaged.anyObj9 replaceObjectAtIndex:0 withObject:objectId(2)];
+    XCTAssertEqualObjects(unmanaged.anyObj9[0], objectId(2));
+    
+    [unmanaged.anyObj10 addObject:uuid(@"00000000-0000-0000-0000-000000000000")];
+    [unmanaged.anyObj10 replaceObjectAtIndex:0 withObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
+    XCTAssertEqualObjects(unmanaged.anyObj10[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     
     [optUnmanaged.boolObj addObject:@NO];
     [optUnmanaged.boolObj replaceObjectAtIndex:0 withObject:@YES];
@@ -2087,9 +2465,45 @@ static double average(NSArray *values) {
     [managed.uuidObj replaceObjectAtIndex:0 withObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
     XCTAssertEqualObjects(managed.uuidObj[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     
-    [managed.anyObj addObject:@NO];
-    [managed.anyObj replaceObjectAtIndex:0 withObject:decimal128(1)];
-    XCTAssertEqualObjects(managed.anyObj[0], decimal128(1));
+    [managed.anyObj1 addObject:@NO];
+    [managed.anyObj1 replaceObjectAtIndex:0 withObject:@YES];
+    XCTAssertEqualObjects(managed.anyObj1[0], @YES);
+    
+    [managed.anyObj2 addObject:@2];
+    [managed.anyObj2 replaceObjectAtIndex:0 withObject:@3];
+    XCTAssertEqualObjects(managed.anyObj2[0], @3);
+    
+    [managed.anyObj3 addObject:@2.2f];
+    [managed.anyObj3 replaceObjectAtIndex:0 withObject:@3.3f];
+    XCTAssertEqualObjects(managed.anyObj3[0], @3.3f);
+    
+    [managed.anyObj4 addObject:@2.2];
+    [managed.anyObj4 replaceObjectAtIndex:0 withObject:@3.3];
+    XCTAssertEqualObjects(managed.anyObj4[0], @3.3);
+    
+    [managed.anyObj5 addObject:@"a"];
+    [managed.anyObj5 replaceObjectAtIndex:0 withObject:@"b"];
+    XCTAssertEqualObjects(managed.anyObj5[0], @"b");
+    
+    [managed.anyObj6 addObject:data(1)];
+    [managed.anyObj6 replaceObjectAtIndex:0 withObject:data(2)];
+    XCTAssertEqualObjects(managed.anyObj6[0], data(2));
+    
+    [managed.anyObj7 addObject:date(1)];
+    [managed.anyObj7 replaceObjectAtIndex:0 withObject:date(2)];
+    XCTAssertEqualObjects(managed.anyObj7[0], date(2));
+    
+    [managed.anyObj8 addObject:decimal128(2)];
+    [managed.anyObj8 replaceObjectAtIndex:0 withObject:decimal128(3)];
+    XCTAssertEqualObjects(managed.anyObj8[0], decimal128(3));
+    
+    [managed.anyObj9 addObject:objectId(1)];
+    [managed.anyObj9 replaceObjectAtIndex:0 withObject:objectId(2)];
+    XCTAssertEqualObjects(managed.anyObj9[0], objectId(2));
+    
+    [managed.anyObj10 addObject:uuid(@"00000000-0000-0000-0000-000000000000")];
+    [managed.anyObj10 replaceObjectAtIndex:0 withObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
+    XCTAssertEqualObjects(managed.anyObj10[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     
     [optManaged.boolObj addObject:@NO];
     [optManaged.boolObj replaceObjectAtIndex:0 withObject:@YES];
@@ -2132,8 +2546,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optManaged.uuidObj[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     
 
-    [unmanaged.anyObj replaceObjectAtIndex:0 withObject:NSNull.null];
-    XCTAssertEqualObjects(unmanaged.anyObj[0], NSNull.null);
     [optUnmanaged.boolObj replaceObjectAtIndex:0 withObject:NSNull.null];
     XCTAssertEqualObjects(optUnmanaged.boolObj[0], NSNull.null);
     [optUnmanaged.intObj replaceObjectAtIndex:0 withObject:NSNull.null];
@@ -2154,8 +2566,6 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optUnmanaged.objectIdObj[0], NSNull.null);
     [optUnmanaged.uuidObj replaceObjectAtIndex:0 withObject:NSNull.null];
     XCTAssertEqualObjects(optUnmanaged.uuidObj[0], NSNull.null);
-    [managed.anyObj replaceObjectAtIndex:0 withObject:NSNull.null];
-    XCTAssertEqualObjects(managed.anyObj[0], NSNull.null);
     [optManaged.boolObj replaceObjectAtIndex:0 withObject:NSNull.null];
     XCTAssertEqualObjects(optManaged.boolObj[0], NSNull.null);
     [optManaged.intObj replaceObjectAtIndex:0 withObject:NSNull.null];
@@ -2319,7 +2729,16 @@ static double average(NSArray *values) {
     [unmanaged.decimalObj addObjects:@[decimal128(2), decimal128(3), decimal128(2), decimal128(3)]];
     [unmanaged.objectIdObj addObjects:@[objectId(1), objectId(2), objectId(1), objectId(2)]];
     [unmanaged.uuidObj addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]];
-    [unmanaged.anyObj addObjects:@[@NO, decimal128(1), @NO, decimal128(1)]];
+    [unmanaged.anyObj1 addObjects:@[@NO, @YES, @NO, @YES]];
+    [unmanaged.anyObj2 addObjects:@[@2, @3, @2, @3]];
+    [unmanaged.anyObj3 addObjects:@[@2.2f, @3.3f, @2.2f, @3.3f]];
+    [unmanaged.anyObj4 addObjects:@[@2.2, @3.3, @2.2, @3.3]];
+    [unmanaged.anyObj5 addObjects:@[@"a", @"b", @"a", @"b"]];
+    [unmanaged.anyObj6 addObjects:@[data(1), data(2), data(1), data(2)]];
+    [unmanaged.anyObj7 addObjects:@[date(1), date(2), date(1), date(2)]];
+    [unmanaged.anyObj8 addObjects:@[decimal128(2), decimal128(3), decimal128(2), decimal128(3)]];
+    [unmanaged.anyObj9 addObjects:@[objectId(1), objectId(2), objectId(1), objectId(2)]];
+    [unmanaged.anyObj10 addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]];
     [optUnmanaged.boolObj addObjects:@[@NO, @YES, @NO, @YES]];
     [optUnmanaged.intObj addObjects:@[@2, @3, @2, @3]];
     [optUnmanaged.floatObj addObjects:@[@2.2f, @3.3f, @2.2f, @3.3f]];
@@ -2340,7 +2759,16 @@ static double average(NSArray *values) {
     [managed.decimalObj addObjects:@[decimal128(2), decimal128(3), decimal128(2), decimal128(3)]];
     [managed.objectIdObj addObjects:@[objectId(1), objectId(2), objectId(1), objectId(2)]];
     [managed.uuidObj addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]];
-    [managed.anyObj addObjects:@[@NO, decimal128(1), @NO, decimal128(1)]];
+    [managed.anyObj1 addObjects:@[@NO, @YES, @NO, @YES]];
+    [managed.anyObj2 addObjects:@[@2, @3, @2, @3]];
+    [managed.anyObj3 addObjects:@[@2.2f, @3.3f, @2.2f, @3.3f]];
+    [managed.anyObj4 addObjects:@[@2.2, @3.3, @2.2, @3.3]];
+    [managed.anyObj5 addObjects:@[@"a", @"b", @"a", @"b"]];
+    [managed.anyObj6 addObjects:@[data(1), data(2), data(1), data(2)]];
+    [managed.anyObj7 addObjects:@[date(1), date(2), date(1), date(2)]];
+    [managed.anyObj8 addObjects:@[decimal128(2), decimal128(3), decimal128(2), decimal128(3)]];
+    [managed.anyObj9 addObjects:@[objectId(1), objectId(2), objectId(1), objectId(2)]];
+    [managed.anyObj10 addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]];
     [optManaged.boolObj addObjects:@[@NO, @YES, @NO, @YES]];
     [optManaged.intObj addObjects:@[@2, @3, @2, @3]];
     [optManaged.floatObj addObjects:@[@2.2f, @3.3f, @2.2f, @3.3f]];
@@ -2376,8 +2804,26 @@ static double average(NSArray *values) {
                           (@[objectId(1), objectId(1), objectId(2), objectId(2)]));
     XCTAssertEqualObjects([unmanaged.uuidObj valueForKey:@"self"],
                           (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
-    XCTAssertEqualObjects([unmanaged.anyObj valueForKey:@"self"],
-                          (@[@NO, @NO, decimal128(1), decimal128(1)]));
+    XCTAssertEqualObjects([unmanaged.anyObj1 valueForKey:@"self"],
+                          (@[@NO, @NO, @YES, @YES]));
+    XCTAssertEqualObjects([unmanaged.anyObj2 valueForKey:@"self"],
+                          (@[@2, @2, @3, @3]));
+    XCTAssertEqualObjects([unmanaged.anyObj3 valueForKey:@"self"],
+                          (@[@2.2f, @2.2f, @3.3f, @3.3f]));
+    XCTAssertEqualObjects([unmanaged.anyObj4 valueForKey:@"self"],
+                          (@[@2.2, @2.2, @3.3, @3.3]));
+    XCTAssertEqualObjects([unmanaged.anyObj5 valueForKey:@"self"],
+                          (@[@"a", @"a", @"b", @"b"]));
+    XCTAssertEqualObjects([unmanaged.anyObj6 valueForKey:@"self"],
+                          (@[data(1), data(1), data(2), data(2)]));
+    XCTAssertEqualObjects([unmanaged.anyObj7 valueForKey:@"self"],
+                          (@[date(1), date(1), date(2), date(2)]));
+    XCTAssertEqualObjects([unmanaged.anyObj8 valueForKey:@"self"],
+                          (@[decimal128(2), decimal128(2), decimal128(3), decimal128(3)]));
+    XCTAssertEqualObjects([unmanaged.anyObj9 valueForKey:@"self"],
+                          (@[objectId(1), objectId(1), objectId(2), objectId(2)]));
+    XCTAssertEqualObjects([unmanaged.anyObj10 valueForKey:@"self"],
+                          (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     XCTAssertEqualObjects([optUnmanaged.boolObj valueForKey:@"self"],
                           (@[@NO, @NO, @YES, @YES]));
     XCTAssertEqualObjects([optUnmanaged.intObj valueForKey:@"self"],
@@ -2418,8 +2864,26 @@ static double average(NSArray *values) {
                           (@[objectId(1), objectId(1), objectId(2), objectId(2)]));
     XCTAssertEqualObjects([managed.uuidObj valueForKey:@"self"],
                           (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
-    XCTAssertEqualObjects([managed.anyObj valueForKey:@"self"],
-                          (@[@NO, @NO, decimal128(1), decimal128(1)]));
+    XCTAssertEqualObjects([managed.anyObj1 valueForKey:@"self"],
+                          (@[@NO, @NO, @YES, @YES]));
+    XCTAssertEqualObjects([managed.anyObj2 valueForKey:@"self"],
+                          (@[@2, @2, @3, @3]));
+    XCTAssertEqualObjects([managed.anyObj3 valueForKey:@"self"],
+                          (@[@2.2f, @2.2f, @3.3f, @3.3f]));
+    XCTAssertEqualObjects([managed.anyObj4 valueForKey:@"self"],
+                          (@[@2.2, @2.2, @3.3, @3.3]));
+    XCTAssertEqualObjects([managed.anyObj5 valueForKey:@"self"],
+                          (@[@"a", @"a", @"b", @"b"]));
+    XCTAssertEqualObjects([managed.anyObj6 valueForKey:@"self"],
+                          (@[data(1), data(1), data(2), data(2)]));
+    XCTAssertEqualObjects([managed.anyObj7 valueForKey:@"self"],
+                          (@[date(1), date(1), date(2), date(2)]));
+    XCTAssertEqualObjects([managed.anyObj8 valueForKey:@"self"],
+                          (@[decimal128(2), decimal128(2), decimal128(3), decimal128(3)]));
+    XCTAssertEqualObjects([managed.anyObj9 valueForKey:@"self"],
+                          (@[objectId(1), objectId(1), objectId(2), objectId(2)]));
+    XCTAssertEqualObjects([managed.anyObj10 valueForKey:@"self"],
+                          (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     XCTAssertEqualObjects([optManaged.boolObj valueForKey:@"self"],
                           (@[@NO, @NO, @YES, @YES]));
     XCTAssertEqualObjects([optManaged.intObj valueForKey:@"self"],
@@ -2462,7 +2926,16 @@ static double average(NSArray *values) {
     [unmanaged.decimalObj addObjects:@[decimal128(2), decimal128(3), decimal128(2), decimal128(3)]];
     [unmanaged.objectIdObj addObjects:@[objectId(1), objectId(2), objectId(1), objectId(2)]];
     [unmanaged.uuidObj addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]];
-    [unmanaged.anyObj addObjects:@[@NO, decimal128(1), @NO, decimal128(1)]];
+    [unmanaged.anyObj1 addObjects:@[@NO, @YES, @NO, @YES]];
+    [unmanaged.anyObj2 addObjects:@[@2, @3, @2, @3]];
+    [unmanaged.anyObj3 addObjects:@[@2.2f, @3.3f, @2.2f, @3.3f]];
+    [unmanaged.anyObj4 addObjects:@[@2.2, @3.3, @2.2, @3.3]];
+    [unmanaged.anyObj5 addObjects:@[@"a", @"b", @"a", @"b"]];
+    [unmanaged.anyObj6 addObjects:@[data(1), data(2), data(1), data(2)]];
+    [unmanaged.anyObj7 addObjects:@[date(1), date(2), date(1), date(2)]];
+    [unmanaged.anyObj8 addObjects:@[decimal128(2), decimal128(3), decimal128(2), decimal128(3)]];
+    [unmanaged.anyObj9 addObjects:@[objectId(1), objectId(2), objectId(1), objectId(2)]];
+    [unmanaged.anyObj10 addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]];
     [optUnmanaged.boolObj addObjects:@[@NO, @YES, @NO, @YES]];
     [optUnmanaged.intObj addObjects:@[@2, @3, @2, @3]];
     [optUnmanaged.floatObj addObjects:@[@2.2f, @3.3f, @2.2f, @3.3f]];
@@ -2483,7 +2956,16 @@ static double average(NSArray *values) {
     [managed.decimalObj addObjects:@[decimal128(2), decimal128(3), decimal128(2), decimal128(3)]];
     [managed.objectIdObj addObjects:@[objectId(1), objectId(2), objectId(1), objectId(2)]];
     [managed.uuidObj addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]];
-    [managed.anyObj addObjects:@[@NO, decimal128(1), @NO, decimal128(1)]];
+    [managed.anyObj1 addObjects:@[@NO, @YES, @NO, @YES]];
+    [managed.anyObj2 addObjects:@[@2, @3, @2, @3]];
+    [managed.anyObj3 addObjects:@[@2.2f, @3.3f, @2.2f, @3.3f]];
+    [managed.anyObj4 addObjects:@[@2.2, @3.3, @2.2, @3.3]];
+    [managed.anyObj5 addObjects:@[@"a", @"b", @"a", @"b"]];
+    [managed.anyObj6 addObjects:@[data(1), data(2), data(1), data(2)]];
+    [managed.anyObj7 addObjects:@[date(1), date(2), date(1), date(2)]];
+    [managed.anyObj8 addObjects:@[decimal128(2), decimal128(3), decimal128(2), decimal128(3)]];
+    [managed.anyObj9 addObjects:@[objectId(1), objectId(2), objectId(1), objectId(2)]];
+    [managed.anyObj10 addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]];
     [optManaged.boolObj addObjects:@[@NO, @YES, @NO, @YES]];
     [optManaged.intObj addObjects:@[@2, @3, @2, @3]];
     [optManaged.floatObj addObjects:@[@2.2f, @3.3f, @2.2f, @3.3f]];
@@ -2519,8 +3001,26 @@ static double average(NSArray *values) {
                           (@[objectId(1), objectId(1), objectId(2), objectId(2)]));
     XCTAssertEqualObjects([unmanaged.uuidObj valueForKey:@"self"],
                           (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
-    XCTAssertEqualObjects([unmanaged.anyObj valueForKey:@"self"],
-                          (@[@NO, @NO, decimal128(1), decimal128(1)]));
+    XCTAssertEqualObjects([unmanaged.anyObj1 valueForKey:@"self"],
+                          (@[@NO, @NO, @YES, @YES]));
+    XCTAssertEqualObjects([unmanaged.anyObj2 valueForKey:@"self"],
+                          (@[@2, @2, @3, @3]));
+    XCTAssertEqualObjects([unmanaged.anyObj3 valueForKey:@"self"],
+                          (@[@2.2f, @2.2f, @3.3f, @3.3f]));
+    XCTAssertEqualObjects([unmanaged.anyObj4 valueForKey:@"self"],
+                          (@[@2.2, @2.2, @3.3, @3.3]));
+    XCTAssertEqualObjects([unmanaged.anyObj5 valueForKey:@"self"],
+                          (@[@"a", @"a", @"b", @"b"]));
+    XCTAssertEqualObjects([unmanaged.anyObj6 valueForKey:@"self"],
+                          (@[data(1), data(1), data(2), data(2)]));
+    XCTAssertEqualObjects([unmanaged.anyObj7 valueForKey:@"self"],
+                          (@[date(1), date(1), date(2), date(2)]));
+    XCTAssertEqualObjects([unmanaged.anyObj8 valueForKey:@"self"],
+                          (@[decimal128(2), decimal128(2), decimal128(3), decimal128(3)]));
+    XCTAssertEqualObjects([unmanaged.anyObj9 valueForKey:@"self"],
+                          (@[objectId(1), objectId(1), objectId(2), objectId(2)]));
+    XCTAssertEqualObjects([unmanaged.anyObj10 valueForKey:@"self"],
+                          (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     XCTAssertEqualObjects([optUnmanaged.boolObj valueForKey:@"self"],
                           (@[@NO, @NO, @YES, @YES]));
     XCTAssertEqualObjects([optUnmanaged.intObj valueForKey:@"self"],
@@ -2561,8 +3061,26 @@ static double average(NSArray *values) {
                           (@[objectId(1), objectId(1), objectId(2), objectId(2)]));
     XCTAssertEqualObjects([managed.uuidObj valueForKey:@"self"],
                           (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
-    XCTAssertEqualObjects([managed.anyObj valueForKey:@"self"],
-                          (@[@NO, @NO, decimal128(1), decimal128(1)]));
+    XCTAssertEqualObjects([managed.anyObj1 valueForKey:@"self"],
+                          (@[@NO, @NO, @YES, @YES]));
+    XCTAssertEqualObjects([managed.anyObj2 valueForKey:@"self"],
+                          (@[@2, @2, @3, @3]));
+    XCTAssertEqualObjects([managed.anyObj3 valueForKey:@"self"],
+                          (@[@2.2f, @2.2f, @3.3f, @3.3f]));
+    XCTAssertEqualObjects([managed.anyObj4 valueForKey:@"self"],
+                          (@[@2.2, @2.2, @3.3, @3.3]));
+    XCTAssertEqualObjects([managed.anyObj5 valueForKey:@"self"],
+                          (@[@"a", @"a", @"b", @"b"]));
+    XCTAssertEqualObjects([managed.anyObj6 valueForKey:@"self"],
+                          (@[data(1), data(1), data(2), data(2)]));
+    XCTAssertEqualObjects([managed.anyObj7 valueForKey:@"self"],
+                          (@[date(1), date(1), date(2), date(2)]));
+    XCTAssertEqualObjects([managed.anyObj8 valueForKey:@"self"],
+                          (@[decimal128(2), decimal128(2), decimal128(3), decimal128(3)]));
+    XCTAssertEqualObjects([managed.anyObj9 valueForKey:@"self"],
+                          (@[objectId(1), objectId(1), objectId(2), objectId(2)]));
+    XCTAssertEqualObjects([managed.anyObj10 valueForKey:@"self"],
+                          (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     XCTAssertEqualObjects([optManaged.boolObj valueForKey:@"self"],
                           (@[@NO, @NO, @YES, @YES]));
     XCTAssertEqualObjects([optManaged.intObj valueForKey:@"self"],
@@ -2596,7 +3114,16 @@ static double average(NSArray *values) {
     XCTAssertEqual(NSNotFound, [unmanaged.decimalObj indexOfObject:decimal128(2)]);
     XCTAssertEqual(NSNotFound, [unmanaged.objectIdObj indexOfObject:objectId(1)]);
     XCTAssertEqual(NSNotFound, [unmanaged.uuidObj indexOfObject:uuid(@"00000000-0000-0000-0000-000000000000")]);
-    XCTAssertEqual(NSNotFound, [unmanaged.anyObj indexOfObject:@NO]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj1 indexOfObject:@NO]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj2 indexOfObject:@2]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj3 indexOfObject:@2.2f]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj4 indexOfObject:@2.2]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj5 indexOfObject:@"a"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj6 indexOfObject:data(1)]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj7 indexOfObject:date(1)]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj8 indexOfObject:decimal128(2)]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj9 indexOfObject:objectId(1)]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj10 indexOfObject:uuid(@"00000000-0000-0000-0000-000000000000")]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.boolObj indexOfObject:@NO]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.intObj indexOfObject:@2]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.floatObj indexOfObject:@2.2f]);
@@ -2617,7 +3144,16 @@ static double average(NSArray *values) {
     XCTAssertEqual(NSNotFound, [managed.decimalObj indexOfObject:decimal128(2)]);
     XCTAssertEqual(NSNotFound, [managed.objectIdObj indexOfObject:objectId(1)]);
     XCTAssertEqual(NSNotFound, [managed.uuidObj indexOfObject:uuid(@"00000000-0000-0000-0000-000000000000")]);
-    XCTAssertEqual(NSNotFound, [managed.anyObj indexOfObject:@NO]);
+    XCTAssertEqual(NSNotFound, [managed.anyObj1 indexOfObject:@NO]);
+    XCTAssertEqual(NSNotFound, [managed.anyObj2 indexOfObject:@2]);
+    XCTAssertEqual(NSNotFound, [managed.anyObj3 indexOfObject:@2.2f]);
+    XCTAssertEqual(NSNotFound, [managed.anyObj4 indexOfObject:@2.2]);
+    XCTAssertEqual(NSNotFound, [managed.anyObj5 indexOfObject:@"a"]);
+    XCTAssertEqual(NSNotFound, [managed.anyObj6 indexOfObject:data(1)]);
+    XCTAssertEqual(NSNotFound, [managed.anyObj7 indexOfObject:date(1)]);
+    XCTAssertEqual(NSNotFound, [managed.anyObj8 indexOfObject:decimal128(2)]);
+    XCTAssertEqual(NSNotFound, [managed.anyObj9 indexOfObject:objectId(1)]);
+    XCTAssertEqual(NSNotFound, [managed.anyObj10 indexOfObject:uuid(@"00000000-0000-0000-0000-000000000000")]);
     XCTAssertEqual(NSNotFound, [optManaged.boolObj indexOfObject:@NO]);
     XCTAssertEqual(NSNotFound, [optManaged.intObj indexOfObject:@2]);
     XCTAssertEqual(NSNotFound, [optManaged.floatObj indexOfObject:@2.2f]);
@@ -2750,7 +3286,6 @@ static double average(NSArray *values) {
                               @"Invalid value '<null>' of type 'NSNull' for expected type 'object id'");
     RLMAssertThrowsWithReason([managed.uuidObj indexOfObject:NSNull.null],
                               @"Invalid value '<null>' of type 'NSNull' for expected type 'uuid'");
-    XCTAssertEqual(NSNotFound, [unmanaged.anyObj indexOfObject:NSNull.null]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.boolObj indexOfObject:NSNull.null]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.intObj indexOfObject:NSNull.null]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.floatObj indexOfObject:NSNull.null]);
@@ -2761,7 +3296,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(NSNotFound, [optUnmanaged.decimalObj indexOfObject:NSNull.null]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.objectIdObj indexOfObject:NSNull.null]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.uuidObj indexOfObject:NSNull.null]);
-    XCTAssertEqual(NSNotFound, [managed.anyObj indexOfObject:NSNull.null]);
     XCTAssertEqual(NSNotFound, [optManaged.boolObj indexOfObject:NSNull.null]);
     XCTAssertEqual(NSNotFound, [optManaged.intObj indexOfObject:NSNull.null]);
     XCTAssertEqual(NSNotFound, [optManaged.floatObj indexOfObject:NSNull.null]);
@@ -2785,7 +3319,16 @@ static double average(NSArray *values) {
     XCTAssertEqual(1U, [unmanaged.decimalObj indexOfObject:decimal128(3)]);
     XCTAssertEqual(1U, [unmanaged.objectIdObj indexOfObject:objectId(2)]);
     XCTAssertEqual(1U, [unmanaged.uuidObj indexOfObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
-    XCTAssertEqual(1U, [unmanaged.anyObj indexOfObject:decimal128(1)]);
+    XCTAssertEqual(1U, [unmanaged.anyObj1 indexOfObject:@YES]);
+    XCTAssertEqual(1U, [unmanaged.anyObj2 indexOfObject:@3]);
+    XCTAssertEqual(1U, [unmanaged.anyObj3 indexOfObject:@3.3f]);
+    XCTAssertEqual(1U, [unmanaged.anyObj4 indexOfObject:@3.3]);
+    XCTAssertEqual(1U, [unmanaged.anyObj5 indexOfObject:@"b"]);
+    XCTAssertEqual(1U, [unmanaged.anyObj6 indexOfObject:data(2)]);
+    XCTAssertEqual(1U, [unmanaged.anyObj7 indexOfObject:date(2)]);
+    XCTAssertEqual(1U, [unmanaged.anyObj8 indexOfObject:decimal128(3)]);
+    XCTAssertEqual(1U, [unmanaged.anyObj9 indexOfObject:objectId(2)]);
+    XCTAssertEqual(1U, [unmanaged.anyObj10 indexOfObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
     XCTAssertEqual(1U, [optUnmanaged.boolObj indexOfObject:@YES]);
     XCTAssertEqual(1U, [optUnmanaged.intObj indexOfObject:@3]);
     XCTAssertEqual(1U, [optUnmanaged.floatObj indexOfObject:@3.3f]);
@@ -2806,7 +3349,16 @@ static double average(NSArray *values) {
     XCTAssertEqual(1U, [managed.decimalObj indexOfObject:decimal128(3)]);
     XCTAssertEqual(1U, [managed.objectIdObj indexOfObject:objectId(2)]);
     XCTAssertEqual(1U, [managed.uuidObj indexOfObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
-    XCTAssertEqual(1U, [managed.anyObj indexOfObject:decimal128(1)]);
+    XCTAssertEqual(1U, [managed.anyObj1 indexOfObject:@YES]);
+    XCTAssertEqual(1U, [managed.anyObj2 indexOfObject:@3]);
+    XCTAssertEqual(1U, [managed.anyObj3 indexOfObject:@3.3f]);
+    XCTAssertEqual(1U, [managed.anyObj4 indexOfObject:@3.3]);
+    XCTAssertEqual(1U, [managed.anyObj5 indexOfObject:@"b"]);
+    XCTAssertEqual(1U, [managed.anyObj6 indexOfObject:data(2)]);
+    XCTAssertEqual(1U, [managed.anyObj7 indexOfObject:date(2)]);
+    XCTAssertEqual(1U, [managed.anyObj8 indexOfObject:decimal128(3)]);
+    XCTAssertEqual(1U, [managed.anyObj9 indexOfObject:objectId(2)]);
+    XCTAssertEqual(1U, [managed.anyObj10 indexOfObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
     XCTAssertEqual(1U, [optManaged.boolObj indexOfObject:@YES]);
     XCTAssertEqual(1U, [optManaged.intObj indexOfObject:@3]);
     XCTAssertEqual(1U, [optManaged.floatObj indexOfObject:@3.3f]);
@@ -2830,7 +3382,6 @@ static double average(NSArray *values) {
     [managed.decimalObj addObjects:@[decimal128(2), decimal128(3), decimal128(2), decimal128(3)]];
     [managed.objectIdObj addObjects:@[objectId(1), objectId(2), objectId(1), objectId(2)]];
     [managed.uuidObj addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]];
-    [managed.anyObj addObjects:@[@NO, decimal128(1), NSNull.null, decimal128(1), @NO]];
     [optManaged.boolObj addObjects:@[@NO, @YES, NSNull.null, @YES, @NO]];
     [optManaged.intObj addObjects:@[@2, @3, NSNull.null, @3, @2]];
     [optManaged.floatObj addObjects:@[@2.2f, @3.3f, NSNull.null, @3.3f, @2.2f]];
@@ -2863,7 +3414,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(2U, [[managed.objectIdObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:objectId(1)]);
     XCTAssertEqual(2U, [[managed.uuidObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:uuid(@"00000000-0000-0000-0000-000000000000")]);
 
-    XCTAssertEqual(0U, [[managed.anyObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:decimal128(1)]);
     XCTAssertEqual(0U, [[optManaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@YES]);
     XCTAssertEqual(0U, [[optManaged.intObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@3]);
     XCTAssertEqual(0U, [[optManaged.floatObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@3.3f]);
@@ -2874,7 +3424,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(0U, [[optManaged.decimalObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:decimal128(3)]);
     XCTAssertEqual(0U, [[optManaged.objectIdObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:objectId(2)]);
     XCTAssertEqual(0U, [[optManaged.uuidObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
-    XCTAssertEqual(2U, [[managed.anyObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@NO]);
     XCTAssertEqual(2U, [[optManaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@NO]);
     XCTAssertEqual(2U, [[optManaged.intObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@2]);
     XCTAssertEqual(2U, [[optManaged.floatObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@2.2f]);
@@ -2885,7 +3434,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(2U, [[optManaged.decimalObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:decimal128(2)]);
     XCTAssertEqual(2U, [[optManaged.objectIdObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:objectId(1)]);
     XCTAssertEqual(2U, [[optManaged.uuidObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:uuid(@"00000000-0000-0000-0000-000000000000")]);
-    XCTAssertEqual(4U, [[managed.anyObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
     XCTAssertEqual(4U, [[optManaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
     XCTAssertEqual(4U, [[optManaged.intObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
     XCTAssertEqual(4U, [[optManaged.floatObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
@@ -2909,7 +3457,6 @@ static double average(NSArray *values) {
     [managed.decimalObj addObjects:@[decimal128(2), decimal128(2), decimal128(3)]];
     [managed.objectIdObj addObjects:@[objectId(1), objectId(1), objectId(2)]];
     [managed.uuidObj addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]];
-    [managed.anyObj addObjects:@[@NO, @NO, NSNull.null, decimal128(1), @NO]];
     [optManaged.boolObj addObjects:@[@NO, @NO, NSNull.null, @YES, @NO]];
     [optManaged.intObj addObjects:@[@2, @2, NSNull.null, @3, @2]];
     [optManaged.floatObj addObjects:@[@2.2f, @2.2f, NSNull.null, @3.3f, @2.2f]];
@@ -2942,7 +3489,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(1U, [[managed.objectIdObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:objectId(2)]);
     XCTAssertEqual(1U, [[managed.uuidObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
 
-    XCTAssertEqual(0U, [[managed.anyObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@NO]);
     XCTAssertEqual(0U, [[optManaged.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@NO]);
     XCTAssertEqual(0U, [[optManaged.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2]);
     XCTAssertEqual(0U, [[optManaged.floatObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2.2f]);
@@ -2953,7 +3499,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(0U, [[optManaged.decimalObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:decimal128(2)]);
     XCTAssertEqual(0U, [[optManaged.objectIdObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:objectId(1)]);
     XCTAssertEqual(0U, [[optManaged.uuidObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:uuid(@"00000000-0000-0000-0000-000000000000")]);
-    XCTAssertEqual(2U, [[managed.anyObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:decimal128(1)]);
     XCTAssertEqual(2U, [[optManaged.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@YES]);
     XCTAssertEqual(2U, [[optManaged.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3]);
     XCTAssertEqual(2U, [[optManaged.floatObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3.3f]);
@@ -2964,7 +3509,6 @@ static double average(NSArray *values) {
     XCTAssertEqual(2U, [[optManaged.decimalObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:decimal128(3)]);
     XCTAssertEqual(2U, [[optManaged.objectIdObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:objectId(2)]);
     XCTAssertEqual(2U, [[optManaged.uuidObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
-    XCTAssertEqual(1U, [[managed.anyObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
     XCTAssertEqual(1U, [[optManaged.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
     XCTAssertEqual(1U, [[optManaged.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
     XCTAssertEqual(1U, [[optManaged.floatObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
@@ -2988,7 +3532,16 @@ static double average(NSArray *values) {
     RLMAssertThrowsWithReason([managed.decimalObj indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
     RLMAssertThrowsWithReason([managed.objectIdObj indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
     RLMAssertThrowsWithReason([managed.uuidObj indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
-    RLMAssertThrowsWithReason([managed.anyObj indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj1 indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj2 indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj3 indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj4 indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj5 indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj6 indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj7 indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj8 indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj9 indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj10 indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
     RLMAssertThrowsWithReason([optManaged.boolObj indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
     RLMAssertThrowsWithReason([optManaged.intObj indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
     RLMAssertThrowsWithReason([optManaged.floatObj indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
@@ -3019,7 +3572,25 @@ static double average(NSArray *values) {
                                indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
     RLMAssertThrowsWithReason([[managed.uuidObj sortedResultsUsingKeyPath:@"self" ascending:NO]
                                indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
-    RLMAssertThrowsWithReason([[managed.anyObj sortedResultsUsingKeyPath:@"self" ascending:NO]
+    RLMAssertThrowsWithReason([[managed.anyObj1 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj2 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj3 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj4 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj5 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj6 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj7 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj8 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj9 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj10 sortedResultsUsingKeyPath:@"self" ascending:NO]
                                indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
     RLMAssertThrowsWithReason([[optManaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO]
                                indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
@@ -3052,7 +3623,16 @@ static double average(NSArray *values) {
     XCTAssertEqual(NSNotFound, [unmanaged.decimalObj indexOfObjectWhere:@"TRUEPREDICATE"]);
     XCTAssertEqual(NSNotFound, [unmanaged.objectIdObj indexOfObjectWhere:@"TRUEPREDICATE"]);
     XCTAssertEqual(NSNotFound, [unmanaged.uuidObj indexOfObjectWhere:@"TRUEPREDICATE"]);
-    XCTAssertEqual(NSNotFound, [unmanaged.anyObj indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj1 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj2 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj3 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj4 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj5 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj6 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj7 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj8 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj9 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj10 indexOfObjectWhere:@"TRUEPREDICATE"]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.boolObj indexOfObjectWhere:@"TRUEPREDICATE"]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.intObj indexOfObjectWhere:@"TRUEPREDICATE"]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.floatObj indexOfObjectWhere:@"TRUEPREDICATE"]);
@@ -3076,7 +3656,16 @@ static double average(NSArray *values) {
     XCTAssertEqual(0U, [unmanaged.decimalObj indexOfObjectWhere:@"TRUEPREDICATE"]);
     XCTAssertEqual(0U, [unmanaged.objectIdObj indexOfObjectWhere:@"TRUEPREDICATE"]);
     XCTAssertEqual(0U, [unmanaged.uuidObj indexOfObjectWhere:@"TRUEPREDICATE"]);
-    XCTAssertEqual(0U, [unmanaged.anyObj indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(0U, [unmanaged.anyObj1 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(0U, [unmanaged.anyObj2 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(0U, [unmanaged.anyObj3 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(0U, [unmanaged.anyObj4 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(0U, [unmanaged.anyObj5 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(0U, [unmanaged.anyObj6 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(0U, [unmanaged.anyObj7 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(0U, [unmanaged.anyObj8 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(0U, [unmanaged.anyObj9 indexOfObjectWhere:@"TRUEPREDICATE"]);
+    XCTAssertEqual(0U, [unmanaged.anyObj10 indexOfObjectWhere:@"TRUEPREDICATE"]);
     XCTAssertEqual(0U, [optUnmanaged.boolObj indexOfObjectWhere:@"TRUEPREDICATE"]);
     XCTAssertEqual(0U, [optUnmanaged.intObj indexOfObjectWhere:@"TRUEPREDICATE"]);
     XCTAssertEqual(0U, [optUnmanaged.floatObj indexOfObjectWhere:@"TRUEPREDICATE"]);
@@ -3097,7 +3686,16 @@ static double average(NSArray *values) {
     XCTAssertEqual(NSNotFound, [unmanaged.decimalObj indexOfObjectWhere:@"FALSEPREDICATE"]);
     XCTAssertEqual(NSNotFound, [unmanaged.objectIdObj indexOfObjectWhere:@"FALSEPREDICATE"]);
     XCTAssertEqual(NSNotFound, [unmanaged.uuidObj indexOfObjectWhere:@"FALSEPREDICATE"]);
-    XCTAssertEqual(NSNotFound, [unmanaged.anyObj indexOfObjectWhere:@"FALSEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj1 indexOfObjectWhere:@"FALSEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj2 indexOfObjectWhere:@"FALSEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj3 indexOfObjectWhere:@"FALSEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj4 indexOfObjectWhere:@"FALSEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj5 indexOfObjectWhere:@"FALSEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj6 indexOfObjectWhere:@"FALSEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj7 indexOfObjectWhere:@"FALSEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj8 indexOfObjectWhere:@"FALSEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj9 indexOfObjectWhere:@"FALSEPREDICATE"]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj10 indexOfObjectWhere:@"FALSEPREDICATE"]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.boolObj indexOfObjectWhere:@"FALSEPREDICATE"]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.intObj indexOfObjectWhere:@"FALSEPREDICATE"]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.floatObj indexOfObjectWhere:@"FALSEPREDICATE"]);
@@ -3121,7 +3719,16 @@ static double average(NSArray *values) {
     RLMAssertThrowsWithReason([managed.decimalObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
     RLMAssertThrowsWithReason([managed.objectIdObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
     RLMAssertThrowsWithReason([managed.uuidObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
-    RLMAssertThrowsWithReason([managed.anyObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj1 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj2 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj3 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj4 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj5 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj6 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj7 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj8 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj9 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj10 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
     RLMAssertThrowsWithReason([optManaged.boolObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
     RLMAssertThrowsWithReason([optManaged.intObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
     RLMAssertThrowsWithReason([optManaged.floatObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
@@ -3152,7 +3759,25 @@ static double average(NSArray *values) {
                                indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
     RLMAssertThrowsWithReason([[managed.uuidObj sortedResultsUsingKeyPath:@"self" ascending:NO]
                                indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
-    RLMAssertThrowsWithReason([[managed.anyObj sortedResultsUsingKeyPath:@"self" ascending:NO]
+    RLMAssertThrowsWithReason([[managed.anyObj1 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj2 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj3 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj4 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj5 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj6 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj7 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj8 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj9 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj10 sortedResultsUsingKeyPath:@"self" ascending:NO]
                                indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
     RLMAssertThrowsWithReason([[optManaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO]
                                indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
@@ -3185,7 +3810,16 @@ static double average(NSArray *values) {
     XCTAssertEqual(NSNotFound, [unmanaged.decimalObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
     XCTAssertEqual(NSNotFound, [unmanaged.objectIdObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
     XCTAssertEqual(NSNotFound, [unmanaged.uuidObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
-    XCTAssertEqual(NSNotFound, [unmanaged.anyObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj1 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj2 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj3 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj4 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj5 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj6 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj7 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj8 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj9 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj10 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.boolObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.intObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.floatObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
@@ -3209,7 +3843,16 @@ static double average(NSArray *values) {
     XCTAssertEqual(0U, [unmanaged.decimalObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
     XCTAssertEqual(0U, [unmanaged.objectIdObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
     XCTAssertEqual(0U, [unmanaged.uuidObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
-    XCTAssertEqual(0U, [unmanaged.anyObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(0U, [unmanaged.anyObj1 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(0U, [unmanaged.anyObj2 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(0U, [unmanaged.anyObj3 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(0U, [unmanaged.anyObj4 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(0U, [unmanaged.anyObj5 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(0U, [unmanaged.anyObj6 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(0U, [unmanaged.anyObj7 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(0U, [unmanaged.anyObj8 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(0U, [unmanaged.anyObj9 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
+    XCTAssertEqual(0U, [unmanaged.anyObj10 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
     XCTAssertEqual(0U, [optUnmanaged.boolObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
     XCTAssertEqual(0U, [optUnmanaged.intObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
     XCTAssertEqual(0U, [optUnmanaged.floatObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
@@ -3230,7 +3873,16 @@ static double average(NSArray *values) {
     XCTAssertEqual(NSNotFound, [unmanaged.decimalObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
     XCTAssertEqual(NSNotFound, [unmanaged.objectIdObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
     XCTAssertEqual(NSNotFound, [unmanaged.uuidObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
-    XCTAssertEqual(NSNotFound, [unmanaged.anyObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj1 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj2 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj3 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj4 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj5 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj6 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj7 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj8 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj9 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
+    XCTAssertEqual(NSNotFound, [unmanaged.anyObj10 indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.boolObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.intObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
     XCTAssertEqual(NSNotFound, [optUnmanaged.floatObj indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
@@ -3264,7 +3916,25 @@ static double average(NSArray *values) {
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
     RLMAssertThrowsWithReason([unmanaged.uuidObj sortedResultsUsingKeyPath:@"self" ascending:NO],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
-    RLMAssertThrowsWithReason([unmanaged.anyObj sortedResultsUsingKeyPath:@"self" ascending:NO],
+    RLMAssertThrowsWithReason([unmanaged.anyObj1 sortedResultsUsingKeyPath:@"self" ascending:NO],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj2 sortedResultsUsingKeyPath:@"self" ascending:NO],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj3 sortedResultsUsingKeyPath:@"self" ascending:NO],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj4 sortedResultsUsingKeyPath:@"self" ascending:NO],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj5 sortedResultsUsingKeyPath:@"self" ascending:NO],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj6 sortedResultsUsingKeyPath:@"self" ascending:NO],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj7 sortedResultsUsingKeyPath:@"self" ascending:NO],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj8 sortedResultsUsingKeyPath:@"self" ascending:NO],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj9 sortedResultsUsingKeyPath:@"self" ascending:NO],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj10 sortedResultsUsingKeyPath:@"self" ascending:NO],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
@@ -3306,7 +3976,25 @@ static double average(NSArray *values) {
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
     RLMAssertThrowsWithReason([unmanaged.uuidObj sortedResultsUsingDescriptors:@[]],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
-    RLMAssertThrowsWithReason([unmanaged.anyObj sortedResultsUsingDescriptors:@[]],
+    RLMAssertThrowsWithReason([unmanaged.anyObj1 sortedResultsUsingDescriptors:@[]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj2 sortedResultsUsingDescriptors:@[]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj3 sortedResultsUsingDescriptors:@[]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj4 sortedResultsUsingDescriptors:@[]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj5 sortedResultsUsingDescriptors:@[]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj6 sortedResultsUsingDescriptors:@[]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj7 sortedResultsUsingDescriptors:@[]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj8 sortedResultsUsingDescriptors:@[]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj9 sortedResultsUsingDescriptors:@[]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj10 sortedResultsUsingDescriptors:@[]],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj sortedResultsUsingDescriptors:@[]],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
@@ -3348,7 +4036,25 @@ static double average(NSArray *values) {
                               @"can only be sorted on 'self'");
     RLMAssertThrowsWithReason([managed.uuidObj sortedResultsUsingKeyPath:@"not self" ascending:NO],
                               @"can only be sorted on 'self'");
-    RLMAssertThrowsWithReason([managed.anyObj sortedResultsUsingKeyPath:@"not self" ascending:NO],
+    RLMAssertThrowsWithReason([managed.anyObj1 sortedResultsUsingKeyPath:@"not self" ascending:NO],
+                              @"can only be sorted on 'self'");
+    RLMAssertThrowsWithReason([managed.anyObj2 sortedResultsUsingKeyPath:@"not self" ascending:NO],
+                              @"can only be sorted on 'self'");
+    RLMAssertThrowsWithReason([managed.anyObj3 sortedResultsUsingKeyPath:@"not self" ascending:NO],
+                              @"can only be sorted on 'self'");
+    RLMAssertThrowsWithReason([managed.anyObj4 sortedResultsUsingKeyPath:@"not self" ascending:NO],
+                              @"can only be sorted on 'self'");
+    RLMAssertThrowsWithReason([managed.anyObj5 sortedResultsUsingKeyPath:@"not self" ascending:NO],
+                              @"can only be sorted on 'self'");
+    RLMAssertThrowsWithReason([managed.anyObj6 sortedResultsUsingKeyPath:@"not self" ascending:NO],
+                              @"can only be sorted on 'self'");
+    RLMAssertThrowsWithReason([managed.anyObj7 sortedResultsUsingKeyPath:@"not self" ascending:NO],
+                              @"can only be sorted on 'self'");
+    RLMAssertThrowsWithReason([managed.anyObj8 sortedResultsUsingKeyPath:@"not self" ascending:NO],
+                              @"can only be sorted on 'self'");
+    RLMAssertThrowsWithReason([managed.anyObj9 sortedResultsUsingKeyPath:@"not self" ascending:NO],
+                              @"can only be sorted on 'self'");
+    RLMAssertThrowsWithReason([managed.anyObj10 sortedResultsUsingKeyPath:@"not self" ascending:NO],
                               @"can only be sorted on 'self'");
     RLMAssertThrowsWithReason([optManaged.boolObj sortedResultsUsingKeyPath:@"not self" ascending:NO],
                               @"can only be sorted on 'self'");
@@ -3381,7 +4087,6 @@ static double average(NSArray *values) {
     [managed.decimalObj addObjects:@[decimal128(2), decimal128(3), decimal128(2)]];
     [managed.objectIdObj addObjects:@[objectId(1), objectId(2), objectId(1)]];
     [managed.uuidObj addObjects:@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000")]];
-    [managed.anyObj addObjects:@[@NO, decimal128(1), NSNull.null, decimal128(1), @NO]];
     [optManaged.boolObj addObjects:@[@NO, @YES, NSNull.null, @YES, @NO]];
     [optManaged.intObj addObjects:@[@2, @3, NSNull.null, @3, @2]];
     [optManaged.floatObj addObjects:@[@2.2f, @3.3f, NSNull.null, @3.3f, @2.2f]];
@@ -3413,8 +4118,6 @@ static double average(NSArray *values) {
                           (@[objectId(1), objectId(2), objectId(1)]));
     XCTAssertEqualObjects([[managed.uuidObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
                           (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000")]));
-    XCTAssertEqualObjects([[managed.anyObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
-                          (@[@NO, decimal128(1), NSNull.null, decimal128(1), @NO]));
     XCTAssertEqualObjects([[optManaged.boolObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
                           (@[@NO, @YES, NSNull.null, @YES, @NO]));
     XCTAssertEqualObjects([[optManaged.intObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
@@ -3456,8 +4159,6 @@ static double average(NSArray *values) {
                           (@[objectId(2), objectId(1), objectId(1)]));
     XCTAssertEqualObjects([[managed.uuidObj sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"],
                           (@[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000")]));
-    XCTAssertEqualObjects([[managed.anyObj sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"],
-                          (@[decimal128(1), decimal128(1), @NO, @NO, NSNull.null]));
     XCTAssertEqualObjects([[optManaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"],
                           (@[@YES, @YES, @NO, @NO, NSNull.null]));
     XCTAssertEqualObjects([[optManaged.intObj sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"],
@@ -3499,8 +4200,6 @@ static double average(NSArray *values) {
                           (@[objectId(1), objectId(1), objectId(2)]));
     XCTAssertEqualObjects([[managed.uuidObj sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"],
                           (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
-    XCTAssertEqualObjects([[managed.anyObj sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"],
-                          (@[NSNull.null, @NO, @NO, decimal128(1), decimal128(1)]));
     XCTAssertEqualObjects([[optManaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"],
                           (@[NSNull.null, @NO, @NO, @YES, @YES]));
     XCTAssertEqualObjects([[optManaged.intObj sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"],
@@ -3544,7 +4243,25 @@ static double average(NSArray *values) {
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
     RLMAssertThrowsWithReason([unmanaged.uuidObj objectsWhere:@"TRUEPREDICATE"],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
-    RLMAssertThrowsWithReason([unmanaged.anyObj objectsWhere:@"TRUEPREDICATE"],
+    RLMAssertThrowsWithReason([unmanaged.anyObj1 objectsWhere:@"TRUEPREDICATE"],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj2 objectsWhere:@"TRUEPREDICATE"],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj3 objectsWhere:@"TRUEPREDICATE"],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj4 objectsWhere:@"TRUEPREDICATE"],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj5 objectsWhere:@"TRUEPREDICATE"],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj6 objectsWhere:@"TRUEPREDICATE"],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj7 objectsWhere:@"TRUEPREDICATE"],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj8 objectsWhere:@"TRUEPREDICATE"],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj9 objectsWhere:@"TRUEPREDICATE"],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj10 objectsWhere:@"TRUEPREDICATE"],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj objectsWhere:@"TRUEPREDICATE"],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
@@ -3586,7 +4303,25 @@ static double average(NSArray *values) {
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
     RLMAssertThrowsWithReason([unmanaged.uuidObj objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
-    RLMAssertThrowsWithReason([unmanaged.anyObj objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+    RLMAssertThrowsWithReason([unmanaged.anyObj1 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj2 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj3 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj4 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj5 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj6 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj7 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj8 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj9 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj10 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
@@ -3629,7 +4364,25 @@ static double average(NSArray *values) {
                               @"implemented");
     RLMAssertThrowsWithReason([managed.uuidObj objectsWhere:@"TRUEPREDICATE"],
                               @"implemented");
-    RLMAssertThrowsWithReason([managed.anyObj objectsWhere:@"TRUEPREDICATE"],
+    RLMAssertThrowsWithReason([managed.anyObj1 objectsWhere:@"TRUEPREDICATE"],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj2 objectsWhere:@"TRUEPREDICATE"],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj3 objectsWhere:@"TRUEPREDICATE"],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj4 objectsWhere:@"TRUEPREDICATE"],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj5 objectsWhere:@"TRUEPREDICATE"],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj6 objectsWhere:@"TRUEPREDICATE"],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj7 objectsWhere:@"TRUEPREDICATE"],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj8 objectsWhere:@"TRUEPREDICATE"],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj9 objectsWhere:@"TRUEPREDICATE"],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj10 objectsWhere:@"TRUEPREDICATE"],
                               @"implemented");
     RLMAssertThrowsWithReason([optManaged.boolObj objectsWhere:@"TRUEPREDICATE"],
                               @"implemented");
@@ -3671,7 +4424,25 @@ static double average(NSArray *values) {
                               @"implemented");
     RLMAssertThrowsWithReason([managed.uuidObj objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
                               @"implemented");
-    RLMAssertThrowsWithReason([managed.anyObj objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+    RLMAssertThrowsWithReason([managed.anyObj1 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj2 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj3 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj4 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj5 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj6 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj7 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj8 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj9 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
+                              @"implemented");
+    RLMAssertThrowsWithReason([managed.anyObj10 objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
                               @"implemented");
     RLMAssertThrowsWithReason([optManaged.boolObj objectsWithPredicate:[NSPredicate predicateWithValue:YES]],
                               @"implemented");
@@ -3714,7 +4485,25 @@ static double average(NSArray *values) {
                                objectsWhere:@"TRUEPREDICATE"], @"implemented");
     RLMAssertThrowsWithReason([[managed.uuidObj sortedResultsUsingKeyPath:@"self" ascending:NO]
                                objectsWhere:@"TRUEPREDICATE"], @"implemented");
-    RLMAssertThrowsWithReason([[managed.anyObj sortedResultsUsingKeyPath:@"self" ascending:NO]
+    RLMAssertThrowsWithReason([[managed.anyObj1 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj2 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj3 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj4 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj5 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj6 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj7 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj8 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj9 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWhere:@"TRUEPREDICATE"], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj10 sortedResultsUsingKeyPath:@"self" ascending:NO]
                                objectsWhere:@"TRUEPREDICATE"], @"implemented");
     RLMAssertThrowsWithReason([[optManaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO]
                                objectsWhere:@"TRUEPREDICATE"], @"implemented");
@@ -3756,7 +4545,25 @@ static double average(NSArray *values) {
                                objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
     RLMAssertThrowsWithReason([[managed.uuidObj sortedResultsUsingKeyPath:@"self" ascending:NO]
                                objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
-    RLMAssertThrowsWithReason([[managed.anyObj sortedResultsUsingKeyPath:@"self" ascending:NO]
+    RLMAssertThrowsWithReason([[managed.anyObj1 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj2 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj3 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj4 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj5 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj6 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj7 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj8 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj9 sortedResultsUsingKeyPath:@"self" ascending:NO]
+                               objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
+    RLMAssertThrowsWithReason([[managed.anyObj10 sortedResultsUsingKeyPath:@"self" ascending:NO]
                                objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
     RLMAssertThrowsWithReason([[optManaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO]
                                objectsWithPredicate:[NSPredicate predicateWithValue:YES]], @"implemented");
@@ -3801,7 +4608,25 @@ static double average(NSArray *values) {
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
     RLMAssertThrowsWithReason([unmanaged.uuidObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
-    RLMAssertThrowsWithReason([unmanaged.anyObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
+    RLMAssertThrowsWithReason([unmanaged.anyObj1 addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj2 addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj3 addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj4 addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj5 addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj6 addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj7 addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj8 addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj9 addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
+                              @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+    RLMAssertThrowsWithReason([unmanaged.anyObj10 addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj addNotificationBlock:^(__unused id a, __unused id c, __unused id e) { }],
                               @"This method may only be called on RLMArray instances retrieved from an RLMRealm");
@@ -3836,8 +4661,18 @@ static double average(NSArray *values) {
                               @"minOfProperty: is not supported for object id array");
     RLMAssertThrowsWithReason([unmanaged.uuidObj minOfProperty:@"self"],
                               @"minOfProperty: is not supported for uuid array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for any array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj1 minOfProperty:@"self"],
+                              @"minOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj2 minOfProperty:@"self"],
+                              @"minOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj5 minOfProperty:@"self"],
+                              @"minOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj6 minOfProperty:@"self"],
+                              @"minOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj9 minOfProperty:@"self"],
+                              @"minOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj10 minOfProperty:@"self"],
+                              @"minOfProperty: is not supported for mixed array");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj minOfProperty:@"self"],
                               @"minOfProperty: is not supported for bool? array");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj minOfProperty:@"self"],
@@ -3858,8 +4693,16 @@ static double average(NSArray *values) {
                               @"minOfProperty: is not supported for object id array 'AllPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj minOfProperty:@"self"],
                               @"minOfProperty: is not supported for uuid array 'AllPrimitiveArrays.uuidObj'");
-    RLMAssertThrowsWithReason([managed.anyObj minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for any array 'AllPrimitiveArrays.anyObj'");
+    RLMAssertThrowsWithReason([managed.anyObj1 minOfProperty:@"self"],
+                              @"minOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj1'");
+    RLMAssertThrowsWithReason([managed.anyObj5 minOfProperty:@"self"],
+                              @"minOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj5'");
+    RLMAssertThrowsWithReason([managed.anyObj6 minOfProperty:@"self"],
+                              @"minOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj6'");
+    RLMAssertThrowsWithReason([managed.anyObj9 minOfProperty:@"self"],
+                              @"minOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj9'");
+    RLMAssertThrowsWithReason([managed.anyObj10 minOfProperty:@"self"],
+                              @"minOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj10'");
     RLMAssertThrowsWithReason([optManaged.boolObj minOfProperty:@"self"],
                               @"minOfProperty: is not supported for bool? array 'AllOptionalPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj minOfProperty:@"self"],
@@ -3876,6 +4719,10 @@ static double average(NSArray *values) {
     XCTAssertNil([unmanaged.doubleObj minOfProperty:@"self"]);
     XCTAssertNil([unmanaged.dateObj minOfProperty:@"self"]);
     XCTAssertNil([unmanaged.decimalObj minOfProperty:@"self"]);
+    XCTAssertNil([unmanaged.anyObj3 minOfProperty:@"self"]);
+    XCTAssertNil([unmanaged.anyObj4 minOfProperty:@"self"]);
+    XCTAssertNil([unmanaged.anyObj7 minOfProperty:@"self"]);
+    XCTAssertNil([unmanaged.anyObj8 minOfProperty:@"self"]);
     XCTAssertNil([optUnmanaged.intObj minOfProperty:@"self"]);
     XCTAssertNil([optUnmanaged.floatObj minOfProperty:@"self"]);
     XCTAssertNil([optUnmanaged.doubleObj minOfProperty:@"self"]);
@@ -3886,6 +4733,11 @@ static double average(NSArray *values) {
     XCTAssertNil([managed.doubleObj minOfProperty:@"self"]);
     XCTAssertNil([managed.dateObj minOfProperty:@"self"]);
     XCTAssertNil([managed.decimalObj minOfProperty:@"self"]);
+    XCTAssertNil([managed.anyObj2 minOfProperty:@"self"]);
+    XCTAssertNil([managed.anyObj3 minOfProperty:@"self"]);
+    XCTAssertNil([managed.anyObj4 minOfProperty:@"self"]);
+    XCTAssertNil([managed.anyObj7 minOfProperty:@"self"]);
+    XCTAssertNil([managed.anyObj8 minOfProperty:@"self"]);
     XCTAssertNil([optManaged.intObj minOfProperty:@"self"]);
     XCTAssertNil([optManaged.floatObj minOfProperty:@"self"]);
     XCTAssertNil([optManaged.doubleObj minOfProperty:@"self"]);
@@ -3899,6 +4751,10 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects([unmanaged.doubleObj minOfProperty:@"self"], @2.2);
     XCTAssertEqualObjects([unmanaged.dateObj minOfProperty:@"self"], date(1));
     XCTAssertEqualObjects([unmanaged.decimalObj minOfProperty:@"self"], decimal128(2));
+    XCTAssertEqualObjects([unmanaged.anyObj3 minOfProperty:@"self"], @2.2f);
+    XCTAssertEqualObjects([unmanaged.anyObj4 minOfProperty:@"self"], @2.2);
+    XCTAssertEqualObjects([unmanaged.anyObj7 minOfProperty:@"self"], date(1));
+    XCTAssertEqualObjects([unmanaged.anyObj8 minOfProperty:@"self"], decimal128(2));
     XCTAssertEqualObjects([optUnmanaged.intObj minOfProperty:@"self"], @2);
     XCTAssertEqualObjects([optUnmanaged.floatObj minOfProperty:@"self"], @2.2f);
     XCTAssertEqualObjects([optUnmanaged.doubleObj minOfProperty:@"self"], @2.2);
@@ -3909,6 +4765,11 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects([managed.doubleObj minOfProperty:@"self"], @2.2);
     XCTAssertEqualObjects([managed.dateObj minOfProperty:@"self"], date(1));
     XCTAssertEqualObjects([managed.decimalObj minOfProperty:@"self"], decimal128(2));
+    XCTAssertEqualObjects([managed.anyObj2 minOfProperty:@"self"], @2);
+    XCTAssertEqualObjects([managed.anyObj3 minOfProperty:@"self"], @2.2f);
+    XCTAssertEqualObjects([managed.anyObj4 minOfProperty:@"self"], @2.2);
+    XCTAssertEqualObjects([managed.anyObj7 minOfProperty:@"self"], date(1));
+    XCTAssertEqualObjects([managed.anyObj8 minOfProperty:@"self"], decimal128(2));
     XCTAssertEqualObjects([optManaged.intObj minOfProperty:@"self"], @2);
     XCTAssertEqualObjects([optManaged.floatObj minOfProperty:@"self"], @2.2f);
     XCTAssertEqualObjects([optManaged.doubleObj minOfProperty:@"self"], @2.2);
@@ -3927,8 +4788,18 @@ static double average(NSArray *values) {
                               @"maxOfProperty: is not supported for object id array");
     RLMAssertThrowsWithReason([unmanaged.uuidObj maxOfProperty:@"self"],
                               @"maxOfProperty: is not supported for uuid array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for any array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj1 maxOfProperty:@"self"],
+                              @"maxOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj2 maxOfProperty:@"self"],
+                              @"maxOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj5 maxOfProperty:@"self"],
+                              @"maxOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj6 maxOfProperty:@"self"],
+                              @"maxOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj9 maxOfProperty:@"self"],
+                              @"maxOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj10 maxOfProperty:@"self"],
+                              @"maxOfProperty: is not supported for mixed array");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj maxOfProperty:@"self"],
                               @"maxOfProperty: is not supported for bool? array");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj maxOfProperty:@"self"],
@@ -3949,8 +4820,16 @@ static double average(NSArray *values) {
                               @"maxOfProperty: is not supported for object id array 'AllPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj maxOfProperty:@"self"],
                               @"maxOfProperty: is not supported for uuid array 'AllPrimitiveArrays.uuidObj'");
-    RLMAssertThrowsWithReason([managed.anyObj maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for any array 'AllPrimitiveArrays.anyObj'");
+    RLMAssertThrowsWithReason([managed.anyObj1 maxOfProperty:@"self"],
+                              @"maxOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj1'");
+    RLMAssertThrowsWithReason([managed.anyObj5 maxOfProperty:@"self"],
+                              @"maxOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj5'");
+    RLMAssertThrowsWithReason([managed.anyObj6 maxOfProperty:@"self"],
+                              @"maxOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj6'");
+    RLMAssertThrowsWithReason([managed.anyObj9 maxOfProperty:@"self"],
+                              @"maxOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj9'");
+    RLMAssertThrowsWithReason([managed.anyObj10 maxOfProperty:@"self"],
+                              @"maxOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj10'");
     RLMAssertThrowsWithReason([optManaged.boolObj maxOfProperty:@"self"],
                               @"maxOfProperty: is not supported for bool? array 'AllOptionalPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj maxOfProperty:@"self"],
@@ -3967,6 +4846,10 @@ static double average(NSArray *values) {
     XCTAssertNil([unmanaged.doubleObj maxOfProperty:@"self"]);
     XCTAssertNil([unmanaged.dateObj maxOfProperty:@"self"]);
     XCTAssertNil([unmanaged.decimalObj maxOfProperty:@"self"]);
+    XCTAssertNil([unmanaged.anyObj3 maxOfProperty:@"self"]);
+    XCTAssertNil([unmanaged.anyObj4 maxOfProperty:@"self"]);
+    XCTAssertNil([unmanaged.anyObj7 maxOfProperty:@"self"]);
+    XCTAssertNil([unmanaged.anyObj8 maxOfProperty:@"self"]);
     XCTAssertNil([optUnmanaged.intObj maxOfProperty:@"self"]);
     XCTAssertNil([optUnmanaged.floatObj maxOfProperty:@"self"]);
     XCTAssertNil([optUnmanaged.doubleObj maxOfProperty:@"self"]);
@@ -3977,6 +4860,11 @@ static double average(NSArray *values) {
     XCTAssertNil([managed.doubleObj maxOfProperty:@"self"]);
     XCTAssertNil([managed.dateObj maxOfProperty:@"self"]);
     XCTAssertNil([managed.decimalObj maxOfProperty:@"self"]);
+    XCTAssertNil([managed.anyObj2 maxOfProperty:@"self"]);
+    XCTAssertNil([managed.anyObj3 maxOfProperty:@"self"]);
+    XCTAssertNil([managed.anyObj4 maxOfProperty:@"self"]);
+    XCTAssertNil([managed.anyObj7 maxOfProperty:@"self"]);
+    XCTAssertNil([managed.anyObj8 maxOfProperty:@"self"]);
     XCTAssertNil([optManaged.intObj maxOfProperty:@"self"]);
     XCTAssertNil([optManaged.floatObj maxOfProperty:@"self"]);
     XCTAssertNil([optManaged.doubleObj maxOfProperty:@"self"]);
@@ -3990,6 +4878,10 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects([unmanaged.doubleObj maxOfProperty:@"self"], @3.3);
     XCTAssertEqualObjects([unmanaged.dateObj maxOfProperty:@"self"], date(2));
     XCTAssertEqualObjects([unmanaged.decimalObj maxOfProperty:@"self"], decimal128(3));
+    XCTAssertEqualObjects([unmanaged.anyObj3 maxOfProperty:@"self"], @3.3f);
+    XCTAssertEqualObjects([unmanaged.anyObj4 maxOfProperty:@"self"], @3.3);
+    XCTAssertEqualObjects([unmanaged.anyObj7 maxOfProperty:@"self"], date(2));
+    XCTAssertEqualObjects([unmanaged.anyObj8 maxOfProperty:@"self"], decimal128(3));
     XCTAssertEqualObjects([optUnmanaged.intObj maxOfProperty:@"self"], @3);
     XCTAssertEqualObjects([optUnmanaged.floatObj maxOfProperty:@"self"], @3.3f);
     XCTAssertEqualObjects([optUnmanaged.doubleObj maxOfProperty:@"self"], @3.3);
@@ -4000,6 +4892,11 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects([managed.doubleObj maxOfProperty:@"self"], @3.3);
     XCTAssertEqualObjects([managed.dateObj maxOfProperty:@"self"], date(2));
     XCTAssertEqualObjects([managed.decimalObj maxOfProperty:@"self"], decimal128(3));
+    XCTAssertEqualObjects([managed.anyObj2 maxOfProperty:@"self"], @3);
+    XCTAssertEqualObjects([managed.anyObj3 maxOfProperty:@"self"], @3.3f);
+    XCTAssertEqualObjects([managed.anyObj4 maxOfProperty:@"self"], @3.3);
+    XCTAssertEqualObjects([managed.anyObj7 maxOfProperty:@"self"], date(2));
+    XCTAssertEqualObjects([managed.anyObj8 maxOfProperty:@"self"], decimal128(3));
     XCTAssertEqualObjects([optManaged.intObj maxOfProperty:@"self"], @3);
     XCTAssertEqualObjects([optManaged.floatObj maxOfProperty:@"self"], @3.3f);
     XCTAssertEqualObjects([optManaged.doubleObj maxOfProperty:@"self"], @3.3);
@@ -4020,8 +4917,18 @@ static double average(NSArray *values) {
                               @"sumOfProperty: is not supported for object id array");
     RLMAssertThrowsWithReason([unmanaged.uuidObj sumOfProperty:@"self"],
                               @"sumOfProperty: is not supported for uuid array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for any array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj1 sumOfProperty:@"self"],
+                              @"sumOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj5 sumOfProperty:@"self"],
+                              @"sumOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj6 sumOfProperty:@"self"],
+                              @"sumOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj7 sumOfProperty:@"self"],
+                              @"sumOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj9 sumOfProperty:@"self"],
+                              @"sumOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj10 sumOfProperty:@"self"],
+                              @"sumOfProperty: is not supported for mixed array");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj sumOfProperty:@"self"],
                               @"sumOfProperty: is not supported for bool? array");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj sumOfProperty:@"self"],
@@ -4046,8 +4953,18 @@ static double average(NSArray *values) {
                               @"sumOfProperty: is not supported for object id array 'AllPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj sumOfProperty:@"self"],
                               @"sumOfProperty: is not supported for uuid array 'AllPrimitiveArrays.uuidObj'");
-    RLMAssertThrowsWithReason([managed.anyObj sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for any array 'AllPrimitiveArrays.anyObj'");
+    RLMAssertThrowsWithReason([managed.anyObj1 sumOfProperty:@"self"],
+                              @"sumOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj1'");
+    RLMAssertThrowsWithReason([managed.anyObj5 sumOfProperty:@"self"],
+                              @"sumOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj5'");
+    RLMAssertThrowsWithReason([managed.anyObj6 sumOfProperty:@"self"],
+                              @"sumOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj6'");
+    RLMAssertThrowsWithReason([managed.anyObj7 sumOfProperty:@"self"],
+                              @"sumOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj7'");
+    RLMAssertThrowsWithReason([managed.anyObj9 sumOfProperty:@"self"],
+                              @"sumOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj9'");
+    RLMAssertThrowsWithReason([managed.anyObj10 sumOfProperty:@"self"],
+                              @"sumOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj10'");
     RLMAssertThrowsWithReason([optManaged.boolObj sumOfProperty:@"self"],
                               @"sumOfProperty: is not supported for bool? array 'AllOptionalPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj sumOfProperty:@"self"],
@@ -4111,8 +5028,18 @@ static double average(NSArray *values) {
                               @"averageOfProperty: is not supported for object id array");
     RLMAssertThrowsWithReason([unmanaged.uuidObj averageOfProperty:@"self"],
                               @"averageOfProperty: is not supported for uuid array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for any array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj1 averageOfProperty:@"self"],
+                              @"averageOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj5 averageOfProperty:@"self"],
+                              @"averageOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj6 averageOfProperty:@"self"],
+                              @"averageOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj7 averageOfProperty:@"self"],
+                              @"averageOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj9 averageOfProperty:@"self"],
+                              @"averageOfProperty: is not supported for mixed array");
+    RLMAssertThrowsWithReason([unmanaged.anyObj10 averageOfProperty:@"self"],
+                              @"averageOfProperty: is not supported for mixed array");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj averageOfProperty:@"self"],
                               @"averageOfProperty: is not supported for bool? array");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj averageOfProperty:@"self"],
@@ -4137,8 +5064,18 @@ static double average(NSArray *values) {
                               @"averageOfProperty: is not supported for object id array 'AllPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj averageOfProperty:@"self"],
                               @"averageOfProperty: is not supported for uuid array 'AllPrimitiveArrays.uuidObj'");
-    RLMAssertThrowsWithReason([managed.anyObj averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for any array 'AllPrimitiveArrays.anyObj'");
+    RLMAssertThrowsWithReason([managed.anyObj1 averageOfProperty:@"self"],
+                              @"averageOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj1'");
+    RLMAssertThrowsWithReason([managed.anyObj5 averageOfProperty:@"self"],
+                              @"averageOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj5'");
+    RLMAssertThrowsWithReason([managed.anyObj6 averageOfProperty:@"self"],
+                              @"averageOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj6'");
+    RLMAssertThrowsWithReason([managed.anyObj7 averageOfProperty:@"self"],
+                              @"averageOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj7'");
+    RLMAssertThrowsWithReason([managed.anyObj9 averageOfProperty:@"self"],
+                              @"averageOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj9'");
+    RLMAssertThrowsWithReason([managed.anyObj10 averageOfProperty:@"self"],
+                              @"averageOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj10'");
     RLMAssertThrowsWithReason([optManaged.boolObj averageOfProperty:@"self"],
                               @"averageOfProperty: is not supported for bool? array 'AllOptionalPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj averageOfProperty:@"self"],
@@ -4286,11 +5223,92 @@ static double average(NSArray *values) {
     
     {
     NSUInteger i = 0;
-    NSArray *values = @[@NO, decimal128(1), NSNull.null];
-    for (id value in unmanaged.anyObj) {
+    NSArray *values = @[@NO, @YES];
+    for (id value in unmanaged.anyObj1) {
     XCTAssertEqualObjects(values[i++ % values.count], value);
     }
-    XCTAssertEqual(i, unmanaged.anyObj.count);
+    XCTAssertEqual(i, unmanaged.anyObj1.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[@2, @3];
+    for (id value in unmanaged.anyObj2) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, unmanaged.anyObj2.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[@2.2f, @3.3f];
+    for (id value in unmanaged.anyObj3) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, unmanaged.anyObj3.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[@2.2, @3.3];
+    for (id value in unmanaged.anyObj4) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, unmanaged.anyObj4.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[@"a", @"b"];
+    for (id value in unmanaged.anyObj5) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, unmanaged.anyObj5.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[data(1), data(2)];
+    for (id value in unmanaged.anyObj6) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, unmanaged.anyObj6.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[date(1), date(2)];
+    for (id value in unmanaged.anyObj7) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, unmanaged.anyObj7.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[decimal128(2), decimal128(3)];
+    for (id value in unmanaged.anyObj8) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, unmanaged.anyObj8.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[objectId(1), objectId(2)];
+    for (id value in unmanaged.anyObj9) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, unmanaged.anyObj9.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
+    for (id value in unmanaged.anyObj10) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, unmanaged.anyObj10.count);
     }
     
     {
@@ -4475,11 +5493,92 @@ static double average(NSArray *values) {
     
     {
     NSUInteger i = 0;
-    NSArray *values = @[@NO, decimal128(1), NSNull.null];
-    for (id value in managed.anyObj) {
+    NSArray *values = @[@NO, @YES];
+    for (id value in managed.anyObj1) {
     XCTAssertEqualObjects(values[i++ % values.count], value);
     }
-    XCTAssertEqual(i, managed.anyObj.count);
+    XCTAssertEqual(i, managed.anyObj1.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[@2, @3];
+    for (id value in managed.anyObj2) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, managed.anyObj2.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[@2.2f, @3.3f];
+    for (id value in managed.anyObj3) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, managed.anyObj3.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[@2.2, @3.3];
+    for (id value in managed.anyObj4) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, managed.anyObj4.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[@"a", @"b"];
+    for (id value in managed.anyObj5) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, managed.anyObj5.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[data(1), data(2)];
+    for (id value in managed.anyObj6) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, managed.anyObj6.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[date(1), date(2)];
+    for (id value in managed.anyObj7) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, managed.anyObj7.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[decimal128(2), decimal128(3)];
+    for (id value in managed.anyObj8) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, managed.anyObj8.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[objectId(1), objectId(2)];
+    for (id value in managed.anyObj9) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, managed.anyObj9.count);
+    }
+    
+    {
+    NSUInteger i = 0;
+    NSArray *values = @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
+    for (id value in managed.anyObj10) {
+    XCTAssertEqualObjects(values[i++ % values.count], value);
+    }
+    XCTAssertEqual(i, managed.anyObj10.count);
     }
     
     {
@@ -4591,7 +5690,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects([unmanaged.decimalObj valueForKey:@"self"], (@[decimal128(2), decimal128(3)]));
     XCTAssertEqualObjects([unmanaged.objectIdObj valueForKey:@"self"], (@[objectId(1), objectId(2)]));
     XCTAssertEqualObjects([unmanaged.uuidObj valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
-    XCTAssertEqualObjects([unmanaged.anyObj valueForKey:@"self"], (@[@NO, decimal128(1), NSNull.null]));
+    XCTAssertEqualObjects([unmanaged.anyObj1 valueForKey:@"self"], (@[@NO, @YES]));
+    XCTAssertEqualObjects([unmanaged.anyObj2 valueForKey:@"self"], (@[@2, @3]));
+    XCTAssertEqualObjects([unmanaged.anyObj3 valueForKey:@"self"], (@[@2.2f, @3.3f]));
+    XCTAssertEqualObjects([unmanaged.anyObj4 valueForKey:@"self"], (@[@2.2, @3.3]));
+    XCTAssertEqualObjects([unmanaged.anyObj5 valueForKey:@"self"], (@[@"a", @"b"]));
+    XCTAssertEqualObjects([unmanaged.anyObj6 valueForKey:@"self"], (@[data(1), data(2)]));
+    XCTAssertEqualObjects([unmanaged.anyObj7 valueForKey:@"self"], (@[date(1), date(2)]));
+    XCTAssertEqualObjects([unmanaged.anyObj8 valueForKey:@"self"], (@[decimal128(2), decimal128(3)]));
+    XCTAssertEqualObjects([unmanaged.anyObj9 valueForKey:@"self"], (@[objectId(1), objectId(2)]));
+    XCTAssertEqualObjects([unmanaged.anyObj10 valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     XCTAssertEqualObjects([optUnmanaged.boolObj valueForKey:@"self"], (@[@NO, @YES, NSNull.null]));
     XCTAssertEqualObjects([optUnmanaged.intObj valueForKey:@"self"], (@[@2, @3, NSNull.null]));
     XCTAssertEqualObjects([optUnmanaged.floatObj valueForKey:@"self"], (@[@2.2f, @3.3f, NSNull.null]));
@@ -4612,7 +5720,16 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects([managed.decimalObj valueForKey:@"self"], (@[decimal128(2), decimal128(3)]));
     XCTAssertEqualObjects([managed.objectIdObj valueForKey:@"self"], (@[objectId(1), objectId(2)]));
     XCTAssertEqualObjects([managed.uuidObj valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
-    XCTAssertEqualObjects([managed.anyObj valueForKey:@"self"], (@[@NO, decimal128(1), NSNull.null]));
+    XCTAssertEqualObjects([managed.anyObj1 valueForKey:@"self"], (@[@NO, @YES]));
+    XCTAssertEqualObjects([managed.anyObj2 valueForKey:@"self"], (@[@2, @3]));
+    XCTAssertEqualObjects([managed.anyObj3 valueForKey:@"self"], (@[@2.2f, @3.3f]));
+    XCTAssertEqualObjects([managed.anyObj4 valueForKey:@"self"], (@[@2.2, @3.3]));
+    XCTAssertEqualObjects([managed.anyObj5 valueForKey:@"self"], (@[@"a", @"b"]));
+    XCTAssertEqualObjects([managed.anyObj6 valueForKey:@"self"], (@[data(1), data(2)]));
+    XCTAssertEqualObjects([managed.anyObj7 valueForKey:@"self"], (@[date(1), date(2)]));
+    XCTAssertEqualObjects([managed.anyObj8 valueForKey:@"self"], (@[decimal128(2), decimal128(3)]));
+    XCTAssertEqualObjects([managed.anyObj9 valueForKey:@"self"], (@[objectId(1), objectId(2)]));
+    XCTAssertEqualObjects([managed.anyObj10 valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     XCTAssertEqualObjects([optManaged.boolObj valueForKey:@"self"], (@[@NO, @YES, NSNull.null]));
     XCTAssertEqualObjects([optManaged.intObj valueForKey:@"self"], (@[@2, @3, NSNull.null]));
     XCTAssertEqualObjects([optManaged.floatObj valueForKey:@"self"], (@[@2.2f, @3.3f, NSNull.null]));
@@ -4783,8 +5900,10 @@ static double average(NSArray *values) {
     [self addObjects];
 
     XCTAssertEqualObjects([unmanaged.stringObj valueForKey:@"length"], ([@[@"a", @"b"] valueForKey:@"length"]));
+    XCTAssertEqualObjects([unmanaged.anyObj5 valueForKey:@"length"], ([@[@"a", @"b"] valueForKey:@"length"]));
     XCTAssertEqualObjects([optUnmanaged.stringObj valueForKey:@"length"], ([@[@"a", @"b", NSNull.null] valueForKey:@"length"]));
     XCTAssertEqualObjects([managed.stringObj valueForKey:@"length"], ([@[@"a", @"b"] valueForKey:@"length"]));
+    XCTAssertEqualObjects([managed.anyObj5 valueForKey:@"length"], ([@[@"a", @"b"] valueForKey:@"length"]));
     XCTAssertEqualObjects([optManaged.stringObj valueForKey:@"length"], ([@[@"a", @"b", NSNull.null] valueForKey:@"length"]));
 }
 
@@ -4822,7 +5941,18 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                     return idx1 - idx2;
                 }
 
-                return [a compare:b];
+                if ([a respondsToSelector:@selector(objCType)]
+                    && [b respondsToSelector:@selector(objCType)]) {
+                    return [a compare:b];
+                } else {
+                    if ([a isKindOfClass:[RLMDecimal128 class]]) {
+                        a = [NSNumber numberWithDouble:[(RLMDecimal128 *)a doubleValue]];
+                    }
+                    if ([b isKindOfClass:[RLMDecimal128 class]]) {
+                        b = [NSNumber numberWithDouble:[(RLMDecimal128 *)b doubleValue]];
+                    }
+                    return [a compare:b];
+                }
             }];
 }
 
@@ -4857,8 +5987,26 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                           (@[objectId(1), objectId(2), objectId(1), objectId(2)]));
     XCTAssertEqualObjects([unmanaged.uuidObj valueForKeyPath:@"@unionOfObjects.self"],
                           (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
-    XCTAssertEqualObjects([unmanaged.anyObj valueForKeyPath:@"@unionOfObjects.self"],
-                          (@[@NO, decimal128(1), NSNull.null, @NO, decimal128(1), NSNull.null]));
+    XCTAssertEqualObjects([unmanaged.anyObj1 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[@NO, @YES, @NO, @YES]));
+    XCTAssertEqualObjects([unmanaged.anyObj2 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[@2, @3, @2, @3]));
+    XCTAssertEqualObjects([unmanaged.anyObj3 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[@2.2f, @3.3f, @2.2f, @3.3f]));
+    XCTAssertEqualObjects([unmanaged.anyObj4 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[@2.2, @3.3, @2.2, @3.3]));
+    XCTAssertEqualObjects([unmanaged.anyObj5 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[@"a", @"b", @"a", @"b"]));
+    XCTAssertEqualObjects([unmanaged.anyObj6 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[data(1), data(2), data(1), data(2)]));
+    XCTAssertEqualObjects([unmanaged.anyObj7 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[date(1), date(2), date(1), date(2)]));
+    XCTAssertEqualObjects([unmanaged.anyObj8 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[decimal128(2), decimal128(3), decimal128(2), decimal128(3)]));
+    XCTAssertEqualObjects([unmanaged.anyObj9 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[objectId(1), objectId(2), objectId(1), objectId(2)]));
+    XCTAssertEqualObjects([unmanaged.anyObj10 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     XCTAssertEqualObjects([optUnmanaged.boolObj valueForKeyPath:@"@unionOfObjects.self"],
                           (@[@NO, @YES, NSNull.null, @NO, @YES, NSNull.null]));
     XCTAssertEqualObjects([optUnmanaged.intObj valueForKeyPath:@"@unionOfObjects.self"],
@@ -4899,8 +6047,26 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                           (@[objectId(1), objectId(2), objectId(1), objectId(2)]));
     XCTAssertEqualObjects([managed.uuidObj valueForKeyPath:@"@unionOfObjects.self"],
                           (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
-    XCTAssertEqualObjects([managed.anyObj valueForKeyPath:@"@unionOfObjects.self"],
-                          (@[@NO, decimal128(1), NSNull.null, @NO, decimal128(1), NSNull.null]));
+    XCTAssertEqualObjects([managed.anyObj1 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[@NO, @YES, @NO, @YES]));
+    XCTAssertEqualObjects([managed.anyObj2 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[@2, @3, @2, @3]));
+    XCTAssertEqualObjects([managed.anyObj3 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[@2.2f, @3.3f, @2.2f, @3.3f]));
+    XCTAssertEqualObjects([managed.anyObj4 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[@2.2, @3.3, @2.2, @3.3]));
+    XCTAssertEqualObjects([managed.anyObj5 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[@"a", @"b", @"a", @"b"]));
+    XCTAssertEqualObjects([managed.anyObj6 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[data(1), data(2), data(1), data(2)]));
+    XCTAssertEqualObjects([managed.anyObj7 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[date(1), date(2), date(1), date(2)]));
+    XCTAssertEqualObjects([managed.anyObj8 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[decimal128(2), decimal128(3), decimal128(2), decimal128(3)]));
+    XCTAssertEqualObjects([managed.anyObj9 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[objectId(1), objectId(2), objectId(1), objectId(2)]));
+    XCTAssertEqualObjects([managed.anyObj10 valueForKeyPath:@"@unionOfObjects.self"],
+                          (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     XCTAssertEqualObjects([optManaged.boolObj valueForKeyPath:@"@unionOfObjects.self"],
                           (@[@NO, @YES, NSNull.null, @NO, @YES, NSNull.null]));
     XCTAssertEqualObjects([optManaged.intObj valueForKeyPath:@"@unionOfObjects.self"],
@@ -4941,8 +6107,26 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                           (@[objectId(1), objectId(2)]));
     XCTAssertEqualObjects(sortedDistinctUnion(unmanaged.uuidObj, @"Objects", @"self"),
                           (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
-    XCTAssertEqualObjects(sortedDistinctUnion(unmanaged.anyObj, @"Objects", @"self"),
-                          (@[@NO, decimal128(1), NSNull.null]));
+    XCTAssertEqualObjects(sortedDistinctUnion(unmanaged.anyObj1, @"Objects", @"self"),
+                          (@[@NO, @YES]));
+    XCTAssertEqualObjects(sortedDistinctUnion(unmanaged.anyObj2, @"Objects", @"self"),
+                          (@[@2, @3]));
+    XCTAssertEqualObjects(sortedDistinctUnion(unmanaged.anyObj3, @"Objects", @"self"),
+                          (@[@2.2f, @3.3f]));
+    XCTAssertEqualObjects(sortedDistinctUnion(unmanaged.anyObj4, @"Objects", @"self"),
+                          (@[@2.2, @3.3]));
+    XCTAssertEqualObjects(sortedDistinctUnion(unmanaged.anyObj5, @"Objects", @"self"),
+                          (@[@"a", @"b"]));
+    XCTAssertEqualObjects(sortedDistinctUnion(unmanaged.anyObj6, @"Objects", @"self"),
+                          (@[data(1), data(2)]));
+    XCTAssertEqualObjects(sortedDistinctUnion(unmanaged.anyObj7, @"Objects", @"self"),
+                          (@[date(1), date(2)]));
+    XCTAssertEqualObjects(sortedDistinctUnion(unmanaged.anyObj8, @"Objects", @"self"),
+                          (@[decimal128(2), decimal128(3)]));
+    XCTAssertEqualObjects(sortedDistinctUnion(unmanaged.anyObj9, @"Objects", @"self"),
+                          (@[objectId(1), objectId(2)]));
+    XCTAssertEqualObjects(sortedDistinctUnion(unmanaged.anyObj10, @"Objects", @"self"),
+                          (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     XCTAssertEqualObjects(sortedDistinctUnion(optUnmanaged.boolObj, @"Objects", @"self"),
                           (@[@NO, @YES, NSNull.null]));
     XCTAssertEqualObjects(sortedDistinctUnion(optUnmanaged.intObj, @"Objects", @"self"),
@@ -4983,8 +6167,26 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                           (@[objectId(1), objectId(2)]));
     XCTAssertEqualObjects(sortedDistinctUnion(managed.uuidObj, @"Objects", @"self"),
                           (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
-    XCTAssertEqualObjects(sortedDistinctUnion(managed.anyObj, @"Objects", @"self"),
-                          (@[@NO, decimal128(1), NSNull.null]));
+    XCTAssertEqualObjects(sortedDistinctUnion(managed.anyObj1, @"Objects", @"self"),
+                          (@[@NO, @YES]));
+    XCTAssertEqualObjects(sortedDistinctUnion(managed.anyObj2, @"Objects", @"self"),
+                          (@[@2, @3]));
+    XCTAssertEqualObjects(sortedDistinctUnion(managed.anyObj3, @"Objects", @"self"),
+                          (@[@2.2f, @3.3f]));
+    XCTAssertEqualObjects(sortedDistinctUnion(managed.anyObj4, @"Objects", @"self"),
+                          (@[@2.2, @3.3]));
+    XCTAssertEqualObjects(sortedDistinctUnion(managed.anyObj5, @"Objects", @"self"),
+                          (@[@"a", @"b"]));
+    XCTAssertEqualObjects(sortedDistinctUnion(managed.anyObj6, @"Objects", @"self"),
+                          (@[data(1), data(2)]));
+    XCTAssertEqualObjects(sortedDistinctUnion(managed.anyObj7, @"Objects", @"self"),
+                          (@[date(1), date(2)]));
+    XCTAssertEqualObjects(sortedDistinctUnion(managed.anyObj8, @"Objects", @"self"),
+                          (@[decimal128(2), decimal128(3)]));
+    XCTAssertEqualObjects(sortedDistinctUnion(managed.anyObj9, @"Objects", @"self"),
+                          (@[objectId(1), objectId(2)]));
+    XCTAssertEqualObjects(sortedDistinctUnion(managed.anyObj10, @"Objects", @"self"),
+                          (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     XCTAssertEqualObjects(sortedDistinctUnion(optManaged.boolObj, @"Objects", @"self"),
                           (@[@NO, @YES, NSNull.null]));
     XCTAssertEqualObjects(sortedDistinctUnion(optManaged.intObj, @"Objects", @"self"),
@@ -5021,7 +6223,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.decimalObj"], @[]);
     XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.objectIdObj"], @[]);
     XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.uuidObj"], @[]);
-    XCTAssertEqualObjects([allOptional valueForKeyPath:@"@unionOfArrays.anyObj"], @[]);
     XCTAssertEqualObjects([allOptional valueForKeyPath:@"@unionOfArrays.boolObj"], @[]);
     XCTAssertEqualObjects([allOptional valueForKeyPath:@"@unionOfArrays.intObj"], @[]);
     XCTAssertEqualObjects([allOptional valueForKeyPath:@"@unionOfArrays.floatObj"], @[]);
@@ -5042,7 +6243,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.decimalObj"], @[]);
     XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.objectIdObj"], @[]);
     XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.uuidObj"], @[]);
-    XCTAssertEqualObjects([allOptional valueForKeyPath:@"@distinctUnionOfArrays.anyObj"], @[]);
     XCTAssertEqualObjects([allOptional valueForKeyPath:@"@distinctUnionOfArrays.boolObj"], @[]);
     XCTAssertEqualObjects([allOptional valueForKeyPath:@"@distinctUnionOfArrays.intObj"], @[]);
     XCTAssertEqualObjects([allOptional valueForKeyPath:@"@distinctUnionOfArrays.floatObj"], @[]);
@@ -5053,6 +6253,28 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects([allOptional valueForKeyPath:@"@distinctUnionOfArrays.decimalObj"], @[]);
     XCTAssertEqualObjects([allOptional valueForKeyPath:@"@distinctUnionOfArrays.objectIdObj"], @[]);
     XCTAssertEqualObjects([allOptional valueForKeyPath:@"@distinctUnionOfArrays.uuidObj"], @[]);
+
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj1"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj2"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj3"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj4"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj5"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj6"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj7"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj8"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj9"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj10"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.anyObj1"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.anyObj2"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.anyObj3"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.anyObj4"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.anyObj5"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.anyObj6"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.anyObj7"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.anyObj8"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.anyObj9"], @[]);
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.anyObj10"], @[]);
+
 
     [self addObjects];
 
@@ -5079,8 +6301,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                           (@[objectId(1), objectId(2), objectId(1), objectId(2)]));
     XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.uuidObj"],
                           (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
-    XCTAssertEqualObjects([allOptional valueForKeyPath:@"@unionOfArrays.anyObj"],
-                          (@[@NO, decimal128(1), NSNull.null, @NO, decimal128(1), NSNull.null]));
     XCTAssertEqualObjects([allOptional valueForKeyPath:@"@unionOfArrays.boolObj"],
                           (@[@NO, @YES, NSNull.null, @NO, @YES, NSNull.null]));
     XCTAssertEqualObjects([allOptional valueForKeyPath:@"@unionOfArrays.intObj"],
@@ -5121,8 +6341,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                           (@[objectId(1), objectId(2)]));
     XCTAssertEqualObjects(sortedDistinctUnion(allRequired, @"Arrays", @"uuidObj"),
                           (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
-    XCTAssertEqualObjects(sortedDistinctUnion(allOptional, @"Arrays", @"anyObj"),
-                          (@[@NO, decimal128(1), NSNull.null]));
     XCTAssertEqualObjects(sortedDistinctUnion(allOptional, @"Arrays", @"boolObj"),
                           (@[@NO, @YES, NSNull.null]));
     XCTAssertEqualObjects(sortedDistinctUnion(allOptional, @"Arrays", @"intObj"),
@@ -5143,6 +6361,47 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                           (@[objectId(1), objectId(2), NSNull.null]));
     XCTAssertEqualObjects(sortedDistinctUnion(allOptional, @"Arrays", @"uuidObj"),
                           (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), NSNull.null]));
+
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj1"],
+                          (@[@NO, @YES, @NO, @YES]));
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj2"],
+                          (@[@2, @3, @2, @3]));
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj3"],
+                          (@[@2.2f, @3.3f, @2.2f, @3.3f]));
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj4"],
+                          (@[@2.2, @3.3, @2.2, @3.3]));
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj5"],
+                          (@[@"a", @"b", @"a", @"b"]));
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj6"],
+                          (@[data(1), data(2), data(1), data(2)]));
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj7"],
+                          (@[date(1), date(2), date(1), date(2)]));
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj8"],
+                          (@[decimal128(2), decimal128(3), decimal128(2), decimal128(3)]));
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj9"],
+                          (@[objectId(1), objectId(2), objectId(1), objectId(2)]));
+    XCTAssertEqualObjects([allRequired valueForKeyPath:@"@unionOfArrays.anyObj10"],
+                          (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
+    XCTAssertEqualObjects(sortedDistinctUnion(allRequired, @"Arrays", @"anyObj1"),
+                          (@[@NO, @YES]));
+    XCTAssertEqualObjects(sortedDistinctUnion(allRequired, @"Arrays", @"anyObj2"),
+                          (@[@2, @3]));
+    XCTAssertEqualObjects(sortedDistinctUnion(allRequired, @"Arrays", @"anyObj3"),
+                          (@[@2.2f, @3.3f]));
+    XCTAssertEqualObjects(sortedDistinctUnion(allRequired, @"Arrays", @"anyObj4"),
+                          (@[@2.2, @3.3]));
+    XCTAssertEqualObjects(sortedDistinctUnion(allRequired, @"Arrays", @"anyObj5"),
+                          (@[@"a", @"b"]));
+    XCTAssertEqualObjects(sortedDistinctUnion(allRequired, @"Arrays", @"anyObj6"),
+                          (@[data(1), data(2)]));
+    XCTAssertEqualObjects(sortedDistinctUnion(allRequired, @"Arrays", @"anyObj7"),
+                          (@[date(1), date(2)]));
+    XCTAssertEqualObjects(sortedDistinctUnion(allRequired, @"Arrays", @"anyObj8"),
+                          (@[decimal128(2), decimal128(3)]));
+    XCTAssertEqualObjects(sortedDistinctUnion(allRequired, @"Arrays", @"anyObj9"),
+                          (@[objectId(1), objectId(2)]));
+    XCTAssertEqualObjects(sortedDistinctUnion(allRequired, @"Arrays", @"anyObj10"),
+                          (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
 }
 
 - (void)testSetValueForKey {
@@ -5283,7 +6542,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     [unmanaged.decimalObj setValue:decimal128(2) forKey:@"self"];
     [unmanaged.objectIdObj setValue:objectId(1) forKey:@"self"];
     [unmanaged.uuidObj setValue:uuid(@"00000000-0000-0000-0000-000000000000") forKey:@"self"];
-    [unmanaged.anyObj setValue:@NO forKey:@"self"];
+    [unmanaged.anyObj1 setValue:@NO forKey:@"self"];
+    [unmanaged.anyObj2 setValue:@2 forKey:@"self"];
+    [unmanaged.anyObj3 setValue:@2.2f forKey:@"self"];
+    [unmanaged.anyObj4 setValue:@2.2 forKey:@"self"];
+    [unmanaged.anyObj5 setValue:@"a" forKey:@"self"];
+    [unmanaged.anyObj6 setValue:data(1) forKey:@"self"];
+    [unmanaged.anyObj7 setValue:date(1) forKey:@"self"];
+    [unmanaged.anyObj8 setValue:decimal128(2) forKey:@"self"];
+    [unmanaged.anyObj9 setValue:objectId(1) forKey:@"self"];
+    [unmanaged.anyObj10 setValue:uuid(@"00000000-0000-0000-0000-000000000000") forKey:@"self"];
     [optUnmanaged.boolObj setValue:@NO forKey:@"self"];
     [optUnmanaged.intObj setValue:@2 forKey:@"self"];
     [optUnmanaged.floatObj setValue:@2.2f forKey:@"self"];
@@ -5304,7 +6572,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     [managed.decimalObj setValue:decimal128(2) forKey:@"self"];
     [managed.objectIdObj setValue:objectId(1) forKey:@"self"];
     [managed.uuidObj setValue:uuid(@"00000000-0000-0000-0000-000000000000") forKey:@"self"];
-    [managed.anyObj setValue:@NO forKey:@"self"];
+    [managed.anyObj1 setValue:@NO forKey:@"self"];
+    [managed.anyObj2 setValue:@2 forKey:@"self"];
+    [managed.anyObj3 setValue:@2.2f forKey:@"self"];
+    [managed.anyObj4 setValue:@2.2 forKey:@"self"];
+    [managed.anyObj5 setValue:@"a" forKey:@"self"];
+    [managed.anyObj6 setValue:data(1) forKey:@"self"];
+    [managed.anyObj7 setValue:date(1) forKey:@"self"];
+    [managed.anyObj8 setValue:decimal128(2) forKey:@"self"];
+    [managed.anyObj9 setValue:objectId(1) forKey:@"self"];
+    [managed.anyObj10 setValue:uuid(@"00000000-0000-0000-0000-000000000000") forKey:@"self"];
     [optManaged.boolObj setValue:@NO forKey:@"self"];
     [optManaged.intObj setValue:@2 forKey:@"self"];
     [optManaged.floatObj setValue:@2.2f forKey:@"self"];
@@ -5326,7 +6603,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects(unmanaged.decimalObj[0], decimal128(2));
     XCTAssertEqualObjects(unmanaged.objectIdObj[0], objectId(1));
     XCTAssertEqualObjects(unmanaged.uuidObj[0], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(unmanaged.anyObj[0], @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj1[0], @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj2[0], @2);
+    XCTAssertEqualObjects(unmanaged.anyObj3[0], @2.2f);
+    XCTAssertEqualObjects(unmanaged.anyObj4[0], @2.2);
+    XCTAssertEqualObjects(unmanaged.anyObj5[0], @"a");
+    XCTAssertEqualObjects(unmanaged.anyObj6[0], data(1));
+    XCTAssertEqualObjects(unmanaged.anyObj7[0], date(1));
+    XCTAssertEqualObjects(unmanaged.anyObj8[0], decimal128(2));
+    XCTAssertEqualObjects(unmanaged.anyObj9[0], objectId(1));
+    XCTAssertEqualObjects(unmanaged.anyObj10[0], uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optUnmanaged.boolObj[0], @NO);
     XCTAssertEqualObjects(optUnmanaged.intObj[0], @2);
     XCTAssertEqualObjects(optUnmanaged.floatObj[0], @2.2f);
@@ -5347,7 +6633,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects(managed.decimalObj[0], decimal128(2));
     XCTAssertEqualObjects(managed.objectIdObj[0], objectId(1));
     XCTAssertEqualObjects(managed.uuidObj[0], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(managed.anyObj[0], @NO);
+    XCTAssertEqualObjects(managed.anyObj1[0], @NO);
+    XCTAssertEqualObjects(managed.anyObj2[0], @2);
+    XCTAssertEqualObjects(managed.anyObj3[0], @2.2f);
+    XCTAssertEqualObjects(managed.anyObj4[0], @2.2);
+    XCTAssertEqualObjects(managed.anyObj5[0], @"a");
+    XCTAssertEqualObjects(managed.anyObj6[0], data(1));
+    XCTAssertEqualObjects(managed.anyObj7[0], date(1));
+    XCTAssertEqualObjects(managed.anyObj8[0], decimal128(2));
+    XCTAssertEqualObjects(managed.anyObj9[0], objectId(1));
+    XCTAssertEqualObjects(managed.anyObj10[0], uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optManaged.boolObj[0], @NO);
     XCTAssertEqualObjects(optManaged.intObj[0], @2);
     XCTAssertEqualObjects(optManaged.floatObj[0], @2.2f);
@@ -5368,7 +6663,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects(unmanaged.decimalObj[1], decimal128(2));
     XCTAssertEqualObjects(unmanaged.objectIdObj[1], objectId(1));
     XCTAssertEqualObjects(unmanaged.uuidObj[1], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(unmanaged.anyObj[1], @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj1[1], @NO);
+    XCTAssertEqualObjects(unmanaged.anyObj2[1], @2);
+    XCTAssertEqualObjects(unmanaged.anyObj3[1], @2.2f);
+    XCTAssertEqualObjects(unmanaged.anyObj4[1], @2.2);
+    XCTAssertEqualObjects(unmanaged.anyObj5[1], @"a");
+    XCTAssertEqualObjects(unmanaged.anyObj6[1], data(1));
+    XCTAssertEqualObjects(unmanaged.anyObj7[1], date(1));
+    XCTAssertEqualObjects(unmanaged.anyObj8[1], decimal128(2));
+    XCTAssertEqualObjects(unmanaged.anyObj9[1], objectId(1));
+    XCTAssertEqualObjects(unmanaged.anyObj10[1], uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optUnmanaged.boolObj[1], @NO);
     XCTAssertEqualObjects(optUnmanaged.intObj[1], @2);
     XCTAssertEqualObjects(optUnmanaged.floatObj[1], @2.2f);
@@ -5389,7 +6693,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects(managed.decimalObj[1], decimal128(2));
     XCTAssertEqualObjects(managed.objectIdObj[1], objectId(1));
     XCTAssertEqualObjects(managed.uuidObj[1], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(managed.anyObj[1], @NO);
+    XCTAssertEqualObjects(managed.anyObj1[1], @NO);
+    XCTAssertEqualObjects(managed.anyObj2[1], @2);
+    XCTAssertEqualObjects(managed.anyObj3[1], @2.2f);
+    XCTAssertEqualObjects(managed.anyObj4[1], @2.2);
+    XCTAssertEqualObjects(managed.anyObj5[1], @"a");
+    XCTAssertEqualObjects(managed.anyObj6[1], data(1));
+    XCTAssertEqualObjects(managed.anyObj7[1], date(1));
+    XCTAssertEqualObjects(managed.anyObj8[1], decimal128(2));
+    XCTAssertEqualObjects(managed.anyObj9[1], objectId(1));
+    XCTAssertEqualObjects(managed.anyObj10[1], uuid(@"00000000-0000-0000-0000-000000000000"));
     XCTAssertEqualObjects(optManaged.boolObj[1], @NO);
     XCTAssertEqualObjects(optManaged.intObj[1], @2);
     XCTAssertEqualObjects(optManaged.floatObj[1], @2.2f);
@@ -5400,7 +6713,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects(optManaged.decimalObj[1], decimal128(2));
     XCTAssertEqualObjects(optManaged.objectIdObj[1], objectId(1));
     XCTAssertEqualObjects(optManaged.uuidObj[1], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(unmanaged.anyObj[2], @NO);
     XCTAssertEqualObjects(optUnmanaged.boolObj[2], @NO);
     XCTAssertEqualObjects(optUnmanaged.intObj[2], @2);
     XCTAssertEqualObjects(optUnmanaged.floatObj[2], @2.2f);
@@ -5411,7 +6723,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects(optUnmanaged.decimalObj[2], decimal128(2));
     XCTAssertEqualObjects(optUnmanaged.objectIdObj[2], objectId(1));
     XCTAssertEqualObjects(optUnmanaged.uuidObj[2], uuid(@"00000000-0000-0000-0000-000000000000"));
-    XCTAssertEqualObjects(managed.anyObj[2], @NO);
     XCTAssertEqualObjects(optManaged.boolObj[2], @NO);
     XCTAssertEqualObjects(optManaged.intObj[2], @2);
     XCTAssertEqualObjects(optManaged.floatObj[2], @2.2f);
@@ -5423,7 +6734,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects(optManaged.objectIdObj[2], objectId(1));
     XCTAssertEqualObjects(optManaged.uuidObj[2], uuid(@"00000000-0000-0000-0000-000000000000"));
 
-    [unmanaged.anyObj setValue:NSNull.null forKey:@"self"];
     [optUnmanaged.boolObj setValue:NSNull.null forKey:@"self"];
     [optUnmanaged.intObj setValue:NSNull.null forKey:@"self"];
     [optUnmanaged.floatObj setValue:NSNull.null forKey:@"self"];
@@ -5434,7 +6744,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     [optUnmanaged.decimalObj setValue:NSNull.null forKey:@"self"];
     [optUnmanaged.objectIdObj setValue:NSNull.null forKey:@"self"];
     [optUnmanaged.uuidObj setValue:NSNull.null forKey:@"self"];
-    [managed.anyObj setValue:NSNull.null forKey:@"self"];
     [optManaged.boolObj setValue:NSNull.null forKey:@"self"];
     [optManaged.intObj setValue:NSNull.null forKey:@"self"];
     [optManaged.floatObj setValue:NSNull.null forKey:@"self"];
@@ -5445,7 +6754,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     [optManaged.decimalObj setValue:NSNull.null forKey:@"self"];
     [optManaged.objectIdObj setValue:NSNull.null forKey:@"self"];
     [optManaged.uuidObj setValue:NSNull.null forKey:@"self"];
-    XCTAssertEqualObjects(unmanaged.anyObj[0], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.boolObj[0], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.intObj[0], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.floatObj[0], NSNull.null);
@@ -5456,7 +6764,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects(optUnmanaged.decimalObj[0], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.objectIdObj[0], NSNull.null);
     XCTAssertEqualObjects(optUnmanaged.uuidObj[0], NSNull.null);
-    XCTAssertEqualObjects(managed.anyObj[0], NSNull.null);
     XCTAssertEqualObjects(optManaged.boolObj[0], NSNull.null);
     XCTAssertEqualObjects(optManaged.intObj[0], NSNull.null);
     XCTAssertEqualObjects(optManaged.floatObj[0], NSNull.null);
@@ -5490,8 +6797,26 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects(unmanaged.objectIdObj[0], objectId(2));
     unmanaged.uuidObj = (id)@[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
     XCTAssertEqualObjects(unmanaged.uuidObj[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    unmanaged.anyObj = (id)@[decimal128(1)];
-    XCTAssertEqualObjects(unmanaged.anyObj[0], decimal128(1));
+    unmanaged.anyObj1 = (id)@[@YES];
+    XCTAssertEqualObjects(unmanaged.anyObj1[0], @YES);
+    unmanaged.anyObj2 = (id)@[@3];
+    XCTAssertEqualObjects(unmanaged.anyObj2[0], @3);
+    unmanaged.anyObj3 = (id)@[@3.3f];
+    XCTAssertEqualObjects(unmanaged.anyObj3[0], @3.3f);
+    unmanaged.anyObj4 = (id)@[@3.3];
+    XCTAssertEqualObjects(unmanaged.anyObj4[0], @3.3);
+    unmanaged.anyObj5 = (id)@[@"b"];
+    XCTAssertEqualObjects(unmanaged.anyObj5[0], @"b");
+    unmanaged.anyObj6 = (id)@[data(2)];
+    XCTAssertEqualObjects(unmanaged.anyObj6[0], data(2));
+    unmanaged.anyObj7 = (id)@[date(2)];
+    XCTAssertEqualObjects(unmanaged.anyObj7[0], date(2));
+    unmanaged.anyObj8 = (id)@[decimal128(3)];
+    XCTAssertEqualObjects(unmanaged.anyObj8[0], decimal128(3));
+    unmanaged.anyObj9 = (id)@[objectId(2)];
+    XCTAssertEqualObjects(unmanaged.anyObj9[0], objectId(2));
+    unmanaged.anyObj10 = (id)@[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
+    XCTAssertEqualObjects(unmanaged.anyObj10[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     optUnmanaged.boolObj = (id)@[@YES];
     XCTAssertEqualObjects(optUnmanaged.boolObj[0], @YES);
     optUnmanaged.intObj = (id)@[@3];
@@ -5532,8 +6857,26 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects(managed.objectIdObj[0], objectId(2));
     managed.uuidObj = (id)@[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
     XCTAssertEqualObjects(managed.uuidObj[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    managed.anyObj = (id)@[decimal128(1)];
-    XCTAssertEqualObjects(managed.anyObj[0], decimal128(1));
+    managed.anyObj1 = (id)@[@YES];
+    XCTAssertEqualObjects(managed.anyObj1[0], @YES);
+    managed.anyObj2 = (id)@[@3];
+    XCTAssertEqualObjects(managed.anyObj2[0], @3);
+    managed.anyObj3 = (id)@[@3.3f];
+    XCTAssertEqualObjects(managed.anyObj3[0], @3.3f);
+    managed.anyObj4 = (id)@[@3.3];
+    XCTAssertEqualObjects(managed.anyObj4[0], @3.3);
+    managed.anyObj5 = (id)@[@"b"];
+    XCTAssertEqualObjects(managed.anyObj5[0], @"b");
+    managed.anyObj6 = (id)@[data(2)];
+    XCTAssertEqualObjects(managed.anyObj6[0], data(2));
+    managed.anyObj7 = (id)@[date(2)];
+    XCTAssertEqualObjects(managed.anyObj7[0], date(2));
+    managed.anyObj8 = (id)@[decimal128(3)];
+    XCTAssertEqualObjects(managed.anyObj8[0], decimal128(3));
+    managed.anyObj9 = (id)@[objectId(2)];
+    XCTAssertEqualObjects(managed.anyObj9[0], objectId(2));
+    managed.anyObj10 = (id)@[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
+    XCTAssertEqualObjects(managed.anyObj10[0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     optManaged.boolObj = (id)@[@YES];
     XCTAssertEqualObjects(optManaged.boolObj[0], @YES);
     optManaged.intObj = (id)@[@3];
@@ -5586,8 +6929,35 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     unmanaged.uuidObj = (id)@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
     XCTAssertEqualObjects([unmanaged.uuidObj valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
-    unmanaged.anyObj = (id)@[@NO, decimal128(1), NSNull.null];
-    XCTAssertEqualObjects([unmanaged.anyObj valueForKey:@"self"], (@[@NO, decimal128(1), NSNull.null]));
+    unmanaged.anyObj1 = (id)@[@NO, @YES];
+    XCTAssertEqualObjects([unmanaged.anyObj1 valueForKey:@"self"], (@[@NO, @YES]));
+    
+    unmanaged.anyObj2 = (id)@[@2, @3];
+    XCTAssertEqualObjects([unmanaged.anyObj2 valueForKey:@"self"], (@[@2, @3]));
+    
+    unmanaged.anyObj3 = (id)@[@2.2f, @3.3f];
+    XCTAssertEqualObjects([unmanaged.anyObj3 valueForKey:@"self"], (@[@2.2f, @3.3f]));
+    
+    unmanaged.anyObj4 = (id)@[@2.2, @3.3];
+    XCTAssertEqualObjects([unmanaged.anyObj4 valueForKey:@"self"], (@[@2.2, @3.3]));
+    
+    unmanaged.anyObj5 = (id)@[@"a", @"b"];
+    XCTAssertEqualObjects([unmanaged.anyObj5 valueForKey:@"self"], (@[@"a", @"b"]));
+    
+    unmanaged.anyObj6 = (id)@[data(1), data(2)];
+    XCTAssertEqualObjects([unmanaged.anyObj6 valueForKey:@"self"], (@[data(1), data(2)]));
+    
+    unmanaged.anyObj7 = (id)@[date(1), date(2)];
+    XCTAssertEqualObjects([unmanaged.anyObj7 valueForKey:@"self"], (@[date(1), date(2)]));
+    
+    unmanaged.anyObj8 = (id)@[decimal128(2), decimal128(3)];
+    XCTAssertEqualObjects([unmanaged.anyObj8 valueForKey:@"self"], (@[decimal128(2), decimal128(3)]));
+    
+    unmanaged.anyObj9 = (id)@[objectId(1), objectId(2)];
+    XCTAssertEqualObjects([unmanaged.anyObj9 valueForKey:@"self"], (@[objectId(1), objectId(2)]));
+    
+    unmanaged.anyObj10 = (id)@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
+    XCTAssertEqualObjects([unmanaged.anyObj10 valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
     optUnmanaged.boolObj = (id)@[@NO, @YES, NSNull.null];
     XCTAssertEqualObjects([optUnmanaged.boolObj valueForKey:@"self"], (@[@NO, @YES, NSNull.null]));
@@ -5649,8 +7019,35 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     managed.uuidObj = (id)@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
     XCTAssertEqualObjects([managed.uuidObj valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
-    managed.anyObj = (id)@[@NO, decimal128(1), NSNull.null];
-    XCTAssertEqualObjects([managed.anyObj valueForKey:@"self"], (@[@NO, decimal128(1), NSNull.null]));
+    managed.anyObj1 = (id)@[@NO, @YES];
+    XCTAssertEqualObjects([managed.anyObj1 valueForKey:@"self"], (@[@NO, @YES]));
+    
+    managed.anyObj2 = (id)@[@2, @3];
+    XCTAssertEqualObjects([managed.anyObj2 valueForKey:@"self"], (@[@2, @3]));
+    
+    managed.anyObj3 = (id)@[@2.2f, @3.3f];
+    XCTAssertEqualObjects([managed.anyObj3 valueForKey:@"self"], (@[@2.2f, @3.3f]));
+    
+    managed.anyObj4 = (id)@[@2.2, @3.3];
+    XCTAssertEqualObjects([managed.anyObj4 valueForKey:@"self"], (@[@2.2, @3.3]));
+    
+    managed.anyObj5 = (id)@[@"a", @"b"];
+    XCTAssertEqualObjects([managed.anyObj5 valueForKey:@"self"], (@[@"a", @"b"]));
+    
+    managed.anyObj6 = (id)@[data(1), data(2)];
+    XCTAssertEqualObjects([managed.anyObj6 valueForKey:@"self"], (@[data(1), data(2)]));
+    
+    managed.anyObj7 = (id)@[date(1), date(2)];
+    XCTAssertEqualObjects([managed.anyObj7 valueForKey:@"self"], (@[date(1), date(2)]));
+    
+    managed.anyObj8 = (id)@[decimal128(2), decimal128(3)];
+    XCTAssertEqualObjects([managed.anyObj8 valueForKey:@"self"], (@[decimal128(2), decimal128(3)]));
+    
+    managed.anyObj9 = (id)@[objectId(1), objectId(2)];
+    XCTAssertEqualObjects([managed.anyObj9 valueForKey:@"self"], (@[objectId(1), objectId(2)]));
+    
+    managed.anyObj10 = (id)@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
+    XCTAssertEqualObjects([managed.anyObj10 valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
     optManaged.boolObj = (id)@[@NO, @YES, NSNull.null];
     XCTAssertEqualObjects([optManaged.boolObj valueForKey:@"self"], (@[@NO, @YES, NSNull.null]));
@@ -5714,8 +7111,35 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     unmanaged.uuidObj = unmanaged.uuidObj;
     XCTAssertEqualObjects([unmanaged.uuidObj valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
-    unmanaged.anyObj = unmanaged.anyObj;
-    XCTAssertEqualObjects([unmanaged.anyObj valueForKey:@"self"], (@[@NO, decimal128(1), NSNull.null]));
+    unmanaged.anyObj1 = unmanaged.anyObj1;
+    XCTAssertEqualObjects([unmanaged.anyObj1 valueForKey:@"self"], (@[@NO, @YES]));
+    
+    unmanaged.anyObj2 = unmanaged.anyObj2;
+    XCTAssertEqualObjects([unmanaged.anyObj2 valueForKey:@"self"], (@[@2, @3]));
+    
+    unmanaged.anyObj3 = unmanaged.anyObj3;
+    XCTAssertEqualObjects([unmanaged.anyObj3 valueForKey:@"self"], (@[@2.2f, @3.3f]));
+    
+    unmanaged.anyObj4 = unmanaged.anyObj4;
+    XCTAssertEqualObjects([unmanaged.anyObj4 valueForKey:@"self"], (@[@2.2, @3.3]));
+    
+    unmanaged.anyObj5 = unmanaged.anyObj5;
+    XCTAssertEqualObjects([unmanaged.anyObj5 valueForKey:@"self"], (@[@"a", @"b"]));
+    
+    unmanaged.anyObj6 = unmanaged.anyObj6;
+    XCTAssertEqualObjects([unmanaged.anyObj6 valueForKey:@"self"], (@[data(1), data(2)]));
+    
+    unmanaged.anyObj7 = unmanaged.anyObj7;
+    XCTAssertEqualObjects([unmanaged.anyObj7 valueForKey:@"self"], (@[date(1), date(2)]));
+    
+    unmanaged.anyObj8 = unmanaged.anyObj8;
+    XCTAssertEqualObjects([unmanaged.anyObj8 valueForKey:@"self"], (@[decimal128(2), decimal128(3)]));
+    
+    unmanaged.anyObj9 = unmanaged.anyObj9;
+    XCTAssertEqualObjects([unmanaged.anyObj9 valueForKey:@"self"], (@[objectId(1), objectId(2)]));
+    
+    unmanaged.anyObj10 = unmanaged.anyObj10;
+    XCTAssertEqualObjects([unmanaged.anyObj10 valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
     optUnmanaged.boolObj = optUnmanaged.boolObj;
     XCTAssertEqualObjects([optUnmanaged.boolObj valueForKey:@"self"], (@[@NO, @YES, NSNull.null]));
@@ -5777,8 +7201,35 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     managed.uuidObj = managed.uuidObj;
     XCTAssertEqualObjects([managed.uuidObj valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
-    managed.anyObj = managed.anyObj;
-    XCTAssertEqualObjects([managed.anyObj valueForKey:@"self"], (@[@NO, decimal128(1), NSNull.null]));
+    managed.anyObj1 = managed.anyObj1;
+    XCTAssertEqualObjects([managed.anyObj1 valueForKey:@"self"], (@[@NO, @YES]));
+    
+    managed.anyObj2 = managed.anyObj2;
+    XCTAssertEqualObjects([managed.anyObj2 valueForKey:@"self"], (@[@2, @3]));
+    
+    managed.anyObj3 = managed.anyObj3;
+    XCTAssertEqualObjects([managed.anyObj3 valueForKey:@"self"], (@[@2.2f, @3.3f]));
+    
+    managed.anyObj4 = managed.anyObj4;
+    XCTAssertEqualObjects([managed.anyObj4 valueForKey:@"self"], (@[@2.2, @3.3]));
+    
+    managed.anyObj5 = managed.anyObj5;
+    XCTAssertEqualObjects([managed.anyObj5 valueForKey:@"self"], (@[@"a", @"b"]));
+    
+    managed.anyObj6 = managed.anyObj6;
+    XCTAssertEqualObjects([managed.anyObj6 valueForKey:@"self"], (@[data(1), data(2)]));
+    
+    managed.anyObj7 = managed.anyObj7;
+    XCTAssertEqualObjects([managed.anyObj7 valueForKey:@"self"], (@[date(1), date(2)]));
+    
+    managed.anyObj8 = managed.anyObj8;
+    XCTAssertEqualObjects([managed.anyObj8 valueForKey:@"self"], (@[decimal128(2), decimal128(3)]));
+    
+    managed.anyObj9 = managed.anyObj9;
+    XCTAssertEqualObjects([managed.anyObj9 valueForKey:@"self"], (@[objectId(1), objectId(2)]));
+    
+    managed.anyObj10 = managed.anyObj10;
+    XCTAssertEqualObjects([managed.anyObj10 valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
     optManaged.boolObj = optManaged.boolObj;
     XCTAssertEqualObjects([optManaged.boolObj valueForKey:@"self"], (@[@NO, @YES, NSNull.null]));
@@ -5841,8 +7292,26 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects(unmanaged[@"objectIdObj"][0], objectId(2));
     unmanaged[@"uuidObj"] = (id)@[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
     XCTAssertEqualObjects(unmanaged[@"uuidObj"][0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    unmanaged[@"anyObj"] = (id)@[decimal128(1)];
-    XCTAssertEqualObjects(unmanaged[@"anyObj"][0], decimal128(1));
+    unmanaged[@"anyObj1"] = (id)@[@YES];
+    XCTAssertEqualObjects(unmanaged[@"anyObj1"][0], @YES);
+    unmanaged[@"anyObj2"] = (id)@[@3];
+    XCTAssertEqualObjects(unmanaged[@"anyObj2"][0], @3);
+    unmanaged[@"anyObj3"] = (id)@[@3.3f];
+    XCTAssertEqualObjects(unmanaged[@"anyObj3"][0], @3.3f);
+    unmanaged[@"anyObj4"] = (id)@[@3.3];
+    XCTAssertEqualObjects(unmanaged[@"anyObj4"][0], @3.3);
+    unmanaged[@"anyObj5"] = (id)@[@"b"];
+    XCTAssertEqualObjects(unmanaged[@"anyObj5"][0], @"b");
+    unmanaged[@"anyObj6"] = (id)@[data(2)];
+    XCTAssertEqualObjects(unmanaged[@"anyObj6"][0], data(2));
+    unmanaged[@"anyObj7"] = (id)@[date(2)];
+    XCTAssertEqualObjects(unmanaged[@"anyObj7"][0], date(2));
+    unmanaged[@"anyObj8"] = (id)@[decimal128(3)];
+    XCTAssertEqualObjects(unmanaged[@"anyObj8"][0], decimal128(3));
+    unmanaged[@"anyObj9"] = (id)@[objectId(2)];
+    XCTAssertEqualObjects(unmanaged[@"anyObj9"][0], objectId(2));
+    unmanaged[@"anyObj10"] = (id)@[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
+    XCTAssertEqualObjects(unmanaged[@"anyObj10"][0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     optUnmanaged[@"boolObj"] = (id)@[@YES];
     XCTAssertEqualObjects(optUnmanaged[@"boolObj"][0], @YES);
     optUnmanaged[@"intObj"] = (id)@[@3];
@@ -5883,8 +7352,26 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertEqualObjects(managed[@"objectIdObj"][0], objectId(2));
     managed[@"uuidObj"] = (id)@[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
     XCTAssertEqualObjects(managed[@"uuidObj"][0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    managed[@"anyObj"] = (id)@[decimal128(1)];
-    XCTAssertEqualObjects(managed[@"anyObj"][0], decimal128(1));
+    managed[@"anyObj1"] = (id)@[@YES];
+    XCTAssertEqualObjects(managed[@"anyObj1"][0], @YES);
+    managed[@"anyObj2"] = (id)@[@3];
+    XCTAssertEqualObjects(managed[@"anyObj2"][0], @3);
+    managed[@"anyObj3"] = (id)@[@3.3f];
+    XCTAssertEqualObjects(managed[@"anyObj3"][0], @3.3f);
+    managed[@"anyObj4"] = (id)@[@3.3];
+    XCTAssertEqualObjects(managed[@"anyObj4"][0], @3.3);
+    managed[@"anyObj5"] = (id)@[@"b"];
+    XCTAssertEqualObjects(managed[@"anyObj5"][0], @"b");
+    managed[@"anyObj6"] = (id)@[data(2)];
+    XCTAssertEqualObjects(managed[@"anyObj6"][0], data(2));
+    managed[@"anyObj7"] = (id)@[date(2)];
+    XCTAssertEqualObjects(managed[@"anyObj7"][0], date(2));
+    managed[@"anyObj8"] = (id)@[decimal128(3)];
+    XCTAssertEqualObjects(managed[@"anyObj8"][0], decimal128(3));
+    managed[@"anyObj9"] = (id)@[objectId(2)];
+    XCTAssertEqualObjects(managed[@"anyObj9"][0], objectId(2));
+    managed[@"anyObj10"] = (id)@[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
+    XCTAssertEqualObjects(managed[@"anyObj10"][0], uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     optManaged[@"boolObj"] = (id)@[@YES];
     XCTAssertEqualObjects(optManaged[@"boolObj"][0], @YES);
     optManaged[@"intObj"] = (id)@[@3];
@@ -5937,8 +7424,35 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     unmanaged[@"uuidObj"] = (id)@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
     XCTAssertEqualObjects([unmanaged[@"uuidObj"] valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
-    unmanaged[@"anyObj"] = (id)@[@NO, decimal128(1), NSNull.null];
-    XCTAssertEqualObjects([unmanaged[@"anyObj"] valueForKey:@"self"], (@[@NO, decimal128(1), NSNull.null]));
+    unmanaged[@"anyObj1"] = (id)@[@NO, @YES];
+    XCTAssertEqualObjects([unmanaged[@"anyObj1"] valueForKey:@"self"], (@[@NO, @YES]));
+    
+    unmanaged[@"anyObj2"] = (id)@[@2, @3];
+    XCTAssertEqualObjects([unmanaged[@"anyObj2"] valueForKey:@"self"], (@[@2, @3]));
+    
+    unmanaged[@"anyObj3"] = (id)@[@2.2f, @3.3f];
+    XCTAssertEqualObjects([unmanaged[@"anyObj3"] valueForKey:@"self"], (@[@2.2f, @3.3f]));
+    
+    unmanaged[@"anyObj4"] = (id)@[@2.2, @3.3];
+    XCTAssertEqualObjects([unmanaged[@"anyObj4"] valueForKey:@"self"], (@[@2.2, @3.3]));
+    
+    unmanaged[@"anyObj5"] = (id)@[@"a", @"b"];
+    XCTAssertEqualObjects([unmanaged[@"anyObj5"] valueForKey:@"self"], (@[@"a", @"b"]));
+    
+    unmanaged[@"anyObj6"] = (id)@[data(1), data(2)];
+    XCTAssertEqualObjects([unmanaged[@"anyObj6"] valueForKey:@"self"], (@[data(1), data(2)]));
+    
+    unmanaged[@"anyObj7"] = (id)@[date(1), date(2)];
+    XCTAssertEqualObjects([unmanaged[@"anyObj7"] valueForKey:@"self"], (@[date(1), date(2)]));
+    
+    unmanaged[@"anyObj8"] = (id)@[decimal128(2), decimal128(3)];
+    XCTAssertEqualObjects([unmanaged[@"anyObj8"] valueForKey:@"self"], (@[decimal128(2), decimal128(3)]));
+    
+    unmanaged[@"anyObj9"] = (id)@[objectId(1), objectId(2)];
+    XCTAssertEqualObjects([unmanaged[@"anyObj9"] valueForKey:@"self"], (@[objectId(1), objectId(2)]));
+    
+    unmanaged[@"anyObj10"] = (id)@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
+    XCTAssertEqualObjects([unmanaged[@"anyObj10"] valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
     optUnmanaged[@"boolObj"] = (id)@[@NO, @YES, NSNull.null];
     XCTAssertEqualObjects([optUnmanaged[@"boolObj"] valueForKey:@"self"], (@[@NO, @YES, NSNull.null]));
@@ -6000,8 +7514,35 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     managed[@"uuidObj"] = (id)@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
     XCTAssertEqualObjects([managed[@"uuidObj"] valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
-    managed[@"anyObj"] = (id)@[@NO, decimal128(1), NSNull.null];
-    XCTAssertEqualObjects([managed[@"anyObj"] valueForKey:@"self"], (@[@NO, decimal128(1), NSNull.null]));
+    managed[@"anyObj1"] = (id)@[@NO, @YES];
+    XCTAssertEqualObjects([managed[@"anyObj1"] valueForKey:@"self"], (@[@NO, @YES]));
+    
+    managed[@"anyObj2"] = (id)@[@2, @3];
+    XCTAssertEqualObjects([managed[@"anyObj2"] valueForKey:@"self"], (@[@2, @3]));
+    
+    managed[@"anyObj3"] = (id)@[@2.2f, @3.3f];
+    XCTAssertEqualObjects([managed[@"anyObj3"] valueForKey:@"self"], (@[@2.2f, @3.3f]));
+    
+    managed[@"anyObj4"] = (id)@[@2.2, @3.3];
+    XCTAssertEqualObjects([managed[@"anyObj4"] valueForKey:@"self"], (@[@2.2, @3.3]));
+    
+    managed[@"anyObj5"] = (id)@[@"a", @"b"];
+    XCTAssertEqualObjects([managed[@"anyObj5"] valueForKey:@"self"], (@[@"a", @"b"]));
+    
+    managed[@"anyObj6"] = (id)@[data(1), data(2)];
+    XCTAssertEqualObjects([managed[@"anyObj6"] valueForKey:@"self"], (@[data(1), data(2)]));
+    
+    managed[@"anyObj7"] = (id)@[date(1), date(2)];
+    XCTAssertEqualObjects([managed[@"anyObj7"] valueForKey:@"self"], (@[date(1), date(2)]));
+    
+    managed[@"anyObj8"] = (id)@[decimal128(2), decimal128(3)];
+    XCTAssertEqualObjects([managed[@"anyObj8"] valueForKey:@"self"], (@[decimal128(2), decimal128(3)]));
+    
+    managed[@"anyObj9"] = (id)@[objectId(1), objectId(2)];
+    XCTAssertEqualObjects([managed[@"anyObj9"] valueForKey:@"self"], (@[objectId(1), objectId(2)]));
+    
+    managed[@"anyObj10"] = (id)@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")];
+    XCTAssertEqualObjects([managed[@"anyObj10"] valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
     optManaged[@"boolObj"] = (id)@[@NO, @YES, NSNull.null];
     XCTAssertEqualObjects([optManaged[@"boolObj"] valueForKey:@"self"], (@[@NO, @YES, NSNull.null]));
@@ -6065,8 +7606,35 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     unmanaged[@"uuidObj"] = unmanaged[@"uuidObj"];
     XCTAssertEqualObjects([unmanaged[@"uuidObj"] valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
-    unmanaged[@"anyObj"] = unmanaged[@"anyObj"];
-    XCTAssertEqualObjects([unmanaged[@"anyObj"] valueForKey:@"self"], (@[@NO, decimal128(1), NSNull.null]));
+    unmanaged[@"anyObj1"] = unmanaged[@"anyObj1"];
+    XCTAssertEqualObjects([unmanaged[@"anyObj1"] valueForKey:@"self"], (@[@NO, @YES]));
+    
+    unmanaged[@"anyObj2"] = unmanaged[@"anyObj2"];
+    XCTAssertEqualObjects([unmanaged[@"anyObj2"] valueForKey:@"self"], (@[@2, @3]));
+    
+    unmanaged[@"anyObj3"] = unmanaged[@"anyObj3"];
+    XCTAssertEqualObjects([unmanaged[@"anyObj3"] valueForKey:@"self"], (@[@2.2f, @3.3f]));
+    
+    unmanaged[@"anyObj4"] = unmanaged[@"anyObj4"];
+    XCTAssertEqualObjects([unmanaged[@"anyObj4"] valueForKey:@"self"], (@[@2.2, @3.3]));
+    
+    unmanaged[@"anyObj5"] = unmanaged[@"anyObj5"];
+    XCTAssertEqualObjects([unmanaged[@"anyObj5"] valueForKey:@"self"], (@[@"a", @"b"]));
+    
+    unmanaged[@"anyObj6"] = unmanaged[@"anyObj6"];
+    XCTAssertEqualObjects([unmanaged[@"anyObj6"] valueForKey:@"self"], (@[data(1), data(2)]));
+    
+    unmanaged[@"anyObj7"] = unmanaged[@"anyObj7"];
+    XCTAssertEqualObjects([unmanaged[@"anyObj7"] valueForKey:@"self"], (@[date(1), date(2)]));
+    
+    unmanaged[@"anyObj8"] = unmanaged[@"anyObj8"];
+    XCTAssertEqualObjects([unmanaged[@"anyObj8"] valueForKey:@"self"], (@[decimal128(2), decimal128(3)]));
+    
+    unmanaged[@"anyObj9"] = unmanaged[@"anyObj9"];
+    XCTAssertEqualObjects([unmanaged[@"anyObj9"] valueForKey:@"self"], (@[objectId(1), objectId(2)]));
+    
+    unmanaged[@"anyObj10"] = unmanaged[@"anyObj10"];
+    XCTAssertEqualObjects([unmanaged[@"anyObj10"] valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
     optUnmanaged[@"boolObj"] = optUnmanaged[@"boolObj"];
     XCTAssertEqualObjects([optUnmanaged[@"boolObj"] valueForKey:@"self"], (@[@NO, @YES, NSNull.null]));
@@ -6128,8 +7696,35 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     managed[@"uuidObj"] = managed[@"uuidObj"];
     XCTAssertEqualObjects([managed[@"uuidObj"] valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
-    managed[@"anyObj"] = managed[@"anyObj"];
-    XCTAssertEqualObjects([managed[@"anyObj"] valueForKey:@"self"], (@[@NO, decimal128(1), NSNull.null]));
+    managed[@"anyObj1"] = managed[@"anyObj1"];
+    XCTAssertEqualObjects([managed[@"anyObj1"] valueForKey:@"self"], (@[@NO, @YES]));
+    
+    managed[@"anyObj2"] = managed[@"anyObj2"];
+    XCTAssertEqualObjects([managed[@"anyObj2"] valueForKey:@"self"], (@[@2, @3]));
+    
+    managed[@"anyObj3"] = managed[@"anyObj3"];
+    XCTAssertEqualObjects([managed[@"anyObj3"] valueForKey:@"self"], (@[@2.2f, @3.3f]));
+    
+    managed[@"anyObj4"] = managed[@"anyObj4"];
+    XCTAssertEqualObjects([managed[@"anyObj4"] valueForKey:@"self"], (@[@2.2, @3.3]));
+    
+    managed[@"anyObj5"] = managed[@"anyObj5"];
+    XCTAssertEqualObjects([managed[@"anyObj5"] valueForKey:@"self"], (@[@"a", @"b"]));
+    
+    managed[@"anyObj6"] = managed[@"anyObj6"];
+    XCTAssertEqualObjects([managed[@"anyObj6"] valueForKey:@"self"], (@[data(1), data(2)]));
+    
+    managed[@"anyObj7"] = managed[@"anyObj7"];
+    XCTAssertEqualObjects([managed[@"anyObj7"] valueForKey:@"self"], (@[date(1), date(2)]));
+    
+    managed[@"anyObj8"] = managed[@"anyObj8"];
+    XCTAssertEqualObjects([managed[@"anyObj8"] valueForKey:@"self"], (@[decimal128(2), decimal128(3)]));
+    
+    managed[@"anyObj9"] = managed[@"anyObj9"];
+    XCTAssertEqualObjects([managed[@"anyObj9"] valueForKey:@"self"], (@[objectId(1), objectId(2)]));
+    
+    managed[@"anyObj10"] = managed[@"anyObj10"];
+    XCTAssertEqualObjects([managed[@"anyObj10"] valueForKey:@"self"], (@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
     
     optManaged[@"boolObj"] = optManaged[@"boolObj"];
     XCTAssertEqualObjects([optManaged[@"boolObj"] valueForKey:@"self"], (@[@NO, @YES, NSNull.null]));
@@ -6480,10 +8075,19 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"decimalObj": [@[decimal128(2), decimal128(3)] subarrayWithRange:range],
         @"objectIdObj": [@[objectId(1), objectId(2)] subarrayWithRange:range],
         @"uuidObj": [@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")] subarrayWithRange:range],
+        @"anyObj1": [@[@NO, @YES] subarrayWithRange:range],
+        @"anyObj2": [@[@2, @3] subarrayWithRange:range],
+        @"anyObj3": [@[@2.2f, @3.3f] subarrayWithRange:range],
+        @"anyObj4": [@[@2.2, @3.3] subarrayWithRange:range],
+        @"anyObj5": [@[@"a", @"b"] subarrayWithRange:range],
+        @"anyObj6": [@[data(1), data(2)] subarrayWithRange:range],
+        @"anyObj7": [@[date(1), date(2)] subarrayWithRange:range],
+        @"anyObj8": [@[decimal128(2), decimal128(3)] subarrayWithRange:range],
+        @"anyObj9": [@[objectId(1), objectId(2)] subarrayWithRange:range],
+        @"anyObj10": [@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")] subarrayWithRange:range],
     }];
     [LinkToAllPrimitiveArrays createInRealm:realm withValue:@[obj]];
     obj = [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
-        @"anyObj": [@[@NO, decimal128(1), NSNull.null] subarrayWithRange:range],
         @"boolObj": [@[@NO, @YES, NSNull.null] subarrayWithRange:range],
         @"intObj": [@[@2, @3, NSNull.null] subarrayWithRange:range],
         @"floatObj": [@[@2.2f, @3.3f, NSNull.null] subarrayWithRange:range],
@@ -6511,7 +8115,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj = %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj = %@", objectId(1));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj = %@", @NO);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj1 = %@", @NO);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 = %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 = %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 = %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj5 = %@", @"a");
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj6 = %@", data(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 = %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 = %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj9 = %@", objectId(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj10 = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj = %@", @NO);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj = %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj = %@", @2.2f);
@@ -6532,7 +8145,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj != %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj != %@", objectId(1));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj != %@", @NO);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj1 != %@", @NO);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 != %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 != %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 != %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj5 != %@", @"a");
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj6 != %@", data(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 != %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 != %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj9 != %@", objectId(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj10 != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj != %@", @NO);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj != %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj != %@", @2.2f);
@@ -6548,6 +8170,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj > %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj > %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj > %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 > %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 > %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 > %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 > %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 > %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj > %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj > %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj > %@", @2.2);
@@ -6558,6 +8185,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj >= %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj >= %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj >= %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 >= %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 >= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 >= %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 >= %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 >= %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj >= %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj >= %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj >= %@", @2.2);
@@ -6568,6 +8200,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj < %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj < %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 < %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 < %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 < %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 < %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 < %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj < %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj < %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
@@ -6578,6 +8215,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj <= %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj <= %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj <= %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 <= %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 <= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 <= %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 <= %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 <= %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj <= %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj <= %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj <= %@", @2.2);
@@ -6596,7 +8238,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj = %@", decimal128(3));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj = %@", objectId(2));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj = %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj1 = %@", @YES);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 = %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 = %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 = %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj5 = %@", @"b");
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj6 = %@", data(2));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 = %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 = %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj9 = %@", objectId(2));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj10 = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj = %@", @YES);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj = %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj = %@", @3.3f);
@@ -6617,7 +8268,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(1));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj = %@", @NO);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj1 = %@", @NO);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 = %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 = %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 = %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj5 = %@", @"a");
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj6 = %@", data(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 = %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 = %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj9 = %@", objectId(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj10 = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj = %@", @NO);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj = %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj = %@", @2.2f);
@@ -6638,7 +8298,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj != %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj != %@", objectId(1));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj != %@", @NO);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj1 != %@", @NO);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 != %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 != %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 != %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj5 != %@", @"a");
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj6 != %@", data(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 != %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 != %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj9 != %@", objectId(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj10 != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj != %@", @NO);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj != %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj != %@", @2.2f);
@@ -6659,7 +8328,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(3));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj != %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj1 != %@", @YES);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 != %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 != %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 != %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj5 != %@", @"b");
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj6 != %@", data(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 != %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 != %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj9 != %@", objectId(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj10 != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj != %@", @YES);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj != %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj != %@", @3.3f);
@@ -6675,6 +8353,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj > %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj > %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj > %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 > %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 > %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 > %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 > %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 > %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj > %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj > %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj > %@", @2.2);
@@ -6685,6 +8368,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj >= %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj >= %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj >= %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 >= %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 >= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 >= %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 >= %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 >= %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj >= %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj >= %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj >= %@", @2.2);
@@ -6695,6 +8383,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj < %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj < %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 < %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 < %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 < %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 < %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 < %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj < %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj < %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
@@ -6705,6 +8398,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj < %@", @3.3);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj < %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj < %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 < %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 < %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 < %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 < %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 < %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj < %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj < %@", @3.3f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj < %@", @3.3);
@@ -6715,6 +8413,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj <= %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj <= %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj <= %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 <= %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 <= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 <= %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 <= %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 <= %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj <= %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj <= %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj <= %@", @2.2);
@@ -6733,7 +8436,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(1));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj = %@", @NO);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj1 = %@", @NO);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 = %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 = %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 = %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj5 = %@", @"a");
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj6 = %@", data(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 = %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 = %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj9 = %@", objectId(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj10 = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj = %@", @NO);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj = %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj = %@", @2.2f);
@@ -6754,7 +8466,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj = %@", decimal128(3));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj = %@", objectId(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj = %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj1 = %@", @YES);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 = %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 = %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 = %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj5 = %@", @"b");
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj6 = %@", data(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 = %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 = %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj9 = %@", objectId(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj10 = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj = %@", @YES);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj = %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj = %@", @3.3f);
@@ -6775,7 +8496,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(1));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj != %@", @NO);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj1 != %@", @NO);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 != %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 != %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 != %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj5 != %@", @"a");
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj6 != %@", data(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 != %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 != %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj9 != %@", objectId(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj10 != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj != %@", @NO);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj != %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj != %@", @2.2f);
@@ -6796,7 +8526,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj != %@", decimal128(3));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj != %@", objectId(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj != %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj1 != %@", @YES);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 != %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 != %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 != %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj5 != %@", @"b");
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj6 != %@", data(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 != %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 != %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj9 != %@", objectId(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj10 != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj != %@", @YES);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj != %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj != %@", @3.3f);
@@ -6812,6 +8551,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj > %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj > %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj > %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 > %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 > %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 > %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 > %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 > %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj > %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj > %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj > %@", @2.2);
@@ -6822,6 +8566,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 2, @"ANY doubleObj >= %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 2, @"ANY dateObj >= %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 2, @"ANY decimalObj >= %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY anyObj2 >= %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY anyObj3 >= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY anyObj4 >= %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY anyObj7 >= %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY anyObj8 >= %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY intObj >= %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY floatObj >= %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY doubleObj >= %@", @2.2);
@@ -6832,6 +8581,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj < %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj < %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 < %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 < %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 < %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 < %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 < %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj < %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj < %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj < %@", @2.2);
@@ -6842,6 +8596,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj < %@", @3.3);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj < %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj < %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 < %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 < %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 < %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 < %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 < %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj < %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj < %@", @3.3f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj < %@", @3.3);
@@ -6852,6 +8611,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj <= %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj <= %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj <= %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 <= %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 <= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 <= %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 <= %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 <= %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj <= %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj <= %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj <= %@", @2.2);
@@ -6862,6 +8626,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 2, @"ANY doubleObj <= %@", @3.3);
     RLMAssertCount(AllPrimitiveArrays, 2, @"ANY dateObj <= %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 2, @"ANY decimalObj <= %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY anyObj2 <= %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY anyObj3 <= %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY anyObj4 <= %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY anyObj7 <= %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 2, @"ANY anyObj8 <= %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY intObj <= %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY floatObj <= %@", @3.3f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 2, @"ANY doubleObj <= %@", @3.3);
@@ -6878,8 +8647,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Operator '>' not supported for type 'object id'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY uuidObj > %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"Operator '>' not supported for type 'uuid'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY anyObj > %@", @NO]),
-                              @"Operator '>' not supported for type 'any'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY anyObj1 > %@", @NO]),
+                              @"Operator '>' not supported for type 'mixed'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY anyObj5 > %@", @"a"]),
+                              @"Operator '>' not supported for type 'mixed'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY anyObj6 > %@", data(1)]),
+                              @"Operator '>' not supported for type 'mixed'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY anyObj9 > %@", objectId(1)]),
+                              @"Operator '>' not supported for type 'mixed'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY anyObj10 > %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
+                              @"Operator '>' not supported for type 'mixed'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY boolObj > %@", @NO]),
                               @"Operator '>' not supported for type 'bool'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY stringObj > %@", @"a"]),
@@ -6905,8 +8682,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Operator 'BETWEEN' not supported for type 'object id'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY uuidObj BETWEEN %@", @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]]),
                               @"Operator 'BETWEEN' not supported for type 'uuid'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY anyObj BETWEEN %@", @[@NO, decimal128(1)]]),
-                              @"Operator 'BETWEEN' not supported for type 'any'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY boolObj BETWEEN %@", @[@NO, @YES]]),
                               @"Operator 'BETWEEN' not supported for type 'bool'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY stringObj BETWEEN %@", @[@"a", @"b"]]),
@@ -6923,6 +8698,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj BETWEEN %@", @[@2.2, @3.3]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj BETWEEN %@", @[date(1), date(2)]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj BETWEEN %@", @[decimal128(2), decimal128(3)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 BETWEEN %@", @[@2, @3]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 BETWEEN %@", @[@2.2f, @3.3f]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 BETWEEN %@", @[@2.2, @3.3]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 BETWEEN %@", @[date(1), date(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 BETWEEN %@", @[decimal128(2), decimal128(3)]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj BETWEEN %@", @[@2, @3]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj BETWEEN %@", @[@2.2f, @3.3f]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj BETWEEN %@", @[@2.2, @3.3]);
@@ -6936,6 +8716,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj BETWEEN %@", @[@2.2, @2.2]);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj BETWEEN %@", @[date(1), date(1)]);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj BETWEEN %@", @[decimal128(2), decimal128(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 BETWEEN %@", @[@2, @2]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 BETWEEN %@", @[@2.2f, @2.2f]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 BETWEEN %@", @[@2.2, @2.2]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 BETWEEN %@", @[date(1), date(1)]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 BETWEEN %@", @[decimal128(2), decimal128(2)]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj BETWEEN %@", @[@2, @2]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj BETWEEN %@", @[@2.2f, @2.2f]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj BETWEEN %@", @[@2.2, @2.2]);
@@ -6946,6 +8731,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY doubleObj BETWEEN %@", @[@2.2, @3.3]);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY dateObj BETWEEN %@", @[date(1), date(2)]);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj BETWEEN %@", @[decimal128(2), decimal128(3)]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 BETWEEN %@", @[@2, @3]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 BETWEEN %@", @[@2.2f, @3.3f]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 BETWEEN %@", @[@2.2, @3.3]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 BETWEEN %@", @[date(1), date(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 BETWEEN %@", @[decimal128(2), decimal128(3)]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj BETWEEN %@", @[@2, @3]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj BETWEEN %@", @[@2.2f, @3.3f]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY doubleObj BETWEEN %@", @[@2.2, @3.3]);
@@ -6956,6 +8746,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY doubleObj BETWEEN %@", @[@3.3, @3.3]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY dateObj BETWEEN %@", @[date(2), date(2)]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj BETWEEN %@", @[decimal128(3), decimal128(3)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 BETWEEN %@", @[@3, @3]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 BETWEEN %@", @[@3.3f, @3.3f]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 BETWEEN %@", @[@3.3, @3.3]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 BETWEEN %@", @[date(2), date(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 BETWEEN %@", @[decimal128(3), decimal128(3)]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj BETWEEN %@", @[@3, @3]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj BETWEEN %@", @[@3.3f, @3.3f]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY doubleObj BETWEEN %@", @[@3.3, @3.3]);
@@ -6976,7 +8771,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj IN %@", @[decimal128(2), decimal128(3)]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj IN %@", @[objectId(1), objectId(2)]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY uuidObj IN %@", @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj IN %@", @[@NO, decimal128(1)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj1 IN %@", @[@NO, @YES]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 IN %@", @[@2, @3]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 IN %@", @[@2.2f, @3.3f]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 IN %@", @[@2.2, @3.3]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj5 IN %@", @[@"a", @"b"]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj6 IN %@", @[data(1), data(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 IN %@", @[date(1), date(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 IN %@", @[decimal128(2), decimal128(3)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj9 IN %@", @[objectId(1), objectId(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj10 IN %@", @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj IN %@", @[@NO, @YES]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj IN %@", @[@2, @3]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj IN %@", @[@2.2f, @3.3f]);
@@ -7000,7 +8804,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY decimalObj IN %@", @[decimal128(3)]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY objectIdObj IN %@", @[objectId(2)]);
     RLMAssertCount(AllPrimitiveArrays, 0, @"ANY uuidObj IN %@", @[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
-    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj IN %@", @[decimal128(1)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj1 IN %@", @[@YES]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj2 IN %@", @[@3]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj3 IN %@", @[@3.3f]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj4 IN %@", @[@3.3]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj5 IN %@", @[@"b"]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj6 IN %@", @[data(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj7 IN %@", @[date(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj8 IN %@", @[decimal128(3)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj9 IN %@", @[objectId(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 0, @"ANY anyObj10 IN %@", @[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY boolObj IN %@", @[@YES]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY intObj IN %@", @[@3]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0, @"ANY floatObj IN %@", @[@3.3f]);
@@ -7021,7 +8834,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY decimalObj IN %@", @[decimal128(2), decimal128(3)]);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY objectIdObj IN %@", @[objectId(1), objectId(2)]);
     RLMAssertCount(AllPrimitiveArrays, 1, @"ANY uuidObj IN %@", @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
-    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj IN %@", @[@NO, decimal128(1)]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj1 IN %@", @[@NO, @YES]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj2 IN %@", @[@2, @3]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj3 IN %@", @[@2.2f, @3.3f]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj4 IN %@", @[@2.2, @3.3]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj5 IN %@", @[@"a", @"b"]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj6 IN %@", @[data(1), data(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj7 IN %@", @[date(1), date(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj8 IN %@", @[decimal128(2), decimal128(3)]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj9 IN %@", @[objectId(1), objectId(2)]);
+    RLMAssertCount(AllPrimitiveArrays, 1, @"ANY anyObj10 IN %@", @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY boolObj IN %@", @[@NO, @YES]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY intObj IN %@", @[@2, @3]);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1, @"ANY floatObj IN %@", @[@2.2f, @3.3f]);
@@ -7048,9 +8870,18 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"decimalObj": @[],
         @"objectIdObj": @[],
         @"uuidObj": @[],
+        @"anyObj1": @[],
+        @"anyObj2": @[],
+        @"anyObj3": @[],
+        @"anyObj4": @[],
+        @"anyObj5": @[],
+        @"anyObj6": @[],
+        @"anyObj7": @[],
+        @"anyObj8": @[],
+        @"anyObj9": @[],
+        @"anyObj10": @[],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
-        @"anyObj": @[],
         @"boolObj": @[],
         @"intObj": @[],
         @"floatObj": @[],
@@ -7073,9 +8904,18 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"decimalObj": @[decimal128(2)],
         @"objectIdObj": @[objectId(1)],
         @"uuidObj": @[uuid(@"00000000-0000-0000-0000-000000000000")],
+        @"anyObj1": @[@NO],
+        @"anyObj2": @[@2],
+        @"anyObj3": @[@2.2f],
+        @"anyObj4": @[@2.2],
+        @"anyObj5": @[@"a"],
+        @"anyObj6": @[data(1)],
+        @"anyObj7": @[date(1)],
+        @"anyObj8": @[decimal128(2)],
+        @"anyObj9": @[objectId(1)],
+        @"anyObj10": @[uuid(@"00000000-0000-0000-0000-000000000000")],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
-        @"anyObj": @[@NO],
         @"boolObj": @[@NO],
         @"intObj": @[@2],
         @"floatObj": @[@2.2f],
@@ -7098,9 +8938,18 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"decimalObj": @[decimal128(2), decimal128(2)],
         @"objectIdObj": @[objectId(1), objectId(1)],
         @"uuidObj": @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000")],
+        @"anyObj1": @[@NO, @NO],
+        @"anyObj2": @[@2, @2],
+        @"anyObj3": @[@2.2f, @2.2f],
+        @"anyObj4": @[@2.2, @2.2],
+        @"anyObj5": @[@"a", @"a"],
+        @"anyObj6": @[data(1), data(1)],
+        @"anyObj7": @[date(1), date(1)],
+        @"anyObj8": @[decimal128(2), decimal128(2)],
+        @"anyObj9": @[objectId(1), objectId(1)],
+        @"anyObj10": @[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"00000000-0000-0000-0000-000000000000")],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
-        @"anyObj": @[@NO, @NO],
         @"boolObj": @[@NO, @NO],
         @"intObj": @[@2, @2],
         @"floatObj": @[@2.2f, @2.2f],
@@ -7124,7 +8973,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllPrimitiveArrays, 1U, @"decimalObj.@count == %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 1U, @"objectIdObj.@count == %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 1U, @"uuidObj.@count == %@", @(i));
-        RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj.@count == %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj1.@count == %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj2.@count == %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj3.@count == %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj4.@count == %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj5.@count == %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj6.@count == %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj7.@count == %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj8.@count == %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj9.@count == %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj10.@count == %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"boolObj.@count == %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"intObj.@count == %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"floatObj.@count == %@", @(i));
@@ -7145,7 +9003,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllPrimitiveArrays, 2U, @"decimalObj.@count != %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 2U, @"objectIdObj.@count != %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 2U, @"uuidObj.@count != %@", @(i));
-        RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj.@count != %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj1.@count != %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj2.@count != %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj3.@count != %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj4.@count != %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj5.@count != %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj6.@count != %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj7.@count != %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj8.@count != %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj9.@count != %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj10.@count != %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"boolObj.@count != %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"intObj.@count != %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"floatObj.@count != %@", @(i));
@@ -7166,7 +9033,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllPrimitiveArrays, 2 - i, @"decimalObj.@count > %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 2 - i, @"objectIdObj.@count > %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 2 - i, @"uuidObj.@count > %@", @(i));
-        RLMAssertCount(AllPrimitiveArrays, 2 - i, @"anyObj.@count > %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2 - i, @"anyObj1.@count > %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2 - i, @"anyObj2.@count > %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2 - i, @"anyObj3.@count > %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2 - i, @"anyObj4.@count > %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2 - i, @"anyObj5.@count > %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2 - i, @"anyObj6.@count > %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2 - i, @"anyObj7.@count > %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2 - i, @"anyObj8.@count > %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2 - i, @"anyObj9.@count > %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 2 - i, @"anyObj10.@count > %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2 - i, @"boolObj.@count > %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2 - i, @"intObj.@count > %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 2 - i, @"floatObj.@count > %@", @(i));
@@ -7187,7 +9063,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllPrimitiveArrays, 3 - i, @"decimalObj.@count >= %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 3 - i, @"objectIdObj.@count >= %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, 3 - i, @"uuidObj.@count >= %@", @(i));
-        RLMAssertCount(AllPrimitiveArrays, 3 - i, @"anyObj.@count >= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 3 - i, @"anyObj1.@count >= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 3 - i, @"anyObj2.@count >= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 3 - i, @"anyObj3.@count >= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 3 - i, @"anyObj4.@count >= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 3 - i, @"anyObj5.@count >= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 3 - i, @"anyObj6.@count >= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 3 - i, @"anyObj7.@count >= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 3 - i, @"anyObj8.@count >= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 3 - i, @"anyObj9.@count >= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, 3 - i, @"anyObj10.@count >= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 3 - i, @"boolObj.@count >= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 3 - i, @"intObj.@count >= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, 3 - i, @"floatObj.@count >= %@", @(i));
@@ -7208,7 +9093,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllPrimitiveArrays, i, @"decimalObj.@count < %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, i, @"objectIdObj.@count < %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, i, @"uuidObj.@count < %@", @(i));
-        RLMAssertCount(AllPrimitiveArrays, i, @"anyObj.@count < %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i, @"anyObj1.@count < %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i, @"anyObj2.@count < %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i, @"anyObj3.@count < %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i, @"anyObj4.@count < %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i, @"anyObj5.@count < %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i, @"anyObj6.@count < %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i, @"anyObj7.@count < %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i, @"anyObj8.@count < %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i, @"anyObj9.@count < %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i, @"anyObj10.@count < %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i, @"boolObj.@count < %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i, @"intObj.@count < %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i, @"floatObj.@count < %@", @(i));
@@ -7229,7 +9123,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertCount(AllPrimitiveArrays, i + 1, @"decimalObj.@count <= %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, i + 1, @"objectIdObj.@count <= %@", @(i));
         RLMAssertCount(AllPrimitiveArrays, i + 1, @"uuidObj.@count <= %@", @(i));
-        RLMAssertCount(AllPrimitiveArrays, i + 1, @"anyObj.@count <= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i + 1, @"anyObj1.@count <= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i + 1, @"anyObj2.@count <= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i + 1, @"anyObj3.@count <= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i + 1, @"anyObj4.@count <= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i + 1, @"anyObj5.@count <= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i + 1, @"anyObj6.@count <= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i + 1, @"anyObj7.@count <= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i + 1, @"anyObj8.@count <= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i + 1, @"anyObj9.@count <= %@", @(i));
+        RLMAssertCount(AllPrimitiveArrays, i + 1, @"anyObj10.@count <= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i + 1, @"boolObj.@count <= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i + 1, @"intObj.@count <= %@", @(i));
         RLMAssertCount(AllOptionalPrimitiveArrays, i + 1, @"floatObj.@count <= %@", @(i));
@@ -7256,8 +9159,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@sum can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@sum = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"@sum can only be applied to a numeric property.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj.@sum = %@", @NO]),
-                              @"@sum can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"boolObj.@sum = %@", @NO]),
                               @"@sum can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"stringObj.@sum = %@", @"a"]),
@@ -7272,6 +9173,26 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Cannot sum or average date properties");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"dateObj.@sum = %@", date(1)]),
                               @"Cannot sum or average date properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj1.@sum = %@", @NO]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj2.@sum = %@", @2]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj3.@sum = %@", @2.2f]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj4.@sum = %@", @2.2]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj5.@sum = %@", @"a"]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj6.@sum = %@", data(1)]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj7.@sum = %@", date(1)]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj8.@sum = %@", decimal128(2)]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj9.@sum = %@", objectId(1)]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj10.@sum = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
+                              @"Cannot sum or average mixed properties");
 
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@sum = %@", @"a"]),
                               @"@sum on a property of type int cannot be compared with 'a'");
@@ -7297,6 +9218,14 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Property 'doubleObj' is not a link in object of type 'AllPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"decimalObj.@sum.prop = %@", @"a"]),
                               @"Property 'decimalObj' is not a link in object of type 'AllPrimitiveArrays'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj2.@sum.prop = %@", @"a"]),
+                              @"Property 'anyObj2' is not a link in object of type 'AllPrimitiveArrays'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj3.@sum.prop = %@", @"a"]),
+                              @"Property 'anyObj3' is not a link in object of type 'AllPrimitiveArrays'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj4.@sum.prop = %@", @"a"]),
+                              @"Property 'anyObj4' is not a link in object of type 'AllPrimitiveArrays'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj8.@sum.prop = %@", @"a"]),
+                              @"Property 'anyObj8' is not a link in object of type 'AllPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"intObj.@sum.prop = %@", @"a"]),
                               @"Property 'intObj' is not a link in object of type 'AllOptionalPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"floatObj.@sum.prop = %@", @"a"]),
@@ -7313,6 +9242,14 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@sum on a property of type double cannot be compared with '<null>'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"decimalObj.@sum = %@", NSNull.null]),
                               @"@sum on a property of type decimal128 cannot be compared with '<null>'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj2.@sum = %@", NSNull.null]),
+                              @"@sum on a property of type mixed cannot be compared with '<null>'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj3.@sum = %@", NSNull.null]),
+                              @"@sum on a property of type mixed cannot be compared with '<null>'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj4.@sum = %@", NSNull.null]),
+                              @"@sum on a property of type mixed cannot be compared with '<null>'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj8.@sum = %@", NSNull.null]),
+                              @"@sum on a property of type mixed cannot be compared with '<null>'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"intObj.@sum = %@", NSNull.null]),
                               @"@sum on a property of type int cannot be compared with '<null>'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"floatObj.@sum = %@", NSNull.null]),
@@ -7442,8 +9379,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@avg can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@avg = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"@avg can only be applied to a numeric property.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj.@avg = %@", @NO]),
-                              @"@avg can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"boolObj.@avg = %@", @NO]),
                               @"@avg can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"stringObj.@avg = %@", @"a"]),
@@ -7458,6 +9393,26 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Cannot sum or average date properties");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"dateObj.@avg = %@", date(1)]),
                               @"Cannot sum or average date properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj1.@avg = %@", @NO]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj2.@avg = %@", @2]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj3.@avg = %@", @2.2f]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj4.@avg = %@", @2.2]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj5.@avg = %@", @"a"]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj6.@avg = %@", data(1)]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj7.@avg = %@", date(1)]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj8.@avg = %@", decimal128(2)]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj9.@avg = %@", objectId(1)]),
+                              @"Cannot sum or average mixed properties");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj10.@avg = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
+                              @"Cannot sum or average mixed properties");
 
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@avg = %@", @"a"]),
                               @"@avg on a property of type int cannot be compared with 'a'");
@@ -7612,8 +9567,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@min can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@min = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"@min can only be applied to a numeric property.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj.@min = %@", @NO]),
-                              @"@min can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"boolObj.@min = %@", @NO]),
                               @"@min can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"stringObj.@min = %@", @"a"]),
@@ -7624,6 +9577,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@min can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@min = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"@min can only be applied to a numeric property.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj1.@min = %@", @NO]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj5.@min = %@", @"a"]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj6.@min = %@", data(1)]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj9.@min = %@", objectId(1)]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj10.@min = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@min = %@", @"a"]),
                               @"@min on a property of type int cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"floatObj.@min = %@", @"a"]),
@@ -7644,6 +9607,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@min on a property of type date cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"decimalObj.@min = %@", @"a"]),
                               @"@min on a property of type decimal128 cannot be compared with 'a'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj2.@min = %@", @"a"]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj3.@min = %@", @"a"]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj4.@min = %@", @"a"]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj7.@min = %@", @"a"]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj8.@min = %@", @"a"]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@min.prop = %@", @"a"]),
                               @"Property 'intObj' is not a link in object of type 'AllPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"floatObj.@min.prop = %@", @"a"]),
@@ -7654,6 +9627,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Property 'dateObj' is not a link in object of type 'AllPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"decimalObj.@min.prop = %@", @"a"]),
                               @"Property 'decimalObj' is not a link in object of type 'AllPrimitiveArrays'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj2.@min.prop = %@", @"a"]),
+                              @"Property 'anyObj2' is not a link in object of type 'AllPrimitiveArrays'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj3.@min.prop = %@", @"a"]),
+                              @"Property 'anyObj3' is not a link in object of type 'AllPrimitiveArrays'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj4.@min.prop = %@", @"a"]),
+                              @"Property 'anyObj4' is not a link in object of type 'AllPrimitiveArrays'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj7.@min.prop = %@", @"a"]),
+                              @"Property 'anyObj7' is not a link in object of type 'AllPrimitiveArrays'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj8.@min.prop = %@", @"a"]),
+                              @"Property 'anyObj8' is not a link in object of type 'AllPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"intObj.@min.prop = %@", @"a"]),
                               @"Property 'intObj' is not a link in object of type 'AllOptionalPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"floatObj.@min.prop = %@", @"a"]),
@@ -7671,6 +9654,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0U, @"doubleObj.@min == %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 0U, @"dateObj.@min == %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 0U, @"decimalObj.@min == %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj2.@min == %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj3.@min == %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj4.@min == %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj7.@min == %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj8.@min == %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"intObj.@min == %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"floatObj.@min == %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"doubleObj.@min == %@", @2.2);
@@ -7686,6 +9674,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0U, @"doubleObj.@min == %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 0U, @"dateObj.@min == %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 0U, @"decimalObj.@min == %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj2.@min == %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj3.@min == %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj4.@min == %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj7.@min == %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj8.@min == %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"intObj.@min == %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"floatObj.@min == %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"doubleObj.@min == %@", @2.2);
@@ -7696,6 +9689,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0U, @"doubleObj.@min == %@", @3.3);
     RLMAssertCount(AllPrimitiveArrays, 0U, @"dateObj.@min == %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 0U, @"decimalObj.@min == %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj2.@min == %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj3.@min == %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj4.@min == %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj7.@min == %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj8.@min == %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"intObj.@min == %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"floatObj.@min == %@", @3.3f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"doubleObj.@min == %@", @3.3);
@@ -7707,6 +9705,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1U, @"doubleObj.@min == nil");
     RLMAssertCount(AllPrimitiveArrays, 1U, @"dateObj.@min == nil");
     RLMAssertCount(AllPrimitiveArrays, 1U, @"decimalObj.@min == nil");
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj2.@min == nil");
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj3.@min == nil");
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj4.@min == nil");
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj7.@min == nil");
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj8.@min == nil");
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"intObj.@min == nil");
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"floatObj.@min == nil");
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"doubleObj.@min == nil");
@@ -7717,6 +9720,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1U, @"doubleObj.@min == %@", NSNull.null);
     RLMAssertCount(AllPrimitiveArrays, 1U, @"dateObj.@min == %@", NSNull.null);
     RLMAssertCount(AllPrimitiveArrays, 1U, @"decimalObj.@min == %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj2.@min == %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj3.@min == %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj4.@min == %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj7.@min == %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj8.@min == %@", NSNull.null);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"intObj.@min == %@", NSNull.null);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"floatObj.@min == %@", NSNull.null);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"doubleObj.@min == %@", NSNull.null);
@@ -7731,6 +9739,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1U, @"doubleObj.@min == %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 1U, @"dateObj.@min == %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 1U, @"decimalObj.@min == %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj2.@min == %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj3.@min == %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj4.@min == %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj7.@min == %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj8.@min == %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"intObj.@min == %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"floatObj.@min == %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"doubleObj.@min == %@", @2.2);
@@ -7741,6 +9754,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0U, @"doubleObj.@min == %@", @3.3);
     RLMAssertCount(AllPrimitiveArrays, 0U, @"dateObj.@min == %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 0U, @"decimalObj.@min == %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj2.@min == %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj3.@min == %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj4.@min == %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj7.@min == %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj8.@min == %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"intObj.@min == %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"floatObj.@min == %@", @3.3f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"doubleObj.@min == %@", @3.3);
@@ -7755,6 +9773,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1U, @"doubleObj.@min == %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 1U, @"dateObj.@min == %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 1U, @"decimalObj.@min == %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj2.@min == %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj3.@min == %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj4.@min == %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj7.@min == %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj8.@min == %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"intObj.@min == %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"floatObj.@min == %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"doubleObj.@min == %@", @2.2);
@@ -7765,6 +9788,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1U, @"doubleObj.@min == %@", @3.3);
     RLMAssertCount(AllPrimitiveArrays, 1U, @"dateObj.@min == %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 1U, @"decimalObj.@min == %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj2.@min == %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj3.@min == %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj4.@min == %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj7.@min == %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj8.@min == %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"intObj.@min == %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"floatObj.@min == %@", @3.3f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"doubleObj.@min == %@", @3.3);
@@ -7777,6 +9805,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"doubleObj": @[@3.3, @2.2],
         @"dateObj": @[date(2), date(1)],
         @"decimalObj": @[decimal128(3), decimal128(2)],
+        @"anyObj2": @[@3, @2],
+        @"anyObj3": @[@3.3f, @2.2f],
+        @"anyObj4": @[@3.3, @2.2],
+        @"anyObj7": @[date(2), date(1)],
+        @"anyObj8": @[decimal128(3), decimal128(2)],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
         @"intObj": @[@3, @2],
@@ -7792,6 +9825,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 2U, @"doubleObj.@min == %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 2U, @"dateObj.@min == %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 2U, @"decimalObj.@min == %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj2.@min == %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj3.@min == %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj4.@min == %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj7.@min == %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj8.@min == %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"intObj.@min == %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"floatObj.@min == %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"doubleObj.@min == %@", @2.2);
@@ -7802,6 +9840,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1U, @"doubleObj.@min == %@", @3.3);
     RLMAssertCount(AllPrimitiveArrays, 1U, @"dateObj.@min == %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 1U, @"decimalObj.@min == %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj2.@min == %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj3.@min == %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj4.@min == %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj7.@min == %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj8.@min == %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"intObj.@min == %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"floatObj.@min == %@", @3.3f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"doubleObj.@min == %@", @3.3);
@@ -7822,8 +9865,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@max can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@max = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"@max can only be applied to a numeric property.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj.@max = %@", @NO]),
-                              @"@max can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"boolObj.@max = %@", @NO]),
                               @"@max can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"stringObj.@max = %@", @"a"]),
@@ -7834,6 +9875,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@max can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@max = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"@max can only be applied to a numeric property.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj1.@max = %@", @NO]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj5.@max = %@", @"a"]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj6.@max = %@", data(1)]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj9.@max = %@", objectId(1)]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj10.@max = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@max = %@", @"a"]),
                               @"@max on a property of type int cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"floatObj.@max = %@", @"a"]),
@@ -7854,6 +9905,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@max on a property of type date cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"decimalObj.@max = %@", @"a"]),
                               @"@max on a property of type decimal128 cannot be compared with 'a'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj2.@max = %@", @"a"]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj3.@max = %@", @"a"]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj4.@max = %@", @"a"]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj7.@max = %@", @"a"]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj8.@max = %@", @"a"]),
+                              @"Unsupported comparision value type for mixed. Value must be numeric.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@max.prop = %@", @"a"]),
                               @"Property 'intObj' is not a link in object of type 'AllPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"floatObj.@max.prop = %@", @"a"]),
@@ -7864,6 +9925,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Property 'dateObj' is not a link in object of type 'AllPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"decimalObj.@max.prop = %@", @"a"]),
                               @"Property 'decimalObj' is not a link in object of type 'AllPrimitiveArrays'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj2.@max.prop = %@", @"a"]),
+                              @"Property 'anyObj2' is not a link in object of type 'AllPrimitiveArrays'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj3.@max.prop = %@", @"a"]),
+                              @"Property 'anyObj3' is not a link in object of type 'AllPrimitiveArrays'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj4.@max.prop = %@", @"a"]),
+                              @"Property 'anyObj4' is not a link in object of type 'AllPrimitiveArrays'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj7.@max.prop = %@", @"a"]),
+                              @"Property 'anyObj7' is not a link in object of type 'AllPrimitiveArrays'");
+    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj8.@max.prop = %@", @"a"]),
+                              @"Property 'anyObj8' is not a link in object of type 'AllPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"intObj.@max.prop = %@", @"a"]),
                               @"Property 'intObj' is not a link in object of type 'AllOptionalPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"floatObj.@max.prop = %@", @"a"]),
@@ -7881,6 +9952,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0U, @"doubleObj.@max == %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 0U, @"dateObj.@max == %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 0U, @"decimalObj.@max == %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj2.@max == %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj3.@max == %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj4.@max == %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj7.@max == %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj8.@max == %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"intObj.@max == %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"floatObj.@max == %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"doubleObj.@max == %@", @2.2);
@@ -7896,6 +9972,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0U, @"doubleObj.@max == %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 0U, @"dateObj.@max == %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 0U, @"decimalObj.@max == %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj2.@max == %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj3.@max == %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj4.@max == %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj7.@max == %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj8.@max == %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"intObj.@max == %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"floatObj.@max == %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"doubleObj.@max == %@", @2.2);
@@ -7906,6 +9987,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0U, @"doubleObj.@max == %@", @3.3);
     RLMAssertCount(AllPrimitiveArrays, 0U, @"dateObj.@max == %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 0U, @"decimalObj.@max == %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj2.@max == %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj3.@max == %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj4.@max == %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj7.@max == %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj8.@max == %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"intObj.@max == %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"floatObj.@max == %@", @3.3f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"doubleObj.@max == %@", @3.3);
@@ -7917,6 +10003,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1U, @"doubleObj.@max == nil");
     RLMAssertCount(AllPrimitiveArrays, 1U, @"dateObj.@max == nil");
     RLMAssertCount(AllPrimitiveArrays, 1U, @"decimalObj.@max == nil");
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj2.@max == nil");
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj3.@max == nil");
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj4.@max == nil");
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj7.@max == nil");
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj8.@max == nil");
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"intObj.@max == nil");
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"floatObj.@max == nil");
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"doubleObj.@max == nil");
@@ -7927,6 +10018,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1U, @"doubleObj.@max == %@", NSNull.null);
     RLMAssertCount(AllPrimitiveArrays, 1U, @"dateObj.@max == %@", NSNull.null);
     RLMAssertCount(AllPrimitiveArrays, 1U, @"decimalObj.@max == %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj2.@max == %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj3.@max == %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj4.@max == %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj7.@max == %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj8.@max == %@", NSNull.null);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"intObj.@max == %@", NSNull.null);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"floatObj.@max == %@", NSNull.null);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"doubleObj.@max == %@", NSNull.null);
@@ -7941,6 +10037,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1U, @"doubleObj.@max == %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 1U, @"dateObj.@max == %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 1U, @"decimalObj.@max == %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj2.@max == %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj3.@max == %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj4.@max == %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj7.@max == %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj8.@max == %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"intObj.@max == %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"floatObj.@max == %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"doubleObj.@max == %@", @2.2);
@@ -7951,6 +10052,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 0U, @"doubleObj.@max == %@", @3.3);
     RLMAssertCount(AllPrimitiveArrays, 0U, @"dateObj.@max == %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 0U, @"decimalObj.@max == %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj2.@max == %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj3.@max == %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj4.@max == %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj7.@max == %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 0U, @"anyObj8.@max == %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"intObj.@max == %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"floatObj.@max == %@", @3.3f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 0U, @"doubleObj.@max == %@", @3.3);
@@ -7965,6 +10071,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1U, @"doubleObj.@max == %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 1U, @"dateObj.@max == %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 1U, @"decimalObj.@max == %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj2.@max == %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj3.@max == %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj4.@max == %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj7.@max == %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj8.@max == %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"intObj.@max == %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"floatObj.@max == %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"doubleObj.@max == %@", @2.2);
@@ -7975,6 +10086,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1U, @"doubleObj.@max == %@", @3.3);
     RLMAssertCount(AllPrimitiveArrays, 1U, @"dateObj.@max == %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 1U, @"decimalObj.@max == %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj2.@max == %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj3.@max == %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj4.@max == %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj7.@max == %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj8.@max == %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"intObj.@max == %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"floatObj.@max == %@", @3.3f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"doubleObj.@max == %@", @3.3);
@@ -7987,6 +10103,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         @"doubleObj": @[@3.3, @2.2],
         @"dateObj": @[date(2), date(1)],
         @"decimalObj": @[decimal128(3), decimal128(2)],
+        @"anyObj2": @[@3, @2],
+        @"anyObj3": @[@3.3f, @2.2f],
+        @"anyObj4": @[@3.3, @2.2],
+        @"anyObj7": @[date(2), date(1)],
+        @"anyObj8": @[decimal128(3), decimal128(2)],
     }];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:@{
         @"intObj": @[@3, @2],
@@ -8002,6 +10123,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 1U, @"doubleObj.@max == %@", @2.2);
     RLMAssertCount(AllPrimitiveArrays, 1U, @"dateObj.@max == %@", date(1));
     RLMAssertCount(AllPrimitiveArrays, 1U, @"decimalObj.@max == %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj2.@max == %@", @2);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj3.@max == %@", @2.2f);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj4.@max == %@", @2.2);
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj7.@max == %@", date(1));
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"anyObj8.@max == %@", decimal128(2));
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"intObj.@max == %@", @2);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"floatObj.@max == %@", @2.2f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 1U, @"doubleObj.@max == %@", @2.2);
@@ -8012,6 +10138,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(AllPrimitiveArrays, 2U, @"doubleObj.@max == %@", @3.3);
     RLMAssertCount(AllPrimitiveArrays, 2U, @"dateObj.@max == %@", date(2));
     RLMAssertCount(AllPrimitiveArrays, 2U, @"decimalObj.@max == %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj2.@max == %@", @3);
+    RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj3.@max == %@", @3.3f);
+    RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj4.@max == %@", @3.3);
+    RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj7.@max == %@", date(2));
+    RLMAssertCount(AllPrimitiveArrays, 2U, @"anyObj8.@max == %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"intObj.@max == %@", @3);
     RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"floatObj.@max == %@", @3.3f);
     RLMAssertCount(AllOptionalPrimitiveArrays, 2U, @"doubleObj.@max == %@", @3.3);
@@ -8032,7 +10163,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj = %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.objectIdObj = %@", objectId(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj = %@", @NO);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj1 = %@", @NO);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj2 = %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj3 = %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj4 = %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj5 = %@", @"a");
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj6 = %@", data(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj7 = %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj8 = %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj9 = %@", objectId(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj10 = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.boolObj = %@", @NO);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj = %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj = %@", @2.2f);
@@ -8053,7 +10193,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj != %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.objectIdObj != %@", objectId(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj != %@", @NO);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj1 != %@", @NO);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj2 != %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj3 != %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj4 != %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj5 != %@", @"a");
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj6 != %@", data(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj7 != %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj8 != %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj9 != %@", objectId(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj10 != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.boolObj != %@", @NO);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj != %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj != %@", @2.2f);
@@ -8069,6 +10218,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj > %@", @2.2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj > %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj > %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj2 > %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj3 > %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj4 > %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj7 > %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj8 > %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj > %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj > %@", @2.2f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj > %@", @2.2);
@@ -8079,6 +10233,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj >= %@", @2.2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj >= %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj >= %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj2 >= %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj3 >= %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj4 >= %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj7 >= %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj8 >= %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj >= %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj >= %@", @2.2f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj >= %@", @2.2);
@@ -8089,6 +10248,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj < %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj < %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj2 < %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj3 < %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj4 < %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj7 < %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj8 < %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj < %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj < %@", @2.2f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
@@ -8099,6 +10263,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj <= %@", @2.2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj <= %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj <= %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj2 <= %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj3 <= %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj4 <= %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj7 <= %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj8 <= %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj <= %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj <= %@", @2.2f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj <= %@", @2.2);
@@ -8117,7 +10286,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj = %@", decimal128(3));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.objectIdObj = %@", objectId(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj = %@", decimal128(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj1 = %@", @YES);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj2 = %@", @3);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj3 = %@", @3.3f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj4 = %@", @3.3);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj5 = %@", @"b");
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj6 = %@", data(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj7 = %@", date(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj8 = %@", decimal128(3));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj9 = %@", objectId(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj10 = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.boolObj = %@", @YES);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj = %@", @3);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj = %@", @3.3f);
@@ -8138,7 +10316,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj = %@", @NO);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj1 = %@", @NO);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj2 = %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj3 = %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj4 = %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj5 = %@", @"a");
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj6 = %@", data(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj7 = %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj8 = %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj9 = %@", objectId(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj10 = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj = %@", @NO);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj = %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj = %@", @2.2f);
@@ -8159,7 +10346,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj != %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.objectIdObj != %@", objectId(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj != %@", @NO);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj1 != %@", @NO);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj2 != %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj3 != %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj4 != %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj5 != %@", @"a");
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj6 != %@", data(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj7 != %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj8 != %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj9 != %@", objectId(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj10 != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.boolObj != %@", @NO);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj != %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj != %@", @2.2f);
@@ -8180,7 +10376,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(3));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj != %@", decimal128(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj1 != %@", @YES);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj2 != %@", @3);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj3 != %@", @3.3f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj4 != %@", @3.3);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj5 != %@", @"b");
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj6 != %@", data(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj7 != %@", date(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj8 != %@", decimal128(3));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj9 != %@", objectId(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj10 != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj != %@", @YES);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj != %@", @3);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj != %@", @3.3f);
@@ -8196,6 +10401,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj > %@", @2.2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj > %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj > %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj2 > %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj3 > %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj4 > %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj7 > %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj8 > %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj > %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj > %@", @2.2f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj > %@", @2.2);
@@ -8206,6 +10416,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj >= %@", @2.2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj >= %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj >= %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj2 >= %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj3 >= %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj4 >= %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj7 >= %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj8 >= %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj >= %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj >= %@", @2.2f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj >= %@", @2.2);
@@ -8216,6 +10431,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj < %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj < %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj2 < %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj3 < %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj4 < %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj7 < %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj8 < %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj < %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj < %@", @2.2f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
@@ -8226,6 +10446,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj < %@", @3.3);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj < %@", date(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj < %@", decimal128(3));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj2 < %@", @3);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj3 < %@", @3.3f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj4 < %@", @3.3);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj7 < %@", date(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj8 < %@", decimal128(3));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj < %@", @3);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj < %@", @3.3f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj < %@", @3.3);
@@ -8236,6 +10461,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj <= %@", @2.2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj <= %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj <= %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj2 <= %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj3 <= %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj4 <= %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj7 <= %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj8 <= %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj <= %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj <= %@", @2.2f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj <= %@", @2.2);
@@ -8254,7 +10484,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj = %@", @NO);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj1 = %@", @NO);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj2 = %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj3 = %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj4 = %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj5 = %@", @"a");
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj6 = %@", data(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj7 = %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj8 = %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj9 = %@", objectId(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj10 = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj = %@", @NO);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj = %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj = %@", @2.2f);
@@ -8275,7 +10514,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj = %@", decimal128(3));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj = %@", objectId(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj = %@", decimal128(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj1 = %@", @YES);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj2 = %@", @3);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj3 = %@", @3.3f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj4 = %@", @3.3);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj5 = %@", @"b");
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj6 = %@", data(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj7 = %@", date(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj8 = %@", decimal128(3));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj9 = %@", objectId(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj10 = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj = %@", @YES);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj = %@", @3);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj = %@", @3.3f);
@@ -8296,7 +10544,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj != %@", @NO);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj1 != %@", @NO);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj2 != %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj3 != %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj4 != %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj5 != %@", @"a");
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj6 != %@", data(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj7 != %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj8 != %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj9 != %@", objectId(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj10 != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj != %@", @NO);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj != %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj != %@", @2.2f);
@@ -8317,7 +10574,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj != %@", decimal128(3));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.objectIdObj != %@", objectId(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
-    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj != %@", decimal128(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj1 != %@", @YES);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj2 != %@", @3);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj3 != %@", @3.3f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj4 != %@", @3.3);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj5 != %@", @"b");
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj6 != %@", data(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj7 != %@", date(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj8 != %@", decimal128(3));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj9 != %@", objectId(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj10 != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.boolObj != %@", @YES);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj != %@", @3);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj != %@", @3.3f);
@@ -8333,6 +10599,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj > %@", @2.2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj > %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj > %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj2 > %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj3 > %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj4 > %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj7 > %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj8 > %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj > %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj > %@", @2.2f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj > %@", @2.2);
@@ -8343,6 +10614,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.doubleObj >= %@", @2.2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.dateObj >= %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.decimalObj >= %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.anyObj2 >= %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.anyObj3 >= %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.anyObj4 >= %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.anyObj7 >= %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.anyObj8 >= %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.intObj >= %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.floatObj >= %@", @2.2f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.doubleObj >= %@", @2.2);
@@ -8353,6 +10629,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.dateObj < %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.decimalObj < %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj2 < %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj3 < %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj4 < %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj7 < %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 0, @"ANY link.anyObj8 < %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.intObj < %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.floatObj < %@", @2.2f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 0, @"ANY link.doubleObj < %@", @2.2);
@@ -8363,6 +10644,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj < %@", @3.3);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj < %@", date(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj < %@", decimal128(3));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj2 < %@", @3);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj3 < %@", @3.3f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj4 < %@", @3.3);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj7 < %@", date(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj8 < %@", decimal128(3));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj < %@", @3);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj < %@", @3.3f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj < %@", @3.3);
@@ -8373,6 +10659,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.doubleObj <= %@", @2.2);
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.dateObj <= %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.decimalObj <= %@", decimal128(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj2 <= %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj3 <= %@", @2.2f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj4 <= %@", @2.2);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj7 <= %@", date(1));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 1, @"ANY link.anyObj8 <= %@", decimal128(2));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.intObj <= %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.floatObj <= %@", @2.2f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 1, @"ANY link.doubleObj <= %@", @2.2);
@@ -8383,6 +10674,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.doubleObj <= %@", @3.3);
     RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.dateObj <= %@", date(2));
     RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.decimalObj <= %@", decimal128(3));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.anyObj2 <= %@", @3);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.anyObj3 <= %@", @3.3f);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.anyObj4 <= %@", @3.3);
+    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.anyObj7 <= %@", date(2));
+    RLMAssertCount(LinkToAllPrimitiveArrays, 2, @"ANY link.anyObj8 <= %@", decimal128(3));
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.intObj <= %@", @3);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.floatObj <= %@", @3.3f);
     RLMAssertCount(LinkToAllOptionalPrimitiveArrays, 2, @"ANY link.doubleObj <= %@", @3.3);
@@ -8399,8 +10695,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Operator '>' not supported for type 'object id'");
     RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.uuidObj > %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"Operator '>' not supported for type 'uuid'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.anyObj > %@", @NO]),
-                              @"Operator '>' not supported for type 'any'");
+    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.anyObj1 > %@", @NO]),
+                              @"Operator '>' not supported for type 'mixed'");
+    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.anyObj5 > %@", @"a"]),
+                              @"Operator '>' not supported for type 'mixed'");
+    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.anyObj6 > %@", data(1)]),
+                              @"Operator '>' not supported for type 'mixed'");
+    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.anyObj9 > %@", objectId(1)]),
+                              @"Operator '>' not supported for type 'mixed'");
+    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.anyObj10 > %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
+                              @"Operator '>' not supported for type 'mixed'");
     RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY link.boolObj > %@", @NO]),
                               @"Operator '>' not supported for type 'bool'");
     RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY link.stringObj > %@", @"a"]),
@@ -8453,15 +10757,19 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 
         NSString *query = [NSString stringWithFormat:@"ANY stringObj %@ %%@", operator];
         RLMAssertCount(AllPrimitiveArrays, count, query, value);
+        RLMAssertCount(AllPrimitiveArrays, count, query, value);
         RLMAssertCount(AllOptionalPrimitiveArrays, count, query, value);
         query = [NSString stringWithFormat:@"ANY link.stringObj %@ %%@", operator];
+        RLMAssertCount(LinkToAllPrimitiveArrays, count, query, value);
         RLMAssertCount(LinkToAllPrimitiveArrays, count, query, value);
         RLMAssertCount(LinkToAllOptionalPrimitiveArrays, count, query, value);
 
         query = [NSString stringWithFormat:@"ANY dataObj %@ %%@", operator];
         RLMAssertCount(AllPrimitiveArrays, count, query, data);
+        RLMAssertCount(AllPrimitiveArrays, count, query, data);
         RLMAssertCount(AllOptionalPrimitiveArrays, count, query, data);
         query = [NSString stringWithFormat:@"ANY link.dataObj %@ %%@", operator];
+        RLMAssertCount(LinkToAllPrimitiveArrays, count, query, data);
         RLMAssertCount(LinkToAllPrimitiveArrays, count, query, data);
         RLMAssertCount(LinkToAllOptionalPrimitiveArrays, count, query, data);
     };

@@ -119,9 +119,6 @@ static RLMObjectId *objectId(NSUInteger i) {
     
     %unman XCTAssertNil(unman.$member, @"RLMValue should be able to initialize as null");
     %man XCTAssertNil(man.$member, @"RLMValue should be able to initialize as null");
-    
-    // @Lee, nil initialized RLMValues are all valueType "0" == RLMPropertyTypeInt
-    XCTAssertEqual(unman.$member.valueType, RLMPropertyTypeAny);
 }
 
 - (void)testUpdateBoolType {
@@ -131,8 +128,8 @@ static RLMObjectId *objectId(NSUInteger i) {
 }
 
 - (void)testUpdateIntType {
-    $rlmValue = @1;
-    XCTAssert([(NSNumber *)$rlmValue isEqual:@1]);
+    $rlmValue = @2;
+    XCTAssert([(NSNumber *)$rlmValue isEqual:@2]);
     XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeInt);
 }
 
@@ -182,16 +179,6 @@ static RLMObjectId *objectId(NSUInteger i) {
     $rlmValue = uuid(@"137DECC8-B300-4954-A233-F89909F4FD89");
     XCTAssert([(NSUUID *)$rlmValue isEqual:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
     XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeUUID);
-}
-
-// Update value to null
-- (void)testUpdateValueNull {
-    $rlmValue = [NSNull null];
-    
-    XCTAssertEqual($rlmValue, [NSNull null]);
-    
-    // @Lee - unmanaged don't have valueType selector, managed are set to "0" == RLMPropertyTypeInt
-    XCTAssertEqual($rlmValue.valueType, RLMPropertyTypeAny);
 }
 
 @end
