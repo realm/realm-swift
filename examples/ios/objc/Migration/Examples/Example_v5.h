@@ -17,10 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #ifndef SCHEMA_VERSION_5
-#define SCHEMA_VERSION_5 0
+#define SCHEMA_VERSION_5 1
 #endif
 
-#if SCHEMA_VERSION_5
+#if SCHEMA_VERSION_5 && !SCHEMA_VERSION_4 && !SCHEMA_VERSION_3 && !SCHEMA_VERSION_2 && !SCHEMA_VERSION_1 && !SCHEMA_VERSION_0
 
 #import <Foundation/Foundation.h>
 #import <Realm/Realm.h>
