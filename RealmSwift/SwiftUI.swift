@@ -50,7 +50,7 @@ private func createBinding<T: ThreadConfined, V>(_ value: T,
             return lastValue
         }
         lastValue = value[keyPath: keyPath]
-        if let value = lastValue as? ListBase & ThreadConfined, !value.isInvalidated && value.realm != nil {
+        if let value = lastValue as? RLMSwiftCollectionBase & ThreadConfined, !value.isInvalidated && value.realm != nil {
             return value.freeze() as! V
         }
         return lastValue

@@ -22,13 +22,18 @@
 
 namespace realm {
     class List;
+    class Obj;
     class Results;
     class TableView;
     struct CollectionChangeSet;
     struct NotificationToken;
+    namespace object_store {
+        class Set;
+        class Collection;
+    }
 }
 class RLMClassInfo;
-@class RLMFastEnumerator, RLMManagedArray;
+@class RLMFastEnumerator, RLMManagedArray, RLMManagedSet, RLMProperty, RLMObjectBase;
 
 @protocol RLMFastEnumerable
 @property (nonatomic, readonly) RLMRealm *realm;
@@ -40,12 +45,14 @@ class RLMClassInfo;
 @end
 
 // An object which encapulates the shared logic for fast-enumerating RLMArray
-// and RLMResults, and has a buffer to store strong references to the current
+// RLMSet and RLMResults, and has a buffer to store strong references to the current
 // set of enumerated items
 @interface RLMFastEnumerator : NSObject
-- (instancetype)initWithList:(realm::List&)list
-                  collection:(id)collection
-                   classInfo:(RLMClassInfo&)info;
+
+- (instancetype)initWithBackingCollection:(realm::object_store::Collection const&)backingCollection
+                               collection:(id)collection
+                                classInfo:(RLMClassInfo&)info;
+
 - (instancetype)initWithResults:(realm::Results&)results
                      collection:(id)collection
                       classInfo:(RLMClassInfo&)info;
@@ -68,6 +75,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state, NSUInteger len, id<RL
 - (instancetype)initWithChanges:(realm::CollectionChangeSet)indices;
 @end
 
+realm::object_store::Set& RLMGetBackingCollection(RLMManagedSet *);
 realm::List& RLMGetBackingCollection(RLMManagedArray *);
 realm::Results& RLMGetBackingCollection(RLMResults *);
 
@@ -80,3 +88,23 @@ template<typename Collection>
 NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClassInfo& info);
 
 std::vector<std::pair<std::string, bool>> RLMSortDescriptorsToKeypathArray(NSArray<RLMSortDescriptor *> *properties);
+
+template<typename Collection, typename ObjcCollection>
+id RLMManagedCollectionFromCollection(RLMClassInfo* info, realm::Obj&& obj, RLMProperty *prop);
+template<typename Fn>
+void RLMGetCollectionType(RLMProperty *prop, Fn&& func);
+
+static bool canAggregate(RLMPropertyType type, bool allowDate) {
+    switch (type) {
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
+        case RLMPropertyTypeDecimal128:
+        case RLMPropertyTypeAny:
+            return true;
+        case RLMPropertyTypeDate:
+            return allowDate;
+        default:
+            return false;
+    }
+}

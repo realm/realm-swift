@@ -18,7 +18,6 @@
 
 #import "RLMQueryUtil.hpp"
 
-#import "RLMArray.h"
 #import "RLMDecimal128_Private.hpp"
 #import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.h"
@@ -87,7 +86,7 @@ BOOL propertyTypeIsNumeric(RLMPropertyType propertyType) {
 }
 
 bool isObjectValidForProperty(id value, RLMProperty *prop) {
-    if (prop.array) {
+    if (prop.collection) {
         if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeLinkingObjects) {
             return [RLMObjectBaseObjectSchema(RLMDynamicCast<RLMObjectBase>(value)).className isEqualToString:prop.objectClassName];
         }
@@ -290,7 +289,7 @@ public:
 
     bool has_any_to_many_links() const {
         return std::any_of(begin(m_links), end(m_links),
-                           [](RLMProperty *property) { return property.array; });
+                           [](RLMProperty *property) { return property.collection; });
     }
 
     ColumnReference last_link_column() const {
@@ -369,8 +368,8 @@ public:
         , m_link_column(std::move(link_column))
         , m_column(std::move(column))
     {
-        RLMPrecondition(m_link_column.property().array,
-                        @"Invalid predicate", @"Collection operation can only be applied to a property of type RLMArray.");
+        RLMPrecondition((m_link_column.property().collection),
+                        @"Invalid predicate", @"Collection operation can only be applied to a property of type RLMArray / RLMSet.");
 
         switch (m_type) {
             case Count:
@@ -399,6 +398,7 @@ public:
     Type type() const { return m_type; }
     const ColumnReference& link_column() const { return m_link_column; }
     const ColumnReference& column() const { return *m_column; }
+
     void validate_comparison(id value) const {
         bool valid = true;
         switch (m_type) {
@@ -565,9 +565,6 @@ public:
     CollectionOperation collection_operation_from_key_path(RLMObjectSchema *desc, NSString *keyPath);
     ColumnReference column_reference_from_key_path(RLMObjectSchema *objectSchema, NSString *keyPath, bool isAggregate);
 
-    template<typename Fn>
-    void get_numeric_type(id, Fn&&) const;
-
 private:
     Query& m_query;
     Group& m_group;
@@ -627,6 +624,7 @@ void QueryBuilder::add_substring_constraint(const T& value, Query condition) {
                       ? std::move(condition)
                       : std::unique_ptr<Expression>(new FalseExpression));
 }
+
 template<>
 void QueryBuilder::add_substring_constraint(const Mixed& value, Query condition) {
     // Foundation always returns false for substring operations with a RHS of null or "".
@@ -729,11 +727,14 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
         [](StringData value) { return make_subexpr<ConstantStringValue>(value); },
         [](const Columns<String>& c) { return c.clone(); },
         [](const Columns<Lst<String>>& c) { return c.clone(); },
+        [](const Columns<Set<String>>& c) { return c.clone(); },
         [](BinaryData value) { return make_subexpr<ConstantStringValue>(StringData(value.data(), value.size())); },
         [](const Columns<BinaryData>& c) { return c.clone(); },
         [](const Columns<Lst<BinaryData>>& c) { return c.clone(); },
+        [](const Columns<Set<BinaryData>>& c) { return c.clone(); },
         [](const Columns<Mixed>& c) { return c.clone(); },
         [](const Columns<Lst<Mixed>>& c) { return c.clone(); },
+        [](const Columns<Set<Mixed>>& c) { return c.clone(); },
         [](Mixed value) { return make_subexpr<ConstantStringValue>(value.get_string()); },
     };
     auto left = as_subexpr(column);
@@ -1133,6 +1134,9 @@ void QueryBuilder::add_constraint(NSPredicateOperatorType operatorType,
     if (column.property().array) {
         do_add_constraint<Lst>(type, operatorType, predicateOptions, column, rhs);
     }
+    else if (column.property().set) {
+        do_add_constraint<Set>(type, operatorType, predicateOptions, column, rhs);
+    }
     else {
         do_add_constraint<Identity>(type, operatorType, predicateOptions, column, rhs);
     }
@@ -1160,7 +1164,7 @@ KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, N
                         @"Property '%@' not found in object of type '%@'",
                         propertyName, objectSchema.className);
 
-        if (property.array)
+        if (property.collection)
             keyPathContainsToManyRelationship = true;
 
         if (end != NSNotFound) {
@@ -1189,7 +1193,7 @@ ColumnReference QueryBuilder::column_reference_from_key_path(RLMObjectSchema *ob
                        @"Aggregate operations can only be used on key paths that include an array property");
     } else if (!isAggregate && keyPath.containsToManyRelationship) {
         throwException(@"Invalid predicate",
-                       @"Key paths that include an array property must use aggregate operations");
+                       @"Key paths that include a collection property must use aggregate operations");
     }
 
     return ColumnReference(m_query, m_group, m_schema, keyPath.property, std::move(keyPath.links));
@@ -1339,30 +1343,6 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
     }
 }
 
-template<typename Fn>
-void QueryBuilder::get_numeric_type(id obj, Fn&& fn) const {
-    if (auto i = RLMDynamicCast<NSNumber>(obj)) {
-        if (numberIsInteger(i)) {
-            fn(value_of_type<Int>(i), (Int *)0);
-            return;
-        }
-        else if (numberIsFloat(i)) {
-            fn(value_of_type<Float>(i), (Float *)0);
-            return;
-        }
-        else if (numberIsDouble(i)) {
-            fn(value_of_type<Double>(i), (Double *)0);
-            return;
-        }
-        else if (numberIsBool(i)) {
-            fn(value_of_type<Bool>(i), (Bool *)0);
-            return;
-        }
-    }
-    throwException(@"Unsupported predicate value type",
-                   @"Cannot cast value to NSNumber");
-}
-
 template <CollectionOperation::Type Operation, typename R>
 void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType operatorType,
                                                        CollectionOperation const& collectionOperation, R rhs)
@@ -1377,6 +1357,20 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
     });
 }
 
+template <typename T, typename Fn>
+void get_collection_type(__unsafe_unretained RLMProperty *prop, Fn&& fn) {
+    if (prop.array) {
+        fn((Lst<T>*)0);
+    }
+    else if (prop.set) {
+        fn((Set<T>*)0);
+    }
+    else {
+        // Add Dictionary here
+        REALM_TERMINATE("Unsupported collection type.");
+    }
+}
+
 template <typename R>
 void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType operatorType,
                                                        CollectionOperation const& collectionOperation, R rhs)
@@ -1386,43 +1380,66 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
             auto& column = collectionOperation.link_column();
             RLMPropertyType type = column.type();
             auto rhsValue = value_of_type<Int>(rhs);
+
             switch (type) {
                 case RLMPropertyTypeBool:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Bool>>().size(), rhsValue);
+                    get_collection_type<Bool>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeObjectId:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<ObjectId>>().size(), rhsValue);
+                    get_collection_type<ObjectId>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeDate:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Timestamp>>().size(), rhsValue);
+                    get_collection_type<Timestamp>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeDouble:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Double>>().size(), rhsValue);
+                    get_collection_type<Double>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeFloat:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Float>>().size(), rhsValue);
+                    get_collection_type<Float>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeInt:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Int>>().size(), rhsValue);
+                    get_collection_type<Int>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeDecimal128:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Decimal128>>().size(), rhsValue);
+                    get_collection_type<Decimal128>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeString:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<String>>().size(), rhsValue);
+                    get_collection_type<String>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeData:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Binary>>().size(), rhsValue);
+                    get_collection_type<Binary>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeObject:
                 case RLMPropertyTypeLinkingObjects:
                     add_numeric_constraint(type, operatorType, column.resolve<Link>().count(), rhsValue);
                     return;
                 case RLMPropertyTypeUUID:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<UUID>>().size(), rhsValue);
+                    get_collection_type<UUID>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeAny:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Mixed>>().size(), rhsValue);
+                    get_collection_type<Mixed>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
             }
         }

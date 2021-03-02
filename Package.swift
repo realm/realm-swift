@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "10.5.1"
-let cocoaVersionStr = "10.6.0"
+let coreVersionStr = "10.5.3"
+let cocoaVersionStr = "10.7.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -78,8 +78,8 @@ let package = Package(
                 "Realm/RLMConstants.m",
                 "Realm/RLMDecimal128.mm",
                 "Realm/RLMEmbeddedObject.mm",
-                "Realm/RLMListBase.mm",
                 "Realm/RLMManagedArray.mm",
+                "Realm/RLMManagedSet.mm",
                 "Realm/RLMMigration.mm",
                 "Realm/RLMObject.mm",
                 "Realm/RLMObjectBase.mm",
@@ -96,6 +96,8 @@ let package = Package(
                 "Realm/RLMRealmUtil.mm",
                 "Realm/RLMResults.mm",
                 "Realm/RLMSchema.mm",
+                "Realm/RLMSet.mm",
+                "Realm/RLMSwiftCollectionBase.mm",
                 "Realm/RLMSwiftSupport.m",
                 "Realm/RLMThreadSafeReference.mm",
                 "Realm/RLMUpdateChecker.mm",
@@ -157,6 +159,7 @@ let package = Package(
                 "SwiftUITestHostUITests",
                 "TestHost",
                 "PrimitiveArrayPropertyTests.tpl.m",
+                "PrimitiveSetPropertyTests.tpl.m",
                 "PrimitiveRLMValuePropertyTests.tpl.m"
             ],
             cxxSettings: testCxxSettings

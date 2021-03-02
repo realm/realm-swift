@@ -33,8 +33,8 @@
 #import <objc/runtime.h>
 #import <vector>
 
-RLM_ARRAY_TYPE(KVOObject)
-RLM_ARRAY_TYPE(KVOLinkObject1)
+RLM_COLLECTION_TYPE(KVOObject)
+RLM_COLLECTION_TYPE(KVOLinkObject1)
 
 @interface KVOObject : RLMObject
 @property int pk; // Primary key for isEqual:
@@ -65,6 +65,17 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property RLMArray<RLMDecimal128> *decimal128Array;
 @property RLMArray<KVOObject>     *objectArray;
 
+@property RLMSet<RLMBool>       *boolSet;
+@property RLMSet<RLMInt>        *intSet;
+@property RLMSet<RLMFloat>      *floatSet;
+@property RLMSet<RLMDouble>     *doubleSet;
+@property RLMSet<RLMString>     *stringSet;
+@property RLMSet<RLMData>       *dataSet;
+@property RLMSet<RLMDate>       *dateSet;
+@property RLMSet<RLMObjectId>   *objectIdSet;
+@property RLMSet<RLMDecimal128> *decimal128Set;
+@property RLMSet<KVOObject>     *objectSet;
+
 @property NSNumber<RLMInt>    *optIntCol;
 @property NSNumber<RLMFloat>  *optFloatCol;
 @property NSNumber<RLMDouble> *optDoubleCol;
@@ -83,6 +94,7 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property int pk; // Primary key for isEqual:
 @property KVOObject *obj;
 @property RLMArray<KVOObject> *array;
+@property RLMSet<KVOObject> *set;
 @end
 @implementation KVOLinkObject1
 + (NSString *)primaryKey {
@@ -94,6 +106,7 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property int pk; // Primary key for isEqual:
 @property KVOLinkObject1 *obj;
 @property RLMArray<KVOLinkObject1> *array;
+@property RLMSet<KVOLinkObject1> *set;
 @end
 @implementation KVOLinkObject2
 + (NSString *)primaryKey {
@@ -129,6 +142,17 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSMutableArray *objectIdArray;
 @property NSMutableArray *decimal128Array;
 
+@property NSMutableSet *boolSet;
+@property NSMutableSet *intSet;
+@property NSMutableSet *floatSet;
+@property NSMutableSet *doubleSet;
+@property NSMutableSet *stringSet;
+@property NSMutableSet *dataSet;
+@property NSMutableSet *dateSet;
+@property NSMutableSet *objectSet;
+@property NSMutableSet *objectIdSet;
+@property NSMutableSet *decimal128Set;
+
 @property NSNumber<RLMInt> *optIntCol;
 @property NSNumber<RLMFloat> *optFloatCol;
 @property NSNumber<RLMDouble> *optDoubleCol;
@@ -140,6 +164,7 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @interface PlainLinkObject1 : NSObject
 @property PlainKVOObject *obj;
 @property NSMutableArray *array;
+@property NSMutableSet *set;
 @end
 @implementation PlainLinkObject1
 @end
@@ -147,6 +172,7 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @interface PlainLinkObject2 : NSObject
 @property PlainLinkObject1 *obj;
 @property NSMutableArray *array;
+@property NSMutableSet *set;
 @end
 @implementation PlainLinkObject2
 @end
@@ -300,6 +326,11 @@ public:
     } \
 } while (false)
 
+#define AssertSetChanged(s) do { \
+    AssertNotification(r); \
+    XCTAssertTrue(r.empty()); \
+} while (false)
+
 // Validate that `r` has a notification with the given kind and changed indexes,
 // remove it, and verify that there are no more notifications
 #define AssertIndexChange(kind, indexes) do { \
@@ -356,6 +387,16 @@ public:
     obj.objectIdArray = [NSMutableArray array];
     obj.decimal128Array = [NSMutableArray array];
     obj.objectArray = [NSMutableArray array];
+    obj.boolSet = [NSMutableSet set];
+    obj.intSet = [NSMutableSet set];
+    obj.floatSet = [NSMutableSet set];
+    obj.doubleSet = [NSMutableSet set];
+    obj.stringSet = [NSMutableSet set];
+    obj.dataSet = [NSMutableSet set];
+    obj.dateSet = [NSMutableSet set];
+    obj.objectIdSet = [NSMutableSet set];
+    obj.decimal128Set = [NSMutableSet set];
+    obj.objectSet = [NSMutableSet set];
     return obj;
 }
 
@@ -363,11 +404,13 @@ public:
     PlainLinkObject1 *obj1 = [PlainLinkObject1 new];
     obj1.obj = [self createObject];
     obj1.array = [NSMutableArray new];
+    obj1.set = [NSMutableSet new];
 
     PlainLinkObject2 *obj2 = [PlainLinkObject2 new];
     obj2.obj = obj1;
     obj2.array = [NSMutableArray new];
-
+    obj2.set = [NSMutableSet new];
+    
     return obj2;
 }
 
@@ -789,6 +832,76 @@ public:
     }
 
     {
+        KVORecorder r(self, obj, @"intSet");
+        obj.intSet = obj.intSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"boolSet");
+        obj.boolSet = obj.boolSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"floatSet");
+        obj.floatSet = obj.floatSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"doubleSet");
+        obj.doubleSet = obj.doubleSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"stringSet");
+        obj.stringSet = obj.stringSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"dataSet");
+        obj.dataSet = obj.dataSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"dateSet");
+        obj.dateSet = obj.dateSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"objectIdSet");
+        obj.objectIdSet = obj.objectIdSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"decimal128Set");
+        obj.decimal128Set = obj.decimal128Set;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"objectSet");
+        obj.objectSet = obj.objectSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
         KVORecorder r(self, obj, @"optIntCol");
         obj.optIntCol = @1;
         AssertChanged(r, NSNull.null, @1);
@@ -1048,6 +1161,13 @@ public:
     }
 
     {
+        KVORecorder r(self, obj, @"objectSet");
+        obj[@"objectSet"] = obj.objectSet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
         KVORecorder r(self, obj, @"optIntCol");
         obj[@"optIntCol"] = @1;
         AssertChanged(r, NSNull.null, @1);
@@ -1182,6 +1302,58 @@ public:
     }
 }
 
+- (void)testSetKVO {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVOLinkObject2 *obj2 = [self createLinkObject];
+    KVORecorder r(self, obj, @"set");
+
+    id mutator = [obj mutableSetValueForKey:@"set"];
+    id mutator2 = [obj2 mutableSetValueForKey:@"set"];
+
+    [mutator addObject:obj.obj];
+    AssertSetChanged();
+    [mutator removeObject:obj.obj];
+    AssertSetChanged();
+    [mutator addObject:obj.obj];
+    AssertSetChanged();
+    [mutator2 addObject:obj2.obj];
+    [mutator setSet:mutator2];
+    AssertSetChanged();
+
+    [mutator intersectSet:mutator2];
+    AssertSetChanged();
+    [mutator minusSet:mutator2];
+    AssertSetChanged();
+    [mutator unionSet:mutator2];
+    AssertSetChanged();
+}
+
+- (void)testPrimitiveSetKVO {
+    KVOObject *obj = [self createObject];
+    KVOObject *obj2 = [self createObject];
+    KVORecorder r(self, obj, @"intSet");
+
+    id mutator = [obj mutableSetValueForKey:@"intSet"];
+    id mutator2 = [obj2 mutableSetValueForKey:@"intSet"];
+
+    [mutator addObject:@1];
+    AssertSetChanged();
+    [mutator removeObject:@1];
+    AssertSetChanged();
+    [mutator addObject:@1];
+    AssertSetChanged();
+    [mutator2 addObject:@2];
+    [mutator setSet:mutator2];
+    AssertSetChanged();
+
+    [mutator intersectSet:mutator2];
+    AssertSetChanged();
+    [mutator minusSet:mutator2];
+    AssertSetChanged();
+    [mutator unionSet:mutator2];
+    AssertSetChanged();
+}
+
 - (void)testIgnoredProperty {
     KVOObject *obj = [self createObject];
     KVORecorder r(self, obj, @"ignored");
@@ -1237,6 +1409,15 @@ public:
 
     KVORecorder r(self, obj, @"boolCol");
     [obj.objectArray setValue:@YES forKey:@"boolCol"];
+    AssertChanged(r, @NO, @YES);
+}
+
+- (void)testSetKVC {
+    KVOObject *obj = [self createObject];
+    [obj.objectSet addObject:obj];
+
+    KVORecorder r(self, obj, @"boolCol");
+    [obj.objectSet setValue:@YES forKey:@"boolCol"];
     AssertChanged(r, @NO, @YES);
 }
 
@@ -2024,6 +2205,9 @@ public:
         return copy;
     }
     else if (RLMArray *array = RLMDynamicCast<RLMArray>(value)) {
+        return array;
+    }
+    else if (RLMSet *set = RLMDynamicCast<RLMSet>(value)) {
         return array;
     }
     else {

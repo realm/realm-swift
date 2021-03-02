@@ -25,13 +25,6 @@ class AnyRealmTypeObject: Object {
 }
 
 class AnyRealmValueTests: TestCase {
-
-//    func testInit() {
-//        let o = AnyRealmTypeObject()
-//        o.anyValue = AnyRealmValue(1)
-//        o.anyValue = AnyRealmValue(1.2)
-//        o.anyValue = AnyRealmValue(true)
-//    }
     
     func testInt() {
         let o = AnyRealmTypeObject()
@@ -218,18 +211,25 @@ class AnyRealmValueTests: TestCase {
         let objectId = ObjectId.generate()
         let decimal = Decimal128(floatLiteral: 12345.6789)
 
+        let tests: ((Realm?) -> Void) = { (realm: Realm?) in
+            self.testVariation(object: o, value: .int(123), keyPath: \.intValue, expected: 123, realm: realm)
+            self.testVariation(object: o, value: .float(123.456), keyPath: \.floatValue, expected: 123.456, realm: realm)
+            self.testVariation(object: o, value: .string("hello there"), keyPath: \.stringValue, expected: "hello there", realm: realm)
+            self.testVariation(object: o, value: .data(data), keyPath: \.dataValue, expected: data, realm: realm)
+            self.testVariation(object: o, value: .date(date), keyPath: \.dateValue, expected: date, realm: realm)
+            self.testVariation(object: o, value: .objectId(objectId), keyPath: \.objectIdValue, expected: objectId, realm: realm)
+            self.testVariation(object: o, value: .decimal128(decimal), keyPath: \.decimal128Value, expected: decimal, realm: realm)
+        }
+
+        // unmanaged
+        tests(nil)
+        o.anyValue.value = .none
         let realm = realmWithTestPath()
         try! realm.write {
             realm.add(o)
         }
-
-        testVariation(object: o, value: .int(123), keyPath: \.intValue, expected: 123, realm: realm)
-        testVariation(object: o, value: .float(123.456), keyPath: \.floatValue, expected: 123.456, realm: realm)
-        testVariation(object: o, value: .string("hello there"), keyPath: \.stringValue, expected: "hello there", realm: realm)
-        testVariation(object: o, value: .data(data), keyPath: \.dataValue, expected: data, realm: realm)
-        //testVariation(object: o, value: .date(date), keyPath: \.dateValue, expected: date, realm: realm)
-        testVariation(object: o, value: .objectId(objectId), keyPath: \.objectIdValue, expected: objectId, realm: realm)
-        testVariation(object: o, value: .decimal128(decimal), keyPath: \.decimal128Value, expected: decimal, realm: realm)
+        // managed
+        tests(realm)
 
         try! realm.write {
             o.anyValue.value = .object(so)
@@ -241,8 +241,12 @@ class AnyRealmValueTests: TestCase {
                                              value: AnyRealmValue.Value,
                                              keyPath: KeyPath<AnyRealmValue.Value, T?>,
                                              expected: T,
-                                             realm: Realm) {
-        try! realm.write {
+                                             realm: Realm?) {
+        if let realm = realm {
+            try! realm.write {
+                object.anyValue.value = value
+            }
+        } else {
             object.anyValue.value = value
         }
         XCTAssertEqual(object.anyValue.value[keyPath: keyPath], expected)

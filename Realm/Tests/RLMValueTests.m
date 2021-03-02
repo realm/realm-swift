@@ -470,9 +470,9 @@
     [r commitWriteTransaction];
 
     // handle lossy margin of error.
-    XCTAssertNotEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyCol).timeIntervalSince1970, .1);
-    XCTAssertNotEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyArray[0]).timeIntervalSince1970, .1);
-    XCTAssertNotEqualWithAccuracy(d2.timeIntervalSince1970, ((NSDate *)mo.anyArray[1]).timeIntervalSince1970, .1);
+    XCTAssertNotEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyCol).timeIntervalSince1970, .5);
+    XCTAssertNotEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyArray[0]).timeIntervalSince1970, .5);
+    XCTAssertNotEqualWithAccuracy(d2.timeIntervalSince1970, ((NSDate *)mo.anyArray[1]).timeIntervalSince1970, .5);
     XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeDate);
 }
 

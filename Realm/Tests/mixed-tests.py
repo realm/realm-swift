@@ -6,12 +6,6 @@ import os, re
 # (no)avg: Type supports average()
 # r/o: Type is Required or Optional
 # (un)man: Type is Managed or Unmanaged
-# !!!: I (Eric) ended up not using these tags. Make sure to remove.
-# n: RLMValue is cast as NSNumber for comparison
-# s: RLMValue is cast as NSString for comparison
-# dc: RLMValue is cast as Decimal128 for comparison
-# dt: RLMValue is cast NSDate for comparison
-# da: RLMValue is cast as NString and initialized as data
 
 types = [
   # Class, Object, Property, Values, Tags

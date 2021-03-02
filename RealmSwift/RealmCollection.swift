@@ -132,15 +132,17 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
     return from as! U
 }
 
-/// A type which can be stored in a Realm List or Results.
+/// A type which can be stored in a Realm List, MutableSet, or Results.
 ///
 /// Declaring additional types as conforming to this protocol will not make them
 /// actually work. Most of the logic for how to store values in Realm is not
 /// implemented in Swift and there is currently no extension mechanism for
 /// supporting more types.
-public protocol RealmCollectionValue: Equatable {
+public protocol RealmCollectionValue: Hashable {
     /// :nodoc:
     static func _rlmArray() -> RLMArray<AnyObject>
+    /// :nodoc:
+    static func _rlmSet() -> RLMSet<AnyObject>
     /// :nodoc:
     static func _nilValue() -> Self
 }
@@ -149,6 +151,10 @@ extension RealmCollectionValue {
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .int, optional: false)
+    }
+    /// :nodoc:
+    public static func _rlmSet() -> RLMSet<AnyObject> {
+        return RLMSet(objectType: .int, optional: false)
     }
     /// :nodoc:
     public static func _nilValue() -> Self {
@@ -174,10 +180,31 @@ private func arrayType<T>(_ type: T.Type) -> RLMArray<AnyObject> {
     }
 }
 
+private func setType<T>(_ type: T.Type) -> RLMSet<AnyObject> {
+    switch type {
+    case is Int.Type, is Int8.Type, is Int16.Type, is Int32.Type, is Int64.Type:
+        return RLMSet(objectType: .int, optional: true)
+    case is Bool.Type:       return RLMSet(objectType: .bool, optional: true)
+    case is Float.Type:      return RLMSet(objectType: .float, optional: true)
+    case is Double.Type:     return RLMSet(objectType: .double, optional: true)
+    case is String.Type:     return RLMSet(objectType: .string, optional: true)
+    case is Data.Type:       return RLMSet(objectType: .data, optional: true)
+    case is Date.Type:       return RLMSet(objectType: .date, optional: true)
+    case is Decimal128.Type: return RLMSet(objectType: .decimal128, optional: true)
+    case is ObjectId.Type:   return RLMSet(objectType: .objectId, optional: true)
+    case is UUID.Type:       return RLMSet(objectType: .UUID, optional: true)
+    default: fatalError("Unsupported type for MutableSet: \(type)?")
+    }
+}
+
 extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue {
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return arrayType(Wrapped.self)
+    }
+    /// :nodoc:
+    public static func _rlmSet() -> RLMSet<AnyObject> {
+        return setType(Wrapped.self)
     }
     /// :nodoc:
     public static func _nilValue() -> Optional {
@@ -195,17 +222,29 @@ extension Float: RealmCollectionValue {
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .float, optional: false)
     }
+    /// :nodoc:
+    public static func _rlmSet() -> RLMSet<AnyObject> {
+        return RLMSet(objectType: .float, optional: false)
+    }
 }
 extension Double: RealmCollectionValue {
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .double, optional: false)
     }
+    /// :nodoc:
+    public static func _rlmSet() -> RLMSet<AnyObject> {
+        return RLMSet(objectType: .double, optional: false)
+    }
 }
 extension Bool: RealmCollectionValue {
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .bool, optional: false)
+    }
+    /// :nodoc:
+    public static func _rlmSet() -> RLMSet<AnyObject> {
+        return RLMSet(objectType: .bool, optional: false)
     }
 }
 
@@ -214,11 +253,19 @@ extension String: RealmCollectionValue {
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .string, optional: false)
     }
+    /// :nodoc:
+    public static func _rlmSet() -> RLMSet<AnyObject> {
+        return RLMSet(objectType: .string, optional: false)
+    }
 }
 extension Date: RealmCollectionValue {
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .date, optional: false)
+    }
+    /// :nodoc:
+    public static func _rlmSet() -> RLMSet<AnyObject> {
+        return RLMSet(objectType: .date, optional: false)
     }
 }
 extension Data: RealmCollectionValue {
@@ -226,11 +273,19 @@ extension Data: RealmCollectionValue {
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .data, optional: false)
     }
+    /// :nodoc:
+    public static func _rlmSet() -> RLMSet<AnyObject> {
+        return RLMSet(objectType: .data, optional: false)
+    }
 }
 extension Decimal128: RealmCollectionValue {
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .decimal128, optional: false)
+    }
+    /// :nodoc:
+    public static func _rlmSet() -> RLMSet<AnyObject> {
+        return RLMSet(objectType: .decimal128, optional: false)
     }
 }
 extension ObjectId: RealmCollectionValue {
@@ -238,11 +293,19 @@ extension ObjectId: RealmCollectionValue {
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .objectId, optional: false)
     }
+    /// :nodoc:
+    public static func _rlmSet() -> RLMSet<AnyObject> {
+        return RLMSet(objectType: .objectId, optional: false)
+    }
 }
 extension UUID: RealmCollectionValue {
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .UUID, optional: false)
+    }
+    /// :nodoc:
+    public static func _rlmSet() -> RLMSet<AnyObject> {
+        return RLMSet(objectType: .UUID, optional: false)
     }
 }
 extension AnyRealmValue: RealmCollectionValue {
@@ -1172,7 +1235,14 @@ extension ObservableCollection {
 extension List: ObservableCollection {
     internal typealias BackingObjcCollection = RLMArray<AnyObject>
     internal func isSameObjcCollection(_ rlmArray: BackingObjcCollection) -> Bool {
-        return _rlmArray === rlmArray
+        return _rlmCollection === rlmArray
+    }
+}
+
+extension MutableSet: ObservableCollection {
+    internal typealias BackingObjcCollection = RLMSet<AnyObject>
+    internal func isSameObjcCollection(_ rlmSet: BackingObjcCollection) -> Bool {
+        return _rlmCollection === rlmSet
     }
 }
 

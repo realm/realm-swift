@@ -98,6 +98,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) BOOL array;
 
+/**
+ Indicates whether this property is a set.
+ */
+@property (nonatomic, readonly) BOOL set;
+
+/**
+ Indicates whether this property is an array or set.
+ */
+@property (nonatomic, readonly) BOOL collection;
+
 #pragma mark - Methods
 
 /**

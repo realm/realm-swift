@@ -6,7 +6,7 @@ import os, re
 # (no)avg: Type supports average()
 # r/o: Type is Required or Optional
 # (un)man: Type is Managed or Unmanaged
-# any: Can accept any type
+# (no)any: Can accept any type
 
 types = [
   # Class, Object, Property, Values, Tags

@@ -45,6 +45,13 @@ class ObjectiveCSupportTests: TestCase {
         XCTAssertEqual(unsafeBitCast(rlmArray.firstObject(), to: SwiftObject.self).floatCol, 1.23)
         XCTAssertEqual(rlmArray.count, 1)
 
+        let set = MutableSet<SwiftObject>()
+        set.insert(SwiftObject())
+        let rlmSet = ObjectiveCSupport.convert(object: set)
+        XCTAssert(rlmSet.isKind(of: RLMSet<AnyObject>.self))
+        XCTAssertEqual(unsafeBitCast(rlmSet.allObjects[0], to: SwiftObject.self).floatCol, 1.23)
+        XCTAssertEqual(rlmSet.count, 1)
+
         let rlmRealm = ObjectiveCSupport.convert(object: realm)
         XCTAssert(rlmRealm.isKind(of: RLMRealm.self))
         XCTAssertEqual(rlmRealm.allObjects("SwiftObject").count, 1)

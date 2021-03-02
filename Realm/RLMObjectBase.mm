@@ -21,7 +21,6 @@
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
 #import "RLMDecimal128.h"
-#import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObservation.hpp"
@@ -29,6 +28,8 @@
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMSet_Private.hpp"
+#import "RLMSwiftCollectionBase.h"
 #import "RLMSwiftSupport.h"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
@@ -112,7 +113,7 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
     }
     if (prop.type == RLMPropertyTypeObject) {
         Class objectClass = schema[prop.objectClassName].objectClass;
-        if (prop.array) {
+        if (prop.collection) {
             NSMutableArray *ret = [[NSMutableArray alloc] init];
             for (id el in obj) {
                 [ret addObject:coerceToObjectType(el, objectClass, schema)];
@@ -121,7 +122,7 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
         }
         return coerceToObjectType(obj, objectClass, schema);
     }
-    else if (prop.type == RLMPropertyTypeDecimal128 && !prop.array) {
+    else if (prop.type == RLMPropertyTypeDecimal128 && !prop.collection) {
         return [[RLMDecimal128 alloc] initWithValue:obj];
     }
     return obj;
@@ -199,14 +200,14 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     value = RLMCoerceToNil(value);
     RLMProperty *property = _objectSchema[key];
     if (Ivar ivar = property.swiftIvar) {
-        if (property.array) {
+        if (property.collection) {
             value = RLMAsFastEnumeration(value);
-            RLMArray *array = [object_getIvar(self, ivar) _rlmArray];
-            [array removeAllObjects];
+            id collection = [object_getIvar(self, ivar) _rlmCollection];
+            [collection removeAllObjects];
 
             if (value) {
-                [array addObjects:validatedObjectForProperty(value, _objectSchema, property,
-                                                             RLMSchema.partialPrivateSharedSchema)];
+                [collection addObjects:validatedObjectForProperty(value, _objectSchema, property,
+                                                                  RLMSchema.partialPrivateSharedSchema)];
             }
         }
         else if (property.optional) {
@@ -362,6 +363,14 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
         return obj;
     }
     return [super mutableArrayValueForKey:key];
+}
+
+- (id)mutableSetValueForKey:(NSString *)key {
+    id obj = [self valueForKey:key];
+    if ([obj isKindOfClass:[RLMSet class]]) {
+        return obj;
+    }
+    return [super mutableSetValueForKey:key];
 }
 
 - (void)addObserver:(id)observer

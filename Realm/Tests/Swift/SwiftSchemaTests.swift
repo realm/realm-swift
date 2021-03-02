@@ -51,6 +51,13 @@ class SwiftRLMNonDefaultArrayObject: RLMObject {
     }
 }
 
+class SwiftRLMNonDefaultSetObject: RLMObject {
+    @objc dynamic var set = RLMSet<SwiftRLMNonDefaultObject>(objectClassName: SwiftRLMNonDefaultObject.className())
+    public override class func shouldIncludeInDefaultSchema() -> Bool {
+        return false
+    }
+}
+
 class SwiftRLMMutualLink1Object: RLMObject {
     @objc dynamic var object: SwiftRLMMutualLink2Object?
     public override class func shouldIncludeInDefaultSchema() -> Bool {
@@ -89,6 +96,10 @@ class SwiftRLMRecursingSchemaTestObject : RLMObject {
 
 class InvalidArrayType: FakeObject {
     @objc dynamic var array = RLMArray<SwiftRLMIntObject>(objectClassName: "invalid class")
+}
+
+class InvalidSetType: FakeObject {
+    @objc dynamic var set = RLMSet<SwiftRLMIntObject>(objectClassName: "invalid class")
 }
 
 class InitAppendsToArrayProperty : RLMObject {
@@ -170,6 +181,7 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
         // Objects not in default schema
         _ = SwiftRLMLinkedNonDefaultObject(value: [[1]])
         _ = SwiftRLMNonDefaultArrayObject(value: [[[1]]])
+        _ = SwiftRLMNonDefaultSetObject(value: [[[1]]])
         _ = SwiftRLMMutualLink1Object(value: [[[:]]])
     }
 

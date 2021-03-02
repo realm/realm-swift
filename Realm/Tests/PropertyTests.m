@@ -40,6 +40,7 @@
                                                 @"\tindexed = NO;\n"
                                                 @"\tisPrimary = NO;\n"
                                                 @"\tarray = NO;\n"
+                                                @"\tset = NO;\n"
                                                 @"\toptional = YES;\n"
                                                 @"}");
 }

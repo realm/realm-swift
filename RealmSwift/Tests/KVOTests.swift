@@ -43,6 +43,7 @@ class SwiftKVOObject: Object {
     @objc dynamic var objectIdCol = ObjectId()
     @objc dynamic var objectCol: SwiftKVOObject?
     let arrayCol = List<SwiftKVOObject>()
+    let setCol = MutableSet<SwiftKVOObject>()
     let optIntCol = RealmOptional<Int>()
     let optFloatCol = RealmOptional<Float>()
     let optDoubleCol = RealmOptional<Double>()
@@ -78,6 +79,32 @@ class SwiftKVOObject: Object {
     let arrayOptDate = List<Date?>()
     let arrayOptDecimal = List<Decimal128?>()
     let arrayOptObjectId = List<ObjectId?>()
+
+    let setBool = MutableSet<Bool>()
+    let setInt8 = MutableSet<Int8>()
+    let setInt16 = MutableSet<Int16>()
+    let setInt32 = MutableSet<Int32>()
+    let setInt64 = MutableSet<Int64>()
+    let setFloat = MutableSet<Float>()
+    let setDouble = MutableSet<Double>()
+    let setString = MutableSet<String>()
+    let setBinary = MutableSet<Data>()
+    let setDate = MutableSet<Date>()
+    let setDecimal = MutableSet<Decimal128>()
+    let setObjectId = MutableSet<ObjectId>()
+
+    let setOptBool = MutableSet<Bool?>()
+    let setOptInt8 = MutableSet<Int8?>()
+    let setOptInt16 = MutableSet<Int16?>()
+    let setOptInt32 = MutableSet<Int32?>()
+    let setOptInt64 = MutableSet<Int64?>()
+    let setOptFloat = MutableSet<Float?>()
+    let setOptDouble = MutableSet<Double?>()
+    let setOptString = MutableSet<String?>()
+    let setOptBinary = MutableSet<Data?>()
+    let setOptDate = MutableSet<Date?>()
+    let setOptDecimal = MutableSet<Decimal128?>()
+    let setOptObjectId = MutableSet<ObjectId?>()
 
     override class func primaryKey() -> String { return "pk" }
     override class func ignoredProperties() -> [String] { return ["ignored"] }
@@ -189,6 +216,16 @@ class KVOTests: TestCase {
         changeDictionary = nil
     }
 
+    func observeSetChange(_ obj: SwiftKVOObject, _ key: String,
+                          fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
+        obj.addObserver(self, forKeyPath: key, options: [], context: nil)
+        block()
+        obj.removeObserver(self, forKeyPath: key)
+
+        XCTAssert(changeDictionary != nil, "Did not get a notification", file: (fileName), line: lineNumber)
+        guard changeDictionary != nil else { return }
+    }
+
     func getObject(_ obj: SwiftKVOObject) -> (SwiftKVOObject, SwiftKVOObject) {
         return (obj, obj)
     }
@@ -223,6 +260,8 @@ class KVOTests: TestCase {
 
         observeListChange(obs, "arrayCol", .insertion) { obj.arrayCol.append(obj) }
         observeListChange(obs, "arrayCol", .removal) { obj.arrayCol.removeAll() }
+        observeSetChange(obs, "setCol") { obj.setCol.insert(obj) }
+        observeSetChange(obs, "setCol") { obj.setCol.remove(obj) }
 
         observeChange(obs, "optIntCol", nil, 10) { obj.optIntCol.value = 10 }
         observeChange(obs, "optFloatCol", nil, 10.0) { obj.optFloatCol.value = 10 }
@@ -280,6 +319,43 @@ class KVOTests: TestCase {
         observeListChange(obs, "arrayOptBinary", .insertion) { obj.arrayOptBinary.insert(nil, at: 0) }
         observeListChange(obs, "arrayOptDecimal", .insertion) { obj.arrayOptDecimal.insert(nil, at: 0) }
         observeListChange(obs, "arrayOptObjectId", .insertion) { obj.arrayOptObjectId.insert(nil, at: 0) }
+
+        observeSetChange(obs, "setBool") { obj.setBool.insert(true) }
+        observeSetChange(obs, "setInt8") { obj.setInt8.insert(10) }
+        observeSetChange(obs, "setInt16") { obj.setInt16.insert(10) }
+        observeSetChange(obs, "setInt32") { obj.setInt32.insert(10) }
+        observeSetChange(obs, "setInt64") { obj.setInt64.insert(10) }
+        observeSetChange(obs, "setFloat") { obj.setFloat.insert(10) }
+        observeSetChange(obs, "setDouble") { obj.setDouble.insert(10) }
+        observeSetChange(obs, "setString") { obj.setString.insert("abc") }
+        observeSetChange(obs, "setDecimal") { obj.setDecimal.insert(decimal) }
+        observeSetChange(obs, "setObjectId") { obj.setObjectId.insert(objectId) }
+
+        observeSetChange(obs, "setOptBool") { obj.setOptBool.insert(true) }
+        observeSetChange(obs, "setOptInt8") { obj.setOptInt8.insert(10) }
+        observeSetChange(obs, "setOptInt16") { obj.setOptInt16.insert(10) }
+        observeSetChange(obs, "setOptInt32") { obj.setOptInt32.insert(10) }
+        observeSetChange(obs, "setOptInt64") { obj.setOptInt64.insert(10) }
+        observeSetChange(obs, "setOptFloat") { obj.setOptFloat.insert(10) }
+        observeSetChange(obs, "setOptDouble") { obj.setOptDouble.insert(10) }
+        observeSetChange(obs, "setOptString") { obj.setOptString.insert("abc") }
+        observeSetChange(obs, "setOptBinary") { obj.setOptBinary.insert(data) }
+        observeSetChange(obs, "setOptDate") { obj.setOptDate.insert(date) }
+        observeSetChange(obs, "setOptDecimal") { obj.setOptDecimal.insert(decimal) }
+        observeSetChange(obs, "setOptObjectId") { obj.setOptObjectId.insert(objectId) }
+
+        observeSetChange(obs, "setOptBool") { obj.setOptBool.insert(nil) }
+        observeSetChange(obs, "setOptInt8") { obj.setOptInt8.insert(nil) }
+        observeSetChange(obs, "setOptInt16") { obj.setOptInt16.insert(nil) }
+        observeSetChange(obs, "setOptInt32") { obj.setOptInt32.insert(nil) }
+        observeSetChange(obs, "setOptInt64") { obj.setOptInt64.insert(nil) }
+        observeSetChange(obs, "setOptFloat") { obj.setOptFloat.insert(nil) }
+        observeSetChange(obs, "setOptDouble") { obj.setOptDouble.insert(nil) }
+        observeSetChange(obs, "setOptString") { obj.setOptString.insert(nil) }
+        observeSetChange(obs, "setOptDate") { obj.setOptDate.insert(nil) }
+        observeSetChange(obs, "setOptBinary") { obj.setOptBinary.insert(nil) }
+        observeSetChange(obs, "setOptDecimal") { obj.setOptDecimal.insert(nil) }
+        observeSetChange(obs, "setOptObjectId") { obj.setOptObjectId.insert(nil) }
 
         if obs.realm == nil {
             return

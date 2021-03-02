@@ -268,6 +268,47 @@
     [dyrealm commitWriteTransaction];
 }
 
+- (void)testDynamicSet {
+    @autoreleasepool {
+        // open realm in autoreleasepool to create tables and then dispose
+        [RLMRealm realmWithURL:RLMTestRealmURL()];
+    }
+    RLMRealm *dyrealm = [self realmWithTestPathAndSchema:nil];
+    [dyrealm beginWriteTransaction];
+
+    RLMObject *stringObject = [dyrealm createObject:StringObject.className withValue:@[@"string"]];
+    RLMObject *stringObject1 = [dyrealm createObject:StringObject.className withValue:@[@"string1"]];
+    [dyrealm createObject:SetPropertyObject.className withValue:@[@"name", @[stringObject, stringObject1], @[]]];
+
+    RLMResults<RLMObject *> *results = [dyrealm allObjects:SetPropertyObject.className];
+    XCTAssertEqual(1U, results.count);
+    RLMObject *setObj = results.firstObject;
+    RLMSet<RLMObject *> *set = setObj[@"set"];
+    XCTAssertEqual(2U, set.count);
+    XCTAssertEqualObjects(set.allObjects[0][@"stringCol"], stringObject[@"stringCol"]);
+
+    [set addObject:stringObject];
+
+    XCTAssertEqual(2U, set.count);
+    XCTAssertEqualObjects(set.allObjects[0][@"stringCol"], stringObject[@"stringCol"]);
+    XCTAssertEqualObjects(set.allObjects[1][@"stringCol"], stringObject1[@"stringCol"]);
+
+    setObj[@"set"] = NSNull.null;
+    XCTAssertEqual(0U, set.count);
+
+    [set addObject:stringObject];
+    XCTAssertEqual(1U, set.count);
+
+    setObj[@"set"] = nil;
+    XCTAssertEqual(0U, set.count);
+
+    setObj[@"set"] = @[stringObject, stringObject1];
+    XCTAssertEqualObjects(set.allObjects[0][@"stringCol"], stringObject[@"stringCol"]);
+    XCTAssertEqualObjects(set.allObjects[1][@"stringCol"], stringObject1[@"stringCol"]);
+
+    [dyrealm commitWriteTransaction];
+}
+
 - (void)testOptionalProperties {
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose

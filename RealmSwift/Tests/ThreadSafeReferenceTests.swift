@@ -33,19 +33,24 @@ class ThreadSafeReferenceTests: TestCase {
         let stringObject = SwiftStringObject()
         let arrayParent = SwiftArrayPropertyObject(value: ["arrayObject", [["a"]], []])
         let arrayObject = arrayParent.array
+        let setParent = SwiftMutableSetPropertyObject(value: ["setObject", [["a"]], []])
+        let setObject = setParent.set
 
         assertThrows(ThreadSafeReference(to: stringObject), reason: "Cannot construct reference to unmanaged object")
         assertThrows(ThreadSafeReference(to: arrayObject), reason: "Cannot construct reference to unmanaged object")
+        assertThrows(ThreadSafeReference(to: setObject), reason: "Cannot construct reference to unmanaged object")
 
         let realm = try! Realm()
         realm.beginWrite()
         realm.add(stringObject)
         realm.add(arrayParent)
+        realm.add(setParent)
         realm.deleteAll()
         try! realm.commitWrite()
 
         assertThrows(ThreadSafeReference(to: stringObject), reason: "Cannot construct reference to invalidated object")
         assertThrows(ThreadSafeReference(to: arrayObject), reason: "Cannot construct reference to invalidated object")
+        assertThrows(ThreadSafeReference(to: setObject), reason: "Cannot construct reference to invalidated object")
     }
 
     func testInvalidThreadSafeReferenceUsage() {
@@ -145,6 +150,37 @@ class ThreadSafeReferenceTests: TestCase {
         XCTAssertEqual(2, company.employees.count)
         XCTAssertEqual("jp", company.employees[0].name)
         XCTAssertEqual("az", company.employees[1].name)
+    }
+
+    func testPassThreadSafeReferenceToMutableSet() {
+        let realm = try! Realm()
+        let company = SwiftCompanyObject()
+        try! realm.write {
+            realm.add(company)
+            company.employeeSet.insert(SwiftEmployeeObject(value: ["name": "jg"]))
+        }
+        XCTAssertEqual(1, company.employeeSet.count)
+        XCTAssertEqual("jg", company.employeeSet[0].name)
+        let setRef = ThreadSafeReference(to: company.employeeSet)
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            let employeeSet = self.assertResolve(realm, setRef)!
+            XCTAssertEqual(1, employeeSet.count)
+            XCTAssertEqual("jg", employeeSet[0].name)
+
+            try! realm.write {
+                employeeSet.removeAll()
+                employeeSet.insert(SwiftEmployeeObject(value: ["name": "jp"]))
+                employeeSet.insert(SwiftEmployeeObject(value: ["name": "az"]))
+            }
+            XCTAssertEqual(2, employeeSet.count)
+            self.assertSetContains(employeeSet, keyPath: \.name, items: ["jp", "az"])
+        }
+        XCTAssertEqual(1, company.employeeSet.count)
+        XCTAssertEqual("jg", company.employeeSet[0].name)
+        realm.refresh()
+        XCTAssertEqual(2, company.employeeSet.count)
+        assertSetContains(company.employeeSet, keyPath: \.name, items: ["jp", "az"])
     }
 
     func testPassThreadSafeReferenceToResults() {
@@ -251,35 +287,46 @@ class ThreadSafeReferenceTests: TestCase {
             company.employees.append(SwiftEmployeeObject(value: ["name": "B"]))
             company.employees.append(SwiftEmployeeObject(value: ["name": "C"]))
             company.employees.append(SwiftEmployeeObject(value: ["name": "D"]))
+            company.employeeSet.insert(SwiftEmployeeObject(value: ["name": "A"]))
+            company.employeeSet.insert(SwiftEmployeeObject(value: ["name": "B"]))
+            company.employeeSet.insert(SwiftEmployeeObject(value: ["name": "C"]))
+            company.employeeSet.insert(SwiftEmployeeObject(value: ["name": "D"]))
         }
         let results = AnyRealmCollection(realm.objects(SwiftEmployeeObject.self)
             .filter("name != 'C'")
             .sorted(byKeyPath: "name", ascending: false))
         let list = AnyRealmCollection(company.employees)
-        XCTAssertEqual(3, results.count)
+        let set = AnyRealmCollection(company.employeeSet)
+        XCTAssertEqual(6, results.count)
         XCTAssertEqual("D", results[0].name)
-        XCTAssertEqual("B", results[1].name)
-        XCTAssertEqual("A", results[2].name)
+        XCTAssertEqual("D", results[1].name)
+        XCTAssertEqual("B", results[2].name)
         XCTAssertEqual(4, list.count)
         XCTAssertEqual("A", list[0].name)
         XCTAssertEqual("B", list[1].name)
         XCTAssertEqual("C", list[2].name)
         XCTAssertEqual("D", list[3].name)
+        XCTAssertEqual(4, set.count)
+        assertAnyRealmCollectionContains(set, keyPath: \.name, items: ["A", "B", "C", "D"])
         let resultsRef = ThreadSafeReference(to: results)
         let listRef = ThreadSafeReference(to: list)
+        let setRef = ThreadSafeReference(to: set)
         dispatchSyncNewThread {
             let realm = try! Realm()
             let results = self.assertResolve(realm, resultsRef)!
             let list = self.assertResolve(realm, listRef)!
-            XCTAssertEqual(3, results.count)
+            let set = self.assertResolve(realm, setRef)!
+            XCTAssertEqual(6, results.count)
             XCTAssertEqual("D", results[0].name)
-            XCTAssertEqual("B", results[1].name)
-            XCTAssertEqual("A", results[2].name)
+            XCTAssertEqual("D", results[1].name)
+            XCTAssertEqual("B", results[2].name)
             XCTAssertEqual(4, list.count)
             XCTAssertEqual("A", list[0].name)
             XCTAssertEqual("B", list[1].name)
             XCTAssertEqual("C", list[2].name)
             XCTAssertEqual("D", list[3].name)
+            XCTAssertEqual(4, set.count)
+            self.assertAnyRealmCollectionContains(set, keyPath: \.name, items: ["A", "B", "C", "D"])
         }
     }
 }

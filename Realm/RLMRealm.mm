@@ -33,6 +33,7 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
+#import "RLMSet_Private.hpp"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
@@ -810,6 +811,11 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
         if (array.type != RLMPropertyTypeObject) {
             @throw RLMException(@"Cannot delete objects from RLMArray<%@>: only RLMObjects can be deleted.",
                                 RLMTypeToString(array.type));
+        }
+    } else if (auto set = RLMDynamicCast<RLMSet>(objects)) {
+        if (set.type != RLMPropertyTypeObject) {
+            @throw RLMException(@"Cannot delete objects from RLMSet<%@>: only RLMObjects can be deleted.",
+                                RLMTypeToString(set.type));
         }
     }
     for (RLMObject *obj in objects) {

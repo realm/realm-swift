@@ -459,6 +459,21 @@ class RealmTests: TestCase {
         XCTAssertEqual(0, realm.objects(SwiftEmployeeObject.self).count)
     }
 
+    func testDeleteMutableSetOfObjects() {
+        let realm = try! Realm()
+        XCTAssertEqual(0, realm.objects(SwiftCompanyObject.self).count)
+        try! realm.write {
+            let obj = SwiftCompanyObject()
+            obj.employeeSet.insert(SwiftEmployeeObject())
+            realm.add(obj)
+            XCTAssertEqual(1, realm.objects(SwiftEmployeeObject.self).count)
+            realm.delete(obj.employeeSet)
+            XCTAssertEqual(0, obj.employeeSet.count)
+            XCTAssertEqual(0, realm.objects(SwiftEmployeeObject.self).count)
+        }
+        XCTAssertEqual(0, realm.objects(SwiftEmployeeObject.self).count)
+    }
+
     func testDeleteResults() {
         let realm = try! Realm(fileURL: testRealmURL())
         XCTAssertEqual(0, realm.objects(SwiftCompanyObject.self).count)
@@ -604,6 +619,33 @@ class RealmTests: TestCase {
         XCTAssertEqual(intArray.last!["intCol"] as? Int, 2)
 
         for object in intArray {
+            XCTAssertEqual(object["intCol"] as? Int, 2)
+        }
+    }
+
+    func testDynamicObjectMutableSetProperties() {
+        try! Realm().write {
+            try! Realm().create(SwiftMutableSetPropertyObject.self, value: ["string", [["set"]], [[2]]])
+        }
+
+        let object = try! Realm().dynamicObjects("SwiftMutableSetPropertyObject")[0]
+
+        XCTAssertEqual(object["name"] as? String, "string")
+
+        let set = object["set"] as! MutableSet<DynamicObject>
+        XCTAssertEqual(set.first!["stringCol"] as? String, "set")
+        XCTAssertEqual(set.last!["stringCol"] as? String, "set")
+
+        for object in set {
+            XCTAssertEqual(object["stringCol"] as? String, "set")
+        }
+
+        let intSet = object["intSet"] as! MutableSet<DynamicObject>
+        XCTAssertEqual(intSet[0]["intCol"] as? Int, 2)
+        XCTAssertEqual(intSet.first!["intCol"] as? Int, 2)
+        XCTAssertEqual(intSet.last!["intCol"] as? Int, 2)
+
+        for object in intSet {
             XCTAssertEqual(object["intCol"] as? Int, 2)
         }
     }

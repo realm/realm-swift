@@ -536,15 +536,15 @@ static double average(NSArray *values) {
 }
 
 - (void)testValueForKeyNumericAggregates {
-    %noany %minmax XCTAssertNil([$array valueForKeyPath:@"@min.self"]);
-    %noany %minmax XCTAssertNil([$array valueForKeyPath:@"@max.self"]);
+    %minmax XCTAssertNil([$array valueForKeyPath:@"@min.self"]);
+    %minmax XCTAssertNil([$array valueForKeyPath:@"@max.self"]);
     %noany %sum XCTAssertEqualObjects([$array valueForKeyPath:@"@sum.self"], @0);
     %noany %avg XCTAssertNil([$array valueForKeyPath:@"@avg.self"]);
 
     [self addObjects];
 
-    %noany %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@min.self"], $v0);
-    %noany %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@max.self"], $v1);
+    %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@min.self"], $v0);
+    %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@max.self"], $v1);
     %noany %sum XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@sum.self"] doubleValue], sum($values), .001);
     %noany %avg XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@avg.self"] doubleValue], average($values), .001);
 }
