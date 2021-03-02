@@ -4661,18 +4661,6 @@ static double average(NSArray *values) {
                               @"minOfProperty: is not supported for object id array");
     RLMAssertThrowsWithReason([unmanaged.uuidObj minOfProperty:@"self"],
                               @"minOfProperty: is not supported for uuid array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj1 minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj2 minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj5 minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj6 minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj9 minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj10 minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for mixed array");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj minOfProperty:@"self"],
                               @"minOfProperty: is not supported for bool? array");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj minOfProperty:@"self"],
@@ -4693,16 +4681,6 @@ static double average(NSArray *values) {
                               @"minOfProperty: is not supported for object id array 'AllPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj minOfProperty:@"self"],
                               @"minOfProperty: is not supported for uuid array 'AllPrimitiveArrays.uuidObj'");
-    RLMAssertThrowsWithReason([managed.anyObj1 minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj1'");
-    RLMAssertThrowsWithReason([managed.anyObj5 minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj5'");
-    RLMAssertThrowsWithReason([managed.anyObj6 minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj6'");
-    RLMAssertThrowsWithReason([managed.anyObj9 minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj9'");
-    RLMAssertThrowsWithReason([managed.anyObj10 minOfProperty:@"self"],
-                              @"minOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj10'");
     RLMAssertThrowsWithReason([optManaged.boolObj minOfProperty:@"self"],
                               @"minOfProperty: is not supported for bool? array 'AllOptionalPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj minOfProperty:@"self"],
@@ -4788,18 +4766,6 @@ static double average(NSArray *values) {
                               @"maxOfProperty: is not supported for object id array");
     RLMAssertThrowsWithReason([unmanaged.uuidObj maxOfProperty:@"self"],
                               @"maxOfProperty: is not supported for uuid array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj1 maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj2 maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj5 maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj6 maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj9 maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj10 maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for mixed array");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj maxOfProperty:@"self"],
                               @"maxOfProperty: is not supported for bool? array");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj maxOfProperty:@"self"],
@@ -4820,16 +4786,6 @@ static double average(NSArray *values) {
                               @"maxOfProperty: is not supported for object id array 'AllPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj maxOfProperty:@"self"],
                               @"maxOfProperty: is not supported for uuid array 'AllPrimitiveArrays.uuidObj'");
-    RLMAssertThrowsWithReason([managed.anyObj1 maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj1'");
-    RLMAssertThrowsWithReason([managed.anyObj5 maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj5'");
-    RLMAssertThrowsWithReason([managed.anyObj6 maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj6'");
-    RLMAssertThrowsWithReason([managed.anyObj9 maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj9'");
-    RLMAssertThrowsWithReason([managed.anyObj10 maxOfProperty:@"self"],
-                              @"maxOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj10'");
     RLMAssertThrowsWithReason([optManaged.boolObj maxOfProperty:@"self"],
                               @"maxOfProperty: is not supported for bool? array 'AllOptionalPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj maxOfProperty:@"self"],
@@ -4917,18 +4873,6 @@ static double average(NSArray *values) {
                               @"sumOfProperty: is not supported for object id array");
     RLMAssertThrowsWithReason([unmanaged.uuidObj sumOfProperty:@"self"],
                               @"sumOfProperty: is not supported for uuid array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj1 sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj5 sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj6 sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj7 sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj9 sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj10 sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for mixed array");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj sumOfProperty:@"self"],
                               @"sumOfProperty: is not supported for bool? array");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj sumOfProperty:@"self"],
@@ -4953,18 +4897,6 @@ static double average(NSArray *values) {
                               @"sumOfProperty: is not supported for object id array 'AllPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj sumOfProperty:@"self"],
                               @"sumOfProperty: is not supported for uuid array 'AllPrimitiveArrays.uuidObj'");
-    RLMAssertThrowsWithReason([managed.anyObj1 sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj1'");
-    RLMAssertThrowsWithReason([managed.anyObj5 sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj5'");
-    RLMAssertThrowsWithReason([managed.anyObj6 sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj6'");
-    RLMAssertThrowsWithReason([managed.anyObj7 sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj7'");
-    RLMAssertThrowsWithReason([managed.anyObj9 sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj9'");
-    RLMAssertThrowsWithReason([managed.anyObj10 sumOfProperty:@"self"],
-                              @"sumOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj10'");
     RLMAssertThrowsWithReason([optManaged.boolObj sumOfProperty:@"self"],
                               @"sumOfProperty: is not supported for bool? array 'AllOptionalPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj sumOfProperty:@"self"],
@@ -4982,6 +4914,10 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects([unmanaged.floatObj sumOfProperty:@"self"], @0);
     XCTAssertEqualObjects([unmanaged.doubleObj sumOfProperty:@"self"], @0);
     XCTAssertEqualObjects([unmanaged.decimalObj sumOfProperty:@"self"], @0);
+    XCTAssertEqualObjects([unmanaged.anyObj2 sumOfProperty:@"self"], @0);
+    XCTAssertEqualObjects([unmanaged.anyObj3 sumOfProperty:@"self"], @0);
+    XCTAssertEqualObjects([unmanaged.anyObj4 sumOfProperty:@"self"], @0);
+    XCTAssertEqualObjects([unmanaged.anyObj8 sumOfProperty:@"self"], @0);
     XCTAssertEqualObjects([optUnmanaged.intObj sumOfProperty:@"self"], @0);
     XCTAssertEqualObjects([optUnmanaged.floatObj sumOfProperty:@"self"], @0);
     XCTAssertEqualObjects([optUnmanaged.doubleObj sumOfProperty:@"self"], @0);
@@ -4990,6 +4926,10 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects([managed.floatObj sumOfProperty:@"self"], @0);
     XCTAssertEqualObjects([managed.doubleObj sumOfProperty:@"self"], @0);
     XCTAssertEqualObjects([managed.decimalObj sumOfProperty:@"self"], @0);
+    XCTAssertEqualObjects([managed.anyObj2 sumOfProperty:@"self"], @0);
+    XCTAssertEqualObjects([managed.anyObj3 sumOfProperty:@"self"], @0);
+    XCTAssertEqualObjects([managed.anyObj4 sumOfProperty:@"self"], @0);
+    XCTAssertEqualObjects([managed.anyObj8 sumOfProperty:@"self"], @0);
     XCTAssertEqualObjects([optManaged.intObj sumOfProperty:@"self"], @0);
     XCTAssertEqualObjects([optManaged.floatObj sumOfProperty:@"self"], @0);
     XCTAssertEqualObjects([optManaged.doubleObj sumOfProperty:@"self"], @0);
@@ -5001,6 +4941,10 @@ static double average(NSArray *values) {
     XCTAssertEqualWithAccuracy([unmanaged.floatObj sumOfProperty:@"self"].doubleValue, sum(@[@2.2f, @3.3f]), .001);
     XCTAssertEqualWithAccuracy([unmanaged.doubleObj sumOfProperty:@"self"].doubleValue, sum(@[@2.2, @3.3]), .001);
     XCTAssertEqualWithAccuracy([unmanaged.decimalObj sumOfProperty:@"self"].doubleValue, sum(@[decimal128(2), decimal128(3)]), .001);
+    XCTAssertEqualWithAccuracy([unmanaged.anyObj2 sumOfProperty:@"self"].doubleValue, sum(@[@2, @3]), .001);
+    XCTAssertEqualWithAccuracy([unmanaged.anyObj3 sumOfProperty:@"self"].doubleValue, sum(@[@2.2f, @3.3f]), .001);
+    XCTAssertEqualWithAccuracy([unmanaged.anyObj4 sumOfProperty:@"self"].doubleValue, sum(@[@2.2, @3.3]), .001);
+    XCTAssertEqualWithAccuracy([unmanaged.anyObj8 sumOfProperty:@"self"].doubleValue, sum(@[decimal128(2), decimal128(3)]), .001);
     XCTAssertEqualWithAccuracy([optUnmanaged.intObj sumOfProperty:@"self"].doubleValue, sum(@[@2, @3, NSNull.null]), .001);
     XCTAssertEqualWithAccuracy([optUnmanaged.floatObj sumOfProperty:@"self"].doubleValue, sum(@[@2.2f, @3.3f, NSNull.null]), .001);
     XCTAssertEqualWithAccuracy([optUnmanaged.doubleObj sumOfProperty:@"self"].doubleValue, sum(@[@2.2, @3.3, NSNull.null]), .001);
@@ -5009,6 +4953,10 @@ static double average(NSArray *values) {
     XCTAssertEqualWithAccuracy([managed.floatObj sumOfProperty:@"self"].doubleValue, sum(@[@2.2f, @3.3f]), .001);
     XCTAssertEqualWithAccuracy([managed.doubleObj sumOfProperty:@"self"].doubleValue, sum(@[@2.2, @3.3]), .001);
     XCTAssertEqualWithAccuracy([managed.decimalObj sumOfProperty:@"self"].doubleValue, sum(@[decimal128(2), decimal128(3)]), .001);
+    XCTAssertEqualWithAccuracy([managed.anyObj2 sumOfProperty:@"self"].doubleValue, sum(@[@2, @3]), .001);
+    XCTAssertEqualWithAccuracy([managed.anyObj3 sumOfProperty:@"self"].doubleValue, sum(@[@2.2f, @3.3f]), .001);
+    XCTAssertEqualWithAccuracy([managed.anyObj4 sumOfProperty:@"self"].doubleValue, sum(@[@2.2, @3.3]), .001);
+    XCTAssertEqualWithAccuracy([managed.anyObj8 sumOfProperty:@"self"].doubleValue, sum(@[decimal128(2), decimal128(3)]), .001);
     XCTAssertEqualWithAccuracy([optManaged.intObj sumOfProperty:@"self"].doubleValue, sum(@[@2, @3, NSNull.null]), .001);
     XCTAssertEqualWithAccuracy([optManaged.floatObj sumOfProperty:@"self"].doubleValue, sum(@[@2.2f, @3.3f, NSNull.null]), .001);
     XCTAssertEqualWithAccuracy([optManaged.doubleObj sumOfProperty:@"self"].doubleValue, sum(@[@2.2, @3.3, NSNull.null]), .001);
@@ -5028,18 +4976,6 @@ static double average(NSArray *values) {
                               @"averageOfProperty: is not supported for object id array");
     RLMAssertThrowsWithReason([unmanaged.uuidObj averageOfProperty:@"self"],
                               @"averageOfProperty: is not supported for uuid array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj1 averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj5 averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj6 averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj7 averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj9 averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for mixed array");
-    RLMAssertThrowsWithReason([unmanaged.anyObj10 averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for mixed array");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj averageOfProperty:@"self"],
                               @"averageOfProperty: is not supported for bool? array");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj averageOfProperty:@"self"],
@@ -5064,18 +5000,6 @@ static double average(NSArray *values) {
                               @"averageOfProperty: is not supported for object id array 'AllPrimitiveArrays.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj averageOfProperty:@"self"],
                               @"averageOfProperty: is not supported for uuid array 'AllPrimitiveArrays.uuidObj'");
-    RLMAssertThrowsWithReason([managed.anyObj1 averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj1'");
-    RLMAssertThrowsWithReason([managed.anyObj5 averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj5'");
-    RLMAssertThrowsWithReason([managed.anyObj6 averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj6'");
-    RLMAssertThrowsWithReason([managed.anyObj7 averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj7'");
-    RLMAssertThrowsWithReason([managed.anyObj9 averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj9'");
-    RLMAssertThrowsWithReason([managed.anyObj10 averageOfProperty:@"self"],
-                              @"averageOfProperty: is not supported for mixed array 'AllPrimitiveArrays.anyObj10'");
     RLMAssertThrowsWithReason([optManaged.boolObj averageOfProperty:@"self"],
                               @"averageOfProperty: is not supported for bool? array 'AllOptionalPrimitiveArrays.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj averageOfProperty:@"self"],
@@ -5093,6 +5017,10 @@ static double average(NSArray *values) {
     XCTAssertNil([unmanaged.floatObj averageOfProperty:@"self"]);
     XCTAssertNil([unmanaged.doubleObj averageOfProperty:@"self"]);
     XCTAssertNil([unmanaged.decimalObj averageOfProperty:@"self"]);
+    XCTAssertNil([unmanaged.anyObj2 averageOfProperty:@"self"]);
+    XCTAssertNil([unmanaged.anyObj3 averageOfProperty:@"self"]);
+    XCTAssertNil([unmanaged.anyObj4 averageOfProperty:@"self"]);
+    XCTAssertNil([unmanaged.anyObj8 averageOfProperty:@"self"]);
     XCTAssertNil([optUnmanaged.intObj averageOfProperty:@"self"]);
     XCTAssertNil([optUnmanaged.floatObj averageOfProperty:@"self"]);
     XCTAssertNil([optUnmanaged.doubleObj averageOfProperty:@"self"]);
@@ -5101,6 +5029,10 @@ static double average(NSArray *values) {
     XCTAssertNil([managed.floatObj averageOfProperty:@"self"]);
     XCTAssertNil([managed.doubleObj averageOfProperty:@"self"]);
     XCTAssertNil([managed.decimalObj averageOfProperty:@"self"]);
+    XCTAssertNil([managed.anyObj2 averageOfProperty:@"self"]);
+    XCTAssertNil([managed.anyObj3 averageOfProperty:@"self"]);
+    XCTAssertNil([managed.anyObj4 averageOfProperty:@"self"]);
+    XCTAssertNil([managed.anyObj8 averageOfProperty:@"self"]);
     XCTAssertNil([optManaged.intObj averageOfProperty:@"self"]);
     XCTAssertNil([optManaged.floatObj averageOfProperty:@"self"]);
     XCTAssertNil([optManaged.doubleObj averageOfProperty:@"self"]);
@@ -5112,6 +5044,10 @@ static double average(NSArray *values) {
     XCTAssertEqualWithAccuracy([unmanaged.floatObj averageOfProperty:@"self"].doubleValue, average(@[@2.2f, @3.3f]), .001);
     XCTAssertEqualWithAccuracy([unmanaged.doubleObj averageOfProperty:@"self"].doubleValue, average(@[@2.2, @3.3]), .001);
     XCTAssertEqualWithAccuracy([unmanaged.decimalObj averageOfProperty:@"self"].doubleValue, average(@[decimal128(2), decimal128(3)]), .001);
+    XCTAssertEqualWithAccuracy([unmanaged.anyObj2 averageOfProperty:@"self"].doubleValue, average(@[@2, @3]), .001);
+    XCTAssertEqualWithAccuracy([unmanaged.anyObj3 averageOfProperty:@"self"].doubleValue, average(@[@2.2f, @3.3f]), .001);
+    XCTAssertEqualWithAccuracy([unmanaged.anyObj4 averageOfProperty:@"self"].doubleValue, average(@[@2.2, @3.3]), .001);
+    XCTAssertEqualWithAccuracy([unmanaged.anyObj8 averageOfProperty:@"self"].doubleValue, average(@[decimal128(2), decimal128(3)]), .001);
     XCTAssertEqualWithAccuracy([optUnmanaged.intObj averageOfProperty:@"self"].doubleValue, average(@[@2, @3, NSNull.null]), .001);
     XCTAssertEqualWithAccuracy([optUnmanaged.floatObj averageOfProperty:@"self"].doubleValue, average(@[@2.2f, @3.3f, NSNull.null]), .001);
     XCTAssertEqualWithAccuracy([optUnmanaged.doubleObj averageOfProperty:@"self"].doubleValue, average(@[@2.2, @3.3, NSNull.null]), .001);
@@ -5120,6 +5056,10 @@ static double average(NSArray *values) {
     XCTAssertEqualWithAccuracy([managed.floatObj averageOfProperty:@"self"].doubleValue, average(@[@2.2f, @3.3f]), .001);
     XCTAssertEqualWithAccuracy([managed.doubleObj averageOfProperty:@"self"].doubleValue, average(@[@2.2, @3.3]), .001);
     XCTAssertEqualWithAccuracy([managed.decimalObj averageOfProperty:@"self"].doubleValue, average(@[decimal128(2), decimal128(3)]), .001);
+    XCTAssertEqualWithAccuracy([managed.anyObj2 averageOfProperty:@"self"].doubleValue, average(@[@2, @3]), .001);
+    XCTAssertEqualWithAccuracy([managed.anyObj3 averageOfProperty:@"self"].doubleValue, average(@[@2.2f, @3.3f]), .001);
+    XCTAssertEqualWithAccuracy([managed.anyObj4 averageOfProperty:@"self"].doubleValue, average(@[@2.2, @3.3]), .001);
+    XCTAssertEqualWithAccuracy([managed.anyObj8 averageOfProperty:@"self"].doubleValue, average(@[decimal128(2), decimal128(3)]), .001);
     XCTAssertEqualWithAccuracy([optManaged.intObj averageOfProperty:@"self"].doubleValue, average(@[@2, @3, NSNull.null]), .001);
     XCTAssertEqualWithAccuracy([optManaged.floatObj averageOfProperty:@"self"].doubleValue, average(@[@2.2f, @3.3f, NSNull.null]), .001);
     XCTAssertEqualWithAccuracy([optManaged.doubleObj averageOfProperty:@"self"].doubleValue, average(@[@2.2, @3.3, NSNull.null]), .001);

@@ -3376,18 +3376,6 @@ static double average(NSArray *values) {
                               @"minOfProperty: is not supported for object id set");
     RLMAssertThrowsWithReason([unmanaged.uuidObj minOfProperty:@"self"], 
                               @"minOfProperty: is not supported for uuid set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjA minOfProperty:@"self"], 
-                              @"minOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjB minOfProperty:@"self"], 
-                              @"minOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjE minOfProperty:@"self"], 
-                              @"minOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjF minOfProperty:@"self"], 
-                              @"minOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjI minOfProperty:@"self"], 
-                              @"minOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjJ minOfProperty:@"self"], 
-                              @"minOfProperty: is not supported for mixed set");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj minOfProperty:@"self"], 
                               @"minOfProperty: is not supported for string? set");
     RLMAssertThrowsWithReason([optUnmanaged.dataObj minOfProperty:@"self"], 
@@ -3406,16 +3394,6 @@ static double average(NSArray *values) {
                               @"minOfProperty: is not supported for object id set 'AllPrimitiveSets.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj minOfProperty:@"self"], 
                               @"minOfProperty: is not supported for uuid set 'AllPrimitiveSets.uuidObj'");
-    RLMAssertThrowsWithReason([managed.anyObjA minOfProperty:@"self"], 
-                              @"minOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjA'");
-    RLMAssertThrowsWithReason([managed.anyObjE minOfProperty:@"self"], 
-                              @"minOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjE'");
-    RLMAssertThrowsWithReason([managed.anyObjF minOfProperty:@"self"], 
-                              @"minOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjF'");
-    RLMAssertThrowsWithReason([managed.anyObjI minOfProperty:@"self"], 
-                              @"minOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjI'");
-    RLMAssertThrowsWithReason([managed.anyObjJ minOfProperty:@"self"], 
-                              @"minOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjJ'");
     RLMAssertThrowsWithReason([optManaged.boolObj minOfProperty:@"self"], 
                               @"minOfProperty: is not supported for bool? set 'AllOptionalPrimitiveSets.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj minOfProperty:@"self"], 
@@ -3502,18 +3480,6 @@ static double average(NSArray *values) {
                               @"maxOfProperty: is not supported for object id set");
     RLMAssertThrowsWithReason([unmanaged.uuidObj maxOfProperty:@"self"], 
                               @"maxOfProperty: is not supported for uuid set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjA maxOfProperty:@"self"], 
-                              @"maxOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjB maxOfProperty:@"self"], 
-                              @"maxOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjE maxOfProperty:@"self"], 
-                              @"maxOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjF maxOfProperty:@"self"], 
-                              @"maxOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjI maxOfProperty:@"self"], 
-                              @"maxOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjJ maxOfProperty:@"self"], 
-                              @"maxOfProperty: is not supported for mixed set");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj maxOfProperty:@"self"], 
                               @"maxOfProperty: is not supported for string? set");
     RLMAssertThrowsWithReason([optUnmanaged.dataObj maxOfProperty:@"self"], 
@@ -3532,16 +3498,6 @@ static double average(NSArray *values) {
                               @"maxOfProperty: is not supported for object id set 'AllPrimitiveSets.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj maxOfProperty:@"self"], 
                               @"maxOfProperty: is not supported for uuid set 'AllPrimitiveSets.uuidObj'");
-    RLMAssertThrowsWithReason([managed.anyObjA maxOfProperty:@"self"], 
-                              @"maxOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjA'");
-    RLMAssertThrowsWithReason([managed.anyObjE maxOfProperty:@"self"], 
-                              @"maxOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjE'");
-    RLMAssertThrowsWithReason([managed.anyObjF maxOfProperty:@"self"], 
-                              @"maxOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjF'");
-    RLMAssertThrowsWithReason([managed.anyObjI maxOfProperty:@"self"], 
-                              @"maxOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjI'");
-    RLMAssertThrowsWithReason([managed.anyObjJ maxOfProperty:@"self"], 
-                              @"maxOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjJ'");
     RLMAssertThrowsWithReason([optManaged.boolObj maxOfProperty:@"self"], 
                               @"maxOfProperty: is not supported for bool? set 'AllOptionalPrimitiveSets.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj maxOfProperty:@"self"], 
