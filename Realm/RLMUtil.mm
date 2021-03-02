@@ -26,6 +26,7 @@
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
+#import "RLMValueBase.h"
 #import "RLMSchema_Private.h"
 #import "RLMSet_Private.hpp"
 #import "RLMSwiftCollectionBase.h"
@@ -382,11 +383,24 @@ BOOL RLMIsRunningInPlayground() {
     return [[NSBundle mainBundle].bundleIdentifier hasPrefix:@"com.apple.dt.playground."];
 }
 
-realm::Mixed RLMObjcToMixed(id<RLMValue> v) {
+realm::Mixed RLMObjcToMixed(id v) {
     if (!v || v == NSNull.null) {
         return realm::Mixed();
     }
-    switch ([(id<RLMValue>)v valueType]) {
+
+    RLMPropertyType type;
+    if ([v isKindOfClass:[RLMValueBase class]]) {
+        type = [[v rlmValue] valueType];
+        v = [v rlmValue];
+    }
+    else if ([v conformsToProtocol:@protocol(RLMValue)]) {
+        type = [v valueType];
+    }
+    else {
+        REALM_TERMINATE("Unexpected Type");
+    }
+
+    switch (type) {
         case RLMPropertyTypeInt:
             return realm::Mixed([(NSNumber *)v intValue]);
         case RLMPropertyTypeBool:

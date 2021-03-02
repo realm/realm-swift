@@ -410,7 +410,7 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
         @throw RLMException(@"Invalid nil value for set of '%@'.",
                             set->_objectClassName ?: RLMTypeToString(set->_type));
     }
-    if (set->_type != RLMPropertyTypeObject) {
+    if (set->_type != RLMPropertyTypeObject && set->_type != RLMPropertyTypeAny) {
         if (!RLMValidateValue(value, set->_type, set->_optional, false, nil)) {
             @throw RLMException(@"Invalid value '%@' of type '%@' for expected type '%@%s'.",
                                 value, [value class], RLMTypeToString(set->_type),

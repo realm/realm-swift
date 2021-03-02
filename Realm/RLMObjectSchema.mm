@@ -18,7 +18,6 @@
 
 #import "RLMObjectSchema_Private.hpp"
 
-#import "RLMArray.h"
 #import "RLMEmbeddedObject.h"
 #import "RLMObject_Private.h"
 #import "RLMProperty_Private.hpp"

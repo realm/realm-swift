@@ -184,6 +184,19 @@ extension Decimal128: CustomObjectiveCBridgeable {
         return self
     }
 }
+extension AnyRealmValue: CustomObjectiveCBridgeable {
+    static func bridging(objCValue: Any) -> AnyRealmValue {
+        if let any = objCValue as? RLMValue {
+            let v = AnyRealmValue()
+            v.rlmValue = any
+            return v
+        }
+        return objCValue as! AnyRealmValue
+    }
+    var objCValue: Any {
+        return self.rlmValue ?? AnyRealmValue()
+    }
+}
 
 // MARK: AssistedObjectiveCBridgeable
 

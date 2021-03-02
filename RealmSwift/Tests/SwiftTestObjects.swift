@@ -141,7 +141,7 @@ class SwiftListObject: Object {
     let decimal = List<Decimal128>()
     let objectId = List<ObjectId>()
     let uuid = List<UUID>()
-    let anyCol = List<AnyRealmValue>()
+    let any = List<AnyRealmValue>()
 
     let intOpt = List<Int?>()
     let int8Opt = List<Int8?>()
@@ -172,6 +172,7 @@ class SwiftMutableSetObject: Object {
     let decimal = MutableSet<Decimal128>()
     let objectId = MutableSet<ObjectId>()
     let uuid = MutableSet<UUID>()
+    let any = MutableSet<AnyRealmValue>()
 
     let intOpt = MutableSet<Int?>()
     let int8Opt = MutableSet<Int8?>()

@@ -22,6 +22,7 @@ import RealmSwift
 class AnyRealmTypeObject: Object {
     var anyValue = AnyRealmValue()
     @objc dynamic var stringObj: SwiftStringObject?
+    let anyList = List<AnyRealmValue>()
 }
 
 class AnyRealmValueTests: TestCase {
