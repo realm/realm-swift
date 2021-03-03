@@ -668,7 +668,7 @@ case "$COMMAND" in
         ;;
 
     "test-swiftui")
-        xctest 'SwiftUITestHost' -sdk iphonesimulator
+        xctest 'SwiftUITestHost' -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 8'
         exit 0
         ;;
 
