@@ -22,10 +22,12 @@ import Realm
 
 public final class AnyRealmValue: RLMValueBase {
 
-    public enum Value {
+    public enum Value: Equatable {
         case none
         case int(Int)
+        case bool(Bool)
         case float(Float)
+        case double(Double)
         case string(String)
         case data(Data)
         case date(Date)
@@ -41,11 +43,25 @@ public final class AnyRealmValue: RLMValueBase {
             return i
         }
 
+        public var boolValue: Bool? {
+            guard case let .bool(b) = self else {
+                return nil
+            }
+            return b
+        }
+
         public var floatValue: Float? {
             guard case let .float(f) = self else {
                 return nil
             }
             return f
+        }
+
+        public var doubleValue: Double? {
+            guard case let .double(d) = self else {
+                return nil
+            }
+            return d
         }
 
         public var stringValue: String? {

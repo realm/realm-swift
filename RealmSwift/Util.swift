@@ -194,7 +194,7 @@ extension AnyRealmValue: CustomObjectiveCBridgeable {
         return objCValue as! AnyRealmValue
     }
     var objCValue: Any {
-        return self.rlmValue ?? AnyRealmValue()
+        return ObjectiveCSupport.convert(value: self.value) ?? NSNull()
     }
 }
 

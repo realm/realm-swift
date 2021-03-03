@@ -26,7 +26,11 @@ public extension ObjectiveCSupport {
         switch value {
             case let .int(i):
                 return i as NSNumber
+            case let .bool(b):
+                return b as NSNumber
             case let .float(f):
+                return f as NSNumber
+            case let .double(f):
                 return f as NSNumber
             case let .string(s):
                 return s as NSString
@@ -54,7 +58,7 @@ public extension ObjectiveCSupport {
         }
 
         switch value.__valueType {
-            case RLMPropertyType.int:
+            case RLMPropertyType.int, RLMPropertyType.bool:
                 guard let val = value as? NSNumber else {
                     return .none
                 }
@@ -64,6 +68,11 @@ public extension ObjectiveCSupport {
                     return .none
                 }
                 return .float(val.floatValue)
+            case RLMPropertyType.double:
+                guard let val = value as? NSNumber else {
+                    return .none
+                }
+                return .double(val.doubleValue)
             case RLMPropertyType.string:
                 guard let val = value as? String else {
                     return .none

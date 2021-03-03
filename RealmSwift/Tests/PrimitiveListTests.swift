@@ -483,7 +483,8 @@ class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
     override func setUp() {
         obj = SwiftListObject()
         if O.isManaged() {
-            let config = Realm.Configuration(inMemoryIdentifier: "test", objectTypes: [SwiftListObject.self])
+            let config = Realm.Configuration(inMemoryIdentifier: "test",
+                                             objectTypes: [SwiftListObject.self, SwiftStringObject.self])
             realm = try! Realm(configuration: config)
             realm!.beginWrite()
             realm!.add(obj)
