@@ -65,14 +65,12 @@ namespace {
 
                 // Convert the RLMResponse to an app:Response and pass downstream to
                 // the object store
-//                completion({
-//                    .status = response.body ? app::ResponseResult::Success : app::ResponseResult::Failure,
-//                    .body = response.body ? util::make_optional<std::string>(response.body.UTF8String) : util::Optional<std::string>(),
-//                    .error = util::none,
-//                    .headers = bridgingHeaders,
-//                    .http_status_code = static_cast<int>(response.httpStatusCode),
-//                    .custom_status_code = static_cast<int>(response.customStatusCode)
-//                });
+                completion(app::Response{
+                    .http_status_code = static_cast<int>(response.httpStatusCode),
+                    .custom_status_code = static_cast<int>(response.customStatusCode),
+                    .headers = bridgingHeaders,
+                    .body = response.body ? response.body.UTF8String : ""
+                });
             }];
         }
 

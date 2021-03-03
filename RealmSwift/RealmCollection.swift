@@ -318,6 +318,12 @@ extension AnyRealmValue: RealmCollectionValue {
     public static func _rlmSet() -> RLMSet<AnyObject> {
         return RLMSet(objectType: .any, optional: false)
     }
+    /// :nodoc:
+    public static func _nilValue() -> AnyRealmValue {
+        let v = AnyRealmValue()
+        v.value = .none
+        return v
+    }
 }
 
 /// :nodoc:

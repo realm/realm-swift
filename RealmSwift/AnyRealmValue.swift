@@ -22,7 +22,7 @@ import Realm
 
 public final class AnyRealmValue: RLMValueBase {
 
-    public enum Value: Equatable {
+    public enum Value: Hashable {
         case none
         case int(Int)
         case bool(Bool)

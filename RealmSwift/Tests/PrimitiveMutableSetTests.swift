@@ -37,7 +37,8 @@ class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase 
         obj = SwiftMutableSetObject()
         obj2 = SwiftMutableSetObject()
         if O.isManaged() {
-            let config = Realm.Configuration(inMemoryIdentifier: "test", objectTypes: [SwiftMutableSetObject.self])
+            let config = Realm.Configuration(inMemoryIdentifier: "test",
+                                             objectTypes: [SwiftMutableSetObject.self, SwiftStringObject.self])
             realm = try! Realm(configuration: config)
             realm!.beginWrite()
             realm!.add(obj)

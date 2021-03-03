@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
+import Realm
 import RealmSwift
 
 class AnyRealmTypeObject: Object {
@@ -312,7 +313,7 @@ class AnyRealmValueIntFactory: BaseAnyRealmValueFactory, ValueFactory {
 
 class AnyRealmValueBoolFactory: BaseAnyRealmValueFactory, ValueFactory {
     static func values() -> [AnyRealmValue] {
-        [value(.bool(true)), value(.bool(false)), value(.bool(false))]
+        [value(.bool(true)), value(.bool(false)), value(.none)]
     }
 }
 
@@ -692,6 +693,271 @@ class ManagedAnyRealmValueListTests: TestCase {
     class func _defaultTestSuite() -> XCTestSuite {
         let suite = XCTestSuite(name: "Managed AnyRealmValue Lists")
         addAnyRealmValueTests(suite, ManagedObjectFactory.self)
+        return suite
+    }
+
+    override class var defaultTestSuite: XCTestSuite {
+        return _defaultTestSuite()
+    }
+}
+
+class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T: AnyRealmValue {
+
+    private func assertEqual(_ obj: AnyRealmValue.Value, _ anotherObj: AnyRealmValue.Value) {
+        if case let .object(a) = obj,
+           case let .object(b) = anotherObj  {
+            XCTAssertEqual((a as! SwiftStringObject).stringCol, (b as! SwiftStringObject).stringCol)
+        } else {
+            XCTAssertEqual(obj, anotherObj)
+        }
+    }
+
+    func testInvalidated() {
+        XCTAssertFalse(mutableSet.isInvalidated)
+        if let realm = obj.realm {
+            realm.delete(obj)
+            XCTAssertTrue(mutableSet.isInvalidated)
+        }
+    }
+
+    func testValueForKey() {
+        XCTAssertEqual(mutableSet.value(forKey: "self").count, 0)
+        mutableSet.insert(values[0])
+        let kvo = (mutableSet.value(forKey: "self") as [AnyObject]).first!
+        if let obj = kvo as? SwiftStringObject, case let .object(o) = values[0].value {
+            XCTAssertEqual(obj.stringCol, (o as! SwiftStringObject).stringCol)
+        } else {
+            let v = AnyRealmValue()
+            v.rlmValue = kvo as? RLMValue
+            XCTAssertEqual(v.value, values[0].value)
+        }
+        assertThrows(mutableSet.value(forKey: "not self"), named: "NSUnknownKeyException")
+    }
+
+    func testInsert() {
+        XCTAssertEqual(Int(0), mutableSet.count)
+
+        mutableSet.insert(values[0])
+        XCTAssertEqual(Int(1), mutableSet.count)
+        XCTAssertTrue(mutableSet.contains(values[0]))
+
+        mutableSet.insert(values[1])
+        XCTAssertEqual(Int(2), mutableSet.count)
+        XCTAssertTrue(mutableSet.contains(values[0]))
+        XCTAssertTrue(mutableSet.contains(values[1]))
+
+        mutableSet.insert(values[2])
+        XCTAssertEqual(Int(3), mutableSet.count)
+        XCTAssertTrue(mutableSet.contains(values[0]))
+        XCTAssertTrue(mutableSet.contains(values[1]))
+
+        mutableSet.insert(values[2])
+        XCTAssertEqual(Int(3), mutableSet.count)
+        XCTAssertTrue(mutableSet.contains(values[0]))
+        XCTAssertTrue(mutableSet.contains(values[1]))
+        XCTAssertTrue(mutableSet.contains(values[2]))
+        // Insert duplicate
+        mutableSet.insert(values[2])
+        XCTAssertEqual(Int(3), mutableSet.count)
+        XCTAssertTrue(mutableSet.contains(values[0]))
+        XCTAssertTrue(mutableSet.contains(values[1]))
+        XCTAssertTrue(mutableSet.contains(values[2]))
+    }
+
+    func testRemove() {
+        mutableSet.removeAll()
+        XCTAssertEqual(mutableSet.count, 0)
+        mutableSet.insert(objectsIn: values)
+        mutableSet.remove(values[0])
+        XCTAssertFalse(mutableSet.contains(values[0]))
+        XCTAssertTrue(mutableSet.contains(values[1]))
+        XCTAssertTrue(mutableSet.contains(values[2]))
+    }
+
+    func testRemoveAll() {
+        mutableSet.removeAll()
+        mutableSet.insert(objectsIn: values)
+        mutableSet.removeAll()
+        XCTAssertEqual(mutableSet.count, 0)
+    }
+
+    func testIsSubset() {
+        XCTAssertEqual(Int(0), mutableSet.count)
+        XCTAssertEqual(Int(0), otherMutableSet.count)
+        mutableSet.insert(objectsIn: values)
+        otherMutableSet.insert(values[0])
+        // Both sets contain values[0]
+        XCTAssertTrue(otherMutableSet.isSubset(of: mutableSet))
+        otherMutableSet.remove(values[0])
+        XCTAssertFalse(mutableSet.isSubset(of: otherMutableSet))
+    }
+
+    func testContains() {
+        XCTAssertEqual(Int(0), mutableSet.count)
+        XCTAssertEqual(Int(0), otherMutableSet.count)
+        mutableSet.insert(objectsIn: values)
+        XCTAssertEqual(values.count, mutableSet.count)
+        values.forEach {
+            XCTAssertTrue(mutableSet.contains($0))
+        }
+    }
+
+    func testIntersects() {
+        XCTAssertEqual(Int(0), mutableSet.count)
+        XCTAssertEqual(Int(0), otherMutableSet.count)
+        mutableSet.insert(objectsIn: values)
+        otherMutableSet.insert(values[0])
+        // Both sets contain values[0]
+        XCTAssertTrue(otherMutableSet.intersects(mutableSet))
+        otherMutableSet.remove(values[0])
+        XCTAssertFalse(mutableSet.intersects(otherMutableSet))
+    }
+
+    func testFormIntersection() {
+        XCTAssertEqual(Int(0), mutableSet.count)
+        XCTAssertEqual(Int(0), otherMutableSet.count)
+        mutableSet.insert(objectsIn: values)
+        otherMutableSet.insert(values[0])
+        // Both sets contain values[0]
+        mutableSet.formIntersection(otherMutableSet)
+        XCTAssertEqual(Int(1), mutableSet.count)
+        assertEqual(mutableSet[0].value, values[0].value)
+    }
+
+    func testFormUnion() {
+        XCTAssertEqual(Int(0), mutableSet.count)
+        XCTAssertEqual(Int(0), otherMutableSet.count)
+        mutableSet.insert(values[0])
+        mutableSet.insert(values[1])
+        otherMutableSet.insert(values[0])
+        otherMutableSet.insert(values[2])
+        mutableSet.formUnion(otherMutableSet)
+        XCTAssertEqual(Int(3), mutableSet.count)
+        if values[0].value.objectValue(SwiftStringObject.self) != nil {
+            XCTAssertTrue(values.map {
+                $0.value.objectValue(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[0].value.objectValue(SwiftStringObject.self)?.stringCol))
+            XCTAssertTrue(values.map {
+                $0.value.objectValue(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[1].value.objectValue(SwiftStringObject.self)?.stringCol))
+            XCTAssertTrue(values.map {
+                $0.value.objectValue(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[2].value.objectValue(SwiftStringObject.self)?.stringCol))
+        } else {
+            XCTAssertTrue(values.map { $0.value }.contains(mutableSet[0].value))
+            XCTAssertTrue(values.map { $0.value }.contains(mutableSet[1].value))
+            XCTAssertTrue(values.map { $0.value }.contains(mutableSet[2].value))
+        }
+    }
+
+    func testSubtract() {
+        XCTAssertEqual(Int(0), mutableSet.count)
+        XCTAssertEqual(Int(0), otherMutableSet.count)
+        mutableSet.insert(values[0])
+        mutableSet.insert(values[1])
+        otherMutableSet.insert(values[0])
+        otherMutableSet.insert(values[2])
+        mutableSet.subtract(otherMutableSet)
+        XCTAssertEqual(Int(1), mutableSet.count)
+        XCTAssertFalse(mutableSet.contains(values[0]))
+        XCTAssertTrue(mutableSet.contains(values[1]))
+    }
+
+    func testSubscript() {
+        mutableSet.insert(objectsIn: values)
+        if values[0].value.objectValue(SwiftStringObject.self) != nil {
+            XCTAssertTrue(values.map {
+                $0.value.objectValue(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[0].value.objectValue(SwiftStringObject.self)?.stringCol))
+            XCTAssertTrue(values.map {
+                $0.value.objectValue(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[1].value.objectValue(SwiftStringObject.self)?.stringCol))
+            XCTAssertTrue(values.map {
+                $0.value.objectValue(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[2].value.objectValue(SwiftStringObject.self)?.stringCol))
+        } else {
+            XCTAssertTrue(values.map { $0.value }.contains(mutableSet[0].value))
+            XCTAssertTrue(values.map { $0.value }.contains(mutableSet[1].value))
+            XCTAssertTrue(values.map { $0.value }.contains(mutableSet[2].value))
+        }
+    }
+}
+
+class MinMaxAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T: AnyRealmValue {
+    func testMin() {
+        XCTAssertNil(mutableSet.min())
+        mutableSet.insert(objectsIn: values)
+        XCTAssertEqual(mutableSet.min()?.value, values.first?.value)
+    }
+
+    func testMax() {
+        XCTAssertNil(mutableSet.max())
+        mutableSet.insert(objectsIn: values)
+        XCTAssertEqual(mutableSet.max()?.value, values.last?.value)
+    }
+}
+
+class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T: AnyRealmValue {
+    func testSum() {
+        XCTAssertEqual(mutableSet.sum().value, .int(0))
+        mutableSet.insert(objectsIn: values)
+
+        // Expressing "can be added and converted to a floating point type" as
+        // a protocol requirement is awful, so sidestep it all with obj-c
+        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
+        XCTAssertEqual(mutableSet.sum().value.doubleValue!, expected, accuracy: 0.01)
+    }
+
+    func testAverage() {
+        XCTAssertNil(mutableSet.average() as V.AverageType?)
+        mutableSet.insert(objectsIn: values)
+
+        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber).doubleValue
+        XCTAssertEqual(V.doubleValue(mutableSet.average()!), expected, accuracy: 0.01)
+    }
+}
+
+func addAnyRealmValueMutableSetTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
+    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueBoolFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueStringFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueDataFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueDateFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueObjectFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueObjectIdFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueUUIDFactory>._defaultTestSuite().tests.map(suite.addTest)
+
+    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueDateFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+
+    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+}
+
+class UnmanagedAnyRealmValueMutableSetTests: TestCase {
+    class func _defaultTestSuite() -> XCTestSuite {
+        let suite = XCTestSuite(name: "Unmanaged Primitive Sets")
+        addAnyRealmValueMutableSetTests(suite, UnmanagedObjectFactory.self)
+        return suite
+    }
+
+    override class var defaultTestSuite: XCTestSuite {
+        return _defaultTestSuite()
+    }
+}
+
+class ManagedAnyRealmValueMutableSetTests: TestCase {
+    class func _defaultTestSuite() -> XCTestSuite {
+        let suite = XCTestSuite(name: "Managed Primitive Sets")
+        addAnyRealmValueMutableSetTests(suite, ManagedObjectFactory.self)
         return suite
     }
 
