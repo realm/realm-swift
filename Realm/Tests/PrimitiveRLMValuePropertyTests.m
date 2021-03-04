@@ -49,10 +49,10 @@ static RLMObjectId *objectId(NSUInteger i) {
     return objectIds[i];
 }
 
-@interface RLMValuePropertyTests : RLMTestCase
+@interface PrimitiveRLMValuePropertyTests : RLMTestCase
 @end
 
-@implementation RLMValuePropertyTests {
+@implementation PrimitiveRLMValuePropertyTests {
     AllPrimitiveRLMValues *unmanaged;
     AllPrimitiveRLMValues *managed;
     RLMRealm *realm;
@@ -64,7 +64,6 @@ static RLMObjectId *objectId(NSUInteger i) {
     realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     [self initValues];
-//    [self assignValues];
     [allMixed addObjects:@[
         unmanaged.boolVal,
         unmanaged.intVal,
@@ -93,11 +92,6 @@ static RLMObjectId *objectId(NSUInteger i) {
     if (realm.inWriteTransaction) {
         [realm cancelWriteTransaction];
     }
-}
-
-// Dummy test
-- (void)testTrue {
-    XCTAssert(true);
 }
 
 - (void)initValues {
