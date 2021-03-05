@@ -291,7 +291,7 @@ public class RealmServer: NSObject {
     @objc public static var shared = RealmServer()
 
     /// Log level for the server and mongo processes.
-    public var logLevel = LogLevel.none
+    public var logLevel = LogLevel.info
 
     /// Process that runs the local mongo server. Should be terminated on exit.
     private let mongoProcess = Process()
@@ -531,10 +531,11 @@ public class RealmServer: NSObject {
         }
 
         let app = session.apps[appId]
-        let group = DispatchGroup()
+        let group0 = DispatchGroup()
+        let group1 = DispatchGroup()
 
-        app.authProviders.post(on: group, ["type": "anon-user"], failOnError)
-        app.authProviders.post(on: group, [
+        app.authProviders.post(on: group0, ["type": "anon-user"], failOnError)
+        app.authProviders.post(on: group0, [
             "type": "local-userpass",
             "config": [
                 "emailConfirmationUrl": "http://foo.com",
@@ -545,7 +546,7 @@ public class RealmServer: NSObject {
             ]
         ], failOnError)
 
-        app.authProviders.get(on: group) { authProviders in
+        app.authProviders.get(on: group0) { authProviders in
             do {
                 guard let authProviders = try authProviders.get() as? [[String: Any]] else {
                     return XCTFail("Bad formatting for authProviders")
@@ -553,7 +554,7 @@ public class RealmServer: NSObject {
                 guard let provider = authProviders.first(where: { $0["type"] as? String == "api-key" }) else {
                     return XCTFail("Did not find api-key provider")
                 }
-                app.authProviders[provider["_id"] as! String].enable.put(on: group, self.failOnError)
+                app.authProviders[provider["_id"] as! String].enable.put(on: group0, self.failOnError)
             } catch {
                 XCTFail(error.localizedDescription)
             }
@@ -661,10 +662,10 @@ public class RealmServer: NSObject {
             "collection": "HugeSyncObject",
             "roles": [[
                 "name": "default",
-                        "apply_when": [:],
+                "apply_when": [:],
                 "insert": true,
                 "delete": true,
-                        "additional_fields": [:]
+                "additional_fields": [:]
             ]],
             "schema": [
                 "properties": [
@@ -684,6 +685,158 @@ public class RealmServer: NSObject {
             "relationships": [:]
         ]
 
+        let allTypesSyncObjectRule: [String: Any] = [
+            "database": "test_data",
+            "collection": "AllTypesSyncObject",
+            "roles": [[
+                "name": "default",
+                "apply_when": [:],
+                "insert": true,
+                "delete": true,
+                "additional_fields": [:]
+            ]],
+            "schema": [
+                "properties": [
+                    "_id": [
+                        "bsonType": "objectId"
+                    ],
+                    "booCol": [
+                        "bsonType": "bool"
+                    ],
+                    "cBoolcol": [
+                        "bsonType": "bool"
+                    ],
+                    "intCol": [
+                        "bsonType": "int"
+                    ],
+                    "doubleCol": [
+                        "bsonType": "double"
+                    ],
+                    "stringCol": [
+                        "bsonType": "string"
+                    ],
+                    "binaryCol": [
+                        "bsonType": "binData"
+                    ],
+                    "dateCol": [
+                        "bsonType": "date"
+                    ],
+                    "longCol": [
+                        "bsonType": "long"
+                    ],
+                    "decimalCol": [
+                        "bsonType": "decimal"
+                    ],
+                    "uuidCol": [
+                        "bsonType": "uuid"
+                    ],
+                    "anyCol": [
+                        "bsonType": "mixed"
+                    ],
+                    "objectCol": [
+                        "bsonType": "objectId",
+                    ],
+                    "realm_id": [
+                        "bsonType": "string"
+                    ],
+                ],
+                "required": [
+                    "booCol",
+                    "cBoolcol",
+                    "intCol",
+                    "doubleCol",
+                    "stringCol",
+                    "binaryCol",
+                    "dateCol",
+                    "longCol",
+                    "decimalCol",
+                    "uuidCol",
+                ],
+                "title": "AllTypesSyncObject"
+            ],
+            "relationships": [
+                "objectCol": [
+                    "ref": "#/relationship/mongodb1/test_data/Person",
+                    "foreign_key": "_id",
+                    "is_list": false
+                ]
+            ]
+        ]
+
+        let swiftTypesSyncObjectRule: [String: Any] = [
+            "database": "test_data",
+            "collection": "SwiftTypesSyncObject",
+            "roles": [[
+                "name": "default",
+                "apply_when": [:],
+                "insert": true,
+                "delete": true,
+                "additional_fields": [:]
+            ]],
+            "schema": [
+                "properties": [
+                    "_id": [
+                        "bsonType": "objectId"
+                    ],
+                    "booCol": [
+                        "bsonType": "bool"
+                    ],
+                    "intCol": [
+                        "bsonType": "int"
+                    ],
+                    "doubleCol": [
+                        "bsonType": "double"
+                    ],
+                    "stringCol": [
+                        "bsonType": "string"
+                    ],
+                    "binaryCol": [
+                        "bsonType": "binData"
+                    ],
+                    "dateCol": [
+                        "bsonType": "date"
+                    ],
+                    "longCol": [
+                        "bsonType": "long"
+                    ],
+                    "decimalCol": [
+                        "bsonType": "decimal"
+                    ],
+                    "uuidCol": [
+                        "bsonType": "uuid"
+                    ],
+                    "anyCol": [
+                        "bsonType": "mixed"
+                    ],
+                    "objectCol": [
+                        "bsonType": "objectId",
+                    ],
+                    "realm_id": [
+                        "bsonType": "string"
+                    ],
+                ],
+                "required": [
+                    "booCol",
+                    "intCol",
+                    "doubleCol",
+                    "stringCol",
+                    "binaryCol",
+                    "dateCol",
+                    "longCol",
+                    "decimalCol",
+                    "uuidCol",
+                ],
+                "title": "SwiftTypesSyncObject"
+            ],
+            "relationships": [
+                "objectCol": [
+                    "ref": "#/relationship/mongodb1/test_data/SwiftPerson",
+                    "foreign_key": "_id",
+                    "is_list": false
+                ]
+            ]
+        ]
+
         let userDataRule: [String: Any] = [
             "database": "test_data",
             "collection": "UserData",
@@ -699,10 +852,10 @@ public class RealmServer: NSObject {
         ]
 
         let rules = app.services[serviceId].rules
-        rules.post(on: group, dogRule, failOnError)
-        rules.post(on: group, personRule, failOnError)
-        rules.post(on: group, hugeSyncObjectRule, failOnError)
-        rules.post(on: group, [
+        rules.post(on: group0, dogRule, failOnError)
+        rules.post(on: group0, personRule, failOnError)
+        rules.post(on: group0, hugeSyncObjectRule, failOnError)
+        rules.post(on: group0, [
             "database": "test_data",
             "collection": "SwiftPerson",
             "roles": [[
@@ -740,11 +893,11 @@ public class RealmServer: NSObject {
                 "relationships": [:]
         ], failOnError)
 
-        app.sync.config.put(on: group, data: [
+        app.sync.config.put(on: group0, data: [
             "development_mode_enabled": true
         ], failOnError)
 
-        app.functions.post(on: group, [
+        app.functions.post(on: group0, [
             "name": "sum",
             "private": false,
             "can_evaluate": [:],
@@ -755,7 +908,7 @@ public class RealmServer: NSObject {
             """
         ], failOnError)
 
-        app.functions.post(on: group, [
+        app.functions.post(on: group0, [
             "name": "updateUserData",
             "private": false,
             "can_evaluate": [:],
@@ -775,7 +928,7 @@ public class RealmServer: NSObject {
         ], failOnError)
 
         _ = rules.post(userDataRule)
-        app.customUserData.patch(on: group, [
+        app.customUserData.patch(on: group0, [
             "mongo_service_id": serviceId,
             "enabled": true,
             "database_name": "test_data",
@@ -788,7 +941,7 @@ public class RealmServer: NSObject {
             "value": "gcm"
         ])
 
-        app.services.post(on: group, [
+        app.services.post(on: group0, [
             "name": "gcm",
             "type": "gcm",
             "config": [
@@ -800,7 +953,13 @@ public class RealmServer: NSObject {
             "version": 1
         ], failOnError)
 
-        guard case .success = group.wait(timeout: .now() + 5.0) else {
+        guard case .success = group0.wait(timeout: .now() + 5.0) else {
+            throw URLError(.badServerResponse)
+        }
+
+        rules.post(on: group1, allTypesSyncObjectRule, failOnError)
+        rules.post(on: group1, swiftTypesSyncObjectRule, failOnError)
+        guard case .success = group1.wait(timeout: .now() + 5.0) else {
             throw URLError(.badServerResponse)
         }
 

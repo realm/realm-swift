@@ -43,6 +43,31 @@ public class SwiftPerson: Object {
     }
 }
 
+public class SwiftTypesSyncObject : Object {
+    @objc public dynamic var _id: ObjectId? = ObjectId.generate()
+    @objc public dynamic var boolCol: Bool = true
+    @objc public dynamic var intCol: Int = 1
+    @objc public dynamic var doubleCol: Double = 1.1
+    @objc public dynamic var stringCol: String = "string"
+    @objc public dynamic var binaryCol: Data = "string".data(using: String.Encoding.utf8)!
+    @objc public dynamic var dateCol: Date = Date(timeIntervalSince1970: -1)
+    @objc public dynamic var longCol: Int64 = 1
+    @objc public dynamic var decimalCol: Decimal128 = Decimal128(1)
+    @objc public dynamic var uuidCol: UUID = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
+    @objc public dynamic var objectCol: SwiftPerson?
+    public var anyCol = AnyRealmValue()
+
+    public convenience init(person: SwiftPerson) {
+        self.init()
+        self.anyCol.value = .int(1)
+        self.objectCol = person
+    }
+
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
 public func randomString(_ length: Int) -> String {
     let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     return String((0..<length).map { _ in letters.randomElement()! })
@@ -82,7 +107,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     public func openRealm(configuration: Realm.Configuration) throws -> Realm {
         var configuration = configuration
         if configuration.objectTypes == nil {
-            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self]
+            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self, SwiftTypesSyncObject.self]
         }
         let realm = try Realm(configuration: configuration)
         waitForDownloads(for: realm)
@@ -92,7 +117,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     public func immediatelyOpenRealm(partitionValue: String, user: User) throws -> Realm {
         var configuration = user.configuration(partitionValue: partitionValue)
         if configuration.objectTypes == nil {
-            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self]
+            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self, SwiftTypesSyncObject.self]
         }
         return try Realm(configuration: configuration)
     }

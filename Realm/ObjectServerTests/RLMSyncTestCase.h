@@ -54,6 +54,26 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)objectWithRealmId:(NSString *)realmId;
 @end
 
+@interface AllTypesSyncObject : RLMObject
+@property RLMObjectId    *_id;
+@property BOOL            boolCol;
+@property bool            cBoolCol;
+@property int             intCol;
+@property double          doubleCol;
+@property NSString       *stringCol;
+@property NSData         *binaryCol;
+@property NSDate         *dateCol;
+@property int64_t         longCol;
+@property RLMDecimal128  *decimalCol;
+@property NSUUID         *uuidCol;
+@property id<RLMValue>    anyCol;
+@property Person         *objectCol;
+
+
++ (NSDictionary *)values:(int)i;
+
+@end
+
 @interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport
 @end
 
@@ -105,6 +125,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)logOutUser:(RLMUser *)user;
 
 - (void)addPersonsToRealm:(RLMRealm *)realm persons:(NSArray<Person *> *)persons;
+
+- (void)addAllTypesSyncObjectToRealm:(RLMRealm *)realm values:(NSDictionary *)dictionary person:(Person *)person;
 
 /// Synchronously wait for downloads to complete for any number of Realms, and then check their `SyncObject` counts.
 - (void)waitForDownloadsForUser:(RLMUser *)user

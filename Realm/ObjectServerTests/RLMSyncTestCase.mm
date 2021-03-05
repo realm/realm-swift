@@ -162,6 +162,53 @@
 
 @end
 
+#pragma mark AllTypeSyncObject
+
+@implementation AllTypesSyncObject
+
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"_id": [RLMObjectId objectId]};
+}
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
+
++ (NSArray *)requiredProperties {
+    return @[@"booCol",
+             @"cBoolcol",
+             @"intCol",
+             @"doubleCol",
+             @"stringCol",
+             @"binaryCol",
+             @"dateCol",
+             @"longCol",
+             @"decimalCol",
+             @"uuidCol",
+    ];
+}
+
++ (NSDictionary *)values:(int)i {
+    char str[] = "";
+    str[0] = i;
+    return @{
+        @"boolCol": @(i % 2),
+        @"cBoolCol": @(i % 2),
+        @"intCol": @(i),
+        @"doubleCol": @(1.11 * i),
+        @"stringCol": [NSString stringWithFormat:@"%d", i],
+        @"binaryCol": [@(str) dataUsingEncoding:NSUTF8StringEncoding],
+        @"dateCol": [NSDate dateWithTimeIntervalSince1970:i],
+        @"longCol": @((long long)i * INT_MAX + 1),
+        @"decimalCol": [[RLMDecimal128 alloc] initWithNumber:@(i)],
+        @"uuidCol": [[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"],
+        @"anyCol": @(i+1),
+    };
+}
+
+
+@end
+
 #pragma mark AsyncOpenConnectionTimeoutTransport
 
 @implementation AsyncOpenConnectionTimeoutTransport
@@ -223,6 +270,14 @@ static NSURL *syncDirectoryForChildProcess() {
 - (void)addPersonsToRealm:(RLMRealm *)realm persons:(NSArray<Person *> *)persons {
     [realm beginWriteTransaction];
     [realm addObjects:persons];
+    [realm commitWriteTransaction];
+}
+
+- (void)addAllTypesSyncObjectToRealm:(RLMRealm *)realm values:(NSDictionary *)dictionary person:(Person *)person {
+    [realm beginWriteTransaction];
+    AllTypesSyncObject *obj = [[AllTypesSyncObject alloc] initWithValue:dictionary];
+    obj.objectCol = person;
+    [realm addObject:obj];
     [realm commitWriteTransaction];
 }
 
@@ -312,7 +367,11 @@ static NSURL *syncDirectoryForChildProcess() {
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     auto c = [user configurationWithPartitionValue:partitionValue];
     c.encryptionKey = encryptionKey;
-    c.objectClasses = @[Dog.self, Person.self, HugeSyncObject.self];
+    c.objectClasses = @[Dog.self,
+                        Person.self,
+                        HugeSyncObject.self,
+                        AllTypesSyncObject.self,
+    ];
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.stopPolicy = stopPolicy;
     c.syncConfiguration = syncConfig;
