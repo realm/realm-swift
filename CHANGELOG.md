@@ -4,8 +4,21 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Queries of the form "a.b.c == nil" would match objects where `b` is `nil` if
+  `c` did not have an index and did not if `c` was indexed. Both will now match
+  to align with NSPredicate's behavior. ([Core #4460]https://github.com/realm/realm-core/pull/4460), since 4.3.0).
+* Restore support for upgrading files from file format 5 (Realm Cocoa 1.x).
+  ([Core #7089](https://github.com/realm/realm-cocoa/issues/7089), since v5.0.0)
+* On 32bit devices you may get exception with "No such object" when upgrading
+  to v10.* ([Java #7314](https://github.com/realm/realm-java/issues/7314), since v5.0.0)
+* The notification worker thread would rerun queries after every commit rather
+  than only commits which modified tables which could effect the query results
+  if the table had any outgoing links to tables not used in the query.
+  ([Core #4456](https://github.com/realm/realm-core/pull/4456), since v5.0.0).
+* Fix "Invalid ref translation entry [16045690984833335023, 78187493520]"
+  assertion failure which could occur when using sync or multiple processes
+  writing to a single Realm file.
+  ([#7086](https://github.com/realm/realm-cocoa/issues/7086), since v5.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -16,7 +29,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v10.5.3 to v10.5.4
 
 10.7.0 Release notes (2021-02-23)
 =============================================================
