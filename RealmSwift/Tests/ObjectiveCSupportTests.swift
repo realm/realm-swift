@@ -102,4 +102,26 @@ class ObjectiveCSupportTests: TestCase {
                        ObjectiveCSupport.convert(object: realm.configuration).deleteRealmIfMigrationNeeded,
                        "Configuration.deleteRealmIfMigrationNeeded must be equal to RLMConfiguration.deleteRealmIfMigrationNeeded")
     }
+
+    func testAnyRealmValueSupport() {
+        let obj = SwiftObject()
+        let expected: [(RLMValue, AnyRealmValue.Value)] = [
+            (NSNumber(1234), .int(1234)),
+            (NSNumber(value: true), .bool(true)),
+            (NSNumber(value: Float(1234.4567)), .float(1234.4567)),
+            (NSNumber(value: Double(1234.4567)), .double(1234.4567)),
+            (NSString("hello"), .string("hello")),
+            (NSData(data: Data.init(repeating: 0, count: 64)), .data(Data.init(repeating: 0, count: 64))),
+            (NSDate.init(timeIntervalSince1970: 1000000), .date(Date.init(timeIntervalSince1970: 1000000))),
+            (try! RLMObjectId(string: "60425fff91d7a195d5ddac1b"), .objectId(try! ObjectId(string: "60425fff91d7a195d5ddac1b"))),
+            (RLMDecimal128(number: 1234.4567), .decimal128(Decimal128(floatLiteral: 1234.4567))),
+            (NSUUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89")!, .uuid(UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89")!)),
+            (obj, .object(obj))
+        ]
+
+        func testObjCSupport(_ objCValue: RLMValue, value: AnyRealmValue.Value) {
+            XCTAssertEqual(ObjectiveCSupport.convert(value: objCValue), value)
+        }
+        expected.forEach { testObjCSupport($0.0, value: $0.1) }
+    }
 }

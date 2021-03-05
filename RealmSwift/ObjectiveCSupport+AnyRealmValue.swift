@@ -58,11 +58,16 @@ public extension ObjectiveCSupport {
         }
 
         switch value.__valueType {
-            case RLMPropertyType.int, RLMPropertyType.bool:
+            case RLMPropertyType.int:
                 guard let val = value as? NSNumber else {
                     return .none
                 }
                 return .int(val.intValue)
+            case RLMPropertyType.bool:
+                guard let val = value as? NSNumber else {
+                    return .none
+                }
+                return .bool(val.boolValue)
             case RLMPropertyType.float:
                 guard let val = value as? NSNumber else {
                     return .none

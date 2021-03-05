@@ -144,10 +144,16 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
             return NO;
         case RLMPropertyTypeData:
             return [value isKindOfClass:[NSData class]];
-        case RLMPropertyTypeAny:
-            return !value
-                || [value isKindOfClass:[NSNull class]]
-                || [value conformsToProtocol:@protocol(RLMValue)];
+        case RLMPropertyTypeAny: {
+            if (RLMValueBase *valueBase = RLMDynamicCast<RLMValueBase>(value)) {
+                return YES;
+            }
+            else {
+                return !value
+                    || [value isKindOfClass:[NSNull class]]
+                    || [value conformsToProtocol:@protocol(RLMValue)];
+            }
+        }
         case RLMPropertyTypeLinkingObjects:
             return YES;
         case RLMPropertyTypeObject: {
@@ -388,7 +394,19 @@ realm::Mixed RLMObjcToMixed(id v) {
         return realm::Mixed();
     }
 
-    switch ([v valueType]) {
+    RLMPropertyType type;
+    if ([v isKindOfClass:[RLMValueBase class]]) {
+        type = [[v rlmValue] valueType];
+        v = [v rlmValue];
+    }
+    else if ([v conformsToProtocol:@protocol(RLMValue)]) {
+        type = [v valueType];
+    }
+    else {
+        REALM_TERMINATE("Unexpected Type");
+    }
+
+    switch (type) {
         case RLMPropertyTypeInt:
             return realm::Mixed([(NSNumber *)v intValue]);
         case RLMPropertyTypeBool:

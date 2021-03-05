@@ -113,6 +113,9 @@ class ObjectAccessorTests: TestCase {
         XCTAssertEqual(object.objectIdCol, oid1)
         object.objectIdCol = oid2
         XCTAssertEqual(object.objectIdCol, oid2)
+
+        object.anyCol.value = .string("hello")
+        XCTAssertEqual(object.anyCol.value.stringValue, "hello")
     }
 
     func testUnmanagedAccessors() {
