@@ -1,9 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.7.1 Release notes (2021-03-05)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
+
 * Queries of the form "a.b.c == nil" would match objects where `b` is `nil` if
   `c` did not have an index and did not if `c` was indexed. Both will now match
   to align with NSPredicate's behavior. ([Core #4460]https://github.com/realm/realm-core/pull/4460), since 4.3.0).
@@ -20,15 +19,15 @@ x.y.z Release notes (yyyy-MM-dd)
   writing to a single Realm file.
   ([#7086](https://github.com/realm/realm-cocoa/issues/7086), since v5.0.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.4.
 * CocoaPods: 1.10 or later.
 
 ### Internal
+
 * Upgraded realm-core from v10.5.3 to v10.5.4
 
 10.7.0 Release notes (2021-02-23)
