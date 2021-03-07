@@ -205,49 +205,43 @@
     XCTAssertNotNil(mo0.anyCol);
     XCTAssertTrue([((StringObject *)mo0.anyCol).stringCol isEqualToString:so.stringCol]);
     XCTAssertEqual(mo0.anyCol.valueType, RLMPropertyTypeObject);
-//    ???: First object has no stringCol
-//    XCTAssertTrue([mo0.anyArray.firstObject.stringCol isEqualToString:so.stringCol]);
-
+    XCTAssertTrue([((StringObject *)mo0.anyArray.firstObject).stringCol isEqualToString:so.stringCol]);
 
     XCTAssertNotNil(mo1.anyCol);
     XCTAssertTrue([((StringObject *)mo1.anyCol).stringCol isEqualToString:so.stringCol]);
     XCTAssertEqual(mo1.anyCol.valueType, RLMPropertyTypeObject);
-    //    XCTAssertTrue([mo1.anyArray.firstObject.stringCol isEqualToString:so.stringCol]);
-
-    
+    XCTAssertTrue([((StringObject *)mo1.anyArray.firstObject).stringCol isEqualToString:so.stringCol]);
 }
 
 - (void)testCreateManagedObjectUnmanagedChild {
     StringObject *so = [[StringObject alloc] init];
     so.stringCol = @"hello";
+
+    StringObject *so1 = [[StringObject alloc] init];
+    so1.stringCol = @"hello2";
     
     RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
-    // Attempt to create a managed mixed object whose object property is unmanaged.
     MixedObject *mo0 = [MixedObject createInRealm:r withValue:@[so, @[so]]];
     
-    // Test another kind of initialization too.
     MixedObject *mo1 = [[MixedObject alloc] init];
-    mo1.anyCol = so;
     [mo1.anyArray addObject:so];
+    [r addObject:mo1];
     [r commitWriteTransaction];
+
+    XCTAssertThrows(mo1.anyCol = so1);
+    [r beginWriteTransaction];
+    mo1.anyCol = so1;
     
-    // Initialization via createInRealm fails
-    // Not sure what the expectation should be, but I'm surprised it's inconsistent with the other initialization.
-    // Perhaps an exception in the write transaction when attempting to write with unmanaged child?
     XCTAssertNotNil(mo0.anyCol);
     XCTAssertTrue([((StringObject *)mo0.anyCol).stringCol isEqualToString:so.stringCol]);
     XCTAssertEqual(mo0.anyCol.valueType, RLMPropertyTypeObject);
-    // ???: Subscripted so has no stringCol
-    //    XCTAssertTrue([mo0.anyArray[0].stringCol isEqualToString:so.stringCol]);
+    XCTAssertTrue([((StringObject *)mo0.anyArray[0]).stringCol isEqualToString:so.stringCol]);
 
-
-
-    XCTAssertNotNil(mo1.anyCol); // pass
-    XCTAssertTrue([((StringObject *)mo1.anyCol).stringCol isEqualToString:so.stringCol]); // pass
-    XCTAssertEqual(mo1.anyCol.valueType, RLMPropertyTypeObject); // pass
-    //    XCTAssertTrue([mo1.anyArray[0].stringCol isEqualToString:so.stringCol]);
-    
+    XCTAssertNotNil(mo1.anyCol);
+    XCTAssertTrue([((StringObject *)mo1.anyCol).stringCol isEqualToString:so1.stringCol]);
+    XCTAssertEqual(mo1.anyCol.valueType, RLMPropertyTypeObject);
+    XCTAssertTrue([((StringObject *)mo1.anyArray[0]).stringCol isEqualToString:so.stringCol]);
 }
 
 // difference between adding object and not!
@@ -470,9 +464,9 @@
     [r commitWriteTransaction];
 
     // handle lossy margin of error.
-    XCTAssertNotEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyCol).timeIntervalSince1970, .5);
-    XCTAssertNotEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyArray[0]).timeIntervalSince1970, .5);
-    XCTAssertNotEqualWithAccuracy(d2.timeIntervalSince1970, ((NSDate *)mo.anyArray[1]).timeIntervalSince1970, .5);
+    XCTAssertEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyCol).timeIntervalSince1970, 1.0);
+    XCTAssertEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyArray[0]).timeIntervalSince1970, 1.0);
+    XCTAssertEqualWithAccuracy(d2.timeIntervalSince1970, ((NSDate *)mo.anyArray[1]).timeIntervalSince1970, 1.0);
     XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeDate);
 }
 

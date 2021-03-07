@@ -61,6 +61,18 @@ static double average(NSArray *values) {
     return sum / c;
 }
 
+@interface LinkToAllPrimitiveSets : RLMObject
+@property (nonatomic) AllPrimitiveSets *link;
+@end
+@implementation LinkToAllPrimitiveSets
+@end
+
+@interface LinkToAllOptionalPrimitiveSets : RLMObject
+@property (nonatomic) AllOptionalPrimitiveSets *link;
+@end
+@implementation LinkToAllOptionalPrimitiveSets
+@end
+
 @interface PrimitiveSetPropertyTests : RLMTestCase
 @end
 
@@ -494,8 +506,8 @@ static double average(NSArray *values) {
 }
 
 - (void)testSum {
-    %nosum %unman RLMAssertThrowsWithReason([$set sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type set");
-    %nosum %man RLMAssertThrowsWithReason([$set sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type set '$class.$prop'");
+    %noany %nosum %unman RLMAssertThrowsWithReason([$set sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type set");
+    %noany %nosum %man RLMAssertThrowsWithReason([$set sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type set '$class.$prop'");
 
     %sum XCTAssertEqualObjects([$set sumOfProperty:@"self"], @0);
 
@@ -505,8 +517,8 @@ static double average(NSArray *values) {
 }
 
 - (void)testAverage {
-    %noavg %unman RLMAssertThrowsWithReason([$set averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type set");
-    %noavg %man RLMAssertThrowsWithReason([$set averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type set '$class.$prop'");
+    %noany %noavg %unman RLMAssertThrowsWithReason([$set averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type set");
+    %noany %noavg %man RLMAssertThrowsWithReason([$set averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type set '$class.$prop'");
 
     %avg XCTAssertNil([$set averageOfProperty:@"self"]);
 
@@ -721,6 +733,64 @@ static double average(NSArray *values) {
 #define RLMAssertCount(cls, expectedCount, ...) \
     XCTAssertEqual(expectedCount, ([cls objectsInRealm:realm where:__VA_ARGS__].count))
 
+- (void)createObjectWithValueIndex:(NSUInteger)index {
+    NSRange range = {index, 1};
+    id obj = [AllPrimitiveSets createInRealm:realm withValue:@{
+        %r %man @"$prop": [$values subarrayWithRange:range],
+        %any %man @"$prop": [$values subarrayWithRange:range],
+    }];
+    [LinkToAllPrimitiveSets createInRealm:realm withValue:@[obj]];
+    obj = [AllOptionalPrimitiveSets createInRealm:realm withValue:@{
+        %o %man @"$prop": [$values subarrayWithRange:range],
+    }];
+    [LinkToAllOptionalPrimitiveSets createInRealm:realm withValue:@[obj]];
+}
+
+- (void)testQueryBasicOperators {
+    [realm deleteAllObjects];
+
+    %man RLMAssertCount($class, 0, @"ANY $prop = %@", $v0);
+    %man RLMAssertCount($class, 0, @"ANY $prop != %@", $v0);
+    %man %minmax RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
+    %man %minmax RLMAssertCount($class, 0, @"ANY $prop >= %@", $v0);
+    %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
+    %man %minmax RLMAssertCount($class, 0, @"ANY $prop <= %@", $v0);
+
+    [self createObjectWithValueIndex:0];
+
+    %man RLMAssertCount($class, 0, @"ANY $prop = %@", $v1);
+    %man RLMAssertCount($class, 1, @"ANY $prop = %@", $v0);
+    %man RLMAssertCount($class, 0, @"ANY $prop != %@", $v0);
+    %man RLMAssertCount($class, 1, @"ANY $prop != %@", $v1);
+    %man %minmax RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
+    %man %minmax RLMAssertCount($class, 1, @"ANY $prop >= %@", $v0);
+    %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
+    %r %man %minmax RLMAssertCount($class, 1, @"ANY $prop < %@", $v1);
+    %o %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v1);
+    %man %minmax RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
+
+    [self createObjectWithValueIndex:1];
+
+    %man RLMAssertCount($class, 1, @"ANY $prop = %@", $v0);
+    %man RLMAssertCount($class, 1, @"ANY $prop = %@", $v1);
+    %man RLMAssertCount($class, 1, @"ANY $prop != %@", $v0);
+    %man RLMAssertCount($class, 1, @"ANY $prop != %@", $v1);
+    %r %man %minmax RLMAssertCount($class, 1, @"ANY $prop > %@", $v0);
+    %r %man %minmax RLMAssertCount($class, 2, @"ANY $prop >= %@", $v0);
+    %r %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
+    %r %man %minmax RLMAssertCount($class, 1, @"ANY $prop < %@", $v1);
+    %r %man %minmax RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
+    %r %man %minmax RLMAssertCount($class, 2, @"ANY $prop <= %@", $v1);
+
+    %o %man %minmax RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
+    %o %man %minmax RLMAssertCount($class, 1, @"ANY $prop >= %@", $v1);
+    %o %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v1);
+    %o %man %minmax RLMAssertCount($class, 1, @"ANY $prop < %@", $v2);
+    %o %man %minmax RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
+    %o %man %minmax RLMAssertCount($class, 1, @"ANY $prop <= %@", $v1);
+
+    %noany %man %nominmax RLMAssertThrows(([$class objectsInRealm:realm where:@"ANY $prop > %@", $v0]));
+}
 - (void)testQueryCount {
     [realm deleteAllObjects];
 

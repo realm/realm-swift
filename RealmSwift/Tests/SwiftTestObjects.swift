@@ -515,8 +515,11 @@ class SwiftIndexedPropertiesObject: Object {
     @objc dynamic var doubleCol: Double = 0.0
     @objc dynamic var dataCol = Data()
 
+    let anyCol = AnyRealmValue()
+
     override class func indexedProperties() -> [String] {
-        return ["stringCol", "intCol", "int8Col", "int16Col", "int32Col", "int64Col", "boolCol", "dateCol"]
+        return ["stringCol", "intCol", "int8Col", "int16Col",
+                "int32Col", "int64Col", "boolCol", "dateCol", "anyCol"]
     }
 }
 

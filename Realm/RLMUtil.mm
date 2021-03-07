@@ -389,15 +389,15 @@ BOOL RLMIsRunningInPlayground() {
     return [[NSBundle mainBundle].bundleIdentifier hasPrefix:@"com.apple.dt.playground."];
 }
 
-realm::Mixed RLMObjcToMixed(id v) {
+realm::Mixed RLMObjcToMixed(__unsafe_unretained id v, __unsafe_unretained RLMRealm *realm) {
     if (!v || v == NSNull.null) {
         return realm::Mixed();
     }
 
     RLMPropertyType type;
     if ([v isKindOfClass:[RLMValueBase class]]) {
-        type = [[v rlmValue] valueType];
         v = [v rlmValue];
+        type = [v valueType];
     }
     else if ([v conformsToProtocol:@protocol(RLMValue)]) {
         type = [v valueType];
@@ -425,6 +425,13 @@ realm::Mixed RLMObjcToMixed(id v) {
         case RLMPropertyTypeDate:
             return realm::Mixed(realm::Timestamp([(NSDate *)v timeIntervalSince1970], 0));
         case RLMPropertyTypeObject: {
+            // If we are unboxing an object and it is unmanaged, we need to
+            // add it to the Realm.
+            if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(v)) {
+                if (!objBase->_realm && !objBase.invalidated) {
+                    RLMAddObjectToRealm(objBase, realm, RLMUpdatePolicyError);
+                }
+            }
             return ((RLMObjectBase *)v)->_row.get_link();
         }
         case RLMPropertyTypeObjectId:
@@ -436,7 +443,7 @@ realm::Mixed RLMObjcToMixed(id v) {
     }
 }
 
-id RLMMixedToObjc(realm::Mixed const& mixed, RLMRealm *realm) {
+id RLMMixedToObjc(realm::Mixed const& mixed, __unsafe_unretained RLMRealm *realm) {
     if (mixed.is_null()) {
         return NSNull.null;
     }

@@ -122,4 +122,11 @@ public final class AnyRealmValue: RLMValueBase {
             ObjectiveCSupport.convert(value: rlmValue)
         }
     }
+
+    // Used for when retrieving an AnyRealmValue via KVC
+    internal convenience init(value: RLMValue?, object: RLMObjectBase, property: RLMProperty) {
+        self.init()
+        rlmValue = value
+        attachIfNeeded(withParent: object, property: property)
+    }
 }

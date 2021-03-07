@@ -214,7 +214,11 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
             RLMSetOptional(object_getIvar(self, ivar), value);
         }
         else if (auto valueBase = RLMDynamicCast<RLMValueBase>(object_getIvar(self, ivar))) {
-            valueBase.rlmValue = value;
+            if (auto v = RLMDynamicCast<RLMValueBase>(value)) {
+                valueBase.rlmValue = v.rlmValue;
+            } else {
+                valueBase.rlmValue = value;
+            }
         }
         return;
     }

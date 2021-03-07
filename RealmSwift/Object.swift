@@ -199,6 +199,12 @@ extension Object: RealmCollectionValue {
         if let ivar = prop.swiftIvar, prop.collection {
             return object_getIvar(self, ivar)
         }
+
+        if (prop.type == .any) {
+            return AnyRealmValue(value: RLMDynamicGet(self, prop) as? RLMValue,
+                                 object: self,
+                                 property: prop)
+        }
         return RLMDynamicGet(self, prop)
     }
 

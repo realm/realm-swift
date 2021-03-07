@@ -43,7 +43,8 @@
         catch (std::exception const& err) {
             @throw RLMException(err);
         }
-    } else {
+    }
+    else {
         [_parent willChangeValueForKey:_propertyName];
         _backingValue = value;
         [_parent didChangeValueForKey:_propertyName];
@@ -61,21 +62,20 @@
         catch (std::exception const& err) {
             @throw RLMException(err);
         }
-
-    } else {
+    }
+    else {
         return _backingValue;
     }
 }
 
-- (void)attachWithParent:(RLMObjectBase *)parent
-                property:(RLMProperty *)property
-                 managed:(BOOL)managed {
-    if (managed) {
-        REALM_ASSERT(parent->_realm);
+- (void)attachIfNeededWithParent:(RLMObjectBase *)parent
+                        property:(RLMProperty *)property {
+    if (!_managed) {
+        REALM_ASSERT_DEBUG(parent->_realm);
+        _parent = parent;
+        _propertyName = property.name;
+        _managed = YES;
     }
-    _parent = parent;
-    _propertyName = property.name;
-    _managed = managed;
 
     // If this mixed container stores an `Object` we need to manually add it
     // to the Realm.
@@ -84,8 +84,9 @@
         if (((RLMObjectBase *)_backingValue)->_realm)
             return;
         RLMAddObjectToRealm((RLMObjectBase *)_backingValue, parent->_realm, RLMUpdatePolicyError);
-        [self setRlmValue:_backingValue];
     }
+    [self setRlmValue:_backingValue];
+    _backingValue = nil;
 }
 
 @end

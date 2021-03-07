@@ -283,7 +283,7 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained id<RLMValue> const value) {
     RLMTranslateError([&] {
         if (value) {
-            obj->_row.set(key, RLMObjcToMixed(value));
+            obj->_row.set(key, RLMObjcToMixed(value, obj->_realm));
         }
         else {
             setNull(obj->_row, key);
@@ -849,14 +849,7 @@ realm::UUID RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
 }
 template<>
 realm::Mixed RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
-    // If we are unboxing an object and it is unmanaged, we need to
-    // add it to the Realm.
-    if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(v)) {
-        if (!objBase->_realm && !objBase.invalidated) {
-            RLMAddObjectToRealm(objBase, _realm, RLMUpdatePolicyError);
-        }
-    }
-    return RLMObjcToMixed(v);
+    return RLMObjcToMixed(v, _realm);
 }
 template<>
 realm::object_store::Dictionary RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {

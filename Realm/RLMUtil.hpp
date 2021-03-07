@@ -192,8 +192,8 @@ static inline void RLMNSStringToStdString(std::string &out, NSString *in) {
     out.resize(size);
 }
 
-realm::Mixed RLMObjcToMixed(id value);
-id RLMMixedToObjc(realm::Mixed const& value, RLMRealm *realm=nil);
+realm::Mixed RLMObjcToMixed(__unsafe_unretained id value, __unsafe_unretained RLMRealm *realm=nil);
+id RLMMixedToObjc(realm::Mixed const& value, __unsafe_unretained RLMRealm *realm=nil);
 
 realm::Decimal128 RLMObjcToDecimal128(id value);
 realm::UUID RLMObjcToUUID(__unsafe_unretained id const value);

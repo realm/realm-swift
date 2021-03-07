@@ -61,6 +61,18 @@ static double average(NSArray *values) {
     return sum / c;
 }
 
+@interface LinkToAllPrimitiveSets : RLMObject
+@property (nonatomic) AllPrimitiveSets *link;
+@end
+@implementation LinkToAllPrimitiveSets
+@end
+
+@interface LinkToAllOptionalPrimitiveSets : RLMObject
+@property (nonatomic) AllOptionalPrimitiveSets *link;
+@end
+@implementation LinkToAllOptionalPrimitiveSets
+@end
+
 @interface PrimitiveSetPropertyTests : RLMTestCase
 @end
 
@@ -3586,18 +3598,6 @@ static double average(NSArray *values) {
                               @"sumOfProperty: is not supported for object id set");
     RLMAssertThrowsWithReason([unmanaged.uuidObj sumOfProperty:@"self"], 
                               @"sumOfProperty: is not supported for uuid set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjA sumOfProperty:@"self"], 
-                              @"sumOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjE sumOfProperty:@"self"], 
-                              @"sumOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjF sumOfProperty:@"self"], 
-                              @"sumOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjG sumOfProperty:@"self"], 
-                              @"sumOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjI sumOfProperty:@"self"], 
-                              @"sumOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjJ sumOfProperty:@"self"], 
-                              @"sumOfProperty: is not supported for mixed set");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj sumOfProperty:@"self"], 
                               @"sumOfProperty: is not supported for string? set");
     RLMAssertThrowsWithReason([optUnmanaged.dataObj sumOfProperty:@"self"], 
@@ -3620,18 +3620,6 @@ static double average(NSArray *values) {
                               @"sumOfProperty: is not supported for object id set 'AllPrimitiveSets.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj sumOfProperty:@"self"], 
                               @"sumOfProperty: is not supported for uuid set 'AllPrimitiveSets.uuidObj'");
-    RLMAssertThrowsWithReason([managed.anyObjA sumOfProperty:@"self"], 
-                              @"sumOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjA'");
-    RLMAssertThrowsWithReason([managed.anyObjE sumOfProperty:@"self"], 
-                              @"sumOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjE'");
-    RLMAssertThrowsWithReason([managed.anyObjF sumOfProperty:@"self"], 
-                              @"sumOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjF'");
-    RLMAssertThrowsWithReason([managed.anyObjG sumOfProperty:@"self"], 
-                              @"sumOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjG'");
-    RLMAssertThrowsWithReason([managed.anyObjI sumOfProperty:@"self"], 
-                              @"sumOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjI'");
-    RLMAssertThrowsWithReason([managed.anyObjJ sumOfProperty:@"self"], 
-                              @"sumOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjJ'");
     RLMAssertThrowsWithReason([optManaged.boolObj sumOfProperty:@"self"], 
                               @"sumOfProperty: is not supported for bool? set 'AllOptionalPrimitiveSets.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj sumOfProperty:@"self"], 
@@ -3711,18 +3699,6 @@ static double average(NSArray *values) {
                               @"averageOfProperty: is not supported for object id set");
     RLMAssertThrowsWithReason([unmanaged.uuidObj averageOfProperty:@"self"], 
                               @"averageOfProperty: is not supported for uuid set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjA averageOfProperty:@"self"], 
-                              @"averageOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjE averageOfProperty:@"self"], 
-                              @"averageOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjF averageOfProperty:@"self"], 
-                              @"averageOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjG averageOfProperty:@"self"], 
-                              @"averageOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjI averageOfProperty:@"self"], 
-                              @"averageOfProperty: is not supported for mixed set");
-    RLMAssertThrowsWithReason([unmanaged.anyObjJ averageOfProperty:@"self"], 
-                              @"averageOfProperty: is not supported for mixed set");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj averageOfProperty:@"self"], 
                               @"averageOfProperty: is not supported for string? set");
     RLMAssertThrowsWithReason([optUnmanaged.dataObj averageOfProperty:@"self"], 
@@ -3745,18 +3721,6 @@ static double average(NSArray *values) {
                               @"averageOfProperty: is not supported for object id set 'AllPrimitiveSets.objectIdObj'");
     RLMAssertThrowsWithReason([managed.uuidObj averageOfProperty:@"self"], 
                               @"averageOfProperty: is not supported for uuid set 'AllPrimitiveSets.uuidObj'");
-    RLMAssertThrowsWithReason([managed.anyObjA averageOfProperty:@"self"], 
-                              @"averageOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjA'");
-    RLMAssertThrowsWithReason([managed.anyObjE averageOfProperty:@"self"], 
-                              @"averageOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjE'");
-    RLMAssertThrowsWithReason([managed.anyObjF averageOfProperty:@"self"], 
-                              @"averageOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjF'");
-    RLMAssertThrowsWithReason([managed.anyObjG averageOfProperty:@"self"], 
-                              @"averageOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjG'");
-    RLMAssertThrowsWithReason([managed.anyObjI averageOfProperty:@"self"], 
-                              @"averageOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjI'");
-    RLMAssertThrowsWithReason([managed.anyObjJ averageOfProperty:@"self"], 
-                              @"averageOfProperty: is not supported for mixed set 'AllPrimitiveSets.anyObjJ'");
     RLMAssertThrowsWithReason([optManaged.boolObj averageOfProperty:@"self"], 
                               @"averageOfProperty: is not supported for bool? set 'AllOptionalPrimitiveSets.boolObj'");
     RLMAssertThrowsWithReason([optManaged.stringObj averageOfProperty:@"self"], 
@@ -5995,6 +5959,603 @@ static double average(NSArray *values) {
 #define RLMAssertCount(cls, expectedCount, ...) \
     XCTAssertEqual(expectedCount, ([cls objectsInRealm:realm where:__VA_ARGS__].count))
 
+- (void)createObjectWithValueIndex:(NSUInteger)index {
+    NSRange range = {index, 1};
+    id obj = [AllPrimitiveSets createInRealm:realm withValue:@{
+        @"boolObj": [@[@NO, @YES] subarrayWithRange:range],
+        @"intObj": [@[@2, @3] subarrayWithRange:range],
+        @"floatObj": [@[@2.2f, @3.3f] subarrayWithRange:range],
+        @"doubleObj": [@[@2.2, @3.3] subarrayWithRange:range],
+        @"stringObj": [@[@"a", @"bc"] subarrayWithRange:range],
+        @"dataObj": [@[data(1), data(2)] subarrayWithRange:range],
+        @"dateObj": [@[date(1), date(2)] subarrayWithRange:range],
+        @"decimalObj": [@[decimal128(1), decimal128(2)] subarrayWithRange:range],
+        @"objectIdObj": [@[objectId(1), objectId(2)] subarrayWithRange:range],
+        @"uuidObj": [@[uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000")] subarrayWithRange:range],
+        @"anyObjA": [@[@NO, @YES] subarrayWithRange:range],
+        @"anyObjB": [@[@2, @3] subarrayWithRange:range],
+        @"anyObjC": [@[@2.2f, @3.3f] subarrayWithRange:range],
+        @"anyObjD": [@[@2.2, @3.3] subarrayWithRange:range],
+        @"anyObjE": [@[@"a", @"b"] subarrayWithRange:range],
+        @"anyObjF": [@[data(1), data(2)] subarrayWithRange:range],
+        @"anyObjG": [@[date(1), date(2)] subarrayWithRange:range],
+        @"anyObjH": [@[decimal128(2), decimal128(3)] subarrayWithRange:range],
+        @"anyObjI": [@[objectId(1), objectId(2)] subarrayWithRange:range],
+        @"anyObjJ": [@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")] subarrayWithRange:range],
+        @"anyObjA": [@[@NO, @YES] subarrayWithRange:range],
+        @"anyObjB": [@[@2, @3] subarrayWithRange:range],
+        @"anyObjC": [@[@2.2f, @3.3f] subarrayWithRange:range],
+        @"anyObjD": [@[@2.2, @3.3] subarrayWithRange:range],
+        @"anyObjE": [@[@"a", @"b"] subarrayWithRange:range],
+        @"anyObjF": [@[data(1), data(2)] subarrayWithRange:range],
+        @"anyObjG": [@[date(1), date(2)] subarrayWithRange:range],
+        @"anyObjH": [@[decimal128(2), decimal128(3)] subarrayWithRange:range],
+        @"anyObjI": [@[objectId(1), objectId(2)] subarrayWithRange:range],
+        @"anyObjJ": [@[uuid(@"00000000-0000-0000-0000-000000000000"), uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")] subarrayWithRange:range],
+    }];
+    [LinkToAllPrimitiveSets createInRealm:realm withValue:@[obj]];
+    obj = [AllOptionalPrimitiveSets createInRealm:realm withValue:@{
+        @"boolObj": [@[NSNull.null, @NO, @YES] subarrayWithRange:range],
+        @"intObj": [@[NSNull.null, @2, @3] subarrayWithRange:range],
+        @"floatObj": [@[NSNull.null, @2.2f, @3.3f] subarrayWithRange:range],
+        @"doubleObj": [@[NSNull.null, @2.2, @3.3] subarrayWithRange:range],
+        @"stringObj": [@[NSNull.null, @"a", @"bc"] subarrayWithRange:range],
+        @"dataObj": [@[NSNull.null, data(1), data(2)] subarrayWithRange:range],
+        @"dateObj": [@[NSNull.null, date(1), date(2)] subarrayWithRange:range],
+        @"decimalObj": [@[NSNull.null, decimal128(1), decimal128(2)] subarrayWithRange:range],
+        @"objectIdObj": [@[NSNull.null, objectId(1), objectId(2)] subarrayWithRange:range],
+        @"uuidObj": [@[NSNull.null, uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"), uuid(@"00000000-0000-0000-0000-000000000000")] subarrayWithRange:range],
+    }];
+    [LinkToAllOptionalPrimitiveSets createInRealm:realm withValue:@[obj]];
+}
+
+- (void)testQueryBasicOperators {
+    [realm deleteAllObjects];
+
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY boolObj = %@", @NO);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY intObj = %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY floatObj = %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY doubleObj = %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY stringObj = %@", @"a");
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dataObj = %@", data(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dateObj = %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY decimalObj = %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY objectIdObj = %@", objectId(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjA = %@", @NO);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjB = %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjC = %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjD = %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjE = %@", @"a");
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjF = %@", data(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjG = %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjH = %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjI = %@", objectId(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjJ = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY boolObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY intObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY floatObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY doubleObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY stringObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dataObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dateObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY decimalObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY objectIdObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY uuidObj = %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY boolObj != %@", @NO);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY intObj != %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY floatObj != %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY doubleObj != %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY stringObj != %@", @"a");
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dataObj != %@", data(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dateObj != %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY decimalObj != %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY objectIdObj != %@", objectId(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjA != %@", @NO);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjB != %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjC != %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjD != %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjE != %@", @"a");
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjF != %@", data(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjG != %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjH != %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjI != %@", objectId(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjJ != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY boolObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY intObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY floatObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY doubleObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY stringObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dataObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dateObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY decimalObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY objectIdObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY uuidObj != %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY intObj > %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY floatObj > %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY doubleObj > %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dateObj > %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY decimalObj > %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjB > %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjC > %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjD > %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjG > %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjH > %@", decimal128(2));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY intObj > %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY floatObj > %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY doubleObj > %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dateObj > %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY decimalObj > %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY intObj >= %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY floatObj >= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY doubleObj >= %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dateObj >= %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY decimalObj >= %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjB >= %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjC >= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjD >= %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjG >= %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjH >= %@", decimal128(2));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY intObj >= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY floatObj >= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY doubleObj >= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dateObj >= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY decimalObj >= %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY intObj < %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY floatObj < %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY doubleObj < %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dateObj < %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY decimalObj < %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjB < %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjC < %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjD < %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjG < %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjH < %@", decimal128(2));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY intObj < %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY floatObj < %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY doubleObj < %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dateObj < %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY decimalObj < %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY intObj <= %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY floatObj <= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY doubleObj <= %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dateObj <= %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY decimalObj <= %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjB <= %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjC <= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjD <= %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjG <= %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjH <= %@", decimal128(2));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY intObj <= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY floatObj <= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY doubleObj <= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dateObj <= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY decimalObj <= %@", NSNull.null);
+
+    [self createObjectWithValueIndex:0];
+
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY boolObj = %@", @YES);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY intObj = %@", @3);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY floatObj = %@", @3.3f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY doubleObj = %@", @3.3);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY stringObj = %@", @"bc");
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dataObj = %@", data(2));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dateObj = %@", date(2));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY decimalObj = %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY objectIdObj = %@", objectId(2));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjA = %@", @YES);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjB = %@", @3);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjC = %@", @3.3f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjD = %@", @3.3);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjE = %@", @"b");
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjF = %@", data(2));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjG = %@", date(2));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjH = %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjI = %@", objectId(2));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjJ = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY boolObj = %@", @NO);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY intObj = %@", @2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY floatObj = %@", @2.2f);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY doubleObj = %@", @2.2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY stringObj = %@", @"a");
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dataObj = %@", data(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dateObj = %@", date(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY decimalObj = %@", decimal128(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY objectIdObj = %@", objectId(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY boolObj = %@", @NO);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY intObj = %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY floatObj = %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY doubleObj = %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY stringObj = %@", @"a");
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dataObj = %@", data(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dateObj = %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY decimalObj = %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY objectIdObj = %@", objectId(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjA = %@", @NO);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjB = %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjC = %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjD = %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjE = %@", @"a");
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjF = %@", data(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjG = %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjH = %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjI = %@", objectId(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjJ = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY boolObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY intObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY floatObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY doubleObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY stringObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dataObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dateObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY decimalObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY objectIdObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY uuidObj = %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY boolObj != %@", @NO);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY intObj != %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY floatObj != %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY doubleObj != %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY stringObj != %@", @"a");
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dataObj != %@", data(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dateObj != %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY decimalObj != %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY objectIdObj != %@", objectId(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjA != %@", @NO);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjB != %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjC != %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjD != %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjE != %@", @"a");
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjF != %@", data(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjG != %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjH != %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjI != %@", objectId(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjJ != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY boolObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY intObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY floatObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY doubleObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY stringObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dataObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dateObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY decimalObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY objectIdObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY uuidObj != %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY boolObj != %@", @YES);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY intObj != %@", @3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY floatObj != %@", @3.3f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY doubleObj != %@", @3.3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY stringObj != %@", @"bc");
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dataObj != %@", data(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dateObj != %@", date(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY decimalObj != %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY objectIdObj != %@", objectId(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjA != %@", @YES);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjB != %@", @3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjC != %@", @3.3f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjD != %@", @3.3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjE != %@", @"b");
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjF != %@", data(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjG != %@", date(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjH != %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjI != %@", objectId(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjJ != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY boolObj != %@", @NO);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY intObj != %@", @2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY floatObj != %@", @2.2f);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY doubleObj != %@", @2.2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY stringObj != %@", @"a");
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dataObj != %@", data(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dateObj != %@", date(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY decimalObj != %@", decimal128(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY objectIdObj != %@", objectId(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY intObj > %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY floatObj > %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY doubleObj > %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dateObj > %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY decimalObj > %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjB > %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjC > %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjD > %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjG > %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjH > %@", decimal128(2));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY intObj > %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY floatObj > %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY doubleObj > %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dateObj > %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY decimalObj > %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY intObj >= %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY floatObj >= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY doubleObj >= %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dateObj >= %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY decimalObj >= %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjB >= %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjC >= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjD >= %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjG >= %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjH >= %@", decimal128(2));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY intObj >= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY floatObj >= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY doubleObj >= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dateObj >= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY decimalObj >= %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY intObj < %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY floatObj < %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY doubleObj < %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dateObj < %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY decimalObj < %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjB < %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjC < %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjD < %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjG < %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjH < %@", decimal128(2));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY intObj < %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY floatObj < %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY doubleObj < %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dateObj < %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY decimalObj < %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY intObj < %@", @3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY floatObj < %@", @3.3f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY doubleObj < %@", @3.3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dateObj < %@", date(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY decimalObj < %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjB < %@", @3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjC < %@", @3.3f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjD < %@", @3.3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjG < %@", date(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjH < %@", decimal128(3));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY intObj < %@", @2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY floatObj < %@", @2.2f);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY doubleObj < %@", @2.2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dateObj < %@", date(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY decimalObj < %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY intObj <= %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY floatObj <= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY doubleObj <= %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dateObj <= %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY decimalObj <= %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjB <= %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjC <= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjD <= %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjG <= %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjH <= %@", decimal128(2));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY intObj <= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY floatObj <= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY doubleObj <= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dateObj <= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY decimalObj <= %@", NSNull.null);
+
+    [self createObjectWithValueIndex:1];
+
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY boolObj = %@", @NO);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY intObj = %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY floatObj = %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY doubleObj = %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY stringObj = %@", @"a");
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dataObj = %@", data(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dateObj = %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY decimalObj = %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY objectIdObj = %@", objectId(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjA = %@", @NO);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjB = %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjC = %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjD = %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjE = %@", @"a");
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjF = %@", data(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjG = %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjH = %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjI = %@", objectId(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjJ = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY boolObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY intObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY floatObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY doubleObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY stringObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dataObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dateObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY decimalObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY objectIdObj = %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY uuidObj = %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY boolObj = %@", @YES);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY intObj = %@", @3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY floatObj = %@", @3.3f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY doubleObj = %@", @3.3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY stringObj = %@", @"bc");
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dataObj = %@", data(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dateObj = %@", date(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY decimalObj = %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY objectIdObj = %@", objectId(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY uuidObj = %@", uuid(@"00000000-0000-0000-0000-000000000000"));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjA = %@", @YES);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjB = %@", @3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjC = %@", @3.3f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjD = %@", @3.3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjE = %@", @"b");
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjF = %@", data(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjG = %@", date(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjH = %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjI = %@", objectId(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjJ = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY boolObj = %@", @NO);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY intObj = %@", @2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY floatObj = %@", @2.2f);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY doubleObj = %@", @2.2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY stringObj = %@", @"a");
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dataObj = %@", data(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dateObj = %@", date(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY decimalObj = %@", decimal128(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY objectIdObj = %@", objectId(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY uuidObj = %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY boolObj != %@", @NO);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY intObj != %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY floatObj != %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY doubleObj != %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY stringObj != %@", @"a");
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dataObj != %@", data(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dateObj != %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY decimalObj != %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY objectIdObj != %@", objectId(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjA != %@", @NO);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjB != %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjC != %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjD != %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjE != %@", @"a");
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjF != %@", data(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjG != %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjH != %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjI != %@", objectId(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjJ != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY boolObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY intObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY floatObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY doubleObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY stringObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dataObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dateObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY decimalObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY objectIdObj != %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY uuidObj != %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY boolObj != %@", @YES);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY intObj != %@", @3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY floatObj != %@", @3.3f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY doubleObj != %@", @3.3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY stringObj != %@", @"bc");
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dataObj != %@", data(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dateObj != %@", date(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY decimalObj != %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY objectIdObj != %@", objectId(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY uuidObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjA != %@", @YES);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjB != %@", @3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjC != %@", @3.3f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjD != %@", @3.3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjE != %@", @"b");
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjF != %@", data(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjG != %@", date(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjH != %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjI != %@", objectId(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjJ != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY boolObj != %@", @NO);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY intObj != %@", @2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY floatObj != %@", @2.2f);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY doubleObj != %@", @2.2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY stringObj != %@", @"a");
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dataObj != %@", data(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dateObj != %@", date(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY decimalObj != %@", decimal128(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY objectIdObj != %@", objectId(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY uuidObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY intObj > %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY floatObj > %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY doubleObj > %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dateObj > %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY decimalObj > %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjB > %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjC > %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjD > %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjG > %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjH > %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY intObj >= %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY floatObj >= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY doubleObj >= %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY dateObj >= %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY decimalObj >= %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY anyObjB >= %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY anyObjC >= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY anyObjD >= %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY anyObjG >= %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY anyObjH >= %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY intObj < %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY floatObj < %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY doubleObj < %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY dateObj < %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY decimalObj < %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjB < %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjC < %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjD < %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjG < %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 0, @"ANY anyObjH < %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY intObj < %@", @3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY floatObj < %@", @3.3f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY doubleObj < %@", @3.3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dateObj < %@", date(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY decimalObj < %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjB < %@", @3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjC < %@", @3.3f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjD < %@", @3.3);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjG < %@", date(2));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjH < %@", decimal128(3));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY intObj <= %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY floatObj <= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY doubleObj <= %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY dateObj <= %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY decimalObj <= %@", decimal128(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjB <= %@", @2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjC <= %@", @2.2f);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjD <= %@", @2.2);
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjG <= %@", date(1));
+    RLMAssertCount(AllPrimitiveSets, 1, @"ANY anyObjH <= %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY intObj <= %@", @3);
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY floatObj <= %@", @3.3f);
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY doubleObj <= %@", @3.3);
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY dateObj <= %@", date(2));
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY decimalObj <= %@", decimal128(2));
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY anyObjB <= %@", @3);
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY anyObjC <= %@", @3.3f);
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY anyObjD <= %@", @3.3);
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY anyObjG <= %@", date(2));
+    RLMAssertCount(AllPrimitiveSets, 2, @"ANY anyObjH <= %@", decimal128(3));
+
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY intObj > %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY floatObj > %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY doubleObj > %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dateObj > %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY decimalObj > %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY intObj >= %@", @2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY floatObj >= %@", @2.2f);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY doubleObj >= %@", @2.2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dateObj >= %@", date(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY decimalObj >= %@", decimal128(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY intObj < %@", @2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY floatObj < %@", @2.2f);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY doubleObj < %@", @2.2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY dateObj < %@", date(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 0, @"ANY decimalObj < %@", decimal128(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY intObj < %@", @3);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY floatObj < %@", @3.3f);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY doubleObj < %@", @3.3);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dateObj < %@", date(2));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY decimalObj < %@", decimal128(2));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY intObj <= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY floatObj <= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY doubleObj <= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dateObj <= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY decimalObj <= %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY intObj <= %@", @2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY floatObj <= %@", @2.2f);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY doubleObj <= %@", @2.2);
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY dateObj <= %@", date(1));
+    RLMAssertCount(AllOptionalPrimitiveSets, 1, @"ANY decimalObj <= %@", decimal128(1));
+
+    RLMAssertThrows(([AllPrimitiveSets objectsInRealm:realm where:@"ANY boolObj > %@", @NO]));
+    RLMAssertThrows(([AllPrimitiveSets objectsInRealm:realm where:@"ANY stringObj > %@", @"a"]));
+    RLMAssertThrows(([AllPrimitiveSets objectsInRealm:realm where:@"ANY dataObj > %@", data(1)]));
+    RLMAssertThrows(([AllPrimitiveSets objectsInRealm:realm where:@"ANY objectIdObj > %@", objectId(1)]));
+    RLMAssertThrows(([AllPrimitiveSets objectsInRealm:realm where:@"ANY uuidObj > %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]));
+    RLMAssertThrows(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"ANY boolObj > %@", NSNull.null]));
+    RLMAssertThrows(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"ANY stringObj > %@", NSNull.null]));
+    RLMAssertThrows(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"ANY dataObj > %@", NSNull.null]));
+    RLMAssertThrows(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"ANY objectIdObj > %@", NSNull.null]));
+    RLMAssertThrows(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"ANY uuidObj > %@", NSNull.null]));
+}
 - (void)testQueryCount {
     [realm deleteAllObjects];
 
