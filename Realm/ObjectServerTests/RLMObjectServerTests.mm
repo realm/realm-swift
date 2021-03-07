@@ -561,31 +561,72 @@ static NSString *randomEmail() {
     RLMUser *user = [self userForTest:_cmd];
     NSString *realmId = NSStringFromSelector(_cmd);
     RLMRealm *realm = [self openRealmForPartitionValue:realmId user:user];
+    NSDictionary *values = [AllTypesSyncObject values:1];
+
     if (self.isParent) {
         CHECK_COUNT(0, Person, realm);
+        CHECK_COUNT(0, AllTypesSyncObject, realm)
         RLMRunChildAndWait();
         [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(4, Person, realm);
+        CHECK_COUNT(1, AllTypesSyncObject, realm);
+
+        AllTypesSyncObject *obj = [[AllTypesSyncObject allObjectsInRealm:realm] firstObject];
+        XCTAssertEqual(obj.boolCol,                           [values[@"boolCol"] boolValue]);
+        XCTAssertEqual(obj.cBoolCol,                          [values[@"cBoolCol"] boolValue]);
+        XCTAssertEqual(obj.intCol,                            [values[@"intCol"] intValue]);
+        XCTAssertEqual(obj.doubleCol,                         [values[@"doubleCol"] doubleValue]);
+        XCTAssertEqualObjects(obj.stringCol,                   values[@"stringCol"]);
+        XCTAssertEqualObjects(obj.binaryCol,         (NSData *)values[@"binaryCol"]);
+        XCTAssertEqualObjects(obj.decimalCol, (RLMDecimal128 *)values[@"decimalCol"]);
+        XCTAssertEqual(obj.dateCol,                            values[@"dateCol"]);
+        XCTAssertEqual(obj.longCol,                           [values[@"longCol"] longValue]);
+        XCTAssertEqualObjects(obj.uuidCol,                     values[@"uuidCol"]);
+        XCTAssertEqualObjects((NSNumber *)obj.anyCol,          values[@"anyCol"]);
+        XCTAssertEqualObjects(obj.objectCol.firstName,        [Person ringo].firstName);
+
     } else {
         // Add objects.
         [self addPersonsToRealm:realm
                         persons:@[[Person john],
                                   [Person paul],
-                                  [Person ringo],
                                   [Person george]]];
+
+        [self addAllTypesSyncObjectToRealm:realm
+                                    values:values
+                                    person:[Person ringo]];
+
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(4, Person, realm);
+        CHECK_COUNT(1, AllTypesSyncObject, realm)
     }
 }
 
 - (void)testAddObjectsWithNilPartitionValue {
     RLMRealm *realm = [self openRealmForPartitionValue:nil user:self.anonymousUser];
 
+    NSDictionary *values = [AllTypesSyncObject values:1];
     if (self.isParent) {
         CHECK_COUNT(0, Person, realm);
+        CHECK_COUNT(0, AllTypesSyncObject, realm)
         RLMRunChildAndWait();
         [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(4, Person, realm);
+        CHECK_COUNT(1, AllTypesSyncObject, realm);
+
+        AllTypesSyncObject *obj = [[AllTypesSyncObject allObjectsInRealm:realm] firstObject];
+        XCTAssertEqual(obj.boolCol,                           [values[@"boolCol"] boolValue]);
+        XCTAssertEqual(obj.cBoolCol,                          [values[@"cBoolCol"] boolValue]);
+        XCTAssertEqual(obj.intCol,                            [values[@"intCol"] intValue]);
+        XCTAssertEqual(obj.doubleCol,                         [values[@"doubleCol"] doubleValue]);
+        XCTAssertEqualObjects(obj.stringCol,                   values[@"stringCol"]);
+        XCTAssertEqualObjects(obj.binaryCol,         (NSData *)values[@"binaryCol"]);
+        XCTAssertEqualObjects(obj.decimalCol, (RLMDecimal128 *)values[@"decimalCol"]);
+        XCTAssertEqual(obj.dateCol,                            values[@"dateCol"]);
+        XCTAssertEqual(obj.longCol,                           [values[@"longCol"] longValue]);
+        XCTAssertEqualObjects(obj.uuidCol,                     values[@"uuidCol"]);
+        XCTAssertEqualObjects((NSNumber *)obj.anyCol,          values[@"anyCol"]);
+        XCTAssertEqualObjects(obj.objectCol.firstName,        [Person ringo].firstName);
 
         // Other tests expect the nil partition to be empty so we need to clean up
         [realm transactionWithBlock:^{
@@ -597,8 +638,12 @@ static NSString *randomEmail() {
         [self addPersonsToRealm:realm
                         persons:@[[Person john],
                                   [Person paul],
-                                  [Person ringo],
                                   [Person george]]];
+
+        [self addAllTypesSyncObjectToRealm:realm
+                                    values:values
+                                    person:[Person ringo]];
+
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(4, Person, realm);
     }
