@@ -327,9 +327,9 @@
     [r commitWriteTransaction];
 
     // handle lossy margin of error.
-    XCTAssertNotEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyCol).timeIntervalSince1970, .1);
-    XCTAssertNotEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyArray[0]).timeIntervalSince1970, .1);
-    XCTAssertNotEqualWithAccuracy(d2.timeIntervalSince1970, ((NSDate *)mo.anyArray[1]).timeIntervalSince1970, .1);
+    XCTAssertEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyCol).timeIntervalSince1970, 1);
+    XCTAssertEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyArray[0]).timeIntervalSince1970, 1);
+    XCTAssertEqualWithAccuracy(d2.timeIntervalSince1970, ((NSDate *)mo.anyArray[1]).timeIntervalSince1970, 1);
     XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeDate);
 }
 
@@ -505,8 +505,5 @@
     XCTAssertTrue([(RLMDecimal128 *)mo.anyArray[1] isEqualTo:d2]);
     XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeDecimal128);
 }
-
-
-#pragma mark - change managed value types
 
 @end

@@ -18,52 +18,90 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMDecimal128.h"
-#import "RLMObject.h"
-#import "RLMObjectBase.h"
-#import "RLMObjectId.h"
-#import "RLMProperty.h"
+#import <Realm/RLMDecimal128.h>
+#import <Realm/RLMObject.h>
+#import <Realm/RLMObjectBase.h>
+#import <Realm/RLMObjectId.h>
+#import <Realm/RLMProperty.h>
 
-NS_ASSUME_NONNULL_BEGIN
+#pragma mark RLMValue
 
-#pragma mark RLMValueType
+/**
+ RLMValue is a property type which represents a polymorphic Realm value. This is similar to the usage of
+ `AnyObject` / `Any` in Swift.
 
+ - Usage:
+ `
+ @interface MyObject : RLMObject
+ @property (nonatomic) id<RLMValue> myAnyValue;
+ @end
+
+ @interface AnotherObject : RLMObject
+ @property (nonatomic) id<RLMValue> myAnyValue;
+ @end
+ ...
+ MyObject *myObject = [MyObject createInRealm:realm withValue:@[]];
+ myObject.myAnyValue = @1234; // underlying type is NSNumber.
+ myObject.myAnyValue = @"hello"; // underlying type is NSString.
+ AnotherObject *anotherObject = [AnotherObject createInRealm:realm withValue:@[]];
+ myObject.myAnyValue = anotherObject; // underlying type is RLMObject.
+ `
+
+ The following types conform to RLMValue:
+
+ `NSData`
+ `NSDate`
+ `NSNull`
+ `NSNumber`
+ `NSUUID`
+ `NSString`
+ `RLMObject
+ `RLMObjectId`
+ `RLMDecimal128`
+ */
 @protocol RLMValue
+
 /// Describes the type of property stored.
 @property (readonly) RLMPropertyType valueType NS_REFINED_FOR_SWIFT;
 
 @end
 
-// !!! Alphabetize later
+/// :nodoc:
 @interface NSNull (RLMValue)<RLMValue>
 @end
 
+/// :nodoc:
 @interface NSNumber (RLMValue)<RLMValue>
 @end
 
+/// :nodoc:
 @interface NSString (RLMValue)<RLMValue>
 @end
 
+/// :nodoc:
 @interface NSData (RLMValue)<RLMValue>
 @end
 
+/// :nodoc:
 @interface NSDate (RLMValue)<RLMValue>
 @end
 
-@interface RLMObject (RLMValue)<RLMValue>
-@end
-
-@interface RLMObjectBase (RLMValue)<RLMValue>
-@end
-
-@interface RLMObjectId (RLMValue)<RLMValue>
-@end
-
-@interface RLMDecimal128 (RLMValue)<RLMValue>
-@end
-
+/// :nodoc:
 @interface NSUUID (RLMValue)<RLMValue>
 @end
 
-NS_ASSUME_NONNULL_END
+/// :nodoc:
+@interface RLMDecimal128 (RLMValue)<RLMValue>
+@end
 
+/// :nodoc:
+@interface RLMObject (RLMValue)<RLMValue>
+@end
+
+/// :nodoc:
+@interface RLMObjectBase (RLMValue)<RLMValue>
+@end
+
+/// :nodoc:
+@interface RLMObjectId (RLMValue)<RLMValue>
+@end

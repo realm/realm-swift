@@ -19,6 +19,26 @@
 #import "RLMValue.h"
 #import "RLMUtil.hpp"
 
+#pragma mark NSData
+
+@implementation NSData (RLMValue)
+
+- (RLMPropertyType)valueType {
+    return RLMPropertyTypeData;
+}
+
+@end
+
+#pragma mark NSDate
+
+@implementation NSDate (RLMValue)
+
+- (RLMPropertyType)valueType {
+    return RLMPropertyTypeDate;
+}
+
+@end
+
 #pragma mark NSNumber
 
 @implementation NSNumber (RLMValue)
@@ -43,13 +63,7 @@
 
 @end
 
-@implementation NSUUID (RLMValue)
-
-- (RLMPropertyType)valueType {
-    return RLMPropertyTypeUUID;
-}
-
-@end
+#pragma mark NSNull
 
 @implementation NSNull (RLMValue)
 
@@ -59,6 +73,8 @@
 
 @end
 
+#pragma mark NSString
+
 @implementation NSString (RLMValue)
 
 - (RLMPropertyType)valueType {
@@ -67,21 +83,27 @@
 
 @end
 
-@implementation NSData (RLMValue)
+#pragma mark NSUUID
+
+@implementation NSUUID (RLMValue)
 
 - (RLMPropertyType)valueType {
-    return RLMPropertyTypeData;
+    return RLMPropertyTypeUUID;
 }
 
 @end
 
-@implementation NSDate (RLMValue)
+#pragma mark RLMDecimal128
+
+@implementation RLMDecimal128 (RLMValue)
 
 - (RLMPropertyType)valueType {
-    return RLMPropertyTypeDate;
+    return RLMPropertyTypeDecimal128;
 }
 
 @end
+
+#pragma mark RLMObject
 
 @implementation RLMObject (RLMValue)
 
@@ -91,6 +113,8 @@
 
 @end
 
+#pragma mark RLMObjectBase
+
 @implementation RLMObjectBase (RLMValue)
 
 - (RLMPropertyType)valueType {
@@ -99,18 +123,12 @@
 
 @end
 
+#pragma mark RLMObjectId
+
 @implementation RLMObjectId (RLMValue)
 
 - (RLMPropertyType)valueType {
     return RLMPropertyTypeObjectId;
-}
-
-@end
-
-@implementation RLMDecimal128 (RLMValue)
-
-- (RLMPropertyType)valueType {
-    return RLMPropertyTypeDecimal128;
 }
 
 @end
