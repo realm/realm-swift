@@ -4,6 +4,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add support for retrying a [custom confirmation](https://docs.mongodb.com/realm/authentication/email-password/#run-a-confirmation-function) function.
 - `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)`
 - `[App.emailPasswordAuth retryCustomConfirmation:completion:]`
+* None.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
@@ -15,10 +16,91 @@ x.y.z Release notes (yyyy-MM-dd)
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.3.
+* Carthage release for Swift is built with Xcode 12.4.
 * CocoaPods: 1.10 or later.
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.7.1 Release notes (2021-03-05)
+=============================================================
+
+### Fixed
+
+* Queries of the form "a.b.c == nil" would match objects where `b` is `nil` if
+  `c` did not have an index and did not if `c` was indexed. Both will now match
+  to align with NSPredicate's behavior. ([Core #4460]https://github.com/realm/realm-core/pull/4460), since 4.3.0).
+* Restore support for upgrading files from file format 5 (Realm Cocoa 1.x).
+  ([Core #7089](https://github.com/realm/realm-cocoa/issues/7089), since v5.0.0)
+* On 32bit devices you may get exception with "No such object" when upgrading
+  to v10.* ([Java #7314](https://github.com/realm/realm-java/issues/7314), since v5.0.0)
+* The notification worker thread would rerun queries after every commit rather
+  than only commits which modified tables which could effect the query results
+  if the table had any outgoing links to tables not used in the query.
+  ([Core #4456](https://github.com/realm/realm-core/pull/4456), since v5.0.0).
+* Fix "Invalid ref translation entry [16045690984833335023, 78187493520]"
+  assertion failure which could occur when using sync or multiple processes
+  writing to a single Realm file.
+  ([#7086](https://github.com/realm/realm-cocoa/issues/7086), since v5.0.0).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.5.3 to v10.5.4
+
+10.7.0 Release notes (2021-02-23)
+=============================================================
+
+### Enhancements
+
+* Add support for some missing query operations on data propertys:
+  - Data properties can be compared to other data properties
+    (e.g. "dataProperty1 == dataProperty2").
+  - Case and diacritic-insensitive queries can be performed on data properties.
+    This will only have meaningful results if the data property contains UTF-8
+    string data.
+  - Data properties on linked objects can be queried
+    (e.g. "link.dataProperty CONTAINS %@")
+* Implement queries which filter on lists other than object links (lists of
+  objects were already supported). All supported operators for normal
+  properties are now supported for lists (e.g. "ANY intList = 5" or "ANY
+  stringList BEGINSWITH 'prefix'"), as well as aggregate operations on the
+  lists (such as "intArray.@sum > 100").
+* Performance of sorting on more than one property has been improved.
+  Especially important if many elements match on the first property. Mitigates
+  ([#7092](https://github.com/realm/realm-cocoa/issues/7092))
+
+### Fixed
+
+* Fixed a bug that prevented an object type with incoming links from being
+  marked as embedded during migrations. ([Core #4414](https://github.com/realm/realm-core/pull/4414))
+* The Realm notification listener thread could sometimes hit the assertion
+  failure "!skip_version.version" if a write transaction was committed at a
+  very specific time (since v10.5.0).
+* Added workaround for a case where upgrading an old file with illegal string
+  would crash ([#7111](https://github.com/realm/realm-cocoa/issues/7111))
+* Fixed a conflict resolution bug related to the ArrayMove instruction, which
+  could sometimes cause an "Invalid prior_size" exception to prevent
+  synchronization (since v10.5.0).
+* Skipping a change notification in the first write transaction after the
+  observer was added could potentially fail to skip the notification (since v10.5.1).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.5.0 to v10.5.3
 
 10.6.0 Release notes (2021-02-15)
 =============================================================
