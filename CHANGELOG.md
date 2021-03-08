@@ -1,22 +1,22 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.7.2 Release notes (2021-03-08)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* During integration of a large amount of data from the server, you may get
+  "Assertion failed: !fields.has_missing_parent_update()"
+  ([Core #4497](https://github.com/realm/realm-core/issues/4497), since v6.0.0)
 
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.4.
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from v10.5.4 to v10.5.5
 
 10.7.1 Release notes (2021-03-05)
 =============================================================
