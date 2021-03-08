@@ -709,6 +709,15 @@ void QueryBuilder::add_diacritic_sensitive_string_constraint(NSPredicateOperator
             else if constexpr (is_any_v<C, Mixed, Lst<Mixed>>) {
                 unsupportedOperator(RLMPropertyTypeAny, operatorType);
             }
+            else if constexpr (is_any_v<C, String, Set<String>>) {
+                unsupportedOperator(RLMPropertyTypeString, operatorType);
+            }
+            else if constexpr (is_any_v<C, Binary, Set<Binary>>) {
+                unsupportedOperator(RLMPropertyTypeData, operatorType);
+            }
+            else if constexpr (is_any_v<C, Mixed, Set<Mixed>>) {
+                unsupportedOperator(RLMPropertyTypeAny, operatorType);
+            }
         }
     }
 }

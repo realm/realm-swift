@@ -67,7 +67,7 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeString = 2,
     /** Binary data: `NSData` */
     RLMPropertyTypeData   = 3,
-    /** Any type: `id<RLMValue>`, `AnyRLMValue` (Swift) */
+    /** Any type: `id<RLMValue>`, `AnyRealmValue` (Swift) */
     RLMPropertyTypeAny    = 9,
     /** Dates: `NSDate` */
     RLMPropertyTypeDate   = 4,

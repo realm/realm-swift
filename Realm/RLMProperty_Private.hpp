@@ -18,12 +18,7 @@
 
 #import <Realm/RLMProperty_Private.h>
 
-// FIXME: forward PropertyType class enum instead
 #import <realm/object-store/property.hpp>
-
-//namespace realm {
-//    struct Property;
-//}
 
 @class RLMSchema;
 
