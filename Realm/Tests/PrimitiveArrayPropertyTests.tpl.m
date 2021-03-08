@@ -268,7 +268,6 @@ static double average(NSArray *values) {
 
     [self addObjects];
 
-    // @Lee - exception thrown when last element of RLMArray<RLMValue> is null. mixed.hpp:167
     XCTAssertEqualObjects($array.lastObject, $last);
 
     [$allArrays removeLastObject];
@@ -339,7 +338,6 @@ static double average(NSArray *values) {
     %r XCTAssertEqual($array.count, 2U);
     %o XCTAssertEqual($array.count, 3U);
 
-    // @Lee - exception thrown when last element of RLMArray<RLMValue> is null. mixed.hpp:167
     [$allArrays removeLastObject];
     %r XCTAssertEqual($array.count, 1U);
     %o XCTAssertEqual($array.count, 2U);
