@@ -134,14 +134,10 @@ class SwiftMapTests: RLMTestCase {
         let realm = realmWithTestPath()
 
         realm.beginWriteTransaction()
-
         for _ in 0..<300 {
-            let po1 = SwiftRLMEmployeeObject(value:["age": 40, "name": "Joe", "hired": true])
-            let po2 = SwiftRLMEmployeeObject(value:["age": 30, "name": "John", "hired": false])
-            let po3 = SwiftRLMEmployeeObject(value:["age": 25, "name": "Jill", "hired": true])
-            realm.add(po1)
-            realm.add(po2)
-            realm.add(po3)
+            realm.add(SwiftRLMEmployeeObject(value:["age": 900, "name": "Joe", "hired": true]))
+            realm.add(SwiftRLMEmployeeObject(value:["age": 30, "name": "John", "hired": false]))
+            realm.add(SwiftRLMEmployeeObject(value:["age": 25, "name": "Jill", "hired": true]))
         }
 
         let company = SwiftRLMCompanyObject()
@@ -151,12 +147,11 @@ class SwiftMapTests: RLMTestCase {
         try! realm.commitWriteTransaction()
 
         let description = company.employeeMap!.description
-        XCTAssertTrue((description as NSString).range(of: "name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMDictionary")
-        XCTAssertTrue((description as NSString).range(of: "Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMDictionary")
-
-        XCTAssertTrue((description as NSString).range(of: "age").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMDictionary")
-        XCTAssertTrue((description as NSString).range(of: "24").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMDictionary")
-
+        print(description)
+        XCTAssertTrue((description as NSString).range(of: "name").location != Foundation.NSNotFound, "property name should be displayed when calling \"description\" on RLMDictionary")
+        XCTAssertTrue((description as NSString).range(of: "John").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMDictionary")
+        XCTAssertTrue((description as NSString).range(of: "age").location != Foundation.NSNotFound, "property age should be displayed when calling \"description\" on RLMDictionary")
+        XCTAssertTrue((description as NSString).range(of: "900").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMDictionary")
         XCTAssertTrue((description as NSString).range(of: "800 objects skipped").location != Foundation.NSNotFound, "'800 objects skipped' should be displayed when calling \"description\" on RLMDictionary")
     }
 }

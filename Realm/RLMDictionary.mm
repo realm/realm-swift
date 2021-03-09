@@ -459,4 +459,66 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
     REALM_TERMINATE("Unexpected handover of unmanaged `RLMDictionary`");
 }
 
+#pragma mark - Superclass Overrides
+
+- (NSString *)description {
+    return [self descriptionWithMaxDepth:RLMDescriptionMaxDepth];
+}
+
+- (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {
+    return RLMDescriptionWithMaxDepth(@"RLMDictionary", self, depth);
+}
+
+NSString *RLMDescriptionWithMaxDepth(NSString *name,
+                                     RLMDictionary *dictionary,
+                                     NSUInteger depth) {
+    if (depth == 0) {
+        return @"<Maximum depth exceeded>";
+    }
+
+    const NSUInteger maxObjects = 100;
+    auto str = [NSMutableString stringWithFormat:@"%@<%@, %@> <%p> (\n", name,
+                RLMTypeToString([dictionary keyType]),
+                [dictionary objectClassName] ?: RLMTypeToString([dictionary type]),
+                (void *)dictionary];
+    size_t index = 0, skipped = 0;
+    for (id key in dictionary.allKeys) {
+        id value = dictionary[key];
+        NSString *keyDesc;
+        if ([key respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
+            keyDesc = [key descriptionWithMaxDepth:depth - 1];
+        }
+        else {
+            keyDesc = [key description];
+        }
+        NSString *valDesc;
+        if ([value respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
+            valDesc = [value descriptionWithMaxDepth:depth - 1];
+        }
+        else {
+            valDesc = [value description];
+        }
+
+        // Indent child objects
+        NSString *sub = [NSString stringWithFormat:@"[%@]: %@", keyDesc, valDesc];
+        NSString *objDescription = [sub stringByReplacingOccurrencesOfString:@"\n"
+                                                                  withString:@"\n\t"];
+        [str appendFormat:@"\t[%zu] %@,\n", index++, objDescription];
+        if (index >= maxObjects) {
+            skipped = dictionary.count - maxObjects;
+            break;
+        }
+    }
+
+    // Remove last comma and newline characters
+    if (dictionary.count > 0) {
+        [str deleteCharactersInRange:NSMakeRange(str.length-2, 2)];
+    }
+    if (skipped) {
+        [str appendFormat:@"\n\t... %zu objects skipped.", skipped];
+    }
+    [str appendFormat:@"\n)"];
+    return str;
+}
+
 @end
