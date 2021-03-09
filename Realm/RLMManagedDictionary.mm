@@ -110,18 +110,28 @@ void RLMEnsureCollectionObservationInfo(std::unique_ptr<RLMObservationInfo>& inf
     }
 }
 
-template<typename ObjcCollection>
-void RLMCollectionValidateMatchingObjectType(__unsafe_unretained ObjcCollection *const collection,
-                                        __unsafe_unretained id const value) {
+void RLMCollectionValidateMatchingObjectType(__unsafe_unretained RLMDictionary *const collection,
+                                             __unsafe_unretained id const key,
+                                             __unsafe_unretained id const value) {
+    if (!key) {
+        @throw RLMException(@"Invalid nil key for dictionary expecting key of type '%@'.",
+                            collection.objectClassName ?: RLMTypeToString(collection.keyType));
+    }
+    if (![key conformsToProtocol:@protocol(RLMDictionaryKey)] ||
+        !RLMValidateValue(key, collection.keyType, false, false, nil)) {
+        @throw RLMException(@"Invalid key '%@' of type '%@' for expected type '%@'.",
+                            key, [key class], RLMTypeToString(collection.keyType));
+    }
+
     if (!value && !collection->_optional) {
         @throw RLMException(@"Invalid nil value for collection of '%@'.",
-                            collection->_objectClassName ?: RLMTypeToString(collection->_type));
+                            collection.objectClassName ?: RLMTypeToString(collection.keyType));
     }
-    if (collection->_type != RLMPropertyTypeObject) {
-        if (!RLMValidateValue(value, collection->_type, collection->_optional, false, nil)) {
+    if (((RLMDictionary *)collection).keyType != RLMPropertyTypeObject) {
+        if (!RLMValidateValue(value, collection.type, collection.optional, false, nil)) {
             @throw RLMException(@"Invalid value '%@' of type '%@' for expected type '%@%s'.",
-                                value, [value class], RLMTypeToString(collection->_type),
-                                collection->_optional ? "?" : "");
+                                value, [value class], RLMTypeToString(collection.type),
+                                collection.optional ? "?" : "");
         }
         return;
     }
@@ -300,7 +310,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (void)setObject:(id)obj forKey:(id<RLMDictionaryKey>)key {
-    RLMCollectionValidateMatchingObjectType<RLMManagedDictionary>(self, obj);
+    RLMCollectionValidateMatchingObjectType(self, key, obj);
     changeDictionary(self, ^{
         RLMAccessorContext context(*_objectInfo);
         _backingCollection.insert(context,
@@ -315,7 +325,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
         [self removeObjectForKey:key];
         return;
     }
-    RLMCollectionValidateMatchingObjectType<RLMManagedDictionary>(self, obj);
+    RLMCollectionValidateMatchingObjectType(self, key, obj);
     changeDictionary(self, ^{
         RLMAccessorContext context(*_objectInfo);
         _backingCollection.insert(context,
@@ -388,7 +398,7 @@ inline realm::StringData keyFromRLMDictionaryKey(id<RLMDictionaryKey> key, RLMAc
 
 - (void)setValue:(id)value forKey:(NSString *)key {
     if ([key isEqualToString:@"self"]) {
-        RLMCollectionValidateMatchingObjectType<RLMDictionary>(self, value);
+        RLMCollectionValidateMatchingObjectType(self, key, value);
         RLMAccessorContext context(*_objectInfo);
         translateErrors<RLMManagedDictionary>([&] {
             _backingCollection.remove_all();
@@ -397,7 +407,7 @@ inline realm::StringData keyFromRLMDictionaryKey(id<RLMDictionaryKey> key, RLMAc
         return;
     }
     else if (_type == RLMPropertyTypeObject) {
-        RLMCollectionValidateMatchingObjectType<RLMDictionary>(self, value);
+        RLMCollectionValidateMatchingObjectType(self, key, value);
         translateErrors<RLMManagedDictionary>([&] { _backingCollection.verify_in_transaction(); });
         RLMCollectionSetValueForKey(self, key, value);
     }

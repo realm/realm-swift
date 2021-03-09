@@ -191,11 +191,6 @@
     return sum && !result ? @0 : result;
 }
 
-- (id)objectAtIndex:(NSUInteger)index {
-    validateDictionaryBounds(self, index);
-    return _backingCollection.allValues[index];
-}
-
 - (nonnull RLMResults *)objectsWhere:(nonnull NSString *)predicateFormat, ... {
     va_list args;
     va_start(args, predicateFormat);
@@ -237,6 +232,10 @@
     @throw RLMException(@"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
 }
 
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
+    @throw RLMException(@"RLMDictionary does not implement indexOfObjectWithPredicate:");
+}
+
 - (id)valueForKeyPath:(NSString *)keyPath {
     if ([keyPath characterAtIndex:0] != '@') {
         return _backingCollection ? [_backingCollection valueForKeyPath:keyPath] : [super valueForKeyPath:keyPath];
@@ -264,6 +263,11 @@
     return [_backingCollection valueForKey:key];
 }
 
+- (nonnull id)objectAtIndex:(NSUInteger)index {
+    @throw RLMException(@"RLMDictionary does not implement objectAtIndex:");
+}
+
+
 - (NSUInteger)countByEnumeratingWithState:(nonnull NSFastEnumerationState *)state
                                   objects:(__unsafe_unretained id  _Nullable * _Nonnull)buffer
                                     count:(NSUInteger)len {
@@ -282,7 +286,7 @@
     copy->items = std::make_unique<id[]>(_backingCollection.count);
 
     NSUInteger i = 0;
-    for (id object in _backingCollection.allKeys) {
+    for (id object in _backingCollection.allValues) {
         copy->items[i++] = object;
     }
 

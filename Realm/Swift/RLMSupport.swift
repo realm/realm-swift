@@ -65,9 +65,10 @@ extension RLMObject {
     }
 }
 
-// Sequence conformance for RLMArray, RLMSet and RLMResults is provided by RLMCollection's
+// Sequence conformance for RLMArray, RLMDictionary, RLMSet and RLMResults is provided by RLMCollection's
 // `makeIterator()` implementation.
 extension RLMArray: Sequence {}
+extension RLMDictionary: Sequence {}
 extension RLMSet: Sequence {}
 extension RLMResults: Sequence {}
 

@@ -117,6 +117,7 @@ class SwiftRLMEmployeeObject: RLMObject {
 class SwiftRLMCompanyObject: RLMObject {
     @objc dynamic var employees = RLMArray<SwiftRLMEmployeeObject>(objectClassName: SwiftRLMEmployeeObject.className())
     @objc dynamic var employeeSet = RLMSet<SwiftRLMEmployeeObject>(objectClassName: SwiftRLMEmployeeObject.className())
+    @objc dynamic var employeeMap = RLMDictionary<NSString, SwiftRLMEmployeeObject>(objectClassName: SwiftRLMEmployeeObject.className())
 }
 
 class SwiftRLMAggregateSet: RLMObject {
@@ -133,6 +134,10 @@ class SwiftRLMSetPropertyObject: RLMObject {
     @objc dynamic var name = ""
     @objc dynamic var set = RLMSet<SwiftRLMStringObject>(objectClassName: SwiftRLMStringObject.className())
     @objc dynamic var intSet = RLMSet<SwiftRLMIntObject>(objectClassName: SwiftRLMIntObject.className())
+}
+
+class SwiftRLMDictionaryPropertyObject: RLMObject {
+    @objc dynamic var dict = RLMDictionary<NSString, SwiftRLMAggregateObject>(objectClassName: SwiftRLMAggregateObject.className())
 }
 
 class SwiftRLMDynamicObject: RLMObject {
