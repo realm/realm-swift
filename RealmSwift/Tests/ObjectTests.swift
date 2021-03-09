@@ -1111,7 +1111,6 @@ class ObjectTests: TestCase {
                     "objectCol": [true],
                     "uuidCol": UUID(),
                     "anyCol": "hello"
-                    
                 ]),
                 realm.create(SwiftOptionalObject.self, value: [
                     "optNSStringCol": "NSString",

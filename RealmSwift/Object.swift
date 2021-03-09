@@ -200,7 +200,7 @@ extension Object: RealmCollectionValue {
             return object_getIvar(self, ivar)
         }
 
-        if (prop.type == .any) {
+        if prop.type == .any {
             return AnyRealmValue(value: RLMDynamicGet(self, prop) as? RLMValue,
                                  object: self,
                                  property: prop)

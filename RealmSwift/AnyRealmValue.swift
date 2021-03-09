@@ -176,6 +176,11 @@ public final class AnyRealmValue: RLMValueBase {
         }
     }
 
+    internal convenience init(value: RLMValue?) {
+        self.init()
+        rlmValue = value
+    }
+
     // Used for when retrieving an AnyRealmValue via KVC
     internal convenience init(value: RLMValue?, object: RLMObjectBase, property: RLMProperty) {
         self.init()

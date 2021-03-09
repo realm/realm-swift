@@ -40,11 +40,11 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
 
     /// The Realm which manages the set, or `nil` if the set is unmanaged.
     public var realm: Realm? {
-        return _rlmCollection.realm.map { Realm($0) }
+        return rlmSet.realm.map { Realm($0) }
     }
 
     /// Indicates if the set can no longer be accessed.
-    public var isInvalidated: Bool { return _rlmCollection.isInvalidated }
+    public var isInvalidated: Bool { return rlmSet.isInvalidated }
 
     internal var rlmSet: RLMSet<AnyObject> {
         _rlmCollection as! RLMSet
@@ -64,7 +64,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
     // MARK: Count
 
     /// Returns the number of objects in this MutableSet.
-    public var count: Int { return Int(_rlmCollection.count) }
+    public var count: Int { return Int(rlmSet.count) }
 
     // MARK: KVC
 
@@ -106,7 +106,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - parameter predicate: The predicate with which to filter the objects.
      */
     public func filter(_ predicate: NSPredicate) -> Results<Element> {
-        return Results<Element>(_rlmCollection.objects(with: predicate))
+        return Results<Element>(rlmSet.objects(with: predicate))
     }
 
     /**
@@ -168,7 +168,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
     */
     public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element>
         where S.Iterator.Element == SortDescriptor {
-            return Results<Element>(_rlmCollection.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
+            return Results<Element>(rlmSet.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
     // MARK: Aggregate Operations
@@ -182,7 +182,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - parameter property: The name of a property whose minimum value is desired.
      */
     public func min<T: MinMaxType>(ofProperty property: String) -> T? {
-        return _rlmCollection.min(ofProperty: property).map(dynamicBridgeCast)
+        return rlmSet.min(ofProperty: property).map(dynamicBridgeCast)
     }
 
     /**
@@ -194,7 +194,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - parameter property: The name of a property whose maximum value is desired.
      */
     public func max<T: MinMaxType>(ofProperty property: String) -> T? {
-        return _rlmCollection.max(ofProperty: property).map(dynamicBridgeCast)
+        return rlmSet.max(ofProperty: property).map(dynamicBridgeCast)
     }
 
     /**
@@ -205,7 +205,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - parameter property: The name of a property whose values should be summed.
      */
     public func sum<T: AddableType>(ofProperty property: String) -> T {
-        return dynamicBridgeCast(fromObjectiveC: _rlmCollection.sum(ofProperty: property))
+        return dynamicBridgeCast(fromObjectiveC: rlmSet.sum(ofProperty: property))
     }
 
     /**
@@ -216,7 +216,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - parameter property: The name of a property whose average value should be calculated.
      */
     public func average<T: AddableType>(ofProperty property: String) -> T? {
-        return _rlmCollection.average(ofProperty: property).map(dynamicBridgeCast)
+        return rlmSet.average(ofProperty: property).map(dynamicBridgeCast)
     }
 
     // MARK: Mutation
@@ -364,7 +364,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
     // MARK: Frozen Objects
 
     public var isFrozen: Bool {
-        return _rlmCollection.isFrozen
+        return rlmSet.isFrozen
     }
 
     public func freeze() -> MutableSet {
@@ -389,7 +389,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
     }
 
     @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
-        return RLMDescriptionWithMaxDepth("MutableSet", _rlmCollection, depth)
+        return RLMDescriptionWithMaxDepth("MutableSet", rlmSet, depth)
     }
 }
 
@@ -398,14 +398,14 @@ extension MutableSet where Element: MinMaxType {
      Returns the minimum (lowest) value in the set, or `nil` if the set is empty.
      */
     public func min() -> Element? {
-        return _rlmCollection.min(ofProperty: "self").map(dynamicBridgeCast)
+        return rlmSet.min(ofProperty: "self").map(dynamicBridgeCast)
     }
 
     /**
      Returns the maximum (highest) value in the set, or `nil` if the set is empty.
      */
     public func max() -> Element? {
-        return _rlmCollection.max(ofProperty: "self").map(dynamicBridgeCast)
+        return rlmSet.max(ofProperty: "self").map(dynamicBridgeCast)
     }
 }
 
@@ -433,13 +433,13 @@ extension MutableSet: RealmCollection {
 
     /// Returns a `RLMIterator` that yields successive elements in the `MutableSet`.
     public func makeIterator() -> RLMIterator<Element> {
-        return RLMIterator(collection: _rlmCollection)
+        return RLMIterator(collection: rlmSet)
     }
 
     /// :nodoc:
     // swiftlint:disable:next identifier_name
     public func _asNSFastEnumerator() -> Any {
-        return _rlmCollection
+        return rlmSet
     }
 
     /// The position of the first element in a non-empty collection.
@@ -470,7 +470,7 @@ extension MutableSet: RealmCollection {
      */
     public subscript(position: Int) -> Element {
         throwForNegativeIndex(position)
-        return dynamicBridgeCast(fromObjectiveC: _rlmCollection.object(at: UInt(position)))
+        return dynamicBridgeCast(fromObjectiveC: rlmSet.object(at: UInt(position)))
     }
 
     /// :nodoc:
@@ -525,6 +525,6 @@ extension MutableSet: AssistedObjectiveCBridgeable {
     }
 
     internal var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: _rlmCollection, metadata: nil)
+        return (objectiveCValue: rlmSet, metadata: nil)
     }
 }

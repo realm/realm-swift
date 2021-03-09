@@ -27,7 +27,7 @@ class AnyRealmTypeObject: Object {
 }
 
 class AnyRealmValueTests: TestCase {
-    
+
     func testInt() {
         let o = AnyRealmTypeObject()
         o.anyValue.value = .int(123)
@@ -147,12 +147,12 @@ class AnyRealmValueTests: TestCase {
             realm.add(o)
         }
         XCTAssertEqual(o.anyValue.value.dateValue!.timeIntervalSince1970,
-                       d2.timeIntervalSince1970, accuracy:1)
+                       d2.timeIntervalSince1970, accuracy: 1)
         try! realm.write {
             o.anyValue.value = .date(d3)
         }
         XCTAssertEqual(o.anyValue.value.dateValue!.timeIntervalSince1970,
-                       d3.timeIntervalSince1970, accuracy:1)
+                       d3.timeIntervalSince1970, accuracy: 1)
     }
 
     func testObjectId() {
@@ -407,7 +407,7 @@ class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTe
 
     private func assertEqual(_ obj: AnyRealmValue.Value, _ anotherObj: AnyRealmValue.Value) {
         if case let .object(a) = obj,
-           case let .object(b) = anotherObj  {
+           case let .object(b) = anotherObj {
             XCTAssertEqual((a as! SwiftStringObject).stringCol, (b as! SwiftStringObject).stringCol)
         } else {
             XCTAssertEqual(obj, anotherObj)
@@ -633,22 +633,34 @@ class MinMaxAnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: Primitive
 
 class AddableAnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T: AnyRealmValue {
     func testSum() {
-        XCTAssertEqual(array.sum().value, .int(0))
+        XCTAssertEqual(array.sum().value.intValue, nil)
         array.append(objectsIn: values)
 
-        // Expressing "can be added and converted to a floating point type" as
-        // a protocol requirement is awful, so sidestep it all with obj-c
-        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
+        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber)
 
-        XCTAssertEqual(array.sum().value.doubleValue!, expected, accuracy: 0.01)
+        // An unmanaged collection will return a double
+        if case let .double(d) = array.sum().value {
+            XCTAssertEqual(d, expected.doubleValue)
+        } else if case let .decimal128(d) = array.sum().value {
+            // A managed collection of AnyRealmValue will return a Decimal128 for `sum()`
+            XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
+        }
     }
 
     func testAverage() {
         XCTAssertNil(array.average() as V.AverageType?)
         array.append(objectsIn: values)
 
-        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber).doubleValue
-        XCTAssertEqual(V.doubleValue(array.average()!), expected, accuracy: 0.01)
+        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber)
+
+        let v: AnyRealmValue? = array.average()
+        // An unmanaged collection will return a double
+        if case let .double(d) = v?.value {
+            XCTAssertEqual(d, expected.doubleValue)
+        } else if case let .decimal128(d) = v?.value {
+            // A managed collection of AnyRealmValue will return a Decimal128 for `avg()`
+            XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
+        }
     }
 }
 
@@ -665,16 +677,16 @@ func addAnyRealmValueTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.T
     _ = AnyRealmValueListTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
     _ = AnyRealmValueListTests<OF, AnyRealmValueUUIDFactory>._defaultTestSuite().tests.map(suite.addTest)
 
-//    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-//    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-//    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-//    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueDateFactory>._defaultTestSuite().tests.map(suite.addTest)
-//    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
-//
-//    _ = AddableAnyRealmValueListTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-//    _ = AddableAnyRealmValueListTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-//    _ = AddableAnyRealmValueListTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-//    _ = AddableAnyRealmValueListTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueDateFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueListTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+
+    _ = AddableAnyRealmValueListTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddableAnyRealmValueListTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddableAnyRealmValueListTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddableAnyRealmValueListTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
 }
 
 class UnmanagedAnyRealmValueListTests: TestCase {
@@ -692,7 +704,7 @@ class UnmanagedAnyRealmValueListTests: TestCase {
 class ManagedAnyRealmValueListTests: TestCase {
     class func _defaultTestSuite() -> XCTestSuite {
         let suite = XCTestSuite(name: "Managed AnyRealmValue Lists")
-        //addAnyRealmValueTests(suite, ManagedObjectFactory.self)
+        addAnyRealmValueTests(suite, ManagedObjectFactory.self)
         return suite
     }
 
@@ -705,7 +717,7 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primitive
 
     private func assertEqual(_ obj: AnyRealmValue.Value, _ anotherObj: AnyRealmValue.Value) {
         if case let .object(a) = obj,
-           case let .object(b) = anotherObj  {
+           case let .object(b) = anotherObj {
             XCTAssertEqual((a as! SwiftStringObject).stringCol, (b as! SwiftStringObject).stringCol)
         } else {
             XCTAssertEqual(obj, anotherObj)
@@ -899,21 +911,34 @@ class MinMaxAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Pri
 
 class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T: AnyRealmValue {
     func testSum() {
-        XCTAssertEqual(mutableSet.sum().value, .int(0))
+        XCTAssertEqual(mutableSet.sum().value.intValue, nil)
         mutableSet.insert(objectsIn: values)
 
-        // Expressing "can be added and converted to a floating point type" as
-        // a protocol requirement is awful, so sidestep it all with obj-c
-        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
-        XCTAssertEqual(mutableSet.sum().value.doubleValue!, expected, accuracy: 0.01)
+        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber)
+
+        // An unmanaged collection will return a double
+        if case let .double(d) = mutableSet.sum().value {
+            XCTAssertEqual(d, expected.doubleValue)
+        } else if case let .decimal128(d) = mutableSet.sum().value {
+            // A managed collection of AnyRealmValue will return a Decimal128 for `sum()`
+            XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
+        }
     }
 
     func testAverage() {
         XCTAssertNil(mutableSet.average() as V.AverageType?)
         mutableSet.insert(objectsIn: values)
 
-        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber).doubleValue
-        XCTAssertEqual(V.doubleValue(mutableSet.average()!), expected, accuracy: 0.01)
+        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber)
+
+        let v: AnyRealmValue? = mutableSet.average()
+        // An unmanaged collection will return a double
+        if case let .double(d) = v?.value {
+            XCTAssertEqual(d, expected.doubleValue)
+        } else if case let .decimal128(d) = v?.value {
+            // A managed collection of AnyRealmValue will return a Decimal128 for `avg()`
+            XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
+        }
     }
 }
 
@@ -930,16 +955,16 @@ func addAnyRealmValueMutableSetTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ 
     _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
     _ = AnyRealmValueMutableSetTests<OF, AnyRealmValueUUIDFactory>._defaultTestSuite().tests.map(suite.addTest)
 
-//    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-//    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-//    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-//    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueDateFactory>._defaultTestSuite().tests.map(suite.addTest)
-//    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
-//
-//    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
-//    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
-//    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
-//    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueDateFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueMutableSetTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+
+    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueIntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddableAnyRealmValueMutableSetTests<OF, AnyRealmValueDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
 }
 
 class UnmanagedAnyRealmValueMutableSetTests: TestCase {
@@ -957,7 +982,7 @@ class UnmanagedAnyRealmValueMutableSetTests: TestCase {
 class ManagedAnyRealmValueMutableSetTests: TestCase {
     class func _defaultTestSuite() -> XCTestSuite {
         let suite = XCTestSuite(name: "Managed Primitive Sets")
-        //addAnyRealmValueMutableSetTests(suite, ManagedObjectFactory.self)
+        addAnyRealmValueMutableSetTests(suite, ManagedObjectFactory.self)
         return suite
     }
 
