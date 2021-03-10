@@ -433,7 +433,6 @@
     XCTAssertEqual(ao.dateCol, now);
     XCTAssertEqual(ao.cBoolCol, true);
     XCTAssertEqual(ao.longCol, INT_MAX + 1LL);
-
     XCTAssertEqual(ao.objectCol, so);
 
     auto opt = [[AllOptionalTypes alloc] initWithValue:@[NSNull.null, NSNull.null,

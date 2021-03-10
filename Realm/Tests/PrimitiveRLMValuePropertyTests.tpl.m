@@ -19,9 +19,6 @@
 #import "RLMTestCase.h"
 #include <objc/runtime.h>
 
-#define objc_dynamic_cast(obj, cls) \
-    ([obj isKindOfClass:(Class)objc_getClass(#cls)] ? (cls *)obj : NULL)
-
 static NSDate *date(int i) {
     return [NSDate dateWithTimeIntervalSince1970:i];
 }
