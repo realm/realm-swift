@@ -1299,11 +1299,7 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
             }
             break;
         case RLMPropertyTypeAny:
-            if constexpr (Operation == CollectionOperation::Sum || Operation == CollectionOperation::Average) {
-                throwException(@"Unsupported predicate value type",
-                               @"Cannot sum or average mixed properties");
-            }
-            else if constexpr (std::is_same_v<R, id>) {
+            if constexpr (std::is_same_v<R, id>) {
                 if (auto i = RLMDynamicCast<NSNumber>(rhs)) {
                     if ([rhs objCType][0] == 'c') {
                         // Bools are not supported
@@ -1327,6 +1323,10 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
                     }
                 }
                 else if ([rhs isKindOfClass:[NSDate class]]) {
+                    if constexpr (Operation == CollectionOperation::Sum || Operation == CollectionOperation::Average) {
+                        throwException(@"Unsupported predicate value type",
+                                       @"Cannot sum or average date properties");
+                    }
                     add_numeric_constraint(type, operatorType,
                                            collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
                                            Mixed(value_of_type<Timestamp>(rhs)));
