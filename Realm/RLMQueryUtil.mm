@@ -571,6 +571,8 @@ private:
     RLMSchema *m_schema;
 };
 
+#pragma mark Numeric Constraints
+
 // add a clause for numeric constraints based on operator type
 template <typename A, typename B>
 void QueryBuilder::add_numeric_constraint(RLMPropertyType datatype,
@@ -616,6 +618,8 @@ void QueryBuilder::add_bool_constraint(RLMPropertyType datatype,
             unsupportedOperator(datatype, operatorType);
     }
 }
+
+#pragma mark String Constraints
 
 template<typename T>
 void QueryBuilder::add_substring_constraint(const T& value, Query condition) {
@@ -793,6 +797,8 @@ void validate_and_extract_between_range(id value, RLMProperty *prop, id *from, i
                     @"NSArray objects must be of type %@ for BETWEEN operations", RLMTypeToString(prop.type));
 }
 
+#pragma mark Between Constraint
+
 void QueryBuilder::add_between_constraint(const ColumnReference& column, id value) {
     if (column.has_any_to_many_links()) {
         auto link_column = column.last_link_column();
@@ -815,6 +821,8 @@ void QueryBuilder::add_between_constraint(const ColumnReference& column, id valu
     add_constraint(NSLessThanOrEqualToPredicateOperatorType, 0, column, to);
     m_query.end_group();
 }
+
+#pragma mark Link Constraints
 
 void QueryBuilder::add_link_constraint(NSPredicateOperatorType operatorType,
                                        const Columns<Link>& column, RLMObjectBase *obj) {
@@ -877,6 +885,8 @@ void process_or_group(Query &query, id array, Func&& func) {
 
     query.end_group();
 }
+
+#pragma mark Conversion Helpers
 
 template <typename RequestedType>
 RequestedType convert(id value);
@@ -1044,7 +1054,7 @@ void QueryBuilder::do_add_constraint(RLMPropertyType type, NSPredicateOperatorTy
     }
 }
 
-#pragma mark AddMixedConstraints
+#pragma mark Mixed Constraints
 
 template<typename C, typename T>
 void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
@@ -1222,6 +1232,8 @@ void validate_property_value(const ColumnReference& column,
                         @"Invalid value origin", @"Object must be from the Realm being queried");
     }
 }
+
+#pragma mark Collection Operations
 
 // static_assert is always evaluated even if it's inside a if constexpr
 // unless the value is derived from the template argument, in which case it's
