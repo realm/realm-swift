@@ -9147,26 +9147,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Cannot sum or average date properties");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"dateObj.@sum = %@", date(1)]),
                               @"Cannot sum or average date properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj1.@sum = %@", @NO]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj2.@sum = %@", @2]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj3.@sum = %@", @2.2f]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj4.@sum = %@", @2.2]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj5.@sum = %@", @"a"]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj6.@sum = %@", data(1)]),
-                              @"Cannot sum or average mixed properties");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj7.@sum = %@", date(1)]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj8.@sum = %@", decimal128(2)]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj9.@sum = %@", objectId(1)]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj10.@sum = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
-                              @"Cannot sum or average mixed properties");
+                              @"Cannot sum or average date properties");
 
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@sum = %@", @"a"]),
                               @"@sum on a property of type int cannot be compared with 'a'");
@@ -9192,14 +9174,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Property 'doubleObj' is not a link in object of type 'AllPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"decimalObj.@sum.prop = %@", @"a"]),
                               @"Property 'decimalObj' is not a link in object of type 'AllPrimitiveArrays'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj2.@sum.prop = %@", @"a"]),
-                              @"Property 'anyObj2' is not a link in object of type 'AllPrimitiveArrays'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj3.@sum.prop = %@", @"a"]),
-                              @"Property 'anyObj3' is not a link in object of type 'AllPrimitiveArrays'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj4.@sum.prop = %@", @"a"]),
-                              @"Property 'anyObj4' is not a link in object of type 'AllPrimitiveArrays'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj8.@sum.prop = %@", @"a"]),
-                              @"Property 'anyObj8' is not a link in object of type 'AllPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"intObj.@sum.prop = %@", @"a"]),
                               @"Property 'intObj' is not a link in object of type 'AllOptionalPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"floatObj.@sum.prop = %@", @"a"]),
@@ -9216,14 +9190,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@sum on a property of type double cannot be compared with '<null>'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"decimalObj.@sum = %@", NSNull.null]),
                               @"@sum on a property of type decimal128 cannot be compared with '<null>'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj2.@sum = %@", NSNull.null]),
-                              @"@sum on a property of type mixed cannot be compared with '<null>'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj3.@sum = %@", NSNull.null]),
-                              @"@sum on a property of type mixed cannot be compared with '<null>'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj4.@sum = %@", NSNull.null]),
-                              @"@sum on a property of type mixed cannot be compared with '<null>'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj8.@sum = %@", NSNull.null]),
-                              @"@sum on a property of type mixed cannot be compared with '<null>'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"intObj.@sum = %@", NSNull.null]),
                               @"@sum on a property of type int cannot be compared with '<null>'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"floatObj.@sum = %@", NSNull.null]),
@@ -9367,26 +9333,8 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Cannot sum or average date properties");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"dateObj.@avg = %@", date(1)]),
                               @"Cannot sum or average date properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj1.@avg = %@", @NO]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj2.@avg = %@", @2]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj3.@avg = %@", @2.2f]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj4.@avg = %@", @2.2]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj5.@avg = %@", @"a"]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj6.@avg = %@", data(1)]),
-                              @"Cannot sum or average mixed properties");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj7.@avg = %@", date(1)]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj8.@avg = %@", decimal128(2)]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj9.@avg = %@", objectId(1)]),
-                              @"Cannot sum or average mixed properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObj10.@avg = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
-                              @"Cannot sum or average mixed properties");
+                              @"Cannot sum or average date properties");
 
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@avg = %@", @"a"]),
                               @"@avg on a property of type int cannot be compared with 'a'");

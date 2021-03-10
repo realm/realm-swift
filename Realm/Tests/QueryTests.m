@@ -630,7 +630,7 @@
     RLMAssertCount(MixedObject, 1U, @"anyCol == %@", [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"]);
 }
 
-- (void)testMixedRealmQuery {
+- (void)testRLMValueQuery {
     RLMRealm *realm = [self realm];
     MixedObject *value;
     [realm beginWriteTransaction];

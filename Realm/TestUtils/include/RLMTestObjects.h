@@ -471,6 +471,7 @@ RLM_COLLECTION_TYPE(CircleObject);
 @property double  doubleCol;
 @property BOOL    boolCol;
 @property NSDate *dateCol;
+@property id<RLMValue> anyCol;
 
 @end
 
