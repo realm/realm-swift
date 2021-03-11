@@ -338,8 +338,8 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
     }
 
     // swiftlint:disable:next identifier_name
-    @objc class func _unmanagedDictionary() -> RLMDictionary<AnyObject, AnyObject> {
-        return Value._rlmDictionary()
+    @objc class func _unmanagedCollection() -> RLMDictionary<AnyObject, AnyObject> {
+        return Element._rlmDictionary()
     }
     
     /**
