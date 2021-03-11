@@ -1017,6 +1017,71 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     });
 }
 
+- (void)testDictionaryDeleteNewlyInsertedRowMatchingQuery {
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        RLMDictionary *dictionary = [[[DictionaryPropertyObject allObjectsInRealm:realm] firstObject] intDictionary];
+        dictionary[@"3"] = [IntObject createInRealm:realm withValue:@[@3]];
+        [realm deleteObject:[IntObject allObjectsInRealm:realm].lastObject];
+    });
+}
+
+- (void)testDictionaryInsertObjectMatchingQuery {
+    ExpectChange(self, @[], @[@4], @[], ^(RLMRealm *realm) {
+        RLMDictionary *dictionary = [[[DictionaryPropertyObject allObjectsInRealm:realm] firstObject] intDictionary];
+        dictionary[@"3"] = [IntObject createInRealm:realm withValue:@[@3]];
+    });
+}
+
+- (void)testDictionaryInsertObjectNotMatchingQuery {
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        RLMDictionary *dictionary = [[[DictionaryPropertyObject allObjectsInRealm:realm] firstObject] intDictionary];
+        dictionary[@"5"] = [IntObject createInRealm:realm withValue:@[@5]];
+    });
+}
+
+- (void)testDictionaryInsertBothMatchingAndNonMatching {
+    ExpectChange(self, @[], @[@4], @[], ^(RLMRealm *realm) {
+        RLMDictionary *dictionary = [[[DictionaryPropertyObject allObjectsInRealm:realm] firstObject] intDictionary];
+        dictionary[@"5"] = [IntObject createInRealm:realm withValue:@[@5]];
+        dictionary[@"5"] = [IntObject createInRealm:realm withValue:@[@3]];
+    });
+}
+
+- (void)testDictionaryInsertMultipleMatching {
+    ExpectChange(self, @[], @[@4, @5], @[], ^(RLMRealm *realm) {
+        RLMDictionary *dictionary = [[[DictionaryPropertyObject allObjectsInRealm:realm] firstObject] intDictionary];
+        dictionary[@"5"] = [IntObject createInRealm:realm withValue:@[@5]];
+        dictionary[@"3"] = [IntObject createInRealm:realm withValue:@[@3]];
+        dictionary[@"5"] = [IntObject createInRealm:realm withValue:@[@5]];
+        dictionary[@"2"] = [IntObject createInRealm:realm withValue:@[@2]];
+    });
+}
+
+- (void)testDictionaryRemoveItem {
+    ExpectChange(self, @[@0], @[], @[], ^(RLMRealm *realm) {
+        RLMDictionary *dictionary = [[[DictionaryPropertyObject allObjectsInRealm:realm] firstObject] intDictionary];
+        [dictionary removeObjectForKey:dictionary.allKeys[1]];
+    });
+
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        RLMDictionary *dictionary = [[[DictionaryPropertyObject allObjectsInRealm:realm] firstObject] intDictionary];
+        [dictionary removeObjectForKey:dictionary.allKeys[0]];
+    });
+}
+
+- (void)testDictionaryClear {
+    ExpectChange(self, @[@0, @1, @2, @3], @[], @[], ^(RLMRealm *realm) {
+        RLMDictionary *dictionary = [[[DictionaryPropertyObject allObjectsInRealm:realm] firstObject] intDictionary];
+        [dictionary removeAllObjects];
+    });
+}
+
+- (void)testDictionaryDelete {
+    ExpectChange(self, @[@0, @1, @2, @3], @[], @[], ^(RLMRealm *realm) {
+        [realm deleteObjects:[DictionaryPropertyObject allObjectsInRealm:realm]];
+    });
+}
+
 - (void)testModifyObjectShiftedByInsertsAndDeletions {
     ExpectChange(self, @[@0, @1], @[], @[], ^(RLMRealm *realm) {
         [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 2"]];

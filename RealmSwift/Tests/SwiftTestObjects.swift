@@ -193,6 +193,36 @@ class SwiftMutableSetObject: Object {
     let uuidOpt = MutableSet<UUID?>()
 }
 
+class SwiftMapObject: Object {
+    let int = Map<String, Int>()
+    let int8 = Map<String, Int8>()
+    let int16 = Map<String, Int16>()
+    let int32 = Map<String, Int32>()
+    let int64 = Map<String, Int64>()
+    let float = Map<String, Float>()
+    let double = Map<String, Double>()
+    let string = Map<String, String>()
+    let data = Map<String, Data>()
+    let date = Map<String, Date>()
+    let decimal = Map<String, Decimal128>()
+    let objectId = Map<String, ObjectId>()
+    let uuid = Map<String, UUID>()
+
+    let intOpt = Map<String, Int?>()
+    let int8Opt = Map<String, Int8?>()
+    let int16Opt = Map<String, Int16?>()
+    let int32Opt = Map<String, Int32?>()
+    let int64Opt = Map<String, Int64?>()
+    let floatOpt = Map<String, Float?>()
+    let doubleOpt = Map<String, Double?>()
+    let stringOpt = Map<String, String?>()
+    let dataOpt = Map<String, Data?>()
+    let dateOpt = Map<String, Date?>()
+    let decimalOpt = Map<String, Decimal128?>()
+    let objectIdOpt = Map<String, ObjectId?>()
+    let uuidOpt = Map<String, UUID?>()
+}
+
 class SwiftImplicitlyUnwrappedOptionalObject: Object {
     @objc dynamic var optNSStringCol: NSString!
     @objc dynamic var optStringCol: String!

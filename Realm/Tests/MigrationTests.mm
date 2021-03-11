@@ -103,6 +103,7 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
 @property MigrationTestObject *object;
 @property RLMArray<MigrationTestObject> *array;
 @property RLMSet<MigrationTestObject> *set;
+@property RLMDictionary<RLMString, MigrationTestObject> *dictionary;
 @end
 
 @implementation MigrationLinkObject

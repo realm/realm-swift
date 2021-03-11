@@ -60,6 +60,16 @@ import Realm
         return MutableSet(objc: object)
     }
 
+    /// Convert a `Map` to a `RLMDictionary`.
+    public static func convert<T>(object: Map<String, T>) -> RLMDictionary<AnyObject, AnyObject> {
+        return object.rlmDictionary
+    }
+
+    /// Convert a `RLMDictionary` to a `Map`.
+    public static func convert(object: RLMDictionary<AnyObject, AnyObject>) -> Map<String, Object> {
+        return Map(objc: object)
+    }
+
     /// Convert a `LinkingObjects` to a `RLMResults`.
     public static func convert<T>(object: LinkingObjects<T>) -> RLMResults<AnyObject> {
         return object.rlmResults

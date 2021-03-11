@@ -511,7 +511,7 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
 }
 
 id unmanagedSetter(RLMProperty *prop, const char *) {
-    // Only RLMArray & RLMSet need special handling for the unmanaged setter
+    // Only RLMArray, RLMDictionary & RLMSet need special handling for the unmanaged setter
     if (!prop.collection) {
         return nil;
     }
@@ -521,7 +521,17 @@ id unmanagedSetter(RLMProperty *prop, const char *) {
         auto prop = obj->_objectSchema[propName];
         RLMValidateValueForProperty(values, obj->_objectSchema, prop, true);
 
-        Class cls = prop.array ? [RLMArray class] : [RLMSet class];
+        Class cls;
+        if (prop.array) {
+            cls = [RLMArray class];
+        } else if (prop.set) {
+            cls = [RLMSet class];
+        } else if (prop.dictionary) {
+            cls = [RLMDictionary class];
+        } else {
+            @throw RLMException(@"Invalid collection '%@' for class '%@'.",
+                                propName, obj->_objectSchema.className);
+        }
         id collection;
             // make copy when setting (as is the case for all other variants)
         if (prop.type == RLMPropertyTypeObject)

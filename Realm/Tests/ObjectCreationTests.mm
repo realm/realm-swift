@@ -200,6 +200,19 @@
     XCTAssertTrue([[co.employeeSet valueForKey:@"name"] containsObject:@"name 2"]);
 }
 
+- (void)testWithNonDictionaryEnumerableForRLMDictionaryProperty {
+    auto employees = @[@[@"name", @2, @YES], @[@"name 2", @3, @NO]];
+    auto eDictionary = @{@"0": @[@"name", @2, @YES], @"1": @[@"name 2", @3, @NO]};
+    auto co = [[CompanyObject alloc] initWithValue:@[@"one employee",
+                                                     employees.reverseObjectEnumerator,
+                                                     employees.reverseObjectEnumerator,
+                                                     eDictionary]];
+    XCTAssertEqual(2U, co.employeeDict.count);
+
+    XCTAssertTrue([[co.employeeSet valueForKey:@"0"] containsObject:@"name"]);
+    XCTAssertTrue([[co.employeeSet valueForKey:@"1"] containsObject:@"name 2"]);
+}
+
 - (void)testInitWithArrayUsesDefaultValuesForMissingFields {
     auto obj = [[NumberDefaultsObject alloc] initWithValue:@[]];
     XCTAssertEqualObjects(obj.intObj, @1);

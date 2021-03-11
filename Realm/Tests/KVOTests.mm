@@ -83,6 +83,17 @@ RLM_COLLECTION_TYPE(KVOLinkObject1)
 @property RLMSet<RLMValue>      *anySet;
 @property RLMSet<KVOObject>     *objectSet;
 
+@property RLMDictionary<RLMString, RLMBool>       *boolDictionary;
+@property RLMDictionary<RLMString, RLMInt>        *intDictionary;
+@property RLMDictionary<RLMString, RLMFloat>      *floatDictionary;
+@property RLMDictionary<RLMString, RLMDouble>     *doubleDictionary;
+@property RLMDictionary<RLMString, RLMString>     *stringDictionary;
+@property RLMDictionary<RLMString, RLMData>       *dataDictionary;
+@property RLMDictionary<RLMString, RLMDate>       *dateDictionary;
+@property RLMDictionary<RLMString, RLMObjectId>   *objectIdDictionary;
+@property RLMDictionary<RLMString, RLMDecimal128> *decimal128Dictionary;
+@property RLMDictionary<RLMString, KVOObject>     *objectDictionary;
+
 @property NSNumber<RLMInt>    *optIntCol;
 @property NSNumber<RLMFloat>  *optFloatCol;
 @property NSNumber<RLMDouble> *optDoubleCol;
@@ -2293,6 +2304,10 @@ public:
     }
     else if (RLMSet *set = RLMDynamicCast<RLMSet>(value)) {
         return array;
+    }
+    else if (RLMDictionary *dictionary = RLMDynamicCast<RLMDictionary>(value)) {
+        XCTFail(@"unsupported type");
+        return dictionary;
     }
     else {
         XCTFail(@"unsupported type");

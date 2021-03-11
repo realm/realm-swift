@@ -439,3 +439,16 @@ extension Map: RealmCollection {
         fatalError("index(matching:) is not available on Map")
     }
 }
+
+// MARK: - AssistedObjectiveCBridgeable
+
+extension Map: AssistedObjectiveCBridgeable {
+    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Map {
+        guard let objectiveCValue = objectiveCValue as? RLMDictionary<AnyObject, AnyObject> else { preconditionFailure() }
+        return Map(objc: objectiveCValue)
+    }
+
+    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
+        return (objectiveCValue: _rlmCollection, metadata: nil)
+    }
+}

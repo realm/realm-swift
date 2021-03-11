@@ -58,6 +58,13 @@ class SwiftRLMNonDefaultSetObject: RLMObject {
     }
 }
 
+class SwiftRLMNonDefaultDictionaryObject: RLMObject {
+    @objc dynamic var dictionary = RLMDictionary<RLMString, SwiftRLMNonDefaultObject>(objectClassName: SwiftRLMNonDefaultObject.className())
+    public override class func shouldIncludeInDefaultSchema() -> Bool {
+        return false
+    }
+}
+
 class SwiftRLMMutualLink1Object: RLMObject {
     @objc dynamic var object: SwiftRLMMutualLink2Object?
     public override class func shouldIncludeInDefaultSchema() -> Bool {
@@ -100,6 +107,10 @@ class InvalidArrayType: FakeObject {
 
 class InvalidSetType: FakeObject {
     @objc dynamic var set = RLMSet<SwiftRLMIntObject>(objectClassName: "invalid class")
+}
+
+class InvalidDictionaryType: FakeObject {
+    @objc dynamic var dictionary = RLMDictionary<RLMString, SwiftRLMIntObject>(objectClassName: "invalid class")
 }
 
 class InitAppendsToArrayProperty : RLMObject {
