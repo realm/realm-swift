@@ -202,7 +202,6 @@ struct MultiRealmContentView: View {
     }
 
     @State var showSheet = false
-
     var body: some View {
         NavigationView {
             VStack {
