@@ -201,7 +201,7 @@ void RLMObservationInfo::recordObserver(realm::Obj& objectRow, RLMClassInfo *obj
         if (auto optional = RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, swiftIvar))) {
             RLMInitializeUnmanagedOptional(optional, object, prop);
         } else if (auto value = RLMDynamicCast<RLMValueBase>(object_getIvar(object, swiftIvar))) {
-            [value attachIfNeededWithParent:object property:prop];
+            [value attachWithParent:object property:prop];
         }
     }
 }

@@ -185,6 +185,6 @@ public final class AnyRealmValue: RLMValueBase {
     internal convenience init(value: RLMValue?, object: RLMObjectBase, property: RLMProperty) {
         self.init()
         rlmValue = value
-        attachIfNeeded(withParent: object, property: property)
+        attach(withParent: object, property: property)
     }
 }

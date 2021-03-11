@@ -27,8 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, nullable) id<RLMValue> rlmValue;
 
-- (void)attachIfNeededWithParent:(RLMObjectBase *)parent
-                        property:(RLMProperty *)property;
+- (void)attachWithParent:(RLMObjectBase *)parent
+                property:(RLMProperty *)property;
 
 @end
 

@@ -28,7 +28,6 @@
 #import <realm/object-store/object.hpp>
 
 @implementation RLMValueBase {
-    @public
     id<RLMValue> _backingValue;
     __weak RLMObjectBase *_parent;
     NSString *_propertyName;
@@ -75,8 +74,8 @@
     }
 }
 
-- (void)attachIfNeededWithParent:(RLMObjectBase *)parent
-                        property:(RLMProperty *)property {
+- (void)attachWithParent:(RLMObjectBase *)parent
+                property:(RLMProperty *)property {
     REALM_ASSERT_DEBUG(parent->_realm);
     _parent = parent;
     _propertyName = property.name;
