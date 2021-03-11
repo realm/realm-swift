@@ -23,9 +23,12 @@
 #import "RLMObjectStore.h"
 #import "RLMProperty_Private.hpp"
 #import "RLMUtil.hpp"
+#import "RLMValue.h"
+
 #import <realm/object-store/object.hpp>
 
 @implementation RLMValueBase {
+    @public
     id<RLMValue> _backingValue;
     __weak RLMObjectBase *_parent;
     NSString *_propertyName;
@@ -81,6 +84,17 @@
 
     [self setRlmValue:_backingValue];
     _backingValue = nil;
+}
+
+@end
+
+@interface RLMValueBase (RLMValue)<RLMValue>
+@end
+
+@implementation RLMValueBase (RLMValue)
+
+- (RLMPropertyType)rlm_valueType {
+    return [_backingValue rlm_valueType];
 }
 
 @end
