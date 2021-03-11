@@ -31,9 +31,5 @@
 @end
 
 static inline bool isNullable(const realm::PropertyType& t) {
-    if (t == realm::PropertyType::Mixed) {
-        return false;
-    } else {
-        return is_nullable(t);
-    }
+    return t != realm::PropertyType::Mixed && is_nullable(t);
 }
