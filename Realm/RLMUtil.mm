@@ -145,13 +145,8 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
         case RLMPropertyTypeData:
             return [value isKindOfClass:[NSData class]];
         case RLMPropertyTypeAny: {
-            if (RLMValueBase *valueBase = RLMDynamicCast<RLMValueBase>(value)) {
-                return YES;
-            }
-            else {
-                return !value
-                    || [value conformsToProtocol:@protocol(RLMValue)];
-            }
+            return !value
+                || [value conformsToProtocol:@protocol(RLMValue)];
         }
         case RLMPropertyTypeLinkingObjects:
             return YES;
@@ -396,10 +391,10 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v, __unsafe_unretained RLMRea
     RLMPropertyType type;
     if ([v isKindOfClass:[RLMValueBase class]]) {
         v = [v rlmValue];
-        type = [v valueType];
+        type = [v rlm_valueType];
     }
     else if ([v conformsToProtocol:@protocol(RLMValue)]) {
-        type = [v valueType];
+        type = [v rlm_valueType];
     }
     else {
         REALM_TERMINATE("Unexpected Type");
@@ -426,10 +421,8 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v, __unsafe_unretained RLMRea
         case RLMPropertyTypeObject: {
             // If we are unboxing an object and it is unmanaged, we need to
             // add it to the Realm.
-            if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(v)) {
-                if (!objBase->_realm && !objBase.invalidated) {
-                    RLMAddObjectToRealm(objBase, realm, RLMUpdatePolicyError);
-                }
+            if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(v); !objBase->_realm) {
+                RLMAddObjectToRealm(objBase, realm, RLMUpdatePolicyError);
             }
             return ((RLMObjectBase *)v)->_row.get_link();
         }
