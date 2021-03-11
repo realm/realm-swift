@@ -38,7 +38,7 @@ target:
  - cocoapods-ios
  - cocoapods-ios-dynamic
  - cocoapods-watchos
- - swiftui
+ - swiftui-ios
 configuration:
  - N/A
 
@@ -336,16 +336,16 @@ exclude:
     target: cocoapods-watchos
 
   - xcode_version: 11.3
-    target: swiftui
+    target: swiftui-ios
 
   - xcode_version: 11.7
-    target: swiftui
+    target: swiftui-ios
 
   - xcode_version: 12.1
-    target: swiftui
+    target: swiftui-ios
 
   - xcode_version: 12.2
-    target: swiftui
+    target: swiftui-ios
 
   - xcode_version: 12.4
-    target: swiftui
+    target: swiftui-ios
