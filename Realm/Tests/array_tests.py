@@ -20,16 +20,16 @@ types = [
   ['AllPrimitiveArrays', 'unmanaged', 'decimalObj', ['decimal128(2)', 'decimal128(3)'], {'r', 'minmax', 'sum', 'avg', 'unman'}],
   ['AllPrimitiveArrays', 'unmanaged', 'objectIdObj', ['objectId(1)', 'objectId(2)'], {'r', 'unman'}],
   ['AllPrimitiveArrays', 'unmanaged', 'uuidObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['r','unman']],
-  ['AllPrimitiveArrays', 'unmanaged', 'anyObj1', ['@NO', '@YES'], {'any', 'unman'}],
-  ['AllPrimitiveArrays', 'unmanaged', 'anyObj2', ['@2', '@3'], {'any', 'sum', 'avg', 'unman'}],
-  ['AllPrimitiveArrays', 'unmanaged', 'anyObj3', ['@2.2f', '@3.3f'], {'any', 'minmax', 'sum', 'avg', 'unman'}],
-  ['AllPrimitiveArrays', 'unmanaged', 'anyObj4', ['@2.2', '@3.3'], {'any', 'minmax', 'sum', 'avg', 'unman'}],
-  ['AllPrimitiveArrays', 'unmanaged', 'anyObj5', ['@"a"', '@"b"'], {'any', 'unman', 'string'}],
-  ['AllPrimitiveArrays', 'unmanaged', 'anyObj6', ['data(1)', 'data(2)'], {'any', 'unman'}],
-  ['AllPrimitiveArrays', 'unmanaged', 'anyObj7', ['date(1)', 'date(2)'], {'any', 'minmax', 'unman', 'date'}],
-  ['AllPrimitiveArrays', 'unmanaged', 'anyObj8', ['decimal128(2)', 'decimal128(3)'], {'any', 'minmax', 'sum', 'avg', 'unman'}],
-  ['AllPrimitiveArrays', 'unmanaged', 'anyObj9', ['objectId(1)', 'objectId(2)'], {'any', 'unman'}],
-  ['AllPrimitiveArrays', 'unmanaged', 'anyObj10', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['any','unman']],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyBoolObj', ['@NO', '@YES'], {'any', 'unman'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyIntObj', ['@2', '@3'], {'any', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyFloatObj', ['@2.2f', '@3.3f'], {'any', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyDoubleObj', ['@2.2', '@3.3'], {'any', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyStringObj', ['@"a"', '@"b"'], {'any', 'unman', 'string'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyDataObj', ['data(1)', 'data(2)'], {'any', 'unman'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyDateObj', ['date(1)', 'date(2)'], {'any', 'minmax', 'unman', 'date'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyDecimalObj', ['decimal128(2)', 'decimal128(3)'], {'any', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyObjectIdObj', ['objectId(1)', 'objectId(2)'], {'any', 'unman'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyUUIDObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['any','unman']],
 
   ['AllOptionalPrimitiveArrays', 'optUnmanaged', 'boolObj', ['@NO', '@YES', 'NSNull.null'], {'o', 'unman'}],
   ['AllOptionalPrimitiveArrays', 'optUnmanaged', 'intObj', ['@2', '@3', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg', 'unman'}],
@@ -51,16 +51,16 @@ types = [
   ['AllPrimitiveArrays', 'managed', 'decimalObj', ['decimal128(2)', 'decimal128(3)'], {'r', 'minmax', 'sum', 'avg', 'man'}],
   ['AllPrimitiveArrays', 'managed', 'objectIdObj', ['objectId(1)', 'objectId(2)'], {'r', 'man'}],
   ['AllPrimitiveArrays', 'managed', 'uuidObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['r', 'man']],
-  ['AllPrimitiveArrays', 'managed', 'anyObj1', ['@NO', '@YES'], {'any', 'man'}],
-  ['AllPrimitiveArrays', 'managed', 'anyObj2', ['@2', '@3'], {'any', 'minmax', 'sum', 'avg', 'man'}],
-  ['AllPrimitiveArrays', 'managed', 'anyObj3', ['@2.2f', '@3.3f'], {'any', 'minmax', 'sum', 'avg', 'man'}],
-  ['AllPrimitiveArrays', 'managed', 'anyObj4', ['@2.2', '@3.3'], {'any', 'minmax', 'sum', 'avg', 'man'}],
-  ['AllPrimitiveArrays', 'managed', 'anyObj5', ['@"a"', '@"b"'], {'any', 'man', 'string'}],
-  ['AllPrimitiveArrays', 'managed', 'anyObj6', ['data(1)', 'data(2)'], {'any', 'man'}],
-  ['AllPrimitiveArrays', 'managed', 'anyObj7', ['date(1)', 'date(2)'], {'any', 'minmax', 'man', 'date'}],
-  ['AllPrimitiveArrays', 'managed', 'anyObj8', ['decimal128(2)', 'decimal128(3)'], {'any', 'minmax', 'sum', 'avg', 'man'}],
-  ['AllPrimitiveArrays', 'managed', 'anyObj9', ['objectId(1)', 'objectId(2)'], {'any', 'man'}],
-  ['AllPrimitiveArrays', 'managed', 'anyObj10', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['any', 'man']],
+  ['AllPrimitiveArrays', 'managed', 'anyBoolObj', ['@NO', '@YES'], {'any', 'man'}],
+  ['AllPrimitiveArrays', 'managed', 'anyIntObj', ['@2', '@3'], {'any', 'minmax', 'sum', 'avg', 'man'}],
+  ['AllPrimitiveArrays', 'managed', 'anyFloatObj', ['@2.2f', '@3.3f'], {'any', 'minmax', 'sum', 'avg', 'man'}],
+  ['AllPrimitiveArrays', 'managed', 'anyDoubleObj', ['@2.2', '@3.3'], {'any', 'minmax', 'sum', 'avg', 'man'}],
+  ['AllPrimitiveArrays', 'managed', 'anyStringObj', ['@"a"', '@"b"'], {'any', 'man', 'string'}],
+  ['AllPrimitiveArrays', 'managed', 'anyDataObj', ['data(1)', 'data(2)'], {'any', 'man'}],
+  ['AllPrimitiveArrays', 'managed', 'anyDateObj', ['date(1)', 'date(2)'], {'any', 'minmax', 'man', 'date'}],
+  ['AllPrimitiveArrays', 'managed', 'anyDecimalObj', ['decimal128(2)', 'decimal128(3)'], {'any', 'minmax', 'sum', 'avg', 'man'}],
+  ['AllPrimitiveArrays', 'managed', 'anyObjectIdObj', ['objectId(1)', 'objectId(2)'], {'any', 'man'}],
+  ['AllPrimitiveArrays', 'managed', 'anyUUIDObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['any', 'man']],
 
   ['AllOptionalPrimitiveArrays', 'optManaged', 'boolObj', ['@NO', '@YES', 'NSNull.null'], {'o', 'man'}],
   ['AllOptionalPrimitiveArrays', 'optManaged', 'intObj', ['@2', '@3', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg', 'man'}],
@@ -75,7 +75,7 @@ types = [
 ]
 
 def type_name(propertyName, optional):
-    if 'anyObj' in propertyName:
+    if 'any' in propertyName:
         return 'mixed'
     else:
         return propertyName.replace('Obj', '') + ('?' if 'opt' in optional else '')

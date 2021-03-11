@@ -218,16 +218,16 @@ RLM_COLLECTION_TYPE(AllTypesObject)
 @property RLMArray<RLMDecimal128> *decimalObj;
 @property RLMArray<RLMObjectId> *objectIdObj;
 @property RLMArray<RLMUUID> *uuidObj;
-@property RLMArray<RLMValue> *anyObj1;
-@property RLMArray<RLMValue> *anyObj2;
-@property RLMArray<RLMValue> *anyObj3;
-@property RLMArray<RLMValue> *anyObj4;
-@property RLMArray<RLMValue> *anyObj5;
-@property RLMArray<RLMValue> *anyObj6;
-@property RLMArray<RLMValue> *anyObj7;
-@property RLMArray<RLMValue> *anyObj8;
-@property RLMArray<RLMValue> *anyObj9;
-@property RLMArray<RLMValue> *anyObj10;
+@property RLMArray<RLMValue> *anyBoolObj;
+@property RLMArray<RLMValue> *anyIntObj;
+@property RLMArray<RLMValue> *anyFloatObj;
+@property RLMArray<RLMValue> *anyDoubleObj;
+@property RLMArray<RLMValue> *anyStringObj;
+@property RLMArray<RLMValue> *anyDataObj;
+@property RLMArray<RLMValue> *anyDateObj;
+@property RLMArray<RLMValue> *anyDecimalObj;
+@property RLMArray<RLMValue> *anyObjectIdObj;
+@property RLMArray<RLMValue> *anyUUIDObj;
 @end
 
 @interface AllOptionalPrimitiveArrays : RLMObject
@@ -265,26 +265,27 @@ RLM_COLLECTION_TYPE(AllTypesObject)
 @property RLMSet<RLMUUID> *uuidObj;
 @property RLMSet<RLMUUID> *uuidObj2;
 
-@property RLMSet<RLMValue> *anyObjA;
-@property RLMSet<RLMValue> *anyObjA2;
-@property RLMSet<RLMValue> *anyObjB;
-@property RLMSet<RLMValue> *anyObjB2;
-@property RLMSet<RLMValue> *anyObjC;
-@property RLMSet<RLMValue> *anyObjC2;
-@property RLMSet<RLMValue> *anyObjD;
-@property RLMSet<RLMValue> *anyObjD2;
-@property RLMSet<RLMValue> *anyObjE;
-@property RLMSet<RLMValue> *anyObjE2;
-@property RLMSet<RLMValue> *anyObjF;
-@property RLMSet<RLMValue> *anyObjF2;
-@property RLMSet<RLMValue> *anyObjG;
-@property RLMSet<RLMValue> *anyObjG2;
-@property RLMSet<RLMValue> *anyObjH;
-@property RLMSet<RLMValue> *anyObjH2;
-@property RLMSet<RLMValue> *anyObjI;
-@property RLMSet<RLMValue> *anyObjI2;
-@property RLMSet<RLMValue> *anyObjJ;
-@property RLMSet<RLMValue> *anyObjJ2;
+@property RLMSet<RLMValue> *anyBoolObj;
+@property RLMSet<RLMValue> *anyBoolObj2;
+@property RLMSet<RLMValue> *anyIntObj;
+@property RLMSet<RLMValue> *anyIntObj2;
+@property RLMSet<RLMValue> *anyFloatObj;
+@property RLMSet<RLMValue> *anyFloatObj2;
+@property RLMSet<RLMValue> *anyDoubleObj;
+@property RLMSet<RLMValue> *anyDoubleObj2;
+@property RLMSet<RLMValue> *anyStringObj;
+@property RLMSet<RLMValue> *anyStringObj2;
+@property RLMSet<RLMValue> *anyDataObj;
+@property RLMSet<RLMValue> *anyDataObj2;
+@property RLMSet<RLMValue> *anyDateObj;
+@property RLMSet<RLMValue> *anyDateObj2;
+@property RLMSet<RLMValue> *anyDecimalObj;
+@property RLMSet<RLMValue> *anyDecimalObj2;
+@property RLMSet<RLMValue> *anyObjectIdObj;
+@property RLMSet<RLMValue> *anyObjectIdObj2;
+@property RLMSet<RLMValue> *anyUUIDObj;
+@property RLMSet<RLMValue> *anyUUIDObj2;
+
 @end
 
 @interface AllOptionalPrimitiveSets : RLMObject

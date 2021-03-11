@@ -24,16 +24,16 @@ types = [
   ['AllPrimitiveSets', 'unmanaged', 'objectIdObj', ['objectId(1)', 'objectId(2)'], ['objectId(1)', 'objectId(3)'], ['r', 'unman']],
   ['AllPrimitiveSets', 'unmanaged', 'uuidObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"123DECC8-B300-4954-A233-F89909F4FD89")'], ['r', 'unman']],
 
-  ['AllPrimitiveSets', 'unmanaged', 'anyObjA', ['@NO', '@YES'], ['@NO', '@YES'], {'r', 'any', 'unman'}],
-  ['AllPrimitiveSets', 'unmanaged', 'anyObjB', ['@2', '@3'], ['@2', '@4'], {'r', 'any', 'sum', 'avg', 'unman'}],
-  ['AllPrimitiveSets', 'unmanaged', 'anyObjC', ['@2.2f', '@3.3f'], ['@4.4f', '@3.3f'], {'r', 'any', 'minmax', 'sum', 'avg', 'unman'}],
-  ['AllPrimitiveSets', 'unmanaged', 'anyObjD', ['@2.2', '@3.3'], ['@2.2', '@4.4'], {'r', 'any', 'minmax', 'sum', 'avg', 'unman'}],
-  ['AllPrimitiveSets', 'unmanaged', 'anyObjE', ['@"a"', '@"b"'], ['@"a"', '@"d"'], {'r', 'any', 'unman', 'string'}],
-  ['AllPrimitiveSets', 'unmanaged', 'anyObjF', ['data(1)', 'data(2)'], ['data(1)', 'data(3)'], {'r', 'any', 'unman'}],
-  ['AllPrimitiveSets', 'unmanaged', 'anyObjG', ['date(1)', 'date(2)'], ['date(1)', 'date(4)'], {'r', 'any', 'minmax', 'unman', 'date'}],
-  ['AllPrimitiveSets', 'unmanaged', 'anyObjH', ['decimal128(1)', 'decimal128(2)'], ['decimal128(1)', 'decimal128(3)'], {'r', 'any', 'minmax', 'sum', 'avg', 'unman'}],
-  ['AllPrimitiveSets', 'unmanaged', 'anyObjI', ['objectId(1)', 'objectId(2)'], ['objectId(1)', 'objectId(3)'], {'r', 'any', 'unman'}],
-  ['AllPrimitiveSets', 'unmanaged', 'anyObjJ', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"123DECC8-B300-4954-A233-F89909F4FD89")'], ['r', 'any','unman']],
+  ['AllPrimitiveSets', 'unmanaged', 'anyBoolObj', ['@NO', '@YES'], ['@NO', '@YES'], {'r', 'any', 'unman'}],
+  ['AllPrimitiveSets', 'unmanaged', 'anyIntObj', ['@2', '@3'], ['@2', '@4'], {'r', 'any', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveSets', 'unmanaged', 'anyFloatObj', ['@2.2f', '@3.3f'], ['@4.4f', '@3.3f'], {'r', 'any', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveSets', 'unmanaged', 'anyDoubleObj', ['@2.2', '@3.3'], ['@2.2', '@4.4'], {'r', 'any', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveSets', 'unmanaged', 'anyStringObj', ['@"a"', '@"b"'], ['@"a"', '@"d"'], {'r', 'any', 'unman', 'string'}],
+  ['AllPrimitiveSets', 'unmanaged', 'anyDataObj', ['data(1)', 'data(2)'], ['data(1)', 'data(3)'], {'r', 'any', 'unman'}],
+  ['AllPrimitiveSets', 'unmanaged', 'anyDateObj', ['date(1)', 'date(2)'], ['date(1)', 'date(4)'], {'r', 'any', 'minmax', 'unman', 'date'}],
+  ['AllPrimitiveSets', 'unmanaged', 'anyDecimalObj', ['decimal128(1)', 'decimal128(2)'], ['decimal128(1)', 'decimal128(3)'], {'r', 'any', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveSets', 'unmanaged', 'anyObjectIdObj', ['objectId(1)', 'objectId(2)'], ['objectId(1)', 'objectId(3)'], {'r', 'any', 'unman'}],
+  ['AllPrimitiveSets', 'unmanaged', 'anyUUIDObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"123DECC8-B300-4954-A233-F89909F4FD89")'], ['r', 'any','unman']],
 
   ['AllOptionalPrimitiveSets', 'optUnmanaged', 'boolObj', ['NSNull.null', '@NO', '@YES'], ['@YES', '@NO'], ['o' 'unman', 'maxtwovalues']],
   ['AllOptionalPrimitiveSets', 'optUnmanaged', 'intObj', ['NSNull.null', '@2', '@3'], ['@3', '@4'], ['o', 'minmax', 'sum', 'avg', 'unman']],
@@ -57,16 +57,16 @@ types = [
   ['AllPrimitiveSets', 'managed', 'objectIdObj', ['objectId(1)', 'objectId(2)'], ['objectId(2)', 'objectId(3)'], ['r', 'nominmax', 'man']],
   ['AllPrimitiveSets', 'managed', 'uuidObj', ['uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")', 'uuid(@"00000000-0000-0000-0000-000000000000")'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"123DECC8-B300-4954-A233-F89909F4FD89")'], ['r', 'man']],
 
-  ['AllPrimitiveSets', 'managed', 'anyObjA', ['@NO', '@YES'], ['@NO', '@YES'], {'r', 'any', 'man'}],
-  ['AllPrimitiveSets', 'managed', 'anyObjB', ['@2', '@3'], ['@2', '@4'], {'r', 'any', 'minmax', 'sum', 'avg', 'man'}],
-  ['AllPrimitiveSets', 'managed', 'anyObjC', ['@2.2f', '@3.3f'], ['@2.2f', '@4.4f'], {'r', 'any', 'minmax', 'sum', 'avg', 'man'}],
-  ['AllPrimitiveSets', 'managed', 'anyObjD', ['@2.2', '@3.3'], ['@2.2', '@4.4'], {'r', 'any', 'minmax', 'sum', 'avg', 'man'}],
-  ['AllPrimitiveSets', 'managed', 'anyObjE', ['@"a"', '@"b"'], ['@"a"', '@"d"'], {'r', 'any', 'man', 'string'}],
-  ['AllPrimitiveSets', 'managed', 'anyObjF', ['data(1)', 'data(2)'], ['data(1)', 'data(3)'], {'r', 'any', 'man'}],
-  ['AllPrimitiveSets', 'managed', 'anyObjG', ['date(1)', 'date(2)'], ['date(1)', 'date(3)'], {'r', 'any', 'minmax', 'man', 'date'}],
-  ['AllPrimitiveSets', 'managed', 'anyObjH', ['decimal128(1)', 'decimal128(2)'], ['decimal128(1)', 'decimal128(3)'], {'r', 'any', 'minmax', 'sum', 'avg', 'man'}],
-  ['AllPrimitiveSets', 'managed', 'anyObjI', ['objectId(1)', 'objectId(2)'], ['objectId(1)', 'objectId(3)'], {'r', 'any', 'man'}],
-  ['AllPrimitiveSets', 'managed', 'anyObjJ', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"123DECC8-B300-4954-A233-F89909F4FD89")'], ['r', 'any', 'man']],
+  ['AllPrimitiveSets', 'managed', 'anyBoolObj', ['@NO', '@YES'], ['@NO', '@YES'], {'r', 'any', 'man'}],
+  ['AllPrimitiveSets', 'managed', 'anyIntObj', ['@2', '@3'], ['@2', '@4'], {'r', 'any', 'minmax', 'sum', 'avg', 'man'}],
+  ['AllPrimitiveSets', 'managed', 'anyFloatObj', ['@2.2f', '@3.3f'], ['@2.2f', '@4.4f'], {'r', 'any', 'minmax', 'sum', 'avg', 'man'}],
+  ['AllPrimitiveSets', 'managed', 'anyDoubleObj', ['@2.2', '@3.3'], ['@2.2', '@4.4'], {'r', 'any', 'minmax', 'sum', 'avg', 'man'}],
+  ['AllPrimitiveSets', 'managed', 'anyStringObj', ['@"a"', '@"b"'], ['@"a"', '@"d"'], {'r', 'any', 'man', 'string'}],
+  ['AllPrimitiveSets', 'managed', 'anyDataObj', ['data(1)', 'data(2)'], ['data(1)', 'data(3)'], {'r', 'any', 'man'}],
+  ['AllPrimitiveSets', 'managed', 'anyDateObj', ['date(1)', 'date(2)'], ['date(1)', 'date(3)'], {'r', 'any', 'minmax', 'man', 'date'}],
+  ['AllPrimitiveSets', 'managed', 'anyDecimalObj', ['decimal128(1)', 'decimal128(2)'], ['decimal128(1)', 'decimal128(3)'], {'r', 'any', 'minmax', 'sum', 'avg', 'man'}],
+  ['AllPrimitiveSets', 'managed', 'anyObjectIdObj', ['objectId(1)', 'objectId(2)'], ['objectId(1)', 'objectId(3)'], {'r', 'any', 'man'}],
+  ['AllPrimitiveSets', 'managed', 'anyUUIDObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"123DECC8-B300-4954-A233-F89909F4FD89")'], ['r', 'any', 'man']],
 
   ['AllOptionalPrimitiveSets', 'optManaged', 'boolObj', ['NSNull.null', '@NO', '@YES'], ['@YES', '@NO'], ['o', 'nominmax', 'nosum', 'noavg', 'man', 'maxtwovalues']],
   ['AllOptionalPrimitiveSets', 'optManaged', 'intObj', ['NSNull.null', '@2', '@3'], ['@3', '@4'], ['o', 'minmax', 'sum', 'avg', 'man']],
@@ -81,7 +81,7 @@ types = [
 ]
 
 def type_name(propertyName, optional):
-    if 'anyObj' in propertyName:
+    if 'any' in propertyName:
         return 'mixed'
     else:
         return propertyName.replace('Obj', '') + ('?' if 'opt' in optional else '')
