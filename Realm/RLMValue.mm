@@ -23,7 +23,7 @@
 
 @implementation NSData (RLMValue)
 
-- (RLMPropertyType)valueType {
+- (RLMPropertyType)rlm_valueType {
     return RLMPropertyTypeData;
 }
 
@@ -33,7 +33,7 @@
 
 @implementation NSDate (RLMValue)
 
-- (RLMPropertyType)valueType {
+- (RLMPropertyType)rlm_valueType {
     return RLMPropertyTypeDate;
 }
 
@@ -43,7 +43,7 @@
 
 @implementation NSNumber (RLMValue)
 
-- (RLMPropertyType)valueType {
+- (RLMPropertyType)rlm_valueType {
     if (numberIsBool(self)) {
         return RLMPropertyTypeBool;
     }
@@ -67,7 +67,7 @@
 
 @implementation NSNull (RLMValue)
 
-- (RLMPropertyType)valueType {
+- (RLMPropertyType)rlm_valueType {
     return RLMPropertyTypeAny;
 }
 
@@ -77,7 +77,7 @@
 
 @implementation NSString (RLMValue)
 
-- (RLMPropertyType)valueType {
+- (RLMPropertyType)rlm_valueType {
     return RLMPropertyTypeString;
 }
 
@@ -87,7 +87,7 @@
 
 @implementation NSUUID (RLMValue)
 
-- (RLMPropertyType)valueType {
+- (RLMPropertyType)rlm_valueType {
     return RLMPropertyTypeUUID;
 }
 
@@ -97,7 +97,7 @@
 
 @implementation RLMDecimal128 (RLMValue)
 
-- (RLMPropertyType)valueType {
+- (RLMPropertyType)rlm_valueType {
     return RLMPropertyTypeDecimal128;
 }
 
@@ -107,7 +107,7 @@
 
 @implementation RLMObject (RLMValue)
 
-- (RLMPropertyType)valueType {
+- (RLMPropertyType)rlm_valueType {
     return RLMPropertyTypeObject;
 }
 
@@ -117,7 +117,7 @@
 
 @implementation RLMObjectBase (RLMValue)
 
-- (RLMPropertyType)valueType {
+- (RLMPropertyType)rlm_valueType {
     return RLMPropertyTypeObject;
 }
 
@@ -127,7 +127,7 @@
 
 @implementation RLMObjectId (RLMValue)
 
-- (RLMPropertyType)valueType {
+- (RLMPropertyType)rlm_valueType {
     return RLMPropertyTypeObjectId;
 }
 

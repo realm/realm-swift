@@ -62,7 +62,7 @@
 @protocol RLMValue
 
 /// Describes the type of property stored.
-@property (readonly) RLMPropertyType valueType NS_REFINED_FOR_SWIFT;
+@property (readonly) RLMPropertyType rlm_valueType;
 
 @end
 

@@ -28,42 +28,42 @@
 
 - (void)testIntType {
     id<RLMValue> v = @123;
-    XCTAssertEqual(v.valueType, RLMPropertyTypeInt);
+    XCTAssertEqual(v.rlm_valueType, RLMPropertyTypeInt);
 }
 
 - (void)testFloatType {
     id<RLMValue> v = @123.456f;
-    XCTAssertEqual(v.valueType, RLMPropertyTypeFloat);
+    XCTAssertEqual(v.rlm_valueType, RLMPropertyTypeFloat);
 }
 
 - (void)testStrinType {
     id<RLMValue> v = @"hello";
-    XCTAssertEqual(v.valueType, RLMPropertyTypeString);
+    XCTAssertEqual(v.rlm_valueType, RLMPropertyTypeString);
 }
 
 - (void)testDataType {
     id<RLMValue> v = [NSData dataWithBytes:"hey" length:3];
-    XCTAssertEqual(v.valueType, RLMPropertyTypeData);
+    XCTAssertEqual(v.rlm_valueType, RLMPropertyTypeData);
 }
 
 - (void)testDateType {
     id<RLMValue> v = [NSDate date];
-    XCTAssertEqual(v.valueType, RLMPropertyTypeDate);
+    XCTAssertEqual(v.rlm_valueType, RLMPropertyTypeDate);
 }
 
 - (void)testObjectType {
     id<RLMValue> v = [[StringObject alloc] init];
-    XCTAssertEqual(v.valueType, RLMPropertyTypeObject);
+    XCTAssertEqual(v.rlm_valueType, RLMPropertyTypeObject);
 }
 
 - (void)testObjectIdType {
     id<RLMValue> v = [RLMObjectId objectId];
-    XCTAssertEqual(v.valueType, RLMPropertyTypeObjectId);
+    XCTAssertEqual(v.rlm_valueType, RLMPropertyTypeObjectId);
 }
 
 - (void)testDecimal128Type {
     id<RLMValue> v = [RLMDecimal128 decimalWithNumber:@123.456];
-    XCTAssertEqual(v.valueType, RLMPropertyTypeDecimal128);
+    XCTAssertEqual(v.rlm_valueType, RLMPropertyTypeDecimal128);
 }
 
 #pragma mark - Comparison
@@ -73,8 +73,8 @@
     id<RLMValue> v2 = @123;
 
     XCTAssertEqual(v1, v2);
-    XCTAssertEqual(v1.valueType, RLMPropertyTypeInt);
-    XCTAssertEqual(v2.valueType, RLMPropertyTypeInt);
+    XCTAssertEqual(v1.rlm_valueType, RLMPropertyTypeInt);
+    XCTAssertEqual(v2.rlm_valueType, RLMPropertyTypeInt);
     XCTAssertNotEqual(v2, @456);
 }
 
@@ -83,8 +83,8 @@
     id<RLMValue> v2 = @"hello";
 
     XCTAssertEqual(v1, v2);
-    XCTAssertEqual(v1.valueType, RLMPropertyTypeString);
-    XCTAssertEqual(v2.valueType, RLMPropertyTypeString);
+    XCTAssertEqual(v1.rlm_valueType, RLMPropertyTypeString);
+    XCTAssertEqual(v2.rlm_valueType, RLMPropertyTypeString);
     XCTAssertNotEqual(v2, @"there");
 }
 
@@ -93,8 +93,8 @@
     id<RLMValue> v1 = [d copy];
     id<RLMValue> v2 = [d copy];
     XCTAssertEqual(v1, v2);
-    XCTAssertEqual(v1.valueType, RLMPropertyTypeData);
-    XCTAssertEqual(v2.valueType, RLMPropertyTypeData);
+    XCTAssertEqual(v1.rlm_valueType, RLMPropertyTypeData);
+    XCTAssertEqual(v2.rlm_valueType, RLMPropertyTypeData);
     XCTAssertNotEqual(v1, [NSData dataWithBytes:"there" length:5]);
 }
 
@@ -103,8 +103,8 @@
     id<RLMValue> v1 = [d copy];
     id<RLMValue> v2 = [d copy];
     XCTAssertEqual(v1, v2);
-    XCTAssertEqual(v1.valueType, RLMPropertyTypeDate);
-    XCTAssertEqual(v2.valueType, RLMPropertyTypeDate);
+    XCTAssertEqual(v1.rlm_valueType, RLMPropertyTypeDate);
+    XCTAssertEqual(v2.rlm_valueType, RLMPropertyTypeDate);
     XCTAssertNotEqual(v1, [NSDate date]);
 }
 
@@ -114,8 +114,8 @@
     id<RLMValue> v2 = so;
     XCTAssertEqual(v1, so);
     XCTAssertEqual(v2, so);
-    XCTAssertEqual(v1.valueType, RLMPropertyTypeObject);
-    XCTAssertEqual(v2.valueType, RLMPropertyTypeObject);
+    XCTAssertEqual(v1.rlm_valueType, RLMPropertyTypeObject);
+    XCTAssertEqual(v2.rlm_valueType, RLMPropertyTypeObject);
     XCTAssertEqual(v1, v2);
     XCTAssertNotEqual(v1, [[StringObject alloc] init]);
 }
@@ -126,8 +126,8 @@
     id<RLMValue> v2 = oid;
     XCTAssertEqual(v1, oid);
     XCTAssertEqual(v2, oid);
-    XCTAssertEqual(v1.valueType, RLMPropertyTypeObjectId);
-    XCTAssertEqual(v2.valueType, RLMPropertyTypeObjectId);
+    XCTAssertEqual(v1.rlm_valueType, RLMPropertyTypeObjectId);
+    XCTAssertEqual(v2.rlm_valueType, RLMPropertyTypeObjectId);
     XCTAssertEqual(v1, v2);
     XCTAssertNotEqual(v1, [RLMObjectId objectId]);
 }
@@ -138,8 +138,8 @@
     id<RLMValue> v2 = d;
     XCTAssertEqual(v1, d);
     XCTAssertEqual(v2, d);
-    XCTAssertEqual(v1.valueType, RLMPropertyTypeDecimal128);
-    XCTAssertEqual(v2.valueType, RLMPropertyTypeDecimal128);
+    XCTAssertEqual(v1.rlm_valueType, RLMPropertyTypeDecimal128);
+    XCTAssertEqual(v2.rlm_valueType, RLMPropertyTypeDecimal128);
     XCTAssertEqual(v1, v2);
     XCTAssertNotEqual(v1, [RLMDecimal128 decimalWithNumber:@456.123]);
 }
@@ -162,12 +162,12 @@
     
     XCTAssertNotNil(mo0.anyCol);
     XCTAssertTrue([((StringObject *)mo0.anyCol).stringCol isEqualToString:so.stringCol]);
-    XCTAssertEqual(mo0.anyCol.valueType, RLMPropertyTypeObject);
+    XCTAssertEqual(mo0.anyCol.rlm_valueType, RLMPropertyTypeObject);
     XCTAssertTrue([((StringObject *)mo0.anyArray.firstObject).stringCol isEqualToString:so.stringCol]);
 
     XCTAssertNotNil(mo1.anyCol);
     XCTAssertTrue([((StringObject *)mo1.anyCol).stringCol isEqualToString:so.stringCol]);
-    XCTAssertEqual(mo1.anyCol.valueType, RLMPropertyTypeObject);
+    XCTAssertEqual(mo1.anyCol.rlm_valueType, RLMPropertyTypeObject);
     XCTAssertTrue([((StringObject *)mo1.anyArray.firstObject).stringCol isEqualToString:so.stringCol]);
 }
 
@@ -193,12 +193,12 @@
     
     XCTAssertNotNil(mo0.anyCol);
     XCTAssertTrue([((StringObject *)mo0.anyCol).stringCol isEqualToString:so.stringCol]);
-    XCTAssertEqual(mo0.anyCol.valueType, RLMPropertyTypeObject);
+    XCTAssertEqual(mo0.anyCol.rlm_valueType, RLMPropertyTypeObject);
     XCTAssertTrue([((StringObject *)mo0.anyArray[0]).stringCol isEqualToString:so.stringCol]);
 
     XCTAssertNotNil(mo1.anyCol);
     XCTAssertTrue([((StringObject *)mo1.anyCol).stringCol isEqualToString:so1.stringCol]);
-    XCTAssertEqual(mo1.anyCol.valueType, RLMPropertyTypeObject);
+    XCTAssertEqual(mo1.anyCol.rlm_valueType, RLMPropertyTypeObject);
     XCTAssertTrue([((StringObject *)mo1.anyArray[0]).stringCol isEqualToString:so.stringCol]);
 }
 
@@ -210,7 +210,7 @@
     MixedObject *mo = [MixedObject createInRealm:r withValue:@[so, @[]]];
     [r commitWriteTransaction];
     XCTAssertTrue([((StringObject *)mo.anyCol).stringCol isEqualToString:so.stringCol]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeObject);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeObject);
 }
 
 - (void)testCreateManagedInt {
@@ -221,7 +221,7 @@
     XCTAssertTrue([(NSNumber *)mo.anyCol isEqualToNumber:@123456789]);
     XCTAssertTrue([mo.anyArray[0] isEqualToNumber:@123456]);
     XCTAssertTrue([mo.anyArray[1] isEqualToNumber:@67890]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeInt);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeInt);
 }
 
 - (void)testCreateManagedFloat {
@@ -232,7 +232,7 @@
     XCTAssertTrue([(NSNumber *)mo.anyCol isEqualToNumber:@1234.5f]);
     XCTAssertTrue([mo.anyArray[0] isEqualToNumber:[NSNumber numberWithFloat:12345.6f]]);
     XCTAssertTrue([mo.anyArray[1] isEqualToNumber:[NSNumber numberWithFloat:678.9f]]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeFloat);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeFloat);
 }
 
 - (void)testCreateManagedDouble {
@@ -243,7 +243,7 @@
     XCTAssertTrue([(NSNumber *)mo.anyCol isEqualToNumber:@1234.5]);
     XCTAssertTrue([mo.anyArray[0] isEqualToNumber:[NSNumber numberWithDouble:12345.6]]);
     XCTAssertTrue([mo.anyArray[1] isEqualToNumber:[NSNumber numberWithDouble:678.9]]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeDouble);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeDouble);
 }
 
 - (void)testCreateManagedString {
@@ -254,7 +254,7 @@
     XCTAssertTrue([(NSString *)mo.anyCol isEqualToString:@"hello"]);
     XCTAssertTrue([mo.anyArray[0] isEqualToString:@"over"]);
     XCTAssertTrue([mo.anyArray[1] isEqualToString:@"there"]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeString);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeString);
 }
 
 - (void)testCreateManagedData {
@@ -272,7 +272,7 @@
                                          encoding:NSUTF8StringEncoding] isEqualToString:@"hey"]);
     XCTAssertTrue([[[NSString alloc] initWithData:mo.anyArray[1]
                                          encoding:NSUTF8StringEncoding] isEqualToString:@"you"]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeData);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeData);
 }
 
 - (void)testCreateManagedDate {
@@ -288,7 +288,7 @@
     XCTAssertEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyCol).timeIntervalSince1970, 1);
     XCTAssertEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyArray[0]).timeIntervalSince1970, 1);
     XCTAssertEqualWithAccuracy(d2.timeIntervalSince1970, ((NSDate *)mo.anyArray[1]).timeIntervalSince1970, 1);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeDate);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeDate);
 }
 
 - (void)testCreateManagedObjectId {
@@ -303,7 +303,7 @@
     XCTAssertTrue([(RLMObjectId *)mo.anyCol isEqual:oid1]);
     XCTAssertTrue([(RLMObjectId *)mo.anyArray[0] isEqual:oid1]);
     XCTAssertTrue([(RLMObjectId *)mo.anyArray[1] isEqual:oid2]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeObjectId);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeObjectId);
 }
 
 - (void)testCreateManagedDecimal128 {
@@ -318,7 +318,7 @@
     XCTAssertTrue([(RLMDecimal128 *)mo.anyCol isEqual:d1]);
     XCTAssertTrue([(RLMDecimal128 *)mo.anyArray[0] isEqual:d1]);
     XCTAssertTrue([(RLMDecimal128 *)mo.anyArray[1] isEqual:d2]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeDecimal128);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeDecimal128);
 }
 
 #pragma mark - Add Managed Values
@@ -338,7 +338,7 @@
     
     XCTAssertNotNil(mo1.anyCol);
     XCTAssertTrue([((StringObject *)mo1.anyCol).stringCol isEqualToString:so.stringCol]);
-    XCTAssertEqual(mo1.anyCol.valueType, RLMPropertyTypeObject);
+    XCTAssertEqual(mo1.anyCol.rlm_valueType, RLMPropertyTypeObject);
 }
 
 - (void)testAddManagedInt {
@@ -354,7 +354,7 @@
     XCTAssertTrue([(NSNumber *)mo.anyCol isEqualToNumber:@123456789]);
     XCTAssertTrue([mo.anyArray[0] isEqualToNumber:@123456]);
     XCTAssertTrue([mo.anyArray[1] isEqualToNumber:@67890]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeInt);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeInt);
 }
 
 - (void)testAddManagedFloat {
@@ -369,7 +369,7 @@
     XCTAssertTrue([(NSNumber *)mo.anyCol isEqualToNumber:@1234.5f]);
     XCTAssertTrue([mo.anyArray[0] isEqualToNumber:[NSNumber numberWithFloat:12345.6f]]);
     XCTAssertTrue([mo.anyArray[1] isEqualToNumber:[NSNumber numberWithFloat:678.9f]]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeFloat);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeFloat);
 }
 
 - (void)testAddManagedString {
@@ -385,7 +385,7 @@
     XCTAssertTrue([(NSString *)mo.anyCol isEqualToString:@"hello"]);
     XCTAssertTrue([mo.anyArray[0] isEqualToString:@"over"]);
     XCTAssertTrue([mo.anyArray[1] isEqualToString:@"there"]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeString);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeString);
 }
 
 - (void)testAddManagedData {
@@ -406,7 +406,7 @@
                                          encoding:NSUTF8StringEncoding] isEqualToString:@"hey"]);
     XCTAssertTrue([[[NSString alloc] initWithData:mo.anyArray[1]
                                          encoding:NSUTF8StringEncoding] isEqualToString:@"you"]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeData);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeData);
 }
 
 - (void)testAddManagedDate {
@@ -425,7 +425,7 @@
     XCTAssertEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyCol).timeIntervalSince1970, 1.0);
     XCTAssertEqualWithAccuracy(d1.timeIntervalSince1970, ((NSDate *)mo.anyArray[0]).timeIntervalSince1970, 1.0);
     XCTAssertEqualWithAccuracy(d2.timeIntervalSince1970, ((NSDate *)mo.anyArray[1]).timeIntervalSince1970, 1.0);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeDate);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeDate);
 }
 
 - (void)testAddManagedObjectId {
@@ -443,7 +443,7 @@
     XCTAssertTrue([(RLMObjectId *)mo.anyCol isEqual:oid1]);
     XCTAssertTrue([(RLMObjectId *)mo.anyArray[0] isEqual:oid1]);
     XCTAssertTrue([(RLMObjectId *)mo.anyArray[1] isEqual:oid2]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeObjectId);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeObjectId);
 }
 
 - (void)testAddManagedDecimal128 {
@@ -461,7 +461,7 @@
     XCTAssertTrue([(RLMDecimal128 *)mo.anyCol isEqual:d1]);
     XCTAssertTrue([(RLMDecimal128 *)mo.anyArray[0] isEqual:d1]);
     XCTAssertTrue([(RLMDecimal128 *)mo.anyArray[1] isEqual:d2]);
-    XCTAssertEqual(mo.anyCol.valueType, RLMPropertyTypeDecimal128);
+    XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeDecimal128);
 }
 
 @end
