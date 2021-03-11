@@ -150,7 +150,6 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
             }
             else {
                 return !value
-                    || [value isKindOfClass:[NSNull class]]
                     || [value conformsToProtocol:@protocol(RLMValue)];
             }
         }
@@ -408,7 +407,7 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v, __unsafe_unretained RLMRea
 
     switch (type) {
         case RLMPropertyTypeInt:
-            return realm::Mixed([(NSNumber *)v intValue]);
+            return realm::Mixed([(NSNumber *)v longLongValue]);
         case RLMPropertyTypeBool:
             return realm::Mixed([(NSNumber *)v boolValue]);
         case RLMPropertyTypeFloat:
@@ -455,7 +454,7 @@ id RLMMixedToObjc(realm::Mixed const& mixed, __unsafe_unretained RLMRealm *realm
         case realm::type_Float:
             return @(mixed.get_float());
         case realm::type_Double:
-            return [NSNumber numberWithDouble:mixed.get_double()];
+            return @(mixed.get_double());
         case realm::type_Bool:
             return @(mixed.get_bool());
         case realm::type_Timestamp:

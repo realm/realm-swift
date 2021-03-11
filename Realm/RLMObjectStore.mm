@@ -173,10 +173,8 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 
 RLMObjectBase *RLMObjectFromObjLink(RLMRealm *realm, realm::ObjLink&& objLink) {
     auto& info = realm->_info[objLink.get_table_key()];
-    RLMAccessorContext c{info};
     RLMObjectBase *object = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, &info);
-    auto table = realm->_realm->read_group().get_table(objLink.get_table_key());
-    object->_row = table->get_object(objLink.get_obj_key());
+    object->_row = realm.group.get_object(objLink);
     RLMInitializeSwiftAccessorGenerics(object);
     return object;
 }

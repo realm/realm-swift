@@ -33,31 +33,35 @@
 }
 
 - (void)setRlmValue:(id<RLMValue>)value {
-    if (_managed) {
-        try {
-            RLMAccessorContext ctx(*_parent->_info);
-            auto object = realm::Object(_parent->_realm->_realm,
-                                        *_parent->_info->objectSchema, _parent->_row);
-            object.set_property_value(ctx, _propertyName.UTF8String, value);
+    @autoreleasepool {
+        if (_managed) {
+            try {
+                RLMAccessorContext ctx(*_parent->_info);
+                auto object = realm::Object(_parent->_realm->_realm,
+                                            *_parent->_info->objectSchema, _parent->_row);
+                object.set_property_value(ctx, _propertyName.UTF8String, value);
+            }
+            catch (std::exception const& err) {
+                @throw RLMException(err);
+            }
         }
-        catch (std::exception const& err) {
-            @throw RLMException(err);
+        else {
+            [_parent willChangeValueForKey:_propertyName];
+            _backingValue = value;
+            [_parent didChangeValueForKey:_propertyName];
         }
-    }
-    else {
-        [_parent willChangeValueForKey:_propertyName];
-        _backingValue = value;
-        [_parent didChangeValueForKey:_propertyName];
     }
 }
 
 - (nullable id<RLMValue>)rlmValue {
     if (_managed) {
         try {
-            RLMAccessorContext ctx(*_parent->_info);
-            auto object = realm::Object(_parent->_realm->_realm,
-                                        *_parent->_info->objectSchema, _parent->_row);
-            return RLMCoerceToNil(object.get_property_value<id<RLMValue>>(ctx, _propertyName.UTF8String));
+            @autoreleasepool {
+                RLMAccessorContext ctx(*_parent->_info);
+                auto object = realm::Object(_parent->_realm->_realm,
+                                            *_parent->_info->objectSchema, _parent->_row);
+                return RLMCoerceToNil(object.get_property_value<id<RLMValue>>(ctx, _propertyName.UTF8String));
+            }
         }
         catch (std::exception const& err) {
             @throw RLMException(err);
@@ -70,21 +74,11 @@
 
 - (void)attachIfNeededWithParent:(RLMObjectBase *)parent
                         property:(RLMProperty *)property {
-    if (!_managed) {
-        REALM_ASSERT_DEBUG(parent->_realm);
-        _parent = parent;
-        _propertyName = property.name;
-        _managed = YES;
-    }
+    REALM_ASSERT_DEBUG(parent->_realm);
+    _parent = parent;
+    _propertyName = property.name;
+    _managed = YES;
 
-    // If this mixed container stores an `Object` we need to manually add it
-    // to the Realm.
-    if (_backingValue && [(id)_backingValue isKindOfClass:[RLMObjectBase class]]) {
-        // Don't add the object if it already exists.
-        if (((RLMObjectBase *)_backingValue)->_realm)
-            return;
-        RLMAddObjectToRealm((RLMObjectBase *)_backingValue, parent->_realm, RLMUpdatePolicyError);
-    }
     [self setRlmValue:_backingValue];
     _backingValue = nil;
 }

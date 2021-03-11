@@ -100,7 +100,7 @@ RLMClassInfo& RLMSchemaInfo::operator[](realm::TableKey const& key) {
         if (pair.second.table()->get_key() == key)
             return pair.second;
     }
-    @throw RLMException(@"Table Key '%d' is not managed by the Realm. ", key.value);
+    @throw RLMException(@"Table Key '%@' is not managed by the Realm. ", @(key.value));
 }
 
 

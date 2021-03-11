@@ -65,11 +65,11 @@
 }
 
 - (void)testDateInitialization {
-    NSDate *d = [NSDate now];
+    NSDate *d = [NSDate date];
     id<RLMValue> v = d;
     XCTAssertEqual(v, d);
     XCTAssertEqual(v.valueType, RLMPropertyTypeDate);
-    d = [NSDate now];
+    d = [NSDate date];
     v = d;
     XCTAssertEqual(v, d);
     XCTAssertEqual(v.valueType, RLMPropertyTypeDate);
@@ -141,13 +141,13 @@
 }
 
 - (void)testDateEquals {
-    NSDate *d = [NSDate now];
+    NSDate *d = [NSDate date];
     id<RLMValue> v1 = [d copy];
     id<RLMValue> v2 = [d copy];
     XCTAssertEqual(v1, v2);
     XCTAssertEqual(v1.valueType, RLMPropertyTypeDate);
     XCTAssertEqual(v2.valueType, RLMPropertyTypeDate);
-    XCTAssertNotEqual(v1, [NSDate now]);
+    XCTAssertNotEqual(v1, [NSDate date]);
 }
 
 - (void)testObjectEquals {
@@ -319,8 +319,8 @@
 
 - (void)testCreateManagedDate {
     RLMRealm *r = [self realmWithTestPath];
-    NSDate *d1 = [NSDate now];
-    NSDate *d2 = [NSDate now];
+    NSDate *d1 = [NSDate date];
+    NSDate *d2 = [NSDate date];
 
     [r beginWriteTransaction];
     MixedObject *mo = [MixedObject createInRealm:r withValue:@[d1, @[d1, d2]]];
@@ -452,8 +452,8 @@
 }
 
 - (void)testAddManagedDate {
-    NSDate *d1 = [NSDate now];
-    NSDate *d2 = [NSDate now];
+    NSDate *d1 = [NSDate date];
+    NSDate *d2 = [NSDate date];
     MixedObject *mo = [[MixedObject alloc] init];
     mo.anyCol = d1;
     [mo.anyArray addObjects:@[d1, d2]];

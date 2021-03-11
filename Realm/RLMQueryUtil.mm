@@ -704,22 +704,13 @@ void QueryBuilder::add_diacritic_sensitive_string_constraint(NSPredicateOperator
             m_query.and_query(column.like(value, caseSensitive));
             break;
         default: {
-            if constexpr (is_any_v<C, String, Lst<String>>) {
+            if constexpr (is_any_v<C, String, Lst<String>> || is_any_v<C, String, Set<String>>) {
                 unsupportedOperator(RLMPropertyTypeString, operatorType);
             }
-            else if constexpr (is_any_v<C, Binary, Lst<Binary>>) {
+            else if constexpr (is_any_v<C, Binary, Lst<Binary>> || is_any_v<C, Binary, Set<Binary>>) {
                 unsupportedOperator(RLMPropertyTypeData, operatorType);
             }
-            else if constexpr (is_any_v<C, Mixed, Lst<Mixed>>) {
-                unsupportedOperator(RLMPropertyTypeAny, operatorType);
-            }
-            else if constexpr (is_any_v<C, String, Set<String>>) {
-                unsupportedOperator(RLMPropertyTypeString, operatorType);
-            }
-            else if constexpr (is_any_v<C, Binary, Set<Binary>>) {
-                unsupportedOperator(RLMPropertyTypeData, operatorType);
-            }
-            else if constexpr (is_any_v<C, Mixed, Set<Mixed>>) {
+            else if constexpr (is_any_v<C, Mixed, Lst<Mixed>> || is_any_v<C, Mixed, Set<Mixed>>) {
                 unsupportedOperator(RLMPropertyTypeAny, operatorType);
             }
         }
