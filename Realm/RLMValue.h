@@ -32,19 +32,19 @@
 
  - Usage:
  `
- @interface MyObject : RLMObject
- @property (nonatomic) id<RLMValue> myAnyValue;
- @end
+     @interface MyObject : RLMObject
+     @property (nonatomic) id<RLMValue> myAnyValue;
+     @end
 
- @interface AnotherObject : RLMObject
- @property (nonatomic) id<RLMValue> myAnyValue;
- @end
- ...
- MyObject *myObject = [MyObject createInRealm:realm withValue:@[]];
- myObject.myAnyValue = @1234; // underlying type is NSNumber.
- myObject.myAnyValue = @"hello"; // underlying type is NSString.
- AnotherObject *anotherObject = [AnotherObject createInRealm:realm withValue:@[]];
- myObject.myAnyValue = anotherObject; // underlying type is RLMObject.
+     @interface AnotherObject : RLMObject
+     @property (nonatomic) id<RLMValue> myAnyValue;
+     @end
+     ...
+     MyObject *myObject = [MyObject createInRealm:realm withValue:@[]];
+     myObject.myAnyValue = @1234; // underlying type is NSNumber.
+     myObject.myAnyValue = @"hello"; // underlying type is NSString.
+     AnotherObject *anotherObject = [AnotherObject createInRealm:realm withValue:@[]];
+     myObject.myAnyValue = anotherObject; // underlying type is RLMObject.
  `
 
  The following types conform to RLMValue:
