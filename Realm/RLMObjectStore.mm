@@ -74,7 +74,7 @@ static inline void RLMVerifyRealmRead(__unsafe_unretained RLMRealm *const realm)
     }
 }
 
-static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *const realm) {
+inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *const realm) {
     RLMVerifyRealmRead(realm);
     // if realm is not writable throw
     if (!realm.inWriteTransaction) {

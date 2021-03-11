@@ -940,7 +940,7 @@ ObjectId convert<ObjectId>(id value) {
 
 template <>
 Mixed convert<Mixed>(id value) {
-    return RLMObjcToMixed(value);
+    return RLMObjcToMixed(value, nil, CreatePolicy::Skip);
 }
 
 template <typename>

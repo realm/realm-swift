@@ -34,6 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 void RLMVerifyHasPrimaryKey(Class cls);
 
+void RLMVerifyInWriteTransaction(RLMRealm *const realm);
+
 //
 // Accessor Creation
 //

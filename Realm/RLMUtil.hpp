@@ -24,6 +24,7 @@
 
 #import <realm/array.hpp>
 #import <realm/binary_data.hpp>
+#import <realm/object-store/object.hpp>
 #import <realm/string_data.hpp>
 #import <realm/timestamp.hpp>
 #import <realm/util/file.hpp>
@@ -192,7 +193,9 @@ static inline void RLMNSStringToStdString(std::string &out, NSString *in) {
     out.resize(size);
 }
 
-realm::Mixed RLMObjcToMixed(__unsafe_unretained id value, __unsafe_unretained RLMRealm *realm=nil);
+realm::Mixed RLMObjcToMixed(__unsafe_unretained id value,
+                            __unsafe_unretained RLMRealm *realm=nil,
+                            realm::CreatePolicy createPolicy={});
 id RLMMixedToObjc(realm::Mixed const& value, __unsafe_unretained RLMRealm *realm=nil);
 
 realm::Decimal128 RLMObjcToDecimal128(id value);

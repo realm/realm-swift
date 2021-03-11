@@ -383,7 +383,9 @@ BOOL RLMIsRunningInPlayground() {
     return [[NSBundle mainBundle].bundleIdentifier hasPrefix:@"com.apple.dt.playground."];
 }
 
-realm::Mixed RLMObjcToMixed(__unsafe_unretained id v, __unsafe_unretained RLMRealm *realm) {
+realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
+                            __unsafe_unretained RLMRealm *realm,
+                            realm::CreatePolicy createPolicy) {
     if (!v || v == NSNull.null) {
         return realm::Mixed();
     }
@@ -404,7 +406,7 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v, __unsafe_unretained RLMRea
         case RLMPropertyTypeInt:
             return realm::Mixed([(NSNumber *)v longLongValue]);
         case RLMPropertyTypeBool:
-            return realm::Mixed([(NSNumber *)v boolValue]);
+            return realm::Mixed((bool)[(NSNumber *)v boolValue]);
         case RLMPropertyTypeFloat:
             return realm::Mixed([(NSNumber *)v floatValue]);
         case RLMPropertyTypeDouble:
@@ -421,9 +423,17 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v, __unsafe_unretained RLMRea
         case RLMPropertyTypeObject: {
             // If we are unboxing an object and it is unmanaged, we need to
             // add it to the Realm.
-            if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(v); !objBase->_realm) {
-                RLMAddObjectToRealm(objBase, realm, RLMUpdatePolicyError);
+            if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(v); !objBase->_realm
+                && createPolicy.create) {
+                RLMVerifyInWriteTransaction(realm);
+                createPolicy.copy = false;
+                RLMAccessorContext c{realm->_info[objBase->_objectSchema.className]};
+                c.createObject(objBase, createPolicy);
             }
+            else if (!((RLMObjectBase *)v)->_row) {
+                return realm::Mixed();
+            }
+
             return ((RLMObjectBase *)v)->_row.get_link();
         }
         case RLMPropertyTypeObjectId:

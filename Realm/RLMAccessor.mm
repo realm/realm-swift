@@ -283,7 +283,7 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained id<RLMValue> const value) {
     RLMTranslateError([&] {
         if (value) {
-            obj->_row.set(key, RLMObjcToMixed(value, obj->_realm));
+            obj->_row.set(key, RLMObjcToMixed(value, obj->_realm, realm::CreatePolicy::SetLink));
         }
         else {
             setNull(obj->_row, key);
@@ -848,8 +848,8 @@ realm::UUID RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
     return RLMObjcToUUID(v);
 }
 template<>
-realm::Mixed RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
-    return RLMObjcToMixed(v, _realm);
+realm::Mixed RLMAccessorContext::unbox(id v, CreatePolicy p, ObjKey) {
+    return RLMObjcToMixed(v, _realm, p);
 }
 template<>
 realm::object_store::Dictionary RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
