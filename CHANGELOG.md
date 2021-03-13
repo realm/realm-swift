@@ -1,3 +1,51 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+
+### Fixed
+
+* During integration of a large amount of data from the server, you may get
+  "Assertion failed: !fields.has_missing_parent_update()"
+  ([Core #4497](https://github.com/realm/realm-core/issues/4497), since v5.0.0)
+* Queries of the form "a.b.c == nil" would match objects where `b` is `nil` if
+  `c` did not have an index and did not if `c` was indexed. Both will now match
+  to align with NSPredicate's behavior. ([Core #4460]https://github.com/realm/realm-core/pull/4460), since 4.3.0).
+* Restore support for upgrading files from file format 5 (Realm Cocoa 1.x).
+  ([Core #7089](https://github.com/realm/realm-cocoa/issues/7089), since v5.0.0)
+* On 32bit devices you may get exception with "No such object" when upgrading
+  to v10.* ([Java #7314](https://github.com/realm/realm-java/issues/7314), since v5.0.0)
+* Fix "Invalid ref translation entry [16045690984833335023, 78187493520]"
+  assertion failure which could occur when using sync or multiple processes
+  writing to a single Realm file.
+  ([#7086](https://github.com/realm/realm-cocoa/issues/7086), since v5.0.0).
+* Restore support for upgrading files from file format 5 (Realm Cocoa 1.x).
+  ([Core #7089](https://github.com/realm/realm-cocoa/issues/7089), since v5.0.0)
+* Fixed an issue where creating an object after file format upgrade may fail
+  with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
+  ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
+* Fast-enumerating a List after deleting the parent object would crash with an
+  assertion failure rather than a more appropriate exception.
+  ([Core #4114](https://github.com/realm/realm-core/issues/4114), since v5.0.0).
+* Fix a race condition which could potentially allow queries on frozen Realms
+  to access an uninitialized structure for search indexes (since v5.0.0).
+* Fix crash in case insensitive query on indexed string columns when nothing
+  matches ([#6836](https://github.com/realm/realm-cocoa/issues/6836), since v5.0.0).
+* Null values in a `List<Float?>` or `List<Double?>` were incorrectly treated
+  as non-null in some places. It is unknown if this caused any functional
+  problems when using the public API. ([Core PR #3987](https://github.com/realm/realm-core/pull/3987), since v5.0.0).
+
+### Compatibility
+
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 5.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 12.
+
+### Internal
+
+* Upgraded realm-core from v6.1.4 to v6.2.4
+* Upgraded realm-sync from v5.0.29 to v5.0.33
+
 5.5.0 Release notes (2020-10-12)
 =============================================================
 
