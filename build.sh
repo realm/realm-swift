@@ -44,7 +44,6 @@ Usage: sh $0 command [argument]
 command:
   clean:                clean up/remove all generated files
   download-core:        downloads core library (binary version)
-  download-sync:        downloads sync library (binary version, core+sync)
   build:                builds all iOS and macOS frameworks
   ios-static:           builds fat iOS static framework
   ios-dynamic:          builds iOS dynamic frameworks
@@ -318,12 +317,8 @@ fi
 
 copy_core() {
     local src="$1"
-    if [ -d .git ]; then
-        git clean -xfdq core
-    else
-        rm -r core
-        mkdir core
-    fi
+    rm -rf core
+    mkdir core
     ditto "$src" core
 }
 
@@ -350,17 +345,19 @@ download_common() {
     fi
 
     # First check if we need to do anything
-    if [ -e core/version.txt ]; then
-        if [ "$(cat core/version.txt)" == "$version" ]; then
-            echo "Version ${version} already present"
-            exit 0
+    if [ -e core ]; then
+        if [ -e core/version.txt ]; then
+            if [ "$(cat core/version.txt)" == "$version" ]; then
+                echo "Version ${version} already present"
+                exit 0
+            else
+                echo "Switching from version $(cat core/version.txt) to ${version}"
+            fi
         else
-            echo "Switching from version $(cat core/version.txt) to ${version}"
-        fi
-    else
-        if [ "$(find core -name librealm-sync.a)" ]; then
-            echo 'Using existing custom core build without checking version'
-            exit 0
+            if [ "$(find core -name librealm-sync.a)" ]; then
+                echo 'Using existing custom core build without checking version'
+                exit 0
+            fi
         fi
     fi
 
@@ -465,15 +462,7 @@ case "$COMMAND" in
     # Core
     ######################################
     "download-core")
-        download_common "core" "$2"
-        exit 0
-        ;;
-
-    ######################################
-    # Sync
-    ######################################
-    "download-sync")
-        download_common "sync" "$2"
+        download_common "sync" "xcframework"
         exit 0
         ;;
 
