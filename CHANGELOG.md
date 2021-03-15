@@ -42,7 +42,7 @@
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 5.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
-* Carthage release for Swift is built with Xcode 12.
+* Carthage release for Swift is built with Xcode 12.4.
 
 ### Internal
 
