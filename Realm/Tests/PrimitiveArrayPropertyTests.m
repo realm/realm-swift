@@ -3643,7 +3643,7 @@ static double average(NSArray *values) {
     XCTAssertEqualWithAccuracy([optManaged.decimalObj averageOfProperty:@"self"].doubleValue, average(@[decimal128(2), decimal128(3), NSNull.null]), .001);
 }
 
-- (void)testFastEnumeration {
+- (void)testFastEnumerationUnmanaged {
     for (int i = 0; i < 10; ++i) {
         [self addObjects];
     }
@@ -3808,6 +3808,12 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(values[i++ % values.count], value);
     }
     XCTAssertEqual(i, optUnmanaged.objectIdObj.count);
+    }
+}
+
+- (void)testFastEnumerationManaged {
+    for (int i = 0; i < 10; ++i) {
+        [self addObjects];
     }
     
     {
