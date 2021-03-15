@@ -40,7 +40,9 @@ private func safeWrite<Value>(_ value: Value, _ block: (Value) -> Void) where Va
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 private func createBinding<T: ThreadConfined, V>(_ value: T,
                                                  forKeyPath keyPath: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
-    precondition(!value.isFrozen, "Should not bind frozen value")
+    guard let value = value.isFrozen ? value.thaw() : value else {
+        throwRealmException("Could not bind value")
+    }
 
     // store last known value outside of the binding so that we can reference it if the parent
     // is invalidated
