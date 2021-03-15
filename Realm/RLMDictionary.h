@@ -115,7 +115,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)enumerateKeysAndObjectsUsingBlock:(void (^)(RLMKeyType <RLMDictionaryKey> key, RLMObjectType obj, BOOL *stop))block;
 
-#pragma mark - Adding, Removing, and Replacing Objects in an Array
+#pragma mark - Adding, Removing, and Replacing Objects in a Dictionary
 
 /**
  Replace the data of a dictionary with the data of another dictionary.
@@ -309,11 +309,6 @@ __attribute__((warn_unused_result));
  `RLMDictionary` properties on `RLMObject`s are lazily created when accessed.
  */
 + (instancetype)new __attribute__((unavailable("RLMDictionary cannot be created directly")));
-
-// TODO: Remove
-
-- (void)addObjects:(NSDictionary *)dictionary;
-
 
 @end
 NS_ASSUME_NONNULL_END

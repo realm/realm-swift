@@ -56,7 +56,10 @@ class RLMObservationInfo;
 - (void)deleteObjectsFromRealm;
 @end
 
-void RLMValidateDictionaryObservationKey(NSString *keyPath, RLMDictionary *dictionary);
+//TODO: Move to RLMCollection
+template<typename ObjcCollection>
+void RLMCollectionValidateObservationKey(__unsafe_unretained NSString *const keyPath,
+                                         __unsafe_unretained ObjcCollection *const collection);
 
 // Initialize the observation info for an dictionary if needed
 void RLMEnsureDictionaryObservationInfo(std::unique_ptr<RLMObservationInfo>& info,

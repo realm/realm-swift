@@ -79,7 +79,7 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
      - parameter key: The key to the property whose values are desired.
      */
     @nonobjc public func value(forKey key: String) -> Value? {
-        guard let value = RLMDictionary<AnyObject, AnyObject>.value(forKey: key) else {
+        guard let value = rlmDictionary.value(forKey: key as NSString) else {
             return nil
         }
         return dynamicBridgeCast(fromObjectiveC: value)
@@ -106,7 +106,9 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
      - parameter key:   The name of the property whose value should be set on each object.
     */
     public override func setValue(_ value: Any?, forKey key: String) {
-        return rlmDictionary.setValue(value, forKey: key)
+        return rlmDictionary.setValue(dynamicBridgeCast(fromSwift: value) as AnyObject,
+                                      forKey: key)
+
     }
 
     // MARK: Filtering

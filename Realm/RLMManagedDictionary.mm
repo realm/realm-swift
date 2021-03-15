@@ -32,7 +32,6 @@
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
 
-//#import <realm/object-store/dictionary.hpp>
 #import <realm/object-store/results.hpp>
 #import <realm/object-store/shared_realm.hpp>
 #import <realm/table_view.hpp>
@@ -107,47 +106,6 @@ void RLMEnsureCollectionObservationInfo(std::unique_ptr<RLMObservationInfo>& inf
         info = std::make_unique<RLMObservationInfo>(*lv->_ownerInfo,
                                                     lv->_backingCollection.get_parent_object_key(),
                                                     observed);
-    }
-}
-
-void RLMCollectionValidateMatchingObjectType(__unsafe_unretained RLMDictionary *const collection,
-                                             __unsafe_unretained id const key,
-                                             __unsafe_unretained id const value) {
-    if (!key) {
-        @throw RLMException(@"Invalid nil key for dictionary expecting key of type '%@'.",
-                            collection.objectClassName ?: RLMTypeToString(collection.keyType));
-    }
-    if (![key conformsToProtocol:@protocol(RLMDictionaryKey)] ||
-        !RLMValidateValue(key, collection.keyType, false, false, nil)) {
-        @throw RLMException(@"Invalid key '%@' of type '%@' for expected type '%@'.",
-                            key, [key class], RLMTypeToString(collection.keyType));
-    }
-
-    if (!value && !collection->_optional) {
-        @throw RLMException(@"Invalid nil value for collection of '%@'.",
-                            collection.objectClassName ?: RLMTypeToString(collection.keyType));
-    }
-    if (((RLMDictionary *)collection).keyType != RLMPropertyTypeObject) {
-        if (!RLMValidateValue(value, collection.type, collection.optional, false, nil)) {
-            @throw RLMException(@"Invalid value '%@' of type '%@' for expected type '%@%s'.",
-                                value, [value class], RLMTypeToString(collection.type),
-                                collection.optional ? "?" : "");
-        }
-        return;
-    }
-
-    auto object = RLMDynamicCast<RLMObjectBase>(value);
-    if (!object) {
-        return;
-    }
-    if (!object->_objectSchema) {
-        // TODO: Make exception generic
-        @throw RLMException(@"Object cannot be inserted unless the schema is initialized. "
-                            "This can happen if you try to insert objects into a RLMArray / List from a default value or from an overriden unmanaged initializer (`init()`).");
-    }
-    if (![collection->_objectClassName isEqualToString:object->_objectSchema.className]) {
-        @throw RLMException(@"Object of type '%@' does not match RLMArray type '%@'.",
-                            object->_objectSchema.className, collection->_objectClassName);
     }
 }
 
@@ -245,19 +203,26 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (NSArray *)allKeys {
-    NSMutableArray<id<RLMDictionaryKey>> *keys = [NSMutableArray array];
-//    return translateErrors<RLMManagedDictionary>([&] {
-//        return _backingCollection.size();
-//    });
-    return keys;
+    return translateErrors<RLMManagedDictionary>([&] {
+        NSMutableArray<id<RLMDictionaryKey>> *keys = [NSMutableArray array];
+        auto keyResult = _backingCollection.get_keys();
+        for (size_t i=0; i<keyResult.size(); i++) {
+            [keys addObject:RLMStringDataToNSString(keyResult.get<realm::StringData>(i))];
+        }
+        return keys;
+    });
 }
 
 - (NSArray *)allValues {
-    NSMutableArray<id<RLMDictionaryKey>> *values = [NSMutableArray array];
-//    return translateErrors<RLMManagedDictionary>([&] {
-//        return _backingCollection.size();
-//    });
-    return values;
+    return translateErrors<RLMManagedDictionary>([&] {
+        NSMutableArray *values = [NSMutableArray array];
+        auto valueResult = _backingCollection.get_values();
+        for (size_t i=0; i<valueResult.size(); i++) {
+            RLMAccessorContext c(*_objectInfo);
+            [values addObject:valueResult.get(c, i)];
+        }
+        return values;
+    });
 }
 
 - (BOOL)isInvalidated {
@@ -310,7 +275,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (void)setObject:(id)obj forKey:(id<RLMDictionaryKey>)key {
-    RLMCollectionValidateMatchingObjectType(self, key, obj);
+    RLMDictionaryValidateMatchingObjectType(self, key, obj);
     changeDictionary(self, ^{
         RLMAccessorContext context(*_objectInfo);
         _backingCollection.insert(context,
@@ -325,7 +290,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
         [self removeObjectForKey:key];
         return;
     }
-    RLMCollectionValidateMatchingObjectType(self, key, obj);
+    RLMDictionaryValidateMatchingObjectType(self, key, obj);
     changeDictionary(self, ^{
         RLMAccessorContext context(*_objectInfo);
         _backingCollection.insert(context,
@@ -398,7 +363,7 @@ inline realm::StringData keyFromRLMDictionaryKey(id<RLMDictionaryKey> key, RLMAc
 
 - (void)setValue:(id)value forKey:(NSString *)key {
     if ([key isEqualToString:@"self"]) {
-        RLMCollectionValidateMatchingObjectType(self, key, value);
+        RLMDictionaryValidateMatchingObjectType(self, key, value);
         RLMAccessorContext context(*_objectInfo);
         translateErrors<RLMManagedDictionary>([&] {
             _backingCollection.remove_all();
@@ -407,7 +372,7 @@ inline realm::StringData keyFromRLMDictionaryKey(id<RLMDictionaryKey> key, RLMAc
         return;
     }
     else if (_type == RLMPropertyTypeObject) {
-        RLMCollectionValidateMatchingObjectType(self, key, value);
+        RLMDictionaryValidateMatchingObjectType(self, key, value);
         translateErrors<RLMManagedDictionary>([&] { _backingCollection.verify_in_transaction(); });
         RLMCollectionSetValueForKey(self, key, value);
     }
