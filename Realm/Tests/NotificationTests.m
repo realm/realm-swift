@@ -516,6 +516,66 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     XCTAssertEqualObjects(@[@5], changes.insertions);
 }
 
+- (void)testMultipleWriteTransactionsWithinNotification {
+    [self prepare];
+
+    RLMResults *query1 = [self query];
+    __block int calls1 = 0;
+    id token1 = [query1 addNotificationBlock:^(RLMResults *results, RLMCollectionChange *c, NSError *error) {
+        XCTAssertNotNil(results);
+        XCTAssertNil(error);
+        if (calls1++ == 0) {
+            XCTAssertNil(c);
+            return;
+        }
+        XCTAssertEqualObjects(c.deletions, @[@(5 - calls1)]);
+    }];
+
+    RLMResults *query2 = [self query];
+    __block int calls2 = 0;
+    id token2 = [query2 addNotificationBlock:^(RLMResults *results, __unused RLMCollectionChange *c, NSError *error) {
+        XCTAssertNotNil(results);
+        XCTAssertNil(error);
+        ++calls2;
+        RLMRealm *realm = results.realm;
+        if (realm.inWriteTransaction) {
+            return;
+        }
+        while (results.count) {
+            [realm beginWriteTransaction];
+            [realm deleteObject:[results lastObject]];
+            [realm commitWriteTransaction];
+        }
+    }];
+
+    id ex = [self expectationWithDescription:@"last query gets final notification"];
+    RLMResults *query3 = [self query];
+    __block int calls3 = 0;
+    id token3 = [query3 addNotificationBlock:^(RLMResults *results, RLMCollectionChange *c, NSError *error) {
+        XCTAssertNotNil(results);
+        XCTAssertNil(error);
+        if (++calls3 == 1) {
+            XCTAssertNil(c);
+        }
+        else {
+            XCTAssertEqualObjects(c.deletions, @[@(5 - calls3)]);
+        }
+        if (results.count == 0) {
+            [ex fulfill];
+        }
+    }];
+
+    [self waitForExpectations:@[ex] timeout:2.0];
+
+    XCTAssertEqual(calls1, 5);
+    XCTAssertEqual(calls2, 5);
+    XCTAssertEqual(calls3, 5);
+
+    [token1 invalidate];
+    [token2 invalidate];
+    [token3 invalidate];
+}
+
 @end
 
 @interface LinkViewChangesetTests : RLMTestCase <ChangesetTestCase>

@@ -1014,6 +1014,7 @@
             [expectation fulfill];
             return;
         }
+        [token invalidate];
 
         XCTAssertEqual(1U, results.count);
         createObject();
@@ -1022,7 +1023,6 @@
         XCTAssertEqual(2U, results.count);
         [realm cancelWriteTransaction];
         [expectation fulfill];
-        [token invalidate];
     };
     token = [StringObject.allObjects addNotificationBlock:block];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
