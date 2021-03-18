@@ -274,6 +274,19 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     return [self objectForKey:key];
 }
 
+- (nonnull id)objectAtIndex:(NSUInteger)index {
+    return translateErrors<RLMManagedDictionary>([&] {
+        auto key = _backingCollection.get_pair(index).first;
+        return RLMStringDataToNSString(key);
+    });
+}
+
+- (NSUInteger)indexOfObject:(id)value {
+    return translateErrors<RLMManagedDictionary>([&] {
+        return _backingCollection.find_any(value);
+    });
+}
+
 - (void)setObject:(id)obj forKey:(id<RLMDictionaryKey>)key {
     RLMDictionaryValidateMatchingObjectType(self, key, obj);
     changeDictionary(self, ^{

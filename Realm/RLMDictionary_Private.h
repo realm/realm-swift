@@ -26,6 +26,10 @@
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
 
-void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *const dictionary, __unsafe_unretained id const key, __unsafe_unretained id const value);
+void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *const dictionary,
+                                             __unsafe_unretained id const key, __unsafe_unretained id const value);
+FOUNDATION_EXTERN NSString *RLMDictionaryDescriptionWithMaxDepth(NSString *name,
+                                                                 RLMDictionary *dictionary,
+                                                                 NSUInteger depth);
 
 @end

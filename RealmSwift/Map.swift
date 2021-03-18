@@ -129,7 +129,24 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
      - parameter object: The value to find in the Map.
      */
     public func contains(_ object: Value) -> Bool {
-        fatalError("Not implemented in Map")
+        fatalError("Not implemented in Map. Please use contains(where:).")
+    }
+
+    /**
+     Returns a Boolean value indicating whether the Map contains the key-value pair
+     satisfies the given predicate
+
+     - parameter where: a closure that test if any key-pair of the given map represents the match.
+     */
+    public func contains(where predicate: @escaping (_ key: String, _ value: Value) -> Bool) -> Bool {
+        var found: Bool = false
+        rlmDictionary.enumerateKeysAndObjects { (key, value, shouldStop) in
+            if predicate(dynamicBridgeCast(fromObjectiveC: key), dynamicBridgeCast(fromObjectiveC: value)) {
+                found = true
+                shouldStop.pointee = true
+            }
+        }
+        return found
     }
 
     // MARK: Sorting
@@ -352,7 +369,7 @@ public final class Map<Key, Value: RealmCollectionValue>: RLMSwiftCollectionBase
     }
 
     @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
-        return RLMDescriptionWithMaxDepth("Map", _rlmCollection, depth)
+        return RLMDictionaryDescriptionWithMaxDepth("Map", rlmDictionary, depth)
     }
 }
 
@@ -392,6 +409,14 @@ extension Map: RealmCollection {
 //    /// The type of the objects stored within the map.
 //    public typealias ElementType = Value
 
+    public var keys: [Key] {
+        return dynamicBridgeCast(fromObjectiveC: rlmDictionary.allKeys)
+    }
+
+    public var values: [Value] {
+        return dynamicBridgeCast(fromObjectiveC: rlmDictionary.allValues)
+    }
+
     // MARK: Sequence Support
 
     /// Returns a `RLMIterator` that yields successive elements in the `Map`.
@@ -428,12 +453,12 @@ extension Map: RealmCollection {
     // MARK: Object Retrieval
 
     public subscript(position: Int) -> Value {
-        fatalError("subscript(position:) is not available on Map")
+        return dynamicBridgeCast(fromObjectiveC: rlmDictionary.object(at: UInt(position))) as Value
     }
 
     /// :nodoc:
     public func index(of object: Value) -> Int? {
-        fatalError("index(of:) is not available on Map")
+        return Int(rlmDictionary.index(of: object))
     }
 
     /// :nodoc:
