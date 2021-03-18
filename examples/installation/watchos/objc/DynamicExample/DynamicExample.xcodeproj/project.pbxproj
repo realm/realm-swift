@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E82D95AC1C791A58000717F3 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E82D95A71C7919D9000717F3 /* Realm.framework */; };
-		E82D95AD1C791A58000717F3 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E82D95A71C7919D9000717F3 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E82D95AC1C791A58000717F3 /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = E82D95A71C7919D9000717F3 /* Realm.xcframework */; };
+		E82D95AD1C791A58000717F3 /* Realm.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E82D95A71C7919D9000717F3 /* Realm.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E8645B891C7913D600C241AA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8645B881C7913D600C241AA /* main.m */; };
 		E8645B9C1C7913D600C241AA /* DynamicExample WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E8645B9B1C7913D600C241AA /* DynamicExample WatchKit App.app */; };
 		E8645BA21C7913D600C241AA /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E8645BA01C7913D600C241AA /* Interface.storyboard */; };
@@ -40,7 +40,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				E82D95AD1C791A58000717F3 /* Realm.framework in Embed Frameworks */,
+				E82D95AD1C791A58000717F3 /* Realm.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -70,7 +70,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		E82D95A71C7919D9000717F3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../realm-objc-latest/watchos/Realm.framework"; sourceTree = "<group>"; };
+		E82D95A71C7919D9000717F3 /* Realm.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = "../../../realm-objc-latest/Realm.xcframework"; sourceTree = "<group>"; };
 		E8645B841C7913D600C241AA /* DynamicExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DynamicExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8645B881C7913D600C241AA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E8645B981C7913D600C241AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -95,7 +95,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E82D95AC1C791A58000717F3 /* Realm.framework in Frameworks */,
+				E82D95AC1C791A58000717F3 /* Realm.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,7 +109,7 @@
 				E8645B9F1C7913D600C241AA /* DynamicExample WatchKit App */,
 				E8645BAE1C7913D600C241AA /* DynamicExample WatchKit Extension */,
 				E8645B851C7913D600C241AA /* Products */,
-				E82D95A71C7919D9000717F3 /* Realm.framework */,
+				E82D95A71C7919D9000717F3 /* Realm.xcframework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -214,7 +214,7 @@
 		E8645B7C1C7913D600C241AA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1020;
+				LastUpgradeCheck = 1220;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					E8645B831C7913D600C241AA = {
@@ -339,6 +339,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+                               CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -393,6 +394,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+                               CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;

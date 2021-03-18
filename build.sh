@@ -44,7 +44,6 @@ Usage: sh $0 command [argument]
 command:
   clean:                clean up/remove all generated files
   download-core:        downloads core library (binary version)
-  download-sync:        downloads sync library (binary version, core+sync)
   build:                builds all iOS and macOS frameworks
   ios-static:           builds fat iOS static framework
   ios-dynamic:          builds iOS dynamic frameworks
@@ -279,7 +278,6 @@ build_docs() {
     local objc="--objc"
 
     if [[ "$language" == "swift" ]]; then
-        sh build.sh set-swift-version
         xcodebuild_arguments="-scheme,RealmSwift"
         module="RealmSwift"
         objc=""
@@ -318,13 +316,13 @@ fi
 
 copy_core() {
     local src="$1"
-    if [ -d .git ]; then
-        git clean -xfdq core
-    else
-        rm -r core
-        mkdir core
-    fi
+    rm -rf core
+    mkdir core
     ditto "$src" core
+
+    # XCFramework processing only copies the "realm" headers, so put the third-party ones in a known location
+    mkdir -p core/include
+    find "$src" -name external -exec ditto "{}" core/include/external \; -quit
 }
 
 download_common() {
@@ -350,17 +348,19 @@ download_common() {
     fi
 
     # First check if we need to do anything
-    if [ -e core/version.txt ]; then
-        if [ "$(cat core/version.txt)" == "$version" ]; then
-            echo "Version ${version} already present"
-            exit 0
+    if [ -e core ]; then
+        if [ -e core/version.txt ]; then
+            if [ "$(cat core/version.txt)" == "$version" ]; then
+                echo "Version ${version} already present"
+                exit 0
+            else
+                echo "Switching from version $(cat core/version.txt) to ${version}"
+            fi
         else
-            echo "Switching from version $(cat core/version.txt) to ${version}"
-        fi
-    else
-        if [ "$(find core -name librealm-sync.a)" ]; then
-            echo 'Using existing custom core build without checking version'
-            exit 0
+            if [ "$(find core -name librealm-sync.a)" ]; then
+                echo 'Using existing custom core build without checking version'
+                exit 0
+            fi
         fi
     fi
 
@@ -465,33 +465,13 @@ case "$COMMAND" in
     # Core
     ######################################
     "download-core")
-        download_common "core" "$2"
-        exit 0
-        ;;
-
-    ######################################
-    # Sync
-    ######################################
-    "download-sync")
-        download_common "sync" "$2"
+        download_common "sync" "xcframework"
         exit 0
         ;;
 
     ######################################
     # Swift versioning
     ######################################
-    "set-swift-version")
-        version=${2:-$REALM_SWIFT_VERSION}
-
-        SWIFT_VERSION_FILE="RealmSwift/SwiftVersion.swift"
-        CONTENTS="let swiftLanguageVersion = \"$version\""
-        if [ ! -f "$SWIFT_VERSION_FILE" ] || ! grep -q "$CONTENTS" "$SWIFT_VERSION_FILE"; then
-            echo "$CONTENTS" > "$SWIFT_VERSION_FILE"
-        fi
-
-        exit 0
-        ;;
-
     "prelaunch-simulator")
         if [ -z "$REALM_SKIP_PRELAUNCH" ]; then
             sh ${source_root}/scripts/reset-simulators.sh "$1"
@@ -1224,17 +1204,13 @@ EOM
           fi
 
           if [ ! -f core/version.txt ]; then
-            sh build.sh download-sync
-            mv core/librealm-sync-ios.a core/librealmcore-ios.a
-            mv core/librealm-sync-macosx.a core/librealmcore-macosx.a
-            mv core/librealm-sync-tvos.a core/librealmcore-tvos.a
-            mv core/librealm-sync-watchos.a core/librealmcore-watchos.a
-            rm core/librealm*-dbg.a
+            sh build.sh download-core
           fi
 
           rm -rf include
           mkdir -p include
-          mv core/include include/core
+          cp -R core/realm-sync.xcframework/ios-armv7_arm64/Headers include/core
+          cp Realm/ObjectStore/external/json/json.hpp include/core
 
           mkdir -p include/impl/apple include/util/apple include/sync/impl/apple
           cp Realm/*.hpp include
@@ -1249,8 +1225,6 @@ EOM
 
           echo '' > Realm/RLMPlatform.h
           cp Realm/*.h include
-        else
-          sh build.sh set-swift-version
         fi
         ;;
 
@@ -1271,7 +1245,6 @@ EOM
         fi
 
         if [ "$target" = "docs" ]; then
-            sh build.sh set-swift-version
             sh build.sh verify-docs
         elif [ "$target" = "swiftlint" ]; then
             sh build.sh verify-swiftlint
@@ -1538,7 +1511,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 5.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
-* Carthage release for Swift is built with Xcode 12.
+* Carthage release for Swift is built with Xcode 12.4.
 
 ### Internal
 * Upgraded realm-core from ? to ?

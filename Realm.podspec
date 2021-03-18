@@ -2,6 +2,7 @@ Pod::Spec.new do |s|
   s.name                    = 'Realm'
   version                   = `sh build.sh get-version`
   s.version                 = version
+  s.cocoapods_version       = '>= 1.10'
   s.summary                 = 'Realm is a modern data framework & database for iOS, macOS, tvOS & watchOS.'
   s.description             = <<-DESC
                               The Realm Mobile Database, for Objective-C. (If you want to use Realm from Swift, see the “RealmSwift” pod.)
@@ -14,8 +15,7 @@ Pod::Spec.new do |s|
   s.library                 = 'c++', 'z'
   s.requires_arc            = true
   s.social_media_url        = 'https://twitter.com/realm'
-  has_versioned_docs        = !(version =~ /alpha|beta|rc/)
-  s.documentation_url       = "https://realm.io/docs/objc/#{has_versioned_docs ? s.version : 'latest'}"
+  s.documentation_url       = "https://docs.mongodb.com/realm-legacy/docs/objc/5.5.0/"
   s.license                 = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
   public_header_files       = 'include/**/RLMArray.h',
@@ -96,16 +96,11 @@ Pod::Spec.new do |s|
   s.preserve_paths          = %w(build.sh include)
 
   s.ios.deployment_target   = '9.0'
-  s.ios.vendored_library    = 'core/librealmcore-ios.a'
-
   s.osx.deployment_target   = '10.9'
-  s.osx.vendored_library    = 'core/librealmcore-macosx.a'
-
   s.watchos.deployment_target = '2.0'
-  s.watchos.vendored_library  = 'core/librealmcore-watchos.a'
-
   s.tvos.deployment_target = '9.0'
-  s.tvos.vendored_library  = 'core/librealmcore-tvos.a'
+
+  s.vendored_frameworks  = 'core/realm-sync.xcframework'
 
   s.subspec 'Headers' do |s|
     s.source_files          = public_header_files

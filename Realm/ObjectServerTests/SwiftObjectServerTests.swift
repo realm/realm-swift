@@ -133,7 +133,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             var theError: SyncError?
             let ex = expectation(description: "Waiting for error handler to be called...")
-            SyncManager.shared.errorHandler = { (error, session) in
+            SyncManager.shared.errorHandler = { (error, _) in
                 if let error = error as? SyncError {
                     theError = error
                 } else {
@@ -162,7 +162,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             try autoreleasepool {
                 let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
                 let ex = expectation(description: "Waiting for error handler to be called...")
-                SyncManager.shared.errorHandler = { (error, session) in
+                SyncManager.shared.errorHandler = { (error, _) in
                     if let error = error as? SyncError {
                         theError = error
                     } else {
@@ -524,7 +524,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                                         serverValidationPolicy: .system)
 
         let ex = expectation(description: "Waiting for error handler to be called")
-        SyncManager.shared.errorHandler = { (error, session) in
+        SyncManager.shared.errorHandler = { (_, _) in
             ex.fulfill()
         }
 
@@ -536,7 +536,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let user = try! synchronouslyLogInUser(for: basicCredentials(), server: authURL)
         let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
                                         serverValidationPolicy: .none)
-        SyncManager.shared.errorHandler = { (error, session) in
+        SyncManager.shared.errorHandler = { (error, _) in
             XCTFail("Unexpected connection failure: \(error)")
         }
 
@@ -553,7 +553,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
                                         serverValidationPolicy: .pinCertificate(path: certURL))
-        SyncManager.shared.errorHandler = { (error, session) in
+        SyncManager.shared.errorHandler = { (error, _) in
             XCTFail("Unexpected connection failure: \(error)")
         }
 
@@ -571,7 +571,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                                         serverValidationPolicy: .pinCertificate(path: certURL))
 
         let ex = expectation(description: "Waiting for error handler to be called")
-        SyncManager.shared.errorHandler = { (error, session) in
+        SyncManager.shared.errorHandler = { (_, _) in
             ex.fulfill()
         }
 

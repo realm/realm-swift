@@ -13,8 +13,8 @@
 		E8358B6B1AFB172C00DE7F8C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E8358B6A1AFB172C00DE7F8C /* Images.xcassets */; };
 		E8358B6E1AFB172C00DE7F8C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E8358B6C1AFB172C00DE7F8C /* Main.storyboard */; };
 		E8358B7A1AFB172C00DE7F8C /* DynamicExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8358B791AFB172C00DE7F8C /* DynamicExampleTests.m */; };
-		E8358B841AFB174600DE7F8C /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8358B831AFB174600DE7F8C /* Realm.framework */; };
-		E8358B851AFB174600DE7F8C /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E8358B831AFB174600DE7F8C /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E8358B841AFB174600DE7F8C /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8358B831AFB174600DE7F8C /* Realm.xcframework */; };
+		E8358B851AFB174600DE7F8C /* Realm.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E8358B831AFB174600DE7F8C /* Realm.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,7 +34,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				E8358B851AFB174600DE7F8C /* Realm.framework in Embed Frameworks */,
+				E8358B851AFB174600DE7F8C /* Realm.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -54,7 +54,7 @@
 		E8358B731AFB172C00DE7F8C /* DynamicExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DynamicExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8358B781AFB172C00DE7F8C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E8358B791AFB172C00DE7F8C /* DynamicExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DynamicExampleTests.m; sourceTree = "<group>"; };
-		E8358B831AFB174600DE7F8C /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../realm-objc-latest/osx/Realm.framework"; sourceTree = "<group>"; };
+		E8358B831AFB174600DE7F8C /* Realm.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = "../../../realm-objc-latest/Realm.xcframework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,7 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8358B841AFB174600DE7F8C /* Realm.framework in Frameworks */,
+				E8358B841AFB174600DE7F8C /* Realm.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -82,7 +82,7 @@
 				E8358B5F1AFB172C00DE7F8C /* DynamicExample */,
 				E8358B761AFB172C00DE7F8C /* DynamicExampleTests */,
 				E8358B5E1AFB172C00DE7F8C /* Products */,
-				E8358B831AFB174600DE7F8C /* Realm.framework */,
+				E8358B831AFB174600DE7F8C /* Realm.xcframework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -180,7 +180,7 @@
 		E8358B551AFB172C00DE7F8C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1020;
+				LastUpgradeCheck = 1220;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					E8358B5C1AFB172C00DE7F8C = {
@@ -293,6 +293,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+                               CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -348,6 +349,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+                               CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;

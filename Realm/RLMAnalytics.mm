@@ -179,9 +179,8 @@ static NSDictionary *RLMAnalyticsPayload() {
     }
 
     NSString *osVersionString = [[NSProcessInfo processInfo] operatingSystemVersionString];
-    Class swiftObjectUtilClass = NSClassFromString(@"RealmSwiftObjectUtil");
-    BOOL isSwift = swiftObjectUtilClass != nil;
-    NSString *swiftVersion = isSwift ? [swiftObjectUtilClass swiftVersion] : @"N/A";
+    Class swiftDecimal128 = NSClassFromString(@"RealmSwiftDecimal128");
+    BOOL isSwift = swiftDecimal128 != nil;
 
     static NSString *kUnknownString = @"unknown";
     NSString *hashedMACAddress = RLMMACAddress() ?: kUnknownString;
@@ -213,7 +212,8 @@ static NSDictionary *RLMAnalyticsPayload() {
 #else
                      @"Target OS Type": @"osx",
 #endif
-                     @"Swift Version": swiftVersion,
+                     @"Clang Version": @__clang_version__,
+                     @"Clang Major Version": @__clang_major__,
                      // Current OS version the app is targetting
                      @"Target OS Version": osVersionString,
                      // Minimum OS version the app is targetting
@@ -242,14 +242,16 @@ void RLMSendAnalytics() {
     if (getenv("REALM_DISABLE_ANALYTICS") || !RLMIsDebuggerAttached() || RLMIsRunningInPlayground()) {
         return;
     }
-
-
+    NSArray *urlStrings = @[@"https://webhooks.mongodb-realm.com/api/client/v2.0/app/realmsdkmetrics-zmhtm/service/metric_webhook/incoming_webhook/metric?data=%@",
+                            @"https://api.mixpanel.com/track/?data=%@&ip=1"];
     NSData *payload = [NSJSONSerialization dataWithJSONObject:RLMAnalyticsPayload() options:0 error:nil];
-    NSString *url = [NSString stringWithFormat:@"https://api.mixpanel.com/track/?data=%@&ip=1", [payload base64EncodedStringWithOptions:0]];
 
-    // No error handling or anything because logging errors annoyed people for no
-    // real benefit, and it's not clear what else we could do
-    [[NSURLSession.sharedSession dataTaskWithURL:[NSURL URLWithString:url]] resume];
+    for (NSString *urlString in urlStrings) {
+        NSString *formatted = [NSString stringWithFormat:urlString, [payload base64EncodedStringWithOptions:0]];
+        // No error handling or anything because logging errors annoyed people for no
+        // real benefit, and it's not clear what else we could do
+        [[NSURLSession.sharedSession dataTaskWithURL:[NSURL URLWithString:formatted]] resume];
+    }
 }
 
 #else

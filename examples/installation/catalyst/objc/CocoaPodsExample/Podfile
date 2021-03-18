@@ -1,0 +1,20 @@
+# Uncomment this line to define a global platform for your project
+platform :ios, '9.0'
+
+branch = ENV['sha']
+
+target 'CocoaPodsExample' do
+  pod 'Realm', git: 'https://github.com/realm/realm-cocoa.git', branch: branch, submodules: true
+end
+
+target 'CocoaPodsExampleTests' do
+  pod 'Realm/Headers', git: 'https://github.com/realm/realm-cocoa.git', branch: branch, submodules: true
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['GCC_GENERATE_DEBUGGING_SYMBOLS'] = 'NO'
+    end
+  end
+end
