@@ -15,8 +15,7 @@ Pod::Spec.new do |s|
   s.library                 = 'c++', 'z'
   s.requires_arc            = true
   s.social_media_url        = 'https://twitter.com/realm'
-  has_versioned_docs        = !(version =~ /alpha|beta|rc/)
-  s.documentation_url       = "https://realm.io/docs/objc/#{has_versioned_docs ? s.version : 'latest'}"
+  s.documentation_url       = "https://docs.mongodb.com/realm-legacy/docs/objc/5.5.0/"
   s.license                 = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
   public_header_files       = 'include/**/RLMArray.h',
