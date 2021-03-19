@@ -60,6 +60,122 @@ extension Int32: AddableType {}
 extension Int64: AddableType {}
 extension Decimal128: AddableType {}
 
+@dynamicMemberLookup
+public struct Query<T: ObjectBase> {
+    fileprivate struct Expr {
+        var value: String = ""
+
+        @discardableResult mutating func equals<Rhs>(_ rhs: Rhs) -> Self {
+            if rhs is String {
+                value += " == '\(rhs)'"
+            } else {
+                value += " == \(rhs)"
+            }
+            return self
+        }
+        @discardableResult mutating func greaterThan<Rhs>(_ rhs: Rhs) -> Self {
+            if rhs is String {
+                value += " > '\(rhs)'"
+            } else {
+                value += " > \(rhs)"
+            }
+            return self
+        }
+        @discardableResult mutating func lessThan<Rhs>(_ rhs: Rhs) -> Self {
+            if rhs is String {
+                value += " < '\(rhs)'"
+            } else {
+                value += " < \(rhs)"
+            }
+            return self
+        }
+        @discardableResult mutating func and(_ rhs: Query<T>) -> Self {
+            value += " AND \(rhs.expr.value)"
+            return self
+        }
+        mutating func contains(_ other: String) {
+            value += " CONTAINS '\(other)'"
+        }
+    }
+
+    fileprivate var expr = Expr()
+
+    public static func == <Rhs>(_ lhs: Query, _ rhs: Rhs) -> Query where Rhs: _ManagedPropertyType & Equatable {
+        var cpy = lhs
+        cpy.expr.equals(rhs)
+        return cpy
+    }
+    public static func > <Rhs>(_ lhs: Query, _ rhs: Rhs) -> Query where Rhs: _ManagedPropertyType & Comparable {
+        var cpy = lhs
+        cpy.expr.greaterThan(rhs)
+        return cpy
+    }
+    public static func < <Rhs>(_ lhs: Query, _ rhs: Rhs) -> Query where Rhs: _ManagedPropertyType & Comparable {
+        var cpy = lhs
+        cpy.expr.lessThan(rhs)
+        return cpy
+    }
+    public static func && (_ lhs: Query, _ rhs: Query) -> Query {
+        var cpy = lhs
+        cpy.expr.and(rhs)
+        return cpy
+    }
+    public func contains(_ other: String) -> Query {
+        var cpy = self
+        cpy.expr.contains(other)
+        return cpy
+    }
+    private class Observer: NSObject {
+        let name: String
+        private(set) var hit = false
+        init(name: String) {
+            self.name = name
+        }
+        override func observeValue(forKeyPath keyPath: String?,
+                                   of object: Any?,
+                                   change: [NSKeyValueChangeKey : Any]?,
+                                   context: UnsafeMutableRawPointer?) {
+            hit = true
+        }
+    }
+
+    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<T, V>) -> Query {
+        let inst = T()
+        var outCount = UInt32()
+        // copy ivars into list
+        let ivarList = class_copyIvarList(T.self, &outCount)
+        defer { free(ivarList) }
+        var observers = [Observer]()
+        // assign an `Observer` to each ivar
+        for i in 0..<outCount {
+            let ivar = ivarList![Int(i)]
+            let name = String(cString: ivar_getName(ivar)!)
+            let obs = Observer(name: name)
+            observers.append(obs)
+            inst.addObserver(obs, forKeyPath: name, options: .new, context: nil)
+        }
+        // set the property for a given keyPath to itself.
+        // this will trigger the observer for the given key path.
+        // the observer will mark itself as "hit", indicating
+        // that is the correct observer.
+        // WHY?: in a generic function (like this one), _kvcKeyPathString will
+        // return nil. therefore, we need to deduce the kvcKeyPathString through
+        // observation
+        inst[keyPath: member] = inst[keyPath: member]
+        guard let propertyName = observers.first(where: { $0.hit })?.name else {
+            // TODO: I'm not sure what is actually disallowed yet.
+            throwRealmException("Disallowed property being queried")
+        }
+        var copy = self
+        copy.expr.value += propertyName
+        return copy
+    }
+
+    var predicate: NSPredicate {
+        NSPredicate(format: expr.value)
+    }
+}
+
 /**
  `Results` is an auto-updating container type in Realm returned from object queries.
 
@@ -195,6 +311,16 @@ extension Decimal128: AddableType {}
      */
     public func filter(_ predicate: NSPredicate) -> Results<Element> {
         return Results<Element>(rlmResults.objects(with: predicate))
+    }
+
+    // FIXME: Why is this called `query` instead of filter?
+    //        This ends up having the exact same signature as the builtin
+    //        `Sequence.filter`, so without giving the compiler extra hints
+    //        (which defeats the purpose of this feature), it defaults to the
+    //        `filter`.
+    public func query(_ queryBuilder: (Query<Element>) -> Query<Element>) -> Self where Element: ObjectBase {
+        let query = queryBuilder(Query())
+        return Results(rlmResults.objects(with: query.predicate))
     }
 
     // MARK: Sorting
