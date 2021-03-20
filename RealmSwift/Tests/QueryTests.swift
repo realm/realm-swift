@@ -20,9 +20,15 @@ import Foundation
 import RealmSwift
 import XCTest
 
+@objcMembers class Dog: Object {
+    dynamic var name = ""
+    dynamic var age = 5
+}
+
 @objcMembers class SimpleObject: Object {
     dynamic var stringCol = "foo"
     dynamic var doubleCol = 42.42
+    let dogs = List<Dog>()
 }
 
 class QueryTests: TestCase {
@@ -33,6 +39,7 @@ class QueryTests: TestCase {
             realm.add(s1)
             let s2 = SimpleObject()
             s2.stringCol = "🤓👍"
+            s2.dogs.append(Dog())
             realm.add(s2)
         }
 
@@ -43,8 +50,17 @@ class QueryTests: TestCase {
             $0.doubleCol == 42.42 &&
                 $0.stringCol.contains("👍")
         }
-
+        let results3 = realm.objects(SimpleObject.self).query {
+           $0.dogs.age == 5
+        }
+        let results4 = realm.objects(SimpleObject.self).query {
+            $0.doubleCol == 42.42 &&
+                $0.stringCol.contains("👍") &&
+                $0.dogs.age == 5
+         }
         XCTAssertEqual(results1.count, 2)
         XCTAssertEqual(results2.count, 1)
+        XCTAssertEqual(results3.count, 1)
+        XCTAssertEqual(results4.count, 1)
     }
 }
