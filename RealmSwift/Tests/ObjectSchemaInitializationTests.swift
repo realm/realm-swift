@@ -22,6 +22,24 @@ import Realm.Private
 import Realm.Dynamic
 import Foundation
 
+class RealmPropObj: Object {
+    let any = RealmProperty<AnyRealmValue>()
+    let int = RealmProperty<Int?>()
+    @objc dynamic var blah = 0
+}
+
+//class LeeTest: XCTestCase {
+//    func testSchema() {
+//        let realm = try! Realm(configuration: .init(objectTypes: [RealmPropObj.self]))
+//
+//
+//        let obj = RealmPropObj()
+//        var schema = obj.objectSchema
+//        print(schema)
+//
+//    }
+//}
+
 class ObjectSchemaInitializationTests: TestCase {
     func testAllValidTypes() {
         let object = SwiftObject()

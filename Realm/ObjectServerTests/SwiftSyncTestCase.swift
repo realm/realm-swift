@@ -55,7 +55,7 @@ public class SwiftTypesSyncObject : Object {
     @objc public dynamic var decimalCol: Decimal128 = Decimal128(1)
     @objc public dynamic var uuidCol: UUID = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
     @objc public dynamic var objectCol: SwiftPerson?
-    public var anyCol = AnyRealmValue()
+    public var anyCol = RealmProperty<AnyRealmValue>()
 
     public convenience init(person: SwiftPerson) {
         self.init()
@@ -105,11 +105,7 @@ public class SwiftCollectionSyncObject: Object {
         self.objectIdList.append(objectsIn: [try! ObjectId(string: "0123456789abcdefABCDEF01"), try! ObjectId(string: "123456789abcdefABCDEF012")])
         self.decimalList.append(objectsIn: [Decimal128(1), Decimal128(2)])
         self.uuidList.append(objectsIn: [UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!, UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89")!])
-        let any0 = AnyRealmValue()
-        any0.value = .int(1)
-        let any1 = AnyRealmValue()
-        any1.value = .string("hi")
-        self.anyList.append(objectsIn: [any0, any1])
+        self.anyList.append(objectsIn: [.int(1), .string("hi")])
 
         self.intSet0.insert(1)
         self.intSet0.insert(2)

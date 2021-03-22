@@ -22,7 +22,7 @@ import Realm
 
 public extension ObjectiveCSupport {
 
-    static func convert(value: AnyRealmValue.Value?) -> RLMValue? {
+    static func convert(value: AnyRealmValue?) -> RLMValue? {
         switch value {
         case let .int(i):
             return i as NSNumber
@@ -52,7 +52,7 @@ public extension ObjectiveCSupport {
         }
     }
 
-    static func convert(value: RLMValue?) -> AnyRealmValue.Value {
+    static func convert(value: RLMValue?) -> AnyRealmValue {
         guard let value = value else {
             return .none
         }

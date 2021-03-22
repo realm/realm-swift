@@ -709,7 +709,7 @@ class MigrationTests: TestCase {
                 XCTAssertEqual((newObj!["uuidCol"] as! UUID), uuidCol)
                 XCTAssertEqual((oldObj!["uuidCol"] as! UUID), uuidCol)
 
-                let anyValue = AnyRealmValue.Value.string("hello!")
+                let anyValue = AnyRealmValue.string("hello!")
                 XCTAssertEqual(((newObj!["anyCol"] as! String)), anyValue.stringValue)
                 XCTAssertEqual(((oldObj!["anyCol"] as! String)), anyValue.stringValue)
 

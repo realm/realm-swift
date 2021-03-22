@@ -74,7 +74,7 @@ class SwiftObject: Object {
     @objc dynamic var objectIdCol = ObjectId("1234567890ab1234567890ab")
     @objc dynamic var objectCol: SwiftBoolObject? = SwiftBoolObject()
     @objc dynamic var uuidCol: UUID = UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!
-    let anyCol = AnyRealmValue()
+    let anyCol = RealmProperty<AnyRealmValue>()
 
     let arrayCol = List<SwiftBoolObject>()
     let setCol = MutableSet<SwiftBoolObject>()
@@ -515,7 +515,7 @@ class SwiftIndexedPropertiesObject: Object {
     @objc dynamic var doubleCol: Double = 0.0
     @objc dynamic var dataCol = Data()
 
-    let anyCol = AnyRealmValue()
+    let anyCol = RealmProperty<AnyRealmValue>()
 
     override class func indexedProperties() -> [String] {
         return ["stringCol", "intCol", "int8Col", "int16Col",

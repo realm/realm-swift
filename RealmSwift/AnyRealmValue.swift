@@ -20,171 +20,131 @@
 import Foundation
 import Realm
 
-/**
- A `AnyRealmValue` instance represents an polymorphic value for supported types.
+/// A enum for storing and retrieving values associated with an `AnyRealmValue` property.
+public enum AnyRealmValue: Hashable {
+    /// Represents `nil`
+    case none
+    /// An integer type.
+    case int(Int)
+    /// A boolean type.
+    case bool(Bool)
+    /// A floating point numeric type.
+    case float(Float)
+    /// A double numeric type.
+    case double(Double)
+    /// A string type.
+    case string(String)
+    /// A binary data type.
+    case data(Data)
+    /// A date type.
+    case date(Date)
+    /// A Realm Object type.
+    case object(Object)
+    /// An ObjectId type.
+    case objectId(ObjectId)
+    /// A Decimal128 type.
+    case decimal128(Decimal128)
+    /// A UUID type.
+    case uuid(UUID)
 
- To change the underlying value stored by a `AnyRealmValue` instance, mutate the instance's `value` property.
-
- - Note:
- An `AnyRealmValue` should not be declared as `@objc dynamic` on a Realm Object. Use `let` instead.
- */
-public final class AnyRealmValue: RLMValueBase {
-
-    /// A enum for storing and retrieving values associated with an `AnyRealmValue` property.
-    public enum Value: Hashable {
-        /// Represents `nil`
-        case none
-        /// An integer type.
-        case int(Int)
-        /// A boolean type.
-        case bool(Bool)
-        /// A floating point numeric type.
-        case float(Float)
-        /// A double numeric type.
-        case double(Double)
-        /// A string type.
-        case string(String)
-        /// A binary data type.
-        case data(Data)
-        /// A date type.
-        case date(Date)
-        /// A Realm Object type.
-        case object(Object)
-        /// An ObjectId type.
-        case objectId(ObjectId)
-        /// A Decimal128 type.
-        case decimal128(Decimal128)
-        /// A UUID type.
-        case uuid(UUID)
-
-        /// Returns an `Int` if that is what the stored value is, otherwise `nil`.
-        public var intValue: Int? {
-            guard case let .int(i) = self else {
-                return nil
-            }
-            return i
+    /// Returns an `Int` if that is what the stored value is, otherwise `nil`.
+    public var intValue: Int? {
+        guard case let .int(i) = self else {
+            return nil
         }
-
-        /// Returns a `Bool` if that is what the stored value is, otherwise `nil`.
-        public var boolValue: Bool? {
-            guard case let .bool(b) = self else {
-                return nil
-            }
-            return b
-        }
-
-        /// Returns a `Float` if that is what the stored value is, otherwise `nil`.
-        public var floatValue: Float? {
-            guard case let .float(f) = self else {
-                return nil
-            }
-            return f
-        }
-
-        /// Returns a `Double` if that is what the stored value is, otherwise `nil`.
-        public var doubleValue: Double? {
-            guard case let .double(d) = self else {
-                return nil
-            }
-            return d
-        }
-
-        /// Returns a `String` if that is what the stored value is, otherwise `nil`.
-        public var stringValue: String? {
-            guard case let .string(s) = self else {
-                return nil
-            }
-            return s
-        }
-
-        /// Returns `Data` if that is what the stored value is, otherwise `nil`.
-        public var dataValue: Data? {
-            guard case let .data(d) = self else {
-                return nil
-            }
-            return d
-        }
-
-        /// Returns a `Date` if that is what the stored value is, otherwise `nil`.
-        public var dateValue: Date? {
-            guard case let .date(d) = self else {
-                return nil
-            }
-            return d
-        }
-
-        /// Returns an `ObjectId` if that is what the stored value is, otherwise `nil`.
-        public var objectIdValue: ObjectId? {
-            guard case let .objectId(o) = self else {
-                return nil
-            }
-            return o
-        }
-
-        /// Returns a `Decimal128` if that is what the stored value is, otherwise `nil`.
-        public var decimal128Value: Decimal128? {
-            guard case let .decimal128(d) = self else {
-                return nil
-            }
-            return d
-        }
-
-        /// Returns a `UUID` if that is what the stored value is, otherwise `nil`.
-        public var uuidValue: UUID? {
-            guard case let .uuid(u) = self else {
-                return nil
-            }
-            return u
-        }
-
-
-        /// Returns the stored value as a Realm Object of a specific type.
-        ///
-        /// - Parameter objectType: The type of the Object to return.
-        /// - Returns: A Realm Object of the supplied type if that is what the underlying value is,
-        /// otherwise `nil` is returned.
-        public func objectValue<T: Object>(_ objectType: T.Type) -> T? {
-            guard case let .object(o) = self else {
-                return nil
-            }
-            return o as? T
-        }
+        return i
     }
 
-    /**
-     Used for getting / setting the underlying value.
-
-      - Usage:
-     ```
-        class MyObject: Object {
-            let myAnyValue = AnyRealmValue()
+    /// Returns a `Bool` if that is what the stored value is, otherwise `nil`.
+    public var boolValue: Bool? {
+        guard case let .bool(b) = self else {
+            return nil
         }
-        // Setting
-        myObject.myAnyValue.value = .string("hello")
-        // Getting
-        if case let .string(s) = myObject.myAnyValue.value {
-            print(s) // Prints 'Hello'
-        }
-     ```
-     */
-    public var value: Value {
-        set {
-            rlmValue = ObjectiveCSupport.convert(value: newValue)
-        }
-        get {
-            ObjectiveCSupport.convert(value: rlmValue)
-        }
+        return b
     }
 
-    internal convenience init(value: RLMValue?) {
-        self.init()
-        rlmValue = value
+    /// Returns a `Float` if that is what the stored value is, otherwise `nil`.
+    public var floatValue: Float? {
+        guard case let .float(f) = self else {
+            return nil
+        }
+        return f
     }
 
-    // Used for when retrieving an AnyRealmValue via KVC
-    internal convenience init(value: RLMValue?, object: RLMObjectBase, property: RLMProperty) {
-        self.init()
-        rlmValue = value
-        attach(withParent: object, property: property)
+    /// Returns a `Double` if that is what the stored value is, otherwise `nil`.
+    public var doubleValue: Double? {
+        guard case let .double(d) = self else {
+            return nil
+        }
+        return d
+    }
+
+    /// Returns a `String` if that is what the stored value is, otherwise `nil`.
+    public var stringValue: String? {
+        guard case let .string(s) = self else {
+            return nil
+        }
+        return s
+    }
+
+    /// Returns `Data` if that is what the stored value is, otherwise `nil`.
+    public var dataValue: Data? {
+        guard case let .data(d) = self else {
+            return nil
+        }
+        return d
+    }
+
+    /// Returns a `Date` if that is what the stored value is, otherwise `nil`.
+    public var dateValue: Date? {
+        guard case let .date(d) = self else {
+            return nil
+        }
+        return d
+    }
+
+    /// Returns an `ObjectId` if that is what the stored value is, otherwise `nil`.
+    public var objectIdValue: ObjectId? {
+        guard case let .objectId(o) = self else {
+            return nil
+        }
+        return o
+    }
+
+    /// Returns a `Decimal128` if that is what the stored value is, otherwise `nil`.
+    public var decimal128Value: Decimal128? {
+        guard case let .decimal128(d) = self else {
+            return nil
+        }
+        return d
+    }
+
+    /// Returns a `UUID` if that is what the stored value is, otherwise `nil`.
+    public var uuidValue: UUID? {
+        guard case let .uuid(u) = self else {
+            return nil
+        }
+        return u
+    }
+
+    /// Returns the stored value as a Realm Object of a specific type.
+    ///
+    /// - Parameter objectType: The type of the Object to return.
+    /// - Returns: A Realm Object of the supplied type if that is what the underlying value is,
+    /// otherwise `nil` is returned.
+    public func objectValue<T: Object>(_ objectType: T.Type) -> T? {
+        guard case let .object(o) = self else {
+            return nil
+        }
+        return o as? T
+    }
+
+    internal var _rlmValue: RLMValue? {
+        ObjectiveCSupport.convert(value: self)
+    }
+
+    /// Required for conformance to `AddableType`
+    public init() {
+        self = .none
     }
 }

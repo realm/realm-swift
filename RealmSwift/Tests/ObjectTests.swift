@@ -252,7 +252,7 @@ class ObjectTests: TestCase {
             XCTAssertEqual(object.value(forKey: "floatCol") as! Float?, 1.23 as Float)
             XCTAssertEqual(object.value(forKey: "doubleCol") as! Double?, 12.3)
             XCTAssertEqual(object.value(forKey: "stringCol") as! String?, "a")
-            XCTAssertEqual((object.value(forKey: "anyCol") as! AnyRealmValue).value, AnyRealmValue.Value.none)
+            XCTAssertEqual((object.value(forKey: "anyCol") as! RealmProperty<AnyRealmValue>).value, AnyRealmValue.none)
 
             let expected = object.value(forKey: "binaryCol") as! Data
             let actual = "a".data(using: String.Encoding.utf8)!
@@ -476,13 +476,13 @@ class ObjectTests: TestCase {
         XCTAssertEqual(getter(object, "uuidCol") as! UUID?, UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89"))
 
         setter(object, "hello", "anyCol")
-        XCTAssertEqual((getter(object, "anyCol") as! AnyRealmValue).value.stringValue, "hello")
+        XCTAssertEqual((getter(object, "anyCol") as! RealmProperty<AnyRealmValue>).value.stringValue, "hello")
 
         let boolObject = SwiftBoolObject(value: [true])
 
         setter(object, boolObject, "anyCol")
-        assertEqual((getter(object, "anyCol") as! AnyRealmValue).value.objectValue(SwiftBoolObject.self)!, boolObject)
-        XCTAssertEqual((getter(object, "anyCol") as! AnyRealmValue).value.objectValue(SwiftBoolObject.self)!.boolCol, true)
+        assertEqual((getter(object, "anyCol") as! RealmProperty<AnyRealmValue>).value.objectValue(SwiftBoolObject.self)!, boolObject)
+        XCTAssertEqual((getter(object, "anyCol") as! RealmProperty<AnyRealmValue>).value.objectValue(SwiftBoolObject.self)!.boolCol, true)
 
         setter(object, boolObject, "objectCol")
         assertEqual(getter(object, "objectCol") as? SwiftBoolObject, boolObject)
@@ -1205,7 +1205,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual(Array(listObj.dateOpt), Array(frozenListObj.dateOpt))
         XCTAssertEqual(Array(listObj.uuid), Array(frozenListObj.uuid))
         XCTAssertEqual(Array(listObj.uuidOpt), Array(frozenListObj.uuidOpt))
-        XCTAssertEqual(Array(listObj.any.map { $0.value }), Array(frozenListObj.any.map { $0.value }))
+        XCTAssertEqual(Array(listObj.any.map { $0 }), Array(frozenListObj.any.map { $0 }))
     }
 
     func testThaw() {

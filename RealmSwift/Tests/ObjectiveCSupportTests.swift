@@ -105,7 +105,7 @@ class ObjectiveCSupportTests: TestCase {
 
     func testAnyRealmValueSupport() {
         let obj = SwiftObject()
-        let expected: [(RLMValue, AnyRealmValue.Value)] = [
+        let expected: [(RLMValue, AnyRealmValue)] = [
             (NSNumber(1234), .int(1234)),
             (NSNumber(value: true), .bool(true)),
             (NSNumber(value: Float(1234.4567)), .float(1234.4567)),
@@ -119,7 +119,7 @@ class ObjectiveCSupportTests: TestCase {
             (obj, .object(obj))
         ]
 
-        func testObjCSupport(_ objCValue: RLMValue, value: AnyRealmValue.Value) {
+        func testObjCSupport(_ objCValue: RLMValue, value: AnyRealmValue) {
             XCTAssertEqual(ObjectiveCSupport.convert(value: objCValue), value)
         }
         expected.forEach { testObjCSupport($0.0, value: $0.1) }

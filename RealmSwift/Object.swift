@@ -201,9 +201,9 @@ extension Object: RealmCollectionValue {
         }
 
         if prop.type == .any {
-            return AnyRealmValue(value: RLMDynamicGet(self, prop) as? RLMValue,
-                                 object: self,
-                                 property: prop)
+            return RealmProperty<AnyRealmValue>(value: RLMDynamicGet(self, prop) as? RLMValue,
+                                                object: self,
+                                                property: prop)
         }
         return RLMDynamicGet(self, prop)
     }
@@ -725,6 +725,19 @@ extension RealmOptional: _ManagedPropertyType where Value: _ManagedPropertyType 
 }
 
 /// :nodoc:
+extension RealmProperty: _ManagedPropertyType where Value: _ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
+    public static func _rlmProperty(_ prop: RLMProperty) {
+        if Value.self is Optional<OptionalRealmPropertyType>.Type {
+            prop.optional = true
+        }
+        Value._rlmProperty(prop)
+    }
+    // swiftlint:disable:next identifier_name
+    public static func _rlmRequireObjc() -> Bool { return false }
+}
+
+/// :nodoc:
 extension AnyRealmValue: _ManagedPropertyType {
     // swiftlint:disable:next identifier_name
     public static func _rlmProperty(_ prop: RLMProperty) {
@@ -817,8 +830,6 @@ internal class ObjectUtil {
                 }
                 if prop.value as? RealmOptionalProtocol != nil {
                     throwRealmException("Property \(cls).\(label) has unsupported RealmOptional type \(type(of: prop.value)). Extending RealmOptionalType with custom types is not currently supported. ")
-                } else if prop.value as? RLMValueBase != nil {
-                    throwRealmException("Property \(cls).\(label) has unsupported AnyRealmType type \(type(of: prop.value)). Extending _AnyRealmType with custom types is not currently supported. ")
                 }
                 return nil
             }

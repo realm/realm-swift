@@ -21,201 +21,109 @@ import Realm
 import RealmSwift
 
 class AnyRealmTypeObject: Object {
-    var anyValue = AnyRealmValue()
-    @objc dynamic var stringObj: SwiftStringObject?
-    let anyList = List<AnyRealmValue>()
+    var anyValue = RealmProperty<AnyRealmValue>()
+    // required for schema validation, but not used in tests.
+    @objc dynamic var int = 0
 }
 
-class AnyRealmValueTests: TestCase {
+class AnyRealmValueTests<T: Equatable, V: ValueFactory>: TestCase {
 
-    func testInt() {
+    var values: [V.T] {
+        V.values()
+    }
+
+    var wrappedValues: [T?] {
+        func cast(_ value: AnyRealmValue) -> T? {
+            switch T.self {
+                case is Int.Type:
+                    return value.intValue as? T
+                case is Bool.Type:
+                    return value.boolValue as? T
+                case is Float.Type:
+                    return value.floatValue as? T
+                case is Double.Type:
+                    return value.floatValue as? T
+                case is String.Type:
+                    return value.stringValue as? T
+                case is Data.Type:
+                    return value.dataValue as? T
+                case is Date.Type:
+                    return value.dateValue as? T
+                case is ObjectId.Type:
+                    return value.objectIdValue as? T
+                case is Decimal128.Type:
+                    return value.decimal128Value as? T
+                case is UUID.Type:
+                    return value.uuidValue as? T
+                default:
+                    return nil
+            }
+        }
+        return (V.values() as! [AnyRealmValue]).map(cast)
+    }
+
+    var keyPath: KeyPath<AnyRealmValue, T?> {
+        switch T.self {
+            case is Int.Type:
+                return \AnyRealmValue.intValue as! KeyPath<AnyRealmValue, T?>
+            case is Bool.Type:
+                return \AnyRealmValue.boolValue as! KeyPath<AnyRealmValue, T?>
+            case is Float.Type:
+                return \AnyRealmValue.floatValue as! KeyPath<AnyRealmValue, T?>
+            case is Double.Type:
+                return \AnyRealmValue.floatValue as! KeyPath<AnyRealmValue, T?>
+            case is String.Type:
+                return \AnyRealmValue.stringValue as! KeyPath<AnyRealmValue, T?>
+            case is Data.Type:
+                return \AnyRealmValue.dataValue as! KeyPath<AnyRealmValue, T?>
+            case is Date.Type:
+                return \AnyRealmValue.dateValue as! KeyPath<AnyRealmValue, T?>
+            case is ObjectId.Type:
+                return \AnyRealmValue.objectIdValue as! KeyPath<AnyRealmValue, T?>
+            case is Decimal128.Type:
+                return \AnyRealmValue.decimal128Value as! KeyPath<AnyRealmValue, T?>
+            case is UUID.Type:
+                return \AnyRealmValue.uuidValue as! KeyPath<AnyRealmValue, T?>
+            default:
+                fatalError()
+                break
+        }
+    }
+
+    func testAnyRealmValue() {
         let o = AnyRealmTypeObject()
-        o.anyValue.value = .int(123)
-        XCTAssertEqual(o.anyValue.value.intValue, 123)
-        o.anyValue.value = .int(456)
-        XCTAssertEqual(o.anyValue.value.intValue, 456)
+        o.anyValue.value = values[0] as! AnyRealmValue
+        XCTAssertEqual(o.anyValue.value[keyPath: keyPath], wrappedValues[0])
+        o.anyValue.value = values[1] as! AnyRealmValue
+        XCTAssertEqual(o.anyValue.value[keyPath: keyPath], wrappedValues[1])
         let realm = realmWithTestPath()
         try! realm.write {
             realm.add(o)
         }
-        XCTAssertEqual(o.anyValue.value.intValue, 456)
+        XCTAssertEqual(o.anyValue.value[keyPath: keyPath], wrappedValues[1])
         try! realm.write {
-            o.anyValue.value = .int(987)
+            o.anyValue.value = values[2] as! AnyRealmValue
         }
-        XCTAssertEqual(o.anyValue.value.intValue, 987)
+        XCTAssertEqual(o.anyValue.value[keyPath: keyPath], wrappedValues[2])
     }
-
-    func testBool() {
-        let o = AnyRealmTypeObject()
-        o.anyValue.value = .bool(true)
-        XCTAssertEqual(o.anyValue.value.boolValue, true)
-        o.anyValue.value = .bool(false)
-        XCTAssertEqual(o.anyValue.value.boolValue, false)
-        let realm = realmWithTestPath()
-        try! realm.write {
-            realm.add(o)
-        }
-        XCTAssertEqual(o.anyValue.value.boolValue, false)
-        try! realm.write {
-            o.anyValue.value = .bool(true)
-        }
-        XCTAssertEqual(o.anyValue.value.boolValue, true)
+}
+class AnyRealmValuePrimitiveTests: TestCase {
+    override class var defaultTestSuite: XCTestSuite {
+        let suite = XCTestSuite(name: "Any Realm Value Tests")
+        _ = AnyRealmValueTests<Int, AnyRealmValueIntFactory>.defaultTestSuite.tests.map(suite.addTest)
+        _ = AnyRealmValueTests<Bool, AnyRealmValueBoolFactory>.defaultTestSuite.tests.map(suite.addTest)
+        _ = AnyRealmValueTests<Float, AnyRealmValueFloatFactory>.defaultTestSuite.tests.map(suite.addTest)
+        _ = AnyRealmValueTests<String, AnyRealmValueStringFactory>.defaultTestSuite.tests.map(suite.addTest)
+        _ = AnyRealmValueTests<Data, AnyRealmValueDataFactory>.defaultTestSuite.tests.map(suite.addTest)
+        _ = AnyRealmValueTests<Date, AnyRealmValueDateFactory>.defaultTestSuite.tests.map(suite.addTest)
+        _ = AnyRealmValueTests<ObjectId, AnyRealmValueObjectIdFactory>.defaultTestSuite.tests.map(suite.addTest)
+        _ = AnyRealmValueTests<Decimal128, AnyRealmValueDecimal128Factory>.defaultTestSuite.tests.map(suite.addTest)
+        _ = AnyRealmValueTests<UUID, AnyRealmValueUUIDFactory>.defaultTestSuite.tests.map(suite.addTest)
+        return suite
     }
+}
 
-    func testFloat() {
-        let o = AnyRealmTypeObject()
-        o.anyValue.value = .float(123.456)
-        XCTAssertEqual(o.anyValue.value.floatValue, 123.456)
-        o.anyValue.value = .float(456.678)
-        XCTAssertEqual(o.anyValue.value.floatValue, 456.678)
-        let realm = realmWithTestPath()
-        try! realm.write {
-            realm.add(o)
-        }
-        XCTAssertEqual(o.anyValue.value.floatValue, 456.678)
-        try! realm.write {
-            o.anyValue.value = .float(987.123)
-        }
-        XCTAssertEqual(o.anyValue.value.floatValue, 987.123)
-    }
-
-    func testDouble() {
-        let o = AnyRealmTypeObject()
-        o.anyValue.value = .double(123.456)
-        XCTAssertEqual(o.anyValue.value.doubleValue, 123.456)
-        o.anyValue.value = .double(456.678)
-        XCTAssertEqual(o.anyValue.value.doubleValue, 456.678)
-        let realm = realmWithTestPath()
-        try! realm.write {
-            realm.add(o)
-        }
-        XCTAssertEqual(o.anyValue.value.doubleValue, 456.678)
-        try! realm.write {
-            o.anyValue.value = .double(987.123)
-        }
-        XCTAssertEqual(o.anyValue.value.doubleValue, 987.123)
-    }
-
-    func testString() {
-        let o = AnyRealmTypeObject()
-        o.anyValue.value = .string("good news everyone")
-        XCTAssertEqual(o.anyValue.value.stringValue, "good news everyone")
-        o.anyValue.value = .string("professor farnsworth")
-        XCTAssertEqual(o.anyValue.value.stringValue, "professor farnsworth")
-        let realm = realmWithTestPath()
-        try! realm.write {
-            realm.add(o)
-        }
-        XCTAssertEqual(o.anyValue.value.stringValue, "professor farnsworth")
-        try! realm.write {
-            o.anyValue.value = .string("Dr. zoidberg")
-        }
-        XCTAssertEqual(o.anyValue.value.stringValue, "Dr. zoidberg")
-    }
-
-    func testData() {
-        let d1 = Data(repeating: 1, count: 64)
-        let d2 = Data(repeating: 2, count: 64)
-        let d3 = Data(repeating: 3, count: 64)
-        let o = AnyRealmTypeObject()
-        o.anyValue.value = .data(d1)
-        XCTAssertEqual(o.anyValue.value.dataValue, d1)
-        o.anyValue.value = .data(d2)
-        XCTAssertEqual(o.anyValue.value.dataValue, d2)
-        let realm = realmWithTestPath()
-        try! realm.write {
-            realm.add(o)
-        }
-        XCTAssertEqual(o.anyValue.value.dataValue, d2)
-        try! realm.write {
-            o.anyValue.value = .data(d3)
-        }
-        XCTAssertEqual(o.anyValue.value.dataValue, d3)
-    }
-
-    func testDate() {
-        let d1 = Date(timeIntervalSinceNow: 10000)
-        let d2 = Date(timeIntervalSinceNow: 20000)
-        let d3 = Date(timeIntervalSinceNow: 30000)
-        let o = AnyRealmTypeObject()
-        o.anyValue.value = .date(d1)
-        XCTAssertEqual(o.anyValue.value.dateValue, d1)
-        o.anyValue.value = .date(d2)
-        XCTAssertEqual(o.anyValue.value.dateValue, d2)
-        let realm = realmWithTestPath()
-        try! realm.write {
-            realm.add(o)
-        }
-        XCTAssertEqual(o.anyValue.value.dateValue!.timeIntervalSince1970,
-                       d2.timeIntervalSince1970, accuracy: 1)
-        try! realm.write {
-            o.anyValue.value = .date(d3)
-        }
-        XCTAssertEqual(o.anyValue.value.dateValue!.timeIntervalSince1970,
-                       d3.timeIntervalSince1970, accuracy: 1)
-    }
-
-    func testObjectId() {
-        let o1 = ObjectId.generate()
-        let o2 = ObjectId.generate()
-        let o3 = ObjectId.generate()
-        let o = AnyRealmTypeObject()
-        o.anyValue.value = .objectId(o1)
-        XCTAssertEqual(o.anyValue.value.objectIdValue, o1)
-        o.anyValue.value = .objectId(o2)
-        XCTAssertEqual(o.anyValue.value.objectIdValue, o2)
-        let realm = realmWithTestPath()
-        try! realm.write {
-            realm.add(o)
-        }
-        XCTAssertEqual(o.anyValue.value.objectIdValue, o2)
-        try! realm.write {
-            o.anyValue.value = .objectId(o3)
-        }
-        XCTAssertEqual(o.anyValue.value.objectIdValue, o3)
-    }
-
-    func testDecimal128() {
-        let d1 = Decimal128(floatLiteral: 1234.5678)
-        let d2 = Decimal128(floatLiteral: 6789.1234)
-        let d3 = Decimal128(floatLiteral: 1.0)
-        let o = AnyRealmTypeObject()
-        o.anyValue.value = .decimal128(d1)
-        XCTAssertEqual(o.anyValue.value.decimal128Value, d1)
-        o.anyValue.value = .decimal128(d2)
-        XCTAssertEqual(o.anyValue.value.decimal128Value, d2)
-        let realm = realmWithTestPath()
-        try! realm.write {
-            realm.add(o)
-        }
-        XCTAssertEqual(o.anyValue.value.decimal128Value, d2)
-        try! realm.write {
-            o.anyValue.value = .decimal128(d3)
-        }
-        XCTAssertEqual(o.anyValue.value.decimal128Value, d3)
-    }
-
-    func testUuid() {
-        let o = AnyRealmTypeObject()
-        let u1 = UUID()
-        let u2 = UUID()
-        let u3 = UUID()
-
-        o.anyValue.value = .uuid(u1)
-        XCTAssertEqual(o.anyValue.value.uuidValue, u1)
-
-        o.anyValue.value = .uuid(u2)
-        XCTAssertEqual(o.anyValue.value.uuidValue, u2)
-        let realm = realmWithTestPath()
-        try! realm.write {
-            realm.add(o)
-        }
-        XCTAssertEqual(o.anyValue.value.uuidValue, u2)
-        try! realm.write {
-            o.anyValue.value = .uuid(u3)
-        }
-        XCTAssertEqual(o.anyValue.value.uuidValue, u3)
-    }
+class AnyRealmValueObjectTests: TestCase {
 
     func testObject() {
         let o = AnyRealmTypeObject()
@@ -274,8 +182,8 @@ class AnyRealmValueTests: TestCase {
     }
 
     private func testVariation<T: Equatable>(object: AnyRealmTypeObject,
-                                             value: AnyRealmValue.Value,
-                                             keyPath: KeyPath<AnyRealmValue.Value, T?>,
+                                             value: AnyRealmValue,
+                                             keyPath: KeyPath<AnyRealmValue, T?>,
                                              expected: T,
                                              realm: Realm?) {
         if let realm = realm {
@@ -297,50 +205,42 @@ class BaseAnyRealmValueFactory {
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<AnyRealmValue> {
         return obj.any
     }
-
-    static func value(_ value: AnyRealmValue.Value) -> AnyRealmValue {
-        let v = AnyRealmValue()
-        v.value = value
-        return v
-    }
 }
 
 class AnyRealmValueIntFactory: BaseAnyRealmValueFactory, ValueFactory {
     static func values() -> [AnyRealmValue] {
-        [value(.int(123)), value(.int(456)), value(.int(789))]
+        [.int(123), .int(456), .int(789)]
     }
 }
 
 class AnyRealmValueBoolFactory: BaseAnyRealmValueFactory, ValueFactory {
     static func values() -> [AnyRealmValue] {
-        [value(.bool(true)), value(.bool(false)), value(.none)]
+        [.bool(true), .bool(false), .none]
     }
 }
 
 class AnyRealmValueFloatFactory: BaseAnyRealmValueFactory, ValueFactory {
     static func values() -> [AnyRealmValue] {
-        [value(.float(123.456)), value(.float(456.789)), value(.float(789.123456))]
+        [.float(123.456), .float(456.789), .float(789.123456)]
     }
 }
 
 class AnyRealmValueDoubleFactory: BaseAnyRealmValueFactory, ValueFactory {
     static func values() -> [AnyRealmValue] {
-        [value(.double(123.456)), value(.double(456.789)), value(.double(789.123456))]
+        [.double(123.456), .double(456.789), .double(789.123456)]
     }
 }
 
 class AnyRealmValueStringFactory: BaseAnyRealmValueFactory, ValueFactory {
     static func values() -> [AnyRealmValue] {
-        [value(.string("Hello There")), value(.string("This is")), value(.string("A test..."))]
+        [.string("Hello There"), .string("This is"), .string("A test...")]
     }
 }
 
 class AnyRealmValueDataFactory: BaseAnyRealmValueFactory, ValueFactory {
     static func values() -> [AnyRealmValue] {
         func data(_ byte: UInt8) -> AnyRealmValue {
-            let v = AnyRealmValue()
-            v.value = .data(Data.init(repeating: byte, count: 64))
-            return v
+            .data(Data.init(repeating: byte, count: 64))
         }
         return [data(11), data(22), data(33)]
     }
@@ -349,9 +249,7 @@ class AnyRealmValueDataFactory: BaseAnyRealmValueFactory, ValueFactory {
 class AnyRealmValueDateFactory: BaseAnyRealmValueFactory, ValueFactory {
     static func values() -> [AnyRealmValue] {
         func date(_ timestamp: TimeInterval) -> AnyRealmValue {
-            let v = AnyRealmValue()
-            v.value = .date(Date(timeIntervalSince1970: timestamp))
-            return v
+            .date(Date(timeIntervalSince1970: timestamp))
         }
         return [date(1614445927), date(1614555927), date(1614665927)]
     }
@@ -360,11 +258,9 @@ class AnyRealmValueDateFactory: BaseAnyRealmValueFactory, ValueFactory {
 class AnyRealmValueObjectFactory: BaseAnyRealmValueFactory, ValueFactory {
     static func values() -> [AnyRealmValue] {
         func object(_ string: String) -> AnyRealmValue {
-            let v = AnyRealmValue()
             let o = SwiftStringObject()
             o.stringCol = string
-            v.value = .object(o)
-            return v
+            return .object(o)
         }
         return [object("Hello"), object("I am"), object("an object")]
     }
@@ -372,21 +268,16 @@ class AnyRealmValueObjectFactory: BaseAnyRealmValueFactory, ValueFactory {
 
 class AnyRealmValueObjectIdFactory: BaseAnyRealmValueFactory, ValueFactory {
     static func values() -> [AnyRealmValue] {
-        func objectId() -> AnyRealmValue {
-            let v = AnyRealmValue()
-            v.value = .objectId(.generate())
-            return v
-        }
-        return [objectId(), objectId(), objectId()]
+        [.objectId(.init("6056670f1a2a5b103c9affda")),
+         .objectId(.init("6056670f1a2a5b103c9affdd")),
+         .objectId(.init("605667111a2a5b103c9affe1"))]
     }
 }
 
 class AnyRealmValueDecimal128Factory: BaseAnyRealmValueFactory, ValueFactory {
     static func values() -> [AnyRealmValue] {
         func decima128(_ double: Double) -> AnyRealmValue {
-            let v = AnyRealmValue()
-            v.value = .decimal128(.init(floatLiteral: double))
-            return v
+            .decimal128(.init(floatLiteral: double))
         }
         return [decima128(123.456), decima128(993.456789), decima128(9874546.65456489)]
     }
@@ -394,18 +285,15 @@ class AnyRealmValueDecimal128Factory: BaseAnyRealmValueFactory, ValueFactory {
 
 class AnyRealmValueUUIDFactory: BaseAnyRealmValueFactory, ValueFactory {
     static func values() -> [AnyRealmValue] {
-        func uuid() -> AnyRealmValue {
-            let v = AnyRealmValue()
-            v.value = .uuid(.init())
-            return v
-        }
-        return [uuid(), uuid(), uuid()]
+        [.uuid(UUID(uuidString: "7729028A-FB89-4555-81C3-C55F7DDBA5CF")!),
+         .uuid(UUID(uuidString: "0F0359D8-8D74-409D-8561-C8EBE3753635")!),
+         .uuid(UUID(uuidString: "0F0359D8-8D74-409D-8561-C8EBE3753636")!)]
     }
 }
 
-class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T: AnyRealmValue {
+class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T == AnyRealmValue {
 
-    private func assertEqual(_ obj: AnyRealmValue.Value, _ anotherObj: AnyRealmValue.Value) {
+    private func assertEqual(_ obj: AnyRealmValue, _ anotherObj: AnyRealmValue) {
         if case let .object(a) = obj,
            case let .object(b) = anotherObj {
             XCTAssertEqual((a as! SwiftStringObject).stringCol, (b as! SwiftStringObject).stringCol)
@@ -447,7 +335,7 @@ class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTe
     func testSubscript() {
         array.append(objectsIn: values)
         for i in 0..<values.count {
-            assertEqual(array[i].value, values[i].value)
+            assertEqual(array[i], values[i])
         }
         assertThrows(array[values.count], reason: "Index 3 is out of bounds")
         assertThrows(array[-1], reason: "negative value")
@@ -455,25 +343,24 @@ class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTe
 
     func testFirst() {
         array.append(objectsIn: values)
-        assertEqual(array.first!.value, values.first!.value)
+        assertEqual(array.first!, values.first!)
         array.removeAll()
         XCTAssertNil(array.first)
     }
 
     func testLast() {
         array.append(objectsIn: values)
-        assertEqual(array.last!.value, values.last!.value)
+        assertEqual(array.last!, values.last!)
         array.removeAll()
         XCTAssertNil(array.last)
 
     }
 
     func testValueForKey() {
-        XCTAssertEqual(array.value(forKey: "self").count, 0)
         array.append(objectsIn: values)
 
         for (expected, actual) in zip(values!, array.value(forKey: "self").map { dynamicBridgeCast(fromObjectiveC: $0) as V.T }) {
-            assertEqual(expected.value, actual.value)
+            assertEqual(expected, actual)
         }
 
         assertThrows(array.value(forKey: "not self"), named: "NSUnknownKeyException")
@@ -493,18 +380,18 @@ class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTe
 
         array.insert(values[0], at: 0)
         XCTAssertEqual(Int(1), array.count)
-        assertEqual(values[0].value, array[0].value)
+        assertEqual(values[0], array[0])
 
         array.insert(values[1], at: 0)
         XCTAssertEqual(Int(2), array.count)
-        assertEqual(values[1].value, array[0].value)
-        assertEqual(values[0].value, array[1].value)
+        assertEqual(values[1], array[0])
+        assertEqual(values[0], array[1])
 
         array.insert(values[2], at: 2)
         XCTAssertEqual(Int(3), array.count)
-        assertEqual(values[1].value, array[0].value)
-        assertEqual(values[0].value, array[1].value)
-        assertEqual(values[2].value, array[2].value)
+        assertEqual(values[1], array[0])
+        assertEqual(values[0], array[1])
+        assertEqual(values[2], array[2])
 
         assertThrows(array.insert(values[0], at: 4))
         assertThrows(array.insert(values[0], at: -1))
@@ -517,19 +404,19 @@ class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTe
         array.append(objectsIn: values)
 
         assertThrows(array.remove(at: -1))
-        assertEqual(values[0].value, array[0].value)
-        assertEqual(values[1].value, array[1].value)
-        assertEqual(values[2].value, array[2].value)
+        assertEqual(values[0], array[0])
+        assertEqual(values[1], array[1])
+        assertEqual(values[2], array[2])
         assertThrows(array[3])
 
         array.remove(at: 0)
-        assertEqual(values[1].value, array[0].value)
-        assertEqual(values[2].value, array[1].value)
+        assertEqual(values[1], array[0])
+        assertEqual(values[2], array[1])
         assertThrows(array[2])
         assertThrows(array.remove(at: 2))
 
         array.remove(at: 1)
-        assertEqual(values[1].value, array[0].value)
+        assertEqual(values[1], array[0])
         assertThrows(array[1])
     }
 
@@ -540,8 +427,8 @@ class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTe
         array.removeLast()
 
         XCTAssertEqual(array.count, 2)
-        assertEqual(values[0].value, array[0].value)
-        assertEqual(values[1].value, array[1].value)
+        assertEqual(values[0], array[0])
+        assertEqual(values[1], array[1])
 
         array.removeLast(2)
         XCTAssertEqual(array.count, 0)
@@ -560,9 +447,9 @@ class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTe
 
         array.append(objectsIn: values)
         array.replace(index: 1, object: values[0])
-        assertEqual(array[0].value, values[0].value)
-        assertEqual(array[1].value, values[0].value)
-        assertEqual(array[2].value, values[2].value)
+        assertEqual(array[0], values[0])
+        assertEqual(array[1], values[0])
+        assertEqual(array[2], values[2])
 
         assertThrows(array.replace(index: 3, object: values[0]),
                      reason: "Index 3 is out of bounds")
@@ -575,15 +462,15 @@ class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTe
 
         array.replaceSubrange(0..<0, with: [values[0]])
         XCTAssertEqual(array.count, 1)
-        assertEqual(array[0].value, values[0].value)
+        assertEqual(array[0], values[0])
 
         array.replaceSubrange(0..<1, with: values)
         XCTAssertEqual(array.count, 3)
 
         array.replaceSubrange(1..<2, with: [])
         XCTAssertEqual(array.count, 2)
-        assertEqual(array[0].value, values[0].value)
-        assertEqual(array[1].value, values[2].value)
+        assertEqual(array[0], values[0])
+        assertEqual(array[1], values[2])
     }
 
     func testMove() {
@@ -591,9 +478,9 @@ class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTe
 
         array.append(objectsIn: values)
         array.move(from: 2, to: 0)
-        assertEqual(array[0].value, values[2].value)
-        assertEqual(array[1].value, values[0].value)
-        assertEqual(array[2].value, values[1].value)
+        assertEqual(array[0], values[2])
+        assertEqual(array[1], values[0])
+        assertEqual(array[2], values[1])
 
         assertThrows(array.move(from: 3, to: 0), reason: "Index 3 is out of bounds")
         assertThrows(array.move(from: 0, to: 3), reason: "Index 3 is out of bounds")
@@ -606,42 +493,54 @@ class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTe
 
         array.append(objectsIn: values)
         array.swapAt(0, 2)
-        assertEqual(array[0].value, values[2].value)
-        assertEqual(array[1].value, values[1].value)
-        assertEqual(array[2].value, values[0].value)
+        assertEqual(array[0], values[2])
+        assertEqual(array[1], values[1])
+        assertEqual(array[2], values[0])
 
         assertThrows(array.swapAt(3, 0), reason: "Index 3 is out of bounds")
         assertThrows(array.swapAt(0, 3), reason: "Index 3 is out of bounds")
         assertThrows(array.swapAt(-1, 0), reason: "negative value")
         assertThrows(array.swapAt(0, -1), reason: "negative value")
     }
+
+    func testAssign() {
+        XCTAssertEqual(Int(0), array.count)
+
+        array.insert(values[0], at: 0)
+        XCTAssertEqual(Int(1), array.count)
+        assertEqual(values[0], array[0])
+
+        array[0] = values[1]
+        XCTAssertEqual(Int(1), array.count)
+        assertEqual(values[1], array[0])
+    }
 }
 
-class MinMaxAnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T: AnyRealmValue {
+class MinMaxAnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T == AnyRealmValue {
     func testMin() {
-        XCTAssertNil(array.min()?.value)
+        XCTAssertNil(array.min())
         array.append(objectsIn: values.reversed())
-        XCTAssertEqual(array.min()?.value, values.first?.value)
+        XCTAssertEqual(array.min(), values.first)
     }
 
     func testMax() {
-        XCTAssertNil(array.max()?.value)
+        XCTAssertNil(array.max())
         array.append(objectsIn: values.reversed())
-        XCTAssertEqual(array.max()?.value, values.last?.value)
+        XCTAssertEqual(array.max(), values.last)
     }
 }
 
-class AddableAnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T: AnyRealmValue {
+class AddableAnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T == AnyRealmValue {
     func testSum() {
-        XCTAssertEqual(array.sum().value.intValue, nil)
+        XCTAssertEqual(array.sum().intValue, nil)
         array.append(objectsIn: values)
 
         let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber)
 
         // An unmanaged collection will return a double
-        if case let .double(d) = array.sum().value {
+        if case let .double(d) = array.sum() {
             XCTAssertEqual(d, expected.doubleValue)
-        } else if case let .decimal128(d) = array.sum().value {
+        } else if case let .decimal128(d) = array.sum() {
             // A managed collection of AnyRealmValue will return a Decimal128 for `sum()`
             XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
         }
@@ -655,9 +554,9 @@ class AddableAnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: Primitiv
 
         let v: AnyRealmValue? = array.average()
         // An unmanaged collection will return a double
-        if case let .double(d) = v?.value {
+        if case let .double(d) = v {
             XCTAssertEqual(d, expected.doubleValue)
-        } else if case let .decimal128(d) = v?.value {
+        } else if case let .decimal128(d) = v {
             // A managed collection of AnyRealmValue will return a Decimal128 for `avg()`
             XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
         }
@@ -713,9 +612,9 @@ class ManagedAnyRealmValueListTests: TestCase {
     }
 }
 
-class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T: AnyRealmValue {
+class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T == AnyRealmValue {
 
-    private func assertEqual(_ obj: AnyRealmValue.Value, _ anotherObj: AnyRealmValue.Value) {
+    private func assertEqual(_ obj: AnyRealmValue, _ anotherObj: AnyRealmValue) {
         if case let .object(a) = obj,
            case let .object(b) = anotherObj {
             XCTAssertEqual((a as! SwiftStringObject).stringCol, (b as! SwiftStringObject).stringCol)
@@ -736,12 +635,12 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primitive
         XCTAssertEqual(mutableSet.value(forKey: "self").count, 0)
         mutableSet.insert(values[0])
         let kvo = (mutableSet.value(forKey: "self") as [AnyObject]).first!
-        if let obj = kvo as? SwiftStringObject, case let .object(o) = values[0].value {
+        if let obj = kvo as? SwiftStringObject, case let .object(o) = values[0] {
             XCTAssertEqual(obj.stringCol, (o as! SwiftStringObject).stringCol)
         } else {
-            let v = AnyRealmValue()
+            let v = RealmProperty<AnyRealmValue>()
             v.rlmValue = kvo as? RLMValue
-            XCTAssertEqual(v.value, values[0].value)
+            XCTAssertEqual(v.value, values[0])
         }
         assertThrows(mutableSet.value(forKey: "not self"), named: "NSUnknownKeyException")
     }
@@ -833,7 +732,7 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primitive
         // Both sets contain values[0]
         mutableSet.formIntersection(otherMutableSet)
         XCTAssertEqual(Int(1), mutableSet.count)
-        assertEqual(mutableSet[0].value, values[0].value)
+        assertEqual(mutableSet[0], values[0])
     }
 
     func testFormUnion() {
@@ -845,20 +744,20 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primitive
         otherMutableSet.insert(values[2])
         mutableSet.formUnion(otherMutableSet)
         XCTAssertEqual(Int(3), mutableSet.count)
-        if values[0].value.objectValue(SwiftStringObject.self) != nil {
+        if values[0].objectValue(SwiftStringObject.self) != nil {
             XCTAssertTrue(values.map {
-                $0.value.objectValue(SwiftStringObject.self)?.stringCol
-            }.contains(mutableSet[0].value.objectValue(SwiftStringObject.self)?.stringCol))
+                $0.objectValue(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[0].objectValue(SwiftStringObject.self)?.stringCol))
             XCTAssertTrue(values.map {
-                $0.value.objectValue(SwiftStringObject.self)?.stringCol
-            }.contains(mutableSet[1].value.objectValue(SwiftStringObject.self)?.stringCol))
+                $0.objectValue(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[1].objectValue(SwiftStringObject.self)?.stringCol))
             XCTAssertTrue(values.map {
-                $0.value.objectValue(SwiftStringObject.self)?.stringCol
-            }.contains(mutableSet[2].value.objectValue(SwiftStringObject.self)?.stringCol))
+                $0.objectValue(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[2].objectValue(SwiftStringObject.self)?.stringCol))
         } else {
-            XCTAssertTrue(values.map { $0.value }.contains(mutableSet[0].value))
-            XCTAssertTrue(values.map { $0.value }.contains(mutableSet[1].value))
-            XCTAssertTrue(values.map { $0.value }.contains(mutableSet[2].value))
+            XCTAssertTrue(values.map { $0 }.contains(mutableSet[0]))
+            XCTAssertTrue(values.map { $0 }.contains(mutableSet[1]))
+            XCTAssertTrue(values.map { $0 }.contains(mutableSet[2]))
         }
     }
 
@@ -877,49 +776,49 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primitive
 
     func testSubscript() {
         mutableSet.insert(objectsIn: values)
-        if values[0].value.objectValue(SwiftStringObject.self) != nil {
+        if values[0].objectValue(SwiftStringObject.self) != nil {
             XCTAssertTrue(values.map {
-                $0.value.objectValue(SwiftStringObject.self)?.stringCol
-            }.contains(mutableSet[0].value.objectValue(SwiftStringObject.self)?.stringCol))
+                $0.objectValue(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[0].objectValue(SwiftStringObject.self)?.stringCol))
             XCTAssertTrue(values.map {
-                $0.value.objectValue(SwiftStringObject.self)?.stringCol
-            }.contains(mutableSet[1].value.objectValue(SwiftStringObject.self)?.stringCol))
+                $0.objectValue(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[1].objectValue(SwiftStringObject.self)?.stringCol))
             XCTAssertTrue(values.map {
-                $0.value.objectValue(SwiftStringObject.self)?.stringCol
-            }.contains(mutableSet[2].value.objectValue(SwiftStringObject.self)?.stringCol))
+                $0.objectValue(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[2].objectValue(SwiftStringObject.self)?.stringCol))
         } else {
-            XCTAssertTrue(values.map { $0.value }.contains(mutableSet[0].value))
-            XCTAssertTrue(values.map { $0.value }.contains(mutableSet[1].value))
-            XCTAssertTrue(values.map { $0.value }.contains(mutableSet[2].value))
+            XCTAssertTrue(values.map { $0 }.contains(mutableSet[0]))
+            XCTAssertTrue(values.map { $0 }.contains(mutableSet[1]))
+            XCTAssertTrue(values.map { $0 }.contains(mutableSet[2]))
         }
     }
 }
 
-class MinMaxAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T: AnyRealmValue {
+class MinMaxAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T == AnyRealmValue {
     func testMin() {
         XCTAssertNil(mutableSet.min())
         mutableSet.insert(objectsIn: values)
-        XCTAssertEqual(mutableSet.min()?.value, values.first?.value)
+        XCTAssertEqual(mutableSet.min(), values.first)
     }
 
     func testMax() {
         XCTAssertNil(mutableSet.max())
         mutableSet.insert(objectsIn: values)
-        XCTAssertEqual(mutableSet.max()?.value, values.last?.value)
+        XCTAssertEqual(mutableSet.max(), values.last)
     }
 }
 
-class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T: AnyRealmValue {
+class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T == AnyRealmValue {
     func testSum() {
-        XCTAssertEqual(mutableSet.sum().value.intValue, nil)
+        XCTAssertEqual(mutableSet.sum().intValue, nil)
         mutableSet.insert(objectsIn: values)
 
         let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber)
 
         // An unmanaged collection will return a double
-        if case let .double(d) = mutableSet.sum().value {
+        if case let .double(d) = mutableSet.sum() {
             XCTAssertEqual(d, expected.doubleValue)
-        } else if case let .decimal128(d) = mutableSet.sum().value {
+        } else if case let .decimal128(d) = mutableSet.sum() {
             // A managed collection of AnyRealmValue will return a Decimal128 for `sum()`
             XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
         }
@@ -933,9 +832,9 @@ class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Pr
 
         let v: AnyRealmValue? = mutableSet.average()
         // An unmanaged collection will return a double
-        if case let .double(d) = v?.value {
+        if case let .double(d) = v {
             XCTAssertEqual(d, expected.doubleValue)
-        } else if case let .decimal128(d) = v?.value {
+        } else if case let .decimal128(d) = v {
             // A managed collection of AnyRealmValue will return a Decimal128 for `avg()`
             XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
         }

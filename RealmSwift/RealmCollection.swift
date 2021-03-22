@@ -320,9 +320,7 @@ extension AnyRealmValue: RealmCollectionValue {
     }
     /// :nodoc:
     public static func _nilValue() -> AnyRealmValue {
-        let v = AnyRealmValue()
-        v.value = .none
-        return v
+        return .none
     }
 }
 
