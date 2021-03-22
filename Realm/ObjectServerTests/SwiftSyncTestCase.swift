@@ -54,6 +54,7 @@ public class SwiftTypesSyncObject : Object {
     @objc public dynamic var longCol: Int64 = 1
     @objc public dynamic var decimalCol: Decimal128 = Decimal128(1)
     @objc public dynamic var uuidCol: UUID = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
+    @objc public dynamic var objectIdCol: ObjectId = .generate()
     @objc public dynamic var objectCol: SwiftPerson?
     public var anyCol = RealmProperty<AnyRealmValue>()
 
@@ -93,38 +94,6 @@ public class SwiftCollectionSyncObject: Object {
 
     public override class func primaryKey() -> String? {
         return "_id"
-    }
-
-    public override init() {
-        self.intList.append(objectsIn: [1 , 2])
-        self.boolList.append(objectsIn: [true, false])
-        self.stringList.append(objectsIn: ["hi", "there"])
-        self.dataList.append(objectsIn: ["beep".data(using: String.Encoding.utf8)!, "boop".data(using: String.Encoding.utf8)!])
-        self.dateList.append(objectsIn: [Date(timeIntervalSince1970: -1), Date(timeIntervalSince1970: -2)])
-        self.doubleList.append(objectsIn: [1.1, 2.2])
-        self.objectIdList.append(objectsIn: [try! ObjectId(string: "0123456789abcdefABCDEF01"), try! ObjectId(string: "123456789abcdefABCDEF012")])
-        self.decimalList.append(objectsIn: [Decimal128(1), Decimal128(2)])
-        self.uuidList.append(objectsIn: [UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!, UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89")!])
-        self.anyList.append(objectsIn: [.int(1), .string("hi")])
-
-        self.intSet0.insert(1)
-        self.intSet0.insert(2)
-        self.intSet1.insert(2)
-        self.intSet1.insert(3)
-        self.stringSet.insert("hi")
-        self.stringSet.insert("there")
-        self.dataSet.insert("beep".data(using: String.Encoding.utf8)!)
-        self.dataSet.insert("boop".data(using: String.Encoding.utf8)!)
-        self.dateSet.insert(Date(timeIntervalSince1970: -1))
-        self.dateSet.insert(Date(timeIntervalSince1970: -2))
-        self.doubleSet.insert(1.1)
-        self.doubleSet.insert(2.2)
-        self.objectIdSet.insert(try! ObjectId(string: "0123456789abcdefABCDEF01"))
-        self.objectIdSet.insert(try! ObjectId(string: "123456789abcdefABCDEF012"))
-        self.decimalSet.insert(Decimal128(1))
-        self.decimalSet.insert(Decimal128(2))
-        self.uuidSet.insert(UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)
-        self.uuidSet.insert(UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89")!)
     }
 }
 

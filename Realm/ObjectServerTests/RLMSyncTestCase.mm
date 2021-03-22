@@ -175,7 +175,7 @@
 }
 
 + (NSArray *)requiredProperties {
-    return @[@"booCol",
+    return @[@"boolCol",
              @"cBoolcol",
              @"intCol",
              @"doubleCol",
@@ -185,6 +185,7 @@
              @"longCol",
              @"decimalCol",
              @"uuidCol",
+             @"objectIdCol",
     ];
 }
 

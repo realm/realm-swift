@@ -66,6 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property int64_t         longCol;
 @property RLMDecimal128  *decimalCol;
 @property NSUUID         *uuidCol;
+@property RLMObjectId    *objectIdCol;
 @property id<RLMValue>    anyCol;
 @property Person         *objectCol;
 
