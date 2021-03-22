@@ -68,6 +68,70 @@ public class SwiftTypesSyncObject : Object {
     }
 }
 
+public class SwiftCollectionSyncObject: Object {
+    @objc public dynamic var _id: ObjectId? = ObjectId.generate()
+    public let intList = List<Int>()
+    public let boolList = List<Bool>()
+    public let stringList = List<String>()
+    public let dataList = List<Data>()
+    public let dateList = List<Date>()
+    public let doubleList = List<Double>()
+    public let objectIdList = List<ObjectId>()
+    public let decimalList = List<Decimal128>()
+    public let uuidList = List<UUID>()
+    public let anyList = List<AnyRealmValue>()
+
+    public let intSet0 = MutableSet<Int>()
+    public let intSet1 = MutableSet<Int>()
+    public let stringSet = MutableSet<String>()
+    public let dataSet = MutableSet<Data>()
+    public let dateSet = MutableSet<Date>()
+    public let doubleSet = MutableSet<Double>()
+    public let objectIdSet = MutableSet<ObjectId>()
+    public let decimalSet = MutableSet<Decimal128>()
+    public let uuidSet = MutableSet<UUID>()
+
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+
+    public override init() {
+        self.intList.append(objectsIn: [1 , 2])
+        self.boolList.append(objectsIn: [true, false])
+        self.stringList.append(objectsIn: ["hi", "there"])
+        self.dataList.append(objectsIn: ["beep".data(using: String.Encoding.utf8)!, "boop".data(using: String.Encoding.utf8)!])
+        self.dateList.append(objectsIn: [Date(timeIntervalSince1970: -1), Date(timeIntervalSince1970: -2)])
+        self.doubleList.append(objectsIn: [1.1, 2.2])
+        self.objectIdList.append(objectsIn: [try! ObjectId(string: "0123456789abcdefABCDEF01"), try! ObjectId(string: "123456789abcdefABCDEF012")])
+        self.decimalList.append(objectsIn: [Decimal128(1), Decimal128(2)])
+        self.uuidList.append(objectsIn: [UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!, UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89")!])
+        let any0 = AnyRealmValue()
+        any0.value = .int(1)
+        let any1 = AnyRealmValue()
+        any1.value = .string("hi")
+        self.anyList.append(objectsIn: [any0, any1])
+
+        self.intSet0.insert(1)
+        self.intSet0.insert(2)
+        self.intSet1.insert(2)
+        self.intSet1.insert(3)
+        self.stringSet.insert("hi")
+        self.stringSet.insert("there")
+        self.dataSet.insert("beep".data(using: String.Encoding.utf8)!)
+        self.dataSet.insert("boop".data(using: String.Encoding.utf8)!)
+        self.dateSet.insert(Date(timeIntervalSince1970: -1))
+        self.dateSet.insert(Date(timeIntervalSince1970: -2))
+        self.doubleSet.insert(1.1)
+        self.doubleSet.insert(2.2)
+        self.objectIdSet.insert(try! ObjectId(string: "0123456789abcdefABCDEF01"))
+        self.objectIdSet.insert(try! ObjectId(string: "123456789abcdefABCDEF012"))
+        self.decimalSet.insert(Decimal128(1))
+        self.decimalSet.insert(Decimal128(2))
+        self.uuidSet.insert(UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)
+        self.uuidSet.insert(UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89")!)
+    }
+}
+
 public func randomString(_ length: Int) -> String {
     let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     return String((0..<length).map { _ in letters.randomElement()! })
@@ -107,7 +171,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     public func openRealm(configuration: Realm.Configuration) throws -> Realm {
         var configuration = configuration
         if configuration.objectTypes == nil {
-            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self, SwiftTypesSyncObject.self]
+            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self, SwiftTypesSyncObject.self, SwiftCollectionSyncObject.self]
         }
         let realm = try Realm(configuration: configuration)
         waitForDownloads(for: realm)

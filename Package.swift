@@ -205,7 +205,8 @@ let package = Package(
             path: "Realm/ObjectServerTests",
             sources: [
                  "SwiftObjectServerTests.swift",
-                 "SwiftBSONTests.swift"
+                 "SwiftBSONTests.swift",
+                 "SwiftCollectionSyncTests.swift"
             ],
             swiftSettings: combineFlags()
         ),
