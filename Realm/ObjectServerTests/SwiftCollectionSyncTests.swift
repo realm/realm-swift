@@ -142,68 +142,175 @@ class ListSwiftCollectionSyncTests: SwiftSyncTestCase {
     }
 }
 
-//class SetSwiftCollectionsyncTests: SwiftCollectionSyncTests {
-//    func testSetOperations() {
-//        do {
-//            let user = try logInUser(for: basicCredentials())
-//            let realm = try openRealm(partitionValue: #function, user: user)
-//            if isParent {
-//                waitForDownloads(for: realm)
-//                checkCount(expected: 0, realm, SwiftCollectionSyncObject.self)
-//                executeChild()
-//                waitForDownloads(for: realm)
-//                checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
-//
-//                let obj = realm.objects(SwiftCollectionSyncObject.self).first!
-//
-//                // 1, 2 ∪ 2, 3
-//                XCTAssertFalse(obj.intSet1.isSubset(of: obj.intSet0))
-//                // 1, 2 ∩ 2, 3
-//                XCTAssertTrue(obj.intSet1.intersects(obj.intSet0))
-//
-//                try realm.write {
-//                    realm.deleteAll()
-//                }
-//                waitForUploads(for: realm)
-//            } else {
-//                try realm.write({
-//                    realm.add(SwiftCollectionSyncObject())
-//                })
-//                waitForUploads(for: realm)
-//                checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
-//            }
-//        } catch {
-//            XCTFail("Got an error: \(error)")
-//        }
-//
-//    }
-//    func testIntSet() {
-//        roundTrip(type: MutableSet<Int>(), propertyName: "intSet")
-//    }
-//    func testStringSet() {
-//        roundTrip(type: MutableSet<String>(), propertyName: "stringSet")
-//    }
-//    // !!!: Failure, reverses order?
-//    func testDataSet() {
-//        roundTrip(type: MutableSet<Data>(), propertyName: "dataSet")
-//    }
-//    // !!!: Failure, reverses order?
-//    func testDateSet() {
-//        roundTrip(type: MutableSet<Date>(), propertyName: "dateSet")
-//    }
-//    func testDoubleSet() {
-//        roundTrip(type: MutableSet<Double>(), propertyName: "doubleSet")
-//    }
-//    func testObjectIdSet() {
-//        roundTrip(type: MutableSet<ObjectId>(), propertyName: "objectIdSet")
-//    }
-//    // !!!: Failure, reverses order?
-//    func testDecimalSet() {
-//        roundTrip(type: MutableSet<Decimal128>(), propertyName: "decimalSet")
-//    }
-//    // !!!: Failure, reverses order?
-//    func testUuidSet() {
-//        roundTrip(type: MutableSet<UUID>(), propertyName: "uuidSet")
-//    }
-//
-//}
+class SetSwiftCollectionsyncTests: SwiftSyncTestCase {
+
+    private typealias MutableSetKeyPath<T: RealmCollectionValue> = KeyPath<SwiftCollectionSyncObject, MutableSet<T>>
+    private typealias MutableSetKeyValues<T: RealmCollectionValue> = (keyPath: MutableSetKeyPath<T>, values: [T])
+
+    private func roundTrip<T: _ManagedPropertyType>(set: MutableSetKeyValues<T>,
+                                                    otherSet: MutableSetKeyValues<T>) throws {
+        let user = try logInUser(for: basicCredentials())
+        let realm = try openRealm(partitionValue: #function, user: user)
+        if isParent {
+            try realm.write {
+                realm.deleteAll()
+            }
+            waitForDownloads(for: realm)
+            checkCount(expected: 0, realm, SwiftCollectionSyncObject.self)
+            executeChild()
+            waitForDownloads(for: realm)
+            checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+            let object = realm.objects(SwiftCollectionSyncObject.self).first!
+            // Run the child again to insert the values
+            executeChild()
+            waitForDownloads(for: realm)
+            checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+            XCTAssertEqual(object[keyPath: set.keyPath].count, set.values.count)
+            XCTAssertEqual(object[keyPath: otherSet.keyPath].count, otherSet.values.count)
+            // Run the child again to intersect the values
+            executeChild()
+            waitForDownloads(for: realm)
+            checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+            XCTAssertTrue(object[keyPath: set.keyPath].intersects(object[keyPath: otherSet.keyPath]))
+            XCTAssertEqual(object[keyPath: set.keyPath].count, 1)
+            // The intersection should have assigned the last value from `values`
+            XCTAssertTrue(object[keyPath: set.keyPath].contains(set.values.last!))
+            // Run the child again to delete the objects in the sets.
+            executeChild()
+            waitForDownloads(for: realm)
+            XCTAssertEqual(object[keyPath: set.keyPath].count, 0)
+            XCTAssertEqual(object[keyPath: otherSet.keyPath].count, 0)
+        } else {
+            guard let object = realm.objects(SwiftCollectionSyncObject.self).first else {
+                try realm.write({
+                    realm.add(SwiftCollectionSyncObject())
+                })
+                waitForUploads(for: realm)
+                checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+                return
+            }
+            print("COUNT:")
+            print(object[keyPath: set.keyPath].count)
+
+            if object[keyPath: set.keyPath].count == 0,
+               object[keyPath: otherSet.keyPath].count == 0 {
+                try realm.write({
+                    object[keyPath: set.keyPath].insert(objectsIn: set.values)
+                    object[keyPath: otherSet.keyPath].insert(objectsIn: otherSet.values)
+                })
+                XCTAssertEqual(object[keyPath: set.keyPath].count, set.values.count)
+                XCTAssertEqual(object[keyPath: otherSet.keyPath].count, otherSet.values.count)
+            } else if object[keyPath: set.keyPath].count == 3,
+                      object[keyPath: otherSet.keyPath].count == 3 {
+                try realm.write({
+                    object[keyPath: set.keyPath].formIntersection(object[keyPath: otherSet.keyPath])
+                })
+                XCTAssertEqual(object[keyPath: set.keyPath].count, 1)
+                XCTAssertEqual(object[keyPath: otherSet.keyPath].count, otherSet.values.count)
+            } else {
+                try realm.write({
+                    object[keyPath: set.keyPath].removeAll()
+                    object[keyPath: otherSet.keyPath].removeAll()
+                })
+                XCTAssertEqual(object[keyPath: set.keyPath].count, 0)
+                XCTAssertEqual(object[keyPath: otherSet.keyPath].count, 0)
+            }
+            waitForUploads(for: realm)
+            checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+        }
+    }
+
+    func testIntSet() {
+        do {
+            try roundTrip(set: (\.intSet, [1,2,3]), otherSet: (\.otherIntSet, [3,4,5]))
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testStringSet() {
+        do {
+            try roundTrip(set: (\.stringSet, ["Who", "What", "When"]),
+                          otherSet: (\.otherStringSet, ["When", "Strings", "Collide"]))
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testDataSet() {
+        do {
+            try roundTrip(set: (\.dataSet, [Data(repeating: 1, count: 1024),
+                                            Data(repeating: 1, count: 256),
+                                            Data(repeating: 2, count: 64)]),
+                          otherSet: (\.otherDataSet, [Data(repeating: 2, count: 64),
+                                                      Data(repeating: 3, count: 256),
+                                                      Data(repeating: 4, count: 1024)]))
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testDateSet() {
+        do {
+            try roundTrip(set: (\.dateSet, [Date(timeIntervalSince1970: 10000000),
+                                            Date(timeIntervalSince1970: 20000000),
+                                            Date(timeIntervalSince1970: 30000000)]),
+                          otherSet: (\.otherDateSet, [Date(timeIntervalSince1970: 30000000),
+                                                      Date(timeIntervalSince1970: 40000000),
+                                                      Date(timeIntervalSince1970: 50000000)]))
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testDoubleSet() {
+        do {
+            try roundTrip(set: (\.doubleSet, [123.456, 345.456, 789.456]),
+                          otherSet: (\.otherDoubleSet, [789.456,
+                                                        888.456,
+                                                        987.456]))
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testObjectIdSet() {
+        do {
+            try roundTrip(set: (\.objectIdSet, [.init("6058f12b957ba06156586a7c"),
+                                                .init("6058f12682b2fbb1f334ef1d"),
+                                                .init("6058f12d42e5a393e67538d0")]),
+                          otherSet: (\.otherObjectIdSet, [.init("6058f12d42e5a393e67538d0"),
+                                                          .init("6058f12682b2fbb1f334ef1f"),
+                                                          .init("6058f12d42e5a393e67538d1")]))
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testDecimalSet() {
+        do {
+            try roundTrip(set: (\.decimalSet, [123.345,
+                                               213.345,
+                                               321.345]),
+                          otherSet: (\.otherDecimalSet, [321.345,
+                                                         333.345,
+                                                         444.345]))
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testUuidSet() {
+        do {
+            try roundTrip(set: (\.uuidSet, [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
+                                               UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
+                                               UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!]),
+                          otherSet: (\.otherUuidSet, [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!,
+                                                         UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ae")!,
+                                                         UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90bf")!]))
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+}

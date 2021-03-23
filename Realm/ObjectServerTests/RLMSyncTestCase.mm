@@ -210,6 +210,23 @@
 
 @end
 
+#pragma mark RLMCollectionSyncObject
+
+@implementation RLMCollectionSyncObject
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
+
++ (NSArray *)requiredProperties {
+    return @[@"intArray", @"boolArray",
+             @"stringArray", @"dataArray",
+             @"doubleArray", @"objectIdArray",
+             @"decimalArray", @"uuidArray", @"anyArray"];
+}
+
+@end
+
 #pragma mark AsyncOpenConnectionTimeoutTransport
 
 @implementation AsyncOpenConnectionTimeoutTransport
@@ -372,6 +389,7 @@ static NSURL *syncDirectoryForChildProcess() {
                         Person.self,
                         HugeSyncObject.self,
                         AllTypesSyncObject.self,
+                        RLMCollectionSyncObject.self
     ];
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.stopPolicy = stopPolicy;

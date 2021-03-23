@@ -75,6 +75,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface RLMCollectionSyncObject: RLMObject
+@property RLMObjectId      *_id;
+@property RLMArray<RLMInt> *intArray;
+@property RLMArray<RLMBool> *boolArray;
+@property RLMArray<RLMString> *stringArray;
+@property RLMArray<RLMData> *dataArray;
+@property RLMArray<RLMDouble> *doubleArray;
+@property RLMArray<RLMObjectId> *objectIdArray;
+@property RLMArray<RLMDecimal128> *decimalArray;
+@property RLMArray<RLMUUID> *uuidArray;
+@property RLMArray<RLMValue> *anyArray;
+
+@end
+
 @interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport
 @end
 

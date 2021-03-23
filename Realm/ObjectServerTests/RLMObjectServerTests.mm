@@ -68,6 +68,145 @@
 
 @end
 
+@interface RLMCollectionObjectServerTests : RLMSyncTestCase
+@end
+
+@implementation RLMCollectionObjectServerTests
+
+- (void)roundTripWithKeyPath:(NSString *)keyPath
+                      values:(NSArray *)values {
+    try {
+        RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                                 register:YES]];
+        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+
+        if (self.isParent) {
+            [realm transactionWithBlock:^{
+                [realm deleteAllObjects];
+            }];
+            [self waitForDownloadsForRealm:realm];
+            CHECK_COUNT(0, RLMCollectionSyncObject, realm);
+//            [self runChildAndWait];
+            RLMRunChildAndWait();
+            [self waitForDownloadsForRealm:realm];
+            CHECK_COUNT(1, RLMCollectionSyncObject, realm);
+            // Run the child again to add the values
+//            [self runChildAndWait];
+            RLMRunChildAndWait();
+            [self waitForDownloadsForRealm:realm];
+            CHECK_COUNT(1, RLMCollectionSyncObject, realm);
+            RLMResults<RLMCollectionSyncObject *> *results
+                = [RLMCollectionSyncObject allObjectsInRealm:realm];
+            RLMCollectionSyncObject *obj = results.firstObject;
+            XCTAssertEqual(((RLMArray *)obj[keyPath]).count, values.count*2);
+            for (int i = 0; i < values.count; i++) {
+                XCTAssertTrue([results[0][keyPath][i] isEqual:values[i]]);
+            }
+            // Run the child again to delete the last 3 objects
+//            [self runChildAndWait];
+            RLMRunChildAndWait();
+            [self waitForDownloadsForRealm:realm];
+            XCTAssertEqual(((RLMArray *)obj[keyPath]).count, values.count);
+//             Run the child again to modify the first element
+//            [self runChildAndWait];
+            RLMRunChildAndWait();
+            [self waitForDownloadsForRealm:realm];
+            XCTAssertTrue([((RLMArray *)obj[keyPath])[0] isEqual:values[1]]);
+        } else {
+            RLMResults<RLMCollectionSyncObject *> *results = [RLMCollectionSyncObject allObjectsInRealm:realm];
+            if (RLMCollectionSyncObject *obj = results.firstObject) {
+                if (((RLMArray *)obj[keyPath]).count == 0) {
+                    [realm transactionWithBlock:^{
+                        [((RLMArray *)obj[keyPath]) addObjects:values];
+                        [((RLMArray *)obj[keyPath]) addObjects:values];
+                    }];
+                } else if (((RLMArray *)obj[keyPath]).count == 6) {
+                    [realm transactionWithBlock:^{
+                        [((RLMArray *)obj[keyPath]) removeLastObject];
+                        [((RLMArray *)obj[keyPath]) removeLastObject];
+                        [((RLMArray *)obj[keyPath]) removeLastObject];
+                    }];
+                    XCTAssertEqual(((RLMArray *)obj[keyPath]).count, values.count);
+                } else {
+                    [realm transactionWithBlock:^{
+                        [((RLMArray *)obj[keyPath]) replaceObjectAtIndex:0 withObject:values[1]];
+                    }];
+                    XCTAssertEqual(((RLMArray *)obj[keyPath]).firstObject, values[1]);
+                }
+            } else {
+                [realm transactionWithBlock:^{
+                    [realm addObject:[RLMCollectionSyncObject new]];
+                }];
+            }
+            [self waitForUploadsForRealm:realm];
+            CHECK_COUNT(1, RLMCollectionSyncObject, realm);
+        }
+    } catch(NSError *e) {
+        XCTFail(@"Got an error: %@ (isParent: %d)",
+                e.localizedDescription, self.isParent);
+    }
+}
+
+- (void)testIntArray {
+    [self roundTripWithKeyPath:@"intArray"
+                        values:@[@123, @234, @345]];
+}
+
+- (void)testBoolArray {
+    [self roundTripWithKeyPath:@"boolArray"
+                        values:@[@YES, @NO, @YES]];
+}
+
+- (void)testStringArray {
+    [self roundTripWithKeyPath:@"stringArray"
+                        values:@[@"Hello...", @"It's", @"Me"]];
+}
+
+- (void)testDataArray {
+    [self roundTripWithKeyPath:@"dataArray"
+                        values:@[[NSData dataWithBytes:(unsigned char[]){0x0a}
+                                                length:1],
+                                 [NSData dataWithBytes:(unsigned char[]){0x0b}
+                                                         length:1],
+                                 [NSData dataWithBytes:(unsigned char[]){0x0c}
+                                                         length:1]]];
+}
+
+- (void)testDoubleArray {
+    [self roundTripWithKeyPath:@"doubleArray"
+                        values:@[@123.456, @789.456, @987.344]];
+}
+
+- (void)testObjectIdArray {
+    [self roundTripWithKeyPath:@"objectIdArray"
+                        values:@[[[RLMObjectId alloc] initWithString:@"6058f12b957ba06156586a7c" error:nil],
+                                 [[RLMObjectId alloc] initWithString:@"6058f12682b2fbb1f334ef1d" error:nil],
+                                 [[RLMObjectId alloc] initWithString:@"6058f12d42e5a393e67538d0" error:nil]]];
+}
+
+- (void)testDecimalArray {
+    [self roundTripWithKeyPath:@"decimalArray"
+                        values:@[[[RLMDecimal128 alloc] initWithNumber:@123.456],
+                                 [[RLMDecimal128 alloc] initWithNumber:@456.456],
+                                 [[RLMDecimal128 alloc] initWithNumber:@789.456]]];
+}
+
+- (void)testUUIDArray {
+    [self roundTripWithKeyPath:@"uuidArray"
+                        values:@[[[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd"],
+                                 [[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe"],
+                                 [[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff"]]];
+}
+
+- (void)testAnyArray {
+    [self roundTripWithKeyPath:@"anyArray"
+                        values:@[@1234,
+                                @"I'm a String",
+                                NSNull.null]];
+}
+
+@end
+
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
 @implementation RLMObjectServerTests
