@@ -26,7 +26,7 @@ import RealmSyncTestSupport
 import RealmTestSupport
 #endif
 
-class ListSwiftCollectionSyncTests: SwiftSyncTestCase {
+class ListSyncTests: SwiftSyncTestCase {
     private func roundTrip<T: _ManagedPropertyType>(keyPath: KeyPath<SwiftCollectionSyncObject, List<T>>,
                                                     values: [T]) {
         do {
@@ -142,7 +142,7 @@ class ListSwiftCollectionSyncTests: SwiftSyncTestCase {
     }
 }
 
-class SetSwiftCollectionsyncTests: SwiftSyncTestCase {
+class SetSyncTests: SwiftSyncTestCase {
 
     private typealias MutableSetKeyPath<T: RealmCollectionValue> = KeyPath<SwiftCollectionSyncObject, MutableSet<T>>
     private typealias MutableSetKeyValues<T: RealmCollectionValue> = (keyPath: MutableSetKeyPath<T>, values: [T])
@@ -303,14 +303,22 @@ class SetSwiftCollectionsyncTests: SwiftSyncTestCase {
     func testUuidSet() {
         do {
             try roundTrip(set: (\.uuidSet, [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
-                                               UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
-                                               UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!]),
+                                            UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
+                                            UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!]),
                           otherSet: (\.otherUuidSet, [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!,
-                                                         UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ae")!,
-                                                         UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90bf")!]))
+                                                      UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ae")!,
+                                                      UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90bf")!]))
         } catch {
             XCTFail(error.localizedDescription)
         }
     }
 
+    func testAnySet() {
+        do {
+            try roundTrip(set: (\.anySet, [.int(12345), .string("Hello"), .none]),
+                          otherSet: (\.otherAnySet, [.none, .string("Hey!"), .double(123.456)]))
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
 }

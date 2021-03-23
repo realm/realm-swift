@@ -90,6 +90,7 @@ public class SwiftCollectionSyncObject: Object {
     public let objectIdSet = MutableSet<ObjectId>()
     public let decimalSet = MutableSet<Decimal128>()
     public let uuidSet = MutableSet<UUID>()
+    public let anySet = MutableSet<AnyRealmValue>()
 
     public let otherIntSet = MutableSet<Int>()
     public let otherStringSet = MutableSet<String>()
@@ -99,6 +100,7 @@ public class SwiftCollectionSyncObject: Object {
     public let otherObjectIdSet = MutableSet<ObjectId>()
     public let otherDecimalSet = MutableSet<Decimal128>()
     public let otherUuidSet = MutableSet<UUID>()
+    public let otherAnySet = MutableSet<AnyRealmValue>()
 
     public override class func primaryKey() -> String? {
         return "_id"
