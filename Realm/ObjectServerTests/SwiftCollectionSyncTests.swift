@@ -48,7 +48,13 @@ class ListSyncTests: SwiftSyncTestCase {
                 let object = realm.objects(SwiftCollectionSyncObject.self).first!
                 XCTAssertEqual(object[keyPath: keyPath].count, values.count*2)
                 for (el, ex) in zip(object[keyPath: keyPath], values + values) {
-                    XCTAssert(el == ex, "\(el) is not equal to \(ex)")
+                    if let person = el as? SwiftPerson,
+                       let otherPerson = ex as? SwiftPerson {
+                        XCTAssert(person.firstName == otherPerson.firstName, "\(el) is not equal to \(ex)")
+
+                    } else {
+                        XCTAssert(el == ex, "\(el) is not equal to \(ex)")
+                    }
                 }
                 // Run the child again to delete the last 3 objects
                 executeChild()
@@ -57,7 +63,12 @@ class ListSyncTests: SwiftSyncTestCase {
                 // Run the child again to modify the first element
                 executeChild()
                 waitForDownloads(for: realm)
-                XCTAssertEqual(object[keyPath: keyPath][0], values[1])
+                if T.self is SwiftPerson.Type {
+                    XCTAssertEqual((object[keyPath: keyPath] as! List<SwiftPerson>)[0].firstName,
+                                   (values as! [SwiftPerson])[1].firstName)
+                } else {
+                    XCTAssertEqual(object[keyPath: keyPath][0], values[1])
+                }
             } else {
                 guard let object = realm.objects(SwiftCollectionSyncObject.self).first else {
                     try realm.write({
@@ -79,10 +90,19 @@ class ListSyncTests: SwiftSyncTestCase {
                     })
                     XCTAssertEqual(object[keyPath: keyPath].count, values.count)
                 } else {
-                    try realm.write({
-                        object[keyPath: keyPath][0] = values[1]
-                    })
-                    XCTAssertEqual(object[keyPath: keyPath][0], values[1])
+                    if T.self is SwiftPerson.Type {
+                        try realm.write({
+                            (object[keyPath: keyPath] as! List<SwiftPerson>)[0].firstName
+                                = (values as! [SwiftPerson])[1].firstName
+                        })
+                        XCTAssertEqual((object[keyPath: keyPath] as! List<SwiftPerson>)[0].firstName,
+                                       (values as! [SwiftPerson])[1].firstName)
+                    } else {
+                        try realm.write({
+                            object[keyPath: keyPath][0] = values[1]
+                        })
+                        XCTAssertEqual(object[keyPath: keyPath][0], values[1])
+                    }
                 }
                 waitForUploads(for: realm)
                 checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
@@ -137,8 +157,15 @@ class ListSyncTests: SwiftSyncTestCase {
                                                 UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
                                                 UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!])
     }
+
     func testAnyList() {
         roundTrip(keyPath: \.anyList, values: [.int(12345), .string("Hello"), .none])
+    }
+
+    func testObjectList() {
+        roundTrip(keyPath: \.objectList, values: [SwiftPerson(firstName: "Peter", lastName: "Parker"),
+                                                  SwiftPerson(firstName: "Bruce", lastName: "Wayne"),
+                                                  SwiftPerson(firstName: "Stephen", lastName: "Strange")])
     }
 }
 
@@ -171,10 +198,14 @@ class SetSyncTests: SwiftSyncTestCase {
             executeChild()
             waitForDownloads(for: realm)
             checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
-            XCTAssertTrue(object[keyPath: set.keyPath].intersects(object[keyPath: otherSet.keyPath]))
-            XCTAssertEqual(object[keyPath: set.keyPath].count, 1)
+            if !(T.self is SwiftPerson.Type) {
+                XCTAssertTrue(object[keyPath: set.keyPath].intersects(object[keyPath: otherSet.keyPath]))
+                XCTAssertEqual(object[keyPath: set.keyPath].count, 1)
+            }
             // The intersection should have assigned the last value from `values`
-            XCTAssertTrue(object[keyPath: set.keyPath].contains(set.values.last!))
+            if !(T.self is SwiftPerson.Type) {
+                XCTAssertTrue(object[keyPath: set.keyPath].contains(set.values.last!))
+            }
             // Run the child again to delete the objects in the sets.
             executeChild()
             waitForDownloads(for: realm)
@@ -189,9 +220,6 @@ class SetSyncTests: SwiftSyncTestCase {
                 checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
                 return
             }
-            print("COUNT:")
-            print(object[keyPath: set.keyPath].count)
-
             if object[keyPath: set.keyPath].count == 0,
                object[keyPath: otherSet.keyPath].count == 0 {
                 try realm.write({
@@ -202,9 +230,17 @@ class SetSyncTests: SwiftSyncTestCase {
                 XCTAssertEqual(object[keyPath: otherSet.keyPath].count, otherSet.values.count)
             } else if object[keyPath: set.keyPath].count == 3,
                       object[keyPath: otherSet.keyPath].count == 3 {
-                try realm.write({
-                    object[keyPath: set.keyPath].formIntersection(object[keyPath: otherSet.keyPath])
-                })
+                if !(T.self is SwiftPerson.Type) {
+                    try realm.write({
+                        object[keyPath: set.keyPath].formIntersection(object[keyPath: otherSet.keyPath])
+                    })
+                } else {
+                    try realm.write({
+                        // formIntersection won't work with unique Objects
+                        object[keyPath: set.keyPath].removeAll()
+                        object[keyPath: set.keyPath].insert(set.values[0])
+                    })
+                }
                 XCTAssertEqual(object[keyPath: set.keyPath].count, 1)
                 XCTAssertEqual(object[keyPath: otherSet.keyPath].count, otherSet.values.count)
             } else {
@@ -317,6 +353,19 @@ class SetSyncTests: SwiftSyncTestCase {
         do {
             try roundTrip(set: (\.anySet, [.int(12345), .string("Hello"), .none]),
                           otherSet: (\.otherAnySet, [.none, .string("Hey!"), .double(123.456)]))
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testObjectSet() {
+        do {
+            try roundTrip(set: (\.objectSet, [SwiftPerson(firstName: "Peter", lastName: "Parker"),
+                                              SwiftPerson(firstName: "Bruce", lastName: "Wayne"),
+                                              SwiftPerson(firstName: "Stephen", lastName: "Strange")]),
+                          otherSet: (\.otherObjectSet, [SwiftPerson(firstName: "Stephen", lastName: "Strange"),
+                                                        SwiftPerson(firstName: "Tony", lastName: "Stark"),
+                                                        SwiftPerson(firstName: "Clark", lastName: "Kent")]))
         } catch {
             XCTFail(error.localizedDescription)
         }

@@ -81,7 +81,8 @@ public class SwiftCollectionSyncObject: Object {
     public let decimalList = List<Decimal128>()
     public let uuidList = List<UUID>()
     public let anyList = List<AnyRealmValue>()
-    //TODO needs object test
+    public let objectList = List<SwiftPerson>()
+
     public let intSet = MutableSet<Int>()
     public let stringSet = MutableSet<String>()
     public let dataSet = MutableSet<Data>()
@@ -91,6 +92,7 @@ public class SwiftCollectionSyncObject: Object {
     public let decimalSet = MutableSet<Decimal128>()
     public let uuidSet = MutableSet<UUID>()
     public let anySet = MutableSet<AnyRealmValue>()
+    public let objectSet = MutableSet<SwiftPerson>()
 
     public let otherIntSet = MutableSet<Int>()
     public let otherStringSet = MutableSet<String>()
@@ -101,6 +103,7 @@ public class SwiftCollectionSyncObject: Object {
     public let otherDecimalSet = MutableSet<Decimal128>()
     public let otherUuidSet = MutableSet<UUID>()
     public let otherAnySet = MutableSet<AnyRealmValue>()
+    public let otherObjectSet = MutableSet<SwiftPerson>()
 
     public override class func primaryKey() -> String? {
         return "_id"
