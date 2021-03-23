@@ -78,7 +78,8 @@ class SwiftObject: Object {
 
     let arrayCol = List<SwiftBoolObject>()
     let setCol = MutableSet<SwiftBoolObject>()
-
+    let mapCol = Map<String, SwiftBoolObject>()
+    
     class func defaultValues() -> [String: Any] {
         return  [
             "boolCol": false,
@@ -97,7 +98,8 @@ class SwiftObject: Object {
             "objectCol": [false],
             "uuidCol": UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
             "arrayCol": [],
-            "setCol": []
+            "setCol": [],
+            "mapCol": [:],
         ]
     }
 }
@@ -384,6 +386,10 @@ class SwiftListOfSwiftOptionalObject: Object {
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftMutableSetOfSwiftOptionalObject: Object {
     let set = MutableSet<SwiftOptionalObject>()
+}
+
+class SwiftMapOfSwiftOptionalObject: Object {
+    let map = Map<String, SwiftOptionalObject>()
 }
 
 class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {

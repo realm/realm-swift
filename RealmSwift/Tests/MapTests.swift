@@ -31,14 +31,75 @@ class MapStandaloneTests: MapTests {
         XCTAssertNil(map.realm)
         return map
     }
+}
 
-    override func createMapWithEmbedded() -> Map<String, EmbeddedTreeObject1> {
-        return Map<String, EmbeddedTreeObject1>()
+class MapNewlyAddedTests: MapTests {
+    override func createMap() -> SwiftMapPropertyObject {
+        let map = SwiftMapPropertyObject()
+        map.name = "name"
+        let realm = realmWithTestPath()
+        try! realm.write { realm.add(map) }
+        XCTAssertNotNil(map.realm)
+        return map
+    }
+
+    override func createMapWithLinks() -> SwiftMapOfSwiftObject {
+        let map = SwiftMapOfSwiftObject()
+        let realm = try! Realm()
+        try! realm.write { realm.add(map) }
+        XCTAssertNotNil(map.realm)
+        return map
+    }
+}
+
+class MapNewlyCreatedTests: MapTests {
+    override func createMap() -> SwiftMapPropertyObject {
+        let realm = realmWithTestPath()
+        realm.beginWrite()
+        let map = realm.create(SwiftMapPropertyObject.self, value: ["name", [], []])
+        try! realm.commitWrite()
+
+        XCTAssertNotNil(map.realm)
+        return map
+    }
+
+    override func createMapWithLinks() -> SwiftMapOfSwiftObject {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let map = realm.create(SwiftMapOfSwiftObject.self)
+        try! realm.commitWrite()
+
+        XCTAssertNotNil(map.realm)
+        return map
+    }
+}
+
+class MapRetrievedTests: MapTests {
+    override func createMap() -> SwiftMapPropertyObject {
+        let realm = realmWithTestPath()
+        realm.beginWrite()
+        realm.create(SwiftMapPropertyObject.self, value: ["name", [:], [:]])
+        try! realm.commitWrite()
+        let map = realm.objects(SwiftMapPropertyObject.self).first!
+
+        XCTAssertNotNil(map.realm)
+        return map
+    }
+
+    override func createMapWithLinks() -> SwiftMapOfSwiftObject {
+        let realm = try! Realm()
+        realm.beginWrite()
+        realm.create(SwiftMapOfSwiftObject.self)
+        try! realm.commitWrite()
+        let map = realm.objects(SwiftMapOfSwiftObject.self).first!
+
+        XCTAssertNotNil(map.realm)
+        return map
     }
 }
 
 fileprivate extension Map {
-    func addTestObjects(from dictionary: [String: Value]) {
+    func addTestObjects(from dictionary: [Key: Value]) {
         dictionary.forEach { (k, v) in
             self[k] = v
         }
@@ -56,10 +117,6 @@ class MapTests: TestCase {
     }
 
     func createMapWithLinks() -> SwiftMapOfSwiftObject {
-        fatalError("abstract")
-    }
-
-    func createMapWithEmbedded() -> Map<String, EmbeddedTreeObject1> {
         fatalError("abstract")
     }
 
@@ -106,21 +163,23 @@ class MapTests: TestCase {
         let obj = SwiftMapObject()
         let valueInTest = 5
         obj.int[String(valueInTest)] = valueInTest
-        XCTAssertEqual(obj.int.first!, 5)
-        XCTAssertEqual(obj.int.last!, 5)
-        XCTAssertEqual(obj.int[0], 5)
+//        XCTAssertEqual(obj.int.first!, MapElement(key: "", value: 1))
+        XCTAssertEqual(obj.int.first!.value, 5) // should expect (key, value)
+        XCTAssertEqual(obj.int.last!.value, 5)
+        XCTAssertEqual(obj.int[0].value, 5)
         XCTAssertEqual(obj.int["5"], 5)
-        
+
         obj.int.addTestObjects(from: ["6": 6, "7": 7, "8": 8])
         XCTAssertEqual(obj.int.index(of: 6), 1)
         XCTAssertEqual(obj.int.max(), 8)
         XCTAssertEqual(obj.int.sum(), 26)
 
         obj.string["strKey"] = "strVal"
-        XCTAssertEqual(obj.string.first!, "strVal")
-        XCTAssertEqual(obj.string[0], "strVal")
+        XCTAssertEqual(obj.string.first!.key, "strKey")
+        XCTAssertEqual(obj.string[0].key, "strKey")
+        XCTAssertEqual(obj.string.first!.value, "strVal")
+        XCTAssertEqual(obj.string[0].value, "strVal")
     }
-    
     func testPrimitiveIterationAcrossNil() {
         let obj = SwiftMapObject()
         XCTAssertFalse(obj.int.contains(where: { $0 == "0" || $1 == 5 }))
@@ -268,10 +327,10 @@ class MapTests: TestCase {
         XCTAssertNil(map["testKey"])
         map["testKey"] = str1
         XCTAssertEqual(Int(1), map.count)
-        XCTAssertEqual(map["testKey"], str1)
+        assertEqual(map["testKey"], str1)
         map["testKey"] = str2
         XCTAssertEqual(Int(1), map.count)
-        XCTAssertEqual(map["testKey"], str2)
+        assertEqual(map["testKey"], str2)
     }
 
     func testChangesArePersisted() {
@@ -284,11 +343,11 @@ class MapTests: TestCase {
             }
 
             let anotherMap = realm.objects(SwiftMapPropertyObject.self).first!.map
-            XCTAssertEqual(map, anotherMap)
+            XCTAssertEqual(map.keys, anotherMap.keys)
         }
     }
 
-    func testPopulateEmptyArray() {
+    func testPopulateEmptyMap() {
         guard let map = map, let str1 = str1 else {
             fatalError("Test precondition failure")
         }
@@ -305,8 +364,10 @@ class MapTests: TestCase {
         XCTAssertEqual(map[str1.stringCol]!.stringCol, str1.stringCol)
 
         // Make sure we can enumerate
-        for obj in map {
-            XCTAssertFalse(obj.description.isEmpty, "Object should have description")
+        for key in map {
+            print("key = \(key)")
+//            let value = map[key as String]
+            XCTAssertFalse(key.description.isEmpty, "Object should have description")
         }
     }
 
@@ -322,9 +383,9 @@ class MapTests: TestCase {
         XCTAssertEqual(10, mapObject.map.count)
 
         for object in mapObject.map {
-            XCTAssertEqual(123, object.intCol)
-            XCTAssertEqual(false, object.objectCol!.boolCol)
-            XCTAssertEqual(0, object.arrayCol.count)
+            XCTAssertEqual(123, object.value.intCol)
+            XCTAssertEqual(false, object.value.objectCol!.boolCol)
+            XCTAssertEqual(0, object.value.arrayCol.count)
         }
     }
 
@@ -349,7 +410,7 @@ class MapTests: TestCase {
         let objects = realm.objects(SwiftObject.self)
 
         func testProperty<T: Equatable>(line: UInt = #line, fn: @escaping (SwiftObject) -> T) {
-            let properties: [T] = Array(mapObjects.flatMap { $0.map.map(fn) })
+            let properties: [T] = Array(mapObjects.flatMap { $0.map.values.map(fn) })
             let kvcProperties: [T] = Array(mapsOfObjects.flatMap { $0.values.map(fn) })
             XCTAssertEqual(properties, kvcProperties, line: line)
         }
@@ -357,7 +418,6 @@ class MapTests: TestCase {
             let properties = Array(objects.compactMap(fn))
             let mapsOfObjects = objects.value(forKeyPath: name) as! [T]
             let kvcProperties = Array(mapsOfObjects.compactMap { $0 })
-
             XCTAssertEqual(properties, kvcProperties, line: line)
         }
 
@@ -372,5 +432,40 @@ class MapTests: TestCase {
         testProperty("stringCol") { $0.stringCol }
         testProperty("decimalCol") { $0.decimalCol }
         testProperty("objectIdCol") { $0.objectIdCol }
+    }
+
+    func testUnmanagedListComparison() {
+        let obj = SwiftIntObject()
+        obj.intCol = 5
+        let obj2 = SwiftIntObject()
+        obj2.intCol = 6
+        let obj3 = SwiftIntObject()
+        obj3.intCol = 8
+
+        let objects = ["obj": obj, "obj2": obj2, "obj3": obj3]
+        let objects2 = ["obj": obj, "obj2": obj2]
+
+        let mapL = Map<String, SwiftIntObject>()
+        let mapR = Map<String, SwiftIntObject>()
+        XCTAssertEqual(mapL, mapR, "Empty instances should be equal by `==` operator")
+
+        mapL.addTestObjects(from: objects)
+        mapR.addTestObjects(from: objects)
+
+        let mapX = Map<String, SwiftIntObject>()
+        mapX.addTestObjects(from: objects2)
+
+        XCTAssertTrue(mapL !== mapR, "instances should not be identical")
+
+        XCTAssertEqual(mapL, mapR, "instances should be equal by `==` operator")
+        XCTAssertNotEqual(mapL, mapX, "instances should be equal by `==` operator")
+
+        XCTAssertTrue(mapL.isEqual(mapR), "instances should be equal by `isEqual` method")
+        XCTAssertTrue(!mapL.isEqual(mapX), "instances should be equal by `isEqual` method")
+
+        XCTAssertEqual(Array(mapL), Array(mapR), "instances converted to Swift.Array should be equal")
+        XCTAssertNotEqual(Array(mapL), Array(mapX), "instances converted to Swift.Array should be equal")
+        mapX["obj3"] = obj3
+        XCTAssertEqual(mapL, mapX, "instances should be equal by `==` operator")
     }
 }

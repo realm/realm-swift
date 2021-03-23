@@ -281,6 +281,12 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     });
 }
 
+- (std::pair<realm::StringData, realm::Mixed>)elementAtIndex:(NSInteger)index {
+    return translateErrors<RLMManagedDictionary>([&] {
+        return _backingCollection.get_pair(index);
+    });
+}
+
 - (NSUInteger)indexOfObject:(id)value {
     return translateErrors<RLMManagedDictionary>([&] {
         return _backingCollection.find_any(value);
@@ -374,13 +380,13 @@ inline realm::StringData keyFromRLMDictionaryKey(id<RLMDictionaryKey> key, RLMAc
     });
 }
 
-- (void)setValue:(id)value forKey:(NSString *)key {
+- (void)setValue:(id)value forKey:(id)key {
     if ([key isEqualToString:@"self"]) {
         RLMDictionaryValidateMatchingObjectType(self, key, value);
         RLMAccessorContext context(*_objectInfo);
         translateErrors<RLMManagedDictionary>([&] {
             _backingCollection.remove_all();
-            _backingCollection.insert(context, key.UTF8String, value);
+            _backingCollection.insert(context, [key UTF8String], value);
         });
         return;
     }

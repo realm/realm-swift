@@ -126,7 +126,13 @@ static const int RLMEnumerationBufferSize = 16;
     @autoreleasepool {
         RLMAccessorContext ctx(*_info);
         for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
-            _strongBuffer[batchCount] = _results->get(ctx, index);
+            if ([_collection dictionary]) {
+                std::pair<realm::StringData, realm::Mixed> pair = [(RLMDictionary *)_collection elementAtIndex:index];
+                _strongBuffer[batchCount] = @{RLM pair.first: pair.second};
+//                _strongBuffer[batchCount] = static_cast<realm::Dictionary>(_results)->get_pair(index);
+            } else {
+                _strongBuffer[batchCount] = _results->get(ctx, index);
+            }
             batchCount++;
         }
     }
