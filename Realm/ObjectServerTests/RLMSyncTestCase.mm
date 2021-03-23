@@ -210,9 +210,9 @@
 
 @end
 
-#pragma mark RLMCollectionSyncObject
+#pragma mark RLMArraySyncObject
 
-@implementation RLMCollectionSyncObject
+@implementation RLMArraySyncObject
 
 + (NSString *)primaryKey {
     return @"_id";
@@ -223,6 +223,27 @@
              @"stringArray", @"dataArray",
              @"doubleArray", @"objectIdArray",
              @"decimalArray", @"uuidArray", @"anyArray"];
+}
+
+@end
+
+#pragma mark RLMSetSyncObject
+
+@implementation RLMSetSyncObject
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
+
++ (NSArray *)requiredProperties {
+    return @[@"intSet", @"boolSet",
+             @"stringSet", @"dataSet",
+             @"doubleSet", @"objectIdSet",
+             @"decimalSet", @"uuidSet", @"anySet",
+             @"otherIntSet", @"otherBoolSet",
+             @"otherStringSet", @"otherDataSet",
+             @"otherDoubleSet", @"otherObjectIdSet",
+             @"otherDecimalSet", @"otherUuidSet", @"otherAnySet"];
 }
 
 @end
@@ -389,8 +410,8 @@ static NSURL *syncDirectoryForChildProcess() {
                         Person.self,
                         HugeSyncObject.self,
                         AllTypesSyncObject.self,
-                        RLMCollectionSyncObject.self
-    ];
+                        RLMArraySyncObject.self,
+                        RLMSetSyncObject.self];
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.stopPolicy = stopPolicy;
     c.syncConfiguration = syncConfig;

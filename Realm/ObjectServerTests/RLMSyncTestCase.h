@@ -75,7 +75,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface RLMCollectionSyncObject: RLMObject
+RLM_COLLECTION_TYPE(Person);
+@interface RLMArraySyncObject: RLMObject
 @property RLMObjectId      *_id;
 @property RLMArray<RLMInt> *intArray;
 @property RLMArray<RLMBool> *boolArray;
@@ -86,6 +87,33 @@ NS_ASSUME_NONNULL_BEGIN
 @property RLMArray<RLMDecimal128> *decimalArray;
 @property RLMArray<RLMUUID> *uuidArray;
 @property RLMArray<RLMValue> *anyArray;
+//@property RLM_GENERIC_ARRAY(Person) *objectArray; //TODO: I need tests
+
+@end
+
+@interface RLMSetSyncObject: RLMObject
+@property RLMObjectId      *_id;
+@property RLMSet<RLMInt> *intSet;
+@property RLMSet<RLMBool> *boolSet;
+@property RLMSet<RLMString> *stringSet;
+@property RLMSet<RLMData> *dataSet;
+@property RLMSet<RLMDouble> *doubleSet;
+@property RLMSet<RLMObjectId> *objectIdSet;
+@property RLMSet<RLMDecimal128> *decimalSet;
+@property RLMSet<RLMUUID> *uuidSet;
+@property RLMSet<RLMValue> *anySet;
+//@property RLM_GENERIC_SET(Person) *objectSet; //TODO: I need tests
+
+@property RLMSet<RLMInt> *otherIntSet;
+@property RLMSet<RLMBool> *otherBoolSet;
+@property RLMSet<RLMString> *otherStringSet;
+@property RLMSet<RLMData> *otherDataSet;
+@property RLMSet<RLMDouble> *otherDoubleSet;
+@property RLMSet<RLMObjectId> *otherObjectIdSet;
+@property RLMSet<RLMDecimal128> *otherDecimalSet;
+@property RLMSet<RLMUUID> *otherUuidSet;
+@property RLMSet<RLMValue> *otherAnySet;
+//@property RLM_GENERIC_SET(Person) *otherObjectSet; //TODO: I need tests
 
 @end
 

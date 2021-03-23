@@ -77,7 +77,7 @@
                       values:(NSArray *)values {
     try {
         RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                 register:YES]];
+                                                                                 register:self.isParent]];
         RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
 
         if (self.isParent) {
@@ -85,36 +85,33 @@
                 [realm deleteAllObjects];
             }];
             [self waitForDownloadsForRealm:realm];
-            CHECK_COUNT(0, RLMCollectionSyncObject, realm);
-//            [self runChildAndWait];
+            CHECK_COUNT(0, RLMArraySyncObject, realm);
             RLMRunChildAndWait();
             [self waitForDownloadsForRealm:realm];
-            CHECK_COUNT(1, RLMCollectionSyncObject, realm);
+            CHECK_COUNT(1, RLMArraySyncObject, realm);
             // Run the child again to add the values
-//            [self runChildAndWait];
             RLMRunChildAndWait();
             [self waitForDownloadsForRealm:realm];
-            CHECK_COUNT(1, RLMCollectionSyncObject, realm);
-            RLMResults<RLMCollectionSyncObject *> *results
-                = [RLMCollectionSyncObject allObjectsInRealm:realm];
-            RLMCollectionSyncObject *obj = results.firstObject;
+            CHECK_COUNT(1, RLMArraySyncObject, realm);
+            RLMResults<RLMArraySyncObject *> *results
+                = [RLMArraySyncObject allObjectsInRealm:realm];
+            RLMArraySyncObject *obj = results.firstObject;
             XCTAssertEqual(((RLMArray *)obj[keyPath]).count, values.count*2);
             for (int i = 0; i < values.count; i++) {
                 XCTAssertTrue([results[0][keyPath][i] isEqual:values[i]]);
             }
             // Run the child again to delete the last 3 objects
-//            [self runChildAndWait];
             RLMRunChildAndWait();
             [self waitForDownloadsForRealm:realm];
             XCTAssertEqual(((RLMArray *)obj[keyPath]).count, values.count);
-//             Run the child again to modify the first element
-//            [self runChildAndWait];
+            // Run the child again to modify the first element
             RLMRunChildAndWait();
             [self waitForDownloadsForRealm:realm];
             XCTAssertTrue([((RLMArray *)obj[keyPath])[0] isEqual:values[1]]);
         } else {
-            RLMResults<RLMCollectionSyncObject *> *results = [RLMCollectionSyncObject allObjectsInRealm:realm];
-            if (RLMCollectionSyncObject *obj = results.firstObject) {
+            RLMResults<RLMArraySyncObject *> *results
+                = [RLMArraySyncObject allObjectsInRealm:realm];
+            if (RLMArraySyncObject *obj = results.firstObject) {
                 if (((RLMArray *)obj[keyPath]).count == 0) {
                     [realm transactionWithBlock:^{
                         [((RLMArray *)obj[keyPath]) addObjects:values];
@@ -129,17 +126,18 @@
                     XCTAssertEqual(((RLMArray *)obj[keyPath]).count, values.count);
                 } else {
                     [realm transactionWithBlock:^{
-                        [((RLMArray *)obj[keyPath]) replaceObjectAtIndex:0 withObject:values[1]];
+                        [((RLMArray *)obj[keyPath]) replaceObjectAtIndex:0
+                                                              withObject:values[1]];
                     }];
-                    XCTAssertEqual(((RLMArray *)obj[keyPath]).firstObject, values[1]);
+                    XCTAssertTrue([((RLMArray *)obj[keyPath]).firstObject isEqual:values[1]]);
                 }
             } else {
                 [realm transactionWithBlock:^{
-                    [realm addObject:[RLMCollectionSyncObject new]];
+                    [realm addObject:[RLMArraySyncObject new]];
                 }];
             }
             [self waitForUploadsForRealm:realm];
-            CHECK_COUNT(1, RLMCollectionSyncObject, realm);
+            CHECK_COUNT(1, RLMArraySyncObject, realm);
         }
     } catch(NSError *e) {
         XCTFail(@"Got an error: %@ (isParent: %d)",
