@@ -103,7 +103,6 @@ RLMClassInfo& RLMSchemaInfo::operator[](realm::TableKey const& key) {
     @throw RLMException(@"Table Key '%@' is not managed by the Realm. ", @(key.value));
 }
 
-
 RLMSchemaInfo::RLMSchemaInfo(RLMRealm *realm) {
     RLMSchema *rlmSchema = realm.schema;
     realm::Schema const& schema = realm->_realm->schema();

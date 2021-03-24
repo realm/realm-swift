@@ -733,11 +733,11 @@ public class RealmServer: NSObject {
                         "bsonType": "mixed"
                     ],
                     "objectIdCol": [
-                        "bsonType": "objectId",
+                        "bsonType": "objectId"
                     ],
                     "realm_id": [
                         "bsonType": "string"
-                    ],
+                    ]
                 ],
                 "required": [
                     "boolCol",
@@ -750,7 +750,7 @@ public class RealmServer: NSObject {
                     "longCol",
                     "decimalCol",
                     "uuidCol",
-                    "objectIdCol",
+                    "objectIdCol"
                 ],
                 "title": "AllTypesSyncObject"
             ],
@@ -804,14 +804,14 @@ public class RealmServer: NSObject {
                         "bsonType": "mixed"
                     ],
                     "objectIdCol": [
-                        "bsonType": "objectId",
+                        "bsonType": "objectId"
                     ],
 //                    "objectCol": [
 //                        "bsonType": "objectId",
 //                    ],
                     "realm_id": [
                         "bsonType": "string"
-                    ],
+                    ]
                 ],
                 "required": [
                     "boolCol",

@@ -89,17 +89,17 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
 
                 let obj = realm.objects(SwiftTypesSyncObject.self).first!
-                XCTAssertEqual(obj.boolCol, true);
-                XCTAssertEqual(obj.intCol, 1);
-                XCTAssertEqual(obj.doubleCol, 1.1);
-                XCTAssertEqual(obj.stringCol, "string");
-                XCTAssertEqual(obj.binaryCol, "string".data(using: String.Encoding.utf8)!);
-                XCTAssertEqual(obj.decimalCol, Decimal128(1));
-                XCTAssertEqual(obj.dateCol, Date(timeIntervalSince1970: -1));
-                XCTAssertEqual(obj.longCol, Int64(1));
-                XCTAssertEqual(obj.uuidCol, UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!);
-                XCTAssertEqual(obj.anyCol.value.intValue, 1);
-                XCTAssertEqual(obj.objectCol!.firstName, "George");
+                XCTAssertEqual(obj.boolCol, true)
+                XCTAssertEqual(obj.intCol, 1)
+                XCTAssertEqual(obj.doubleCol, 1.1)
+                XCTAssertEqual(obj.stringCol, "string")
+                XCTAssertEqual(obj.binaryCol, "string".data(using: String.Encoding.utf8)!)
+                XCTAssertEqual(obj.decimalCol, Decimal128(1))
+                XCTAssertEqual(obj.dateCol, Date(timeIntervalSince1970: -1))
+                XCTAssertEqual(obj.longCol, Int64(1))
+                XCTAssertEqual(obj.uuidCol, UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)
+                XCTAssertEqual(obj.anyCol.value.intValue, 1)
+                XCTAssertEqual(obj.objectCol!.firstName, "George")
 
             } else {
                 // Add objects

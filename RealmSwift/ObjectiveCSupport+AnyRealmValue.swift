@@ -46,7 +46,6 @@ public extension ObjectiveCSupport {
             return u as NSUUID
         case let .object(o):
             return o.unsafeCastToRLMObject()
-
         default:
             return nil
         }

@@ -113,7 +113,7 @@ class ListSyncTests: SwiftSyncTestCase {
     }
 
     func testIntList() {
-        roundTrip(keyPath: \.intList, values: [1,2,3])
+        roundTrip(keyPath: \.intList, values: [1, 2, 3])
     }
 
     func testBoolList() {
@@ -258,7 +258,7 @@ class SetSyncTests: SwiftSyncTestCase {
 
     func testIntSet() {
         do {
-            try roundTrip(set: (\.intSet, [1,2,3]), otherSet: (\.otherIntSet, [3,4,5]))
+            try roundTrip(set: (\.intSet, [1, 2, 3]), otherSet: (\.otherIntSet, [3, 4, 5]))
         } catch {
             XCTFail(error.localizedDescription)
         }

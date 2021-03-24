@@ -35,27 +35,27 @@ class AnyRealmValueTests<T: Equatable, V: ValueFactory>: TestCase {
     var wrappedValues: [T?] {
         func cast(_ value: AnyRealmValue) -> T? {
             switch T.self {
-                case is Int.Type:
+            case is Int.Type:
                     return value.intValue as? T
-                case is Bool.Type:
+            case is Bool.Type:
                     return value.boolValue as? T
-                case is Float.Type:
+            case is Float.Type:
                     return value.floatValue as? T
-                case is Double.Type:
+            case is Double.Type:
                     return value.floatValue as? T
-                case is String.Type:
+            case is String.Type:
                     return value.stringValue as? T
-                case is Data.Type:
+            case is Data.Type:
                     return value.dataValue as? T
-                case is Date.Type:
+            case is Date.Type:
                     return value.dateValue as? T
-                case is ObjectId.Type:
+            case is ObjectId.Type:
                     return value.objectIdValue as? T
-                case is Decimal128.Type:
+            case is Decimal128.Type:
                     return value.decimal128Value as? T
-                case is UUID.Type:
+            case is UUID.Type:
                     return value.uuidValue as? T
-                default:
+            default:
                     return nil
             }
         }
@@ -64,27 +64,27 @@ class AnyRealmValueTests<T: Equatable, V: ValueFactory>: TestCase {
 
     var keyPath: KeyPath<AnyRealmValue, T?> {
         switch T.self {
-            case is Int.Type:
+        case is Int.Type:
                 return \AnyRealmValue.intValue as! KeyPath<AnyRealmValue, T?>
-            case is Bool.Type:
+        case is Bool.Type:
                 return \AnyRealmValue.boolValue as! KeyPath<AnyRealmValue, T?>
-            case is Float.Type:
+        case is Float.Type:
                 return \AnyRealmValue.floatValue as! KeyPath<AnyRealmValue, T?>
-            case is Double.Type:
+        case is Double.Type:
                 return \AnyRealmValue.floatValue as! KeyPath<AnyRealmValue, T?>
-            case is String.Type:
+        case is String.Type:
                 return \AnyRealmValue.stringValue as! KeyPath<AnyRealmValue, T?>
-            case is Data.Type:
+        case is Data.Type:
                 return \AnyRealmValue.dataValue as! KeyPath<AnyRealmValue, T?>
-            case is Date.Type:
+        case is Date.Type:
                 return \AnyRealmValue.dateValue as! KeyPath<AnyRealmValue, T?>
-            case is ObjectId.Type:
+        case is ObjectId.Type:
                 return \AnyRealmValue.objectIdValue as! KeyPath<AnyRealmValue, T?>
-            case is Decimal128.Type:
+        case is Decimal128.Type:
                 return \AnyRealmValue.decimal128Value as! KeyPath<AnyRealmValue, T?>
-            case is UUID.Type:
+        case is UUID.Type:
                 return \AnyRealmValue.uuidValue as! KeyPath<AnyRealmValue, T?>
-            default:
+        default:
                 fatalError()
                 break
         }

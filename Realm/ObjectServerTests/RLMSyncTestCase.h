@@ -55,23 +55,21 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface AllTypesSyncObject : RLMObject
-@property RLMObjectId    *_id;
-@property BOOL            boolCol;
-@property bool            cBoolCol;
-@property int             intCol;
-@property double          doubleCol;
-@property NSString       *stringCol;
-@property NSData         *binaryCol;
-@property NSDate         *dateCol;
-@property int64_t         longCol;
-@property RLMDecimal128  *decimalCol;
-@property NSUUID         *uuidCol;
-@property RLMObjectId    *objectIdCol;
-@property id<RLMValue>    anyCol;
-@property Person         *objectCol;
 
-
-+ (NSDictionary *)values:(int)i;
+@property RLMObjectId *_id;
+@property BOOL boolCol;
+@property bool cBoolCol;
+@property int intCol;
+@property double doubleCol;
+@property NSString *stringCol;
+@property NSData *binaryCol;
+@property NSDate *dateCol;
+@property int64_t longCol;
+@property RLMDecimal128 *decimalCol;
+@property NSUUID *uuidCol;
+@property id<RLMValue> anyCol;
+@property Person *objectCol;
++ (NSDictionary *)values:(int)idx;
 
 @end
 

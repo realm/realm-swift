@@ -43,7 +43,7 @@ public class SwiftPerson: Object {
     }
 }
 
-public class SwiftTypesSyncObject : Object {
+public class SwiftTypesSyncObject: Object {
     @objc public dynamic var _id: ObjectId? = ObjectId.generate()
     @objc public dynamic var boolCol: Bool = true
     @objc public dynamic var intCol: Int = 1
