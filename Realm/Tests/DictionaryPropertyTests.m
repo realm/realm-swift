@@ -183,7 +183,7 @@
     [realm beginWriteTransaction];
     CompanyObject *company = [CompanyObject createInDefaultRealmWithValue:@[@"company", @[]]];
     RLMAssertThrowsWithReason([company.employeeDict setObject:self.nonLiteralNil forKey:@"blah"],
-                              @"Invalid nil value for dictionary of 'EmployeeObject'.");
+                              @"Must provide a non-nil value.");
     [realm cancelWriteTransaction];
 }
 
@@ -278,7 +278,7 @@
 
     XCTAssertTrue([dict.stringDictionary isEqual:dict2.stringDictionary], @"Dictionaries should be equal");
     [dict2.stringDictionary removeObjectForKey:@"three"];
-    XCTAssertTrue([dict.stringDictionary isEqual:dict2.stringDictionary], @"Dictionaries should be equal");
+    XCTAssertFalse([dict.stringDictionary isEqual:dict2.stringDictionary], @"Dictionaries should not be equal");
     dict2.stringDictionary[@"three"] = obj3;
     XCTAssertTrue([dict.stringDictionary isEqual:dict2.stringDictionary], @"Dictionaries should be equal");
 

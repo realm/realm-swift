@@ -281,12 +281,6 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     });
 }
 
-- (std::pair<realm::StringData, realm::Mixed>)elementAtIndex:(NSInteger)index {
-    return translateErrors<RLMManagedDictionary>([&] {
-        return _backingCollection.get_pair(index);
-    });
-}
-
 - (NSUInteger)indexOfObject:(id)value {
     return translateErrors<RLMManagedDictionary>([&] {
         return _backingCollection.find_any(value);

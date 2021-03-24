@@ -19,19 +19,12 @@
 #import <Realm/RLMDictionary.h>
 
 #import "RLMObjectBase.h"
-#include <utility>
-
-namespace realm {
-class StringData;
-class Mixed;
-}
 
 @interface RLMDictionary ()
 
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
-- (std::pair<realm::StringData, realm::Mixed>)elementAtIndex:(NSInteger)index;
 
 void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *const dictionary,
                                              __unsafe_unretained id const key, __unsafe_unretained id const value);
