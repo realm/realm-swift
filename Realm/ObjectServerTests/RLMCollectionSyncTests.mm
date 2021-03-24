@@ -52,7 +52,7 @@
             [self waitForDownloadsForRealm:realm];
             CHECK_COUNT(1, RLMSetSyncObject, realm);
             RLMResults<RLMSetSyncObject *> *results
-            = [RLMSetSyncObject allObjectsInRealm:realm];
+                = [RLMSetSyncObject allObjectsInRealm:realm];
             RLMSetSyncObject *obj = results.firstObject;
 
             XCTAssertEqual(((RLMSet *)obj[keyPath]).count, values.count);
@@ -79,7 +79,7 @@
             [self waitForExpectationsWithTimeout:30.0 handler:nil];
         } else {
             RLMResults<RLMSetSyncObject *> *results
-            = [RLMSetSyncObject allObjectsInRealm:realm];
+                = [RLMSetSyncObject allObjectsInRealm:realm];
             if (RLMSetSyncObject *obj = results.firstObject) {
                 if (((RLMSet *)obj[keyPath]).count == 0) {
                     [realm transactionWithBlock:^{
@@ -122,7 +122,6 @@
     }
 }
 
-
 - (void)testIntSet {
     [self roundTripWithKeyPath:@"intSet"
                         values:@[@123, @234, @345]
@@ -153,7 +152,7 @@
     };
 
     NSData *duplicateData = createData(1024U);
-
+    // FIXME: Failing on sync step
     //    [self roundTripWithKeyPath:@"dataSet"
     //                        values:@[duplicateData, createData(1024U), createData(1024U)]
     //                  otherKeyPath:@"otherDataSet"
@@ -251,7 +250,7 @@
             [self waitForDownloadsForRealm:realm];
             CHECK_COUNT(1, RLMArraySyncObject, realm);
             RLMResults<RLMArraySyncObject *> *results
-            = [RLMArraySyncObject allObjectsInRealm:realm];
+                = [RLMArraySyncObject allObjectsInRealm:realm];
             RLMArraySyncObject *obj = results.firstObject;
             XCTAssertEqual(((RLMArray *)obj[keyPath]).count, values.count*2);
             for (int i = 0; i < values.count; i++) {
@@ -277,7 +276,7 @@
             }
         } else {
             RLMResults<RLMArraySyncObject *> *results
-            = [RLMArraySyncObject allObjectsInRealm:realm];
+                = [RLMArraySyncObject allObjectsInRealm:realm];
             if (RLMArraySyncObject *obj = results.firstObject) {
                 if (((RLMArray *)obj[keyPath]).count == 0) {
                     [realm transactionWithBlock:^{
