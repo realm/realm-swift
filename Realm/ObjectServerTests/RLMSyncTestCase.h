@@ -87,7 +87,7 @@ RLM_COLLECTION_TYPE(Person);
 @property RLMArray<RLMDecimal128> *decimalArray;
 @property RLMArray<RLMUUID> *uuidArray;
 @property RLMArray<RLMValue> *anyArray;
-//@property RLM_GENERIC_ARRAY(Person) *objectArray; //TODO: I need tests
+@property RLM_GENERIC_ARRAY(Person) *objectArray;
 
 @end
 
