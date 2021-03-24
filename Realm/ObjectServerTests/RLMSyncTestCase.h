@@ -102,7 +102,7 @@ RLM_COLLECTION_TYPE(Person);
 @property RLMSet<RLMDecimal128> *decimalSet;
 @property RLMSet<RLMUUID> *uuidSet;
 @property RLMSet<RLMValue> *anySet;
-//@property RLM_GENERIC_SET(Person) *objectSet; //TODO: I need tests
+@property RLM_GENERIC_SET(Person) *objectSet;
 
 @property RLMSet<RLMInt> *otherIntSet;
 @property RLMSet<RLMBool> *otherBoolSet;
@@ -113,7 +113,7 @@ RLM_COLLECTION_TYPE(Person);
 @property RLMSet<RLMDecimal128> *otherDecimalSet;
 @property RLMSet<RLMUUID> *otherUuidSet;
 @property RLMSet<RLMValue> *otherAnySet;
-//@property RLM_GENERIC_SET(Person) *otherObjectSet; //TODO: I need tests
+@property RLM_GENERIC_SET(Person) *otherObjectSet;
 
 @end
 
