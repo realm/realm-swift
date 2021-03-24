@@ -450,6 +450,8 @@
 		CF986D8F25AE3C980039D287 /* MutableSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF986D8E25AE3C980039D287 /* MutableSet.swift */; };
 		CF986DE225AE3EC70039D287 /* MutableSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF986DE125AE3EC70039D287 /* MutableSetTests.swift */; };
 		CF986DF625AE3EDF0039D287 /* PrimitiveMutableSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF986DF525AE3EDF0039D287 /* PrimitiveMutableSetTests.swift */; };
+		CFA3A23F260B8430002C3266 /* SwiftCollectionSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA3A23E260B8430002C3266 /* SwiftCollectionSyncTests.swift */; };
+		CFA3A254260B8445002C3266 /* RLMCollectionSyncTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFA3A23D260B8427002C3266 /* RLMCollectionSyncTests.mm */; };
 		CFAEF761242B5F9A00EAF721 /* RLMAPIKeyAuth.h in Headers */ = {isa = PBXBuildFile; fileRef = CFAEF75F242B5F9A00EAF721 /* RLMAPIKeyAuth.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFAEF762242B5F9A00EAF721 /* RLMAPIKeyAuth.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFAEF760242B5F9A00EAF721 /* RLMAPIKeyAuth.mm */; };
 		CFAEF765242B672700EAF721 /* RLMUserAPIKey.h in Headers */ = {isa = PBXBuildFile; fileRef = CFAEF763242B672700EAF721 /* RLMUserAPIKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -916,6 +918,8 @@
 		CF986D8E25AE3C980039D287 /* MutableSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutableSet.swift; sourceTree = "<group>"; };
 		CF986DE125AE3EC70039D287 /* MutableSetTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutableSetTests.swift; sourceTree = "<group>"; };
 		CF986DF525AE3EDF0039D287 /* PrimitiveMutableSetTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimitiveMutableSetTests.swift; sourceTree = "<group>"; };
+		CFA3A23D260B8427002C3266 /* RLMCollectionSyncTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMCollectionSyncTests.mm; path = Realm/ObjectServerTests/RLMCollectionSyncTests.mm; sourceTree = "<group>"; };
+		CFA3A23E260B8430002C3266 /* SwiftCollectionSyncTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftCollectionSyncTests.swift; path = Realm/ObjectServerTests/SwiftCollectionSyncTests.swift; sourceTree = "<group>"; };
 		CFAE926A24A0A7F40033CB31 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
 		CFAEF75F242B5F9A00EAF721 /* RLMAPIKeyAuth.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAPIKeyAuth.h; sourceTree = "<group>"; };
 		CFAEF760242B5F9A00EAF721 /* RLMAPIKeyAuth.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAPIKeyAuth.mm; sourceTree = "<group>"; };
@@ -973,7 +977,7 @@
 		E81A1FD01955FE0100FDED82 /* SwiftRealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftRealmTests.swift; sourceTree = "<group>"; };
 		E81A1FD11955FE0100FDED82 /* TransactionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransactionTests.m; sourceTree = "<group>"; };
 		E8267FED1D90B79000E001C7 /* ObjectServerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ObjectServerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E8267FF01D90B8E700E001C7 /* RLMObjectServerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = RLMObjectServerTests.mm; path = Realm/ObjectServerTests/RLMObjectServerTests.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		E8267FF01D90B8E700E001C7 /* RLMObjectServerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = RLMObjectServerTests.mm; path = Realm/ObjectServerTests/RLMObjectServerTests.mm; sourceTree = "<group>"; };
 		E82FA60A195632F20043A3C3 /* SwiftArrayPropertyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SwiftArrayPropertyTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E82FA60B195632F20043A3C3 /* SwiftArrayTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SwiftArrayTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E82FA60D195632F20043A3C3 /* SwiftLinkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SwiftLinkTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -1450,6 +1454,8 @@
 		E8267FEF1D90B7B100E001C7 /* Object Server Tests */ = {
 			isa = PBXGroup;
 			children = (
+				CFA3A23D260B8427002C3266 /* RLMCollectionSyncTests.mm */,
+				CFA3A23E260B8430002C3266 /* SwiftCollectionSyncTests.swift */,
 				1AA5AEA21D98CA5300ED8C27 /* Utility */,
 				536B7C0B24A4C223006B535D /* dependencies.list */,
 				5346E7312487AC9D00595C68 /* RLMBSONTests.mm */,
@@ -2585,9 +2591,11 @@
 			files = (
 				537130C824A9E417001FDBBC /* RealmServer.swift in Sources */,
 				5346E7322487AC9D00595C68 /* RLMBSONTests.mm in Sources */,
+				CFA3A23F260B8430002C3266 /* SwiftCollectionSyncTests.swift in Sources */,
 				3F558C9422C29A03002F0F30 /* RLMMultiProcessTestCase.m in Sources */,
 				E8267FF11D90B8E700E001C7 /* RLMObjectServerTests.mm in Sources */,
 				1AA5AE9C1D98A68E00ED8C27 /* RLMSyncTestCase.mm in Sources */,
+				CFA3A254260B8445002C3266 /* RLMCollectionSyncTests.mm in Sources */,
 				3F558C9022C29A03002F0F30 /* RLMTestCase.m in Sources */,
 				3F73BC921E3A877300FE80B6 /* RLMTestUtils.m in Sources */,
 				1A1536481DB0408A00C0EC93 /* RLMUser+ObjectServerTests.mm in Sources */,
