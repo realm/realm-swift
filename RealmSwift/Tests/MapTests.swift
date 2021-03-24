@@ -179,7 +179,7 @@ class MapTests: TestCase {
         XCTAssertEqual(obj.string.first!.1, "strVal")
         XCTAssertEqual(obj.string[0].1, "strVal")
     }
-    
+
     func testPrimitiveIterationAcrossNil() {
         let obj = SwiftMapObject()
         XCTAssertFalse(obj.int.contains(where: { $0 == "0" || $1 == 5 }))
@@ -231,7 +231,6 @@ class MapTests: TestCase {
         for i in 0...5 {
             map[String(i)] = SwiftStringObject(value: [String(i)])
         }
-        
         var sum: Int = 0
         var i: Int = 5
         for obj in map.values {
@@ -249,12 +248,12 @@ class MapTests: TestCase {
         for i in 0...5 {
             map[String(i)] = SwiftStringObject(value: [String(i)])
         }
-        
+
         XCTAssertTrue(map.description.hasPrefix("Map<string, SwiftStringObject>"))
         XCTAssertTrue(map.description.contains("[3]: SwiftStringObject {\n\t\tstringCol = 3;\n\t}"))
     }
-    
-    func testAppendObject() {        
+
+    func testAppendObject() {
         guard let map = map else {
             fatalError("Test precondition failure")
         }

@@ -79,7 +79,7 @@ class SwiftObject: Object {
     let arrayCol = List<SwiftBoolObject>()
     let setCol = MutableSet<SwiftBoolObject>()
     let mapCol = Map<String, SwiftBoolObject>()
-    
+
     class func defaultValues() -> [String: Any] {
         return  [
             "boolCol": false,
@@ -99,7 +99,7 @@ class SwiftObject: Object {
             "uuidCol": UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
             "arrayCol": [],
             "setCol": [],
-            "mapCol": [:],
+            "mapCol": [:]
         ]
     }
 }

@@ -42,7 +42,7 @@ extension String: MapKeyType { }
 public final class Map<Key: RealmCollectionValue, Value: RealmCollectionValue>: RLMSwiftCollectionBase where Key: MapKeyType {
 
     public typealias Element = (Key, Value)
-    
+
     // MARK: Properties
 
     /// The Realm which manages the map, or `nil` if the map is unmanaged.
@@ -165,7 +165,8 @@ public final class Map<Key: RealmCollectionValue, Value: RealmCollectionValue>: 
         fatalError("Not implemented in Map")
     }
 
-    public func sorted<S>(by sortDescriptors: S) -> Results<(Key, Value)> where S : Sequence, S.Element == SortDescriptor {
+    public func sorted<S>(by sortDescriptors: S) -> Results<(Key, Value)>
+        where S: Sequence, S.Element == SortDescriptor {
         fatalError("Not implemented in Map")
     }
 
@@ -217,7 +218,6 @@ public final class Map<Key: RealmCollectionValue, Value: RealmCollectionValue>: 
     public func average<T: AddableType>(ofProperty property: String) -> T? {
         return _rlmCollection.average(ofProperty: property).map(dynamicBridgeCast)
     }
-    
 
     // MARK: Mutation
 
@@ -231,7 +231,7 @@ public final class Map<Key: RealmCollectionValue, Value: RealmCollectionValue>: 
 //    public func insert(_ object: Element) {
 //        rlmDictionary.add(dynamicBridgeCast(fromSwift: object) as AnyObject)
 //    }
-
+//
 //    /**
 //     Inserts the given sequence of objects into the set if not already present.
 //
@@ -278,7 +278,7 @@ public final class Map<Key: RealmCollectionValue, Value: RealmCollectionValue>: 
             rlmDictionary.setObject(dynamicBridgeCast(fromSwift: newValue) as AnyObject, for: dynamicBridgeCast(fromSwift: key) as! RLMDictionaryKey)
         }
     }
-    
+
     public subscript(key: (Key, Value)) -> Value? {
         get {
             fatalError()
@@ -375,7 +375,7 @@ public final class Map<Key: RealmCollectionValue, Value: RealmCollectionValue>: 
     @objc class func _unmanagedCollection() -> RLMDictionary<AnyObject, AnyObject> {
         return Value._rlmDictionary()
     }
-    
+
     /**
      Returns a human-readable description of the objects contained in the Map.
      */
@@ -386,6 +386,42 @@ public final class Map<Key: RealmCollectionValue, Value: RealmCollectionValue>: 
     @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
         return RLMDictionaryDescriptionWithMaxDepth("Map", rlmDictionary, depth)
     }
+
+//    @objc
+//    public override func countByEnumerating(with state: UnsafeMutablePointer<NSFastEnumerationState>, objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>, count len: UInt) -> UInt {
+//        
+//        var theState = state.pointee
+//        if theState.state != 0 {
+//            return 0
+//        }
+//
+//        // We need to enumerate a copy of the backing dictionary so that it doesn't
+//        // reflect changes made during enumeration. This copy has to be autoreleased
+//        // (since there's nowhere for us to store a strong reference), and uses
+//        // RLMDictionaryHolder rather than an NSDictionary because NSDictionary doesn't guarantee
+//        // that it'll use a single contiguous block of memory, and if it doesn't
+//        // we'd need to forward multiple calls to this method to the same NSArray,
+//        // which would require holding a reference to it somewhere.
+//        var copy: RLMDictionaryHolder = RLMDictionaryHolder()
+//        copy->items = std::make_unique<id[]>(_backingCollection.count);
+//
+//    //    std::vector<std::pair<id<RLMDictionaryKey>, id>> pairs;
+//        NSUInteger i = 0;
+//        if ([_backingCollection isKindOfClass:[NSDictionary class]]) {
+//            for (id key in _backingCollection) {
+//        //        copy->items[i++] = std::make_pair(key, _backingCollection[key]);
+//                copy->items[i++] = (key, _backingCollection[key]);
+//            }
+//        }
+//        state->itemsPtr = (__unsafe_unretained id *)(void *)copy->items.get();
+//    //    state->itemsPtr = (__unsafe_unretained id *)(void *)(&pairs[0]);
+//        // needs to point to something valid, but the whole point of this is so
+//        // that it can't be changed
+//        state->mutationsPtr = state->extra;
+//        state->state = i;
+//
+//        return i;
+//    }
 }
 
 extension Map where Value: MinMaxType {
@@ -421,15 +457,14 @@ extension Map where Value: AddableType {
 }
 
 extension Map: RealmCollection {
-    
     public typealias Index = Int
     public typealias Indices = Range<Int>
     public typealias SubSequence = Slice<Map>
-    
+
     public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
         fatalError()
     }
-    
+
     public func index(matching predicate: NSPredicate) -> Int? {
         fatalError()
     }
@@ -523,8 +558,8 @@ extension Map: AssistedObjectiveCBridgeable {
         return (objectiveCValue: _rlmCollection, metadata: nil)
     }
 }
-
-extension Map {
+//
+//extension Map {
 //    public func filter(_ predicate: NSPredicate) -> Results<(Key, Value)> {
 //        return Results<(Key, Value)>(_rlmCollection.objects(with: predicate))
 //    }
@@ -536,7 +571,7 @@ extension Map {
 //    public func sorted<S>(by sortDescriptors: S) -> Results<(Key, Value)> where S : Sequence, S.Element == SortDescriptor {
 //        fatalError("Not implemented in Map")
 //    }
-
+//
 //    public subscript(key: (Key, Value)) -> Value? {
 //        get {
 //            let value = rlmDictionary.object(for: key.1 as! RLMDictionaryKey) as? Value
@@ -546,19 +581,19 @@ extension Map {
 //            rlmDictionary.setObject(dynamicBridgeCast(fromSwift: newValue) as AnyObject, for: dynamicBridgeCast(fromSwift: key.0) as! RLMDictionaryKey)
 //        }
 //    }
-    
+//
 //    public func makeIterator() -> RLMMapIterator<Key, Value> {
 //        return RLMMapIterator(collection: rlmDictionary)
 ////        return RLMIterator(collection: rlmDictionary)
 //    }
-    
+//
 //    public func _observe(_ queue: DispatchQueue?,
 //                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection<(Key, Value)>>) -> Void)
 //        -> NotificationToken {
 //        fatalError()
 ////        return rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
 //    }
-
+//
 //    public subscript(position: Int) -> (Key, Value) {
 //        let key = dynamicBridgeCast(fromObjectiveC: rlmDictionary.allKeys[position]) as Key
 //        let val = self[key]!
@@ -570,13 +605,12 @@ extension Map {
 ////        let val = self[key]!
 ////        return MapElement(key: key, value: val)
 //    }
-
+//
 //    public func index(of object: (Key, Value)) -> Int? {
 //        fatalError()
 //    }
-    
+//
 //    static func == (lhs: Map<Key, Value>, rhs: Map<Key, Value>) -> Bool {
 //        return lhs.keys == rhs.keys && lhs.values == rhs.values
 //    }
-
-}
+//}
