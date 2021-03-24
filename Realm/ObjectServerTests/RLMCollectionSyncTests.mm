@@ -210,17 +210,6 @@
                     callerName:NSStringFromSelector(_cmd)];
 }
 
-- (void)testAnySet {
-    [self roundTripWithKeyPath:@"anySet"
-                        values:@[@123, @"Hey", NSNull.null]
-                  otherKeyPath:@"otherAnySet"
-                   otherValues:@[[[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd"],
-                                 @123,
-                                 [[RLMObjectId alloc] initWithString:@"6058f12682b2fbb1f334ef1d" error:nil]]
-                      isObject:NO
-                    callerName:NSStringFromSelector(_cmd)];
-}
-
 - (void)testObjectSet {
     [self roundTripWithKeyPath:@"objectSet"
                         values:@[[Person john], [Person paul], [Person ringo]]
@@ -386,15 +375,6 @@
                         values:@[[[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd"],
                                  [[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe"],
                                  [[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff"]]
-                      isObject:NO
-                    callerName:NSStringFromSelector(_cmd)];
-}
-
-- (void)testAnyArray {
-    [self roundTripWithKeyPath:@"anyArray"
-                        values:@[@1234,
-                                 @"I'm a String",
-                                 NSNull.null]
                       isObject:NO
                     callerName:NSStringFromSelector(_cmd)];
 }
