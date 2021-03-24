@@ -17,29 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncTestCase.h"
-//#import "RLMUser+ObjectServerTests.h"
-
-//#import "RLMApp_Private.hpp"
-//#import "RLMBSON_Private.hpp"
-//#import "RLMCredentials.h"
-//#import "RLMObjectSchema_Private.hpp"
-//#import "RLMRealm+Sync.h"
-//#import "RLMRealmConfiguration_Private.h"
-//#import "RLMRealmUtil.hpp"
-//#import "RLMRealm_Dynamic.h"
-//#import "RLMRealm_Private.hpp"
-//#import "RLMSchema_Private.h"
-//#import "RLMSyncConfiguration_Private.h"
-//#import "RLMSyncManager_Private.hpp"
-//#import "RLMSyncUtil_Private.h"
-//#import "RLMUser_Private.hpp"
-//#import "RLMWatchTestUtility.h"
-
-//#import <realm/object-store/shared_realm.hpp>
-//#import <realm/object-store/sync/sync_manager.hpp>
-//#import <realm/util/file.hpp>
 
 #if TARGET_OS_OSX
+
+#pragma mark RLMSet Sync Tests
 
 @interface RLMSetObjectServerTests : RLMSyncTestCase
 @end
@@ -71,7 +52,7 @@
             [self waitForDownloadsForRealm:realm];
             CHECK_COUNT(1, RLMSetSyncObject, realm);
             RLMResults<RLMSetSyncObject *> *results
-                = [RLMSetSyncObject allObjectsInRealm:realm];
+            = [RLMSetSyncObject allObjectsInRealm:realm];
             RLMSetSyncObject *obj = results.firstObject;
 
             XCTAssertEqual(((RLMSet *)obj[keyPath]).count, values.count);
@@ -98,7 +79,7 @@
             [self waitForExpectationsWithTimeout:30.0 handler:nil];
         } else {
             RLMResults<RLMSetSyncObject *> *results
-                = [RLMSetSyncObject allObjectsInRealm:realm];
+            = [RLMSetSyncObject allObjectsInRealm:realm];
             if (RLMSetSyncObject *obj = results.firstObject) {
                 if (((RLMSet *)obj[keyPath]).count == 0) {
                     [realm transactionWithBlock:^{
@@ -165,20 +146,20 @@
         NSMutableData* data = [NSMutableData dataWithCapacity:size];
         for( unsigned int i = 0 ; i < size/4 ; ++i )
         {
-          u_int64_t randomBits = arc4random();
-          [data appendBytes:(void*)&randomBits length:4];
+            u_int64_t randomBits = arc4random();
+            [data appendBytes:(void*)&randomBits length:4];
         }
         return data;
     };
 
     NSData *duplicateData = createData(1024U);
 
-//    [self roundTripWithKeyPath:@"dataSet"
-//                        values:@[duplicateData, createData(1024U), createData(1024U)]
-//                  otherKeyPath:@"otherDataSet"
-//                   otherValues:@[duplicateData, createData(1024U), createData(1024U)]
-//                      isObject:NO
-//                    callerName:NSStringFromSelector(_cmd)];
+    //    [self roundTripWithKeyPath:@"dataSet"
+    //                        values:@[duplicateData, createData(1024U), createData(1024U)]
+    //                  otherKeyPath:@"otherDataSet"
+    //                   otherValues:@[duplicateData, createData(1024U), createData(1024U)]
+    //                      isObject:NO
+    //                    callerName:NSStringFromSelector(_cmd)];
 }
 
 - (void)testDoubleSet {
@@ -251,6 +232,7 @@
 
 @end
 
+#pragma mark RLMArray Sync Tests
 
 @interface RLMArrayObjectServerTests : RLMSyncTestCase
 @end
@@ -280,7 +262,7 @@
             [self waitForDownloadsForRealm:realm];
             CHECK_COUNT(1, RLMArraySyncObject, realm);
             RLMResults<RLMArraySyncObject *> *results
-                = [RLMArraySyncObject allObjectsInRealm:realm];
+            = [RLMArraySyncObject allObjectsInRealm:realm];
             RLMArraySyncObject *obj = results.firstObject;
             XCTAssertEqual(((RLMArray *)obj[keyPath]).count, values.count*2);
             for (int i = 0; i < values.count; i++) {
@@ -306,7 +288,7 @@
             }
         } else {
             RLMResults<RLMArraySyncObject *> *results
-                = [RLMArraySyncObject allObjectsInRealm:realm];
+            = [RLMArraySyncObject allObjectsInRealm:realm];
             if (RLMArraySyncObject *obj = results.firstObject) {
                 if (((RLMArray *)obj[keyPath]).count == 0) {
                     [realm transactionWithBlock:^{
@@ -411,8 +393,8 @@
 - (void)testAnyArray {
     [self roundTripWithKeyPath:@"anyArray"
                         values:@[@1234,
-                                @"I'm a String",
-                                NSNull.null]
+                                 @"I'm a String",
+                                 NSNull.null]
                       isObject:NO
                     callerName:NSStringFromSelector(_cmd)];
 }

@@ -217,7 +217,8 @@ let package = Package(
             sources: [
                 "RLMBSONTests.mm",
                 "RLMObjectServerTests.mm",
-                "RLMWatchTestUtility.m"
+                "RLMWatchTestUtility.m",
+                "RLMCollectionSyncTests.mm"
             ],
             cxxSettings: testCxxSettings
         )

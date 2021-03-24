@@ -892,7 +892,7 @@ public class RealmServer: NSObject {
             "relationships": [:]
         ], failOnError)
 
-        rules.post(on: group, swiftTypesSyncObjectRule, failOnError)
+//        rules.post(on: group, swiftTypesSyncObjectRule, failOnError)
 
         app.sync.config.put(on: group, data: [
             "development_mode_enabled": true
