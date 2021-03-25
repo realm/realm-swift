@@ -23,10 +23,15 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMObjectBase, RLMProperty;
 @protocol RLMValue;
 
+/// This class implements the backing storage for `RealmProperty<>`. It is not intended that this class be
+/// subclassed or used directly.
 @interface RLMPropertyBase : NSObject
 
 @property (nonatomic, nullable) id value NS_REFINED_FOR_SWIFT;
 
+/// Hands over the backing storage to managed accessors.
+/// @param parent The enclosing parent Realm Object of this class.
+/// @param property The property on the Realm Object that represents this class.
 - (void)attachWithParent:(RLMObjectBase *)parent
                 property:(RLMProperty *)property;
 

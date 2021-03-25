@@ -103,16 +103,6 @@
 
 @end
 
-#pragma mark RLMObject
-
-@implementation RLMObject (RLMValue)
-
-- (RLMPropertyType)rlm_valueType {
-    return RLMPropertyTypeObject;
-}
-
-@end
-
 #pragma mark RLMObjectBase
 
 @implementation RLMObjectBase (RLMValue)

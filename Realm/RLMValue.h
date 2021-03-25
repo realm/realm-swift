@@ -95,10 +95,6 @@
 @end
 
 /// :nodoc:
-@interface RLMObject (RLMValue)<RLMValue>
-@end
-
-/// :nodoc:
 @interface RLMObjectBase (RLMValue)<RLMValue>
 @end
 
