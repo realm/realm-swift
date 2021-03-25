@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
-#include <objc/runtime.h>
 
 static NSDate *date(int i) {
     return [NSDate dateWithTimeIntervalSince1970:i];

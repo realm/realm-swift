@@ -21,7 +21,6 @@ import Foundation
 import Realm
 
 public extension ObjectiveCSupport {
-
     static func convert(value: AnyRealmValue?) -> RLMValue? {
         switch value {
         case let .int(i):

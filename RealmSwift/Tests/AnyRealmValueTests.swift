@@ -19,6 +19,7 @@
 import XCTest
 import Realm
 import RealmSwift
+// swiftlint:disable identifier_name
 
 class AnyRealmTypeObject: Object {
     var anyValue = RealmProperty<AnyRealmValue>()
@@ -86,7 +87,6 @@ class AnyRealmValueTests<T: Equatable, V: ValueFactory>: TestCase {
                 return \AnyRealmValue.uuidValue as! KeyPath<AnyRealmValue, T?>
         default:
                 fatalError()
-                break
         }
     }
 

@@ -139,7 +139,7 @@ public enum AnyRealmValue: Hashable {
         return o as? T
     }
 
-    internal var _rlmValue: RLMValue? {
+    internal var rlmValue: RLMValue? {
         ObjectiveCSupport.convert(value: self)
     }
 

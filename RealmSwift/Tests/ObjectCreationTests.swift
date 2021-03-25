@@ -1428,7 +1428,7 @@ class ObjectCreationTests: TestCase {
         case .object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
         case .objectId: return ["invalid", 123]
         case .decimal128: return ["invalid"]
-        case .any:      return [List<String>()]
+        case .any: return [List<String>()]
         case .linkingObjects: fatalError("not supported")
         case .UUID: return ["invalid"]
         }
