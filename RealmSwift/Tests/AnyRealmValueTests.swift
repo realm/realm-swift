@@ -538,7 +538,11 @@ class MinMaxAnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: Primitive
 
 class AddableAnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T == AnyRealmValue {
     func testSum() {
-        XCTAssertEqual(array.sum().intValue, nil)
+        if O.isManaged() {
+            XCTAssertEqual(array.sum().intValue, nil)
+        } else {
+            XCTAssertEqual(array.sum().intValue, 0)
+        }
         array.append(objectsIn: values)
 
         let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber)
@@ -816,7 +820,11 @@ class MinMaxAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Pri
 
 class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T == AnyRealmValue {
     func testSum() {
-        XCTAssertEqual(mutableSet.sum().intValue, nil)
+        if O.isManaged() {
+            XCTAssertEqual(mutableSet.sum().intValue, nil)
+        } else {
+            XCTAssertEqual(mutableSet.sum().intValue, 0)
+        }
         mutableSet.insert(objectsIn: values)
 
         let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber)
