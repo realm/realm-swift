@@ -82,18 +82,62 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let realm = try openRealm(partitionValue: #function, user: user)
             if isParent {
                 checkCount(expected: 0, realm, SwiftPerson.self)
+                checkCount(expected: 0, realm, SwiftUUIDPrimaryKeyObject.self)
                 executeChild()
                 waitForDownloads(for: realm)
                 checkCount(expected: 3, realm, SwiftPerson.self)
+                checkCount(expected: 1, realm, SwiftUUIDPrimaryKeyObject.self)
+
+                let swiftUUIDPrimaryKeyObject = realm.object(ofType: SwiftUUIDPrimaryKeyObject.self, forPrimaryKey: UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e"))!
+                XCTAssertEqual(swiftUUIDPrimaryKeyObject.strCol, "Steve")
+                XCTAssertEqual(swiftUUIDPrimaryKeyObject.intCol, 10)
             } else {
                 // Add objects
                 try realm.write {
                     realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
                     realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
                     realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                    realm.add(SwiftUUIDPrimaryKeyObject(strCol: "Steve", intCol: 10))
                 }
                 waitForUploads(for: realm)
                 checkCount(expected: 3, realm, SwiftPerson.self)
+                checkCount(expected: 1, realm, SwiftUUIDPrimaryKeyObject.self)
+            }
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    func testSwiftAddObjectWithUUIDPartitionValue() {
+        do {
+            let user = try logInUser(for: basicCredentials())
+            let realmUUIDPartition = try openRealm(partitionValue: UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!, user: user)
+            let realm = try openRealm(partitionValue: #function, user: user)
+            if isParent {
+                checkCount(expected: 0, realm, SwiftUUIDPrimaryKeyObject.self)
+                checkCount(expected: 0, realmUUIDPartition, SwiftUUIDPrimaryKeyObject.self)
+
+                executeChild()
+
+                waitForDownloads(for: realm)
+                waitForDownloads(for: realmUUIDPartition)
+
+                checkCount(expected: 1, realm, SwiftUUIDPrimaryKeyObject.self)
+                checkCount(expected: 1, realmUUIDPartition, SwiftUUIDPrimaryKeyObject.self)
+            } else {
+                try realm.write {
+                    realm.add(SwiftUUIDPrimaryKeyObject(strCol: "John", intCol: 10))
+                }
+
+                try realmUUIDPartition.write {
+                    realm.add(SwiftUUIDPrimaryKeyObject(strCol: "Chris", intCol: 20))
+                }
+                
+                waitForUploads(for: realm)
+                waitForUploads(for: realmUUIDPartition)
+
+                checkCount(expected: 1, realm, SwiftUUIDPrimaryKeyObject.self)
+                checkCount(expected: 1, realmUUIDPartition, SwiftUUIDPrimaryKeyObject.self)
             }
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
@@ -160,6 +204,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let partitionValueA = #function
         let partitionValueB = "\(#function)bar"
         let partitionValueC = "\(#function)baz"
+        let partitionValueUUID = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
 
         do {
             let user = try logInUser(for: basicCredentials())
@@ -167,25 +212,30 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let realmA = try openRealm(partitionValue: partitionValueA, user: user)
             let realmB = try openRealm(partitionValue: partitionValueB, user: user)
             let realmC = try openRealm(partitionValue: partitionValueC, user: user)
+            let realmUUID = try openRealm(partitionValue: partitionValueUUID, user: user)
 
             if self.isParent {
                 checkCount(expected: 0, realmA, SwiftPerson.self)
                 checkCount(expected: 0, realmB, SwiftPerson.self)
                 checkCount(expected: 0, realmC, SwiftPerson.self)
+                checkCount(expected: 0, realmUUID, SwiftPerson.self)
                 executeChild()
 
                 waitForDownloads(for: realmA)
                 waitForDownloads(for: realmB)
                 waitForDownloads(for: realmC)
+                waitForDownloads(for: realmUUID)
 
                 checkCount(expected: 3, realmA, SwiftPerson.self)
                 checkCount(expected: 2, realmB, SwiftPerson.self)
                 checkCount(expected: 5, realmC, SwiftPerson.self)
+                checkCount(expected: 1, realmUUID, SwiftPerson.self)
 
-                XCTAssertEqual(realmA.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count,
-                               1)
-                XCTAssertEqual(realmB.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count,
-                               0)
+                XCTAssertEqual(realmA.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count, 1)
+                XCTAssertEqual(realmB.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count, 0)
+
+                XCTAssertEqual(realmUUID.objects(SwiftPerson.self).filter("firstName == %@", "John").count, 1)
+                XCTAssertEqual(realmUUID.objects(SwiftPerson.self).filter("lastname == %@", "Lennon").count, 0)
             } else {
                 // Add objects.
                 try realmA.write {
@@ -204,14 +254,19 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     realmC.add(SwiftPerson(firstName: "George", lastName: "Harrison"))
                     realmC.add(SwiftPerson(firstName: "Pete", lastName: "Best"))
                 }
+                try realmUUID.write {
+                    realmUUID.add(SwiftPerson(firstName: "John", lastName: "Wightman"))
+                }
 
                 waitForUploads(for: realmA)
                 waitForUploads(for: realmB)
                 waitForUploads(for: realmC)
+                waitForUploads(for: realmUUID)
 
                 checkCount(expected: 3, realmA, SwiftPerson.self)
                 checkCount(expected: 2, realmB, SwiftPerson.self)
                 checkCount(expected: 5, realmC, SwiftPerson.self)
+                checkCount(expected: 1, realmUUID, SwiftPerson.self)
             }
         } catch {
             XCTFail(error.localizedDescription)
