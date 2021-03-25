@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMValueBase.h"
+#import "RLMPropertyBase.h"
 
 #import "RLMAccessor.hpp"
 #import "RLMObject_Private.hpp"
@@ -27,7 +27,7 @@
 
 #import <realm/object-store/object.hpp>
 
-@implementation RLMValueBase {
+@implementation RLMPropertyBase {
     id<RLMValue> _backingValue;
     __weak RLMObjectBase *_parent;
     NSString *_propertyName;
@@ -85,12 +85,16 @@
     _backingValue = nil;
 }
 
+- (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {
+    return @"Fixme";
+}
+
 @end
 
-@interface RLMValueBase (RLMValue)<RLMValue>
+@interface RLMPropertyBase (RLMValue)<RLMValue>
 @end
 
-@implementation RLMValueBase (RLMValue)
+@implementation RLMPropertyBase (RLMValue)
 
 - (RLMPropertyType)rlm_valueType {
     return [_backingValue rlm_valueType];

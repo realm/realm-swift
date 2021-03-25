@@ -481,8 +481,8 @@ class ObjectTests: TestCase {
         let boolObject = SwiftBoolObject(value: [true])
 
         setter(object, boolObject, "anyCol")
-        assertEqual((getter(object, "anyCol") as! RealmProperty<AnyRealmValue>).value.objectValue(SwiftBoolObject.self)!, boolObject)
-        XCTAssertEqual((getter(object, "anyCol") as! RealmProperty<AnyRealmValue>).value.objectValue(SwiftBoolObject.self)!.boolCol, true)
+        assertEqual((getter(object, "anyCol") as! RealmProperty<AnyRealmValue>).value.object(SwiftBoolObject.self)!, boolObject)
+        XCTAssertEqual((getter(object, "anyCol") as! RealmProperty<AnyRealmValue>).value.object(SwiftBoolObject.self)!.boolCol, true)
 
         setter(object, boolObject, "objectCol")
         assertEqual(getter(object, "objectCol") as? SwiftBoolObject, boolObject)

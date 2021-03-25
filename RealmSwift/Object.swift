@@ -728,9 +728,7 @@ extension RealmOptional: _ManagedPropertyType where Value: _ManagedPropertyType 
 extension RealmProperty: _ManagedPropertyType where Value: _ManagedPropertyType {
     // swiftlint:disable:next identifier_name
     public static func _rlmProperty(_ prop: RLMProperty) {
-        if Value.self is Optional<OptionalRealmPropertyType>.Type {
-            prop.optional = true
-        }
+        prop.optional = false
         Value._rlmProperty(prop)
     }
     // swiftlint:disable:next identifier_name

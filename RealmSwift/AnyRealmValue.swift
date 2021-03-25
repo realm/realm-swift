@@ -132,7 +132,7 @@ public enum AnyRealmValue: Hashable {
     /// - Parameter objectType: The type of the Object to return.
     /// - Returns: A Realm Object of the supplied type if that is what the underlying value is,
     /// otherwise `nil` is returned.
-    public func objectValue<T: Object>(_ objectType: T.Type) -> T? {
+    public func object<T: Object>(_ objectType: T.Type) -> T? {
         guard case let .object(o) = self else {
             return nil
         }

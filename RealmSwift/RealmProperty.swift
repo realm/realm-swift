@@ -28,7 +28,7 @@ import Realm
  - Note:
  An `RealmProperty` should not be declared as `@objc dynamic` on a Realm Object. Use `let` instead.
  */
-public final class RealmProperty<Value: RealmPropertyType>: RLMValueBase {
+public final class RealmProperty<Value: RealmPropertyType>: RLMPropertyBase {
     /**
      Used for getting / setting the underlying value.
 
@@ -52,11 +52,6 @@ public final class RealmProperty<Value: RealmPropertyType>: RLMValueBase {
         get {
             dynamicBridgeCast(fromObjectiveC: rlmValue ?? NSNull())
         }
-    }
-
-    internal convenience init(value: RLMValue?) {
-        self.init()
-        rlmValue = value
     }
 
     // Used for when retrieving an AnyRealmValue via KVC

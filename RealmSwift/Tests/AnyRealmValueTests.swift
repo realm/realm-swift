@@ -130,18 +130,18 @@ class AnyRealmValueObjectTests: TestCase {
         let so = SwiftStringObject()
         so.stringCol = "hello"
         o.anyValue.value = .object(so)
-        XCTAssertEqual(o.anyValue.value.objectValue(SwiftStringObject.self)!.stringCol, "hello")
-        o.anyValue.value.objectValue(SwiftStringObject.self)!.stringCol = "there"
-        XCTAssertEqual(o.anyValue.value.objectValue(SwiftStringObject.self)!.stringCol, "there")
+        XCTAssertEqual(o.anyValue.value.object(SwiftStringObject.self)!.stringCol, "hello")
+        o.anyValue.value.object(SwiftStringObject.self)!.stringCol = "there"
+        XCTAssertEqual(o.anyValue.value.object(SwiftStringObject.self)!.stringCol, "there")
         let realm = realmWithTestPath()
         try! realm.write {
             realm.add(o)
         }
-        XCTAssertEqual(o.anyValue.value.objectValue(SwiftStringObject.self)!.stringCol, "there")
+        XCTAssertEqual(o.anyValue.value.object(SwiftStringObject.self)!.stringCol, "there")
         try! realm.write {
-            o.anyValue.value.objectValue(SwiftStringObject.self)!.stringCol = "bye!"
+            o.anyValue.value.object(SwiftStringObject.self)!.stringCol = "bye!"
         }
-        XCTAssertEqual(o.anyValue.value.objectValue(SwiftStringObject.self)!.stringCol, "bye!")
+        XCTAssertEqual(o.anyValue.value.object(SwiftStringObject.self)!.stringCol, "bye!")
     }
 
     func testAssortment() {
@@ -178,7 +178,7 @@ class AnyRealmValueObjectTests: TestCase {
         try! realm.write {
             o.anyValue.value = .object(so)
         }
-        XCTAssertEqual(o.anyValue.value.objectValue(SwiftStringObject.self)!.stringCol, "hello")
+        XCTAssertEqual(o.anyValue.value.object(SwiftStringObject.self)!.stringCol, "hello")
     }
 
     private func testVariation<T: Equatable>(object: AnyRealmTypeObject,
@@ -744,16 +744,16 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primitive
         otherMutableSet.insert(values[2])
         mutableSet.formUnion(otherMutableSet)
         XCTAssertEqual(Int(3), mutableSet.count)
-        if values[0].objectValue(SwiftStringObject.self) != nil {
+        if values[0].object(SwiftStringObject.self) != nil {
             XCTAssertTrue(values.map {
-                $0.objectValue(SwiftStringObject.self)?.stringCol
-            }.contains(mutableSet[0].objectValue(SwiftStringObject.self)?.stringCol))
+                $0.object(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[0].object(SwiftStringObject.self)?.stringCol))
             XCTAssertTrue(values.map {
-                $0.objectValue(SwiftStringObject.self)?.stringCol
-            }.contains(mutableSet[1].objectValue(SwiftStringObject.self)?.stringCol))
+                $0.object(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[1].object(SwiftStringObject.self)?.stringCol))
             XCTAssertTrue(values.map {
-                $0.objectValue(SwiftStringObject.self)?.stringCol
-            }.contains(mutableSet[2].objectValue(SwiftStringObject.self)?.stringCol))
+                $0.object(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[2].object(SwiftStringObject.self)?.stringCol))
         } else {
             XCTAssertTrue(values.map { $0 }.contains(mutableSet[0]))
             XCTAssertTrue(values.map { $0 }.contains(mutableSet[1]))
@@ -776,16 +776,16 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primitive
 
     func testSubscript() {
         mutableSet.insert(objectsIn: values)
-        if values[0].objectValue(SwiftStringObject.self) != nil {
+        if values[0].object(SwiftStringObject.self) != nil {
             XCTAssertTrue(values.map {
-                $0.objectValue(SwiftStringObject.self)?.stringCol
-            }.contains(mutableSet[0].objectValue(SwiftStringObject.self)?.stringCol))
+                $0.object(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[0].object(SwiftStringObject.self)?.stringCol))
             XCTAssertTrue(values.map {
-                $0.objectValue(SwiftStringObject.self)?.stringCol
-            }.contains(mutableSet[1].objectValue(SwiftStringObject.self)?.stringCol))
+                $0.object(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[1].object(SwiftStringObject.self)?.stringCol))
             XCTAssertTrue(values.map {
-                $0.objectValue(SwiftStringObject.self)?.stringCol
-            }.contains(mutableSet[2].objectValue(SwiftStringObject.self)?.stringCol))
+                $0.object(SwiftStringObject.self)?.stringCol
+            }.contains(mutableSet[2].object(SwiftStringObject.self)?.stringCol))
         } else {
             XCTAssertTrue(values.map { $0 }.contains(mutableSet[0]))
             XCTAssertTrue(values.map { $0 }.contains(mutableSet[1]))

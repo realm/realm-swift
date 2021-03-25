@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMObjectBase, RLMProperty;
 @protocol RLMValue;
 
-@interface RLMValueBase : NSObject
+@interface RLMPropertyBase : NSObject
 
 @property (nonatomic, nullable) id rlmValue;
 

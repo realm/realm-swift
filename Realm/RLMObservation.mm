@@ -26,7 +26,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSet_Private.hpp"
 #import "RLMSwiftCollectionBase.h"
-#import "RLMValueBase.h"
+#import "RLMPropertyBase.h"
 
 #import <realm/group.hpp>
 
@@ -200,7 +200,7 @@ void RLMObservationInfo::recordObserver(realm::Obj& objectRow, RLMClassInfo *obj
     else if (auto swiftIvar = prop.swiftIvar) {
         if (auto optional = RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, swiftIvar))) {
             RLMInitializeUnmanagedOptional(optional, object, prop);
-        } else if (auto value = RLMDynamicCast<RLMValueBase>(object_getIvar(object, swiftIvar))) {
+        } else if (auto value = RLMDynamicCast<RLMPropertyBase>(object_getIvar(object, swiftIvar))) {
             [value attachWithParent:object property:prop];
         }
     }

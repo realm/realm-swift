@@ -32,7 +32,7 @@
 #import "RLMSwiftCollectionBase.h"
 #import "RLMUtil.hpp"
 #import "RLMUUID_Private.hpp"
-#import "RLMValueBase.h"
+#import "RLMPropertyBase.h"
 
 #import <realm/object-store/results.hpp>
 #import <realm/object-store/property.hpp>
@@ -744,8 +744,8 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
         if (prop.collection) {
             return static_cast<RLMSwiftCollectionBase *>(object_getIvar(obj, prop.swiftIvar))._rlmCollection;
         }
-        else if (prop.type == RLMPropertyTypeAny) { // mixed
-            value = static_cast<RLMValueBase *>(object_getIvar(obj, prop.swiftIvar)).rlmValue;
+        else if (prop.type == RLMPropertyTypeAny || RLMDynamicCast<RLMPropertyBase>(object_getIvar(obj, prop.swiftIvar)) != nil) { // mixed
+            value = static_cast<RLMPropertyBase *>(object_getIvar(obj, prop.swiftIvar)).rlmValue;
         } else { // optional
             value = RLMGetOptional(static_cast<RLMOptionalBase *>(object_getIvar(obj, prop.swiftIvar)));
         }

@@ -75,7 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 RLM_COLLECTION_TYPE(Person);
 @interface RLMArraySyncObject: RLMObject
-@property RLMObjectId      *_id;
+@property RLMObjectId *_id;
 @property RLMArray<RLMInt> *intArray;
 @property RLMArray<RLMBool> *boolArray;
 @property RLMArray<RLMString> *stringArray;
@@ -90,7 +90,7 @@ RLM_COLLECTION_TYPE(Person);
 @end
 
 @interface RLMSetSyncObject: RLMObject
-@property RLMObjectId      *_id;
+@property RLMObjectId *_id;
 @property RLMSet<RLMInt> *intSet;
 @property RLMSet<RLMBool> *boolSet;
 @property RLMSet<RLMString> *stringSet;

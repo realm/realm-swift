@@ -104,7 +104,7 @@ let package = Package(
                 "Realm/RLMUtil.mm",
                 "Realm/RLMUUID.mm",
                 "Realm/RLMValue.mm",
-                "Realm/RLMValueBase.mm",
+                "Realm/RLMPropertyBase.mm",
 
                 // Sync source files
                 "Realm/NSError+RLMSync.m",

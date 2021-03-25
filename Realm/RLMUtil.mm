@@ -26,7 +26,7 @@
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
-#import "RLMValueBase.h"
+#import "RLMPropertyBase.h"
 #import "RLMSchema_Private.h"
 #import "RLMSet_Private.hpp"
 #import "RLMSwiftCollectionBase.h"
@@ -391,7 +391,7 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
     }
 
     RLMPropertyType type;
-    if ([v isKindOfClass:[RLMValueBase class]]) {
+    if ([v isKindOfClass:[RLMPropertyBase class]]) {
         v = [v rlmValue];
         type = [v rlm_valueType];
     }
