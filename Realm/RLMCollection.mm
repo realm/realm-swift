@@ -125,14 +125,19 @@ static const int RLMEnumerationBufferSize = 16;
 
     @autoreleasepool {
         RLMAccessorContext ctx(*_info);
-        for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
-//            if ([_collection isKindOfClass:[RLMDictionary class]]) {
-//                _strongBuffer[batchCount] = ctx.box(_results->get_dictionary_element(index).first);
-//            }
-//            else {
+
+        if ([_collection isKindOfClass:[RLMDictionary class]]) {
+            NSMutableSet<NSString *> *dictKeys = [NSMutableSet new];
+            for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
+                auto element = _results->get_dictionary_element(index);
+                _strongBuffer[batchCount] = RLMStringDataToNSString(element.first);
+                batchCount++;
+            }
+        } else {
+            for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
                 _strongBuffer[batchCount] = _results->get(ctx, index);
-//            }
-            batchCount++;
+                batchCount++;
+            }
         }
     }
 
@@ -165,7 +170,11 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     if (state->state == 0) {
         enumerator = collection.fastEnumerator;
         state->extra[0] = (long)enumerator;
-        state->extra[1] = collection.count;
+        if (RLMDictionary *dict = RLMDynamicCast<RLMDictionary>(collection)) {
+            state->extra[1] = dict.allKeys.count;
+        } else {
+            state->extra[1] = collection.count;
+        }
     }
     else {
         enumerator = (__bridge id)(void *)state->extra[0];

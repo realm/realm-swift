@@ -46,11 +46,11 @@ class SwiftMapTests: RLMTestCase {
         var totalSum: Int = 0
 
         XCTAssertTrue(false)
-//        for val in company.employeeMap! {
-//            if let employee = val as? SwiftRLMEmployeeObject {
-//                totalSum += employee.age
-//            }
-//        }
+        for val in company.employeeMap! {
+            if let employee = val as? SwiftRLMEmployeeObject {
+                totalSum += employee.age
+            }
+        }
 
         XCTAssertEqual(totalSum, 95, "total sum should be 95")
     }

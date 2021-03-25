@@ -48,8 +48,8 @@
     RLMDictionary *dictionaryProp = dict.stringDictionary;
     RLMAssertThrowsWithReasonMatching([dictionaryProp setObject:obj forKey:@"four"], @"write transaction");
 
-    for (StringObject *obj in dictionaryProp) {
-        XCTAssertTrue(obj.description.length, @"Object should have description");
+    for (NSString *key in dictionaryProp) {
+        XCTAssertTrue(((RLMDictionary *)dictionaryProp[key]).description.length, @"Object should have description");
     }
 }
 
