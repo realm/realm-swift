@@ -26,6 +26,22 @@ import RealmTestSupport
 import RealmSyncTestSupport
 #endif
 
+@objcMembers public class SwiftUUIDPrimaryKeyObject: Object {
+    @objc public dynamic var _id: UUID =  UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
+    @objc public dynamic var strCol: String = ""
+    @objc public dynamic var intCol: Int = 0
+
+    public convenience init(strCol: String, intCol: Int) {
+        self.init()
+        self.strCol = strCol
+        self.intCol = intCol
+    }
+
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
 public class SwiftPerson: Object {
     @objc public dynamic var _id: ObjectId? = ObjectId.generate()
     @objc public dynamic var firstName: String = ""
@@ -121,7 +137,8 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         var configuration = configuration
         if configuration.objectTypes == nil {
             configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self,
-                                         HugeSyncObject.self, SwiftCollectionSyncObject.self]
+                                         HugeSyncObject.self, SwiftCollectionSyncObject.self,
+                                         SwiftUUIDPrimaryKeyObject.self]
         }
         let realm = try Realm(configuration: configuration)
         waitForDownloads(for: realm)
@@ -169,6 +186,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
                                       file: StaticString = #file,
                                       line: UInt = #line) {
         let actual = realm.objects(type).count
+        print("---------> Count :\(actual), expected :\(expected)")
         XCTAssertEqual(actual, expected,
                        "Error: expected \(expected) items, but got \(actual) (process: \(isParent ? "parent" : "child"))",
             file: file,
