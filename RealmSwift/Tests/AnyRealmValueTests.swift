@@ -193,7 +193,13 @@ class AnyRealmValueObjectTests: TestCase {
         } else {
             object.anyValue.value = value
         }
-        XCTAssertEqual(object.anyValue.value[keyPath: keyPath], expected)
+        if let date = expected as? Date {
+            XCTAssertEqual(object.anyValue.value.dateValue!.timeIntervalSince1970,
+                           date.timeIntervalSince1970,
+                           accuracy: 1.0)
+        } else {
+            XCTAssertEqual(object.anyValue.value[keyPath: keyPath], expected)
+        }
     }
 }
 
@@ -639,7 +645,7 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primitive
             XCTAssertEqual(obj.stringCol, (o as! SwiftStringObject).stringCol)
         } else {
             let v = RealmProperty<AnyRealmValue>()
-            v.value = kvo as? RLMValue
+            v.__value = kvo as? RLMValue
             XCTAssertEqual(v.value, values[0])
         }
         assertThrows(mutableSet.value(forKey: "not self"), named: "NSUnknownKeyException")

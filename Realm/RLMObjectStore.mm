@@ -118,6 +118,11 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
                 id ivar = object_getIvar(object, prop.swiftIvar);
                 RLMInitializeManagedOptional(ivar, object, prop);
             }
+            continue;
+        } else if (prop.type == RLMPropertyTypeAny) {
+            if (RLMPropertyBase *valueBase = RLMDynamicCast<RLMPropertyBase>(object_getIvar(object, prop.swiftIvar))) {
+                [valueBase attachWithParent:object property:prop];
+            }
         }
     }
 }

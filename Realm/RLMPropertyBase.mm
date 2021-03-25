@@ -80,13 +80,6 @@
     _parent = parent;
     _propertyName = property.name;
     _managed = YES;
-
-    [self setValue:_backingValue];
-    _backingValue = nil;
-}
-
-- (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {
-    return @"Fixme";
 }
 
 @end

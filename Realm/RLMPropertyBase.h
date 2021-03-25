@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMPropertyBase : NSObject
 
-@property (nonatomic, nullable) id value;
+@property (nonatomic, nullable) id value NS_REFINED_FOR_SWIFT;
 
 - (void)attachWithParent:(RLMObjectBase *)parent
                 property:(RLMProperty *)property;
