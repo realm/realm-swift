@@ -34,7 +34,7 @@
     BOOL _managed;
 }
 
-- (void)setRlmValue:(id<RLMValue>)value {
+- (void)setValue:(id<RLMValue>)value {
     @autoreleasepool {
         if (_managed) {
             try {
@@ -55,7 +55,7 @@
     }
 }
 
-- (nullable id<RLMValue>)rlmValue {
+- (nullable id<RLMValue>)value {
     if (_managed) {
         try {
             @autoreleasepool {
@@ -81,7 +81,7 @@
     _propertyName = property.name;
     _managed = YES;
 
-    [self setRlmValue:_backingValue];
+    [self setValue:_backingValue];
     _backingValue = nil;
 }
 

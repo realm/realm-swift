@@ -392,7 +392,7 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
 
     RLMPropertyType type;
     if ([v isKindOfClass:[RLMPropertyBase class]]) {
-        v = [v rlmValue];
+        v = [v value];
         type = [v rlm_valueType];
     }
     else if ([v conformsToProtocol:@protocol(RLMValue)]) {

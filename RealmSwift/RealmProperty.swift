@@ -47,17 +47,17 @@ public final class RealmProperty<Value: RealmPropertyType>: RLMPropertyBase {
      */
     public var value: Value {
         set {
-            rlmValue = dynamicBridgeCast(fromSwift: newValue)
+            value = dynamicBridgeCast(fromSwift: newValue)
         }
         get {
-            dynamicBridgeCast(fromObjectiveC: rlmValue ?? NSNull())
+            dynamicBridgeCast(fromObjectiveC: value ?? NSNull())
         }
     }
 
     // Used for when retrieving an AnyRealmValue via KVC
     internal convenience init(value: RLMValue?, object: RLMObjectBase, property: RLMProperty) {
         self.init()
-        rlmValue = value
+        value = value
         attach(withParent: object, property: property)
     }
 }

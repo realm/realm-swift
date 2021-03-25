@@ -639,7 +639,7 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primitive
             XCTAssertEqual(obj.stringCol, (o as! SwiftStringObject).stringCol)
         } else {
             let v = RealmProperty<AnyRealmValue>()
-            v.rlmValue = kvo as? RLMValue
+            v.value = kvo as? RLMValue
             XCTAssertEqual(v.value, values[0])
         }
         assertThrows(mutableSet.value(forKey: "not self"), named: "NSUnknownKeyException")

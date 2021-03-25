@@ -215,9 +215,9 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
         }
         else if (auto valueBase = RLMDynamicCast<RLMPropertyBase>(object_getIvar(self, ivar))) {
             if (auto v = RLMDynamicCast<RLMPropertyBase>(value)) {
-                valueBase.rlmValue = v.rlmValue;
+                valueBase.value = v.value;
             } else {
-                valueBase.rlmValue = value;
+                valueBase.value = value;
             }
         }
         return;
