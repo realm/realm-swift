@@ -60,29 +60,22 @@ public final class RealmProperty<Value: RealmPropertyType>: RLMPropertyBase {
         __value = value
         attach(withParent: object, property: property)
     }
-
-    @objc public override var description: String {
-        """
-        \(String(describing: Self.self)) {
-        \tvalue: \(String(describing: __value))
-        }
-        """
-    }
 }
 
 /// A protocol describing types that can parameterize a `RealmPropertyType`.
-public protocol RealmPropertyType { }
+public protocol RealmPropertyType {}
+extension RealmPropertyType {}
 /// A protocol describing types that can be represented as optional in a `RealmProperty<>`
-internal protocol OptionalRealmPropertyType { }
+internal protocol OptionalRealmPropertyType {}
 
-extension AnyRealmValue: RealmPropertyType { }
-extension Optional: RealmPropertyType where Wrapped: OptionalRealmPropertyType { }
+extension AnyRealmValue: RealmPropertyType {}
+extension Optional: RealmPropertyType where Wrapped: OptionalRealmPropertyType {}
 
-extension Int: OptionalRealmPropertyType { }
-extension Int8: OptionalRealmPropertyType { }
-extension Int16: OptionalRealmPropertyType { }
-extension Int32: OptionalRealmPropertyType { }
-extension Int64: OptionalRealmPropertyType { }
-extension Float: OptionalRealmPropertyType { }
-extension Double: OptionalRealmPropertyType { }
-extension Bool: OptionalRealmPropertyType { }
+extension Int: OptionalRealmPropertyType {}
+extension Int8: OptionalRealmPropertyType {}
+extension Int16: OptionalRealmPropertyType {}
+extension Int32: OptionalRealmPropertyType {}
+extension Int64: OptionalRealmPropertyType {}
+extension Float: OptionalRealmPropertyType {}
+extension Double: OptionalRealmPropertyType {}
+extension Bool: OptionalRealmPropertyType {}

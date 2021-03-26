@@ -1482,8 +1482,7 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
             }];
         }];
         [migration enumerateObjects:AllTypesObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
-            
-            //XCTAssertEqualObjects([oldObject.description stringByReplacingOccurrencesOfString:@"before_" withString:@""], newObject.description);
+            XCTAssertEqualObjects([oldObject.description stringByReplacingOccurrencesOfString:@"before_" withString:@""], newObject.description);
         }];
     }];
     XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]);

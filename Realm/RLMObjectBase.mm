@@ -25,6 +25,7 @@
 #import "RLMObjectStore.h"
 #import "RLMObservation.hpp"
 #import "RLMOptionalBase.h"
+#import "RLMPropertyBase.h"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
@@ -33,7 +34,6 @@
 #import "RLMSwiftSupport.h"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
-#import "RLMPropertyBase.h"
 
 #import <realm/object-store/object.hpp>
 #import <realm/object-store/object_schema.hpp>
@@ -282,6 +282,19 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
             }
             NSString *dataDescription = [data description];
             sub = [NSString stringWithFormat:@"<%@ — %lu total bytes>", [dataDescription substringWithRange:NSMakeRange(1, dataDescription.length - 2)], (unsigned long)length];
+        }
+        else if (property.type == RLMPropertyTypeAny) {
+            if (auto base = RLMDynamicCast<RLMPropertyBase>(object)) {
+                if ([base.value respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
+                    sub = [base.value descriptionWithMaxDepth:depth - 1];
+                }
+                else {
+                    sub = [base.value description];
+                }
+            }
+            else {
+                sub = [object description];
+            }
         }
         else {
             sub = [object description];

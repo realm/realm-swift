@@ -2062,6 +2062,58 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
     }
 }
 
+class AnyRealmValueSyncTests: SwiftSyncTestCase {
+    /// The purpose of this test is to confirm that when an Object is set on a mixed Column and an old
+    /// version of an app does not have that Realm Object / Schema, we must fail gracefully and return nil
+    /// when calling `obj!.anyCol.value.object(Object.self)`
+    func testMissingSchema() {
+        do {
+            let user = try logInUser(for: basicCredentials())
+
+            if isParent {
+                executeChild()
+                // Imagine this is v1 of an app with just 2 classes, `SwiftMissingObject`
+                // did not exist when this version was shipped,
+                // but v2 managed to sync `SwiftMissingObject` to this Realm.
+                var configB = user.configuration(partitionValue: #function)
+                configB.objectTypes = [SwiftAnyRealmValueObject.self, SwiftPerson.self]
+                let realmB = try openRealm(configuration: configB)
+                let obj = realmB.objects(SwiftAnyRealmValueObject.self).first
+                // Because we have no schema information for `SwiftMissingObject`,
+                // expect `nil` to be returned
+                XCTAssertEqual(obj!.anyCol.value, .none)
+                XCTAssertNil(obj!.anyCol.value.object(Object.self))
+                // We expect to be able to access objects in the schema.
+                XCTAssertNotNil(obj!.otherAnyCol.value.object(SwiftPerson.self))
+                XCTAssertEqual(obj!.otherAnyCol.value.object(SwiftPerson.self)!.firstName, "Squidward")
+            } else {
+                // Imagine this is v2 of an app with 3 classes
+                var config = user.configuration(partitionValue: #function)
+                config.objectTypes = [SwiftPerson.self, SwiftAnyRealmValueObject.self, SwiftMissingObject.self]
+                let realm = try openRealm(configuration: config)
+                try realm.write {
+                    let so1 = SwiftPerson()
+                    so1.firstName = "Rick"
+                    so1.lastName = "Sanchez"
+                    let so2 = SwiftPerson()
+                    so2.firstName = "Squidward"
+                    so2.lastName = "Tentacles"
+                    let syncObj = SwiftMissingObject()
+                    syncObj.objectCol = so1
+                    syncObj.anyCol.value = .object(so1)
+                    let obj = SwiftAnyRealmValueObject()
+                    obj.anyCol.value = .object(syncObj)
+                    obj.otherAnyCol.value = .object(so2)
+                    realm.add(obj)
+                }
+                waitForUploads(for: realm)
+            }
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+}
+
 #if REALM_HAVE_COMBINE || !SWIFT_PACKAGE
 
 // XCTest doesn't care about the @available on the class and will try to run

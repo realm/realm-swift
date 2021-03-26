@@ -182,11 +182,16 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 }
 
 RLMObjectBase *RLMObjectFromObjLink(RLMRealm *realm, realm::ObjLink&& objLink) {
-    auto& info = realm->_info[objLink.get_table_key()];
-    RLMObjectBase *object = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, &info);
-    object->_row = realm.group.get_object(objLink);
-    RLMInitializeSwiftAccessorGenerics(object);
-    return object;
+    try {
+        auto& info = realm->_info[objLink.get_table_key()];
+        RLMObjectBase *object = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, &info);
+        object->_row = realm.group.get_object(objLink);
+        RLMInitializeSwiftAccessorGenerics(object);
+        return object;
+    }
+    catch (...) {
+        return nil;
+    }
 }
 
 void RLMDeleteObjectFromRealm(__unsafe_unretained RLMObjectBase *const object,

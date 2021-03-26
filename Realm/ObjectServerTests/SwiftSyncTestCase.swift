@@ -110,6 +110,24 @@ public class SwiftCollectionSyncObject: Object {
     }
 }
 
+public class SwiftAnyRealmValueObject: Object {
+    @objc public dynamic var _id: ObjectId? = ObjectId.generate()
+    public let anyCol = RealmProperty<AnyRealmValue>()
+    public let otherAnyCol = RealmProperty<AnyRealmValue>()
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
+public class SwiftMissingObject: Object {
+    @objc public dynamic var _id: ObjectId? = ObjectId.generate()
+    @objc public dynamic var objectCol: SwiftPerson?
+    public let anyCol = RealmProperty<AnyRealmValue>()
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
 public func randomString(_ length: Int) -> String {
     let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     return String((0..<length).map { _ in letters.randomElement()! })
