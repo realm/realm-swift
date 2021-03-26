@@ -152,13 +152,12 @@
     };
 
     NSData *duplicateData = createData(1024U);
-    // FIXME: Failing on sync step
-    //    [self roundTripWithKeyPath:@"dataSet"
-    //                        values:@[duplicateData, createData(1024U), createData(1024U)]
-    //                  otherKeyPath:@"otherDataSet"
-    //                   otherValues:@[duplicateData, createData(1024U), createData(1024U)]
-    //                      isObject:NO
-    //                    callerName:NSStringFromSelector(_cmd)];
+    [self roundTripWithKeyPath:@"dataSet"
+                        values:@[duplicateData, createData(1024U), createData(1024U)]
+                  otherKeyPath:@"otherDataSet"
+                   otherValues:@[duplicateData, createData(1024U), createData(1024U)]
+                      isObject:NO
+                    callerName:NSStringFromSelector(_cmd)];
 }
 
 - (void)testDoubleSet {
