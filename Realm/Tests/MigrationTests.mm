@@ -1482,7 +1482,23 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
             }];
         }];
         [migration enumerateObjects:AllTypesObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
-            XCTAssertEqualObjects([oldObject.description stringByReplacingOccurrencesOfString:@"before_" withString:@""], newObject.description);
+            NSString *(^regexReplace)(NSString *) = ^(NSString *desc) {
+                NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<0x[0-9a-f]+>"
+                                                                                       options:NSRegularExpressionCaseInsensitive
+                                                                                         error:nil];
+                return [regex stringByReplacingMatchesInString:desc
+                                                       options:0
+                                                         range:NSMakeRange(0, desc.length)
+                                                  withTemplate:@""];
+            };
+
+            NSString *oldDescription = [oldObject.description stringByReplacingOccurrencesOfString:@"before_" withString:@""];
+            NSString *newDescription = newObject.description;
+
+            oldDescription = regexReplace(oldDescription);
+            newDescription = regexReplace(newDescription);
+
+            XCTAssertEqualObjects(oldDescription, newDescription);
         }];
     }];
     XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]);
