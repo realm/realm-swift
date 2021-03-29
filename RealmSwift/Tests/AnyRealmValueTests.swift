@@ -645,13 +645,49 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primitive
         XCTAssertEqual(mutableSet.value(forKey: "self").count, 0)
         mutableSet.insert(values[0])
         let kvo = (mutableSet.value(forKey: "self") as [AnyObject]).first!
-        if let obj = kvo as? SwiftStringObject, case let .object(o) = values[0] {
-            XCTAssertEqual(obj.stringCol, (o as! SwiftStringObject).stringCol)
-        } else {
-            let v = RealmProperty<AnyRealmValue>()
-            v.__value = kvo as? RLMValue
-            XCTAssertEqual(v.value, values[0])
+        switch values[0] {
+            case let .object(o):
+                if let obj = kvo as? SwiftStringObject {
+                    XCTAssertEqual(obj.stringCol, (o as! SwiftStringObject).stringCol)
+                } else {
+                    XCTFail()
+                }
+                break
+            case let .bool(b):
+                XCTAssertEqual(kvo as! Bool, b)
+                break
+            case let .data(d):
+                XCTAssertEqual(kvo as! Data, d)
+                break
+            case let .date(d):
+                XCTAssertEqual(kvo as! Date, d)
+                break
+            case let .decimal128(d):
+                XCTAssertEqual(kvo as! Decimal128, d)
+                break
+            case let .double(d):
+                XCTAssertEqual(kvo as! Double, d)
+                break
+            case let .float(f):
+                XCTAssertEqual(kvo as! Float, f)
+                break
+            case let .int(i):
+                XCTAssertEqual(kvo as! Int, i)
+                break
+            case .none:
+                XCTAssertNil(kvo)
+                break
+            case let .objectId(o):
+                XCTAssertEqual(kvo as! ObjectId, o)
+                break
+            case let .string(s):
+                XCTAssertEqual(kvo as! String, s)
+                break
+            case let .uuid(u):
+                XCTAssertEqual(kvo as! UUID, u)
+                break
         }
+
         assertThrows(mutableSet.value(forKey: "not self"), named: "NSUnknownKeyException")
     }
 
