@@ -509,16 +509,10 @@ public:
                               const ColumnReference& c);
 
     template <typename C>
-    void add_mixed_constraint(NSPredicateOperatorType operatorType,
-                              NSComparisonPredicateOptions predicateOptions,
-                              Columns<C>&& column,
-                              Mixed&& value);
-
-    template <typename C>
-    void add_mixed_constraint(NSPredicateOperatorType operatorType,
-                              NSComparisonPredicateOptions predicateOptions,
-                              Columns<C>&& column,
-                              realm::null);
+    void do_add_mixed_constraint(NSPredicateOperatorType operatorType,
+                                 NSComparisonPredicateOptions predicateOptions,
+                                 Columns<C>&& column,
+                                 Mixed&& value);
 
     template<typename T>
     void add_substring_constraint(const T& value, Query condition);
@@ -975,7 +969,8 @@ void QueryBuilder::do_add_constraint(RLMPropertyType type, NSPredicateOperatorTy
     switch (type) {
         case RLMPropertyTypeBool:
             convert_null(value, [&](auto&& value) {
-                add_bool_constraint(type, operatorType, column.resolve<W<bool>>(), value_of_type<bool>(value));
+                add_bool_constraint(type, operatorType, column.resolve<W<bool>>(),
+                                    value_of_type<bool>(value));
             });
             break;
         case RLMPropertyTypeObjectId:
@@ -1053,25 +1048,56 @@ void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
                                         Columns<C>&& column,
                                         T value)
 {
-    if (auto i = RLMDynamicCast<NSNumber>(value)) {
-        if ([value objCType][0] == 'c') {
-            add_bool_constraint(RLMPropertyTypeAny, operatorType, column, value_of_type<Bool>(value));
-        }
-        else if (numberIsInteger(i)) {
-            add_numeric_constraint(RLMPropertyTypeAny, operatorType, column, value_of_type<Int>(value));
-        }
-        else if ([value objCType][0] == *@encode(float)) {
-            add_numeric_constraint(RLMPropertyTypeAny, operatorType, column, value_of_type<Float>(value));
-        }
-        else if ([value objCType][0] == *@encode(double)) {
-            add_numeric_constraint(RLMPropertyTypeAny, operatorType, column, value_of_type<Double>(value));
+    // Handle cases where a string might be '1' or '0'. Without this the string
+    // will be boxed as a bool and thus string query operations will crash in core.
+    if constexpr(std::is_same_v<T, id>) {
+        if (auto str = RLMDynamicCast<NSString>(value)) {
+            add_string_constraint(operatorType, predicateOptions,
+                                  std::move(column), realm::Mixed([str UTF8String]));
+            return;
         }
     }
-    else {
-        add_mixed_constraint(operatorType,
-                             predicateOptions,
-                             std::move(column),
-                             value_of_type<Mixed>(value));
+    do_add_mixed_constraint(operatorType, predicateOptions,
+                            std::move(column), value_of_type<Mixed>(value));
+}
+
+template<typename C>
+void QueryBuilder::do_add_mixed_constraint(NSPredicateOperatorType operatorType,
+                                           NSComparisonPredicateOptions predicateOptions,
+                                           Columns<C>&& column,
+                                           Mixed&& value)
+{
+    switch (operatorType) {
+        case NSLessThanPredicateOperatorType:
+            m_query.and_query(column < value);
+            break;
+        case NSLessThanOrEqualToPredicateOperatorType:
+            m_query.and_query(column <= value);
+            break;
+        case NSGreaterThanPredicateOperatorType:
+            m_query.and_query(column > value);
+            break;
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            m_query.and_query(column >= value);
+            break;
+        case NSEqualToPredicateOperatorType:
+            m_query.and_query(column == value);
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            m_query.and_query(column != value);
+            break;
+        // String comparison operators: There isn't a way for a string value
+        // to get down here, but a rhs of NULL can
+        case NSLikePredicateOperatorType:
+        case NSMatchesPredicateOperatorType:
+        case NSBeginsWithPredicateOperatorType:
+        case NSEndsWithPredicateOperatorType:
+        case NSContainsPredicateOperatorType:
+            add_string_constraint(operatorType, predicateOptions,
+                                  std::move(column), value);
+            break;
+        default:
+            break;
     }
 }
 
@@ -1082,55 +1108,6 @@ void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
                                         const ColumnReference& value)
 {
     add_bool_constraint(RLMPropertyTypeObject, operatorType, column, value.resolve<Mixed>());
-}
-
-template<typename C>
-void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
-                                        NSComparisonPredicateOptions predicateOptions,
-                                        Columns<C>&& column,
-                                        Mixed&& value)
-{
-    switch (value.get_type()) {
-        case realm::type_Int:
-        case realm::type_Timestamp:
-        case realm::type_Double:
-        case realm::type_Float:
-        case realm::type_Decimal:
-            add_numeric_constraint(RLMPropertyTypeAny, operatorType, column, value);
-            break;
-        case realm::type_UUID:
-        case realm::type_ObjectId:
-        case realm::type_Bool:
-            add_bool_constraint(RLMPropertyTypeAny, operatorType, column, value);
-            break;
-        case realm::type_String:
-        case realm::type_Binary:
-            add_string_constraint(operatorType, predicateOptions, std::move(column), value);
-            break;
-        default:
-            @throw RLMException(@"Unsupported RLMValue type.");
-    }
-}
-
-template<typename C>
-void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
-                                        NSComparisonPredicateOptions predicateOptions,
-                                        Columns<C>&& column,
-                                        null rhs)
-{
-    switch (operatorType) {
-        case NSEqualToPredicateOperatorType:
-            m_query.and_query(column == rhs);
-            break;
-        case NSNotEqualToPredicateOperatorType:
-            m_query.and_query(column != rhs);
-            break;
-        default:
-            // Here to handle edge cases there the rhs is NULL and the predicate may
-            // be something such as BEGINSWITH
-            m_query.and_query(column == rhs);
-            break;
-    }
 }
 
 template<typename T>
@@ -1302,6 +1279,9 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
             }
             break;
         case RLMPropertyTypeAny:
+            // We use `constexpr (std::is_same_v<R, id>)` here because we want to
+            // perform operations on Obj-C types. By using `constexpr` the compiler
+            // can infer R as `id` and thus do things with the Obj-C values.
             if constexpr (std::is_same_v<R, id>) {
                 if (auto i = RLMDynamicCast<NSNumber>(rhs)) {
                     if ([rhs objCType][0] == 'c') {

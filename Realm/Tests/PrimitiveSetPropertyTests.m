@@ -8239,16 +8239,6 @@ static double average(NSArray *values) {
                               @"Operator '>' not supported for type 'object id'");
     RLMAssertThrowsWithReason(([LinkToAllPrimitiveSets objectsInRealm:realm where:@"ANY link.uuidObj > %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]), 
                               @"Operator '>' not supported for type 'uuid'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveSets objectsInRealm:realm where:@"ANY link.anyBoolObj > %@", @NO]), 
-                              @"Operator '>' not supported for type 'mixed'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveSets objectsInRealm:realm where:@"ANY link.anyStringObj > %@", @"a"]), 
-                              @"Operator '>' not supported for type 'mixed'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveSets objectsInRealm:realm where:@"ANY link.anyDataObj > %@", data(1)]), 
-                              @"Operator '>' not supported for type 'mixed'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveSets objectsInRealm:realm where:@"ANY link.anyObjectIdObj > %@", objectId(1)]), 
-                              @"Operator '>' not supported for type 'mixed'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveSets objectsInRealm:realm where:@"ANY link.anyUUIDObj > %@", uuid(@"00000000-0000-0000-0000-000000000000")]), 
-                              @"Operator '>' not supported for type 'mixed'");
     RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveSets objectsInRealm:realm where:@"ANY link.boolObj > %@", NSNull.null]), 
                               @"Operator '>' not supported for type 'bool'");
     RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveSets objectsInRealm:realm where:@"ANY link.stringObj > %@", NSNull.null]), 

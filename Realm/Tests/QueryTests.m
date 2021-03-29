@@ -439,7 +439,6 @@
     [self testStringOperatorsOnClass:[DoubleObject class] property:@"doubleCol" value:@0];
     [self testStringOperatorsOnClass:[DateObject class] property:@"dateCol" value:NSDate.date];
     [self testStringOperatorsOnClass:[DecimalObject class] property:@"decimalCol" value:[RLMDecimal128 decimalWithNumber:@0]];
-    [self testStringOperatorsOnClass:[MixedObject class] property:@"anyCol" value:@0];
 }
 @end
 
@@ -700,22 +699,13 @@
     RLMAssertCount(AllTypesObject, 2U, @"anyCol CONTAINS '1'");
     RLMAssertCount(AllTypesObject, 0U, @"anyCol CONTAINS 'a'");
 
-    XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol BEGINSWITH 0"],
-                                 NSException,
-                                 @"Invalid operator type",
-                                 @"Invalid operator in anyCol predicate.");
-    XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol ENDSWITH 0"],
-                                 NSException,
-                                 @"Invalid operator type",
-                                 @"Invalid operator in anyCol predicate.");
     XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol CONATINS 0"],
                                  NSException,
                                  NSInvalidArgumentException,
                                  @"Unable to parse the format string \"anyCol CONATINS 0\"");
-    XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol >= '0'"],
-                                 NSException,
-                                 @"Invalid operator type",
-                                 @"Operator '>=' not supported for type 'data'");
+
+    RLMAssertCount(AllTypesObject, 0U, @"anyCol BEGINSWITH '%@'", @0);
+    RLMAssertCount(AllTypesObject, 0U, @"anyCol ENDSWITH '%@'", @0);
 
     RLMAssertCount(AllTypesObject, 1U, @"anyCol == %@", [NSDate dateWithTimeIntervalSince1970:0]);
     RLMAssertCount(AllTypesObject, allValues.count, @"anyCol != %@", [NSDate dateWithTimeIntervalSince1970:123]);

@@ -100,12 +100,12 @@ let package = Package(
                 "Realm/RLMSet.mm",
                 "Realm/RLMSwiftCollectionBase.mm",
                 "Realm/RLMSwiftSupport.m",
+                "Realm/RLMSwiftValueStorage.mm",
                 "Realm/RLMThreadSafeReference.mm",
                 "Realm/RLMUpdateChecker.mm",
                 "Realm/RLMUtil.mm",
                 "Realm/RLMUUID.mm",
                 "Realm/RLMValue.mm",
-                "Realm/RLMPropertyBase.mm",
 
                 // Sync source files
                 "Realm/NSError+RLMSync.m",

@@ -8621,16 +8621,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Operator '>' not supported for type 'object id'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY uuidObj > %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"Operator '>' not supported for type 'uuid'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY anyBoolObj > %@", @NO]),
-                              @"Operator '>' not supported for type 'mixed'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY anyStringObj > %@", @"a"]),
-                              @"Operator '>' not supported for type 'mixed'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY anyDataObj > %@", data(1)]),
-                              @"Operator '>' not supported for type 'mixed'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY anyObjectIdObj > %@", objectId(1)]),
-                              @"Operator '>' not supported for type 'mixed'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"ANY anyUUIDObj > %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
-                              @"Operator '>' not supported for type 'mixed'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY boolObj > %@", @NO]),
                               @"Operator '>' not supported for type 'bool'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY stringObj > %@", @"a"]),
@@ -10617,16 +10607,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Operator '>' not supported for type 'object id'");
     RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.uuidObj > %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"Operator '>' not supported for type 'uuid'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.anyBoolObj > %@", @NO]),
-                              @"Operator '>' not supported for type 'mixed'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.anyStringObj > %@", @"a"]),
-                              @"Operator '>' not supported for type 'mixed'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.anyDataObj > %@", data(1)]),
-                              @"Operator '>' not supported for type 'mixed'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.anyObjectIdObj > %@", objectId(1)]),
-                              @"Operator '>' not supported for type 'mixed'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveArrays objectsInRealm:realm where:@"ANY link.anyUUIDObj > %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
-                              @"Operator '>' not supported for type 'mixed'");
     RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY link.boolObj > %@", @NO]),
                               @"Operator '>' not supported for type 'bool'");
     RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveArrays objectsInRealm:realm where:@"ANY link.stringObj > %@", @"a"]),

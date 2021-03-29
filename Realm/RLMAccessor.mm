@@ -32,7 +32,7 @@
 #import "RLMSwiftCollectionBase.h"
 #import "RLMUtil.hpp"
 #import "RLMUUID_Private.hpp"
-#import "RLMPropertyBase.h"
+#import "RLMSwiftValueStorage.h"
 
 #import <realm/object-store/results.hpp>
 #import <realm/object-store/property.hpp>
@@ -383,6 +383,9 @@ id managedGetter(RLMProperty *prop, const char *type) {
         case RLMPropertyTypeObjectId:
             return makeWrapperGetter<realm::ObjectId>(index, prop.optional);
         case RLMPropertyTypeAny:
+            // Mixed is represented as optional as Core,
+            // but not in Cocoa. We use `makeBoxedGetter` over
+            // `makeWrapperGetter` becuase Mixed can box a `null` representation.
             return makeBoxedGetter<realm::Mixed>(index);
         case RLMPropertyTypeLinkingObjects:
             return ^(__unsafe_unretained RLMObjectBase *const obj) {
@@ -744,8 +747,8 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
         if (prop.collection) {
             return static_cast<RLMSwiftCollectionBase *>(object_getIvar(obj, prop.swiftIvar))._rlmCollection;
         }
-        else if (prop.type == RLMPropertyTypeAny || RLMDynamicCast<RLMPropertyBase>(object_getIvar(obj, prop.swiftIvar)) != nil) { // mixed
-            value = static_cast<RLMPropertyBase *>(object_getIvar(obj, prop.swiftIvar)).value;
+        else if (prop.type == RLMPropertyTypeAny || RLMDynamicCast<RLMSwiftValueStorage>(object_getIvar(obj, prop.swiftIvar)) != nil) { // mixed
+            value = static_cast<RLMSwiftValueStorage *>(object_getIvar(obj, prop.swiftIvar)).value;
         } else { // optional
             value = RLMGetOptional(static_cast<RLMOptionalBase *>(object_getIvar(obj, prop.swiftIvar)));
         }

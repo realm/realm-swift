@@ -28,7 +28,7 @@ import Realm
  - Note:
  An `RealmProperty` should not be declared as `@objc dynamic` on a Realm Object. Use `let` instead.
  */
-public final class RealmProperty<Value: RealmPropertyType>: RLMPropertyBase {
+public final class RealmProperty<Value: RealmPropertyType>: RLMSwiftValueStorage {
     /**
      Used for getting / setting the underlying value.
 
@@ -60,11 +60,14 @@ public final class RealmProperty<Value: RealmPropertyType>: RLMPropertyBase {
         __value = value
         attach(withParent: object, property: property)
     }
+
+//    @objc public override var description: String {
+//        String(describing: __value)
+//    }
 }
 
 /// A protocol describing types that can parameterize a `RealmPropertyType`.
 public protocol RealmPropertyType {}
-extension RealmPropertyType {}
 /// A protocol describing types that can be represented as optional in a `RealmProperty<>`
 internal protocol OptionalRealmPropertyType {}
 

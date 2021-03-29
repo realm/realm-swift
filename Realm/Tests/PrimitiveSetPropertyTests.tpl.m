@@ -1069,7 +1069,7 @@ static double average(NSArray *values) {
 
     %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop <= %@", $v1);
 
-    %man %nominmax RLMAssertThrowsWithReason(([LinkTo$class objectsInRealm:realm where:@"ANY link.$prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
+    %man %nominmax %noany RLMAssertThrowsWithReason(([LinkTo$class objectsInRealm:realm where:@"ANY link.$prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
 }
 
 - (void)testSubstringQueries {

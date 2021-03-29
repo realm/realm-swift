@@ -43,6 +43,7 @@ extension Bool: RealmOptionalType {}
 
  To change the underlying value stored by a `RealmOptional` instance, mutate the instance's `value` property.
  */
+@available(*, deprecated, message: "RealmOptional has been deprecated, use RealmProperty instead.")
 public final class RealmOptional<Value: RealmOptionalType>: RLMOptionalBase {
     /// The value the optional represents.
     public var value: Value? {

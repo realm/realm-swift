@@ -26,7 +26,7 @@
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
-#import "RLMPropertyBase.h"
+#import "RLMSwiftValueStorage.h"
 #import "RLMSchema_Private.h"
 #import "RLMSet_Private.hpp"
 #import "RLMSwiftCollectionBase.h"
@@ -391,8 +391,8 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
     }
 
     RLMPropertyType type;
-    if ([v isKindOfClass:[RLMPropertyBase class]]) {
-        v = ((RLMPropertyBase *)v).value;
+    if ([v isKindOfClass:[RLMSwiftValueStorage class]]) {
+        v = ((RLMSwiftValueStorage *)v).value;
         if (!v || v == NSNull.null) {
             return realm::Mixed();
         }

@@ -25,7 +25,7 @@
 #import "RLMObjectStore.h"
 #import "RLMObservation.hpp"
 #import "RLMOptionalBase.h"
-#import "RLMPropertyBase.h"
+#import "RLMSwiftValueStorage.h"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
@@ -213,8 +213,8 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
         else if (property.optional) {
             RLMSetOptional(object_getIvar(self, ivar), value);
         }
-        else if (auto valueBase = RLMDynamicCast<RLMPropertyBase>(object_getIvar(self, ivar))) {
-            if (auto v = RLMDynamicCast<RLMPropertyBase>(value)) {
+        else if (auto valueBase = RLMDynamicCast<RLMSwiftValueStorage>(object_getIvar(self, ivar))) {
+            if (auto v = RLMDynamicCast<RLMSwiftValueStorage>(value)) {
                 valueBase.value = v.value;
             } else {
                 valueBase.value = value;
@@ -284,7 +284,7 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
             sub = [NSString stringWithFormat:@"<%@ — %lu total bytes>", [dataDescription substringWithRange:NSMakeRange(1, dataDescription.length - 2)], (unsigned long)length];
         }
         else if (property.type == RLMPropertyTypeAny) {
-            if (auto base = RLMDynamicCast<RLMPropertyBase>(object)) {
+            if (auto base = RLMDynamicCast<RLMSwiftValueStorage>(object)) {
                 if ([base.value respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
                     sub = [base.value descriptionWithMaxDepth:depth - 1];
                 }

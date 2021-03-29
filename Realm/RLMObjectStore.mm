@@ -32,7 +32,7 @@
 #import "RLMSwiftCollectionBase.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
-#import "RLMPropertyBase.h"
+#import "RLMSwiftValueStorage.h"
 
 #import <realm/object-store/object_store.hpp>
 #import <realm/object-store/results.hpp>
@@ -111,7 +111,7 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
             [ivar set_rlmCollection:managedCollection];
         }
         else if (prop.optional) {
-            if (RLMPropertyBase *valueBase = RLMDynamicCast<RLMPropertyBase>(object_getIvar(object, prop.swiftIvar))) {
+            if (RLMSwiftValueStorage *valueBase = RLMDynamicCast<RLMSwiftValueStorage>(object_getIvar(object, prop.swiftIvar))) {
                 [valueBase attachWithParent:object property:prop];
             }
             else if (RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, prop.swiftIvar)) != nil) {
@@ -120,7 +120,7 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
             }
             continue;
         } else if (prop.type == RLMPropertyTypeAny) {
-            if (RLMPropertyBase *valueBase = RLMDynamicCast<RLMPropertyBase>(object_getIvar(object, prop.swiftIvar))) {
+            if (RLMSwiftValueStorage *valueBase = RLMDynamicCast<RLMSwiftValueStorage>(object_getIvar(object, prop.swiftIvar))) {
                 [valueBase attachWithParent:object property:prop];
             }
         }

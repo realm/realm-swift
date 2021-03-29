@@ -1039,7 +1039,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     %man %minmax RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
     %man %minmax RLMAssertCount($class, 2, @"ANY $prop <= %@", $v1);
 
-    %man %nominmax RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"ANY $prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
+    %man %nominmax %noany RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"ANY $prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
 }
 
 - (void)testQueryBetween {
@@ -1320,7 +1320,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop <= %@", $v0);
     %man %minmax RLMAssertCount(LinkTo$class, 2, @"ANY link.$prop <= %@", $v1);
 
-    %man %nominmax RLMAssertThrowsWithReason(([LinkTo$class objectsInRealm:realm where:@"ANY link.$prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
+    %man %nominmax %noany RLMAssertThrowsWithReason(([LinkTo$class objectsInRealm:realm where:@"ANY link.$prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
 }
 
 - (void)testSubstringQueries {
