@@ -210,15 +210,8 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
                                                                   RLMSchema.partialPrivateSharedSchema)];
             }
         }
-        else if (property.optional) {
+        else if (property.optional || (property.type == RLMPropertyTypeAny)) {
             RLMSetOptional(object_getIvar(self, ivar), value);
-        }
-        else if (auto valueBase = RLMDynamicCast<RLMSwiftValueStorage>(object_getIvar(self, ivar))) {
-            if (auto v = RLMDynamicCast<RLMSwiftValueStorage>(value)) {
-                valueBase.value = v.value;
-            } else {
-                valueBase.value = value;
-            }
         }
         return;
     }

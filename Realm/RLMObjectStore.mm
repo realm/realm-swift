@@ -110,19 +110,9 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
             id managedCollection = [[cls alloc] initWithParent:object property:prop];
             [ivar set_rlmCollection:managedCollection];
         }
-        else if (prop.optional) {
-            if (RLMSwiftValueStorage *valueBase = RLMDynamicCast<RLMSwiftValueStorage>(object_getIvar(object, prop.swiftIvar))) {
-                [valueBase attachWithParent:object property:prop];
-            }
-            else if (RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, prop.swiftIvar)) != nil) {
-                id ivar = object_getIvar(object, prop.swiftIvar);
-                RLMInitializeManagedOptional(ivar, object, prop);
-            }
-            continue;
-        } else if (prop.type == RLMPropertyTypeAny) {
-            if (RLMSwiftValueStorage *valueBase = RLMDynamicCast<RLMSwiftValueStorage>(object_getIvar(object, prop.swiftIvar))) {
-                [valueBase attachWithParent:object property:prop];
-            }
+        else if (RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, prop.swiftIvar)) != nil) {
+            id ivar = object_getIvar(object, prop.swiftIvar);
+            RLMInitializeManagedOptional(ivar, object, prop);
         }
     }
 }

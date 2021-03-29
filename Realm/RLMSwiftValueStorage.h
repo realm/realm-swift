@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// Hands over the backing storage to managed accessors.
 /// @param parent The enclosing parent Realm Object of this class.
 /// @param property The property on the Realm Object that represents this class.
-- (void)attachWithParent:(RLMObjectBase *)parent
+- (void)_attachWithParent:(RLMObjectBase *)parent
                 property:(RLMProperty *)property;
 
 @end

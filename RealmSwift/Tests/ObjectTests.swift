@@ -252,7 +252,7 @@ class ObjectTests: TestCase {
             XCTAssertEqual(object.value(forKey: "floatCol") as! Float?, 1.23 as Float)
             XCTAssertEqual(object.value(forKey: "doubleCol") as! Double?, 12.3)
             XCTAssertEqual(object.value(forKey: "stringCol") as! String?, "a")
-            XCTAssertEqual((object.value(forKey: "anyCol") as! RealmProperty<AnyRealmValue>).value, AnyRealmValue.none)
+            XCTAssertNil(object.value(forKey: "anyCol"))
 
             let expected = object.value(forKey: "binaryCol") as! Data
             let actual = "a".data(using: String.Encoding.utf8)!
@@ -476,13 +476,13 @@ class ObjectTests: TestCase {
         XCTAssertEqual(getter(object, "uuidCol") as! UUID?, UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89"))
 
         setter(object, "hello", "anyCol")
-        XCTAssertEqual((getter(object, "anyCol") as! RealmProperty<AnyRealmValue>).value.stringValue, "hello")
+        XCTAssertEqual(getter(object, "anyCol") as! String, "hello")
 
         let boolObject = SwiftBoolObject(value: [true])
 
         setter(object, boolObject, "anyCol")
-        assertEqual((getter(object, "anyCol") as! RealmProperty<AnyRealmValue>).value.object(SwiftBoolObject.self)!, boolObject)
-        XCTAssertEqual((getter(object, "anyCol") as! RealmProperty<AnyRealmValue>).value.object(SwiftBoolObject.self)!.boolCol, true)
+        assertEqual(getter(object, "anyCol") as? SwiftBoolObject, boolObject)
+        XCTAssertEqual((getter(object, "anyCol") as! SwiftBoolObject).boolCol, true)
 
         setter(object, boolObject, "objectCol")
         assertEqual(getter(object, "objectCol") as? SwiftBoolObject, boolObject)

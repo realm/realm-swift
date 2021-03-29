@@ -197,13 +197,9 @@ void RLMObservationInfo::recordObserver(realm::Obj& objectRow, RLMClassInfo *obj
             REALM_UNREACHABLE();
         }
     }
-    else if (auto swiftIvar = prop.swiftIvar) {
-        if (auto optional = RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, swiftIvar))) {
-            RLMInitializeUnmanagedOptional(optional, object, prop);
-        }
-        else if (auto value = RLMDynamicCast<RLMSwiftValueStorage>(object_getIvar(object, swiftIvar))) {
-            [value attachWithParent:object property:prop];
-        }
+    else if (auto swiftIvar = prop.swiftIvar;
+             auto optional = RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, swiftIvar))) {
+        RLMInitializeUnmanagedOptional(optional, object, prop);
     }
 }
 

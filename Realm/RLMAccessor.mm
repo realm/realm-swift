@@ -747,9 +747,7 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
         if (prop.collection) {
             return static_cast<RLMSwiftCollectionBase *>(object_getIvar(obj, prop.swiftIvar))._rlmCollection;
         }
-        else if (prop.type == RLMPropertyTypeAny || RLMDynamicCast<RLMSwiftValueStorage>(object_getIvar(obj, prop.swiftIvar)) != nil) { // mixed
-            value = static_cast<RLMSwiftValueStorage *>(object_getIvar(obj, prop.swiftIvar)).value;
-        } else { // optional
+        else { // optional / RLMPropertyTypeAny
             value = RLMGetOptional(static_cast<RLMOptionalBase *>(object_getIvar(obj, prop.swiftIvar)));
         }
     }

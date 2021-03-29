@@ -28,7 +28,7 @@ import Realm
  - Note:
  An `RealmProperty` should not be declared as `@objc dynamic` on a Realm Object. Use `let` instead.
  */
-public final class RealmProperty<Value: RealmPropertyType>: RLMSwiftValueStorage {
+public final class RealmProperty<Value: RealmPropertyType>: RLMOptionalBase {
     /**
      Used for getting / setting the underlying value.
 
@@ -46,24 +46,17 @@ public final class RealmProperty<Value: RealmPropertyType>: RLMSwiftValueStorage
      ```
      */
     public var value: Value {
-        set {
-            __value = dynamicBridgeCast(fromSwift: newValue)
-        }
         get {
-            dynamicBridgeCast(fromObjectiveC: __value ?? NSNull())
+            dynamicBridgeCast(fromObjectiveC: RLMGetOptional(self) ?? NSNull())
+        }
+        set {
+            RLMSetOptional(self, dynamicBridgeCast(fromSwift: newValue))
         }
     }
 
-    // Used for when retrieving an AnyRealmValue via KVC
-    internal convenience init(value: RLMValue?, object: RLMObjectBase, property: RLMProperty) {
-        self.init()
-        __value = value
-        attach(withParent: object, property: property)
+    @objc public override var description: String {
+        String(describing: value)
     }
-
-//    @objc public override var description: String {
-//        String(describing: __value)
-//    }
 }
 
 /// A protocol describing types that can parameterize a `RealmPropertyType`.
