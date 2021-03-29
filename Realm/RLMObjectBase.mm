@@ -24,7 +24,7 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObservation.hpp"
-#import "RLMOptionalBase.h"
+#import "RLMSwiftValueStorage.h"
 #import "RLMSwiftValueStorage.h"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
@@ -211,7 +211,7 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
             }
         }
         else if (property.optional || (property.type == RLMPropertyTypeAny)) {
-            RLMSetOptional(object_getIvar(self, ivar), value);
+            RLMSetSwiftValueStorage(object_getIvar(self, ivar), value);
         }
         return;
     }
@@ -275,19 +275,6 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
             }
             NSString *dataDescription = [data description];
             sub = [NSString stringWithFormat:@"<%@ — %lu total bytes>", [dataDescription substringWithRange:NSMakeRange(1, dataDescription.length - 2)], (unsigned long)length];
-        }
-        else if (property.type == RLMPropertyTypeAny) {
-            if (auto base = RLMDynamicCast<RLMSwiftValueStorage>(object)) {
-                if ([base.value respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
-                    sub = [base.value descriptionWithMaxDepth:depth - 1];
-                }
-                else {
-                    sub = [base.value description];
-                }
-            }
-            else {
-                sub = [object description];
-            }
         }
         else {
             sub = [object description];

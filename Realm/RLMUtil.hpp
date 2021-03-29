@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMConstants.h>
-#import <Realm/RLMOptionalBase.h>
+#import <Realm/RLMSwiftValueStorage.h>
 #import <Realm/RLMValue.h>
 
 #import <objc/runtime.h>
@@ -87,8 +87,8 @@ static inline id RLMCoerceToNil(__unsafe_unretained id obj) {
     if (static_cast<id>(obj) == NSNull.null) {
         return nil;
     }
-    else if (__unsafe_unretained auto optional = RLMDynamicCast<RLMOptionalBase>(obj)) {
-        return RLMCoerceToNil(RLMGetOptional(optional));
+    else if (__unsafe_unretained auto optional = RLMDynamicCast<RLMSwiftValueStorage>(obj)) {
+        return RLMCoerceToNil(RLMGetSwiftValueStorage(optional));
     }
     return obj;
 }

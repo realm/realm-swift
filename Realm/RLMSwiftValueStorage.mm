@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2021 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,81 +20,145 @@
 
 #import "RLMAccessor.hpp"
 #import "RLMObject_Private.hpp"
-#import "RLMObjectStore.h"
-#import "RLMProperty_Private.hpp"
+#import "RLMProperty.h"
 #import "RLMUtil.hpp"
-#import "RLMValue.h"
 
 #import <realm/object-store/object.hpp>
 
-@implementation RLMSwiftValueStorage {
-    id<RLMValue> _backingValue;
+namespace {
+struct SwiftValueStorageBase {
+    virtual id get() = 0;
+    virtual void set(id) = 0;
+    virtual ~SwiftValueStorageBase() = default;
+};
+
+class UnmanagedSwiftValueStorage : public SwiftValueStorageBase {
+public:
+    id get() override {
+        return _value;
+    }
+
+    void set(__unsafe_unretained const id newValue) override {
+        @autoreleasepool {
+            RLMObjectBase *object = _parent;
+            [object willChangeValueForKey:_property];
+            _value = newValue;
+            [object didChangeValueForKey:_property];
+        }
+    }
+
+    void attach(__unsafe_unretained RLMObjectBase *const obj, NSString *property) {
+        if (!_property) {
+            _property = property;
+            _parent = obj;
+        }
+    }
+
+private:
+    id _value;
+    NSString *_property;
     __weak RLMObjectBase *_parent;
-    NSString *_propertyName;
-    BOOL _managed;
-}
 
-- (void)setValue:(id<RLMValue>)value {
-    @autoreleasepool {
-        if (_managed) {
-            try {
-                RLMAccessorContext ctx(*_parent->_info);
-                auto object = realm::Object(_parent->_realm->_realm,
-                                            *_parent->_info->objectSchema, _parent->_row);
-                object.set_property_value(ctx, _propertyName.UTF8String, value);
-            }
-            catch (std::exception const& err) {
-                @throw RLMException(err);
-            }
-        }
-        else {
-            [_parent willChangeValueForKey:_propertyName];
-            _backingValue = value;
-            [_parent didChangeValueForKey:_propertyName];
-        }
+};
+
+class ManagedSwiftValueStorage : public SwiftValueStorageBase {
+public:
+    ManagedSwiftValueStorage(RLMObjectBase *obj, RLMProperty *prop)
+    : _realm(obj->_realm)
+    , _object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row)
+    , _propertyName(prop.name.UTF8String)
+    , _ctx(*obj->_info)
+    {
     }
-}
 
-- (nullable id<RLMValue>)value {
-    if (_managed) {
-        try {
-            @autoreleasepool {
-                RLMAccessorContext ctx(*_parent->_info);
-                auto object = realm::Object(_parent->_realm->_realm,
-                                            *_parent->_info->objectSchema, _parent->_row);
-                return RLMCoerceToNil(object.get_property_value<id<RLMValue>>(ctx, _propertyName.UTF8String));
-            }
-        }
-        catch (std::exception const& err) {
-            @throw RLMException(err);
-        }
+    id get() override {
+        return _object.get_property_value<id>(_ctx, _propertyName);
     }
-    else {
-        return _backingValue;
+
+    void set(__unsafe_unretained id const value) override {
+        _object.set_property_value(_ctx, _propertyName, value ?: NSNull.null);
     }
-}
 
-- (BOOL)isEqual:(id)other
-{
-    return [self.value isEqual:other];
-}
+private:
+    // We have to hold onto a strong reference to the Realm as
+    // RLMAccessorContext holds a non-retaining one.
+    __unused RLMRealm *_realm;
+    realm::Object _object;
+    std::string _propertyName;
+    RLMAccessorContext _ctx;
+};
+} // anonymous namespace
 
-- (void)attachWithParent:(RLMObjectBase *)parent
-                property:(RLMProperty *)property {
-    _parent = parent;
-    _propertyName = property.name;
-    _managed = !(parent->_realm == nil);
+@interface RLMSwiftValueStorage () {
+    std::unique_ptr<SwiftValueStorageBase> _impl;
 }
-
 @end
 
-@interface RLMSwiftValueStorage (RLMValue)<RLMValue>
-@end
-
-@implementation RLMSwiftValueStorage (RLMValue)
-
-- (RLMPropertyType)rlm_valueType {
-    return [_backingValue rlm_valueType];
+@implementation RLMSwiftValueStorage
+- (instancetype)init {
+    return self;
 }
 
+- (BOOL)isKindOfClass:(Class)aClass {
+    return [RLMGetSwiftValueStorage(self) isKindOfClass:aClass] || RLMIsKindOfClass(object_getClass(self), aClass);
+}
+
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
+    return [RLMGetSwiftValueStorage(self) methodSignatureForSelector:sel];
+}
+
+- (void)forwardInvocation:(NSInvocation *)invocation {
+    [invocation invokeWithTarget:RLMGetSwiftValueStorage(self)];
+}
+
+- (id)forwardingTargetForSelector:(__unused SEL)sel {
+    return RLMGetSwiftValueStorage(self);
+}
+
+- (BOOL)respondsToSelector:(SEL)aSelector {
+    return [RLMGetSwiftValueStorage(self) respondsToSelector:aSelector];
+}
+
+- (void)doesNotRecognizeSelector:(SEL)aSelector {
+    [RLMGetSwiftValueStorage(self) doesNotRecognizeSelector:aSelector];
+}
+
+id RLMGetSwiftValueStorage(__unsafe_unretained RLMSwiftValueStorage *const self) {
+    try {
+        return self->_impl ? RLMCoerceToNil(self->_impl->get()) : nil;
+    }
+    catch (std::exception const& err) {
+        @throw RLMException(err);
+    }
+}
+
+void RLMSetSwiftValueStorage(__unsafe_unretained RLMSwiftValueStorage *const self, __unsafe_unretained const id value) {
+    try {
+        if (!self->_impl && value) {
+            self->_impl.reset(new UnmanagedSwiftValueStorage);
+        }
+        if (self->_impl) {
+            self->_impl->set(value);
+        }
+    }
+    catch (std::exception const& err) {
+        @throw RLMException(err);
+    }
+}
+
+void RLMInitializeManagedSwiftValueStorage(__unsafe_unretained RLMSwiftValueStorage *const self,
+                                  __unsafe_unretained RLMObjectBase *const parent,
+                                  __unsafe_unretained RLMProperty *const prop) {
+    REALM_ASSERT(parent->_realm);
+    self->_impl.reset(new ManagedSwiftValueStorage(parent, prop));
+}
+
+void RLMInitializeUnmanagedSwiftValueStorage(__unsafe_unretained RLMSwiftValueStorage *const self,
+                                    __unsafe_unretained RLMObjectBase *const parent,
+                                    __unsafe_unretained RLMProperty *const prop) {
+    if (!self->_impl) {
+        self->_impl.reset(new UnmanagedSwiftValueStorage);
+    }
+    static_cast<UnmanagedSwiftValueStorage&>(*self->_impl).attach(parent, prop.name);
+}
 @end

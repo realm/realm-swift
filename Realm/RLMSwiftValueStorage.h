@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2021 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,25 +17,24 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <Realm/RLMConstants.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObjectBase, RLMProperty;
-@protocol RLMValue;
 
-/// This class implements the backing storage for `RealmProperty<>`. It is not intended that this class be
-/// subclassed or used directly.
-// RLMSwiftValueStorage
-@interface RLMSwiftValueStorage : NSObject
-
-@property (nonatomic, nullable) id value NS_REFINED_FOR_SWIFT;
-
-/// Hands over the backing storage to managed accessors.
-/// @param parent The enclosing parent Realm Object of this class.
-/// @param property The property on the Realm Object that represents this class.
-- (void)_attachWithParent:(RLMObjectBase *)parent
-                property:(RLMProperty *)property;
-
+@interface RLMSwiftValueStorage : NSProxy
+- (instancetype)init;
 @end
+
+FOUNDATION_EXTERN id _Nullable RLMGetSwiftValueStorage(RLMSwiftValueStorage *);
+FOUNDATION_EXTERN void RLMSetSwiftValueStorage(RLMSwiftValueStorage *, id _Nullable);
+
+void RLMInitializeManagedSwiftValueStorage(RLMSwiftValueStorage *,
+                                           RLMObjectBase *parent,
+                                           RLMProperty *prop);
+void RLMInitializeUnmanagedSwiftValueStorage(RLMSwiftValueStorage *,
+                                             RLMObjectBase *parent,
+                                             RLMProperty *prop);
 
 NS_ASSUME_NONNULL_END

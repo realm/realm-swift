@@ -88,7 +88,6 @@ let package = Package(
                 "Realm/RLMObjectSchema.mm",
                 "Realm/RLMObjectStore.mm",
                 "Realm/RLMObservation.mm",
-                "Realm/RLMOptionalBase.mm",
                 "Realm/RLMPredicateUtil.mm",
                 "Realm/RLMProperty.mm",
                 "Realm/RLMQueryUtil.mm",

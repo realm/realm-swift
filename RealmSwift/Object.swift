@@ -708,6 +708,7 @@ extension Optional: _ManagedPropertyType where Wrapped: _ManagedPropertyType {
 }
 
 /// :nodoc:
+@available(*, deprecated, message: "RealmOptional has been deprecated, use RealmProperty<T?> instead.")
 extension RealmOptional: _ManagedPropertyType where Value: _ManagedPropertyType {
     // swiftlint:disable:next identifier_name
     public static func _rlmProperty(_ prop: RLMProperty) {

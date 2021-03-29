@@ -23,7 +23,7 @@
 #import "RLMObservation.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMOptionalBase.h"
+#import "RLMSwiftValueStorage.h"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
@@ -110,9 +110,9 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
             id managedCollection = [[cls alloc] initWithParent:object property:prop];
             [ivar set_rlmCollection:managedCollection];
         }
-        else if (RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, prop.swiftIvar)) != nil) {
+        else if (RLMDynamicCast<RLMSwiftValueStorage>(object_getIvar(object, prop.swiftIvar)) != nil) {
             id ivar = object_getIvar(object, prop.swiftIvar);
-            RLMInitializeManagedOptional(ivar, object, prop);
+            RLMInitializeManagedSwiftValueStorage(ivar, object, prop);
         }
     }
 }

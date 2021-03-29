@@ -28,7 +28,7 @@ import Realm
  - Note:
  An `RealmProperty` should not be declared as `@objc dynamic` on a Realm Object. Use `let` instead.
  */
-public final class RealmProperty<Value: RealmPropertyType>: RLMOptionalBase {
+public final class RealmProperty<Value: RealmPropertyType>: RLMSwiftValueStorage {
     /**
      Used for getting / setting the underlying value.
 
@@ -47,10 +47,10 @@ public final class RealmProperty<Value: RealmPropertyType>: RLMOptionalBase {
      */
     public var value: Value {
         get {
-            dynamicBridgeCast(fromObjectiveC: RLMGetOptional(self) ?? NSNull())
+            dynamicBridgeCast(fromObjectiveC: RLMGetSwiftValueStorage(self) ?? NSNull())
         }
         set {
-            RLMSetOptional(self, dynamicBridgeCast(fromSwift: newValue))
+            RLMSetSwiftValueStorage(self, dynamicBridgeCast(fromSwift: newValue))
         }
     }
 

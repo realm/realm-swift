@@ -54,8 +54,8 @@ class ObjectCreationTests: TestCase {
         let object = SwiftOptionalObject()
         for prop in object.objectSchema.properties {
             let value = object[prop.name]
-            if let value = value as? RLMOptionalBase {
-                XCTAssertNil(RLMGetOptional(value))
+            if let value = value as? RLMSwiftValueStorage {
+                XCTAssertNil(RLMGetSwiftValueStorage(value))
             } else {
                 XCTAssertNil(value)
             }
