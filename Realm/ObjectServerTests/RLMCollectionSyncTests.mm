@@ -36,12 +36,9 @@
     try {
         RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:callerName
                                                                             register:self.isParent]];
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:callerName user:user];
 
         if (self.isParent) {
-            [realm transactionWithBlock:^{
-                [realm deleteAllObjects];
-            }];
             [self waitForDownloadsForRealm:realm];
             CHECK_COUNT(0, RLMSetSyncObject, realm);
             RLMRunChildAndWait();
@@ -116,9 +113,9 @@
             [self waitForUploadsForRealm:realm];
             CHECK_COUNT(1, RLMSetSyncObject, realm);
         }
-    } catch(NSError *e) {
+    } catch(NSException *e) {
         XCTFail(@"Got an error: %@ (isParent: %d)",
-                e.localizedDescription, self.isParent);
+                e, self.isParent);
     }
 }
 
@@ -233,12 +230,9 @@
     try {
         RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:callerName
                                                                             register:self.isParent]];
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:callerName user:user];
 
         if (self.isParent) {
-            [realm transactionWithBlock:^{
-                [realm deleteAllObjects];
-            }];
             [self waitForDownloadsForRealm:realm];
             CHECK_COUNT(0, RLMArraySyncObject, realm);
             RLMRunChildAndWait();
@@ -304,9 +298,9 @@
             [self waitForUploadsForRealm:realm];
             CHECK_COUNT(1, RLMArraySyncObject, realm);
         }
-    } catch(NSError *e) {
+    } catch(NSException *e) {
         XCTFail(@"Got an error: %@ (isParent: %d)",
-                e.localizedDescription, self.isParent);
+                e, self.isParent);
     }
 }
 
