@@ -241,9 +241,19 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
             return;
         }
 
-        for (id value in enumeration) {
-            if (!RLMValidateValue(value, prop.type, prop.optional, false, prop.objectClassName)) {
-                RLMThrowTypeError(value, objectSchema, prop);
+        if (prop.dictionary) {
+            for (id key in enumeration) {
+                id value = enumeration[key];
+                if (!RLMValidateValue(value, prop.type, prop.optional, false, prop.objectClassName)) {
+                    RLMThrowTypeError(value, objectSchema, prop);
+                }
+            }
+        }
+        else {
+            for (id value in enumeration) {
+                if (!RLMValidateValue(value, prop.type, prop.optional, false, prop.objectClassName)) {
+                    RLMThrowTypeError(value, objectSchema, prop);
+                }
             }
         }
         return;

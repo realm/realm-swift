@@ -99,7 +99,7 @@
     RLMRealm *realm = [self realmWithTestPath];
     StringObject *obj = [[StringObject alloc] init];
     [realm beginWriteTransaction];
-    DictionaryPropertyObject *dictObj = [DictionaryPropertyObject createInRealm:realm withValue:@[@{@"one": obj}]];
+    DictionaryPropertyObject *dictObj = [DictionaryPropertyObject createInRealm:realm withValue: @{@"stringDictionary": @{@"one": obj}}];
     RLMDictionary *stringDictionary = dictObj.stringDictionary;
     StringObject *one = stringDictionary[@"one"];
     [realm deleteObjects:[StringObject allObjectsInRealm:realm]];

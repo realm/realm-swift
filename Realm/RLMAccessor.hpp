@@ -78,9 +78,17 @@ struct RLMStatelessAccessorContext {
     void enumerate_dictionary(__unsafe_unretained const id v, Func&& func) {
         id enumerable = RLMAsFastEnumeration(v) ?: v;
         for (id pair in enumerable) {
-            id key = [pair allKeys].firstObject;
-            id value = enumerable[key];
-            func(unbox<realm::StringData>(key), value);
+            // testDeleteObjectInDictionaryProperty
+            if ([pair isKindOfClass:[NSDictionary class]]) {
+                id key = [pair allKeys].firstObject;
+                id value = enumerable[key];
+                func(unbox<realm::StringData>(key), value);
+            }
+            else {
+                id key = pair;
+//                func(unbox<realm::StringData>(key), value);
+                1/0;
+            }
         }
     }
 

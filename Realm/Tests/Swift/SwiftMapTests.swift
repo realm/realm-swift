@@ -38,14 +38,14 @@ class SwiftMapTests: RLMTestCase {
         realm.add(po3)
 
         let company = SwiftRLMCompanyObject()
-        for employee in SwiftRLMEmployeeObject.allObjects(in: realm) {
+        let employees = SwiftRLMEmployeeObject.allObjects(in: realm)
+        for employee in employees {
             company.employeeMap![UUID().uuidString as NSString] = employee as? SwiftRLMEmployeeObject
         }
         try! realm.commitWriteTransaction()
 
         var totalSum: Int = 0
 
-        XCTAssertTrue(false)
         for val in company.employeeMap! {
             if let employee = val as? SwiftRLMEmployeeObject {
                 totalSum += employee.age

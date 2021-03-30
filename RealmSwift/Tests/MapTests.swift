@@ -163,9 +163,10 @@ class MapTests: TestCase {
         let obj = SwiftMapObject()
         let valueInTest = 5
         obj.int[String(valueInTest)] = valueInTest
-        XCTAssertEqual(obj.int.first!.1, 5) // should expect (key, value)
-        XCTAssertEqual(obj.int.last!.1, 5)
-        XCTAssertEqual(obj.int[0].1, 5)
+        XCTAssertTrue(false)
+//        XCTAssertEqual(obj.int.first!.1, 5) // should expect (key, value)
+//        XCTAssertEqual(obj.int.last!.1, 5)
+//        XCTAssertEqual(obj.int[0].1, 5)
         XCTAssertEqual(obj.int["5"], 5)
 
         obj.int.addTestObjects(from: ["6": 6, "7": 7, "8": 8])
@@ -174,10 +175,10 @@ class MapTests: TestCase {
         XCTAssertEqual(obj.int.sum(), 26)
 
         obj.string["strKey"] = "strVal"
-        XCTAssertEqual(obj.string.first!.0, "strKey")
-        XCTAssertEqual(obj.string[0].0, "strKey")
-        XCTAssertEqual(obj.string.first!.1, "strVal")
-        XCTAssertEqual(obj.string[0].1, "strVal")
+//        XCTAssertEqual(obj.string.first!.0, "strKey")
+//        XCTAssertEqual(obj.string[0].0, "strKey")
+//        XCTAssertEqual(obj.string.first!.1, "strVal")
+//        XCTAssertEqual(obj.string[0].1, "strVal")
     }
 
     func testPrimitiveIterationAcrossNil() {
@@ -363,10 +364,11 @@ class MapTests: TestCase {
         XCTAssertEqual(map[str1.stringCol]!.stringCol, str1.stringCol)
 
         // Make sure we can enumerate
-        for (key, value) in map {
-            XCTAssertFalse(key.description.isEmpty, "Object should have description")
-            XCTAssertFalse(value.description.isEmpty, "Object should have description")
-        }
+        XCTAssertTrue(false)
+//        for (key, value) in map {
+//            XCTAssertFalse(key.description.isEmpty, "Object should have description")
+//            XCTAssertFalse(value.description.isEmpty, "Object should have description")
+//        }
     }
 
     func testEnumeratingMap() {
@@ -380,11 +382,12 @@ class MapTests: TestCase {
 
         XCTAssertEqual(10, mapObject.map.count)
 
-        for (_, value) in mapObject.map {
-            XCTAssertEqual(123, value.intCol)
-            XCTAssertEqual(false, value.objectCol!.boolCol)
-            XCTAssertEqual(0, value.arrayCol.count)
-        }
+        XCTAssertTrue(false)
+//        for (_, value) in mapObject.map {
+//            XCTAssertEqual(123, value.intCol)
+//            XCTAssertEqual(false, value.objectCol!.boolCol)
+//            XCTAssertEqual(0, value.arrayCol.count)
+//        }
     }
 
     func testValueForKey() {

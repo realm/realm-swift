@@ -41,7 +41,8 @@ extension String: MapKeyType { }
 */
 public final class Map<Key: RealmCollectionValue, Value: RealmCollectionValue>: RLMSwiftCollectionBase where Key: MapKeyType {
 
-    public typealias Element = (Key, Value)
+    public typealias EnumerableElement = Key
+    public typealias OuterElement = (Key, Value)
 
     // MARK: Properties
 
@@ -456,10 +457,12 @@ extension Map where Value: AddableType {
     }
 }
 
-extension Map: RealmCollection {
+//extension Map: RealmCollection {
+extension Map {
+
     public typealias Index = Int
     public typealias Indices = Range<Int>
-    public typealias SubSequence = Slice<Map>
+//    public typealias SubSequence = Slice<Map>
 
     public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
         fatalError()

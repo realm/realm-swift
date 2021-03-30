@@ -83,7 +83,12 @@ public struct RLMCollectionIterator<T>: IteratorProtocol {
     }
 
     public mutating func next() -> T? {
-        return iteratorBase.next() as! T?
+        let next = iteratorBase.next()
+        if let d = next as? NSDictionary {
+            let key = d.allKeys.first!
+            return d[key] as! T?
+        }
+        return next as! T?
     }
 }
 

@@ -34,6 +34,7 @@ import Realm.Private
 
  Properties of `MutableSet` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
  */
+//public final class MutableSet<Element/*: RealmCollectionValue*/>: RLMSwiftCollectionBase {
 public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
 
     // MARK: Properties
