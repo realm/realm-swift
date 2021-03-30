@@ -59,6 +59,20 @@ public final class RealmProperty<Value: RealmPropertyType>: RLMSwiftValueStorage
     }
 }
 
+extension RealmProperty: Codable where Value: Codable {
+    public convenience init(from decoder: Decoder) throws {
+        self.init()
+        // `try decoder.singleValueContainer().decode(Value?.self)` incorrectly
+        // rejects null values: https://bugs.swift.org/browse/SR-7404
+        let container = try decoder.singleValueContainer()
+        self.value = try container.decode(Value.self)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        try self.value.encode(to: encoder)
+    }
+}
+
 /// A protocol describing types that can parameterize a `RealmPropertyType`.
 public protocol RealmPropertyType {}
 /// A protocol describing types that can be represented as optional in a `RealmProperty<>`

@@ -1103,7 +1103,7 @@ void QueryBuilder::do_add_mixed_constraint(NSPredicateOperatorType operatorType,
 
 template<typename C>
 void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
-                                        NSComparisonPredicateOptions predicateOptions,
+                                        NSComparisonPredicateOptions,
                                         Columns<C>&& column,
                                         const ColumnReference& value)
 {

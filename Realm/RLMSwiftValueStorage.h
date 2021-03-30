@@ -23,16 +23,26 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObjectBase, RLMProperty;
 
+/// This class implements the backing storage for `RealmProperty<>` and `RealmOptional<>`.
+/// This class should not be subclassed or used directly.
 @interface RLMSwiftValueStorage : NSProxy
 - (instancetype)init;
 @end
-
+/// Retrieves the value that is stored, or nil if it is empty.
 FOUNDATION_EXTERN id _Nullable RLMGetSwiftValueStorage(RLMSwiftValueStorage *);
+/// Sets a value on the property this instance represents for an object.
 FOUNDATION_EXTERN void RLMSetSwiftValueStorage(RLMSwiftValueStorage *, id _Nullable);
 
+/// Initialises managed accessors on an instance of `RLMSwiftValueStorage`
+/// @param parent The enclosing parent object.
+/// @param prop The property which this class represents.
 void RLMInitializeManagedSwiftValueStorage(RLMSwiftValueStorage *,
                                            RLMObjectBase *parent,
                                            RLMProperty *prop);
+
+/// Initialises unmanaged accessors on an instance of `RLMSwiftValueStorage`
+/// @param parent The enclosing parent object.
+/// @param prop The property which this class represents.
 void RLMInitializeUnmanagedSwiftValueStorage(RLMSwiftValueStorage *,
                                              RLMObjectBase *parent,
                                              RLMProperty *prop);

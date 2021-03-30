@@ -32,7 +32,6 @@ Pod::Spec.new do |s|
                               'include/**/RLMObjectBase.h',
                               'include/**/RLMObjectId.h',
                               'include/**/RLMObjectSchema.h',
-                              'include/**/RLMOptionalBase.h',
                               'include/**/RLMPlatform.h',
                               'include/**/RLMProperty.h',
                               'include/**/RLMRealm.h',
@@ -41,6 +40,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMSchema.h',
                               'include/**/RLMSet.h',
                               'include/**/RLMSwiftCollectionBase.h',
+                              'include/**/RLMSwiftValueStorage.h',
                               'include/**/RLMThreadSafeReference.h',
 
                               # Sync

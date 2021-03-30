@@ -14,7 +14,6 @@ framework module Realm {
         header "RLMObjectBase_Private.h"
         header "RLMObjectSchema_Private.h"
         header "RLMObjectStore.h"
-        header "RLMOptionalBase.h"
         header "RLMProperty_Private.h"
         header "RLMRealm_Private.h"
         header "RLMRealmConfiguration_Private.h"
@@ -22,10 +21,10 @@ framework module Realm {
         header "RLMSchema_Private.h"
         header "RLMSet_Private.h"
         header "RLMSwiftCollectionBase.h"
+        header "RLMSwiftValueStorage.h"
         header "RLMSyncConfiguration_Private.h"
         header "RLMSyncUtil_Private.h"
         header "RLMUser_Private.h"
-        header "RLMValueBase.h"
     }
 
     explicit module Dynamic {

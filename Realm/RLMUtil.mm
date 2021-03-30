@@ -391,12 +391,10 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
     }
 
     RLMPropertyType type;
-    if ([v conformsToProtocol:@protocol(RLMValue)]) {
+    if ([v conformsToProtocol:@protocol(RLMValue)])
         type = [v rlm_valueType];
-    }
-    else {
+    else
         REALM_TERMINATE("Unexpected Type");
-    }
 
     switch (type) {
         case RLMPropertyTypeInt:
@@ -422,6 +420,8 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
             if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(v); !objBase->_realm
                 && createPolicy.create) {
                 RLMVerifyInWriteTransaction(realm);
+                // We do not want to copy the object, instead we want to promote
+                // it to a managed one.
                 createPolicy.copy = false;
                 RLMAccessorContext c{realm->_info[objBase->_objectSchema.className]};
                 c.createObject(objBase, createPolicy);
@@ -465,7 +465,7 @@ id RLMMixedToObjc(realm::Mixed const& mixed, __unsafe_unretained RLMRealm *realm
         case realm::type_ObjectId:
             return [[RLMObjectId alloc] initWithValue:mixed.get<realm::ObjectId>()];
         case realm::type_TypedLink:
-            return RLMObjectFromObjLink(realm, std::move(mixed.get<realm::ObjLink>()));
+            return RLMObjectFromObjLink(realm, mixed.get<realm::ObjLink>());
         case realm::type_Link:
         case realm::type_LinkList:
             REALM_UNREACHABLE();
