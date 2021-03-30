@@ -671,12 +671,13 @@
     [realm commitWriteTransaction];
 
     // Numeric based comparability
-    // Expect (7) matches for int, double, float, decimal, 3 bools.
-    RLMAssertCount(AllTypesObject, 12U, @"anyCol BETWEEN %@", @[@0, @3]);
-    RLMAssertCount(AllTypesObject, 12U, @"anyCol BETWEEN {0, 3}");
+    RLMAssertCount(AllTypesObject, 6U, @"anyCol BETWEEN %@", @[@1, @2]);
+    RLMAssertCount(AllTypesObject, 6U, @"anyCol BETWEEN {1, 2}");
     RLMAssertCount(AllTypesObject, 1U, @"anyCol == FALSE");
     RLMAssertCount(AllTypesObject, 6U, @"anyCol == 0");
+    RLMAssertCount(AllTypesObject, 22, @"anyCol != false");
     RLMAssertCount(AllTypesObject, 22, @"anyCol != FALSE");
+    RLMAssertCount(AllTypesObject, 22, @"anyCol != NO");
     RLMAssertCount(AllTypesObject, 17, @"anyCol != 0");
     RLMAssertCount(AllTypesObject, 6U, @"anyCol < 1");
     RLMAssertCount(AllTypesObject, 0U, @"anyCol > 1");
@@ -689,7 +690,6 @@
                                  @"object must be of type NSArray for BETWEEN operations");
 
     // Binary based comparability
-    // Expect (2) matches for string and data.
     RLMAssertCount(AllTypesObject, 2U, @"anyCol == '0'");
     RLMAssertCount(AllTypesObject, allValues.count-2, @"anyCol != '0'");
     RLMAssertCount(AllTypesObject, 2U, @"anyCol BEGINSWITH '1'");
