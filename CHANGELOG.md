@@ -24,6 +24,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 10.7.2 Release notes (2021-03-08)
 =============================================================
+
 ### Fixed
 
 * During integration of a large amount of data from the server, you may get
