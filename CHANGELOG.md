@@ -1,6 +1,28 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* None.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* Adjust the header paths for the podspec to avoid accidentally finding a file
+  which isn't part of the pod that produced warnings when importing the
+  framework. ([#7113](https://github.com/realm/realm-cocoa/issues/7113), since 10.5.2).
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
+10.7.2 Release notes (2021-03-08)
+=============================================================
+### Enhancements
 * Add support for retrying a [custom confirmation](https://docs.mongodb.com/realm/authentication/email-password/#run-a-confirmation-function) function.
 - `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)`
 - `[App.emailPasswordAuth retryCustomConfirmation:completion:]`
