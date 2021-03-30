@@ -182,25 +182,25 @@
              @"decimalCol", @"uuidCol", @"objectIdCol"];
 }
 
-+ (NSDictionary *)values:(int)idx {
++ (NSDictionary *)values:(int)i {
     char str[] = "";
-    str[0] = idx;
+    str[0] = i;
     return @{
-        @"boolCol": @(idx % 2),
-        @"cBoolCol": @(idx % 2),
-        @"intCol": @(idx),
-        @"doubleCol": @(1.11 * idx),
-        @"stringCol": [NSString stringWithFormat:@"%d", idx],
+        @"boolCol": @(i % 2),
+        @"cBoolCol": @(i % 2),
+        @"intCol": @(i),
+        @"doubleCol": @(1.11 * i),
+        @"stringCol": [NSString stringWithFormat:@"%d", i],
         @"binaryCol": [@(str) dataUsingEncoding:NSUTF8StringEncoding],
-        @"dateCol": [NSDate dateWithTimeIntervalSince1970:idx],
-        @"longCol": @((long long)idx * INT_MAX + 1),
-        @"decimalCol": [[RLMDecimal128 alloc] initWithNumber:@(idx)],
-        @"uuidCol": idx < 4 ? @[[[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"],
+        @"dateCol": [NSDate dateWithTimeIntervalSince1970:i],
+        @"longCol": @((long long)i * INT_MAX + 1),
+        @"decimalCol": [[RLMDecimal128 alloc] initWithNumber:@(i)],
+        @"uuidCol": i < 4 ? @[[[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"],
                               [[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"],
                               [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"],
-                              [[NSUUID alloc] initWithUUIDString:@"b84e8912-a7c2-41cd-8385-86d200d7b31e"]][idx] :
+                              [[NSUUID alloc] initWithUUIDString:@"b84e8912-a7c2-41cd-8385-86d200d7b31e"]][i] :
             [[NSUUID alloc] initWithUUIDString:@"b9d325b0-3058-4838-8473-8f1aaae410db"],
-        @"anyCol": @(idx+1),
+        @"anyCol": @(i+1),
     };
 }
 
