@@ -304,19 +304,19 @@ class SetSyncTests: SwiftSyncTestCase {
             XCTFail(error.localizedDescription)
         }
     }
-// FIXME: needs investigation on core side
-//    func testDataSet() {
-//        do {
-//            try roundTrip(set: (\.dataSet, [Data(repeating: 1, count: 1024),
-//                                            Data(repeating: 1, count: 256),
-//                                            Data(repeating: 2, count: 64)]),
-//                          otherSet: (\.otherDataSet, [Data(repeating: 2, count: 64),
-//                                                      Data(repeating: 3, count: 256),
-//                                                      Data(repeating: 4, count: 1024)]))
-//        } catch {
-//            XCTFail(error.localizedDescription)
-//        }
-//    }
+
+    func testDataSet() {
+        do {
+            try roundTrip(set: (\.dataSet, [Data(repeating: 1, count: 1024),
+                                            Data(repeating: 1, count: 256),
+                                            Data(repeating: 2, count: 64)]),
+                          otherSet: (\.otherDataSet, [Data(repeating: 2, count: 64),
+                                                      Data(repeating: 3, count: 256),
+                                                      Data(repeating: 4, count: 1024)]))
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
 
     func testDateSet() {
         do {
