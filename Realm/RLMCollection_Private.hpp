@@ -94,7 +94,7 @@ id RLMManagedCollectionFromCollection(RLMClassInfo* info, realm::Obj&& obj, RLMP
 template<typename Fn>
 void RLMGetCollectionType(RLMProperty *prop, Fn&& func);
 
-static bool canAggregate(RLMPropertyType type, bool allowDate) {
+static inline bool canAggregate(RLMPropertyType type, bool allowDate) {
     switch (type) {
         case RLMPropertyTypeInt:
         case RLMPropertyTypeFloat:

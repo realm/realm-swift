@@ -29,22 +29,19 @@
 /**
  RLMValue is a property type which represents a polymorphic Realm value. This is similar to the usage of
  `AnyObject` / `Any` in Swift.
+```
+ // A property on `MyObject`
+ @property (nonatomic) id<RLMValue> myAnyValue;
 
- - Usage:
-     @interface MyObject : RLMObject
-     @property (nonatomic) id<RLMValue> myAnyValue;
-     @end
+ // A property on `AnotherObject`
+ @property (nonatomic) id<RLMValue> myAnyValue;
 
-     @interface AnotherObject : RLMObject
-     @property (nonatomic) id<RLMValue> myAnyValue;
-     @end
-     ...
-     MyObject *myObject = [MyObject createInRealm:realm withValue:@[]];
-     myObject.myAnyValue = @1234; // underlying type is NSNumber.
-     myObject.myAnyValue = @"hello"; // underlying type is NSString.
-     AnotherObject *anotherObject = [AnotherObject createInRealm:realm withValue:@[]];
-     myObject.myAnyValue = anotherObject; // underlying type is RLMObject.
-
+ MyObject *myObject = [MyObject createInRealm:realm withValue:@[]];
+ myObject.myAnyValue = @1234; // underlying type is NSNumber.
+ myObject.myAnyValue = @"hello"; // underlying type is NSString.
+ AnotherObject *anotherObject = [AnotherObject createInRealm:realm withValue:@[]];
+ myObject.myAnyValue = anotherObject; // underlying type is RLMObject.
+```
  The following types conform to RLMValue:
 
  `NSData`

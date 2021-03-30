@@ -646,46 +646,34 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primitive
         mutableSet.insert(values[0])
         let kvo = (mutableSet.value(forKey: "self") as [AnyObject]).first!
         switch values[0] {
-            case let .object(o):
-                if let obj = kvo as? SwiftStringObject {
-                    XCTAssertEqual(obj.stringCol, (o as! SwiftStringObject).stringCol)
-                } else {
-                    XCTFail()
-                }
-                break
-            case let .bool(b):
-                XCTAssertEqual(kvo as! Bool, b)
-                break
-            case let .data(d):
-                XCTAssertEqual(kvo as! Data, d)
-                break
-            case let .date(d):
-                XCTAssertEqual(kvo as! Date, d)
-                break
-            case let .decimal128(d):
-                XCTAssertEqual(kvo as! Decimal128, d)
-                break
-            case let .double(d):
-                XCTAssertEqual(kvo as! Double, d)
-                break
-            case let .float(f):
-                XCTAssertEqual(kvo as! Float, f)
-                break
-            case let .int(i):
-                XCTAssertEqual(kvo as! Int, i)
-                break
-            case .none:
-                XCTAssertNil(kvo)
-                break
-            case let .objectId(o):
-                XCTAssertEqual(kvo as! ObjectId, o)
-                break
-            case let .string(s):
-                XCTAssertEqual(kvo as! String, s)
-                break
-            case let .uuid(u):
-                XCTAssertEqual(kvo as! UUID, u)
-                break
+        case let .object(o):
+            if let obj = kvo as? SwiftStringObject {
+                XCTAssertEqual(obj.stringCol, (o as! SwiftStringObject).stringCol)
+            } else {
+                XCTFail("not an object")
+            }
+        case let .bool(b):
+            XCTAssertEqual(kvo as! Bool, b)
+        case let .data(d):
+            XCTAssertEqual(kvo as! Data, d)
+        case let .date(d):
+            XCTAssertEqual(kvo as! Date, d)
+        case let .decimal128(d):
+            XCTAssertEqual(kvo as! Decimal128, d)
+        case let .double(d):
+            XCTAssertEqual(kvo as! Double, d)
+        case let .float(f):
+            XCTAssertEqual(kvo as! Float, f)
+        case let .int(i):
+            XCTAssertEqual(kvo as! Int, i)
+        case .none:
+            XCTAssertNil(kvo)
+        case let .objectId(o):
+            XCTAssertEqual(kvo as! ObjectId, o)
+        case let .string(s):
+            XCTAssertEqual(kvo as! String, s)
+        case let .uuid(u):
+            XCTAssertEqual(kvo as! UUID, u)
         }
 
         assertThrows(mutableSet.value(forKey: "not self"), named: "NSUnknownKeyException")
