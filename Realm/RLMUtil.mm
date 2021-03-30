@@ -417,16 +417,14 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
         case RLMPropertyTypeObject: {
             // If we are unboxing an object and it is unmanaged, we need to
             // add it to the Realm.
-            if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(v); !objBase->_realm
-                && createPolicy.create) {
+            if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(v);
+                !objBase->_realm && createPolicy.create) {
                 RLMVerifyInWriteTransaction(realm);
-                // We do not want to copy the object, instead we want to promote
-                // it to a managed one.
-                createPolicy.copy = false;
                 RLMAccessorContext c{realm->_info[objBase->_objectSchema.className]};
-                c.createObject(objBase, createPolicy);
+                return realm::Mixed(c.createObject(objBase, createPolicy).first);
             }
-            else if (!((RLMObjectBase *)v)->_row) {
+
+            if (!((RLMObjectBase *)v)->_row) {
                 return realm::Mixed();
             }
 

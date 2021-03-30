@@ -672,16 +672,16 @@
 
     // Numeric based comparability
     // Expect (7) matches for int, double, float, decimal, 3 bools.
-    RLMAssertCount(AllTypesObject, 7U, @"anyCol BETWEEN %@", @[@1, @2]);
-    RLMAssertCount(AllTypesObject, 7U, @"anyCol BETWEEN {1, 2}");
-    RLMAssertCount(AllTypesObject, 7U, @"anyCol == FALSE");
-    RLMAssertCount(AllTypesObject, 7U, @"anyCol == 0");
-    RLMAssertCount(AllTypesObject, allValues.count-7, @"anyCol != FALSE");
-    RLMAssertCount(AllTypesObject, allValues.count-7, @"anyCol != 0");
-    RLMAssertCount(AllTypesObject, 7U, @"anyCol < 1");
+    RLMAssertCount(AllTypesObject, 12U, @"anyCol BETWEEN %@", @[@0, @3]);
+    RLMAssertCount(AllTypesObject, 12U, @"anyCol BETWEEN {0, 3}");
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol == FALSE");
+    RLMAssertCount(AllTypesObject, 6U, @"anyCol == 0");
+    RLMAssertCount(AllTypesObject, 22, @"anyCol != FALSE");
+    RLMAssertCount(AllTypesObject, 17, @"anyCol != 0");
+    RLMAssertCount(AllTypesObject, 6U, @"anyCol < 1");
     RLMAssertCount(AllTypesObject, 0U, @"anyCol > 1");
-    RLMAssertCount(AllTypesObject, 7U, @"anyCol >= 1");
-    RLMAssertCount(AllTypesObject, 14U, @"anyCol <= 1");
+    RLMAssertCount(AllTypesObject, 6U, @"anyCol >= 1");
+    RLMAssertCount(AllTypesObject, 12U, @"anyCol <= 1");
 
     XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol BETWEEN TRUE"],
                                  NSException,
@@ -2628,18 +2628,18 @@ static NSData *data(const char *str) {
     RLMAssertCount(self.queryObjectClass, 3U, @"2 >= decimal1");
     RLMAssertCount(self.queryObjectClass, 5U, @"2 <= decimal1");
 
-    RLMAssertCount(self.queryObjectClass, 3U, @"1 == any1");
-    RLMAssertCount(self.queryObjectClass, 3U, @"1.0 == any1");
+    RLMAssertCount(self.queryObjectClass, 2U, @"1 == any1");
+    RLMAssertCount(self.queryObjectClass, 2U, @"1.0 == any1");
     RLMAssertCount(self.queryObjectClass, 1U, @"'one' == any1");
     RLMAssertCount(self.queryObjectClass, 6U, @"'one' != any1");
-    RLMAssertCount(self.queryObjectClass, 3U, @"TRUE == any1");
-    RLMAssertCount(self.queryObjectClass, 4U, @"TRUE != any1");
+    RLMAssertCount(self.queryObjectClass, 1U, @"TRUE == any1");
+    RLMAssertCount(self.queryObjectClass, 6U, @"TRUE != any1");
     RLMAssertCount(self.queryObjectClass, 1U, @"%@ == any1", oid1);
     RLMAssertCount(self.queryObjectClass, 6U, @"%@ != any1", oid1);
     RLMAssertCount(self.queryObjectClass, 5U, @"2 != any2");
-    RLMAssertCount(self.queryObjectClass, 3U, @"2 > any1");
+    RLMAssertCount(self.queryObjectClass, 2U, @"2 > any1");
     RLMAssertCount(self.queryObjectClass, 0U, @"2 < any1");
-    RLMAssertCount(self.queryObjectClass, 3U, @"2 >= any1");
+    RLMAssertCount(self.queryObjectClass, 2U, @"2 >= any1");
     RLMAssertCount(self.queryObjectClass, 0U, @"2 <= any1");
 
     RLMAssertCount(self.queryObjectClass, 4U, @"%@ == objectId1", oid1);

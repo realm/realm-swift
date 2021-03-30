@@ -110,7 +110,7 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
             id managedCollection = [[cls alloc] initWithParent:object property:prop];
             [ivar set_rlmCollection:managedCollection];
         }
-        else if (RLMDynamicCast<RLMSwiftValueStorage>(object_getIvar(object, prop.swiftIvar)) != nil) {
+        else if ([object_getIvar(object, prop.swiftIvar) isKindOfClass:[RLMSwiftValueStorage class]]) {
             id ivar = object_getIvar(object, prop.swiftIvar);
             RLMInitializeManagedSwiftValueStorage(ivar, object, prop);
         }
