@@ -120,8 +120,8 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
                 [ret setObject:val forKey:key];
             }
             return ret;
-        } else
-        if (prop.collection) {
+        }
+        else if (prop.collection) {
             NSMutableArray *ret = [[NSMutableArray alloc] init];
             for (id el in obj) {
                 [ret addObject:coerceToObjectType(el, objectClass, schema)];

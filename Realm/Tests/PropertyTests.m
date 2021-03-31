@@ -41,6 +41,7 @@
                                                 @"\tisPrimary = NO;\n"
                                                 @"\tarray = NO;\n"
                                                 @"\tset = NO;\n"
+                                                @"\tdictionary = NO;\n"
                                                 @"\toptional = YES;\n"
                                                 @"}");
 }

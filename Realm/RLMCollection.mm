@@ -170,11 +170,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state,
     if (state->state == 0) {
         enumerator = collection.fastEnumerator;
         state->extra[0] = (long)enumerator;
-        if (RLMDictionary *dict = RLMDynamicCast<RLMDictionary>(collection)) {
-            state->extra[1] = dict.allKeys.count;
-        } else {
-            state->extra[1] = collection.count;
-        }
+        state->extra[1] = collection.count;
     }
     else {
         enumerator = (__bridge id)(void *)state->extra[0];

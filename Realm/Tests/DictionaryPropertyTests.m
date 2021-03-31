@@ -554,15 +554,16 @@
 
     RLM_GENERIC_DICTIONARY(RLMString, EmployeeObject) *employeeObjects = [company valueForKey:@"employeeDict"];
     NSMutableArray *kvcAgeProperties = [NSMutableArray array];
-    for (EmployeeObject *employee in employeeObjects) {
+    for (id key in employeeObjects) {
+        EmployeeObject *employee = employeeObjects[key];
         [kvcAgeProperties addObject:@(employee.age)];
     }
     XCTAssertEqualObjects([kvcAgeProperties sortedArrayUsingSelector: @selector(compare:)], ages);
 
     XCTAssertEqualObjects([[company.employeeDict valueForKey:@"age"]
                            sortedArrayUsingSelector: @selector(compare:)], ages);
-//    XCTAssertTrue([[[company.employeeDict valueForKey:@"self"] firstObject] isEqualToObject:company.employeeDict.firstObject]);
-//    XCTAssertTrue([[[company.employeeDict valueForKey:@"self"] lastObject] isEqualToObject:company.employeeDict.lastObject]);
+    XCTAssertTrue([[[company.employeeDict valueForKey:@"self"] firstObject] isEqualToObject:company.employeeDict.firstObject]);
+    XCTAssertTrue([[[company.employeeDict valueForKey:@"self"] lastObject] isEqualToObject:company.employeeDict.lastObject]);
 
     XCTAssertEqual([[company.employeeDict valueForKeyPath:@"@count"] integerValue], 30);
     XCTAssertEqual([[company.employeeDict valueForKeyPath:@"@min.age"] integerValue], 0);
@@ -586,8 +587,8 @@
     }
 
     XCTAssertEqualObjects([company.employeeDict valueForKey:@"age"], ages);
-//    XCTAssertTrue([[[company.employeeDict valueForKey:@"self"] firstObject] isEqualToObject:company.employees.firstObject]);
-//    XCTAssertTrue([[[company.employees valueForKey:@"self"] lastObject] isEqualToObject:company.employees.lastObject]);
+    XCTAssertTrue([[[company.employeeDict valueForKey:@"self"] firstObject] isEqualToObject:company.employees.firstObject]);
+    XCTAssertTrue([[[company.employees valueForKey:@"self"] lastObject] isEqualToObject:company.employees.lastObject]);
 
     XCTAssertEqual([[company.employeeDict valueForKeyPath:@"@count"] integerValue], 30);
     XCTAssertEqual([[company.employeeDict valueForKeyPath:@"@min.age"] integerValue], 0);
