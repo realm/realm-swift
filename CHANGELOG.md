@@ -8,6 +8,12 @@ x.y.z Release notes (yyyy-MM-dd)
 * Adjust the header paths for the podspec to avoid accidentally finding a file
   which isn't part of the pod that produced warnings when importing the
   framework. ([#7113](https://github.com/realm/realm-cocoa/issues/7113), since 10.5.2).
+* Fixed a crash that would occur when observing unmanaged Objects in multiple views in SwiftUI.
+  When using `@StateRealmObject` or `@ObservedObject` across multiple views with an unmanaged object,
+  each view would subscribe to the object. As each view unsubscribed (generally when trailing back through the view stack),
+  our propertyWrappers would attempt to remove the KVOs for each cancellation, when it should only be done once.
+  We now correctly remove KVOs only once.
+  ([#7131](https://github.com/realm/realm-cocoa/issues/7131))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

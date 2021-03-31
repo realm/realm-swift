@@ -20,6 +20,7 @@
 import XCTest
 import RealmSwift
 import SwiftUI
+import Combine
 
 @objcMembers class SwiftUIObject: Object, ObjectKeyIdentifiable {
     var list = RealmSwift.List<SwiftBoolObject>()

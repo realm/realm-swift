@@ -68,8 +68,8 @@ command:
   test-catalyst:        tests Mac Catalyst framework
   test-catalyst-swift:  tests RealmSwift Mac Catalyst framework
   test-swiftpm:         tests ObjC and Swift macOS frameworks via SwiftPM
-  test-swiftui:         tests SwiftUI framework UI tests
-  verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device in both Debug and Release configurations, swiftlint
+  test-swiftui-ios:         tests SwiftUI framework UI tests
+  verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device, swiftui-ios in both Debug and Release configurations, swiftlint
   verify-osx-object-server:  downloads the Realm Object Server and runs the Objective-C and Swift integration tests
   docs:                 builds docs in docs/output
   examples:             builds all examples
@@ -507,7 +507,7 @@ case "$COMMAND" in
         ;;
 
     "swiftui")
-        xc "-scheme SwiftUITestHost -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 12' build-for-testing"
+        xc -scheme SwiftUITestHost -configuration $CONFIGURATION -sdk iphonesimulator build
         ;;
 
     "catalyst")
@@ -667,8 +667,8 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "test-swiftui")
-        xctest 'SwiftUITestHost' -sdk iphonesimulator -destination 'name=iPhone 12'
+    "test-swiftui-ios")
+        xctest 'SwiftUITestHost' -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 8'
         exit 0
         ;;
 
@@ -711,6 +711,7 @@ case "$COMMAND" in
         sh build.sh verify-osx-object-server
         sh build.sh verify-catalyst
         sh build.sh verify-catalyst-swift
+        sh build.sh verify-swiftui-ios
         ;;
 
     "verify-cocoapods")
@@ -786,8 +787,8 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "verify-swiftui")
-        sh build.sh test-swiftui
+    "verify-swiftui-ios")
+        sh build.sh test-swiftui-ios
         exit 0
         ;;
 
