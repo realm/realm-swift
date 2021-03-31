@@ -4,7 +4,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* Adjust the header paths for the podspec to avoid accidentally finding a file
+  which isn't part of the pod that produced warnings when importing the
+  framework. ([#7113](https://github.com/realm/realm-cocoa/issues/7113), since 10.5.2).
 * Fixed a crash that would occur when observing unmanaged Objects in multiple views in SwiftUI.
   When using `@StateRealmObject` or `@ObservedObject` across multiple views with an unmanaged object,
   each view would subscribe to the object. As each view unsubscribed (generally when trailing back through the view stack),
@@ -22,6 +25,58 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.7.2 Release notes (2021-03-08)
+=============================================================
+
+### Fixed
+
+* During integration of a large amount of data from the server, you may get
+  "Assertion failed: !fields.has_missing_parent_update()"
+  ([Core #4497](https://github.com/realm/realm-core/issues/4497), since v6.0.0)
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.5.4 to v10.5.5
+
+10.7.1 Release notes (2021-03-05)
+=============================================================
+
+### Fixed
+
+* Queries of the form "a.b.c == nil" would match objects where `b` is `nil` if
+  `c` did not have an index and did not if `c` was indexed. Both will now match
+  to align with NSPredicate's behavior. ([Core #4460]https://github.com/realm/realm-core/pull/4460), since 4.3.0).
+* Restore support for upgrading files from file format 5 (Realm Cocoa 1.x).
+  ([Core #7089](https://github.com/realm/realm-cocoa/issues/7089), since v5.0.0)
+* On 32bit devices you may get exception with "No such object" when upgrading
+  to v10.* ([Java #7314](https://github.com/realm/realm-java/issues/7314), since v5.0.0)
+* The notification worker thread would rerun queries after every commit rather
+  than only commits which modified tables which could effect the query results
+  if the table had any outgoing links to tables not used in the query.
+  ([Core #4456](https://github.com/realm/realm-core/pull/4456), since v5.0.0).
+* Fix "Invalid ref translation entry [16045690984833335023, 78187493520]"
+  assertion failure which could occur when using sync or multiple processes
+  writing to a single Realm file.
+  ([#7086](https://github.com/realm/realm-cocoa/issues/7086), since v5.0.0).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.5.3 to v10.5.4
 
 10.7.0 Release notes (2021-02-23)
 =============================================================

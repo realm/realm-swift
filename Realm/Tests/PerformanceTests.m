@@ -364,7 +364,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [realm commitWriteTransaction];
 
     [self measureBlock:^{
-        (void)[[IntObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"intCol" ascending:YES].lastObject;
+        (void)[[IntObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:@"intCol" ascending:YES].lastObject;
     }];
 }
 
@@ -684,7 +684,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         const NSUInteger factor = count / 10;
 
         [self observeObject:obj keyPath:@"array"
-                      until:^(id obj) { return [obj array].count >= count; }];
+                      until:^(ArrayPropertyObject *obj) { return obj.array.count >= count; }];
 
         RLMArray *array = obj.array;
         [self startMeasuring];

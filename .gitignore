@@ -13,6 +13,7 @@
 *.zip
 *.realm
 !examples/ios/swift/Migration/RealmTemplates/*.realm
+!examples/ios/objc/Migration/RealmTemplates/*.realm
 *.realm.lock
 
 # core
