@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMBSON_Private.hpp"
+#import "RLMUUID_Private.hpp"
 
 #import <realm/object-store/util/bson/bson.hpp>
 
@@ -95,6 +96,14 @@ using namespace realm::bson;
     RLMObjectId *rlm = (RLMObjectId *)RLMConvertBsonToRLMBSON(bson);
     RLMObjectId *d = [[RLMObjectId alloc] initWithString:rlm.stringValue error:nil];
     XCTAssertEqualObjects(rlm, d);
+    XCTAssertEqual(RLMConvertRLMBSONToBson(rlm), bson);
+}
+
+- (void)testUUIDRoundTrip {
+    NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:@"b1c11e54-e719-4275-b631-69ec3f2d616d"];
+    auto bson = Bson(uuid.rlm_uuidValue);
+    NSUUID *rlm = (NSUUID *)RLMConvertBsonToRLMBSON(bson);
+    XCTAssertEqualObjects(rlm, uuid);
     XCTAssertEqual(RLMConvertRLMBSONToBson(rlm), bson);
 }
 
