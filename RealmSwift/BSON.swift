@@ -150,6 +150,8 @@ extension MinKey: BSON {
     /// if will be considered `BSON` null type and will return `nil`.
     public init<T: BSON>(_ bson: T) {
         switch bson {
+        case let val as AnyBSON:
+            self = val
         case let val as Int:
             self = .int64(Int64(val))
         case let val as Int32:

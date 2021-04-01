@@ -18,7 +18,6 @@
 
 import Foundation
 import RealmSwift
-import XCTest
 
 #if os(macOS)
 
@@ -467,7 +466,7 @@ public class RealmServer: NSObject {
                 try launchServerProcess()
                 self.session = try Admin().login()
             } catch {
-                XCTFail("Could not initiate admin session: \(error.localizedDescription)")
+                fatalError("Could not initiate admin session: \(error.localizedDescription)")
             }
         }
     }
@@ -810,7 +809,7 @@ public class RealmServer: NSObject {
         }
         pingServer()
         guard case .success = group.wait(timeout: .now() + 10) else {
-            return XCTFail("Server did not start")
+            fatalError("Server did not start")
         }
     }
 
@@ -818,7 +817,7 @@ public class RealmServer: NSObject {
 
     private func failOnError<T>(_ result: Result<T, Error>) {
         if case .failure(let error) = result {
-            XCTFail(error.localizedDescription)
+            fatalError(error.localizedDescription)
         }
     }
 
@@ -853,14 +852,14 @@ public class RealmServer: NSObject {
         app.authProviders.get(on: group) { authProviders in
             do {
                 guard let authProviders = try authProviders.get() as? [[String: Any]] else {
-                    return XCTFail("Bad formatting for authProviders")
+                    fatalError("Bad formatting for authProviders")
                 }
                 guard let provider = authProviders.first(where: { $0["type"] as? String == "api-key" }) else {
-                    return XCTFail("Did not find api-key provider")
+                    fatalError("Did not find api-key provider")
                 }
                 app.authProviders[provider["_id"] as! String].enable.put(on: group, self.failOnError)
             } catch {
-                XCTFail(error.localizedDescription)
+                fatalError(error.localizedDescription)
             }
         }
 
@@ -1066,7 +1065,7 @@ public class RealmServer: NSObject {
                              ],
                 "title": "SwiftPerson"
             ],
-                "relationships": [:]
+            "relationships": [:]
         ]
 
         let rules = app.services[serviceId].rules
@@ -1076,10 +1075,9 @@ public class RealmServer: NSObject {
         rules.post(on: group, hugeSyncObjectRule, failOnError)
         // When running ObjcObjectServerTests,
         // we do not want to pull in swift schema reqs
-        #if SWIFT_PACKAGE && REALM_HAVE_COMBINE
+
         rules.post(on: group, swiftHugeSyncObjectRule, failOnError)
         rules.post(on: group, swiftPersonRule, failOnError)
-        #endif
 
         app.sync.config.put(on: group, data: [
             "development_mode_enabled": true
@@ -1148,5 +1146,4 @@ public class RealmServer: NSObject {
         return clientAppId
     }
 }
-
 #endif

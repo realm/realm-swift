@@ -563,6 +563,66 @@ extension EnvironmentValues {
     }
 }
 
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@propertyWrapper public struct AutoOpen: DynamicProperty {
+    private class ObservableRealmStorage: ObservableObject {
+        var cancellables = [AnyCancellable]()
+        @Published var realm: Realm? {
+            willSet {
+                if newValue != realm {
+                    objectWillChange.send()
+                }
+            }
+        }
+
+        var configuration: Realm.Configuration? {
+            didSet {
+                if let configuration = configuration { asyncOpen(configuration: configuration) }
+            }
+        }
+
+        func asyncOpen(configuration: Realm.Configuration) {
+            Realm.asyncOpen(configuration: configuration).sink { completion in
+                if case .failure(let error) = completion {
+                    throwRealmException(error.localizedDescription)
+                }
+            } receiveValue: { realm in
+                self.realm = realm
+            }.store(in: &cancellables)
+        }
+    }
+
+    @Environment(\.realmConfiguration) var configuration
+    @ObservedObject private var storage = ObservableRealmStorage()
+    public var wrappedValue: Realm? {
+        get {
+            storage.realm
+        }
+    }
+
+    public init(appId: String, partitionValue: AnyBSON) {
+        let app = App(id: appId)
+        if app.currentUser?.isLoggedIn ?? false, let currentUser = app.currentUser {
+            storage.asyncOpen(configuration: currentUser.configuration(partitionValue: partitionValue))
+        } else {
+            app.objectWillChange.sink { [storage] app in
+                if let currentUser = app.currentUser {
+                    storage.asyncOpen(configuration: currentUser.configuration(partitionValue: partitionValue))
+                }
+            }.store(in: &storage.cancellables)
+        }
+    }
+
+    public mutating func update() {
+        // When the view updates, it will inject the @Environment
+        // into the propertyWrapper
+        if storage.configuration == nil || storage.configuration != configuration {
+            storage.configuration = configuration
+        }
+    }
+}
+
+
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension SwiftUIKVO {
     static func removeObservers(object: NSObject) {

@@ -19,6 +19,7 @@
 import RealmSwift
 import SwiftUI
 
+#if os(iOS)
 struct ReminderRowView: View {
     @ObservedRealmObject var list: ReminderList
     @ObservedRealmObject var reminder: Reminder
@@ -228,6 +229,7 @@ struct UnmanagedObjectTestView: View {
 
 @main
 struct App: SwiftUI.App {
+
     var body: some Scene {
         if let realmPath = ProcessInfo.processInfo.environment["REALM_PATH"] {
             Realm.Configuration.defaultConfiguration =
@@ -242,6 +244,10 @@ struct App: SwiftUI.App {
                 return AnyView(MultiRealmContentView())
             case "unmanaged_object_test":
                 return AnyView(UnmanagedObjectTestView())
+            #if os(macOS)
+            case "auto_open":
+                hydrate()
+            #endif
             default:
                 return AnyView(ContentView())
             }
@@ -251,3 +257,78 @@ struct App: SwiftUI.App {
         }
     }
 }
+#elseif os(macOS)
+import Combine
+
+public class SwiftPerson: Object {
+    @objc public dynamic var _id: ObjectId? = ObjectId.generate()
+    @objc public dynamic var firstName: String = ""
+    @objc public dynamic var lastName: String = ""
+    @objc public dynamic var age: Int = 30
+
+    public convenience init(firstName: String, lastName: String) {
+        self.init()
+        self.firstName = firstName
+        self.lastName = lastName
+    }
+
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
+@main
+struct App: SwiftUI.App {
+    func hydrateServer() -> String {
+        print("hydrating")
+        let server = RealmServer.shared
+        let appId = try! server.createApp()
+        print("app created: \(appId)")
+        let app = App(id: appId, configuration: AppConfiguration(baseURL: "http://localhost:9090", transport: nil,
+                      localAppName: nil, localAppVersion: nil))
+        let data: [Document] = (0..<1000).map { _ in
+            Document(dictionaryLiteral: ("firstName", "Forrest"), ("lastName", "Gump"), ("age", 50), ("realm_id", .string(appId)))
+        }
+        var cancellables = [AnyCancellable]()
+        let semaphore = DispatchSemaphore(value: 0)
+        app.login(credentials: .anonymous).flatMap { (user: User) in
+            user.mongoClient("mongodb1")
+                .database(named: "test_data")
+                .collection(withName: "SwiftPerson")
+                .insertMany(data)
+        }.sink { completion in
+            switch completion {
+            case .failure(let error):
+                print(error)
+            default: break
+            }
+            semaphore.signal()
+        } receiveValue: { values in
+            print(values)
+        }.store(in: &cancellables)
+        semaphore.wait()
+    }
+
+    var body: some Scene {
+        if let realmPath = ProcessInfo.processInfo.environment["REALM_PATH"] {
+            Realm.Configuration.defaultConfiguration =
+                Realm.Configuration(fileURL: URL(string: realmPath)!, deleteRealmIfMigrationNeeded: true)
+        } else {
+            Realm.Configuration.defaultConfiguration =
+                Realm.Configuration(deleteRealmIfMigrationNeeded: true)
+        }
+        let view: AnyView = {
+            switch ProcessInfo.processInfo.environment["test_type"] {
+            case "auto_open":
+                hydrate()
+            default:
+                return AnyView(ContentView())
+            }
+        }()
+        return WindowGroup {
+            view
+        }
+    }
+}
+#endif
+
