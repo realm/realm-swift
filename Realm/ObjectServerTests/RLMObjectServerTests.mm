@@ -604,6 +604,116 @@ static NSString *randomEmail() {
     }
 }
 
+- (void)testRountripForDistinctPrimaryKey {
+    RLMUser *user = [self userForTest:_cmd];
+    NSString *realmId = NSStringFromSelector(_cmd);
+    RLMRealm *realm = [self openRealmForPartitionValue:realmId user:user];
+    if (self.isParent) {
+        CHECK_COUNT(0, Person, realm);
+        CHECK_COUNT(0, UUIDPrimaryKeyObject, realm);
+        CHECK_COUNT(0, StringPrimaryKeyObject, realm);
+        CHECK_COUNT(0, IntPrimaryKeyObject, realm);
+
+        RLMRunChildAndWait();
+        [self waitForDownloadsForRealm:realm];
+        CHECK_COUNT(1, Person, realm);
+        CHECK_COUNT(1, UUIDPrimaryKeyObject, realm);
+        CHECK_COUNT(1, StringPrimaryKeyObject, realm);
+        CHECK_COUNT(1, IntPrimaryKeyObject, realm);
+
+        Person *person = [Person objectInRealm:realm forPrimaryKey:[[RLMObjectId alloc] initWithString:@"1234567890ab1234567890ab" error:nil]];
+        XCTAssertEqualObjects(person.firstName, @"Ringo");
+        XCTAssertEqualObjects(person.lastName, @"Starr");
+
+        UUIDPrimaryKeyObject *uuidPrimaryKeyObject = [UUIDPrimaryKeyObject objectInRealm:realm forPrimaryKey:[[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"]];
+        XCTAssertEqualObjects(uuidPrimaryKeyObject.strCol, @"Steve");
+        XCTAssertEqual(uuidPrimaryKeyObject.intCol, 10);
+
+        StringPrimaryKeyObject *stringPrimaryKeyObject = [StringPrimaryKeyObject objectInRealm:realm forPrimaryKey:@"1234567890ab1234567890aa"];
+        XCTAssertEqualObjects(stringPrimaryKeyObject.strCol, @"Paul");
+        XCTAssertEqual(stringPrimaryKeyObject.intCol, 20);
+
+        IntPrimaryKeyObject *intPrimaryKeyObject = [IntPrimaryKeyObject objectInRealm:realm forPrimaryKey:@1234567890];
+        XCTAssertEqualObjects(intPrimaryKeyObject.strCol, @"Jackson");
+        XCTAssertEqual(intPrimaryKeyObject.intCol, 30);
+
+    } else {
+        Person *person = [[Person alloc] initWithPrimaryKey:[[RLMObjectId alloc] initWithString:@"1234567890ab1234567890ab" error:nil]
+                                                        age:5
+                                                  firstName:@"Ringo"
+                                                   lastName:@"Starr"];
+        UUIDPrimaryKeyObject *uuidPrimaryKeyObject = [[UUIDPrimaryKeyObject alloc] initWithPrimaryKey:[[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"]
+                                                                                               strCol:@"Steve"
+                                                                                               intCol:10];
+        StringPrimaryKeyObject *stringPrimaryKeyObject = [[StringPrimaryKeyObject alloc] initWithPrimaryKey:@"1234567890ab1234567890aa"
+                                                                                                     strCol:@"Paul"
+                                                                                                     intCol:20];
+        IntPrimaryKeyObject *intPrimaryKeyObject = [[IntPrimaryKeyObject alloc] initWithPrimaryKey:1234567890
+                                                                                            strCol:@"Jackson"
+                                                                                            intCol:30];
+
+        [realm beginWriteTransaction];
+        [realm addObject:person];
+        [realm addObject:uuidPrimaryKeyObject];
+        [realm addObject:stringPrimaryKeyObject];
+        [realm addObject:intPrimaryKeyObject];
+        [realm commitWriteTransaction];
+        [self waitForUploadsForRealm:realm];
+        CHECK_COUNT(1, Person, realm);
+        CHECK_COUNT(1, UUIDPrimaryKeyObject, realm);
+        CHECK_COUNT(1, StringPrimaryKeyObject, realm);
+        CHECK_COUNT(1, IntPrimaryKeyObject, realm);
+    }
+}
+
+- (void)testRoundTripForObjectIdPartitionValue {
+    [self roundTripForPartitionValue:[[RLMObjectId alloc] initWithString:@"1234567890ab1234567890ab" error:nil]];
+}
+
+- (void)testRoundTripForUUIDPartitionValue {
+    [self roundTripForPartitionValue:[[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"]];
+}
+
+- (void)testRoundTripForStringPartitionValue {
+    [self roundTripForPartitionValue:@"1234567890ab1234567890ab"];
+}
+
+- (void)testRoundTripForIntPartitionValue {
+    [self roundTripForPartitionValue:@1234567890];
+}
+
+- (void)roundTripForPartitionValue:(id<RLMBSON>)value  {
+    RLMApp *app = [self createAppForPartition:value];
+    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                        register:self.isParent
+                                                             app:app];
+    RLMUser *user = [self logInUserForCredentials:credentials app:app];
+    RLMRealm *realm = [self openRealmForPartitionValue:value user:user];
+    if (self.isParent) {
+        [realm beginWriteTransaction];
+        [realm deleteAllObjects];
+        [realm commitWriteTransaction];
+        CHECK_COUNT(0, Person, realm);
+
+        RLMRunChildAndWait();
+        [self waitForDownloadsForRealm:realm];
+        CHECK_COUNT(3, Person, realm);
+        XCTAssertEqual([Person objectsInRealm:realm where:@"firstName = 'John'"].count, 1UL);
+
+        RLMRunChildAndWait();
+        [self waitForDownloadsForRealm:realm];
+        CHECK_COUNT(6, Person, realm);
+        XCTAssertEqual([Person objectsInRealm:realm where:@"firstName = 'John'"].count, 2UL);
+    } else {
+        // Add objects.
+        [self addPersonsToRealm:realm
+                        persons:@[[Person john],
+                                  [Person paul],
+                                  [Person ringo]]];
+        [self waitForUploadsForRealm:realm];
+    }
+}
+
 /// If client B adds objects to a synced Realm, client A should see those objects.
 - (void)testAddObjectsMultipleApps {
     NSString *appId1;
@@ -1299,7 +1409,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     CHECK_COUNT(0, HugeSyncObject, realm);
     [realm beginWriteTransaction];
     for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
-        [realm addObject:[HugeSyncObject objectWithRealmId:partitionValue]];
+        [realm addObject:[HugeSyncObject hugeSyncObject]];
     }
     [realm commitWriteTransaction];
     [self waitForUploadsForRealm:realm];
@@ -1379,7 +1489,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     // Upload lots of data
     [realm beginWriteTransaction];
     for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
-        [realm addObject:[HugeSyncObject objectWithRealmId:NSStringFromSelector(_cmd)]];
+        [realm addObject:[HugeSyncObject hugeSyncObject]];
     }
     [realm commitWriteTransaction];
     // Wait for upload to begin and finish
@@ -1622,7 +1732,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                         encryptionKey:nil
                                                            stopPolicy:RLMSyncStopPolicyImmediately];
         [realm beginWriteTransaction];
-        [realm addObject:[HugeSyncObject objectWithRealmId:partitionValue]];
+        [realm addObject:[HugeSyncObject hugeSyncObject]];
         [realm commitWriteTransaction];
         [self waitForUploadsForRealm:realm];
 
