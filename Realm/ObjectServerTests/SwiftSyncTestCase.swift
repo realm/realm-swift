@@ -26,22 +26,6 @@ import RealmTestSupport
 import RealmSyncTestSupport
 #endif
 
-@objcMembers public class SwiftUUIDPrimaryKeyObject: Object {
-    @objc public dynamic var _id: UUID =  UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
-    @objc public dynamic var strCol: String = ""
-    @objc public dynamic var intCol: Int = 0
-
-    public convenience init(strCol: String, intCol: Int) {
-        self.init()
-        self.strCol = strCol
-        self.intCol = intCol
-    }
-
-    public override class func primaryKey() -> String? {
-        return "_id"
-    }
-}
-
 public class SwiftPerson: Object {
     @objc public dynamic var _id: ObjectId? = ObjectId.generate()
     @objc public dynamic var firstName: String = ""
@@ -52,6 +36,57 @@ public class SwiftPerson: Object {
         self.init()
         self.firstName = firstName
         self.lastName = lastName
+    }
+
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
+@objcMembers public class SwiftUUIDPrimaryKeyObject: Object {
+    @objc public dynamic var _id: UUID? = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
+    @objc public dynamic var strCol: String = ""
+    @objc public dynamic var intCol: Int = 0
+
+    public convenience init(id: UUID?, strCol: String, intCol: Int) {
+        self.init()
+        self._id = id
+        self.strCol = strCol
+        self.intCol = intCol
+    }
+
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
+@objcMembers public class SwiftStringPrimaryKeyObject: Object {
+    @objc public dynamic var _id: String? = "1234567890ab1234567890ab"
+    @objc public dynamic var strCol: String = ""
+    @objc public dynamic var intCol: Int = 0
+
+    public convenience init(id: String, strCol: String, intCol: Int) {
+        self.init()
+        self._id = id
+        self.strCol = strCol
+        self.intCol = intCol
+    }
+
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
+@objcMembers public class SwiftIntPrimaryKeyObject: Object {
+    @objc public dynamic var _id: Int = 1234567890
+    @objc public dynamic var strCol: String = ""
+    @objc public dynamic var intCol: Int = 0
+
+    public convenience init(id: Int, strCol: String, intCol: Int) {
+        self.init()
+        self._id = id
+        self.strCol = strCol
+        self.intCol = intCol
     }
 
     public override class func primaryKey() -> String? {
@@ -136,9 +171,14 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     public func openRealm(configuration: Realm.Configuration) throws -> Realm {
         var configuration = configuration
         if configuration.objectTypes == nil {
-            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self,
-                                         HugeSyncObject.self, SwiftCollectionSyncObject.self,
-                                         SwiftUUIDPrimaryKeyObject.self]
+            configuration.objectTypes = [SwiftPerson.self,
+                                         Person.self,
+                                         Dog.self,
+                                         HugeSyncObject.self,
+                                         SwiftCollectionSyncObject.self,
+                                         SwiftUUIDPrimaryKeyObject.self,
+                                         SwiftStringPrimaryKeyObject.self,
+                                         SwiftIntPrimaryKeyObject.self]
         }
         let realm = try Realm(configuration: configuration)
         waitForDownloads(for: realm)
@@ -148,9 +188,17 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     public func immediatelyOpenRealm(partitionValue: String, user: User) throws -> Realm {
         var configuration = user.configuration(partitionValue: partitionValue)
         if configuration.objectTypes == nil {
-            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self]
+            configuration.objectTypes = [SwiftPerson.self,
+                                         Person.self,
+                                         Dog.self,
+                                         HugeSyncObject.self]
         }
         return try Realm(configuration: configuration)
+    }
+
+
+    public func createAppForPartition<T: BSON>(_ partitionValue: T) -> App {
+        return createApp(forPartition: ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
     }
 
     open func logInUser(for credentials: Credentials, app: App? = nil) throws -> User {
@@ -186,7 +234,6 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
                                       file: StaticString = #file,
                                       line: UInt = #line) {
         let actual = realm.objects(type).count
-        print("---------> Count :\(actual), expected :\(expected)")
         XCTAssertEqual(actual, expected,
                        "Error: expected \(expected) items, but got \(actual) (process: \(isParent ? "parent" : "child"))",
             file: file,
