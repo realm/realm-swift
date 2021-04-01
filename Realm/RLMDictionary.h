@@ -128,6 +128,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeAllObjects;
 
 /**
+ Adds an array of distinct objects to the set.
+
+ @warning This method may only be called during a write transaction.
+
+ @param objects      `NSDictionary` which contains objects of the
+                    same class as the dictionary.
+ */
+- (void)addObjects:(NSDictionary *)objects;
+
+/**
  Delete dictionary's values for a given keys.
  */
 - (void)removeObjectsForKeys:(NSArray<RLMKeyType> *)keyArray;

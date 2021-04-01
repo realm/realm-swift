@@ -97,7 +97,7 @@ extension RLMCollection {
      Returns a `RLMCollectionIterator` that yields successive elements in the collection.
      This enables support for sequence-style enumeration of `RLMObject` subclasses in Swift.
      */
-    public func makeIterator() -> RLMCollectionIterator<RLMObject> {
+    public func makeIterator() -> RLMCollectionIterator<AnyObject> {
         return RLMCollectionIterator(collection: self)
     }
 }

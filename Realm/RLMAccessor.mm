@@ -538,13 +538,7 @@ id unmanagedSetter(RLMProperty *prop, const char *) {
             collection = [[cls alloc] initWithObjectClassName:prop.objectClassName];
         else
             collection = [[cls alloc] initWithObjectType:prop.type optional:prop.optional];
-        if (!prop.dictionary)
-            [collection addObjects:values];
-        else {
-            for (id key in values) {
-                [collection setValue:((NSDictionary *)values)[key] forKey:key];
-            }
-        }
+        [collection addObjects:values];
         superSet(obj, propName, collection);
     };
 }
