@@ -39,7 +39,7 @@ public enum AnyRealmValue: Hashable {
     /// A date type.
     case date(Date)
     /// A Realm Object type.
-    case object(Object)
+    case object(ObjectBase)
     /// An ObjectId type.
     case objectId(ObjectId)
     /// A Decimal128 type.
@@ -137,6 +137,13 @@ public enum AnyRealmValue: Hashable {
             return nil
         }
         return o as? T
+    }
+
+    public var dynamicObject: ObjectBase? {
+        guard let val = rlmValue as? ObjectBase else {
+            return nil
+        }
+        return val
     }
 
     internal var rlmValue: RLMValue? {

@@ -107,10 +107,10 @@ public extension ObjectiveCSupport {
             }
             return .uuid(val)
         case RLMPropertyType.object:
-            guard let val = value as? RLMObjectBase else {
+            guard let val = value as? ObjectBase else {
                 return .none
             }
-            return .object(Object.bridging(from: val, with: nil))
+            return .object(val)
         default:
             return .none
         }

@@ -19,7 +19,7 @@
 #import "RLMClassInfo.hpp"
 
 #import "RLMRealm_Private.hpp"
-#import "RLMObjectSchema_Private.h"
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMSchema.h"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
@@ -34,8 +34,8 @@
 using namespace realm;
 
 RLMClassInfo::RLMClassInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
-                           const realm::ObjectSchema *objectSchema)
-: realm(realm), rlmObjectSchema(rlmObjectSchema), objectSchema(objectSchema) { }
+                           const realm::ObjectSchema *objectSchema, bool created_locally)
+: realm(realm), rlmObjectSchema(rlmObjectSchema), objectSchema(objectSchema), m_created_locally(created_locally) { }
 
 realm::TableRef RLMClassInfo::table() const {
     if (auto key = objectSchema->table_key) {
@@ -79,6 +79,11 @@ RLMClassInfo &RLMClassInfo::resolve(__unsafe_unretained RLMRealm *const realm) {
     return realm->_info[rlmObjectSchema.className];
 }
 
+RLMClassInfo::~RLMClassInfo() {
+    if (m_created_locally)
+        delete objectSchema;
+}
+
 RLMSchemaInfo::impl::iterator RLMSchemaInfo::begin() noexcept { return m_objects.begin(); }
 RLMSchemaInfo::impl::iterator RLMSchemaInfo::end() noexcept { return m_objects.end(); }
 RLMSchemaInfo::impl::const_iterator RLMSchemaInfo::begin() const noexcept { return m_objects.begin(); }
@@ -95,12 +100,12 @@ RLMClassInfo& RLMSchemaInfo::operator[](NSString *name) {
     return *&it->second;
 }
 
-RLMClassInfo& RLMSchemaInfo::operator[](realm::TableKey const& key) {
+util::Optional<RLMClassInfo&> RLMSchemaInfo::operator[](realm::TableKey const& key) {
     for (auto& pair : m_objects) {
         if (pair.second.table()->get_key() == key)
             return pair.second;
     }
-    @throw RLMException(@"Table Key '%@' is not managed by the Realm. ", @(key.value));
+    return util::none;
 }
 
 RLMSchemaInfo::RLMSchemaInfo(RLMRealm *realm) {
@@ -133,3 +138,17 @@ RLMSchemaInfo RLMSchemaInfo::clone(realm::Schema const& source_schema,
     }
     return info;
 }
+
+RLMObjectSchema* RLMSchemaInfo::append_dynamic_object_schema(NSString *name, realm::ObjectSchema schema,
+                                                             __unsafe_unretained RLMRealm *const target_realm) {
+    realm::ObjectSchema *s = new realm::ObjectSchema;
+    *s = schema;
+    RLMObjectSchema *objectSchema = [RLMObjectSchema objectSchemaForObjectStoreSchema:*s];
+
+    m_objects.emplace(std::piecewise_construct,
+                      std::forward_as_tuple(name),
+                      std::forward_as_tuple(target_realm, objectSchema,
+                                            &*s, true));
+    return objectSchema;
+}
+

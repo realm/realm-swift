@@ -172,15 +172,27 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 }
 
 RLMObjectBase *RLMObjectFromObjLink(RLMRealm *realm, realm::ObjLink&& objLink) {
-    try {
-        auto& info = realm->_info[objLink.get_table_key()];
-        RLMObjectBase *object = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, &info);
+    auto info = realm->_info[objLink.get_table_key()];
+    if (info) {
+        RLMClassInfo &tableInfo = *info;
+        RLMObjectBase *object = RLMCreateManagedAccessor(tableInfo.rlmObjectSchema.accessorClass, &tableInfo);
         object->_row = realm.group.get_object(objLink);
         RLMInitializeSwiftAccessorGenerics(object);
         return object;
-    }
-    catch (...) {
-        return nil;
+    } else {
+        // Construct the object dynamically.
+        RLMObjectBase *obj = [[RLMObjectBase alloc] init];
+        realm::Schema const schema = realm::ObjectStore::schema_from_group(realm->_realm->read_group());
+        auto objectSchema = *schema.find(objLink.get_table_key());
+        RLMObjectSchema *rlmObjectSchema = realm->_info.append_dynamic_object_schema(@(objectSchema.name.c_str()),
+                                                                                     objectSchema,
+                                                                                     realm);
+        obj->_info = &realm->_info[rlmObjectSchema.className];
+        obj->_realm = realm;
+        obj->_objectSchema = rlmObjectSchema;
+        obj->_row = realm->_info[rlmObjectSchema.className].table()->get_object(objLink.get_obj_key());
+        RLMInitializeSwiftAccessorGenerics(obj);
+        return obj;
     }
 }
 

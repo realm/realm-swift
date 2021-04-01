@@ -2075,14 +2075,13 @@ class AnyRealmValueSyncTests: SwiftSyncTestCase {
                 // Imagine this is v1 of an app with just 2 classes, `SwiftMissingObject`
                 // did not exist when this version was shipped,
                 // but v2 managed to sync `SwiftMissingObject` to this Realm.
-                var configB = user.configuration(partitionValue: #function)
-                configB.objectTypes = [SwiftAnyRealmValueObject.self, SwiftPerson.self]
-                let realmB = try openRealm(configuration: configB)
-                let obj = realmB.objects(SwiftAnyRealmValueObject.self).first
-                // Because we have no schema information for `SwiftMissingObject`,
-                // expect `nil` to be returned
-                XCTAssertEqual(obj!.anyCol.value, .none)
-                XCTAssertNil(obj!.anyCol.value.object(Object.self))
+                var config = user.configuration(partitionValue: #function)
+                config.objectTypes = [SwiftAnyRealmValueObject.self, SwiftPerson.self]
+                let realm = try openRealm(configuration: config)
+                let obj = realm.objects(SwiftAnyRealmValueObject.self).first
+                // Can cast to Object because it exists in the schema
+                XCTAssertEqual(((obj!.anyCol.value.dynamicObject?["anyCol"] as? ObjectBase)?["firstName"] as? String), "Rick")
+                print(obj!.anyCol.value)
                 // We expect to be able to access objects in the schema.
                 XCTAssertNotNil(obj!.otherAnyCol.value.object(SwiftPerson.self))
                 XCTAssertEqual(obj!.otherAnyCol.value.object(SwiftPerson.self)!.firstName, "Squidward")

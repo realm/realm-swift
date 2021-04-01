@@ -19,6 +19,7 @@
 #import <Foundation/Foundation.h>
 
 #import <realm/table_ref.hpp>
+#import <realm/util/optional.hpp>
 
 #import <unordered_map>
 #import <vector>
@@ -54,7 +55,9 @@ template<> struct equal_to<NSString *> {
 // reference, handles table column lookups, and tracks observed objects
 class RLMClassInfo {
 public:
-    RLMClassInfo(RLMRealm *, RLMObjectSchema *, const realm::ObjectSchema *);
+    RLMClassInfo(RLMRealm *, RLMObjectSchema *,
+                 const realm::ObjectSchema *, bool created_locally=false);
+    ~RLMClassInfo();
 
     __unsafe_unretained RLMRealm *const realm;
     __unsafe_unretained RLMObjectSchema *const rlmObjectSchema;
@@ -89,6 +92,12 @@ public:
 
     // Get the corresponding ClassInfo for the given Realm
     RLMClassInfo &resolve(RLMRealm *);
+
+private:
+    // If the ObjectSchema is not owned by the realm instance
+    // we need to manually dispose of the object. This flag lets us
+    // know if the object schema was created locally.
+    bool m_created_locally;
 };
 
 // A per-RLMRealm object schema map which stores RLMClassInfo keyed on the name
@@ -102,8 +111,13 @@ public:
 
     // Look up by name, throwing if it's not present
     RLMClassInfo& operator[](NSString *name);
-    // Look up by table key, throwing if it's not present
-    RLMClassInfo& operator[](realm::TableKey const& tableKey);
+    // Look up by table key, return none if its not present.
+    realm::util::Optional<RLMClassInfo&> operator[](realm::TableKey const& tableKey);
+
+    // Emplaces a locally derived object schema into RLMSchemaInfo. This is used
+    // when creating objects dynamically that are not registered in the Cocoa schema.
+    RLMObjectSchema* append_dynamic_object_schema(NSString *name, realm::ObjectSchema schema,
+                                                  __unsafe_unretained RLMRealm *const target_realm);
 
     impl::iterator begin() noexcept;
     impl::iterator end() noexcept;

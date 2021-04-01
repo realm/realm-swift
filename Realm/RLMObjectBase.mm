@@ -52,6 +52,11 @@ static bool isManagedAccessorClass(Class cls) {
 
 static bool maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
     Class cls = obj.class;
+
+    if (cls == [RLMObjectBase class]) {
+        return false;
+    }
+
     if (isManagedAccessorClass(cls)) {
         return false;
     }
@@ -250,6 +255,10 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     }
 
     return [self descriptionWithMaxDepth:RLMDescriptionMaxDepth];
+}
+
+- (id)objectForKeyedSubscript:(NSString *)subscript {
+    return RLMObjectBaseObjectForKeyedSubscript(self, subscript);
 }
 
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {

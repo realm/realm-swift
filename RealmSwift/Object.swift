@@ -172,7 +172,7 @@ extension Object: RealmCollectionValue {
     // MARK: Key-Value Coding & Subscripting
 
     /// Returns or sets the value of the property with the given name.
-    @objc open subscript(key: String) -> Any? {
+    @objc open override subscript(key: String) -> Any? {
         get {
             if realm == nil {
                 return value(forKey: key)
