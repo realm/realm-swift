@@ -2080,7 +2080,8 @@ class AnyRealmValueSyncTests: SwiftSyncTestCase {
                 let realm = try openRealm(configuration: config)
                 let obj = realm.objects(SwiftAnyRealmValueObject.self).first
                 // Can cast to Object because it exists in the schema
-                XCTAssertEqual(((obj!.anyCol.value.dynamicObject?["anyCol"] as? ObjectBase)?["firstName"] as? String), "Rick")
+                XCTAssertEqual(((obj!.anyCol.value.dynamicObject?["anyCol"] as? Object)?["firstName"] as? String), "Rick")
+                XCTAssertEqual(((obj!.anyCol.value.dynamicObject?["anyCol"] as? Object)?["lastName"] as? String), "Sanchez")
                 print(obj!.anyCol.value)
                 // We expect to be able to access objects in the schema.
                 XCTAssertNotNil(obj!.otherAnyCol.value.object(SwiftPerson.self))

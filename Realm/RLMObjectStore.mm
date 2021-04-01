@@ -181,12 +181,13 @@ RLMObjectBase *RLMObjectFromObjLink(RLMRealm *realm, realm::ObjLink&& objLink) {
         return object;
     } else {
         // Construct the object dynamically.
-        RLMObjectBase *obj = [[RLMObjectBase alloc] init];
+        // This code path should only be hit on first access of the object.
         realm::Schema const schema = realm::ObjectStore::schema_from_group(realm->_realm->read_group());
         auto objectSchema = *schema.find(objLink.get_table_key());
         RLMObjectSchema *rlmObjectSchema = realm->_info.append_dynamic_object_schema(@(objectSchema.name.c_str()),
                                                                                      objectSchema,
                                                                                      realm);
+        RLMObjectBase *obj = [[rlmObjectSchema.accessorClass alloc] init];
         obj->_info = &realm->_info[rlmObjectSchema.className];
         obj->_realm = realm;
         obj->_objectSchema = rlmObjectSchema;
