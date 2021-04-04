@@ -107,7 +107,7 @@ public extension ObjectiveCSupport {
             }
             return .uuid(val)
         case RLMPropertyType.object:
-            guard let val = value as? ObjectBase else {
+            guard let val = value as? Object else {
                 return .none
             }
             return .object(val)

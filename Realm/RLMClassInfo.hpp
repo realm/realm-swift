@@ -56,7 +56,8 @@ template<> struct equal_to<NSString *> {
 class RLMClassInfo {
 public:
     RLMClassInfo(RLMRealm *, RLMObjectSchema *,
-                 const realm::ObjectSchema *, bool created_locally=false);
+                 const realm::ObjectSchema *,
+                 bool created_locally=false);
     ~RLMClassInfo();
 
     __unsafe_unretained RLMRealm *const realm;
@@ -93,6 +94,9 @@ public:
     // Get the corresponding ClassInfo for the given Realm
     RLMClassInfo &resolve(RLMRealm *);
 
+    // Return true if the RLMObjectSchema is for a Swift class
+    bool isSwiftClass();
+
 private:
     // If the ObjectSchema is not owned by the realm instance
     // we need to manually dispose of the object. This flag lets us
@@ -116,8 +120,10 @@ public:
 
     // Emplaces a locally derived object schema into RLMSchemaInfo. This is used
     // when creating objects dynamically that are not registered in the Cocoa schema.
-    RLMObjectSchema* append_dynamic_object_schema(NSString *name, realm::ObjectSchema schema,
-                                                  __unsafe_unretained RLMRealm *const target_realm);
+    // Note: `RLMClassInfo` assumes ownership of `schema`.
+    void append_dynamic_object_schema(realm::ObjectSchema* schema,
+                                      RLMObjectSchema *objectSchema,
+                                      __unsafe_unretained RLMRealm *const target_realm);
 
     impl::iterator begin() noexcept;
     impl::iterator end() noexcept;

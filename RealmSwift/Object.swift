@@ -172,7 +172,7 @@ extension Object: RealmCollectionValue {
     // MARK: Key-Value Coding & Subscripting
 
     /// Returns or sets the value of the property with the given name.
-    @objc open override subscript(key: String) -> Any? {
+    @objc open subscript(key: String) -> Any? {
         get {
             if realm == nil {
                 return value(forKey: key)
@@ -404,6 +404,7 @@ extension Object: ThreadConfined {
 
 /// Object interface which allows untyped getters and setters for Objects.
 /// :nodoc:
+@dynamicMemberLookup
 public final class DynamicObject: Object {
     public override subscript(key: String) -> Any? {
         get {
@@ -418,6 +419,22 @@ public final class DynamicObject: Object {
         }
         set(value) {
             RLMDynamicValidatedSet(self, key, value)
+        }
+    }
+
+    public subscript(dynamicMember member: String) -> Any? {
+        get {
+            let value = RLMDynamicGetByName(self, member)
+            if let array = value as? RLMArray<AnyObject> {
+                return List<DynamicObject>(objc: array)
+            }
+            if let set = value as? RLMSet<AnyObject> {
+                return MutableSet<DynamicObject>(objc: set)
+            }
+            return value
+        }
+        set(value) {
+            RLMDynamicValidatedSet(self, member, value)
         }
     }
 

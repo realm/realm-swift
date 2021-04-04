@@ -2079,13 +2079,15 @@ class AnyRealmValueSyncTests: SwiftSyncTestCase {
                 config.objectTypes = [SwiftAnyRealmValueObject.self, SwiftPerson.self]
                 let realm = try openRealm(configuration: config)
                 let obj = realm.objects(SwiftAnyRealmValueObject.self).first
-                // Can cast to Object because it exists in the schema
-                XCTAssertEqual(((obj!.anyCol.value.dynamicObject?["anyCol"] as? Object)?["firstName"] as? String), "Rick")
-                XCTAssertEqual(((obj!.anyCol.value.dynamicObject?["anyCol"] as? Object)?["lastName"] as? String), "Sanchez")
-                print(obj!.anyCol.value)
-                // We expect to be able to access objects in the schema.
-                XCTAssertNotNil(obj!.otherAnyCol.value.object(SwiftPerson.self))
-                XCTAssertEqual(obj!.otherAnyCol.value.object(SwiftPerson.self)!.firstName, "Squidward")
+                // SwiftMissingObject.anyCol -> SwiftMissingObject.anyCol -> SwiftPerson.firstName
+                let anyCol = ((obj!.anyCol.value.dynamicObject?.anyCol as? Object)?["anyCol"] as? Object)
+                XCTAssertEqual((anyCol?["firstName"] as? String), "Rick")
+                try! realm.write {
+                    anyCol?["firstName"] = "Morty"
+                }
+                XCTAssertEqual((anyCol?["firstName"] as? String), "Morty")
+                let objectCol = (obj!.anyCol.value.dynamicObject?.objectCol as? Object)
+                XCTAssertEqual((objectCol?["firstName"] as? String), "Morty")
             } else {
                 // Imagine this is v2 of an app with 3 classes
                 var config = user.configuration(partitionValue: #function)
@@ -2098,9 +2100,14 @@ class AnyRealmValueSyncTests: SwiftSyncTestCase {
                     let so2 = SwiftPerson()
                     so2.firstName = "Squidward"
                     so2.lastName = "Tentacles"
+
+                    let syncObj2 = SwiftMissingObject()
+                    syncObj2.objectCol = so1
+                    syncObj2.anyCol.value = .object(so1)
+
                     let syncObj = SwiftMissingObject()
                     syncObj.objectCol = so1
-                    syncObj.anyCol.value = .object(so1)
+                    syncObj.anyCol.value = .object(syncObj2)
                     let obj = SwiftAnyRealmValueObject()
                     obj.anyCol.value = .object(syncObj)
                     obj.otherAnyCol.value = .object(so2)

@@ -139,11 +139,11 @@ public enum AnyRealmValue: Hashable {
         return o as? T
     }
 
-    public var dynamicObject: ObjectBase? {
-        guard let val = rlmValue as? ObjectBase else {
+    public var dynamicObject: DynamicObject? {
+        guard case let .object(o) = self else {
             return nil
         }
-        return val
+        return unsafeBitCast(o, to: DynamicObject?.self)
     }
 
     internal var rlmValue: RLMValue? {

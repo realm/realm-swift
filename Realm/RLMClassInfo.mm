@@ -79,6 +79,10 @@ RLMClassInfo &RLMClassInfo::resolve(__unsafe_unretained RLMRealm *const realm) {
     return realm->_info[rlmObjectSchema.className];
 }
 
+bool RLMClassInfo::isSwiftClass() {
+    return rlmObjectSchema.isSwiftClass;
+}
+
 RLMClassInfo::~RLMClassInfo() {
     if (m_created_locally)
         delete objectSchema;
@@ -139,16 +143,12 @@ RLMSchemaInfo RLMSchemaInfo::clone(realm::Schema const& source_schema,
     return info;
 }
 
-RLMObjectSchema* RLMSchemaInfo::append_dynamic_object_schema(NSString *name, realm::ObjectSchema schema,
-                                                             __unsafe_unretained RLMRealm *const target_realm) {
-    realm::ObjectSchema *s = new realm::ObjectSchema;
-    *s = schema;
-    RLMObjectSchema *objectSchema = [RLMObjectSchema objectSchemaForObjectStoreSchema:*s];
-
+void RLMSchemaInfo::append_dynamic_object_schema(realm::ObjectSchema* schema,
+                                                 RLMObjectSchema *objectSchema,
+                                                 __unsafe_unretained RLMRealm *const target_realm) {
     m_objects.emplace(std::piecewise_construct,
-                      std::forward_as_tuple(name),
+                      std::forward_as_tuple(objectSchema.className),
                       std::forward_as_tuple(target_realm, objectSchema,
-                                            &*s, true));
-    return objectSchema;
+                                            &*schema, true));
 }
 

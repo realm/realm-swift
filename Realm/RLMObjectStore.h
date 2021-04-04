@@ -88,8 +88,9 @@ namespace realm {
 class RLMClassInfo;
 
 // get an object with a given table & object key
-RLMObjectBase *RLMObjectFromObjLink(RLMRealm *realm, realm::ObjLink&& objLink)
-NS_RETURNS_RETAINED;
+RLMObjectBase *RLMObjectFromObjLink(RLMRealm *realm,
+                                    realm::ObjLink&& objLink,
+                                    bool parentIsSwiftObject) NS_RETURNS_RETAINED;
 
 // Create accessors
 RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, int64_t key) NS_RETURNS_RETAINED;

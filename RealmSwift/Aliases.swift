@@ -117,30 +117,4 @@ extension ObjectBase {
             }))
         }
     }
-
-    @objc public subscript(key: String) -> Any? {
-        get {
-            let value = RLMDynamicGetByName(self, key)
-            if let array = value as? RLMArray<AnyObject> {
-                return List<DynamicObject>(objc: array)
-            }
-            if let set = value as? RLMSet<AnyObject> {
-                return MutableSet<DynamicObject>(objc: set)
-            }
-            return value
-        }
-        set(value) {
-            RLMDynamicValidatedSet(self, key, value)
-        }
-    }
-
-    /// :nodoc:
-    public override func value(forUndefinedKey key: String) -> Any? {
-        return self[key]
-    }
-
-    /// :nodoc:
-    public override func setValue(_ value: Any?, forUndefinedKey key: String) {
-        self[key] = value
-    }
 }

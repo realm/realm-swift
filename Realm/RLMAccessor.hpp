@@ -18,6 +18,7 @@
 
 #import "RLMAccessor.h"
 
+#import "RLMClassInfo.hpp"
 #import "RLMDecimal128_Private.hpp"
 #import "RLMObjectId_Private.hpp"
 #import "RLMUUID_Private.hpp"
@@ -62,7 +63,7 @@ public:
     id box(realm::Timestamp v) { return RLMTimestampToNSDate(v) ?: NSNull.null; }
     id box(realm::Decimal128 v) { return v.is_null() ? NSNull.null : [[RLMDecimal128 alloc] initWithDecimal128:v]; }
     id box(realm::ObjectId v) { return [[RLMObjectId alloc] initWithValue:v]; }
-    id box(realm::Mixed v) { return RLMMixedToObjc(v, _realm); }
+    id box(realm::Mixed v) { return RLMMixedToObjc(v, _realm, _info.isSwiftClass()); }
     id box(realm::UUID v) { return RLMMixedToObjc(v); }
 
     id box(realm::util::Optional<bool> v) { return v ? @(*v) : NSNull.null; }

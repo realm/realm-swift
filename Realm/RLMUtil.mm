@@ -439,7 +439,9 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
     }
 }
 
-id RLMMixedToObjc(realm::Mixed const& mixed, __unsafe_unretained RLMRealm *realm) {
+id RLMMixedToObjc(realm::Mixed const& mixed,
+                  __unsafe_unretained RLMRealm *realm,
+                  bool parentIsSwiftObject) {
     if (mixed.is_null()) {
         return NSNull.null;
     }
@@ -463,7 +465,7 @@ id RLMMixedToObjc(realm::Mixed const& mixed, __unsafe_unretained RLMRealm *realm
         case realm::type_ObjectId:
             return [[RLMObjectId alloc] initWithValue:mixed.get<realm::ObjectId>()];
         case realm::type_TypedLink:
-            return RLMObjectFromObjLink(realm, mixed.get<realm::ObjLink>());
+            return RLMObjectFromObjLink(realm, mixed.get<realm::ObjLink>(), parentIsSwiftObject);
         case realm::type_Link:
         case realm::type_LinkList:
             REALM_UNREACHABLE();

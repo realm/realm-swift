@@ -171,29 +171,23 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     return object;
 }
 
-RLMObjectBase *RLMObjectFromObjLink(RLMRealm *realm, realm::ObjLink&& objLink) {
-    auto info = realm->_info[objLink.get_table_key()];
-    if (info) {
-        RLMClassInfo &tableInfo = *info;
-        RLMObjectBase *object = RLMCreateManagedAccessor(tableInfo.rlmObjectSchema.accessorClass, &tableInfo);
-        object->_row = realm.group.get_object(objLink);
-        RLMInitializeSwiftAccessorGenerics(object);
-        return object;
+RLMObjectBase *RLMObjectFromObjLink(RLMRealm *realm, realm::ObjLink&& objLink, bool parentIsSwiftObject) {
+    if (auto tableInfo = realm->_info[objLink.get_table_key()]) {
+        return RLMCreateObjectAccessor(*tableInfo, objLink.get_obj_key().value);
     } else {
         // Construct the object dynamically.
         // This code path should only be hit on first access of the object.
-        realm::Schema const schema = realm::ObjectStore::schema_from_group(realm->_realm->read_group());
-        auto objectSchema = *schema.find(objLink.get_table_key());
-        RLMObjectSchema *rlmObjectSchema = realm->_info.append_dynamic_object_schema(@(objectSchema.name.c_str()),
-                                                                                     objectSchema,
-                                                                                     realm);
-        RLMObjectBase *obj = [[rlmObjectSchema.accessorClass alloc] init];
-        obj->_info = &realm->_info[rlmObjectSchema.className];
-        obj->_realm = realm;
-        obj->_objectSchema = rlmObjectSchema;
-        obj->_row = realm->_info[rlmObjectSchema.className].table()->get_object(objLink.get_obj_key());
-        RLMInitializeSwiftAccessorGenerics(obj);
-        return obj;
+        Class cls = parentIsSwiftObject ? [RealmSwiftObject class] : [RLMDynamicObject class];
+        realm::Schema const groupSchema = realm::ObjectStore::schema_from_group(realm->_realm->read_group());
+        realm::ObjectSchema *schema = new realm::ObjectSchema;
+        *schema = *groupSchema.find(objLink.get_table_key());
+        RLMObjectSchema *rlmObjectSchema = [RLMObjectSchema objectSchemaForObjectStoreSchema:*schema];
+        rlmObjectSchema.accessorClass = cls;
+        rlmObjectSchema.isSwiftClass = parentIsSwiftObject;
+        // RLMClassInfo inside of RLMSchemaInfo will handle the ownership of `schema`.
+        realm->_info.append_dynamic_object_schema(schema, rlmObjectSchema, realm);
+        return RLMCreateObjectAccessor(realm->_info[rlmObjectSchema.className],
+                                       objLink.get_obj_key().value);
     }
 }
 
