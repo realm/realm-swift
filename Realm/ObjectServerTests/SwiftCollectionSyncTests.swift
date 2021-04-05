@@ -28,14 +28,12 @@ import RealmTestSupport
 
 class ListSyncTests: SwiftSyncTestCase {
     private func roundTrip<T: _ManagedPropertyType>(keyPath: KeyPath<SwiftCollectionSyncObject, List<T>>,
-                                                    values: [T]) throws {
-        let user = try logInUser(for: basicCredentials())
-        let realm = try openRealm(partitionValue: #function, user: user)
+                                                    values: [T],
+                                                    partitionValue: String = #function) throws {
+        let user = logInUser(for: basicCredentials(withName: partitionValue,
+                                                   register: isParent))
+        let realm = try openRealm(partitionValue: partitionValue, user: user)
         if isParent {
-            try realm.write {
-                realm.deleteAll()
-            }
-            waitForDownloads(for: realm)
             checkCount(expected: 0, realm, SwiftCollectionSyncObject.self)
             executeChild()
             waitForDownloads(for: realm)
@@ -134,8 +132,8 @@ class ListSyncTests: SwiftSyncTestCase {
 
     func testDataList() {
         do {
-            try roundTrip(keyPath: \.dataList, values: [Data(repeating: 0, count: 1024*8*1024),
-                                                        Data(repeating: 1, count: 256),
+            try roundTrip(keyPath: \.dataList, values: [Data(repeating: 0, count: 64),
+                                                        Data(repeating: 1, count: 64),
                                                         Data(repeating: 2, count: 64)])
         } catch {
             XCTFail(error.localizedDescription)
@@ -207,14 +205,11 @@ class SetSyncTests: SwiftSyncTestCase {
     private typealias MutableSetKeyValues<T: RealmCollectionValue> = (keyPath: MutableSetKeyPath<T>, values: [T])
 
     private func roundTrip<T: _ManagedPropertyType>(set: MutableSetKeyValues<T>,
-                                                    otherSet: MutableSetKeyValues<T>) throws {
-        let user = try logInUser(for: basicCredentials())
-        let realm = try openRealm(partitionValue: #function, user: user)
+                                                    otherSet: MutableSetKeyValues<T>,
+                                                    partitionValue: String = #function) throws {
+        let user = logInUser(for: basicCredentials(withName: partitionValue, register: isParent))
+        let realm = try openRealm(partitionValue: partitionValue, user: user)
         if isParent {
-            try realm.write {
-                realm.deleteAll()
-            }
-            waitForDownloads(for: realm)
             checkCount(expected: 0, realm, SwiftCollectionSyncObject.self)
             executeChild()
             waitForDownloads(for: realm)
@@ -307,12 +302,12 @@ class SetSyncTests: SwiftSyncTestCase {
 
     func testDataSet() {
         do {
-            try roundTrip(set: (\.dataSet, [Data(repeating: 1, count: 1024),
-                                            Data(repeating: 1, count: 256),
-                                            Data(repeating: 2, count: 64)]),
-                          otherSet: (\.otherDataSet, [Data(repeating: 2, count: 64),
-                                                      Data(repeating: 3, count: 256),
-                                                      Data(repeating: 4, count: 1024)]))
+            try roundTrip(set: (\.dataSet, [Data(repeating: 1, count: 64),
+                                            Data(repeating: 2, count: 64),
+                                            Data(repeating: 3, count: 64)]),
+                          otherSet: (\.otherDataSet, [Data(repeating: 3, count: 64),
+                                                      Data(repeating: 4, count: 64),
+                                                      Data(repeating: 5, count: 64)]))
         } catch {
             XCTFail(error.localizedDescription)
         }

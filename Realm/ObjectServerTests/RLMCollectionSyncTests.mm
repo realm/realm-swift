@@ -37,9 +37,7 @@
         RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:callerName
                                                                             register:self.isParent]];
         RLMRealm *realm = [self openRealmForPartitionValue:callerName user:user];
-
         if (self.isParent) {
-            [self waitForDownloadsForRealm:realm];
             CHECK_COUNT(0, RLMSetSyncObject, realm);
             RLMRunChildAndWait();
             [self waitForDownloadsForRealm:realm];
@@ -231,9 +229,7 @@
         RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:callerName
                                                                             register:self.isParent]];
         RLMRealm *realm = [self openRealmForPartitionValue:callerName user:user];
-
         if (self.isParent) {
-            [self waitForDownloadsForRealm:realm];
             CHECK_COUNT(0, RLMArraySyncObject, realm);
             RLMRunChildAndWait();
             [self waitForDownloadsForRealm:realm];
