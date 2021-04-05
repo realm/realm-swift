@@ -424,17 +424,10 @@ public final class DynamicObject: Object {
 
     public subscript(dynamicMember member: String) -> Any? {
         get {
-            let value = RLMDynamicGetByName(self, member)
-            if let array = value as? RLMArray<AnyObject> {
-                return List<DynamicObject>(objc: array)
-            }
-            if let set = value as? RLMSet<AnyObject> {
-                return MutableSet<DynamicObject>(objc: set)
-            }
-            return value
+            self[member]
         }
         set(value) {
-            RLMDynamicValidatedSet(self, member, value)
+            self[member] = value
         }
     }
 
