@@ -204,7 +204,6 @@
     };
 }
 
-
 @end
 
 #pragma mark RLMArraySyncObject

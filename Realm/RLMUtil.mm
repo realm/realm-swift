@@ -417,7 +417,8 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
         case RLMPropertyTypeObject: {
             // If we are unboxing an object and it is unmanaged, we need to
             // add it to the Realm.
-            if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(v); !objBase->_realm) {
+            if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(v);
+                !objBase->_realm && (createPolicy.create || createPolicy.copy)) {
                 RLMVerifyInWriteTransaction(realm);
                 RLMAccessorContext c{realm->_info[objBase->_objectSchema.className]};
                 return realm::Mixed(c.createObject(objBase, createPolicy).first);
