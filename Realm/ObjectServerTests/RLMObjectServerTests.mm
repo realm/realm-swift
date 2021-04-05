@@ -739,6 +739,47 @@ static NSString *randomEmail() {
     }
 }
 
+#pragma mark - RLMValue Sync with missing schema -
+
+- (void)testMissingSchema {
+    RLMUser *user = [self userForTest:_cmd];
+    auto c = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
+    if (self.isParent)
+        c.objectClasses = @[Person.self, AllTypesSyncObject.self];
+    else
+        c.objectClasses = @[Person.self,
+                            AllTypesSyncObject.self,
+                            RLMSetSyncObject.self];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
+    [self waitForDownloadsForRealm:realm];
+    if (self.isParent) {
+        RLMRunChildAndWait();
+        [self waitForDownloadsForRealm:realm];
+        RLMResults <AllTypesSyncObject *> *res = [AllTypesSyncObject allObjectsInRealm:realm];
+        AllTypesSyncObject *o = res.firstObject;
+        Person *p = o.objectCol;
+        RLMSet<RLMValue> *anySet = ((RLMObject *)o.anyCol)[@"anySet"];
+        XCTAssertTrue([anySet.allObjects[0][@"firstName"] isEqualToString:p.firstName]);
+        [realm beginWriteTransaction];
+        anySet.allObjects[0][@"firstName"] = @"Bob";
+        [realm commitWriteTransaction];
+        XCTAssertTrue([anySet.allObjects[0][@"firstName"] isEqualToString:p.firstName]);
+        CHECK_COUNT(1, AllTypesSyncObject, realm);
+    } else {
+        AllTypesSyncObject *obj = [[AllTypesSyncObject alloc] initWithValue:[AllTypesSyncObject values:0]];
+        RLMSetSyncObject *o = [RLMSetSyncObject new];
+        Person *p = [Person john];
+        [o.anySet addObjects:@[p]];
+        obj.anyCol = o;
+        obj.objectCol = p;
+        [realm beginWriteTransaction];
+        [realm addObject:obj];
+        [realm commitWriteTransaction];
+        [self waitForUploadsForRealm:realm];
+        CHECK_COUNT(1, AllTypesSyncObject, realm);
+    }
+}
+
 #pragma mark - Encryption -
 
 /// If client B encrypts its synced Realm, client A should be able to access that Realm with a different encryption key.

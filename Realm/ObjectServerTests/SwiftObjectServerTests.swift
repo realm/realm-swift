@@ -2064,8 +2064,8 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
 
 class AnyRealmValueSyncTests: SwiftSyncTestCase {
     /// The purpose of this test is to confirm that when an Object is set on a mixed Column and an old
-    /// version of an app does not have that Realm Object / Schema, we must fail gracefully and return nil
-    /// when calling `obj!.anyCol.value.object(Object.self)`
+    /// version of an app does not have that Realm Object / Schema we can still access that object via
+    /// `AnyRealmValue.dynamicSchema`.
     func testMissingSchema() {
         do {
             let user = try logInUser(for: basicCredentials())

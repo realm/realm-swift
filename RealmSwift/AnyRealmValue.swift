@@ -139,6 +139,12 @@ public enum AnyRealmValue: Hashable {
         return o as? T
     }
 
+    /// Returns a `DynamicObject` if the stored value is an `Object`, otherwise `nil`.
+    ///
+    /// Note: This allows access to an object stored in `AnyRealmValue` where you may not have
+    /// the class information associated for it. For example if you are using Realm Sync and version 2
+    /// of your app sets an object into `AnyRealmValue` and that class does not exist in version 1
+    /// use this accessor to gain access to the object in the Realm.
     public var dynamicObject: DynamicObject? {
         guard case let .object(o) = self else {
             return nil
