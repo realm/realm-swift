@@ -3,6 +3,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * Add `RLMSet`/`MutableSet<>` datatype. This is a Set collection type used for storing distinct values in a collection.
 * Add support for `id<RLMValue>`/`AnyRealmValue`.
+* Add support for `UUID`/`NSUUID` data type.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
@@ -267,7 +268,6 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * MongoDB Realm is now supported when installing Realm via Swift Package Manager.
-* Added support for `UUID`/`NSUUID` data type.
 
 ### Fixed
 

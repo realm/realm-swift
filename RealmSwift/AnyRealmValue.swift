@@ -39,7 +39,7 @@ public enum AnyRealmValue: Hashable {
     /// A date type.
     case date(Date)
     /// A Realm Object type.
-    case object(ObjectBase)
+    case object(Object)
     /// An ObjectId type.
     case objectId(ObjectId)
     /// A Decimal128 type.
