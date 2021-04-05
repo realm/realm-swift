@@ -119,6 +119,7 @@ class SwiftOptionalObject: Object {
     let optDoubleCol = RealmOptional<Double>()
     let optBoolCol = RealmOptional<Bool>()
     let optEnumCol = RealmOptional<IntEnum>()
+    let otherIntCol = RealmProperty<Int?>()
     @objc dynamic var optObjectCol: SwiftBoolObject?
 }
 

@@ -740,8 +740,6 @@ public class RealmServer: NSObject {
             "relationships": [:]
         ], failOnError)
 
-//        rules.post(on: group, swiftTypesSyncObjectRule, failOnError)
-
         app.sync.config.put(on: group, data: [
             "development_mode_enabled": true
         ], failOnError)
@@ -802,7 +800,6 @@ public class RealmServer: NSObject {
             "version": 1
         ], failOnError)
 
-//        rules.post(on: group, allTypesSyncObjectRule, failOnError)
         guard case .success = group.wait(timeout: .now() + 5.0) else {
             throw URLError(.badServerResponse)
         }

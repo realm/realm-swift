@@ -577,10 +577,12 @@ class ObjectTests: TestCase {
         setter(object, boolObject, "anyCol")
         assertEqual((getter(object, "anyCol") as! DynamicObject), boolObject)
         XCTAssertEqual(((getter(object, "anyCol") as! DynamicObject)["boolCol"] as! Bool), true)
+        XCTAssertEqual(((getter(object, "anyCol") as! DynamicObject).boolCol as! Bool), true)
 
         setter(object, boolObject, "objectCol")
         assertEqual((getter(object, "objectCol") as! DynamicObject), boolObject)
         XCTAssertEqual(((getter(object, "objectCol") as! DynamicObject)["boolCol"] as! Bool), true)
+        XCTAssertEqual(((getter(object, "objectCol") as! DynamicObject).boolCol as! Bool), true)
 
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 1)
