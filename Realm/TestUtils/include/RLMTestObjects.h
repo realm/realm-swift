@@ -134,13 +134,11 @@ RLM_COLLECTION_TYPE(EmbeddedIntObject)
 @interface MixedObject: RLMObject
 @property id<RLMValue> anyCol;
 @property RLMArray<RLMValue> *anyArray;
-
 @end
 
 #pragma mark AllTypesObject
 
 @interface AllTypesObject : RLMObject
-
 @property BOOL          boolCol;
 @property int           intCol;
 @property float         floatCol;
@@ -162,7 +160,6 @@ RLM_COLLECTION_TYPE(EmbeddedIntObject)
 + (NSDictionary *)values:(int)i
             stringObject:(StringObject *)so
              mixedObject:(MixedObject *)mo;
-
 @end
 
 RLM_COLLECTION_TYPE(AllTypesObject)

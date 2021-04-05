@@ -11,7 +11,7 @@ x.y.z Release notes (yyyy-MM-dd)
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Deprecations
-* `RealmOptional` has been deprecated in favor of  `RealmProperty`.
+* `RealmOptional` has been deprecated in favor of `RealmProperty`.
 
 ### Compatibility
 * Realm Studio: 10.0.0 or later.
