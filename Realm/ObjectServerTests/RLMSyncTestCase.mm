@@ -162,6 +162,44 @@
 
 @end
 
+#pragma mark RLMArraySyncObject
+
+@implementation RLMArraySyncObject
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
+
++ (NSArray *)requiredProperties {
+    return @[@"intArray", @"boolArray",
+             @"stringArray", @"dataArray",
+             @"doubleArray", @"objectIdArray",
+             @"decimalArray", @"uuidArray", @"anyArray"];
+}
+
+@end
+
+#pragma mark RLMSetSyncObject
+
+@implementation RLMSetSyncObject
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
+
++ (NSArray *)requiredProperties {
+    return @[@"intSet", @"boolSet",
+             @"stringSet", @"dataSet",
+             @"doubleSet", @"objectIdSet",
+             @"decimalSet", @"uuidSet", @"anySet",
+             @"otherIntSet", @"otherBoolSet",
+             @"otherStringSet", @"otherDataSet",
+             @"otherDoubleSet", @"otherObjectIdSet",
+             @"otherDecimalSet", @"otherUuidSet", @"otherAnySet"];
+}
+
+@end
+
 #pragma mark AsyncOpenConnectionTimeoutTransport
 
 @implementation AsyncOpenConnectionTimeoutTransport
@@ -312,7 +350,9 @@ static NSURL *syncDirectoryForChildProcess() {
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     auto c = [user configurationWithPartitionValue:partitionValue];
     c.encryptionKey = encryptionKey;
-    c.objectClasses = @[Dog.self, Person.self, HugeSyncObject.self];
+    c.objectClasses = @[Dog.self, Person.self,
+                        HugeSyncObject.self, RLMSetSyncObject.self,
+                        RLMArraySyncObject.self];
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.stopPolicy = stopPolicy;
     c.syncConfiguration = syncConfig;

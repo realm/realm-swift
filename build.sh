@@ -1106,7 +1106,7 @@ case "$COMMAND" in
 
             if [[ "$target" = *"server"* ]] || [[ "$target" = "swiftpm"* ]]; then
                 source "$(brew --prefix nvm)/nvm.sh" --no-use
-                nvm install 8.11.2
+                nvm install 13.14.0
                 sh build.sh setup-baas
             fi
 

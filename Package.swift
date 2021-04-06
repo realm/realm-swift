@@ -62,7 +62,7 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core", .branch("master"))
+        .package(url: "https://github.com/realm/realm-core", .branch("v11"))
     ],
     targets: [
       .target(
@@ -201,8 +201,9 @@ let package = Package(
             dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftSyncTestSupport"],
             path: "Realm/ObjectServerTests",
             sources: [
-                 "SwiftObjectServerTests.swift",
-                 "SwiftBSONTests.swift"
+                "SwiftObjectServerTests.swift",
+                "SwiftBSONTests.swift",
+                "SwiftCollectionSyncTests.swift"
             ],
             swiftSettings: combineFlags()
         ),
@@ -213,7 +214,8 @@ let package = Package(
             sources: [
                 "RLMBSONTests.mm",
                 "RLMObjectServerTests.mm",
-                "RLMWatchTestUtility.m"
+                "RLMWatchTestUtility.m",
+                "RLMCollectionSyncTests.mm"
             ],
             cxxSettings: testCxxSettings
         )
