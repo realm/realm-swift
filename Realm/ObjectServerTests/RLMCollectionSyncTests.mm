@@ -242,7 +242,7 @@
                 = [RLMArraySyncObject allObjectsInRealm:realm];
             RLMArraySyncObject *obj = results.firstObject;
             XCTAssertEqual(propertyGetter(obj).count, values.count*2);
-            for (int i = 0; i < values.count; i++) {
+            for (NSUInteger i = 0; i < values.count; i++) {
                 if (isObject) {
                     XCTAssertTrue([((Person *)propertyGetter(results[0])[i]).firstName
                                    isEqual:((Person *)values[i]).firstName]);
