@@ -507,6 +507,7 @@ RLM_COLLECTION_TYPE(CircleObject);
 @property RLM_GENERIC_DICTIONARY(RLMString, StringObject) *stringDictionary;
 @property RLM_GENERIC_DICTIONARY(RLMString, IntObject) *intDictionary;
 @property RLM_GENERIC_DICTIONARY(RLMString, RLMString) *primitiveStringDictionary;
+@property RLM_GENERIC_DICTIONARY(RLMString, EmbeddedIntObject) *embeddedDictionary;
 
 @end
 
@@ -539,6 +540,10 @@ RLM_COLLECTION_TYPE(AggregateObject)
 
 @interface AggregateSetObject : RLMObject
 @property RLMSet<AggregateObject *><AggregateObject> *set;
+@end
+
+@interface AggregateDictionaryObject : RLMObject
+@property RLMDictionary<RLMString, AggregateObject> *dictionary;
 @end
 
 #pragma mark PrimaryStringObject
@@ -685,6 +690,7 @@ RLM_COLLECTION_TYPE(RenamedProperties2)
 @property (nonatomic) RenamedProperties2 *linkB;
 @property (nonatomic) RLM_GENERIC_ARRAY(RenamedProperties1) *array;
 @property (nonatomic) RLM_GENERIC_SET(RenamedProperties1) *set;
+@property (nonatomic) RLM_GENERIC_DICTIONARY(RLMString, RenamedProperties1) *dictionary;
 @end
 
 @interface LinkToRenamedProperties2 : RLMObject

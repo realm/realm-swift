@@ -217,12 +217,6 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
     });
 }
 
-- (void)addObjects:(NSDictionary *)objects {
-    for (id key in objects) {
-        [self setObject:objects[key] forKey:key];
-    }
-}
-
 - (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id <RLMDictionaryKey> key,
                                                     id obj, BOOL *stop))block {
     [_backingCollection enumerateKeysAndObjectsUsingBlock:block];

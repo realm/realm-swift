@@ -531,75 +531,140 @@
     [realm commitWriteTransaction];
 }
 
+// valueForKey forwards objectForKey to the reciever.
 - (void)testValueForKey {
-    RLMRealm *realm = self.realmWithTestPath;
+    // unmanaged
+    DictionaryPropertyObject *unmanObj = [DictionaryPropertyObject new];
+    StringObject *unmanChild1 = [[StringObject alloc] initWithValue:@[@"a"]];
+    EmbeddedIntObject *unmanChild2 = [[EmbeddedIntObject alloc] initWithValue:@[@123]];
 
-    [realm beginWriteTransaction];
-    CompanyObject *company = [[CompanyObject alloc] init];
-    [realm addObject:company];
-    [realm commitWriteTransaction];
+    [unmanObj.stringDictionary setValue:unmanChild1 forKey:@"one"];
+    XCTAssertTrue([[unmanObj.stringDictionary valueForKey:@"one"][@"stringCol"] isEqualToString:unmanChild1.stringCol]);
 
-    XCTAssertEqualObjects([company.employeeDict valueForKey:@"age"], @[]);
+    [unmanObj.embeddedDictionary setValue:unmanChild2 forKey:@"two"];
+    XCTAssertEqual([[unmanObj.embeddedDictionary valueForKey:@"two"][@"intCol"] integerValue], unmanChild2.intCol);
 
     // managed
-    NSMutableArray *ages = [NSMutableArray array];
+    RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
-    for (int i = 0; i < 30; ++i) {
-        [ages addObject:@(i)];
-        EmployeeObject *eo = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
-        NSString *key = [NSString stringWithFormat:@"item%d", i];
-        company.employeeDict[key] = eo;
-    }
+    DictionaryPropertyObject *obj = [DictionaryPropertyObject createInRealm:realm withValue:@[]];
+    StringObject *child1 = [StringObject createInRealm:realm withValue:@[@"a"]];
+    EmbeddedIntObject *child2 = [[EmbeddedIntObject alloc] initWithValue:@[@123]];
+
+    [obj.stringDictionary setValue:child1 forKey:@"one"];
+    XCTAssertTrue([[obj.stringDictionary valueForKey:@"one"][@"stringCol"] isEqualToString:child1.stringCol]);
+
+    [obj.embeddedDictionary setValue:child2 forKey:@"two"];
+    XCTAssertEqual([[obj.embeddedDictionary valueForKey:@"two"][@"intCol"] integerValue], child2.intCol);
+
     [realm commitWriteTransaction];
+}
 
-    RLM_GENERIC_DICTIONARY(RLMString, EmployeeObject) *employeeObjects = [company valueForKey:@"employeeDict"];
-    NSMutableArray *kvcAgeProperties = [NSMutableArray array];
-    for (id key in employeeObjects) {
-        EmployeeObject *employee = employeeObjects[key];
-        [kvcAgeProperties addObject:@(employee.age)];
-    }
-    XCTAssertEqualObjects([kvcAgeProperties sortedArrayUsingSelector: @selector(compare:)], ages);
+- (void)testObjectAggregate {
+    RLMRealm *realm = [RLMRealm defaultRealm];
 
-    XCTAssertEqualObjects([[company.employeeDict valueForKey:@"age"]
-                           sortedArrayUsingSelector: @selector(compare:)], ages);
-    XCTAssertTrue([[[company.employeeDict valueForKey:@"self"] firstObject] isEqualToObject:company.employeeDict.firstObject]);
-    XCTAssertTrue([[[company.employeeDict valueForKey:@"self"] lastObject] isEqualToObject:company.employeeDict.lastObject]);
+    AggregateDictionaryObject *obj = [AggregateDictionaryObject new];
+    XCTAssertEqual(0, [obj.dictionary sumOfProperty:@"intCol"].intValue);
+    XCTAssertNil([obj.dictionary averageOfProperty:@"intCol"]);
+    XCTAssertNil([obj.dictionary minOfProperty:@"intCol"]);
+    XCTAssertNil([obj.dictionary maxOfProperty:@"intCol"]);
 
-    XCTAssertEqual([[company.employeeDict valueForKeyPath:@"@count"] integerValue], 30);
-    XCTAssertEqual([[company.employeeDict valueForKeyPath:@"@min.age"] integerValue], 0);
-    XCTAssertEqual([[company.employeeDict valueForKeyPath:@"@max.age"] integerValue], 29);
-    XCTAssertEqualWithAccuracy([[company.employeeDict valueForKeyPath:@"@avg.age"] doubleValue], 14.5, 0.1f);
+    NSDate *dateMinInput = [NSDate date];
+    NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
 
-    XCTAssertEqualObjects([company.employeeDict valueForKeyPath:@"@unionOfObjects.age"],
-                          (@[@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17, @18, @19, @20, @21, @22, @23, @24, @25, @26, @27, @28, @29]));
-    XCTAssertEqualObjects([company.employeeDict valueForKeyPath:@"@distinctUnionOfObjects.name"], (@[@"Joe"]));
+    [realm transactionWithBlock:^{
+        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
 
-    RLMAssertThrowsWithReasonMatching([company.employeeDict valueForKeyPath:@"@sum.dogs.@sum.age"], @"Nested key paths.*not supported");
+        RLMResults<AggregateObject *> *allObjects = [AggregateObject allObjectsInRealm:realm];
+        for (NSUInteger i = 0; i < allObjects.count; i++) {
+            NSString *key = [NSString stringWithFormat:@"item%lu", (unsigned long)i];
+            obj.dictionary[key] = allObjects[i];
+        }
+    }];
 
-    // unmanaged object
-    company = [[CompanyObject alloc] init];
-    ages = [NSMutableArray array];
-    for (int i = 0; i < 30; ++i) {
-        [ages addObject:@(i)];
-        EmployeeObject *eo = [[EmployeeObject alloc] initWithValue:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
-        NSString *key = [NSString stringWithFormat:@"item%d", i];
-        [company.employeeDict setObject:eo forKey:key];
-    }
+    void (^test)(void) = ^{
+        RLMDictionary *dictionary = obj.dictionary;
 
-    XCTAssertEqualObjects([company.employeeDict valueForKey:@"age"], ages);
-    XCTAssertTrue([[[company.employeeDict valueForKey:@"self"] firstObject] isEqualToObject:company.employees.firstObject]);
-    XCTAssertTrue([[[company.employees valueForKey:@"self"] lastObject] isEqualToObject:company.employees.lastObject]);
+        // SUM
+        XCTAssertEqual([dictionary sumOfProperty:@"intCol"].integerValue, 4);
+        XCTAssertEqualWithAccuracy([dictionary sumOfProperty:@"floatCol"].floatValue, 7.2f, 0.1f);
+        XCTAssertEqualWithAccuracy([dictionary sumOfProperty:@"doubleCol"].doubleValue, 10.0, 0.1f);
+        RLMAssertThrowsWithReasonMatching([dictionary sumOfProperty:@"foo"], @"foo.*AggregateObject");
+        RLMAssertThrowsWithReasonMatching([dictionary sumOfProperty:@"boolCol"], @"sum.*bool");
+        RLMAssertThrowsWithReasonMatching([dictionary sumOfProperty:@"dateCol"], @"sum.*date");
 
-    XCTAssertEqual([[company.employeeDict valueForKeyPath:@"@count"] integerValue], 30);
-    XCTAssertEqual([[company.employeeDict valueForKeyPath:@"@min.age"] integerValue], 0);
-    XCTAssertEqual([[company.employeeDict valueForKeyPath:@"@max.age"] integerValue], 29);
-    XCTAssertEqualWithAccuracy([[company.employeeDict valueForKeyPath:@"@avg.age"] doubleValue], 14.5, 0.1f);
+        // Average
+        XCTAssertEqualWithAccuracy([dictionary averageOfProperty:@"intCol"].doubleValue, 0.4, 0.1f);
+        XCTAssertEqualWithAccuracy([dictionary averageOfProperty:@"floatCol"].doubleValue, 0.72, 0.1f);
+        XCTAssertEqualWithAccuracy([dictionary averageOfProperty:@"doubleCol"].doubleValue, 1.0, 0.1f);
+        RLMAssertThrowsWithReasonMatching([dictionary averageOfProperty:@"foo"], @"foo.*AggregateObject");
+        RLMAssertThrowsWithReasonMatching([dictionary averageOfProperty:@"boolCol"], @"average.*bool");
+        RLMAssertThrowsWithReasonMatching([dictionary averageOfProperty:@"dateCol"], @"average.*date");
 
-    XCTAssertEqualObjects([company.employeeDict valueForKeyPath:@"@unionOfObjects.age"],
-                          (@[@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13, @14, @15, @16, @17, @18, @19, @20, @21, @22, @23, @24, @25, @26, @27, @28, @29]));
-    XCTAssertEqualObjects([company.employeeDict valueForKeyPath:@"@distinctUnionOfObjects.name"], (@[@"Joe"]));
+        // MIN
+        XCTAssertEqual(0, [[dictionary minOfProperty:@"intCol"] intValue]);
+        XCTAssertEqual(0.0f, [[dictionary minOfProperty:@"floatCol"] floatValue]);
+        XCTAssertEqual(0.0, [[dictionary minOfProperty:@"doubleCol"] doubleValue]);
+        XCTAssertEqualObjects(dateMinInput, [dictionary minOfProperty:@"dateCol"]);
+        RLMAssertThrowsWithReasonMatching([dictionary minOfProperty:@"foo"], @"foo.*AggregateObject");
+        RLMAssertThrowsWithReasonMatching([dictionary minOfProperty:@"boolCol"], @"min.*bool");
 
-    RLMAssertThrowsWithReasonMatching([company.employeeDict valueForKeyPath:@"@sum.dogs.@sum.age"], @"Nested key paths.*not supported");
+        // MAX
+        XCTAssertEqual(1, [[dictionary maxOfProperty:@"intCol"] intValue]);
+        XCTAssertEqual(1.2f, [[dictionary maxOfProperty:@"floatCol"] floatValue]);
+        XCTAssertEqual(2.5, [[dictionary maxOfProperty:@"doubleCol"] doubleValue]);
+        XCTAssertEqualObjects(dateMaxInput, [dictionary maxOfProperty:@"dateCol"]);
+        RLMAssertThrowsWithReasonMatching([dictionary maxOfProperty:@"foo"], @"foo.*AggregateObject");
+        RLMAssertThrowsWithReasonMatching([dictionary maxOfProperty:@"boolCol"], @"max.*bool");
+    };
+
+    test();
+    [realm transactionWithBlock:^{ [realm addObject:obj]; }];
+    test();
+}
+
+- (void)testRenamedPropertyAggregate {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    LinkToRenamedProperties1 *obj = [LinkToRenamedProperties1 new];
+    XCTAssertEqual(0, [obj.dictionary sumOfProperty:@"propA"].intValue);
+    XCTAssertNil([obj.dictionary averageOfProperty:@"propA"]);
+    XCTAssertNil([obj.dictionary minOfProperty:@"propA"]);
+    XCTAssertNil([obj.dictionary maxOfProperty:@"propA"]);
+    XCTAssertThrows([obj.dictionary sumOfProperty:@"prop 1"]);
+
+    [realm transactionWithBlock:^{
+        [RenamedProperties1 createInRealm:realm withValue:@[@1, @""]];
+        [RenamedProperties1 createInRealm:realm withValue:@[@2, @""]];
+        [RenamedProperties1 createInRealm:realm withValue:@[@3, @""]];
+
+        RLMResults<RenamedProperties1 *> *allObjects = [RenamedProperties1 allObjectsInRealm:realm];
+        for (NSUInteger i = 0; i < allObjects.count; i++) {
+            NSString *key = [NSString stringWithFormat:@"item%lu", (unsigned long)i];
+            obj.dictionary[key] = allObjects[i];
+        }
+    }];
+
+    XCTAssertEqual(6, [obj.dictionary sumOfProperty:@"propA"].intValue);
+    XCTAssertEqual(2.0, [obj.dictionary averageOfProperty:@"propA"].doubleValue);
+    XCTAssertEqual(1, [[obj.dictionary minOfProperty:@"propA"] intValue]);
+    XCTAssertEqual(3, [[obj.dictionary maxOfProperty:@"propA"] intValue]);
+
+    [realm transactionWithBlock:^{ [realm addObject:obj]; }];
+
+    XCTAssertEqual(6, [obj.dictionary sumOfProperty:@"propA"].intValue);
+    XCTAssertEqual(2.0, [obj.dictionary averageOfProperty:@"propA"].doubleValue);
+    XCTAssertEqual(1, [[obj.dictionary minOfProperty:@"propA"] intValue]);
+    XCTAssertEqual(3, [[obj.dictionary maxOfProperty:@"propA"] intValue]);
 }
 
 @end

@@ -310,6 +310,8 @@
 @end
 @implementation AggregateSetObject
 @end
+@implementation AggregateDictionaryObject
+@end
 
 #pragma mark PrimaryStringObject
 

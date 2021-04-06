@@ -357,41 +357,15 @@ inline realm::StringData keyFromRLMDictionaryKey(id<RLMDictionaryKey> key, RLMAc
 }
 
 - (id)valueForKey:(NSString *)key {
-    // Ideally we'd use "@invalidated" for this so that "invalidated" would use
-    // normal array KVC semantics, but observing @things works very oddly (when
-    // it's part of a key path, it's triggered automatically when array index
-    // changes occur, and can't be sent explicitly, but works normally when it's
-    // the entire key path), and an RLMManagedArray *can't* have objects where
-    // invalidated is true, so we're not losing much.
-    return translateErrors<RLMManagedDictionary>([&]() -> id {
-        if ([key isEqualToString:RLMInvalidatedKey]) {
-            return @(!_backingCollection.is_valid());
-        }
-
-        _backingCollection.verify_attached();
-        auto results = _backingCollection.as_results();
-        return RLMCollectionValueForKey(results, key, *_objectInfo);
-    });
+    return [self objectForKey:key];
 }
 
 - (void)setValue:(id)value forKey:(id)key {
-    if ([key isEqualToString:@"self"]) {
-        RLMDictionaryValidateMatchingObjectType(self, key, value);
-        RLMAccessorContext context(*_objectInfo);
-        translateErrors<RLMManagedDictionary>([&] {
-            _backingCollection.remove_all();
-            _backingCollection.insert(context, [key UTF8String], value);
-        });
-        return;
-    }
-    else if (_type == RLMPropertyTypeObject) {
-        RLMDictionaryValidateMatchingObjectType(self, key, value);
-        translateErrors<RLMManagedDictionary>([&] { _backingCollection.verify_in_transaction(); });
-        RLMCollectionSetValueForKey(self, key, value);
-    }
-    else {
-        [self setValue:value forUndefinedKey:key];
-    }
+    RLMDictionaryValidateMatchingObjectType(self, key, value);
+    RLMAccessorContext context(*_objectInfo);
+    translateErrors<RLMManagedDictionary>([&] {
+        _backingCollection.insert(context, [key UTF8String], value);
+    });
 }
 
 // TODO: this can be a common func
