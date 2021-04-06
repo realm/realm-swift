@@ -55,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 RLM_COLLECTION_TYPE(Person);
-@interface RLMArraySyncObject: RLMObject
+@interface RLMArraySyncObject : RLMObject
 @property RLMObjectId *_id;
 @property RLMArray<RLMInt> *intArray;
 @property RLMArray<RLMBool> *boolArray;
@@ -68,7 +68,7 @@ RLM_COLLECTION_TYPE(Person);
 @property RLM_GENERIC_ARRAY(Person) *objectArray;
 @end
 
-@interface RLMSetSyncObject: RLMObject
+@interface RLMSetSyncObject : RLMObject
 @property RLMObjectId *_id;
 @property RLMSet<RLMInt> *intSet;
 @property RLMSet<RLMBool> *boolSet;

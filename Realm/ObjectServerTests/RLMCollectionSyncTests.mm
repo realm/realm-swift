@@ -137,13 +137,9 @@
 
 - (void)testDataSet {
     NSData* (^createData)(size_t) = ^(size_t size) {
-        NSMutableData* data = [NSMutableData dataWithCapacity:size];
-        for( unsigned int i = 0 ; i < size/4 ; ++i )
-        {
-            u_int64_t randomBits = arc4random();
-            [data appendBytes:(void*)&randomBits length:4];
-        }
-        return data;
+        void *buffer = malloc(size);
+        arc4random_buf(buffer, size);
+        return [NSData dataWithBytesNoCopy:buffer length:size freeWhenDone:YES];
     };
 
     NSData *duplicateData = createData(1024U);

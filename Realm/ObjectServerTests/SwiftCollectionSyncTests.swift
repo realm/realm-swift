@@ -43,28 +43,27 @@ class ListSyncTests: SwiftSyncTestCase {
             waitForDownloads(for: realm)
             checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
             let object = realm.objects(SwiftCollectionSyncObject.self).first!
-            XCTAssertEqual(object[keyPath: keyPath].count, values.count*2)
-            for (el, ex) in zip(object[keyPath: keyPath], values + values) {
-                if let person = el as? SwiftPerson,
-                   let otherPerson = ex as? SwiftPerson {
-                    XCTAssert(person.firstName == otherPerson.firstName, "\(el) is not equal to \(ex)")
-
+            let collection = object[keyPath: keyPath]
+            XCTAssertEqual(collection.count, values.count*2)
+            for (el, ex) in zip(collection, values + values) {
+                if let person = el as? SwiftPerson, let otherPerson = ex as? SwiftPerson {
+                    XCTAssertEqual(person.firstName, otherPerson.firstName, "\(el) is not equal to \(ex)")
                 } else {
-                    XCTAssert(el == ex, "\(el) is not equal to \(ex)")
+                    XCTAssertEqual(el, ex)
                 }
             }
             // Run the child again to delete the last 3 objects
             executeChild()
             waitForDownloads(for: realm)
-            XCTAssertEqual(object[keyPath: keyPath].count, values.count)
+            XCTAssertEqual(collection.count, values.count)
             // Run the child again to modify the first element
             executeChild()
             waitForDownloads(for: realm)
             if T.self is SwiftPerson.Type {
-                XCTAssertEqual((object[keyPath: keyPath] as! List<SwiftPerson>)[0].firstName,
+                XCTAssertEqual((collection as! List<SwiftPerson>)[0].firstName,
                                (values as! [SwiftPerson])[1].firstName)
             } else {
-                XCTAssertEqual(object[keyPath: keyPath][0], values[1])
+                XCTAssertEqual(collection[0], values[1])
             }
         } else {
             guard let object = realm.objects(SwiftCollectionSyncObject.self).first else {
@@ -75,30 +74,31 @@ class ListSyncTests: SwiftSyncTestCase {
                 checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
                 return
             }
+            let collection = object[keyPath: keyPath]
 
-            if object[keyPath: keyPath].count == 0 {
+            if collection.count == 0 {
                 try realm.write({
-                    object[keyPath: keyPath].append(objectsIn: values + values)
+                    collection.append(objectsIn: values + values)
                 })
-                XCTAssertEqual(object[keyPath: keyPath].count, values.count*2)
-            } else if object[keyPath: keyPath].count == 6 {
+                XCTAssertEqual(collection.count, values.count*2)
+            } else if collection.count == 6 {
                 try realm.write({
-                    object[keyPath: keyPath].removeSubrange(3...5)
+                    collection.removeSubrange(3...5)
                 })
-                XCTAssertEqual(object[keyPath: keyPath].count, values.count)
+                XCTAssertEqual(collection.count, values.count)
             } else {
                 if T.self is SwiftPerson.Type {
                     try realm.write({
-                        (object[keyPath: keyPath] as! List<SwiftPerson>)[0].firstName
+                        (collection as! List<SwiftPerson>)[0].firstName
                             = (values as! [SwiftPerson])[1].firstName
                     })
-                    XCTAssertEqual((object[keyPath: keyPath] as! List<SwiftPerson>)[0].firstName,
+                    XCTAssertEqual((collection as! List<SwiftPerson>)[0].firstName,
                                    (values as! [SwiftPerson])[1].firstName)
                 } else {
                     try realm.write({
-                        object[keyPath: keyPath][0] = values[1]
+                        collection[0] = values[1]
                     })
-                    XCTAssertEqual(object[keyPath: keyPath][0], values[1])
+                    XCTAssertEqual(collection[0], values[1])
                 }
             }
             waitForUploads(for: realm)
@@ -219,25 +219,27 @@ class SetSyncTests: SwiftSyncTestCase {
             executeChild()
             waitForDownloads(for: realm)
             checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
-            XCTAssertEqual(object[keyPath: set.keyPath].count, set.values.count)
-            XCTAssertEqual(object[keyPath: otherSet.keyPath].count, otherSet.values.count)
+            let collection = object[keyPath: set.keyPath]
+            let otherCollection = object[keyPath: otherSet.keyPath]
+            XCTAssertEqual(collection.count, set.values.count)
+            XCTAssertEqual(otherCollection.count, otherSet.values.count)
             // Run the child again to intersect the values
             executeChild()
             waitForDownloads(for: realm)
             checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
             if !(T.self is SwiftPerson.Type) {
-                XCTAssertTrue(object[keyPath: set.keyPath].intersects(object[keyPath: otherSet.keyPath]))
-                XCTAssertEqual(object[keyPath: set.keyPath].count, 1)
+                XCTAssertTrue(collection.intersects(object[keyPath: otherSet.keyPath]))
+                XCTAssertEqual(collection.count, 1)
             }
             // The intersection should have assigned the last value from `values`
             if !(T.self is SwiftPerson.Type) {
-                XCTAssertTrue(object[keyPath: set.keyPath].contains(set.values.last!))
+                XCTAssertTrue(collection.contains(set.values.last!))
             }
             // Run the child again to delete the objects in the sets.
             executeChild()
             waitForDownloads(for: realm)
-            XCTAssertEqual(object[keyPath: set.keyPath].count, 0)
-            XCTAssertEqual(object[keyPath: otherSet.keyPath].count, 0)
+            XCTAssertEqual(collection.count, 0)
+            XCTAssertEqual(otherCollection.count, 0)
         } else {
             guard let object = realm.objects(SwiftCollectionSyncObject.self).first else {
                 try realm.write({
@@ -247,36 +249,38 @@ class SetSyncTests: SwiftSyncTestCase {
                 checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
                 return
             }
-            if object[keyPath: set.keyPath].count == 0,
-               object[keyPath: otherSet.keyPath].count == 0 {
+            let collection = object[keyPath: set.keyPath]
+            let otherCollection = object[keyPath: otherSet.keyPath]
+            if collection.count == 0,
+               otherCollection.count == 0 {
                 try realm.write({
-                    object[keyPath: set.keyPath].insert(objectsIn: set.values)
-                    object[keyPath: otherSet.keyPath].insert(objectsIn: otherSet.values)
+                    collection.insert(objectsIn: set.values)
+                    otherCollection.insert(objectsIn: otherSet.values)
                 })
-                XCTAssertEqual(object[keyPath: set.keyPath].count, set.values.count)
-                XCTAssertEqual(object[keyPath: otherSet.keyPath].count, otherSet.values.count)
-            } else if object[keyPath: set.keyPath].count == 3,
-                      object[keyPath: otherSet.keyPath].count == 3 {
+                XCTAssertEqual(collection.count, set.values.count)
+                XCTAssertEqual(otherCollection.count, otherSet.values.count)
+            } else if collection.count == 3,
+                      otherCollection.count == 3 {
                 if !(T.self is SwiftPerson.Type) {
                     try realm.write({
-                        object[keyPath: set.keyPath].formIntersection(object[keyPath: otherSet.keyPath])
+                        collection.formIntersection(otherCollection)
                     })
                 } else {
                     try realm.write({
                         // formIntersection won't work with unique Objects
-                        object[keyPath: set.keyPath].removeAll()
-                        object[keyPath: set.keyPath].insert(set.values[0])
+                        collection.removeAll()
+                        collection.insert(set.values[0])
                     })
                 }
-                XCTAssertEqual(object[keyPath: set.keyPath].count, 1)
-                XCTAssertEqual(object[keyPath: otherSet.keyPath].count, otherSet.values.count)
+                XCTAssertEqual(collection.count, 1)
+                XCTAssertEqual(otherCollection.count, otherSet.values.count)
             } else {
                 try realm.write({
-                    object[keyPath: set.keyPath].removeAll()
-                    object[keyPath: otherSet.keyPath].removeAll()
+                    collection.removeAll()
+                    otherCollection.removeAll()
                 })
-                XCTAssertEqual(object[keyPath: set.keyPath].count, 0)
-                XCTAssertEqual(object[keyPath: otherSet.keyPath].count, 0)
+                XCTAssertEqual(collection.count, 0)
+                XCTAssertEqual(otherCollection.count, 0)
             }
             waitForUploads(for: realm)
             checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
