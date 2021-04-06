@@ -43,6 +43,44 @@ public class SwiftPerson: Object {
     }
 }
 
+public class SwiftCollectionSyncObject: Object {
+    @objc public dynamic var _id: ObjectId? = ObjectId.generate()
+    public let intList = List<Int>()
+    public let boolList = List<Bool>()
+    public let stringList = List<String>()
+    public let dataList = List<Data>()
+    public let dateList = List<Date>()
+    public let doubleList = List<Double>()
+    public let objectIdList = List<ObjectId>()
+    public let decimalList = List<Decimal128>()
+    public let uuidList = List<UUID>()
+    public let objectList = List<SwiftPerson>()
+
+    public let intSet = MutableSet<Int>()
+    public let stringSet = MutableSet<String>()
+    public let dataSet = MutableSet<Data>()
+    public let dateSet = MutableSet<Date>()
+    public let doubleSet = MutableSet<Double>()
+    public let objectIdSet = MutableSet<ObjectId>()
+    public let decimalSet = MutableSet<Decimal128>()
+    public let uuidSet = MutableSet<UUID>()
+    public let objectSet = MutableSet<SwiftPerson>()
+
+    public let otherIntSet = MutableSet<Int>()
+    public let otherStringSet = MutableSet<String>()
+    public let otherDataSet = MutableSet<Data>()
+    public let otherDateSet = MutableSet<Date>()
+    public let otherDoubleSet = MutableSet<Double>()
+    public let otherObjectIdSet = MutableSet<ObjectId>()
+    public let otherDecimalSet = MutableSet<Decimal128>()
+    public let otherUuidSet = MutableSet<UUID>()
+    public let otherObjectSet = MutableSet<SwiftPerson>()
+
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
 public func randomString(_ length: Int) -> String {
     let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     return String((0..<length).map { _ in letters.randomElement()! })
@@ -82,7 +120,8 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     public func openRealm(configuration: Realm.Configuration) throws -> Realm {
         var configuration = configuration
         if configuration.objectTypes == nil {
-            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self]
+            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self,
+                                         HugeSyncObject.self, SwiftCollectionSyncObject.self]
         }
         let realm = try Realm(configuration: configuration)
         waitForDownloads(for: realm)
