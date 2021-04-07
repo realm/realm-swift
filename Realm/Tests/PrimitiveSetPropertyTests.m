@@ -7002,8 +7002,6 @@ static double average(NSArray *values) {
                               @"Cannot sum or average date properties");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"dateObj.@sum = %@", date(1)]), 
                               @"Cannot sum or average date properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDateObj.@sum = %@", date(2)]), 
-                              @"Cannot sum or average date properties");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@sum = %@", @"a"]), 
                               @"@sum on a property of type int cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@sum = %@", @"a"]), 
@@ -7240,18 +7238,6 @@ static double average(NSArray *values) {
                               @"Cannot sum or average date properties");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"dateObj.@avg = %@", NSNull.null]), 
                               @"Cannot sum or average date properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyBoolObj.@avg = %@", @NO]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyStringObj.@avg = %@", @"a"]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDataObj.@avg = %@", data(1)]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyObjectIdObj.@avg = %@", objectId(1)]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyUUIDObj.@avg = %@", uuid(@"00000000-0000-0000-0000-000000000000")]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDateObj.@avg = %@", date(1)]), 
-                              @"Cannot sum or average date properties");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@avg = %@", @"a"]), 
                               @"@avg on a property of type int cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@avg = %@", @"a"]), 
@@ -7459,16 +7445,6 @@ static double average(NSArray *values) {
                               @"@min can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"uuidObj.@min = %@", NSNull.null]), 
                               @"@min can only be applied to a numeric property.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyBoolObj.@min = %@", @NO]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyStringObj.@min = %@", @"a"]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDataObj.@min = %@", data(1)]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyObjectIdObj.@min = %@", objectId(1)]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyUUIDObj.@min = %@", uuid(@"00000000-0000-0000-0000-000000000000")]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@min = %@", @"a"]), 
                               @"@min on a property of type int cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@min = %@", @"a"]), 
@@ -7489,16 +7465,6 @@ static double average(NSArray *values) {
                               @"@min on a property of type date cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"decimalObj.@min = %@", @"a"]), 
                               @"@min on a property of type decimal128 cannot be compared with 'a'");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyIntObj.@min = %@", @"a"]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyFloatObj.@min = %@", @"a"]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDoubleObj.@min = %@", @"a"]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDateObj.@min = %@", @"a"]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDecimalObj.@min = %@", @"a"]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@min.prop = %@", @"a"]), 
                               @"Property 'intObj' is not a link in object of type 'AllPrimitiveSets'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@min.prop = %@", @"a"]), 
@@ -7698,16 +7664,6 @@ static double average(NSArray *values) {
                               @"@max can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"uuidObj.@max = %@", NSNull.null]), 
                               @"@max can only be applied to a numeric property.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyBoolObj.@max = %@", @NO]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyStringObj.@max = %@", @"a"]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDataObj.@max = %@", data(1)]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyObjectIdObj.@max = %@", objectId(1)]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyUUIDObj.@max = %@", uuid(@"00000000-0000-0000-0000-000000000000")]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@max = %@", @"a"]), 
                               @"@max on a property of type int cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@max = %@", @"a"]), 
@@ -7728,16 +7684,6 @@ static double average(NSArray *values) {
                               @"@max on a property of type date cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveSets objectsInRealm:realm where:@"decimalObj.@max = %@", @"a"]), 
                               @"@max on a property of type decimal128 cannot be compared with 'a'");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyIntObj.@max = %@", @"a"]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyFloatObj.@max = %@", @"a"]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDoubleObj.@max = %@", @"a"]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDateObj.@max = %@", @"a"]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"anyDecimalObj.@max = %@", @"a"]), 
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"intObj.@max.prop = %@", @"a"]), 
                               @"Property 'intObj' is not a link in object of type 'AllPrimitiveSets'");
     RLMAssertThrowsWithReason(([AllPrimitiveSets objectsInRealm:realm where:@"floatObj.@max.prop = %@", @"a"]), 

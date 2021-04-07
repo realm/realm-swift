@@ -9137,8 +9137,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Cannot sum or average date properties");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"dateObj.@sum = %@", date(1)]),
                               @"Cannot sum or average date properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyDateObj.@sum = %@", date(1)]),
-                              @"Cannot sum or average date properties");
 
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@sum = %@", @"a"]),
                               @"@sum on a property of type int cannot be compared with 'a'");
@@ -9323,8 +9321,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"Cannot sum or average date properties");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"dateObj.@avg = %@", date(1)]),
                               @"Cannot sum or average date properties");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyDateObj.@avg = %@", date(1)]),
-                              @"Cannot sum or average date properties");
 
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@avg = %@", @"a"]),
                               @"@avg on a property of type int cannot be compared with 'a'");
@@ -9489,16 +9485,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@min can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@min = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"@min can only be applied to a numeric property.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyBoolObj.@min = %@", @NO]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyStringObj.@min = %@", @"a"]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyDataObj.@min = %@", data(1)]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObjectIdObj.@min = %@", objectId(1)]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyUUIDObj.@min = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@min = %@", @"a"]),
                               @"@min on a property of type int cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"floatObj.@min = %@", @"a"]),
@@ -9519,16 +9505,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@min on a property of type date cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"decimalObj.@min = %@", @"a"]),
                               @"@min on a property of type decimal128 cannot be compared with 'a'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyIntObj.@min = %@", @"a"]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyFloatObj.@min = %@", @"a"]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyDoubleObj.@min = %@", @"a"]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyDateObj.@min = %@", @"a"]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyDecimalObj.@min = %@", @"a"]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@min.prop = %@", @"a"]),
                               @"Property 'intObj' is not a link in object of type 'AllPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"floatObj.@min.prop = %@", @"a"]),
@@ -9787,16 +9763,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@max can only be applied to a numeric property.");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"uuidObj.@max = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
                               @"@max can only be applied to a numeric property.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyBoolObj.@max = %@", @NO]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyStringObj.@max = %@", @"a"]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyDataObj.@max = %@", data(1)]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyObjectIdObj.@max = %@", objectId(1)]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyUUIDObj.@max = %@", uuid(@"00000000-0000-0000-0000-000000000000")]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@max = %@", @"a"]),
                               @"@max on a property of type int cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"floatObj.@max = %@", @"a"]),
@@ -9817,16 +9783,6 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                               @"@max on a property of type date cannot be compared with 'a'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveArrays objectsInRealm:realm where:@"decimalObj.@max = %@", @"a"]),
                               @"@max on a property of type decimal128 cannot be compared with 'a'");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyIntObj.@max = %@", @"a"]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyFloatObj.@max = %@", @"a"]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyDoubleObj.@max = %@", @"a"]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyDateObj.@max = %@", @"a"]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
-    RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"anyDecimalObj.@max = %@", @"a"]),
-                              @"Unsupported comparision value type for mixed. Value must be numeric.");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"intObj.@max.prop = %@", @"a"]),
                               @"Property 'intObj' is not a link in object of type 'AllPrimitiveArrays'");
     RLMAssertThrowsWithReason(([AllPrimitiveArrays objectsInRealm:realm where:@"floatObj.@max.prop = %@", @"a"]),
