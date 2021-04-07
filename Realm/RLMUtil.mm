@@ -390,11 +390,8 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
         return realm::Mixed();
     }
 
-    RLMPropertyType type;
-    if ([v conformsToProtocol:@protocol(RLMValue)])
-        type = [v rlm_valueType];
-    else
-        REALM_TERMINATE("Unexpected Type");
+    REALM_ASSERT([v conformsToProtocol:@protocol(RLMValue)]);
+    RLMPropertyType type = [v rlm_valueType];
 
     switch (type) {
         case RLMPropertyTypeInt:

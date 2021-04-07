@@ -1279,56 +1279,9 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
             }
             break;
         case RLMPropertyTypeAny:
-            // We use `constexpr (std::is_same_v<R, id>)` here because we want to
-            // perform operations on Obj-C types. By using `constexpr` the compiler
-            // can infer R as `id` and thus do things with the Obj-C values.
-            if constexpr (std::is_same_v<R, id>) {
-                if (auto i = RLMDynamicCast<NSNumber>(rhs)) {
-                    if ([rhs objCType][0] == 'c') {
-                        // Bools are not supported
-                        throwException(@"Unsupported predicate value type",
-                                       @"Unsupported comparision value type for mixed. Value must be numeric.");
-                    }
-                    else if (numberIsInteger(i)) {
-                        add_numeric_constraint(type, operatorType,
-                                               collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
-                                               Mixed([i intValue]));
-                    }
-                    else if ([rhs objCType][0] == *@encode(float)) {
-                        add_numeric_constraint(type, operatorType,
-                                               collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
-                                               Mixed([i floatValue]));
-                    }
-                    else if ([rhs objCType][0] == *@encode(double)) {
-                        add_numeric_constraint(type, operatorType,
-                                               collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
-                                               Mixed([i doubleValue]));
-                    }
-                }
-                else if ([rhs isKindOfClass:[NSDate class]]) {
-                    if constexpr (Operation == CollectionOperation::Sum || Operation == CollectionOperation::Average) {
-                        throwException(@"Unsupported predicate value type",
-                                       @"Cannot sum or average date properties");
-                    }
-                    add_numeric_constraint(type, operatorType,
-                                           collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
-                                           Mixed(value_of_type<Timestamp>(rhs)));
-                }
-                else if ([rhs isKindOfClass:[RLMDecimal128 class]]) {
-                    add_numeric_constraint(type, operatorType,
-                                           collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
-                                           Mixed(value_of_type<Decimal128>(rhs)));
-                }
-                else {
-                    throwException(@"Unsupported predicate value type",
-                                   @"Unsupported comparision value type for mixed. Value must be numeric.");
-                }
-            }
-            else if constexpr (std::is_empty_v<R>) {
-                add_numeric_constraint(type, operatorType,
-                                       collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
-                                       Mixed());
-            }
+            add_numeric_constraint(type, operatorType,
+                                   collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
+                                   value_of_type<Mixed>(rhs));
             break;
         default:
             REALM_ASSERT(false && "Only numeric property types should hit this path.");

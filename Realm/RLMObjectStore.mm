@@ -74,7 +74,7 @@ static inline void RLMVerifyRealmRead(__unsafe_unretained RLMRealm *const realm)
     }
 }
 
-inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *const realm) {
+void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *const realm) {
     RLMVerifyRealmRead(realm);
     // if realm is not writable throw
     if (!realm.inWriteTransaction) {
@@ -178,14 +178,14 @@ RLMObjectBase *RLMObjectFromObjLink(RLMRealm *realm, realm::ObjLink&& objLink, b
         // Construct the object dynamically.
         // This code path should only be hit on first access of the object.
         Class cls = parentIsSwiftObject ? [RealmSwiftObject class] : [RLMDynamicObject class];
-        realm::Schema const groupSchema = realm::ObjectStore::schema_from_group(realm->_realm->read_group());
-        realm::ObjectSchema *schema = new realm::ObjectSchema;
-        *schema = *groupSchema.find(objLink.get_table_key());
+        auto& group = realm->_realm->read_group();
+        auto schema = std::make_unique<realm::ObjectSchema>(group,
+                                                            group.get_table_name(objLink.get_table_key()),
+                                                            objLink.get_table_key());
         RLMObjectSchema *rlmObjectSchema = [RLMObjectSchema objectSchemaForObjectStoreSchema:*schema];
         rlmObjectSchema.accessorClass = cls;
         rlmObjectSchema.isSwiftClass = parentIsSwiftObject;
-        // RLMClassInfo inside of RLMSchemaInfo will handle the ownership of `schema`.
-        realm->_info.append_dynamic_object_schema(schema, rlmObjectSchema, realm);
+        realm->_info.append_dynamic_object_schema(std::move(schema), rlmObjectSchema, realm);
         return RLMCreateObjectAccessor(realm->_info[rlmObjectSchema.className],
                                        objLink.get_obj_key().value);
     }
