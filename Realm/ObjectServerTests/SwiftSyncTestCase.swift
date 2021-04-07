@@ -198,7 +198,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
 
     public func createAppForPartition<T: BSON>(_ partitionValue: T) -> App {
-        return createApp(forPartition: ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
+        return createApp(forPartitionType: ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
     }
 
     open func logInUser(for credentials: Credentials, app: App? = nil) throws -> User {

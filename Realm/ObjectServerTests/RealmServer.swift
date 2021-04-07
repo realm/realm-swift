@@ -518,7 +518,7 @@ public class RealmServer: NSObject {
     }
 
     /// Create a new server app
-    @objc public func createApp(forBSONType bsonType: String) throws -> AppId {
+    @objc public func createAppForBSONType(_ bsonType: String) throws -> AppId {
         guard let session = session else {
             throw URLError(.unknown)
         }
@@ -686,7 +686,7 @@ public class RealmServer: NSObject {
             "relationships": [:]
         ]
 
-        let uUIDPrimaryKeyObjectRule: [String: Any] = [
+        let uuidPrimaryKeyObjectRule: [String: Any] = [
             "database": "test_data",
             "collection": "UUIDPrimaryKeyObject",
             "roles": [[
@@ -934,7 +934,7 @@ public class RealmServer: NSObject {
         rules.post(on: group, dogRule, failOnError)
         rules.post(on: group, personRule, failOnError)
         rules.post(on: group, hugeSyncObjectRule, failOnError)
-        rules.post(on: group, uUIDPrimaryKeyObjectRule, failOnError)
+        rules.post(on: group, uuidPrimaryKeyObjectRule, failOnError)
         rules.post(on: group, stringPrimaryKeyObjectRule, failOnError)
         rules.post(on: group, intPrimaryKeyObjectRule, failOnError)
         rules.post(on: group, swiftPerson, failOnError)
@@ -1024,7 +1024,7 @@ public class RealmServer: NSObject {
     }
 
     @objc public func createApp() throws -> AppId {
-        try createApp(forBSONType: "string")
+        try createAppForBSONType("string")
     }
 }
 

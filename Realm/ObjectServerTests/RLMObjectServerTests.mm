@@ -683,7 +683,7 @@ static NSString *randomEmail() {
 }
 
 - (void)roundTripForPartitionValue:(id<RLMBSON>)value  {
-    RLMApp *app = [self createAppForPartition:value];
+    RLMApp *app = [self createAppForPartitionType:value];
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                         register:self.isParent
                                                              app:app];
