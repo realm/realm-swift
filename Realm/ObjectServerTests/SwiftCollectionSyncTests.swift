@@ -28,189 +28,43 @@ import RealmTestSupport
 
 class ListSyncTests: SwiftSyncTestCase {
     private func roundTrip<T: _ManagedPropertyType>(keyPath: KeyPath<SwiftCollectionSyncObject, List<T>>,
-                                                    values: [T]) {
-        do {
-            let user = try logInUser(for: basicCredentials())
-            let realm = try openRealm(partitionValue: #function, user: user)
-            if isParent {
-                try realm.write {
-                    realm.deleteAll()
-                }
-                waitForDownloads(for: realm)
-                checkCount(expected: 0, realm, SwiftCollectionSyncObject.self)
-                executeChild()
-                waitForDownloads(for: realm)
-                checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
-                // Run the child again to add the values
-                executeChild()
-                waitForDownloads(for: realm)
-                checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
-                let object = realm.objects(SwiftCollectionSyncObject.self).first!
-                XCTAssertEqual(object[keyPath: keyPath].count, values.count*2)
-                for (el, ex) in zip(object[keyPath: keyPath], values + values) {
-                    if let person = el as? SwiftPerson,
-                       let otherPerson = ex as? SwiftPerson {
-                        XCTAssert(person.firstName == otherPerson.firstName, "\(el) is not equal to \(ex)")
-
-                    } else {
-                        XCTAssert(el == ex, "\(el) is not equal to \(ex)")
-                    }
-                }
-                // Run the child again to delete the last 3 objects
-                executeChild()
-                waitForDownloads(for: realm)
-                XCTAssertEqual(object[keyPath: keyPath].count, values.count)
-                // Run the child again to modify the first element
-                executeChild()
-                waitForDownloads(for: realm)
-                if T.self is SwiftPerson.Type {
-                    XCTAssertEqual((object[keyPath: keyPath] as! List<SwiftPerson>)[0].firstName,
-                                   (values as! [SwiftPerson])[1].firstName)
-                } else {
-                    XCTAssertEqual(object[keyPath: keyPath][0], values[1])
-                }
-            } else {
-                guard let object = realm.objects(SwiftCollectionSyncObject.self).first else {
-                    try realm.write({
-                        realm.add(SwiftCollectionSyncObject())
-                    })
-                    waitForUploads(for: realm)
-                    checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
-                    return
-                }
-
-                if object[keyPath: keyPath].count == 0 {
-                    try realm.write({
-                        object[keyPath: keyPath].append(objectsIn: values + values)
-                    })
-                    XCTAssertEqual(object[keyPath: keyPath].count, values.count*2)
-                } else if object[keyPath: keyPath].count == 6 {
-                    try realm.write({
-                        object[keyPath: keyPath].removeSubrange(3...5)
-                    })
-                    XCTAssertEqual(object[keyPath: keyPath].count, values.count)
-                } else {
-                    if T.self is SwiftPerson.Type {
-                        try realm.write({
-                            (object[keyPath: keyPath] as! List<SwiftPerson>)[0].firstName
-                                = (values as! [SwiftPerson])[1].firstName
-                        })
-                        XCTAssertEqual((object[keyPath: keyPath] as! List<SwiftPerson>)[0].firstName,
-                                       (values as! [SwiftPerson])[1].firstName)
-                    } else {
-                        try realm.write({
-                            object[keyPath: keyPath][0] = values[1]
-                        })
-                        XCTAssertEqual(object[keyPath: keyPath][0], values[1])
-                    }
-                }
-                waitForUploads(for: realm)
-                checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
-            }
-        } catch {
-            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
-        }
-    }
-
-    func testIntList() {
-        roundTrip(keyPath: \.intList, values: [1, 2, 3])
-    }
-
-    func testBoolList() {
-        roundTrip(keyPath: \.boolList, values: [true, false, false])
-    }
-
-    func testStringList() {
-        roundTrip(keyPath: \.stringList, values: ["Hey", "Hi", "Bye"])
-    }
-
-    func testDataList() {
-        roundTrip(keyPath: \.dataList, values: [Data(repeating: 0, count: 1024*8*1024),
-                                                Data(repeating: 1, count: 256),
-                                                Data(repeating: 2, count: 64)])
-    }
-
-    func testDateList() {
-        roundTrip(keyPath: \.dateList, values: [Date(timeIntervalSince1970: 10000000),
-                                                Date(timeIntervalSince1970: 20000000),
-                                                Date(timeIntervalSince1970: 30000000)])
-    }
-
-    func testDoubleList() {
-        roundTrip(keyPath: \.doubleList, values: [123.456, 234.456, 567.333])
-    }
-
-    func testObjectIdList() {
-        roundTrip(keyPath: \.objectIdList, values: [.init("6058f12b957ba06156586a7c"),
-                                                    .init("6058f12682b2fbb1f334ef1d"),
-                                                    .init("6058f12d42e5a393e67538d0")])
-    }
-
-    func testDecimalList() {
-        roundTrip(keyPath: \.decimalList, values: [123.345,
-                                                   213.345,
-                                                   321.345])
-    }
-
-    func testUuidList() {
-        roundTrip(keyPath: \.uuidList, values: [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
-                                                UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
-                                                UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!])
-    }
-
-    func testAnyList() {
-        roundTrip(keyPath: \.anyList, values: [.int(12345), .string("Hello"), .none])
-    }
-
-    func testObjectList() {
-        roundTrip(keyPath: \.objectList, values: [SwiftPerson(firstName: "Peter", lastName: "Parker"),
-                                                  SwiftPerson(firstName: "Bruce", lastName: "Wayne"),
-                                                  SwiftPerson(firstName: "Stephen", lastName: "Strange")])
-    }
-}
-
-class SetSyncTests: SwiftSyncTestCase {
-
-    private typealias MutableSetKeyPath<T: RealmCollectionValue> = KeyPath<SwiftCollectionSyncObject, MutableSet<T>>
-    private typealias MutableSetKeyValues<T: RealmCollectionValue> = (keyPath: MutableSetKeyPath<T>, values: [T])
-
-    private func roundTrip<T: _ManagedPropertyType>(set: MutableSetKeyValues<T>,
-                                                    otherSet: MutableSetKeyValues<T>) throws {
-        let user = try logInUser(for: basicCredentials())
-        let realm = try openRealm(partitionValue: #function, user: user)
+                                                    values: [T],
+                                                    partitionValue: String = #function) throws {
+        let user = logInUser(for: basicCredentials(withName: partitionValue,
+                                                   register: isParent))
+        let realm = try openRealm(partitionValue: partitionValue, user: user)
         if isParent {
-            try realm.write {
-                realm.deleteAll()
-            }
-            waitForDownloads(for: realm)
             checkCount(expected: 0, realm, SwiftCollectionSyncObject.self)
             executeChild()
             waitForDownloads(for: realm)
             checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+            // Run the child again to add the values
+            executeChild()
+            waitForDownloads(for: realm)
+            checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
             let object = realm.objects(SwiftCollectionSyncObject.self).first!
-            // Run the child again to insert the values
-            executeChild()
-            waitForDownloads(for: realm)
-            checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
-            XCTAssertEqual(object[keyPath: set.keyPath].count, set.values.count)
-            XCTAssertEqual(object[keyPath: otherSet.keyPath].count, otherSet.values.count)
-            // Run the child again to intersect the values
-            executeChild()
-            waitForDownloads(for: realm)
-            checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
-            if !(T.self is SwiftPerson.Type) {
-                XCTAssertTrue(object[keyPath: set.keyPath].intersects(object[keyPath: otherSet.keyPath]))
-                XCTAssertEqual(object[keyPath: set.keyPath].count, 1)
+            let collection = object[keyPath: keyPath]
+            XCTAssertEqual(collection.count, values.count*2)
+            for (el, ex) in zip(collection, values + values) {
+                if let person = el as? SwiftPerson, let otherPerson = ex as? SwiftPerson {
+                    XCTAssertEqual(person.firstName, otherPerson.firstName, "\(el) is not equal to \(ex)")
+                } else {
+                    XCTAssertEqual(el, ex)
+                }
             }
-            // The intersection should have assigned the last value from `values`
-            if !(T.self is SwiftPerson.Type) {
-                XCTAssertTrue(object[keyPath: set.keyPath].contains(set.values.last!))
-            }
-            // Run the child again to delete the objects in the sets.
+            // Run the child again to delete the last 3 objects
             executeChild()
             waitForDownloads(for: realm)
-            XCTAssertEqual(object[keyPath: set.keyPath].count, 0)
-            XCTAssertEqual(object[keyPath: otherSet.keyPath].count, 0)
+            XCTAssertEqual(collection.count, values.count)
+            // Run the child again to modify the first element
+            executeChild()
+            waitForDownloads(for: realm)
+            if T.self is SwiftPerson.Type {
+                XCTAssertEqual((collection as! List<SwiftPerson>)[0].firstName,
+                               (values as! [SwiftPerson])[1].firstName)
+            } else {
+                XCTAssertEqual(collection[0], values[1])
+            }
         } else {
             guard let object = realm.objects(SwiftCollectionSyncObject.self).first else {
                 try realm.write({
@@ -220,36 +74,221 @@ class SetSyncTests: SwiftSyncTestCase {
                 checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
                 return
             }
-            if object[keyPath: set.keyPath].count == 0,
-               object[keyPath: otherSet.keyPath].count == 0 {
+            let collection = object[keyPath: keyPath]
+
+            if collection.count == 0 {
                 try realm.write({
-                    object[keyPath: set.keyPath].insert(objectsIn: set.values)
-                    object[keyPath: otherSet.keyPath].insert(objectsIn: otherSet.values)
+                    collection.append(objectsIn: values + values)
                 })
-                XCTAssertEqual(object[keyPath: set.keyPath].count, set.values.count)
-                XCTAssertEqual(object[keyPath: otherSet.keyPath].count, otherSet.values.count)
-            } else if object[keyPath: set.keyPath].count == 3,
-                      object[keyPath: otherSet.keyPath].count == 3 {
+                XCTAssertEqual(collection.count, values.count*2)
+            } else if collection.count == 6 {
+                try realm.write({
+                    collection.removeSubrange(3...5)
+                })
+                XCTAssertEqual(collection.count, values.count)
+            } else {
+                if T.self is SwiftPerson.Type {
+                    try realm.write({
+                        (collection as! List<SwiftPerson>)[0].firstName
+                            = (values as! [SwiftPerson])[1].firstName
+                    })
+                    XCTAssertEqual((collection as! List<SwiftPerson>)[0].firstName,
+                                   (values as! [SwiftPerson])[1].firstName)
+                } else {
+                    try realm.write({
+                        collection[0] = values[1]
+                    })
+                    XCTAssertEqual(collection[0], values[1])
+                }
+            }
+            waitForUploads(for: realm)
+            checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+        }
+    }
+
+    func testIntList() {
+        do {
+            try roundTrip(keyPath: \.intList, values: [1, 2, 3])
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testBoolList() {
+        do {
+            try roundTrip(keyPath: \.boolList, values: [true, false, false])
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testStringList() {
+        do {
+            try roundTrip(keyPath: \.stringList, values: ["Hey", "Hi", "Bye"])
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testDataList() {
+        do {
+            try roundTrip(keyPath: \.dataList, values: [Data(repeating: 0, count: 64),
+                                                        Data(repeating: 1, count: 64),
+                                                        Data(repeating: 2, count: 64)])
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testDateList() {
+        do {
+            try roundTrip(keyPath: \.dateList, values: [Date(timeIntervalSince1970: 10000000),
+                                                        Date(timeIntervalSince1970: 20000000),
+                                                        Date(timeIntervalSince1970: 30000000)])
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testDoubleList() {
+        do {
+            try roundTrip(keyPath: \.doubleList, values: [123.456, 234.456, 567.333])
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testObjectIdList() {
+        do {
+            try roundTrip(keyPath: \.objectIdList, values: [.init("6058f12b957ba06156586a7c"),
+                                                            .init("6058f12682b2fbb1f334ef1d"),
+                                                            .init("6058f12d42e5a393e67538d0")])
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testDecimalList() {
+        do {
+            try roundTrip(keyPath: \.decimalList, values: [123.345,
+                                                           213.345,
+                                                           321.345])
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testUuidList() {
+        do {
+            try roundTrip(keyPath: \.uuidList, values: [UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
+                                                        UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
+                                                        UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!])
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testObjectList() {
+        do {
+            try roundTrip(keyPath: \.objectList, values: [SwiftPerson(firstName: "Peter", lastName: "Parker"),
+                                                          SwiftPerson(firstName: "Bruce", lastName: "Wayne"),
+                                                          SwiftPerson(firstName: "Stephen", lastName: "Strange")])
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testAnyList() {
+        do {
+            try roundTrip(keyPath: \.anyList, values: [.int(12345), .string("Hello"), .none])
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+}
+
+class SetSyncTests: SwiftSyncTestCase {
+
+    private typealias MutableSetKeyPath<T: RealmCollectionValue> = KeyPath<SwiftCollectionSyncObject, MutableSet<T>>
+    private typealias MutableSetKeyValues<T: RealmCollectionValue> = (keyPath: MutableSetKeyPath<T>, values: [T])
+
+    private func roundTrip<T: _ManagedPropertyType>(set: MutableSetKeyValues<T>,
+                                                    otherSet: MutableSetKeyValues<T>,
+                                                    partitionValue: String = #function) throws {
+        let user = logInUser(for: basicCredentials(withName: partitionValue, register: isParent))
+        let realm = try openRealm(partitionValue: partitionValue, user: user)
+        if isParent {
+            checkCount(expected: 0, realm, SwiftCollectionSyncObject.self)
+            executeChild()
+            waitForDownloads(for: realm)
+            checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+            let object = realm.objects(SwiftCollectionSyncObject.self).first!
+            // Run the child again to insert the values
+            executeChild()
+            waitForDownloads(for: realm)
+            checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+            let collection = object[keyPath: set.keyPath]
+            let otherCollection = object[keyPath: otherSet.keyPath]
+            XCTAssertEqual(collection.count, set.values.count)
+            XCTAssertEqual(otherCollection.count, otherSet.values.count)
+            // Run the child again to intersect the values
+            executeChild()
+            waitForDownloads(for: realm)
+            checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+            if !(T.self is SwiftPerson.Type) {
+                XCTAssertTrue(collection.intersects(object[keyPath: otherSet.keyPath]))
+                XCTAssertEqual(collection.count, 1)
+            }
+            // The intersection should have assigned the last value from `values`
+            if !(T.self is SwiftPerson.Type) {
+                XCTAssertTrue(collection.contains(set.values.last!))
+            }
+            // Run the child again to delete the objects in the sets.
+            executeChild()
+            waitForDownloads(for: realm)
+            XCTAssertEqual(collection.count, 0)
+            XCTAssertEqual(otherCollection.count, 0)
+        } else {
+            guard let object = realm.objects(SwiftCollectionSyncObject.self).first else {
+                try realm.write({
+                    realm.add(SwiftCollectionSyncObject())
+                })
+                waitForUploads(for: realm)
+                checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+                return
+            }
+            let collection = object[keyPath: set.keyPath]
+            let otherCollection = object[keyPath: otherSet.keyPath]
+            if collection.count == 0,
+               otherCollection.count == 0 {
+                try realm.write({
+                    collection.insert(objectsIn: set.values)
+                    otherCollection.insert(objectsIn: otherSet.values)
+                })
+                XCTAssertEqual(collection.count, set.values.count)
+                XCTAssertEqual(otherCollection.count, otherSet.values.count)
+            } else if collection.count == 3,
+                      otherCollection.count == 3 {
                 if !(T.self is SwiftPerson.Type) {
                     try realm.write({
-                        object[keyPath: set.keyPath].formIntersection(object[keyPath: otherSet.keyPath])
+                        collection.formIntersection(otherCollection)
                     })
                 } else {
                     try realm.write({
                         // formIntersection won't work with unique Objects
-                        object[keyPath: set.keyPath].removeAll()
-                        object[keyPath: set.keyPath].insert(set.values[0])
+                        collection.removeAll()
+                        collection.insert(set.values[0])
                     })
                 }
-                XCTAssertEqual(object[keyPath: set.keyPath].count, 1)
-                XCTAssertEqual(object[keyPath: otherSet.keyPath].count, otherSet.values.count)
+                XCTAssertEqual(collection.count, 1)
+                XCTAssertEqual(otherCollection.count, otherSet.values.count)
             } else {
                 try realm.write({
-                    object[keyPath: set.keyPath].removeAll()
-                    object[keyPath: otherSet.keyPath].removeAll()
+                    collection.removeAll()
+                    otherCollection.removeAll()
                 })
-                XCTAssertEqual(object[keyPath: set.keyPath].count, 0)
-                XCTAssertEqual(object[keyPath: otherSet.keyPath].count, 0)
+                XCTAssertEqual(collection.count, 0)
+                XCTAssertEqual(otherCollection.count, 0)
             }
             waitForUploads(for: realm)
             checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
@@ -275,12 +314,12 @@ class SetSyncTests: SwiftSyncTestCase {
 
     func testDataSet() {
         do {
-            try roundTrip(set: (\.dataSet, [Data(repeating: 1, count: 1024),
-                                            Data(repeating: 1, count: 256),
-                                            Data(repeating: 2, count: 64)]),
-                          otherSet: (\.otherDataSet, [Data(repeating: 2, count: 64),
-                                                      Data(repeating: 3, count: 256),
-                                                      Data(repeating: 4, count: 1024)]))
+            try roundTrip(set: (\.dataSet, [Data(repeating: 1, count: 64),
+                                            Data(repeating: 2, count: 64),
+                                            Data(repeating: 3, count: 64)]),
+                          otherSet: (\.otherDataSet, [Data(repeating: 3, count: 64),
+                                                      Data(repeating: 4, count: 64),
+                                                      Data(repeating: 5, count: 64)]))
         } catch {
             XCTFail(error.localizedDescription)
         }
@@ -349,15 +388,6 @@ class SetSyncTests: SwiftSyncTestCase {
         }
     }
 
-    func testAnySet() {
-        do {
-            try roundTrip(set: (\.anySet, [.int(12345), .string("Hello"), .none]),
-                          otherSet: (\.otherAnySet, [.none, .string("Hey!"), .double(123.456)]))
-        } catch {
-            XCTFail(error.localizedDescription)
-        }
-    }
-
     func testObjectSet() {
         do {
             try roundTrip(set: (\.objectSet, [SwiftPerson(firstName: "Peter", lastName: "Parker"),
@@ -366,6 +396,15 @@ class SetSyncTests: SwiftSyncTestCase {
                           otherSet: (\.otherObjectSet, [SwiftPerson(firstName: "Stephen", lastName: "Strange"),
                                                         SwiftPerson(firstName: "Tony", lastName: "Stark"),
                                                         SwiftPerson(firstName: "Clark", lastName: "Kent")]))
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testAnySet() {
+        do {
+            try roundTrip(set: (\.anySet, [.int(12345), .string("Hello"), .none]),
+                          otherSet: (\.otherAnySet, [.double(765.6543), .string("Hello"), .objectId(.generate())]))
         } catch {
             XCTFail(error.localizedDescription)
         }

@@ -203,9 +203,9 @@ let package = Package(
             dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftSyncTestSupport"],
             path: "Realm/ObjectServerTests",
             sources: [
-                 "SwiftObjectServerTests.swift",
-                 "SwiftBSONTests.swift",
-                 "SwiftCollectionSyncTests.swift"
+                "SwiftObjectServerTests.swift",
+                "SwiftBSONTests.swift",
+                "SwiftCollectionSyncTests.swift"
             ],
             swiftSettings: combineFlags()
         ),

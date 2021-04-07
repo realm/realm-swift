@@ -59,7 +59,7 @@ public:
                  const realm::ObjectSchema *);
 
     RLMClassInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
-                 std::unique_ptr<const realm::ObjectSchema *> objectSchema);
+                 std::unique_ptr<realm::ObjectSchema> objectSchema);
 
     __unsafe_unretained RLMRealm *const realm;
     __unsafe_unretained RLMObjectSchema *const rlmObjectSchema;
@@ -101,7 +101,7 @@ public:
 private:
     // If the ObjectSchema is not owned by the realm instance
     // we need to manually manage the ownership of the object.
-    std::unique_ptr<const realm::ObjectSchema *> dynamicObjectSchema;
+    std::unique_ptr<realm::ObjectSchema> dynamicObjectSchema;
 };
 
 // A per-RLMRealm object schema map which stores RLMClassInfo keyed on the name

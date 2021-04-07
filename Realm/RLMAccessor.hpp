@@ -41,13 +41,18 @@ struct RLMOptionalId {
     id operator*() const noexcept { return value; }
 };
 
-class RLMAccessorContext {
+// The subset of RLMAccessorContext which does not require any member variables
+struct RLMStatelessAccessorContext {
+    template<typename T>
+    T unbox(id v);
+};
+
+class RLMAccessorContext : public RLMStatelessAccessorContext {
 public:
     ~RLMAccessorContext();
 
     // Accessor context interface
     RLMAccessorContext(RLMAccessorContext& parent, realm::Obj const& parent_obj, realm::Property const& property);
-
     id box(realm::object_store::Dictionary&&);
     id box(realm::object_store::Set&&);
     id box(realm::List&&);

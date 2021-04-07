@@ -37,6 +37,7 @@
 #import <realm/mixed.hpp>
 #import <realm/object-store/shared_realm.hpp>
 #import <realm/table_view.hpp>
+#import <realm/util/overload.hpp>
 
 #if REALM_ENABLE_SYNC
 #import "RLMSyncUtil.h"
@@ -393,47 +394,19 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
     REALM_ASSERT([v conformsToProtocol:@protocol(RLMValue)]);
     RLMPropertyType type = [v rlm_valueType];
 
-    switch (type) {
-        case RLMPropertyTypeInt:
-            return realm::Mixed([(NSNumber *)v longLongValue]);
-        case RLMPropertyTypeBool:
-            return realm::Mixed((bool)[(NSNumber *)v boolValue]);
-        case RLMPropertyTypeFloat:
-            return realm::Mixed([(NSNumber *)v floatValue]);
-        case RLMPropertyTypeDouble:
-            return realm::Mixed([(NSNumber *)v doubleValue]);
-        case RLMPropertyTypeUUID:
-            return realm::Mixed(RLMObjcToUUID(v));
-        case RLMPropertyTypeString:
-            return realm::Mixed([(NSString *)v cStringUsingEncoding:NSUTF8StringEncoding]);
-        case RLMPropertyTypeData:
-            return realm::Mixed(realm::BinaryData((const char*)[(NSData *)v bytes],
-                                                  (size_t)[(NSData *)v length]));
-        case RLMPropertyTypeDate:
-            return realm::Mixed(realm::Timestamp([(NSDate *)v timeIntervalSince1970], 0));
-        case RLMPropertyTypeObject: {
-            // If we are unboxing an object and it is unmanaged, we need to
-            // add it to the Realm.
-            if (RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(v);
-                !objBase->_realm && (createPolicy.create || createPolicy.copy)) {
-                RLMVerifyInWriteTransaction(realm);
-                RLMAccessorContext c{realm->_info[objBase->_objectSchema.className]};
-                return realm::Mixed(c.createObject(objBase, createPolicy).first);
-            }
-
-            if (!((RLMObjectBase *)v)->_row) {
-                return realm::Mixed();
-            }
-
-            return ((RLMObjectBase *)v)->_row.get_link();
-        }
-        case RLMPropertyTypeObjectId:
-            return realm::Mixed([(RLMObjectId *)v value]);
-        case RLMPropertyTypeDecimal128:
-            return realm::Mixed([(RLMDecimal128 *)v decimal128Value]);
-        default:
-            @throw RLMException(@"Unexpected property type for mixed value type code");
-    }
+    return switch_on_type(static_cast<realm::PropertyType>(type), realm::util::overload{[&](realm::Obj*) {
+        // The RLMObjectBase may be unmanaged and therefor has no RLMClassInfo attached.
+        // So we fetch from the Realm instead.
+        // If the Object is managed use it's RLMClassInfo instead so we do not have to do a
+        // lookup in the table of schemas.
+        RLMObjectBase *objBase = v;
+        RLMAccessorContext c{objBase->_info ? *objBase->_info : realm->_info[objBase->_objectSchema.className]};
+        auto obj = c.unbox<realm::Obj>(v, createPolicy);
+        return obj.is_valid() ? realm::Mixed(obj) : realm::Mixed();
+    }, [&](auto t) {
+        RLMStatelessAccessorContext c;
+        return realm::Mixed(c.unbox<std::decay_t<decltype(*t)>>(v));
+    }});
 }
 
 id RLMMixedToObjc(realm::Mixed const& mixed,

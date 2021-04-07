@@ -1121,7 +1121,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 return
             }
 
-            guard case let .int64(sum) = bson else {
+            guard case let .int32(sum) = bson else {
                 XCTFail(error!.localizedDescription)
                 return
             }

@@ -55,7 +55,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface AllTypesSyncObject : RLMObject
-
 @property RLMObjectId *_id;
 @property BOOL boolCol;
 @property bool cBoolCol;
@@ -69,12 +68,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSUUID *uuidCol;
 @property id<RLMValue> anyCol;
 @property Person *objectCol;
-+ (NSDictionary *)values:(int)idx;
-
++ (NSDictionary *)values:(int)i;
 @end
 
 RLM_COLLECTION_TYPE(Person);
-@interface RLMArraySyncObject: RLMObject
+@interface RLMArraySyncObject : RLMObject
 @property RLMObjectId *_id;
 @property RLMArray<RLMInt> *intArray;
 @property RLMArray<RLMBool> *boolArray;
@@ -86,10 +84,9 @@ RLM_COLLECTION_TYPE(Person);
 @property RLMArray<RLMUUID> *uuidArray;
 @property RLMArray<RLMValue> *anyArray;
 @property RLM_GENERIC_ARRAY(Person) *objectArray;
-
 @end
 
-@interface RLMSetSyncObject: RLMObject
+@interface RLMSetSyncObject : RLMObject
 @property RLMObjectId *_id;
 @property RLMSet<RLMInt> *intSet;
 @property RLMSet<RLMBool> *boolSet;
@@ -112,7 +109,6 @@ RLM_COLLECTION_TYPE(Person);
 @property RLMSet<RLMUUID> *otherUuidSet;
 @property RLMSet<RLMValue> *otherAnySet;
 @property RLM_GENERIC_SET(Person) *otherObjectSet;
-
 @end
 
 @interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport
