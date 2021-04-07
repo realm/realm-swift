@@ -324,10 +324,8 @@ extension AnyRealmValue: RealmCollectionValue {
     }
 }
 
-/// :nodoc:
-public protocol _RealmCollectionEnumerator {
-    // swiftlint:disable:next identifier_name
-    func _asNSFastEnumerator() -> Any
+internal protocol UntypedRealmCollection {
+    func asNSFastEnumerator() -> Any
 }
 
 /// :nodoc:
@@ -340,7 +338,7 @@ public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProto
 /**
  A homogenous collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
 */
-public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator {
+public protocol RealmCollection: RealmCollectionBase {
     // Must also conform to `AssistedObjectiveCBridgeable`
 
     // MARK: Properties
@@ -751,8 +749,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
         -> NotificationToken { fatalError() }
     class func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self { fatalError() }
     var bridged: (objectiveCValue: Any, metadata: Any?) { fatalError() }
-    // swiftlint:disable:next identifier_name
-    func _asNSFastEnumerator() -> Any { fatalError() }
+    func asNSFastEnumerator() -> Any { fatalError() }
     var isFrozen: Bool { fatalError() }
     func freeze() -> AnyRealmCollection<T> { fatalError() }
     func thaw() -> AnyRealmCollection<T> { fatalError() }
@@ -824,9 +821,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
         return base.makeIterator() as! RLMIterator<Element>
     }
 
-    /// :nodoc:
-    override func _asNSFastEnumerator() -> Any {
-        return base._asNSFastEnumerator()
+    override func asNSFastEnumerator() -> Any {
+        return (base as! UntypedRealmCollection).asNSFastEnumerator()
     }
 
     // MARK: Collection Support
@@ -885,7 +881,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
  Instances of `RealmCollection` forward operations to an opaque underlying collection having the same `Element` type.
  */
-public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection {
+public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection, UntypedRealmCollection {
 
     /// The type of the objects contained within the collection.
     public typealias ElementType = Element
@@ -1045,9 +1041,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
     /// Returns a `RLMIterator` that yields successive elements in the collection.
     public func makeIterator() -> RLMIterator<Element> { return base.makeIterator() }
 
-    /// :nodoc:
-    // swiftlint:disable:next identifier_name
-    public func _asNSFastEnumerator() -> Any { return base._asNSFastEnumerator() }
+    internal func asNSFastEnumerator() -> Any { return base.asNSFastEnumerator() }
 
 
     // MARK: Collection Support

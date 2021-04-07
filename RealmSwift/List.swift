@@ -478,7 +478,7 @@ extension List where Element: AddableType {
     }
 }
 
-extension List: RealmCollection {
+extension List: RealmCollection, UntypedRealmCollection {
     /// The type of the objects stored within the list.
     public typealias ElementType = Element
 
@@ -489,10 +489,8 @@ extension List: RealmCollection {
         return RLMIterator(collection: _rlmCollection)
     }
 
-    /// :nodoc:
-    // swiftlint:disable:next identifier_name
-    public func _asNSFastEnumerator() -> Any {
-        return _rlmCollection
+    internal func asNSFastEnumerator() -> Any {
+        return _rlmArray
     }
 
     /**

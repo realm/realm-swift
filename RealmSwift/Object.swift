@@ -761,8 +761,8 @@ internal class ObjectUtil {
     private static let runOnce: Void = {
         RLMSwiftAsFastEnumeration = { (obj: Any) -> Any? in
             // Intermediate cast to AnyObject due to https://bugs.swift.org/browse/SR-8651
-            if let collection = obj as AnyObject as? _RealmCollectionEnumerator {
-                return collection._asNSFastEnumerator()
+            if let collection = obj as AnyObject as? UntypedRealmCollection {
+                return collection.asNSFastEnumerator()
             }
             return nil
         }
