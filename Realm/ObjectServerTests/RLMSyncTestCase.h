@@ -74,6 +74,43 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype) initWithPrimaryKey:(NSInteger)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol;
 @end
 
+RLM_COLLECTION_TYPE(Person);
+@interface RLMArraySyncObject : RLMObject
+@property RLMObjectId *_id;
+@property RLMArray<RLMInt> *intArray;
+@property RLMArray<RLMBool> *boolArray;
+@property RLMArray<RLMString> *stringArray;
+@property RLMArray<RLMData> *dataArray;
+@property RLMArray<RLMDouble> *doubleArray;
+@property RLMArray<RLMObjectId> *objectIdArray;
+@property RLMArray<RLMDecimal128> *decimalArray;
+@property RLMArray<RLMUUID> *uuidArray;
+@property RLM_GENERIC_ARRAY(Person) *objectArray;
+@end
+
+@interface RLMSetSyncObject : RLMObject
+@property RLMObjectId *_id;
+@property RLMSet<RLMInt> *intSet;
+@property RLMSet<RLMBool> *boolSet;
+@property RLMSet<RLMString> *stringSet;
+@property RLMSet<RLMData> *dataSet;
+@property RLMSet<RLMDouble> *doubleSet;
+@property RLMSet<RLMObjectId> *objectIdSet;
+@property RLMSet<RLMDecimal128> *decimalSet;
+@property RLMSet<RLMUUID> *uuidSet;
+@property RLM_GENERIC_SET(Person) *objectSet;
+
+@property RLMSet<RLMInt> *otherIntSet;
+@property RLMSet<RLMBool> *otherBoolSet;
+@property RLMSet<RLMString> *otherStringSet;
+@property RLMSet<RLMData> *otherDataSet;
+@property RLMSet<RLMDouble> *otherDoubleSet;
+@property RLMSet<RLMObjectId> *otherObjectIdSet;
+@property RLMSet<RLMDecimal128> *otherDecimalSet;
+@property RLMSet<RLMUUID> *otherUuidSet;
+@property RLM_GENERIC_SET(Person) *otherObjectSet;
+@end
+
 @interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport
 @end
 

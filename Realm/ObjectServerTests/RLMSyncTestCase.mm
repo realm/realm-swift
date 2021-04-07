@@ -174,6 +174,36 @@
 
 @end
 
+#pragma mark RLMArraySyncObject
+
+@implementation RLMArraySyncObject
+
++ (NSArray *)requiredProperties {
+    return @[@"intArray", @"boolArray",
+             @"stringArray", @"dataArray",
+             @"doubleArray", @"objectIdArray",
+             @"decimalArray", @"uuidArray", @"anyArray"];
+}
+
+@end
+
+#pragma mark RLMSetSyncObject
+
+@implementation RLMSetSyncObject
+
++ (NSArray *)requiredProperties {
+    return @[@"intSet", @"boolSet",
+             @"stringSet", @"dataSet",
+             @"doubleSet", @"objectIdSet",
+             @"decimalSet", @"uuidSet", @"anySet",
+             @"otherIntSet", @"otherBoolSet",
+             @"otherStringSet", @"otherDataSet",
+             @"otherDoubleSet", @"otherObjectIdSet",
+             @"otherDecimalSet", @"otherUuidSet", @"otherAnySet"];
+}
+
+@end
+
 #pragma mark UUIDPrimaryKeyObject
 
 @implementation UUIDPrimaryKeyObject
@@ -413,7 +443,7 @@ static NSURL *syncDirectoryForChildProcess() {
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     auto c = [user configurationWithPartitionValue:partitionValue];
     c.encryptionKey = encryptionKey;
-    c.objectClasses = @[Dog.self, Person.self, HugeSyncObject.self, UUIDPrimaryKeyObject.self, StringPrimaryKeyObject.self, IntPrimaryKeyObject.self];
+    c.objectClasses = @[Dog.self, Person.self, HugeSyncObject.self, RLMSetSyncObject.self, RLMArraySyncObject.self, UUIDPrimaryKeyObject.self, StringPrimaryKeyObject.self, IntPrimaryKeyObject.self];
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.stopPolicy = stopPolicy;
     c.syncConfiguration = syncConfig;

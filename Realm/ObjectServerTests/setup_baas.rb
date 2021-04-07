@@ -19,11 +19,11 @@ DEPENDENCIES = File.open("#{BASE_DIR}/dependencies.list").map { |line|
 
 MONGODB_VERSION='4.4.1'
 GO_VERSION='1.15.2'
-NODE_VERSION='8.11.2'
+NODE_VERSION='13.14.0'
 STITCH_VERSION=DEPENDENCIES["STITCH_VERSION"]
 
 MONGODB_URL="https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-#{MONGODB_VERSION}.tgz"
-TRANSPILER_TARGET='node8-macos'
+TRANSPILER_TARGET='node13-macos'
 SERVER_STITCH_LIB_URL="https://s3.amazonaws.com/stitch-artifacts/stitch-support/stitch-support-macos-debug-4.3.2-721-ge791a2e-patch-5e2a6ad2a4cf473ae2e67b09.tgz"
 MONGO_DIR="#{BUILD_DIR}/mongodb-macos-x86_64-#{MONGODB_VERSION}"
 

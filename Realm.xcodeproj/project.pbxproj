@@ -393,6 +393,8 @@
 		C042A48E1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
 		C0CDC0831B38DABB00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
+		CF087567260B98CF00B9BE60 /* SwiftCollectionSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF087566260B98CF00B9BE60 /* SwiftCollectionSyncTests.swift */; };
+		CF08757D260B98E100B9BE60 /* RLMCollectionSyncTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF08757C260B98E100B9BE60 /* RLMCollectionSyncTests.mm */; };
 		CF330BBE24E57D5F00F07EE2 /* RLMWatchTestUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = CF330BBD24E57D5F00F07EE2 /* RLMWatchTestUtility.m */; };
 		CF6E0482242A141200DB7F14 /* RLMEmailPasswordAuth.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0480242A141200DB7F14 /* RLMEmailPasswordAuth.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF6E0483242A141200DB7F14 /* RLMEmailPasswordAuth.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0481242A141200DB7F14 /* RLMEmailPasswordAuth.mm */; };
@@ -651,7 +653,6 @@
 		02B8EF5B19E7048D0045A93D /* RLMCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMCollection.h; sourceTree = "<group>"; };
 		02E334C21A5F3C45009F8810 /* Realm.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = Realm.modulemap; sourceTree = "<group>"; };
 		02E334C41A5F4923009F8810 /* RLMRealm_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMRealm_Private.hpp; sourceTree = "<group>"; };
-		0C074C292552E98700CA56C2 /* realm-core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "realm-core"; path = "../realm-core"; sourceTree = "<group>"; };
 		0C57969E25643D7500744CAE /* RLMUUID_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMUUID_Private.hpp; sourceTree = "<group>"; };
 		0C57969F25643D7500744CAE /* RLMUUID.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUUID.mm; sourceTree = "<group>"; };
 		1A0512731D87413000806AEC /* RLMSyncUtil_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSyncUtil_Private.hpp; sourceTree = "<group>"; };
@@ -867,6 +868,8 @@
 		C0D2DD051B6BDEA1004E8919 /* RLMRealmConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealmConfiguration.h; sourceTree = "<group>"; };
 		C0D2DD061B6BDEA1004E8919 /* RLMRealmConfiguration.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMRealmConfiguration.mm; sourceTree = "<group>"; };
 		C0D2DD0F1B6BE0DD004E8919 /* RLMRealmConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMRealmConfiguration_Private.h; sourceTree = "<group>"; };
+		CF087566260B98CF00B9BE60 /* SwiftCollectionSyncTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftCollectionSyncTests.swift; path = Realm/ObjectServerTests/SwiftCollectionSyncTests.swift; sourceTree = "<group>"; };
+		CF08757C260B98E100B9BE60 /* RLMCollectionSyncTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMCollectionSyncTests.mm; path = Realm/ObjectServerTests/RLMCollectionSyncTests.mm; sourceTree = "<group>"; };
 		CF330BBB24E56E3A00F07EE2 /* RLMNetworkTransport_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMNetworkTransport_Private.hpp; sourceTree = "<group>"; };
 		CF330BBC24E57D5F00F07EE2 /* RLMWatchTestUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMWatchTestUtility.h; path = Realm/ObjectServerTests/RLMWatchTestUtility.h; sourceTree = "<group>"; };
 		CF330BBD24E57D5F00F07EE2 /* RLMWatchTestUtility.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RLMWatchTestUtility.m; path = Realm/ObjectServerTests/RLMWatchTestUtility.m; sourceTree = "<group>"; };
@@ -1439,12 +1442,14 @@
 				536B7C0B24A4C223006B535D /* dependencies.list */,
 				5346E7312487AC9D00595C68 /* RLMBSONTests.mm */,
 				E8267FF01D90B8E700E001C7 /* RLMObjectServerTests.mm */,
+				CF08757C260B98E100B9BE60 /* RLMCollectionSyncTests.mm */,
 				1AA5AE9D1D98A6D800ED8C27 /* RLMSyncTestCase.h */,
 				1AA5AE9B1D98A68E00ED8C27 /* RLMSyncTestCase.mm */,
 				3F73BC8A1E3A876600FE80B6 /* RLMTestUtils.h */,
 				3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */,
 				49D9DFC4246C8E48003AD31D /* setup_baas.rb */,
 				4996EA9F2465C44E003A1F51 /* SwiftBSONTests.swift */,
+				CF087566260B98CF00B9BE60 /* SwiftCollectionSyncTests.swift */,
 				1AA5AE9F1D98C99500ED8C27 /* SwiftObjectServerTests.swift */,
 				1AA5AE961D989BE000ED8C27 /* SwiftSyncTestCase.swift */,
 			);
@@ -2558,9 +2563,11 @@
 			files = (
 				537130C824A9E417001FDBBC /* RealmServer.swift in Sources */,
 				5346E7322487AC9D00595C68 /* RLMBSONTests.mm in Sources */,
+				CF087567260B98CF00B9BE60 /* SwiftCollectionSyncTests.swift in Sources */,
 				3F558C9422C29A03002F0F30 /* RLMMultiProcessTestCase.m in Sources */,
 				E8267FF11D90B8E700E001C7 /* RLMObjectServerTests.mm in Sources */,
 				1AA5AE9C1D98A68E00ED8C27 /* RLMSyncTestCase.mm in Sources */,
+				CF08757D260B98E100B9BE60 /* RLMCollectionSyncTests.mm in Sources */,
 				3F558C9022C29A03002F0F30 /* RLMTestCase.m in Sources */,
 				3F73BC921E3A877300FE80B6 /* RLMTestUtils.m in Sources */,
 				1A1536481DB0408A00C0EC93 /* RLMUser+ObjectServerTests.mm in Sources */,
