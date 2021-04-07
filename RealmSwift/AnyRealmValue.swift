@@ -152,10 +152,6 @@ public enum AnyRealmValue: Hashable {
         return unsafeBitCast(o, to: DynamicObject?.self)
     }
 
-    internal var rlmValue: RLMValue? {
-        ObjectiveCSupport.convert(value: self)
-    }
-
     /// Required for conformance to `AddableType`
     public init() {
         self = .none

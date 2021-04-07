@@ -631,7 +631,6 @@
 
 - (void)testRLMValueQuery {
     RLMRealm *realm = [self realm];
-    MixedObject *value;
     [realm beginWriteTransaction];
 
     NSArray *allValues = @[@YES,
@@ -663,7 +662,7 @@
     stringObj.stringCol = @"required-string";
     ArrayOfAllTypesObject *arrayOfAll = [ArrayOfAllTypesObject createInRealm:realm withValue:@{}];
 
-    for (int i = 0; i < allValues.count; i++) {
+    for (NSUInteger i = 0; i < allValues.count; i++) {
         AllTypesObject *obj = [AllTypesObject createInRealm:realm withValue:[AllTypesObject values:i stringObject:stringObj]];
         obj.anyCol = allValues[i];
         [arrayOfAll.array addObject:obj];
@@ -1060,8 +1059,6 @@
     [realm beginWriteTransaction];
 
     NSArray<NSArray *> *values = [self queryObjectClassValues];
-    RLMObjectId *oid1 = values[0][14];
-    RLMObjectId *oid2 = values[1][15];
     for (id value in values) {
         [self.queryObjectClass createInRealm:realm withValue:value];
     }
@@ -2585,7 +2582,6 @@ static NSData *data(const char *str) {
     [realm beginWriteTransaction];
     NSArray<NSArray *> *values = [self queryObjectClassValues];
     RLMObjectId *oid1 = values[0][14];
-    RLMObjectId *oid2 = values[1][15];
     for (id value in values) {
         [self.queryObjectClass createInRealm:realm withValue:value];
     }

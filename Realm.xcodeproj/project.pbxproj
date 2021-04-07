@@ -448,14 +448,15 @@
 		CF986D8F25AE3C980039D287 /* MutableSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF986D8E25AE3C980039D287 /* MutableSet.swift */; };
 		CF986DE225AE3EC70039D287 /* MutableSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF986DE125AE3EC70039D287 /* MutableSetTests.swift */; };
 		CF986DF625AE3EDF0039D287 /* PrimitiveMutableSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF986DF525AE3EDF0039D287 /* PrimitiveMutableSetTests.swift */; };
-		CFA3A23F260B8430002C3266 /* SwiftCollectionSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA3A23E260B8430002C3266 /* SwiftCollectionSyncTests.swift */; };
-		CFA3A254260B8445002C3266 /* RLMCollectionSyncTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFA3A23D260B8427002C3266 /* RLMCollectionSyncTests.mm */; };
 		CFAEF761242B5F9A00EAF721 /* RLMAPIKeyAuth.h in Headers */ = {isa = PBXBuildFile; fileRef = CFAEF75F242B5F9A00EAF721 /* RLMAPIKeyAuth.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFAEF762242B5F9A00EAF721 /* RLMAPIKeyAuth.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFAEF760242B5F9A00EAF721 /* RLMAPIKeyAuth.mm */; };
 		CFAEF765242B672700EAF721 /* RLMUserAPIKey.h in Headers */ = {isa = PBXBuildFile; fileRef = CFAEF763242B672700EAF721 /* RLMUserAPIKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFAEF766242B672700EAF721 /* RLMUserAPIKey.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFAEF764242B672700EAF721 /* RLMUserAPIKey.mm */; };
 		CFB4313A243DF87100471C18 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB43139243DF87100471C18 /* App.swift */; };
 		CFB674A324EEE9CB00FBF0B8 /* WatchTestUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB674A224EEE9CB00FBF0B8 /* WatchTestUtility.swift */; };
+		CFBB9B13261E6B7500FC7C77 /* RLMSwiftValueStorage.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF44460526121B2A00BAFDB4 /* RLMSwiftValueStorage.mm */; };
+		CFBB9B1E261E6B8A00FC7C77 /* RLMSwiftValueStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = CF44460626121B2A00BAFDB4 /* RLMSwiftValueStorage.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		CFBB9B33261E6C5000FC7C77 /* RLMValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 681EE2FE25EE8D8800A9DEC5 /* RLMValue.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFD8D12025BB0B8B0037FE4D /* RLMManagedSet.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFD8D11F25BB0B8B0037FE4D /* RLMManagedSet.mm */; };
 		CFD8D13325BB0B900037FE4D /* RLMManagedSet.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFD8D11F25BB0B8B0037FE4D /* RLMManagedSet.mm */; };
 		CFFECBAA250646820010F585 /* Decimal128Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFECBA8250646750010F585 /* Decimal128Tests.swift */; };
@@ -972,7 +973,7 @@
 		E81A1FBF1955FE0100FDED82 /* ObjectTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectTests.m; sourceTree = "<group>"; };
 		E81A1FC11955FE0100FDED82 /* QueryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QueryTests.m; sourceTree = "<group>"; };
 		E81A1FC21955FE0100FDED82 /* RealmTests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "RealmTests-Info.plist"; sourceTree = "<group>"; };
-		E81A1FC31955FE0100FDED82 /* RealmTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RealmTests.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		E81A1FC31955FE0100FDED82 /* RealmTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RealmTests.mm; sourceTree = "<group>"; };
 		E81A1FD01955FE0100FDED82 /* SwiftRealmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftRealmTests.swift; sourceTree = "<group>"; };
 		E81A1FD11955FE0100FDED82 /* TransactionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransactionTests.m; sourceTree = "<group>"; };
 		E8267FED1D90B79000E001C7 /* ObjectServerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ObjectServerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1791,6 +1792,7 @@
 				684BE25224927ACA00F122B1 /* RLMPushClient.h in Headers */,
 				6807E6502487F9210096066F /* RLMPushClient_Private.hpp in Headers */,
 				1AD397D01F72FFCC002AA897 /* RLMRealm+Sync.h in Headers */,
+				CFBB9B33261E6C5000FC7C77 /* RLMValue.h in Headers */,
 				5DD755BD1BE056DE002800DA /* RLMRealm.h in Headers */,
 				5DD755BE1BE056DE002800DA /* RLMRealm_Dynamic.h in Headers */,
 				5DD755BF1BE056DE002800DA /* RLMRealm_Private.h in Headers */,
@@ -1815,6 +1817,7 @@
 				53CCC6E9257EC8C400A8FC50 /* RLMUser_Private.h in Headers */,
 				CF986D1F25AE3B090039D287 /* RLMSet_Private.h in Headers */,
 				CF986D2525AE3B090039D287 /* RLMSet.h in Headers */,
+				CFBB9B1E261E6B8A00FC7C77 /* RLMSwiftValueStorage.h in Headers */,
 				3F275EC02433AB3300161E7F /* RLMUserAPIKey.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2523,6 +2526,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CFBB9B13261E6B7500FC7C77 /* RLMSwiftValueStorage.mm in Sources */,
 				3F73BC981E3A879E00FE80B6 /* NSError+RLMSync.m in Sources */,
 				0C5796A325643D7500744CAE /* RLMUUID.mm in Sources */,
 				5DD755831BE056DE002800DA /* RLMAccessor.mm in Sources */,

@@ -192,7 +192,7 @@ extension AnyRealmValue: CustomObjectiveCBridgeable {
         throwRealmException("objCValue is not bridgable to AnyRealmValue")
     }
     var objCValue: Any {
-        return rlmValue ?? NSNull()
+        return ObjectiveCSupport.convert(value: self) ?? NSNull()
     }
 }
 
