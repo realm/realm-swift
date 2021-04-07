@@ -357,7 +357,7 @@ import Realm
     internal var handle: RLMLinkingObjectsHandle?
 }
 
-extension LinkingObjects: RealmCollection {
+extension LinkingObjects: RealmCollection, UntypedRealmCollection {
     // MARK: Sequence Support
 
     /// Returns an iterator that yields successive elements in the linking objects.
@@ -365,9 +365,7 @@ extension LinkingObjects: RealmCollection {
         return RLMIterator(collection: rlmResults)
     }
 
-    /// :nodoc:
-    // swiftlint:disable:next identifier_name
-    public func _asNSFastEnumerator() -> Any {
+    internal func asNSFastEnumerator() -> Any {
         return rlmResults
     }
 
