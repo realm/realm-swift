@@ -681,6 +681,18 @@ class ObjectTests: TestCase {
         }
     }
 
+    func testDynamicMemberSubscript() {
+        withMigrationObject { migrationObject, migration in
+            let boolObject = migration.create("SwiftBoolObject", value: [true])
+            migrationObject.anyCol = boolObject
+            self.assertEqual(migrationObject.anyCol as? DynamicObject, boolObject)
+            migrationObject.objectCol = boolObject
+            self.assertEqual(migrationObject.objectCol as? DynamicObject, boolObject)
+            migrationObject.anyCol = 12345
+            XCTAssertEqual(migrationObject.anyCol as! Int, 12345)
+        }
+    }
+
     func testDynamicList() {
         let realm = try! Realm()
         let arrayObject = SwiftArrayPropertyObject()
