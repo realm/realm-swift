@@ -199,7 +199,7 @@ RLM_COLLECTION_TYPE(Person);
 
 - (nonnull NSURL *)clientDataRoot;
 
-- (RLMApp *)createAppForPartition:(id<RLMBSON>)partition;
+- (RLMApp *)createAppForPartitionType:(id<RLMBSON>)partition;
 
 @end
 

@@ -228,7 +228,7 @@
     return @{@"_id": [[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"]};
 }
 
-- (instancetype) initWithPrimaryKey:(NSUUID *)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol {
+- (instancetype)initWithPrimaryKey:(NSUUID *)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol {
     self = [super init];
     if (self) {
         self._id = primaryKey;
@@ -256,7 +256,7 @@
     return @{@"_id": @"1234567890ab1234567890ab"};
 }
 
-- (instancetype) initWithPrimaryKey:(NSString *)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol {
+- (instancetype)initWithPrimaryKey:(NSString *)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol {
     self = [super init];
     if (self) {
         self._id = primaryKey;
@@ -284,7 +284,7 @@
     return @{@"_id": @1234567890};
 }
 
-- (instancetype) initWithPrimaryKey:(NSInteger)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol {
+- (instancetype)initWithPrimaryKey:(NSInteger)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol {
     self = [super init];
     if (self) {
         self._id = primaryKey;
@@ -337,10 +337,10 @@ static NSURL *syncDirectoryForChildProcess() {
     return [self basicCredentialsWithName:name register:shouldRegister app:nil];
 }
 
-- (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister app:(nullable RLMApp*) app {
+- (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister app:(nullable RLMApp *) app {
     if (shouldRegister) {
         XCTestExpectation *expectation = [self expectationWithDescription:@""];
-        RLMApp *currentApp = app != nil ? app : self.app;
+        RLMApp *currentApp = app ?: self.app;
         [currentApp.emailPasswordAuth registerUserWithEmail:name password:@"password" completion:^(NSError *error) {
             XCTAssertNil(error);
             [expectation fulfill];
@@ -600,7 +600,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)setupSyncManager {
-    [self createAppForPartition:@""];
+    [self createAppForPartitionType:@"string"];
 }
 
 - (NSString *)appId {
@@ -679,7 +679,7 @@ static NSURL *syncDirectoryForChildProcess() {
     return [self childTaskWithAppIds:_appId ? @[_appId] : @[]];
 }
 
-- (RLMApp *)createAppForPartition:(id<RLMBSON>)partition {
+- (RLMApp *)createAppForPartitionType:(id<RLMBSON>)partition {
     static NSString *s_appId;
     if (self.isParent && s_appId) {
         _appId = s_appId;
@@ -711,20 +711,15 @@ static NSURL *syncDirectoryForChildProcess() {
     switch(type){
         case RLMBSONTypeString:
             return @"string";
-            break;
         case RLMBSONTypeUUID:
             return @"uuid";
-            break;
         case RLMBSONTypeInt32:
         case RLMBSONTypeInt64:
             return @"long";
-            break;
         case RLMBSONTypeObjectId:
             return @"objectId";
-            break;
         default:
             return(@"");
-            break;
         }
 }
 
