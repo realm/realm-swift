@@ -82,7 +82,7 @@ extension AnyRealmValue: AddableType {}
 
  Results instances cannot be directly instantiated.
  */
-@frozen public struct Results<Element>: Equatable /*where Element: RealmCollectionValue*/ {
+@frozen public struct Results<Element>: Equatable where Element: RealmCollectionValue {
 
     internal let rlmResults: RLMResults<AnyObject>
 

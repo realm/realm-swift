@@ -93,11 +93,12 @@ public struct RLMCollectionIterator<T>: IteratorProtocol {
 }
 
 extension RLMCollection {
+    public typealias RLMElement = AnyObject
     /**
      Returns a `RLMCollectionIterator` that yields successive elements in the collection.
      This enables support for sequence-style enumeration of `RLMObject` subclasses in Swift.
      */
-    public func makeIterator() -> RLMCollectionIterator<AnyObject> {
+    public func makeIterator() -> RLMCollectionIterator<RLMElement> {
         return RLMCollectionIterator(collection: self)
     }
 }

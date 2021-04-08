@@ -39,10 +39,7 @@ extension String: MapKeyType { }
  
  Properties of Map type defined on Object subclasses must be declared as let and cannot be dynamic.
 */
-public final class Map<Key: RealmCollectionValue, Value: RealmCollectionValue>: RLMSwiftCollectionBase where Key: MapKeyType {
-
-    public typealias EnumerableElement = Key
-    public typealias OuterElement = (Key, Value)
+public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCollectionBase {
 
     // MARK: Properties
 
@@ -121,8 +118,8 @@ public final class Map<Key: RealmCollectionValue, Value: RealmCollectionValue>: 
 
      - parameter predicate: The predicate with which to filter the objects.
      */
-    public func filter(_ predicate: NSPredicate) -> Results<(Key, Value)> {
-        return Results<(Key, Value)>(_rlmCollection.objects(with: predicate))
+    public func filter(_ predicate: NSPredicate) -> Results<SingleMapEntry<Key, Value>> {
+        return Results<SingleMapEntry>(_rlmCollection.objects(with: predicate))
     }
 
     /**
@@ -162,11 +159,11 @@ public final class Map<Key: RealmCollectionValue, Value: RealmCollectionValue>: 
      - parameter byKeyPath: a value's key path predicate.
      - parameter ascending: The direction to sort in.
      */
-    public func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<(Key, Value)> {
+    public func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<SingleMapEntry<Key, Value>> {
         fatalError("Not implemented in Map")
     }
 
-    public func sorted<S>(by sortDescriptors: S) -> Results<(Key, Value)>
+    public func sorted<S>(by sortDescriptors: S) -> Results<SingleMapEntry<Key, Value>>
         where S: Sequence, S.Element == SortDescriptor {
         fatalError("Not implemented in Map")
     }
@@ -250,8 +247,8 @@ public final class Map<Key: RealmCollectionValue, Value: RealmCollectionValue>: 
      - parameter value: a value's key path predicate.
      - parameter forKey: The direction to sort in.
      */
-    public func updateValue(_ value: Value, forKey key: String) {
-        rlmDictionary[key as RLMDictionaryKey] = dynamicBridgeCast(fromSwift: value) as AnyObject
+    public func updateValue(_ value: Value, forKey key: Key) {
+        rlmDictionary[key as! RLMDictionaryKey] = dynamicBridgeCast(fromSwift: value) as AnyObject
     }
 
     /**
@@ -277,18 +274,6 @@ public final class Map<Key: RealmCollectionValue, Value: RealmCollectionValue>: 
         }
         set {
             rlmDictionary.setObject(dynamicBridgeCast(fromSwift: newValue) as AnyObject, for: dynamicBridgeCast(fromSwift: key) as! RLMDictionaryKey)
-        }
-    }
-
-    public subscript(key: (Key, Value)) -> Value? {
-        get {
-            fatalError()
-//            let value = rlmDictionary.object(for: key.1 as! RLMDictionaryKey) as? Value
-//            return value != nil ? dynamicBridgeCast(fromObjectiveC: value) : nil
-        }
-        set {
-            fatalError()
-//            rlmDictionary.setObject(dynamicBridgeCast(fromSwift: newValue) as AnyObject, for: dynamicBridgeCast(fromSwift: key.0) as! RLMDictionaryKey)
         }
     }
 
@@ -458,7 +443,7 @@ extension Map where Value: AddableType {
 }
 
 //extension Map: RealmCollection {
-extension Map {
+extension Map: Sequence {
 
     public typealias Index = Int
     public typealias Indices = Range<Int>
@@ -493,7 +478,7 @@ extension Map {
     }
 
     /// Returns a `RLMMapIterator` that yields successive elements in the `Map`.
-    public func makeIterator() -> RLMMapIterator<Key, Value> {
+    public func makeIterator() -> RLMMapIterator<SingleMapEntry<Key, Value>> {
         return RLMMapIterator(collection: rlmDictionary)
 //        return RLMIterator(collection: rlmDictionary)
     }
@@ -518,7 +503,7 @@ extension Map {
     /// :nodoc:
     // swiftlint:disable:next identifier_name
     public func _observe(_ queue: DispatchQueue?,
-                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection<(Key, Value)>>) -> Void)
+                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection<SingleMapEntry<Key, Value>>>) -> Void)
         -> NotificationToken {
         fatalError()
 //        return rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
