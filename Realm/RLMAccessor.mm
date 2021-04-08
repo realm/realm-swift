@@ -383,7 +383,7 @@ id managedGetter(RLMProperty *prop, const char *type) {
         case RLMPropertyTypeObjectId:
             return makeWrapperGetter<realm::ObjectId>(index, prop.optional);
         case RLMPropertyTypeAny:
-            // Mixed is represented as optional as Core,
+            // Mixed is represented as optional in Core,
             // but not in Cocoa. We use `makeBoxedGetter` over
             // `makeWrapperGetter` becuase Mixed can box a `null` representation.
             return makeBoxedGetter<realm::Mixed>(index);

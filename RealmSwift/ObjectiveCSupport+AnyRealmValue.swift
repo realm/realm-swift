@@ -21,6 +21,11 @@ import Foundation
 import Realm
 
 public extension ObjectiveCSupport {
+
+    /// Convert an object boxed in `AnyRealmValue` to its
+    /// Objective-C representation.
+    /// - Parameter value: The AnyRealmValue with the object.
+    /// - Returns: Conversion of `value` to its Objective-C representation.
     static func convert(value: AnyRealmValue?) -> RLMValue? {
         switch value {
         case let .int(i):
@@ -50,6 +55,10 @@ public extension ObjectiveCSupport {
         }
     }
 
+    /// Takes an RLMValue, converts it to its Swift type and
+    /// stores it in `AnyRealmValue`.
+    /// - Parameter value: The RLMValue.
+    /// - Returns: The converted RLMValue type as an AnyRealmValue enum.
     static func convert(value: RLMValue?) -> AnyRealmValue {
         guard let value = value else {
             return .none

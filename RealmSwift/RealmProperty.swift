@@ -54,6 +54,7 @@ public final class RealmProperty<Value: RealmPropertyType>: RLMSwiftValueStorage
         }
     }
 
+    /// :nodoc:
     @objc public override var description: String {
         String(describing: value)
     }
