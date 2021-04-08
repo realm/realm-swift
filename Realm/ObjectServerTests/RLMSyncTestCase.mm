@@ -100,7 +100,7 @@
     return @[@"firstName", @"lastName", @"age"];
 }
 
-- (instancetype) initWithPrimaryKey:(RLMObjectId *)primaryKey age:(NSInteger)age firstName:(NSString *)firstName lastName:(NSString *)lastName {
+- (instancetype)initWithPrimaryKey:(RLMObjectId *)primaryKey age:(NSInteger)age firstName:(NSString *)firstName lastName:(NSString *)lastName {
     self = [super init];
     if (self) {
         self._id = primaryKey;
