@@ -65,55 +65,66 @@ extension RLMObject {
     }
 }
 
-// Sequence conformance for RLMArray, RLMDictionary, RLMSet and RLMResults is provided by RLMCollection's
-// `makeIterator()` implementation.
-extension RLMArray: Sequence {}
-extension RLMDictionary: Sequence {}
-extension RLMSet: Sequence {}
-extension RLMResults: Sequence {}
-
-/**
- This struct enables sequence-style enumeration for RLMObjects in Swift via `RLMCollection.makeIterator`
- */
-public struct RLMCollectionIterator<T>: IteratorProtocol {
-    private var iteratorBase: NSFastEnumerationIterator
-    private let dictionary: RLMDictionary<AnyObject, AnyObject>?
-
-    internal init(collection: RLMCollection) {
-        dictionary = collection as? RLMDictionary<AnyObject, AnyObject>
-        iteratorBase = NSFastEnumerationIterator(collection)
-    }
-
-    public mutating func next() -> T? {
-        if let dictionary = dictionary {
-            let key = iteratorBase.next() as! RLMDictionaryKey
-            // TODO: Support multiple key types
-            return RLMDictionarySingleEntry(key: key as! String,
-                                            value: dictionary[key]) as? T
-        }
-        return iteratorBase.next() as! T?
-    }
-}
-
-public protocol RLMCollectionIteratorValue {
-    var description: String { get }
-}
-
-public struct RLMDictionarySingleEntry: RLMCollectionIteratorValue {
-    public var description: String { String(describing: value) }
-    public var key: String
-    public var value: Any?
-}
-
-extension RLMObject: RLMCollectionIteratorValue { }
-
-extension RLMCollection {
+public protocol _RandomAccessIterator {
     /**
      Returns a `RLMCollectionIterator` that yields successive elements in the collection.
      This enables support for sequence-style enumeration of `RLMObject` subclasses in Swift.
      */
-    public func makeIterator() -> RLMCollectionIterator<RLMCollectionIteratorValue> {
-        return RLMCollectionIterator<RLMCollectionIteratorValue>(collection: self)
+    func makeIterator() -> RLMRandomAccessIterator;
+}
+
+extension _RandomAccessIterator where Self: RLMCollection {
+    public func makeIterator() -> RLMRandomAccessIterator {
+        return RLMRandomAccessIterator(self)
+    }
+}
+
+public typealias RLMDictionarySingleEntry = (key: String, value: RLMObject)
+public protocol _MapIterator {
+    func makeIterator() -> RLMDictionaryIterator;
+}
+
+extension _MapIterator where Self: RLMCollection {
+    public func makeIterator() -> RLMDictionaryIterator {
+        return RLMDictionaryIterator(self)
+    }
+}
+
+// Sequence conformance for RLMArray, RLMDictionary, RLMSet and RLMResults is provided by RLMCollection's
+// `makeIterator()` implementation.
+extension RLMArray: Sequence, _RandomAccessIterator { }
+extension RLMDictionary: Sequence, _MapIterator {}
+extension RLMSet: Sequence, _RandomAccessIterator {}
+extension RLMResults: Sequence, _RandomAccessIterator {}
+
+/**
+ This struct enables sequence-style enumeration for RLMObjects in Swift via `RLMCollection.makeIterator`
+ */
+public struct RLMRandomAccessIterator: IteratorProtocol {
+    private var iteratorBase: NSFastEnumerationIterator
+
+    internal init(_ collection: RLMCollection) {
+        iteratorBase = NSFastEnumerationIterator(collection)
+    }
+
+    public mutating func next() -> RLMObject? {
+        return iteratorBase.next() as! RLMObject?
+    }
+}
+
+public struct RLMDictionaryIterator: IteratorProtocol {
+    private var iteratorBase: NSFastEnumerationIterator
+    private let dictionary: RLMDictionary<AnyObject, AnyObject>
+
+    internal init(_ collection: RLMCollection) {
+        dictionary = collection as! RLMDictionary<AnyObject, AnyObject>
+        iteratorBase = NSFastEnumerationIterator(collection)
+    }
+
+    public mutating func next() -> RLMDictionarySingleEntry? {
+        let key = iteratorBase.next() as! RLMDictionaryKey
+        // TODO: Support multiple key types
+        return (key: key as! String, value: dictionary[key]) as? RLMDictionarySingleEntry
     }
 }
 
