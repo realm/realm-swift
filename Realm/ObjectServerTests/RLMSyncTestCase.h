@@ -201,7 +201,7 @@ RLM_COLLECTION_TYPE(Person);
 
 - (NSString *)partitionBsonType:(id<RLMBSON>)bson;
 
-- (RLMApp *)appTest:(NSString *)appId;
+- (RLMApp *)appFromAppId:(NSString *)appId;
 
 @end
 
