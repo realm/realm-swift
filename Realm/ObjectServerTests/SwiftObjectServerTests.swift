@@ -155,63 +155,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    func testSwiftRoundTripForObjectIdPartitionValue() {
-        roundTripForPartitionValue(partitionValue: ObjectId("1234567890ab1234567890ab"))
-    }
-
-    func testSwiftRoundTripForUUIDPartitionValue() {
-        roundTripForPartitionValue(partitionValue: UUID(uuidString: "b1c11e54-e719-4275-b631-69ec3f2d616d")!)
-    }
-
-    func testSwiftRoundTripForStringPartitionValue() {
-        roundTripForPartitionValue(partitionValue: "1234567890ab1234567890ab")
-    }
-
-    func testSwiftRoundTripForIntPartitionValue() {
-        roundTripForPartitionValue(partitionValue: 1234567890)
-    }
-
-    func roundTripForPartitionValue<T: BSON>(partitionValue: T) {
-        do {
-            let app = createAppForPartition(partitionValue)
-            let user = try logInUser(for: basicCredentials(usernameSuffix: "", app: app), app: app)
-            let realm = try openRealm(partitionValue: partitionValue, user: user)
-            if isParent {
-                try realm.write {
-                    realm.deleteAll()
-                }
-                checkCount(expected: 0, realm, SwiftPerson.self)
-                executeChild()
-                waitForDownloads(for: realm)
-                checkCount(expected: 4, realm, SwiftPerson.self)
-
-                XCTAssertEqual(realm.objects(SwiftPerson.self).filter { $0.firstName == "Ringo" }.count, 1)
-
-                executeChild()
-                waitForDownloads(for: realm)
-                checkCount(expected: 8, realm, SwiftPerson.self)
-
-                XCTAssertEqual(realm.objects(SwiftPerson.self).filter { $0.firstName == "Ringo" }.count, 2)
-
-                try realm.write {
-                    realm.deleteAll()
-                }
-                waitForUploads(for: realm)
-                checkCount(expected: 0, realm, SwiftPerson.self)
-            } else {
-                try realm.write {
-                    realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
-                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
-                    realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
-                    realm.add(SwiftPerson(firstName: "George", lastName: "Harrison"))
-                }
-                waitForUploads(for: realm)
-            }
-        } catch {
-            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
-        }
-    }
-
     func testSwiftAddObjectsWithNilPartitionValue() {
         do {
             let user = try logInUser(for: basicCredentials())
