@@ -605,7 +605,6 @@ static NSURL *syncDirectoryForChildProcess() {
     else {
         NSError *error;
         _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmServer.shared createAppAndReturnError:&error];
-
         if (error) {
             NSLog(@"Failed to create app: %@", error);
             abort();
@@ -621,8 +620,6 @@ static NSURL *syncDirectoryForChildProcess() {
     RLMSyncManager *syncManager = self.app.syncManager;
     syncManager.logLevel = RLMSyncLogLevelTrace;
     syncManager.userAgent = self.name;
-
-    return _app;
 }
 
 - (NSString *)appId {
