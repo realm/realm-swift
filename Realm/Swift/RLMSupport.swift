@@ -77,29 +77,43 @@ extension RLMResults: Sequence {}
  */
 public struct RLMCollectionIterator<T>: IteratorProtocol {
     private var iteratorBase: NSFastEnumerationIterator
+    private let dictionary: RLMDictionary<AnyObject, AnyObject>?
 
     internal init(collection: RLMCollection) {
+        dictionary = collection as? RLMDictionary<AnyObject, AnyObject>
         iteratorBase = NSFastEnumerationIterator(collection)
     }
 
     public mutating func next() -> T? {
-        let next = iteratorBase.next()
-        if let d = next as? NSDictionary {
-            let key = d.allKeys.first!
-            return d[key] as! T?
+        if let dictionary = dictionary {
+            let key = iteratorBase.next() as! RLMDictionaryKey
+            // TODO: Support multiple key types
+            return RLMDictionarySingleEntry(key: key as! String,
+                                            value: dictionary[key]) as? T
         }
-        return next as! T?
+        return iteratorBase.next() as! T?
     }
 }
 
+public protocol RLMCollectionIteratorValue {
+    var description: String { get }
+}
+
+public struct RLMDictionarySingleEntry: RLMCollectionIteratorValue {
+    public var description: String { String(describing: value) }
+    public var key: String
+    public var value: Any?
+}
+
+extension RLMObject: RLMCollectionIteratorValue { }
+
 extension RLMCollection {
-    public typealias RLMElement = AnyObject
     /**
      Returns a `RLMCollectionIterator` that yields successive elements in the collection.
      This enables support for sequence-style enumeration of `RLMObject` subclasses in Swift.
      */
-    public func makeIterator() -> RLMCollectionIterator<RLMElement> {
-        return RLMCollectionIterator(collection: self)
+    public func makeIterator() -> RLMCollectionIterator<RLMCollectionIteratorValue> {
+        return RLMCollectionIterator<RLMCollectionIteratorValue>(collection: self)
     }
 }
 
