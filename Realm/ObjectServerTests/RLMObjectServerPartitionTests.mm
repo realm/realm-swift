@@ -43,10 +43,11 @@
     NSString *appId;
     if (self.isParent) {
         NSError *error;
-        appId = [RealmServer.shared createAppForBSONType: [self partitionBsonType:value]  error:&error];
+        appId = [RealmServer.shared createAppForBSONType:[self partitionBsonType:value] error:&error];
 
         if (error) {
             XCTFail(@"Could not create app for partition value %@d", value);
+            return;
         }
     } else {
         appId = self.appIds[0];
