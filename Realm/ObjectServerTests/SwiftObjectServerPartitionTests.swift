@@ -34,7 +34,7 @@ class SwiftObjectServerPartitionTests: SwiftSyncTestCase {
         } else {
             appId = appIds[0]
         }
-        
+
         let partitionApp = app(fromAppId: appId)
         do {
             let user = try logInUser(for: basicCredentials(usernameSuffix: "", app: partitionApp), app: partitionApp)
@@ -91,4 +91,3 @@ class SwiftObjectServerPartitionTests: SwiftSyncTestCase {
         roundTripForPartitionValue(partitionValue: 1234567890)
     }
 }
-
