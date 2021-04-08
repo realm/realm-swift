@@ -454,9 +454,9 @@ extension Map: Sequence {
         /// :nodoc:
         public func hash(into hasher: inout Hasher) { }
         /// :nodoc:
-        var key: Self.Key
+        public var key: Self.Key
         /// :nodoc:
-        var value: Self.Value
+        public var value: Self.Value
     }
 
     public typealias Index = Int

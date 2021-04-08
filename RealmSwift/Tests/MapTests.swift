@@ -162,7 +162,10 @@ class MapTests: TestCase {
     func testPrimitive() {
         let obj = SwiftMapObject()
         let valueInTest = 5
-        obj.int[String(valueInTest)] = valueInTest
+        obj.intOpt[String(valueInTest)] = valueInTest
+        obj.intOpt["Blah"] = 456456
+        obj.intOpt["Blah"] = nil
+
         //XCTAssertTrue(false)
 //        XCTAssertEqual(obj.int.first!.1, 5) // should expect (key, value)
 //        XCTAssertEqual(obj.int.last!.1, 5)
@@ -181,8 +184,9 @@ class MapTests: TestCase {
 //        XCTAssertEqual(obj.string[0].1, "strVal")
 
 
-        for entry in obj.int {
-            print(entry)
+        for entry in obj.intOpt {
+            print(entry.key)
+            print(entry.value)
         }
 
     }
