@@ -36,9 +36,9 @@ class SwiftObjectServerPartitionTests: SwiftSyncTestCase {
         }
 
         
-        let app = appTest(appId)
+        let partitionApp = app(fromAppId: appId)
         do {
-            let user = try logInUser(for: basicCredentials(usernameSuffix: "", app: app), app: app)
+            let user = try logInUser(for: basicCredentials(usernameSuffix: "", app: partitionApp), app: partitionApp)
             let realm = try openRealm(partitionValue: partitionValue, user: user)
             if isParent {
                 try realm.write {
