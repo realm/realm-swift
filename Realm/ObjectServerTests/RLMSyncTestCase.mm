@@ -39,8 +39,6 @@
 + (RealmServer *)shared;
 + (bool)haveServer;
 - (NSString *)createAppAndReturnError:(NSError **)error;
-- (NSString *)createAppForBSONType:(NSString *)bsonType
-                             error:(NSError **)error;;
 @end
 
 // Set this to 1 if you want the test ROS instance to log its debug messages to console.
@@ -598,7 +596,31 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)setupSyncManager {
-    [self createAppForPartitionType:@"string"];
+    static NSString *s_appId;
+    if (self.isParent && s_appId) {
+        _appId = s_appId;
+    }
+    else {
+        NSError *error;
+        _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmServer.shared createAppAndReturnError:&error];
+
+        if (error) {
+            NSLog(@"Failed to create app: %@", error);
+            abort();
+        }
+
+        if (self.isParent) {
+            s_appId = _appId;
+        }
+    }
+
+    _app = [RLMApp appWithId:_appId configuration:self.defaultAppConfiguration rootDirectory:self.clientDataRoot];
+
+    RLMSyncManager *syncManager = self.app.syncManager;
+    syncManager.logLevel = RLMSyncLogLevelTrace;
+    syncManager.userAgent = self.name;
+
+    return _app;
 }
 
 - (NSString *)appId {
@@ -677,36 +699,14 @@ static NSURL *syncDirectoryForChildProcess() {
     return [self childTaskWithAppIds:_appId ? @[_appId] : @[]];
 }
 
-- (RLMApp *)createAppForPartitionType:(id<RLMBSON>)partition {
-    static NSString *s_appId;
-    if (self.isParent && s_appId) {
-        _appId = s_appId;
-    }
-    else {
-        NSError *error;
-        _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmServer.shared createAppForBSONType:[self partitionBsonType:partition.bsonType] error:&error];
-
-        if (error) {
-            NSLog(@"Failed to create app: %@", error);
-            abort();
-        }
-
-        if (self.isParent) {
-            s_appId = _appId;
-        }
-    }
-
-    _app = [RLMApp appWithId:_appId configuration:self.defaultAppConfiguration rootDirectory:self.clientDataRoot];
-
-    RLMSyncManager *syncManager = self.app.syncManager;
-    syncManager.logLevel = RLMSyncLogLevelTrace;
-    syncManager.userAgent = self.name;
-
-    return _app;
+- (RLMApp *)appFromAppId:(NSString *)appId {
+    return [RLMApp appWithId:appId
+               configuration:self.defaultAppConfiguration
+               rootDirectory:self.clientDataRoot];
 }
 
-- (NSString *)partitionBsonType:(RLMBSONType)type {
-    switch(type){
+- (NSString *)partitionBsonType:(id<RLMBSON>)bson {
+    switch(bson.bsonType){
         case RLMBSONTypeString:
             return @"string";
         case RLMBSONTypeUUID:
