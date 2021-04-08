@@ -445,6 +445,20 @@ extension Map where Value: AddableType {
 //extension Map: RealmCollection {
 extension Map: Sequence {
 
+    /// Container for holding a single key-value entry in a Map
+    public struct SingleMapEntry<Key: MapKeyType, Value: RealmCollectionValue>: RealmMapValue, Hashable {
+        /// :nodoc:
+        public static func == (lhs: SingleMapEntry, rhs: SingleMapEntry) -> Bool {
+            return lhs.value == rhs.value
+        }
+        /// :nodoc:
+        public func hash(into hasher: inout Hasher) { }
+        /// :nodoc:
+        var key: Self.Key
+        /// :nodoc:
+        var value: Self.Value
+    }
+
     public typealias Index = Int
     public typealias Indices = Range<Int>
 //    public typealias SubSequence = Slice<Map>
