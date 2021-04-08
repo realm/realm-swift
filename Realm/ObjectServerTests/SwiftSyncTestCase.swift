@@ -196,11 +196,6 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         return try Realm(configuration: configuration)
     }
 
-
-    public func createAppForPartition<T: BSON>(_ partitionValue: T) -> App {
-        return createApp(forPartitionType: ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
-    }
-
     open func logInUser(for credentials: Credentials, app: App? = nil) throws -> User {
         var theUser: User!
         let ex = expectation(description: "Should log in the user properly")
