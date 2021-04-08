@@ -666,53 +666,7 @@ static NSString *randomEmail() {
     }
 }
 
-- (void)testRoundTripForObjectIdPartitionValue {
-    [self roundTripForPartitionValue:[[RLMObjectId alloc] initWithString:@"1234567890ab1234567890ab" error:nil]];
-}
 
-- (void)testRoundTripForUUIDPartitionValue {
-    [self roundTripForPartitionValue:[[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"]];
-}
-
-- (void)testRoundTripForStringPartitionValue {
-    [self roundTripForPartitionValue:@"1234567890ab1234567890ab"];
-}
-
-- (void)testRoundTripForIntPartitionValue {
-    [self roundTripForPartitionValue:@1234567890];
-}
-
-- (void)roundTripForPartitionValue:(id<RLMBSON>)value  {
-    RLMApp *app = [self createAppForPartitionType:value];
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                        register:self.isParent
-                                                             app:app];
-    RLMUser *user = [self logInUserForCredentials:credentials app:app];
-    RLMRealm *realm = [self openRealmForPartitionValue:value user:user];
-    if (self.isParent) {
-        [realm beginWriteTransaction];
-        [realm deleteAllObjects];
-        [realm commitWriteTransaction];
-        CHECK_COUNT(0, Person, realm);
-
-        RLMRunChildAndWait();
-        [self waitForDownloadsForRealm:realm];
-        CHECK_COUNT(3, Person, realm);
-        XCTAssertEqual([Person objectsInRealm:realm where:@"firstName = 'John'"].count, 1UL);
-
-        RLMRunChildAndWait();
-        [self waitForDownloadsForRealm:realm];
-        CHECK_COUNT(6, Person, realm);
-        XCTAssertEqual([Person objectsInRealm:realm where:@"firstName = 'John'"].count, 2UL);
-    } else {
-        // Add objects.
-        [self addPersonsToRealm:realm
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person ringo]]];
-        [self waitForUploadsForRealm:realm];
-    }
-}
 
 /// If client B adds objects to a synced Realm, client A should see those objects.
 - (void)testAddObjectsMultipleApps {
