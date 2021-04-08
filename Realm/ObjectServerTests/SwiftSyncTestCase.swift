@@ -101,7 +101,7 @@ public class SwiftCollectionSyncObject: Object {
 @objcMembers public class SwiftStringPrimaryKeyObject: Object {
     public dynamic var _id: String? = "1234567890ab1234567890ab"
     public dynamic var strCol: String = ""
-    xopublic dynamic var intCol: Int = 0
+    public dynamic var intCol: Int = 0
 
     public convenience init(id: String, strCol: String, intCol: Int) {
         self.init()
