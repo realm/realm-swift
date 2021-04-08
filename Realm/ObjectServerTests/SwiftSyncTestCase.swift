@@ -82,9 +82,9 @@ public class SwiftCollectionSyncObject: Object {
 }
 
 @objcMembers public class SwiftUUIDPrimaryKeyObject: Object {
-    @objc public dynamic var _id: UUID? = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
-    @objc public dynamic var strCol: String = ""
-    @objc public dynamic var intCol: Int = 0
+    public dynamic var _id: UUID? = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
+    public dynamic var strCol: String = ""
+    public dynamic var intCol: Int = 0
 
     public convenience init(id: UUID?, strCol: String, intCol: Int) {
         self.init()
@@ -99,9 +99,9 @@ public class SwiftCollectionSyncObject: Object {
 }
 
 @objcMembers public class SwiftStringPrimaryKeyObject: Object {
-    @objc public dynamic var _id: String? = "1234567890ab1234567890ab"
-    @objc public dynamic var strCol: String = ""
-    @objc public dynamic var intCol: Int = 0
+    public dynamic var _id: String? = "1234567890ab1234567890ab"
+    public dynamic var strCol: String = ""
+    xopublic dynamic var intCol: Int = 0
 
     public convenience init(id: String, strCol: String, intCol: Int) {
         self.init()
@@ -116,9 +116,9 @@ public class SwiftCollectionSyncObject: Object {
 }
 
 @objcMembers public class SwiftIntPrimaryKeyObject: Object {
-    @objc public dynamic var _id: Int = 1234567890
-    @objc public dynamic var strCol: String = ""
-    @objc public dynamic var intCol: Int = 0
+    public dynamic var _id: Int = 1234567890
+    public dynamic var strCol: String = ""
+    public dynamic var intCol: Int = 0
 
     public convenience init(id: Int, strCol: String, intCol: Int) {
         self.init()
