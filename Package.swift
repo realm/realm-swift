@@ -205,7 +205,8 @@ let package = Package(
             sources: [
                 "SwiftObjectServerTests.swift",
                 "SwiftBSONTests.swift",
-                "SwiftCollectionSyncTests.swift"
+                "SwiftCollectionSyncTests.swift",
+                "SwiftObjectServerPartitionTests.swift"
             ],
             swiftSettings: combineFlags()
         ),
@@ -217,7 +218,8 @@ let package = Package(
                 "RLMBSONTests.mm",
                 "RLMObjectServerTests.mm",
                 "RLMWatchTestUtility.m",
-                "RLMCollectionSyncTests.mm"
+                "RLMCollectionSyncTests.mm",
+                "RLMObjectServerPartitionTests.mm"
             ],
             cxxSettings: testCxxSettings
         )

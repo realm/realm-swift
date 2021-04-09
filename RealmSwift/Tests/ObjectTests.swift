@@ -141,6 +141,8 @@ class ObjectTests: TestCase {
         XCTAssertNil(SwiftStringObject().objectSchema.primaryKeyProperty)
         XCTAssertEqual(SwiftPrimaryStringObject.primaryKey()!, "stringCol")
         XCTAssertEqual(SwiftPrimaryStringObject().objectSchema.primaryKeyProperty!.name, "stringCol")
+        XCTAssertEqual(SwiftPrimaryUUIDObject().objectSchema.primaryKeyProperty!.name, "uuidCol")
+        XCTAssertEqual(SwiftPrimaryObjectIdObject().objectSchema.primaryKeyProperty!.name, "objectIdCol")
     }
 
     func testCannotUpdatePrimaryKey() {
@@ -162,6 +164,16 @@ class ObjectTests: TestCase {
         stringObj.stringCol = "b" // can change primary key unattached
         XCTAssertEqual("b", stringObj.stringCol)
 
+        let uuidObj = SwiftPrimaryUUIDObject()
+        uuidObj.uuidCol = UUID(uuidString: "8a12daba-8b23-11eb-8dcd-0242ac130003")!
+        uuidObj.uuidCol = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
+        XCTAssertEqual(UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!, uuidObj.uuidCol)
+
+        let objectIdObj = SwiftPrimaryObjectIdObject()
+        objectIdObj.objectIdCol = ObjectId("1234567890ab1234567890aa")
+        objectIdObj.objectIdCol = ObjectId("1234567890ab1234567890ab")
+        XCTAssertEqual(ObjectId("1234567890ab1234567890ab"), objectIdObj.objectIdCol)
+
         try! realm.write {
             realm.add(intObj)
             assertThrows(intObj.intCol = 2, reasonMatching: primaryKeyReason)
@@ -177,6 +189,16 @@ class ObjectTests: TestCase {
             assertThrows(stringObj.stringCol = "c", reasonMatching: primaryKeyReason)
             assertThrows(stringObj["stringCol"] = "c", reasonMatching: primaryKeyReason)
             assertThrows(stringObj.setValue("c", forKey: "stringCol"), reasonMatching: primaryKeyReason)
+
+            realm.add(uuidObj)
+            assertThrows(uuidObj.uuidCol = UUID(uuidString: "4ee1fa48-8b23-11eb-8dcd-0242ac130003")!, reasonMatching: primaryKeyReason)
+            assertThrows(uuidObj["uuidCol"] = UUID(uuidString: "4ee1fa48-8b23-11eb-8dcd-0242ac130003")!, reasonMatching: primaryKeyReason)
+            assertThrows(uuidObj.setValue(UUID(uuidString: "4ee1fa48-8b23-11eb-8dcd-0242ac130003")!, forKey: "uuidCol"), reasonMatching: primaryKeyReason)
+
+            realm.add(objectIdObj)
+            assertThrows(objectIdObj.objectIdCol = ObjectId("1234567890ab1234567890ac"), reasonMatching: primaryKeyReason)
+            assertThrows(objectIdObj["objectIdCol"] = ObjectId("1234567890ab1234567890ac"), reasonMatching: primaryKeyReason)
+            assertThrows(objectIdObj.setValue(ObjectId("1234567890ab1234567890ac"), forKey: "objectIdCol"), reasonMatching: primaryKeyReason)
         }
     }
 
@@ -188,7 +210,7 @@ class ObjectTests: TestCase {
 
     func testIndexedProperties() {
         XCTAssertEqual(Object.indexedProperties(), [], "indexed properties should default to []")
-        XCTAssertEqual(SwiftIndexedPropertiesObject.indexedProperties().count, 9)
+        XCTAssertEqual(SwiftIndexedPropertiesObject.indexedProperties().count, 10)
 
         let objectSchema = SwiftIndexedPropertiesObject().objectSchema
         XCTAssertTrue(objectSchema["stringCol"]!.isIndexed)
@@ -199,6 +221,7 @@ class ObjectTests: TestCase {
         XCTAssertTrue(objectSchema["int64Col"]!.isIndexed)
         XCTAssertTrue(objectSchema["boolCol"]!.isIndexed)
         XCTAssertTrue(objectSchema["dateCol"]!.isIndexed)
+        XCTAssertTrue(objectSchema["uuidCol"]!.isIndexed)
         XCTAssertTrue(objectSchema["anyCol"]!.isIndexed)
 
         XCTAssertFalse(objectSchema["floatCol"]!.isIndexed)
@@ -208,7 +231,7 @@ class ObjectTests: TestCase {
 
     func testIndexedOptionalProperties() {
         XCTAssertEqual(Object.indexedProperties(), [], "indexed properties should default to []")
-        XCTAssertEqual(SwiftIndexedOptionalPropertiesObject.indexedProperties().count, 8)
+        XCTAssertEqual(SwiftIndexedOptionalPropertiesObject.indexedProperties().count, 9)
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalStringCol"]!.isIndexed)
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDateCol"]!.isIndexed)
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalBoolCol"]!.isIndexed)
@@ -217,6 +240,7 @@ class ObjectTests: TestCase {
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalInt16Col"]!.isIndexed)
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalInt32Col"]!.isIndexed)
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalInt64Col"]!.isIndexed)
+        XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalUUIDCol"]!.isIndexed)
 
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDataCol"]!.isIndexed)
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalFloatCol"]!.isIndexed)
@@ -252,6 +276,7 @@ class ObjectTests: TestCase {
             XCTAssertEqual(object.value(forKey: "floatCol") as! Float?, 1.23 as Float)
             XCTAssertEqual(object.value(forKey: "doubleCol") as! Double?, 12.3)
             XCTAssertEqual(object.value(forKey: "stringCol") as! String?, "a")
+            XCTAssertEqual(object.value(forKey: "uuidCol") as! UUID?, UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!)
             XCTAssertNil(object.value(forKey: "anyCol"))
 
             let expected = object.value(forKey: "binaryCol") as! Data
@@ -289,6 +314,7 @@ class ObjectTests: TestCase {
             XCTAssertNil(object.value(forKey: "optDoubleCol"))
             XCTAssertNil(object.value(forKey: "optBoolCol"))
             XCTAssertNil(object.value(forKey: "optEnumCol"))
+            XCTAssertNil(object.value(forKey: "optUuidCol"))
         }
 
         test(SwiftOptionalObject())
