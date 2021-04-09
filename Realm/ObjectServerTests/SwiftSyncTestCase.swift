@@ -239,7 +239,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
             configuration.objectTypes = [SwiftPerson.self,
                                          Person.self,
                                          Dog.self,
-                                         HugeSyncObject.self, 
+                                         HugeSyncObject.self,
                                          SwiftTypesSyncObject.self]
         }
         return try Realm(configuration: configuration)
