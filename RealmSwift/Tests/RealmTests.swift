@@ -739,6 +739,42 @@ class RealmTests: TestCase {
         XCTAssertNil(missingObject)
     }
 
+    func testUUIDPrimaryKey() {
+        let realm = try! Realm()
+        try! realm.write {
+            realm.create(SwiftPrimaryUUIDObject.self, value: [UUID(uuidString: "8a12daba-8b23-11eb-8dcd-0242ac130003")!, "a"])
+            realm.create(SwiftPrimaryUUIDObject.self, value: [UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!, "b"])
+        }
+
+        let object1 = realm.object(ofType: SwiftPrimaryUUIDObject.self, forPrimaryKey: UUID(uuidString: "8a12daba-8b23-11eb-8dcd-0242ac130003")!)!
+        XCTAssertNotNil(object1)
+        XCTAssertEqual(object1.stringCol, "a")
+
+        let object2 = realm.object(ofType: SwiftPrimaryUUIDObject.self, forPrimaryKey: UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)!
+        XCTAssertNotNil(object2)
+        XCTAssertEqual(object2.stringCol, "b")
+
+        XCTAssertNil(realm.object(ofType: SwiftPrimaryUUIDObject.self, forPrimaryKey: UUID(uuidString: "4ee1fa48-8b23-11eb-8dcd-0242ac130003")!))
+    }
+
+    func testObjectIdPrimaryKey() {
+        let realm = try! Realm()
+        try! realm.write {
+            realm.create(SwiftPrimaryObjectIdObject.self, value: [ObjectId("1234567890ab1234567890aa"), 1])
+            realm.create(SwiftPrimaryObjectIdObject.self, value: [ObjectId("1234567890ab1234567890ab"), 2])
+        }
+
+        let object1 = realm.object(ofType: SwiftPrimaryObjectIdObject.self, forPrimaryKey: ObjectId("1234567890ab1234567890aa"))!
+        XCTAssertNotNil(object1)
+        XCTAssertEqual(object1.intCol, 1)
+
+        let object2 = realm.object(ofType: SwiftPrimaryObjectIdObject.self, forPrimaryKey: ObjectId("1234567890ab1234567890ab"))!
+        XCTAssertNotNil(object2)
+        XCTAssertEqual(object2.intCol, 2)
+
+        XCTAssertNil(realm.object(ofType: SwiftPrimaryObjectIdObject.self, forPrimaryKey: ObjectId("1234567890ab1234567890ac")))
+    }
+
     func testDynamicObjectForPrimaryKey() {
         let realm = try! Realm()
         try! realm.write {

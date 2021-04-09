@@ -498,6 +498,26 @@ class SwiftPrimaryOptionalInt64Object: Object, SwiftPrimaryKeyObjectType {
     }
 }
 
+class SwiftPrimaryUUIDObject: Object, SwiftPrimaryKeyObjectType {
+    @objc dynamic var uuidCol: UUID = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
+    @objc dynamic var stringCol = ""
+
+    typealias PrimaryKey = Int64
+    override class func primaryKey() -> String? {
+        return "uuidCol"
+    }
+}
+
+class SwiftPrimaryObjectIdObject: Object, SwiftPrimaryKeyObjectType {
+    @objc dynamic var objectIdCol: ObjectId = ObjectId.generate()
+    @objc dynamic var intCol = 0
+
+    typealias PrimaryKey = Int64
+    override class func primaryKey() -> String? {
+        return "objectIdCol"
+    }
+}
+
 class SwiftIndexedPropertiesObject: Object {
     @objc dynamic var stringCol = ""
     @objc dynamic var intCol = 0
@@ -507,13 +527,14 @@ class SwiftIndexedPropertiesObject: Object {
     @objc dynamic var int64Col: Int64 = 0
     @objc dynamic var boolCol = false
     @objc dynamic var dateCol = Date()
+    @objc dynamic var uuidCol = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
 
     @objc dynamic var floatCol: Float = 0.0
     @objc dynamic var doubleCol: Double = 0.0
     @objc dynamic var dataCol = Data()
 
     override class func indexedProperties() -> [String] {
-        return ["stringCol", "intCol", "int8Col", "int16Col", "int32Col", "int64Col", "boolCol", "dateCol"]
+        return ["stringCol", "intCol", "int8Col", "int16Col", "int32Col", "int64Col", "boolCol", "dateCol", "uuidCol"]
     }
 }
 
@@ -526,6 +547,7 @@ class SwiftIndexedOptionalPropertiesObject: Object {
     let optionalInt64Col = RealmOptional<Int64>()
     let optionalBoolCol = RealmOptional<Bool>()
     @objc dynamic var optionalDateCol: Date? = Date()
+    @objc dynamic var optionalUUIDCol: UUID? = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")
 
     let optionalFloatCol = RealmOptional<Float>()
     let optionalDoubleCol = RealmOptional<Double>()
@@ -533,7 +555,7 @@ class SwiftIndexedOptionalPropertiesObject: Object {
 
     override class func indexedProperties() -> [String] {
         return ["optionalStringCol", "optionalIntCol", "optionalInt8Col", "optionalInt16Col",
-            "optionalInt32Col", "optionalInt64Col", "optionalBoolCol", "optionalDateCol"]
+            "optionalInt32Col", "optionalInt64Col", "optionalBoolCol", "optionalDateCol", "optionalUUIDCol"]
     }
 }
 

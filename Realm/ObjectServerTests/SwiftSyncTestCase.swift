@@ -81,6 +81,57 @@ public class SwiftCollectionSyncObject: Object {
     }
 }
 
+@objcMembers public class SwiftUUIDPrimaryKeyObject: Object {
+    public dynamic var _id: UUID? = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
+    public dynamic var strCol: String = ""
+    public dynamic var intCol: Int = 0
+
+    public convenience init(id: UUID?, strCol: String, intCol: Int) {
+        self.init()
+        self._id = id
+        self.strCol = strCol
+        self.intCol = intCol
+    }
+
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
+@objcMembers public class SwiftStringPrimaryKeyObject: Object {
+    public dynamic var _id: String? = "1234567890ab1234567890ab"
+    public dynamic var strCol: String = ""
+    public dynamic var intCol: Int = 0
+
+    public convenience init(id: String, strCol: String, intCol: Int) {
+        self.init()
+        self._id = id
+        self.strCol = strCol
+        self.intCol = intCol
+    }
+
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
+@objcMembers public class SwiftIntPrimaryKeyObject: Object {
+    public dynamic var _id: Int = 1234567890
+    public dynamic var strCol: String = ""
+    public dynamic var intCol: Int = 0
+
+    public convenience init(id: Int, strCol: String, intCol: Int) {
+        self.init()
+        self._id = id
+        self.strCol = strCol
+        self.intCol = intCol
+    }
+
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
 public func randomString(_ length: Int) -> String {
     let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     return String((0..<length).map { _ in letters.randomElement()! })
@@ -120,8 +171,14 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     public func openRealm(configuration: Realm.Configuration) throws -> Realm {
         var configuration = configuration
         if configuration.objectTypes == nil {
-            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self,
-                                         HugeSyncObject.self, SwiftCollectionSyncObject.self]
+            configuration.objectTypes = [SwiftPerson.self,
+                                         Person.self,
+                                         Dog.self,
+                                         HugeSyncObject.self,
+                                         SwiftCollectionSyncObject.self,
+                                         SwiftUUIDPrimaryKeyObject.self,
+                                         SwiftStringPrimaryKeyObject.self,
+                                         SwiftIntPrimaryKeyObject.self]
         }
         let realm = try Realm(configuration: configuration)
         waitForDownloads(for: realm)
@@ -131,7 +188,10 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     public func immediatelyOpenRealm(partitionValue: String, user: User) throws -> Realm {
         var configuration = user.configuration(partitionValue: partitionValue)
         if configuration.objectTypes == nil {
-            configuration.objectTypes = [SwiftPerson.self, Person.self, Dog.self, HugeSyncObject.self]
+            configuration.objectTypes = [SwiftPerson.self,
+                                         Person.self,
+                                         Dog.self,
+                                         HugeSyncObject.self]
         }
         return try Realm(configuration: configuration)
     }

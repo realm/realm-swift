@@ -100,6 +100,17 @@
     return @[@"firstName", @"lastName", @"age"];
 }
 
+- (instancetype)initWithPrimaryKey:(RLMObjectId *)primaryKey age:(NSInteger)age firstName:(NSString *)firstName lastName:(NSString *)lastName {
+    self = [super init];
+    if (self) {
+        self._id = primaryKey;
+        self.age = age;
+        self.firstName = firstName;
+        self.lastName = lastName;
+    }
+    return self;
+}
+
 + (instancetype)john {
     Person *john = [[Person alloc] init];
     john._id = [RLMObjectId objectId];
@@ -150,13 +161,12 @@
     return @"_id";
 }
 
-+ (instancetype)objectWithRealmId:(NSString *)realmId {
++ (instancetype)hugeSyncObject {
     const NSInteger fakeDataSize = 1000000;
     HugeSyncObject *object = [[self alloc] init];
     char fakeData[fakeDataSize];
     memset(fakeData, 16, sizeof(fakeData));
     object.dataProp = [NSData dataWithBytes:fakeData length:sizeof(fakeData)];
-    object.realm_id = realmId;
     return object;
 }
 
@@ -200,6 +210,90 @@
 
 @end
 
+#pragma mark UUIDPrimaryKeyObject
+
+@implementation UUIDPrimaryKeyObject
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
+
++ (NSArray *)requiredProperties {
+    return @[@"strCol", @"intCol"];
+}
+
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"_id": [[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"]};
+}
+
+- (instancetype)initWithPrimaryKey:(NSUUID *)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol {
+    self = [super init];
+    if (self) {
+        self._id = primaryKey;
+        self.strCol = strCol;
+        self.intCol = intCol;
+    }
+    return self;
+}
+
+@end
+
+#pragma mark StringPrimaryKeyObject
+
+@implementation StringPrimaryKeyObject
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
+
++ (NSArray *)requiredProperties {
+    return @[@"strCol", @"intCol"];
+}
+
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"_id": @"1234567890ab1234567890ab"};
+}
+
+- (instancetype)initWithPrimaryKey:(NSString *)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol {
+    self = [super init];
+    if (self) {
+        self._id = primaryKey;
+        self.strCol = strCol;
+        self.intCol = intCol;
+    }
+    return self;
+}
+
+@end
+
+#pragma mark IntPrimaryKeyObject
+
+@implementation IntPrimaryKeyObject
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
+
++ (NSArray *)requiredProperties {
+    return @[@"_id", @"strCol", @"intCol"];
+}
+
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"_id": @1234567890};
+}
+
+- (instancetype)initWithPrimaryKey:(NSInteger)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol {
+    self = [super init];
+    if (self) {
+        self._id = primaryKey;
+        self.strCol = strCol;
+        self.intCol = intCol;
+    }
+    return self;
+}
+
+@end
+
 #pragma mark AsyncOpenConnectionTimeoutTransport
 
 @implementation AsyncOpenConnectionTimeoutTransport
@@ -238,9 +332,14 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
+    return [self basicCredentialsWithName:name register:shouldRegister app:nil];
+}
+
+- (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister app:(nullable RLMApp *) app {
     if (shouldRegister) {
         XCTestExpectation *expectation = [self expectationWithDescription:@""];
-        [self.app.emailPasswordAuth registerUserWithEmail:name password:@"password" completion:^(NSError *error) {
+        RLMApp *currentApp = app ?: self.app;
+        [currentApp.emailPasswordAuth registerUserWithEmail:name password:@"password" completion:^(NSError *error) {
             XCTAssertNil(error);
             [expectation fulfill];
         }];
@@ -350,9 +449,7 @@ static NSURL *syncDirectoryForChildProcess() {
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     auto c = [user configurationWithPartitionValue:partitionValue];
     c.encryptionKey = encryptionKey;
-    c.objectClasses = @[Dog.self, Person.self,
-                        HugeSyncObject.self, RLMSetSyncObject.self,
-                        RLMArraySyncObject.self];
+    c.objectClasses = @[Dog.self, Person.self, HugeSyncObject.self, RLMSetSyncObject.self, RLMArraySyncObject.self, UUIDPrimaryKeyObject.self, StringPrimaryKeyObject.self, IntPrimaryKeyObject.self];
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.stopPolicy = stopPolicy;
     c.syncConfiguration = syncConfig;
@@ -597,6 +694,28 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (NSTask *)childTask {
     return [self childTaskWithAppIds:_appId ? @[_appId] : @[]];
+}
+
+- (RLMApp *)appFromAppId:(NSString *)appId {
+    return [RLMApp appWithId:appId
+               configuration:self.defaultAppConfiguration
+               rootDirectory:self.clientDataRoot];
+}
+
+- (NSString *)partitionBsonType:(id<RLMBSON>)bson {
+    switch(bson.bsonType){
+        case RLMBSONTypeString:
+            return @"string";
+        case RLMBSONTypeUUID:
+            return @"uuid";
+        case RLMBSONTypeInt32:
+        case RLMBSONTypeInt64:
+            return @"long";
+        case RLMBSONTypeObjectId:
+            return @"objectId";
+        default:
+            return(@"");
+        }
 }
 
 @end
