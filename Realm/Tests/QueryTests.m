@@ -662,7 +662,7 @@
     stringObj.stringCol = @"required-string";
     ArrayOfAllTypesObject *arrayOfAll = [ArrayOfAllTypesObject createInRealm:realm withValue:@{}];
 
-    for (NSUInteger i = 0; i < allValues.count; i++) {
+    for (int i = 0; i < (int)allValues.count; i++) {
         AllTypesObject *obj = [AllTypesObject createInRealm:realm withValue:[AllTypesObject values:i stringObject:stringObj]];
         obj.anyCol = allValues[i];
         [arrayOfAll.array addObject:obj];

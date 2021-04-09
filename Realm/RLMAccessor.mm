@@ -851,7 +851,7 @@ realm::UUID RLMStatelessAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
     return RLMObjcToUUID(v);
 }
 template<>
-realm::Mixed RLMStatelessAccessorContext::unbox(__unsafe_unretained id v, CreatePolicy p, ObjKey) {
+realm::Mixed RLMStatelessAccessorContext::unbox(id, CreatePolicy, ObjKey) {
     REALM_UNREACHABLE();
 }
 template<>
@@ -988,6 +988,10 @@ RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
     return {*outObj, false};
 }
 
+template<>
+realm::Obj RLMStatelessAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
+}
 template<>
 realm::Obj RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy policy, ObjKey key) {
     return createObject(v, policy, false, key).first;
