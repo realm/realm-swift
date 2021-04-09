@@ -411,15 +411,15 @@
 
     __weak id objects[30];
     NSInteger count = 0;
-    for (EmployeeObject *e in company.employeeDict) {
-        XCTAssertNotNil(e, @"Object is not nil and accessible");
+    for (NSString *key in company.employeeDict) {
+        XCTAssertNotNil(key, @"Object is not nil and accessible");
         if (count > 16) {
             // 16 is the size of blocks fast enumeration happens to ask for at
             // the moment, but of course that's just an implementation detail
             // that may change
             XCTAssertNil(objects[count - 16]);
         }
-        objects[count++] = e;
+        objects[count++] = key;
     }
 
     XCTAssertEqual(count, 30, @"should have enumerated 30 objects");
@@ -462,7 +462,7 @@
     for (EmployeeObject *eo in company.employeeDict) {
         NSString *key = [NSString stringWithFormat:@"item%zu", count];
         ++count;
-        [company.employeeDict setObject:eo forKey:key];
+        company.employeeDict[key] = eo;
     }
     XCTAssertEqual(totalCount, count);
     XCTAssertEqual(totalCount * 2, company.employeeDict.count);

@@ -357,7 +357,7 @@ inline realm::StringData keyFromRLMDictionaryKey(id<RLMDictionaryKey> key, RLMAc
 }
 
 - (id)valueForKey:(NSString *)key {
-    return [self objectForKey:key];
+    return [super valueForKey:key];
 }
 
 - (void)setValue:(id)value forKey:(id)key {

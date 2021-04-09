@@ -373,12 +373,10 @@ class MapTests: TestCase {
         XCTAssertEqual(map["b"]!.stringCol, "b")
         XCTAssertEqual(map[str1.stringCol]!.stringCol, str1.stringCol)
 
-        // Make sure we can enumerate
-        XCTAssertTrue(false)
-//        for (key, value) in map {
-//            XCTAssertFalse(key.description.isEmpty, "Object should have description")
-//            XCTAssertFalse(value.description.isEmpty, "Object should have description")
-//        }
+        for object in map {
+            XCTAssertFalse(object.key.description.isEmpty, "Object should have description")
+            XCTAssertFalse(object.value.description.isEmpty, "Object should have description")
+        }
     }
 
     func testEnumeratingMap() {
@@ -392,12 +390,11 @@ class MapTests: TestCase {
 
         XCTAssertEqual(10, mapObject.map.count)
 
-        XCTAssertTrue(false)
-//        for (_, value) in mapObject.map {
-//            XCTAssertEqual(123, value.intCol)
-//            XCTAssertEqual(false, value.objectCol!.boolCol)
-//            XCTAssertEqual(0, value.arrayCol.count)
-//        }
+        for element in mapObject.map {
+            XCTAssertEqual(123, element.value.intCol)
+            XCTAssertEqual(false, element.value.objectCol!.boolCol)
+            XCTAssertEqual(0, element.value.arrayCol.count)
+        }
     }
 
     func testValueForKey() {
