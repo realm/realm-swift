@@ -122,9 +122,14 @@ public struct RLMDictionaryIterator: IteratorProtocol {
     }
 
     public mutating func next() -> RLMDictionarySingleEntry? {
-        let key = iteratorBase.next() as! RLMDictionaryKey
-        // TODO: Support multiple key types
-        return (key: key as! String, value: dictionary[key]) as? RLMDictionarySingleEntry
+        let key = iteratorBase.next()
+        if let key = key as? RLMDictionaryKey {
+            return (key: key as! String, value: dictionary[key]) as? RLMDictionarySingleEntry
+        }
+        if key != nil {
+            fatalError("unsupported key type")
+        }
+        return nil
     }
 }
 

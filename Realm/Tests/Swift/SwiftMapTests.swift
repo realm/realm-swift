@@ -46,11 +46,8 @@ class SwiftMapTests: RLMTestCase {
 
         var totalSum: Int = 0
 
-        for element in company.employeeMap! {
-            if let element = element as? RLMDictionarySingleEntry {
-                let employee = element.value as? SwiftRLMEmployeeObject
-                totalSum += employee!.age
-            }
+        for (key, value) in company.employeeMap!.map({ ($0.key, $0.value as! SwiftRLMEmployeeObject) }) {
+            totalSum += value.age
         }
 
         XCTAssertEqual(totalSum, 95, "total sum should be 95")
