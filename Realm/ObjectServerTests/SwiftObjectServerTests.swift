@@ -100,6 +100,61 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    func testSwiftRountripForDistinctPrimaryKey() {
+        do {
+            let user = try logInUser(for: basicCredentials())
+            let realm = try openRealm(partitionValue: #function, user: user)
+            if isParent {
+                checkCount(expected: 0, realm, SwiftPerson.self) // ObjectId
+                checkCount(expected: 0, realm, SwiftUUIDPrimaryKeyObject.self)
+                checkCount(expected: 0, realm, SwiftStringPrimaryKeyObject.self)
+                checkCount(expected: 0, realm, SwiftIntPrimaryKeyObject.self)
+                executeChild()
+                waitForDownloads(for: realm)
+                checkCount(expected: 1, realm, SwiftPerson.self)
+                checkCount(expected: 1, realm, SwiftUUIDPrimaryKeyObject.self)
+                checkCount(expected: 1, realm, SwiftStringPrimaryKeyObject.self)
+                checkCount(expected: 1, realm, SwiftIntPrimaryKeyObject.self)
+
+                let swiftOjectIdPrimaryKeyObject = realm.object(ofType: SwiftPerson.self,
+                                                                forPrimaryKey: ObjectId("1234567890ab1234567890ab"))!
+                XCTAssertEqual(swiftOjectIdPrimaryKeyObject.firstName, "Ringo")
+                XCTAssertEqual(swiftOjectIdPrimaryKeyObject.lastName, "Starr")
+
+                let swiftUUIDPrimaryKeyObject = realm.object(ofType: SwiftUUIDPrimaryKeyObject.self,
+                                                             forPrimaryKey: UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)!
+                XCTAssertEqual(swiftUUIDPrimaryKeyObject.strCol, "Steve")
+                XCTAssertEqual(swiftUUIDPrimaryKeyObject.intCol, 10)
+
+                let swiftStringPrimaryKeyObject = realm.object(ofType: SwiftStringPrimaryKeyObject.self,
+                                                               forPrimaryKey: "1234567890ab1234567890ab")!
+                XCTAssertEqual(swiftStringPrimaryKeyObject.strCol, "Paul")
+                XCTAssertEqual(swiftStringPrimaryKeyObject.intCol, 20)
+
+                let swiftIntPrimaryKeyObject = realm.object(ofType: SwiftIntPrimaryKeyObject.self,
+                                                            forPrimaryKey: 1234567890)!
+                XCTAssertEqual(swiftIntPrimaryKeyObject.strCol, "Jackson")
+                XCTAssertEqual(swiftIntPrimaryKeyObject.intCol, 30)
+            } else {
+                try realm.write {
+                    let swiftPerson = SwiftPerson(firstName: "Ringo", lastName: "Starr")
+                    swiftPerson._id = ObjectId("1234567890ab1234567890ab")
+                    realm.add(swiftPerson)
+                    realm.add(SwiftUUIDPrimaryKeyObject(id: UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!, strCol: "Steve", intCol: 10))
+                    realm.add(SwiftStringPrimaryKeyObject(id: "1234567890ab1234567890ab", strCol: "Paul", intCol: 20))
+                    realm.add(SwiftIntPrimaryKeyObject(id: 1234567890, strCol: "Jackson", intCol: 30))
+                }
+                waitForUploads(for: realm)
+                checkCount(expected: 1, realm, SwiftPerson.self)
+                checkCount(expected: 1, realm, SwiftUUIDPrimaryKeyObject.self)
+                checkCount(expected: 1, realm, SwiftStringPrimaryKeyObject.self)
+                checkCount(expected: 1, realm, SwiftIntPrimaryKeyObject.self)
+            }
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
     func testSwiftAddObjectsWithNilPartitionValue() {
         do {
             let user = try logInUser(for: basicCredentials())
@@ -182,10 +237,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 checkCount(expected: 2, realmB, SwiftPerson.self)
                 checkCount(expected: 5, realmC, SwiftPerson.self)
 
-                XCTAssertEqual(realmA.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count,
-                               1)
-                XCTAssertEqual(realmB.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count,
-                               0)
+                XCTAssertEqual(realmA.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count, 1)
+                XCTAssertEqual(realmB.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count, 0)
             } else {
                 // Add objects.
                 try realmA.write {

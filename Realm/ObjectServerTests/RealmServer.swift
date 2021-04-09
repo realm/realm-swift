@@ -518,7 +518,7 @@ public class RealmServer: NSObject {
     }
 
     /// Create a new server app
-    @objc public func createApp() throws -> AppId {
+    @objc public func createAppForBSONType(_ bsonType: String) throws -> AppId {
         guard let session = session else {
             throw URLError(.unknown)
         }
@@ -574,7 +574,7 @@ public class RealmServer: NSObject {
                     "database_name": "test_data",
                     "partition": [
                         "key": "realm_id",
-                        "type": "string",
+                        "type": "\(bsonType)",
                         "required": false,
                         "permissions": [
                             "read": true,
@@ -611,7 +611,7 @@ public class RealmServer: NSObject {
                         "bsonType": "string"
                     ],
                     "realm_id": [
-                        "bsonType": "string"
+                        "bsonType": "\(bsonType)"
                     ]
                 ],
                 "required": ["name"],
@@ -646,12 +646,14 @@ public class RealmServer: NSObject {
                         "bsonType": "string"
                     ],
                     "realm_id": [
-                        "bsonType": "string"
+                        "bsonType": "\(bsonType)"
                     ]
                 ],
-                "required": ["firstName",
-                             "lastName",
-                             "age"],
+                "required": [
+                    "firstName",
+                    "lastName",
+                    "age"
+                ],
                 "title": "Person"
             ]
         ]
@@ -675,7 +677,7 @@ public class RealmServer: NSObject {
                         "bsonType": "binData"
                     ],
                     "realm_id": [
-                        "bsonType": "string"
+                        "bsonType": "\(bsonType)"
                     ]
                 ],
                 "required": [],
@@ -684,9 +686,9 @@ public class RealmServer: NSObject {
             "relationships": [:]
         ]
 
-        let userDataRule: [String: Any] = [
+        let uuidPrimaryKeyObjectRule: [String: Any] = [
             "database": "test_data",
-            "collection": "UserData",
+            "collection": "UUIDPrimaryKeyObject",
             "roles": [[
                 "name": "default",
                 "apply_when": [:],
@@ -694,15 +696,100 @@ public class RealmServer: NSObject {
                 "delete": true,
                 "additional_fields": [:]
             ]],
-            "schema": [:],
+            "schema": [
+                "properties": [
+                    "_id": [
+                        "bsonType": "uuid"
+                    ],
+                    "strCol": [
+                        "bsonType": "string"
+                    ],
+                    "intCol": [
+                        "bsonType": "int"
+                    ],
+                    "realm_id": [
+                        "bsonType": "\(bsonType)"
+                    ]
+                ],
+                "required": [
+                    "strCol",
+                    "intCol"
+                ],
+                "title": "UUIDPrimaryKeyObject"
+            ],
             "relationships": [:]
         ]
 
-        let rules = app.services[serviceId].rules
-        rules.post(on: group, dogRule, failOnError)
-        rules.post(on: group, personRule, failOnError)
-        rules.post(on: group, hugeSyncObjectRule, failOnError)
-        rules.post(on: group, [
+        let stringPrimaryKeyObjectRule: [String: Any] = [
+            "database": "test_data",
+            "collection": "StringPrimaryKeyObject",
+            "roles": [[
+                "name": "default",
+                "apply_when": [:],
+                "insert": true,
+                "delete": true,
+                "additional_fields": [:]
+            ]],
+            "schema": [
+                "properties": [
+                    "_id": [
+                        "bsonType": "string"
+                    ],
+                    "strCol": [
+                        "bsonType": "string"
+                    ],
+                    "intCol": [
+                        "bsonType": "int"
+                    ],
+                    "realm_id": [
+                        "bsonType": "\(bsonType)"
+                    ]
+                ],
+                "required": [
+                    "strCol",
+                    "intCol"
+                ],
+                "title": "StringPrimaryKeyObject"
+            ],
+            "relationships": [:]
+        ]
+
+        let intPrimaryKeyObjectRule: [String: Any] = [
+            "database": "test_data",
+            "collection": "IntPrimaryKeyObject",
+            "roles": [[
+                "name": "default",
+                "apply_when": [:],
+                "insert": true,
+                "delete": true,
+                "additional_fields": [:]
+            ]],
+            "schema": [
+                "properties": [
+                    "_id": [
+                        "bsonType": "int"
+                    ],
+                    "strCol": [
+                        "bsonType": "string"
+                    ],
+                    "intCol": [
+                        "bsonType": "int"
+                    ],
+                    "realm_id": [
+                        "bsonType": "\(bsonType)"
+                    ]
+                ],
+                "required": [
+                    "_id",
+                    "strCol",
+                    "intCol"
+                ],
+                "title": "IntPrimaryKeyObject"
+            ],
+            "relationships": [:]
+        ]
+
+        let swiftPerson: [String: Any] = [
             "database": "test_data",
             "collection": "SwiftPerson",
             "roles": [[
@@ -727,18 +814,133 @@ public class RealmServer: NSObject {
                         "bsonType": "string"
                     ],
                     "realm_id": [
-                        "bsonType": "string"
+                        "bsonType": "\(bsonType)"
                     ]
                 ],
                 "required": [
-                             "firstName",
-                             "lastName",
-                             "age"
-                             ],
+                    "firstName",
+                    "lastName",
+                    "age"
+                ],
                 "title": "SwiftPerson"
             ],
-                "relationships": [:]
-        ], failOnError)
+            "relationships": [:]
+        ]
+
+        let swiftUUIDPrimaryKeyObjectRule: [String: Any] = [
+            "database": "test_data",
+            "collection": "SwiftUUIDPrimaryKeyObject",
+            "roles": [[
+                "name": "default",
+                "apply_when": [:],
+                "insert": true,
+                "delete": true,
+                "additional_fields": [:]
+            ]],
+            "schema": [
+                "properties": [
+                    "_id": [
+                        "bsonType": "uuid"
+                    ],
+                    "strCol": [
+                        "bsonType": "string"
+                    ],
+                    "intCol": [
+                        "bsonType": "int"
+                    ],
+                    "realm_id": [
+                        "bsonType": "\(bsonType)"
+                    ]
+                ],
+                "required": [
+                    "strCol",
+                    "intCol"
+                ],
+                "title": "SwiftUUIDPrimaryKeyObject"
+            ],
+            "relationships": [:]
+        ]
+
+        let swiftStringPrimaryKeyObjectRule: [String: Any] = [
+            "database": "test_data",
+            "collection": "SwiftStringPrimaryKeyObject",
+            "roles": [[
+                "name": "default",
+                "apply_when": [:],
+                "insert": true,
+                "delete": true,
+                "additional_fields": [:]
+            ]],
+            "schema": [
+                "properties": [
+                    "_id": [
+                        "bsonType": "string"
+                    ],
+                    "strCol": [
+                        "bsonType": "string"
+                    ],
+                    "intCol": [
+                        "bsonType": "int"
+                    ],
+                    "realm_id": [
+                        "bsonType": "\(bsonType)"
+                    ]
+                ],
+                "required": [
+                    "strCol",
+                    "intCol"
+                ],
+                "title": "SwiftStringPrimaryKeyObject"
+            ],
+            "relationships": [:]
+        ]
+
+        let swiftIntPrimaryKeyObjectRule: [String: Any] = [
+            "database": "test_data",
+            "collection": "SwiftIntPrimaryKeyObject",
+            "roles": [[
+                "name": "default",
+                "apply_when": [:],
+                "insert": true,
+                "delete": true,
+                "additional_fields": [:]
+            ]],
+            "schema": [
+                "properties": [
+                    "_id": [
+                        "bsonType": "int"
+                    ],
+                    "strCol": [
+                        "bsonType": "string"
+                    ],
+                    "intCol": [
+                        "bsonType": "int"
+                    ],
+                    "realm_id": [
+                        "bsonType": "\(bsonType)"
+                    ]
+                ],
+                "required": [
+                    "_id",
+                    "strCol",
+                    "intCol"
+                ],
+                "title": "SwiftIntPrimaryKeyObject"
+            ],
+            "relationships": [:]
+        ]
+
+        let rules = app.services[serviceId].rules
+        rules.post(on: group, dogRule, failOnError)
+        rules.post(on: group, personRule, failOnError)
+        rules.post(on: group, hugeSyncObjectRule, failOnError)
+        rules.post(on: group, uuidPrimaryKeyObjectRule, failOnError)
+        rules.post(on: group, stringPrimaryKeyObjectRule, failOnError)
+        rules.post(on: group, intPrimaryKeyObjectRule, failOnError)
+        rules.post(on: group, swiftPerson, failOnError)
+        rules.post(on: group, swiftUUIDPrimaryKeyObjectRule, failOnError)
+        rules.post(on: group, swiftStringPrimaryKeyObjectRule, failOnError)
+        rules.post(on: group, swiftIntPrimaryKeyObjectRule, failOnError)
 
         app.sync.config.put(on: group, data: [
             "development_mode_enabled": true
@@ -774,6 +976,20 @@ public class RealmServer: NSObject {
             """
         ], failOnError)
 
+        let userDataRule: [String: Any] = [
+            "database": "test_data",
+            "collection": "UserData",
+            "roles": [[
+                "name": "default",
+                "apply_when": [:],
+                "insert": true,
+                "delete": true,
+                "additional_fields": [:]
+            ]],
+            "schema": [:],
+            "relationships": [:]
+        ]
+
         _ = rules.post(userDataRule)
         app.customUserData.patch(on: group, [
             "mongo_service_id": serviceId,
@@ -805,6 +1021,10 @@ public class RealmServer: NSObject {
         }
 
         return clientAppId
+    }
+
+    @objc public func createApp() throws -> AppId {
+        try createAppForBSONType("string")
     }
 }
 

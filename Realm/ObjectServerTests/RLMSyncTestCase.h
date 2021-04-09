@@ -29,7 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property RLMObjectId *_id;
 @property NSString *breed;
 @property NSString *name;
-@property NSString *realm_id;
 
 @end
 
@@ -40,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString *firstName;
 @property NSString *lastName;
 
+- (instancetype) initWithPrimaryKey:(RLMObjectId *)primaryKey age:(NSInteger)strCol firstName:(NSString *)intCol lastName:(NSString *)intCol;
 + (instancetype)john;
 + (instancetype)paul;
 + (instancetype)ringo;
@@ -49,9 +49,29 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface HugeSyncObject : RLMObject
 @property RLMObjectId *_id;
-@property NSString *realm_id;
 @property NSData *dataProp;
-+ (instancetype)objectWithRealmId:(NSString *)realmId;
++ (instancetype)hugeSyncObject;
+@end
+
+@interface UUIDPrimaryKeyObject : RLMObject
+@property NSUUID *_id;
+@property NSString *strCol;
+@property NSInteger intCol;
+- (instancetype) initWithPrimaryKey:(NSUUID *)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol;
+@end
+
+@interface StringPrimaryKeyObject : RLMObject
+@property NSString *_id;
+@property NSString *strCol;
+@property NSInteger intCol;
+- (instancetype) initWithPrimaryKey:(NSString *)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol;
+@end
+
+@interface IntPrimaryKeyObject : RLMObject
+@property NSInteger _id;
+@property NSString *strCol;
+@property NSInteger intCol;
+- (instancetype) initWithPrimaryKey:(NSInteger)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol;
 @end
 
 RLM_COLLECTION_TYPE(Person);
@@ -105,6 +125,8 @@ RLM_COLLECTION_TYPE(Person);
 @property (nonatomic, readonly) NSArray<NSString *> *appIds;
 
 - (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
+
+- (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister app:(nullable RLMApp*) app;
 
 /// Synchronously open a synced Realm via asyncOpen and return the Realm.
 - (RLMRealm *)asyncOpenRealmWithConfiguration:(RLMRealmConfiguration *)configuration;
@@ -176,6 +198,10 @@ RLM_COLLECTION_TYPE(Person);
 - (void)cleanupRemoteDocuments:(RLMMongoCollection *)collection;
 
 - (nonnull NSURL *)clientDataRoot;
+
+- (NSString *)partitionBsonType:(id<RLMBSON>)bson;
+
+- (RLMApp *)appFromAppId:(NSString *)appId;
 
 @end
 
