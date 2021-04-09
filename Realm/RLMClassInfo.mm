@@ -41,7 +41,7 @@ RLMClassInfo::RLMClassInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
                            std::unique_ptr<realm::ObjectSchema> schema)
 : realm(realm),
 rlmObjectSchema(rlmObjectSchema),
-objectSchema(std::move(&*schema)),
+objectSchema(&*schema),
 dynamicObjectSchema(std::move(schema)) { }
 
 realm::TableRef RLMClassInfo::table() const {

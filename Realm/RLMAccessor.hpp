@@ -44,7 +44,7 @@ struct RLMOptionalId {
 // The subset of RLMAccessorContext which does not require any member variables
 struct RLMStatelessAccessorContext {
     template<typename T>
-    T unbox(id v);
+    T unbox(id v, realm::CreatePolicy = realm::CreatePolicy::Skip, realm::ObjKey = {});
 };
 
 class RLMAccessorContext : public RLMStatelessAccessorContext {
@@ -104,7 +104,9 @@ public:
     }
 
     template<typename T>
-    T unbox(id v, realm::CreatePolicy = realm::CreatePolicy::Skip, realm::ObjKey = {});
+    T unbox(id v, realm::CreatePolicy = realm::CreatePolicy::Skip, realm::ObjKey = {}) {
+        return RLMStatelessAccessorContext::unbox<T>(v);
+    }
 
     realm::Obj create_embedded_object();
 

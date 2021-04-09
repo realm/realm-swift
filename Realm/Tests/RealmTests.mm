@@ -1002,43 +1002,42 @@
     [token invalidate];
 }
 
-// FIXME:
-//- (void)testBeginWriteTransactionFromWithinCollectionChangedNotification {
-//    RLMRealm *realm = [RLMRealm defaultRealm];
-//
-//    auto createObject = ^{
-//        [self dispatchAsyncAndWait:^{
-//            RLMRealm *realm = [RLMRealm defaultRealm];
-//            [realm beginWriteTransaction];
-//            [StringObject createInRealm:realm withValue:@[@"string"]];
-//            [realm commitWriteTransaction];
-//        }];
-//    };
-//
-//    __block auto expectation = [self expectationWithDescription:@""];
-//    __block RLMNotificationToken *token;
-//    auto block = ^(RLMResults *results, RLMCollectionChange *changes, NSError *) {
-//        if (!changes) {
-//            [expectation fulfill];
-//            return;
-//        }
-//
-//        XCTAssertEqual(1U, results.count);
-//        createObject();
-//        XCTAssertEqual(1U, results.count);
-//        [realm beginWriteTransaction];
-//        XCTAssertEqual(2U, results.count);
-//        [realm cancelWriteTransaction];
-//        [expectation fulfill];
-//        [token invalidate];
-//    };
-//    token = [StringObject.allObjects addNotificationBlock:block];
-//    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-//
-//    createObject();
-//    expectation = [self expectationWithDescription:@""];
-//    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-//}
+- (void)FIXME_testBeginWriteTransactionFromWithinCollectionChangedNotification {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    auto createObject = ^{
+        [self dispatchAsyncAndWait:^{
+            RLMRealm *realm = [RLMRealm defaultRealm];
+            [realm beginWriteTransaction];
+            [StringObject createInRealm:realm withValue:@[@"string"]];
+            [realm commitWriteTransaction];
+        }];
+    };
+
+    __block auto expectation = [self expectationWithDescription:@""];
+    __block RLMNotificationToken *token;
+    auto block = ^(RLMResults *results, RLMCollectionChange *changes, NSError *) {
+        if (!changes) {
+            [expectation fulfill];
+            return;
+        }
+
+        XCTAssertEqual(1U, results.count);
+        createObject();
+        XCTAssertEqual(1U, results.count);
+        [realm beginWriteTransaction];
+        XCTAssertEqual(2U, results.count);
+        [realm cancelWriteTransaction];
+        [expectation fulfill];
+        [token invalidate];
+    };
+    token = [StringObject.allObjects addNotificationBlock:block];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    createObject();
+    expectation = [self expectationWithDescription:@""];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
 
 - (void)testReadOnlyRealmIsImmutable
 {
