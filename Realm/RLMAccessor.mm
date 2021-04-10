@@ -850,7 +850,10 @@ template<>
 realm::UUID RLMStatelessAccessorContext::unbox(id v) {
     return RLMObjcToUUID(v);
 }
-
+template<>
+realm::Mixed RLMStatelessAccessorContext::unbox(id) {
+    REALM_UNREACHABLE();
+}
 template<>
 realm::Mixed RLMAccessorContext::unbox(__unsafe_unretained id v, CreatePolicy p, ObjKey) {
     return RLMObjcToMixed(v, _realm, p);
@@ -1028,15 +1031,15 @@ RLMOptionalId RLMAccessorContext::default_value_for_property(realm::ObjectSchema
     return RLMOptionalId{defaultValue(@(prop.name.c_str()))};
 }
 
-bool RLMAccessorContext::is_same_list(realm::List const& list, __unsafe_unretained id const v) const noexcept {
+bool RLMStatelessAccessorContext::is_same_list(realm::List const& list, __unsafe_unretained id const v) const noexcept {
     return [v respondsToSelector:@selector(isBackedByList:)] && [v isBackedByList:list];
 }
 
-bool RLMAccessorContext::is_same_set(realm::object_store::Set const& set, __unsafe_unretained id const v) const noexcept {
+bool RLMStatelessAccessorContext::is_same_set(realm::object_store::Set const& set, __unsafe_unretained id const v) const noexcept {
     return [v respondsToSelector:@selector(isBackedBySet:)] && [v isBackedBySet:set];
 }
 
-bool RLMAccessorContext::is_same_dictionary(realm::object_store::Dictionary const&, __unsafe_unretained id const) const noexcept {
+bool RLMStatelessAccessorContext::is_same_dictionary(realm::object_store::Dictionary const&, __unsafe_unretained id const) const noexcept {
     REALM_UNREACHABLE();
 }
 #pragma clang diagnostic push

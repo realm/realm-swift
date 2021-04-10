@@ -405,11 +405,6 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
     }, [&](auto t) {
         RLMStatelessAccessorContext c;
         return realm::Mixed(c.unbox<std::decay_t<decltype(*t)>>(v));
-    }, [&](realm::Mixed *) {
-        // This is a no op as the path cannot be reached.
-        // Return a null Mixed because REALM_UNREACHABLE does
-        // not satisfy compiler.
-        return realm::Mixed();
     }});
 }
 
