@@ -403,8 +403,8 @@ class SetSyncTests: SwiftSyncTestCase {
 
     func testAnySet() {
         do {
-            try roundTrip(set: (\.anySet, [.int(12345), .string("Hello"), .none]),
-                          otherSet: (\.otherAnySet, [.double(765.6543), .string("Hello"), .objectId(.generate())]))
+            try roundTrip(set: (\.anySet, [.int(12345), .none, .string("Hello")]),
+                          otherSet: (\.otherAnySet, [.string("Hello"), .double(765.6543), .objectId(.generate())]))
         } catch {
             XCTFail(error.localizedDescription)
         }

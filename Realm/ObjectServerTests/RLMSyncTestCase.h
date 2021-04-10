@@ -29,7 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property RLMObjectId *_id;
 @property NSString *breed;
 @property NSString *name;
-
 @end
 
 @interface Person : RLMObject
@@ -49,9 +48,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface HugeSyncObject : RLMObject
 @property RLMObjectId *_id;
-@property NSString *realm_id;
 @property NSData *dataProp;
-+ (instancetype)objectWithRealmId:(NSString *)realmId;
++ (instancetype)hugeSyncObject;
 @end
 
 @interface UUIDPrimaryKeyObject : RLMObject

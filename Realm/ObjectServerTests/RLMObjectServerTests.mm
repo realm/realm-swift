@@ -1428,7 +1428,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     CHECK_COUNT(0, HugeSyncObject, realm);
     [realm beginWriteTransaction];
     for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
-        [realm addObject:[HugeSyncObject objectWithRealmId:partitionValue]];
+        [realm addObject:[HugeSyncObject hugeSyncObject]];
     }
     [realm commitWriteTransaction];
     [self waitForUploadsForRealm:realm];
@@ -1508,7 +1508,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     // Upload lots of data
     [realm beginWriteTransaction];
     for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
-        [realm addObject:[HugeSyncObject objectWithRealmId:NSStringFromSelector(_cmd)]];
+        [realm addObject:[HugeSyncObject hugeSyncObject]];
     }
     [realm commitWriteTransaction];
     // Wait for upload to begin and finish
@@ -1751,7 +1751,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                         encryptionKey:nil
                                                            stopPolicy:RLMSyncStopPolicyImmediately];
         [realm beginWriteTransaction];
-        [realm addObject:[HugeSyncObject objectWithRealmId:partitionValue]];
+        [realm addObject:[HugeSyncObject hugeSyncObject]];
         [realm commitWriteTransaction];
         [self waitForUploadsForRealm:realm];
 

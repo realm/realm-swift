@@ -161,13 +161,12 @@
     return @"_id";
 }
 
-+ (instancetype)objectWithRealmId:(NSString *)realmId {
++ (instancetype)hugeSyncObject {
     const NSInteger fakeDataSize = 1000000;
     HugeSyncObject *object = [[self alloc] init];
     char fakeData[fakeDataSize];
     memset(fakeData, 16, sizeof(fakeData));
     object.dataProp = [NSData dataWithBytes:fakeData length:sizeof(fakeData)];
-    object.realm_id = realmId;
     return object;
 }
 
@@ -504,7 +503,7 @@ static NSURL *syncDirectoryForChildProcess() {
     c.encryptionKey = encryptionKey;
     c.objectClasses = @[Dog.self, Person.self, HugeSyncObject.self, RLMSetSyncObject.self,
                         RLMArraySyncObject.self, UUIDPrimaryKeyObject.self, StringPrimaryKeyObject.self,
-                        IntPrimaryKeyObject.self];
+                        IntPrimaryKeyObject.self, AllTypesSyncObject.self];
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.stopPolicy = stopPolicy;
     c.syncConfiguration = syncConfig;
