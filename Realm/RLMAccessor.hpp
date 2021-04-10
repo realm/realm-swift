@@ -44,7 +44,7 @@ struct RLMOptionalId {
 // The subset of RLMAccessorContext which does not require any member variables
 struct RLMStatelessAccessorContext {
     template<typename T>
-    T unbox(id v, realm::CreatePolicy = realm::CreatePolicy::Skip, realm::ObjKey = {});
+    T unbox(id v);
 };
 
 class RLMAccessorContext : public RLMStatelessAccessorContext {

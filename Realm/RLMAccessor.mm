@@ -807,59 +807,56 @@ using realm::CreatePolicy;
 #pragma mark - unboxing -
 
 template<>
-realm::Timestamp RLMStatelessAccessorContext::unbox(__unsafe_unretained id const value, CreatePolicy, ObjKey) {
+realm::Timestamp RLMStatelessAccessorContext::unbox(__unsafe_unretained id const value) {
     id v = RLMCoerceToNil(value);
     return RLMTimestampForNSDate(v);
 }
 
 template<>
-bool RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+bool RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return [v boolValue];
 }
 template<>
-double RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+double RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return [v doubleValue];
 }
 template<>
-float RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+float RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return [v floatValue];
 }
 template<>
-long long RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+long long RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return [v longLongValue];
 }
 template<>
-realm::BinaryData RLMStatelessAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+realm::BinaryData RLMStatelessAccessorContext::unbox(id v) {
     v = RLMCoerceToNil(v);
     return RLMBinaryDataForNSData(v);
 }
 template<>
-realm::StringData RLMStatelessAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+realm::StringData RLMStatelessAccessorContext::unbox(id v) {
     v = RLMCoerceToNil(v);
     return RLMStringDataWithNSString(v);
 }
 template<>
-realm::Decimal128 RLMStatelessAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+realm::Decimal128 RLMStatelessAccessorContext::unbox(id v) {
     return RLMObjcToDecimal128(v);
 }
 template<>
-realm::ObjectId RLMStatelessAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+realm::ObjectId RLMStatelessAccessorContext::unbox(id v) {
     return static_cast<RLMObjectId *>(v).value;
 }
 template<>
-realm::UUID RLMStatelessAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+realm::UUID RLMStatelessAccessorContext::unbox(id v) {
     return RLMObjcToUUID(v);
 }
-template<>
-realm::Mixed RLMStatelessAccessorContext::unbox(id, CreatePolicy, ObjKey) {
-    REALM_COMPILER_HINT_UNREACHABLE();
-}
+
 template<>
 realm::Mixed RLMAccessorContext::unbox(__unsafe_unretained id v, CreatePolicy p, ObjKey) {
     return RLMObjcToMixed(v, _realm, p);
 }
 template<>
-realm::object_store::Dictionary RLMStatelessAccessorContext::unbox(id, CreatePolicy, ObjKey) {
+realm::object_store::Dictionary RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
     REALM_UNREACHABLE();
 }
 
@@ -870,27 +867,27 @@ static auto to_optional(__unsafe_unretained id const value, Fn&& fn) {
 }
 
 template<>
-realm::util::Optional<bool> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+realm::util::Optional<bool> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return to_optional(v, [&](__unsafe_unretained id v) { return (bool)[v boolValue]; });
 }
 template<>
-realm::util::Optional<double> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+realm::util::Optional<double> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v doubleValue]; });
 }
 template<>
-realm::util::Optional<float> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+realm::util::Optional<float> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v floatValue]; });
 }
 template<>
-realm::util::Optional<int64_t> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+realm::util::Optional<int64_t> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v longLongValue]; });
 }
 template<>
-realm::util::Optional<realm::ObjectId> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+realm::util::Optional<realm::ObjectId> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return to_optional(v, [&](__unsafe_unretained RLMObjectId *v) { return v.value; });
 }
 template<>
-realm::util::Optional<realm::UUID> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+realm::util::Optional<realm::UUID> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return to_optional(v, [&](__unsafe_unretained NSUUID *v) { return [v rlm_uuidValue]; });
 }
 
@@ -989,8 +986,12 @@ RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
 }
 
 template<>
-realm::Obj RLMStatelessAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
-    REALM_COMPILER_HINT_UNREACHABLE();
+realm::Mixed RLMStatelessAccessorContext::unbox(__unsafe_unretained id const) {
+    REALM_UNREACHABLE();
+}
+template<>
+realm::Obj RLMStatelessAccessorContext::unbox(__unsafe_unretained id const) {
+    REALM_UNREACHABLE();
 }
 template<>
 realm::Obj RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy policy, ObjKey key) {
