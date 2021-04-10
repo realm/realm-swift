@@ -114,7 +114,7 @@ public:
                                              realm::Property const& prop);
 
     template<typename T>
-    T unbox(id v, realm::CreatePolicy = realm::CreatePolicy::Skip, realm::ObjKey = {}) {
+    T unbox(id v, realm::CreatePolicy p = realm::CreatePolicy::Skip, realm::ObjKey o = {}) {
         return RLMStatelessAccessorContext::unbox<T>(v);
     }
     template<>
