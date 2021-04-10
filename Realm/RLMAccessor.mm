@@ -986,14 +986,6 @@ RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
 }
 
 template<>
-realm::Mixed RLMStatelessAccessorContext::unbox(__unsafe_unretained id const) {
-    REALM_UNREACHABLE();
-}
-template<>
-realm::Obj RLMStatelessAccessorContext::unbox(__unsafe_unretained id const) {
-    REALM_UNREACHABLE();
-}
-template<>
 realm::Obj RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy policy, ObjKey key) {
     return createObject(v, policy, false, key).first;
 }

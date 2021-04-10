@@ -393,7 +393,6 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
 
     REALM_ASSERT([v conformsToProtocol:@protocol(RLMValue)]);
     RLMPropertyType type = [v rlm_valueType];
-
     return switch_on_type(static_cast<realm::PropertyType>(type), realm::util::overload{[&](realm::Obj*) {
         // The RLMObjectBase may be unmanaged and therefor has no RLMClassInfo attached.
         // So we fetch from the Realm instead.
@@ -406,6 +405,11 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
     }, [&](auto t) {
         RLMStatelessAccessorContext c;
         return realm::Mixed(c.unbox<std::decay_t<decltype(*t)>>(v));
+    }, [&](realm::Mixed *) {
+        // This is a no op as the path cannot be reached.
+        // Return a null Mixed because REALM_UNREACHABLE does
+        // not satisfy compiler.
+        return realm::Mixed();
     }});
 }
 

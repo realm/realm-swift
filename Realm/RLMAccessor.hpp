@@ -104,7 +104,10 @@ public:
     }
 
     template<typename T>
-    T unbox(id v, realm::CreatePolicy = realm::CreatePolicy::Skip, realm::ObjKey = {}) {
+    T unbox(id v, realm::CreatePolicy c = realm::CreatePolicy::Skip, realm::ObjKey o = {}) {
+        if constexpr(std::is_same_v<T, realm::Obj> || std::is_same_v<T, realm::Mixed>) {
+            return unbox<T>(v, c, o);
+        }
         return RLMStatelessAccessorContext::unbox<T>(v);
     }
 
