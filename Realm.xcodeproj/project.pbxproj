@@ -461,6 +461,7 @@
 		CFBB9B33261E6C5000FC7C77 /* RLMValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 681EE2FE25EE8D8800A9DEC5 /* RLMValue.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFD8D12025BB0B8B0037FE4D /* RLMManagedSet.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFD8D11F25BB0B8B0037FE4D /* RLMManagedSet.mm */; };
 		CFD8D13325BB0B900037FE4D /* RLMManagedSet.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFD8D11F25BB0B8B0037FE4D /* RLMManagedSet.mm */; };
+		CFFC8CC8262310C800929608 /* AnyRealmValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFC8CC7262310C800929608 /* AnyRealmValueTests.swift */; };
 		CFFECBAA250646820010F585 /* Decimal128Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFECBA8250646750010F585 /* Decimal128Tests.swift */; };
 		CFFECBAD250667B20010F585 /* Decimal128Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = CFFECBAB250667A90010F585 /* Decimal128Tests.m */; };
 		CFFECBAE250667B20010F585 /* Decimal128Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = CFFECBAB250667A90010F585 /* Decimal128Tests.m */; };
@@ -680,7 +681,7 @@
 		1AA5AE9A1D98A1B000ED8C27 /* Object-Server-Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Object-Server-Tests-Bridging-Header.h"; path = "Realm/ObjectServerTests/Object-Server-Tests-Bridging-Header.h"; sourceTree = "<group>"; };
 		1AA5AE9B1D98A68E00ED8C27 /* RLMSyncTestCase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMSyncTestCase.mm; path = Realm/ObjectServerTests/RLMSyncTestCase.mm; sourceTree = "<group>"; };
 		1AA5AE9D1D98A6D800ED8C27 /* RLMSyncTestCase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMSyncTestCase.h; path = Realm/ObjectServerTests/RLMSyncTestCase.h; sourceTree = "<group>"; };
-		1AA5AE9F1D98C99500ED8C27 /* SwiftObjectServerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftObjectServerTests.swift; path = Realm/ObjectServerTests/SwiftObjectServerTests.swift; sourceTree = "<group>"; };
+		1AA5AE9F1D98C99500ED8C27 /* SwiftObjectServerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftObjectServerTests.swift; path = Realm/ObjectServerTests/SwiftObjectServerTests.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		1AB605D21D495927007F53DE /* RealmCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmCollection.swift; sourceTree = "<group>"; };
 		1ABDCDAD1D792FEB003489E3 /* RLMUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMUser.h; sourceTree = "<group>"; };
 		1ABDCDAF1D793008003489E3 /* RLMUser.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUser.mm; sourceTree = "<group>"; };
@@ -934,6 +935,7 @@
 		CFB5E1602497A45D009CABB3 /* RLMProviderClient_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMProviderClient_Private.hpp; sourceTree = "<group>"; };
 		CFB674A224EEE9CB00FBF0B8 /* WatchTestUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WatchTestUtility.swift; path = Realm/ObjectServerTests/WatchTestUtility.swift; sourceTree = "<group>"; };
 		CFD8D11F25BB0B8B0037FE4D /* RLMManagedSet.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMManagedSet.mm; sourceTree = "<group>"; };
+		CFFC8CC7262310C800929608 /* AnyRealmValueTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyRealmValueTests.swift; sourceTree = "<group>"; };
 		CFFECBA8250646750010F585 /* Decimal128Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Decimal128Tests.swift; sourceTree = "<group>"; };
 		CFFECBAB250667A90010F585 /* Decimal128Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Decimal128Tests.m; sourceTree = "<group>"; };
 		CFFECBAF250690EA0010F585 /* ObjectIdTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ObjectIdTests.m; sourceTree = "<group>"; };
@@ -1324,6 +1326,7 @@
 				CFFECBB225078D100010F585 /* ObjectIdTests.swift */,
 				5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */,
 				5D6610041BE98D880021E04F /* ObjectSchemaInitializationTests.swift */,
+				CFFC8CC7262310C800929608 /* AnyRealmValueTests.swift */,
 				5D6610051BE98D880021E04F /* ObjectSchemaTests.swift */,
 				5D6610061BE98D880021E04F /* ObjectTests.swift */,
 				5D6610071BE98D880021E04F /* PerformanceTests.swift */,
@@ -2506,6 +2509,7 @@
 				535EAA7525B0B02B00DBF3CD /* SwiftUITests.swift in Sources */,
 				3F8825031E5E335000586B35 /* ObjectTests.swift in Sources */,
 				3F8825041E5E335000586B35 /* PerformanceTests.swift in Sources */,
+				CFFC8CC8262310C800929608 /* AnyRealmValueTests.swift in Sources */,
 				3F2633C31E9D630000B32D30 /* PrimitiveListTests.swift in Sources */,
 				3F8825051E5E335000586B35 /* PropertyTests.swift in Sources */,
 				3F8825061E5E335000586B35 /* RealmCollectionTypeTests.swift in Sources */,

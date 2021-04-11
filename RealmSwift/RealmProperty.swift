@@ -60,6 +60,12 @@ public final class RealmProperty<Value: RealmPropertyType>: RLMSwiftValueStorage
     }
 }
 
+extension RealmProperty: Equatable where Value: Equatable {
+    public static func == (lhs: RealmProperty<Value>, rhs: RealmProperty<Value>) -> Bool {
+        return lhs.value == rhs.value
+    }
+}
+
 extension RealmProperty: Codable where Value: Codable {
     public convenience init(from decoder: Decoder) throws {
         self.init()
@@ -77,16 +83,7 @@ extension RealmProperty: Codable where Value: Codable {
 /// A protocol describing types that can parameterize a `RealmPropertyType`.
 public protocol RealmPropertyType {}
 /// A protocol describing types that can be represented as optional in a `RealmProperty<>`
-internal protocol OptionalRealmPropertyType {}
+//internal protocol OptionalRealmPropertyType {}
 
 extension AnyRealmValue: RealmPropertyType {}
-extension Optional: RealmPropertyType where Wrapped: OptionalRealmPropertyType {}
-
-extension Int: OptionalRealmPropertyType {}
-extension Int8: OptionalRealmPropertyType {}
-extension Int16: OptionalRealmPropertyType {}
-extension Int32: OptionalRealmPropertyType {}
-extension Int64: OptionalRealmPropertyType {}
-extension Float: OptionalRealmPropertyType {}
-extension Double: OptionalRealmPropertyType {}
-extension Bool: OptionalRealmPropertyType {}
+extension Optional: RealmPropertyType where Wrapped: RealmOptionalType {}
