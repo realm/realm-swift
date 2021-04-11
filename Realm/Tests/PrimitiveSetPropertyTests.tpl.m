@@ -737,7 +737,6 @@ static double average(NSArray *values) {
     NSRange range = {index, 1};
     id obj = [AllPrimitiveSets createInRealm:realm withValue:@{
         %r %man @"$prop": [$values subarrayWithRange:range],
-        %any %man @"$prop": [$values subarrayWithRange:range],
     }];
     [LinkToAllPrimitiveSets createInRealm:realm withValue:@[obj]];
     obj = [AllOptionalPrimitiveSets createInRealm:realm withValue:@{
@@ -826,7 +825,6 @@ static double average(NSArray *values) {
 
     [AllPrimitiveSets createInRealm:realm withValue:@{
         %r %man @"$prop": @[$v0, $v1],
-        %any %man @"$prop": @[$v0, $v1],
     }];
     [AllOptionalPrimitiveSets createInRealm:realm withValue:@{
         %o %man @"$prop": @[$v0, $v1],
@@ -969,7 +967,6 @@ static double average(NSArray *values) {
 
     [AllPrimitiveSets createInRealm:realm withValue:@{
         %minmax %r %man @"$prop": @[$v1, $v0],
-        %minmax %any %man @"$prop": @[$v1, $v0],
     }];
     [AllOptionalPrimitiveSets createInRealm:realm withValue:@{
         %minmax %o %man @"$prop": @[$v2, $v1],
@@ -1015,12 +1012,10 @@ static double average(NSArray *values) {
 
     [AllPrimitiveSets createInRealm:realm withValue:@{
         %minmax %r %man @"$prop": @[$v0],
-        %any %minmax %man @"$prop": @[$v0],
     }];
 
     [AllPrimitiveSets createInRealm:realm withValue:@{
         %minmax %r %man @"$prop": @[$v1, $v0],
-        %any %minmax %man @"$prop": @[$v1, $v0],
     }];
     [AllOptionalPrimitiveSets createInRealm:realm withValue:@{
         %minmax %o %man @"$prop": @[$v1, $v0],
