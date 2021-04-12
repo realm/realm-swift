@@ -102,6 +102,7 @@ private:
     // If the ObjectSchema is not owned by the realm instance
     // we need to manually manage the ownership of the object.
     std::unique_ptr<realm::ObjectSchema> dynamicObjectSchema;
+    __strong RLMObjectSchema * dynamicRLMObjectSchema;
 };
 
 // A per-RLMRealm object schema map which stores RLMClassInfo keyed on the name

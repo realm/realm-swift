@@ -42,7 +42,8 @@ RLMClassInfo::RLMClassInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
 : realm(realm),
 rlmObjectSchema(rlmObjectSchema),
 objectSchema(&*schema),
-dynamicObjectSchema(std::move(schema)) { }
+dynamicObjectSchema(std::move(schema)),
+dynamicRLMObjectSchema(rlmObjectSchema) { }
 
 realm::TableRef RLMClassInfo::table() const {
     if (auto key = objectSchema->table_key) {

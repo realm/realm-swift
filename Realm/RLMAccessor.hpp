@@ -115,6 +115,9 @@ public:
 
     template<typename T>
     T unbox(id v, realm::CreatePolicy = realm::CreatePolicy::Skip, realm::ObjKey = {}) {
+        if constexpr(std::is_same_v<T, realm::Mixed>) {
+            unbox<realm::Mixed>(v);
+        }
         return RLMStatelessAccessorContext::unbox<T>(v);
     }
     template<>
