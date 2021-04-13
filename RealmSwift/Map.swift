@@ -539,8 +539,10 @@ extension Map: Sequence {
 
     /// :nodoc:
     public func index(of object: Value) -> Int? {
-//        fatalError()
-        return Int(rlmDictionary.index(of: object))
+        if let object = object as? AnyClass {
+            return Int(rlmDictionary.index(of: object))
+        }
+        fatalError()
     }
 
     public func index(of object: (Key, Value)) -> Int? {

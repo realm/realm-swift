@@ -164,22 +164,83 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Querying a Dictionary
 
+/**
+ Returns the index of an object in the dictionary.
+
+ Returns `NSNotFound` if the object is not found in the dictionary.
+
+ @param object  An object (of the same type as returned from the `objectClassName` selector).
+ */
+- (NSUInteger)indexOfObject:(RLMObjectType)object;
+
+/**
+ Returns the index of the first object in the array matching the predicate.
+
+ @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
+
+ @return    The index of the object, or `NSNotFound` if the object is not found in the dictionary.
+ */
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...;
+
 /// :nodoc:
+- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args;
+
+/**
+ Returns the index of the first object in the dictionary matching the predicate.
+
+ @param predicate   The predicate with which to filter the objects.
+
+ @return    The index of the object, or `NSNotFound` if the object is not found in the dictionary.
+ */
+- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate;
+
+/**
+ Returns all the objects matching the given predicate in the dictionary.
+
+ @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
+
+ @return                An `RLMResults` of objects that match the given predicate.
+ */
 - (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat, ...;
 
 /// :nodoc:
 - (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 
-/// :nodoc:
+/**
+ Returns all the objects matching the given predicate in the dictionary.
+
+ @param predicate   The predicate with which to filter the objects.
+
+ @return            An `RLMResults` of objects that match the given predicate
+ */
 - (RLMResults<RLMObjectType> *)objectsWithPredicate:(NSPredicate *)predicate;
 
-/// :nodoc:
+/**
+ Returns a sorted `RLMResults` from the dictionary.
+
+ @param keyPath     The key path to sort by.
+ @param ascending   The direction to sort in.
+
+ @return    An `RLMResults` sorted by the specified key path.
+ */
 - (RLMResults<RLMObjectType> *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending;
 
-/// :nodoc:
+/**
+ Returns a sorted `RLMResults` from the dictionary.
+
+ @param properties  An array of `RLMSortDescriptor`s to sort by.
+
+ @return    An `RLMResults` sorted by the specified properties.
+ */
 - (RLMResults<RLMObjectType> *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties;
 
-/// :nodoc:
+/**
+ Returns a distinct `RLMResults` from the dictionary.
+
+ @param keyPaths     The key paths to distinct on.
+
+ @return    An `RLMResults` with the distinct values of the keypath(s).
+ */
 - (RLMResults<RLMObjectType> *)distinctResultsUsingKeyPaths:(NSArray<NSString *> *)keyPaths;
 
 #pragma mark - Aggregating Property Values

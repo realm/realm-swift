@@ -459,13 +459,12 @@
     }
 
     size_t count = 0;
-    for (EmployeeObject *eo in company.employeeDict) {
-        NSString *key = [NSString stringWithFormat:@"item%zu", count];
+    for (id key in company.employeeDict) {
         ++count;
-        company.employeeDict[key] = eo;
+        [company.employeeDict removeObjectForKey: key];
     }
     XCTAssertEqual(totalCount, count);
-    XCTAssertEqual(totalCount * 2, company.employeeDict.count);
+    XCTAssertEqual(company.employeeDict.count, 0);
 
     [realm cancelWriteTransaction];
 
@@ -477,20 +476,20 @@
     }
 
     count = 0;
-    for (EmployeeObject *eo in company.employeeDict) {
-        NSString *key = [NSString stringWithFormat:@"item%zu", count];
+    for (id key in company.employeeDict) {
+        id eo = company.employeeDict[key];
         ++count;
-        [company.employeeDict setObject:eo forKey:key];
+        company.employeeDict[key] = eo;
     }
     XCTAssertEqual(totalCount, count);
-    XCTAssertEqual(totalCount * 2, company.employeeDict.count);
+    XCTAssertEqual(totalCount, company.employeeDict.count);
 
     [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(id<RLMDictionaryKey>  _Nonnull key,
                                                               id  _Nonnull obj,
                                                               BOOL * _Nonnull stop) {
-        [company.employeeDict setObject:company forKey:key];
+        [company.employeeDict setObject:obj forKey:key];
     }];
-    XCTAssertEqual(totalCount * 2, company.employeeDict.count);
+    XCTAssertEqual(totalCount, company.employeeDict.count);
 }
 
 - (void)testDeleteDuringEnumeration {

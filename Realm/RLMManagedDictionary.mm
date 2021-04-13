@@ -413,7 +413,7 @@ inline realm::StringData keyFromRLMDictionaryKey(id<RLMDictionaryKey> key, RLMAc
 
 - (void)deleteObjectsFromRealm {
     if (_type != RLMPropertyTypeObject) {
-        @throw RLMException(@"Cannot delete objects from RLMManagedDictionary<RLMString, %@>: only RLMObjects can be deleted.", RLMTypeToString(_type));
+        @throw RLMException(@"Cannot delete objects from RLMManagedDictionary<RLMString, %@%@>: only RLMObjects can be deleted.", RLMTypeToString(_type), _optional? @"?": @"");
     }
     // delete all target rows from the realm
     RLMObservationTracker tracker(_realm, true);
@@ -425,6 +425,10 @@ inline realm::StringData keyFromRLMDictionaryKey(id<RLMDictionaryKey> key, RLMAc
         return [RLMResults resultsWithObjectInfo:*_objectInfo
                                          results:_backingCollection.as_results().sort(RLMSortDescriptorsToKeypathArray(properties))];
     });
+}
+
+- (RLMResults *)sortedResultsUsingKeyPath:(nonnull NSString *)keyPath ascending:(BOOL)ascending {
+    return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:keyPath ascending:ascending]]];
 }
 
 - (RLMResults *)distinctResultsUsingKeyPaths:(NSArray<NSString *> *)keyPaths {

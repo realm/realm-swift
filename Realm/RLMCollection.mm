@@ -126,8 +126,7 @@ static const int RLMEnumerationBufferSize = 16;
     @autoreleasepool {
         RLMAccessorContext ctx(*_info);
 
-        if ([_collection isKindOfClass:[RLMDictionary class]]) {
-            NSMutableSet<NSString *> *dictKeys = [NSMutableSet new];
+        if (is_dictionary(_results->get_type())) {
             for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
                 auto element = _results->get_dictionary_element(index);
                 _strongBuffer[batchCount] = RLMStringDataToNSString(element.first);
