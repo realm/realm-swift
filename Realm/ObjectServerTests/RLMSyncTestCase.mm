@@ -193,15 +193,14 @@
 }
 
 + (NSDictionary *)values:(int)i {
-    char str[] = "";
-    str[0] = i;
+    NSString *str = [NSString stringWithFormat:@"%d", i];
     return @{
              @"boolCol": @(i % 2),
              @"cBoolCol": @(i % 2),
              @"intCol": @(i),
              @"doubleCol": @(1.11 * i),
              @"stringCol": [NSString stringWithFormat:@"%d", i],
-             @"binaryCol": [@(str) dataUsingEncoding:NSUTF8StringEncoding],
+             @"binaryCol": [str dataUsingEncoding:NSUTF8StringEncoding],
              @"dateCol": [NSDate dateWithTimeIntervalSince1970:i],
              @"longCol": @((long long)i * INT_MAX + 1),
              @"decimalCol": [[RLMDecimal128 alloc] initWithNumber:@(i)],
