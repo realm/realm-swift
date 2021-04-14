@@ -608,7 +608,6 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
 
 - (void)testObjectSubclassAddedAtRuntime {
     @autoreleasepool {
-        {
         Class objectClass = objc_allocateClassPair(RLMObject.class, "RuntimeGeneratedObject", 0);
         addProperty(objectClass, "objectCol", "@\"RuntimeGeneratedObject\"", sizeof(id), alignof(id), ^(__unused id obj) { return nil; });
         addProperty(objectClass, "intCol", "i", sizeof(int), alignof(int), ^int(__unused id obj) { return 0; });
@@ -628,7 +627,6 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
         XCTAssert([[object objectCol] isKindOfClass:objectClass]);
         XCTAssertEqual([object intCol], 17);
         [realm commitWriteTransaction];
-        }
     }
     // Creating the class via ObjC runtime can cause issues with other tests. Specifically
     // Swift tests run in asan mode as, if RuntimeGeneratedObject is lingering around when
