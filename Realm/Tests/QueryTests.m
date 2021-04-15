@@ -2130,9 +2130,9 @@
 
     // check for ANY object in set
     RLMAssertCount(SetOfAllTypesObject, 2U, @"ANY set = %@", obj0);
-    RLMAssertCount(SetOfAllTypesObject, 2U, @"ANY set != %@", obj1);
+    RLMAssertCount(SetOfAllTypesObject, 3U, @"ANY set != %@", obj1);
     RLMAssertCount(SetOfAllTypesObject, 2U, @"NONE set = %@", obj0);
-    RLMAssertCount(SetOfAllTypesObject, 2U, @"NONE set != %@", obj1);
+    RLMAssertCount(SetOfAllTypesObject, 1U, @"NONE set != %@", obj1);
     XCTAssertThrows(([SetOfAllTypesObject objectsWhere:@"set = %@", obj0].count));
     XCTAssertThrows(([SetOfAllTypesObject objectsWhere:@"set != %@", obj0].count));
 }
