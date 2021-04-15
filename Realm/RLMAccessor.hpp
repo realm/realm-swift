@@ -41,7 +41,9 @@ struct RLMOptionalId {
     id operator*() const noexcept { return value; }
 };
 
-// The subset of RLMAccessorContext which does not require any member variables
+// The subset of RLMAccessorContext which does not require any member variables.
+// Use this if you require to box/unbox types and you do not have access to the
+// parent object or realm.
 struct RLMStatelessAccessorContext {
     id box(bool v) { return @(v); }
     id box(double v) { return @(v); }
