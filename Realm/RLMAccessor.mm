@@ -174,14 +174,27 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
     }
 }
 
+id RLMCollectionClassForProperty(RLMProperty *prop, bool isManaged) {
+    Class cls = nil;
+    if (prop.array) {
+        cls = isManaged ? [RLMManagedArray class] : [RLMArray class];
+    } else if (prop.set) {
+        cls = isManaged ? [RLMManagedSet class] : [RLMSet class];
+    } else if (prop.dictionary) {
+        cls = isManaged ? [RLMManagedDictionary class] : [RLMDictionary class];
+    } else {
+        @throw RLMException(@"Invalid collection '%@' for class '%@'.",
+                            prop.name, prop.objectClassName);
+    }
+    return cls;
+}
+
 // collection getter/setter
 id<RLMCollection> getCollection(__unsafe_unretained RLMObjectBase *const obj, NSUInteger propIndex) {
     RLMVerifyAttached(obj);
     auto prop = obj->_info->rlmObjectSchema.properties[propIndex];
-    if (prop.array) { return [[RLMManagedArray alloc] initWithParent:obj property:prop]; }
-    if (prop.set) { return [[RLMManagedSet alloc] initWithParent:obj property:prop]; }
-    if (prop.dictionary) { return [[RLMManagedDictionary alloc] initWithParent:obj property:prop]; }
-    REALM_UNREACHABLE();
+    Class cls = RLMCollectionClassForProperty(prop, true);
+    return [[cls alloc] initWithParent:obj property:prop];
 }
 
 template <typename Collection>
@@ -472,19 +485,7 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
     }
     if (prop.collection) {
         NSString *propName = prop.name;
-        Class cls;
-        if (prop.array) {
-            cls = [RLMArray class];
-        }
-        else if (prop.set) {
-            cls = [RLMSet class];
-        }
-        else if (prop.dictionary) {
-            cls = [RLMDictionary class];
-        }
-        else {
-            REALM_UNREACHABLE();
-        }
+        Class cls = RLMCollectionClassForProperty(prop, false);
         if (prop.type == RLMPropertyTypeObject) {
             NSString *objectClassName = prop.objectClassName;
             return ^(RLMObjectBase *obj) {
@@ -521,17 +522,7 @@ id unmanagedSetter(RLMProperty *prop, const char *) {
         auto prop = obj->_objectSchema[propName];
         RLMValidateValueForProperty(values, obj->_objectSchema, prop, true);
 
-        Class cls;
-        if (prop.array) {
-            cls = [RLMArray class];
-        } else if (prop.set) {
-            cls = [RLMSet class];
-        } else if (prop.dictionary) {
-            cls = [RLMDictionary class];
-        } else {
-            @throw RLMException(@"Invalid collection '%@' for class '%@'.",
-                                propName, obj->_objectSchema.className);
-        }
+        Class cls = RLMCollectionClassForProperty(prop, false);
         id collection;
             // make copy when setting (as is the case for all other variants)
         if (prop.type == RLMPropertyTypeObject)

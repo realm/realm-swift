@@ -141,7 +141,7 @@ static void throwError(__unsafe_unretained ObjcCollection *const col, NSString *
                                 is_nullable(e.property_type) ? "?" : "",
                                 e.column_name.data());
         }
-        @throw RLMException(@"%@: is not supported for %s%s array '%@.%@'.",
+        @throw RLMException(@"%@: is not supported for %s%s dictionary '%@.%@'.",
                             aggregateMethod,
                             string_for_property_type(e.property_type),
                             is_nullable(e.property_type) ? "?" : "",
@@ -217,8 +217,8 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     return translateErrors<RLMManagedDictionary>([&] {
         NSMutableArray *values = [NSMutableArray array];
         auto valueResult = _backingCollection.get_values();
+        RLMAccessorContext c(*_objectInfo);
         for (size_t i=0; i<valueResult.size(); i++) {
-            RLMAccessorContext c(*_objectInfo);
             [values addObject:valueResult.get(c, i)];
         }
         return values;
@@ -362,10 +362,18 @@ inline realm::StringData keyFromRLMDictionaryKey(id<RLMDictionaryKey> key, RLMAc
 
 - (void)setValue:(id)value forKey:(id)key {
     RLMDictionaryValidateMatchingObjectType(self, key, value);
-    RLMAccessorContext context(*_objectInfo);
-    translateErrors<RLMManagedDictionary>([&] {
-        _backingCollection.insert(context, [key UTF8String], value);
-    });
+    if ([key isEqualToString:@"self"]) {
+        RLMAccessorContext context(*_objectInfo);
+        translateErrors<RLMManagedDictionary>([&] {
+            _backingCollection.remove_all();
+            _backingCollection.insert(context, [key UTF8String], value);
+        });
+    } else {
+        RLMAccessorContext context(*_objectInfo);
+        translateErrors<RLMManagedDictionary>([&] {
+            _backingCollection.insert(context, [key UTF8String], value);
+        });
+    }
 }
 
 // TODO: this can be a common func

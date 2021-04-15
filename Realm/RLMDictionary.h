@@ -128,16 +128,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeAllObjects;
 
 /**
- Adds an array of distinct objects to the set.
-
- @warning This method may only be called during a write transaction.
-
- @param objects      `NSDictionary` which contains objects of the
-                    same class as the dictionary.
- */
-- (void)addObjects:(NSDictionary *)objects;
-
-/**
  Delete dictionary's values for a given keys.
  */
 - (void)removeObjectsForKeys:(NSArray<RLMKeyType> *)keyArray;
@@ -158,9 +148,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setObject:(RLMObjectType)anObject forKey:(RLMKeyType <RLMDictionaryKey>)aKey;
 
 /**
- Adds to the receiving dictionary the entries from another dictionary.
+  Adds to the receiving dictionary the entries from another dictionary.
+ 
+  @warning This method may only be called during a write transaction.
+
+  @param objects     An enumerable object such as `NSDictionary` or `RLMDictionary` which contains objects of the
+                     same class as the array.
  */
-- (void)addEntriesFromDictionary:(RLMDictionary<RLMKeyType <RLMDictionaryKey>, RLMObjectType> *)otherDictionary;
+- (void)addEntriesFromDictionary:(id)otherDictionary;
 
 #pragma mark - Querying a Dictionary
 

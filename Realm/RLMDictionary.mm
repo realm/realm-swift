@@ -170,8 +170,8 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 }
 
 - (void)setValue:(nullable id)value forKey:(nonnull NSString *)key {
+    RLMDictionaryValidateMatchingObjectType(self, key, value);
     changeDictionary(self, ^{
-        RLMDictionaryValidateMatchingObjectType(self, key, value);
         [_backingCollection setValue:value forKey:key];
     });
 }
@@ -264,12 +264,21 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
         @throw RLMException(@"Cannot add entries from the object of class '%@'", [otherDictionary className]);
     }
 
-    changeDictionary(self, ^{
-        for (id key in otherDictionary) {
-            RLMDictionaryValidateMatchingObjectType(self, key, otherDictionary[key]);
-            [self setObject:otherDictionary[key] forKey:key];
-        }
-    });
+    [otherDictionary enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull value, BOOL *) {
+        RLMDictionaryValidateMatchingObjectType(self, key, value);
+    }];
+    if ([otherDictionary isKindOfClass:[RLMDictionary class]]) {
+        changeDictionary(self, ^{
+            [_backingCollection addEntriesFromDictionary:((RLMDictionary *)otherDictionary)->_backingCollection];
+        });
+    }
+    else if ([otherDictionary isKindOfClass:[NSDictionary class]]) {
+        changeDictionary(self, ^{
+            for (id key in otherDictionary) {
+                [self setObject:otherDictionary[key] forKey:key];
+            }
+        });
+    }
 }
 
 - (NSUInteger)countByEnumeratingWithState:(nonnull NSFastEnumerationState *)state
