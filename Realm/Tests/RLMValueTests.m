@@ -105,7 +105,7 @@
     XCTAssertEqual(v1, v2);
     XCTAssertEqual(v1.rlm_valueType, RLMPropertyTypeDate);
     XCTAssertEqual(v2.rlm_valueType, RLMPropertyTypeDate);
-    XCTAssertNotEqual(v1, [NSDate date]);
+    XCTAssertNotEqual(v1, [NSDate dateWithTimeIntervalSince1970:0]);
 }
 
 - (void)testObjectEquals {
