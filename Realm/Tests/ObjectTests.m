@@ -628,38 +628,6 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
         XCTAssertEqual([object intCol], 17);
         [realm commitWriteTransaction];
     }
-    // Creating the class via ObjC runtime can cause issues with other tests. Specifically
-    // Swift tests run in asan mode as, if RuntimeGeneratedObject is lingering around when
-    // certain tests are run (tests with objects using `AnyRealmValue` as a property) the code
-    // path they hit in RLMClassInfo will cause a heap overflow as no schema actually exists for
-    // RuntimeGeneratedObject by that time. So, to solve this we need to manually clean up after this
-    // test.
-    int numClasses;
-    Class *classes = NULL;
-    classes = NULL;
-    numClasses = objc_getClassList(NULL, 0);
-    NSMutableDictionary<NSString *, NSNumber *> *runtimeRealmClasses = [NSMutableDictionary dictionary];
-    classes = (__unsafe_unretained Class *)malloc(sizeof(Class) * numClasses);
-    numClasses = objc_getClassList(classes, numClasses);
-    for (int i = 0; i < numClasses; i++) {
-        Class c = classes[i];
-        if ([@(class_getName(c)) rangeOfString:@"RuntimeGeneratedObject"].location != NSNotFound) {
-            if ([@(class_getName(c)) rangeOfString:@":Managed"].location != NSNotFound) {
-                runtimeRealmClasses[@"RuntimeGeneratedObject_Managed"] = @(i);
-            } else if ([@(class_getName(c)) rangeOfString:@":Unmanaged"].location != NSNotFound) {
-                runtimeRealmClasses[@"RuntimeGeneratedObject_Unmanaged"] = @(i);
-            } else {
-                runtimeRealmClasses[@"RuntimeGeneratedObject"] = @(i);
-            }
-        }
-    }
-    objc_disposeClassPair(classes[[runtimeRealmClasses[@"RuntimeGeneratedObject_Managed"] intValue]]);
-    objc_disposeClassPair(classes[[runtimeRealmClasses[@"RuntimeGeneratedObject_Unmanaged"] intValue]]);
-    objc_disposeClassPair(classes[[runtimeRealmClasses[@"RuntimeGeneratedObject"] intValue]]);
-    free(classes);
-    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
-    NSMutableDictionary *sharedSchema = [defaultRealm.schema valueForKey:@"objectSchemaByName"];
-    [sharedSchema removeObjectForKey:@"RuntimeGeneratedObject"];
 }
 
 #pragma mark - Default Property Values

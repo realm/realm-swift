@@ -106,9 +106,7 @@ class InitAppendsToArrayProperty : RLMObject {
     @objc dynamic var propertyWithIllegalDefaultValue: RLMArray<InitAppendsToArrayValue> = {
         if mayAppend {
             let array = RLMArray<InitAppendsToArrayValue>(objectClassName: InitAppendsToArrayValue.className())
-            let o = InitAppendsToArrayValue()
-            o["_objectSchema"] = nil
-            array.add(o)
+            array.add(InitAppendsToArrayValue())
             return array
         } else {
             return RLMArray<InitAppendsToArrayValue>(objectClassName: InitAppendsToArrayValue.className())
@@ -224,11 +222,6 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
     }
 
     func testAccessSchemaCreatesObjectWhichAttempsInsertionsToArrayProperty() {
-        // This test depends on InitAppendsToArrayValue having a nil _objectSchema.
-        // There is a chicken and egg race problem here as InitAppendsToArrayValue may
-        // have its object schema registered before InitAppendsToArrayProperty.
-        // To combat this scenario we manually set the '_objectSchema' on an object
-        // to `nil`.
         if isParent {
             XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
             return
