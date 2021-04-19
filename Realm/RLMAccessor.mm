@@ -851,10 +851,6 @@ realm::UUID RLMStatelessAccessorContext::unbox(id v) {
     return RLMObjcToUUID(v);
 }
 template<>
-realm::Mixed RLMStatelessAccessorContext::unbox(id) {
-    REALM_UNREACHABLE();
-}
-template<>
 realm::Mixed RLMAccessorContext::unbox(__unsafe_unretained id v, CreatePolicy p, ObjKey) {
     return RLMObjcToMixed(v, _realm, p);
 }

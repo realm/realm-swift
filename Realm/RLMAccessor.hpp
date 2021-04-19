@@ -117,13 +117,12 @@ public:
 
     template<typename T>
     T unbox(id v, realm::CreatePolicy = realm::CreatePolicy::Skip, realm::ObjKey = {}) {
-        if constexpr(std::is_same_v<T, realm::Mixed>) {
-            unbox<realm::Mixed>(v);
-        }
         return RLMStatelessAccessorContext::unbox<T>(v);
     }
     template<>
     realm::Obj unbox(id v, realm::CreatePolicy, realm::ObjKey);
+    template<>
+    realm::Mixed unbox(id v, realm::CreatePolicy, realm::ObjKey);
 
     realm::Obj create_embedded_object();
 
