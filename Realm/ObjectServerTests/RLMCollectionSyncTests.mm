@@ -38,6 +38,7 @@
                                                                             register:self.isParent]];
         RLMRealm *realm = [self openRealmForPartitionValue:callerName user:user];
         if (self.isParent) {
+            // Add a RLMSetSyncObject to the Realm
             CHECK_COUNT(0, RLMSetSyncObject, realm);
             RLMRunChildAndWait();
             [self waitForDownloadsForRealm:realm];
@@ -76,7 +77,9 @@
             RLMResults<RLMSetSyncObject *> *results
                 = [RLMSetSyncObject allObjectsInRealm:realm];
             if (RLMSetSyncObject *obj = results.firstObject) {
-                if (propertyGetter(obj).count == 0) {
+                CHECK_COUNT(1, RLMSetSyncObject, realm);
+                if (propertyGetter(obj).count == 0
+                    && otherPropertyGetter(obj).count == 0) {
                     [realm transactionWithBlock:^{
                         [propertyGetter(obj) addObjects:values];
                         [otherPropertyGetter(obj) addObjects:otherValues];
@@ -105,7 +108,8 @@
                 }
             } else {
                 [realm transactionWithBlock:^{
-                    [realm addObject:[RLMSetSyncObject new]];
+                    [RLMSetSyncObject createInRealm:realm
+                                          withValue:@{@"_id": [RLMObjectId objectId]}];
                 }];
             }
             [self waitForUploadsForRealm:realm];
@@ -289,13 +293,14 @@
                 } else {
                     [realm transactionWithBlock:^{
                         [propertyGetter(obj) replaceObjectAtIndex:0
-                                                              withObject:values[1]];
+                                                       withObject:values[1]];
                     }];
                     XCTAssertTrue([propertyGetter(obj).firstObject isEqual:values[1]]);
                 }
             } else {
                 [realm transactionWithBlock:^{
-                    [realm addObject:[RLMArraySyncObject new]];
+                    [RLMArraySyncObject createInRealm:realm
+                                            withValue:@{@"_id": [RLMObjectId objectId]}];
                 }];
             }
             [self waitForUploadsForRealm:realm];
