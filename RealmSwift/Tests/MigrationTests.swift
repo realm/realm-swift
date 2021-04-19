@@ -1004,7 +1004,7 @@ class MigrationTests: TestCase {
         XCTAssertEqual(object.mapCol["false"]!.boolCol, false)
 
         // make sure we added new bool objects as object property and in the list
-        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 9) // Map creates additional obj while it shoudln't
+        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 10)
     }
 
     func testFailOnSchemaMismatch() {

@@ -168,13 +168,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (NSUInteger)indexOfObject:(RLMObjectType)object;
 
-/**
- Returns the index of the first object in the array matching the predicate.
-
- @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
-
- @return    The index of the object, or `NSNotFound` if the object is not found in the dictionary.
- */
+/// :nodoc:
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...;
 
 /// :nodoc:
@@ -189,53 +183,22 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate;
 
-/**
- Returns all the objects matching the given predicate in the dictionary.
-
- @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
-
- @return                An `RLMResults` of objects that match the given predicate.
- */
+/// :nodoc:
 - (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat, ...;
 
 /// :nodoc:
 - (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 
-/**
- Returns all the objects matching the given predicate in the dictionary.
-
- @param predicate   The predicate with which to filter the objects.
-
- @return            An `RLMResults` of objects that match the given predicate
- */
+/// :nodoc:
 - (RLMResults<RLMObjectType> *)objectsWithPredicate:(NSPredicate *)predicate;
 
-/**
- Returns a sorted `RLMResults` from the dictionary.
-
- @param keyPath     The key path to sort by.
- @param ascending   The direction to sort in.
-
- @return    An `RLMResults` sorted by the specified key path.
- */
+/// :nodoc:
 - (RLMResults<RLMObjectType> *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending;
 
-/**
- Returns a sorted `RLMResults` from the dictionary.
-
- @param properties  An array of `RLMSortDescriptor`s to sort by.
-
- @return    An `RLMResults` sorted by the specified properties.
- */
+/// :nodoc:
 - (RLMResults<RLMObjectType> *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties;
 
-/**
- Returns a distinct `RLMResults` from the dictionary.
-
- @param keyPaths     The key paths to distinct on.
-
- @return    An `RLMResults` with the distinct values of the keypath(s).
- */
+/// :nodoc:
 - (RLMResults<RLMObjectType> *)distinctResultsUsingKeyPaths:(NSArray<NSString *> *)keyPaths;
 
 #pragma mark - Aggregating Property Values

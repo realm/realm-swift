@@ -465,7 +465,8 @@ class ObjectCreationTests: TestCase {
             "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
-            "setCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
+            "setCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "mapCol": ["trueVal": SwiftBoolObject(value: [true]), "falseVal": SwiftBoolObject(value: [false])]
         ]
 
         let realmA = realmWithTestPath()

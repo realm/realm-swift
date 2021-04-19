@@ -350,6 +350,27 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return [NSSet setWithArray:[self _unionOfArraysForKeyPath:keyPath]].allObjects;
 }
 
+- (NSArray *)_unionOfDictionariesForKeyPath:(NSString *)keyPath {
+    assertKeyPathIsNotNested(keyPath);
+    if ([keyPath isEqualToString:@"self"]) {
+        @throw RLMException(@"self is not a valid key-path for a KVC dictionary collection operator as 'unionOfDictionaries'.");
+    }
+
+    return translateRLMResultsErrors([&] {
+        NSMutableArray *flatArray = [NSMutableArray new];
+        for (id<NSFastEnumeration> array in RLMCollectionValueForKey(_results, keyPath, *_info)) {
+            for (id value in array) {
+                [flatArray addObject:value];
+            }
+        }
+        return flatArray;
+    });
+}
+
+- (NSArray *)_distinctUnionOfDictionariesForKeyPath:(__unused NSString *)keyPath {
+    return [NSSet setWithArray:[self _unionOfDictionariesForKeyPath:keyPath]].allObjects;
+}
+
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
     va_list args;
     va_start(args, predicateFormat);
