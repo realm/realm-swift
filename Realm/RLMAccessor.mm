@@ -874,6 +874,7 @@ RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
 
             objBase->_info = &_info;
             objBase->_realm = _realm;
+            objBase->_objectSchema = _info.rlmObjectSchema;
         }
     }
     if (!policy.create) {

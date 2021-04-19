@@ -14,6 +14,10 @@ x.y.z Release notes (yyyy-MM-dd)
   our propertyWrappers would attempt to remove the KVOs for each cancellation, when it should only be done once.
   We now correctly remove KVOs only once.
   ([#7131](https://github.com/realm/realm-cocoa/issues/7131))
+  * Fixed `isInvalidated` not returning correct value after object deletion from realm when using a custom schema . 
+  Object Schema was not updated when the object was added to the realm.
+  We now correctly update the object schema when adding it to the realm.
+  ([#7181](https://github.com/realm/realm-cocoa/issues/7181))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

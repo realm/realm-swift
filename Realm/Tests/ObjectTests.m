@@ -1110,6 +1110,40 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     XCTAssertNil(obj1.realm, @"Realm should be nil after deletion");
 }
 
+#pragma mark - Invalidated
+
+- (void)testIsInvalidated {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    StringObject *obj1 = [[StringObject alloc] initWithValue:@[@"a"]];
+    XCTAssertEqual(obj1.isInvalidated, NO);
+    [realm transactionWithBlock:^{
+        [realm addObject:obj1];
+    }];
+    XCTAssertEqual(obj1.isInvalidated, NO);
+    [realm transactionWithBlock:^{
+        [realm deleteObject:obj1];
+    }];
+    XCTAssertEqual(obj1.isInvalidated, YES);
+}
+
+- (void)testInvalidatedWithCustomObjectClasses {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.objectClasses = @[[StringObject class]];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+
+    StringObject *obj1 = [[StringObject alloc] initWithValue:@[@"a"]];
+    XCTAssertEqual(obj1.isInvalidated, NO);
+    [realm transactionWithBlock:^{
+        [realm addObject:obj1];
+    }];
+    XCTAssertEqual(obj1.isInvalidated, NO);
+    [realm transactionWithBlock:^{
+        [realm deleteObject:obj1];
+    }];
+    XCTAssertEqual(obj1.isInvalidated, YES);
+}
+
 #pragma mark - Primary Keys
 
 - (void)testPrimaryKey {
