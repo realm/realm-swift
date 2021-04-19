@@ -1,7 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Package a prebuilt XCFramework for Carthage. Carthage 0.38 and later will
+  download this instead of the old frameworks when using `--use-xcframeworks`.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
