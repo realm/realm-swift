@@ -122,9 +122,9 @@ public:
     // Emplaces a locally derived object schema into RLMSchemaInfo. This is used
     // when creating objects dynamically that are not registered in the Cocoa schema.
     // Note: `RLMClassInfo` assumes ownership of `schema`.
-    void append_dynamic_object_schema(std::unique_ptr<realm::ObjectSchema> schema,
-                                      RLMObjectSchema *objectSchema,
-                                      RLMRealm *const target_realm);
+    void appendDynamicObjectSchema(std::unique_ptr<realm::ObjectSchema> schema,
+                                   RLMObjectSchema *objectSchema,
+                                   RLMRealm *const target_realm);
 
     impl::iterator begin() noexcept;
     impl::iterator end() noexcept;

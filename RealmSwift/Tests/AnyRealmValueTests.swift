@@ -181,6 +181,40 @@ class AnyRealmValueObjectTests: TestCase {
         XCTAssertEqual(o.anyValue.value.object(SwiftStringObject.self)!.stringCol, "hello")
     }
 
+    func testDynamicObjectAccessor() {
+        // The first block knows about SwiftStringObject and will add it as a value to
+        // SwiftObject.anyCol
+        autoreleasepool {
+            let realm = realmWithTestPath(configuration: .init(objectTypes: [SwiftObject.self,
+                                                                             SwiftOwnerObject.self,
+                                                                             SwiftBoolObject.self,
+                                                                             SwiftDogObject.self,
+                                                                             SwiftStringObject.self]))
+            try! realm.write {
+                let dog = SwiftStringObject(value: ["stringCol": "some string..."])
+                let parent = SwiftObject(value: ["anyCol": dog])
+                realm.add(parent)
+            }
+            XCTAssertEqual(realm.objects(SwiftStringObject.self).count, 1)
+        }
+
+        // The second block omits SwiftStringObject from objectTypes so test that the
+        // object can be retrieved dynamically.
+        let realm = realmWithTestPath(configuration: .init(objectTypes: [SwiftObject.self,
+                                                                         SwiftOwnerObject.self,
+                                                                         SwiftBoolObject.self,
+                                                                         SwiftDogObject.self]))
+        // Ensure that SwiftStringObject does not exist in the schema
+        XCTAssertFalse(realm.schema.objectSchema.map { $0.className }.contains("SwiftStringObject"))
+        guard let object = realm.objects(SwiftObject.self).first else {
+            return XCTFail("SwiftObject does not exist")
+        }
+        guard let dynamicObject = object.anyCol.value.dynamicObject else {
+            return XCTFail("dynamicObject does not exist")
+        }
+        XCTAssertEqual(dynamicObject.stringCol as! String, "some string...")
+    }
+
     private func testVariation<T: Equatable>(object: AnyRealmTypeObject,
                                              value: AnyRealmValue,
                                              keyPath: KeyPath<AnyRealmValue, T?>,

@@ -607,27 +607,25 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
 }
 
 - (void)testObjectSubclassAddedAtRuntime {
-    @autoreleasepool {
-        Class objectClass = objc_allocateClassPair(RLMObject.class, "RuntimeGeneratedObject", 0);
-        addProperty(objectClass, "objectCol", "@\"RuntimeGeneratedObject\"", sizeof(id), alignof(id), ^(__unused id obj) { return nil; });
-        addProperty(objectClass, "intCol", "i", sizeof(int), alignof(int), ^int(__unused id obj) { return 0; });
-        objc_registerClassPair(objectClass);
-        XCTAssertEqualObjects([objectClass className], @"RuntimeGeneratedObject");
+    Class objectClass = objc_allocateClassPair(RLMObject.class, "RuntimeGeneratedObject", 0);
+    addProperty(objectClass, "objectCol", "@\"RuntimeGeneratedObject\"", sizeof(id), alignof(id), ^(__unused id obj) { return nil; });
+    addProperty(objectClass, "intCol", "i", sizeof(int), alignof(int), ^int(__unused id obj) { return 0; });
+    objc_registerClassPair(objectClass);
+    XCTAssertEqualObjects([objectClass className], @"RuntimeGeneratedObject");
 
-        RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-        configuration.objectClasses = @[objectClass];
-        XCTAssertEqualObjects([objectClass className], @"RuntimeGeneratedObject");
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.objectClasses = @[objectClass];
+    XCTAssertEqualObjects([objectClass className], @"RuntimeGeneratedObject");
 
-        RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
-        [realm beginWriteTransaction];
-        id object = [objectClass createInRealm:realm withValue:@{@"objectCol": [[objectClass alloc] init], @"intCol": @17}];
-        RLMObjectSchema *schema = [object objectSchema];
-        XCTAssertNotNil(schema[@"objectCol"]);
-        XCTAssertNotNil(schema[@"intCol"]);
-        XCTAssert([[object objectCol] isKindOfClass:objectClass]);
-        XCTAssertEqual([object intCol], 17);
-        [realm commitWriteTransaction];
-    }
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+    [realm beginWriteTransaction];
+    id object = [objectClass createInRealm:realm withValue:@{@"objectCol": [[objectClass alloc] init], @"intCol": @17}];
+    RLMObjectSchema *schema = [object objectSchema];
+    XCTAssertNotNil(schema[@"objectCol"]);
+    XCTAssertNotNil(schema[@"intCol"]);
+    XCTAssert([[object objectCol] isKindOfClass:objectClass]);
+    XCTAssertEqual([object intCol], 17);
+    [realm commitWriteTransaction];
 }
 
 #pragma mark - Default Property Values

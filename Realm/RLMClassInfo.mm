@@ -39,11 +39,11 @@ RLMClassInfo::RLMClassInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
 
 RLMClassInfo::RLMClassInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
                            std::unique_ptr<realm::ObjectSchema> schema)
-: realm(realm),
-rlmObjectSchema(rlmObjectSchema),
-objectSchema(&*schema),
-dynamicObjectSchema(std::move(schema)),
-dynamicRLMObjectSchema(rlmObjectSchema) { }
+: realm(realm)
+,rlmObjectSchema(rlmObjectSchema)
+,objectSchema(&*schema)
+,dynamicObjectSchema(std::move(schema))
+,dynamicRLMObjectSchema(rlmObjectSchema) { }
 
 realm::TableRef RLMClassInfo::table() const {
     if (auto key = objectSchema->table_key) {
@@ -146,9 +146,9 @@ RLMSchemaInfo RLMSchemaInfo::clone(realm::Schema const& source_schema,
     return info;
 }
 
-void RLMSchemaInfo::append_dynamic_object_schema(std::unique_ptr<realm::ObjectSchema> schema,
-                                                 RLMObjectSchema *objectSchema,
-                                                 __unsafe_unretained RLMRealm *const target_realm) {
+void RLMSchemaInfo::appendDynamicObjectSchema(std::unique_ptr<realm::ObjectSchema> schema,
+                                              RLMObjectSchema *objectSchema,
+                                              __unsafe_unretained RLMRealm *const target_realm) {
     m_objects.emplace(std::piecewise_construct,
                       std::forward_as_tuple(objectSchema.className),
                       std::forward_as_tuple(target_realm, objectSchema,

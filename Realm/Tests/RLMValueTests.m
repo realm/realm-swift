@@ -36,7 +36,7 @@
     XCTAssertEqual(v.rlm_valueType, RLMPropertyTypeFloat);
 }
 
-- (void)testStrinType {
+- (void)testStringType {
     id<RLMValue> v = @"hello";
     XCTAssertEqual(v.rlm_valueType, RLMPropertyTypeString);
 }
@@ -462,6 +462,34 @@
     XCTAssertTrue([(RLMDecimal128 *)mo.anyArray[0] isEqual:d1]);
     XCTAssertTrue([(RLMDecimal128 *)mo.anyArray[1] isEqual:d2]);
     XCTAssertEqual(mo.anyCol.rlm_valueType, RLMPropertyTypeDecimal128);
+}
+
+#pragma mark - Dynamic Object Accessor
+
+- (void)testDynamicObjectAccessor {
+    @autoreleasepool {
+        RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+        configuration.objectClasses = @[MixedObject.class, StringObject.class];
+        configuration.fileURL = RLMTestRealmURL();
+        RLMRealm *r = [RLMRealm realmWithConfiguration:configuration error:nil];
+        [r transactionWithBlock:^{
+            StringObject *so = [StringObject new];
+            so.stringCol = @"some string...";
+            [MixedObject createInRealm:r withValue:@{@"anyCol": so}];
+        }];
+        XCTAssertEqual([StringObject allObjectsInRealm:r].count, 1U);
+    }
+
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.objectClasses = @[MixedObject.class];
+    configuration.fileURL = RLMTestRealmURL();
+    RLMRealm *r = [RLMRealm realmWithConfiguration:configuration error:nil];
+    for (RLMObjectSchema *os in r.schema.objectSchema) {
+        XCTAssertFalse([os.className isEqualToString:@"StringObject"]);
+    }
+    XCTAssertEqual([MixedObject allObjectsInRealm:r].count, 1U);
+    MixedObject *o = [MixedObject allObjectsInRealm:r][0];
+    XCTAssertTrue([o[@"anyCol"][@"stringCol"] isEqualToString:@"some string..."]);
 }
 
 @end
