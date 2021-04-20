@@ -211,6 +211,10 @@
 
 @implementation RLMDynamicObject
 
+- (instancetype)initFromDynamicAccessor {
+    return [super initFromDynamicAccessor];
+}
+
 + (bool)_realmIgnoreClass {
     return true;
 }

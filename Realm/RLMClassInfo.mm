@@ -123,6 +123,9 @@ RLMSchemaInfo::RLMSchemaInfo(RLMRealm *realm) {
 
     m_objects.reserve(schema.size());
     for (RLMObjectSchema *rlmObjectSchema in rlmSchema.objectSchema) {
+        if (schema.find(rlmObjectSchema.objectName.UTF8String) == schema.end()) {
+            continue;
+        }
         m_objects.emplace(std::piecewise_construct,
                           std::forward_as_tuple(rlmObjectSchema.className),
                           std::forward_as_tuple(realm, rlmObjectSchema,

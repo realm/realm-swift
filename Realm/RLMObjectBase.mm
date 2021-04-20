@@ -50,7 +50,12 @@ static bool isManagedAccessorClass(Class cls) {
     return strncmp(className, accessorClassPrefix, sizeof(accessorClassPrefix) - 1) == 0;
 }
 
+static bool preventInitObjectSchema;
 static bool maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
+    if (preventInitObjectSchema) {
+        preventInitObjectSchema = false; // reset
+        return false;
+    }
     Class cls = obj.class;
     if (isManagedAccessorClass(cls)) {
         return false;
@@ -84,6 +89,13 @@ static bool maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
         maybeInitObjectSchemaForUnmanaged(self);
     }
     return self;
+}
+// called from `RLMObjectFromObjLink` where we need to create an
+// object where the schema is not available. Because the schema work is
+// done in that method we need to skip `maybeInitObjectSchemaForUnmanaged`.
+- (instancetype)initFromDynamicAccessor {
+    preventInitObjectSchema = true;
+    return [self init];
 }
 
 - (void)dealloc {
@@ -751,6 +763,9 @@ uint64_t RLMObjectBaseGetCombineId(__unsafe_unretained RLMObjectBase *const obj)
 }
 
 @implementation RealmSwiftObject
+- (instancetype)initFromDynamicAccessor {
+    return [super initFromDynamicAccessor];
+}
 @end
 
 @implementation RealmSwiftEmbeddedObject
