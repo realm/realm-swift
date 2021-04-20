@@ -186,13 +186,7 @@ RLMObjectBase *RLMObjectFromObjLink(RLMRealm *realm, realm::ObjLink&& objLink, b
         rlmObjectSchema.accessorClass = cls;
         rlmObjectSchema.isSwiftClass = parentIsSwiftObject;
         realm->_info.appendDynamicObjectSchema(std::move(schema), rlmObjectSchema, realm);
-        RLMObjectBase *obj = [[rlmObjectSchema.accessorClass alloc] initFromDynamicAccessor];
-        obj->_info = &realm->_info[rlmObjectSchema.className];
-        obj->_realm = realm;//&realm->_info[rlmObjectSchema.className]->realm;
-        obj->_objectSchema = rlmObjectSchema;
-        obj->_row = std::move(realm->_info[rlmObjectSchema.className].table()->get_object(objLink.get_obj_key()));
-        RLMInitializeSwiftAccessorGenerics(obj);
-        return obj;
+        return RLMCreateObjectAccessor(realm->_info[rlmObjectSchema.className], objLink.get_obj_key().value);
     }
 }
 

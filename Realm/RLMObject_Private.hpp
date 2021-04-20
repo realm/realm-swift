@@ -32,7 +32,6 @@ class RLMObservationInfo;
     RLMObservationInfo *_observationInfo;
     RLMClassInfo *_info;
 }
-- (instancetype)initFromDynamicAccessor;
 @end
 
 id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) NS_RETURNS_RETAINED;

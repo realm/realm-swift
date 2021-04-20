@@ -492,4 +492,34 @@
     XCTAssertTrue([o[@"anyCol"][@"stringCol"] isEqualToString:@"some string..."]);
 }
 
+// Tests that the `RLMSchemaInfo::clone` and `RLMSchemaInfo::operator[]` correctly
+// skip class names that are not present in the source schema. If such an event were
+// to occur an OOB exception would be thrown.
+- (void)testDynamicSchema {
+    @autoreleasepool {
+        RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+        config.objectClasses = @[MixedObject.class, IntObject.class];
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        [realm beginWriteTransaction];
+        [MixedObject createInRealm:realm withValue:@[[IntObject new]]];
+        [realm commitWriteTransaction];
+    }
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.objectClasses = @[MixedObject.class];
+    XCTestExpectation *ex = [self expectationWithDescription:@""];
+    __block RLMRealm *realm2;
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        @autoreleasepool {
+            RLMRealm *realm1 = [RLMRealm realmWithConfiguration:config error:nil];
+            (void)[[MixedObject allObjectsInRealm:realm1].firstObject anyCol];
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                realm2 = [RLMRealm realmWithConfiguration:config error:nil];
+            });
+        }
+        [ex fulfill];
+    });
+    [self waitForExpectations:@[ex] timeout:1.0];
+    (void)[[MixedObject allObjectsInRealm:realm2].firstObject anyCol];
+}
+
 @end

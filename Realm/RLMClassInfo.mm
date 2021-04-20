@@ -123,13 +123,14 @@ RLMSchemaInfo::RLMSchemaInfo(RLMRealm *realm) {
 
     m_objects.reserve(schema.size());
     for (RLMObjectSchema *rlmObjectSchema in rlmSchema.objectSchema) {
-        if (schema.find(rlmObjectSchema.objectName.UTF8String) == schema.end()) {
+        auto it = schema.find(rlmObjectSchema.objectName.UTF8String);
+        if (it == schema.end()) {
             continue;
         }
         m_objects.emplace(std::piecewise_construct,
                           std::forward_as_tuple(rlmObjectSchema.className),
                           std::forward_as_tuple(realm, rlmObjectSchema,
-                                                &*schema.find(rlmObjectSchema.objectName.UTF8String)));
+                                                &*it));
     }
 }
 
@@ -140,6 +141,9 @@ RLMSchemaInfo RLMSchemaInfo::clone(realm::Schema const& source_schema,
 
     auto& schema = target_realm->_realm->schema();
     for (auto& pair : m_objects) {
+        if (schema.find(pair.first.UTF8String) == schema.end()) {
+            continue;
+        }
         size_t idx = pair.second.objectSchema - &*source_schema.begin();
         info.m_objects.emplace(std::piecewise_construct,
                                std::forward_as_tuple(pair.first),
