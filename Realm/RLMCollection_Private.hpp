@@ -88,6 +88,7 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
 
 template<typename Collection>
 NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClassInfo& info);
+NSDictionary *RLMDictionaryValueForKey(realm::object_store::Dictionary& collection, NSString *key, RLMClassInfo& info);
 
 std::vector<std::pair<std::string, bool>> RLMSortDescriptorsToKeypathArray(NSArray<RLMSortDescriptor *> *properties);
 

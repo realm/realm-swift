@@ -29,6 +29,7 @@
 #import "RLMSwiftCollectionBase.h"
 
 #import <realm/object-store/collection_notifications.hpp>
+#import <realm/object-store/dictionary.hpp>
 #import <realm/object-store/list.hpp>
 #import <realm/object-store/results.hpp>
 #import <realm/object-store/set.hpp>
