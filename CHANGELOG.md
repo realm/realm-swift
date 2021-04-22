@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.7.3 Release notes (2021-04-22)
 =============================================================
+
 ### Enhancements
+
 * Package a prebuilt XCFramework for Carthage. Carthage 0.38 and later will
   download this instead of the old frameworks when using `--use-xcframeworks`.
 * We now make a backup of the realm file prior to any file format upgrade. The
@@ -15,30 +17,26 @@ x.y.z Release notes (yyyy-MM-dd)
   19 significant digits. This means that Decimal128's initializer which takes a
   string will now never throw, as it previously threw only for out-of-bounds
   values. The initializer is still marked as `throws` for
-  backwards-compatibility.
+  backwards compatibility.
   ([#4548](https://github.com/realm/realm-core/issues/4548))
 
 ### Fixed
+
 * Adjust the header paths for the podspec to avoid accidentally finding a file
   which isn't part of the pod that produced warnings when importing the
   framework. ([#7113](https://github.com/realm/realm-cocoa/issues/7113), since 10.5.2).
-* Fixed a crash that would occur when observing unmanaged Objects in multiple views in SwiftUI.
-  When using `@StateRealmObject` or `@ObservedObject` across multiple views with an unmanaged object,
-  each view would subscribe to the object. As each view unsubscribed (generally when trailing back through the view stack),
-  our propertyWrappers would attempt to remove the KVOs for each cancellation, when it should only be done once.
-  We now correctly remove KVOs only once.
-  ([#7131](https://github.com/realm/realm-cocoa/issues/7131))
-  * Fixed `isInvalidated` not returning correct value after object deletion from realm when using a custom schema . 
-  Object Schema was not updated when the object was added to the realm.
-  We now correctly update the object schema when adding it to the realm.
-  ([#7181](https://github.com/realm/realm-cocoa/issues/7181))
 * Fixed a crash that would occur when observing unmanaged Objects in multiple
   views in SwiftUI. When using `@StateRealmObject` or `@ObservedObject` across
   multiple views with an unmanaged object, each view would subscribe to the
   object. As each view unsubscribed (generally when trailing back through the
   view stack), our propertyWrappers would attempt to remove the KVOs for each
-  cancellation, when it should only be done once.  We now correctly remove KVOs
+  cancellation, when it should only be done once. We now correctly remove KVOs
   only once. ([#7131](https://github.com/realm/realm-cocoa/issues/7131))
+* Fixed `isInvalidated` not returning correct value after object deletion from
+  Realm when using a custom schema. The object's Object Schema was not updated
+  when the object was added to the realm. We now correctly update the object
+  schema when adding it to the realm.
+  ([#7181](https://github.com/realm/realm-cocoa/issues/7181))
 * Syncing large Decimal128 values would cause "Assertion failed: cx.w[1] == 0"
   ([Core #4519](https://github.com/realm/realm-core/issues/4519), since v10.0.0).
 * Potential/unconfirmed fix for crashes associated with failure to memory map
@@ -56,15 +54,15 @@ x.y.z Release notes (yyyy-MM-dd)
   modifications have occured.
   ([#4573](https://github.com/realm/realm-core/pull/4573) since v5.0.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.4.
 * CocoaPods: 1.10 or later.
 
 ### Internal
+
 * Upgraded realm-core from v10.5.5 to v10.6.0
 * Add additional debug validation to file map management that will hopefully
   catch cases where we unmap something which is still in use.
