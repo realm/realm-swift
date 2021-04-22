@@ -103,21 +103,18 @@ class InvalidSetType: FakeObject {
 }
 
 class InitAppendsToArrayProperty : RLMObject {
-    @objc dynamic var propertyWithIllegalDefaultValue: RLMArray<InitAppendsToArrayValue> = {
+    @objc dynamic var propertyWithIllegalDefaultValue: RLMArray<InitAppendsToArrayProperty> = {
         if mayAppend {
-            let array = RLMArray<InitAppendsToArrayValue>(objectClassName: InitAppendsToArrayValue.className())
-            array.add(InitAppendsToArrayValue())
+            mayAppend = false
+            let array = RLMArray<InitAppendsToArrayProperty>(objectClassName: InitAppendsToArrayProperty.className())
+            array.add(InitAppendsToArrayProperty())
             return array
         } else {
-            return RLMArray<InitAppendsToArrayValue>(objectClassName: InitAppendsToArrayValue.className())
+            return RLMArray<InitAppendsToArrayProperty>(objectClassName: InitAppendsToArrayProperty.className())
         }
     }()
 
     static var mayAppend = false
-}
-
-class InitAppendsToArrayValue : RLMObject {
-    @objc dynamic var value: Int = 0
 }
 
 class NoProps: FakeObject {
@@ -230,7 +227,8 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
         // This is different from the above tests in that it is a to-many link
         // and it only occurs while the schema is initializing
         InitAppendsToArrayProperty.mayAppend = true
-        assertThrowsWithReasonMatching(RLMSchema.shared(), ".*unless the schema is initialized.*")
+        assertThrowsWithReasonMatching(RLMSchema.shared(),
+                                       ".*Object cannot be inserted unless the schema is initialized.*")
     }
 
     func testInvalidObjectTypeForRLMArray() {
