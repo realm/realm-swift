@@ -213,10 +213,11 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     /// :nodoc:
     public var wrappedValue: T {
         get {
-            if storage.value.realm == nil {
+            let value = storage.value
+            if value.realm == nil {
                 // if unmanaged return the unmanaged value
-                return storage.value
-            } else if storage.value.isInvalidated {
+                return value
+            } else if value.isInvalidated {
                 // if invalidated, return the default value
                 return defaultValue
             }
@@ -226,7 +227,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
             // during some timeframe. The ObjectType is frozen so that
             // SwiftUI can cache state. other access points will thaw
             // the ObjectType
-            return storage.value.freeze()
+            return value.freeze()
         }
         nonmutating set {
             storage.value = newValue
@@ -235,10 +236,11 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     /// :nodoc:
     public var projectedValue: Binding<T> {
         Binding(get: {
-            if self.storage.value.isInvalidated {
+            let value = self.storage.value
+            if value.isInvalidated {
                 return self.defaultValue
             }
-            return self.storage.value
+            return value
         }, set: { newValue in
             self.storage.value = newValue
         })
