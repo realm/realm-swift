@@ -3,9 +3,22 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * Package a prebuilt XCFramework for Carthage. Carthage 0.38 and later will
   download this instead of the old frameworks when using `--use-xcframeworks`.
+* We now make a backup of the realm file prior to any file format upgrade. The
+  backup is retained for 3 months. Backups from before a file format upgrade
+  allows for better analysis of any upgrade failure. We also restore a backup,
+  if a) an attempt is made to open a realm file whith a "future" file format
+  and b) a backup file exist that fits the current file format.
+  ([Core #4166](https://github.com/realm/realm-core/pull/4166))
+* The error message when the intial steps of opening a Realm file fails is now
+  more descriptive.
+* Make conversion of Decimal128 to/from string work for numbers with more than
+  19 significant digits. This means that Decimal128's initializer which takes a
+  string will now never throw, as it previously threw only for out-of-bounds
+  values. The initializer is still marked as `throws` for
+  backwards-compatibility.
+  ([#4548](https://github.com/realm/realm-core/issues/4548))
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * Adjust the header paths for the podspec to avoid accidentally finding a file
   which isn't part of the pod that produced warnings when importing the
   framework. ([#7113](https://github.com/realm/realm-cocoa/issues/7113), since 10.5.2).
@@ -19,6 +32,29 @@ x.y.z Release notes (yyyy-MM-dd)
   Object Schema was not updated when the object was added to the realm.
   We now correctly update the object schema when adding it to the realm.
   ([#7181](https://github.com/realm/realm-cocoa/issues/7181))
+* Fixed a crash that would occur when observing unmanaged Objects in multiple
+  views in SwiftUI. When using `@StateRealmObject` or `@ObservedObject` across
+  multiple views with an unmanaged object, each view would subscribe to the
+  object. As each view unsubscribed (generally when trailing back through the
+  view stack), our propertyWrappers would attempt to remove the KVOs for each
+  cancellation, when it should only be done once.  We now correctly remove KVOs
+  only once. ([#7131](https://github.com/realm/realm-cocoa/issues/7131))
+* Syncing large Decimal128 values would cause "Assertion failed: cx.w[1] == 0"
+  ([Core #4519](https://github.com/realm/realm-core/issues/4519), since v10.0.0).
+* Potential/unconfirmed fix for crashes associated with failure to memory map
+  (low on memory, low on virtual address space). For example
+  ([#4514](https://github.com/realm/realm-core/issues/4514), since v5.0.0).
+* Fix assertion failures such as "!m_notifier_skip_version.version" or
+  "m_notifier_sg->get_version() + 1 == new_version.version" when performing
+  writes inside change notification callbacks. Previously refreshing the Realm
+  by beginning a write transaction would skip delivering notifications, leaving
+  things in an inconsistent state. Notifications are now delivered recursively
+  when needed instead. ([Cocoa #7165](https://github.com/realm/realm-cocoa/issues/7165)).
+* Fix collection notification reporting for modifications. This could be
+  observed by receiving the wrong indices of modifications on sorted or
+  distinct results, or notification blocks sometimes not being called when only
+  modifications have occured.
+  ([#4573](https://github.com/realm/realm-core/pull/4573) since v5.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -29,7 +65,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v10.5.5 to v10.6.0
+* Add additional debug validation to file map management that will hopefully
+  catch cases where we unmap something which is still in use.
 
 10.7.2 Release notes (2021-03-08)
 =============================================================

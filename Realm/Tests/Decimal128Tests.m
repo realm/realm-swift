@@ -30,8 +30,8 @@
     RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithNumber:@3.14159];
     RLMDecimal128 *d2 = [[RLMDecimal128 alloc] initWithString:@"3.14159" error:nil];
     NSError *error;
-    RLMDecimal128 *d3 = [[RLMDecimal128 alloc] initWithString:@"123456789123456789123.0" error:&error];
-    XCTAssertNotNil(error);
+    RLMDecimal128 *d3 = [[RLMDecimal128 alloc] initWithString:@"1.2.3" error:&error];
+    XCTAssertNil(error);
     RLMDecimal128 *d4 = [[RLMDecimal128 alloc] initWithValue:@3.14159];
     RLMDecimal128 *d5 = [[RLMDecimal128 alloc] initWithValue:@"123.456"];
     RLMDecimal128 *d6 = [[RLMDecimal128 alloc] initWithNumber:@123456789];
@@ -40,7 +40,7 @@
     XCTAssertTrue([d1.stringValue isEqualToString:@"3.14159"]);
     XCTAssertEqual(d2.doubleValue, 3.14159);
     XCTAssertTrue([d2.stringValue isEqualToString:@"3.14159"]);
-    XCTAssertNil(d3);
+    XCTAssertTrue(d3.isNaN);
     XCTAssertEqual(d4.doubleValue, 3.14159);
     XCTAssertTrue([d5.stringValue isEqualToString:@"123.456"]);
     XCTAssertTrue([d6.stringValue isEqualToString:@"123456789"]);

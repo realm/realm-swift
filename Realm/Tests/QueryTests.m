@@ -1307,7 +1307,7 @@
     [realm beginWriteTransaction];
     [DecimalObject createInRealm:realm withValue:@[@"-Inf"]];
     [DecimalObject createInRealm:realm withValue:@[@"Inf"]];
-    [DecimalObject createInRealm:realm withValue:@[@"123456789.123456789e12345"]];
+    [DecimalObject createInRealm:realm withValue:@[@"123456789.123456789e1234"]];
     [realm commitWriteTransaction];
 
     RLMAssertCount(DecimalObject, 0U, @"decimalCol >  'Inf'");
@@ -1322,11 +1322,11 @@
     RLMAssertCount(DecimalObject, 1U, @"decimalCol <= '-Inf'");
     RLMAssertCount(DecimalObject, 0U, @"decimalCol <  '-Inf'");
 
-    RLMAssertCount(DecimalObject, 1U, @"decimalCol >  '123456789.123456789e12345'");
-    RLMAssertCount(DecimalObject, 2U, @"decimalCol >= '123456789.123456789e12345'");
-    RLMAssertCount(DecimalObject, 1U, @"decimalCol == '123456789.123456789e12345'");
-    RLMAssertCount(DecimalObject, 2U, @"decimalCol <= '123456789.123456789e12345'");
-    RLMAssertCount(DecimalObject, 1U, @"decimalCol <  '123456789.123456789e12345'");
+    RLMAssertCount(DecimalObject, 1U, @"decimalCol >  '123456789.123456789e1234'");
+    RLMAssertCount(DecimalObject, 2U, @"decimalCol >= '123456789.123456789e1234'");
+    RLMAssertCount(DecimalObject, 1U, @"decimalCol == '123456789.123456789e1234'");
+    RLMAssertCount(DecimalObject, 2U, @"decimalCol <= '123456789.123456789e1234'");
+    RLMAssertCount(DecimalObject, 1U, @"decimalCol <  '123456789.123456789e1234'");
 }
 
 - (void)testLiveQueriesInsideTransaction
