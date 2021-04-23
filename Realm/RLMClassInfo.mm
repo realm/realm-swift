@@ -107,12 +107,12 @@ RLMClassInfo& RLMSchemaInfo::operator[](NSString *name) {
     return *&it->second;
 }
 
-util::Optional<RLMClassInfo&> RLMSchemaInfo::operator[](realm::TableKey const& key) {
+RLMClassInfo* RLMSchemaInfo::operator[](realm::TableKey const& key) {
     for (auto& pair : m_objects) {
         if (pair.second.objectSchema->table_key == key)
-            return pair.second;
+            return &pair.second;
     }
-    return util::none;
+    return nullptr;
 }
 
 RLMSchemaInfo::RLMSchemaInfo(RLMRealm *realm) {

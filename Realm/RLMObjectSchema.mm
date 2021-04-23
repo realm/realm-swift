@@ -112,7 +112,6 @@ using namespace realm;
     schema.unmanagedClass = objectClass;
     schema.isSwiftClass = isSwift;
     schema.isEmbedded = [(id)objectClass isEmbedded];
-    schema.isDynamic = [(id)objectClass isDynamic];
 
     // create array of RLMProperties, inserting properties of superclasses first
     Class cls = objectClass;
@@ -179,7 +178,6 @@ using namespace realm;
 
     if ([objectClass shouldIncludeInDefaultSchema]
         && schema.isSwiftClass
-        && !schema.isDynamic
         && schema.properties.count == 0) {
         @throw RLMException(@"No properties are defined for '%@'. Did you remember to mark them with '@objc' in your model?", schema.className);
     }
@@ -264,7 +262,6 @@ using namespace realm;
     schema->_unmanagedClass = _unmanagedClass;
     schema->_isSwiftClass = _isSwiftClass;
     schema->_isEmbedded = _isEmbedded;
-    schema->_isDynamic = _isDynamic;
 
     // call property setter to reset map and primary key
     schema.properties = [[NSArray allocWithZone:zone] initWithArray:_properties copyItems:YES];

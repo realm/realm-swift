@@ -404,6 +404,7 @@ extension Object: ThreadConfined {
 
 /// Object interface which allows untyped getters and setters for Objects.
 /// :nodoc:
+@objc(RealmSwiftDynamicObject)
 @dynamicMemberLookup
 public final class DynamicObject: Object {
     public override subscript(key: String) -> Any? {

@@ -95,9 +95,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RealmSwiftObject : RLMObjectBase
 @end
 
-@interface RealmDynamicSwiftObject : RealmSwiftObject
-@end
-
 /**
  `EmbeddedObject` is a base class used to define embedded Realm model objects.
 
