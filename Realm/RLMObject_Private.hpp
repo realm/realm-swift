@@ -55,5 +55,5 @@ static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMObjectBase
 }
 
 [[clang::objc_runtime_visible]]
-@interface RealmSwiftDynamicObject : RLMObjectBase
+@interface RealmSwiftDynamicObject : RealmSwiftObject
 @end
