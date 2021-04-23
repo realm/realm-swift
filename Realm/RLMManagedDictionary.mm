@@ -127,7 +127,7 @@ static void throwError(__unsafe_unretained ObjcCollection *const col, NSString *
         @throw RLMException(@"Realm accessed from incorrect thread.");
     }
     catch (realm::List::InvalidatedException const&) {
-        @throw RLMException(@"RLMArray has been invalidated or the containing object has been deleted.");
+        @throw RLMException(@"RLMDictionary has been invalidated or the containing object has been deleted.");
     }
     catch (realm::List::OutOfBoundsIndexException const& e) {
         @throw RLMException(@"Index %zu is out of bounds (must be less than %zu).",
@@ -260,7 +260,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     try {
         RLMAccessorContext context(*_objectInfo);
         return _backingCollection.get(context,
-                                      keyFromRLMDictionaryKey(key, context));
+                                      context.unbox<realm::StringData>(key));
     }
     catch (realm::KeyNotFound const&) {
         return nil;
@@ -292,7 +292,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     changeDictionary(self, ^{
         RLMAccessorContext context(*_objectInfo);
         _backingCollection.insert(context,
-                                  keyFromRLMDictionaryKey(key, context),
+                                  context.unbox<realm::StringData>(key),
                                   obj);
     });
 }
@@ -307,7 +307,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     changeDictionary(self, ^{
         RLMAccessorContext context(*_objectInfo);
         _backingCollection.insert(context,
-                                  keyFromRLMDictionaryKey(key, context),
+                                  context.unbox<realm::StringData>(key),
                                   obj);
     });
 }
@@ -322,7 +322,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     changeDictionary(self, ^{
         RLMAccessorContext context(*_objectInfo);
         for (id key in keyArray) {
-            _backingCollection.erase(keyFromRLMDictionaryKey(key, context));
+            _backingCollection.erase(context.unbox<realm::StringData>(key));
         }
     });
 }
@@ -330,7 +330,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 - (void)removeObjectForKey:(id<RLMDictionaryKey>)key {
     changeDictionary(self, ^{
         RLMAccessorContext context(*_objectInfo);
-        _backingCollection.erase(keyFromRLMDictionaryKey(key, context));
+        _backingCollection.erase(context.unbox<realm::StringData>(key));
     });
 }
 
@@ -343,14 +343,6 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
         if (stop) {
             break;
         }
-    }
-}
-
-inline realm::StringData keyFromRLMDictionaryKey(id<RLMDictionaryKey> key, RLMAccessorContext &context) {
-    if (auto *k = RLMDynamicCast<NSString>(key)) {
-        return context.unbox<realm::StringData>(k);
-    } else {
-        @throw RLMException(@"Unsupported key type %@ in key array", key);
     }
 }
 
@@ -381,7 +373,7 @@ inline realm::StringData keyFromRLMDictionaryKey(id<RLMDictionaryKey> key, RLMAc
         }
 
         _backingCollection.verify_attached();
-        return RLMCollectionValueForKey(_backingCollection, key, *_objectInfo);
+        return RLMDictionaryValueForKey(_backingCollection, key, *_objectInfo) ?: [self objectForKey:key];
     });
 }
 

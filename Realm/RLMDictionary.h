@@ -159,30 +159,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Querying a Dictionary
 
-/**
- Returns the index of an object in the dictionary.
-
- Returns `NSNotFound` if the object is not found in the dictionary.
-
- @param object  An object (of the same type as returned from the `objectClassName` selector).
- */
-- (NSUInteger)indexOfObject:(RLMObjectType)object;
-
-/// :nodoc:
-- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...;
-
-/// :nodoc:
-- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args;
-
-/**
- Returns the index of the first object in the dictionary matching the predicate.
-
- @param predicate   The predicate with which to filter the objects.
-
- @return    The index of the object, or `NSNotFound` if the object is not found in the dictionary.
- */
-- (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate;
-
 /// :nodoc:
 - (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat, ...;
 
