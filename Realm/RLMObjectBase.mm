@@ -750,9 +750,6 @@ uint64_t RLMObjectBaseGetCombineId(__unsafe_unretained RLMObjectBase *const obj)
 }
 
 @implementation RealmSwiftObject
-+ (RLMObjectSchema *)sharedSchema {
-    return nil;
-}
 @end
 
 @implementation RealmSwiftEmbeddedObject

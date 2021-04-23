@@ -445,6 +445,10 @@ public final class DynamicObject: Object {
     public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
+
+    override public class func sharedSchema() -> RLMObjectSchema? {
+        nil
+    }
 }
 
 /**
