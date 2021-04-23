@@ -215,7 +215,7 @@ void RLMArrayValidateMatchingObjectType(__unsafe_unretained RLMArray *const arra
         @throw RLMException(@"Invalid nil value for array of '%@'.",
                             array->_objectClassName ?: RLMTypeToString(array->_type));
     }
-    if ((array->_type == RLMPropertyTypeAny) || (array->_type != RLMPropertyTypeObject)) {
+    if (array->_type != RLMPropertyTypeObject) {
         if (!RLMValidateValue(value, array->_type, array->_optional, false, nil)) {
             @throw RLMException(@"Invalid value '%@' of type '%@' for expected type '%@%s'.",
                                 value, [value class], RLMTypeToString(array->_type),
