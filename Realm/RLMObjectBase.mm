@@ -752,5 +752,8 @@ uint64_t RLMObjectBaseGetCombineId(__unsafe_unretained RLMObjectBase *const obj)
 @implementation RealmSwiftObject
 @end
 
+@implementation RealmDynamicSwiftObject
+@end
+
 @implementation RealmSwiftEmbeddedObject
 @end
