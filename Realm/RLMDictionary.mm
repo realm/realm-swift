@@ -267,18 +267,11 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
     [otherDictionary enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull value, BOOL *) {
         RLMDictionaryValidateMatchingObjectType(self, key, value);
     }];
-    if ([otherDictionary isKindOfClass:[RLMDictionary class]]) {
-        changeDictionary(self, ^{
-            [_backingCollection addEntriesFromDictionary:((RLMDictionary *)otherDictionary)->_backingCollection];
-        });
-    }
-    else if ([otherDictionary isKindOfClass:[NSDictionary class]]) {
-        changeDictionary(self, ^{
-            for (id key in otherDictionary) {
-                [self setObject:otherDictionary[key] forKey:key];
-            }
-        });
-    }
+    changeDictionary(self, ^{
+        for (id key in otherDictionary) {
+            [self setObject:otherDictionary[key] forKey:key];
+        }
+    });
 }
 
 - (NSUInteger)countByEnumeratingWithState:(nonnull NSFastEnumerationState *)state

@@ -334,6 +334,18 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     });
 }
 
+- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id <RLMDictionaryKey> key,
+                                                    id obj, BOOL *stop))block {
+    for (id key in [self allKeys]) {
+        BOOL stop = false;
+        id value = self[key];
+        block(key, self[key], &stop);
+        if (stop) {
+            break;
+        }
+    }
+}
+
 inline realm::StringData keyFromRLMDictionaryKey(id<RLMDictionaryKey> key, RLMAccessorContext &context) {
     if (auto *k = RLMDynamicCast<NSString>(key)) {
         return context.unbox<realm::StringData>(k);

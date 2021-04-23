@@ -347,6 +347,15 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     return [IntObject objectsWhere:@"intCol > 0 AND intCol < 5"];
 }
 
+- (void)testCrashOnDeleteFromDictionary {
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol > 4"]];
+    });
+    ExpectNoChange(self, ^(RLMRealm *realm) {
+        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol > 4"]];
+    });
+}
+
 - (void)testDeleteMultiple {
     ExpectNoChange(self, ^(RLMRealm *realm) {
         [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol > 4"]];
