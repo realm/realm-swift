@@ -82,8 +82,6 @@ extension RealmProperty: Codable where Value: Codable {
 
 /// A protocol describing types that can parameterize a `RealmPropertyType`.
 public protocol RealmPropertyType {}
-/// A protocol describing types that can be represented as optional in a `RealmProperty<>`
-//internal protocol OptionalRealmPropertyType {}
 
 extension AnyRealmValue: RealmPropertyType {}
 extension Optional: RealmPropertyType where Wrapped: RealmOptionalType {}

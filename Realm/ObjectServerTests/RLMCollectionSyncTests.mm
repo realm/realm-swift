@@ -78,8 +78,7 @@
                 = [RLMSetSyncObject allObjectsInRealm:realm];
             if (RLMSetSyncObject *obj = results.firstObject) {
                 CHECK_COUNT(1, RLMSetSyncObject, realm);
-                if (propertyGetter(obj).count == 0
-                    && otherPropertyGetter(obj).count == 0) {
+                if (propertyGetter(obj).count == 0 && otherPropertyGetter(obj).count == 0) {
                     [realm transactionWithBlock:^{
                         [propertyGetter(obj) addObjects:values];
                         [otherPropertyGetter(obj) addObjects:otherValues];

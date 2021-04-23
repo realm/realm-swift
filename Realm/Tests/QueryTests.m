@@ -1578,18 +1578,14 @@
     [realm beginWriteTransaction];
     [DecimalObject createInRealm:realm withValue:@[@"-Inf"]];
     [DecimalObject createInRealm:realm withValue:@[@"Inf"]];
-    // 123456789.123456789e12345 represents Inf
-    [DecimalObject createInRealm:realm withValue:@[@"123456789.123456789e12345"]];
-    [MixedObject createInRealm:realm withValue:@[[[RLMDecimal128 alloc] initWithValue:@"-Inf"]]];
-    [MixedObject createInRealm:realm withValue:@[[[RLMDecimal128 alloc] initWithValue:@"Inf"]]];
-    [MixedObject createInRealm:realm withValue:@[[[RLMDecimal128 alloc] initWithValue:@"123456789.123456789e12345"]]];
+    [DecimalObject createInRealm:realm withValue:@[@"123456789.123456789e1234"]];
     [realm commitWriteTransaction];
 
     RLMAssertCount(DecimalObject, 0U, @"decimalCol >  'Inf'");
-    RLMAssertCount(DecimalObject, 2U, @"decimalCol >= 'Inf'");
-    RLMAssertCount(DecimalObject, 2U, @"decimalCol == 'Inf'");
+    RLMAssertCount(DecimalObject, 1U, @"decimalCol >= 'Inf'");
+    RLMAssertCount(DecimalObject, 1U, @"decimalCol == 'Inf'");
     RLMAssertCount(DecimalObject, 3U, @"decimalCol <= 'Inf'");
-    RLMAssertCount(DecimalObject, 1U, @"decimalCol <  'Inf'");
+    RLMAssertCount(DecimalObject, 2U, @"decimalCol <  'Inf'");
 
     RLMAssertCount(DecimalObject, 2U, @"decimalCol >  '-Inf'");
     RLMAssertCount(DecimalObject, 3U, @"decimalCol >= '-Inf'");
@@ -1597,30 +1593,11 @@
     RLMAssertCount(DecimalObject, 1U, @"decimalCol <= '-Inf'");
     RLMAssertCount(DecimalObject, 0U, @"decimalCol <  '-Inf'");
 
-    RLMAssertCount(DecimalObject, 0U, @"decimalCol >  '123456789.123456789e12345'");
-    RLMAssertCount(DecimalObject, 2U, @"decimalCol >= '123456789.123456789e12345'");
-    RLMAssertCount(DecimalObject, 2U, @"decimalCol == '123456789.123456789e12345'");
-    RLMAssertCount(DecimalObject, 3U, @"decimalCol <= '123456789.123456789e12345'");
-    RLMAssertCount(DecimalObject, 1U, @"decimalCol <  '123456789.123456789e12345'");
-
-    // RLMValue requires us to be explicit about the rhs, due to 'Inf' being inferred as a string.
-    RLMAssertCount(MixedObject, 0U, @"anyCol >  %@", [[RLMDecimal128 alloc] initWithValue:@"Inf"]);
-    RLMAssertCount(MixedObject, 2U, @"anyCol >= %@", [[RLMDecimal128 alloc] initWithValue:@"Inf"]);
-    RLMAssertCount(MixedObject, 2U, @"anyCol == %@", [[RLMDecimal128 alloc] initWithValue:@"Inf"]);
-    RLMAssertCount(MixedObject, 3U, @"anyCol <= %@", [[RLMDecimal128 alloc] initWithValue:@"Inf"]);
-    RLMAssertCount(MixedObject, 1U, @"anyCol <  %@", [[RLMDecimal128 alloc] initWithValue:@"Inf"]);
-
-    RLMAssertCount(MixedObject, 2U, @"anyCol >  %@", [[RLMDecimal128 alloc] initWithValue:@"-Inf"]);
-    RLMAssertCount(MixedObject, 3U, @"anyCol >= %@", [[RLMDecimal128 alloc] initWithValue:@"-Inf"]);
-    RLMAssertCount(MixedObject, 1U, @"anyCol == %@", [[RLMDecimal128 alloc] initWithValue:@"-Inf"]);
-    RLMAssertCount(MixedObject, 1U, @"anyCol <= %@", [[RLMDecimal128 alloc] initWithValue:@"-Inf"]);
-    RLMAssertCount(MixedObject, 0U, @"anyCol <  %@", [[RLMDecimal128 alloc] initWithValue:@"-Inf"]);
-
-    RLMAssertCount(MixedObject, 0U, @"anyCol >  %@", [[RLMDecimal128 alloc] initWithValue:@"123456789.123456789e12345"]);
-    RLMAssertCount(MixedObject, 2U, @"anyCol >= %@", [[RLMDecimal128 alloc] initWithValue:@"123456789.123456789e12345"]);
-    RLMAssertCount(MixedObject, 2U, @"anyCol == %@", [[RLMDecimal128 alloc] initWithValue:@"123456789.123456789e12345"]);
-    RLMAssertCount(MixedObject, 3U, @"anyCol <= %@", [[RLMDecimal128 alloc] initWithValue:@"123456789.123456789e12345"]);
-    RLMAssertCount(MixedObject, 1U, @"anyCol <  %@", [[RLMDecimal128 alloc] initWithValue:@"123456789.123456789e12345"]);
+    RLMAssertCount(DecimalObject, 1U, @"decimalCol >  '123456789.123456789e1234'");
+    RLMAssertCount(DecimalObject, 2U, @"decimalCol >= '123456789.123456789e1234'");
+    RLMAssertCount(DecimalObject, 1U, @"decimalCol == '123456789.123456789e1234'");
+    RLMAssertCount(DecimalObject, 2U, @"decimalCol <= '123456789.123456789e1234'");
+    RLMAssertCount(DecimalObject, 1U, @"decimalCol <  '123456789.123456789e1234'");
 }
 
 - (void)testLiveQueriesInsideTransaction

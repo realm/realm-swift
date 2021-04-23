@@ -219,6 +219,10 @@
 
 @implementation RLMArraySyncObject
 
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"_id": [RLMObjectId objectId]};
+}
+
 + (NSString *)primaryKey {
     return @"_id";
 }
@@ -235,6 +239,10 @@
 #pragma mark RLMSetSyncObject
 
 @implementation RLMSetSyncObject
+
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"_id": [RLMObjectId objectId]};
+}
 
 + (NSString *)primaryKey {
     return @"_id";

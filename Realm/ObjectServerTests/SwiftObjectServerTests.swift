@@ -2123,25 +2123,7 @@ class AnyRealmValueSyncTests: SwiftSyncTestCase {
         do {
             let user = try logInUser(for: basicCredentials())
 
-            if isParent {
-                executeChild()
-                // Imagine this is v1 of an app with just 2 classes, `SwiftMissingObject`
-                // did not exist when this version was shipped,
-                // but v2 managed to sync `SwiftMissingObject` to this Realm.
-                var config = user.configuration(partitionValue: #function)
-                config.objectTypes = [SwiftAnyRealmValueObject.self, SwiftPerson.self]
-                let realm = try openRealm(configuration: config)
-                let obj = realm.objects(SwiftAnyRealmValueObject.self).first
-                // SwiftMissingObject.anyCol -> SwiftMissingObject.anyCol -> SwiftPerson.firstName
-                let anyCol = ((obj!.anyCol.value.dynamicObject?.anyCol as? Object)?["anyCol"] as? Object)
-                XCTAssertEqual((anyCol?["firstName"] as? String), "Rick")
-                try! realm.write {
-                    anyCol?["firstName"] = "Morty"
-                }
-                XCTAssertEqual((anyCol?["firstName"] as? String), "Morty")
-                let objectCol = (obj!.anyCol.value.dynamicObject?.objectCol as? Object)
-                XCTAssertEqual((objectCol?["firstName"] as? String), "Morty")
-            } else {
+            if !isParent {
                 // Imagine this is v2 of an app with 3 classes
                 var config = user.configuration(partitionValue: #function)
                 config.objectTypes = [SwiftPerson.self, SwiftAnyRealmValueObject.self, SwiftMissingObject.self]
@@ -2167,7 +2149,26 @@ class AnyRealmValueSyncTests: SwiftSyncTestCase {
                     realm.add(obj)
                 }
                 waitForUploads(for: realm)
+                return
             }
+            executeChild()
+
+            // Imagine this is v1 of an app with just 2 classes, `SwiftMissingObject`
+            // did not exist when this version was shipped,
+            // but v2 managed to sync `SwiftMissingObject` to this Realm.
+            var config = user.configuration(partitionValue: #function)
+            config.objectTypes = [SwiftAnyRealmValueObject.self, SwiftPerson.self]
+            let realm = try openRealm(configuration: config)
+            let obj = realm.objects(SwiftAnyRealmValueObject.self).first
+            // SwiftMissingObject.anyCol -> SwiftMissingObject.anyCol -> SwiftPerson.firstName
+            let anyCol = ((obj!.anyCol.value.dynamicObject?.anyCol as? Object)?["anyCol"] as? Object)
+            XCTAssertEqual((anyCol?["firstName"] as? String), "Rick")
+            try! realm.write {
+                anyCol?["firstName"] = "Morty"
+            }
+            XCTAssertEqual((anyCol?["firstName"] as? String), "Morty")
+            let objectCol = (obj!.anyCol.value.dynamicObject?.objectCol as? Object)
+            XCTAssertEqual((objectCol?["firstName"] as? String), "Morty")
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
