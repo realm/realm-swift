@@ -25,7 +25,6 @@
 #import "RLMObjectStore.h"
 #import "RLMObservation.hpp"
 #import "RLMSwiftValueStorage.h"
-#import "RLMSwiftValueStorage.h"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
