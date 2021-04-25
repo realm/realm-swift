@@ -1491,7 +1491,7 @@
 
     // wait for background realm to be created
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    bgDone = [self expectationWithDescription:@"background queue done"];;
+    bgDone = [self expectationWithDescription:@"background queue done"];
 
     [realm beginWriteTransaction];
     [StringObject createInRealm:realm withValue:@[@"string"]];
