@@ -1,23 +1,21 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.7.4 Release notes (2021-04-26)
 =============================================================
+
 ### Enhancements
+
 * Add Xcode 12.5 binaries to the release package.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* Add the Info.plist file to the XCFrameworks in the Carthage xcframwork
-  package (since 10.7.3).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Add the Info.plist file to the XCFrameworks in the Carthage xcframwork
+  package ([#7216](https://github.com/realm/realm-cocoa/issues/7216), since 10.7.3).
 
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.5.
 * CocoaPods: 1.10 or later.
-
-### Internal
-* Upgraded realm-core from ? to ?
 
 10.7.3 Release notes (2021-04-22)
 =============================================================
