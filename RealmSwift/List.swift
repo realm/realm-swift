@@ -34,7 +34,6 @@ import Realm.Private
 
  Properties of `List` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
  */
-//public final class List<Element/*: RealmCollectionValue*/>: RLMSwiftCollectionBase {
 public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
 
     // MARK: Properties

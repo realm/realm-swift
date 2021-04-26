@@ -20,7 +20,7 @@ import Foundation
 import Realm
 import Realm.Private
 
-public protocol MapKeyType { }
+public protocol MapKeyType: Hashable { }
 extension String: MapKeyType { }
 
 /**
@@ -55,6 +55,13 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
         _rlmCollection as! RLMDictionary
     }
 
+    private func objcKey(from swiftKey: Key) -> RLMDictionaryKey {
+        guard let key = /*dynamicBridgeCast(fromSwift: */swiftKey/*)*/ as? RLMDictionaryKey else {
+            throwRealmException("Could not cast \(String(describing: swiftKey.self)) to RLMDictionaryKey")
+        }
+        return key
+    }
+
     // MARK: Initializers
 
     /// Creates a `Map` that holds Realm model objects of type `Value`.
@@ -71,152 +78,6 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
     /// Returns the number of key-value pairs in this map.
     public var count: Int { return Int(_rlmCollection.count) }
 
-    // MARK: KVC
-
-    /**
-     Returns a type of `Value` for a specified key if it exists in the map.
-
-     - parameter key: The key to the property whose values are desired.
-     */
-    @nonobjc public func value(forKey key: Key) -> Value? {
-        guard let value = rlmDictionary.object(for: dynamicBridgeCast(fromSwift: key) as! RLMDictionaryKey) else {
-            return nil
-        }
-        return dynamicBridgeCast(fromObjectiveC: value)
-    }
-
-    /**
-     Returns a type of `Value` for a specified key if it exists in the map.
-
-     - parameter keyPath: The key to the property whose values are desired.
-     */
-    @nonobjc public func value(forKeyPath keyPath: String) -> Value? {
-        guard let value = rlmDictionary.value(forKeyPath: keyPath) else {
-            return nil
-        }
-        return dynamicBridgeCast(fromObjectiveC: value)
-    }
-
-    /**
-     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified `value` and `key`.
-
-     - warning: This method can only be called during a write transaction.
-
-     - parameter value: The object value.
-     - parameter key:   The name of the property whose value should be set on each object.
-    */
-    public override func setValue(_ value: Any?, forKey key: String) {
-        return rlmDictionary.setObject(dynamicBridgeCast(fromSwift: value) as AnyObject,
-                                      for: key as RLMDictionaryKey)
-
-    }
-
-    // MARK: Filtering
-
-    /**
-     Returns a `Results` containing all matching key-value pairs the given predicate in the Map.
-
-     - parameter predicate: The predicate with which to filter the objects.
-     */
-    public func filter(_ predicate: NSPredicate) -> Results<SingleMapEntry<Key, Value>> {
-        return Results<SingleMapEntry>(_rlmCollection.objects(with: predicate))
-    }
-
-    /**
-     Returns a Boolean value indicating whether the Map contains the
-     given object.
-
-     - parameter object: The value to find in the Map.
-     */
-    public func contains(_ object: Value) -> Bool {
-        fatalError("Not implemented in Map. Please use contains(where:).")
-    }
-
-    /**
-     Returns a Boolean value indicating whether the Map contains the key-value pair
-     satisfies the given predicate
-
-     - parameter where: a closure that test if any key-pair of the given map represents the match.
-     */
-    public func contains(where predicate: @escaping (_ key: String, _ value: Value) -> Bool) -> Bool {
-        var found: Bool = false
-        rlmDictionary.enumerateKeysAndObjects { (key, value, shouldStop) in
-            if predicate(dynamicBridgeCast(fromObjectiveC: key), dynamicBridgeCast(fromObjectiveC: value)) {
-                found = true
-                shouldStop.pointee = true
-            }
-        }
-        return found
-    }
-
-    // MARK: Sorting
-
-    /**
-     Returns a `Results` containing the objects in the dictionary, but sorted.
-
-     Pairs are sorted based on the given keyPath for a value.
-
-     - parameter byKeyPath: a value's key path predicate.
-     - parameter ascending: The direction to sort in.
-     */
-    public func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<SingleMapEntry<Key, Value>> {
-        fatalError("Not implemented in Map")
-    }
-
-    public func sorted<S>(by sortDescriptors: S) -> Results<SingleMapEntry<Key, Value>>
-        where S: Sequence, S.Element == SortDescriptor {
-        fatalError("Not implemented in Map")
-    }
-
-    // MARK: Aggregate Operations
-
-    /**
-     Returns the minimum (lowest) value of the given property among all the objects in the collection, or `nil` if the
-     collection is empty.
-
-     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
-
-     - parameter property: The name of a property whose minimum value is desired.
-     */
-    public func min<T: MinMaxType>(ofProperty property: String) -> T? {
-        return _rlmCollection.min(ofProperty: property).map(dynamicBridgeCast)
-    }
-
-    /**
-     Returns the maximum (highest) value of the given property among all the objects in the collection, or `nil` if the
-     collection is empty.
-
-     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
-
-     - parameter property: The name of a property whose minimum value is desired.
-     */
-    public func max<T: MinMaxType>(ofProperty property: String) -> T? {
-        return _rlmCollection.max(ofProperty: property).map(dynamicBridgeCast)
-    }
-
-    /**
-    Returns the sum of the given property for objects in the collection, or `nil` if the collection is empty.
-
-    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
-
-    - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
-    */
-    public func sum<T: AddableType>(ofProperty property: String) -> T {
-        return dynamicBridgeCast(fromObjectiveC: _rlmCollection.sum(ofProperty: property))
-    }
-
-    /**
-     Returns the average value of a given property over all the objects in the collection, or `nil` if
-     the collection is empty.
-
-     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
-
-     - parameter property: The name of a property whose values should be summed.
-     */
-    public func average<T: AddableType>(ofProperty property: String) -> T? {
-        return _rlmCollection.average(ofProperty: property).map(dynamicBridgeCast)
-    }
-
     // MARK: Mutation
 
     /**
@@ -226,7 +87,7 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
      - parameter forKey: The direction to sort in.
      */
     public func updateValue(_ value: Value, forKey key: Key) {
-        rlmDictionary[key as! RLMDictionaryKey] = dynamicBridgeCast(fromSwift: value) as AnyObject
+        rlmDictionary[objcKey(from: key)] = dynamicBridgeCast(fromSwift: value) as AnyObject
     }
 
     /**
@@ -247,12 +108,152 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
 
     public subscript(key: Key) -> Value? {
         get {
-            let value = rlmDictionary.object(for: key as! RLMDictionaryKey) as? Value
-            return value != nil ? dynamicBridgeCast(fromObjectiveC: value) : nil
+            return rlmDictionary[objcKey(from: key)].map { dynamicBridgeCast(fromObjectiveC:$0) }
         }
         set {
-            rlmDictionary.setObject(dynamicBridgeCast(fromSwift: newValue) as AnyObject, for: dynamicBridgeCast(fromSwift: key) as! RLMDictionaryKey)
+            rlmDictionary[objcKey(from: key)] = dynamicBridgeCast(fromSwift: newValue) as AnyObject
         }
+    }
+
+    // MARK: KVC
+
+    /**
+     Returns a type of `Value` for a specified key if it exists in the map.
+
+     - parameter key: The key to the property whose values are desired.
+     */
+    @nonobjc public func value(forKey key: Key) -> Value? {
+        return rlmDictionary.value(forKey: objcKey(from: key))
+            .map { dynamicBridgeCast(fromObjectiveC:$0) }
+    }
+
+    /**
+     Returns a type of `Value` for a specified key if it exists in the map.
+
+     - parameter keyPath: The key to the property whose values are desired.
+     */
+    @nonobjc public func value(forKeyPath keyPath: String) -> Value? {
+        return rlmDictionary.value(forKeyPath: keyPath)
+            .map { dynamicBridgeCast(fromObjectiveC:$0) }
+    }
+
+    /**
+     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified `value` and `key`.
+
+     - warning: This method can only be called during a write transaction.
+
+     - parameter value: The object value.
+     - parameter key:   The name of the property whose value should be set on each object.
+    */
+    public override func setValue(_ value: Any?, forKey key: String) {
+        rlmDictionary.setValue(value, forKey: key)
+
+    }
+
+    // MARK: Filtering
+
+    /**
+     Returns a `Results` containing all matching key-value pairs the given predicate in the Map.
+
+     - parameter predicate: The predicate with which to filter the objects.
+     */
+    public func filter(_ predicate: NSPredicate) -> Results<SingleMapEntry<Key, Value>> {
+        return Results<SingleMapEntry>(rlmDictionary.objects(with: predicate))
+    }
+
+    /**
+     Returns a Boolean value indicating whether the Map contains the key-value pair
+     satisfies the given predicate
+
+     - parameter where: a closure that test if any key-pair of the given map represents the match.
+     */
+    public func contains(where predicate: @escaping (_ key: Key, _ value: Value) -> Bool) -> Bool {
+        var found = false
+        rlmDictionary.enumerateKeysAndObjects { (key, value, shouldStop) in
+            if predicate(dynamicBridgeCast(fromObjectiveC: key), dynamicBridgeCast(fromObjectiveC: value)) {
+                found = true
+                shouldStop.pointee = true
+            }
+        }
+        return found
+    }
+
+    // MARK: Sorting
+
+    /// Returns the elements of the sequence, sorted using the given predicate as
+    /// the comparison between elements.
+    ///
+    /// When you want to sort a sequence of elements that don't conform to the
+    /// `Comparable` protocol, pass a predicate to this method that returns
+    /// `true` when the first element should be ordered before the second. The
+    /// elements of the resulting array are ordered according to the given
+    /// predicate.
+    ///
+    /// The sorting algorithm is not guaranteed to be stable. A stable sort
+    /// preserves the relative order of elements for which
+    /// `areInIncreasingOrder` does not establish an order.
+    ///
+    /// - Note The elements in this dictionary will be copied and then the call will be forwarded to use
+    /// Foundation's `sorted(by:)` implementation.
+    ///
+    /// - Parameter areInIncreasingOrder: A predicate that returns `true` if its
+    ///   first argument should be ordered before its second argument;
+    ///   otherwise, `false`.
+    ///
+    /// - Returns: A sorted array of the sequence's elements.
+    func sorted(by areInIncreasingOrder: ((key: Key, value: Value), (key: Key, value: Value)) -> Bool) -> [(Key, Value)] {
+        return keys.reduce(into: [:]) { (dictionary, key) in
+            dictionary[key] = self[key]
+        }.sorted(by: areInIncreasingOrder)
+    }
+
+    // MARK: Aggregate Operations
+
+    /**
+     Returns the minimum (lowest) value of the given property among all the objects in the collection, or `nil` if the
+     collection is empty.
+
+     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+
+     - parameter property: The name of a property whose minimum value is desired.
+     */
+    public func min<T: MinMaxType>(ofProperty property: String) -> T? {
+        return rlmDictionary.min(ofProperty: property).map(dynamicBridgeCast)
+    }
+
+    /**
+     Returns the maximum (highest) value of the given property among all the objects in the collection, or `nil` if the
+     collection is empty.
+
+     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+
+     - parameter property: The name of a property whose minimum value is desired.
+     */
+    public func max<T: MinMaxType>(ofProperty property: String) -> T? {
+        return rlmDictionary.max(ofProperty: property).map(dynamicBridgeCast)
+    }
+
+    /**
+    Returns the sum of the given property for objects in the collection, or `nil` if the collection is empty.
+
+    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
+    */
+    public func sum<T: AddableType>(ofProperty property: String) -> T {
+        return dynamicBridgeCast(fromObjectiveC: rlmDictionary.sum(ofProperty: property))
+    }
+
+    /**
+     Returns the average value of a given property over all the objects in the collection, or `nil` if
+     the collection is empty.
+
+     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
+
+     - parameter property: The name of a property whose values should be summed.
+     */
+    public func average<T: AddableType>(ofProperty property: String) -> T? {
+        return rlmDictionary.average(ofProperty: property).map(dynamicBridgeCast)
     }
 
     // MARK: Notifications
@@ -318,7 +319,6 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
     public func observe(on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<Map>) -> Void) -> NotificationToken {
         fatalError()
-//        return rlmDictionary.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Frozen Objects
