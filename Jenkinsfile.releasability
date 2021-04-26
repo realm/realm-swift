@@ -288,7 +288,10 @@ def doBuild() {
         node('osx') {
           deleteDir()
           unstash 'source'
-          sh 'sh build.sh test-osx'
+          sh '''
+            export REALM_DISABLE_METADATA_ENCRYPTION=1
+            sh build.sh test-osx
+          '''
         }
       }
     ]
