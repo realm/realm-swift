@@ -1,3 +1,20 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+
+### Enhancements
+
+* Package a prebuilt XCFramework for Carthage. Carthage 0.38 and later will
+  download this instead of the old frameworks when using `--use-xcframeworks`.
+* Add Xcode 12.5 binaries to the release package.
+
+### Compatibility
+
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 5.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.
+
 5.5.1 Release notes (2021-03-15)
 =============================================================
 
