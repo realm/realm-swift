@@ -29,24 +29,47 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Key-value collection. Where the key is a string and value is one of the available Realm types.
+ `RLMDictionary` is a container type in Realm representing a dynamic collection of key-value pairs.
+
+ Unlike an `NSDictionary`, `RLMDictionary`s hold a single key and value type.
+ This is referred to in these docs as the “type” and “keyType” of the dictionary.
+
+ When declaring an `RLMDictionary` property, the object type must be marked as conforming to a
+ protocol by the same name as the objects it should contain (see the
+ `RLM_COLLECTION_TYPE` macro).
+
+     RLM_COLLECTION_TYPE(ObjectType)
+     ...
+     @property RLMDictionary<RLMString, ObjectType> *objectTypeDictionary;
+
+ `RLMDictionary`s can be queried with the same predicates as `RLMObject` and `RLMResult`s.
+
+ `RLMDictionary`s cannot be created directly. `RLMDictionary` properties on `RLMObject`s are
+ lazily created when accessed, or can be obtained by querying a Realm.
+
+ ### Key-Value Observing
+
+ `RLMDictionary` supports dictionary key-value observing on `RLMDictionary` properties on `RLMObject`
+ subclasses, and the `invalidated` property on `RLMDictionary` instances themselves is
+ key-value observing compliant when the `RLMDictionary` is attached to a managed
+ `RLMObject` (`RLMDictionary`s on unmanaged `RLMObject`s will never become invalidated).
  */
 @interface RLMDictionary<RLMKeyType, RLMObjectType>: NSObject<RLMCollection>
 
 #pragma mark - Properties
 
 /**
- The number of (key, value) pairs in the dictionary.
+ The number of entries in the dictionary.
  */
 @property (nonatomic, readonly, assign) NSUInteger count;
 
 /**
- The type of the value objects in the dictionary.
+ The type of the objects in the dictionary.
  */
 @property (nonatomic, readonly, assign) RLMPropertyType type;
 
 /**
- The type of the key object in the dictionary.
+ The type of the key used in this dictionary.
  */
 @property (nonatomic, readonly, assign) RLMPropertyType keyType;
 
@@ -81,12 +104,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, getter = isFrozen) BOOL frozen;
 
-#pragma mark - Accessing Objects from an Dictionary
+#pragma mark - Accessing Objects from a Dictionary
 
 /**
  Returns the value associated with a given key.
 
  @param key The name of the property.
+
+ // Lee we need to match this behaviour
+ @discussion If key does not start with “@”, invokes object(forKey:). If key does start
+ with “@”, strips the “@” and invokes [super valueForKey:] with the rest of the key.
 
  @return A value associated with a given key or `nil`.
  */
@@ -118,27 +145,27 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Adding, Removing, and Replacing Objects in a Dictionary
 
 /**
- Replace the data of a dictionary with the data of another dictionary.
+ Replace the contents of a dictionary with the contents of another dictionary.
  */
 - (void)setDictionary:(RLMDictionary<RLMKeyType <RLMDictionaryKey>, RLMObjectType> *)otherDictionary;
 
 /**
- Delete all dictionary's keys and values.
+ Delete all contents in the dictionary.
  */
 - (void)removeAllObjects;
 
 /**
- Delete dictionary's values for a given keys.
+ Removes from the dictionary entries specified by elements in a given array.
  */
 - (void)removeObjectsForKeys:(NSArray<RLMKeyType> *)keyArray;
 
 /**
- Delete dictionary's value for a given key.
+ Removes a given key and its associated value from the dictionary.
  */
 - (void)removeObjectForKey:(RLMKeyType <RLMDictionaryKey>)key;
 
 /**
- Add a value for a given key indictioanry.
+ Adds a given key-value pair to the dictionary.
  */
 - (void)setObject:(RLMObjectType)obj forKeyedSubscript:(RLMKeyType <RLMDictionaryKey>)key;
 
@@ -152,10 +179,10 @@ NS_ASSUME_NONNULL_BEGIN
  
   @warning This method may only be called during a write transaction.
 
-  @param objects     An enumerable object such as `NSDictionary` or `RLMDictionary` which contains objects of the
-                     same class as the array.
+  @param objects An enumerable object such as `NSDictionary` or `RLMDictionary` which contains objects of the
+                same type as the receiving dictionary.
  */
-- (void)addEntriesFromDictionary:(id)otherDictionary;
+- (void)addEntriesFromDictionary:(id <NSFastEnumeration>)otherDictionary;
 
 #pragma mark - Querying a Dictionary
 
@@ -184,7 +211,7 @@ NS_ASSUME_NONNULL_BEGIN
 
      NSNumber *min = [object.dictionaryProperty minOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`,  `RLMArray`,  `RLMSet`, and `NSData` properties.
+ @warning You cannot use this method on Realm collection, and `NSData` properties.
 
  @param property The property whose minimum value is desired. Only properties of
                  types `int`, `float`, `double`, and `NSDate` are supported.
@@ -231,7 +258,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param property The property whose average value should be calculated. Only
                  properties of types `int`, `float`, and `double` are supported.
 
- @return    The average value of the given property, or `nil` if the dictionary is empty.
+ @return The average value of the given property, or `nil` if the dictionary is empty.
  */
 - (nullable NSNumber *)averageOfProperty:(NSString *)property;
 

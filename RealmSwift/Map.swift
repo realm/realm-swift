@@ -219,28 +219,6 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
 
     // MARK: Mutation
 
-//    /**
-//     Inserts an object to the set if not already present.
-//
-//     - warning: This method may only be called during a write transaction.
-//
-//     - parameter object: An object.
-//     */
-//    public func insert(_ object: Element) {
-//        rlmDictionary.add(dynamicBridgeCast(fromSwift: object) as AnyObject)
-//    }
-//
-//    /**
-//     Inserts the given sequence of objects into the set if not already present.
-//
-//     - warning: This method may only be called during a write transaction.
-//    */
-//    public func insert<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == Element {
-//        for obj in objects {
-//            rlmDictionary.add(dynamicBridgeCast(fromSwift: obj) as AnyObject)
-//        }
-//    }
-
     /**
      Updates the value stored in the dictionary for the given key, or adds a new key-value pair if the key does not exist.
 

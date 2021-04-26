@@ -304,7 +304,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param keyPaths     The key paths to distinct on.
 
- @return    An `RLMResults` with the distinct values of the keypath(s).
+ @return An `RLMResults` with the distinct values of the keypath(s).
  */
 - (RLMResults<RLMObjectType> *)distinctResultsUsingKeyPaths:(NSArray<NSString *> *)keyPaths;
 
