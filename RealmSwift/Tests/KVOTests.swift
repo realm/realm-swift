@@ -48,6 +48,10 @@ class SwiftKVOObject: Object {
     let optFloatCol = RealmOptional<Float>()
     let optDoubleCol = RealmOptional<Double>()
     let optBoolCol = RealmOptional<Bool>()
+    let otherIntCol = RealmProperty<Int?>()
+    let otherFloatCol = RealmProperty<Float?>()
+    let otherDoubleCol = RealmProperty<Double?>()
+    let otherBoolCol = RealmProperty<Bool?>()
     @objc dynamic var optStringCol: String?
     @objc dynamic var optBinaryCol: Data?
     @objc dynamic var optDateCol: Date?
@@ -145,8 +149,8 @@ class KVOTests: TestCase {
         XCTAssert(changeDictionary != nil, "Did not get a notification", file: (fileName), line: lineNumber)
         guard changeDictionary != nil else { return }
 
-        let actualOld = changeDictionary![.oldKey]! as? T
-        let actualNew = changeDictionary![.newKey]! as? T
+        let actualOld = changeDictionary![.oldKey] as? T
+        let actualNew = changeDictionary![.newKey] as? T
 
         XCTAssert(old == actualOld,
                   "Old value: expected \(String(describing: old)), got \(String(describing: actualOld))",
@@ -273,6 +277,11 @@ class KVOTests: TestCase {
         observeChange(obs, "optDecimalCol", nil, decimal) { obj.optDecimalCol = decimal }
         observeChange(obs, "optObjectIdCol", nil, objectId) { obj.optObjectIdCol = objectId }
 
+        observeChange(obs, "otherIntCol", nil, 10) { obj.otherIntCol.value = 10 }
+        observeChange(obs, "otherFloatCol", nil, 10.0) { obj.otherFloatCol.value = 10 }
+        observeChange(obs, "otherDoubleCol", nil, 10.0) { obj.otherDoubleCol.value = 10 }
+        observeChange(obs, "otherBoolCol", nil, true) { obj.otherBoolCol.value = true }
+
         observeChange(obs, "optIntCol", 10, nil) { obj.optIntCol.value = nil }
         observeChange(obs, "optFloatCol", 10.0, nil) { obj.optFloatCol.value = nil }
         observeChange(obs, "optDoubleCol", 10.0, nil) { obj.optDoubleCol.value = nil }
@@ -282,6 +291,11 @@ class KVOTests: TestCase {
         observeChange(obs, "optDateCol", date, nil) { obj.optDateCol = nil }
         observeChange(obs, "optDecimalCol", decimal, nil) { obj.optDecimalCol = nil }
         observeChange(obs, "optObjectIdCol", objectId, nil) { obj.optObjectIdCol = nil }
+
+        observeChange(obs, "otherIntCol", 10, nil) { obj.otherIntCol.value = nil }
+        observeChange(obs, "otherFloatCol", 10.0, nil) { obj.otherFloatCol.value = nil }
+        observeChange(obs, "otherDoubleCol", 10.0, nil) { obj.otherDoubleCol.value = nil }
+        observeChange(obs, "otherBoolCol", true, nil) { obj.otherBoolCol.value = nil }
 
         observeListChange(obs, "arrayBool", .insertion) { obj.arrayBool.append(true) }
         observeListChange(obs, "arrayInt8", .insertion) { obj.arrayInt8.append(10) }

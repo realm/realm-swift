@@ -46,7 +46,7 @@ class SwiftHugeSyncObject: Object {
 extension User {
     func configuration(testName: String) -> Realm.Configuration {
         var config = self.configuration(partitionValue: testName)
-        config.objectTypes = [SwiftPerson.self, SwiftHugeSyncObject.self]
+        config.objectTypes = [SwiftPerson.self, SwiftHugeSyncObject.self, SwiftTypesSyncObject.self]
         return config
     }
 }
@@ -82,18 +82,37 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let realm = try openRealm(partitionValue: #function, user: user)
             if isParent {
                 checkCount(expected: 0, realm, SwiftPerson.self)
+                checkCount(expected: 0, realm, SwiftTypesSyncObject.self)
                 executeChild()
                 waitForDownloads(for: realm)
-                checkCount(expected: 3, realm, SwiftPerson.self)
+                checkCount(expected: 4, realm, SwiftPerson.self)
+                checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
+
+                let obj = realm.objects(SwiftTypesSyncObject.self).first!
+                XCTAssertEqual(obj.boolCol, true)
+                XCTAssertEqual(obj.intCol, 1)
+                XCTAssertEqual(obj.doubleCol, 1.1)
+                XCTAssertEqual(obj.stringCol, "string")
+                XCTAssertEqual(obj.binaryCol, "string".data(using: String.Encoding.utf8)!)
+                XCTAssertEqual(obj.decimalCol, Decimal128(1))
+                XCTAssertEqual(obj.dateCol, Date(timeIntervalSince1970: -1))
+                XCTAssertEqual(obj.longCol, Int64(1))
+                XCTAssertEqual(obj.uuidCol, UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)
+                XCTAssertEqual(obj.anyCol.value.intValue, 1)
+                XCTAssertEqual(obj.objectCol!.firstName, "George")
+
             } else {
                 // Add objects
                 try realm.write {
                     realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
                     realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
                     realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                    realm.add(SwiftTypesSyncObject(person: SwiftPerson(firstName: "George", lastName: "Harrison")))
                 }
                 waitForUploads(for: realm)
-                checkCount(expected: 3, realm, SwiftPerson.self)
+                checkCount(expected: 4, realm, SwiftPerson.self)
+                checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
+
             }
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
@@ -164,6 +183,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 executeChild()
                 waitForDownloads(for: realm)
                 checkCount(expected: 3, realm, SwiftPerson.self)
+
                 try realm.write {
                     realm.deleteAll()
                 }
@@ -193,17 +213,21 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
                     realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
                     realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                    realm.add(SwiftTypesSyncObject(person: SwiftPerson(firstName: "George", lastName: "Harrison")))
                 }
                 waitForUploads(for: realm)
-                checkCount(expected: 3, realm, SwiftPerson.self)
+                checkCount(expected: 4, realm, SwiftPerson.self)
+                checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
                 executeChild()
             } else {
-                checkCount(expected: 3, realm, SwiftPerson.self)
+                checkCount(expected: 4, realm, SwiftPerson.self)
+                checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
                 try realm.write {
                     realm.deleteAll()
                 }
                 waitForUploads(for: realm)
                 checkCount(expected: 0, realm, SwiftPerson.self)
+                checkCount(expected: 0, realm, SwiftTypesSyncObject.self)
             }
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
@@ -2091,6 +2115,66 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
     }
 }
 
+class AnyRealmValueSyncTests: SwiftSyncTestCase {
+    /// The purpose of this test is to confirm that when an Object is set on a mixed Column and an old
+    /// version of an app does not have that Realm Object / Schema we can still access that object via
+    /// `AnyRealmValue.dynamicSchema`.
+    func testMissingSchema() {
+        do {
+            let user = try logInUser(for: basicCredentials())
+
+            if !isParent {
+                // Imagine this is v2 of an app with 3 classes
+                var config = user.configuration(partitionValue: #function)
+                config.objectTypes = [SwiftPerson.self, SwiftAnyRealmValueObject.self, SwiftMissingObject.self]
+                let realm = try openRealm(configuration: config)
+                try realm.write {
+                    let so1 = SwiftPerson()
+                    so1.firstName = "Rick"
+                    so1.lastName = "Sanchez"
+                    let so2 = SwiftPerson()
+                    so2.firstName = "Squidward"
+                    so2.lastName = "Tentacles"
+
+                    let syncObj2 = SwiftMissingObject()
+                    syncObj2.objectCol = so1
+                    syncObj2.anyCol.value = .object(so1)
+
+                    let syncObj = SwiftMissingObject()
+                    syncObj.objectCol = so1
+                    syncObj.anyCol.value = .object(syncObj2)
+                    let obj = SwiftAnyRealmValueObject()
+                    obj.anyCol.value = .object(syncObj)
+                    obj.otherAnyCol.value = .object(so2)
+                    realm.add(obj)
+                }
+                waitForUploads(for: realm)
+                return
+            }
+            executeChild()
+
+            // Imagine this is v1 of an app with just 2 classes, `SwiftMissingObject`
+            // did not exist when this version was shipped,
+            // but v2 managed to sync `SwiftMissingObject` to this Realm.
+            var config = user.configuration(partitionValue: #function)
+            config.objectTypes = [SwiftAnyRealmValueObject.self, SwiftPerson.self]
+            let realm = try openRealm(configuration: config)
+            let obj = realm.objects(SwiftAnyRealmValueObject.self).first
+            // SwiftMissingObject.anyCol -> SwiftMissingObject.anyCol -> SwiftPerson.firstName
+            let anyCol = ((obj!.anyCol.value.dynamicObject?.anyCol as? Object)?["anyCol"] as? Object)
+            XCTAssertEqual((anyCol?["firstName"] as? String), "Rick")
+            try! realm.write {
+                anyCol?["firstName"] = "Morty"
+            }
+            XCTAssertEqual((anyCol?["firstName"] as? String), "Morty")
+            let objectCol = (obj!.anyCol.value.dynamicObject?.objectCol as? Object)
+            XCTAssertEqual((objectCol?["firstName"] as? String), "Morty")
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+}
+
 #if REALM_HAVE_COMBINE || !SWIFT_PACKAGE
 
 // XCTest doesn't care about the @available on the class and will try to run
@@ -2507,9 +2591,9 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    func testAsyncOpenStandaloneCombine() {
-        autoreleasepool {
-            let realm = try! Realm()
+    func testAsyncOpenStandaloneCombine() throws {
+        try autoreleasepool {
+            let realm = try Realm()
             try! realm.write {
                 (0..<10000).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket")) }
             }

@@ -40,6 +40,7 @@ static_assert((int)RLMPropertyTypeObject     == (int)realm::PropertyType::Object
 static_assert((int)RLMPropertyTypeObjectId   == (int)realm::PropertyType::ObjectId);
 static_assert((int)RLMPropertyTypeDecimal128 == (int)realm::PropertyType::Decimal);
 static_assert((int)RLMPropertyTypeUUID       == (int)realm::PropertyType::UUID);
+static_assert((int)RLMPropertyTypeAny        == (int)realm::PropertyType::Mixed);
 
 BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType) {
     return propertyType == RLMPropertyTypeLinkingObjects;
@@ -91,7 +92,7 @@ static bool rawTypeShouldBeTreatedAsComputedProperty(NSString *rawType) {
                                  objectClassName:prop.object_type.length() ? @(prop.object_type.c_str()) : nil
                           linkOriginPropertyName:prop.link_origin_property_name.length() ? @(prop.link_origin_property_name.c_str()) : nil
                                          indexed:prop.is_indexed
-                                        optional:is_nullable(prop.type)];
+                                        optional:isNullable(prop.type)];
     if (is_array(prop.type)) {
         ret->_array = true;
     }
@@ -149,6 +150,9 @@ static bool rawTypeShouldBeTreatedAsComputedProperty(NSString *rawType) {
 }
 
 static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char *type) {
+    if (strcmp(type, "RLMValue>\"") == 0) {
+        return RLMPropertyTypeAny;
+    }
     if (strncmp(type, "RLM", 3)) {
         return realm::none;
     }
@@ -243,9 +247,17 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     else if (strcmp(code, "@\"NSUUID\"") == 0) {
         _type = RLMPropertyTypeUUID;
     }
+    else if (strcmp(code, "@\"<RLMValue>\"") == 0) {
+        _type = RLMPropertyTypeAny;
+        // Mixed can represent a null type but can't explicitly be an optional type.
+        _optional = false;
+    }
     else if (strncmp(code, arrayPrefix, arrayPrefixLen) == 0) {
         _array = true;
         if (auto type = typeFromProtocolString(code + arrayPrefixLen)) {
+            if (*type == RLMPropertyTypeAny) {
+                _optional = false;
+            }
             _type = *type;
             return YES;
         }
@@ -267,6 +279,9 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     else if (strncmp(code, setPrefix, setPrefixLen) == 0) {
         _set = true;
         if (auto type = typeFromProtocolString(code + setPrefixLen)) {
+            if (*type == RLMPropertyTypeAny) {
+                _optional = false;
+            }
             _type = *type;
             return YES;
         }
@@ -680,7 +695,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     if (_set) {
         p.type |= realm::PropertyType::Set;
     }
-    if (_optional) {
+    if (_optional || (p.type == realm::PropertyType::Mixed)) {
         p.type |= realm::PropertyType::Nullable;
     }
     return p;

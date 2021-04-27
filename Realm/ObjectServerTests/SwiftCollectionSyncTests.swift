@@ -197,6 +197,14 @@ class ListSyncTests: SwiftSyncTestCase {
             XCTFail(error.localizedDescription)
         }
     }
+
+    func testAnyList() {
+        do {
+            try roundTrip(keyPath: \.anyList, values: [.int(12345), .string("Hello"), .none])
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
 }
 
 class SetSyncTests: SwiftSyncTestCase {
@@ -388,6 +396,15 @@ class SetSyncTests: SwiftSyncTestCase {
                           otherSet: (\.otherObjectSet, [SwiftPerson(firstName: "Stephen", lastName: "Strange"),
                                                         SwiftPerson(firstName: "Tony", lastName: "Stark"),
                                                         SwiftPerson(firstName: "Clark", lastName: "Kent")]))
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testAnySet() {
+        do {
+            try roundTrip(set: (\.anySet, [.int(12345), .none, .string("Hello")]),
+                          otherSet: (\.otherAnySet, [.string("Hello"), .double(765.6543), .objectId(.generate())]))
         } catch {
             XCTFail(error.localizedDescription)
         }

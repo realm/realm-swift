@@ -32,6 +32,7 @@
 #import "RLMSwiftCollectionBase.h"
 #import "RLMUtil.hpp"
 #import "RLMUUID_Private.hpp"
+#import "RLMSwiftValueStorage.h"
 
 #import <realm/object-store/results.hpp>
 #import <realm/object-store/property.hpp>
@@ -80,7 +81,10 @@ template<>
 bool is_null(realm::Decimal128 const& v) {
     return v.is_null();
 }
-
+template<>
+bool is_null(realm::Mixed const& v) {
+    return v.is_null();
+}
 template<>
 bool is_null(realm::UUID const&) {
     return false;
@@ -275,6 +279,18 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
     }
 }
 
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
+              __unsafe_unretained id<RLMValue> const value) {
+    RLMTranslateError([&] {
+        if (value) {
+            obj->_row.set(key, RLMObjcToMixed(value, obj->_realm, realm::CreatePolicy::SetLink));
+        }
+        else {
+            setNull(obj->_row, key);
+        }
+    });
+}
+
 RLMLinkingObjects *getLinkingObjects(__unsafe_unretained RLMObjectBase *const obj,
                                      __unsafe_unretained RLMProperty *const property) {
     RLMVerifyAttached(obj);
@@ -367,7 +383,10 @@ id managedGetter(RLMProperty *prop, const char *type) {
         case RLMPropertyTypeObjectId:
             return makeWrapperGetter<realm::ObjectId>(index, prop.optional);
         case RLMPropertyTypeAny:
-            @throw RLMException(@"Cannot create accessor class for schema with Mixed properties");
+            // Mixed is represented as optional in Core,
+            // but not in Cocoa. We use `makeBoxedGetter` over
+            // `makeWrapperGetter` becuase Mixed can box a `null` representation.
+            return makeBoxedGetter<realm::Mixed>(index);
         case RLMPropertyTypeLinkingObjects:
             return ^(__unsafe_unretained RLMObjectBase *const obj) {
                 return getLinkingObjects(obj, prop);
@@ -428,7 +447,7 @@ id managedSetter(RLMProperty *prop, const char *type) {
         case RLMPropertyTypeString:         return makeSetter<NSString *>(prop);
         case RLMPropertyTypeDate:           return makeSetter<NSDate *>(prop);
         case RLMPropertyTypeData:           return makeSetter<NSData *>(prop);
-        case RLMPropertyTypeAny:            return nil;
+        case RLMPropertyTypeAny:            return makeSetter<id<RLMValue>>(prop);
         case RLMPropertyTypeLinkingObjects: return nil;
         case RLMPropertyTypeObject:         return makeSetter<RLMObjectBase *>(prop);
         case RLMPropertyTypeObjectId:       return makeSetter<RLMObjectId *>(prop);
@@ -728,8 +747,8 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
         if (prop.collection) {
             return static_cast<RLMSwiftCollectionBase *>(object_getIvar(obj, prop.swiftIvar))._rlmCollection;
         }
-        else { // optional
-            value = RLMGetOptional(static_cast<RLMOptionalBase *>(object_getIvar(obj, prop.swiftIvar)));
+        else { // optional / RLMPropertyTypeAny
+            value = RLMGetSwiftValueStorage(static_cast<RLMSwiftValueStorage *>(object_getIvar(obj, prop.swiftIvar)));
         }
     }
     else {
@@ -785,53 +804,55 @@ id RLMAccessorContext::box(realm::Results&& r) {
 using realm::ObjKey;
 using realm::CreatePolicy;
 
+#pragma mark - unboxing -
+
 template<>
-realm::Timestamp RLMAccessorContext::unbox(__unsafe_unretained id const value, CreatePolicy, ObjKey) {
+realm::Timestamp RLMStatelessAccessorContext::unbox(__unsafe_unretained id const value) {
     id v = RLMCoerceToNil(value);
     return RLMTimestampForNSDate(v);
 }
 
 template<>
-bool RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+bool RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return [v boolValue];
 }
 template<>
-double RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+double RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return [v doubleValue];
 }
 template<>
-float RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+float RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return [v floatValue];
 }
 template<>
-long long RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+long long RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return [v longLongValue];
 }
 template<>
-realm::BinaryData RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+realm::BinaryData RLMStatelessAccessorContext::unbox(id v) {
     v = RLMCoerceToNil(v);
     return RLMBinaryDataForNSData(v);
 }
 template<>
-realm::StringData RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+realm::StringData RLMStatelessAccessorContext::unbox(id v) {
     v = RLMCoerceToNil(v);
     return RLMStringDataWithNSString(v);
 }
 template<>
-realm::Decimal128 RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+realm::Decimal128 RLMStatelessAccessorContext::unbox(id v) {
     return RLMObjcToDecimal128(v);
 }
 template<>
-realm::ObjectId RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+realm::ObjectId RLMStatelessAccessorContext::unbox(id v) {
     return static_cast<RLMObjectId *>(v).value;
 }
 template<>
-realm::UUID RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+realm::UUID RLMStatelessAccessorContext::unbox(id v) {
     return RLMObjcToUUID(v);
 }
 template<>
-realm::Mixed RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
-    REALM_UNREACHABLE();
+realm::Mixed RLMAccessorContext::unbox(__unsafe_unretained id v, CreatePolicy p, ObjKey) {
+    return RLMObjcToMixed(v, _realm, p);
 }
 template<>
 realm::object_store::Dictionary RLMAccessorContext::unbox(id, CreatePolicy, ObjKey) {
@@ -845,29 +866,31 @@ static auto to_optional(__unsafe_unretained id const value, Fn&& fn) {
 }
 
 template<>
-realm::util::Optional<bool> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+realm::util::Optional<bool> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return to_optional(v, [&](__unsafe_unretained id v) { return (bool)[v boolValue]; });
 }
 template<>
-realm::util::Optional<double> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+realm::util::Optional<double> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v doubleValue]; });
 }
 template<>
-realm::util::Optional<float> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+realm::util::Optional<float> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v floatValue]; });
 }
 template<>
-realm::util::Optional<int64_t> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+realm::util::Optional<int64_t> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v longLongValue]; });
 }
 template<>
-realm::util::Optional<realm::ObjectId> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+realm::util::Optional<realm::ObjectId> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return to_optional(v, [&](__unsafe_unretained RLMObjectId *v) { return v.value; });
 }
 template<>
-realm::util::Optional<realm::UUID> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+realm::util::Optional<realm::UUID> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
     return to_optional(v, [&](__unsafe_unretained NSUUID *v) { return [v rlm_uuidValue]; });
 }
+
+#pragma mark - Helper Methods -
 
 std::pair<realm::Obj, bool>
 RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
@@ -957,6 +980,7 @@ RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
         object_setClass(objBase, _info.rlmObjectSchema.accessorClass);
         RLMInitializeSwiftAccessorGenerics(objBase);
     }
+
     return {*outObj, false};
 }
 
@@ -1003,15 +1027,15 @@ RLMOptionalId RLMAccessorContext::default_value_for_property(realm::ObjectSchema
     return RLMOptionalId{defaultValue(@(prop.name.c_str()))};
 }
 
-bool RLMAccessorContext::is_same_list(realm::List const& list, __unsafe_unretained id const v) const noexcept {
+bool RLMStatelessAccessorContext::is_same_list(realm::List const& list, __unsafe_unretained id const v) const noexcept {
     return [v respondsToSelector:@selector(isBackedByList:)] && [v isBackedByList:list];
 }
 
-bool RLMAccessorContext::is_same_set(realm::object_store::Set const& set, __unsafe_unretained id const v) const noexcept {
+bool RLMStatelessAccessorContext::is_same_set(realm::object_store::Set const& set, __unsafe_unretained id const v) const noexcept {
     return [v respondsToSelector:@selector(isBackedBySet:)] && [v isBackedBySet:set];
 }
 
-bool RLMAccessorContext::is_same_dictionary(realm::object_store::Dictionary const&, __unsafe_unretained id const) const noexcept {
+bool RLMStatelessAccessorContext::is_same_dictionary(realm::object_store::Dictionary const&, __unsafe_unretained id const) const noexcept {
     REALM_UNREACHABLE();
 }
 #pragma clang diagnostic push

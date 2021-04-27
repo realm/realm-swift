@@ -113,6 +113,9 @@ class ObjectAccessorTests: TestCase {
         XCTAssertEqual(object.objectIdCol, oid1)
         object.objectIdCol = oid2
         XCTAssertEqual(object.objectIdCol, oid2)
+
+        object.anyCol.value = .string("hello")
+        XCTAssertEqual(object.anyCol.value.stringValue, "hello")
     }
 
     func testUnmanagedAccessors() {
@@ -478,12 +481,15 @@ class ObjectAccessorTests: TestCase {
 
     func testPropertiesOutlivingParentObject() {
         var optional: RealmOptional<Int>!
+        var realmProperty: RealmProperty<Int?>!
         var list: List<Int>!
         var set: MutableSet<Int>!
         let realm = try! Realm()
         try! realm.write {
             autoreleasepool {
-                optional = realm.create(SwiftOptionalObject.self, value: ["optIntCol": 1]).optIntCol
+                let optObject = realm.create(SwiftOptionalObject.self, value: ["optIntCol": 1, "otherIntCol": 1])
+                optional = optObject.optIntCol
+                realmProperty = optObject.otherIntCol
                 list = realm.create(SwiftListObject.self, value: ["int": [1]]).int
                 set = realm.create(SwiftMutableSetObject.self, value: ["int": [1]]).int
             }
@@ -491,6 +497,7 @@ class ObjectAccessorTests: TestCase {
 
         // Verify that we can still read the correct value
         XCTAssertEqual(optional.value, 1)
+        XCTAssertEqual(realmProperty.value, 1)
         XCTAssertEqual(list.count, 1)
         XCTAssertEqual(list[0], 1)
         XCTAssertEqual(set.count, 1)
@@ -500,11 +507,13 @@ class ObjectAccessorTests: TestCase {
         // have it properly update the parent
         try! realm.write {
             optional.value = 2
+            realmProperty.value = 2
             list.append(2)
             set.insert(2)
         }
 
         XCTAssertEqual(optional.value, 2)
+        XCTAssertEqual(realmProperty.value, 2)
         XCTAssertEqual(list.count, 2)
         XCTAssertEqual(list[0], 1)
         XCTAssertEqual(list[1], 2)
@@ -514,22 +523,26 @@ class ObjectAccessorTests: TestCase {
 
         autoreleasepool {
             XCTAssertEqual(realm.objects(SwiftOptionalObject.self).first!.optIntCol.value, 2)
+            XCTAssertEqual(realm.objects(SwiftOptionalObject.self).first!.otherIntCol.value, 2)
             XCTAssertEqual(Array(realm.objects(SwiftListObject.self).first!.int), [1, 2])
             XCTAssertEqual(Array(realm.objects(SwiftMutableSetObject.self).first!.int), [1, 2])
         }
 
         try! realm.write {
             optional.value = nil
+            realmProperty.value = nil
             list.removeAll()
             set.removeAll()
         }
 
         XCTAssertEqual(optional.value, nil)
+        XCTAssertEqual(realmProperty.value, nil)
         XCTAssertEqual(list.count, 0)
         XCTAssertEqual(set.count, 0)
 
         autoreleasepool {
             XCTAssertEqual(realm.objects(SwiftOptionalObject.self).first!.optIntCol.value, nil)
+            XCTAssertEqual(realm.objects(SwiftOptionalObject.self).first!.otherIntCol.value, nil)
             XCTAssertEqual(Array(realm.objects(SwiftListObject.self).first!.int), [])
             XCTAssertEqual(Array(realm.objects(SwiftMutableSetObject.self).first!.int), [])
         }

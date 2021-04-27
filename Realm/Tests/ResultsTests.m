@@ -229,16 +229,16 @@
     NSDate *dateMinInput = [NSDate date];
     NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
 
-    [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-    [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
-    [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-    [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
-    [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-    [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
-    [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-    [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
-    [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
-    [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput, @0.0]];
+    [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput, @2.5]];
+    [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput, @0.0]];
+    [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput, @2.5]];
+    [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput, @0.0]];
+    [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput, @2.5]];
+    [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput, @0.0]];
+    [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput, @2.5]];
+    [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput, @0.0]];
+    [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput, @0.0]];
 
     [realm commitWriteTransaction];
 
@@ -257,6 +257,11 @@
     XCTAssertEqualWithAccuracy([noArray sumOfProperty:@"doubleCol"].doubleValue, 10.0, 0.1f);
     XCTAssertEqualWithAccuracy([yesArray sumOfProperty:@"doubleCol"].doubleValue, 0.0, 0.1f);
     XCTAssertEqualWithAccuracy([allArray sumOfProperty:@"doubleCol"].doubleValue, 10.0, 0.1f);
+
+    // Test RLMValue sum
+    XCTAssertEqualWithAccuracy([noArray sumOfProperty:@"anyCol"].doubleValue, 10.0, 0.1f);
+    XCTAssertEqualWithAccuracy([yesArray sumOfProperty:@"anyCol"].doubleValue, 0.0, 0.1f);
+    XCTAssertEqualWithAccuracy([allArray sumOfProperty:@"anyCol"].doubleValue, 10.0, 0.1f);
 
     // Test invalid column name
     RLMAssertThrowsWithReasonMatching([yesArray sumOfProperty:@"foo"], @"foo.*AggregateObject");
@@ -283,6 +288,11 @@
     XCTAssertEqualWithAccuracy([yesArray averageOfProperty:@"doubleCol"].doubleValue, 0.0, 0.1f);
     XCTAssertEqualWithAccuracy([allArray averageOfProperty:@"doubleCol"].doubleValue, 1.0, 0.1f);
 
+    // Test RLMValue average
+    XCTAssertEqualWithAccuracy([noArray averageOfProperty:@"anyCol"].doubleValue, 2.5, 0.1f);
+    XCTAssertEqualWithAccuracy([yesArray averageOfProperty:@"anyCol"].doubleValue, 0.0, 0.1f);
+    XCTAssertEqualWithAccuracy([allArray averageOfProperty:@"anyCol"].doubleValue, 1.0, 0.1f);
+
     // Test invalid column name
     RLMAssertThrowsWithReasonMatching([yesArray averageOfProperty:@"foo"], @"foo.*AggregateObject");
     RLMAssertThrowsWithReasonMatching([allArray averageOfProperty:@"foo"], @"foo.*AggregateObject");
@@ -306,6 +316,11 @@
     XCTAssertEqual(2.5, [[noArray minOfProperty:@"doubleCol"] doubleValue]);
     XCTAssertEqual(0.0, [[yesArray minOfProperty:@"doubleCol"] doubleValue]);
     XCTAssertEqual(0.0, [[allArray minOfProperty:@"doubleCol"] doubleValue]);
+
+    // Test RLMValue min
+    XCTAssertEqual(2.5, [[noArray minOfProperty:@"anyCol"] doubleValue]);
+    XCTAssertEqual(0.0, [[yesArray minOfProperty:@"anyCol"] doubleValue]);
+    XCTAssertEqual(0.0, [[allArray minOfProperty:@"anyCol"] doubleValue]);
 
     // Test date min
     XCTAssertEqualObjects(dateMaxInput, [noArray minOfProperty:@"dateCol"]);
@@ -335,6 +350,11 @@
     XCTAssertEqual(2.5, [[noArray maxOfProperty:@"doubleCol"] doubleValue]);
     XCTAssertEqual(0.0, [[yesArray maxOfProperty:@"doubleCol"] doubleValue]);
     XCTAssertEqual(2.5, [[allArray maxOfProperty:@"doubleCol"] doubleValue]);
+
+    // Test RLMValue max
+    XCTAssertEqual(2.5, [[noArray maxOfProperty:@"anyCol"] doubleValue]);
+    XCTAssertEqual(0.0, [[yesArray maxOfProperty:@"anyCol"] doubleValue]);
+    XCTAssertEqual(2.5, [[allArray maxOfProperty:@"anyCol"] doubleValue]);
 
     // Test date max
     XCTAssertEqualObjects(dateMaxInput, [noArray maxOfProperty:@"dateCol"]);

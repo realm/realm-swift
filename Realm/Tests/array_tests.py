@@ -6,6 +6,7 @@ import os, re
 # (no)avg: Type supports average()
 # r/o: Type is Required or Optional
 # (un)man: Type is Managed or Unmanaged
+# (no)any: Can accept any type
 
 types = [
   # Class, Object, Property, Values, Tags
@@ -19,6 +20,17 @@ types = [
   ['AllPrimitiveArrays', 'unmanaged', 'decimalObj', ['decimal128(2)', 'decimal128(3)'], {'r', 'minmax', 'sum', 'avg', 'unman'}],
   ['AllPrimitiveArrays', 'unmanaged', 'objectIdObj', ['objectId(1)', 'objectId(2)'], {'r', 'unman'}],
   ['AllPrimitiveArrays', 'unmanaged', 'uuidObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['r','unman']],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyBoolObj', ['@NO', '@YES'], {'any', 'unman'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyIntObj', ['@2', '@3'], {'any', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyFloatObj', ['@2.2f', '@3.3f'], {'any', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyDoubleObj', ['@2.2', '@3.3'], {'any', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyStringObj', ['@"a"', '@"b"'], {'any', 'unman', 'string'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyDataObj', ['data(1)', 'data(2)'], {'any', 'unman'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyDateObj', ['date(1)', 'date(2)'], {'any', 'minmax', 'unman', 'date'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyDecimalObj', ['decimal128(2)', 'decimal128(3)'], {'any', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyObjectIdObj', ['objectId(1)', 'objectId(2)'], {'any', 'unman'}],
+  ['AllPrimitiveArrays', 'unmanaged', 'anyUUIDObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['any','unman']],
+
   ['AllOptionalPrimitiveArrays', 'optUnmanaged', 'boolObj', ['@NO', '@YES', 'NSNull.null'], {'o', 'unman'}],
   ['AllOptionalPrimitiveArrays', 'optUnmanaged', 'intObj', ['@2', '@3', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg', 'unman'}],
   ['AllOptionalPrimitiveArrays', 'optUnmanaged', 'floatObj', ['@2.2f', '@3.3f', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg', 'unman'}],
@@ -39,6 +51,17 @@ types = [
   ['AllPrimitiveArrays', 'managed', 'decimalObj', ['decimal128(2)', 'decimal128(3)'], {'r', 'minmax', 'sum', 'avg', 'man'}],
   ['AllPrimitiveArrays', 'managed', 'objectIdObj', ['objectId(1)', 'objectId(2)'], {'r', 'man'}],
   ['AllPrimitiveArrays', 'managed', 'uuidObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['r', 'man']],
+  ['AllPrimitiveArrays', 'managed', 'anyBoolObj', ['@NO', '@YES'], {'any', 'man'}],
+  ['AllPrimitiveArrays', 'managed', 'anyIntObj', ['@2', '@3'], {'any', 'minmax', 'sum', 'avg', 'man'}],
+  ['AllPrimitiveArrays', 'managed', 'anyFloatObj', ['@2.2f', '@3.3f'], {'any', 'minmax', 'sum', 'avg', 'man'}],
+  ['AllPrimitiveArrays', 'managed', 'anyDoubleObj', ['@2.2', '@3.3'], {'any', 'minmax', 'sum', 'avg', 'man'}],
+  ['AllPrimitiveArrays', 'managed', 'anyStringObj', ['@"a"', '@"b"'], {'any', 'man', 'string'}],
+  ['AllPrimitiveArrays', 'managed', 'anyDataObj', ['data(1)', 'data(2)'], {'any', 'man'}],
+  ['AllPrimitiveArrays', 'managed', 'anyDateObj', ['date(1)', 'date(2)'], {'any', 'minmax', 'man', 'date'}],
+  ['AllPrimitiveArrays', 'managed', 'anyDecimalObj', ['decimal128(2)', 'decimal128(3)'], {'any', 'minmax', 'sum', 'avg', 'man'}],
+  ['AllPrimitiveArrays', 'managed', 'anyObjectIdObj', ['objectId(1)', 'objectId(2)'], {'any', 'man'}],
+  ['AllPrimitiveArrays', 'managed', 'anyUUIDObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['any', 'man']],
+
   ['AllOptionalPrimitiveArrays', 'optManaged', 'boolObj', ['@NO', '@YES', 'NSNull.null'], {'o', 'man'}],
   ['AllOptionalPrimitiveArrays', 'optManaged', 'intObj', ['@2', '@3', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg', 'man'}],
   ['AllOptionalPrimitiveArrays', 'optManaged', 'floatObj', ['@2.2f', '@3.3f', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg', 'man'}],
@@ -50,13 +73,20 @@ types = [
   ['AllOptionalPrimitiveArrays', 'optManaged', 'objectIdObj', ['objectId(1)', 'objectId(2)', 'NSNull.null'], {'o', 'man'}],
   ['AllOptionalPrimitiveArrays', 'optManaged', 'uuidObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")', 'NSNull.null'], ['o', 'man']]
 ]
+
+def type_name(propertyName, optional):
+    if 'any' in propertyName:
+        return 'mixed'
+    else:
+        return propertyName.replace('Obj', '') + ('?' if 'opt' in optional else '')
+
 types = [{'class': t[0], 'obj': t[1], 'prop': t[2], 'v0': t[3][0], 'v1': t[3][1],
           'array': t[1] + '.' + t[2],
           'values2': '@[' + ', '.join(t[3] * 2) + ']',
           'values': '@[' + ', '.join(t[3]) + ']',
           'first': t[3][0], 'last': t[3][2] if len(t[3]) == 3 else t[3][1],
           'wrong': '@"a"', 'wdesc': 'a', 'wtype': '__NSCFConstantString',
-          'type': t[2].replace('Obj', '') + ('?' if 'opt' in t[1] else ''),
+          'type': type_name(t[2], t[1]),
           'tags': set(t[4]),
           }
          for t in types]

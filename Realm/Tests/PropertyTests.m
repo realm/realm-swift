@@ -67,6 +67,8 @@ static RLMProperty *makeProperty(NSString *name, RLMPropertyType type, NSString 
             @"decimalCol":  makeProperty(@"decimalCol", RLMPropertyTypeDecimal128, nil, NO),
             @"objectCol":   makeProperty(@"objectCol", RLMPropertyTypeObject, @"StringObject", YES),
             @"uuidCol":     makeProperty(@"uuidCol", RLMPropertyTypeUUID, nil, NO),
+            @"anyCol":      makeProperty(@"anyCol", RLMPropertyTypeAny, nil, NO),
+            @"mixedObjectCol": makeProperty(@"mixedObjectCol", RLMPropertyTypeObject, @"MixedObject", YES),
         };
         XCTAssertEqual(objectSchema.properties.count, expectedProperties.allKeys.count);
         for (NSString *propertyName in expectedProperties) {

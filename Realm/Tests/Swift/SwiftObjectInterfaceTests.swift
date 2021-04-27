@@ -79,6 +79,7 @@ class SwiftRLMObjectInterfaceTests: RLMTestCase {
         obj.arrayCol.add(obj.objectCol)
         obj.setCol.add(obj.objectCol)
         obj.uuidCol = UUID(uuidString: "00000000-0000-0000-0000-000000000000")
+        obj.rlmValue = NSString("I am a mixed value")
         try! realm.commitWriteTransaction()
 
         let data = "abcd".data(using: String.Encoding.utf8)
@@ -93,6 +94,7 @@ class SwiftRLMObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(firstObj.dateCol, Date(timeIntervalSince1970: 123), "should be epoch + 123")
         XCTAssertEqual(firstObj.objectCol.boolCol, true, "should be true")
         XCTAssertEqual(firstObj.uuidCol?.uuidString, "00000000-0000-0000-0000-000000000000")
+        XCTAssertEqual(firstObj.rlmValue as! NSString, NSString("I am a mixed value"))
         XCTAssertEqual(obj.arrayCol.count, UInt(1), "array count should be 1")
         XCTAssertEqual(obj.arrayCol.firstObject()!.boolCol, true, "should be true")
         XCTAssertEqual(obj.setCol.count, UInt(1), "set count should be 1")
@@ -119,6 +121,8 @@ class SwiftRLMObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(firstObj.arrayCol.count, UInt(0), "array count should be zero")
         XCTAssertEqual(firstObj.setCol.count, UInt(0), "set count should be zero")
         XCTAssertEqual(firstObj.uuidCol!.uuidString, "00000000-0000-0000-0000-000000000000")
+        XCTAssertEqual(firstObj.uuidCol!.uuidString, "00000000-0000-0000-0000-000000000000")
+        XCTAssertEqual(firstObj.rlmValue as! NSString, NSString("A Mixed Object"))
     }
 
     func testMergedDefaultValuesSwiftRLMObject() {

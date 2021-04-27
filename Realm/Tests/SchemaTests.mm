@@ -467,6 +467,7 @@ RLM_COLLECTION_TYPE(NotARealClass)
     NSArray *expectedTypes = @[@"AllTypesObject",
                                @"LinkToAllTypesObject",
                                @"StringObject",
+                               @"MixedObject",
                                @"IntObject"];
 
     NSString *unexpectedType = @"__$ThisTypeShouldNotOccur$__";
@@ -653,6 +654,24 @@ RLM_COLLECTION_TYPE(NotARealClass)
                                               @"\t\t\tarray = NO;\n"
                                               @"\t\t\tset = NO;\n"
                                               @"\t\t\toptional = YES;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tmixedObjectCol {\n"
+                                              @"\t\t\ttype = object;\n"
+                                              @"\t\t\tobjectClassName = MixedObject;\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\toptional = YES;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tanyCol {\n"
+                                              @"\t\t\ttype = mixed;\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tlinkingObjectsCol {\n"
                                               @"\t\t\ttype = linking objects;\n"

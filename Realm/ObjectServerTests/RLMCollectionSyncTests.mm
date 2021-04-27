@@ -38,6 +38,7 @@
                                                                             register:self.isParent]];
         RLMRealm *realm = [self openRealmForPartitionValue:callerName user:user];
         if (self.isParent) {
+            // Add a RLMSetSyncObject to the Realm
             CHECK_COUNT(0, RLMSetSyncObject, realm);
             RLMRunChildAndWait();
             [self waitForDownloadsForRealm:realm];
@@ -76,7 +77,8 @@
             RLMResults<RLMSetSyncObject *> *results
                 = [RLMSetSyncObject allObjectsInRealm:realm];
             if (RLMSetSyncObject *obj = results.firstObject) {
-                if (propertyGetter(obj).count == 0) {
+                CHECK_COUNT(1, RLMSetSyncObject, realm);
+                if (propertyGetter(obj).count == 0 && otherPropertyGetter(obj).count == 0) {
                     [realm transactionWithBlock:^{
                         [propertyGetter(obj) addObjects:values];
                         [otherPropertyGetter(obj) addObjects:otherValues];
@@ -105,7 +107,8 @@
                 }
             } else {
                 [realm transactionWithBlock:^{
-                    [realm addObject:[RLMSetSyncObject new]];
+                    [RLMSetSyncObject createInRealm:realm
+                                          withValue:@{@"_id": [RLMObjectId objectId]}];
                 }];
             }
             [self waitForUploadsForRealm:realm];
@@ -208,6 +211,17 @@
                            callerName:NSStringFromSelector(_cmd)];
 }
 
+- (void)testAnySet {
+    [self roundTripWithPropertyGetter:^RLMSet *(RLMSetSyncObject *obj) { return obj.anySet; }
+                               values:@[@123, @"Hey", NSNull.null]
+                  otherPropertyGetter:^RLMSet *(RLMSetSyncObject *obj) { return obj.otherAnySet; }
+                          otherValues:@[[[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd"],
+                                        @123,
+                                        [[RLMObjectId alloc] initWithString:@"6058f12682b2fbb1f334ef1d" error:nil]]
+                             isObject:NO
+                           callerName:NSStringFromSelector(_cmd)];
+}
+
 @end
 
 #pragma mark RLMArray Sync Tests
@@ -278,13 +292,14 @@
                 } else {
                     [realm transactionWithBlock:^{
                         [propertyGetter(obj) replaceObjectAtIndex:0
-                                                              withObject:values[1]];
+                                                       withObject:values[1]];
                     }];
                     XCTAssertTrue([propertyGetter(obj).firstObject isEqual:values[1]]);
                 }
             } else {
                 [realm transactionWithBlock:^{
-                    [realm addObject:[RLMArraySyncObject new]];
+                    [RLMArraySyncObject createInRealm:realm
+                                            withValue:@{@"_id": [RLMObjectId objectId]}];
                 }];
             }
             [self waitForUploadsForRealm:realm];
@@ -367,6 +382,13 @@
     [self roundTripWithPropertyGetter:^RLMArray *(RLMArraySyncObject *obj) { return obj.objectArray; }
                                values:@[[Person john], [Person paul], [Person ringo]]
                              isObject:YES
+                           callerName:NSStringFromSelector(_cmd)];
+}
+
+- (void)testAnyArray {
+    [self roundTripWithPropertyGetter:^RLMArray *(RLMArraySyncObject *obj) { return obj.anyArray; }
+                               values:@[@1234, @"I'm a String", NSNull.null]
+                             isObject:NO
                            callerName:NSStringFromSelector(_cmd)];
 }
 

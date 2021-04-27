@@ -18,9 +18,7 @@
 
 #import <Realm/RLMProperty_Private.h>
 
-namespace realm {
-    struct Property;
-}
+#import <realm/object-store/property.hpp>
 
 @class RLMSchema;
 
@@ -31,3 +29,7 @@ namespace realm {
 - (realm::Property)objectStoreCopy:(RLMSchema *)schema;
 
 @end
+
+static inline bool isNullable(const realm::PropertyType& t) {
+    return t != realm::PropertyType::Mixed && is_nullable(t);
+}

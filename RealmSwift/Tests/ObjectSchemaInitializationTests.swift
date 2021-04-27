@@ -86,6 +86,22 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertFalse(dateCol!.isOptional)
         XCTAssertNil(dateCol!.objectClassName)
 
+        let uuidCol = objectSchema["uuidCol"]
+        XCTAssertNotNil(uuidCol)
+        XCTAssertEqual(uuidCol!.name, "uuidCol")
+        XCTAssertEqual(uuidCol!.type, PropertyType.UUID)
+        XCTAssertFalse(uuidCol!.isIndexed)
+        XCTAssertFalse(uuidCol!.isOptional)
+        XCTAssertNil(uuidCol!.objectClassName)
+
+        let anyCol = objectSchema["anyCol"]
+        XCTAssertNotNil(anyCol)
+        XCTAssertEqual(anyCol!.name, "anyCol")
+        XCTAssertEqual(anyCol!.type, PropertyType.any)
+        XCTAssertFalse(anyCol!.isIndexed)
+        XCTAssertFalse(anyCol!.isOptional)
+        XCTAssertNil(anyCol!.objectClassName)
+
         let objectCol = objectSchema["objectCol"]
         XCTAssertNotNil(objectCol)
         XCTAssertEqual(objectCol!.name, "objectCol")

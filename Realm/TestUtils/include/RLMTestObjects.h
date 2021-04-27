@@ -131,10 +131,14 @@ RLM_COLLECTION_TYPE(EmbeddedIntObject)
 @property NSUUID *uuidCol;
 @end
 
+@interface MixedObject: RLMObject
+@property id<RLMValue> anyCol;
+@property RLMArray<RLMValue> *anyArray;
+@end
+
 #pragma mark AllTypesObject
 
 @interface AllTypesObject : RLMObject
-
 @property BOOL          boolCol;
 @property int           intCol;
 @property float         floatCol;
@@ -148,10 +152,14 @@ RLM_COLLECTION_TYPE(EmbeddedIntObject)
 @property RLMObjectId  *objectIdCol;
 @property NSUUID       *uuidCol;
 @property StringObject *objectCol;
+@property MixedObject  *mixedObjectCol;
 @property (readonly) RLMLinkingObjects *linkingObjectsCol;
+@property id<RLMValue> anyCol;
 
 + (NSDictionary *)values:(int)i stringObject:(StringObject *)so;
-
++ (NSDictionary *)values:(int)i
+            stringObject:(StringObject *)so
+             mixedObject:(MixedObject *)mo;
 @end
 
 RLM_COLLECTION_TYPE(AllTypesObject)
@@ -207,6 +215,16 @@ RLM_COLLECTION_TYPE(AllTypesObject)
 @property RLMArray<RLMDecimal128> *decimalObj;
 @property RLMArray<RLMObjectId> *objectIdObj;
 @property RLMArray<RLMUUID> *uuidObj;
+@property RLMArray<RLMValue> *anyBoolObj;
+@property RLMArray<RLMValue> *anyIntObj;
+@property RLMArray<RLMValue> *anyFloatObj;
+@property RLMArray<RLMValue> *anyDoubleObj;
+@property RLMArray<RLMValue> *anyStringObj;
+@property RLMArray<RLMValue> *anyDataObj;
+@property RLMArray<RLMValue> *anyDateObj;
+@property RLMArray<RLMValue> *anyDecimalObj;
+@property RLMArray<RLMValue> *anyObjectIdObj;
+@property RLMArray<RLMValue> *anyUUIDObj;
 @end
 
 @interface AllOptionalPrimitiveArrays : RLMObject
@@ -243,6 +261,28 @@ RLM_COLLECTION_TYPE(AllTypesObject)
 @property RLMSet<RLMObjectId> *objectIdObj2;
 @property RLMSet<RLMUUID> *uuidObj;
 @property RLMSet<RLMUUID> *uuidObj2;
+
+@property RLMSet<RLMValue> *anyBoolObj;
+@property RLMSet<RLMValue> *anyBoolObj2;
+@property RLMSet<RLMValue> *anyIntObj;
+@property RLMSet<RLMValue> *anyIntObj2;
+@property RLMSet<RLMValue> *anyFloatObj;
+@property RLMSet<RLMValue> *anyFloatObj2;
+@property RLMSet<RLMValue> *anyDoubleObj;
+@property RLMSet<RLMValue> *anyDoubleObj2;
+@property RLMSet<RLMValue> *anyStringObj;
+@property RLMSet<RLMValue> *anyStringObj2;
+@property RLMSet<RLMValue> *anyDataObj;
+@property RLMSet<RLMValue> *anyDataObj2;
+@property RLMSet<RLMValue> *anyDateObj;
+@property RLMSet<RLMValue> *anyDateObj2;
+@property RLMSet<RLMValue> *anyDecimalObj;
+@property RLMSet<RLMValue> *anyDecimalObj2;
+@property RLMSet<RLMValue> *anyObjectIdObj;
+@property RLMSet<RLMValue> *anyObjectIdObj2;
+@property RLMSet<RLMValue> *anyUUIDObj;
+@property RLMSet<RLMValue> *anyUUIDObj2;
+
 @end
 
 @interface AllOptionalPrimitiveSets : RLMObject
@@ -266,6 +306,20 @@ RLM_COLLECTION_TYPE(AllTypesObject)
 @property RLMSet<RLMObjectId> *objectIdObj2;
 @property RLMSet<RLMUUID> *uuidObj;
 @property RLMSet<RLMUUID> *uuidObj2;
+@end
+
+@interface AllPrimitiveRLMValues : RLMObject
+@property id<RLMValue> nullVal;
+@property id<RLMValue> intVal;
+@property id<RLMValue> floatVal;
+@property id<RLMValue> doubleVal;
+@property id<RLMValue> boolVal;
+@property id<RLMValue> stringVal;
+@property id<RLMValue> dateVal;
+@property id<RLMValue> dataVal;
+@property id<RLMValue> decimalVal;
+@property id<RLMValue> objectIdVal;
+@property id<RLMValue> uuidVal;
 @end
 
 #pragma mark - Real Life Objects
@@ -415,6 +469,7 @@ RLM_COLLECTION_TYPE(CircleObject);
 @property double  doubleCol;
 @property BOOL    boolCol;
 @property NSDate *dateCol;
+@property id<RLMValue> anyCol;
 
 @end
 
