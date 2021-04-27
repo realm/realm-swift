@@ -353,10 +353,6 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     return false;
 }
 
-+ (bool)isDynamic {
-    return false;
-}
-
 - (id)mutableArrayValueForKey:(NSString *)key {
     id obj = [self valueForKey:key];
     if ([obj isKindOfClass:[RLMArray class]]) {
