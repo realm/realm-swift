@@ -401,8 +401,8 @@
 
     [realm beginWriteTransaction];
     for (int i = 0; i < 30; ++i) {
-        EmployeeObject *eo = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
         NSString *key = [NSString stringWithFormat:@"item%d", i];
+        EmployeeObject *eo = [EmployeeObject createInRealm:realm withValue:@{@"name": key,  @"age": @40, @"hired": @YES}];
         company.employeeDict[key] = eo;
     }
     [realm commitWriteTransaction];
@@ -411,15 +411,10 @@
 
     __weak id objects[30];
     NSInteger count = 0;
-    for (NSString *key in company.employeeDict) {
-        XCTAssertNotNil(key, @"Object is not nil and accessible");
-        if (count > 16) {
-            // 16 is the size of blocks fast enumeration happens to ask for at
-            // the moment, but of course that's just an implementation detail
-            // that may change
-            XCTAssertNil(objects[count - 16]);
-        }
-        objects[count++] = key;
+    for (id key in company.employeeDict) {
+        XCTAssertNotNil(key, @"Key is not nil and accessible");
+        XCTAssertNotNil(company.employeeDict[key], @"Object is not nil and accessible");
+        objects[count++] = key;//company.employeeDict[key];
     }
 
     XCTAssertEqual(count, 30, @"should have enumerated 30 objects");
@@ -428,18 +423,11 @@
         XCTAssertNil(objects[i], @"Object should have been released");
     }
 
-    @autoreleasepool {
-        for (EmployeeObject *e in company.employees) {
-            objects[0] = e;
-            break;
-        }
-    }
-    XCTAssertNil(objects[0], @"Object should have been released");
 
     [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(id<RLMDictionaryKey>  _Nonnull key,
                                                               id  _Nonnull obj,
                                                               BOOL * _Nonnull stop) {
-        XCTAssertEqual(company.employeeDict[key], obj);
+        XCTAssertEqual(((EmployeeObject *)company.employeeDict[key]).name, ((EmployeeObject *)obj).name);
     }];
 }
 

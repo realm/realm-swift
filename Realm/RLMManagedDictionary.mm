@@ -126,13 +126,6 @@ static void throwError(__unsafe_unretained ObjcCollection *const col, NSString *
     catch (realm::IncorrectThreadException const&) {
         @throw RLMException(@"Realm accessed from incorrect thread.");
     }
-    catch (realm::List::InvalidatedException const&) {
-        @throw RLMException(@"RLMDictionary has been invalidated or the containing object has been deleted.");
-    }
-    catch (realm::List::OutOfBoundsIndexException const& e) {
-        @throw RLMException(@"Index %zu is out of bounds (must be less than %zu).",
-                            e.requested, e.valid_count);
-    }
     catch (realm::Results::UnsupportedColumnTypeException const& e) {
         if (col->_backingCollection.get_type() == realm::PropertyType::Object) {
             @throw RLMException(@"%@: is not supported for %s%s property '%s'.",
@@ -245,7 +238,6 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 - (NSUInteger)hash {
     // TODO: implement hash
     //return std::hash<realm::object_store::Dictionary>()(_backingCollection);
-    return 0;
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
@@ -393,19 +385,8 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     }
 }
 
-// TODO: this can be a common func
-- (realm::ColKey)columnForProperty:(NSString *)propertyName {
-    if (_backingCollection.get_type() == realm::PropertyType::Object) {
-        return _objectInfo->tableColumn(propertyName);
-    }
-    if (![propertyName isEqualToString:@"self"]) {
-        @throw RLMException(@"Dictionaries of '%@' can only be aggregated on \"self\"", RLMTypeToString(_type));
-    }
-    return {};
-}
-
 - (id)minOfProperty:(NSString *)property {
-    auto column = [self columnForProperty:property];
+    auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
     auto value = translateErrors<RLMManagedDictionary>(self, [&] {
         return _backingCollection.as_results().min(column);
     }, @"minOfProperty");
@@ -413,7 +394,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (id)maxOfProperty:(NSString *)property {
-    auto column = [self columnForProperty:property];
+    auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
     auto value = translateErrors<RLMManagedDictionary>(self, [&] {
         return _backingCollection.as_results().max(column);
     }, @"maxOfProperty");
@@ -421,7 +402,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (id)sumOfProperty:(NSString *)property {
-    auto column = [self columnForProperty:property];
+    auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
     auto value = translateErrors<RLMManagedDictionary>(self, [&] {
         return _backingCollection.as_results().sum(column);
     }, @"sumOfProperty");
@@ -429,7 +410,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (id)averageOfProperty:(NSString *)property {
-    auto column = [self columnForProperty:property];
+    auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
     auto value = translateErrors<RLMManagedDictionary>(self, [&] {
         return _backingCollection.as_results().average(column);
     }, @"averageOfProperty");

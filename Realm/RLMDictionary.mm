@@ -228,8 +228,7 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 }
 
 - (nullable id)valueForKey:(nonnull NSString *)key {
-    // `invalidated` should be accessed with a `@` prefix when using RLMDictionary.
-    if ([key isEqualToString:[NSString stringWithFormat:@"@%@", RLMInvalidatedKey]]) {
+    if ([key isEqualToString:@"@invalidated"]) {
         return @NO; // Unmanaged dictionaries are never invalidated
     }
     if (!_backingCollection) {

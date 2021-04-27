@@ -130,7 +130,7 @@ static const int RLMEnumerationBufferSize = 16;
         if (is_dictionary(_results->get_type())) {
             for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
                 auto element = _results->get_dictionary_element(index);
-                _strongBuffer[batchCount] = RLMStringDataToNSString(element.first);
+                _strongBuffer[batchCount] = ctx.box(element.first);
                 batchCount++;
             }
         } else {
@@ -230,6 +230,33 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
         [array addObject:[accessor valueForKey:key] ?: NSNull.null];
     }
     return array;
+}
+
+realm::ColKey columnForProperty(NSString *propertyName,
+                                realm::object_store::Collection const& backingCollection,
+                                RLMClassInfo *objectInfo,
+                                RLMPropertyType propertyType,
+                                RLMCollectionType collectionType) {
+    if (backingCollection.get_type() == realm::PropertyType::Object) {
+        return objectInfo->tableColumn(propertyName);
+    }
+    if (![propertyName isEqualToString:@"self"]) {
+        NSString *collectionTypeName;
+        switch (collectionType) {
+            case RLMCollectionTypeArray:
+                collectionTypeName = @"Arrays";
+                break;
+            case RLMCollectionTypeSet:
+                collectionTypeName = @"Sets";
+                break;
+            case RLMCollectionTypeDictionary:
+                collectionTypeName = @"Dictionaries";
+                break;
+        }
+        @throw RLMException(@"%@ of '%@' can only be aggregated on \"self\"",
+                            collectionTypeName, RLMTypeToString(propertyType));
+    }
+    return {};
 }
 
 template NSArray *RLMCollectionValueForKey(realm::Results&, NSString *, RLMClassInfo&);

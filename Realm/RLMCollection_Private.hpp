@@ -26,6 +26,7 @@ namespace realm {
     class Results;
     class TableView;
     struct CollectionChangeSet;
+    struct ColKey;
     struct NotificationToken;
     namespace object_store {
         class Collection;
@@ -92,10 +93,11 @@ NSDictionary *RLMDictionaryValueForKey(realm::object_store::Dictionary& collecti
 
 std::vector<std::pair<std::string, bool>> RLMSortDescriptorsToKeypathArray(NSArray<RLMSortDescriptor *> *properties);
 
-template<typename Collection, typename ObjcCollection>
-id RLMManagedCollectionFromCollection(RLMClassInfo* info, realm::Obj&& obj, RLMProperty *prop);
-template<typename Fn>
-void RLMGetCollectionType(RLMProperty *prop, Fn&& func);
+realm::ColKey columnForProperty(NSString *propertyName,
+                                realm::object_store::Collection const& backingCollection,
+                                RLMClassInfo *objectInfo,
+                                RLMPropertyType propertyType,
+                                RLMCollectionType collectionType);
 
 static inline bool canAggregate(RLMPropertyType type, bool allowDate) {
     switch (type) {
