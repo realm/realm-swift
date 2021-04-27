@@ -42,8 +42,6 @@ which will help determining some of these versions.
 -->
 Realm framework version: ?
 
-Realm Object Server version: ?
-
 Xcode version: ?
 
 iOS/OSX version: ?
