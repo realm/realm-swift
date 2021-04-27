@@ -663,10 +663,10 @@ public class RealmServer: NSObject {
             "collection": "HugeSyncObject",
             "roles": [[
                 "name": "default",
-                        "apply_when": [:],
+                "apply_when": [:],
                 "insert": true,
                 "delete": true,
-                        "additional_fields": [:]
+                "additional_fields": [:]
             ]],
             "schema": [
                 "properties": [

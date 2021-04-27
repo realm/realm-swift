@@ -17,11 +17,14 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMConstants.h>
-#import <Realm/RLMOptionalBase.h>
+#import <Realm/RLMSwiftValueStorage.h>
+#import <Realm/RLMValue.h>
+
 #import <objc/runtime.h>
 
 #import <realm/array.hpp>
 #import <realm/binary_data.hpp>
+#import <realm/object-store/object.hpp>
 #import <realm/string_data.hpp>
 #import <realm/timestamp.hpp>
 #import <realm/util/file.hpp>
@@ -84,8 +87,8 @@ static inline id RLMCoerceToNil(__unsafe_unretained id obj) {
     if (static_cast<id>(obj) == NSNull.null) {
         return nil;
     }
-    else if (__unsafe_unretained auto optional = RLMDynamicCast<RLMOptionalBase>(obj)) {
-        return RLMCoerceToNil(RLMGetOptional(optional));
+    else if (__unsafe_unretained auto optional = RLMDynamicCast<RLMSwiftValueStorage>(obj)) {
+        return RLMCoerceToNil(RLMGetSwiftValueStorage(optional));
     }
     return obj;
 }
@@ -190,7 +193,13 @@ static inline void RLMNSStringToStdString(std::string &out, NSString *in) {
     out.resize(size);
 }
 
-id RLMMixedToObjc(realm::Mixed const& value);
+realm::Mixed RLMObjcToMixed(__unsafe_unretained id value,
+                            __unsafe_unretained RLMRealm *realm=nil,
+                            realm::CreatePolicy createPolicy={});
+id RLMMixedToObjc(realm::Mixed const& value,
+                  __unsafe_unretained RLMRealm *realm=nil,
+                  bool parentIsSwiftObject=false);
+
 realm::Decimal128 RLMObjcToDecimal128(id value);
 realm::UUID RLMObjcToUUID(__unsafe_unretained id const value);
 
@@ -209,4 +218,62 @@ static auto RLMTranslateError(Fn&& fn) {
     catch (std::exception const& e) {
         @throw RLMException(e);
     }
+}
+
+static inline bool numberIsInteger(__unsafe_unretained NSNumber *const obj) {
+    char data_type = [obj objCType][0];
+    return data_type == *@encode(bool) ||
+           data_type == *@encode(char) ||
+           data_type == *@encode(short) ||
+           data_type == *@encode(int) ||
+           data_type == *@encode(long) ||
+           data_type == *@encode(long long) ||
+           data_type == *@encode(unsigned short) ||
+           data_type == *@encode(unsigned int) ||
+           data_type == *@encode(unsigned long) ||
+           data_type == *@encode(unsigned long long);
+}
+
+static inline bool numberIsBool(__unsafe_unretained NSNumber *const obj) {
+    // @encode(BOOL) is 'B' on iOS 64 and 'c'
+    // objcType is always 'c'. Therefore compare to "c".
+    if ([obj objCType][0] == 'c') {
+        return true;
+    }
+
+    if (numberIsInteger(obj)) {
+        int value = [obj intValue];
+        return value == 0 || value == 1;
+    }
+
+    return false;
+}
+
+static inline bool numberIsFloat(__unsafe_unretained NSNumber *const obj) {
+    char data_type = [obj objCType][0];
+    return data_type == *@encode(float) ||
+           data_type == *@encode(short) ||
+           data_type == *@encode(int) ||
+           data_type == *@encode(long) ||
+           data_type == *@encode(long long) ||
+           data_type == *@encode(unsigned short) ||
+           data_type == *@encode(unsigned int) ||
+           data_type == *@encode(unsigned long) ||
+           data_type == *@encode(unsigned long long) ||
+           // A double is like float if it fits within float bounds or is NaN.
+           (data_type == *@encode(double) && (ABS([obj doubleValue]) <= FLT_MAX || isnan([obj doubleValue])));
+}
+
+static inline bool numberIsDouble(__unsafe_unretained NSNumber *const obj) {
+    char data_type = [obj objCType][0];
+    return data_type == *@encode(double) ||
+           data_type == *@encode(float) ||
+           data_type == *@encode(short) ||
+           data_type == *@encode(int) ||
+           data_type == *@encode(long) ||
+           data_type == *@encode(long long) ||
+           data_type == *@encode(unsigned short) ||
+           data_type == *@encode(unsigned int) ||
+           data_type == *@encode(unsigned long) ||
+           data_type == *@encode(unsigned long long);
 }

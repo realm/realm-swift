@@ -24,7 +24,7 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObservation.hpp"
-#import "RLMOptionalBase.h"
+#import "RLMSwiftValueStorage.h"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
@@ -209,8 +209,8 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
                                                                   RLMSchema.partialPrivateSharedSchema)];
             }
         }
-        else if (property.optional) {
-            RLMSetOptional(object_getIvar(self, ivar), value);
+        else if (property.optional || (property.type == RLMPropertyTypeAny)) {
+            RLMSetSwiftValueStorage(object_getIvar(self, ivar), value);
         }
         return;
     }

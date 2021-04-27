@@ -2,13 +2,17 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add `RLMSet`/`MutableSet<>` datatype. This is a Set collection type used for storing distinct values in a collection.
-* None.
+* Add support for `id<RLMValue>`/`AnyRealmValue`.
+* Add support for `UUID`/`NSUUID` data type.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Deprecations
+* `RealmOptional` has been deprecated in favor of `RealmProperty`.
 
 ### Compatibility
 * Realm Studio: 10.0.0 or later.
@@ -40,6 +44,19 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* Fixed an issue where creating an object after file format upgrade may fail
+  with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
+ ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
 * None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
@@ -251,7 +268,6 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * MongoDB Realm is now supported when installing Realm via Swift Package Manager.
-* Added support for UUID data type
 
 ### Fixed
 

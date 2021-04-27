@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMOptionalBase.h"
+#import "RLMSwiftValueStorage.h"
 
 #import "RLMAccessor.hpp"
 #import "RLMObject_Private.hpp"
@@ -26,13 +26,13 @@
 #import <realm/object-store/object.hpp>
 
 namespace {
-struct OptionalBase {
+struct SwiftValueStorageBase {
     virtual id get() = 0;
     virtual void set(id) = 0;
-    virtual ~OptionalBase() = default;
+    virtual ~SwiftValueStorageBase() = default;
 };
 
-class UnmanagedOptional : public OptionalBase {
+class UnmanagedSwiftValueStorage : public SwiftValueStorageBase {
 public:
     id get() override {
         return _value;
@@ -61,9 +61,9 @@ private:
 
 };
 
-class ManagedOptional : public OptionalBase {
+class ManagedSwiftValueStorage : public SwiftValueStorageBase {
 public:
-    ManagedOptional(RLMObjectBase *obj, RLMProperty *prop)
+    ManagedSwiftValueStorage(RLMObjectBase *obj, RLMProperty *prop)
     : _realm(obj->_realm)
     , _object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row)
     , _propertyName(prop.name.UTF8String)
@@ -89,41 +89,41 @@ private:
 };
 } // anonymous namespace
 
-@interface RLMOptionalBase () {
-    std::unique_ptr<OptionalBase> _impl;
+@interface RLMSwiftValueStorage () {
+    std::unique_ptr<SwiftValueStorageBase> _impl;
 }
 @end
 
-@implementation RLMOptionalBase
+@implementation RLMSwiftValueStorage
 - (instancetype)init {
     return self;
 }
 
 - (BOOL)isKindOfClass:(Class)aClass {
-    return [RLMGetOptional(self) isKindOfClass:aClass] || RLMIsKindOfClass(object_getClass(self), aClass);
+    return [RLMGetSwiftValueStorage(self) isKindOfClass:aClass] || RLMIsKindOfClass(object_getClass(self), aClass);
 }
 
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
-    return [RLMGetOptional(self) methodSignatureForSelector:sel];
+    return [RLMGetSwiftValueStorage(self) methodSignatureForSelector:sel];
 }
 
 - (void)forwardInvocation:(NSInvocation *)invocation {
-    [invocation invokeWithTarget:RLMGetOptional(self)];
+    [invocation invokeWithTarget:RLMGetSwiftValueStorage(self)];
 }
 
 - (id)forwardingTargetForSelector:(__unused SEL)sel {
-    return RLMGetOptional(self);
+    return RLMGetSwiftValueStorage(self);
 }
 
 - (BOOL)respondsToSelector:(SEL)aSelector {
-    return [RLMGetOptional(self) respondsToSelector:aSelector];
+    return [RLMGetSwiftValueStorage(self) respondsToSelector:aSelector];
 }
 
 - (void)doesNotRecognizeSelector:(SEL)aSelector {
-    [RLMGetOptional(self) doesNotRecognizeSelector:aSelector];
+    [RLMGetSwiftValueStorage(self) doesNotRecognizeSelector:aSelector];
 }
 
-id RLMGetOptional(__unsafe_unretained RLMOptionalBase *const self) {
+id RLMGetSwiftValueStorage(__unsafe_unretained RLMSwiftValueStorage *const self) {
     try {
         return self->_impl ? RLMCoerceToNil(self->_impl->get()) : nil;
     }
@@ -132,10 +132,10 @@ id RLMGetOptional(__unsafe_unretained RLMOptionalBase *const self) {
     }
 }
 
-void RLMSetOptional(__unsafe_unretained RLMOptionalBase *const self, __unsafe_unretained const id value) {
+void RLMSetSwiftValueStorage(__unsafe_unretained RLMSwiftValueStorage *const self, __unsafe_unretained const id value) {
     try {
         if (!self->_impl && value) {
-            self->_impl.reset(new UnmanagedOptional);
+            self->_impl.reset(new UnmanagedSwiftValueStorage);
         }
         if (self->_impl) {
             self->_impl->set(value);
@@ -146,19 +146,19 @@ void RLMSetOptional(__unsafe_unretained RLMOptionalBase *const self, __unsafe_un
     }
 }
 
-void RLMInitializeManagedOptional(__unsafe_unretained RLMOptionalBase *const self,
+void RLMInitializeManagedSwiftValueStorage(__unsafe_unretained RLMSwiftValueStorage *const self,
                                   __unsafe_unretained RLMObjectBase *const parent,
                                   __unsafe_unretained RLMProperty *const prop) {
     REALM_ASSERT(parent->_realm);
-    self->_impl.reset(new ManagedOptional(parent, prop));
+    self->_impl.reset(new ManagedSwiftValueStorage(parent, prop));
 }
 
-void RLMInitializeUnmanagedOptional(__unsafe_unretained RLMOptionalBase *const self,
+void RLMInitializeUnmanagedSwiftValueStorage(__unsafe_unretained RLMSwiftValueStorage *const self,
                                     __unsafe_unretained RLMObjectBase *const parent,
                                     __unsafe_unretained RLMProperty *const prop) {
     if (!self->_impl) {
-        self->_impl.reset(new UnmanagedOptional);
+        self->_impl.reset(new UnmanagedSwiftValueStorage);
     }
-    static_cast<UnmanagedOptional&>(*self->_impl).attach(parent, prop.name);
+    static_cast<UnmanagedSwiftValueStorage&>(*self->_impl).attach(parent, prop.name);
 }
 @end

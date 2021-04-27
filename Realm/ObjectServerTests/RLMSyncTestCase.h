@@ -29,7 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property RLMObjectId *_id;
 @property NSString *breed;
 @property NSString *name;
-
 @end
 
 @interface Person : RLMObject
@@ -74,6 +73,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype) initWithPrimaryKey:(NSInteger)primaryKey strCol:(NSString *)strCol intCol:(NSInteger)intCol;
 @end
 
+@interface AllTypesSyncObject : RLMObject
+@property RLMObjectId *_id;
+@property BOOL boolCol;
+@property bool cBoolCol;
+@property int intCol;
+@property double doubleCol;
+@property NSString *stringCol;
+@property NSData *binaryCol;
+@property NSDate *dateCol;
+@property int64_t longCol;
+@property RLMDecimal128 *decimalCol;
+@property NSUUID *uuidCol;
+@property id<RLMValue> anyCol;
+@property Person *objectCol;
++ (NSDictionary *)values:(int)i;
+@end
+
 RLM_COLLECTION_TYPE(Person);
 @interface RLMArraySyncObject : RLMObject
 @property RLMObjectId *_id;
@@ -85,6 +101,7 @@ RLM_COLLECTION_TYPE(Person);
 @property RLMArray<RLMObjectId> *objectIdArray;
 @property RLMArray<RLMDecimal128> *decimalArray;
 @property RLMArray<RLMUUID> *uuidArray;
+@property RLMArray<RLMValue> *anyArray;
 @property RLM_GENERIC_ARRAY(Person) *objectArray;
 @end
 
@@ -98,6 +115,7 @@ RLM_COLLECTION_TYPE(Person);
 @property RLMSet<RLMObjectId> *objectIdSet;
 @property RLMSet<RLMDecimal128> *decimalSet;
 @property RLMSet<RLMUUID> *uuidSet;
+@property RLMSet<RLMValue> *anySet;
 @property RLM_GENERIC_SET(Person) *objectSet;
 
 @property RLMSet<RLMInt> *otherIntSet;
@@ -108,6 +126,7 @@ RLM_COLLECTION_TYPE(Person);
 @property RLMSet<RLMObjectId> *otherObjectIdSet;
 @property RLMSet<RLMDecimal128> *otherDecimalSet;
 @property RLMSet<RLMUUID> *otherUuidSet;
+@property RLMSet<RLMValue> *otherAnySet;
 @property RLM_GENERIC_SET(Person) *otherObjectSet;
 @end
 
@@ -164,6 +183,8 @@ RLM_COLLECTION_TYPE(Person);
 - (void)logOutUser:(RLMUser *)user;
 
 - (void)addPersonsToRealm:(RLMRealm *)realm persons:(NSArray<Person *> *)persons;
+
+- (void)addAllTypesSyncObjectToRealm:(RLMRealm *)realm values:(NSDictionary *)dictionary person:(Person *)person;
 
 /// Synchronously wait for downloads to complete for any number of Realms, and then check their `SyncObject` counts.
 - (void)waitForDownloadsForUser:(RLMUser *)user

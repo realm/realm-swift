@@ -771,7 +771,7 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
 - (void)testCreateInRealmValidationForDictionary {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
-    NSDictionary *dictValidAllTypes = [AllTypesObject values:0 stringObject:nil];
+    NSDictionary *dictValidAllTypes = [AllTypesObject values:0 stringObject:nil mixedObject: nil];
     [realm beginWriteTransaction];
 
     XCTAssertNoThrow(([AllTypesObject createInRealm:realm withValue:dictValidAllTypes]),
@@ -782,6 +782,10 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
         id obj = @"invalid";
         if ([keyToInvalidate isEqualToString:@"stringCol"]) {
             obj = @1;
+        }
+
+        if ([keyToInvalidate isEqualToString:@"anyCol"]) {
+            obj = self;
         }
 
         invalidInput[keyToInvalidate] = obj;

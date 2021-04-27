@@ -78,6 +78,7 @@ BOOL propertyTypeIsNumeric(RLMPropertyType propertyType) {
         case RLMPropertyTypeDouble:
         case RLMPropertyTypeDecimal128:
         case RLMPropertyTypeDate:
+        case RLMPropertyTypeAny:
             return YES;
         default:
             return NO;
@@ -487,7 +488,6 @@ public:
     void apply_function_expression(RLMObjectSchema *objectSchema, NSExpression *functionExpression,
                                    NSPredicateOperatorType operatorType, NSExpression *right);
 
-
     template <typename A, typename B>
     void add_numeric_constraint(RLMPropertyType datatype,
                                 NSPredicateOperatorType operatorType,
@@ -495,6 +495,24 @@ public:
 
     template <typename A, typename B>
     void add_bool_constraint(RLMPropertyType, NSPredicateOperatorType operatorType, A&& lhs, B&& rhs);
+
+    template <typename C, typename T>
+    void add_mixed_constraint(NSPredicateOperatorType operatorType,
+                              NSComparisonPredicateOptions predicateOptions,
+                              Columns<C>&& column,
+                              T value);
+
+    template <typename C>
+    void add_mixed_constraint(NSPredicateOperatorType operatorType,
+                              NSComparisonPredicateOptions predicateOptions,
+                              Columns<C>&& column,
+                              const ColumnReference& c);
+
+    template <typename C>
+    void do_add_mixed_constraint(NSPredicateOperatorType operatorType,
+                                 NSComparisonPredicateOptions predicateOptions,
+                                 Columns<C>&& column,
+                                 Mixed&& value);
 
     template<typename T>
     void add_substring_constraint(const T& value, Query condition);
@@ -547,6 +565,8 @@ private:
     RLMSchema *m_schema;
 };
 
+#pragma mark Numeric Constraints
+
 // add a clause for numeric constraints based on operator type
 template <typename A, typename B>
 void QueryBuilder::add_numeric_constraint(RLMPropertyType datatype,
@@ -593,6 +613,8 @@ void QueryBuilder::add_bool_constraint(RLMPropertyType datatype,
     }
 }
 
+#pragma mark String Constraints
+
 template<typename T>
 void QueryBuilder::add_substring_constraint(const T& value, Query condition) {
     // Foundation always returns false for substring operations with a RHS of null or "".
@@ -600,6 +622,15 @@ void QueryBuilder::add_substring_constraint(const T& value, Query condition) {
                       ? std::move(condition)
                       : std::unique_ptr<Expression>(new FalseExpression));
 }
+
+template<>
+void QueryBuilder::add_substring_constraint(const Mixed& value, Query condition) {
+    // Foundation always returns false for substring operations with a RHS of null or "".
+    m_query.and_query(value.get_string().size()
+                      ? std::move(condition)
+                      : std::unique_ptr<Expression>(new FalseExpression));
+}
+
 
 template<typename T>
 void QueryBuilder::add_substring_constraint(const Columns<T>& value, Query condition) {
@@ -667,8 +698,15 @@ void QueryBuilder::add_diacritic_sensitive_string_constraint(NSPredicateOperator
             m_query.and_query(column.like(value, caseSensitive));
             break;
         default: {
-            constexpr auto propertyType = is_any_v<C, String, Lst<String>> ? RLMPropertyTypeString : RLMPropertyTypeData;
-            unsupportedOperator(propertyType, operatorType);
+            if constexpr (is_any_v<C, String, Lst<String>> || is_any_v<C, String, Set<String>>) {
+                unsupportedOperator(RLMPropertyTypeString, operatorType);
+            }
+            else if constexpr (is_any_v<C, Binary, Lst<Binary>> || is_any_v<C, Binary, Set<Binary>>) {
+                unsupportedOperator(RLMPropertyTypeData, operatorType);
+            }
+            else if constexpr (is_any_v<C, Mixed, Lst<Mixed>> || is_any_v<C, Mixed, Set<Mixed>>) {
+                unsupportedOperator(RLMPropertyTypeAny, operatorType);
+            }
         }
     }
 }
@@ -691,7 +729,11 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
         [](BinaryData value) { return make_subexpr<ConstantStringValue>(StringData(value.data(), value.size())); },
         [](const Columns<BinaryData>& c) { return c.clone(); },
         [](const Columns<Lst<BinaryData>>& c) { return c.clone(); },
-        [](const Columns<Set<BinaryData>>& c) { return c.clone(); }
+        [](const Columns<Set<BinaryData>>& c) { return c.clone(); },
+        [](const Columns<Mixed>& c) { return c.clone(); },
+        [](const Columns<Lst<Mixed>>& c) { return c.clone(); },
+        [](const Columns<Set<Mixed>>& c) { return c.clone(); },
+        [](Mixed value) { return make_subexpr<ConstantStringValue>(value.get_string()); },
     };
     auto left = as_subexpr(column);
     auto right = as_subexpr(value);
@@ -740,6 +782,8 @@ void validate_and_extract_between_range(id value, RLMProperty *prop, id *from, i
                     @"NSArray objects must be of type %@ for BETWEEN operations", RLMTypeToString(prop.type));
 }
 
+#pragma mark Between Constraint
+
 void QueryBuilder::add_between_constraint(const ColumnReference& column, id value) {
     if (column.has_any_to_many_links()) {
         auto link_column = column.last_link_column();
@@ -762,6 +806,8 @@ void QueryBuilder::add_between_constraint(const ColumnReference& column, id valu
     add_constraint(NSLessThanOrEqualToPredicateOperatorType, 0, column, to);
     m_query.end_group();
 }
+
+#pragma mark Link Constraints
 
 void QueryBuilder::add_link_constraint(NSPredicateOperatorType operatorType,
                                        const Columns<Link>& column, RLMObjectBase *obj) {
@@ -825,6 +871,8 @@ void process_or_group(Query &query, id array, Func&& func) {
     query.end_group();
 }
 
+#pragma mark Conversion Helpers
+
 template <typename RequestedType>
 RequestedType convert(id value);
 
@@ -884,6 +932,11 @@ ObjectId convert<ObjectId>(id value) {
     @throw RLMException(@"Cannot convert value '%@' of type '%@' to object id", value, [value class]);
 }
 
+template <>
+Mixed convert<Mixed>(id value) {
+    return RLMObjcToMixed(value, nil, CreatePolicy::Skip);
+}
+
 template <typename>
 realm::null value_of_type(realm::null) {
     return realm::null();
@@ -916,7 +969,8 @@ void QueryBuilder::do_add_constraint(RLMPropertyType type, NSPredicateOperatorTy
     switch (type) {
         case RLMPropertyTypeBool:
             convert_null(value, [&](auto&& value) {
-                add_bool_constraint(type, operatorType, column.resolve<W<bool>>(), value_of_type<bool>(value));
+                add_bool_constraint(type, operatorType, column.resolve<W<bool>>(),
+                                    value_of_type<bool>(value));
             });
             break;
         case RLMPropertyTypeObjectId:
@@ -972,13 +1026,88 @@ void QueryBuilder::do_add_constraint(RLMPropertyType type, NSPredicateOperatorTy
             break;
         case RLMPropertyTypeUUID:
             convert_null(value, [&](auto&& value) {
-                add_bool_constraint(type, operatorType, column.resolve<W<UUID>>(), value_of_type<UUID>(value));
+                add_bool_constraint(type, operatorType, column.resolve<W<UUID>>(),
+                                    value_of_type<UUID>(value));
             });
             break;
         case RLMPropertyTypeAny:
-            throwException(@"Unsupported predicate value type",
-                           @"Object type '%@' not supported", RLMTypeToString(type));
+            convert_null(value, [&](auto&& value) {
+                add_mixed_constraint(operatorType,
+                                     predicateOptions,
+                                     column.resolve<W<Mixed>>(),
+                                     value);
+            });
     }
+}
+
+#pragma mark Mixed Constraints
+
+template<typename C, typename T>
+void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
+                                        NSComparisonPredicateOptions predicateOptions,
+                                        Columns<C>&& column,
+                                        T value)
+{
+    // Handle cases where a string might be '1' or '0'. Without this the string
+    // will be boxed as a bool and thus string query operations will crash in core.
+    if constexpr(std::is_same_v<T, id>) {
+        if (auto str = RLMDynamicCast<NSString>(value)) {
+            add_string_constraint(operatorType, predicateOptions,
+                                  std::move(column), realm::Mixed([str UTF8String]));
+            return;
+        }
+    }
+    do_add_mixed_constraint(operatorType, predicateOptions,
+                            std::move(column), value_of_type<Mixed>(value));
+}
+
+template<typename C>
+void QueryBuilder::do_add_mixed_constraint(NSPredicateOperatorType operatorType,
+                                           NSComparisonPredicateOptions predicateOptions,
+                                           Columns<C>&& column,
+                                           Mixed&& value)
+{
+    switch (operatorType) {
+        case NSLessThanPredicateOperatorType:
+            m_query.and_query(column < value);
+            break;
+        case NSLessThanOrEqualToPredicateOperatorType:
+            m_query.and_query(column <= value);
+            break;
+        case NSGreaterThanPredicateOperatorType:
+            m_query.and_query(column > value);
+            break;
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            m_query.and_query(column >= value);
+            break;
+        case NSEqualToPredicateOperatorType:
+            m_query.and_query(column == value);
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            m_query.and_query(column != value);
+            break;
+        // String comparison operators: There isn't a way for a string value
+        // to get down here, but a rhs of NULL can
+        case NSLikePredicateOperatorType:
+        case NSMatchesPredicateOperatorType:
+        case NSBeginsWithPredicateOperatorType:
+        case NSEndsWithPredicateOperatorType:
+        case NSContainsPredicateOperatorType:
+            add_string_constraint(operatorType, predicateOptions,
+                                  std::move(column), value);
+            break;
+        default:
+            break;
+    }
+}
+
+template<typename C>
+void QueryBuilder::add_mixed_constraint(NSPredicateOperatorType operatorType,
+                                        NSComparisonPredicateOptions,
+                                        Columns<C>&& column,
+                                        const ColumnReference& value)
+{
+    add_bool_constraint(RLMPropertyTypeObject, operatorType, column, value.resolve<Mixed>());
 }
 
 template<typename T>
@@ -1072,6 +1201,8 @@ void validate_property_value(const ColumnReference& column,
     }
 }
 
+#pragma mark Collection Operations
+
 // static_assert is always evaluated even if it's inside a if constexpr
 // unless the value is derived from the template argument, in which case it's
 // only evaluated if that branch is active
@@ -1147,6 +1278,11 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
                                        value_of_type<Timestamp>(rhs));
             }
             break;
+        case RLMPropertyTypeAny:
+            add_numeric_constraint(type, operatorType,
+                                   collection_operation_expr<Mixed, Operation, IsLinkCollection>(collectionOperation),
+                                   value_of_type<Mixed>(rhs));
+            break;
         default:
             REALM_ASSERT(false && "Only numeric property types should hit this path.");
     }
@@ -1166,6 +1302,20 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
     });
 }
 
+template <typename T, typename Fn>
+void get_collection_type(__unsafe_unretained RLMProperty *prop, Fn&& fn) {
+    if (prop.array) {
+        fn((Lst<T>*)0);
+    }
+    else if (prop.set) {
+        fn((Set<T>*)0);
+    }
+    else {
+        // Add Dictionary here
+        REALM_TERMINATE("Unsupported collection type.");
+    }
+}
+
 template <typename R>
 void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType operatorType,
                                                        CollectionOperation const& collectionOperation, R rhs)
@@ -1175,44 +1325,67 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
             auto& column = collectionOperation.link_column();
             RLMPropertyType type = column.type();
             auto rhsValue = value_of_type<Int>(rhs);
+
             switch (type) {
                 case RLMPropertyTypeBool:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Bool>>().size(), rhsValue);
+                    get_collection_type<Bool>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeObjectId:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<ObjectId>>().size(), rhsValue);
+                    get_collection_type<ObjectId>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeDate:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Timestamp>>().size(), rhsValue);
+                    get_collection_type<Timestamp>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeDouble:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Double>>().size(), rhsValue);
+                    get_collection_type<Double>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeFloat:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Float>>().size(), rhsValue);
+                    get_collection_type<Float>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeInt:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Int>>().size(), rhsValue);
+                    get_collection_type<Int>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeDecimal128:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Decimal128>>().size(), rhsValue);
+                    get_collection_type<Decimal128>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeString:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<String>>().size(), rhsValue);
+                    get_collection_type<String>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeData:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<Binary>>().size(), rhsValue);
+                    get_collection_type<Binary>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeObject:
                 case RLMPropertyTypeLinkingObjects:
                     add_numeric_constraint(type, operatorType, column.resolve<Link>().count(), rhsValue);
                     return;
                 case RLMPropertyTypeUUID:
-                    add_numeric_constraint(type, operatorType, column.resolve<Lst<UUID>>().size(), rhsValue);
+                    get_collection_type<UUID>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
                     return;
                 case RLMPropertyTypeAny:
-                    throwException(@"Unsupported predicate value type",
-                                   @"Object type %@ not supported", RLMTypeToString(type));
+                    get_collection_type<Mixed>(column.property(), [&](auto t) {
+                        add_numeric_constraint(type, operatorType, column.resolve<std::decay_t<decltype(*t)>>().size(), rhsValue);
+                    });
+                    return;
             }
         }
         case CollectionOperation::Minimum:

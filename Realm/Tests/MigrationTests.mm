@@ -1447,6 +1447,7 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
 - (void)testMigrationRenameProperty {
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:AllTypesObject.class];
     RLMObjectSchema *stringObjectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
+    RLMObjectSchema *mixedObjectSchema = [RLMObjectSchema schemaForObjectClass:MixedObject.class];
     RLMObjectSchema *linkingObjectsSchema = [RLMObjectSchema schemaForObjectClass:LinkToAllTypesObject.class];
     NSMutableArray *beforeProperties = [NSMutableArray arrayWithCapacity:objectSchema.properties.count];
     for (RLMProperty *property in objectSchema.properties) {
@@ -1455,19 +1456,20 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
     NSArray *afterProperties = objectSchema.properties;
     objectSchema.properties = beforeProperties;
 
-    NSDictionary *valueDictionary = [AllTypesObject values:1 stringObject:(id)@[@"a"]];
+    NSDictionary *valueDictionary = [AllTypesObject values:1 stringObject:(id)@[@"a"] mixedObject:(id)@[@"a"]];
     NSMutableArray *inputValue = [NSMutableArray arrayWithCapacity:valueDictionary.count];
     for (NSString *key in [afterProperties valueForKey:@"name"]) {
         [inputValue addObject:valueDictionary[key]];
     }
 
-    [self createTestRealmWithSchema:@[objectSchema, stringObjectSchema, linkingObjectsSchema] block:^(RLMRealm *realm) {
+    [self createTestRealmWithSchema:@[objectSchema, stringObjectSchema, mixedObjectSchema, linkingObjectsSchema]
+                              block:^(RLMRealm *realm) {
         [AllTypesObject createInRealm:realm withValue:inputValue];
     }];
 
     objectSchema.properties = afterProperties;
 
-    RLMRealmConfiguration *config = [self renameConfigurationWithObjectSchemas:@[objectSchema, stringObjectSchema, linkingObjectsSchema]
+    RLMRealmConfiguration *config = [self renameConfigurationWithObjectSchemas:@[objectSchema, stringObjectSchema, mixedObjectSchema, linkingObjectsSchema]
                                                                 migrationBlock:^(RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
         [afterProperties enumerateObjectsUsingBlock:^(RLMProperty *property, NSUInteger idx, __unused BOOL *stop) {
             [migration renamePropertyForClass:AllTypesObject.className oldName:[beforeProperties[idx] name] newName:property.name];
@@ -1480,7 +1482,23 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
             }];
         }];
         [migration enumerateObjects:AllTypesObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
-            XCTAssertEqualObjects([oldObject.description stringByReplacingOccurrencesOfString:@"before_" withString:@""], newObject.description);
+            NSString *(^regexReplace)(NSString *) = ^(NSString *desc) {
+                NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<0x[0-9a-f]+>"
+                                                                                       options:NSRegularExpressionCaseInsensitive
+                                                                                         error:nil];
+                return [regex stringByReplacingMatchesInString:desc
+                                                       options:0
+                                                         range:NSMakeRange(0, desc.length)
+                                                  withTemplate:@""];
+            };
+
+            NSString *oldDescription = [oldObject.description stringByReplacingOccurrencesOfString:@"before_" withString:@""];
+            NSString *newDescription = newObject.description;
+
+            oldDescription = regexReplace(oldDescription);
+            newDescription = regexReplace(newDescription);
+
+            XCTAssertEqualObjects(oldDescription, newDescription);
         }];
     }];
     XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]);
@@ -1506,6 +1524,8 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
     XCTAssertEqualObjects(inputValue[10], obj.objectIdCol);
     XCTAssertEqualObjects(inputValue[11], obj.uuidCol);
     XCTAssertEqualObjects(inputValue[12], @[obj.objectCol.stringCol]);
+    XCTAssertEqualObjects(inputValue[13], @[obj.mixedObjectCol.anyCol]);
+    XCTAssertEqualObjects(inputValue[14], obj.anyCol);
 }
 
 - (void)testMultipleMigrationRenameProperty {

@@ -429,6 +429,7 @@
     XCTAssertEqual(ao.doubleCol, 1.11);
     XCTAssertEqualObjects(ao.stringCol, @"a");
     XCTAssertEqualObjects(ao.binaryCol, bytes);
+    XCTAssertEqualObjects(ao.decimalCol, [[RLMDecimal128 alloc] initWithNumber:@(1)]);
     XCTAssertEqual(ao.dateCol, now);
     XCTAssertEqual(ao.cBoolCol, true);
     XCTAssertEqual(ao.longCol, INT_MAX + 1LL);

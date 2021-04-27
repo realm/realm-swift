@@ -24,7 +24,7 @@
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
 #import "RLMObservation.hpp"
-#import "RLMProperty_Private.h"
+#import "RLMProperty_Private.hpp"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration_Private.hpp"
@@ -146,7 +146,7 @@ static void throwError(__unsafe_unretained RLMManagedArray *const ar, NSString *
         @throw RLMException(@"%@: is not supported for %s%s array '%@.%@'.",
                             aggregateMethod,
                             string_for_property_type(e.property_type),
-                            is_nullable(e.property_type) ? "?" : "",
+                            isNullable(e.property_type) ? "?" : "",
                             ar->_ownerInfo->rlmObjectSchema.className, ar->_key);
     }
     catch (std::logic_error const& e) {

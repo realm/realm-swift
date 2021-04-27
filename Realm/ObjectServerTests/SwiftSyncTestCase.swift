@@ -43,6 +43,32 @@ public class SwiftPerson: Object {
     }
 }
 
+public class SwiftTypesSyncObject: Object {
+    @objc public dynamic var _id: ObjectId? = ObjectId.generate()
+    @objc public dynamic var boolCol: Bool = true
+    @objc public dynamic var intCol: Int = 1
+    @objc public dynamic var doubleCol: Double = 1.1
+    @objc public dynamic var stringCol: String = "string"
+    @objc public dynamic var binaryCol: Data = "string".data(using: String.Encoding.utf8)!
+    @objc public dynamic var dateCol: Date = Date(timeIntervalSince1970: -1)
+    @objc public dynamic var longCol: Int64 = 1
+    @objc public dynamic var decimalCol: Decimal128 = Decimal128(1)
+    @objc public dynamic var uuidCol: UUID = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
+    @objc public dynamic var objectIdCol: ObjectId = .generate()
+    @objc public dynamic var objectCol: SwiftPerson?
+    public var anyCol = RealmProperty<AnyRealmValue>()
+
+    public convenience init(person: SwiftPerson) {
+        self.init()
+        self.anyCol.value = .int(1)
+        self.objectCol = person
+    }
+
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
 public class SwiftCollectionSyncObject: Object {
     @objc public dynamic var _id: ObjectId? = ObjectId.generate()
     public let intList = List<Int>()
@@ -54,6 +80,7 @@ public class SwiftCollectionSyncObject: Object {
     public let objectIdList = List<ObjectId>()
     public let decimalList = List<Decimal128>()
     public let uuidList = List<UUID>()
+    public let anyList = List<AnyRealmValue>()
     public let objectList = List<SwiftPerson>()
 
     public let intSet = MutableSet<Int>()
@@ -64,6 +91,7 @@ public class SwiftCollectionSyncObject: Object {
     public let objectIdSet = MutableSet<ObjectId>()
     public let decimalSet = MutableSet<Decimal128>()
     public let uuidSet = MutableSet<UUID>()
+    public let anySet = MutableSet<AnyRealmValue>()
     public let objectSet = MutableSet<SwiftPerson>()
 
     public let otherIntSet = MutableSet<Int>()
@@ -74,8 +102,27 @@ public class SwiftCollectionSyncObject: Object {
     public let otherObjectIdSet = MutableSet<ObjectId>()
     public let otherDecimalSet = MutableSet<Decimal128>()
     public let otherUuidSet = MutableSet<UUID>()
+    public let otherAnySet = MutableSet<AnyRealmValue>()
     public let otherObjectSet = MutableSet<SwiftPerson>()
 
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
+public class SwiftAnyRealmValueObject: Object {
+    @objc public dynamic var _id: ObjectId? = ObjectId.generate()
+    public let anyCol = RealmProperty<AnyRealmValue>()
+    public let otherAnyCol = RealmProperty<AnyRealmValue>()
+    public override class func primaryKey() -> String? {
+        return "_id"
+    }
+}
+
+public class SwiftMissingObject: Object {
+    @objc public dynamic var _id: ObjectId? = ObjectId.generate()
+    @objc public dynamic var objectCol: SwiftPerson?
+    public let anyCol = RealmProperty<AnyRealmValue>()
     public override class func primaryKey() -> String? {
         return "_id"
     }
@@ -178,7 +225,8 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
                                          SwiftCollectionSyncObject.self,
                                          SwiftUUIDPrimaryKeyObject.self,
                                          SwiftStringPrimaryKeyObject.self,
-                                         SwiftIntPrimaryKeyObject.self]
+                                         SwiftIntPrimaryKeyObject.self,
+                                         SwiftTypesSyncObject.self]
         }
         let realm = try Realm(configuration: configuration)
         waitForDownloads(for: realm)
@@ -191,7 +239,8 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
             configuration.objectTypes = [SwiftPerson.self,
                                          Person.self,
                                          Dog.self,
-                                         HugeSyncObject.self]
+                                         HugeSyncObject.self,
+                                         SwiftTypesSyncObject.self]
         }
         return try Realm(configuration: configuration)
     }

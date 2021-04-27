@@ -256,20 +256,6 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
     return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
-static bool canAggregate(RLMPropertyType type, bool allowDate) {
-    switch (type) {
-        case RLMPropertyTypeInt:
-        case RLMPropertyTypeFloat:
-        case RLMPropertyTypeDouble:
-        case RLMPropertyTypeDecimal128:
-            return true;
-        case RLMPropertyTypeDate:
-            return allowDate;
-        default:
-            return false;
-    }
-}
-
 - (RLMPropertyType)typeForProperty:(NSString *)propertyName {
     if ([propertyName isEqualToString:@"self"]) {
         return _type;
@@ -441,7 +427,8 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
         @throw RLMException(@"Object cannot be inserted unless the schema is initialized. "
                             "This can happen if you try to insert objects into a RLMSet / Set from a default value or from an overriden unmanaged initializer (`init()`).");
     }
-    if (![set->_objectClassName isEqualToString:object->_objectSchema.className]) {
+    if (![set->_objectClassName isEqualToString:object->_objectSchema.className]
+        && (set->_type != RLMPropertyTypeAny)) {
         @throw RLMException(@"Object of type '%@' does not match RLMSet type '%@'.",
                             object->_objectSchema.className, set->_objectClassName);
     }

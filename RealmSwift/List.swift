@@ -107,7 +107,9 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
     }
 
     /// Returns the first object in the list, or `nil` if the list is empty.
-    public var first: Element? { return rlmArray.firstObject().map(dynamicBridgeCast) }
+    public var first: Element? {
+        return rlmArray.firstObject().map(dynamicBridgeCast)
+    }
 
     /// Returns the last object in the list, or `nil` if the list is empty.
     public var last: Element? { return rlmArray.lastObject().map(dynamicBridgeCast) }

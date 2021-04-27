@@ -19,21 +19,25 @@
 #import "RLMUtil.hpp"
 
 #import "RLMArray_Private.hpp"
+#import "RLMAccessor.hpp"
 #import "RLMDecimal128_Private.hpp"
 #import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
+#import "RLMSwiftValueStorage.h"
 #import "RLMSchema_Private.h"
 #import "RLMSet_Private.hpp"
 #import "RLMSwiftCollectionBase.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUUID_Private.hpp"
+#import "RLMValue.h"
 
 #import <realm/mixed.hpp>
 #import <realm/object-store/shared_realm.hpp>
 #import <realm/table_view.hpp>
+#import <realm/util/overload.hpp>
 
 #if REALM_ENABLE_SYNC
 #import "RLMSyncUtil.h"
@@ -46,64 +50,6 @@
 #if !defined(REALM_COCOA_VERSION)
 #import "RLMVersion.h"
 #endif
-
-static inline bool numberIsInteger(__unsafe_unretained NSNumber *const obj) {
-    char data_type = [obj objCType][0];
-    return data_type == *@encode(bool) ||
-           data_type == *@encode(char) ||
-           data_type == *@encode(short) ||
-           data_type == *@encode(int) ||
-           data_type == *@encode(long) ||
-           data_type == *@encode(long long) ||
-           data_type == *@encode(unsigned short) ||
-           data_type == *@encode(unsigned int) ||
-           data_type == *@encode(unsigned long) ||
-           data_type == *@encode(unsigned long long);
-}
-
-static inline bool numberIsBool(__unsafe_unretained NSNumber *const obj) {
-    // @encode(BOOL) is 'B' on iOS 64 and 'c'
-    // objcType is always 'c'. Therefore compare to "c".
-    if ([obj objCType][0] == 'c') {
-        return true;
-    }
-
-    if (numberIsInteger(obj)) {
-        int value = [obj intValue];
-        return value == 0 || value == 1;
-    }
-
-    return false;
-}
-
-static inline bool numberIsFloat(__unsafe_unretained NSNumber *const obj) {
-    char data_type = [obj objCType][0];
-    return data_type == *@encode(float) ||
-           data_type == *@encode(short) ||
-           data_type == *@encode(int) ||
-           data_type == *@encode(long) ||
-           data_type == *@encode(long long) ||
-           data_type == *@encode(unsigned short) ||
-           data_type == *@encode(unsigned int) ||
-           data_type == *@encode(unsigned long) ||
-           data_type == *@encode(unsigned long long) ||
-           // A double is like float if it fits within float bounds or is NaN.
-           (data_type == *@encode(double) && (ABS([obj doubleValue]) <= FLT_MAX || isnan([obj doubleValue])));
-}
-
-static inline bool numberIsDouble(__unsafe_unretained NSNumber *const obj) {
-    char data_type = [obj objCType][0];
-    return data_type == *@encode(double) ||
-           data_type == *@encode(float) ||
-           data_type == *@encode(short) ||
-           data_type == *@encode(int) ||
-           data_type == *@encode(long) ||
-           data_type == *@encode(long long) ||
-           data_type == *@encode(unsigned short) ||
-           data_type == *@encode(unsigned int) ||
-           data_type == *@encode(unsigned long) ||
-           data_type == *@encode(unsigned long long);
-}
 
 static inline RLMArray *asRLMArray(__unsafe_unretained id const value) {
     return RLMDynamicCast<RLMArray>(value) ?: RLMDynamicCast<RLMSwiftCollectionBase>(value)._rlmCollection;
@@ -199,8 +145,10 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
             return NO;
         case RLMPropertyTypeData:
             return [value isKindOfClass:[NSData class]];
-        case RLMPropertyTypeAny:
-            return NO;
+        case RLMPropertyTypeAny: {
+            return !value
+                || [value conformsToProtocol:@protocol(RLMValue)];
+        }
         case RLMPropertyTypeLinkingObjects:
             return YES;
         case RLMPropertyTypeObject: {
@@ -436,7 +384,39 @@ BOOL RLMIsRunningInPlayground() {
     return [[NSBundle mainBundle].bundleIdentifier hasPrefix:@"com.apple.dt.playground."];
 }
 
-id RLMMixedToObjc(realm::Mixed const& mixed) {
+realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
+                            __unsafe_unretained RLMRealm *realm,
+                            realm::CreatePolicy createPolicy) {
+    if (!v || v == NSNull.null) {
+        return realm::Mixed();
+    }
+
+    REALM_ASSERT([v conformsToProtocol:@protocol(RLMValue)]);
+    RLMPropertyType type = [v rlm_valueType];
+    return switch_on_type(static_cast<realm::PropertyType>(type), realm::util::overload{[&](realm::Obj*) {
+        // The RLMObjectBase may be unmanaged and therefor has no RLMClassInfo attached.
+        // So we fetch from the Realm instead.
+        // If the Object is managed use it's RLMClassInfo instead so we do not have to do a
+        // lookup in the table of schemas.
+        RLMObjectBase *objBase = v;
+        RLMAccessorContext c{objBase->_info ? *objBase->_info : realm->_info[objBase->_objectSchema.className]};
+        auto obj = c.unbox<realm::Obj>(v, createPolicy);
+        return obj.is_valid() ? realm::Mixed(obj) : realm::Mixed();
+    }, [&](auto t) {
+        RLMStatelessAccessorContext c;
+        return realm::Mixed(c.unbox<std::decay_t<decltype(*t)>>(v));
+    }, [&](realm::Mixed*) {
+        REALM_UNREACHABLE();
+        return realm::Mixed();
+    }});
+}
+
+id RLMMixedToObjc(realm::Mixed const& mixed,
+                  __unsafe_unretained RLMRealm *realm,
+                  bool parentIsSwiftObject) {
+    if (mixed.is_null()) {
+        return NSNull.null;
+    }
     switch (mixed.get_type()) {
         case realm::type_String:
             return RLMStringDataToNSString(mixed.get_string());
@@ -456,6 +436,8 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
             return [[RLMDecimal128 alloc] initWithDecimal128:mixed.get<realm::Decimal128>()];
         case realm::type_ObjectId:
             return [[RLMObjectId alloc] initWithValue:mixed.get<realm::ObjectId>()];
+        case realm::type_TypedLink:
+            return RLMObjectFromObjLink(realm, mixed.get<realm::ObjLink>(), parentIsSwiftObject);
         case realm::type_Link:
         case realm::type_LinkList:
             REALM_UNREACHABLE();

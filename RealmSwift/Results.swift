@@ -38,6 +38,7 @@ extension Int64: MinMaxType {}
 extension Date: MinMaxType {}
 extension NSDate: MinMaxType {}
 extension Decimal128: MinMaxType {}
+extension AnyRealmValue: MinMaxType {}
 
 // MARK: AddableType
 
@@ -59,6 +60,7 @@ extension Int16: AddableType {}
 extension Int32: AddableType {}
 extension Int64: AddableType {}
 extension Decimal128: AddableType {}
+extension AnyRealmValue: AddableType {}
 
 /**
  `Results` is an auto-updating container type in Realm returned from object queries.

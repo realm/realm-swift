@@ -48,6 +48,16 @@ final class CodableObject: Object, Codable {
     var floatOpt = RealmOptional<Float>()
     var doubleOpt = RealmOptional<Double>()
     var boolOpt = RealmOptional<Bool>()
+
+    var otherInt = RealmProperty<Int?>()
+    var otherInt8 = RealmProperty<Int8?>()
+    var otherInt16 = RealmProperty<Int16?>()
+    var otherInt32 = RealmProperty<Int32?>()
+    var otherInt64 = RealmProperty<Int64?>()
+    var otherFloat = RealmProperty<Float?>()
+    var otherDouble = RealmProperty<Double?>()
+    var otherBool = RealmProperty<Bool?>()
+
     @objc dynamic var uuidOpt: UUID?
 
     var boolList = List<Bool>()
@@ -199,6 +209,15 @@ class CodableTests: TestCase {
             "objectIdOpt": "1234567890abcdef12345678",
             "uuidOpt": "00000000-0000-0000-0000-000000000000",
 
+            "otherBool": true,
+            "otherInt": 123,
+            "otherInt8": 123,
+            "otherInt16": 123,
+            "otherInt32": 123,
+            "otherInt64": 123,
+            "otherFloat": 2.5,
+            "otherDouble": 2.5,
+
             "boolList": [true],
             "stringList": ["abc"],
             "intList": [123],
@@ -291,6 +310,15 @@ class CodableTests: TestCase {
         XCTAssertEqual(obj.decimalOpt, "1.5e2")
         XCTAssertEqual(obj.objectIdOpt, ObjectId("1234567890abcdef12345678"))
 
+        XCTAssertEqual(obj.otherBool.value, true)
+        XCTAssertEqual(obj.otherInt.value, 123)
+        XCTAssertEqual(obj.otherInt8.value, 123)
+        XCTAssertEqual(obj.otherInt16.value, 123)
+        XCTAssertEqual(obj.otherInt32.value, 123)
+        XCTAssertEqual(obj.otherInt64.value, 123)
+        XCTAssertEqual(obj.otherFloat.value, 2.5)
+        XCTAssertEqual(obj.otherDouble.value, 2.5)
+
         XCTAssertEqual(obj.boolList.first, true)
         XCTAssertEqual(obj.intList.first, 123)
         XCTAssertEqual(obj.int8List.first, 123)
@@ -347,7 +375,7 @@ class CodableTests: TestCase {
         XCTAssertEqual(obj.decimalOptSet.first, "1.5e2")
         XCTAssertEqual(obj.objectIdOptSet.first, ObjectId("1234567890abcdef12345678"))
 
-        let expected = "{\"doubleOptList\":[2.5],\"decimalOptList\":[\"1.5E2\"],\"objectId\":\"1234567890abcdef12345678\",\"doubleOpt\":2.5,\"int32\":123,\"stringOptList\":[\"abc\"],\"stringSet\":[\"abc\"],\"stringOptSet\":[\"abc\"],\"doubleList\":[2.5],\"floatOpt\":2.5,\"boolOpt\":true,\"doubleSet\":[2.5],\"doubleOptSet\":[2.5],\"uuid\":\"00000000-0000-0000-0000-000000000000\",\"decimalList\":[\"1.5E2\"],\"boolOptList\":[true],\"date\":2.5,\"uuidOpt\":\"00000000-0000-0000-0000-000000000000\",\"float\":2.5,\"boolSet\":[true],\"dataOpt\":\"ZGVm\",\"floatSet\":[2.5],\"uuidSet\":[\"00000000-0000-0000-0000-000000000000\"],\"int16OptList\":[123],\"int16List\":[123],\"dateOptList\":[2.5],\"int64List\":[123],\"intList\":[123],\"int64Opt\":123,\"int\":123,\"int64OptList\":[123],\"intSet\":[123],\"dataSet\":[\"ZGVm\"],\"int16OptSet\":[123],\"decimalOpt\":\"1.5E2\",\"int64Set\":[123],\"int8List\":[123],\"int32Opt\":123,\"objectIdOpt\":\"1234567890abcdef12345678\",\"dataList\":[\"ZGVm\"],\"dateOptSet\":[2.5],\"objectIdOptSet\":[\"1234567890abcdef12345678\"],\"int32Set\":[123],\"int8OptSet\":[123],\"boolOptSet\":[true],\"uuidList\":[\"00000000-0000-0000-0000-000000000000\"],\"floatOptSet\":[2.5],\"int16\":123,\"dateList\":[2.5],\"decimalSet\":[\"1.5E2\"],\"dataOptSet\":[\"ZGVm\"],\"dataOptList\":[\"ZGVm\"],\"string\":\"abc\",\"intOptSet\":[123],\"data\":\"ZGVm\",\"decimal\":\"1.5E2\",\"floatList\":[2.5],\"objectIdOptList\":[\"1234567890abcdef12345678\"],\"intOptList\":[123],\"int8OptList\":[123],\"decimalOptSet\":[\"1.5E2\"],\"bool\":true,\"objectIdList\":[\"1234567890abcdef12345678\"],\"uuidOptList\":[\"00000000-0000-0000-0000-000000000000\"],\"uuidOptSet\":[\"00000000-0000-0000-0000-000000000000\"],\"intOpt\":123,\"int64OptSet\":[123],\"floatOptList\":[2.5],\"int32OptList\":[123],\"objectIdSet\":[\"1234567890abcdef12345678\"],\"boolList\":[true],\"int32List\":[123],\"int32OptSet\":[123],\"int8\":123,\"double\":2.5,\"int16Opt\":123,\"dateOpt\":2.5,\"int64\":123,\"int8Opt\":123,\"stringList\":[\"abc\"],\"stringOpt\":\"abc\",\"dateSet\":[2.5],\"int16Set\":[123],\"int8Set\":[123]}"
+        let expected = "{\"double\":2.5,\"int16OptList\":[123],\"dateSet\":[2.5],\"intOpt\":123,\"dataOptSet\":[\"ZGVm\"],\"doubleOptSet\":[2.5],\"decimalList\":[\"1.5E2\"],\"boolOptSet\":[true],\"int64\":123,\"stringOpt\":\"abc\",\"int16List\":[123],\"boolSet\":[true],\"decimalOpt\":\"1.5E2\",\"uuidOpt\":\"00000000-0000-0000-0000-000000000000\",\"string\":\"abc\",\"int8Set\":[123],\"dataOptList\":[\"ZGVm\"],\"doubleSet\":[2.5],\"int32OptList\":[123],\"uuidOptSet\":[\"00000000-0000-0000-0000-000000000000\"],\"floatList\":[2.5],\"objectIdOptSet\":[\"1234567890abcdef12345678\"],\"otherInt8\":123,\"intOptSet\":[123],\"int\":123,\"dataSet\":[\"ZGVm\"],\"dataList\":[\"ZGVm\"],\"intList\":[123],\"int8List\":[123],\"objectIdOptList\":[\"1234567890abcdef12345678\"],\"dateOpt\":2.5,\"dateList\":[2.5],\"int8\":123,\"stringOptList\":[\"abc\"],\"otherBool\":true,\"otherInt32\":123,\"int64OptSet\":[123],\"uuid\":\"00000000-0000-0000-0000-000000000000\",\"intOptList\":[123],\"stringOptSet\":[\"abc\"],\"decimalOptList\":[\"1.5E2\"],\"boolOpt\":true,\"int16\":123,\"int8OptSet\":[123],\"otherInt16\":123,\"int8Opt\":123,\"decimalOptSet\":[\"1.5E2\"],\"otherInt\":123,\"floatSet\":[2.5],\"floatOpt\":2.5,\"int32\":123,\"dataOpt\":\"ZGVm\",\"data\":\"ZGVm\",\"boolOptList\":[true],\"otherDouble\":2.5,\"intSet\":[123],\"int32Set\":[123],\"int32Opt\":123,\"doubleOpt\":2.5,\"decimal\":\"1.5E2\",\"otherInt64\":123,\"stringSet\":[\"abc\"],\"objectIdSet\":[\"1234567890abcdef12345678\"],\"int32OptSet\":[123],\"int64List\":[123],\"floatOptList\":[2.5],\"float\":2.5,\"boolList\":[true],\"dateOptList\":[2.5],\"objectIdOpt\":\"1234567890abcdef12345678\",\"int16OptSet\":[123],\"int64Set\":[123],\"int8OptList\":[123],\"objectId\":\"1234567890abcdef12345678\",\"int64Opt\":123,\"uuidList\":[\"00000000-0000-0000-0000-000000000000\"],\"bool\":true,\"objectIdList\":[\"1234567890abcdef12345678\"],\"int16Opt\":123,\"doubleList\":[2.5],\"doubleOptList\":[2.5],\"otherFloat\":2.5,\"int16Set\":[123],\"dateOptSet\":[2.5],\"decimalSet\":[\"1.5E2\"],\"int64OptList\":[123],\"stringList\":[\"abc\"],\"uuidSet\":[\"00000000-0000-0000-0000-000000000000\"],\"int32List\":[123],\"date\":2.5,\"floatOptSet\":[2.5],\"uuidOptList\":[\"00000000-0000-0000-0000-000000000000\"]}"
         let encoder = JSONEncoder()
         XCTAssertEqual(try! String(data: encoder.encode(obj), encoding: .utf8), expected)
     }

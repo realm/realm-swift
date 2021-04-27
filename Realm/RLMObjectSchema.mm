@@ -18,7 +18,6 @@
 
 #import "RLMObjectSchema_Private.hpp"
 
-#import "RLMArray.h"
 #import "RLMEmbeddedObject.h"
 #import "RLMObject_Private.h"
 #import "RLMProperty_Private.hpp"
@@ -177,7 +176,9 @@ using namespace realm;
         }
     }
 
-    if ([objectClass shouldIncludeInDefaultSchema] && schema.isSwiftClass && schema.properties.count == 0) {
+    if ([objectClass shouldIncludeInDefaultSchema]
+        && schema.isSwiftClass
+        && schema.properties.count == 0) {
         @throw RLMException(@"No properties are defined for '%@'. Did you remember to mark them with '@objc' in your model?", schema.className);
     }
     return schema;
@@ -243,6 +244,9 @@ using namespace realm;
         if (!property.optional && property.type == RLMPropertyTypeObject && !property.collection) {
             @throw RLMException(@"The `%@.%@` property must be marked as being optional.",
                                 [objectClass className], property.name);
+        }
+        if (property.type == RLMPropertyTypeAny) {
+            property.optional = NO;
         }
     }
 

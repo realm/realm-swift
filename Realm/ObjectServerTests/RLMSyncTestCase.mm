@@ -172,9 +172,56 @@
 
 @end
 
+#pragma mark AllTypeSyncObject
+
+@implementation AllTypesSyncObject
+
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"_id": [RLMObjectId objectId]};
+}
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
+
++ (NSArray *)requiredProperties {
+    return @[@"boolCol", @"cBoolcol",
+             @"intCol", @"doubleCol",
+             @"stringCol", @"binaryCol",
+             @"dateCol", @"longCol",
+             @"decimalCol", @"uuidCol", @"objectIdCol"];
+}
+
++ (NSDictionary *)values:(int)i {
+    NSString *str = [NSString stringWithFormat:@"%d", i];
+    return @{
+             @"boolCol": @(i % 2),
+             @"cBoolCol": @(i % 2),
+             @"intCol": @(i),
+             @"doubleCol": @(1.11 * i),
+             @"stringCol": [NSString stringWithFormat:@"%d", i],
+             @"binaryCol": [str dataUsingEncoding:NSUTF8StringEncoding],
+             @"dateCol": [NSDate dateWithTimeIntervalSince1970:i],
+             @"longCol": @((long long)i * INT_MAX + 1),
+             @"decimalCol": [[RLMDecimal128 alloc] initWithNumber:@(i)],
+             @"uuidCol": i < 4 ? @[[[NSUUID alloc] initWithUUIDString:@"85d4fbee-6ec6-47df-bfa1-615931903d7e"],
+                                   [[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"],
+                                   [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"],
+                                   [[NSUUID alloc] initWithUUIDString:@"b84e8912-a7c2-41cd-8385-86d200d7b31e"]][i] :
+                 [[NSUUID alloc] initWithUUIDString:@"b9d325b0-3058-4838-8473-8f1aaae410db"],
+             @"anyCol": @(i+1),
+             };
+}
+
+@end
+
 #pragma mark RLMArraySyncObject
 
 @implementation RLMArraySyncObject
+
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"_id": [RLMObjectId objectId]};
+}
 
 + (NSString *)primaryKey {
     return @"_id";
@@ -192,6 +239,10 @@
 #pragma mark RLMSetSyncObject
 
 @implementation RLMSetSyncObject
+
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"_id": [RLMObjectId objectId]};
+}
 
 + (NSString *)primaryKey {
     return @"_id";
@@ -363,6 +414,14 @@ static NSURL *syncDirectoryForChildProcess() {
     [realm commitWriteTransaction];
 }
 
+- (void)addAllTypesSyncObjectToRealm:(RLMRealm *)realm values:(NSDictionary *)dictionary person:(Person *)person {
+    [realm beginWriteTransaction];
+    AllTypesSyncObject *obj = [[AllTypesSyncObject alloc] initWithValue:dictionary];
+    obj.objectCol = person;
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+}
+
 - (void)waitForDownloadsForUser:(RLMUser *)user
                          realms:(NSArray<RLMRealm *> *)realms
                 partitionValues:(NSArray<NSString *> *)partitionValues
@@ -449,7 +508,9 @@ static NSURL *syncDirectoryForChildProcess() {
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     auto c = [user configurationWithPartitionValue:partitionValue];
     c.encryptionKey = encryptionKey;
-    c.objectClasses = @[Dog.self, Person.self, HugeSyncObject.self, RLMSetSyncObject.self, RLMArraySyncObject.self, UUIDPrimaryKeyObject.self, StringPrimaryKeyObject.self, IntPrimaryKeyObject.self];
+    c.objectClasses = @[Dog.self, Person.self, HugeSyncObject.self, RLMSetSyncObject.self,
+                        RLMArraySyncObject.self, UUIDPrimaryKeyObject.self, StringPrimaryKeyObject.self,
+                        IntPrimaryKeyObject.self, AllTypesSyncObject.self];
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.stopPolicy = stopPolicy;
     c.syncConfiguration = syncConfig;

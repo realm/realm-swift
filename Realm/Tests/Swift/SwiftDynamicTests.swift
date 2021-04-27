@@ -118,8 +118,10 @@ class SwiftRLMDynamicTests: RLMTestCase {
     }
 
     func testDynamicTypes_objc() {
-        let obj1 = AllTypesObject.values(1, stringObject: nil)!
-        let obj2 = AllTypesObject.values(2, stringObject: StringObject(value: ["string"]))!
+        let obj1 = AllTypesObject.values(1, stringObject: nil, mixedObject: nil)!
+        let obj2 = AllTypesObject.values(2,
+                                         stringObject: StringObject(value: ["string"]),
+                                         mixedObject: MixedObject(value: ["string"]))!
 
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
@@ -138,16 +140,20 @@ class SwiftRLMDynamicTests: RLMTestCase {
         let robj2 = results[1]
 
         let schema = dyrealm.schema[AllTypesObject.className()]
-        for prop in schema.properties.dropLast() {
+        let props = schema.properties.filter { $0.type != .object }
+        for prop in props {
             XCTAssertTrue((obj1[prop.name] as AnyObject).isEqual(robj1[prop.name]))
             XCTAssertTrue((obj2[prop.name] as AnyObject).isEqual(robj2[prop.name]))
         }
 
         // check sub object type
         XCTAssertTrue(schema.properties[12].objectClassName! == "StringObject")
+        XCTAssertTrue(schema.properties[13].objectClassName! == "MixedObject")
 
         // check object equality
         XCTAssertNil(robj1["objectCol"], "object should be nil")
+        XCTAssertNil(robj1["mixedObjectCol"], "object should be nil")
         XCTAssertTrue((robj2["objectCol"] as! RLMObject)["stringCol"] as! String == "string")
+        XCTAssertTrue((robj2["mixedObjectCol"] as! RLMObject)["anyCol"] as! String == "string")
     }
 }

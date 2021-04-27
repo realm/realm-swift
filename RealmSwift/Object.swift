@@ -404,6 +404,8 @@ extension Object: ThreadConfined {
 
 /// Object interface which allows untyped getters and setters for Objects.
 /// :nodoc:
+@objc(RealmSwiftDynamicObject)
+@dynamicMemberLookup
 public final class DynamicObject: Object {
     public override subscript(key: String) -> Any? {
         get {
@@ -421,6 +423,15 @@ public final class DynamicObject: Object {
         }
     }
 
+    public subscript(dynamicMember member: String) -> Any? {
+        get {
+            self[member]
+        }
+        set(value) {
+            self[member] = value
+        }
+    }
+
     /// :nodoc:
     public override func value(forUndefinedKey key: String) -> Any? {
         return self[key]
@@ -434,6 +445,10 @@ public final class DynamicObject: Object {
     /// :nodoc:
     public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false
+    }
+
+    override public class func sharedSchema() -> RLMObjectSchema? {
+        nil
     }
 }
 
@@ -708,11 +723,34 @@ extension Optional: _ManagedPropertyType where Wrapped: _ManagedPropertyType {
 }
 
 /// :nodoc:
+@available(*, deprecated, message: "RealmOptional has been deprecated, use RealmProperty<T?> instead.")
 extension RealmOptional: _ManagedPropertyType where Value: _ManagedPropertyType {
     // swiftlint:disable:next identifier_name
     public static func _rlmProperty(_ prop: RLMProperty) {
         prop.optional = true
         Value._rlmProperty(prop)
+    }
+    // swiftlint:disable:next identifier_name
+    public static func _rlmRequireObjc() -> Bool { return false }
+}
+
+/// :nodoc:
+extension RealmProperty: _ManagedPropertyType where Value: _ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
+    public static func _rlmProperty(_ prop: RLMProperty) {
+        prop.optional = false
+        Value._rlmProperty(prop)
+    }
+    // swiftlint:disable:next identifier_name
+    public static func _rlmRequireObjc() -> Bool { return false }
+}
+
+/// :nodoc:
+extension AnyRealmValue: _ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
+    public static func _rlmProperty(_ prop: RLMProperty) {
+        prop.type = .any
+        prop.optional = false
     }
     // swiftlint:disable:next identifier_name
     public static func _rlmRequireObjc() -> Bool { return false }

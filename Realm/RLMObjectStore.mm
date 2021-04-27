@@ -23,7 +23,7 @@
 #import "RLMObservation.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
-#import "RLMOptionalBase.h"
+#import "RLMSwiftValueStorage.h"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
@@ -32,6 +32,7 @@
 #import "RLMSwiftCollectionBase.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
+#import "RLMSwiftValueStorage.h"
 
 #import <realm/object-store/object_store.hpp>
 #import <realm/object-store/results.hpp>
@@ -73,7 +74,7 @@ static inline void RLMVerifyRealmRead(__unsafe_unretained RLMRealm *const realm)
     }
 }
 
-static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *const realm) {
+void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *const realm) {
     RLMVerifyRealmRead(realm);
     // if realm is not writable throw
     if (!realm.inWriteTransaction) {
@@ -109,9 +110,9 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
             id managedCollection = [[cls alloc] initWithParent:object property:prop];
             [ivar set_rlmCollection:managedCollection];
         }
-        else {
+        else if ([object_getIvar(object, prop.swiftIvar) isKindOfClass:[RLMSwiftValueStorage class]]) {
             id ivar = object_getIvar(object, prop.swiftIvar);
-            RLMInitializeManagedOptional(ivar, object, prop);
+            RLMInitializeManagedSwiftValueStorage(ivar, object, prop);
         }
     }
 }
@@ -168,6 +169,25 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     object->_row = std::move(obj);
     RLMInitializeSwiftAccessorGenerics(object);
     return object;
+}
+
+RLMObjectBase *RLMObjectFromObjLink(RLMRealm *realm, realm::ObjLink&& objLink, bool parentIsSwiftObject) {
+    if (auto* tableInfo = realm->_info[objLink.get_table_key()]) {
+        return RLMCreateObjectAccessor(*tableInfo, objLink.get_obj_key().value);
+    } else {
+        // Construct the object dynamically.
+        // This code path should only be hit on first access of the object.
+        Class cls = parentIsSwiftObject ? [RealmSwiftDynamicObject class] : [RLMDynamicObject class];
+        auto& group = realm->_realm->read_group();
+        auto schema = std::make_unique<realm::ObjectSchema>(group,
+                                                            group.get_table_name(objLink.get_table_key()),
+                                                            objLink.get_table_key());
+        RLMObjectSchema *rlmObjectSchema = [RLMObjectSchema objectSchemaForObjectStoreSchema:*schema];
+        rlmObjectSchema.accessorClass = cls;
+        rlmObjectSchema.isSwiftClass = parentIsSwiftObject;
+        realm->_info.appendDynamicObjectSchema(std::move(schema), rlmObjectSchema, realm);
+        return RLMCreateObjectAccessor(realm->_info[rlmObjectSchema.className], objLink.get_obj_key().value);
+    }
 }
 
 void RLMDeleteObjectFromRealm(__unsafe_unretained RLMObjectBase *const object,

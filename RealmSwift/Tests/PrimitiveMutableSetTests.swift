@@ -37,7 +37,8 @@ class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase 
         obj = SwiftMutableSetObject()
         obj2 = SwiftMutableSetObject()
         if O.isManaged() {
-            let config = Realm.Configuration(inMemoryIdentifier: "test", objectTypes: [SwiftMutableSetObject.self])
+            let config = Realm.Configuration(inMemoryIdentifier: "test",
+                                             objectTypes: [SwiftMutableSetObject.self, SwiftStringObject.self])
             realm = try! Realm(configuration: config)
             realm!.beginWrite()
             realm!.add(obj)
@@ -327,6 +328,7 @@ func addMutableSetTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type
     _ = PrimitiveMutableSetTests<OF, DateFactory>._defaultTestSuite().tests.map(suite.addTest)
     _ = PrimitiveMutableSetTests<OF, DecimalFactory>._defaultTestSuite().tests.map(suite.addTest)
     _ = PrimitiveMutableSetTests<OF, ObjectIdFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveMutableSetTests<OF, UUIDFactory>._defaultTestSuite().tests.map(suite.addTest)
 
     _ = MinMaxPrimitiveMutableSetTests<OF, IntFactory>._defaultTestSuite().tests.map(suite.addTest)
     _ = MinMaxPrimitiveMutableSetTests<OF, Int8Factory>._defaultTestSuite().tests.map(suite.addTest)
@@ -359,6 +361,7 @@ func addMutableSetTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type
     _ = PrimitiveMutableSetTests<OF, OptionalDateFactory>._defaultTestSuite().tests.map(suite.addTest)
     _ = PrimitiveMutableSetTests<OF, OptionalDecimalFactory>._defaultTestSuite().tests.map(suite.addTest)
     _ = PrimitiveMutableSetTests<OF, OptionalObjectIdFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveMutableSetTests<OF, OptionalUUIDFactory>._defaultTestSuite().tests.map(suite.addTest)
 
     _ = OptionalMinMaxPrimitiveMutableSetTests<OF, OptionalIntFactory>._defaultTestSuite().tests.map(suite.addTest)
     _ = OptionalMinMaxPrimitiveMutableSetTests<OF, OptionalInt8Factory>._defaultTestSuite().tests.map(suite.addTest)

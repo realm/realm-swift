@@ -483,7 +483,8 @@ class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
     override func setUp() {
         obj = SwiftListObject()
         if O.isManaged() {
-            let config = Realm.Configuration(inMemoryIdentifier: "test", objectTypes: [SwiftListObject.self])
+            let config = Realm.Configuration(inMemoryIdentifier: "test",
+                                             objectTypes: [SwiftListObject.self, SwiftStringObject.self])
             realm = try! Realm(configuration: config)
             realm!.beginWrite()
             realm!.add(obj)
@@ -836,6 +837,7 @@ func addTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
     _ = PrimitiveListTests<OF, DateFactory>._defaultTestSuite().tests.map(suite.addTest)
     _ = PrimitiveListTests<OF, DecimalFactory>._defaultTestSuite().tests.map(suite.addTest)
     _ = PrimitiveListTests<OF, ObjectIdFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, UUIDFactory>._defaultTestSuite().tests.map(suite.addTest)
 
     _ = MinMaxPrimitiveListTests<OF, IntFactory>._defaultTestSuite().tests.map(suite.addTest)
     _ = MinMaxPrimitiveListTests<OF, Int8Factory>._defaultTestSuite().tests.map(suite.addTest)
@@ -868,6 +870,7 @@ func addTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
     _ = PrimitiveListTests<OF, OptionalDateFactory>._defaultTestSuite().tests.map(suite.addTest)
     _ = PrimitiveListTests<OF, OptionalDecimalFactory>._defaultTestSuite().tests.map(suite.addTest)
     _ = PrimitiveListTests<OF, OptionalObjectIdFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, OptionalUUIDFactory>._defaultTestSuite().tests.map(suite.addTest)
 
     _ = OptionalMinMaxPrimitiveListTests<OF, OptionalIntFactory>._defaultTestSuite().tests.map(suite.addTest)
     _ = OptionalMinMaxPrimitiveListTests<OF, OptionalInt8Factory>._defaultTestSuite().tests.map(suite.addTest)

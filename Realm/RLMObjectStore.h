@@ -34,6 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 void RLMVerifyHasPrimaryKey(Class cls);
 
+void RLMVerifyInWriteTransaction(RLMRealm *const realm);
+
 //
 // Accessor Creation
 //
@@ -81,8 +83,14 @@ void RLMInitializeSwiftAccessorGenerics(RLMObjectBase *object);
 namespace realm {
     class Table;
     class Obj;
+    struct ObjLink;
 }
 class RLMClassInfo;
+
+// get an object with a given table & object key
+RLMObjectBase *RLMObjectFromObjLink(RLMRealm *realm,
+                                    realm::ObjLink&& objLink,
+                                    bool parentIsSwiftObject) NS_RETURNS_RETAINED;
 
 // Create accessors
 RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, int64_t key) NS_RETURNS_RETAINED;

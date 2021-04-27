@@ -561,20 +561,44 @@ static NSString *randomEmail() {
     RLMUser *user = [self userForTest:_cmd];
     NSString *realmId = NSStringFromSelector(_cmd);
     RLMRealm *realm = [self openRealmForPartitionValue:realmId user:user];
+    NSDictionary *values = [AllTypesSyncObject values:1];
+
     if (self.isParent) {
         CHECK_COUNT(0, Person, realm);
+        CHECK_COUNT(0, AllTypesSyncObject, realm)
         RLMRunChildAndWait();
         [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(4, Person, realm);
+        CHECK_COUNT(1, AllTypesSyncObject, realm);
+
+        AllTypesSyncObject *obj = [[AllTypesSyncObject allObjectsInRealm:realm] firstObject];
+        XCTAssertEqual(obj.boolCol, [values[@"boolCol"] boolValue]);
+        XCTAssertEqual(obj.cBoolCol, [values[@"cBoolCol"] boolValue]);
+        XCTAssertEqual(obj.intCol, [values[@"intCol"] intValue]);
+        XCTAssertEqual(obj.doubleCol, [values[@"doubleCol"] doubleValue]);
+        XCTAssertEqualObjects(obj.stringCol, values[@"stringCol"]);
+        XCTAssertEqualObjects(obj.binaryCol, values[@"binaryCol"]);
+        XCTAssertEqualObjects(obj.decimalCol, values[@"decimalCol"]);
+        XCTAssertEqual(obj.dateCol, values[@"dateCol"]);
+        XCTAssertEqual(obj.longCol, [values[@"longCol"] longValue]);
+        XCTAssertEqualObjects(obj.uuidCol, values[@"uuidCol"]);
+        XCTAssertEqualObjects((NSNumber *)obj.anyCol, values[@"anyCol"]);
+        XCTAssertEqualObjects(obj.objectCol.firstName, [Person ringo].firstName);
+
     } else {
         // Add objects.
         [self addPersonsToRealm:realm
                         persons:@[[Person john],
                                   [Person paul],
-                                  [Person ringo],
                                   [Person george]]];
+
+        [self addAllTypesSyncObjectToRealm:realm
+                                    values:values
+                                    person:[Person ringo]];
+
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(4, Person, realm);
+        CHECK_COUNT(1, AllTypesSyncObject, realm)
     }
 }
 
@@ -777,6 +801,47 @@ static NSString *randomEmail() {
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(0, Person, realm);
     }
+}
+
+#pragma mark - RLMValue Sync with missing schema -
+
+- (void)testMissingSchema {
+    RLMUser *user = [self userForTest:_cmd];
+    auto c = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
+    if (!self.isParent) {
+        c.objectClasses = @[Person.self,
+                            AllTypesSyncObject.self,
+                            RLMSetSyncObject.self];
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
+        [self waitForDownloadsForRealm:realm];
+        AllTypesSyncObject *obj = [[AllTypesSyncObject alloc] initWithValue:[AllTypesSyncObject values:0]];
+        RLMSetSyncObject *o = [RLMSetSyncObject new];
+        Person *p = [Person john];
+        [o.anySet addObjects:@[p]];
+        obj.anyCol = o;
+        obj.objectCol = p;
+        [realm beginWriteTransaction];
+        [realm addObject:obj];
+        [realm commitWriteTransaction];
+        [self waitForUploadsForRealm:realm];
+        CHECK_COUNT(1, AllTypesSyncObject, realm);
+        return;
+    }
+    RLMRunChildAndWait();
+
+    c.objectClasses = @[Person.self, AllTypesSyncObject.self];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
+    [self waitForDownloadsForRealm:realm];
+    RLMResults <AllTypesSyncObject *> *res = [AllTypesSyncObject allObjectsInRealm:realm];
+    AllTypesSyncObject *o = res.firstObject;
+    Person *p = o.objectCol;
+    RLMSet<RLMValue> *anySet = ((RLMObject *)o.anyCol)[@"anySet"];
+    XCTAssertTrue([anySet.allObjects[0][@"firstName"] isEqualToString:p.firstName]);
+    [realm beginWriteTransaction];
+    anySet.allObjects[0][@"firstName"] = @"Bob";
+    [realm commitWriteTransaction];
+    XCTAssertTrue([anySet.allObjects[0][@"firstName"] isEqualToString:p.firstName]);
+    CHECK_COUNT(1, AllTypesSyncObject, realm);
 }
 
 #pragma mark - Encryption -
