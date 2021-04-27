@@ -90,7 +90,7 @@
         if (self._rlmArray.realm != other._rlmArray.realm) {
             return NO;
         }
-        return [self._rlmArray isEqual:other._rlmArray];
+        return !self._rlmArray.realm && [self._rlmArray isEqual:other._rlmArray];
     }
     return NO;
 }
