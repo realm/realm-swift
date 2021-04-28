@@ -422,6 +422,10 @@ RLM_COLLECTION_TYPE(DogObject)
 @property RLM_GENERIC_SET(DogObject) *dogs;
 @end
 
+@interface DogDictionaryObject : RLMObject
+@property RLM_GENERIC_DICTIONARY(RLMString, DogObject) *dogs;
+@end
+
 #pragma mark OwnerObject
 
 @interface OwnerObject : RLMObject
@@ -648,6 +652,7 @@ RLM_COLLECTION_TYPE(PrimaryEmployeeObject);
 @property NSString *name;
 @property RLM_GENERIC_ARRAY(PrimaryEmployeeObject) *employees;
 @property RLM_GENERIC_SET(PrimaryEmployeeObject) *employeeSet;
+@property RLM_GENERIC_DICTIONARY(RLMString, PrimaryEmployeeObject) *employeeDict;
 @property PrimaryEmployeeObject *intern;
 @property LinkToPrimaryEmployeeObject *wrappedIntern;
 @end

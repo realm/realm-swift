@@ -124,6 +124,29 @@ void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *
     }
 }
 
+void RLMDictionaryValidateMatchingValueType(__unsafe_unretained RLMDictionary *const dictionary,
+                                            __unsafe_unretained id const value) {
+   if (!value) {
+       return;
+   }
+   if (dictionary->_type != RLMPropertyTypeObject) {
+       if (!RLMValidateValue(value, dictionary->_type, dictionary->_optional, false, nil)) {
+           @throw RLMException(@"Invalid value '%@' of type '%@' for expected type '%@%s'.",
+                               value, [value class], RLMTypeToString(dictionary->_type),
+                               dictionary->_optional ? "?" : "");
+       }
+       return;
+   }
+   auto valueObject = RLMDynamicCast<RLMObjectBase>(value);
+   if (!valueObject) {
+       return;
+   }
+   if (!valueObject->_objectSchema) {
+       @throw RLMException(@"Object cannot be inserted unless the schema is initialized. "
+                           "This can happen if you try to insert objects into a RLMDictionary / Map from a default value or from an overriden unmanaged initializer (`init()`) or if the key is uninitialized.");
+   }
+}
+
 static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary,
                              dispatch_block_t f) {
     if (!dictionary->_backingCollection) {

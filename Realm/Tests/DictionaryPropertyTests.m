@@ -21,6 +21,9 @@
 @interface DictionaryPropertyTests : RLMTestCase
 @end
 
+@implementation DogDictionaryObject
+@end
+    
 @implementation DictionaryPropertyTests
 
 -(void)testPopulateEmptyDictionary {
@@ -401,8 +404,8 @@
 
     [realm beginWriteTransaction];
     for (int i = 0; i < 30; ++i) {
+        EmployeeObject *eo = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
         NSString *key = [NSString stringWithFormat:@"item%d", i];
-        EmployeeObject *eo = [EmployeeObject createInRealm:realm withValue:@{@"name": key,  @"age": @40, @"hired": @YES}];
         company.employeeDict[key] = eo;
     }
     [realm commitWriteTransaction];
@@ -411,10 +414,15 @@
 
     __weak id objects[30];
     NSInteger count = 0;
-    for (id key in company.employeeDict) {
-        XCTAssertNotNil(key, @"Key is not nil and accessible");
-        XCTAssertNotNil(company.employeeDict[key], @"Object is not nil and accessible");
-        objects[count++] = key;//company.employeeDict[key];
+    for (NSString *key in company.employeeDict) {
+        XCTAssertNotNil(key, @"Object is not nil and accessible");
+        if (count > 16) {
+            // 16 is the size of blocks fast enumeration happens to ask for at
+            // the moment, but of course that's just an implementation detail
+            // that may change
+            XCTAssertNil(objects[count - 16]);
+        }
+        objects[count++] = key;
     }
 
     XCTAssertEqual(count, 30, @"should have enumerated 30 objects");
@@ -423,11 +431,18 @@
         XCTAssertNil(objects[i], @"Object should have been released");
     }
 
+    @autoreleasepool {
+        for (EmployeeObject *e in company.employeeDict) {
+            objects[0] = e;
+            break;
+        }
+    }
+    XCTAssertNil(objects[0], @"Object should have been released");
 
     [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(id<RLMDictionaryKey>  _Nonnull key,
                                                               id  _Nonnull obj,
                                                               BOOL * _Nonnull stop) {
-        XCTAssertEqual(((EmployeeObject *)company.employeeDict[key]).name, ((EmployeeObject *)obj).name);
+        XCTAssertEqual(company.employeeDict[key], obj);
     }];
 }
 
@@ -447,7 +462,7 @@
     }
 
     size_t count = 0;
-    for (id key in company.employeeDict) {
+    for (id key in company.employeeDict.allKeys) {
         ++count;
         [company.employeeDict removeObjectForKey: key];
     }
@@ -464,7 +479,7 @@
     }
 
     count = 0;
-    for (id key in company.employeeDict) {
+    for (id key in company.employeeDict.allKeys) {
         id eo = company.employeeDict[key];
         ++count;
         company.employeeDict[key] = eo;
@@ -652,6 +667,907 @@
     XCTAssertEqual(2.0, [obj.dictionary averageOfProperty:@"propA"].doubleValue);
     XCTAssertEqual(1, [[obj.dictionary minOfProperty:@"propA"] intValue]);
     XCTAssertEqual(3, [[obj.dictionary maxOfProperty:@"propA"] intValue]);
+}
+
+-(void)testInsertMultiple {
+    RLMRealm *realm = [self realmWithTestPath];
+    
+    [realm beginWriteTransaction];
+    DictionaryPropertyObject *obj = [DictionaryPropertyObject createInRealm:realm withValue: @{@"stringDictionary": @{}}];
+
+    StringObject *child1 = [StringObject createInRealm:realm withValue:@[@"a"]];
+    StringObject *child2 = [[StringObject alloc] init];
+    child2.stringCol = @"b";
+    [obj.stringDictionary setValuesForKeysWithDictionary:@{@"a": child1, @"b": child2}];
+    [realm commitWriteTransaction];
+    
+    RLMResults *children = [StringObject allObjectsInRealm:realm];
+    XCTAssertEqualObjects([children[0] stringCol], @"a", @"First child should be 'a'");
+    XCTAssertEqualObjects([children[1] stringCol], @"b", @"Second child should be 'b'");
+}
+
+- (void)testReplaceObjectInUnmanagedDictionary {
+    DictionaryPropertyObject *dict = [[DictionaryPropertyObject alloc] init];
+    
+    StringObject *stringObj1 = [[StringObject alloc] initWithValue:@{@"stringCol": @"a"}];
+    StringObject *stringObj2 = [[StringObject alloc] initWithValue:@{@"stringCol": @"b"}];
+    StringObject *stringObj3 = [[StringObject alloc] initWithValue:@{@"stringCol": @"c"}];
+    dict.stringDictionary[@"a"] = stringObj1;
+    dict.stringDictionary[@"b"] = stringObj2;
+    dict.stringDictionary[@"c"] = stringObj3;
+    
+    IntObject *intObj1 = [[IntObject alloc] initWithValue:@{@"intCol": @0}];
+    IntObject *intObj2 = [[IntObject alloc] initWithValue:@{@"intCol": @1}];
+    IntObject *intObj3 = [[IntObject alloc] initWithValue:@{@"intCol": @2}];
+    dict.intDictionary[@"a"] = intObj1;
+    dict.intDictionary[@"b"] = intObj2;
+    dict.intDictionary[@"c"] = intObj3;
+
+    XCTAssertEqualObjects(dict.stringDictionary[@"a"], stringObj1, @"Objects should be equal");
+    XCTAssertEqualObjects(dict.stringDictionary[@"b"], stringObj2, @"Objects should be equal");
+    XCTAssertEqualObjects(dict.stringDictionary[@"c"], stringObj3, @"Objects should be equal");
+    XCTAssertEqual(dict.stringDictionary.count, 3U, @"Should have 3 elements in stringDictionary");
+    
+    XCTAssertEqualObjects(dict.intDictionary[@"a"], intObj1, @"Objects should be equal");
+    XCTAssertEqualObjects(dict.intDictionary[@"b"], intObj2, @"Objects should be equal");
+    XCTAssertEqualObjects(dict.intDictionary[@"c"], intObj3, @"Objects should be equal");
+    XCTAssertEqual(dict.intDictionary.count, 3U, @"Should have 3 elements in intDictionary");
+    
+    StringObject *stringObj4 = [[StringObject alloc] initWithValue:@{@"stringCol": @"d"}];
+    
+    dict.stringDictionary[@"a"] = stringObj4;
+    
+    XCTAssertEqualObjects(dict.stringDictionary[@"a"], stringObj4, @"Objects should be replaced");
+    XCTAssertEqual(dict.stringDictionary.count, 3U, @"Should have 3 elements in stringDictionary");
+
+    IntObject *intObj4 = [[IntObject alloc] initWithValue:@{@"intCol": @3}];
+    
+    dict.intDictionary[@"a"] = intObj4;
+
+    XCTAssertEqualObjects(dict.intDictionary[@"a"], intObj4, @"Objects should be replaced");
+    XCTAssertEqual(dict.intDictionary.count, 3U, @"Should have 3 elements in intDictionary");
+    
+    RLMAssertThrowsWithReasonMatching([dict.stringDictionary setObject:(id)intObj4 forKey:@"a"],
+                                      @"IntObject.*StringObject");
+    RLMAssertThrowsWithReasonMatching([dict.intDictionary setObject:(id)stringObj4 forKey:@"a"],
+                                      @"StringObject.*IntObject");
+}
+
+- (void)testExchangeObjectForKeyWithObjectForKey {
+    
+    void (^test)(RLMDictionary *) = ^(RLMDictionary *dict) {
+        id obj = dict[@"a"];
+        dict[@"a"] = dict[@"b"];
+        dict[@"b"] = obj;
+        XCTAssertEqual(2U, dict.count);
+        XCTAssertEqualObjects(@"b", [dict[@"a"] stringCol]);
+        XCTAssertEqualObjects(@"a", [dict[@"b"] stringCol]);
+        
+        obj = dict[@"a"];
+        dict[@"a"] = dict[@"b"];
+        dict[@"b"] = obj;
+        XCTAssertEqual(2U, dict.count);
+        XCTAssertEqualObjects(@"a", [dict[@"a"] stringCol]);
+        XCTAssertEqualObjects(@"b", [dict[@"b"] stringCol]);
+    };
+    
+    DictionaryPropertyObject *dict = [[DictionaryPropertyObject alloc] initWithValue:@{@"stringDictionary": @{@"a": [[StringObject alloc] initWithValue:@{@"stringCol": @"a"}], @"b": [[StringObject alloc] initWithValue:@{@"stringCol": @"b"}]}}];
+
+    test(dict.stringDictionary);
+    
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:dict];
+    test(dict.stringDictionary);
+    [realm commitWriteTransaction];
+}
+
+- (void)testObjectForKey {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    EmployeeObject *po2 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    EmployeeObject *deleted = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    EmployeeObject *indirectlyDeleted = [EmployeeObject allObjectsInRealm:realm].lastObject;
+    [realm deleteObject:deleted];
+    
+    // create company
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
+    [company.employeeDict setObject:po1 forKey:@"po1"];
+    [company.employeeDict setObject:po2 forKey:@"po2"];
+    [company.employeeDict setObject:po3 forKey:@"po3"];
+    [company.employeeDict setObject:deleted forKey:@"deleted"];
+    
+    // test unmanaged
+    XCTAssertNotNil(company.employeeDict[@"deleted"]);
+    XCTAssertTrue(deleted.isInvalidated);
+    [company.employeeDict removeObjectForKey:@"deleted"];
+    
+    // add to realm
+    [realm addObject:company];
+    [realm commitWriteTransaction];
+    
+    // test LinkView
+    XCTAssertEqual(3U, company.employeeDict.count);
+    XCTAssertEqualObjects(po2.name, [company.employeeDict[@"po2"] name]);
+        
+    // invalid object
+    XCTAssertTrue(indirectlyDeleted.isInvalidated);
+    
+    RLMResults *employees = [company.employeeDict objectsWhere:@"age = %@", @40];
+    XCTAssertEqual(0U, [employees indexOfObject:po1]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [employees indexOfObject:po3]);
+}
+
+- (void)testObjectWhere {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    EmployeeObject *po4 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Bill", @"age": @55, @"hired": @YES}];
+    
+    // create company
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
+    for(EmployeeObject *eo in [EmployeeObject allObjectsInRealm:realm]) {
+        company.employeeDict[eo.name] = eo;
+    }
+    
+    // test unmanaged
+    RLMAssertThrowsWithReasonMatching([company.employeeDict objectsWhere:@"name = 'Jill'"],
+                                      @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
+
+    // add to realm
+    [realm addObject:company];
+    [realm commitWriteTransaction];
+    
+    // test LinkView RLMDictionary
+    XCTAssertEqualObjects(@"Jill", [[company.employeeDict objectsWhere:@"name = 'Jill'"].firstObject name]);
+    XCTAssertEqualObjects(@"Joe", [[company.employeeDict objectsWhere:@"name = 'Joe'"].firstObject name]);
+    XCTAssertEqual([company.employeeDict objectsWhere:@"name = 'JoJo'"].count, 0U);
+    
+    RLMResults *results = [company.employeeDict objectsWhere:@"age > 30"];
+    XCTAssertEqual(0U, [results indexOfObjectWhere:@"name = 'Joe'"]);
+    XCTAssertEqual(1U, [results indexOfObjectWhere:@"name = 'Bill'"]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObjectWhere:@"name = 'John'"]);
+    XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObjectWhere:@"name = 'Jill'"]);
+}
+
+- (void)testSetValueForKey {
+    RLMRealm *realm = self.realmWithTestPath;
+    
+    [realm beginWriteTransaction];
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
+
+    RLMAssertThrowsWithReasonMatching([company.employeeDict setValue:@"name" forKey:@"name"], @"Value of type '__NSCFConstantString' does not match RLMDictionary value type 'EmployeeObject'.");
+
+    [company.employeeDict setValue:@"name" forKey:@"@name"];
+    XCTAssertEqualObjects([company.employeeDict valueForKey:@"@name"], @{});
+
+    [realm addObject:company];
+    [realm commitWriteTransaction];
+    
+    XCTAssertThrows([company.employeeDict setValue:@10 forKey:@"@age"]);
+    XCTAssertEqualObjects([company.employeeDict valueForKey:@"@age"], @{});
+    
+    // managed
+    NSMutableArray *ages = [NSMutableArray array];
+    [realm beginWriteTransaction];
+    for (int i = 0; i < 30; ++i) {
+        [ages addObject:@(20)];
+        EmployeeObject *eo = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
+        company.employeeDict[[NSString stringWithFormat:@"%d", i]] = eo;
+    }
+    
+    [company.employeeDict setValue:@20 forKey:@"@age"];
+    [realm commitWriteTransaction];
+    
+    XCTAssertEqualObjects([company.employeeDict valueForKey:@"@age"], ages);
+    
+    // unmanaged object
+    company = [[CompanyObject alloc] init];
+    ages = [NSMutableArray array];
+    for (int i = 0; i < 30; ++i) {
+        [ages addObject:@(20)];
+        EmployeeObject *eo = [[EmployeeObject alloc] initWithValue:@{@"name": @"Joe",  @"age": @(i), @"hired": @YES}];
+        company.employeeDict[[NSString stringWithFormat:@"%d", i]] = eo;
+    }
+    
+    [company.employeeDict setValue:@20 forKey:@"@age"];
+    
+    XCTAssertEqualObjects([company.employeeDict valueForKey:@"@age"], ages);
+}
+
+- (void)testValueForCollectionOperationKeyPath {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    EmployeeObject *e1 = [PrimaryEmployeeObject createInRealm:realm withValue:@{@"name": @"A", @"age": @20, @"hired": @YES}];
+    EmployeeObject *e2 = [PrimaryEmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
+    EmployeeObject *e3 = [PrimaryEmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
+    EmployeeObject *e4 = [PrimaryEmployeeObject createInRealm:realm withValue:@{@"name": @"D", @"age": @50, @"hired": @YES}];
+    PrimaryCompanyObject *c1 = [PrimaryCompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employeeDict": @{@"e1": e1, @"e2": e2, @"e3": e3, @"e4": e2}, @"employee": @[], @"employeeSet": @[]}];
+    PrimaryCompanyObject *c2 = [PrimaryCompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG 2", @"employeeDict": @{@"e1": e1, @"e4": e4}, @"employee": @[], @"employeeSet": @[]}];
+    
+    ArrayOfPrimaryCompanies *companies = [ArrayOfPrimaryCompanies createInRealm:realm withValue:@[@[c1, c2]]];
+    [realm commitWriteTransaction];
+    
+    // count operator
+    XCTAssertEqual([[c1.employeeDict valueForKeyPath:@"@count"] integerValue], 4);
+    
+    // numeric operators
+    XCTAssertEqual([[c1.employeeDict valueForKeyPath:@"@min.age"] intValue], 20);
+    XCTAssertEqual([[c1.employeeDict valueForKeyPath:@"@max.age"] intValue], 40);
+    XCTAssertEqual([[c1.employeeDict valueForKeyPath:@"@sum.age"] integerValue], 120);
+    XCTAssertEqualWithAccuracy([[c1.employeeDict valueForKeyPath:@"@avg.age"] doubleValue], 30, 0.1f);
+    
+    // collection
+    XCTAssertEqualObjects([[c1.employeeDict valueForKeyPath:@"@unionOfObjects.name"] sortedArrayUsingSelector:@selector(compare:)],
+                          ([@[@"A", @"B", @"C", @"B"] sortedArrayUsingSelector:@selector(compare:)]));
+    XCTAssertEqualObjects([[c1.employeeDict valueForKeyPath:@"@distinctUnionOfObjects.name"] sortedArrayUsingSelector:@selector(compare:)],
+                          (@[@"A", @"B", @"C"]));
+    NSComparator cmp = ^NSComparisonResult(id obj1, id obj2) {
+        return [obj1 compare: obj2];
+        
+    };
+    XCTAssertEqualObjects([[companies.companies valueForKeyPath:@"@unionOfArrays.employeeDict"] sortedArrayUsingComparator:cmp],
+                          (@[@"e1", @"e1", @"e2", @"e3", @"e4", @"e4"]));
+    XCTAssertEqualObjects([[companies.companies valueForKeyPath:@"@distinctUnionOfArrays.employeeDict"] sortedArrayUsingComparator:cmp],
+                          (@[@"e1", @"e2", @"e3", @"e4"]));
+
+    // invalid key paths
+    RLMAssertThrowsWithReasonMatching([c1.employeeDict valueForKeyPath:@"@invalid.name"],
+                                      @"Unsupported KVC collection operator found in key path '@invalid.name'");
+    RLMAssertThrowsWithReasonMatching([c1.employeeDict valueForKeyPath:@"@sum"],
+                                      @"Missing key path for KVC collection operator sum in key path '@sum'");
+    RLMAssertThrowsWithReasonMatching([c1.employeeDict valueForKeyPath:@"@sum."],
+                                      @"Missing key path for KVC collection operator sum in key path '@sum.'");
+    RLMAssertThrowsWithReasonMatching([c1.employeeDict valueForKeyPath:@"@sum.employees.@sum.age"],
+                                      @"Nested key paths.*not supported");
+}
+
+- (void)testCrossThreadAccess {
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
+    
+    EmployeeObject *eo = [[EmployeeObject alloc] initWithValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    company.employeeDict[@"eo"] = eo;
+    RLMDictionary *employees = company.employeeDict;
+    
+    // Unmanaged object can be accessed from other threads
+    [self dispatchAsyncAndWait:^{
+        XCTAssertNoThrow(company.employeeDict);
+        XCTAssertNoThrow(employees[@"eo"]);
+    }];
+    
+    [RLMRealm.defaultRealm beginWriteTransaction];
+    [RLMRealm.defaultRealm addObject:company];
+    [RLMRealm.defaultRealm commitWriteTransaction];
+    
+    employees = company.employeeDict;
+    XCTAssertNoThrow(company.employeeDict);
+    XCTAssertNoThrow(employees[@"eo"]);
+    [self dispatchAsyncAndWait:^{
+        XCTAssertThrows(company.employeeDict);
+        XCTAssertThrows(employees[@"eo"]);
+    }];
+}
+
+- (void)testSortByNoColumns {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    DogObject *a2 = [DogObject createInDefaultRealmWithValue:@[@"a", @2]];
+    DogObject *b1 = [DogObject createInDefaultRealmWithValue:@[@"b", @1]];
+    DogObject *a1 = [DogObject createInDefaultRealmWithValue:@[@"a", @1]];
+    DogObject *b2 = [DogObject createInDefaultRealmWithValue:@[@"b", @2]];
+    
+    RLMDictionary<NSString *, DogObject *> *dict = [DogDictionaryObject createInDefaultRealmWithValue:@[@{@"a1": a1, @"b1": b1, @"a2": a2, @"b2": b2}]].dogs;
+    [realm commitWriteTransaction];
+    
+    RLMResults *notActuallySorted = [dict sortedResultsUsingDescriptors:@[]];
+    XCTAssertEqual(notActuallySorted.count, dict.count);
+    XCTAssertTrue([dict[@"a1"] isEqualToObject:notActuallySorted[0]]);
+    XCTAssertTrue([dict[@"b2"] isEqualToObject:notActuallySorted[1]]);
+    XCTAssertTrue([dict[@"b1"] isEqualToObject:notActuallySorted[2]]);
+    XCTAssertTrue([dict[@"a2"] isEqualToObject:notActuallySorted[3]]);
+}
+
+- (void)testSortByMultipleColumns {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    DogObject *a1 = [DogObject createInDefaultRealmWithValue:@[@"a", @1]];
+    DogObject *a2 = [DogObject createInDefaultRealmWithValue:@[@"a", @2]];
+    DogObject *b1 = [DogObject createInDefaultRealmWithValue:@[@"b", @1]];
+    DogObject *b2 = [DogObject createInDefaultRealmWithValue:@[@"b", @2]];
+    
+    DogDictionaryObject *ddo = [DogDictionaryObject createInDefaultRealmWithValue:@[@{@"a1": a1, @"b1": b1, @"a2": a2, @"b2": b2}]];
+    [realm commitWriteTransaction];
+    
+    bool (^checkOrder)(NSArray *, NSArray *, NSArray *) = ^bool(NSArray *properties, NSArray *ascending, NSArray *dogs) {
+        NSArray *sort = @[[RLMSortDescriptor sortDescriptorWithKeyPath:properties[0] ascending:[ascending[0] boolValue]],
+                          [RLMSortDescriptor sortDescriptorWithKeyPath:properties[1] ascending:[ascending[1] boolValue]]];
+        RLMResults *actual = [ddo.dogs sortedResultsUsingDescriptors:sort];
+        
+        return [actual[0] isEqualToObject:dogs[0]]
+        && [actual[1] isEqualToObject:dogs[1]]
+        && [actual[2] isEqualToObject:dogs[2]]
+        && [actual[3] isEqualToObject:dogs[3]];
+    };
+    
+    // Check each valid sort
+    XCTAssertTrue(checkOrder(@[@"dogName", @"age"], @[@YES, @YES], @[a1, a2, b1, b2]));
+    XCTAssertTrue(checkOrder(@[@"dogName", @"age"], @[@YES, @NO], @[a2, a1, b2, b1]));
+    XCTAssertTrue(checkOrder(@[@"dogName", @"age"], @[@NO, @YES], @[b1, b2, a1, a2]));
+    XCTAssertTrue(checkOrder(@[@"dogName", @"age"], @[@NO, @NO], @[b2, b1, a2, a1]));
+    XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@YES, @YES], @[a1, b1, a2, b2]));
+    XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@YES, @NO], @[b1, a1, b2, a2]));
+    XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@NO, @YES], @[a2, b2, a1, b1]));
+    XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@NO, @NO], @[b2, a2, b1, a1]));
+}
+
+- (void)testSortByRenamedColumns {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    id value = @{@"dictionary": @{@"0": @[@1, @"c"], @"1": @[@2, @"b"], @"2": @[@3, @"a"]}, @"set": @[]};
+    LinkToRenamedProperties1 *obj = [LinkToRenamedProperties1 createInRealm:realm withValue:value];
+    
+    // FIXME: sorting has to use the column names because the parsing is done by
+    // the object store. This is not ideal.
+    XCTAssertEqualObjects([[obj.dictionary sortedResultsUsingKeyPath:@"prop 1" ascending:YES] valueForKeyPath:@"propA"],
+                          (@[@1, @2, @3]));
+    XCTAssertEqualObjects([[obj.dictionary sortedResultsUsingKeyPath:@"prop 2" ascending:YES] valueForKeyPath:@"propA"],
+                          (@[@3, @2, @1]));
+    
+    LinkToRenamedProperties2 *obj2 = [LinkToRenamedProperties2 allObjectsInRealm:realm].firstObject;
+    XCTAssertEqualObjects([[obj2.dictionary sortedResultsUsingKeyPath:@"prop 1" ascending:YES] valueForKeyPath:@"propC"],
+                          (@[@1, @2, @3]));
+    XCTAssertEqualObjects([[obj2.dictionary sortedResultsUsingKeyPath:@"prop 2" ascending:YES] valueForKeyPath:@"propC"],
+                          (@[@3, @2, @1]));
+    
+    [realm cancelWriteTransaction];
+}
+
+- (void)testDeleteLinksAndObjectsInDictionary {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withValue:@[@"Joe", @40, @YES]];
+    EmployeeObject *po2 = [EmployeeObject createInRealm:realm withValue:@[@"John", @30, @NO]];
+    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withValue:@[@"Jill", @25, @YES]];
+    
+    CompanyObject *company = [[CompanyObject alloc] init];
+    company.name = @"name";
+    for (EmployeeObject *eo in [EmployeeObject allObjects]) {
+        company.employeeDict[eo.name] = eo;
+    }
+    [realm addObject:company];
+    [realm commitWriteTransaction];
+    
+    RLMDictionary *peopleInCompany = company.employeeDict;
+    
+    // Delete link to employee
+    XCTAssertThrowsSpecificNamed([peopleInCompany removeObjectForKey:@"Joe"], NSException, @"RLMException", @"Not allowed in read transaction");
+    XCTAssertEqual(peopleInCompany.count, 3U, @"No links should have been deleted");
+    
+    [realm beginWriteTransaction];
+    XCTAssertNoThrow([peopleInCompany removeObjectForKey:@"John"], @"Should delete link to employee");
+    [realm commitWriteTransaction];
+    
+    XCTAssertEqual(peopleInCompany.count, 2U, @"link deleted when accessing via links");
+    EmployeeObject *test = peopleInCompany[@"Joe"];
+    XCTAssertEqual(test.age, po1.age, @"Should be equal");
+    XCTAssertEqualObjects(test.name, po1.name, @"Should be equal");
+    XCTAssertEqual(test.hired, po1.hired, @"Should be equal");
+    XCTAssertTrue([test isEqualToObject:po1], @"Should be equal");
+    
+    test = peopleInCompany[@"Jill"];
+    XCTAssertEqual(test.age, po3.age, @"Should be equal");
+    XCTAssertEqualObjects(test.name, po3.name, @"Should be equal");
+    XCTAssertEqual(test.hired, po3.hired, @"Should be equal");
+    XCTAssertTrue([test isEqualToObject:po3], @"Should be equal");
+    
+    XCTAssertThrowsSpecificNamed([peopleInCompany removeAllObjects], NSException, @"RLMException", @"Not allowed in read transaction");
+    XCTAssertThrowsSpecificNamed(peopleInCompany[@"Joe"] = po2, NSException, @"RLMException", @"Replace not allowed in read transaction");
+    XCTAssertThrowsSpecificNamed(peopleInCompany[@"John"] = po2, NSException, @"RLMException", @"Add not allowed in read transaction");
+    
+    [realm beginWriteTransaction];
+    XCTAssertNoThrow(peopleInCompany[@"Jill"] = nil, @"Should delete value for key");
+    XCTAssertEqual(peopleInCompany.count, 1U, @"1 remaining link");
+    peopleInCompany[@"Joe"] = po2;
+    XCTAssertEqual(peopleInCompany.count, 1U, @"1 link replaced");
+    peopleInCompany[@"Jill"] = po3;
+    XCTAssertEqual(peopleInCompany.count, 2U, @"2 links");
+    XCTAssertNoThrow([peopleInCompany removeAllObjects], @"Should delete all links");
+    XCTAssertEqual(peopleInCompany.count, 0U, @"0 remaining links");
+    [realm commitWriteTransaction];
+    
+    RLMResults *allPeople = [EmployeeObject allObjects];
+    XCTAssertEqual(allPeople.count, 3U, @"Only links should have been deleted, not the employees");
+}
+
+- (void)testDictionaryDescription {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    RLMDictionary<NSString *, EmployeeObject *> *employees = [CompanyObject createInDefaultRealmWithValue:@[@"company"]].employeeDict;
+    RLMDictionary<NSString *, NSNumber *> *ints = [AllPrimitiveDictionaries createInDefaultRealmWithValue:@[]].intObj;
+    for (NSInteger i = 0; i < 1012; ++i) {
+        EmployeeObject *person = [[EmployeeObject alloc] init];
+        person.name = @"Mary";
+        person.age = 24;
+        person.hired = YES;
+        NSString *key = [NSString stringWithFormat:@"%li", (long)i];
+        employees[key] = person;
+        ints[key] = @(i + 100);
+    }
+    [realm commitWriteTransaction];
+
+    RLMAssertMatches(employees.description,
+                     @"(?s)RLMDictionary\\<string, EmployeeObject\\> \\<0x[a-z0-9]+\\> \\(\n"
+                     @"\t\\[0\\] \\[[0-9]+\\]: EmployeeObject \\{\n"
+                     @"\t\tname = Mary;\n"
+                     @"\t\tage = 24;\n"
+                     @"\t\thired = 1;\n"
+                     @"\t\\},\n"
+                     @".*\n"
+                     @"\t... 912 objects skipped.\n"
+                     @"\\)");
+
+    RLMAssertMatches(ints.description,
+                     @"(?s)RLMDictionary\\<string, int\\> \\<0x[a-z0-9]+\\> \\(\n"
+                     @"\t\\[0\\] \\[[0-9]+\\]: [0-9]+,\n"
+                     @"\t\\[1\\] \\[[0-9]+\\]: [0-9]+,\n"
+                     @".*\n"
+                     @"\t\\[99\\] \\[[0-9]+\\]: [0-9]+\n"
+                     @"\t... 912 objects skipped.\n"
+                     @"\\)");
+}
+
+- (void)testUnmanagedAssignment {
+    IntObject *io1 = [[IntObject alloc] init];
+    IntObject *io2 = [[IntObject alloc] init];
+    IntObject *io3 = [[IntObject alloc] init];
+    
+    DictionaryPropertyObject *dict1 = [[DictionaryPropertyObject alloc] init];
+    DictionaryPropertyObject *dict2 = [[DictionaryPropertyObject alloc] init];
+    
+    // Assigning NSDictionary shallow copies
+    dict1.intDictionary = (id)@{@"io1": io1, @"io2": io2};
+    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"self"], (@{@"io1": io1, @"io2": io2}));
+    
+    [dict1 setValue:@{@"io1": io1, @"io3": io3} forKey:@"intDictionary"];
+    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"self"], (@{@"io1": io1, @"io3": io3}));
+    
+    dict1[@"intDictionary"] = @{@"io2": io2, @"io3": io3};
+    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"self"], (@{@"io2": io2, @"io3": io3}));
+    
+    // Assigning RLMDictionary shallow copies
+    dict2.intDictionary = dict1.intDictionary;
+    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"self"], (@{@"io2": io2, @"io3": io3}));
+    
+    [dict1.intDictionary removeAllObjects];
+    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"self"], (@{@"io2": io2, @"io3": io3}));
+    
+    // Self-assignment is a no-op
+    dict2.intDictionary = dict2.intDictionary;
+    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"self"], (@{@"io2": io2, @"io3": io3}));
+    dict2[@"intDictionary"] = dict2[@"intDictionary"];
+    XCTAssertEqualObjects([dict2[@"intDictionary"] valueForKey:@"self"], (@{@"io2": io2, @"io3": io3}));
+}
+
+- (void)testManagedAssignment {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    
+    IntObject *io1 = [IntObject createInRealm:realm withValue:@[@1]];
+    IntObject *io2 = [IntObject createInRealm:realm withValue:@[@2]];
+    IntObject *io3 = [IntObject createInRealm:realm withValue:@[@3]];
+    
+    DictionaryPropertyObject *dict1 = [[DictionaryPropertyObject alloc] init];
+    DictionaryPropertyObject *dict2 = [[DictionaryPropertyObject alloc] init];
+
+    // Assigning NSDictonary shallow copies
+    dict1.intDictionary = (id)@{@"io1": io1, @"io2": io2};
+    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"intCol"], (@{@"io1": io1, @"io2": io2}));
+    
+    [dict1 setValue:@{@"io1": io1, @"io3": io3} forKey:@"intDictionary"];
+    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"intCol"], (@{@"io1": io1, @"io3": io3}));
+    
+    dict1[@"intDictionary"] = @{@"io2": io2, @"io3": io3};
+    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"intCol"], (@{@"io2": io2, @"io3": io3}));
+    
+    // Assigning RLMDictionary shallow copies
+    dict2.intDictionary = dict1.intDictionary;
+    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"intCol"], (@{@"io2": io2, @"io3": io3}));
+    
+    [dict1.intDictionary removeAllObjects];
+    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"intCol"], (@{@"io2": io2, @"io3": io3}));
+    
+    // Self-assignment is a no-op
+    dict2.intDictionary = dict2.intDictionary;
+    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"intCol"], (@{@"io2": io2, @"io3": io3}));
+    dict2[@"intDictionary"] = dict2[@"intDictionary"];
+    XCTAssertEqualObjects([dict2[@"intDictionary"] valueForKey:@"intCol"], (@{@"io2": io2, @"io3": io3}));
+
+    [realm cancelWriteTransaction];
+}
+
+- (void)testAssignIncorrectType {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    DictionaryPropertyObject *dict = [DictionaryPropertyObject createInRealm:realm
+                                                                   withValue:@{@"stringDictionary": @{@"a": [[StringObject alloc] initWithValue:@[@"a"]]}}];
+
+    RLMAssertThrowsWithReason(dict.intDictionary = (id)dict.stringDictionary,
+                              @"RLMDictionary<string, StringObject> does not match expected type 'IntObject' for property 'DictionaryPropertyObject.intDictionary'.");
+    RLMAssertThrowsWithReason(dict[@"intDictionary"] = dict[@"stringDictionary"],
+                              @"RLMDictionary<string, StringObject> does not match expected type 'IntObject' for property 'DictionaryPropertyObject.intDictionary'.");
+    [realm cancelWriteTransaction];
+}
+
+- (void)testNotificationSentInitially {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    DictionaryPropertyObject *dict = [DictionaryPropertyObject createInRealm:realm
+                                                                   withValue:@{@"stringDictionary": @{@"a": [[StringObject alloc] initWithValue:@[@"a"]]}}];
+    [realm commitWriteTransaction];
+    
+    id expectation = [self expectationWithDescription:@""];
+    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMCollectionChange *change, NSError *error) {
+        XCTAssertNotNil(dictionary);
+        XCTAssertNil(change);
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [(RLMNotificationToken *)token invalidate];
+}
+
+- (void)testNotificationSentAfterCommit {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    DictionaryPropertyObject *dict = [DictionaryPropertyObject createInRealm:realm withValue:@{}];
+    [realm commitWriteTransaction];
+    
+    __block bool first = true;
+    __block id expectation = [self expectationWithDescription:@""];
+    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMCollectionChange *change, NSError *error) {
+        XCTAssertNotNil(dictionary);
+        XCTAssert(first ? !change : !!change);
+        XCTAssertNil(error);
+        first = false;
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    
+    expectation = [self expectationWithDescription:@""];
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = self.realmWithTestPath;
+        [realm transactionWithBlock:^{
+            RLMDictionary *dict = [(DictionaryPropertyObject *)[DictionaryPropertyObject allObjectsInRealm:realm].firstObject stringDictionary];
+            dict[@"new"] = [[StringObject alloc] init];
+        }];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    
+    [(RLMNotificationToken *)token invalidate];
+}
+
+- (void)testNotificationNotSentForUnrelatedChange {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    DictionaryPropertyObject *dict = [DictionaryPropertyObject createInRealm:realm withValue:@{}];
+    [realm commitWriteTransaction];
+
+    id expectation = [self expectationWithDescription:@""];
+    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMCollectionChange *change, NSError *error) {
+        // will throw if it's incorrectly called a second time due to the
+        // unrelated write transaction
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // All notification blocks are called as part of a single runloop event, so
+    // waiting for this one also waits for the above one to get a chance to run
+    [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
+        [self dispatchAsyncAndWait:^{
+            RLMRealm *realm = self.realmWithTestPath;
+            [realm transactionWithBlock:^{
+                [DictionaryPropertyObject createInRealm:realm withValue:@{}];
+            }];
+        }];
+    }];
+    [(RLMNotificationToken *)token invalidate];
+}
+
+- (void)testNotificationSentOnlyForActualRefresh {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    DictionaryPropertyObject *dict = [DictionaryPropertyObject createInRealm:realm withValue:@{}];
+    [realm commitWriteTransaction];
+    
+    __block id expectation = [self expectationWithDescription:@""];
+    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMCollectionChange *change, NSError *error) {
+        XCTAssertNotNil(dictionary);
+        XCTAssertNil(error);
+        // will throw if it's called a second time before we create the new
+        // expectation object immediately before manually refreshing
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    
+    // Turn off autorefresh, so the background commit should not result in a notification
+    realm.autorefresh = NO;
+    
+    // All notification blocks are called as part of a single runloop event, so
+    // waiting for this one also waits for the above one to get a chance to run
+    [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
+        [self dispatchAsyncAndWait:^{
+            RLMRealm *realm = self.realmWithTestPath;
+            [realm transactionWithBlock:^{
+                RLMDictionary *dict = [(DictionaryPropertyObject *)[DictionaryPropertyObject allObjectsInRealm:realm].firstObject stringDictionary];
+                dict[@"new"] = [[StringObject alloc] init];
+            }];
+        }];
+    }];
+    
+    expectation = [self expectationWithDescription:@""];
+    [realm refresh];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    
+    [(RLMNotificationToken *)token invalidate];
+}
+
+- (void)testDeletingObjectWithNotificationsRegistered {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    DictionaryPropertyObject *dict = [DictionaryPropertyObject createInRealm:realm withValue:@{}];
+    [realm commitWriteTransaction];
+    
+    __block id expectation = [self expectationWithDescription:@""];
+    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMCollectionChange *change, NSError *error) {
+        XCTAssertNotNil(dictionary);
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    
+    [realm beginWriteTransaction];
+    [realm deleteObject:dict];
+    [realm commitWriteTransaction];
+    
+    [(RLMNotificationToken *)token invalidate];
+}
+
+static RLMDictionary<NSString *, IntObject *> *managedTestDictionary() {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block RLMDictionary *dict;
+    [realm transactionWithBlock:^{
+        DictionaryPropertyObject *dpo = [DictionaryPropertyObject createInDefaultRealmWithValue:
+                                         @{@"intDictionary": @{@"0": @[@0], @"1": @[@1]}}];
+        dict = dpo.intDictionary;
+    }];
+    return dict;
+}
+
+- (void)testAllMethodsCheckThread {
+    RLMDictionary<NSString *, IntObject *> *dict = managedTestDictionary();
+    IntObject *io = dict.allValues.firstObject;
+    RLMRealm *realm = dict.realm;
+    [realm beginWriteTransaction];
+    
+    [self dispatchAsyncAndWait:^{
+        RLMAssertThrowsWithReasonMatching([dict count], @"thread");
+        RLMAssertThrowsWithReasonMatching([dict objectForKey:@"thread"], @"thread");
+        RLMAssertThrowsWithReasonMatching([dict firstObject], @"thread");
+        RLMAssertThrowsWithReasonMatching([dict lastObject], @"thread");
+        
+        RLMAssertThrowsWithReasonMatching([dict setObject:io forKey:@"thread"], @"thread");
+        RLMAssertThrowsWithReasonMatching([dict removeObjectForKey:@"thread"], @"thread");
+        RLMAssertThrowsWithReasonMatching([dict setObject:nil forKey:@"thread"], @"thread");
+        RLMAssertThrowsWithReasonMatching([dict removeAllObjects], @"thread");
+        
+        RLMAssertThrowsWithReasonMatching([dict indexOfObject:[IntObject allObjects].firstObject], @"thread");
+        RLMAssertThrowsWithReasonMatching([dict indexOfObjectWhere:@"intCol = 0"], @"thread");
+        RLMAssertThrowsWithReasonMatching([dict indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
+        RLMAssertThrowsWithReasonMatching([dict objectsWhere:@"intCol = 0"], @"thread");
+        RLMAssertThrowsWithReasonMatching([dict objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
+        RLMAssertThrowsWithReasonMatching([dict sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"thread");
+        RLMAssertThrowsWithReasonMatching([dict sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]], @"thread");
+        RLMAssertThrowsWithReasonMatching(dict[@"thread"], @"thread");
+        RLMAssertThrowsWithReasonMatching(dict[@"thread"] = io, @"thread");
+        RLMAssertThrowsWithReasonMatching([dict valueForKey:@"intCol"], @"thread");
+        RLMAssertThrowsWithReasonMatching([dict setValue:@1 forKey:@"intCol"], @"thread");
+        RLMAssertThrowsWithReasonMatching({for (__unused id obj in dict);}, @"thread");
+    }];
+    [realm cancelWriteTransaction];
+}
+
+- (void)testAllMethodsCheckForInvalidation {
+    RLMDictionary<NSString *, IntObject *> *dict = managedTestDictionary();
+    IntObject *io = dict.allValues.firstObject;
+    RLMRealm *realm = dict.realm;
+    
+    [realm beginWriteTransaction];
+    
+    RLMAssertThrowsWithReasonMatching([dict count], @"thread");
+    RLMAssertThrowsWithReasonMatching([dict objectForKey:@"thread"], @"thread");
+    RLMAssertThrowsWithReasonMatching([dict firstObject], @"thread");
+    RLMAssertThrowsWithReasonMatching([dict lastObject], @"thread");
+    
+    RLMAssertThrowsWithReasonMatching([dict setObject:io forKey:@"thread"], @"thread");
+    RLMAssertThrowsWithReasonMatching([dict removeObjectForKey:@"thread"], @"thread");
+    RLMAssertThrowsWithReasonMatching([dict setObject:nil forKey:@"thread"], @"thread");
+    RLMAssertThrowsWithReasonMatching([dict removeAllObjects], @"thread");
+
+    RLMAssertThrowsWithReasonMatching([dict indexOfObject:[IntObject allObjects].firstObject], @"thread");
+    RLMAssertThrowsWithReasonMatching([dict indexOfObjectWhere:@"intCol = 0"], @"thread");
+    RLMAssertThrowsWithReasonMatching([dict indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
+    RLMAssertThrowsWithReasonMatching([dict objectsWhere:@"intCol = 0"], @"thread");
+    RLMAssertThrowsWithReasonMatching([dict objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
+    RLMAssertThrowsWithReasonMatching([dict sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"thread");
+    RLMAssertThrowsWithReasonMatching([dict sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]], @"thread");
+    RLMAssertThrowsWithReasonMatching(dict[@"thread"], @"thread");
+    RLMAssertThrowsWithReasonMatching(dict[@"thread"] = io, @"thread");
+    RLMAssertThrowsWithReasonMatching([dict valueForKey:@"intCol"], @"thread");
+    RLMAssertThrowsWithReasonMatching([dict setValue:@1 forKey:@"intCol"], @"thread");
+    RLMAssertThrowsWithReasonMatching({for (__unused id obj in dict);}, @"thread");
+
+    XCTAssertNoThrow([dict objectClassName]);
+    XCTAssertNoThrow([dict realm]);
+    XCTAssertNoThrow([dict isInvalidated]);
+    
+    XCTAssertNoThrow([dict count]);
+    XCTAssertNoThrow([dict objectForKey:@"0"]);
+    XCTAssertNoThrow([dict firstObject]);
+    XCTAssertNoThrow([dict lastObject]);
+    
+    XCTAssertNoThrow([dict setObject:io forKey:@"thread"]);
+    XCTAssertNoThrow([dict removeObjectForKey:@"thread"]);
+    XCTAssertNoThrow([dict setObject:nil forKey:@"thread"]);
+    XCTAssertNoThrow([dict removeAllObjects]);
+
+    [dict setDictionary:@{@"0": io, @"1": io, @"2": io}];
+    XCTAssertNoThrow([dict setObject:io forKey:@"0"]);
+    XCTAssertNoThrow([dict setObject:[dict objectForKey:@"1"] forKey:@"0"]);
+    
+    XCTAssertNoThrow([dict indexOfObject:[IntObject allObjects].firstObject]);
+    XCTAssertNoThrow([dict indexOfObjectWhere:@"intCol = 0"]);
+    XCTAssertNoThrow([dict indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+    XCTAssertNoThrow([dict objectsWhere:@"intCol = 0"]);
+    XCTAssertNoThrow([dict objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+    XCTAssertNoThrow([dict sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
+    XCTAssertNoThrow([dict sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
+    XCTAssertNoThrow(dict[@"0"]);
+    XCTAssertNoThrow(dict[@"0"] = io);
+    XCTAssertNoThrow([dict valueForKey:@"intCol"]);
+    XCTAssertNoThrow([dict setValue:@1 forKey:@"intCol"]);
+    XCTAssertNoThrow({for (__unused id obj in dict);});
+    
+    [realm cancelWriteTransaction];
+    [realm invalidate];
+    [realm beginWriteTransaction];
+    io = [IntObject createInDefaultRealmWithValue:@[@0]];
+    
+    XCTAssertNoThrow([dict objectClassName]);
+    XCTAssertNoThrow([dict realm]);
+    XCTAssertNoThrow([dict isInvalidated]);
+    
+    RLMAssertThrowsWithReasonMatching([dict count], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([dict objectForKey:@"0"], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([dict firstObject], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([dict lastObject], @"invalidated");
+    
+    RLMAssertThrowsWithReasonMatching([dict setObject:io forKey:@"thread"], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([dict removeObjectForKey:@"thread"], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([dict setObject:nil forKey:@"thread"], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([dict removeAllObjects], @"invalidated");
+    
+    RLMAssertThrowsWithReasonMatching([dict indexOfObject:[IntObject allObjects].firstObject], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([dict indexOfObjectWhere:@"intCol = 0"], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([dict indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([dict objectsWhere:@"intCol = 0"], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([dict objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([dict sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([dict sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]], @"invalidated");
+    RLMAssertThrowsWithReasonMatching(dict[@"0"], @"invalidated");
+    RLMAssertThrowsWithReasonMatching(dict[@"0"] = io, @"invalidated");
+    RLMAssertThrowsWithReasonMatching([dict valueForKey:@"intCol"], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([dict setValue:@1 forKey:@"intCol"], @"invalidated");
+    RLMAssertThrowsWithReasonMatching({for (__unused id obj in dict);}, @"invalidated");
+    
+    [realm cancelWriteTransaction];
+}
+
+- (void)testMutatingMethodsCheckForWriteTransaction {
+    RLMDictionary<NSString *, IntObject *> *dict = managedTestDictionary();
+    IntObject *io = dict.allValues.firstObject;
+    
+    XCTAssertNoThrow([dict objectClassName]);
+    XCTAssertNoThrow([dict realm]);
+    XCTAssertNoThrow([dict isInvalidated]);
+    
+    XCTAssertNoThrow([dict count]);
+    XCTAssertNoThrow([dict objectForKey:@"0"]);
+    XCTAssertNoThrow([dict firstObject]);
+    XCTAssertNoThrow([dict lastObject]);
+    
+    XCTAssertNoThrow([dict indexOfObject:[IntObject allObjects].firstObject]);
+    XCTAssertNoThrow([dict indexOfObjectWhere:@"intCol = 0"]);
+    XCTAssertNoThrow([dict indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+    XCTAssertNoThrow([dict objectsWhere:@"intCol = 0"]);
+    XCTAssertNoThrow([dict objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+    XCTAssertNoThrow([dict sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
+    XCTAssertNoThrow([dict sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
+    XCTAssertNoThrow(dict[@"0"]);
+    XCTAssertNoThrow([dict valueForKey:@"intCol"]);
+    XCTAssertNoThrow({for (__unused id obj in dict);});
+    
+    RLMAssertThrowsWithReasonMatching([dict setObject:io forKey:@"thread"], @"write transaction");
+    RLMAssertThrowsWithReasonMatching([dict removeObjectForKey:@"thread"], @"write transaction");
+    RLMAssertThrowsWithReasonMatching([dict setObject:nil forKey:@"thread"], @"write transaction");
+    RLMAssertThrowsWithReasonMatching([dict removeAllObjects], @"write transaction");
+
+    RLMAssertThrowsWithReasonMatching(dict[@"0"] = io, @"write transaction");
+    RLMAssertThrowsWithReasonMatching([dict setValue:@1 forKey:@"intCol"], @"write transaction");
+}
+
+- (void)testIsFrozen {
+    RLMDictionary *unfrozen = managedTestDictionary();
+    RLMDictionary *frozen = [unfrozen freeze];
+    XCTAssertFalse(unfrozen.isFrozen);
+    XCTAssertTrue(frozen.isFrozen);
+}
+
+- (void)testFreezingFrozenObjectReturnsSelf {
+    RLMDictionary *dict = managedTestDictionary();
+    RLMDictionary *frozen = [dict freeze];
+    XCTAssertNotEqual(dict, frozen);
+    XCTAssertNotEqual(dict.freeze, frozen);
+    XCTAssertEqual(frozen, frozen.freeze);
+}
+
+- (void)testFreezeFromWrongThread {
+    RLMDictionary *dict = managedTestDictionary();
+    [self dispatchAsyncAndWait:^{
+        RLMAssertThrowsWithReason([dict freeze],
+                                  @"Realm accessed from incorrect thread");
+    }];
+}
+
+- (void)testAccessFrozenFromDifferentThread {
+    RLMDictionary *frozen = [managedTestDictionary() freeze];
+    [self dispatchAsyncAndWait:^{
+        XCTAssertEqualObjects([frozen valueForKey:@"intCol"], (@[@0, @1]));
+    }];
+}
+
+- (void)testObserveFrozenDictionary {
+    RLMDictionary *frozen = [managedTestDictionary() freeze];
+    id block = ^(__unused BOOL deleted, __unused NSArray *changes, __unused NSError *error) {};
+    RLMAssertThrowsWithReason([frozen addNotificationBlock:block],
+                              @"Frozen Realms do not change and do not have change notifications.");
+}
+
+- (void)testQueryFrozenDictionary {
+    RLMDictionary *frozen = [managedTestDictionary() freeze];
+    XCTAssertEqualObjects([[frozen objectsWhere:@"intCol > 0"] valueForKey:@"intCol"], (@[@1]));
+}
+
+- (void)testFrozenDictionarysDoNotUpdate {
+    RLMDictionary *dict = managedTestDictionary();
+    RLMDictionary *frozen = [dict freeze];
+    XCTAssertEqual(frozen.count, 2);
+    [dict.realm transactionWithBlock:^{
+        [dict removeObjectForKey:dict.allKeys.lastObject];
+    }];
+    XCTAssertEqual(frozen.count, 2);
 }
 
 @end
