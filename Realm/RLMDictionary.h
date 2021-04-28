@@ -145,9 +145,9 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Adding, Removing, and Replacing Objects in a Dictionary
 
 /**
- Replace the contents of a dictionary with the contents of another dictionary.
+ Replace the contents of a dictionary with the contents of another dictionary - NSDictionary or RLMDictionary
  */
-- (void)setDictionary:(RLMDictionary<RLMKeyType <RLMDictionaryKey>, RLMObjectType> *)otherDictionary;
+- (void)setDictionary:(id)otherDictionary;
 
 /**
  Delete all contents in the dictionary.
@@ -167,12 +167,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Adds a given key-value pair to the dictionary.
  */
-- (void)setObject:(RLMObjectType)obj forKeyedSubscript:(RLMKeyType <RLMDictionaryKey>)key;
+- (void)setObject:(nullable RLMObjectType)obj forKeyedSubscript:(RLMKeyType <RLMDictionaryKey>)key;
 
 /**
  Adds a given key-value pair to the dictionary.
  */
-- (void)setObject:(RLMObjectType)anObject forKey:(RLMKeyType <RLMDictionaryKey>)aKey;
+- (void)setObject:(nullable RLMObjectType)anObject forKey:(RLMKeyType <RLMDictionaryKey>)aKey;
 
 /**
   Adds to the receiving dictionary the entries from another dictionary.
