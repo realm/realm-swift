@@ -165,6 +165,15 @@ class MapTests: TestCase {
         obj.intOpt[String(valueInTest)] = valueInTest
         obj.intOpt["Blah"] = 456456
         obj.intOpt["Blah"] = nil
+        obj.string["Name"] = "Heyyy"
+
+        obj.object["SomeObject"] = SwiftStringObject(value: ["Helloooo"])
+
+        let link = obj.object["SomeObject"]
+
+        let obj2 = SwiftMapObject()
+        obj2.string["Name"] = "Heyyy"
+
 
         //XCTAssertTrue(false)
 //        XCTAssertEqual(obj.int.first!.1, 5) // should expect (key, value)
@@ -182,13 +191,6 @@ class MapTests: TestCase {
 //        XCTAssertEqual(obj.string[0].0, "strKey")
 //        XCTAssertEqual(obj.string.first!.1, "strVal")
 //        XCTAssertEqual(obj.string[0].1, "strVal")
-
-
-        for entry in obj.intOpt {
-            print(entry.key)
-            print(entry.value)
-        }
-
     }
 
     func testPrimitiveIterationAcrossNil() {
@@ -478,5 +480,118 @@ class MapTests: TestCase {
 
         mapX["obj3"] = obj3
         XCTAssertEqual(mapL, mapX, "instances should be equal by `==` operator")
+    }
+
+    func testAllKeysQuery() {
+        let realm = realmWithTestPath()
+
+        func test<T: RealmCollectionValue>(on key: String, value: T) {
+            XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys = 'aKey'").count, 0)
+            let o = SwiftMapObject()
+            (o.value(forKey: key) as! Map<String, T>)["aKey"] = value
+            let o2 = SwiftMapObject()
+            (o2.value(forKey: key) as! Map<String, T>)["aKey2"] = value
+            let o3 = SwiftMapObject()
+            (o3.value(forKey: key) as! Map<String, T>)["aKey3"] = value
+            let o4 = SwiftMapObject()
+            // this object should be visible from `ANY \(key).@allKeys != 'aKey'`
+            // as the dictionary contains more then one key.
+            (o4.value(forKey: key) as! Map<String, T>)["aKey"] = value
+            (o4.value(forKey: key) as! Map<String, T>)["aKey4"] = value
+            realm.add([o, o2, o3, o4])
+
+            XCTAssertEqual(realm.objects(SwiftMapObject.self).count, 4)
+            XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys = 'aKey'").count, 2)
+            XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys != 'aKey'").count, 3)
+
+            // case sensitivity doesn't make much sense when it comes to keys in a map. But test anyway to ensure
+            // there are no issues.
+            XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys =[c] 'aKey'").count, 2)
+            XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys !=[c] 'aKey'").count, 3)
+
+            XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys =[cd] 'aKey'").count, 2)
+            XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys !=[cd] 'aKey'").count, 3)
+
+            realm.delete([o, o2, o3, o4])
+        }
+
+        test(on: "int", value: Int(123))
+        test(on: "int8", value: Int8(127))
+        test(on: "int16", value: Int16(789))
+        test(on: "int32", value: Int32(789))
+        test(on: "int64", value: Int64(789))
+        test(on: "float", value: Float(789.123))
+        test(on: "double", value: Double(789.123))
+        test(on: "string", value: "Hello")
+        test(on: "data", value: Data(count: 16))
+        test(on: "date", value: Date())
+        test(on: "decimal", value: Decimal128(floatLiteral: 123.456))
+        test(on: "objectId", value: ObjectId())
+        test(on: "uuid", value: UUID())
+        test(on: "object", value: SwiftStringObject(value: ["hello"]))
+    }
+
+    func testAllValuesQuery() {
+        let realm = realmWithTestPath()
+
+        func test<T: RealmCollectionValue>(on key: String, values: T...) {
+            XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues = %@", values[0]).count, 0)
+            let o = SwiftMapObject()
+            (o.value(forKey: key) as! Map<String, T>)["aKey"] = values[0]
+            let o2 = SwiftMapObject()
+            (o2.value(forKey: key) as! Map<String, T>)["aKey2"] = values[1]
+            let o3 = SwiftMapObject()
+            (o3.value(forKey: key) as! Map<String, T>)["aKey3"] = values[2]
+            realm.add([o, o2, o3])
+
+            XCTAssertEqual(realm.objects(SwiftMapObject.self).count, 3)
+            XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues = %@", values[0]).count, 1)
+            XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues != %@", values[0]).count, 2)
+
+            if (T.self is String.Type) {
+                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues =[c] %@", values[0]).count, 2)
+                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues !=[c] %@", values[0]).count, 1)
+
+                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues =[cd] %@", values[0]).count, 3)
+                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues !=[cd] %@", values[0]).count, 0)
+            }
+
+            if (T.self is Object.Type) {
+                let stringObj = realm.objects(SwiftStringObject.self).filter("stringCol == 'hello'").first!
+                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues = %@", stringObj).count, 1)
+                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues != %@", stringObj).count, 2)
+            }
+
+            realm.delete(o)
+            realm.delete(o2)
+            realm.delete(o3)
+        }
+
+        test(on: "int", values: Int(123), Int(456), Int(789))
+        test(on: "int8", values: Int8(127), Int8(0), Int8(64))
+        test(on: "int16", values: Int16(789), Int16(345), Int16(567))
+        test(on: "int32", values: Int32(789), Int32(132), Int32(345))
+        test(on: "int64", values: Int64(789), Int64(234), Int64(345))
+        test(on: "float", values: Float(789.123), Float(123.123), Float(234.123))
+        test(on: "double", values: Double(789.123), Double(123.123), Double(234.123))
+        test(on: "string", values: "Hello", "Héllo", "hello")
+        test(on: "data", values: Data(count: 16), Data(count: 32), Data(count: 64))
+        test(on: "date",
+             values: Date(timeIntervalSince1970: 2000),
+             Date(timeIntervalSince1970: 4000),
+             Date(timeIntervalSince1970: 8000))
+        test(on: "decimal", values: Decimal128(floatLiteral: 123.456), Decimal128(floatLiteral: 234.456), Decimal128(floatLiteral: 345.456))
+        test(on: "objectId",
+             values: ObjectId("507f1f77bcf86cd799439011"),
+             ObjectId("507f1f77bcf86cd799439012"),
+             ObjectId("507f1f77bcf86cd799439013"))
+        test(on: "uuid",
+             values: UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89")!,
+             UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD88")!,
+             UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD87")!)
+        test(on: "object",
+             values: SwiftStringObject(value: ["hello"]),
+             SwiftStringObject(value: ["there"]),
+             SwiftStringObject(value: ["bye"]))
     }
 }
