@@ -482,6 +482,24 @@ class MapTests: TestCase {
         XCTAssertEqual(mapL, mapX, "instances should be equal by `==` operator")
     }
 
+    func testFilter() {
+        let realm = realmWithTestPath()
+
+        let o = SwiftMapObject()
+        o.object["key"] = SwiftStringObject(value: ["aello"])
+        o.object["key2"] = SwiftStringObject(value: ["bello"])
+
+        realm.add(o)
+
+        let result: Results<SwiftStringObject> = o.object.filter(NSPredicate(format: "stringCol = 'hello'"))
+        print(result)
+
+        let result2: Results<SwiftStringObject> = o.object.sorted(byKeyPath: "stringCol", ascending: false)
+        print(result2)
+
+
+    }
+
     func testAllKeysQuery() {
         let realm = realmWithTestPath()
 
