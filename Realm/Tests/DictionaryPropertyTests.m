@@ -131,7 +131,6 @@
     [realm commitWriteTransaction];
 }
 
-// TODO: = nil erase value for key
 -(void)testRemoveObject {
     RLMRealm *realm = [self realmWithTestPath];
 
@@ -160,12 +159,18 @@
     XCTAssertNil(obj.stringDictionary[@"three"]);
 
     obj.stringDictionary[@"one"] = child1;
-    XCTAssertTrue([[obj.stringDictionary[@"one"] stringCol] isEqualToString:@"a"]);
+    XCTAssertNotNil(obj.stringDictionary[@"one"]);
     obj.stringDictionary[@"two"] = child2;
-    XCTAssertNil([obj.stringDictionary[@"two"] stringCol]);
+    XCTAssertNotNil(obj.stringDictionary[@"two"]);
     [obj.stringDictionary removeObjectsForKeys:@[@"one", @"two"]];
     XCTAssertNil(obj.stringDictionary[@"one"]);
     XCTAssertNil(obj.stringDictionary[@"two"]);
+    
+    obj.stringDictionary[@"one"] = child1;
+    XCTAssertNotNil(obj.stringDictionary[@"one"]);
+    obj.stringDictionary[@"one"] = nil;
+    XCTAssertNil(obj.stringDictionary[@"one"]);
+
     [realm commitWriteTransaction];
 }
 
@@ -462,7 +467,7 @@
     }
 
     size_t count = 0;
-    for (id key in company.employeeDict.allKeys) {
+    for (id key in company.employeeDict) {
         ++count;
         [company.employeeDict removeObjectForKey: key];
     }
@@ -479,7 +484,7 @@
     }
 
     count = 0;
-    for (id key in company.employeeDict.allKeys) {
+    for (id key in company.employeeDict) {
         id eo = company.employeeDict[key];
         ++count;
         company.employeeDict[key] = eo;

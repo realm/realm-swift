@@ -3075,6 +3075,59 @@ static NSData *data(const char *str) {
     RLMAssertThrowsWithReasonMatching(([IntegerSetPropertyObject objectsWhere:@"set.@sum.intCol == 1.23"]), @"@sum.*type int cannot be compared");
 }
 
+- (void)testDictionaryQueryAllKeys {
+    RLMRealm *realm = [self realm];
+    [realm beginWriteTransaction];
+    DictionaryPropertyObject *dpo1 = [DictionaryPropertyObject createInRealm:realm withValue:@{@"stringDictionary": @{@"key1": @[@"value1"]}}];
+    DictionaryPropertyObject *dpo2 = [DictionaryPropertyObject createInRealm:realm withValue:@{@"stringDictionary": @{@"key2": @[@"value2"]}}];
+    DictionaryPropertyObject *dpo3 = [DictionaryPropertyObject createInRealm:realm withValue:@{@"stringDictionary": @{@"key3": @[@"value3"]}}];
+    DictionaryPropertyObject *dpo4 = [DictionaryPropertyObject createInRealm:realm withValue:@{@"stringDictionary": @{@"key1": @[@"value1"]}}];
+    DictionaryPropertyObject *dpo3b = [DictionaryPropertyObject createInRealm:realm withValue:@{@"stringDictionary": @{@"KEY3": @[@"Value3"]}}];
+
+    XCTAssertEqual(0U, [[realm objects:@"DictionaryPropertyObject" where:@"stringDictionary.@allKeys = 'key'"] count], @"Should be 0 elements in Results");
+    XCTAssertEqual(2U, [[realm objects:@"DictionaryPropertyObject" where:@"stringDictionary.@allKeys = 'key1'"] count], @"Should be 2 elements in Results");
+
+    XCTAssertEqual(1U, [[realm objects:@"DictionaryPropertyObject" where:@"ANY stringDictionary.@allKeys = 'key3'"] count], @"Should be 2 elements in Results");
+    XCTAssertEqual(4U, [[realm objects:@"DictionaryPropertyObject" where:@"ANY stringDictionary.@allKeys != 'key3'"] count], @"Should be 2 elements in Results");
+
+    XCTAssertEqual(2U, [[realm objects:@"DictionaryPropertyObject" where:@"ANY stringDictionary.@allKeys =[c] 'key3'"] count], @"Should be 2 elements in Results");
+    XCTAssertEqual(3U, [[realm objects:@"DictionaryPropertyObject" where:@"ANY stringDictionary.@allKeys !=[c] 'key3'"] count], @"Should be 3 elements in Results");
+    [realm cancelWriteTransaction];
+}
+
+- (void)testDictionaryQueryAllValues {
+    RLMRealm *realm = [self realm];
+    [realm beginWriteTransaction];
+    StringObject *so1 = [StringObject createInRealm:realm withValue:@[@"value1"]];
+    StringObject *so2 = [StringObject createInRealm:realm withValue:@[@"value2"]];
+    StringObject *so3 = [StringObject createInRealm:realm withValue:@[@"value3"]];
+    StringObject *so3b = [StringObject createInRealm:realm withValue:@[@"Value3"]];
+    DictionaryPropertyObject *dpo1 = [DictionaryPropertyObject createInRealm:realm withValue:@{@"stringDictionary": @{@"key1": so1}}];
+    DictionaryPropertyObject *dpo2 = [DictionaryPropertyObject createInRealm:realm withValue:@{@"stringDictionary": @{@"key2": so2}}];
+    DictionaryPropertyObject *dpo3 = [DictionaryPropertyObject createInRealm:realm withValue:@{@"stringDictionary": @{@"key3": so3}}];
+    DictionaryPropertyObject *dpo4 = [DictionaryPropertyObject createInRealm:realm withValue:@{@"stringDictionary": @{@"key1": so1}}];
+    DictionaryPropertyObject *dpo3b = [DictionaryPropertyObject createInRealm:realm withValue:@{@"stringDictionary": @{@"KEY3": so3b}}];
+    
+    XCTAssertEqual(2U, ([[realm objects:@"DictionaryPropertyObject" where:@"ANY stringDictionary.@allValues = %@", so1] count]), @"Should be 2 elements in Results");
+    XCTAssertEqual(3U, ([[realm objects:@"DictionaryPropertyObject" where:@"ANY stringDictionary.@allValues != %@", so1] count]), @"Should be 3 elements in Results");
+    XCTAssertEqual(1U, ([[realm objects:@"DictionaryPropertyObject" where:@"ANY stringDictionary.@allValues =[c] %@", so3] count]), @"Should be 3 elements in Results");
+    [realm cancelWriteTransaction];
+}
+
+- (void)testCollectionsQueryAllValuesAllKeys {
+    RLMRealm *realm = [self realm];
+    [realm beginWriteTransaction];
+    StringObject *so1 = [StringObject createInRealm:realm withValue:@[@"value1"]];
+
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"ArrayPropertyObject" where:@"ANY array.@allValues = %@", so1]), @"@allValues can only be valid for dictionary");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"ArrayPropertyObject" where:@"ANY array.@allKeys = %@", so1]), @"@allKeys can only be valid for dictionary");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"SetPropertyObject" where:@"ANY set.@allValues = %@", so1]), @"@allValues can only be valid for dictionary");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"SetPropertyObject" where:@"ANY set.@allKeys = %@", so1]), @"@allKeys can only be valid for dictionary");
+
+    [realm cancelWriteTransaction];
+
+}
+
 @end
 
 @interface NullQueryTests : QueryTests
@@ -3736,6 +3789,7 @@ struct NullTestData {
     [self testClass:[RenamedProperties1 class] withNormalCount:1 notCount:1 where:@"ANY linking1.linkA.propA = 2"];
     [self testClass:[RenamedProperties1 class] withNormalCount:0 notCount:2 where:@"ANY linking1.linkA.propA = 3"];
 }
+
 @end
 
 @interface AsyncQueryTests : QueryTests
