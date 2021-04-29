@@ -235,11 +235,6 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
            [object isBackedByDictionary:_backingCollection];
 }
 
-- (NSUInteger)hash {
-    // TODO: implement hash
-    //return std::hash<realm::object_store::Dictionary>()(_backingCollection);
-}
-
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
                                   objects:(__unused __unsafe_unretained id [])buffer
                                     count:(NSUInteger)len {
@@ -471,8 +466,8 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (RLMFastEnumerator *)fastEnumerator {
     return translateErrors<RLMManagedDictionary>([&] {
-        return [[RLMFastEnumerator alloc] initWithBackingCollection:_backingCollection
-                                                         collection:self
+        return [[RLMFastEnumerator alloc] initWithBackingDictionary:_backingCollection
+                                                         dictionary:self
                                                           classInfo:*_objectInfo];
     });
 }

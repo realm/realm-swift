@@ -77,6 +77,27 @@ static const int RLMEnumerationBufferSize = 16;
     return self;
 }
 
+- (instancetype)initWithBackingDictionary:(realm::object_store::Dictionary const&)backingDictionary
+                               dictionary:(id)dictionary
+                                classInfo:(RLMClassInfo&)info {
+    self = [super init];
+    if (self) {
+        _info = &info;
+        _realm = _info->realm;
+
+        if (_realm.inWriteTransaction) {
+            _snapshot = backingDictionary.get_keys().snapshot();
+        }
+        else {
+            _snapshot = backingDictionary.get_keys();
+            _collection = dictionary;
+            [_realm registerEnumerator:self];
+        }
+        _results = &_snapshot;
+    }
+    return self;
+}
+
 - (instancetype)initWithResults:(realm::Results&)results
                      collection:(id)collection
                       classInfo:(RLMClassInfo&)info {
@@ -127,17 +148,9 @@ static const int RLMEnumerationBufferSize = 16;
     @autoreleasepool {
         RLMAccessorContext ctx(*_info);
 
-        if (is_dictionary(_results->get_type())) {
-            for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
-                auto element = _results->get_dictionary_element(index);
-                _strongBuffer[batchCount] = ctx.box(element.first);
-                batchCount++;
-            }
-        } else {
-            for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
-                _strongBuffer[batchCount] = _results->get(ctx, index);
-                batchCount++;
-            }
+        for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
+            _strongBuffer[batchCount] = _results->get(ctx, index);
+            batchCount++;
         }
     }
 

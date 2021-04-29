@@ -380,6 +380,11 @@ class SwiftMapOfSwiftObject: Object {
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
+class SwiftMapOfSwiftOptionalObject: Object {
+    let map = Map<String, SwiftOptionalObject>()
+}
+
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftListOfSwiftOptionalObject: Object {
     let array = List<SwiftOptionalObject>()
 }
@@ -387,10 +392,6 @@ class SwiftListOfSwiftOptionalObject: Object {
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftMutableSetOfSwiftOptionalObject: Object {
     let set = MutableSet<SwiftOptionalObject>()
-}
-
-class SwiftMapOfSwiftOptionalObject: Object {
-    let map = Map<String, SwiftOptionalObject>()
 }
 
 class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {

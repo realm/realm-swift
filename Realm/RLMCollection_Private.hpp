@@ -55,6 +55,10 @@ class RLMClassInfo;
                                collection:(id)collection
                                 classInfo:(RLMClassInfo&)info;
 
+- (instancetype)initWithBackingDictionary:(realm::object_store::Dictionary const&)backingDictionary
+                               dictionary:(id)dictionary
+                                classInfo:(RLMClassInfo&)info;
+
 - (instancetype)initWithResults:(realm::Results&)results
                      collection:(id)collection
                       classInfo:(RLMClassInfo&)info;

@@ -76,7 +76,7 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
     // MARK: Count
 
     /// Returns the number of key-value pairs in this map.
-    public var count: Int { return Int(_rlmCollection.count) }
+    @objc public var count: Int { return Int(_rlmCollection.count) }
 
     // MARK: Mutation
 
@@ -138,6 +138,15 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
     }
 
     /**
+     Returns a type of `AnyObject` for a specified key if it exists in the map.
+
+     - parameter key: The key to the property whose values are desired.
+     */
+    @objc public func object(forKey key: AnyObject) -> AnyObject? {
+        return rlmDictionary.object(for: key as! RLMDictionaryKey)
+    }
+
+    /**
      Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified `value` and `key`.
 
      - warning: This method can only be called during a write transaction.
@@ -179,33 +188,6 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
     }
 
     // MARK: Sorting
-
-    /// Returns the elements of the sequence, sorted using the given predicate as
-    /// the comparison between elements.
-    ///
-    /// When you want to sort a sequence of elements that don't conform to the
-    /// `Comparable` protocol, pass a predicate to this method that returns
-    /// `true` when the first element should be ordered before the second. The
-    /// elements of the resulting array are ordered according to the given
-    /// predicate.
-    ///
-    /// The sorting algorithm is not guaranteed to be stable. A stable sort
-    /// preserves the relative order of elements for which
-    /// `areInIncreasingOrder` does not establish an order.
-    ///
-    /// - Note The elements in this dictionary will be copied and then the call will be forwarded to use
-    /// Foundation's `sorted(by:)` implementation. The sorting performed here will not be persisted.
-    ///
-    /// - Parameter areInIncreasingOrder: A predicate that returns `true` if its
-    ///   first argument should be ordered before its second argument;
-    ///   otherwise, `false`.
-    ///
-    /// - Returns: A sorted array of the sequence's elements.
-    func sorted(by areInIncreasingOrder: ((key: Key, value: Value), (key: Key, value: Value)) -> Bool) -> [(Key, Value)] {
-        return keys.reduce(into: [:]) { (dictionary, key) in
-            dictionary[key] = self[key]
-        }.sorted(by: areInIncreasingOrder)
-    }
 
     /**
      Returns a `Results` containing the objects in the dictionary, but sorted.
@@ -270,7 +252,7 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
 
     /// Container type which holds the offset of the element in the Map.
     public struct Index {
-        var offset: UInt
+        public var offset: UInt
     }
 
     /// Container for holding a single key-value entry in a Map. This is used where a tuple cannot be expressed as a generic arguement.
