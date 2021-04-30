@@ -110,6 +110,7 @@ class MapTests: TestCase {
         XCTAssertFalse(obj.decimal.contains(where: { $0 == "0" || $1 == Decimal128() }))
         XCTAssertFalse(obj.objectId.contains(where: { $0 == "0" || $1 == ObjectId() }))
         XCTAssertFalse(obj.uuid.contains(where: { $0 == "0" || $1 == UUID() }))
+        XCTAssertFalse(obj.object.contains(where: { $0 == "0" || $1 == SwiftStringObject() }))
 
         XCTAssertFalse(obj.intOpt.contains { $1 == nil })
         XCTAssertFalse(obj.int8Opt.contains { $1 == nil })
@@ -141,6 +142,7 @@ class MapTests: TestCase {
         XCTAssertFalse(obj.decimal.map(obj.decimal.contains).contains(true))
         XCTAssertFalse(obj.objectId.map(obj.objectId.contains).contains(true))
         XCTAssertFalse(obj.uuid.map(obj.uuid.contains).contains(true))
+        XCTAssertFalse(obj.object.map(obj.object.contains).contains(true))
 
         XCTAssertFalse(obj.intOpt.map(obj.intOpt.contains).contains(true))
         XCTAssertFalse(obj.int8Opt.map(obj.int8Opt.contains).contains(true))

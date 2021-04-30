@@ -111,7 +111,12 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
             return rlmDictionary[objcKey(from: key)].map(dynamicBridgeCast)
         }
         set {
-            rlmDictionary[objcKey(from: key)] = newValue.map(dynamicBridgeCast)
+            if newValue == nil {
+                // explicity set nil so it doesnt become NSNull
+                rlmDictionary[objcKey(from: key)] = nil
+            } else {
+                rlmDictionary[objcKey(from: key)] = dynamicBridgeCast(fromSwift: newValue) as AnyObject
+            }
         }
     }
 
