@@ -1,10 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.5.2 Release notes (2021-04-30)
 =============================================================
 
 ### Enhancements
 
-* Package a prebuilt XCFramework for Carthage. Carthage 0.38 and later will
-  download this instead of the old frameworks when using `--use-xcframeworks`.
 * Add Xcode 12.5 binaries to the release package.
 
 ### Compatibility
