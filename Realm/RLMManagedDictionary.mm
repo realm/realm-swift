@@ -306,19 +306,24 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (void)removeObjectsForKeys:(NSArray *)keyArray {
-    changeDictionary(self, ^{
-        RLMAccessorContext context(*_objectInfo);
-        for (id key in keyArray) {
-            _backingCollection.erase(context.unbox<realm::StringData>(key));
-        }
-    });
+    for (id key in keyArray) {
+        [self removeObjectForKey:key];
+    }
 }
 
 - (void)removeObjectForKey:(id<RLMDictionaryKey>)key {
-    changeDictionary(self, ^{
-        RLMAccessorContext context(*_objectInfo);
-        _backingCollection.erase(context.unbox<realm::StringData>(key));
-    });
+    try {
+        changeDictionary(self, ^{
+            RLMAccessorContext context(*_objectInfo);
+            _backingCollection.erase(context.unbox<realm::StringData>(key));
+        });
+    }
+    catch (realm::KeyNotFound const&) {
+        return;
+    }
+    catch (...) {
+        throwError<RLMManagedDictionary>(nil, nil);
+    }
 }
 
 - (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id <RLMDictionaryKey> key,
@@ -348,36 +353,21 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (id)valueForKey:(NSString *)key {
-    // Ideally we'd use "@invalidated" for this so that "invalidated" would use
-    // normal array KVC semantics, but observing @things works very oddly (when
-    // it's part of a key path, it's triggered automatically when array index
-    // changes occur, and can't be sent explicitly, but works normally when it's
-    // the entire key path), and an RLMManagedArray *can't* have objects where
-    // invalidated is true, so we're not losing much.
-    return translateErrors<RLMManagedDictionary>([&]() -> id {
-        if ([key isEqualToString:RLMInvalidatedKey]) {
-            return @(!_backingCollection.is_valid());
-        }
-
-        _backingCollection.verify_attached();
-        return RLMDictionaryValueForKey(_backingCollection, key, *_objectInfo) ?: [self objectForKey:key];
-    });
+    // Forward to [objectForKey:] as it performs the
+    // same operation as [valueForKey:].
+    return [self objectForKey:key];
 }
 
 - (void)setValue:(id)value forKey:(id)key {
     RLMDictionaryValidateMatchingObjectType(self, key, value);
-    if ([key isEqualToString:@"self"]) {
-        RLMAccessorContext context(*_objectInfo);
-        translateErrors<RLMManagedDictionary>([&] {
-            _backingCollection.remove_all();
-            _backingCollection.insert(context, [key UTF8String], value);
-        });
-    } else {
-        RLMAccessorContext context(*_objectInfo);
-        translateErrors<RLMManagedDictionary>([&] {
-            _backingCollection.insert(context, [key UTF8String], value);
-        });
+    if (!value) {
+        [self removeObjectForKey:key];
+        return;
     }
+    RLMAccessorContext context(*_objectInfo);
+    translateErrors<RLMManagedDictionary>([&] {
+        _backingCollection.insert(context, [key UTF8String], value);
+    });
 }
 
 - (id)minOfProperty:(NSString *)property {
@@ -401,7 +391,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     auto value = translateErrors<RLMManagedDictionary>(self, [&] {
         return _backingCollection.as_results().sum(column);
     }, @"sumOfProperty");
-    return value ? RLMMixedToObjc(*value) : nil;
+    return value ? RLMMixedToObjc(*value) : RLMMixedToObjc(realm::none);
 }
 
 - (id)averageOfProperty:(NSString *)property {

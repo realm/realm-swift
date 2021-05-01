@@ -512,13 +512,11 @@ class MapTests: TestCase {
                 XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys = 'aKey'").count, 2)
                 XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys != 'aKey'").count, 3)
 
-                // case sensitivity doesn't make much sense when it comes to keys in a map. But test anyway to ensure
-                // there are no issues.
-                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys =[c] 'aKey'").count, 2)
-                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys !=[c] 'aKey'").count, 3)
+                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys =[c] 'akey'").count, 2)
+                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys !=[c] 'akey'").count, 3)
 
-                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys =[cd] 'aKey'").count, 2)
-                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys !=[cd] 'aKey'").count, 3)
+                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys =[cd] 'akéy'").count, 2)
+                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allKeys !=[cd] 'akéy'").count, 3)
 
                 realm.delete([o, o2, o3, o4])
             }

@@ -161,7 +161,6 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
     */
     public override func setValue(_ value: Any?, forKey key: String) {
         rlmDictionary.setValue(value, forKey: key)
-
     }
 
     // MARK: Filtering
@@ -226,12 +225,12 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
 
     /// Returns all of the keys in this dictionary.
     public var keys: [Key] {
-        return dynamicBridgeCast(fromObjectiveC: rlmDictionary.allKeys)
+        return rlmDictionary.allKeys.map(dynamicBridgeCast)
     }
 
     /// Returns all of the values in the dictionary.
     public var values: [Value] {
-        return dynamicBridgeCast(fromObjectiveC: rlmDictionary.allValues)
+        return rlmDictionary.allValues.map(dynamicBridgeCast)
     }
 
     /// :nodoc:
