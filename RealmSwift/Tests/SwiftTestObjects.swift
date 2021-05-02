@@ -796,6 +796,7 @@ class LinkToSwiftRenamedProperties2: Object {
 class EmbeddedParentObject: Object {
     @objc dynamic var object: EmbeddedTreeObject1?
     let array = List<EmbeddedTreeObject1>()
+    let map = Map<String, EmbeddedTreeObject1>()
 }
 
 class EmbeddedPrimaryParentObject: Object {

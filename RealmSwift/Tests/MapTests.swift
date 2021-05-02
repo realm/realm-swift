@@ -33,6 +33,10 @@ class MapTests: TestCase {
         fatalError("abstract")
     }
 
+    func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1> {
+        fatalError("abstract")
+    }
+
     override func setUp() {
         super.setUp()
 
@@ -421,6 +425,50 @@ class MapTests: TestCase {
         testProperty("optObjectCol") { $0.optObjectCol }
     }
 
+    func testAppendEmbedded() {
+        let map = createEmbeddedMap()
+
+        map.realm?.beginWrite()
+        for i in 0..<10 {
+            map["\(i)"] = EmbeddedTreeObject1(value: [i])
+        }
+        XCTAssertEqual(10, map.count)
+
+        for element in map {
+            XCTAssertEqual(Int(element.key), element.value.value)
+            XCTAssertEqual(map.realm, element.value.realm)
+        }
+
+        if map.realm != nil {
+            assertThrows((map["unassigned"] = map["0"]),
+                         reason: "Cannot add an existing managed embedded object to a List.")
+        }
+
+        map.realm?.cancelWrite()
+    }
+
+    func testSetEmbedded() {
+        let map = createEmbeddedMap()
+
+        map.realm?.beginWrite()
+        map["key"] = EmbeddedTreeObject1(value: [0])
+
+        let oldObj = map["key"]
+        let obj = EmbeddedTreeObject1(value: [1])
+        map["key"] = obj
+        XCTAssertTrue(map["key"]!.isSameObject(as: obj))
+        XCTAssertEqual(obj.value, 1)
+        XCTAssertEqual(obj.realm, map.realm)
+
+        if map.realm != nil {
+            XCTAssertTrue(oldObj!.isInvalidated)
+            assertThrows(map["key"] = obj,
+                         reason: "Cannot add an existing managed embedded object to a List.")
+        }
+
+        map.realm?.cancelWrite()
+    }
+
     func testUnmanagedMapComparison() {
         let obj = SwiftIntObject()
         obj.intCol = 5
@@ -613,6 +661,10 @@ class MapStandaloneTests: MapTests {
         XCTAssertNil(map.realm)
         return map
     }
+
+    override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1> {
+        return Map<String, EmbeddedTreeObject1>()
+    }
 }
 
 class MapNewlyAddedTests: MapTests {
@@ -630,6 +682,14 @@ class MapNewlyAddedTests: MapTests {
         let realm = try! Realm()
         try! realm.write { realm.add(map) }
         XCTAssertNotNil(map.realm)
+        return map
+    }
+
+    override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1> {
+        let parent = EmbeddedParentObject()
+        let map = parent.map
+        let realm = try! Realm()
+        try! realm.write { realm.add(parent) }
         return map
     }
 }
@@ -654,6 +714,13 @@ class MapNewlyCreatedTests: MapTests {
         XCTAssertNotNil(map.realm)
         return map
     }
+
+    override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1> {
+        let realm = try! Realm()
+        return try! realm.write {
+            realm.create(EmbeddedParentObject.self, value: []).map
+        }
+    }
 }
 
 class MapRetrievedTests: MapTests {
@@ -677,6 +744,14 @@ class MapRetrievedTests: MapTests {
 
         XCTAssertNotNil(map.realm)
         return map
+    }
+
+    override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1> {
+        let realm = try! Realm()
+        try! realm.write {
+            realm.create(EmbeddedParentObject.self, value: [])
+        }
+        return realm.objects(EmbeddedParentObject.self).first!.map
     }
 }
 
