@@ -234,7 +234,7 @@ class MapTests: TestCase {
         XCTAssertEqual(1, map.count)
         XCTAssertNotNil(map[str1.stringCol])
 
-        map.removeValue(for: str1.stringCol)
+        map.removeObject(for: str1.stringCol)
         XCTAssertEqual(0, map.count)
         XCTAssertNil(map[str1.stringCol])
 

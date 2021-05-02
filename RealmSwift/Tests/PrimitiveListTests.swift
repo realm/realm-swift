@@ -38,7 +38,6 @@ protocol ValueFactory {
     associatedtype AverageType: AddableType = Double
     static func array(_ obj: SwiftListObject) -> List<T>
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<T>
-    static func map(_ obj: SwiftMapObject) -> Map<String, T>
     static func values() -> [T]
     static func doubleValue(_ value: AverageType) -> Double
     static func doubleValue(t value: T) -> Double

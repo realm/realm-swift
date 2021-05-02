@@ -21,13 +21,37 @@ import Realm
 import RealmSwift
 // swiftlint:disable identifier_name
 
-class PrimitiveMapTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
+protocol MapValueFactory {
+    associatedtype T: RealmCollectionValue
+    associatedtype W: RealmCollectionValue = T
+    associatedtype Key: MapKeyType
+    associatedtype AverageType: AddableType = Double
+    static func map(_ obj: SwiftMapObject) -> Map<Key, T>
+    static func values() -> [(key: Key, value: T)]
+    static func doubleValue(_ value: AverageType) -> Double
+    static func doubleValue(t value: T) -> Double
+    static func doubleValue(w value: W) -> Double
+}
+
+extension MapValueFactory {
+    static func doubleValue(_ value: Double) -> Double {
+        return value
+    }
+    static func doubleValue(t value: T) -> Double {
+        return (value as! NSNumber).doubleValue
+    }
+    static func doubleValue(w value: W) -> Double {
+        return (value as! NSNumber).doubleValue
+    }
+}
+
+class PrimitiveMapTestsBase<O: ObjectFactory, V: MapValueFactory>: TestCase {
     var realm: Realm?
     var obj: SwiftMapObject!
     var obj2: SwiftMapObject!
-    var map: Map<String, V.T>!
-    var otherMap: Map<String, V.T>!
-    var values: [V.T]!
+    var map: Map<V.Key, V.T>!
+    var otherMap: Map<V.Key, V.T>!
+    var values: [(key: V.Key, value: V.T)]!
 
     class func _defaultTestSuite() -> XCTestSuite {
         return defaultTestSuite

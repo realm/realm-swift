@@ -93,8 +93,8 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
     /**
      Removes the given key and its associated object.
      */
-    public func removeValue(for key: String) {
-        rlmDictionary.removeObject(for: key as RLMDictionaryKey)
+    public func removeObject(for key: Key) {
+        rlmDictionary.removeObject(for: objcKey(from: key))
     }
 
     /**
@@ -120,15 +120,26 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
         }
     }
 
+    /**
+     Returns a type of `AnyObject` for a specified key if it exists in the map.
+
+     - parameter key: The key to the property whose values are desired.
+     */
+    @objc public func object(forKey key: AnyObject) -> AnyObject? {
+        return rlmDictionary.object(for: key as! RLMDictionaryKey)
+    }
+
     // MARK: KVC
 
     /**
      Returns a type of `Value` for a specified key if it exists in the map.
 
+     Note that when using key-value coding, the key must be a string.
+
      - parameter key: The key to the property whose values are desired.
      */
-    @nonobjc public func value(forKey key: Key) -> Value? {
-        return rlmDictionary.value(forKey: objcKey(from: key))
+    @nonobjc public func value(forKey key: String) -> AnyObject? {
+        return rlmDictionary.value(forKey: key as! NSString)
             .map { dynamicBridgeCast(fromObjectiveC:$0) }
     }
 
@@ -137,18 +148,9 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
 
      - parameter keyPath: The key to the property whose values are desired.
      */
-    @nonobjc public func value(forKeyPath keyPath: String) -> Value? {
+    @nonobjc public func value(forKeyPath keyPath: String) -> AnyObject? {
         return rlmDictionary.value(forKeyPath: keyPath)
             .map { dynamicBridgeCast(fromObjectiveC:$0) }
-    }
-
-    /**
-     Returns a type of `AnyObject` for a specified key if it exists in the map.
-
-     - parameter key: The key to the property whose values are desired.
-     */
-    @objc public func object(forKey key: AnyObject) -> AnyObject? {
-        return rlmDictionary.object(for: key as! RLMDictionaryKey)
     }
 
     /**

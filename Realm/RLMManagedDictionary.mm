@@ -340,6 +340,10 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 #pragma mark - KVC
 
+// Note: KVC operations require the key to be a string. So RLMDictionaries with
+// key types other than a string cannot really make much use out of KVC.
+
+//TODO: Create test that hits this
 - (id)valueForKeyPath:(NSString *)keyPath {
     if ([keyPath hasPrefix:@"@"]) {
         // Delegate KVC collection operators to RLMResults
@@ -358,7 +362,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     return [self objectForKey:key];
 }
 
-- (void)setValue:(id)value forKey:(id)key {
+- (void)setValue:(id)value forKey:(nonnull NSString *)key {
     RLMDictionaryValidateMatchingObjectType(self, key, value);
     if (!value) {
         [self removeObjectForKey:key];
