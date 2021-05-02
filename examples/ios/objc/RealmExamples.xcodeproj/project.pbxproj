@@ -31,6 +31,12 @@
 		3F78C9CA1B431D7400A0988E /* TableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F78C9B01B431CDF00A0988E /* TableViewController.m */; };
 		3F78C9CB1B431D7A00A0988E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F78C9AF1B431CDF00A0988E /* main.m */; };
 		3FC898FD1A140F550067CBEC /* LabelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FC1A140F550067CBEC /* LabelViewController.m */; };
+		7DD1D7E225DC2D3D00E63229 /* default-v2.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DD1D7D225DC2C7400E63229 /* default-v2.realm */; };
+		7DD1D7E325DC2D3D00E63229 /* default-v3.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DD1D7D325DC2C7400E63229 /* default-v3.realm */; };
+		7DD1D7E425DC2D3D00E63229 /* default-v0.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DD1D7D425DC2C7400E63229 /* default-v0.realm */; };
+		7DD1D7E525DC2D3D00E63229 /* default-v5.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DD1D7D525DC2C7400E63229 /* default-v5.realm */; };
+		7DD1D7E625DC2D3D00E63229 /* default-v4.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DD1D7D125DC2C7400E63229 /* default-v4.realm */; };
+		7DD1D7E725DC2D3D00E63229 /* default-v1.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DD1D7D025DC2C7400E63229 /* default-v1.realm */; };
 		C06134DF1A718BB800D22D12 /* TodayExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C0DC42061A7079D00067156A /* TodayExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C06134E41A71AA4E00D22D12 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		C06134E51A71AA5600D22D12 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
@@ -90,10 +96,6 @@
 		E8F70EAA19BA5093006F60D5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F70EA519BA5093006F60D5 /* AppDelegate.m */; };
 		E8F70EAB19BA5093006F60D5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F70EA619BA5093006F60D5 /* main.m */; };
 		E8F70EAD19BA5093006F60D5 /* Venue.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F70EA919BA5093006F60D5 /* Venue.m */; };
-		E8F70EB819BA50A3006F60D5 /* DataModels.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F70EB019BA50A3006F60D5 /* DataModels.m */; };
-		E8F70EB919BA50A3006F60D5 /* default-v0.realm in Resources */ = {isa = PBXBuildFile; fileRef = E8F70EB119BA50A3006F60D5 /* default-v0.realm */; };
-		E8F70EBA19BA50A3006F60D5 /* default-v1.realm in Resources */ = {isa = PBXBuildFile; fileRef = E8F70EB219BA50A3006F60D5 /* default-v1.realm */; };
-		E8F70EBB19BA50A3006F60D5 /* default-v2.realm in Resources */ = {isa = PBXBuildFile; fileRef = E8F70EB319BA50A3006F60D5 /* default-v2.realm */; };
 		E8F70EBC19BA50A3006F60D5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F70EB419BA50A3006F60D5 /* main.m */; };
 		E8F70EBE19BA50A3006F60D5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F70EB719BA50A3006F60D5 /* AppDelegate.m */; };
 		E8F70EC419BA50AB006F60D5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E8F70EC119BA50AB006F60D5 /* AppDelegate.m */; };
@@ -167,6 +169,18 @@
 		3F78C9C71B431CF300A0988E /* RACTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RACTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FC898FB1A140F550067CBEC /* LabelViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabelViewController.h; sourceTree = "<group>"; };
 		3FC898FC1A140F550067CBEC /* LabelViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LabelViewController.m; sourceTree = "<group>"; };
+		7D56426A25DD66160079F4C2 /* Example_v0.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Example_v0.h; sourceTree = "<group>"; };
+		7D56427625DD6A7F0079F4C2 /* Example_v2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Example_v2.h; sourceTree = "<group>"; };
+		7D56427725DD6A860079F4C2 /* Example_v3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Example_v3.h; sourceTree = "<group>"; };
+		7D56427825DD6A8B0079F4C2 /* Example_v4.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Example_v4.h; sourceTree = "<group>"; };
+		7D56427925DD6A920079F4C2 /* Example_v5.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Example_v5.h; sourceTree = "<group>"; };
+		7D718BC825DAADB500A74FDD /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../swift/Migration/README.md; sourceTree = "<group>"; };
+		7DD1D7D025DC2C7400E63229 /* default-v1.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v1.realm"; sourceTree = "<group>"; };
+		7DD1D7D125DC2C7400E63229 /* default-v4.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v4.realm"; sourceTree = "<group>"; };
+		7DD1D7D225DC2C7400E63229 /* default-v2.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v2.realm"; sourceTree = "<group>"; };
+		7DD1D7D325DC2C7400E63229 /* default-v3.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v3.realm"; sourceTree = "<group>"; };
+		7DD1D7D425DC2C7400E63229 /* default-v0.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v0.realm"; sourceTree = "<group>"; };
+		7DD1D7D525DC2C7400E63229 /* default-v5.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v5.realm"; sourceTree = "<group>"; };
 		BCC00CB8F0405D9A0E8A33E2 /* Pods-RACTableView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACTableView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RACTableView/Pods-RACTableView.debug.xcconfig"; sourceTree = "<group>"; };
 		C0DC41CC1A7072670067156A /* extension.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = extension.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0DC41D21A7072670067156A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -224,11 +238,7 @@
 		E8F70EA719BA5093006F60D5 /* REST-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "REST-Info.plist"; sourceTree = "<group>"; };
 		E8F70EA819BA5093006F60D5 /* Venue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Venue.h; sourceTree = "<group>"; };
 		E8F70EA919BA5093006F60D5 /* Venue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Venue.m; sourceTree = "<group>"; };
-		E8F70EAF19BA50A3006F60D5 /* DataModels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataModels.h; sourceTree = "<group>"; };
-		E8F70EB019BA50A3006F60D5 /* DataModels.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataModels.m; sourceTree = "<group>"; };
-		E8F70EB119BA50A3006F60D5 /* default-v0.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v0.realm"; sourceTree = "<group>"; };
-		E8F70EB219BA50A3006F60D5 /* default-v1.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v1.realm"; sourceTree = "<group>"; };
-		E8F70EB319BA50A3006F60D5 /* default-v2.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "default-v2.realm"; sourceTree = "<group>"; };
+		E8F70EAF19BA50A3006F60D5 /* Example_v1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Example_v1.h; sourceTree = "<group>"; };
 		E8F70EB419BA50A3006F60D5 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E8F70EB519BA50A3006F60D5 /* Migration-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Migration-Info.plist"; sourceTree = "<group>"; };
 		E8F70EB619BA50A3006F60D5 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -429,6 +439,32 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		7D718BED25DAADE400A74FDD /* Examples */ = {
+			isa = PBXGroup;
+			children = (
+				7D56426A25DD66160079F4C2 /* Example_v0.h */,
+				E8F70EAF19BA50A3006F60D5 /* Example_v1.h */,
+				7D56427625DD6A7F0079F4C2 /* Example_v2.h */,
+				7D56427725DD6A860079F4C2 /* Example_v3.h */,
+				7D56427825DD6A8B0079F4C2 /* Example_v4.h */,
+				7D56427925DD6A920079F4C2 /* Example_v5.h */,
+			);
+			path = Examples;
+			sourceTree = "<group>";
+		};
+		7DD1D7D625DC2CC000E63229 /* RealmTemplates */ = {
+			isa = PBXGroup;
+			children = (
+				7DD1D7D425DC2C7400E63229 /* default-v0.realm */,
+				7DD1D7D025DC2C7400E63229 /* default-v1.realm */,
+				7DD1D7D225DC2C7400E63229 /* default-v2.realm */,
+				7DD1D7D325DC2C7400E63229 /* default-v3.realm */,
+				7DD1D7D125DC2C7400E63229 /* default-v4.realm */,
+				7DD1D7D525DC2C7400E63229 /* default-v5.realm */,
+			);
+			path = RealmTemplates;
+			sourceTree = "<group>";
+		};
 		C0DC41CD1A7072670067156A /* Extension */ = {
 			isa = PBXGroup;
 			children = (
@@ -585,13 +621,11 @@
 		E8F70EAE19BA50A3006F60D5 /* Migration */ = {
 			isa = PBXGroup;
 			children = (
+				7D718BC825DAADB500A74FDD /* README.md */,
 				E8F70EB619BA50A3006F60D5 /* AppDelegate.h */,
 				E8F70EB719BA50A3006F60D5 /* AppDelegate.m */,
-				E8F70EAF19BA50A3006F60D5 /* DataModels.h */,
-				E8F70EB019BA50A3006F60D5 /* DataModels.m */,
-				E8F70EB119BA50A3006F60D5 /* default-v0.realm */,
-				E8F70EB219BA50A3006F60D5 /* default-v1.realm */,
-				E8F70EB319BA50A3006F60D5 /* default-v2.realm */,
+				7D718BED25DAADE400A74FDD /* Examples */,
+				7DD1D7D625DC2CC000E63229 /* RealmTemplates */,
 				E8F70EB419BA50A3006F60D5 /* main.m */,
 				E8F70EB519BA50A3006F60D5 /* Migration-Info.plist */,
 			);
@@ -855,7 +889,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = RLM;
-				LastUpgradeCheck = 1220;
+				LastUpgradeCheck = 1250;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					C0DC41CB1A7072670067156A = {
@@ -988,9 +1022,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8F70EB919BA50A3006F60D5 /* default-v0.realm in Resources */,
-				E8F70EBA19BA50A3006F60D5 /* default-v1.realm in Resources */,
-				E8F70EBB19BA50A3006F60D5 /* default-v2.realm in Resources */,
+				7DD1D7E425DC2D3D00E63229 /* default-v0.realm in Resources */,
+				7DD1D7E725DC2D3D00E63229 /* default-v1.realm in Resources */,
+				7DD1D7E225DC2D3D00E63229 /* default-v2.realm in Resources */,
+				7DD1D7E325DC2D3D00E63229 /* default-v3.realm in Resources */,
+				7DD1D7E625DC2D3D00E63229 /* default-v4.realm in Resources */,
+				7DD1D7E525DC2D3D00E63229 /* default-v5.realm in Resources */,
 				227D20E31CB6009D008F641B /* LaunchScreen.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1104,7 +1141,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8F70EBE19BA50A3006F60D5 /* AppDelegate.m in Sources */,
-				E8F70EB819BA50A3006F60D5 /* DataModels.m in Sources */,
 				E8F70EBC19BA50A3006F60D5 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1361,7 +1397,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-                               CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1419,7 +1455,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-                               CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;

@@ -201,27 +201,64 @@ struct MultiRealmContentView: View {
         }
     }
 
+    @State var showSheet = false
+
     var body: some View {
         NavigationView {
             VStack {
                 NavigationLink("Realm A", destination: RealmView().environment(\.realmConfiguration, Realm.Configuration(inMemoryIdentifier: "realm_a")))
                 NavigationLink("Realm B", destination: RealmView().environment(\.realmConfiguration, Realm.Configuration(inMemoryIdentifier: "realm_b")))
-            }
+                Button("Realm C") {
+                    showSheet = true
+                }
+            }.sheet(isPresented: $showSheet, content: {
+                RealmView().environment(\.realmConfiguration, Realm.Configuration(inMemoryIdentifier: "realm_c"))
+            })
         }
     }
 }
 
 struct UnmanagedObjectTestView: View {
-    @StateRealmObject var reminderList = ReminderList()
+    struct NestedViewOne: View {
+        struct NestedViewTwo: View {
+            @Environment(\.realm) var realm
+            @Environment(\.presentationMode) var presentationMode
+            @ObservedRealmObject var reminderList: ReminderList
+
+            var body: some View {
+                Button("Delete") {
+                    $reminderList.delete()
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
+        }
+        @ObservedRealmObject var reminderList: ReminderList
+        @Environment(\.presentationMode) var presentationMode
+        @State var shown = false
+        var body: some View {
+            NavigationLink("Next", destination: NestedViewTwo(reminderList: reminderList)).onAppear {
+                if shown {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                shown = true
+            }
+        }
+    }
+    @ObservedRealmObject var reminderList = ReminderList()
     @Environment(\.realm) var realm
+    @State var passToNestedView = false
 
     var body: some View {
         NavigationView {
             Form {
                 TextField("name", text: $reminderList.name).accessibilityIdentifier("name")
+                NavigationLink("test", destination: NestedViewOne(reminderList: reminderList), isActive: $passToNestedView)
             }.navigationBarItems(trailing: Button("Add", action: {
                 try! realm.write { realm.add(reminderList) }
+                passToNestedView = true
             }).accessibility(identifier: "addReminder"))
+        }.onAppear {
+            print("ReminderList: \(reminderList)")
         }
     }
 }

@@ -234,9 +234,329 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add support for queries which have nil on the left side and a keypath on the
   right side (e.g. "nil == name" rather than "name == nil" as was previously
   required).
+* None.
 
 ### Fixed
 
+* Timeouts when calling server functions via App would sometimes crash rather
+  than report an error.
+* Fix a race condition which would lead to "uncaught exception in notifier
+  thread: N5realm15InvalidTableRefE: transaction_ended" and a crash when the
+  source Realm was closed or invalidated at a very specific time during the
+  first run of a collection notifier
+  ([#3761](https://github.com/realm/realm-core/issues/3761), since v5.0.0).
+* Deleting and recreating objects with embedded objects may fail.
+  ([Core PR #4240](https://github.com/realm/realm-core/pull/4240), since v10.0.0)
+* Fast-enumerating a List after deleting the parent object would crash with an
+  assertion failure rather than a more appropriate exception.
+  ([Core #4114](https://github.com/realm/realm-core/issues/4114), since v5.0.0).
+* Fix an issue where calling a MongoDB Realm Function would never be performed as the reference to the weak `User` was lost.
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.3.2 to v10.3.3
+
+10.7.4 Release notes (2021-04-26)
+=============================================================
+
+### Enhancements
+
+* Add Xcode 12.5 binaries to the release package.
+
+### Fixed
+
+* Add the Info.plist file to the XCFrameworks in the Carthage xcframwork
+  package ([#7216](https://github.com/realm/realm-cocoa/issues/7216), since 10.7.3).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
+
+10.7.3 Release notes (2021-04-22)
+=============================================================
+
+### Enhancements
+
+* Package a prebuilt XCFramework for Carthage. Carthage 0.38 and later will
+  download this instead of the old frameworks when using `--use-xcframeworks`.
+* We now make a backup of the realm file prior to any file format upgrade. The
+  backup is retained for 3 months. Backups from before a file format upgrade
+  allows for better analysis of any upgrade failure. We also restore a backup,
+  if a) an attempt is made to open a realm file whith a "future" file format
+  and b) a backup file exist that fits the current file format.
+  ([Core #4166](https://github.com/realm/realm-core/pull/4166))
+* The error message when the intial steps of opening a Realm file fails is now
+  more descriptive.
+* Make conversion of Decimal128 to/from string work for numbers with more than
+  19 significant digits. This means that Decimal128's initializer which takes a
+  string will now never throw, as it previously threw only for out-of-bounds
+  values. The initializer is still marked as `throws` for
+  backwards compatibility.
+  ([#4548](https://github.com/realm/realm-core/issues/4548))
+
+### Fixed
+
+* Adjust the header paths for the podspec to avoid accidentally finding a file
+  which isn't part of the pod that produced warnings when importing the
+  framework. ([#7113](https://github.com/realm/realm-cocoa/issues/7113), since 10.5.2).
+* Fixed a crash that would occur when observing unmanaged Objects in multiple
+  views in SwiftUI. When using `@StateRealmObject` or `@ObservedObject` across
+  multiple views with an unmanaged object, each view would subscribe to the
+  object. As each view unsubscribed (generally when trailing back through the
+  view stack), our propertyWrappers would attempt to remove the KVOs for each
+  cancellation, when it should only be done once. We now correctly remove KVOs
+  only once. ([#7131](https://github.com/realm/realm-cocoa/issues/7131))
+* Fixed `isInvalidated` not returning correct value after object deletion from
+  Realm when using a custom schema. The object's Object Schema was not updated
+  when the object was added to the realm. We now correctly update the object
+  schema when adding it to the realm.
+  ([#7181](https://github.com/realm/realm-cocoa/issues/7181))
+* Syncing large Decimal128 values would cause "Assertion failed: cx.w[1] == 0"
+  ([Core #4519](https://github.com/realm/realm-core/issues/4519), since v10.0.0).
+* Potential/unconfirmed fix for crashes associated with failure to memory map
+  (low on memory, low on virtual address space). For example
+  ([#4514](https://github.com/realm/realm-core/issues/4514), since v5.0.0).
+* Fix assertion failures such as "!m_notifier_skip_version.version" or
+  "m_notifier_sg->get_version() + 1 == new_version.version" when performing
+  writes inside change notification callbacks. Previously refreshing the Realm
+  by beginning a write transaction would skip delivering notifications, leaving
+  things in an inconsistent state. Notifications are now delivered recursively
+  when needed instead. ([Cocoa #7165](https://github.com/realm/realm-cocoa/issues/7165)).
+* Fix collection notification reporting for modifications. This could be
+  observed by receiving the wrong indices of modifications on sorted or
+  distinct results, or notification blocks sometimes not being called when only
+  modifications have occured.
+  ([#4573](https://github.com/realm/realm-core/pull/4573) since v5.0.0).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.5.5 to v10.6.0
+* Add additional debug validation to file map management that will hopefully
+  catch cases where we unmap something which is still in use.
+
+10.7.2 Release notes (2021-03-08)
+=============================================================
+
+### Fixed
+
+* During integration of a large amount of data from the server, you may get
+  "Assertion failed: !fields.has_missing_parent_update()"
+  ([Core #4497](https://github.com/realm/realm-core/issues/4497), since v6.0.0)
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.5.4 to v10.5.5
+
+10.7.1 Release notes (2021-03-05)
+=============================================================
+
+### Fixed
+
+* Queries of the form "a.b.c == nil" would match objects where `b` is `nil` if
+  `c` did not have an index and did not if `c` was indexed. Both will now match
+  to align with NSPredicate's behavior. ([Core #4460]https://github.com/realm/realm-core/pull/4460), since 4.3.0).
+* Restore support for upgrading files from file format 5 (Realm Cocoa 1.x).
+  ([Core #7089](https://github.com/realm/realm-cocoa/issues/7089), since v5.0.0)
+* On 32bit devices you may get exception with "No such object" when upgrading
+  to v10.* ([Java #7314](https://github.com/realm/realm-java/issues/7314), since v5.0.0)
+* The notification worker thread would rerun queries after every commit rather
+  than only commits which modified tables which could effect the query results
+  if the table had any outgoing links to tables not used in the query.
+  ([Core #4456](https://github.com/realm/realm-core/pull/4456), since v5.0.0).
+* Fix "Invalid ref translation entry [16045690984833335023, 78187493520]"
+  assertion failure which could occur when using sync or multiple processes
+  writing to a single Realm file.
+  ([#7086](https://github.com/realm/realm-cocoa/issues/7086), since v5.0.0).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.5.3 to v10.5.4
+
+10.7.0 Release notes (2021-02-23)
+=============================================================
+
+### Enhancements
+
+* Add support for some missing query operations on data propertys:
+  - Data properties can be compared to other data properties
+    (e.g. "dataProperty1 == dataProperty2").
+  - Case and diacritic-insensitive queries can be performed on data properties.
+    This will only have meaningful results if the data property contains UTF-8
+    string data.
+  - Data properties on linked objects can be queried
+    (e.g. "link.dataProperty CONTAINS %@")
+* Implement queries which filter on lists other than object links (lists of
+  objects were already supported). All supported operators for normal
+  properties are now supported for lists (e.g. "ANY intList = 5" or "ANY
+  stringList BEGINSWITH 'prefix'"), as well as aggregate operations on the
+  lists (such as "intArray.@sum > 100").
+* Performance of sorting on more than one property has been improved.
+  Especially important if many elements match on the first property. Mitigates
+  ([#7092](https://github.com/realm/realm-cocoa/issues/7092))
+
+### Fixed
+
+* Fixed a bug that prevented an object type with incoming links from being
+  marked as embedded during migrations. ([Core #4414](https://github.com/realm/realm-core/pull/4414))
+* The Realm notification listener thread could sometimes hit the assertion
+  failure "!skip_version.version" if a write transaction was committed at a
+  very specific time (since v10.5.0).
+* Added workaround for a case where upgrading an old file with illegal string
+  would crash ([#7111](https://github.com/realm/realm-cocoa/issues/7111))
+* Fixed a conflict resolution bug related to the ArrayMove instruction, which
+  could sometimes cause an "Invalid prior_size" exception to prevent
+  synchronization (since v10.5.0).
+* Skipping a change notification in the first write transaction after the
+  observer was added could potentially fail to skip the notification (since v10.5.1).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.5.0 to v10.5.3
+
+10.6.0 Release notes (2021-02-15)
+=============================================================
+
+### Enhancements
+
+* Add `@StateRealmObject` for SwiftUI support. This property wrapper type instantiates an observable object on a View. 
+  Use in place of `SwiftUI.StateObject` for Realm `Object`, `List`, and `EmbeddedObject` types.
+* Add `@ObservedRealmObject` for SwiftUI support. This property wrapper type subscribes to an observable object
+  and invalidates a view whenever the observable object changes. Use in place of `SwiftUI.ObservedObject` for
+  Realm `Object`, `List`, or `EmbeddedObject` types.
+* Add `@ObservedResults` for SwiftUI support. This property wrapper type retrieves results from a Realm.
+  The results use the realm configuration provided by the environment value `EnvironmentValues.realmConfiguration`.
+* Add `EnvironmentValues.realm` and `EnvironmentValues.realmConfiguration` for `Realm`
+  and `Realm.Configuration` types respectively. Values can be injected into views using the `View.environment` method, e.g., `MyView().environment(\.realmConfiguration, Realm.Configuration(fileURL: URL(fileURLWithPath: "myRealmPath.realm")))`. 
+  The value can then be declared on the example `MyView` as `@Environment(\.realm) var realm`.
+* Add `SwiftUI.Binding` extensions where `Value` is of type `Object`, `List`, or `EmbeddedObject`. 
+  These extensions expose methods for wrapped write transactions, to avoid boilerplate within 
+  views, e.g., `TextField("name", $personObject.name)` or `$personList.append(Person())`.
+* Add `Object.bind` and `EmbeddedObject.bind` for SwiftUI support. This allows you to create 
+  bindings of realm properties when a propertyWrapper is not available for you to do so, e.g., `TextField("name", personObject.bind(\.name))`.
+* The Sync client now logs error messages received from server rather than just
+  the size of the error message.
+* Errors returned from the server when sync WebSockets get closed are now
+  captured and surfaced as a SyncError.
+* Improve performance of sequential reads on a Results backed directly by a
+  Table (i.e. `realm.object(ClasSName.self)` with no filter/sort/etc.) by 50x.
+* Orphaned embedded object types which are not linked to by any top-level types
+  are now better handled. Previously the server would reject the schema,
+  resulting in delayed and confusing error reporting. Explicitly including an
+  orphan in `objectTypes` is now immediately reported as an error when opening
+  the Realm, and orphans are automatically excluded from the auto-discovered
+  schema when `objectTypes` is not specified.
+
+### Fixed
+
+* Reading from a Results backed directly by a Table (i.e.
+  `realm.object(ClasSName.self)` with no filter/sort/etc.) would give incorrect
+  results if the Results was constructed and accessed before creating a new
+  object with a primary key less than the smallest primary key which previously
+  existed. ([#7014](https://github.com/realm/realm-cocoa/issues/7014), since v5.0.0).
+* During synchronization you might experience crash with
+  "Assertion failed: ref + size <= next->first".
+  ([Core #4388](https://github.com/realm/realm-core/issues/4388))
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.4.0 to v10.5.0
+
+10.5.2 Release notes (2021-02-09)
+=============================================================
+
+### Enhancements
+
+* Add support for "thawing" objects. `Realm`, `Results`, `List` and `Object`
+  now have `thaw()` methods which return a live copy of the frozen object. This
+  enables app behvaior where a frozen object can be made live again in order to
+  mutate values. For example, first freezing an object passed into UI view,
+  then thawing the object in the view to update values.
+* Add Xcode 12.4 binaries to the release package.
+
+### Fixed
+
+* Inserting a date into a synced collection via `AnyBSON.datetime(...)` would
+  be of type `Timestamp` and not `Date`. This could break synced objects with a
+  `Date` property.
+  ([#6654](https://github.com/realm/realm-cocoa/issues/6654), since v10.0.0).
+* Fixed an issue where creating an object after file format upgrade may fail
+  with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
+  ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
+* Allow enumerating objects in migrations with types which are no longer
+  present in the schema.
+* Add `RLMResponse.customStatusCode`. This fixes timeout exceptions that were
+  occuring with a poor connection. ([#4188](https://github.com/realm/realm-core/issues/4188))
+* Limit availability of ObjectKeyIdentifiable to platforms which support
+  Combine to match the change made in the Xcode 12.5 SDK.
+  ([#7083](https://github.com/realm/realm-cocoa/issues/7083))
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.3.3 to v10.4.0
+
+10.5.1 Release notes (2021-01-15)
+=============================================================
+
+### Enhancements
+
+* Add Xcode 12.3 binary to release package.
+* Add support for queries which have nil on the left side and a keypath on the
+  right side (e.g. "nil == name" rather than "name == nil" as was previously
+  required).
+
+### Fixed
 * Timeouts when calling server functions via App would sometimes crash rather
   than report an error.
 * Fix a race condition which would lead to "uncaught exception in notifier
