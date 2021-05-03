@@ -8,66 +8,46 @@ import os, re
 # (un)man: Type is Managed or Unmanaged
 
 types = [
-  # Class, Object, Property, Values, Tags
-  ['AllPrimitiveDictionaries', 'unmanaged', 'boolObj', ['@NO', '@YES'], ['@NO', '@YES'], {'r', 'unman'}, '__NSCFBoolean'],
-  ['AllPrimitiveDictionaries', 'unmanaged', 'intObj', ['@2', '@3'], ['@2', '@4'], {'r', 'minmax', 'sum', 'avg', 'unman'}, '__NSCFNumber'],
-#  ['AllPrimitiveDictionaries', 'unmanaged', 'floatObj', ['@2.2f', '@3.3f'], ['@2.2f', '@4.4f'], {'r', 'minmax', 'sum', 'avg', 'unman'}, '__NSCFNumber'],
-#  ['AllPrimitiveDictionaries', 'unmanaged', 'doubleObj', ['@2.2', '@3.3'], ['@2.2', '@4.4'], {'r', 'minmax', 'sum', 'avg', 'unman'}, '__NSCFNumber'],
-  ['AllPrimitiveDictionaries', 'unmanaged', 'stringObj', ['@"a"', '@"b"'], ['@"a"', '@"de"'], {'r', 'unman', 'string'}, '__NSCFConstantString'],
-#  ['AllPrimitiveDictionaries', 'unmanaged', 'dataObj', ['data(1)', 'data(2)'], ['data(1)', 'data(3)'], {'r', 'unman'}, 'NSConcreteData'],
-#  ['AllPrimitiveDictionaries', 'unmanaged', 'dateObj', ['date(1)', 'date(2)'], ['date(1)', 'date(3)'], {'r', 'minmax', 'unman', 'date'}, '__NSTaggedDate'],
-#  ['AllPrimitiveDictionaries', 'unmanaged', 'decimalObj', ['decimal128(2)', 'decimal128(3)'], ['decimal128(1)', 'decimal128(3)'], {'r', 'minmax', 'sum', 'avg', 'unman'}, 'RLMDecimal128'],
-#  ['AllPrimitiveDictionaries', 'unmanaged', 'objectIdObj', ['objectId(1)', 'objectId(2)'], ['objectId(1)', 'objectId(3)'], {'r', 'unman'}, 'RLMObjectId'],
-#  ['AllPrimitiveDictionaries', 'unmanaged', 'uuidObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"123DECC8-B300-4954-A233-F89909F4FD89")'], {'r','unman'}, '__NSConcreteUUID'],
-  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'boolObj', ['@NO', '@YES', 'NSNull.null'], ['@YES', '@NO'], {'o', 'unman'}, '__NSCFBoolean'],
-  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'intObj', ['@2', '@3', 'NSNull.null'], ['@3', '@4'], {'o', 'minmax', 'sum', 'avg', 'unman'}, '__NSCFNumber'],
-#  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'floatObj', ['@2.2f', '@3.3f', 'NSNull.null'], ['@3.3f', '@4.4f'], {'o', 'minmax', 'sum', 'avg', 'unman'}, '__NSCFNumber'],
-#  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'doubleObj', ['@2.2', '@3.3', 'NSNull.null'], ['@3.3', '@4.4'], {'o', 'minmax', 'sum', 'avg', 'unman'}, '__NSCFNumber'],
-  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'stringObj', ['@"a"', '@"b"', 'NSNull.null'], ['@"bc"', '@"de"'], {'o', 'unman', 'string'}, '__NSCFConstantString'],
-#  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'dataObj', ['data(1)', 'data(2)', 'NSNull.null'], ['data(2)', 'data(3)'], {'o', 'unman'}, 'NSConcreteData'],
-#  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'dateObj', ['date(1)', 'date(2)', 'NSNull.null'], ['date(2)', 'date(3)'], {'o', 'minmax', 'unman', 'date'}, '__NSTaggedDate'],
-#  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'decimalObj', ['decimal128(2)', 'decimal128(3)', 'NSNull.null'], ['decimal128(2)', 'decimal128(4)'], {'o', 'minmax', 'sum', 'avg', 'unman'}, 'RLMDecimal128'],
-#  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'objectIdObj', ['objectId(1)', 'objectId(2)', 'NSNull.null'], ['objectId(2)', 'objectId(4)'], {'o', 'unman'}, 'RLMObjectId'],
-#  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'uuidObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")', 'NSNull.null'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"123DECC8-B300-4954-A233-F89909F4FD89")'], {'o', 'unman'}, '__NSConcreteUUID'],
-  ['AllPrimitiveDictionaries', 'managed', 'boolObj', ['@NO', '@YES'], ['@YES', '@NO'], {'r', 'man'}, '__NSCFBoolean'],
-  ['AllPrimitiveDictionaries', 'managed', 'intObj', ['@2', '@3'], ['@3', '@4'], {'r', 'minmax', 'sum', 'avg', 'man'}, '__NSCFNumber'],
-#  ['AllPrimitiveDictionaries', 'managed', 'floatObj', ['@2.2f', '@3.3f'], ['@3.3f', '@4.4f'], {'r', 'minmax', 'sum', 'avg', 'man'}, '__NSCFNumber'],
-#  ['AllPrimitiveDictionaries', 'managed', 'doubleObj', ['@2.2', '@3.3'], ['@3.3', '@4.4'], {'r', 'minmax', 'sum', 'avg', 'man'}, '__NSCFNumber'],
-  ['AllPrimitiveDictionaries', 'managed', 'stringObj', ['@"a"', '@"b"'], ['@"bc"', '@"de"'], {'r', 'man', 'string'}, '__NSCFConstantString'],
-#  ['AllPrimitiveDictionaries', 'managed', 'dataObj', ['data(1)', 'data(2)'], ['data(2)', 'data(3)'], {'r', 'man'}, 'NSConcreteData'],
-#  ['AllPrimitiveDictionaries', 'managed', 'dateObj', ['date(1)', 'date(2)'], ['date(2)', 'date(3)'], {'r', 'minmax', 'man', 'date'}, '__NSTaggedDate'],
-#  ['AllPrimitiveDictionaries', 'managed', 'decimalObj', ['decimal128(2)', 'decimal128(3)'], ['decimal128(2)', 'decimal128(3)'], {'r', 'minmax', 'sum', 'avg', 'man'}, 'RLMDecimal128'],
-#  ['AllPrimitiveDictionaries', 'managed', 'objectIdObj', ['objectId(1)', 'objectId(2)'], ['objectId(2)', 'objectId(3)'], {'r', 'man'}, 'RLMObjectId'],
-#  ['AllPrimitiveDictionaries', 'managed', 'uuidObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"123DECC8-B300-4954-A233-F89909F4FD89")'], {'r', 'man'}, '__NSConcreteUUID'],
-  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'boolObj', ['@NO', '@YES', 'NSNull.null'], ['@YES', '@NO'], {'o', 'man'}, '__NSCFBoolean'],
-  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'intObj', ['@2', '@3', 'NSNull.null'], ['@3', '@4'], {'o', 'minmax', 'sum', 'avg', 'man'}, '__NSCFNumber'],
-#  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'floatObj', ['@2.2f', '@3.3f', 'NSNull.null'], ['@3.3f', '@4.4f'], {'o', 'minmax', 'sum', 'avg', 'man'}, '__NSCFNumber'],
-#  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'doubleObj', ['@2.2', '@3.3', 'NSNull.null'], ['@3.3', '@4.4'], {'o', 'minmax', 'sum', 'avg', 'man'}, '__NSCFNumber'],
-  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'stringObj', ['@"a"', '@"b"', 'NSNull.null'], ['@"bc"', '@"de"'], {'o', 'man', 'string'}, '__NSCFConstantString'],
-#  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'dataObj', ['data(1)', 'data(2)', 'NSNull.null'], ['data(2)', 'data(3)'], {'o', 'man'}, 'NSConcreteData'],
-#  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'dateObj', ['date(1)', 'date(2)', 'NSNull.null'], ['date(2)', 'date(3)'], {'o', 'minmax', 'man', 'date'}, '__NSTaggedDate'],
-#  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'decimalObj', ['decimal128(2)', 'decimal128(3)', 'NSNull.null'], ['decimal128(2)', 'decimal128(3)'], {'o', 'minmax', 'sum', 'avg', 'man'}, 'RLMDecimal128'],
-#  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'objectIdObj', ['objectId(1)', 'objectId(2)', 'NSNull.null'], ['objectId(2)', 'objectId(3)'], {'o', 'man'}, 'RLMObjectId'],
-#  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'uuidObj', ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")', 'NSNull.null'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"123DECC8-B300-4954-A233-F89909F4FD89")'], {'o', 'man'}, '__NSConcreteUUID']
+  # Class, Object, Property, Keys, Values, Tags
+  # Bool
+  ['AllPrimitiveDictionaries', 'unmanaged', 'boolObj', ['@"key1"', '@"key2"'], ['@NO', '@YES'], {'r', 'unman'}],
+  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'boolObj', ['@"key1"', '@"key2"'], ['@NO', 'NSNull.null'], {'o', 'unman'}],
+  ['AllPrimitiveDictionaries', 'managed', 'boolObj', ['@"key1"', '@"key2"'], ['@NO', '@YES'], {'r', 'man'}],
+  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'boolObj', ['@"key1"', '@"key2"'], ['@NO', 'NSNull.null'], {'o', 'man'}],
+  # Int
+  ['AllPrimitiveDictionaries', 'unmanaged', 'intObj', ['@"key1"', '@"key2"'], ['@2', '@3'], {'r', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'intObj', ['@"key1"', '@"key2"'], ['@2', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveDictionaries', 'managed', 'intObj', ['@"key1"', '@"key2"'], ['@2', '@3'], {'r', 'minmax', 'sum', 'avg', 'man'}],
+  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'intObj', ['@"key1"', '@"key2"'], ['@2', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg', 'man'}],
+  # String
+  ['AllPrimitiveDictionaries', 'unmanaged', 'stringObj', ['@"key1"', '@"key2"'], ['@"foo"', '@"bar"'], {'r', 'unman', 'string'}],
+  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'stringObj', ['@"key1"', '@"key2"'], ['@"foo"', 'NSNull.null'], {'o', 'unman', 'string'}],
+  ['AllPrimitiveDictionaries', 'managed', 'stringObj', ['@"key1"', '@"key2"'], ['@"foo"', '@"bar"'], {'r', 'man', 'string'}],
+  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'stringObj', ['@"key1"', '@"key2"'], ['@"foo"', 'NSNull.null'], {'o', 'man', 'string'}],
 ]
+
+def type_name(propertyName, optional):
+    if 'any' in propertyName:
+        return 'mixed'
+    else:
+        return propertyName.replace('Obj', '') + ('?' if 'opt' in optional else '')
+
 types = [{'class': t[0],
           'obj': t[1],
           'prop': t[2],
-          'v0': t[3][0],
-          'v1': t[3][1],
+          'k0': t[3][0],
+          'k1': t[3][1],
+          'v0': t[4][0],
+          'v1': t[4][1],
           'dictionary': t[1] + '.' + t[2],
-          'values': '@{' + ', '.join('@"{}": {}'.format(k, v) for k, v in enumerate(t[3])) + '}',
-          'values2': '@{' + ', '.join('@"{}": {}'.format(k, v) for k, v in enumerate(t[4])) + '}',
-          'first': t[3][0],
-          'last': t[3][2] if len(t[3]) == 3 else t[3][1],
-          'wrong': '@"a"',
-          'wdesc': 'a',
-          'wtype': '__NSCFConstantString',
-          'type': t[2].replace('Obj', '') + ('?' if 'opt' in t[1] else ''),
+          'values': '@{ ' + ', '.join('{}: {}'.format(pair[0], pair[1]) for pair in zip(t[3], t[4])) + ' }',
+          'firstKey': t[3][0],
+          'firstValue': t[4][0],
+          'last': t[4][2] if len(t[4]) == 3 else t[4][1],
+          'wrong': '@"a"', 'wdesc': 'a', 'wtype': '__NSCFConstantString',
+          'type': type_name(t[2], t[1]),
           'tags': set(t[5]),
-          'cType': t[6],
-          'cVal': t[3][0].replace('@', '').replace('"', '').replace('f', '').replace('NO', '0')
-          }
+         }
          for t in types]
 
 # Add negative tags to all types
@@ -100,7 +80,8 @@ for line in file:
 
     if '$allDictionaries' in line:
         line = line.replace(' ^n', '\n' + ' ' * (line.find('(') + 4))
-        print '    for (RLMDictionary *dictionary in allDictionaries) {\n    ' + line.replace('$allDictionaries', 'dictionary') + '    }'
+        line = line.replace('$allDictionaries', 'dictionary')
+        print '    for (RLMDictionary *dictionary in allDictionaries) {\n    ' + line + '    }'
         continue
 
     filtered_types = types

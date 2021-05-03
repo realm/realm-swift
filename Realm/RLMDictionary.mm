@@ -170,8 +170,8 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 }
 
 - (void)setValue:(nullable id)value forKey:(nonnull NSString *)key {
-    RLMDictionaryValidateMatchingObjectType(self, key, value);
     changeDictionary(self, ^{
+        RLMDictionaryValidateMatchingObjectType(self, key, value);
         [_backingCollection setValue:value forKey:key];
     });
 }
@@ -228,7 +228,8 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 }
 
 - (nullable id)valueForKey:(nonnull NSString *)key {
-    if ([key isEqualToString:@"@invalidated"]) {
+    // `invalidated` should be accessed with a `@` prefix when using RLMDictionary.
+    if ([key isEqualToString:[NSString stringWithFormat:@"@%@", RLMInvalidatedKey]]) {
         return @NO; // Unmanaged dictionaries are never invalidated
     }
     if (!_backingCollection) {
@@ -263,11 +264,9 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
         @throw RLMException(@"Cannot add entries from the object of class '%@'", [otherDictionary className]);
     }
 
-    [otherDictionary enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull value, BOOL *) {
-        RLMDictionaryValidateMatchingObjectType(self, key, value);
-    }];
     changeDictionary(self, ^{
         for (id key in otherDictionary) {
+            RLMDictionaryValidateMatchingObjectType(self, key, otherDictionary[key]);
             [self setObject:otherDictionary[key] forKey:key];
         }
     });

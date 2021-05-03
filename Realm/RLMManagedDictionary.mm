@@ -131,13 +131,13 @@ static void throwError(__unsafe_unretained ObjcCollection *const col, NSString *
             @throw RLMException(@"%@: is not supported for %s%s property '%s'.",
                                 aggregateMethod,
                                 string_for_property_type(e.property_type),
-                                is_nullable(e.property_type) ? "?" : "",
+                                col->_optional ? "?" : "",
                                 e.column_name.data());
         }
         @throw RLMException(@"%@: is not supported for %s%s dictionary '%@.%@'.",
                             aggregateMethod,
                             string_for_property_type(e.property_type),
-                            is_nullable(e.property_type) ? "?" : "",
+                            col->_optional ? "?" : "",
                             col->_ownerInfo->rlmObjectSchema.className, col->_key);
     }
     catch (std::logic_error const& e) {
@@ -340,10 +340,6 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 #pragma mark - KVC
 
-// Note: KVC operations require the key to be a string. So RLMDictionaries with
-// key types other than a string cannot really make much use out of KVC.
-
-//TODO: Create test that hits this
 - (id)valueForKeyPath:(NSString *)keyPath {
     if ([keyPath hasPrefix:@"@"]) {
         // Delegate KVC collection operators to RLMResults
@@ -395,7 +391,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     auto value = translateErrors<RLMManagedDictionary>(self, [&] {
         return _backingCollection.as_results().sum(column);
     }, @"sumOfProperty");
-    return value ? RLMMixedToObjc(*value) : RLMMixedToObjc(realm::none);
+    return value ? RLMMixedToObjc(*value) : @0;
 }
 
 - (id)averageOfProperty:(NSString *)property {

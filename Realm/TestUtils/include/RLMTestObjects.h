@@ -326,48 +326,29 @@ RLM_COLLECTION_TYPE(AllTypesObject)
 
 @interface AllPrimitiveDictionaries : RLMObject
 @property RLMDictionary<RLMString, RLMInt> *intObj;
-@property RLMDictionary<RLMString, RLMInt> *intObj2;
 @property RLMDictionary<RLMString, RLMFloat> *floatObj;
-@property RLMDictionary<RLMString, RLMFloat> *floatObj2;
 @property RLMDictionary<RLMString, RLMDouble> *doubleObj;
-@property RLMDictionary<RLMString, RLMDouble> *doubleObj2;
 @property RLMDictionary<RLMString, RLMBool> *boolObj;
-@property RLMDictionary<RLMString, RLMBool> *boolObj2;
 @property RLMDictionary<RLMString, RLMString> *stringObj;
-@property RLMDictionary<RLMString, RLMString> *stringObj2;
 @property RLMDictionary<RLMString, RLMDate> *dateObj;
-@property RLMDictionary<RLMString, RLMDate> *dateObj2;
 @property RLMDictionary<RLMString, RLMData> *dataObj;
-@property RLMDictionary<RLMString, RLMData> *dataObj2;
 @property RLMDictionary<RLMString, RLMDecimal128> *decimalObj;
-@property RLMDictionary<RLMString, RLMDecimal128> *decimalObj2;
 @property RLMDictionary<RLMString, RLMObjectId> *objectIdObj;
-@property RLMDictionary<RLMString, RLMObjectId> *objectIdObj2;
 @property RLMDictionary<RLMString, RLMUUID> *uuidObj;
-@property RLMDictionary<RLMString, RLMUUID> *uuidObj2;
+@property RLMDictionary<RLMString, RLMValue> *anyObj;
 @end
 
 @interface AllOptionalPrimitiveDictionaries : RLMObject
 @property RLMDictionary<RLMString, RLMInt> *intObj;
-@property RLMDictionary<RLMString, RLMInt> *intObj2;
 @property RLMDictionary<RLMString, RLMFloat> *floatObj;
-@property RLMDictionary<RLMString, RLMFloat> *floatObj2;
 @property RLMDictionary<RLMString, RLMDouble> *doubleObj;
-@property RLMDictionary<RLMString, RLMDouble> *doubleObj2;
 @property RLMDictionary<RLMString, RLMBool> *boolObj;
-@property RLMDictionary<RLMString, RLMBool> *boolObj2;
 @property RLMDictionary<RLMString, RLMString> *stringObj;
-@property RLMDictionary<RLMString, RLMString> *stringObj2;
 @property RLMDictionary<RLMString, RLMDate> *dateObj;
-@property RLMDictionary<RLMString, RLMDate> *dateObj2;
 @property RLMDictionary<RLMString, RLMData> *dataObj;
-@property RLMDictionary<RLMString, RLMData> *dataObj2;
 @property RLMDictionary<RLMString, RLMDecimal128> *decimalObj;
-@property RLMDictionary<RLMString, RLMDecimal128> *decimalObj2;
 @property RLMDictionary<RLMString, RLMObjectId> *objectIdObj;
-@property RLMDictionary<RLMString, RLMObjectId> *objectIdObj2;
 @property RLMDictionary<RLMString, RLMUUID> *uuidObj;
-@property RLMDictionary<RLMString, RLMUUID> *uuidObj2;
 @end
 
 #pragma mark - Real Life Objects
