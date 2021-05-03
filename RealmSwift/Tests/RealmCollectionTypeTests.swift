@@ -470,9 +470,88 @@ class RealmCollectionTypeTests: TestCase {
         token2.invalidate()
     }
 
+    // !!!: Two tokens that filter for different keypaths will both fire.
+    // related to the issue Dominic raised.
+    func testObserveKeyPath() {
+        var ex0 = expectation(description: "initial notification")
+        let token0 = collection.observe(keyPaths: ["stringCol"])  { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update:
+                // TODO: check the change notifications are correct
+                break
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex0.fulfill()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+
+        // Only expect a change notification for the token observing `stringCol` keypath.
+        ex0 = self.expectation(description: "change notification")
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.stringCol = "changed"
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+        
+        // Expect no notification for `stringCol` key path because only `linkCol.id` is modified.
+        ex0 = self.expectation(description: "NO change notification")
+        ex0.isInverted = true
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.linkCol?.id = 2
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+        // add a second notification and wait for it
+//        var ex1 = expectation(description: "second initial notification")
+//        let token1 = collection.observe(keyPaths: ["linkCol.id"]) { _ in
+//            ex1.fulfill()
+//        }
+//        waitForExpectations(timeout: 0.2, handler: nil)
+//
+//        // Only expect a change notification for the token observing `stringCol` keypath.
+//        // Expect no notification for `linkCol.id` key path because it's not changed.
+//        ex0 = expectation(description: "change notification")
+//        ex1 = expectation(description: "This expectation should not be reached. Expect NO change notification.")
+//        ex1.isInverted = true
+//
+//        waitForExpectations(timeout: 0.1, handler: nil)
+//
+//
+//        // Only expect a change notification for the token observing `linkCol.id` keypath.
+//        // Expect no notification for `stringCol` because it's not changed.
+//        ex0 = expectation(description: "This expectation should not be reached. Expect NO change notification.")
+//        ex0.isInverted = true
+//        ex1 = expectation(description: "change notification")
+//        realm.beginWrite()
+//        collection.first!.linkCol?.id = 2
+//        try! realm.commitWrite()
+//        waitForExpectations(timeout: 0.1, handler: nil)
+//
+//        // Only the unskipped notification token should be called (token0).
+//        ex0 = expectation(description: "change notification")
+//        ex1 = expectation(description: "This expectation should not be reached. Expect NO change notification.")
+//        ex1.isInverted = true
+//        realm.beginWrite()
+//        realm.delete(collection)
+//        try! realm.commitWrite(withoutNotifying: [token1])
+//        waitForExpectations(timeout: 0.1, handler: nil)
+
+        token0.invalidate()
+//        token1.invalidate()
+    }
+    
     func observeOnQueue<Collection: RealmCollection>(_ collection: Collection) where Collection.Element: Object {
         let sema = DispatchSemaphore(value: 0)
-        let token = collection.observe(on: queue) { (changes: RealmCollectionChange) in
+        let token = collection.observe(keyPaths: nil, on: queue) { (changes: RealmCollectionChange) in
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 2)
@@ -669,6 +748,7 @@ class RealmCollectionTypeTests: TestCase {
         }
     }
 
+    // TODO: test with kpf
     func testObserveFrozenCollection() {
         let frozen = collection.freeze()
         assertThrows(frozen.observe({ _ in }),
@@ -774,6 +854,7 @@ class ResultsTests: RealmCollectionTypeTests {
         }
     }
 
+    // TODO: Add kpf version
     func testNotificationBlockUpdating() {
         let collection = collectionBase()
 
@@ -802,6 +883,7 @@ class ResultsTests: RealmCollectionTypeTests {
         token.invalidate()
     }
 
+    // TODO: Add kpf version
     func testNotificationBlockChangeIndices() {
         let collection = collectionBase()
 
@@ -1002,6 +1084,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         assertMatches(collection.description, "List<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
     }
 
+    // !!!: Test with kpf
     func testObserveDirect() {
         let collection = collectionBase()
 
@@ -1114,6 +1197,7 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         assertThrows(collection.filter("ANY stringListCol == %@", CTTNullableStringObjectWithLink()))
     }
 
+    // ???: KPF not needed to test on these overrides?
     override func testObserve() {
         assertThrows(collection.observe { _ in })
     }

@@ -417,7 +417,8 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe(on queue: DispatchQueue? = nil,
+    public func observe(keyPaths: [String]? = nil,
+                        on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<List>) -> Void) -> NotificationToken {
         return _rlmArray.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
@@ -522,7 +523,8 @@ extension List: RealmCollection {
 
     /// :nodoc:
     // swiftlint:disable:next identifier_name
-    public func _observe(_ queue: DispatchQueue?,
+    public func _observe(_ keyPaths: [String]?,
+                         _ queue: DispatchQueue?,
                          _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
         -> NotificationToken {
             return _rlmArray.addNotificationBlock(wrapObserveBlock(block), queue: queue)

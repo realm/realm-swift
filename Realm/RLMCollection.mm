@@ -18,6 +18,10 @@
 
 #import "RLMCollection_Private.hpp"
 
+// TODO: Add any new imported files to alphabetic order
+#import "RLMQueryUtil.hpp"
+#import "RLMObservation.hpp"
+
 #import "RLMAccessor.hpp"
 #import "RLMArray_Private.hpp"
 #import "RLMListBase.h"
@@ -418,6 +422,7 @@ struct CollectionCallbackWrapper {
 
 template<typename RLMCollection>
 RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
+                                              NSArray<NSString *> *keyPaths,
                                               void (^block)(id, RLMCollectionChange *, NSError *),
                                               dispatch_queue_t queue) {
     RLMRealm *realm = collection.realm;
@@ -426,10 +431,16 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
     }
     bool skipFirst = std::is_same_v<RLMCollection, RLMResults>;
     auto token = [[RLMCancellationToken alloc] init];
+    
+    std::vector<RLMKeyPath> rlmKeyPaths;
+    for (NSString *keyPath in keyPaths) {
+        // key_path_from_string(obj.realm.schema, obj->_objectSchema, obj->_info, keyPath)
+    }
 
     if (!queue) {
         [realm verifyNotificationsAreSupported:true];
         token->_realm = realm;
+        auto tk = [[RLMCancellationToken alloc] init];
         token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst});
         return token;
     }
@@ -456,5 +467,5 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
 @end
 
 // Explicitly instantiate the templated function for the two types we'll use it on
-template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedArray *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
-template RLMNotificationToken *RLMAddNotificationBlock<>(RLMResults *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
+template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedArray *, NSArray<NSString *> *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
+template RLMNotificationToken *RLMAddNotificationBlock<>(RLMResults *, NSArray<NSString *> *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);

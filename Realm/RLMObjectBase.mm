@@ -18,6 +18,9 @@
 
 #import "RLMObject_Private.hpp"
 
+// TODO: Put in alphebtized list
+#import "RLMQueryUtil.hpp"
+
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
 #import "RLMDecimal128.h"
@@ -673,23 +676,87 @@ struct ObjectChangeCallbackWrapper {
     _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj});
 }
 
-- (void)addNotificationBlock:(RLMObjectNotificationCallback)block object:(RLMObjectBase *)obj {
-    _object = realm::Object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
-    _realm = obj->_realm;
-    _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj});
+using KeyPath = std::vector<std::pair<TableKey, ColKey>>;
+using KeyPathArray = std::vector<KeyPath>;
+
+// ???: How to convert Property, RLMObjectSchema to TableKey, ColKey?
+//using KeyPath = std::vector<std::pair<TableKey, ColKey>>;
+std::vector<std::pair<TableKey, ColKey>> key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, RLMClassInfo *info, NSString *keyPath)
+{
+    RLMProperty *property;
+    std::vector<RLMProperty *> links;
+    std::vector<std::pair<TableKey, ColKey>> keyPairs;
+
+    bool keyPathContainsToManyRelationship = false;
+
+    // !!!: NEED test where developer passes in property that doesn't exist on schema, but is still valid syntax
+    // !!!: NEED test without a dot in the keypath
+    NSUInteger start = 0, length = keyPath.length, end = NSNotFound;
+    do {
+        end = [keyPath rangeOfString:@"." options:0 range:{start, length - start}].location;
+        NSString *propertyName = [keyPath substringWithRange:{start, end == NSNotFound ? length - start : end - start}];
+        property = objectSchema[propertyName];
+        RLMPrecondition(property, @"Invalid property name",
+                        @"Property '%@' not found in object of type '%@'",
+                        propertyName, objectSchema.className);
+
+        if (property.array)
+            keyPathContainsToManyRelationship = true;
+
+        if (end != NSNotFound) {
+            RLMPrecondition(property.type == RLMPropertyTypeObject || property.type == RLMPropertyTypeLinkingObjects,
+                            @"Invalid value", @"Property '%@' is not a link in object of type '%@'",
+                            propertyName, objectSchema.className);
+
+            links.push_back(property);
+            REALM_ASSERT(property.objectClassName);
+            
+            // (1) What's the difference? Doesn't seem to be any except that the first line is safer because it checks for null first.
+            TableKey tk = info->table()->get_key();
+            //    TableKey tk = info->objectSchema->table_key;
+            
+            ColKey ck = info->table()->get_column_key(property.columnName.UTF8String);
+//            std::pair<TableKey, ColKey> keyPair = std::make_pair(tk, ck);
+            keyPairs.push_back(std::make_pair(tk, ck));
+            
+            objectSchema = schema[property.objectClassName];
+        }
+
+        start = end + 1;
+    } while (end != NSNotFound);
+
+    return keyPairs;
+//    return {std::move(links), property, keyPathContainsToManyRelationship};
 }
 
-RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj, dispatch_queue_t queue,
+- (void)addNotificationBlock:(RLMObjectNotificationCallback)block object:(RLMObjectBase *)obj keyPaths:(realm::Object::KeyPathArray)keyPaths {
+    _object = realm::Object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
+    _realm = obj->_realm;
+    _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj}, keyPaths);
+}
+
+RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
+                                                        NSArray<NSString *> *keyPaths, // ["dogs.name", "dogs.age"]
+                                                        dispatch_queue_t queue,
                                                         RLMObjectNotificationCallback block) {
     if (!obj->_realm) {
         @throw RLMException(@"Only objects which are managed by a Realm support change notifications");
+    }
+    
+    // should string keypath be translated here?
+    // TODO: This shouldn't be on object, need to change for collection notifications
+    // Handle case where nothing in keypath
+    realm::Object::KeyPathArray keyPathArray;
+    for (NSString *keyPath in keyPaths) {
+        auto kp = key_path_from_string(obj.realm.schema, obj->_objectSchema, obj->_info, keyPath);
+        keyPathArray.push_back(kp);
     }
 
     if (!queue) {
         [obj->_realm verifyNotificationsAreSupported:true];
         auto token = [[RLMObjectNotificationToken alloc] init];
         token->_realm = obj->_realm;
-        [token addNotificationBlock:block object:obj];
+        [token addNotificationBlock:block object:obj keyPaths:keyPathArray];
         return token;
     }
 
@@ -708,7 +775,7 @@ RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj, disp
 @end
 
 RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjectChangeBlock block, dispatch_queue_t queue) {
-    return RLMObjectBaseAddNotificationBlock(obj, queue, ^(RLMObjectBase *, NSArray<NSString *> *propertyNames,
+    return RLMObjectBaseAddNotificationBlock(obj, nil, queue, ^(RLMObjectBase *, NSArray<NSString *> *propertyNames,
                                                            NSArray *oldValues, NSArray *newValues, NSError *error) {
         if (error) {
             block(false, nil, error);

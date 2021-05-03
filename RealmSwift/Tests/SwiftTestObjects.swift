@@ -223,11 +223,16 @@ class SwiftOptionalIgnoredPropertiesObject: Object {
 
 class SwiftDogObject: Object {
     @objc dynamic var dogName = ""
+    @objc dynamic var intCol: Int = 0
+    @objc dynamic var boolCol: Bool = true
     let owners = LinkingObjects(fromType: SwiftOwnerObject.self, property: "dog")
 }
 
 class SwiftOwnerObject: Object {
     @objc dynamic var name = ""
+    // TODO: Should probably rename
+    @objc dynamic var intCol: Int = 0
+    let objects = List<SwiftDogObject>()
     @objc dynamic var dog: SwiftDogObject? = SwiftDogObject()
 }
 

@@ -612,32 +612,47 @@ class ObjectTests: TestCase {
         XCTAssertEqual(now, object.dateCol)
         XCTAssertEqual(data, object.dataCol)
     }
+    
+    // MARK: - Observation tests
 
     func testObserveUnmanagedObject() {
         assertThrows(SwiftIntObject().observe { _ in }, reason: "managed")
+        assertThrows(SwiftIntObject().observe(keyPaths: ["intCol"]) { _ in }, reason: "managed")
     }
 
     func testDeleteObservedObject() {
         let realm = try! Realm()
         realm.beginWrite()
-        let object = realm.create(SwiftIntObject.self, value: [0])
+        let object0 = realm.create(SwiftIntObject.self, value: [0])
+        let object1 = realm.create(SwiftIntObject.self, value: [0])
         try! realm.commitWrite()
 
-        let exp = expectation(description: "")
-        let token = object.observe { change in
+        let exp0 = expectation(description: "Delete observed object")
+        let token0 = object0.observe { change in
             if case .deleted = change {
             } else {
                 XCTFail("expected .deleted, got \(change)")
             }
-            exp.fulfill()
+            exp0.fulfill()
+        }
+
+        let exp1 = expectation(description: "Delete observed object with filtered Keypath")
+        let token1 = object1.observe(keyPaths: ["intCol"]) { change in
+            if case .deleted = change {
+            } else {
+                XCTFail("expected .deleted, got \(change)")
+            }
+            exp1.fulfill()
         }
 
         realm.beginWrite()
-        realm.delete(object)
+        realm.delete(object0)
+        realm.delete(object1)
         try! realm.commitWrite()
 
         waitForExpectations(timeout: 2)
-        token.invalidate()
+        token0.invalidate()
+        token1.invalidate()
     }
 
     func checkChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ change: ObjectChange<ObjectBase>) {
@@ -651,8 +666,20 @@ class ObjectTests: TestCase {
         } else {
             XCTFail("expected .change, got \(change)")
         }
-
     }
+    
+//    func checkChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ filter: String, _ change: ObjectChange<ObjectBase>) {
+//        if case .change(_, let properties) = change {
+//            XCTAssertEqual(properties.count, 1)
+//            if let prop = properties.first {
+//                XCTAssertEqual(prop.name, name)
+//                XCTAssertEqual(prop.oldValue as? T, old)
+//                XCTAssertEqual(prop.newValue as? U, new)
+//            }
+//        } else {
+//            XCTFail("expected .change, got \(change)")
+//        }
+//    }
 
     func expectChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?) -> ((ObjectChange<ObjectBase>) -> Void) {
         let exp = expectation(description: "change from \(String(describing: old)) to \(String(describing: new))")
@@ -661,6 +688,23 @@ class ObjectTests: TestCase {
             exp.fulfill()
         }
     }
+    
+    func expectNoChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?) -> ((ObjectChange<ObjectBase>) -> Void) {
+        let exp = expectation(description: "Change from \(String(describing: old)) to \(String(describing: new)) should not have notified for \(name)")
+        exp.isInverted = true // Expectation will now fail if `exp` is fulfilled.
+        return { change in
+            self.checkChange(name, old, new, change)
+            exp.fulfill()
+        }
+    }
+
+//    func expectChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ filter: String) -> ((ObjectChange<ObjectBase>) -> Void) {
+//        let exp = expectation(description: "change from \(String(describing: old)) to \(String(describing: new)), with filter \(filter)")
+//        return { change in
+//            self.checkChange(name, old, new, change)
+//            exp.fulfill()
+//        }
+//    }
 
     func testModifyObservedObjectLocally() {
         let realm = try! Realm()
@@ -675,6 +719,29 @@ class ObjectTests: TestCase {
 
         waitForExpectations(timeout: 2)
         token.invalidate()
+    }
+    
+    func testModifyObservedKeyPathLocally() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let object = realm.create(SwiftObject.self)
+        try! realm.commitWrite()
+
+        // Expect notification for "intCol" keyPath when "intCol" is modified
+        let token1 = object.observe(keyPaths: ["intCol"], expectChange("intCol", Int?.none, 2))
+
+        // Expect no notification for "boolCol" keypath when "intCol" is modified
+        let token0 = object.observe(keyPaths: ["boolCol"], { change in
+            XCTFail("expected no change, got \(change)")
+        })
+
+        try! realm.write {
+            object.intCol = 2
+        }
+
+        waitForExpectations(timeout: 2)
+        token0.invalidate()
+        token1.invalidate()
     }
 
     func testModifyObservedObjectRemotely() {
@@ -696,6 +763,34 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
 
+    func testModifyObservedKeyPathRemotely() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let object = realm.create(SwiftObject.self)
+        try! realm.commitWrite()
+
+        // Expect no notification for "intCol" keypath when "boolCol" is modified
+        let token0 = object.observe(keyPaths: ["intCol"], { change in
+            XCTFail("expected no change, got \(change)")
+        })
+        // Expect notification for "intCol" keyPath when "intCol" is modified
+        let token1 = object.observe(keyPaths: ["intCol"], expectChange("intCol", 1, 2))
+        
+        // TODO: Expect notification when object property is modified
+        // TODO: Expect no notification when object property is modified outside of keypath
+
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write {
+                realm.objects(SwiftObject.self).first!.intCol = 2
+            }
+        }
+
+        waitForExpectations(timeout: 1)
+        token0.invalidate()
+        token1.invalidate()
+    }
+
     func testListPropertyNotifications() {
         let realm = try! Realm()
         realm.beginWrite()
@@ -713,6 +808,78 @@ class ObjectTests: TestCase {
 
         waitForExpectations(timeout: 2)
         token.invalidate()
+    }
+    
+    func testListPropertyKeyPathNotifications() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let object = realm.create(SwiftOwnerObject.self, value: ["intCol": 2])
+        try! realm.commitWrite()
+
+        var token0: NotificationToken
+        var token1: NotificationToken
+
+        // Expect no notification for property outside of List key path
+        token0 = object.observe(keyPaths: ["objects"], expectNoChange("intCol", 1, 2))
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write {
+                let obj = realm.objects(SwiftOwnerObject.self).first!
+                obj.intCol = 2
+            }
+        }
+        realm.refresh()
+        // !!!: Is delaying 1 second too long?
+        waitForExpectations(timeout: 1)
+        token0.invalidate()
+        
+        // Expect notification for List key path when object is appended
+        token0 = object.observe(keyPaths: ["objects"], expectChange("objects", Int?.none, Int?.none))
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write {
+                let parent = realm.objects(SwiftOwnerObject.self).filter("intCol == 2").first!
+                let child = realm.create(SwiftDogObject.self, value: ["dogName": "fido"])
+                parent.objects.append(child)
+            }
+        }
+        realm.refresh()
+        waitForExpectations(timeout: 0)
+        token0.invalidate()
+        
+        // Expect notification for List<SwiftRecursiveObject>.intCol because it's within key path
+        token0 = object.observe(keyPaths: ["objects.intCol"], expectChange("intCol", 1, 3))
+        // Expect no notification for List<SwiftRecursiveObject>.boolCol because boolCol is not changed.
+        token1 = object.observe(keyPaths: ["objects.boolCol"], expectNoChange("intCol", 1, 3))
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write {
+                let obj = realm.objects(SwiftOwnerObject.self).filter("intCol == 2").first!
+                obj.dog!.intCol = 3
+            }
+        }
+        realm.refresh()
+        waitForExpectations(timeout: 0.5)
+        token0.invalidate()
+        token1.invalidate()
+        
+        // Expect notification for List<SwiftRecursiveObject>.intCol when object is reassigned with different values
+        token0 = object.observe(keyPaths: ["objects.intCol"], expectChange("intCol", 3, 1))
+        // Expect notification for List<SwiftRecursiveObject>.boolCol when object is reassigned with different values.
+        token1 = object.observe(keyPaths: ["objects.boolCol"], expectChange("boolCol", false, true))
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write {
+                let obj = realm.objects(SwiftOwnerObject.self).filter("intCol == 2").first!
+                obj.objects[0] = realm.create(SwiftDogObject.self, value: ["boolCol": true])
+            }
+        }
+        realm.refresh()
+        waitForExpectations(timeout: 0.5)
+        token0.invalidate()
+        token1.invalidate()
+        
+        // !!!: What about object reassigned with the same values?
     }
 
     func testOptionalPropertyNotifications() {
@@ -750,6 +917,64 @@ class ObjectTests: TestCase {
             try! realm.write {
                 realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = 3
             }
+        }
+        realm.refresh()
+        waitForExpectations(timeout: 0)
+        token.invalidate()
+    }
+    
+    // !!!: How awful is using "KPF" shorthand in these test names?
+    func testKPFOptionalProperty() {
+        let realm = try! Realm()
+        let object = SwiftOptionalDefaultValuesObject()
+        try! realm.write({
+            realm.add(object)
+        })
+        
+        // Expect notification for change on observed path
+        var token = object.observe(keyPaths: ["optIntCol"], expectChange("optIntCol", 1, 2))
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write({
+                realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = 2
+            })
+        }
+        realm.refresh()
+        waitForExpectations(timeout: 0)
+        token.invalidate()
+        
+        // Expect no notification for change outside of observed path
+        token = object.observe(keyPaths: ["optStringCol"], expectNoChange("optIntCol", 2, 3))
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write({
+                realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = 2
+            })
+        }
+        realm.refresh()
+        // !!!: Is delaying 1 second too long?
+        waitForExpectations(timeout: 1)
+        token.invalidate()
+        
+        // Expect notification for change from value to nil on observed path
+        token = object.observe(keyPaths: ["optIntCol"], expectChange("optIntCol", 2, Int?.none))
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write({
+                realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = 2
+            })
+        }
+        realm.refresh()
+        waitForExpectations(timeout: 0)
+        token.invalidate()
+        
+        // Expect notification for change from nil to value on observed path
+        token = object.observe(keyPaths: ["optIntCol"], expectChange("optIntCol", Int?.none, 2))
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write({
+                realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = 2
+            })
         }
         realm.refresh()
         waitForExpectations(timeout: 0)
@@ -813,6 +1038,8 @@ class ObjectTests: TestCase {
         token2.invalidate()
         queue.sync { }
     }
+    
+    // MARK: Equality Tests
 
     func testEqualityForObjectTypeWithPrimaryKey() {
         let realm = try! Realm()
@@ -923,6 +1150,8 @@ class ObjectTests: TestCase {
         // Shouldn't throw when using type(of:).
         XCTAssertEqual(realm.objects(type(of: managedStringObject)).count, 1)
     }
+    
+    // MARK: Frozen Objects Tests
 
     func testIsFrozen() {
         let obj = SwiftStringObject()

@@ -421,7 +421,8 @@ extension RealmCollection {
     public func _observe<S>(on queue: DispatchQueue? = nil, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
             // FIXME: we could skip some pointless work in converting the changeset to the Swift type here
-            return observe(on: queue) { change in
+        // !!!: Couldn't have default argument in RealmCollection.observe
+        return observe(keyPaths: nil, on: queue) { change in
                 switch change {
                 case .initial(let collection):
                     _ = subscriber.receive(collection)
@@ -435,7 +436,7 @@ extension RealmCollection {
 
     /// :nodoc:
     public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
-        return observe(on: nil) { _ in _ = subscriber.receive() }
+        return observe(keyPaths: nil, on: nil) { _ in _ = subscriber.receive() }
     }
 }
 
@@ -1262,7 +1263,7 @@ public enum RealmPublishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let token = self.collection.observe(on: self.queue) { change in
+            let token = self.collection.observe(keyPaths: nil, on: self.queue) { change in
                 _ = subscriber.receive(change)
             }
             subscriber.receive(subscription: ObservationSubscription(token: token))
@@ -1340,7 +1341,7 @@ public enum RealmPublishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let token = self.collection.observe(on: self.queue) { change in
+            let token = self.collection.observe(keyPaths: nil, on: self.queue) { change in
                 _ = subscriber.receive(change)
             }
             tokenParent[keyPath: tokenKeyPath] = token

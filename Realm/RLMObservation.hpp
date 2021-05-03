@@ -29,6 +29,8 @@ class RLMSchemaInfo;
 namespace realm {
     class History;
     class SharedGroup;
+    class TableKey;
+    class ColKey;
 }
 
 // RLMObservationInfo stores all of the KVO-related data for RLMObjectBase and
@@ -179,3 +181,7 @@ private:
 std::vector<realm::BindingContext::ObserverState> RLMGetObservedRows(RLMSchemaInfo const& schema);
 void RLMWillChange(std::vector<realm::BindingContext::ObserverState> const& observed, std::vector<void *> const& invalidated);
 void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& observed, std::vector<void *> const& invalidated);
+
+using RLMKeyPath = std::vector<std::pair<realm::TableKey, realm::ColKey>>;
+RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema, RLMClassInfo *info, NSString *keyPath);
+

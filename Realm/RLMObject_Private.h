@@ -57,6 +57,7 @@ typedef void (^RLMObjectNotificationCallback)(RLMObjectBase *_Nullable object,
                                               NSError *_Nullable error);
 
 FOUNDATION_EXTERN RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
+                                                                          NSArray<NSString *> *_Nullable key_paths,
                                                                           dispatch_queue_t _Nullable queue,
                                                                           RLMObjectNotificationCallback block);
 RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjectChangeBlock block,

@@ -62,7 +62,8 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
+//        .package(url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
+        .package(url: "https://github.com/realm/realm-core", .branch("df/keypath-filtering-for-change-notifications"))
     ],
     targets: [
       .target(
@@ -189,7 +190,8 @@ let package = Package(
                  "SwiftSyncTestCase.swift",
                  "TimeoutProxyServer.swift",
                  "WatchTestUtility.swift",
-                 "RealmServer.swift"
+                 "RealmServer.swift",
+                "../RLMArray.mm"
             ]
         ),
         .testTarget(
@@ -209,7 +211,8 @@ let package = Package(
             sources: [
                 "RLMBSONTests.mm",
                 "RLMObjectServerTests.mm",
-                "RLMWatchTestUtility.m"
+                "RLMWatchTestUtility.m",
+                "../RLMArray.mm"
             ],
             cxxSettings: testCxxSettings
         )

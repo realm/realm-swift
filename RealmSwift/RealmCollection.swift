@@ -476,11 +476,12 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    func observe(on queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
+    func observe(keyPaths: [String]?, on queue: DispatchQueue?,
+                  _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
 
     /// :nodoc:
     // swiftlint:disable:next identifier_name
-    func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
+    func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 
     // MARK: Frozen Objects
 
@@ -661,7 +662,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func value(forKeyPath keyPath: String) -> Any? { fatalError() }
     func setValue(_ value: Any?, forKey key: String) { fatalError() }
     // swiftlint:disable:next identifier_name
-    func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
+    func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
     class func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self { fatalError() }
     var bridged: (objectiveCValue: Any, metadata: Any?) { fatalError() }
@@ -767,8 +768,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     // MARK: Notifications
 
     /// :nodoc:
-    override func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
-        -> NotificationToken { return base._observe(queue, block) }
+    override func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
+        -> NotificationToken { return base._observe(keyPaths, queue, block) }
 
     // MARK: AssistedObjectiveCBridgeable
 
@@ -800,6 +801,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
  Instances of `RealmCollection` forward operations to an opaque underlying collection having the same `Element` type.
  */
 public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection {
+    
 
     /// The type of the objects contained within the collection.
     public typealias ElementType = Element
@@ -1055,20 +1057,18 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
 
      You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
      updates, call `invalidate()` on the token.
-
      - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
-
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe(on queue: DispatchQueue? = nil,
+    public func observe(keyPaths: [String]? = nil, on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
-        -> NotificationToken { return base._observe(queue, block) }
+    -> NotificationToken { return base._observe(keyPaths, queue, block) }
 
     /// :nodoc:
     // swiftlint:disable:next identifier_name
-    public func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
-        -> NotificationToken { return base._observe(queue, block) }
+    public func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
+    -> NotificationToken { return base._observe(keyPaths, queue, block) }
 
     // MARK: Frozen Objects
 
