@@ -605,6 +605,15 @@ RLM_COLLECTION_TYPE(PrimaryIntObject);
 
 @end
 
+#pragma mark IntegerDictionaryPropertyObject
+
+@interface IntegerDictionaryPropertyObject : RLMObject
+
+@property NSInteger number;
+@property RLM_GENERIC_DICTIONARY(RLMString, IntObject) *dictionary;
+
+@end
+
 @interface NumberObject : RLMObject
 @property NSNumber<RLMInt> *intObj;
 @property NSNumber<RLMFloat> *floatObj;

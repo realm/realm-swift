@@ -382,6 +382,10 @@
 @implementation IntegerSetPropertyObject
 @end
 
+#pragma mark IntegerDictionaryPropertyObject
+
+@implementation IntegerDictionaryPropertyObject
+@end
 
 @implementation NumberObject
 @end
