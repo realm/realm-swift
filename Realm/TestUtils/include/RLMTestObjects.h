@@ -353,7 +353,16 @@ RLM_COLLECTION_TYPE(AllTypesObject)
 @property RLMDictionary<RLMString, RLMDecimal128> *decimalObj;
 @property RLMDictionary<RLMString, RLMObjectId> *objectIdObj;
 @property RLMDictionary<RLMString, RLMUUID> *uuidObj;
-@property RLMDictionary<RLMString, RLMValue> *anyObj;
+@property RLMDictionary<RLMString, RLMValue> *anyBoolObj;
+@property RLMDictionary<RLMString, RLMValue> *anyIntObj;
+@property RLMDictionary<RLMString, RLMValue> *anyFloatObj;
+@property RLMDictionary<RLMString, RLMValue> *anyDoubleObj;
+@property RLMDictionary<RLMString, RLMValue> *anyStringObj;
+@property RLMDictionary<RLMString, RLMValue> *anyDataObj;
+@property RLMDictionary<RLMString, RLMValue> *anyDateObj;
+@property RLMDictionary<RLMString, RLMValue> *anyDecimalObj;
+@property RLMDictionary<RLMString, RLMValue> *anyObjectIdObj;
+@property RLMDictionary<RLMString, RLMValue> *anyUUIDObj;
 @end
 
 @interface AllOptionalPrimitiveDictionaries : RLMObject

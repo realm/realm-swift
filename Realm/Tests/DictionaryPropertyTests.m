@@ -1143,26 +1143,26 @@
     
     // Assigning NSDictionary shallow copies
     dict1.intDictionary = (id)@{@"io1": io1, @"io2": io2};
-    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"self"], (@{@"io1": io1, @"io2": io2}));
+    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"io1"], io1);
     
     [dict1 setValue:@{@"io1": io1, @"io3": io3} forKey:@"intDictionary"];
-    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"self"], (@{@"io1": io1, @"io3": io3}));
+    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"io3"], io3);
     
     dict1[@"intDictionary"] = @{@"io2": io2, @"io3": io3};
-    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"self"], (@{@"io2": io2, @"io3": io3}));
-    
+    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"io3"], io3);
+
     // Assigning RLMDictionary shallow copies
     dict2.intDictionary = dict1.intDictionary;
-    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"self"], (@{@"io2": io2, @"io3": io3}));
-    
+    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io3"], io3);
+
     [dict1.intDictionary removeAllObjects];
-    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"self"], (@{@"io2": io2, @"io3": io3}));
-    
+    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io3"], io3);
+
     // Self-assignment is a no-op
     dict2.intDictionary = dict2.intDictionary;
-    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"self"], (@{@"io2": io2, @"io3": io3}));
+    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io3"], io3);
     dict2[@"intDictionary"] = dict2[@"intDictionary"];
-    XCTAssertEqualObjects([dict2[@"intDictionary"] valueForKey:@"self"], (@{@"io2": io2, @"io3": io3}));
+    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io3"], io3);
 }
 
 - (void)testManagedAssignment {
@@ -1178,26 +1178,26 @@
 
     // Assigning NSDictonary shallow copies
     dict1.intDictionary = (id)@{@"io1": io1, @"io2": io2};
-    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"intCol"], (@{@"io1": io1, @"io2": io2}));
+    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"io1"], io1);
     
     [dict1 setValue:@{@"io1": io1, @"io3": io3} forKey:@"intDictionary"];
-    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"intCol"], (@{@"io1": io1, @"io3": io3}));
+    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"io3"], io3);
     
     dict1[@"intDictionary"] = @{@"io2": io2, @"io3": io3};
-    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"intCol"], (@{@"io2": io2, @"io3": io3}));
+    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"io2"], io2);
     
     // Assigning RLMDictionary shallow copies
     dict2.intDictionary = dict1.intDictionary;
-    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"intCol"], (@{@"io2": io2, @"io3": io3}));
+    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io2"], io2);
     
     [dict1.intDictionary removeAllObjects];
-    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"intCol"], (@{@"io2": io2, @"io3": io3}));
+    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io2"], io2);
     
     // Self-assignment is a no-op
     dict2.intDictionary = dict2.intDictionary;
-    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"intCol"], (@{@"io2": io2, @"io3": io3}));
+    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io2"], io2);
     dict2[@"intDictionary"] = dict2[@"intDictionary"];
-    XCTAssertEqualObjects([dict2[@"intDictionary"] valueForKey:@"intCol"], (@{@"io2": io2, @"io3": io3}));
+    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io2"], io2);
 
     [realm cancelWriteTransaction];
 }
@@ -1209,9 +1209,9 @@
                                                                    withValue:@{@"stringDictionary": @{@"a": [[StringObject alloc] initWithValue:@[@"a"]]}}];
 
     RLMAssertThrowsWithReason(dict.intDictionary = (id)dict.stringDictionary,
-                              @"RLMDictionary<string, StringObject> does not match expected type 'IntObject' for property 'DictionaryPropertyObject.intDictionary'.");
+                              @"RLMDictionary<string, StringObject> does not match expected type RLMDictionary<string, IntObject> for property 'DictionaryPropertyObject.intDictionary'.");
     RLMAssertThrowsWithReason(dict[@"intDictionary"] = dict[@"stringDictionary"],
-                              @"RLMDictionary<string, StringObject> does not match expected type 'IntObject' for property 'DictionaryPropertyObject.intDictionary'.");
+                              @"RLMDictionary<string, StringObject> does not match expected type RLMDictionary<string, IntObject> for property 'DictionaryPropertyObject.intDictionary'.");
     [realm cancelWriteTransaction];
 }
 
@@ -1370,17 +1370,12 @@ static RLMDictionary<NSString *, IntObject *> *managedTestDictionary() {
     [self dispatchAsyncAndWait:^{
         RLMAssertThrowsWithReasonMatching([dict count], @"thread");
         RLMAssertThrowsWithReasonMatching([dict objectForKey:@"thread"], @"thread");
-        RLMAssertThrowsWithReasonMatching([dict firstObject], @"thread");
-        RLMAssertThrowsWithReasonMatching([dict lastObject], @"thread");
         
         RLMAssertThrowsWithReasonMatching([dict setObject:io forKey:@"thread"], @"thread");
         RLMAssertThrowsWithReasonMatching([dict removeObjectForKey:@"thread"], @"thread");
         RLMAssertThrowsWithReasonMatching([dict setObject:nil forKey:@"thread"], @"thread");
         RLMAssertThrowsWithReasonMatching([dict removeAllObjects], @"thread");
-        
-        RLMAssertThrowsWithReasonMatching([dict indexOfObject:[IntObject allObjects].firstObject], @"thread");
-        RLMAssertThrowsWithReasonMatching([dict indexOfObjectWhere:@"intCol = 0"], @"thread");
-        RLMAssertThrowsWithReasonMatching([dict indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
+
         RLMAssertThrowsWithReasonMatching([dict objectsWhere:@"intCol = 0"], @"thread");
         RLMAssertThrowsWithReasonMatching([dict objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
         RLMAssertThrowsWithReasonMatching([dict sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"thread");
@@ -1388,7 +1383,6 @@ static RLMDictionary<NSString *, IntObject *> *managedTestDictionary() {
         RLMAssertThrowsWithReasonMatching(dict[@"thread"], @"thread");
         RLMAssertThrowsWithReasonMatching(dict[@"thread"] = io, @"thread");
         RLMAssertThrowsWithReasonMatching([dict valueForKey:@"intCol"], @"thread");
-        RLMAssertThrowsWithReasonMatching([dict setValue:@1 forKey:@"intCol"], @"thread");
         RLMAssertThrowsWithReasonMatching({for (__unused id obj in dict);}, @"thread");
     }];
     [realm cancelWriteTransaction];
@@ -1403,17 +1397,12 @@ static RLMDictionary<NSString *, IntObject *> *managedTestDictionary() {
     
     RLMAssertThrowsWithReasonMatching([dict count], @"thread");
     RLMAssertThrowsWithReasonMatching([dict objectForKey:@"thread"], @"thread");
-    RLMAssertThrowsWithReasonMatching([dict firstObject], @"thread");
-    RLMAssertThrowsWithReasonMatching([dict lastObject], @"thread");
     
     RLMAssertThrowsWithReasonMatching([dict setObject:io forKey:@"thread"], @"thread");
     RLMAssertThrowsWithReasonMatching([dict removeObjectForKey:@"thread"], @"thread");
     RLMAssertThrowsWithReasonMatching([dict setObject:nil forKey:@"thread"], @"thread");
     RLMAssertThrowsWithReasonMatching([dict removeAllObjects], @"thread");
 
-    RLMAssertThrowsWithReasonMatching([dict indexOfObject:[IntObject allObjects].firstObject], @"thread");
-    RLMAssertThrowsWithReasonMatching([dict indexOfObjectWhere:@"intCol = 0"], @"thread");
-    RLMAssertThrowsWithReasonMatching([dict indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
     RLMAssertThrowsWithReasonMatching([dict objectsWhere:@"intCol = 0"], @"thread");
     RLMAssertThrowsWithReasonMatching([dict objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
     RLMAssertThrowsWithReasonMatching([dict sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"thread");
@@ -1430,8 +1419,6 @@ static RLMDictionary<NSString *, IntObject *> *managedTestDictionary() {
     
     XCTAssertNoThrow([dict count]);
     XCTAssertNoThrow([dict objectForKey:@"0"]);
-    XCTAssertNoThrow([dict firstObject]);
-    XCTAssertNoThrow([dict lastObject]);
     
     XCTAssertNoThrow([dict setObject:io forKey:@"thread"]);
     XCTAssertNoThrow([dict removeObjectForKey:@"thread"]);
@@ -1441,10 +1428,7 @@ static RLMDictionary<NSString *, IntObject *> *managedTestDictionary() {
     [dict setDictionary:@{@"0": io, @"1": io, @"2": io}];
     XCTAssertNoThrow([dict setObject:io forKey:@"0"]);
     XCTAssertNoThrow([dict setObject:[dict objectForKey:@"1"] forKey:@"0"]);
-    
-    XCTAssertNoThrow([dict indexOfObject:[IntObject allObjects].firstObject]);
-    XCTAssertNoThrow([dict indexOfObjectWhere:@"intCol = 0"]);
-    XCTAssertNoThrow([dict indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+
     XCTAssertNoThrow([dict objectsWhere:@"intCol = 0"]);
     XCTAssertNoThrow([dict objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
     XCTAssertNoThrow([dict sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
@@ -1466,17 +1450,12 @@ static RLMDictionary<NSString *, IntObject *> *managedTestDictionary() {
     
     RLMAssertThrowsWithReasonMatching([dict count], @"invalidated");
     RLMAssertThrowsWithReasonMatching([dict objectForKey:@"0"], @"invalidated");
-    RLMAssertThrowsWithReasonMatching([dict firstObject], @"invalidated");
-    RLMAssertThrowsWithReasonMatching([dict lastObject], @"invalidated");
     
     RLMAssertThrowsWithReasonMatching([dict setObject:io forKey:@"thread"], @"invalidated");
     RLMAssertThrowsWithReasonMatching([dict removeObjectForKey:@"thread"], @"invalidated");
     RLMAssertThrowsWithReasonMatching([dict setObject:nil forKey:@"thread"], @"invalidated");
     RLMAssertThrowsWithReasonMatching([dict removeAllObjects], @"invalidated");
-    
-    RLMAssertThrowsWithReasonMatching([dict indexOfObject:[IntObject allObjects].firstObject], @"invalidated");
-    RLMAssertThrowsWithReasonMatching([dict indexOfObjectWhere:@"intCol = 0"], @"invalidated");
-    RLMAssertThrowsWithReasonMatching([dict indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"invalidated");
+
     RLMAssertThrowsWithReasonMatching([dict objectsWhere:@"intCol = 0"], @"invalidated");
     RLMAssertThrowsWithReasonMatching([dict objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"invalidated");
     RLMAssertThrowsWithReasonMatching([dict sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"invalidated");
@@ -1500,12 +1479,7 @@ static RLMDictionary<NSString *, IntObject *> *managedTestDictionary() {
     
     XCTAssertNoThrow([dict count]);
     XCTAssertNoThrow([dict objectForKey:@"0"]);
-    XCTAssertNoThrow([dict firstObject]);
-    XCTAssertNoThrow([dict lastObject]);
-    
-    XCTAssertNoThrow([dict indexOfObject:[IntObject allObjects].firstObject]);
-    XCTAssertNoThrow([dict indexOfObjectWhere:@"intCol = 0"]);
-    XCTAssertNoThrow([dict indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
+
     XCTAssertNoThrow([dict objectsWhere:@"intCol = 0"]);
     XCTAssertNoThrow([dict objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
     XCTAssertNoThrow([dict sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
@@ -1520,7 +1494,7 @@ static RLMDictionary<NSString *, IntObject *> *managedTestDictionary() {
     RLMAssertThrowsWithReasonMatching([dict removeAllObjects], @"write transaction");
 
     RLMAssertThrowsWithReasonMatching(dict[@"0"] = io, @"write transaction");
-    RLMAssertThrowsWithReasonMatching([dict setValue:@1 forKey:@"intCol"], @"write transaction");
+    RLMAssertThrowsWithReasonMatching([dict setValue:io forKey:@"intCol"], @"write transaction");
 }
 
 - (void)testIsFrozen {
@@ -1549,7 +1523,7 @@ static RLMDictionary<NSString *, IntObject *> *managedTestDictionary() {
 - (void)testAccessFrozenFromDifferentThread {
     RLMDictionary *frozen = [managedTestDictionary() freeze];
     [self dispatchAsyncAndWait:^{
-        XCTAssertEqualObjects([frozen valueForKey:@"intCol"], (@[@0, @1]));
+        XCTAssertEqualObjects(@([[frozen valueForKey:@"0"] intCol]), (@0));
     }];
 }
 

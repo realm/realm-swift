@@ -29,7 +29,47 @@ types = [
   ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'dateObj', ['@"key1"', '@"key2"'], ['date(1)', 'NSNull.null'], {'o', 'minmax', 'unman', 'date'}],
   ['AllPrimitiveDictionaries', 'managed', 'dateObj', ['@"key1"', '@"key2"'], ['date(1)', 'date(2)'], {'r', 'minmax', 'man', 'date'}],
   ['AllOptionalPrimitiveDictionaries', 'optManaged', 'dateObj', ['@"key1"', '@"key2"'], ['date(1)', 'NSNull.null'], {'o', 'minmax', 'man', 'date'}],
-
+  # Float
+  ['AllPrimitiveDictionaries', 'unmanaged', 'floatObj', ['@"key1"', '@"key2"'], ['@2.2f', '@3.3f'], {'r', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'floatObj', ['@"key1"', '@"key2"'], ['@2.2f', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveDictionaries', 'managed', 'floatObj', ['@"key1"', '@"key2"'], ['@2.2f', '@3.3f'], {'r', 'minmax', 'sum', 'avg'}],
+  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'floatObj', ['@"key1"', '@"key2"'], ['@2.2f', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg'}],
+  # Double
+  ['AllPrimitiveDictionaries', 'unmanaged', 'doubleObj', ['@"key1"', '@"key2"'], ['@2.2', '@3.3'], {'r', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'doubleObj', ['@"key1"', '@"key2"'], ['@2.2', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveDictionaries', 'managed', 'doubleObj', ['@"key1"', '@"key2"'], ['@2.2', '@3.3'], {'r', 'minmax', 'sum', 'avg'}],
+  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'doubleObj', ['@"key1"', '@"key2"'], ['@2.2', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg'}],
+  # Data
+  ['AllPrimitiveDictionaries', 'unmanaged', 'dataObj', ['@"key1"', '@"key2"'], ['data(1)', 'data(2)'], {'r', 'unman'}],
+  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'dataObj', ['@"key1"', '@"key2"'], ['data(1)', 'NSNull.null'], {'o', 'unman'}],
+  ['AllPrimitiveDictionaries', 'managed', 'dataObj', ['@"key1"', '@"key2"'], ['data(1)', 'data(2)'], {'r'}],
+  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'dataObj', ['@"key1"', '@"key2"'], ['data(1)', 'NSNull.null'], {'o'}],
+  # Double
+  ['AllPrimitiveDictionaries', 'unmanaged', 'decimalObj', ['@"key1"', '@"key2"'], ['decimal128(2)', 'decimal128(3)'], {'r', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'decimalObj', ['@"key1"', '@"key2"'], ['decimal128(2)', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveDictionaries', 'managed', 'decimalObj', ['@"key1"', '@"key2"'], ['decimal128(2)', 'decimal128(3)'], {'r', 'minmax', 'sum', 'avg'}],
+  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'decimalObj', ['@"key1"', '@"key2"'], ['decimal128(2)', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg'}],
+  # ObjectId
+  ['AllPrimitiveDictionaries', 'unmanaged', 'objectIdObj', ['@"key1"', '@"key2"'], ['objectId(1)', 'objectId(2)'], {'r', 'unman'}],
+  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'objectIdObj', ['@"key1"', '@"key2"'], ['objectId(1)', 'NSNull.null'], {'o', 'unman'}],
+  ['AllPrimitiveDictionaries', 'managed', 'objectIdObj', ['@"key1"', '@"key2"'], ['objectId(1)', 'objectId(2)'], {'r'}],
+  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'objectIdObj', ['@"key1"', '@"key2"'], ['objectId(1)', 'NSNull.null'], {'o'}],
+  # UUID
+  ['AllPrimitiveDictionaries', 'unmanaged', 'uuidObj', ['@"key1"', '@"key2"'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], {'r', 'unman'}],
+  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'uuidObj', ['@"key1"', '@"key2"'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'NSNull.null'], {'o', 'unman'}],
+  ['AllPrimitiveDictionaries', 'managed', 'uuidObj', ['@"key1"', '@"key2"'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], {'r'}],
+  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'uuidObj', ['@"key1"', '@"key2"'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'NSNull.null'], {'o'}],
+  # Mixed
+  ['AllPrimitiveDictionaries', 'unmanaged', 'anyBoolObj', ['@"key1"', '@"key2"'], ['@NO', '@YES'], {'any', 'unman'}],
+  ['AllPrimitiveDictionaries', 'unmanaged', 'anyIntObj', ['@"key1"', '@"key2"'], ['@2', '@3'], {'any', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveDictionaries', 'unmanaged', 'anyFloatObj', ['@"key1"', '@"key2"'], ['@2.2f', '@3.3f'], {'any', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveDictionaries', 'unmanaged', 'anyDoubleObj', ['@"key1"', '@"key2"'], ['@2.2', '@3.3'], {'any', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveDictionaries', 'unmanaged', 'anyStringObj', ['@"key1"', '@"key2"'], ['@"a"', '@"b"'], {'any', 'unman', 'string'}],
+  ['AllPrimitiveDictionaries', 'unmanaged', 'anyDataObj', ['@"key1"', '@"key2"'], ['data(1)', 'data(2)'], {'any', 'unman'}],
+  ['AllPrimitiveDictionaries', 'unmanaged', 'anyDateObj', ['@"key1"', '@"key2"'], ['date(1)', 'date(2)'], {'any', 'minmax', 'unman', 'date'}],
+  ['AllPrimitiveDictionaries', 'unmanaged', 'anyDecimalObj', ['@"key1"', '@"key2"'], ['decimal128(2)', 'decimal128(3)'], {'any', 'minmax', 'sum', 'avg', 'unman'}],
+  ['AllPrimitiveDictionaries', 'unmanaged', 'anyObjectIdObj', ['@"key1"', '@"key2"'], ['objectId(1)', 'objectId(2)'], {'any', 'unman'}],
+  ['AllPrimitiveDictionaries', 'unmanaged', 'anyUUIDObj', ['@"key1"', '@"key2"'], ['uuid(@"00000000-0000-0000-0000-000000000000")', 'uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")'], ['any','unman']],
 ]
 
 def type_name(propertyName, optional):
