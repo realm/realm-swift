@@ -881,8 +881,7 @@ import Realm.Private
      and a new read transaction is implicitly begun the next time data is read from the Realm.
 
      Calling this method multiple times in a row without reading any data from the
-     Realm, or before ever reading any data from the Realm, is a no-op. This method
-     may not be called on a read-only Realm.
+     Realm, or before ever reading any data from the Realm, is a no-op.
      */
     public func invalidate() {
         rlmRealm.invalidate()

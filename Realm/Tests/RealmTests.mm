@@ -1252,14 +1252,20 @@
     XCTAssertThrows([array count]);
 }
 
-- (void)testInvalidateOnReadOnlyRealmIsError
+- (void)testInvalidateOnReadOnlyRealm
 {
     @autoreleasepool {
-        // Create the file
-        [self realmWithTestPath];
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm transactionWithBlock:^{
+            [IntObject createInRealm:realm withValue:@[@0]];
+        }];
     }
     RLMRealm *realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
-    XCTAssertThrows([realm invalidate]);
+    IntObject *io = [[IntObject allObjectsInRealm:realm] firstObject];
+    [realm invalidate];
+    XCTAssertTrue(io.isInvalidated);
+    // Starts a new read transaction
+    XCTAssertFalse([[[IntObject allObjectsInRealm:realm] firstObject] isInvalidated]);
 }
 
 - (void)testInvalidateBeforeReadDoesNotAssert

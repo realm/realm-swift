@@ -1,11 +1,41 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Realms opened in read-only mode can now be invalidated (although it is
+  unlikely to be useful to do so).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Fix an availability warning when building Realm. The code path which gave the
+  warning can not currently be hit, so this did not cause any runtime problems
+  ([#7219](https://github.com/realm/realm-cocoa/issues/7219), since 10.7.3).
+* Proactively check the expiry time on the access token and refresh it before
+  attempting to initiate a sync session. This prevents some error logs from
+  appearing on the client such as: "ERROR: Connection[1]: Websocket: Expected
+  HTTP response 101 Switching Protocols, but received: HTTP/1.1 401
+  Unauthorized" ([RCORE-473](https://jira.mongodb.org/browse/RCORE-473), since v10.0.0)
+* Fix a race condition which could result in a skipping notifications failing
+  to skip if several commits using notification skipping were made in
+  succession (since v5.0.0).
+* Fix a crash on exit inside TableRecycler which could happen if Realms were
+  open on background threads when the app exited.
+  ([Core #4600](https://github.com/realm/realm-core/issues/4600), since v5.0.0)
+* Fix errors related to "uncaught exception in notifier thread:
+  N5realm11KeyNotFoundE: No such object" which could happen on sycnronized
+  Realms if a linked object was deleted by another client.
+  ([JS #3611](https://github.com/realm/realm-js/issues/3611), since v10.0.0).
+* Reading a link to an object which has been deleted by a different client via
+  a string-based interface (such as value(forKey:) or the subscript operator on
+  DynamicObject) could return an invalid object rather than nil.
+  ([Core #4687](https://github.com/realm/realm-core/pull/4687), since v10.0.0)
+* Recreate the sync metadata Realm if the encryption key for it is missing from
+  the keychain rather than crashing. This can happen if a device is restored
+  from an unencrypted backup, which restores app data but not the app's
+  keychain entries, and results in all cached logics for sync users being
+  discarded but no data being lost.
+  [Core #4285](https://github.com/realm/realm-core/pull/4285)
+* Thread-safe references can now be created for read-only Realms.
+  ([#5475](https://github.com/realm/realm-cocoa/issues/5475)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -16,7 +46,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v10.6.0 to v10.7.2
 
 10.7.5 Release notes (2021-05-07)
 =============================================================
