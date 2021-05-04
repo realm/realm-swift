@@ -49,9 +49,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Parses the given string to a RLMDecimal128.
 ///
-/// Returns `nil` and sets `error` if the string cannot be parsed as a
-/// RLMDecimal128.
-- (nullable instancetype)initWithString:(NSString *)string error:(NSError *_Nullable*)error;
+/// Returns a decimal where `isNaN` is `YES` if the string cannot be parsed as a decimal. `error` is never set
+/// and this will never actually return `nil`.
+- (nullable instancetype)initWithString:(NSString *)string error:(NSError **)error;
 
 /// Converts the given number to a RLMDecimal128.
 + (instancetype)decimalWithNumber:(NSNumber *)number;

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2021 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,12 @@
 
 #import "AppDelegate.h"
 #import <Realm/Realm.h>
-#import "DataModels.h"
+#import "Example_v0.h"
+#import "Example_v1.h"
+#import "Example_v2.h"
+#import "Example_v3.h"
+#import "Example_v4.h"
+#import "Example_v5.h"
 
 @implementation AppDelegate
 
@@ -27,99 +32,78 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.rootViewController = [[UIViewController alloc] init];
     [self.window makeKeyAndVisible];
+    
+    #if CREATE_EXAMPLES
+    [self addExampleDataToRealm:exampleData];
+    #else
+    [self performMigration];
+    #endif
+    
+    return YES;
+}
 
-    // copy over old data files for migration
+- (void)addExampleDataToRealm:(void (^)(RLMRealm*))examplesData {
+    NSURL *url = [self realmUrlFor:schemaVersion usingTemplate:false];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = url;
+    configuration.schemaVersion = schemaVersion;
+    [RLMRealmConfiguration setDefaultConfiguration:configuration];
+    NSError *error;
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
+    if (error) {
+        @throw [NSException exceptionWithName:@"RLMExampleException" reason:@"Could not open realm." userInfo:nil];
+    }
+    [realm beginWriteTransaction];
+    exampleData(realm);
+    [realm commitWriteTransaction];
+}
+
+// Any version before the current versions will be migrated to check if all version combinations work.
+- (void)performMigration {
+    for (NSInteger oldSchemaVersion = 0; oldSchemaVersion < schemaVersion; oldSchemaVersion++) {
+        NSURL *realmUrl = [self realmUrlFor:oldSchemaVersion usingTemplate:true];
+        RLMRealmConfiguration *realmConfiguration = [RLMRealmConfiguration defaultConfiguration];
+        realmConfiguration.fileURL = realmUrl;
+        realmConfiguration.schemaVersion = schemaVersion;
+        realmConfiguration.migrationBlock = migrationBlock;
+        [RLMRealmConfiguration setDefaultConfiguration:realmConfiguration];
+        NSError *error;
+        [RLMRealm performMigrationForConfiguration:realmConfiguration error:&error];
+        if (error) {
+            @throw [NSException exceptionWithName:@"RLMExampleException" reason:@"Could not migrate realm." userInfo:nil];
+        }
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:realmConfiguration error:&error];
+        if (error) {
+            @throw [NSException exceptionWithName:@"RLMExampleException" reason:@"Could not open realm." userInfo:nil];
+        }
+        migrationCheck(realm);
+    }
+}
+
+- (NSURL*)realmUrlFor:(NSInteger)schemaVersion usingTemplate:(BOOL)usingTemplate {
     NSURL *defaultRealmURL = [RLMRealmConfiguration defaultConfiguration].fileURL;
     NSURL *defaultRealmParentURL = [defaultRealmURL URLByDeletingLastPathComponent];
-    NSURL *v0URL = [[NSBundle mainBundle] URLForResource:@"default-v0" withExtension:@"realm"];
-    [[NSFileManager defaultManager] removeItemAtURL:defaultRealmURL error:nil];
-    [[NSFileManager defaultManager] copyItemAtURL:v0URL toURL:defaultRealmURL error:nil];
-
-    // trying to open an outdated realm file without first registering a new schema version and migration block
-    // with throw
-    @try {
-        [RLMRealm defaultRealm];
+    NSString *fileName = [NSString stringWithFormat:@"default-v%ld", schemaVersion];
+    NSString *fileExtension = @"realm";
+    NSString *fileNameWithExtension = [NSString stringWithFormat:@"%@.%@", fileName, fileExtension];
+    NSURL *destinationUrl = [defaultRealmParentURL URLByAppendingPathComponent:fileNameWithExtension];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:destinationUrl.path]) {
+        NSError *error;
+        [[NSFileManager defaultManager] removeItemAtPath:destinationUrl.path error:&error];
+        if (error) {
+            @throw [NSException exceptionWithName:@"RLMExampleException" reason:@"Could not remove realm file." userInfo:nil];
+        }
     }
-    @catch (NSException *exception) {
-        NSLog(@"Trying to open an outdated realm a migration block threw an exception.");
+    if (usingTemplate) {
+        NSURL *bundleUrl = [[NSBundle mainBundle] URLForResource:fileName withExtension:fileExtension];
+        NSError *error;
+        [[NSFileManager defaultManager] copyItemAtPath:bundleUrl.path toPath:destinationUrl.path error:&error];
+        if (error) {
+            @throw [NSException exceptionWithName:@"RLMExampleException" reason:@"Could not copy realm template to new path." userInfo:nil];
+        }
     }
 
-    // define a migration block
-    // you can define this inline, but we will reuse this to migrate realm files from multiple versions
-    // to the most current version of our data model
-    RLMMigrationBlock migrationBlock = ^(RLMMigration *migration, uint64_t oldSchemaVersion) {
-        if (oldSchemaVersion < 1) {
-            [migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {
-                if (oldSchemaVersion < 1) {
-                    // combine name fields into a single field
-                    newObject[@"fullName"] = [NSString stringWithFormat:@"%@ %@", oldObject[@"firstName"], oldObject[@"lastName"]];
-                }
-            }];
-        }
-        if (oldSchemaVersion < 2) {
-            [migration enumerateObjects:Person.className block:^(RLMObject *oldObject, RLMObject *newObject) {
-                // give JP a dog
-                if ([newObject[@"fullName"] isEqualToString:@"JP McDonald"]) {
-                    Pet *jpsDog = [[Pet alloc] initWithValue:@[@"Jimbo", @(AnimalTypeDog)]];
-                    [newObject[@"pets"] addObject:jpsDog];
-                }
-            }];
-        }
-        if (oldSchemaVersion < 3) {
-            [migration enumerateObjects:Pet.className block:^(RLMObject *oldObject, RLMObject *newObject) {
-                // convert type string to type enum if we have outdated Pet object
-                if (oldObject && oldObject.objectSchema[@"type"].type == RLMPropertyTypeString) {
-                    newObject[@"type"] = @([Pet animalTypeForString:oldObject[@"type"]]);
-                }
-            }];
-        }
-        NSLog(@"Migration complete.");
-    };
-
-    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-
-    // set the schema verion and migration block for the defualt realm
-    configuration.schemaVersion = 3;
-    configuration.migrationBlock = migrationBlock;
-
-    [RLMRealmConfiguration setDefaultConfiguration:configuration];
-
-    // now that we have set a schema version and migration block for the configuration,
-    // performing the migration and opening the Realm will succeed
-    [RLMRealm defaultRealm];
-
-    // print out all migrated objects in the default realm
-    NSLog(@"Migrated objects in the default Realm: %@", [[Person allObjects] description]);
-
-    //
-    // Migrate other Realm versions
-    //
-    NSURL *v1URL = [[NSBundle mainBundle] URLForResource:@"default-v1" withExtension:@"realm"];
-    NSURL *v2URL = [[NSBundle mainBundle] URLForResource:@"default-v2" withExtension:@"realm"];
-    NSURL *realmv1URL = [defaultRealmParentURL URLByAppendingPathComponent:@"default-v1.realm"];
-    NSURL *realmv2URL = [defaultRealmParentURL URLByAppendingPathComponent:@"default-v2.realm"];
-    [[NSFileManager defaultManager] removeItemAtURL:realmv1URL error:nil];
-    [[NSFileManager defaultManager] copyItemAtURL:v1URL toURL:realmv1URL error:nil];
-    [[NSFileManager defaultManager] removeItemAtURL:realmv2URL error:nil];
-    [[NSFileManager defaultManager] copyItemAtURL:v2URL toURL:realmv2URL error:nil];
-
-    // set schemave versions and migration blocks form Realms at each path
-    RLMRealmConfiguration *realmv1Configuration = [configuration copy];
-    realmv1Configuration.fileURL = realmv1URL;
-
-    RLMRealmConfiguration *realmv2Configuration = [configuration copy];
-    realmv2Configuration.fileURL = realmv2URL;
-
-    // manully migration v1Path, v2Path is migrated implicitly on access
-    [RLMRealm performMigrationForConfiguration:realmv1Configuration error:nil];
-
-    // print out all migrated objects in the migrated realms
-    RLMRealm *realmv1 = [RLMRealm realmWithConfiguration:realmv1Configuration error:nil];
-    NSLog(@"Migrated objects in the Realm migrated from v1: %@", [[Person allObjectsInRealm:realmv1] description]);
-    RLMRealm *realmv2 = [RLMRealm realmWithConfiguration:realmv2Configuration error:nil];
-    NSLog(@"Migrated objects in the Realm migrated from v2: %@", [[Person allObjectsInRealm:realmv2] description]);
-
-    return YES;
+    return destinationUrl;
 }
 
 @end

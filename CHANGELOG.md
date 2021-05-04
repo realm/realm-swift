@@ -23,6 +23,146 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Internal
 * Upgraded realm-core from ? to ?
 
+10.7.4 Release notes (2021-04-26)
+=============================================================
+
+### Enhancements
+
+* Add Xcode 12.5 binaries to the release package.
+
+### Fixed
+
+* Add the Info.plist file to the XCFrameworks in the Carthage xcframwork
+  package ([#7216](https://github.com/realm/realm-cocoa/issues/7216), since 10.7.3).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
+
+10.7.3 Release notes (2021-04-22)
+=============================================================
+
+### Enhancements
+
+* Package a prebuilt XCFramework for Carthage. Carthage 0.38 and later will
+  download this instead of the old frameworks when using `--use-xcframeworks`.
+* We now make a backup of the realm file prior to any file format upgrade. The
+  backup is retained for 3 months. Backups from before a file format upgrade
+  allows for better analysis of any upgrade failure. We also restore a backup,
+  if a) an attempt is made to open a realm file whith a "future" file format
+  and b) a backup file exist that fits the current file format.
+  ([Core #4166](https://github.com/realm/realm-core/pull/4166))
+* The error message when the intial steps of opening a Realm file fails is now
+  more descriptive.
+* Make conversion of Decimal128 to/from string work for numbers with more than
+  19 significant digits. This means that Decimal128's initializer which takes a
+  string will now never throw, as it previously threw only for out-of-bounds
+  values. The initializer is still marked as `throws` for
+  backwards compatibility.
+  ([#4548](https://github.com/realm/realm-core/issues/4548))
+
+### Fixed
+
+* Adjust the header paths for the podspec to avoid accidentally finding a file
+  which isn't part of the pod that produced warnings when importing the
+  framework. ([#7113](https://github.com/realm/realm-cocoa/issues/7113), since 10.5.2).
+* Fixed a crash that would occur when observing unmanaged Objects in multiple
+  views in SwiftUI. When using `@StateRealmObject` or `@ObservedObject` across
+  multiple views with an unmanaged object, each view would subscribe to the
+  object. As each view unsubscribed (generally when trailing back through the
+  view stack), our propertyWrappers would attempt to remove the KVOs for each
+  cancellation, when it should only be done once. We now correctly remove KVOs
+  only once. ([#7131](https://github.com/realm/realm-cocoa/issues/7131))
+* Fixed `isInvalidated` not returning correct value after object deletion from
+  Realm when using a custom schema. The object's Object Schema was not updated
+  when the object was added to the realm. We now correctly update the object
+  schema when adding it to the realm.
+  ([#7181](https://github.com/realm/realm-cocoa/issues/7181))
+* Syncing large Decimal128 values would cause "Assertion failed: cx.w[1] == 0"
+  ([Core #4519](https://github.com/realm/realm-core/issues/4519), since v10.0.0).
+* Potential/unconfirmed fix for crashes associated with failure to memory map
+  (low on memory, low on virtual address space). For example
+  ([#4514](https://github.com/realm/realm-core/issues/4514), since v5.0.0).
+* Fix assertion failures such as "!m_notifier_skip_version.version" or
+  "m_notifier_sg->get_version() + 1 == new_version.version" when performing
+  writes inside change notification callbacks. Previously refreshing the Realm
+  by beginning a write transaction would skip delivering notifications, leaving
+  things in an inconsistent state. Notifications are now delivered recursively
+  when needed instead. ([Cocoa #7165](https://github.com/realm/realm-cocoa/issues/7165)).
+* Fix collection notification reporting for modifications. This could be
+  observed by receiving the wrong indices of modifications on sorted or
+  distinct results, or notification blocks sometimes not being called when only
+  modifications have occured.
+  ([#4573](https://github.com/realm/realm-core/pull/4573) since v5.0.0).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.5.5 to v10.6.0
+* Add additional debug validation to file map management that will hopefully
+  catch cases where we unmap something which is still in use.
+
+10.7.2 Release notes (2021-03-08)
+=============================================================
+
+### Fixed
+
+* During integration of a large amount of data from the server, you may get
+  "Assertion failed: !fields.has_missing_parent_update()"
+  ([Core #4497](https://github.com/realm/realm-core/issues/4497), since v6.0.0)
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.5.4 to v10.5.5
+
+10.7.1 Release notes (2021-03-05)
+=============================================================
+
+### Fixed
+
+* Queries of the form "a.b.c == nil" would match objects where `b` is `nil` if
+  `c` did not have an index and did not if `c` was indexed. Both will now match
+  to align with NSPredicate's behavior. ([Core #4460]https://github.com/realm/realm-core/pull/4460), since 4.3.0).
+* Restore support for upgrading files from file format 5 (Realm Cocoa 1.x).
+  ([Core #7089](https://github.com/realm/realm-cocoa/issues/7089), since v5.0.0)
+* On 32bit devices you may get exception with "No such object" when upgrading
+  to v10.* ([Java #7314](https://github.com/realm/realm-java/issues/7314), since v5.0.0)
+* The notification worker thread would rerun queries after every commit rather
+  than only commits which modified tables which could effect the query results
+  if the table had any outgoing links to tables not used in the query.
+  ([Core #4456](https://github.com/realm/realm-core/pull/4456), since v5.0.0).
+* Fix "Invalid ref translation entry [16045690984833335023, 78187493520]"
+  assertion failure which could occur when using sync or multiple processes
+  writing to a single Realm file.
+  ([#7086](https://github.com/realm/realm-cocoa/issues/7086), since v5.0.0).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.5.3 to v10.5.4
+
 10.7.0 Release notes (2021-02-23)
 =============================================================
 
@@ -41,27 +181,6 @@ x.y.z Release notes (yyyy-MM-dd)
   properties are now supported for lists (e.g. "ANY intList = 5" or "ANY
   stringList BEGINSWITH 'prefix'"), as well as aggregate operations on the
   lists (such as "intArray.@sum > 100").
-
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* Fixed an issue where creating an object after file format upgrade may fail
-  with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
- ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
-### Compatibility
-* Realm Studio: 10.0.0 or later.
-* APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 12.4.
-* CocoaPods: 1.10 or later.
-
-### Internal
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
-### Compatibility
 * Performance of sorting on more than one property has been improved.
   Especially important if many elements match on the first property. Mitigates
   ([#7092](https://github.com/realm/realm-cocoa/issues/7092))
@@ -89,7 +208,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from v10.5.0 to v10.5.1
 
 * Upgraded realm-core from v10.5.0 to v10.5.3
 
@@ -152,27 +270,6 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 
 ### Enhancements
-* None.
-
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
-### Compatibility
-* Realm Studio: 10.0.0 or later.
-* APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 12.4.
-* CocoaPods: 1.10 or later.
-
-### Internal
-* Upgraded realm-core from ? to ?
-
-10.5.2 Release notes (2021-02-09)
-=============================================================
-### Enhancements
-* None.
 
 * Add support for "thawing" objects. `Realm`, `Results`, `List` and `Object`
   now have `thaw()` methods which return a live copy of the frozen object. This
@@ -182,21 +279,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add Xcode 12.4 binaries to the release package.
 
 ### Fixed
-* Inserting a date into a synced collection via `AnyBSON.datetime(...)` would be of type `Timestamp` and not `Date`. 
-* Inserting a date into a synced collection via `AnyBSON.datetime(...)` would be of type `Timestamp` and not `Date`.
-  This could break synced objects with a `Date` property  ([#6654](https://github.com/realm/realm-cocoa/issues/6654), since v10.0.0).
-* Fixed an issue where creating an object after file format upgrade may fail
-  with assertion "Assertion failed: lo() <= std::numeric_limits<uint32_t>::max()"
- ([#4295](https://github.com/realm/realm-core/issues/4295), since v5.0.0)
-* Allow enumerating objects of types which are no longer present in the schema.
-* Add `RLMResponse.customStatusCode`. This fixes timeout exceptions that were occuring with a poor connection. ([#4188](https://github.com/realm/realm-core/issues/4188))
- * Fix - `RLMResponse` will have a non nil `customStatusCode` in case of error.
-   ([#4188](https://github.com/realm/realm-core/issues/4188))
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-* Fix - `RLMResponse` will have a non nil `customStatusCode` in case of error.
-([#4188](https://github.com/realm/realm-core/issues/4188))
-* Limit availability of ObjectKeyIdentifiable to platforms which support Combine to match the change made in the Xcode 12.5 SDK. ([#7083](https://github.com/realm/realm-cocoa/issues/7083))
 
 * Inserting a date into a synced collection via `AnyBSON.datetime(...)` would
   be of type `Timestamp` and not `Date`. This could break synced objects with a
@@ -217,7 +299,6 @@ x.y.z Release notes (yyyy-MM-dd)
 
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 12.3.
 * Carthage release for Swift is built with Xcode 12.4.
 * CocoaPods: 1.10 or later.
 
@@ -236,7 +317,6 @@ x.y.z Release notes (yyyy-MM-dd)
   required).
 
 ### Fixed
-
 * Timeouts when calling server functions via App would sometimes crash rather
   than report an error.
 * Fix a race condition which would lead to "uncaught exception in notifier

@@ -1,9 +1,9 @@
-xcodeVersions = ['11.3', '11.7', '12.1', '12.2', '12.4']
+xcodeVersions = ['11.3', '11.7', '12.2', '12.4', '12.5']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
-carthageXcodeVersion = '12.4'
-objcXcodeVersion = '11.3'
+carthageXcodeVersion = '12.5'
+objcXcodeVersion = '12.2'
 docsSwiftVersion = '5.3.2'
 
 def installationTest(platform, test, language) {
@@ -288,7 +288,10 @@ def doBuild() {
         node('osx') {
           deleteDir()
           unstash 'source'
-          sh 'sh build.sh test-osx'
+          sh '''
+            export REALM_DISABLE_METADATA_ENCRYPTION=1
+            sh build.sh test-osx
+          '''
         }
       }
     ]
