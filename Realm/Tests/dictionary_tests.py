@@ -20,10 +20,16 @@ types = [
   ['AllPrimitiveDictionaries', 'managed', 'intObj', ['@"key1"', '@"key2"'], ['@2', '@3'], {'r', 'minmax', 'sum', 'avg', 'man'}],
   ['AllOptionalPrimitiveDictionaries', 'optManaged', 'intObj', ['@"key1"', '@"key2"'], ['@2', 'NSNull.null'], {'o', 'minmax', 'sum', 'avg', 'man'}],
   # String
-  ['AllPrimitiveDictionaries', 'unmanaged', 'stringObj', ['@"key1"', '@"key2"'], ['@"foo"', '@"bar"'], {'r', 'unman', 'string'}],
-  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'stringObj', ['@"key1"', '@"key2"'], ['@"foo"', 'NSNull.null'], {'o', 'unman', 'string'}],
-  ['AllPrimitiveDictionaries', 'managed', 'stringObj', ['@"key1"', '@"key2"'], ['@"foo"', '@"bar"'], {'r', 'man', 'string'}],
-  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'stringObj', ['@"key1"', '@"key2"'], ['@"foo"', 'NSNull.null'], {'o', 'man', 'string'}],
+  ['AllPrimitiveDictionaries', 'unmanaged', 'stringObj', ['@"key1"', '@"key2"'], ['@"bar"', '@"foo"'], {'r', 'unman', 'string'}],
+  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'stringObj', ['@"key1"', '@"key2"'], ['@"bar"', 'NSNull.null'], {'o', 'unman', 'string'}],
+  ['AllPrimitiveDictionaries', 'managed', 'stringObj', ['@"key1"', '@"key2"'], ['@"bar"', '@"foo"'], {'r', 'man', 'string'}],
+  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'stringObj', ['@"key1"', '@"key2"'], ['@"bar"', 'NSNull.null'], {'o', 'man', 'string'}],
+  # Date
+  ['AllPrimitiveDictionaries', 'unmanaged', 'dateObj', ['@"key1"', '@"key2"'], ['date(1)', 'date(2)'], {'r', 'minmax', 'unman', 'date'}],
+  ['AllOptionalPrimitiveDictionaries', 'optUnmanaged', 'dateObj', ['@"key1"', '@"key2"'], ['date(1)', 'NSNull.null'], {'o', 'minmax', 'unman', 'date'}],
+  ['AllPrimitiveDictionaries', 'managed', 'dateObj', ['@"key1"', '@"key2"'], ['date(1)', 'date(2)'], {'r', 'minmax', 'man', 'date'}],
+  ['AllOptionalPrimitiveDictionaries', 'optManaged', 'dateObj', ['@"key1"', '@"key2"'], ['date(1)', 'NSNull.null'], {'o', 'minmax', 'man', 'date'}],
+
 ]
 
 def type_name(propertyName, optional):
