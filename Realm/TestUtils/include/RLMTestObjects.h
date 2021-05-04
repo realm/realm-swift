@@ -178,6 +178,10 @@ RLM_COLLECTION_TYPE(AllTypesObject)
 @property RLM_GENERIC_SET(AllTypesObject) *set;
 @end
 
+@interface DictionaryOfAllTypesObject : RLMObject
+@property RLM_GENERIC_DICTIONARY(RLMString, AllTypesObject) *dictionary;
+@end
+
 @interface AllOptionalTypes : RLMObject
 @property NSNumber<RLMInt> *intObj;
 @property NSNumber<RLMFloat> *floatObj;
@@ -324,6 +328,20 @@ RLM_COLLECTION_TYPE(AllTypesObject)
 @property id<RLMValue> uuidVal;
 @end
 
+@interface AllDictionariesObject : RLMObject
+@property RLMDictionary<RLMString, RLMInt> *intDict;
+@property RLMDictionary<RLMString, RLMFloat> *floatDict;
+@property RLMDictionary<RLMString, RLMDouble> *doubleDict;
+@property RLMDictionary<RLMString, RLMBool> *boolDict;
+@property RLMDictionary<RLMString, RLMString> *stringDict;
+@property RLMDictionary<RLMString, RLMDate> *dateDict;
+@property RLMDictionary<RLMString, RLMData> *dataDict;
+@property RLMDictionary<RLMString, RLMDecimal128> *decimalDict;
+@property RLMDictionary<RLMString, RLMObjectId> *objectIdDict;
+@property RLMDictionary<RLMString, RLMUUID> *uuidDict;
+@property RLMDictionary<RLMString, StringObject> *stringObjDict;
+@end
+
 @interface AllPrimitiveDictionaries : RLMObject
 @property RLMDictionary<RLMString, RLMInt> *intObj;
 @property RLMDictionary<RLMString, RLMFloat> *floatObj;
@@ -463,6 +481,12 @@ RLM_COLLECTION_TYPE(CircleObject);
 
 @interface CircleSetObject : RLMObject
 @property RLM_GENERIC_SET(CircleObject) *circles;
+@end
+
+#pragma mark CircleDictionaryObject
+
+@interface CircleDictionaryObject : RLMObject
+@property RLM_GENERIC_DICTIONARY(RLMString, CircleObject) *circles;
 @end
 
 #pragma mark ArrayPropertyObject

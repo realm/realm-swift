@@ -142,6 +142,9 @@
 @implementation ArrayOfAllTypesObject
 @end
 
+@implementation DictionaryOfAllTypesObject
+@end
+
 @implementation SetOfAllTypesObject
 @end
 
@@ -167,6 +170,9 @@
 @end
 
 @implementation AllOptionalPrimitiveArrays
+@end
+
+@implementation AllDictionariesObject
 @end
 
 @implementation AllOptionalPrimitiveSets
@@ -280,6 +286,11 @@
 #pragma mark CircleSetObject
 
 @implementation CircleSetObject
+@end
+
+#pragma mark CircleDictionaryObject
+
+@implementation CircleDictionaryObject
 @end
 
 #pragma mark ArrayPropertyObject

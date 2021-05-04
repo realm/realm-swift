@@ -1951,6 +1951,47 @@
     RLMAssertCount(SetPropertyObject, 2U, @"NONE intSet.intCol > 10");
 }
 
+- (void)testLinkQueryManyDictionaries {
+    RLMRealm *realm = [self realm];
+
+    DictionaryPropertyObject *dpo1 = [[DictionaryPropertyObject alloc] init];
+    for(NSUInteger i=0; i<10; i++) {
+        StringObject *sobj = [[StringObject alloc] init];
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
+        dpo1.stringDictionary[sobj.stringCol] = sobj;
+        IntObject *iobj = [[IntObject alloc] init];
+        iobj.intCol = (int)i;
+        dpo1.intDictionary[sobj.stringCol] = iobj;
+    }
+    [realm beginWriteTransaction];
+    [realm addObject:dpo1];
+    [realm commitWriteTransaction];
+
+    RLMAssertCount(DictionaryPropertyObject, 0U, @"ANY intDictionary.@allValues.intCol > 10");
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"ANY intDictionary.@allValues.intCol > 5");
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"ANY stringDictionary.@allValues.stringCol = '1'");
+    RLMAssertCount(DictionaryPropertyObject, 0U, @"NONE intDictionary.@allValues.intCol == 5");
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"NONE intDictionary.@allValues.intCol > 10");
+
+    DictionaryPropertyObject *dpo2 = [[DictionaryPropertyObject alloc] init];
+    for(NSUInteger i=0; i<4; i++) {
+        StringObject *sobj = [[StringObject alloc] init];
+        sobj.stringCol = [NSString stringWithFormat:@"%lu", (unsigned long)i];
+        dpo2.stringDictionary[sobj.stringCol] = sobj;
+        IntObject *iobj = [[IntObject alloc] init];
+        iobj.intCol = (int)i;
+        dpo2.intDictionary[sobj.stringCol] = iobj;
+    }
+    [realm beginWriteTransaction];
+    [realm addObject:dpo2];
+    [realm commitWriteTransaction];
+    RLMAssertCount(DictionaryPropertyObject, 0U, @"ANY intDictionary.@allValues.intCol > 10");
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"ANY intDictionary.@allValues.intCol > 5");
+    RLMAssertCount(DictionaryPropertyObject, 2U, @"ANY intDictionary.@allValues.intCol > 2");
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"NONE intDictionary.@allValues.intCol == 5");
+    RLMAssertCount(DictionaryPropertyObject, 2U, @"NONE intDictionary.@allValues.intCol > 10");
+}
+
 - (void)testMultiLevelLinkQuery
 {
     RLMRealm *realm = [self realm];
@@ -2042,6 +2083,59 @@
     XCTAssertThrows([CircleSetObject objectsInRealm:realm where:@"NONE data.circles = '2'"]);
 }
 
+- (void)testDictionaryMultiLevelLinkQuery {
+    RLMRealm *realm = [self realm];
+
+    [realm beginWriteTransaction];
+    CircleObject *circle = nil;
+    for (int i = 0; i < 5; ++i) {
+        circle = [CircleObject createInRealm:realm withValue:@{@"data": [NSString stringWithFormat:@"%d", i],
+                                                                @"next": circle ?: NSNull.null}];
+    }
+    CircleDictionaryObject *cdo = [CircleDictionaryObject createInRealm:realm withValue:@{}];
+    for (CircleObject *co in [CircleObject allObjectsInRealm:realm]) {
+        cdo.circles[co.data] = co;
+    }
+    [realm commitWriteTransaction];
+
+    RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.data = '4'");
+    RLMAssertCount(CircleDictionaryObject, 0U, @"ANY circles.next.data = '4'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.next.data = '3'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.data = '3'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"NONE circles.next.data = '4'");
+
+    RLMAssertCount(CircleDictionaryObject, 0U, @"ANY circles.next.next.data = '3'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.next.next.data = '2'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.next.data = '2'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.data = '2'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"NONE circles.next.next.data = '3'");
+
+    XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"ANY data = '2'"]);
+    XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"ANY circles.next = '2'"]);
+    XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"ANY data.circles = '2'"]);
+    XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"circles.data = '2'"]);
+    XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"NONE data.circles = '2'"]);
+
+    // Same as above but with '@allValues'
+    RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.@allValues.data = '4'");
+    RLMAssertCount(CircleDictionaryObject, 0U, @"ANY circles.@allValues.next.data = '4'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.@allValues.next.data = '3'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.@allValues.data = '3'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"NONE circles.@allValues.next.data = '4'");
+
+    RLMAssertCount(CircleDictionaryObject, 0U, @"ANY circles.@allValues.next.next.data = '3'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.@allValues.next.next.data = '2'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.@allValues.next.data = '2'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"ANY circles.@allValues.data = '2'");
+    RLMAssertCount(CircleDictionaryObject, 1U, @"NONE circles.@allValues.next.next.data = '3'");
+
+    XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"ANY data = '2'"]);
+    XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"ANY circles.@allValues.next = '2'"]);
+    XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"ANY data.circles.@allValues = '2'"]);
+    XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"circles.@allValues.data = '2'"]);
+    XCTAssertThrows([CircleDictionaryObject objectsInRealm:realm where:@"NONE data.circles.@allValues = '2'"]);
+}
+
 - (void)testMultiLevelBackLinkQuery
 {
     RLMRealm *realm = [self realm];
@@ -2088,6 +2182,11 @@
     [SetOfAllTypesObject createInDefaultRealmWithValue:@[@[obj0, obj2, obj3]]];
     [SetOfAllTypesObject createInDefaultRealmWithValue:@[@[obj4]]];
 
+    [DictionaryOfAllTypesObject createInDefaultRealmWithValue:@[@{@"0": obj0, @"1": obj1}]];
+    [DictionaryOfAllTypesObject createInDefaultRealmWithValue:@[@{@"1": obj1}]];
+    [DictionaryOfAllTypesObject createInDefaultRealmWithValue:@[@{@"0": obj0, @"2": obj2, @"3": obj3}]];
+    [DictionaryOfAllTypesObject createInDefaultRealmWithValue:@[@{@"4": obj4}]];
+
     [realm commitWriteTransaction];
 
     // simple queries
@@ -2112,6 +2211,14 @@
     RLMAssertCount(SetOfAllTypesObject, 1U, @"NONE set != %@", obj1);
     XCTAssertThrows(([SetOfAllTypesObject objectsWhere:@"set = %@", obj0].count));
     XCTAssertThrows(([SetOfAllTypesObject objectsWhere:@"set != %@", obj0].count));
+
+    // check for ANY object in dictionary
+    RLMAssertCount(DictionaryOfAllTypesObject, 2U, @"ANY dictionary = %@", obj0);
+    RLMAssertCount(DictionaryOfAllTypesObject, 3U, @"ANY dictionary != %@", obj1);
+    RLMAssertCount(DictionaryOfAllTypesObject, 2U, @"NONE dictionary = %@", obj0);
+    RLMAssertCount(DictionaryOfAllTypesObject, 1U, @"NONE dictionary != %@", obj1);
+    XCTAssertThrows(([DictionaryOfAllTypesObject objectsWhere:@"dictionary = %@", obj0].count));
+    XCTAssertThrows(([DictionaryOfAllTypesObject objectsWhere:@"dictionary != %@", obj0].count));
 }
 
 - (void)testCompoundOrQuery {
@@ -2362,6 +2469,36 @@
     StringObject *stringObject = [[StringObject allObjectsInRealm:realm] firstObject];
     RLMAssertCount(SetPropertyObject, 1U, @"%@ IN set", stringObject);
     RLMAssertCount(SetPropertyObject, 0U, @"%@ IN set", otherStringObject);
+}
+
+- (void)testDictionaryIn {
+    RLMRealm *realm = [self realm];
+    [realm beginWriteTransaction];
+
+    DictionaryPropertyObject *dict = [DictionaryPropertyObject createInRealm:realm withValue:@[]];
+    dict.stringDictionary[@"value"] = [StringObject createInRealm:realm withValue:@[@"value"]];
+    StringObject *otherStringObject = [StringObject createInRealm:realm withValue:@[@"some other value"]];
+    [realm commitWriteTransaction];
+
+
+    RLMAssertCount(DictionaryPropertyObject, 0U, @"ANY stringDictionary.stringCol IN %@", @[@"missing"]);
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"ANY stringDictionary.stringCol IN %@", @[@"value"]);
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"NONE stringDictionary.stringCol IN %@", @[@"missing"]);
+    RLMAssertCount(DictionaryPropertyObject, 0U, @"NONE stringDictionary.stringCol IN %@", @[@"value"]);
+
+    RLMAssertCount(DictionaryPropertyObject, 0U, @"ANY stringDictionary.@allValues.stringCol IN %@", @[@"missing"]);
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"ANY stringDictionary.@allValues.stringCol IN %@", @[@"value"]);
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"NONE stringDictionary.@allValues.stringCol IN %@", @[@"missing"]);
+    RLMAssertCount(DictionaryPropertyObject, 0U, @"NONE stringDictionary.@allValues.stringCol IN %@", @[@"value"]);
+
+    RLMAssertCount(DictionaryPropertyObject, 0U, @"ANY stringDictionary IN %@", [StringObject objectsWhere:@"stringCol = 'missing'"]);
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"ANY stringDictionary IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]);
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"NONE stringDictionary IN %@", [StringObject objectsWhere:@"stringCol = 'missing'"]);
+    RLMAssertCount(DictionaryPropertyObject, 0U, @"NONE stringDictionary IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]);
+
+    StringObject *stringObject = [[StringObject allObjectsInRealm:realm] firstObject];
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"%@ IN stringDictionary", stringObject);
+    RLMAssertCount(DictionaryPropertyObject, 0U, @"%@ IN stringDictionary", otherStringObject);
 }
 
 - (void)testQueryChaining {
