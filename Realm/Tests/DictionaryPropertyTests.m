@@ -469,7 +469,7 @@
     size_t count = 0;
     for (id key in company.employeeDict) {
         ++count;
-        [company.employeeDict removeObjectForKey: key];
+        [company.employeeDict removeObjectForKey:key];
     }
     XCTAssertEqual(totalCount, count);
     XCTAssertEqual(company.employeeDict.count, 0);
@@ -517,8 +517,8 @@
     [realm commitWriteTransaction];
 
     [realm beginWriteTransaction];
-    for (__unused EmployeeObject *eo in company.employeeDict) {
-        [realm deleteObjects:company.employeeDict];
+    for (NSString *key in company.employeeDict) {
+        [realm deleteObject:company.employeeDict[key]];
     }
     [realm commitWriteTransaction];
 

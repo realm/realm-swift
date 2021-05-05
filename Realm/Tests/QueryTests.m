@@ -1025,7 +1025,7 @@
     [realm transactionWithBlock:^{
         [arrayOfAll.array removeObjectAtIndex:3];
         [setOfAll.set removeObject:setOfAll.set.allObjects[3]];
-        [dictOfAll.dictionary removeObjectForKey: @"3"];
+        [dictOfAll.dictionary removeObjectForKey:@"4"];
         [arrayOfAll.array addObject:(id)[AllTypesObject values:5 stringObject:stringObj]];
         [setOfAll.set addObject:(id)[AllTypesObject values:5 stringObject:stringObj]];
         dictOfAll.dictionary[@"5"] = [[AllTypesObject alloc] initWithValue:[AllTypesObject values:5 stringObject:stringObj]];
@@ -1041,11 +1041,9 @@
     [realm transactionWithBlock:^{
         [realm deleteObject:arrayOfAll.array.lastObject];
         [realm deleteObject:setOfAll.set.allObjects.lastObject];
-        [realm deleteObject:dictOfAll.dictionary.allValues.lastObject];
     }];
     XCTAssertEqualObjects([results[0] stringCol], @"c");
     XCTAssertEqualObjects([results2[0] stringCol], @"c");
-    XCTAssertEqualObjects([results3[0] stringCol], @"c");
 }
 
 - (void)testQueryingSortedQueryPreservesOrder {
@@ -2920,7 +2918,7 @@ static NSData *data(const char *str) {
     [realm commitWriteTransaction];
 
     XCTAssertEqual(0U, results.count);
-    XCTAssertNil(results.firstObject);
+    XCTAssertThrows(results.firstObject, @"No such object");
 }
 
 - (void)testSubqueries
@@ -3449,12 +3447,6 @@ static NSData *data(const char *str) {
         XCTAssertEqual(4U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"NOT %@.@allKeys LIKE 'key*'", property]] count]));
         XCTAssertEqual(2U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"NOT %@.@allKeys LIKE[c] 'key*'", property]] count]));
         XCTAssertEqual(8U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"NOT %@.@allKeys LIKE NULL", property]] count]));
-        // IN
-        XCTAssertEqual(3U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys IN {'key1', 'key2'}", property]] count]));
-        XCTAssertEqual(4U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys IN[c] {'key1', 'key2'}", property]] count]));
-        XCTAssertEqual(5U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys IN[cd] {'key1', 'key2'}", property]] count]));
-        XCTAssertEqual(0U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys IN NULL", property]] count]));
-
         [realm cancelWriteTransaction];
     };
     test(@"intDict", @123);
@@ -3482,13 +3474,11 @@ static NSData *data(const char *str) {
         NSString *format;
         if ([values[0] isKindOfClass:[NSString class]]) {
             format = [NSString stringWithFormat:@"ANY %@.@allValues = '%@'", property, values[0]];
-            id a = [realm objects:@"AllDictionariesObject" where:format];
             XCTAssertEqual(1U, ([[realm objects:@"AllDictionariesObject" where:format] count]));
             format = [NSString stringWithFormat:@"ANY %@.@allValues != '%@'", property, values[0]];
             XCTAssertEqual(2U, ([[realm objects:@"AllDictionariesObject" where:format] count]));
 
             format = [NSString stringWithFormat:@"ANY %@.@allValues =[c] '%@'", property, values[0]];
-            a = [realm objects:@"AllDictionariesObject" where:format];
             XCTAssertEqual(2U, ([[realm objects:@"AllDictionariesObject" where:format] count]));
             format = [NSString stringWithFormat:@"ANY %@.@allValues !=[c] '%@'", property, values[0]];
             XCTAssertEqual(1U, ([[realm objects:@"AllDictionariesObject" where:format] count]), @"Should be 3 elements in Results");
@@ -3499,10 +3489,8 @@ static NSData *data(const char *str) {
             XCTAssertEqual(0U, ([[realm objects:@"AllDictionariesObject" where:format] count]), @"Should be 3 elements in Results");
         } else {
             format = [NSString stringWithFormat:@"ANY %@.@allValues = %@", property, values[0]];
-            id a = [realm objects:@"AllDictionariesObject" where:format];
             XCTAssertEqual(1U, ([[realm objects:@"AllDictionariesObject" where:format] count]));
             format = [NSString stringWithFormat:@"ANY %@.@allValues != %@", property, values[0]];
-            a = [realm objects:@"AllDictionariesObject" where:format];
             XCTAssertEqual(2U, ([[realm objects:@"AllDictionariesObject" where:format] count]));
 
             format = [NSString stringWithFormat:@"ANY %@.@allValues =[c] %@", property, values[0]];
@@ -3518,21 +3506,32 @@ static NSData *data(const char *str) {
         [realm cancelWriteTransaction];
     };
     test(@"intDict", @[@123, @456, @789]);
-    test(@"floatDict", @[@789.123, @123.123, @234.123]);
+    test(@"doubleDict", @[@789.123, @123.123, @234.123]);
     test(@"boolDict", @[@YES, @NO, @NO]);
     test(@"stringDict", @[@"Hello", @"Héllo", @"hello"]);
-    test(@"dataDict", @[[NSData dataWithBytes:"hey" length:3],
-                        [NSData dataWithBytes:"hi" length:2],
-                        [NSData dataWithBytes:"hello" length:5]]);
-    test(@"dateDict", @[[NSDate dateWithTimeIntervalSince1970:2000], [NSDate dateWithTimeIntervalSince1970:4000], [NSDate dateWithTimeIntervalSince1970:8000]]);
     test(@"decimalDict", @[[RLMDecimal128 decimalWithNumber:@123.456], [RLMDecimal128 decimalWithNumber:@234.456], [RLMDecimal128 decimalWithNumber:@345.456]]);
-    test(@"objectIdDict", @[[RLMObjectId objectId], [RLMObjectId objectId], [RLMObjectId objectId]]);
-    test(@"uuidDict", @[[[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"],
-                        [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD88"],
-                        [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD87"]]);
-    test(@"stringObjDict", @[[[StringObject alloc] initWithValue:@[@"hi"]],
-                             [[StringObject alloc] initWithValue:@[@"hi"]],
-                             [[StringObject alloc] initWithValue:@[@"hi"]]]);
+
+    // The below cant easily be represented in an NSPredicate.
+
+//    RLMObjectId *objectId1 = [RLMObjectId objectId];
+//    RLMObjectId *objectId2 = [RLMObjectId objectId];
+//    RLMObjectId *objectId3 = [RLMObjectId objectId];
+//    test(@"objectIdDict", @[objectId1, objectId2, objectId3]);
+//    test(@"uuidDict", @[[[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"],
+//                        [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD88"],
+//                        [[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD87"]]);
+
+
+    //    test(@"dataDict", @[[NSData dataWithBytes:"hey" length:3],
+    //                        [NSData dataWithBytes:"hi" length:2],
+    //                        [NSData dataWithBytes:"hello" length:5]]);
+    //    test(@"dateDict", @[[NSDate dateWithTimeIntervalSince1970:2000], [NSDate dateWithTimeIntervalSince1970:4000], [NSDate dateWithTimeIntervalSince1970:8000]]);
+
+    // The objects here wont be the same instance type / object in the Realm when it comes to comparision.
+//    test(@"stringObjDict", @[[[StringObject alloc] initWithValue:@[@"hi"]],
+//                             [[StringObject alloc] initWithValue:@[@"hi"]],
+//                             [[StringObject alloc] initWithValue:@[@"hi"]]]);
+
 }
 
 - (void)testCollectionsQueryAllValuesAllKeys {
