@@ -681,22 +681,23 @@ class ObjectTests: TestCase {
 //        }
 //    }
 
-    func expectChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?) -> ((ObjectChange<ObjectBase>) -> Void) {
+    func expectChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ inverted: Bool = false) -> ((ObjectChange<ObjectBase>) -> Void) {
         let exp = expectation(description: "change from \(String(describing: old)) to \(String(describing: new))")
+        exp.isInverted = inverted
         return { change in
             self.checkChange(name, old, new, change)
             exp.fulfill()
         }
     }
     
-    func expectNoChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?) -> ((ObjectChange<ObjectBase>) -> Void) {
-        let exp = expectation(description: "Change from \(String(describing: old)) to \(String(describing: new)) should not have notified for \(name)")
-        exp.isInverted = true // Expectation will now fail if `exp` is fulfilled.
-        return { change in
-            self.checkChange(name, old, new, change)
-            exp.fulfill()
-        }
-    }
+//    func expectNoChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?) -> ((ObjectChange<ObjectBase>) -> Void) {
+//        let exp = expectation(description: "Change from \(String(describing: old)) to \(String(describing: new)) should not have notified for \(name)")
+//        exp.isInverted = true // Expectation will now fail if `exp` is fulfilled.
+//        return { change in
+//            self.checkChange(name, old, new, change)
+//            exp.fulfill()
+//        }
+//    }
 
 //    func expectChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ filter: String) -> ((ObjectChange<ObjectBase>) -> Void) {
 //        let exp = expectation(description: "change from \(String(describing: old)) to \(String(describing: new)), with filter \(filter)")
@@ -721,27 +722,55 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
     
+    // !!!: Fails, but the feature will not support this behavior at first.
+    // See version below
+//    func testModifyObservedKeyPathLocally() {
+//        let realm = try! Realm()
+//        realm.beginWrite()
+//        let object = realm.create(SwiftObject.self)
+//        try! realm.commitWrite()
+//
+//        // Expect notification for "intCol" keyPath when "intCol" is modified
+//        let token1 = object.observe(keyPaths: ["intCol"], expectChange("intCol", Int?.none, 2))
+//
+//        // Expect no notification for "boolCol" keypath when "intCol" is modified
+//        let token0 = object.observe(keyPaths: ["boolCol"], { change in
+//            XCTFail("expected no change, got \(change)")
+//        })
+//
+//        try! realm.write {
+//            object.intCol = 2
+//        }
+//
+//        waitForExpectations(timeout: 2)
+//        token0.invalidate()
+//        token1.invalidate()
+//    }
+    
     func testModifyObservedKeyPathLocally() {
         let realm = try! Realm()
         realm.beginWrite()
-        let object = realm.create(SwiftObject.self)
+        let object = SwiftObject()
+        realm.add(object)
         try! realm.commitWrite()
 
         // Expect notification for "intCol" keyPath when "intCol" is modified
-        let token1 = object.observe(keyPaths: ["intCol"], expectChange("intCol", Int?.none, 2))
-
-        // Expect no notification for "boolCol" keypath when "intCol" is modified
-        let token0 = object.observe(keyPaths: ["boolCol"], { change in
-            XCTFail("expected no change, got \(change)")
-        })
-
+        var token = object.observe(keyPaths: ["intCol"], expectChange("intCol", Int?.none, 2))
         try! realm.write {
             object.intCol = 2
         }
-
-        waitForExpectations(timeout: 2)
-        token0.invalidate()
-        token1.invalidate()
+        waitForExpectations(timeout: 0.1)
+        token.invalidate()
+        // Expect no notification for "boolCol" keypath when "intCol" is modified
+        let ex = expectation(description: "no change")
+        token = object.observe(keyPaths: ["boolCol"], { change in
+            ex.fulfill()
+        })
+        try! realm.write {
+            object.intCol = 3
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+        token.invalidate()
     }
 
     func testModifyObservedObjectRemotely() {
@@ -762,34 +791,70 @@ class ObjectTests: TestCase {
         waitForExpectations(timeout: 0)
         token.invalidate()
     }
-
+    
     func testModifyObservedKeyPathRemotely() {
         let realm = try! Realm()
         realm.beginWrite()
-        let object = realm.create(SwiftObject.self)
+        let object = SwiftObject()
+        realm.add(object)
         try! realm.commitWrite()
 
-        // Expect no notification for "intCol" keypath when "boolCol" is modified
-        let token0 = object.observe(keyPaths: ["intCol"], { change in
-            XCTFail("expected no change, got \(change)")
-        })
         // Expect notification for "intCol" keyPath when "intCol" is modified
-        let token1 = object.observe(keyPaths: ["intCol"], expectChange("intCol", 1, 2))
-        
-        // TODO: Expect notification when object property is modified
-        // TODO: Expect no notification when object property is modified outside of keypath
-
+        var token = object.observe(keyPaths: ["intCol"], expectChange("intCol", 123, 2))
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write {
                 realm.objects(SwiftObject.self).first!.intCol = 2
             }
         }
+        realm.refresh()
+        waitForExpectations(timeout: 0.1)
+        token.invalidate()
 
-        waitForExpectations(timeout: 1)
-        token0.invalidate()
-        token1.invalidate()
+        // Expect no notification for "boolCol" keypath when "intCol" is modified
+        let ex = expectation(description: "no change")
+        ex.isInverted = true
+        token = object.observe(keyPaths: ["boolCol"], { change in
+            ex.fulfill()
+        })
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write {
+                realm.objects(SwiftObject.self).first!.intCol = 3
+            }
+        }
+        realm.refresh()
+        waitForExpectations(timeout: 0.1, handler: nil)
+        token.invalidate()
     }
+
+//    func testModifyObservedKeyPathRemotely() {
+//        let realm = try! Realm()
+//        realm.beginWrite()
+//        let object = realm.create(SwiftObject.self)
+//        try! realm.commitWrite()
+//
+//        // Expect no notification for "intCol" keypath when "boolCol" is modified
+//        let token0 = object.observe(keyPaths: ["intCol"], { change in
+//            XCTFail("expected no change, got \(change)")
+//        })
+//        // Expect notification for "intCol" keyPath when "intCol" is modified
+//        let token1 = object.observe(keyPaths: ["intCol"], expectChange("intCol", 1, 2))
+//
+//        // TODO: Expect notification when object property is modified
+//        // TODO: Expect no notification when object property is modified outside of keypath
+//
+//        dispatchSyncNewThread {
+//            let realm = try! Realm()
+//            try! realm.write {
+//                realm.objects(SwiftObject.self).first!.intCol = 2
+//            }
+//        }
+//
+//        waitForExpectations(timeout: 1)
+//        token0.invalidate()
+//        token1.invalidate()
+//    }
 
     func testListPropertyNotifications() {
         let realm = try! Realm()
@@ -813,73 +878,105 @@ class ObjectTests: TestCase {
     func testListPropertyKeyPathNotifications() {
         let realm = try! Realm()
         realm.beginWrite()
-        let object = realm.create(SwiftOwnerObject.self, value: ["intCol": 2])
+        let object = realm.create(SwiftObject.self, value: ["intCol": 1])
         try! realm.commitWrite()
 
-        var token0: NotificationToken
-        var token1: NotificationToken
+        var token: NotificationToken
 
-        // Expect no notification for property outside of List key path
-        token0 = object.observe(keyPaths: ["objects"], expectNoChange("intCol", 1, 2))
+        // Expect no notification for arracyCol when intCol is changed
+        token = object.observe(keyPaths: ["arrayCol"], expectChange("intCol", 1, 2, true)) // Passing true inverts expectation
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write {
-                let obj = realm.objects(SwiftOwnerObject.self).first!
+                let obj = realm.objects(SwiftObject.self).first!
                 obj.intCol = 2
             }
         }
         realm.refresh()
-        // !!!: Is delaying 1 second too long?
-        waitForExpectations(timeout: 1)
-        token0.invalidate()
-        
-        // Expect notification for List key path when object is appended
-        token0 = object.observe(keyPaths: ["objects"], expectChange("objects", Int?.none, Int?.none))
+        waitForExpectations(timeout: 0.1)
+        token.invalidate()
+
+        // Expect notification for arrayCol when object is appended to arrayCol
+        token = object.observe(keyPaths: ["arrayCol"], expectChange("arrayCol", Bool?.none, Bool?.none))
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write {
-                let parent = realm.objects(SwiftOwnerObject.self).filter("intCol == 2").first!
-                let child = realm.create(SwiftDogObject.self, value: ["dogName": "fido"])
-                parent.objects.append(child)
+                let parent = realm.objects(SwiftObject.self).filter("intCol == 2").first!
+                let child = realm.create(SwiftBoolObject.self, value: ["boolCol": true])
+                parent.arrayCol.append(child)
             }
         }
         realm.refresh()
-        waitForExpectations(timeout: 0)
-        token0.invalidate()
+        waitForExpectations(timeout: 0.1)
+        token.invalidate()
+
+        // Expect notification for arrayCol when object is reassigned to an object with same values
+        token = object.observe(keyPaths: ["arrayCol"], expectChange("arrayCol", Bool?.none, Bool?.none))
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write {
+                let obj = realm.objects(SwiftObject.self).filter("intCol == 2").first!
+                let boolObj = SwiftBoolObject()
+                boolObj.boolCol = obj.arrayCol[0].boolCol
+                obj.arrayCol[0] = boolObj
+            }
+        }
+        realm.refresh()
+        waitForExpectations(timeout: 0.1)
+        token.invalidate()
         
-        // Expect notification for List<SwiftRecursiveObject>.intCol because it's within key path
-        token0 = object.observe(keyPaths: ["objects.intCol"], expectChange("intCol", 1, 3))
+        // Expect notification for arrayCol when object is reassigned to an object with different values
+        token = object.observe(keyPaths: ["arrayCol"], expectChange("arrayCol", Bool?.none, Bool?.none))
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write {
+                let obj = realm.objects(SwiftObject.self).filter("intCol == 2").first!
+//                let boolObj = realm.create(SwiftBoolObject.self, value: ["boolCol": false])
+                let boolObj = SwiftBoolObject()
+                boolObj.boolCol = !obj.arrayCol[0].boolCol
+//                XCTAssert(boolObj != obj.arrayCol[0]) // Check they are different objects ...
+//                XCTAssert(boolObj.boolCol == obj.arrayCol[0].boolCol) // ... but the same value
+                obj.arrayCol[0] = boolObj
+            }
+        }
+        realm.refresh()
+        waitForExpectations(timeout: 0.1)
+        token.invalidate()
+        
+        // Expect notification for an object stored in a list
+        token = object.observe(keyPaths: ["arrayCol.boolCol"], expectChange("arrayCol.boolCol", true, false))
         // Expect no notification for List<SwiftRecursiveObject>.boolCol because boolCol is not changed.
-        token1 = object.observe(keyPaths: ["objects.boolCol"], expectNoChange("intCol", 1, 3))
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write {
-                let obj = realm.objects(SwiftOwnerObject.self).filter("intCol == 2").first!
-                obj.dog!.intCol = 3
+                let obj = realm.objects(SwiftObject.self).filter("intCol == 2").first!
+                let boolObj = obj.arrayCol.first!
+                boolObj.boolCol = !boolObj.boolCol
             }
         }
         realm.refresh()
-        waitForExpectations(timeout: 0.5)
-        token0.invalidate()
-        token1.invalidate()
+        waitForExpectations(timeout: 0.1)
+        token.invalidate()
         
-        // Expect notification for List<SwiftRecursiveObject>.intCol when object is reassigned with different values
-        token0 = object.observe(keyPaths: ["objects.intCol"], expectChange("intCol", 3, 1))
-        // Expect notification for List<SwiftRecursiveObject>.boolCol when object is reassigned with different values.
-        token1 = object.observe(keyPaths: ["objects.boolCol"], expectChange("boolCol", false, true))
+        // Expect notification for arrayCol when an object in the list is modified
+        token = object.observe(keyPaths: ["arrayCol"], expectChange("boolCol", false, true))
+        // Expect no notification for List<SwiftRecursiveObject>.boolCol because boolCol is not changed.
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write {
-                let obj = realm.objects(SwiftOwnerObject.self).filter("intCol == 2").first!
-                obj.objects[0] = realm.create(SwiftDogObject.self, value: ["boolCol": true])
+                let obj = realm.objects(SwiftObject.self).filter("intCol == 2").first!
+                obj.arrayCol.first!.boolCol = true
             }
         }
         realm.refresh()
-        waitForExpectations(timeout: 0.5)
-        token0.invalidate()
-        token1.invalidate()
+        waitForExpectations(timeout: 0.1)
+        token.invalidate()
         
-        // !!!: What about object reassigned with the same values?
+        
+        
+        
+        
+        
     }
 
     func testOptionalPropertyNotifications() {
@@ -923,8 +1020,7 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
     
-    // !!!: How awful is using "KPF" shorthand in these test names?
-    func testKPFOptionalProperty() {
+    func testOptionalPropertyKeyPath() {
         let realm = try! Realm()
         let object = SwiftOptionalDefaultValuesObject()
         try! realm.write({
@@ -944,24 +1040,23 @@ class ObjectTests: TestCase {
         token.invalidate()
         
         // Expect no notification for change outside of observed path
-        token = object.observe(keyPaths: ["optStringCol"], expectNoChange("optIntCol", 2, 3))
+        token = object.observe(keyPaths: ["optStringCol"], expectChange("optIntCol", 2, 3, true)) // Passing true inverts expectation
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write({
-                realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = 2
+                realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = 3
             })
         }
         realm.refresh()
-        // !!!: Is delaying 1 second too long?
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 0)
         token.invalidate()
         
         // Expect notification for change from value to nil on observed path
-        token = object.observe(keyPaths: ["optIntCol"], expectChange("optIntCol", 2, Int?.none))
+        token = object.observe(keyPaths: ["optIntCol"], expectChange("optIntCol", 3, Int?.none))
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write({
-                realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = 2
+                realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = nil
             })
         }
         realm.refresh()

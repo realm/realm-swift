@@ -470,9 +470,94 @@ class RealmCollectionTypeTests: TestCase {
         token2.invalidate()
     }
 
+    func testObserveKeyPath() {
+        var ex = expectation(description: "initial notification")
+        let token0 = collection.observe(keyPaths: ["stringCol"])  { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update:
+                // TODO: check the change notifications are correct
+                break
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+
+        // Only expect a change notification for the token observing `stringCol` keypath.
+        ex = self.expectation(description: "change notification")
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.stringCol = "changed"
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+        
+        // Expect no notification for `stringCol` key path because only `linkCol.id` will be modified.
+        ex = self.expectation(description: "NO change notification")
+        ex.isInverted = true // Inverted expectation causes failure if fulfilled.
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.linkCol?.id = 2
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+
+        token0.invalidate()
+    }
+    
+    func testObserveKeyPathWithLink() {
+        var ex = expectation(description: "initial notification")
+        let token = collection.observe(keyPaths: ["linkCol.id"]) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update(_, let deletions, let insertions, let modifications):
+                XCTAssertEqual(deletions, [])
+                XCTAssertEqual(insertions, [])
+                XCTAssertEqual(modifications, [0])
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+        
+        // Only expect a change notification for `linkCol.id` keypath.
+        ex = self.expectation(description: "change notification")
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.linkCol?.id = 2
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+        
+        // Expect no notification for `linkCol.id` key path because only `stringCol` will be modified.
+        ex = self.expectation(description: "NO change notification")
+        ex.isInverted = true // Inverted expectation causes failure if fulfilled.
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.stringCol = "changed"
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+
+        token.invalidate()
+    }
+
     // !!!: Two tokens that filter for different keypaths will both fire.
     // related to the issue Dominic raised.
-    func testObserveKeyPath() {
+    func testObserveTwoKeyPaths() {
         var ex0 = expectation(description: "initial notification")
         let token0 = collection.observe(keyPaths: ["stringCol"])  { (changes: RealmCollectionChange) in
             switch changes {
@@ -486,20 +571,25 @@ class RealmCollectionTypeTests: TestCase {
             }
             ex0.fulfill()
         }
-        waitForExpectations(timeout: 0.2, handler: nil)
 
-        // Only expect a change notification for the token observing `stringCol` keypath.
-        ex0 = self.expectation(description: "change notification")
-        dispatchSyncNewThread {
-            let realm = self.realmWithTestPath()
-            realm.beginWrite()
-            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
-            obj.stringCol = "changed"
-            try! realm.commitWrite()
+        var ex1 = expectation(description: "initial notification")
+        let token1 = collection.observe(keyPaths: ["linkCol.id"]) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update:
+                // TODO: check the change notifications are correct
+                break
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex1.fulfill()
         }
         waitForExpectations(timeout: 0.2, handler: nil)
-        
-        // Expect no notification for `stringCol` key path because only `linkCol.id` is modified.
+
+        // Only expect a change notification for the token observing `linkCol.id` keypath.
+        // Expect no notification for `linkCol.id` key path because only `stringCol` will be modified.
+        ex1 = self.expectation(description: "change notification")
         ex0 = self.expectation(description: "NO change notification")
         ex0.isInverted = true
         dispatchSyncNewThread {
@@ -510,45 +600,25 @@ class RealmCollectionTypeTests: TestCase {
             try! realm.commitWrite()
         }
         waitForExpectations(timeout: 0.2, handler: nil)
-        // add a second notification and wait for it
-//        var ex1 = expectation(description: "second initial notification")
-//        let token1 = collection.observe(keyPaths: ["linkCol.id"]) { _ in
-//            ex1.fulfill()
-//        }
-//        waitForExpectations(timeout: 0.2, handler: nil)
-//
-//        // Only expect a change notification for the token observing `stringCol` keypath.
-//        // Expect no notification for `linkCol.id` key path because it's not changed.
-//        ex0 = expectation(description: "change notification")
-//        ex1 = expectation(description: "This expectation should not be reached. Expect NO change notification.")
-//        ex1.isInverted = true
-//
-//        waitForExpectations(timeout: 0.1, handler: nil)
-//
-//
-//        // Only expect a change notification for the token observing `linkCol.id` keypath.
-//        // Expect no notification for `stringCol` because it's not changed.
-//        ex0 = expectation(description: "This expectation should not be reached. Expect NO change notification.")
-//        ex0.isInverted = true
-//        ex1 = expectation(description: "change notification")
-//        realm.beginWrite()
-//        collection.first!.linkCol?.id = 2
-//        try! realm.commitWrite()
-//        waitForExpectations(timeout: 0.1, handler: nil)
-//
-//        // Only the unskipped notification token should be called (token0).
-//        ex0 = expectation(description: "change notification")
-//        ex1 = expectation(description: "This expectation should not be reached. Expect NO change notification.")
-//        ex1.isInverted = true
-//        realm.beginWrite()
-//        realm.delete(collection)
-//        try! realm.commitWrite(withoutNotifying: [token1])
-//        waitForExpectations(timeout: 0.1, handler: nil)
+
+        // Only expect a change notification for the token observing `linkCol.id` keypath.
+        // Expect no notification for `stringCol` key path because only `linkCol.is` will be modified.
+        ex0 = self.expectation(description: "change notification")
+        ex1 = self.expectation(description: "NO change notification")
+        ex1.isInverted = true // Inverted expectation causes failure if fulfilled.
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.stringCol = "changed"
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
 
         token0.invalidate()
-//        token1.invalidate()
+        token1.invalidate()
     }
-    
+
     func observeOnQueue<Collection: RealmCollection>(_ collection: Collection) where Collection.Element: Object {
         let sema = DispatchSemaphore(value: 0)
         let token = collection.observe(keyPaths: nil, on: queue) { (changes: RealmCollectionChange) in
@@ -1199,6 +1269,18 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 
     // ???: KPF not needed to test on these overrides?
     override func testObserve() {
+        assertThrows(collection.observe { _ in })
+    }
+    
+    override func testObserveKeyPath() {
+        assertThrows(collection.observe { _ in })
+    }
+    
+    override func testObserveKeyPathWithLink() {
+        assertThrows(collection.observe { _ in })
+    }
+    
+    override func testObserveTwoKeyPaths() {
         assertThrows(collection.observe { _ in })
     }
 

@@ -182,6 +182,7 @@ std::vector<realm::BindingContext::ObserverState> RLMGetObservedRows(RLMSchemaIn
 void RLMWillChange(std::vector<realm::BindingContext::ObserverState> const& observed, std::vector<void *> const& invalidated);
 void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& observed, std::vector<void *> const& invalidated);
 
+// ???: I'm guessing adding RLM here is extremely misleading since it's not objc.
 using RLMKeyPath = std::vector<std::pair<realm::TableKey, realm::ColKey>>;
 RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema, RLMClassInfo *info, NSString *keyPath);
 

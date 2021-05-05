@@ -601,6 +601,10 @@ RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema
         start = end + 1;
     } while (end != NSNotFound);
 
+    TableKey tk = info->table()->get_key();
+    ColKey ck = info->table()->get_column_key(property.columnName.UTF8String);
+    keyPairs.push_back(std::make_pair(tk, ck));
+    
     return keyPairs;
 }
 

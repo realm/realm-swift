@@ -434,14 +434,17 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
     
     std::vector<RLMKeyPath> rlmKeyPaths;
     for (NSString *keyPath in keyPaths) {
-        // key_path_from_string(obj.realm.schema, obj->_objectSchema, obj->_info, keyPath)
+        // ???: Is it possible to hit this where a collection doesn't have an RLMClassinfo?
+        RLMClassInfo *info = collection.objectInfo;
+        RLMKeyPath rlmKeyPath = RLMKeyPathFromString(realm.schema, info->rlmObjectSchema, info, keyPath);
+        rlmKeyPaths.push_back(rlmKeyPath);
     }
 
     if (!queue) {
         [realm verifyNotificationsAreSupported:true];
         token->_realm = realm;
         auto tk = [[RLMCancellationToken alloc] init];
-        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst});
+        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst}, rlmKeyPaths);
         return token;
     }
 
@@ -460,7 +463,7 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
             return;
         }
         RLMCollection *collection = [realm resolveThreadSafeReference:tsr];
-        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst});
+        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst}, rlmKeyPaths);
     });
     return token;
 }
