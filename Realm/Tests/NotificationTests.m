@@ -1027,6 +1027,11 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     [super tearDown];
 }
 
+- (void)testObserveUnmanagedObject {
+    AllTypesObject *unmanagedObj = [[AllTypesObject alloc] init];
+    XCTAssertThrows([unmanagedObj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {}]);
+}
+
 - (void)testDeleteObservedObject {
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
     RLMNotificationToken *token = [_obj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {

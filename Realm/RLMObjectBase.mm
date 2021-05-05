@@ -774,8 +774,8 @@ RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
 
 @end
 
-RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjectChangeBlock block, dispatch_queue_t queue) {
-    return RLMObjectBaseAddNotificationBlock(obj, nil, queue, ^(RLMObjectBase *, NSArray<NSString *> *propertyNames,
+RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, NSArray<NSString *> *keyPaths, dispatch_queue_t queue,RLMObjectChangeBlock block) {
+    return RLMObjectBaseAddNotificationBlock(obj, keyPaths, queue, ^(RLMObjectBase *, NSArray<NSString *> *propertyNames,
                                                            NSArray *oldValues, NSArray *newValues, NSError *error) {
         if (error) {
             block(false, nil, error);

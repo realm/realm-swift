@@ -971,12 +971,6 @@ class ObjectTests: TestCase {
         realm.refresh()
         waitForExpectations(timeout: 0.1)
         token.invalidate()
-        
-        
-        
-        
-        
-        
     }
 
     func testOptionalPropertyNotifications() {

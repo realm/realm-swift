@@ -623,6 +623,13 @@ typedef void (^RLMObjectChangeBlock)(BOOL deleted,
  */
 - (RLMNotificationToken *)addNotificationBlock:(RLMObjectChangeBlock)block queue:(dispatch_queue_t)queue;
 
+// TODO: Add comments
+- (RLMNotificationToken *)addNotificationBlock:(RLMObjectChangeBlock)block queue:(dispatch_queue_t)queue keyPaths:(NSArray<NSString *> *)keyPaths;
+
+// TODO: Add comments
+- (RLMNotificationToken *)addNotificationBlock:(RLMObjectChangeBlock)block keyPaths:(NSArray<NSString *> *)keyPaths;
+
+
 #pragma mark - Other Instance Methods
 
 /**
