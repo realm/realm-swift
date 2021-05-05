@@ -139,6 +139,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 }
 
 @implementation RLMRealm {
+    std::mutex _collectionEnumeratorMutex;
     NSHashTable<RLMFastEnumerator *> *_collectionEnumerators;
     bool _sendingNotifications;
 }
@@ -976,6 +977,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
 }
 
 - (void)registerEnumerator:(RLMFastEnumerator *)enumerator {
+    std::lock_guard lock(_collectionEnumeratorMutex);
     if (!_collectionEnumerators) {
         _collectionEnumerators = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
     }
@@ -983,10 +985,12 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
 }
 
 - (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator {
+    std::lock_guard lock(_collectionEnumeratorMutex);
     [_collectionEnumerators removeObject:enumerator];
 }
 
 - (void)detachAllEnumerators {
+    std::lock_guard lock(_collectionEnumeratorMutex);
     for (RLMFastEnumerator *enumerator in _collectionEnumerators) {
         [enumerator detach];
     }
