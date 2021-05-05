@@ -3412,28 +3412,49 @@ static NSData *data(const char *str) {
         [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"key3": value}}];
         [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"key1": value}}];
         [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"KEY3": value}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"kêÿ2": value}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"KEY2": value}}];
+        [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"lock1": value}}];
 
-        // Preliminary string format required as NSPredicate will format string in other way
-        NSString *format;
-        format = [NSString stringWithFormat:@"%@.@allKeys = 'key'", property];
-        XCTAssertEqual(0U, ([[realm objects:@"AllDictionariesObject" where:format] count]));
-        format = [NSString stringWithFormat:@"%@.@allKeys = 'key1'", property];
-        XCTAssertEqual(2U, ([[realm objects:@"AllDictionariesObject" where:format] count]));
+        XCTAssertEqual(0U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys = 'key'", property]] count]));
+        XCTAssertEqual(2U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys = 'key1'", property]] count]));
+        XCTAssertEqual(1U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"ANY %@.@allKeys = 'key3'", property]] count]));
+        XCTAssertEqual(7U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"ANY %@.@allKeys != 'key3'", property]] count]));
+        XCTAssertEqual(2U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"ANY %@.@allKeys =[c] 'key3'", property]] count]));
+        XCTAssertEqual(6U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"ANY %@.@allKeys !=[c] 'key3'", property]] count]));
+        XCTAssertEqual(2U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"ANY %@.@allKeys =[cd] 'key3'", property]] count]));
+        XCTAssertEqual(6U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"ANY %@.@allKeys !=[cd] 'key3'", property]] count]));
+        XCTAssertEqual(2U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"NOT %@.@allKeys !=[cd] 'key3'", property]] count]));
+        // BEGINSWITH
+        XCTAssertEqual(4U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys BEGINSWITH 'ke'", property]] count]));
+        XCTAssertEqual(4U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"NOT %@.@allKeys BEGINSWITH 'ke'", property]] count]));
+        XCTAssertEqual(6U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys BEGINSWITH[c] 'ke'", property]] count]));
+        XCTAssertEqual(7U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys BEGINSWITH[cd] 'ke'", property]] count]));
+        XCTAssertEqual(0U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys BEGINSWITH NULL", property]] count]));
+        // CONTAINS
+        XCTAssertEqual(4U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys CONTAINS 'ey'", property]] count]));
+        XCTAssertEqual(6U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys CONTAINS[c] 'ey'", property]] count]));
+        XCTAssertEqual(7U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys CONTAINS[cd] 'ey'", property]] count]));
+        XCTAssertEqual(0U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys CONTAINS NULL", property]] count]));
+        // ENDSWITH
+        XCTAssertEqual(1U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys ENDSWITH 'y2'", property]] count]));
+        XCTAssertEqual(2U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys ENDSWITH[c] 'y2'", property]] count]));
+        XCTAssertEqual(3U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys ENDSWITH[cd] 'y2'", property]] count]));
+        XCTAssertEqual(0U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys ENDSWITH NULL", property]] count]));
+        // LIKE
+        XCTAssertEqual(4U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys LIKE 'key*'", property]] count]));
+        XCTAssertEqual(6U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys LIKE[c] 'key*'", property]] count]));
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys LIKE[cd] 'key*'", property]]), @"not supported");
+        XCTAssertEqual(0U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys LIKE NULL", property]] count]));
+        XCTAssertEqual(4U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"NOT %@.@allKeys LIKE 'key*'", property]] count]));
+        XCTAssertEqual(2U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"NOT %@.@allKeys LIKE[c] 'key*'", property]] count]));
+        XCTAssertEqual(8U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"NOT %@.@allKeys LIKE NULL", property]] count]));
+        // IN
+        XCTAssertEqual(3U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys IN {'key1', 'key2'}", property]] count]));
+        XCTAssertEqual(4U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys IN[c] {'key1', 'key2'}", property]] count]));
+        XCTAssertEqual(5U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys IN[cd] {'key1', 'key2'}", property]] count]));
+        XCTAssertEqual(0U, ([[realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allKeys IN NULL", property]] count]));
 
-        format = [NSString stringWithFormat:@"ANY %@.@allKeys = 'key3'", property];
-        XCTAssertEqual(1U, ([[realm objects:@"AllDictionariesObject" where:format] count]));
-        format = [NSString stringWithFormat:@"ANY %@.@allKeys != 'key3'", property];
-        XCTAssertEqual(4U, ([[realm objects:@"AllDictionariesObject" where:format] count]));
-
-        format = [NSString stringWithFormat:@"ANY %@.@allKeys =[c] 'key3'", property];
-        XCTAssertEqual(2U, ([[realm objects:@"AllDictionariesObject" where:format] count]));
-        format = [NSString stringWithFormat:@"ANY %@.@allKeys !=[c] 'key3'", property];
-        XCTAssertEqual(3U, ([[realm objects:@"AllDictionariesObject" where:format] count]));
-
-        format = [NSString stringWithFormat:@"ANY %@.@allKeys =[cd] 'key3'", property];
-        XCTAssertEqual(2U, ([[realm objects:@"AllDictionariesObject" where:format] count]));
-        format = [NSString stringWithFormat:@"ANY %@.@allKeys !=[cd] 'key3'", property];
-        XCTAssertEqual(3U, ([[realm objects:@"AllDictionariesObject" where:format] count]));
         [realm cancelWriteTransaction];
     };
     test(@"intDict", @123);
