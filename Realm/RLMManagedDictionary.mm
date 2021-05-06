@@ -112,14 +112,12 @@ void RLMEnsureCollectionObservationInfo(std::unique_ptr<RLMObservationInfo>& inf
 //
 // validation helpers
 //
-template<typename ObjcCollection>
 [[gnu::noinline]]
 [[noreturn]]
-static void throwError(__unsafe_unretained ObjcCollection *const col, NSString *aggregateMethod) {
+static void throwError(__unsafe_unretained RLMManagedDictionary *const dict, NSString *aggregateMethod) {
     try {
         throw;
     }
-    // TODO: Fix up these exceptions
     catch (realm::InvalidTransactionException const&) {
         @throw RLMException(@"Cannot modify managed RLMArray outside of a write transaction.");
     }
@@ -127,48 +125,48 @@ static void throwError(__unsafe_unretained ObjcCollection *const col, NSString *
         @throw RLMException(@"Realm accessed from incorrect thread.");
     }
     catch (realm::Results::UnsupportedColumnTypeException const& e) {
-        if (col->_backingCollection.get_type() == realm::PropertyType::Object) {
+        if (dict->_backingCollection.get_type() == realm::PropertyType::Object) {
             @throw RLMException(@"%@: is not supported for %s%s property '%s'.",
                                 aggregateMethod,
                                 string_for_property_type(e.property_type),
-                                col->_optional ? "?" : "",
+                                dict->_optional ? "?" : "",
                                 e.column_name.data());
         }
         @throw RLMException(@"%@: is not supported for %s%s dictionary '%@.%@'.",
                             aggregateMethod,
                             string_for_property_type(e.property_type),
-                            col->_optional ? "?" : "",
-                            col->_ownerInfo->rlmObjectSchema.className, col->_key);
+                            dict->_optional ? "?" : "",
+                            dict->_ownerInfo->rlmObjectSchema.className, dict->_key);
     }
     catch (std::logic_error const& e) {
         @throw RLMException(e);
     }
 }
 
-template<typename ObjcCollection, typename Function>
-static auto translateErrors(__unsafe_unretained ObjcCollection *const collection,
+template<typename Function>
+static auto translateErrors(__unsafe_unretained RLMManagedDictionary *const dictionary,
                             Function&& f, NSString *aggregateMethod=nil) {
     try {
         return f();
     }
     catch (...) {
-        throwError<ObjcCollection>(collection, aggregateMethod);
+        throwError(dictionary, aggregateMethod);
     }
 }
 
-template<typename ObjcCollection, typename Function>
+template<typename Function>
 static auto translateErrors(Function&& f) {
     try {
         return f();
     }
     catch (...) {
-        throwError<ObjcCollection>(nil, nil);
+        throwError(nil, nil);
     }
 }
 
 static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dict,
                              dispatch_block_t f) {
-    translateErrors<RLMManagedDictionary>([&] { dict->_backingCollection.verify_in_transaction(); });
+    translateErrors([&] { dict->_backingCollection.verify_in_transaction(); });
 
     RLMObservationTracker tracker(dict->_realm);
     tracker.trackDeletions();
@@ -179,7 +177,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
         tracker.willChange(obsInfo, dict->_key);
     }
 
-    translateErrors<RLMManagedDictionary>(f);
+    translateErrors(f);
 }
 
 //
@@ -190,13 +188,13 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (NSUInteger)count {
-    return translateErrors<RLMManagedDictionary>([&] {
+    return translateErrors([&] {
         return _backingCollection.size();
     });
 }
 
 - (NSArray *)allKeys {
-    return translateErrors<RLMManagedDictionary>([&] {
+    return translateErrors([&] {
         NSMutableArray<id<RLMDictionaryKey>> *keys = [NSMutableArray array];
         auto keyResult = _backingCollection.get_keys();
         for (size_t i=0; i<keyResult.size(); i++) {
@@ -207,7 +205,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (NSArray *)allValues {
-    return translateErrors<RLMManagedDictionary>([&] {
+    return translateErrors([&] {
         NSMutableArray *values = [NSMutableArray array];
         auto valueResult = _backingCollection.get_values();
         RLMAccessorContext c(*_objectInfo);
@@ -219,7 +217,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (BOOL)isInvalidated {
-    return translateErrors<RLMManagedDictionary>([&] { return !_backingCollection.is_valid(); });
+    return translateErrors([&] { return !_backingCollection.is_valid(); });
 }
 
 - (RLMClassInfo *)objectInfo {
@@ -253,7 +251,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
         return nil;
     }
     catch (...) {
-        throwError<RLMManagedDictionary>(nil, nil);
+        throwError(nil, nil);
     }
 }
 
@@ -262,14 +260,14 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (nonnull id)objectAtIndex:(NSUInteger)index {
-    return translateErrors<RLMManagedDictionary>([&] {
+    return translateErrors([&] {
         auto key = _backingCollection.get_pair(index).first;
         return RLMStringDataToNSString(key);
     });
 }
 
 - (NSUInteger)indexOfObject:(id)value {
-    return translateErrors<RLMManagedDictionary>([&] {
+    return translateErrors([&] {
         return _backingCollection.find_any(value);
     });
 }
@@ -322,7 +320,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
         return;
     }
     catch (...) {
-        throwError<RLMManagedDictionary>(nil, nil);
+        throwError(nil, nil);
     }
 }
 
@@ -343,7 +341,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 - (id)valueForKeyPath:(NSString *)keyPath {
     if ([keyPath hasPrefix:@"@"]) {
         // Delegate KVC collection operators to RLMResults
-        return translateErrors<RLMManagedDictionary>([&] {
+        return translateErrors([&] {
             auto results = [RLMResults resultsWithObjectInfo:*_objectInfo
                                                      results:_backingCollection.as_results()];
             return [results valueForKeyPath:keyPath];
@@ -365,14 +363,14 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
         return;
     }
     RLMAccessorContext context(*_objectInfo);
-    translateErrors<RLMManagedDictionary>([&] {
+    translateErrors([&] {
         _backingCollection.insert(context, [key UTF8String], value);
     });
 }
 
 - (id)minOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
-    auto value = translateErrors<RLMManagedDictionary>(self, [&] {
+    auto value = translateErrors(self, [&] {
         return _backingCollection.as_results().min(column);
     }, @"minOfProperty");
     return value ? RLMMixedToObjc(*value) : nil;
@@ -380,7 +378,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (id)maxOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
-    auto value = translateErrors<RLMManagedDictionary>(self, [&] {
+    auto value = translateErrors(self, [&] {
         return _backingCollection.as_results().max(column);
     }, @"maxOfProperty");
     return value ? RLMMixedToObjc(*value) : nil;
@@ -388,7 +386,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (id)sumOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
-    auto value = translateErrors<RLMManagedDictionary>(self, [&] {
+    auto value = translateErrors(self, [&] {
         return _backingCollection.as_results().sum(column);
     }, @"sumOfProperty");
     return value ? RLMMixedToObjc(*value) : @0;
@@ -396,7 +394,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (id)averageOfProperty:(NSString *)property {
     auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
-    auto value = translateErrors<RLMManagedDictionary>(self, [&] {
+    auto value = translateErrors(self, [&] {
         return _backingCollection.as_results().average(column);
     }, @"averageOfProperty");
     return value ? RLMMixedToObjc(*value) : nil;
@@ -408,11 +406,11 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     }
     // delete all target rows from the realm
     RLMObservationTracker tracker(_realm, true);
-    translateErrors<RLMManagedDictionary>([&] { _backingCollection.remove_all(); });
+    translateErrors([&] { _backingCollection.remove_all(); });
 }
 
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties {
-    return translateErrors<RLMManagedDictionary>([&] {
+    return translateErrors([&] {
         return [RLMResults resultsWithObjectInfo:*_objectInfo
                                          results:_backingCollection.as_results().sort(RLMSortDescriptorsToKeypathArray(properties))];
     });
@@ -423,7 +421,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (RLMResults *)distinctResultsUsingKeyPaths:(NSArray<NSString *> *)keyPaths {
-    return translateErrors<RLMManagedDictionary>([&] {
+    return translateErrors([&] {
         auto results = [RLMResults resultsWithObjectInfo:*_objectInfo results:_backingCollection.as_results()];
         return [results distinctResultsUsingKeyPaths:keyPaths];
     });
@@ -434,7 +432,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
         @throw RLMException(@"Querying is currently only implemented for dictionaries of Realm Objects");
     }
     auto query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema, _realm.schema, _realm.group);
-    auto results = translateErrors<RLMManagedDictionary>([&] {
+    auto results = translateErrors([&] {
         return _backingCollection.as_results().filter(std::move(query));
     });
     return [RLMResults resultsWithObjectInfo:*_objectInfo results:std::move(results)];
@@ -449,13 +447,13 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (realm::TableView)tableView {
-    return translateErrors<RLMManagedDictionary>([&] {
+    return translateErrors([&] {
         return _backingCollection.as_results().get_query();
     }).find_all();
 }
 
 - (RLMFastEnumerator *)fastEnumerator {
-    return translateErrors<RLMManagedDictionary>([&] {
+    return translateErrors([&] {
         return [[RLMFastEnumerator alloc] initWithBackingDictionary:_backingCollection
                                                          dictionary:self
                                                           classInfo:*_objectInfo];

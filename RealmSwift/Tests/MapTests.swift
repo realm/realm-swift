@@ -598,9 +598,15 @@ class MapTests: TestCase {
                 (o3.value(forKey: key) as! Map<String, T>)["aKey3"] = values[2]
                 realm.add([o, o2, o3])
 
-                XCTAssertEqual(realm.objects(SwiftMapObject.self).count, 3)
-                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues = %@", values[0]).count, 1)
-                XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues != %@", values[0]).count, 2)
+                if (T.self is Object.Type) {
+                    XCTAssertEqual(realm.objects(SwiftMapObject.self).count, 3)
+                    XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues = %@", o.object).count, 1)
+                    XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues != %@", o.object).count, 2)
+                } else {
+                    XCTAssertEqual(realm.objects(SwiftMapObject.self).count, 3)
+                    XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues = %@", values[0]).count, 1)
+                    XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues != %@", values[0]).count, 2)
+                }
 
                 if (T.self is String.Type) {
                     XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues =[c] %@", values[0]).count, 2)

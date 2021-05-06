@@ -1268,11 +1268,7 @@ class MinMaxAnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: Primiti
 
 class AddableAnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.T == AnyRealmValue {
     func testSum() {
-        if O.isManaged() {
-            XCTAssertEqual(map.sum().intValue, nil)
-        } else {
-            XCTAssertEqual(map.sum().intValue, 0)
-        }
+        XCTAssertEqual(map.sum().intValue, 0)
         for element in values {
             map[element.key] = element.value
         }
