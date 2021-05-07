@@ -1030,16 +1030,25 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 - (void)testObserveUnmanagedObject {
     AllTypesObject *unmanagedObj = [[AllTypesObject alloc] init];
     XCTAssertThrows([unmanagedObj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {}]);
+    XCTAssertThrows([unmanagedObj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {} keyPaths:@[@"boolCol"]]);
 }
 
 - (void)testDeleteObservedObject {
-    XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    RLMNotificationToken *token = [_obj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
+    XCTestExpectation *expectation0 = [self expectationWithDescription:@"delete observed object"];
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"delete observed object"];
+
+    RLMNotificationToken *token0 = [_obj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
         XCTAssertTrue(deleted);
         XCTAssertNil(error);
         XCTAssertNil(changes);
-        [expectation fulfill];
+        [expectation0 fulfill];
     }];
+    RLMNotificationToken *token1 = [_obj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
+        XCTAssertTrue(deleted);
+        XCTAssertNil(error);
+        XCTAssertNil(changes);
+        [expectation1 fulfill];
+    } keyPaths:@[@"boolCol"]];
 
     RLMRealm *realm = _obj.realm;
     [realm beginWriteTransaction];
@@ -1047,7 +1056,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     [realm commitWriteTransaction];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token invalidate];
+    [token0 invalidate];
 }
 
 - (void)testChangeAllPropertyTypes {

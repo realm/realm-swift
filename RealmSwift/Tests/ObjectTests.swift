@@ -636,7 +636,7 @@ class ObjectTests: TestCase {
             exp0.fulfill()
         }
 
-        let exp1 = expectation(description: "Delete observed object with filtered Keypath")
+        let exp1 = expectation(description: "Delete observed object")
         let token1 = object1.observe(keyPaths: ["intCol"]) { change in
             if case .deleted = change {
             } else {
@@ -650,7 +650,7 @@ class ObjectTests: TestCase {
         realm.delete(object1)
         try! realm.commitWrite()
 
-        waitForExpectations(timeout: 2)
+        waitForExpectations(timeout: 1)
         token0.invalidate()
         token1.invalidate()
     }
@@ -667,19 +667,6 @@ class ObjectTests: TestCase {
             XCTFail("expected .change, got \(change)")
         }
     }
-    
-//    func checkChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ filter: String, _ change: ObjectChange<ObjectBase>) {
-//        if case .change(_, let properties) = change {
-//            XCTAssertEqual(properties.count, 1)
-//            if let prop = properties.first {
-//                XCTAssertEqual(prop.name, name)
-//                XCTAssertEqual(prop.oldValue as? T, old)
-//                XCTAssertEqual(prop.newValue as? U, new)
-//            }
-//        } else {
-//            XCTFail("expected .change, got \(change)")
-//        }
-//    }
 
     func expectChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ inverted: Bool = false) -> ((ObjectChange<ObjectBase>) -> Void) {
         let exp = expectation(description: "change from \(String(describing: old)) to \(String(describing: new))")
@@ -689,23 +676,6 @@ class ObjectTests: TestCase {
             exp.fulfill()
         }
     }
-    
-//    func expectNoChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?) -> ((ObjectChange<ObjectBase>) -> Void) {
-//        let exp = expectation(description: "Change from \(String(describing: old)) to \(String(describing: new)) should not have notified for \(name)")
-//        exp.isInverted = true // Expectation will now fail if `exp` is fulfilled.
-//        return { change in
-//            self.checkChange(name, old, new, change)
-//            exp.fulfill()
-//        }
-//    }
-
-//    func expectChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ filter: String) -> ((ObjectChange<ObjectBase>) -> Void) {
-//        let exp = expectation(description: "change from \(String(describing: old)) to \(String(describing: new)), with filter \(filter)")
-//        return { change in
-//            self.checkChange(name, old, new, change)
-//            exp.fulfill()
-//        }
-//    }
 
     func testModifyObservedObjectLocally() {
         let realm = try! Realm()
@@ -761,8 +731,11 @@ class ObjectTests: TestCase {
         }
         waitForExpectations(timeout: 0.1)
         token.invalidate()
+
+        // !!!: Split into different test
         // Expect no notification for "boolCol" keypath when "intCol" is modified
         let ex = expectation(description: "no change")
+        ex.isInverted = true
         token = object.observe(keyPaths: ["boolCol"], { change in
             ex.fulfill()
         })
@@ -1014,7 +987,7 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
     
-    func testOptionalPropertyKeyPath() {
+    func testOptionalPropertyKeyPathNotifications() {
         let realm = try! Realm()
         let object = SwiftOptionalDefaultValuesObject()
         try! realm.write({

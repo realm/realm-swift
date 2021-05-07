@@ -560,8 +560,8 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
 
 RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema, RLMClassInfo *info, NSString *keyPath) {
     RLMProperty *property;
-    std::vector<RLMProperty *> links;
-    std::vector<std::pair<TableKey, ColKey>> keyPairs;
+//    std::vector<RLMProperty *> links;
+    std::vector<std::pair<TableKey, ColKey>> keyPairs; // maybe name keyPaths?
 
     bool keyPathContainsToManyRelationship = false;
 
@@ -584,7 +584,7 @@ RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema
                             @"Invalid value", @"Property '%@' is not a link in object of type '%@'",
                             propertyName, objectSchema.className);
 
-            links.push_back(property);
+//            links.push_back(property);
             REALM_ASSERT(property.objectClassName);
             
             // (1) What's the difference? Doesn't seem to be any except that the first line is safer because it checks for null first.
@@ -593,6 +593,7 @@ RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema
             
             ColKey ck = info->table()->get_column_key(property.columnName.UTF8String);
 //            std::pair<TableKey, ColKey> keyPair = std::make_pair(tk, ck);
+            // How to assert that this is in fact a link? is line 588 enough?
             keyPairs.push_back(std::make_pair(tk, ck));
             
             objectSchema = schema[property.objectClassName];

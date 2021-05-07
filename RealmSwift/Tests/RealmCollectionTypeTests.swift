@@ -476,8 +476,10 @@ class RealmCollectionTypeTests: TestCase {
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 2)
-            case .update:
-                // TODO: check the change notifications are correct
+            case .update(_, let deletions, let insertions, let modifications):
+                XCTAssertEqual(deletions, [])
+                XCTAssertEqual(insertions, [])
+                XCTAssertEqual(modifications, [0])
                 break
             case .error:
                 XCTFail("error not expected")
@@ -486,7 +488,7 @@ class RealmCollectionTypeTests: TestCase {
         }
         waitForExpectations(timeout: 0.2, handler: nil)
 
-        // Only expect a change notification for the token observing `stringCol` keypath.
+        // Expect a change notification for the token observing `stringCol` keypath.
         ex = self.expectation(description: "change notification")
         dispatchSyncNewThread {
             let realm = self.realmWithTestPath()
@@ -1267,7 +1269,6 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         assertThrows(collection.filter("ANY stringListCol == %@", CTTNullableStringObjectWithLink()))
     }
 
-    // ???: KPF not needed to test on these overrides?
     override func testObserve() {
         assertThrows(collection.observe { _ in })
     }
