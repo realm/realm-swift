@@ -377,9 +377,13 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
 
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedCollection() -> RLMSet<AnyObject> {
-        return Element._rlmSet()
+        if let type = Element.self as? ObjectBase.Type {
+            return RLMSet(objectClassName: type.className())
+        }
+        return RLMSet(objectType: Element._rlmType, optional: Element._rlmOptional)
     }
 
+    /// :nodoc:
     @objc public override class func _backingCollectionType() -> AnyClass {
         return RLMManagedSet.self
     }

@@ -20,14 +20,18 @@ import Foundation
 import Realm.Private
 
 public protocol _RealmSchemaDiscoverable {
+    static var _rlmType: PropertyType { get }
+    static var _rlmOptional: Bool { get }
     func _rlmPopulateProperty(_ prop: RLMProperty)
     static func _rlmPopulateProperty(_ prop: RLMProperty)
-    static func _rlmRequireObjc() -> Bool
+    static var _rlmRequireObjc: Bool { get }
 }
 
 extension _RealmSchemaDiscoverable {
+    public static var _rlmOptional: Bool { false }
+    public static var _rlmRequireObjc: Bool { true }
     public func _rlmPopulateProperty(_ prop: RLMProperty) { }
-    public static func _rlmRequireObjc() -> Bool { return true }
+    public static func _rlmPopulateProperty(_ prop: RLMProperty) { }
 }
 
 // If the property is a storage property for a lazy Swift property, return
@@ -88,6 +92,8 @@ private func getProperties(_ cls: RLMObjectBase.Type) -> [RLMProperty] {
 
         let property = RLMProperty()
         property.name = label
+        property.type = valueType._rlmType
+        property.optional = valueType._rlmOptional
         valueType._rlmPopulateProperty(property)
         value._rlmPopulateProperty(property)
         property.indexed = indexedProperties.contains(property.name)
@@ -122,7 +128,7 @@ private func getProperties(_ cls: RLMObjectBase.Type) -> [RLMProperty] {
             if computed && class_getInstanceVariable(cls, label) == nil {
                 return nil
             }
-        } else if valueType._rlmRequireObjc() {
+        } else if valueType._rlmRequireObjc {
             // Implicitly ignore non-@objc dynamic properties
             return nil
         } else {

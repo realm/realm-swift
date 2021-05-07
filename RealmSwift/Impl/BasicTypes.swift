@@ -20,109 +20,73 @@ import Realm
 import Realm.Private
 
 extension Int: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ property: RLMProperty) {
-        property.type = .int
-    }
+    public static var _rlmType: PropertyType { .int }
 }
 
 extension Int8: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ property: RLMProperty) {
-        property.type = .int
-    }
+    public static var _rlmType: PropertyType { .int }
 }
 
 extension Int16: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ property: RLMProperty) {
-        property.type = .int
-    }
+    public static var _rlmType: PropertyType { .int }
 }
 
 extension Int32: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ property: RLMProperty) {
-        property.type = .int
-    }
+    public static var _rlmType: PropertyType { .int }
 }
 
 extension Int64: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ property: RLMProperty) {
-        property.type = .int
-    }
+    public static var _rlmType: PropertyType { .int }
 }
 
 extension Bool: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ property: RLMProperty) {
-        property.type = .bool
-    }
+    public static var _rlmType: PropertyType { .bool }
 }
 
 extension Float: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ property: RLMProperty) {
-        property.type = .float
-    }
+    public static var _rlmType: PropertyType { .float }
 }
 
 extension Double: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ property: RLMProperty) {
-        property.type = .double
-    }
+    public static var _rlmType: PropertyType { .double }
 }
 
 extension String: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ property: RLMProperty) {
-        property.type = .string
-    }
+    public static var _rlmType: PropertyType { .string }
 }
 
 extension Data: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ property: RLMProperty) {
-        property.type = .data
-    }
+    public static var _rlmType: PropertyType { .data }
 }
 
 extension ObjectId: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ property: RLMProperty) {
-        property.type = .objectId
-    }
+    public static var _rlmType: PropertyType { .objectId }
 }
 
 extension Decimal128: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ property: RLMProperty) {
-        property.type = .decimal128
-    }
+    public static var _rlmType: PropertyType { .decimal128 }
 }
 
 extension Date: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ property: RLMProperty) {
-        property.type = .date
-    }
+    public static var _rlmType: PropertyType { .date }
 }
 
 extension UUID: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ property: RLMProperty) {
-        property.type = .UUID
-    }
+    public static var _rlmType: PropertyType { .UUID }
 }
 
 extension AnyRealmValue: _RealmSchemaDiscoverable {
-    public static func _rlmPopulateProperty(_ prop: RLMProperty) {
-        prop.type = .any
-    }
+    public static var _rlmType: PropertyType { .any }
 }
 
 extension NSString: _RealmSchemaDiscoverable {
-    static public func _rlmPopulateProperty(_ prop: RLMProperty) {
-        prop.type = .string
-    }
+    public static var _rlmType: PropertyType { .string }
 }
 
 extension NSData: _RealmSchemaDiscoverable {
-    static public func _rlmPopulateProperty(_ prop: RLMProperty) {
-        prop.type = .data
-    }
+    public static var _rlmType: PropertyType { .data }
 }
 
 extension NSDate: _RealmSchemaDiscoverable {
-    static public func _rlmPopulateProperty(_ prop: RLMProperty) {
-        prop.type = .date
-    }
+    public static var _rlmType: PropertyType { .date }
 }
