@@ -19,13 +19,13 @@ identifier_name:
     - _observe(_:)
     - _realmColumnNames()
     - _realmObjectName()
-    - _rlmArray()
     - _rlmCollection()
     - _rlmFromRawValue(_:)
+    - _rlmOptional
     - _rlmPopulateProperty(_:)
-    - _rlmRequireObjc()
-    - _rlmSet()
+    - _rlmRequireObjc
     - _rlmToRawValue(_:)
+    - _rlmType
     - id
     - pk
     - to

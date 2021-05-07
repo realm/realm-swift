@@ -74,15 +74,6 @@ import Realm.Private
  */
 public typealias Object = RealmSwiftObject
 extension Object: RealmCollectionValue {
-    /// :nodoc:
-    public static func _rlmArray() -> RLMArray<AnyObject> {
-        return RLMArray(objectClassName: className())
-    }
-    /// :nodoc:
-    public static func _rlmSet() -> RLMSet<AnyObject> {
-        return RLMSet(objectClassName: className())
-    }
-
     // MARK: Initializers
 
     /**
@@ -469,6 +460,7 @@ public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSc
     static func _rlmPopulateProperty(_ prop: RLMProperty) {
         RawValue._rlmPopulateProperty(prop)
     }
+    static var _rlmType: PropertyType { RawValue._rlmType }
 }
 
 internal func dynamicGet(object: ObjectBase, key: String) -> Any? {

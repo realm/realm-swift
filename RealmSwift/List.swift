@@ -430,9 +430,13 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
 
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedCollection() -> RLMArray<AnyObject> {
-        return Element._rlmArray()
+        if let type = Element.self as? ObjectBase.Type {
+            return RLMArray(objectClassName: type.className())
+        }
+        return RLMArray(objectType: Element._rlmType, optional: Element._rlmOptional)
     }
 
+    /// :nodoc:
     @objc public override class func _backingCollectionType() -> AnyClass {
         return RLMManagedArray.self
     }
