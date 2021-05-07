@@ -1,15 +1,9 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.8.0-beta.0 Release notes (2021-05-07)
 =============================================================
 ### Enhancements
 * Add `RLMSet`/`MutableSet<>` datatype. This is a Set collection type used for storing distinct values in a collection.
 * Add support for `id<RLMValue>`/`AnyRealmValue`.
 * Add support for `UUID`/`NSUUID` data type.
-
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Deprecations
 * `RealmOptional` has been deprecated in favor of `RealmProperty`.
@@ -21,7 +15,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * CocoaPods: 1.10 or later.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v10.6.0 to v11.0.0-beta.4
 
 10.7.4 Release notes (2021-04-26)
 =============================================================
