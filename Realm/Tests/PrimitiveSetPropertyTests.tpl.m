@@ -625,11 +625,11 @@ static double average(NSArray *values) {
 
 - (void)testInvalidAssignment {
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)@[NSNull.null],
-                              @"Invalid value '<null>' of type 'NSNull' for 'int' property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value '<null>' of type 'NSNull' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)@[@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)(@[@1, @"a"]),
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)unmanaged.floatObj,
                               @"RLMSet<float> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)optUnmanaged.intObj,
@@ -640,11 +640,11 @@ static double average(NSArray *values) {
                               @"RLMSet<int?> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
 
     RLMAssertThrowsWithReason(managed.intObj = (id)@[NSNull.null],
-                              @"Invalid value '<null>' of type 'NSNull' for 'int' property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value '<null>' of type 'NSNull' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)@[@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)(@[@1, @"a"]),
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)managed.floatObj,
                               @"RLMSet<float> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)optManaged.intObj,

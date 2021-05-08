@@ -1090,24 +1090,12 @@ void QueryBuilder::add_dictionary_constraint(RLMPropertyType type, NSPredicateOp
             });
             break;
         case RLMPropertyTypeObjectId:
-            if (operatorType == NSLikePredicateOperatorType ||
-                operatorType == NSBeginsWithPredicateOperatorType ||
-                operatorType == NSContainsPredicateOperatorType ||
-                operatorType == NSEndsWithPredicateOperatorType) {
-                unsupportedOperator(type, operatorType);
-            }
             convert_null(value, [&](auto&& value) {
                 add_bool_constraint(type, operatorType, column.resolve<Dictionary>(),
                                     value_of_type<ObjectId>(value));
             });
             break;
         case RLMPropertyTypeDate:
-            if (operatorType == NSLikePredicateOperatorType ||
-                operatorType == NSBeginsWithPredicateOperatorType ||
-                operatorType == NSContainsPredicateOperatorType ||
-                operatorType == NSEndsWithPredicateOperatorType) {
-                unsupportedOperator(type, operatorType);
-            }
             convert_null(value, [&](auto&& value) {
                 add_numeric_constraint(type, operatorType, column.resolve<Dictionary>(),
                                        value_of_type<Timestamp>(value));

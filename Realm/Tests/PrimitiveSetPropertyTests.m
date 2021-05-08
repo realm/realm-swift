@@ -5851,11 +5851,11 @@ static double average(NSArray *values) {
 
 - (void)testInvalidAssignment {
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)@[NSNull.null],
-                              @"Invalid value '<null>' of type 'NSNull' for 'int' property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value '<null>' of type 'NSNull' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)@[@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)(@[@1, @"a"]),
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)unmanaged.floatObj,
                               @"RLMSet<float> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(unmanaged.intObj = (id)optUnmanaged.intObj,
@@ -5866,11 +5866,11 @@ static double average(NSArray *values) {
                               @"RLMSet<int?> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
 
     RLMAssertThrowsWithReason(managed.intObj = (id)@[NSNull.null],
-                              @"Invalid value '<null>' of type 'NSNull' for 'int' property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value '<null>' of type 'NSNull' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)@[@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)(@[@1, @"a"]),
-                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' property 'AllPrimitiveSets.intObj'.");
+                              @"Invalid value 'a' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)managed.floatObj,
                               @"RLMSet<float> does not match expected type 'int' for property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason(managed.intObj = (id)optManaged.intObj,
@@ -8244,98 +8244,98 @@ static double average(NSArray *values) {
     // match half as many as they should. Many of the below tests will start
     // failing if this is fixed.
 
-//    testNull(@"==", 0);
-//    test(@"==", @"", 4);
-//    test(@"==", @"a", 1);
-//    test(@"==", @"á", 1);
-//    test(@"==[c]", @"a", 2);
-//    test(@"==[c]", @"á", 1);
-//    test(@"==", @"A", 1);
-//    test(@"==", @"Á", 1);
-//    test(@"==[c]", @"A", 2);
+    testNull(@"==", 0);
+    test(@"==", @"", 4);
+    test(@"==", @"a", 1);
+    test(@"==", @"á", 1);
+    test(@"==[c]", @"a", 2);
+    test(@"==[c]", @"á", 1);
+    test(@"==", @"A", 1);
+    test(@"==", @"Á", 1);
+    test(@"==[c]", @"A", 2);
     test(@"==[c]", @"Á", 1);
-//    test(@"==[d]", @"a", 2);
-//    test(@"==[d]", @"á", 2);
-//    test(@"==[cd]", @"a", 4);
-//    test(@"==[cd]", @"á", 4);
-//    test(@"==[d]", @"A", 2);
-//    test(@"==[d]", @"Á", 2);
-//    test(@"==[cd]", @"A", 4);
-//    test(@"==[cd]", @"Á", 4);
-//
-//    testNull(@"!=", 160);
-//    test(@"!=", @"", 156);
-//    test(@"!=", @"a", 159);
-//    test(@"!=", @"á", 159);
-//    test(@"!=[c]", @"a", 158);
-//    test(@"!=[c]", @"á", 159);
-//    test(@"!=", @"A", 159);
-//    test(@"!=", @"Á", 159);
-//    test(@"!=[c]", @"A", 158);
-//    test(@"!=[c]", @"Á", 159);
-//    test(@"!=[d]", @"a", 158);
-//    test(@"!=[d]", @"á", 158);
-//    test(@"!=[cd]", @"a", 156);
-//    test(@"!=[cd]", @"á", 156);
-//    test(@"!=[d]", @"A", 158);
-//    test(@"!=[d]", @"Á", 158);
-//    test(@"!=[cd]", @"A", 156);
-//    test(@"!=[cd]", @"Á", 156);
-//
-//    testNull(@"CONTAINS", 0);
-//    testNull(@"CONTAINS[c]", 0);
-//    testNull(@"CONTAINS[d]", 0);
-//    testNull(@"CONTAINS[cd]", 0);
-//    test(@"CONTAINS", @"a", 25);
-//    test(@"CONTAINS", @"á", 25);
-//    test(@"CONTAINS[c]", @"a", 50);
-//    test(@"CONTAINS[c]", @"á", 25);
-//    test(@"CONTAINS", @"A", 25);
-//    test(@"CONTAINS", @"Á", 25);
-//    test(@"CONTAINS[c]", @"A", 50);
-//    test(@"CONTAINS[c]", @"Á", 25);
-//    test(@"CONTAINS[d]", @"a", 50);
-//    test(@"CONTAINS[d]", @"á", 50);
-//    test(@"CONTAINS[cd]", @"a", 100);
-//    test(@"CONTAINS[cd]", @"á", 100);
-//    test(@"CONTAINS[d]", @"A", 50);
-//    test(@"CONTAINS[d]", @"Á", 50);
-//    test(@"CONTAINS[cd]", @"A", 100);
-//    test(@"CONTAINS[cd]", @"Á", 100);
-//
-//    test(@"BEGINSWITH", @"a", 13);
-//    test(@"BEGINSWITH", @"á", 13);
-//    test(@"BEGINSWITH[c]", @"a", 26);
-//    test(@"BEGINSWITH[c]", @"á", 13);
-//    test(@"BEGINSWITH", @"A", 13);
-//    test(@"BEGINSWITH", @"Á", 13);
-//    test(@"BEGINSWITH[c]", @"A", 26);
-//    test(@"BEGINSWITH[c]", @"Á", 13);
-//    test(@"BEGINSWITH[d]", @"a", 26);
-//    test(@"BEGINSWITH[d]", @"á", 26);
-//    test(@"BEGINSWITH[cd]", @"a", 52);
-//    test(@"BEGINSWITH[cd]", @"á", 52);
-//    test(@"BEGINSWITH[d]", @"A", 26);
-//    test(@"BEGINSWITH[d]", @"Á", 26);
-//    test(@"BEGINSWITH[cd]", @"A", 52);
-//    test(@"BEGINSWITH[cd]", @"Á", 52);
-//
-//    test(@"ENDSWITH", @"a", 13);
-//    test(@"ENDSWITH", @"á", 13);
-//    test(@"ENDSWITH[c]", @"a", 26);
-//    test(@"ENDSWITH[c]", @"á", 13);
-//    test(@"ENDSWITH", @"A", 13);
-//    test(@"ENDSWITH", @"Á", 13);
-//    test(@"ENDSWITH[c]", @"A", 26);
-//    test(@"ENDSWITH[c]", @"Á", 13);
-//    test(@"ENDSWITH[d]", @"a", 26);
-//    test(@"ENDSWITH[d]", @"á", 26);
-//    test(@"ENDSWITH[cd]", @"a", 52);
-//    test(@"ENDSWITH[cd]", @"á", 52);
-//    test(@"ENDSWITH[d]", @"A", 26);
-//    test(@"ENDSWITH[d]", @"Á", 26);
-//    test(@"ENDSWITH[cd]", @"A", 52);
-//    test(@"ENDSWITH[cd]", @"Á", 52);
+    test(@"==[d]", @"a", 2);
+    test(@"==[d]", @"á", 2);
+    test(@"==[cd]", @"a", 4);
+    test(@"==[cd]", @"á", 4);
+    test(@"==[d]", @"A", 2);
+    test(@"==[d]", @"Á", 2);
+    test(@"==[cd]", @"A", 4);
+    test(@"==[cd]", @"Á", 4);
+
+    testNull(@"!=", 160);
+    test(@"!=", @"", 156);
+    test(@"!=", @"a", 159);
+    test(@"!=", @"á", 159);
+    test(@"!=[c]", @"a", 158);
+    test(@"!=[c]", @"á", 159);
+    test(@"!=", @"A", 159);
+    test(@"!=", @"Á", 159);
+    test(@"!=[c]", @"A", 158);
+    test(@"!=[c]", @"Á", 159);
+    test(@"!=[d]", @"a", 158);
+    test(@"!=[d]", @"á", 158);
+    test(@"!=[cd]", @"a", 156);
+    test(@"!=[cd]", @"á", 156);
+    test(@"!=[d]", @"A", 158);
+    test(@"!=[d]", @"Á", 158);
+    test(@"!=[cd]", @"A", 156);
+    test(@"!=[cd]", @"Á", 156);
+
+    testNull(@"CONTAINS", 0);
+    testNull(@"CONTAINS[c]", 0);
+    testNull(@"CONTAINS[d]", 0);
+    testNull(@"CONTAINS[cd]", 0);
+    test(@"CONTAINS", @"a", 25);
+    test(@"CONTAINS", @"á", 25);
+    test(@"CONTAINS[c]", @"a", 50);
+    test(@"CONTAINS[c]", @"á", 25);
+    test(@"CONTAINS", @"A", 25);
+    test(@"CONTAINS", @"Á", 25);
+    test(@"CONTAINS[c]", @"A", 50);
+    test(@"CONTAINS[c]", @"Á", 25);
+    test(@"CONTAINS[d]", @"a", 50);
+    test(@"CONTAINS[d]", @"á", 50);
+    test(@"CONTAINS[cd]", @"a", 100);
+    test(@"CONTAINS[cd]", @"á", 100);
+    test(@"CONTAINS[d]", @"A", 50);
+    test(@"CONTAINS[d]", @"Á", 50);
+    test(@"CONTAINS[cd]", @"A", 100);
+    test(@"CONTAINS[cd]", @"Á", 100);
+
+    test(@"BEGINSWITH", @"a", 13);
+    test(@"BEGINSWITH", @"á", 13);
+    test(@"BEGINSWITH[c]", @"a", 26);
+    test(@"BEGINSWITH[c]", @"á", 13);
+    test(@"BEGINSWITH", @"A", 13);
+    test(@"BEGINSWITH", @"Á", 13);
+    test(@"BEGINSWITH[c]", @"A", 26);
+    test(@"BEGINSWITH[c]", @"Á", 13);
+    test(@"BEGINSWITH[d]", @"a", 26);
+    test(@"BEGINSWITH[d]", @"á", 26);
+    test(@"BEGINSWITH[cd]", @"a", 52);
+    test(@"BEGINSWITH[cd]", @"á", 52);
+    test(@"BEGINSWITH[d]", @"A", 26);
+    test(@"BEGINSWITH[d]", @"Á", 26);
+    test(@"BEGINSWITH[cd]", @"A", 52);
+    test(@"BEGINSWITH[cd]", @"Á", 52);
+
+    test(@"ENDSWITH", @"a", 13);
+    test(@"ENDSWITH", @"á", 13);
+    test(@"ENDSWITH[c]", @"a", 26);
+    test(@"ENDSWITH[c]", @"á", 13);
+    test(@"ENDSWITH", @"A", 13);
+    test(@"ENDSWITH", @"Á", 13);
+    test(@"ENDSWITH[c]", @"A", 26);
+    test(@"ENDSWITH[c]", @"Á", 13);
+    test(@"ENDSWITH[d]", @"a", 26);
+    test(@"ENDSWITH[d]", @"á", 26);
+    test(@"ENDSWITH[cd]", @"a", 52);
+    test(@"ENDSWITH[cd]", @"á", 52);
+    test(@"ENDSWITH[d]", @"A", 26);
+    test(@"ENDSWITH[d]", @"Á", 26);
+    test(@"ENDSWITH[cd]", @"A", 52);
+    test(@"ENDSWITH[cd]", @"Á", 52);
 }
 
 

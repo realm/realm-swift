@@ -50,6 +50,8 @@ static const int RLMEnumerationBufferSize = 16;
     // to avoid having to copy the Results when not in a write transaction
     realm::Results *_results;
     realm::Results _snapshot;
+    bool _isDictionary;
+    std::vector<__unsafe_unretained id> _dictionaryKeys;
 
     // A strong reference to the collection being enumerated to ensure it stays
     // alive when we're holding a pointer to a member in it
@@ -78,7 +80,7 @@ static const int RLMEnumerationBufferSize = 16;
 }
 
 - (instancetype)initWithBackingDictionary:(realm::object_store::Dictionary const&)backingDictionary
-                               dictionary:(id)dictionary
+                               dictionary:(RLMManagedDictionary *)dictionary
                                 classInfo:(RLMClassInfo&)info {
     self = [super init];
     if (self) {
@@ -86,14 +88,31 @@ static const int RLMEnumerationBufferSize = 16;
         _realm = _info->realm;
 
         if (_realm.inWriteTransaction) {
+            // Freezing a Results has very temperamental behavior. It also pins a version of a Realm
+            // which is something we do not want. It seems more efficient to store the keys in a
+            // temporary array.
+
+            // It is more efficient to store the keys as NS types because
+            // if we are to store the key from Results we would need to perform
+            // RLMMixedToObjc on each itteration.
+            //
+            // We still need some reference to the Results as we need to know
+            // if the parent object is valid or not.
             _snapshot = backingDictionary.get_keys().snapshot();
+            for (id key in dictionary.allKeys) {
+                _dictionaryKeys.push_back(key);
+            }
         }
         else {
             _snapshot = backingDictionary.get_keys();
+            for (id key in dictionary.allKeys) {
+                _dictionaryKeys.push_back(key);
+            }
             _collection = dictionary;
             [_realm registerEnumerator:self];
         }
         _results = &_snapshot;
+        _isDictionary = true;
     }
     return self;
 }
@@ -128,6 +147,8 @@ static const int RLMEnumerationBufferSize = 16;
     _snapshot = _results->snapshot();
     _results = &_snapshot;
     _collection = nil;
+    if (_isDictionary)
+        _dictionaryKeys.clear();
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
@@ -147,9 +168,14 @@ static const int RLMEnumerationBufferSize = 16;
 
     @autoreleasepool {
         RLMAccessorContext ctx(*_info);
-
         for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
-            _strongBuffer[batchCount] = _results->get(ctx, index);
+            if (_isDictionary) {
+                _strongBuffer[batchCount] = _dictionaryKeys[index];
+                _dictionaryKeys[index] = nil;
+            }
+            else {
+                _strongBuffer[batchCount] = _results->get(ctx, index);
+            }
             batchCount++;
         }
     }
@@ -165,6 +191,9 @@ static const int RLMEnumerationBufferSize = 16;
             _collection = nil;
             [_realm unregisterEnumerator:self];
         }
+        if (_isDictionary)
+            _dictionaryKeys.clear();
+
         _snapshot = {};
     }
 

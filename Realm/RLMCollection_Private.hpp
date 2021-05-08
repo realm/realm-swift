@@ -56,7 +56,7 @@ class RLMClassInfo;
                                 classInfo:(RLMClassInfo&)info;
 
 - (instancetype)initWithBackingDictionary:(realm::object_store::Dictionary const&)backingDictionary
-                               dictionary:(id)dictionary
+                               dictionary:(RLMManagedDictionary *)dictionary
                                 classInfo:(RLMClassInfo&)info;
 
 - (instancetype)initWithResults:(realm::Results&)results

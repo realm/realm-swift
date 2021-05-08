@@ -33,10 +33,11 @@ class RLMClassInfo;
 class RLMObservationInfo;
 
 @interface RLMDictionary () {
-@public
+@protected
     NSString *_objectClassName;
     RLMPropertyType _type;
     BOOL _optional;
+@public
     // The name of the property which this RLMDictionary represents
     NSString *_key;
     __weak RLMObjectBase *_parentObject;

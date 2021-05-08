@@ -615,13 +615,6 @@ class MapTests: TestCase {
                     XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues =[cd] %@", values[0]).count, 3)
                     XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues !=[cd] %@", values[0]).count, 0)
                 }
-
-                if (T.self is Object.Type) {
-                    let stringObj = realm.objects(SwiftStringObject.self).filter("stringCol == 'hello'").first!
-                    XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues = %@", stringObj).count, 1)
-                    XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues != %@", stringObj).count, 2)
-                }
-
                 realm.delete([o, o2, o3])
             }
 

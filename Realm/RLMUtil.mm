@@ -181,17 +181,10 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
 void RLMThrowTypeError(__unsafe_unretained id const obj,
                        __unsafe_unretained RLMObjectSchema *const objectSchema,
                        __unsafe_unretained RLMProperty *const prop) {
-    if (prop.dictionary) {
-        @throw RLMException(@"Invalid value '%@' of type '%@' for RLMDictionary<string, %@%s> property '%@.%@'.",
-                            obj, [obj class],
-                            prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
-                            objectSchema.className, prop.name);
-    } else {
-        @throw RLMException(@"Invalid value '%@' of type '%@' for '%@%s'%s property '%@.%@'.",
-                            obj, [obj class],
-                            prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
-                            prop.array ? " array" : "", objectSchema.className, prop.name);
-    }
+    @throw RLMException(@"Invalid value '%@' of type '%@' for '%@%s'%s property '%@.%@'.",
+                        obj, [obj class],
+                        prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
+                        prop.array ? " array" : prop.set ? " set" : prop.dictionary ? " dictionary" : "", objectSchema.className, prop.name);
 }
 
 void RLMValidateValueForProperty(__unsafe_unretained id const obj,
@@ -240,7 +233,7 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
         }
         else if (RLMDictionary *dictionary = asRLMDictionary(obj)) {
             if (!checkCollectionType(dictionary, prop.type, prop.optional, prop.objectClassName)) {
-                @throw RLMException(@"RLMDictionary<%@, %@%s> does not match expected type RLMDictionary<string, %@%s> for property '%@.%@'.",
+                @throw RLMException(@"RLMDictionary<%@, %@%s> does not match expected type '%@%s' for property '%@.%@'.",
                                     RLMTypeToString(dictionary.keyType),
                                     dictionary.objectClassName ?: RLMTypeToString(dictionary.type), dictionary.optional ? "?" : "",
                                     prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",

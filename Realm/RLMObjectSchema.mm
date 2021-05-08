@@ -169,7 +169,7 @@ using namespace realm;
     }
 
     for (RLMProperty *prop in schema.properties) {
-        if (prop.optional && prop.collection && (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeLinkingObjects)) {
+        if (prop.optional && prop.collection && !prop.dictionary && (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeLinkingObjects)) {
             // FIXME: message is awkward
             @throw RLMException(@"Property '%@.%@' cannot be made optional because optional '%@' properties are not supported.",
                                 className, prop.name, RLMTypeToString(prop.type));
@@ -232,7 +232,7 @@ using namespace realm;
     if (auto requiredProperties = [objectClass requiredProperties]) {
         for (RLMProperty *property in propArray) {
             bool required = [requiredProperties containsObject:property.name];
-            if (required && property.type == RLMPropertyTypeObject && !property.collection) {
+            if (required && property.type == RLMPropertyTypeObject && (!property.collection || property.dictionary)) {
                 @throw RLMException(@"Object properties cannot be made required, "
                                     "but '+[%@ requiredProperties]' included '%@'", objectClass, property.name);
             }
