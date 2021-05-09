@@ -52,7 +52,7 @@ class SwiftLongObject: Object {
     @objc dynamic var longCol: Int64 = 0
 }
 
-@objc enum IntEnum: Int, RealmEnum {
+@objc enum IntEnum: Int, RealmEnum, Codable {
     case value1 = 1
     case value2 = 3
 }

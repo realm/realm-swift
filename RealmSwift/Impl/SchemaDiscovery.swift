@@ -45,6 +45,17 @@ private func baseName(forLazySwiftProperty name: String) -> String? {
     return nil
 }
 
+internal extension RLMProperty {
+    convenience init(name: String, value: _RealmSchemaDiscoverable) {
+        let valueType = Swift.type(of: value)
+        self.init(name: name, createSelectors: valueType._rlmRequireObjc)
+        self.type = valueType._rlmType
+        self.optional = valueType._rlmOptional
+        valueType._rlmPopulateProperty(self)
+        value._rlmPopulateProperty(self)
+    }
+}
+
 private func getProperties(_ cls: RLMObjectBase.Type) -> [RLMProperty] {
     let object = cls.init()
     let indexedProperties: Set<String>
@@ -90,12 +101,7 @@ private func getProperties(_ cls: RLMObjectBase.Type) -> [RLMProperty] {
         RLMValidateSwiftPropertyName(label)
         let valueType = type(of: value)
 
-        let property = RLMProperty()
-        property.name = label
-        property.type = valueType._rlmType
-        property.optional = valueType._rlmOptional
-        valueType._rlmPopulateProperty(property)
-        value._rlmPopulateProperty(property)
+        let property = RLMProperty(name: label, value: value)
         property.indexed = indexedProperties.contains(property.name)
         property.columnName = columnNames?[property.name]
 

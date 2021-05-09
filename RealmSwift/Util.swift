@@ -107,8 +107,8 @@ internal protocol CustomObjectiveCBridgeable {
     var objCValue: Any { get }
 }
 
-// FIXME: needed with swift 3.2
-// Double isn't though?
+// `NSNumber as? Float` fails if the value can't be exactly represented as a float,
+// unlike the other NSNumber conversions
 extension Float: CustomObjectiveCBridgeable {
     internal static func bridging(objCValue: Any) -> Float {
         return (objCValue as! NSNumber).floatValue
