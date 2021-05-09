@@ -21,7 +21,7 @@ import RealmSwift
 import Foundation
 
 class ObjectAccessorTests: TestCase {
-    func setAndTestAllProperties(_ object: SwiftObject) {
+    func setAndTestAllPropertiesViaNormalAccess(_ object: SwiftObject, _ optObject: SwiftOptionalObject) {
         object.boolCol = true
         XCTAssertEqual(object.boolCol, true)
         object.boolCol = false
@@ -116,14 +116,756 @@ class ObjectAccessorTests: TestCase {
 
         object.anyCol.value = .string("hello")
         XCTAssertEqual(object.anyCol.value.stringValue, "hello")
+
+        // Optional properties
+
+        optObject.optNSStringCol = ""
+        XCTAssertEqual(optObject.optNSStringCol!, "")
+        optObject.optNSStringCol = utf8TestString as NSString?
+        XCTAssertEqual(optObject.optNSStringCol! as String, utf8TestString)
+        optObject.optNSStringCol = nil
+        XCTAssertNil(optObject.optNSStringCol)
+
+        optObject.optStringCol = ""
+        XCTAssertEqual(optObject.optStringCol!, "")
+        optObject.optStringCol = utf8TestString
+        XCTAssertEqual(optObject.optStringCol!, utf8TestString)
+        optObject.optStringCol = nil
+        XCTAssertNil(optObject.optStringCol)
+
+        optObject.optBinaryCol = data
+        XCTAssertEqual(optObject.optBinaryCol!, data)
+        optObject.optBinaryCol = nil
+        XCTAssertNil(optObject.optBinaryCol)
+
+        optObject.optDateCol = date
+        XCTAssertEqual(optObject.optDateCol!, date)
+        optObject.optDateCol = nil
+        XCTAssertNil(optObject.optDateCol)
+
+        optObject.optIntCol.value = Int.min
+        XCTAssertEqual(optObject.optIntCol.value!, Int.min)
+        optObject.optIntCol.value = 0
+        XCTAssertEqual(optObject.optIntCol.value!, 0)
+        optObject.optIntCol.value = Int.max
+        XCTAssertEqual(optObject.optIntCol.value!, Int.max)
+        optObject.optIntCol.value = nil
+        XCTAssertNil(optObject.optIntCol.value)
+
+        optObject.optInt8Col.value = Int8.min
+        XCTAssertEqual(optObject.optInt8Col.value!, Int8.min)
+        optObject.optInt8Col.value = 0
+        XCTAssertEqual(optObject.optInt8Col.value!, 0)
+        optObject.optInt8Col.value = Int8.max
+        XCTAssertEqual(optObject.optInt8Col.value!, Int8.max)
+        optObject.optInt8Col.value = nil
+        XCTAssertNil(optObject.optInt8Col.value)
+
+        optObject.optInt16Col.value = Int16.min
+        XCTAssertEqual(optObject.optInt16Col.value!, Int16.min)
+        optObject.optInt16Col.value = 0
+        XCTAssertEqual(optObject.optInt16Col.value!, 0)
+        optObject.optInt16Col.value = Int16.max
+        XCTAssertEqual(optObject.optInt16Col.value!, Int16.max)
+        optObject.optInt16Col.value = nil
+        XCTAssertNil(optObject.optInt16Col.value)
+
+        optObject.optInt32Col.value = Int32.min
+        XCTAssertEqual(optObject.optInt32Col.value!, Int32.min)
+        optObject.optInt32Col.value = 0
+        XCTAssertEqual(optObject.optInt32Col.value!, 0)
+        optObject.optInt32Col.value = Int32.max
+        XCTAssertEqual(optObject.optInt32Col.value!, Int32.max)
+        optObject.optInt32Col.value = nil
+        XCTAssertNil(optObject.optInt32Col.value)
+
+        optObject.optInt64Col.value = Int64.min
+        XCTAssertEqual(optObject.optInt64Col.value!, Int64.min)
+        optObject.optInt64Col.value = 0
+        XCTAssertEqual(optObject.optInt64Col.value!, 0)
+        optObject.optInt64Col.value = Int64.max
+        XCTAssertEqual(optObject.optInt64Col.value!, Int64.max)
+        optObject.optInt64Col.value = nil
+        XCTAssertNil(optObject.optInt64Col.value)
+
+        optObject.optFloatCol.value = -Float.greatestFiniteMagnitude
+        XCTAssertEqual(optObject.optFloatCol.value!, -Float.greatestFiniteMagnitude)
+        optObject.optFloatCol.value = 0
+        XCTAssertEqual(optObject.optFloatCol.value!, 0)
+        optObject.optFloatCol.value = Float.greatestFiniteMagnitude
+        XCTAssertEqual(optObject.optFloatCol.value!, Float.greatestFiniteMagnitude)
+        optObject.optFloatCol.value = nil
+        XCTAssertNil(optObject.optFloatCol.value)
+
+        optObject.optDoubleCol.value = -Double.greatestFiniteMagnitude
+        XCTAssertEqual(optObject.optDoubleCol.value!, -Double.greatestFiniteMagnitude)
+        optObject.optDoubleCol.value = 0
+        XCTAssertEqual(optObject.optDoubleCol.value!, 0)
+        optObject.optDoubleCol.value = Double.greatestFiniteMagnitude
+        XCTAssertEqual(optObject.optDoubleCol.value!, Double.greatestFiniteMagnitude)
+        optObject.optDoubleCol.value = nil
+        XCTAssertNil(optObject.optDoubleCol.value)
+
+        optObject.optBoolCol.value = true
+        XCTAssertEqual(optObject.optBoolCol.value!, true)
+        optObject.optBoolCol.value = false
+        XCTAssertEqual(optObject.optBoolCol.value!, false)
+        optObject.optBoolCol.value = nil
+        XCTAssertNil(optObject.optBoolCol.value)
+
+        optObject.optObjectCol = SwiftBoolObject(value: [true])
+        XCTAssertEqual(optObject.optObjectCol!.boolCol, true)
+        optObject.optObjectCol = nil
+        XCTAssertNil(optObject.optObjectCol)
+
+        optObject.optEnumCol.value = .value1
+        XCTAssertEqual(optObject.optEnumCol.value, .value1)
+        optObject.optEnumCol.value = .value2
+        XCTAssertEqual(optObject.optEnumCol.value, .value2)
+        optObject.optEnumCol.value = nil
+        XCTAssertNil(optObject.optEnumCol.value)
+    }
+
+    func setAndTestAllPropertiesViaSubscript(_ object: SwiftObject, _ optObject: SwiftOptionalObject) {
+        object["boolCol"] = true
+        XCTAssertEqual(object["boolCol"] as! Bool, true)
+        object["boolCol"] = false
+        XCTAssertEqual(object["boolCol"] as! Bool, false)
+
+        object["intCol"] = -1
+        XCTAssertEqual(object["intCol"] as! Int, -1)
+        object["intCol"] = 0
+        XCTAssertEqual(object["intCol"] as! Int, 0)
+        object["intCol"] = 1
+        XCTAssertEqual(object["intCol"] as! Int, 1)
+
+        object["int8Col"] = -1
+        XCTAssertEqual(object["int8Col"] as! Int, -1)
+        object["int8Col"] = 0
+        XCTAssertEqual(object["int8Col"] as! Int, 0)
+        object["int8Col"] = 1
+        XCTAssertEqual(object["int8Col"] as! Int, 1)
+
+        object["int16Col"] = -1
+        XCTAssertEqual(object["int16Col"] as! Int, -1)
+        object["int16Col"] = 0
+        XCTAssertEqual(object["int16Col"] as! Int, 0)
+        object["int16Col"] = 1
+        XCTAssertEqual(object["int16Col"] as! Int, 1)
+
+        object["int32Col"] = -1
+        XCTAssertEqual(object["int32Col"] as! Int, -1)
+        object["int32Col"] = 0
+        XCTAssertEqual(object["int32Col"] as! Int, 0)
+        object["int32Col"] = 1
+        XCTAssertEqual(object["int32Col"] as! Int, 1)
+
+        object["int64Col"] = -1
+        XCTAssertEqual(object["int64Col"] as! Int, -1)
+        object["int64Col"] = 0
+        XCTAssertEqual(object["int64Col"] as! Int, 0)
+        object["int64Col"] = 1
+        XCTAssertEqual(object["int64Col"] as! Int, 1)
+
+        object["floatCol"] = 20
+        XCTAssertEqual(object["floatCol"] as! Float, 20 as Float)
+        object["floatCol"] = 20.2
+        XCTAssertEqual(object["floatCol"] as! Float, 20.2 as Float)
+        object["floatCol"] = 16777217
+        XCTAssertEqual(object["floatCol"] as! Float, 16777216 as Float)
+
+        object["doubleCol"] = 20
+        XCTAssertEqual(object["doubleCol"] as! Double, 20)
+        object["doubleCol"] = 20.2
+        XCTAssertEqual(object["doubleCol"] as! Double, 20.2)
+        object["doubleCol"] = 16777217
+        XCTAssertEqual(object["doubleCol"] as! Double, 16777217)
+
+        object["stringCol"] = ""
+        XCTAssertEqual(object["stringCol"] as! String, "")
+        let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
+        object["stringCol"] = utf8TestString
+        XCTAssertEqual(object["stringCol"] as! String, utf8TestString)
+
+        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)!
+        object["binaryCol"] = data
+        XCTAssertEqual(object["binaryCol"] as! Data, data)
+
+        let date = Date(timeIntervalSinceReferenceDate: 2)
+        object["dateCol"] = date
+        XCTAssertEqual(object["dateCol"] as! Date, date)
+
+        object["objectCol"] = SwiftBoolObject(value: [true])
+        XCTAssertEqual((object["objectCol"]! as! SwiftBoolObject).boolCol, true)
+
+        object["intEnumCol"] = IntEnum.value1
+        XCTAssertEqual(object["intEnumCol"] as! Int, IntEnum.value1.rawValue)
+        object["intEnumCol"] = IntEnum.value2
+        XCTAssertEqual(object["intEnumCol"] as! Int, IntEnum.value2.rawValue)
+
+        object["decimalCol"] = Decimal128("inf")
+        XCTAssertEqual(object["decimalCol"] as! Decimal128, "inf")
+        object["decimalCol"] = Decimal128("-inf")
+        XCTAssertEqual(object["decimalCol"] as! Decimal128, "-inf")
+        object["decimalCol"] = Decimal128("0")
+        XCTAssertEqual(object["decimalCol"] as! Decimal128, "0")
+        object["decimalCol"] = Decimal128("nan")
+        XCTAssertTrue((object["decimalCol"] as! Decimal128).isNaN)
+
+        let oid1 = ObjectId("1234567890ab1234567890ab")
+        let oid2 = ObjectId("abcdef123456abcdef123456")
+        object["objectIdCol"] = oid1
+        XCTAssertEqual(object["objectIdCol"] as! ObjectId, oid1)
+        object["objectIdCol"] = oid2
+        XCTAssertEqual(object["objectIdCol"] as! ObjectId, oid2)
+
+        object["anyCol"] = AnyRealmValue.string("hello")
+        XCTAssertEqual(object["anyCol"] as! String, "hello")
+        object["anyCol"] = "goodbye"
+        XCTAssertEqual(object["anyCol"] as! String, "goodbye")
+
+        // Optional properties
+
+        optObject["optNSStringCol"] = ""
+        XCTAssertEqual(optObject["optNSStringCol"] as! String, "")
+        optObject["optNSStringCol"] = utf8TestString as NSString?
+        XCTAssertEqual(optObject["optNSStringCol"] as! String, utf8TestString)
+        optObject["optNSStringCol"] = nil
+        XCTAssertNil(optObject["optNSStringCol"])
+
+        optObject["optStringCol"] = ""
+        XCTAssertEqual(optObject["optStringCol"] as! String, "")
+        optObject["optStringCol"] = utf8TestString
+        XCTAssertEqual(optObject["optStringCol"] as! String, utf8TestString)
+        optObject["optStringCol"] = nil
+        XCTAssertNil(optObject["optStringCol"])
+
+        optObject["optBinaryCol"] = data
+        XCTAssertEqual(optObject["optBinaryCol"] as! Data, data)
+        optObject["optBinaryCol"] = nil
+        XCTAssertNil(optObject["optBinaryCol"])
+
+        optObject["optDateCol"] = date
+        XCTAssertEqual(optObject["optDateCol"] as! Date, date)
+        optObject["optDateCol"] = nil
+        XCTAssertNil(optObject["optDateCol"])
+
+        optObject["optIntCol"] = Int.min
+        XCTAssertEqual(optObject["optIntCol"] as! Int, Int.min)
+        optObject["optIntCol"] = 0
+        XCTAssertEqual(optObject["optIntCol"] as! Int, 0)
+        optObject["optIntCol"] = Int.max
+        XCTAssertEqual(optObject["optIntCol"] as! Int, Int.max)
+        optObject["optIntCol"] = nil
+        XCTAssertNil(optObject["optIntCol"])
+
+        optObject["optInt8Col"] = Int8.min
+        XCTAssertEqual(optObject["optInt8Col"] as! Int8, Int8.min)
+        optObject["optInt8Col"] = 0
+        XCTAssertEqual(optObject["optInt8Col"] as! Int8, 0)
+        optObject["optInt8Col"] = Int8.max
+        XCTAssertEqual(optObject["optInt8Col"] as! Int8, Int8.max)
+        optObject["optInt8Col"] = nil
+        XCTAssertNil(optObject["optInt8Col"])
+
+        optObject["optInt16Col"] = Int16.min
+        XCTAssertEqual(optObject["optInt16Col"] as! Int16, Int16.min)
+        optObject["optInt16Col"] = 0
+        XCTAssertEqual(optObject["optInt16Col"] as! Int16, 0)
+        optObject["optInt16Col"] = Int16.max
+        XCTAssertEqual(optObject["optInt16Col"] as! Int16, Int16.max)
+        optObject["optInt16Col"] = nil
+        XCTAssertNil(optObject["optInt16Col"])
+
+        optObject["optInt32Col"] = Int32.min
+        XCTAssertEqual(optObject["optInt32Col"] as! Int32, Int32.min)
+        optObject["optInt32Col"] = 0
+        XCTAssertEqual(optObject["optInt32Col"] as! Int32, 0)
+        optObject["optInt32Col"] = Int32.max
+        XCTAssertEqual(optObject["optInt32Col"] as! Int32, Int32.max)
+        optObject["optInt32Col"] = nil
+        XCTAssertNil(optObject["optInt32Col"])
+
+        optObject["optInt64Col"] = Int64.min
+        XCTAssertEqual(optObject["optInt64Col"] as! Int64, Int64.min)
+        optObject["optInt64Col"] = 0
+        XCTAssertEqual(optObject["optInt64Col"] as! Int64, 0)
+        optObject["optInt64Col"] = Int64.max
+        XCTAssertEqual(optObject["optInt64Col"] as! Int64, Int64.max)
+        optObject["optInt64Col"] = nil
+        XCTAssertNil(optObject["optInt64Col"])
+
+        optObject["optFloatCol"] = -Float.greatestFiniteMagnitude
+        XCTAssertEqual(optObject["optFloatCol"] as! Float, -Float.greatestFiniteMagnitude)
+        optObject["optFloatCol"] = 0
+        XCTAssertEqual(optObject["optFloatCol"] as! Float, 0)
+        optObject["optFloatCol"] = Float.greatestFiniteMagnitude
+        XCTAssertEqual(optObject["optFloatCol"] as! Float, Float.greatestFiniteMagnitude)
+        optObject["optFloatCol"] = nil
+        XCTAssertNil(optObject["optFloatCol"])
+
+        optObject["optDoubleCol"] = -Double.greatestFiniteMagnitude
+        XCTAssertEqual(optObject["optDoubleCol"] as! Double, -Double.greatestFiniteMagnitude)
+        optObject["optDoubleCol"] = 0
+        XCTAssertEqual(optObject["optDoubleCol"] as! Double, 0)
+        optObject["optDoubleCol"] = Double.greatestFiniteMagnitude
+        XCTAssertEqual(optObject["optDoubleCol"] as! Double, Double.greatestFiniteMagnitude)
+        optObject["optDoubleCol"] = nil
+        XCTAssertNil(optObject["optDoubleCol"])
+
+        optObject["optBoolCol"] = true
+        XCTAssertEqual(optObject["optBoolCol"] as! Bool, true)
+        optObject["optBoolCol"] = false
+        XCTAssertEqual(optObject["optBoolCol"] as! Bool, false)
+        optObject["optBoolCol"] = nil
+        XCTAssertNil(optObject["optBoolCol"])
+
+        optObject["optObjectCol"] = SwiftBoolObject(value: [true])
+        XCTAssertEqual((optObject["optObjectCol"] as! SwiftBoolObject).boolCol, true)
+        optObject["optObjectCol"] = nil
+        XCTAssertNil(optObject["optObjectCol"])
+
+        optObject["optEnumCol"] = IntEnum.value1
+        XCTAssertEqual(optObject["optEnumCol"] as! Int, IntEnum.value1.rawValue)
+        optObject["optEnumCol"] = IntEnum.value2
+        XCTAssertEqual(optObject["optEnumCol"] as! Int, IntEnum.value2.rawValue)
+        optObject["optEnumCol"] = nil
+        XCTAssertNil(optObject["optEnumCol"])
+    }
+
+    func setAndTestAnyViaAccessorObjectWithCoercion(_ object: ObjectBase) {
+        let anyProp = RLMObjectBaseObjectSchema(object)!.properties.first { $0.name == "anyCol" }!
+        func get() -> Any {
+            return anyProp.swiftAccessor!.get(anyProp, on: object)
+        }
+        func set(_ value: Any) {
+            anyProp.swiftAccessor!.set(anyProp, on: object, to: value)
+        }
+        set(true)
+        XCTAssertEqual(get() as! Bool, true)
+        set(false)
+        XCTAssertEqual(get() as! Bool, false)
+
+        set(-1)
+        XCTAssertEqual(get() as! Int, -1)
+        set(0)
+        XCTAssertEqual(get() as! Int, 0)
+        set(1)
+        XCTAssertEqual(get() as! Int, 1)
+
+        set(-1 as Int8)
+        XCTAssertEqual(get() as! Int, -1)
+        set(0 as Int8)
+        XCTAssertEqual(get() as! Int, 0)
+        set(1 as Int8)
+        XCTAssertEqual(get() as! Int, 1)
+
+        set(-1 as Int16)
+        XCTAssertEqual(get() as! Int, -1)
+        set(0 as Int16)
+        XCTAssertEqual(get() as! Int, 0)
+        set(1 as Int16)
+        XCTAssertEqual(get() as! Int, 1)
+
+        set(-1 as Int32)
+        XCTAssertEqual(get() as! Int, -1)
+        set(0 as Int32)
+        XCTAssertEqual(get() as! Int, 0)
+        set(1 as Int32)
+        XCTAssertEqual(get() as! Int, 1)
+
+        set(-1 as Int64)
+        XCTAssertEqual(get() as! Int, -1)
+        set(0 as Int64)
+        XCTAssertEqual(get() as! Int, 0)
+        set(1 as Int64)
+        XCTAssertEqual(get() as! Int, 1)
+
+        set(20 as Float)
+        XCTAssertEqual(get() as! Float, 20 as Float)
+        set(20.2 as Float)
+        XCTAssertEqual(get() as! Float, 20.2 as Float)
+
+        set(20 as Double)
+        XCTAssertEqual(get() as! Double, 20)
+        set(20.2 as Double)
+        XCTAssertEqual(get() as! Double, 20.2)
+        set(16777217 as Double)
+        XCTAssertEqual(get() as! Double, 16777217)
+
+        set("")
+        XCTAssertEqual(get() as! String, "")
+        let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
+        set(utf8TestString)
+        XCTAssertEqual(get() as! String, utf8TestString)
+
+        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)!
+        set(data)
+        XCTAssertEqual(get() as! Data, data)
+
+        let date = Date(timeIntervalSinceReferenceDate: 2)
+        set(date)
+        XCTAssertEqual(get() as! Date, date)
+
+        set(SwiftBoolObject(value: [true]))
+        XCTAssertEqual((get() as! SwiftBoolObject).boolCol, true)
+
+        set(Decimal128("inf"))
+        XCTAssertEqual(get() as! Decimal128, "inf")
+        set(Decimal128("-inf"))
+        XCTAssertEqual(get() as! Decimal128, "-inf")
+        set(Decimal128("0"))
+        XCTAssertEqual(get() as! Decimal128, "0")
+        set(Decimal128("nan"))
+        XCTAssertTrue((get() as! Decimal128).isNaN)
+
+        let oid1 = ObjectId("1234567890ab1234567890ab")
+        let oid2 = ObjectId("abcdef123456abcdef123456")
+        set(oid1)
+        XCTAssertEqual(get() as! ObjectId, oid1)
+        set(oid2)
+        XCTAssertEqual(get() as! ObjectId, oid2)
+
+        set(NSNull())
+        XCTAssertTrue(get() is NSNull)
+    }
+
+    func setAndTestAnyViaAccessorObjectWithExplicitAnyRealmValue(_ object: ObjectBase) {
+        let anyProp = RLMObjectBaseObjectSchema(object)!.properties.first { $0.name == "anyCol" }!
+        func get() -> Any {
+            return anyProp.swiftAccessor!.get(anyProp, on: object)
+        }
+        func set(_ value: AnyRealmValue) {
+            anyProp.swiftAccessor!.set(anyProp, on: object, to: value)
+        }
+        set(.bool(true))
+        XCTAssertEqual(get() as! Bool, true)
+        set(.bool(false))
+        XCTAssertEqual(get() as! Bool, false)
+
+        set(.int(-1))
+        XCTAssertEqual(get() as! Int, -1)
+        set(.int(0))
+        XCTAssertEqual(get() as! Int, 0)
+        set(.int(1))
+        XCTAssertEqual(get() as! Int, 1)
+
+        set(.float(20))
+        XCTAssertEqual(get() as! Float, 20 as Float)
+        set(.float(20.2))
+        XCTAssertEqual(get() as! Float, 20.2 as Float)
+
+        set(.double(20))
+        XCTAssertEqual(get() as! Double, 20)
+        set(.double(20.2))
+        XCTAssertEqual(get() as! Double, 20.2)
+        set(.double(16777217))
+        XCTAssertEqual(get() as! Double, 16777217)
+
+        set(.string(""))
+        XCTAssertEqual(get() as! String, "")
+        let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
+        set(.string(utf8TestString))
+        XCTAssertEqual(get() as! String, utf8TestString)
+
+        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)!
+        set(.data(data))
+        XCTAssertEqual(get() as! Data, data)
+
+        let date = Date(timeIntervalSinceReferenceDate: 2)
+        set(.date(date))
+        XCTAssertEqual(get() as! Date, date)
+
+        set(.object(SwiftBoolObject(value: [true])))
+        XCTAssertEqual((get() as! SwiftBoolObject).boolCol, true)
+
+        set(.decimal128(Decimal128("inf")))
+        XCTAssertEqual(get() as! Decimal128, "inf")
+        set(.decimal128(Decimal128("-inf")))
+        XCTAssertEqual(get() as! Decimal128, "-inf")
+        set(.decimal128(Decimal128("0")))
+        XCTAssertEqual(get() as! Decimal128, "0")
+        set(.decimal128(Decimal128("nan")))
+        XCTAssertTrue((get() as! Decimal128).isNaN)
+
+        let oid1 = ObjectId("1234567890ab1234567890ab")
+        let oid2 = ObjectId("abcdef123456abcdef123456")
+        set(.objectId(oid1))
+        XCTAssertEqual(get() as! ObjectId, oid1)
+        set(.objectId(oid2))
+        XCTAssertEqual(get() as! ObjectId, oid2)
+
+        set(.none)
+        XCTAssertTrue(get() is NSNull)
+    }
+
+    func setAndTestRealmPropertyViaAccessor(_ object: ObjectBase) {
+        func get(_ propertyName: String) -> Any {
+            let prop = RLMObjectBaseObjectSchema(object)!.properties.first { $0.name == propertyName }!
+            return prop.swiftAccessor!.get(prop, on: object)
+        }
+        func set(_ propertyName: String, _ value: Any) {
+            let prop = RLMObjectBaseObjectSchema(object)!.properties.first { $0.name == propertyName }!
+            prop.swiftAccessor!.set(prop, on: object, to: value)
+        }
+
+        set("otherInt", -1)
+        XCTAssertEqual(get("otherInt") as! Int, -1)
+        set("otherInt", 0)
+        XCTAssertEqual(get("otherInt") as! Int, 0)
+        set("otherInt", 1)
+        XCTAssertEqual(get("otherInt") as! Int, 1)
+        set("otherInt", NSNull())
+        XCTAssertTrue(get("otherInt") is NSNull)
+
+        set("otherInt8", -1)
+        XCTAssertEqual(get("otherInt8") as! Int, -1)
+        set("otherInt8", 0)
+        XCTAssertEqual(get("otherInt8") as! Int, 0)
+        set("otherInt8", 1)
+        XCTAssertEqual(get("otherInt8") as! Int, 1)
+
+        set("otherInt16", -1)
+        XCTAssertEqual(get("otherInt16") as! Int, -1)
+        set("otherInt16", 0)
+        XCTAssertEqual(get("otherInt16") as! Int, 0)
+        set("otherInt16", 1)
+        XCTAssertEqual(get("otherInt16") as! Int, 1)
+
+        set("otherInt32", -1)
+        XCTAssertEqual(get("otherInt32") as! Int, -1)
+        set("otherInt32", 0)
+        XCTAssertEqual(get("otherInt32") as! Int, 0)
+        set("otherInt32", 1)
+        XCTAssertEqual(get("otherInt32") as! Int, 1)
+
+        set("otherInt64", -1)
+        XCTAssertEqual(get("otherInt64") as! Int, -1)
+        set("otherInt64", 0)
+        XCTAssertEqual(get("otherInt64") as! Int, 0)
+        set("otherInt64", 1)
+        XCTAssertEqual(get("otherInt64") as! Int, 1)
+
+        set("otherFloat", -20 as Float)
+        XCTAssertEqual(get("otherFloat") as! Float, -20)
+        set("otherFloat", 20.2 as Float)
+        XCTAssertEqual(get("otherFloat") as! Float, 20.2)
+        // 16777217 is not exactly representable as a float
+        set("otherFloat", 16777217 as Double)
+        XCTAssertEqual(get("otherFloat") as! Float, 16777216)
+
+        set("otherDouble", -20 as Double)
+        XCTAssertEqual(get("otherDouble") as! Double, -20)
+        set("otherDouble", 20.2 as Double)
+        XCTAssertEqual(get("otherDouble") as! Double, 20.2)
+        set("otherDouble", 16777217 as Double)
+        XCTAssertEqual(get("otherDouble") as! Double, 16777217)
+
+        set("otherBool", true)
+        XCTAssertEqual(get("otherBool") as! Bool, true)
+        set("otherBool", false)
+        XCTAssertEqual(get("otherBool") as! Bool, false)
+        set("otherBool", 1)
+        XCTAssertEqual(get("otherBool") as! Bool, true)
+        set("otherBool", 0)
+        XCTAssertEqual(get("otherBool") as! Bool, false)
+
+        set("otherEnum", IntEnum.value1)
+        XCTAssertEqual(get("otherEnum") as! Int, IntEnum.value1.rawValue)
+        set("otherEnum", IntEnum.value2)
+        XCTAssertEqual(get("otherEnum") as! Int, IntEnum.value2.rawValue)
+        set("otherEnum", IntEnum.value1.rawValue)
+        XCTAssertEqual(get("otherEnum") as! Int, IntEnum.value1.rawValue)
+    }
+
+    func setAndTestRealmOptionalViaAccessor(_ object: ObjectBase) {
+        func get(_ propertyName: String) -> Any {
+            let prop = RLMObjectBaseObjectSchema(object)!.properties.first { $0.name == propertyName }!
+            return prop.swiftAccessor!.get(prop, on: object)
+        }
+        func set(_ propertyName: String, _ value: Any) {
+            let prop = RLMObjectBaseObjectSchema(object)!.properties.first { $0.name == propertyName }!
+            prop.swiftAccessor!.set(prop, on: object, to: value)
+        }
+
+        set("optIntCol", -1)
+        XCTAssertEqual(get("optIntCol") as! Int, -1)
+        set("optIntCol", 0)
+        XCTAssertEqual(get("optIntCol") as! Int, 0)
+        set("optIntCol", 1)
+        XCTAssertEqual(get("optIntCol") as! Int, 1)
+        set("optIntCol", NSNull())
+        XCTAssertTrue(get("optIntCol") is NSNull)
+
+        set("optInt8Col", -1)
+        XCTAssertEqual(get("optInt8Col") as! Int, -1)
+        set("optInt8Col", 0)
+        XCTAssertEqual(get("optInt8Col") as! Int, 0)
+        set("optInt8Col", 1)
+        XCTAssertEqual(get("optInt8Col") as! Int, 1)
+
+        set("optInt16Col", -1)
+        XCTAssertEqual(get("optInt16Col") as! Int, -1)
+        set("optInt16Col", 0)
+        XCTAssertEqual(get("optInt16Col") as! Int, 0)
+        set("optInt16Col", 1)
+        XCTAssertEqual(get("optInt16Col") as! Int, 1)
+
+        set("optInt32Col", -1)
+        XCTAssertEqual(get("optInt32Col") as! Int, -1)
+        set("optInt32Col", 0)
+        XCTAssertEqual(get("optInt32Col") as! Int, 0)
+        set("optInt32Col", 1)
+        XCTAssertEqual(get("optInt32Col") as! Int, 1)
+
+        set("optInt64Col", -1)
+        XCTAssertEqual(get("optInt64Col") as! Int, -1)
+        set("optInt64Col", 0)
+        XCTAssertEqual(get("optInt64Col") as! Int, 0)
+        set("optInt64Col", 1)
+        XCTAssertEqual(get("optInt64Col") as! Int, 1)
+
+        set("optFloatCol", -20 as Float)
+        XCTAssertEqual(get("optFloatCol") as! Float, -20)
+        set("optFloatCol", 20.2 as Float)
+        XCTAssertEqual(get("optFloatCol") as! Float, 20.2)
+        // 16777217 is not exactly representable as a float
+        set("optFloatCol", 16777217 as Double)
+        XCTAssertEqual(get("optFloatCol") as! Float, 16777216)
+
+        set("optDoubleCol", -20 as Double)
+        XCTAssertEqual(get("optDoubleCol") as! Double, -20)
+        set("optDoubleCol", 20.2 as Double)
+        XCTAssertEqual(get("optDoubleCol") as! Double, 20.2)
+        set("optDoubleCol", 16777217 as Double)
+        XCTAssertEqual(get("optDoubleCol") as! Double, 16777217)
+
+        set("optBoolCol", true)
+        XCTAssertEqual(get("optBoolCol") as! Bool, true)
+        set("optBoolCol", false)
+        XCTAssertEqual(get("optBoolCol") as! Bool, false)
+        set("optBoolCol", 1)
+        XCTAssertEqual(get("optBoolCol") as! Bool, true)
+        set("optBoolCol", 0)
+        XCTAssertEqual(get("optBoolCol") as! Bool, false)
+
+        set("optEnumCol", IntEnum.value1)
+        XCTAssertEqual(get("optEnumCol") as! Int, IntEnum.value1.rawValue)
+        set("optEnumCol", IntEnum.value2)
+        XCTAssertEqual(get("optEnumCol") as! Int, IntEnum.value2.rawValue)
+        set("optEnumCol", IntEnum.value1.rawValue)
+        XCTAssertEqual(get("optEnumCol") as! Int, IntEnum.value1.rawValue)
+        set("optEnumCol", NSNull())
+        XCTAssertTrue(get("optEnumCol") is NSNull)
+    }
+
+    func setAndTestListViaAccessor(_ object: ObjectBase) {
+        func get(_ propertyName: String) -> Any {
+            let prop = RLMObjectBaseObjectSchema(object)!.properties.first { $0.name == propertyName }!
+            return prop.swiftAccessor!.get(prop, on: object)
+        }
+        func set(_ propertyName: String, _ value: Any) {
+            let prop = RLMObjectBaseObjectSchema(object)!.properties.first { $0.name == propertyName }!
+            prop.swiftAccessor!.set(prop, on: object, to: value)
+        }
+
+        XCTAssertTrue(get("int") is List<Int>)
+        XCTAssertTrue(get("int8") is List<Int8>)
+        XCTAssertTrue(get("int16") is List<Int16>)
+        XCTAssertTrue(get("int32") is List<Int32>)
+        XCTAssertTrue(get("int64") is List<Int64>)
+        XCTAssertTrue(get("float") is List<Float>)
+        XCTAssertTrue(get("double") is List<Double>)
+        XCTAssertTrue(get("string") is List<String>)
+        XCTAssertTrue(get("data") is List<Data>)
+        XCTAssertTrue(get("date") is List<Date>)
+        XCTAssertTrue(get("decimal") is List<Decimal128>)
+        XCTAssertTrue(get("objectId") is List<ObjectId>)
+        XCTAssertTrue(get("uuid") is List<UUID>)
+        XCTAssertTrue(get("any") is List<AnyRealmValue>)
+
+        XCTAssertTrue(get("intOpt") is List<Int?>)
+        XCTAssertTrue(get("int8Opt") is List<Int8?>)
+        XCTAssertTrue(get("int16Opt") is List<Int16?>)
+        XCTAssertTrue(get("int32Opt") is List<Int32?>)
+        XCTAssertTrue(get("int64Opt") is List<Int64?>)
+        XCTAssertTrue(get("floatOpt") is List<Float?>)
+        XCTAssertTrue(get("doubleOpt") is List<Double?>)
+        XCTAssertTrue(get("stringOpt") is List<String?>)
+        XCTAssertTrue(get("dataOpt") is List<Data?>)
+        XCTAssertTrue(get("dateOpt") is List<Date?>)
+        XCTAssertTrue(get("decimalOpt") is List<Decimal128?>)
+        XCTAssertTrue(get("objectIdOpt") is List<ObjectId?>)
+        XCTAssertTrue(get("uuidOpt") is List<UUID?>)
+
+        set("int", [1, 2, 3])
+        XCTAssertEqual(Array(get("int") as! List<Int>), [1, 2, 3])
+        set("int", [4, 5, 6])
+        XCTAssertEqual(Array(get("int") as! List<Int>), [4, 5, 6])
+        set("int8", get("int"))
+        XCTAssertEqual(Array(get("int8") as! List<Int8>), [4, 5, 6])
+        set("int", NSNull())
+        XCTAssertEqual((get("int") as! List<Int>).count, 0)
+    }
+
+    func setAndTestSetViaAccessor(_ object: ObjectBase) {
+        func get(_ propertyName: String) -> Any {
+            let prop = RLMObjectBaseObjectSchema(object)!.properties.first { $0.name == propertyName }!
+            return prop.swiftAccessor!.get(prop, on: object)
+        }
+        func set(_ propertyName: String, _ value: Any) {
+            let prop = RLMObjectBaseObjectSchema(object)!.properties.first { $0.name == propertyName }!
+            prop.swiftAccessor!.set(prop, on: object, to: value)
+        }
+
+        XCTAssertTrue(get("int") is MutableSet<Int>)
+        XCTAssertTrue(get("int8") is MutableSet<Int8>)
+        XCTAssertTrue(get("int16") is MutableSet<Int16>)
+        XCTAssertTrue(get("int32") is MutableSet<Int32>)
+        XCTAssertTrue(get("int64") is MutableSet<Int64>)
+        XCTAssertTrue(get("float") is MutableSet<Float>)
+        XCTAssertTrue(get("double") is MutableSet<Double>)
+        XCTAssertTrue(get("string") is MutableSet<String>)
+        XCTAssertTrue(get("data") is MutableSet<Data>)
+        XCTAssertTrue(get("date") is MutableSet<Date>)
+        XCTAssertTrue(get("decimal") is MutableSet<Decimal128>)
+        XCTAssertTrue(get("objectId") is MutableSet<ObjectId>)
+        XCTAssertTrue(get("uuid") is MutableSet<UUID>)
+        XCTAssertTrue(get("any") is MutableSet<AnyRealmValue>)
+
+        XCTAssertTrue(get("intOpt") is MutableSet<Int?>)
+        XCTAssertTrue(get("int8Opt") is MutableSet<Int8?>)
+        XCTAssertTrue(get("int16Opt") is MutableSet<Int16?>)
+        XCTAssertTrue(get("int32Opt") is MutableSet<Int32?>)
+        XCTAssertTrue(get("int64Opt") is MutableSet<Int64?>)
+        XCTAssertTrue(get("floatOpt") is MutableSet<Float?>)
+        XCTAssertTrue(get("doubleOpt") is MutableSet<Double?>)
+        XCTAssertTrue(get("stringOpt") is MutableSet<String?>)
+        XCTAssertTrue(get("dataOpt") is MutableSet<Data?>)
+        XCTAssertTrue(get("dateOpt") is MutableSet<Date?>)
+        XCTAssertTrue(get("decimalOpt") is MutableSet<Decimal128?>)
+        XCTAssertTrue(get("objectIdOpt") is MutableSet<ObjectId?>)
+        XCTAssertTrue(get("uuidOpt") is MutableSet<UUID?>)
+
+        set("int", [1, 2, 3])
+        XCTAssertEqual(Array(get("int") as! MutableSet<Int>).sorted(), [1, 2, 3])
+        set("int", [4, 5, 6])
+        XCTAssertEqual(Array(get("int") as! MutableSet<Int>).sorted(), [4, 5, 6])
+        set("int8", get("int"))
+        XCTAssertEqual(Array(get("int8") as! MutableSet<Int8>).sorted(), [4, 5, 6])
+        set("int", NSNull())
+        XCTAssertEqual((get("int") as! MutableSet<Int>).count, 0)
     }
 
     func testUnmanagedAccessors() {
-        let object = SwiftObject()
-        setAndTestAllProperties(object)
-
-        let optionalObject = SwiftOptionalObject()
-        setAndTestAllOptionalProperties(optionalObject)
+        setAndTestAllPropertiesViaNormalAccess(SwiftObject(), SwiftOptionalObject())
+        setAndTestAllPropertiesViaSubscript(SwiftObject(), SwiftOptionalObject())
+        setAndTestAnyViaAccessorObjectWithCoercion(SwiftObject())
+        setAndTestAnyViaAccessorObjectWithExplicitAnyRealmValue(SwiftObject())
+        setAndTestRealmPropertyViaAccessor(CodableObject())
+        setAndTestRealmOptionalViaAccessor(SwiftOptionalObject())
+        setAndTestListViaAccessor(SwiftListObject())
+        setAndTestSetViaAccessor(SwiftMutableSetObject())
     }
 
     func testManagedAccessors() {
@@ -131,9 +873,15 @@ class ObjectAccessorTests: TestCase {
         realm.beginWrite()
         let object = realm.create(SwiftObject.self)
         let optionalObject = realm.create(SwiftOptionalObject.self)
-        setAndTestAllProperties(object)
-        setAndTestAllOptionalProperties(optionalObject)
-        try! realm.commitWrite()
+        setAndTestAllPropertiesViaNormalAccess(object, optionalObject)
+        setAndTestAllPropertiesViaSubscript(object, optionalObject)
+        setAndTestAnyViaAccessorObjectWithCoercion(object)
+        setAndTestAnyViaAccessorObjectWithExplicitAnyRealmValue(object)
+        setAndTestRealmPropertyViaAccessor(realm.create(CodableObject.self))
+        setAndTestRealmOptionalViaAccessor(optionalObject)
+        setAndTestListViaAccessor(realm.create(SwiftListObject.self))
+        setAndTestSetViaAccessor(realm.create(SwiftMutableSetObject.self))
+        realm.cancelWrite()
     }
 
     func testIntSizes() {
@@ -286,117 +1034,6 @@ class ObjectAccessorTests: TestCase {
             self.assertThrows(obj.optIntCol.value = 1)
             self.assertThrows(obj.optIntCol.value = nil)
         }
-    }
-
-    func setAndTestAllOptionalProperties(_ object: SwiftOptionalObject) {
-        object.optNSStringCol = ""
-        XCTAssertEqual(object.optNSStringCol!, "")
-        let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
-        object.optNSStringCol = utf8TestString as NSString?
-        XCTAssertEqual(object.optNSStringCol! as String, utf8TestString)
-        object.optNSStringCol = nil
-        XCTAssertNil(object.optNSStringCol)
-
-        object.optStringCol = ""
-        XCTAssertEqual(object.optStringCol!, "")
-        object.optStringCol = utf8TestString
-        XCTAssertEqual(object.optStringCol!, utf8TestString)
-        object.optStringCol = nil
-        XCTAssertNil(object.optStringCol)
-
-        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)!
-        object.optBinaryCol = data
-        XCTAssertEqual(object.optBinaryCol!, data)
-        object.optBinaryCol = nil
-        XCTAssertNil(object.optBinaryCol)
-
-        let date = Date(timeIntervalSinceReferenceDate: 2)
-        object.optDateCol = date
-        XCTAssertEqual(object.optDateCol!, date)
-        object.optDateCol = nil
-        XCTAssertNil(object.optDateCol)
-
-        object.optIntCol.value = Int.min
-        XCTAssertEqual(object.optIntCol.value!, Int.min)
-        object.optIntCol.value = 0
-        XCTAssertEqual(object.optIntCol.value!, 0)
-        object.optIntCol.value = Int.max
-        XCTAssertEqual(object.optIntCol.value!, Int.max)
-        object.optIntCol.value = nil
-        XCTAssertNil(object.optIntCol.value)
-
-        object.optInt8Col.value = Int8.min
-        XCTAssertEqual(object.optInt8Col.value!, Int8.min)
-        object.optInt8Col.value = 0
-        XCTAssertEqual(object.optInt8Col.value!, 0)
-        object.optInt8Col.value = Int8.max
-        XCTAssertEqual(object.optInt8Col.value!, Int8.max)
-        object.optInt8Col.value = nil
-        XCTAssertNil(object.optInt8Col.value)
-
-        object.optInt16Col.value = Int16.min
-        XCTAssertEqual(object.optInt16Col.value!, Int16.min)
-        object.optInt16Col.value = 0
-        XCTAssertEqual(object.optInt16Col.value!, 0)
-        object.optInt16Col.value = Int16.max
-        XCTAssertEqual(object.optInt16Col.value!, Int16.max)
-        object.optInt16Col.value = nil
-        XCTAssertNil(object.optInt16Col.value)
-
-        object.optInt32Col.value = Int32.min
-        XCTAssertEqual(object.optInt32Col.value!, Int32.min)
-        object.optInt32Col.value = 0
-        XCTAssertEqual(object.optInt32Col.value!, 0)
-        object.optInt32Col.value = Int32.max
-        XCTAssertEqual(object.optInt32Col.value!, Int32.max)
-        object.optInt32Col.value = nil
-        XCTAssertNil(object.optInt32Col.value)
-
-        object.optInt64Col.value = Int64.min
-        XCTAssertEqual(object.optInt64Col.value!, Int64.min)
-        object.optInt64Col.value = 0
-        XCTAssertEqual(object.optInt64Col.value!, 0)
-        object.optInt64Col.value = Int64.max
-        XCTAssertEqual(object.optInt64Col.value!, Int64.max)
-        object.optInt64Col.value = nil
-        XCTAssertNil(object.optInt64Col.value)
-
-        object.optFloatCol.value = -Float.greatestFiniteMagnitude
-        XCTAssertEqual(object.optFloatCol.value!, -Float.greatestFiniteMagnitude)
-        object.optFloatCol.value = 0
-        XCTAssertEqual(object.optFloatCol.value!, 0)
-        object.optFloatCol.value = Float.greatestFiniteMagnitude
-        XCTAssertEqual(object.optFloatCol.value!, Float.greatestFiniteMagnitude)
-        object.optFloatCol.value = nil
-        XCTAssertNil(object.optFloatCol.value)
-
-        object.optDoubleCol.value = -Double.greatestFiniteMagnitude
-        XCTAssertEqual(object.optDoubleCol.value!, -Double.greatestFiniteMagnitude)
-        object.optDoubleCol.value = 0
-        XCTAssertEqual(object.optDoubleCol.value!, 0)
-        object.optDoubleCol.value = Double.greatestFiniteMagnitude
-        XCTAssertEqual(object.optDoubleCol.value!, Double.greatestFiniteMagnitude)
-        object.optDoubleCol.value = nil
-        XCTAssertNil(object.optDoubleCol.value)
-
-        object.optBoolCol.value = true
-        XCTAssertEqual(object.optBoolCol.value!, true)
-        object.optBoolCol.value = false
-        XCTAssertEqual(object.optBoolCol.value!, false)
-        object.optBoolCol.value = nil
-        XCTAssertNil(object.optBoolCol.value)
-
-        object.optObjectCol = SwiftBoolObject(value: [true])
-        XCTAssertEqual(object.optObjectCol!.boolCol, true)
-        object.optObjectCol = nil
-        XCTAssertNil(object.optObjectCol)
-
-        object.optEnumCol.value = .value1
-        XCTAssertEqual(object.optEnumCol.value, .value1)
-        object.optEnumCol.value = .value2
-        XCTAssertEqual(object.optEnumCol.value, .value2)
-        object.optEnumCol.value = nil
-        XCTAssertNil(object.optEnumCol.value)
     }
 
     func testLinkingObjectsDynamicGet() {

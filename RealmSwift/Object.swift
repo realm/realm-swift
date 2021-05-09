@@ -479,10 +479,18 @@ internal func dynamicGet(object: ObjectBase, key: String) -> Any? {
 }
 
 internal func dynamicSet(object: ObjectBase, key: String, value: Any?) {
-    if RLMObjectBaseRealm(object) == nil {
-        object.setValue(value, forKey: key)
+    let bridgedValue: Any?
+    if let v1 = value, let v2 = v1 as? CustomObjectiveCBridgeable {
+        bridgedValue = v2.objCValue
+    } else if let v1 = value, let v2 = v1 as? RealmEnum {
+        bridgedValue = type(of: v2)._rlmToRawValue(v2)
     } else {
-        RLMDynamicValidatedSet(object, key, value)
+        bridgedValue = value
+    }
+    if RLMObjectBaseRealm(object) == nil {
+        object.setValue(bridgedValue, forKey: key)
+    } else {
+        RLMDynamicValidatedSet(object, key, bridgedValue)
     }
 }
 

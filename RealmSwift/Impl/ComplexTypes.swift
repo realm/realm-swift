@@ -77,6 +77,7 @@ extension LinkingObjects: _RealmSchemaDiscoverable {
     }
 }
 
+@available(*, deprecated)
 extension RealmOptional: _RealmSchemaDiscoverable where Value: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Value._rlmType }
     public static var _rlmOptional: Bool { true }

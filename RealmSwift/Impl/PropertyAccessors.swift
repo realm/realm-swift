@@ -88,6 +88,19 @@ internal class LinkingObjectsAccessor<Element: ObjectBase>: RLMManagedPropertyAc
     }
 }
 
+private func isNull(_ value: Any) -> Bool {
+    // nil in Any is bridged to obj-c as NSNull. In the obj-c code we usually
+    // convert NSNull back to nil, which ends up as Optional<Any>.none
+    if value is NSNull {
+        return true
+    }
+    if case Optional<Any>.none = value {
+        return true
+    }
+    return false
+}
+
+@available(*, deprecated)
 internal class RealmOptionalAccessor<Value: RealmOptionalType>: RLMManagedPropertyAccessor {
     private static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> RealmOptional<Value> {
         return ptr(property, obj).assumingMemoryBound(to: RealmOptional<Value>.self).pointee
@@ -102,17 +115,27 @@ internal class RealmOptionalAccessor<Value: RealmOptionalType>: RLMManagedProper
     }
 
     @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
-        return bound(property, parent).value as Any
+        let value = bound(property, parent).value
+        if let value = value as? RealmEnum {
+            return type(of: value)._rlmToRawValue(value)
+        }
+        // RealmOptional does not support any non-enum types which require custom
+        // bridging from swift to objc, so no CustomObjectiveCBridgeable check here
+        return value as Any
     }
 
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
         let bridged: Value?
-        if case Optional<Any>.none = value {
+        if isNull(value) {
             bridged = nil
+        } else if let value = value as? Value {
+            bridged = value
         } else if let type = Value.self as? CustomObjectiveCBridgeable.Type {
             bridged = (type.bridging(objCValue: value) as! Value)
+        } else if let type = Value.self as? RealmEnum.Type {
+            bridged = (type._rlmFromRawValue(value) as! Value)
         } else {
-            bridged = (value as! Value)
+            fatalError("Unexpected value '\(value)' of type '\(type(of: value))' for '\(Value.self)' property")
         }
         bound(property, parent).value = bridged
     }
@@ -136,15 +159,20 @@ internal class RealmPropertyAccessor<Value: RealmPropertyType>: RLMManagedProper
         if let value = value as? CustomObjectiveCBridgeable {
             return value.objCValue
         }
+        // Not actually reachable as all types which can be stored on a RealmProperty
+        // are CustomObjectiveCBridgeable but we can't express that in the type
+        // system without making CustomObjectiveCBridgeable public
         return value as Any
     }
 
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
         let bridged: Value
-        if let type = Value.self as? CustomObjectiveCBridgeable.Type {
+        if let value = value as? Value {
+            bridged = value
+        } else if let type = Value.self as? CustomObjectiveCBridgeable.Type {
             bridged = (type.bridging(objCValue: value) as! Value)
         } else {
-            bridged = (value as! Value)
+            fatalError("Unexpected value '\(value)' of type '\(type(of: value))' for '\(Value.self)' property")
         }
         bound(property, parent).value = bridged
     }

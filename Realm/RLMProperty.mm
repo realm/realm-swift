@@ -126,6 +126,19 @@ static bool rawTypeShouldBeTreatedAsComputedProperty(NSString *rawType) {
     return self;
 }
 
+- (instancetype)initWithName:(NSString *)name
+             createSelectors:(BOOL)createSelectors {
+    self = [super init];
+    if (self) {
+        _name = name;
+        if (createSelectors) {
+            [self updateAccessors];
+        }
+    }
+
+    return self;
+}
+
 - (void)setName:(NSString *)name {
     _name = name;
     [self updateAccessors];
@@ -550,28 +563,6 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
 
     // update getter/setter names
     [self updateAccessors];
-
-    return self;
-}
-
-- (instancetype)initSwiftPropertyWithName:(NSString *)name
-                                  indexed:(BOOL)indexed
-                                     type:(RLMPropertyType)type
-                                 optional:(BOOL)optional
-                                className:(nullable NSString *)className
-                                     ivar:(Ivar)ivar
-{
-    self = [super init];
-    if (!self) {
-        return nil;
-    }
-
-    _name = name;
-    _indexed = indexed;
-    _type = type;
-    _optional = optional;
-    _swiftIvar = ivar;
-    _objectClassName = className;
 
     return self;
 }
