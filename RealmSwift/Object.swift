@@ -212,47 +212,37 @@ extension Object: RealmCollectionValue {
      transactions it will be called at some point in the future after the write
      transaction is committed.
 
-     If no queue is given, notifications are delivered via the standard run
-     loop, and so can't be delivered while the run loop is blocked by other
-     activity. If a queue is given, notifications are delivered to that queue
-     instead. When notifications can't be delivered instantly, multiple
-     notifications may be coalesced into a single notification.
+     If no key paths are given, the block will be executed on any insertion,
+     modification, or deletion for all object properties and nested linked
+     properties (up to a depth of 4). If a key path or key paths are provided,
+     then the block will be called for changes which occur on those key paths,
+     or links to those key paths (up to a depth of four). For example, if:
+     ```swift
+     class Dog: Object {
+         @objc dynamic var name: String = ""
+         @objc dynamic var adopted: Bool = false
+         let siblings = List<Dog>()
+     }
 
-     Unlike with `List` and `Results`, there is no "initial" callback made after
-     you add a new notification block.
+     // ... where `dog` is a managed Dog object.
+     dog.observe(keyPaths: ["adopted"], { changes in
+        // ...
+     })
+     ```
+     - The above notification block would be called for changes to the
+     `adopted` property, but not for any changes made to `name`.
+     - If the observed key path were `["siblings"]`, then any insertion,
+     deletion, or modification to the `siblings` list or objects contained
+     in that list trigger the block.
+     - If the observed key path were `["siblings.name"]`, then any insertion or
+     deletion to the `siblings` list would trigger the block. For objects
+     contained in the `siblings` list, only modifications to their `name` property
+     will trigger the block.
 
-     Only objects which are managed by a Realm can be observed in this way. You
-     must retain the returned token for as long as you want updates to be sent
-     to the block. To stop receiving updates, call `invalidate()` on the token.
-
-     It is safe to capture a strong reference to the observed object within the
-     callback block. There is no retain cycle due to that the callback is
-     retained by the returned token and not by the object itself.
-
-     - warning: This method cannot be called during a write transaction, or when
-     the containing Realm is read-only.
-     - parameter queue: The serial dispatch queue to receive notification on. If
-     `nil`, notifications are delivered to the current thread.
-     - parameter block: The block to call with information about changes to the object.
-     - returns: A token which must be held for as long as you want updates to be delivered.
-     */
-    public func observe<T: RLMObjectBase>(on queue: DispatchQueue? = nil,
-                                          _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
-        return _observe(on: queue, block)
-    }
-
-    /**
-     Registers a block to be called each time the object changes.
-
-     The block will be asynchronously called after each write transaction which
-     deletes the object or modifies any of the managed properties of the object,
-     including self-assignments that set a property to its existing value.
-
-     For write transactions performed on different threads or in different
-     processes, the block will be called when the managing Realm is
-     (auto)refreshed to a version including the changes, while for local write
-     transactions it will be called at some point in the future after the write
-     transaction is committed.
+     - note: Multiple notification tokens on the same object which filter for
+     separate key paths are *do not* filter exclusively. If one key path
+     change is satisified for one notification token, then all notification
+     token blocks for that object will execute.
 
      If no queue is given, notifications are delivered via the standard run
      loop, and so can't be delivered while the run loop is blocked by other
@@ -273,6 +263,9 @@ extension Object: RealmCollectionValue {
 
      - warning: This method cannot be called during a write transaction, or when
      the containing Realm is read-only.
+     - parameter keyPaths: The object properties which trigger the block to
+     be called when they are modified. If `nil`, notifications will be delivered for
+     any property change on the object.
      - parameter queue: The serial dispatch queue to receive notification on. If
      `nil`, notifications are delivered to the current thread.
      - parameter block: The block to call with information about changes to the object.
@@ -280,7 +273,7 @@ extension Object: RealmCollectionValue {
      */
     public func observe<T: RLMObjectBase>(keyPaths: [String]? = nil,
                                           on queue: DispatchQueue? = nil,
-                                          _ block: @escaping (ObjectChange<T>)-> Void) -> NotificationToken {
+                                          _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
         return _observe(keyPaths: keyPaths, on: queue, block)
     }
 

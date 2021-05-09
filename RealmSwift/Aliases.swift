@@ -74,6 +74,38 @@ extension ObjectBase {
      transactions it will be called at some point in the future after the write
      transaction is committed.
 
+     If no key paths are given, the block will be executed on any insertion,
+     modification, or deletion for all object properties and nested linked
+     properties (up to a depth of 4). If a key path or key paths are provided,
+     then the block will be called for changes which occur on those key paths,
+     or links to those key paths (up to a depth of four). For example, if:
+     ```swift
+     class Dog: Object {
+         @objc dynamic var name: String = ""
+         @objc dynamic var adopted: Bool = false
+         let siblings = List<Dog>()
+     }
+
+     // ... where `dog` is a managed Dog object.
+     dog.observe(keyPaths: ["adopted"], { changes in
+        // ...
+     })
+     ```
+     - The above notification block would be called for changes to the
+     `adopted` property, but not for any changes made to `name`.
+     - If the observed key path were `["siblings"]`, then any insertion,
+     deletion, or modification to the `siblings` list or objects contained
+     in that list trigger the block.
+     - If the observed key path were `["siblings.name"]`, then any insertion or
+     deletion to the `siblings` list would trigger the block. For objects
+     contained in the `siblings`, only modifications to their `name` property
+     will trigger the block.
+
+     - note: Multiple notification tokens on the same object which filter for
+     separate key paths are *do not* filter exclusively. If one key path
+     change is satisified for one notification token, then all notification
+     token blocks for that object will execute.
+
      If no queue is given, notifications are delivered via the standard run
      loop, and so can't be delivered while the run loop is blocked by other
      activity. If a queue is given, notifications are delivered to that queue
@@ -93,7 +125,9 @@ extension ObjectBase {
 
      - warning: This method cannot be called during a write transaction, or when
                 the containing Realm is read-only.
-
+     - - parameter keyPaths: The object properties which trigger the block to
+     be called when they are modified. If `nil`, notifications will be delivered for
+     any property change on the object.
      - parameter queue: The serial dispatch queue to receive notification on. If
                         `nil`, notifications are delivered to the current thread.
      - parameter block: The block to call with information about changes to the object.

@@ -175,7 +175,6 @@ class SwiftOptionalDefaultValuesObject: Object {
     let optDoubleCol = RealmOptional<Double>(3.3)
     let optBoolCol = RealmOptional<Bool>(true)
     @objc dynamic var optObjectCol: SwiftBoolObject? = SwiftBoolObject(value: [true])
-    //    let arrayCol = List<SwiftBoolObject?>()
 
     class func defaultValues() -> [String: Any] {
         return [
@@ -260,6 +259,7 @@ class SwiftEmployeeObject: Object {
 }
 
 class SwiftCompanyObject: Object {
+    @objc dynamic var name = ""
     let employees = List<SwiftEmployeeObject>()
 }
 

@@ -443,7 +443,7 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
      will reflect the state of the Realm after the write transaction.
 
      ```swift
-     let results = realm.objects(Dog.self)
+     let dogs = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
      let token = dogs.observe { changes in
      switch changes {
@@ -476,8 +476,9 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    func observe(keyPaths: [String]?, on queue: DispatchQueue?,
-                  _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
+    func observe(keyPaths: [String]?,
+                 on queue: DispatchQueue?,
+                 _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
 
     /// :nodoc:
     // swiftlint:disable:next identifier_name
@@ -801,7 +802,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
  Instances of `RealmCollection` forward operations to an opaque underlying collection having the same `Element` type.
  */
 public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection {
-    
+
 
     /// The type of the objects contained within the collection.
     public typealias ElementType = Element
@@ -1032,7 +1033,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      will reflect the state of the Realm after the write transaction.
 
      ```swift
-     let results = realm.objects(Dog.self)
+     let dogs = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
      let token = dogs.observe { changes in
          switch changes {
@@ -1054,6 +1055,53 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      }
      // end of run loop execution context
      ```
+
+     If no key paths are given, the block will be executed on any insertion,
+     modification, or deletion for all collection type properties and nested linked
+     properties (up to a depth of 4). If a key path or key paths are provided,
+     then the block will be called for changes which occur on those key paths,
+     or links to those key paths (up to a depth of four). For example, if:
+     ```swift
+     class Dog: Object {
+         @objc dynamic var name: String = ""
+         @objc dynamic var adopted: Bool = false
+         let toys = List<Toy>()
+     }
+     // ...
+     let dogs = realm.objects(Dog.self)
+
+     let token = dogs.observe(keyPaths: ["name"]) { changes in
+         switch changes {
+         case .initial(let dogs):
+            // ...
+             break
+         case .update:
+            // This case is hit:
+            // - only after the token is intialized
+            // - when an element of the collections' name
+            // property is modified
+            // - when an element is inserted or deleted.
+            // This block is not triggered:
+            // - when any of the elements "age" values is modified
+             break
+         case .error:
+             break
+         }
+     }
+     ```
+     - If the above example observed the `["toys"]` key path, then any insertion,
+     deletion, or modification to the `toys` list for any element in the collection would trigger the block.
+     Any insertion or deletion to the `Dog` type collection being observed would also trigger a notification.
+     - If the observed key path were `["toys.size"]`, then any insertion or
+     deletion to the `toys` list on any of the collection elements would trigger the block. Changes to the `size` value
+     on any `Toy` that is linked to a `Dog` in this collection will trigger the block. Changes to the `toyBrand` value
+     on any `Toy` that is linked to a `Dog` in this collection would not trigger the block.
+     Any insertion or deletion to the `Dog` type collection being observed would also trigger a notification.
+
+     - note: Multiple notification tokens on the same object which filter for
+     separate key paths are *do not* filter exclusively. If one key path
+     change is satisified for one notification token, then all notification
+     token blocks for that object will execute.
 
      You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
      updates, call `invalidate()` on the token.
