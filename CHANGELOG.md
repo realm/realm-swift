@@ -5,9 +5,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* Iterating over frozen collections on multiple threads at the same time could
-  throw a "count underflow" NSInternalInconsistencyException.
-  ([#7237](https://github.com/realm/realm-cocoa/issues/7237), since v5.0.0).
+* None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -19,6 +17,22 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.7.5 Release notes (2021-05-07)
+=============================================================
+
+### Fixed
+
+* Iterating over frozen collections on multiple threads at the same time could
+  throw a "count underflow" NSInternalInconsistencyException.
+  ([#7237](https://github.com/realm/realm-cocoa/issues/7237), since v5.0.0).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
 
 10.7.4 Release notes (2021-04-26)
 =============================================================
