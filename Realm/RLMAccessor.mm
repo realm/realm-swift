@@ -522,25 +522,6 @@ Class createAccessorClass(Class objectClass,
 
     return accClass;
 }
-
-//// TODO: Ask Dominic the proper way to expose.
-//// I need to use this in RLMObjectBase.mm. I don't want to fork it into that source file, but I can also tell doing the below feels absolutely off limits.
-//
-//// check a precondition and throw an exception if it is not met
-//// this should be used if the condition being false indicates a bug in the caller
-//// of the function checking its preconditions
-//void RLMPrecondition(bool condition, NSString *name, NSString *format, ...) {
-//    if (__builtin_expect(condition, 1)) {
-//        return;
-//    }
-//
-//    va_list args;
-//    va_start(args, format);
-//    NSString *reason = [[NSString alloc] initWithFormat:format arguments:args];
-//    va_end(args);
-//
-//    @throw [NSException exceptionWithName:name reason:reason userInfo:nil];
-//}
 } // anonymous namespace
 
 #pragma mark - Public Interface

@@ -386,7 +386,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     else {
         objectSchema = [RLMSchema.partialPrivateSharedSchema schemaForClassName:_objectClassName];
     }
-    keyPathFromString(@"test");
+    
     return RLMValidatedProperty(objectSchema, propertyName).type;
 }
 

@@ -1150,7 +1150,6 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         assertMatches(collection.description, "List<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
     }
 
-    // !!!: Test with kpf
     func testObserveDirect() {
         let collection = collectionBase()
 

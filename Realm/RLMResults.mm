@@ -536,7 +536,6 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return RLMAddNotificationBlock(self, nil, block, queue);
 }
 
-// ???: Should these be split into two?
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMCollectionChange *, NSError *))block keyPaths:(NSArray<NSString *> *)keyPaths {
     return RLMAddNotificationBlock(self, keyPaths, block, nil);
 }

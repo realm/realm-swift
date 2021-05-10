@@ -540,7 +540,7 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block queue:(dispatch_queue_t)queue {
     return RLMAddNotificationBlock(self, nil, block, queue);
 }
-// ???: Should these be split into two?
+
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block keyPaths:(NSArray<NSString *> *)keyPaths {
     return RLMAddNotificationBlock(self, keyPaths, block, nil);
 }

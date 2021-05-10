@@ -18,9 +18,6 @@
 
 #import "RLMObject_Private.hpp"
 
-// TODO: Put in alphebtized list
-#import "RLMQueryUtil.hpp"
-
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
 #import "RLMDecimal128.h"
@@ -676,59 +673,6 @@ struct ObjectChangeCallbackWrapper {
     _object = realm::Object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
     _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj});
 }
-
-// Delete all of this vvvvvv
-//using KeyPath = std::vector<std::pair<TableKey, ColKey>>;
-////using KeyPathArray = std::vector<KeyPath>;
-//
-////using KeyPath = std::vector<std::pair<TableKey, ColKey>>;
-//std::vector<std::pair<TableKey, ColKey>> key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, RLMClassInfo *info, NSString *keyPath)
-//{
-//    RLMProperty *property;
-//    std::vector<RLMProperty *> links;
-//    std::vector<std::pair<TableKey, ColKey>> keyPairs;
-//
-//    bool keyPathContainsToManyRelationship = false;
-//
-//    // !!!: NEED test where developer passes in property that doesn't exist on schema, but is still valid syntax
-//    // !!!: NEED test without a dot in the keypath
-//    NSUInteger start = 0, length = keyPath.length, end = NSNotFound;
-//    do {
-//        end = [keyPath rangeOfString:@"." options:0 range:{start, length - start}].location;
-//        NSString *propertyName = [keyPath substringWithRange:{start, end == NSNotFound ? length - start : end - start}];
-//        property = objectSchema[propertyName];
-//        RLMPrecondition(property, @"Invalid property name",
-//                        @"Property '%@' not found in object of type '%@'",
-//                        propertyName, objectSchema.className);
-//
-//        if (property.array)
-//            keyPathContainsToManyRelationship = true;
-//
-//        if (end != NSNotFound) {
-//            RLMPrecondition(property.type == RLMPropertyTypeObject || property.type == RLMPropertyTypeLinkingObjects,
-//                            @"Invalid value", @"Property '%@' is not a link in object of type '%@'",
-//                            propertyName, objectSchema.className);
-//
-//            links.push_back(property);
-//            REALM_ASSERT(property.objectClassName);
-//
-//            // (1) What's the difference? Doesn't seem to be any except that the first line is safer because it checks for null first.
-//            TableKey tk = info->table()->get_key();
-//            //    TableKey tk = info->objectSchema->table_key;
-//
-//            ColKey ck = info->table()->get_column_key(property.columnName.UTF8String);
-////            std::pair<TableKey, ColKey> keyPair = std::make_pair(tk, ck);
-//            keyPairs.push_back(std::make_pair(tk, ck));
-//
-//            objectSchema = schema[property.objectClassName];
-//        }
-//
-//        start = end + 1;
-//    } while (end != NSNotFound);
-//
-//    return keyPairs;
-////    return {std::move(links), property, keyPathContainsToManyRelationship};
-//}
 
 - (void)addNotificationBlock:(RLMObjectNotificationCallback)block object:(RLMObjectBase *)obj keyPaths:(KeyPathArray)keyPaths {
     _object = realm::Object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);

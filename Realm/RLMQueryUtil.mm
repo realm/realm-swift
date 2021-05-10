@@ -1562,12 +1562,6 @@ realm::Query RLMPredicateToQuery(NSPredicate *predicate, RLMObjectSchema *object
     return query;
 }
 
-// TODO: Figure out how to have a single keypath from string work for both query builder and notifications
-//std::vector<std::pair<TableKey, ColKey>>
-void keyPathFromString(NSString *keyPath) {
-    
-}
-
 // return the property for a validated column name
 RLMProperty *RLMValidatedProperty(RLMObjectSchema *desc, NSString *columnName) {
     RLMProperty *prop = desc[columnName];

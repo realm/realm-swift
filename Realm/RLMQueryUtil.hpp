@@ -24,9 +24,6 @@ namespace realm {
     class Group;
     class Query;
     class SortDescriptor;
-    class TableKey;
-    class ColKey;
-//    class Results;
 }
 
 @class RLMObjectSchema, RLMProperty, RLMSchema, RLMSortDescriptor;
@@ -41,8 +38,4 @@ realm::Query RLMPredicateToQuery(NSPredicate *predicate, RLMObjectSchema *object
 // return property - throw for invalid column name
 RLMProperty *RLMValidatedProperty(RLMObjectSchema *objectSchema, NSString *columnName);
 
-// ???: Move to realm util?
 void RLMPrecondition(bool condition, NSString *name, NSString *format, ...);
-
-//using KeyPath = std::vector<std::pair<realm::TableKey, realm::ColKey>>;
-void keyPathFromString(NSString *keyPath);

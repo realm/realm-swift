@@ -18,17 +18,15 @@
 
 #import "RLMObservation.hpp"
 
-// TODO: Order new files into alphabetic list below
-#import "RLMQueryUtil.hpp"
-#import "RLMSchema_Private.h"
-
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
 #import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
+#import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
 
 #import <realm/group.hpp>
 
@@ -577,11 +575,10 @@ RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema
                             propertyName, objectSchema.className);
 
             REALM_ASSERT(property.objectClassName);
-            
+
             TableKey tk = info->table()->get_key();
-            
             ColKey ck = info->table()->get_column_key(property.columnName.UTF8String);
-            // How to assert that this is in fact a link? is line 588 enough?
+            // How to assert that this is in fact a link?
             keyPairs.push_back(std::make_pair(tk, ck));
             
             objectSchema = schema[property.objectClassName];

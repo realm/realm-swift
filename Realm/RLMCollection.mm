@@ -18,16 +18,13 @@
 
 #import "RLMCollection_Private.hpp"
 
-// TODO: Add any new imported files to alphabetic order
-#import "RLMQueryUtil.hpp"
-#import "RLMObservation.hpp"
-
 #import "RLMAccessor.hpp"
 #import "RLMArray_Private.hpp"
 #import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
+#import "RLMObservation.hpp"
 #import "RLMProperty_Private.h"
 
 #import <realm/object-store/collection_notifications.hpp>
@@ -432,19 +429,18 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
     bool skipFirst = std::is_same_v<RLMCollection, RLMResults>;
     auto token = [[RLMCancellationToken alloc] init];
     
-    std::vector<RLMKeyPath> rlmKeyPaths;
+    realm::KeyPathArray keyPathArray;
     for (NSString *keyPath in keyPaths) {
-        // ???: Is it possible to hit this where a collection doesn't have an RLMClassinfo?
+        // ???: Is it possible to hit this when a collection doesn't have an RLMClassinfo?
         RLMClassInfo *info = collection.objectInfo;
         RLMKeyPath rlmKeyPath = RLMKeyPathFromString(realm.schema, info->rlmObjectSchema, info, keyPath);
-        rlmKeyPaths.push_back(rlmKeyPath);
+        keyPathArray.push_back(rlmKeyPath);
     }
 
     if (!queue) {
         [realm verifyNotificationsAreSupported:true];
         token->_realm = realm;
-        auto tk = [[RLMCancellationToken alloc] init];
-        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst}, rlmKeyPaths);
+        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst}, keyPathArray);
         return token;
     }
 
@@ -463,7 +459,7 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
             return;
         }
         RLMCollection *collection = [realm resolveThreadSafeReference:tsr];
-        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst}, rlmKeyPaths);
+        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst}, keyPathArray);
     });
     return token;
 }
