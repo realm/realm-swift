@@ -803,7 +803,6 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
  */
 public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection {
 
-
     /// The type of the objects contained within the collection.
     public typealias ElementType = Element
 
@@ -1103,9 +1102,20 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      change is satisified for one notification token, then all notification
      token blocks for that object will execute.
 
+     If no queue is given, notifications are delivered via the standard run
+     loop, and so can't be delivered while the run loop is blocked by other
+     activity. If a queue is given, notifications are delivered to that queue
+     instead. When notifications can't be delivered instantly, multiple
+     notifications may be coalesced into a single notification.
+
      You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
      updates, call `invalidate()` on the token.
      - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
+     - parameter keyPaths: The element type properties which trigger the block to
+     be called when they are modified. If `nil`, notifications will be delivered for
+     any property change on the collection elements..
+     - parameter queue: The serial dispatch queue to receive notification on. If
+     `nil`, notifications are delivered to the current thread.
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */

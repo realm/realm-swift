@@ -688,8 +688,6 @@ RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
         @throw RLMException(@"Only objects which are managed by a Realm support change notifications");
     }
 
-    // should string keypath be translated here?
-    // TODO: This shouldn't be on object, need to change for collection notifications
     KeyPathArray keyPathArray;
     for (NSString *keyPath in keyPaths) {
         RLMKeyPath kp = RLMKeyPathFromString(obj.realm.schema, obj->_objectSchema, obj->_info, keyPath);

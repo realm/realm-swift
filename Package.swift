@@ -191,7 +191,6 @@ let package = Package(
                  "TimeoutProxyServer.swift",
                  "WatchTestUtility.swift",
                  "RealmServer.swift"
-//                "../RLMArray.mm"
             ]
         ),
         .testTarget(
@@ -212,7 +211,6 @@ let package = Package(
                 "RLMBSONTests.mm",
                 "RLMObjectServerTests.mm",
                 "RLMWatchTestUtility.m"
-//                "../RLMArray.mm"
             ],
             cxxSettings: testCxxSettings
         )
