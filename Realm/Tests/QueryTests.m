@@ -3475,25 +3475,12 @@ static NSData *data(const char *str) {
         [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey3": values[2]}}];
         [realm commitWriteTransaction];
 
-//        RLMAssertCount(ArrayPropertyObject, 1U, @"ANY array IN %@", [StringObject objectsWhere:@"stringCol = 'value'"]);
-//        NSString *fmt = [NSString stringWithFormat:@"ANY stringObjDict.@allValues IN %@", values[0]];
-        RLMAssertCount(AllDictionariesObject, 1U, @"ANY stringObjDict.@allValues IN %@", [StringObject objectsWhere:@"stringCol = '%@'", [values[0] stringCol]]);
-        RLMAssertCount(AllDictionariesObject, 1U, @"ANY stringObjDict.@allValues = %@", [StringObject objectsWhere:@"stringCol = '%@'", [values[0] stringCol]]);
-        RLMAssertCount(AllDictionariesObject, 1U, [NSString stringWithFormat:@"ANY %@.@allValues = '%@'", property, values[0]]);
-        
-        RLMAssertCount(AllDictionariesObject, 0U, @"ANY %K.@allValues IN %@", property, [StringObject objectsWhere:@"stringCol = 'hello'"]);
-        RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues IN %@", property, [StringObject objectsWhere:@"stringCol = 'hello'"]);
-        RLMAssertCount(AllDictionariesObject, 1U, @"NONE %K.@allValues IN %@", property, [StringObject objectsWhere:@"stringCol = 'hello'"]);
-        RLMAssertCount(AllDictionariesObject, 0U, @"NONE %K.@allValues IN %@", property, [StringObject objectsWhere:@"stringCol = 'hello'"]);
+        StringObject *obj = [[StringObject objectsInRealm:realm where:@"stringCol = %@", [values[0] stringCol]] firstObject];
+        RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues = %@", property, obj);
+        RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues != %@", property, obj);
 
-        
-//        RLMAssertCount(AllDictionariesObject, 1U, [NSString stringWithFormat:@"ANY %@.@allValues.stringCol = '%@'", property, values[0]]);
-//        RLMAssertCount(AllDictionariesObject, 2U, [NSString stringWithFormat:@"ANY %@.@allValues != '%@'", property, values[0]]);
-//        RLMAssertCount(AllDictionariesObject, 2U, [NSString stringWithFormat:@"ANY %@.@allValues =[c] '%@'", property, values[0]]);
-//        RLMAssertCount(AllDictionariesObject, 1U, [NSString stringWithFormat:@"ANY %@.@allValues !=[c] '%@'", property, values[0]]);
-//        RLMAssertCount(AllDictionariesObject, 3U, [NSString stringWithFormat:@"ANY %@.@allValues =[cd] '%@'", property, values[0]]);
-//        RLMAssertCount(AllDictionariesObject, 0U, [NSString stringWithFormat:@"ANY %@.@allValues !=[cd] '%@'", property, values[0]]);
-
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allValues IN %@", property, @[obj]]]), @"not supported");
+        RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allValues BETWEEN %@", property, @[obj]]]), @"not supported");
         RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allValues BEGINSWITH 'he'", property]]), @"not supported");
         RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allValues CONTAINS 'el'", property]]), @"not supported");
         RLMAssertThrowsWithReasonMatching(([realm objects:@"AllDictionariesObject" where:[NSString stringWithFormat:@"%@.@allValues ENDSWITH 'lo'", property]]), @"not supported");
