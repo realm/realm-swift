@@ -24,7 +24,7 @@ import XCTest
 import RealmTestSupport
 #endif
 
-class SwiftMapTests: RLMTestCase {
+class SwiftRLMDictionaryTests: RLMTestCase {
     
     func testEnumerationInMap() {
         let realm = realmWithTestPath()
