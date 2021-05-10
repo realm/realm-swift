@@ -153,4 +153,34 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         XCTAssertTrue((description as NSString).range(of: "900").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMDictionary")
         XCTAssertTrue((description as NSString).range(of: "800 objects skipped").location != Foundation.NSNotFound, "'800 objects skipped' should be displayed when calling \"description\" on RLMDictionary")
     }
+    
+    func testPopulateEmptyDictionary() {
+        let realm = realmWithTestPath()
+        realm.beginWriteTransaction()
+        
+        let dict = DictionaryPropertyObject.create(in: realm, withValue: [])//@[@{}, @{}]];
+        XCTAssertNotNil(dict.stringDictionary, "Should be able to get an empty dictionary")
+        XCTAssertEqual(dict.stringDictionary.count, 0, "Should start with no dictionary elements")
+
+        let obj = StringObject()
+        obj.stringCol = "a"
+
+        dict.stringDictionary["one" as RLMDictionaryKey] = obj
+        dict.stringDictionary["two" as RLMDictionaryKey] = StringObject.create(in: realm, withValue: ["b"])
+        dict.stringDictionary["three" as RLMDictionaryKey] = obj
+
+        try! realm.commitWriteTransaction()
+
+//        XCTAssertEqual(dict.stringDictionary.count, 3, "Should have three elements in the dictionary")
+//        XCTAssertEqualObjects(dict.stringDictionary["one"].stringCol, "a", "First element should have property value 'a'")
+//        XCTAssertEqualObjects(dict.stringDictionary["two"].stringCol, "b", "Second element should have property value 'b'")
+//        XCTAssertEqualObjects(dict.stringDictionary["three"].stringCol, "a", "Third element should have property value 'a'")
+//
+//        RLMDictionary *dictionaryProp = dict.stringDictionary;
+//        RLMAssertThrowsWithReasonMatching([dictionaryProp setObject:obj forKey:@"four"], @"write transaction");
+//
+//        for (NSString *key in dictionaryProp) {
+//            XCTAssertTrue(((RLMDictionary *)dictionaryProp[key]).description.length, @"Object should have description");
+//        }
+    }
 }
