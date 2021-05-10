@@ -1475,21 +1475,21 @@ static RLMDictionary<RLMString, IntObject> *managedTestDictionary() {
     RLMAssertThrowsWithReasonMatching([dict setValue:io forKey:@"intCol"], @"write transaction");
 }
 
-//- (void)testDeleteObjectFromOutsideDictionary {
-//    RLMDictionary<RLMString, IntObject> *dict = managedTestDictionary();
-//    RLMRealm *realm = dict.realm;
-//    [realm beginWriteTransaction];
-//
-//    XCTAssertNotNil(dict[@"0"]);
-//    IntObject *o = dict.allValues[0];
-//    IntObject *o2 = dict.allValues[1];
-//    [realm deleteObject:o];
-//    [realm deleteObject:o2];
-//    XCTAssertNil(dict[@"0"]);
-//    XCTAssertNil(dict[@"1"]);
-//
-//    [realm commitWriteTransaction];
-//}
+- (void)testDeleteObjectFromOutsideDictionary {
+    RLMDictionary<RLMString, IntObject> *dict = managedTestDictionary();
+    RLMRealm *realm = dict.realm;
+    [realm beginWriteTransaction];
+
+    XCTAssertNotNil(dict[@"0"]);
+    IntObject *o = dict.allValues[0];
+    IntObject *o2 = dict.allValues[1];
+    [realm deleteObject:o];
+    [realm deleteObject:o2];
+    XCTAssertNil(dict[@"0"]);
+    XCTAssertNil(dict[@"1"]);
+
+    [realm commitWriteTransaction];
+}
 
 - (void)testIsFrozen {
     RLMDictionary *unfrozen = managedTestDictionary();

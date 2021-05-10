@@ -111,6 +111,32 @@ class SwiftKVOObject: Object {
     let setOptDecimal = MutableSet<Decimal128?>()
     let setOptObjectId = MutableSet<ObjectId?>()
 
+    let mapBool = Map<String, Bool>()
+    let mapInt8 = Map<String, Int8>()
+    let mapInt16 = Map<String, Int16>()
+    let mapInt32 = Map<String, Int32>()
+    let mapInt64 = Map<String, Int64>()
+    let mapFloat = Map<String, Float>()
+    let mapDouble = Map<String, Double>()
+    let mapString = Map<String, String>()
+    let mapBinary = Map<String, Data>()
+    let mapDate = Map<String, Date>()
+    let mapDecimal = Map<String, Decimal128>()
+    let mapObjectId = Map<String, ObjectId>()
+
+    let mapOptBool = Map<String, Bool?>()
+    let mapOptInt8 = Map<String, Int8?>()
+    let mapOptInt16 = Map<String, Int16?>()
+    let mapOptInt32 = Map<String, Int32?>()
+    let mapOptInt64 = Map<String, Int64?>()
+    let mapOptFloat = Map<String, Float?>()
+    let mapOptDouble = Map<String, Double?>()
+    let mapOptString = Map<String, String?>()
+    let mapOptBinary = Map<String, Data?>()
+    let mapOptDate = Map<String, Date?>()
+    let mapOptDecimal = Map<String, Decimal128?>()
+    let mapOptObjectId = Map<String, ObjectId?>()
+
     override class func primaryKey() -> String { return "pk" }
     override class func ignoredProperties() -> [String] { return ["ignored"] }
 }
@@ -372,6 +398,39 @@ class KVOTests: TestCase {
         observeSetChange(obs, "setOptBinary") { obj.setOptBinary.insert(nil) }
         observeSetChange(obs, "setOptDecimal") { obj.setOptDecimal.insert(nil) }
         observeSetChange(obs, "setOptObjectId") { obj.setOptObjectId.insert(nil) }
+
+        observeSetChange(obs, "mapBool") { obj.mapBool["key"] = true }
+        observeSetChange(obs, "mapInt8") { obj.mapInt8["key"] = 10 }
+        observeSetChange(obs, "mapInt16") { obj.mapInt16["key"] = 10 }
+        observeSetChange(obs, "mapInt32") { obj.mapInt32["key"] = 10 }
+        observeSetChange(obs, "mapInt64") { obj.mapInt64["key"] = 10 }
+        observeSetChange(obs, "mapFloat") { obj.mapFloat["key"] = 10 }
+        observeSetChange(obs, "mapDouble") { obj.mapDouble["key"] = 10 }
+        observeSetChange(obs, "mapString") { obj.mapString["key"] = "abc" }
+        observeSetChange(obs, "mapDecimal") { obj.mapDecimal["key"] = decimal }
+        observeSetChange(obs, "mapObjectId") { obj.mapObjectId["key"] = objectId }
+
+        observeSetChange(obs, "mapOptBool") { obj.mapOptBool["key"] = true }
+        observeSetChange(obs, "mapOptInt8") { obj.mapOptInt8["key"] = 10 }
+        observeSetChange(obs, "mapOptInt16") { obj.mapOptInt16["key"] = 10 }
+        observeSetChange(obs, "mapOptInt32") { obj.mapOptInt32["key"] = 10 }
+        observeSetChange(obs, "mapOptInt64") { obj.mapOptInt64["key"] = 10 }
+        observeSetChange(obs, "mapOptFloat") { obj.mapOptFloat["key"] = 10 }
+        observeSetChange(obs, "mapOptDouble") { obj.mapOptDouble["key"] = 10 }
+        observeSetChange(obs, "mapOptString") { obj.mapOptString["key"] = "abc" }
+        observeSetChange(obs, "mapOptDecimal") { obj.mapOptDecimal["key"] = decimal }
+        observeSetChange(obs, "mapOptObjectId") { obj.mapOptObjectId["key"] = objectId }
+
+        observeSetChange(obs, "mapOptBool") { obj.mapOptBool["key"] = nil }
+        observeSetChange(obs, "mapOptInt8") { obj.mapOptInt8["key"] = nil }
+        observeSetChange(obs, "mapOptInt16") { obj.mapOptInt16["key"] = nil }
+        observeSetChange(obs, "mapOptInt32") { obj.mapOptInt32["key"] = nil }
+        observeSetChange(obs, "mapOptInt64") { obj.mapOptInt64["key"] = nil }
+        observeSetChange(obs, "mapOptFloat") { obj.mapOptFloat["key"] = nil }
+        observeSetChange(obs, "mapOptDouble") { obj.mapOptDouble["key"] = nil }
+        observeSetChange(obs, "mapOptString") { obj.mapOptString["key"] = nil }
+        observeSetChange(obs, "mapOptDecimal") { obj.mapOptDecimal["key"] = nil }
+        observeSetChange(obs, "mapOptObjectId") { obj.mapOptObjectId["key"] = nil }
 
         if obs.realm == nil {
             return

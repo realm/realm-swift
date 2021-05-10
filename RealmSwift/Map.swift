@@ -32,12 +32,12 @@ extension String: MapKeyType { }
  
  Map only supports String as a key.
  
- Unlike Swift's native collections, Map is a reference types, and are only immutable if the Realm that manages them
+ Unlike Swift's native collections, `Map`s is a reference types, and are only immutable if the Realm that manages them
  is opened as read-only.
  
- A Map can be filtered and sorted with the same predicates as Results<Value>.
+ A Map can be filtered and sorted with the same predicates as `Results<Value>`.
  
- Properties of Map type defined on Object subclasses must be declared as let and cannot be dynamic.
+ Properties of `Map` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
 */
 public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCollectionBase {
 
@@ -139,7 +139,7 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
      - parameter key: The key to the property whose values are desired.
      */
     @nonobjc public func value(forKey key: String) -> AnyObject? {
-        return rlmDictionary.value(forKey: key as! NSString)
+        return rlmDictionary.value(forKey: key as RLMDictionaryKey)
             .map { dynamicBridgeCast(fromObjectiveC:$0) }
     }
 
@@ -154,7 +154,7 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
     }
 
     /**
-     Invokes `setValue(_:forKey:)` on each of the collection's objects using the specified `value` and `key`.
+     Adds a given key-value pair to the dictionary or updates a given key should it already exist.
 
      - warning: This method can only be called during a write transaction.
 
@@ -184,8 +184,8 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
      */
     public func contains(where predicate: @escaping (_ key: Key, _ value: Value) -> Bool) -> Bool {
         var found = false
-        rlmDictionary.enumerateKeysAndObjects { (key, value, shouldStop) in
-            if predicate(dynamicBridgeCast(fromObjectiveC: key), dynamicBridgeCast(fromObjectiveC: value)) {
+        rlmDictionary.enumerateKeysAndObjects { (k, v, shouldStop) in
+            if predicate(dynamicBridgeCast(fromObjectiveC: k), dynamicBridgeCast(fromObjectiveC: v)) {
                 found = true
                 shouldStop.pointee = true
             }
@@ -194,6 +194,18 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
     }
 
     // MARK: Sorting
+
+    /**
+     Returns a `Results` containing the objects in the dictionary, but sorted.
+
+     Objects are sorted based on their values. For example, to sort a dictionary of `Date`s from
+     neweset to oldest based, you might call `dates.sorted(ascending: true)`.
+
+     - parameter ascending: The direction to sort in.
+     */
+    public func sorted(ascending: Bool = true) -> Results<Value> {
+        return sorted(byKeyPath: "self", ascending: ascending)
+    }
 
     /**
      Returns a `Results` containing the objects in the dictionary, but sorted.
@@ -281,7 +293,7 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
 
     /**
      Returns the minimum (lowest) value of the given property among all the objects in the collection, or `nil` if the
-     collection is empty.
+     dictionary is empty.
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
@@ -293,7 +305,7 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
 
     /**
      Returns the maximum (highest) value of the given property among all the objects in the collection, or `nil` if the
-     collection is empty.
+     dictionary is empty.
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
@@ -304,7 +316,7 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
     }
 
     /**
-    Returns the sum of the given property for objects in the collection, or `nil` if the collection is empty.
+    Returns the sum of the given property for objects in the collection, or `nil` if the dictionary is empty.
 
     - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
 
@@ -316,7 +328,7 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
 
     /**
      Returns the average value of a given property over all the objects in the collection, or `nil` if
-     the collection is empty.
+     the dictionary is empty.
 
      - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
 
@@ -329,7 +341,7 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
     // MARK: Notifications
 
     /**
-     Registers a block to be called each time the collection changes.
+     Registers a block to be called each time the dictionary changes.
 
      The block will be asynchronously called with the initial results, and then called again after each write
      transaction which changes either any of the objects in the collection, or which objects are in the collection.
@@ -339,7 +351,7 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
      documentation for more information on the change information supplied and an example of how to use it to update a
      `UITableView`.
 
-     At the time when the block is called, the collection will be fully evaluated and up-to-date, and as long as you do
+     At the time when the block is called, the dictionary will be fully evaluated and up-to-date, and as long as you do
      not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
      perform blocking work.
 
@@ -438,6 +450,21 @@ extension Map where Value: MinMaxType {
     }
 }
 
+extension Map where Value: OptionalProtocol, Value.Wrapped: MinMaxType {
+    /**
+     Returns the minimum (lowest) value of the dictionary, or `nil` if the dictionary is empty.
+     */
+    func min() -> Value.Wrapped? {
+        return _rlmCollection.min(ofProperty: "self").map(dynamicBridgeCast)
+    }
+    /**
+     Returns the maximum (highest) value of the dictionary, or `nil` if the dictionary is empty.
+     */
+    func max() -> Value.Wrapped? {
+        return _rlmCollection.max(ofProperty: "self").map(dynamicBridgeCast)
+    }
+}
+
 extension Map where Value: AddableType {
     /**
      Returns the sum of the values in the map.
@@ -450,6 +477,21 @@ extension Map where Value: AddableType {
      Returns the average of the values in the map, or `nil` if the map is empty.
      */
     public func average<T: AddableType>() -> T? {
+        return average(ofProperty: "self")
+    }
+}
+
+public extension Map where Value: OptionalProtocol, Value.Wrapped: AddableType {
+    /**
+     Returns the sum of the values in the dictionary, or `nil` if the dictionary is empty.
+     */
+    func sum() -> Value.Wrapped {
+        return sum(ofProperty: "self")
+    }
+    /**
+     Returns the average of all of the values in the collection.
+     */
+    func average<T: AddableType>() -> T? {
         return average(ofProperty: "self")
     }
 }

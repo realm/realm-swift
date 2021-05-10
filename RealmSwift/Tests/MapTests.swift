@@ -263,6 +263,10 @@ class MapTests: TestCase {
         XCTAssertEqual(0, map.count)
     }
 
+    func testDeleteObjectFromMap() {
+        
+    }
+
     func testChangesArePersisted() {
         guard let map = map,
               let str1 = str1,
