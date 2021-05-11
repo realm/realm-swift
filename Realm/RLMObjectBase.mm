@@ -544,7 +544,8 @@ struct ObjectChangeCallbackWrapper {
 
         auto properties = [NSMutableArray new];
         for (RLMProperty *property in object->_info->rlmObjectSchema.properties) {
-            if (c.columns.count(object->_info->tableColumn(property).value)) {
+            auto columnKey = object->_info->tableColumn(property).value;
+            if (c.columns.count(columnKey)) {
                 [properties addObject:property.name];
             }
         }
@@ -671,7 +672,7 @@ struct ObjectChangeCallbackWrapper {
     RLMObjectBase *obj = [realm resolveThreadSafeReference:tsr];
 
     _object = realm::Object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
-    _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj});
+    _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj}, keyPaths);
 }
 
 - (void)addNotificationBlock:(RLMObjectNotificationCallback)block object:(RLMObjectBase *)obj keyPaths:(KeyPathArray)keyPaths {
@@ -690,8 +691,8 @@ RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
 
     KeyPathArray keyPathArray;
     for (NSString *keyPath in keyPaths) {
-        RLMKeyPath kp = RLMKeyPathFromString(obj.realm.schema, obj->_objectSchema, obj->_info, keyPath);
-        keyPathArray.push_back(kp);
+        RLMKeyPath rlmKeyPath = RLMKeyPathFromString(obj.realm.schema, obj->_objectSchema, obj->_info, keyPath);
+        keyPathArray.push_back(rlmKeyPath);
     }
 
     if (!queue) {
