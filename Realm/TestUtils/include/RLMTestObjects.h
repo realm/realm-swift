@@ -522,11 +522,10 @@ RLM_COLLECTION_TYPE(CircleObject);
 
 @interface DictionaryPropertyObject : RLMObject
 
-@property RLM_GENERIC_DICTIONARY(RLMString, StringObject) *stringDictionary;
-@property RLM_GENERIC_DICTIONARY(RLMString, IntObject) *intDictionary;
-@property RLM_GENERIC_DICTIONARY(RLMString, RLMString) *primitiveStringDictionary;
-@property RLM_GENERIC_DICTIONARY(RLMString, EmbeddedIntObject) *embeddedDictionary;
-
+@property RLMDictionary<RLMString, StringObject> *stringDictionary;
+@property RLMDictionary<RLMString, RLMInt> *intDictionary;
+@property RLMDictionary<RLMString, RLMString> *primitiveStringDictionary;
+@property RLMDictionary<RLMString, EmbeddedIntObject> *embeddedDictionary;
 @end
 
 #pragma mark DynamicObject

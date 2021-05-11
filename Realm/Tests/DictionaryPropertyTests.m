@@ -91,10 +91,10 @@
 
     [realm beginWriteTransaction];
     DictionaryPropertyObject *dictObj = [DictionaryPropertyObject createInRealm:realm withValue:@[]];
-    RLMDictionary *dictArray = dictObj.stringDictionary;
-    XCTAssertFalse(dictArray.isInvalidated, @"dictArray should be valid after creation.");
+    RLMDictionary *dictionary = dictObj.stringDictionary;
+    XCTAssertFalse(dictionary.isInvalidated, @"dictionary should be valid after creation.");
     [realm deleteObject:dictObj];
-    XCTAssertTrue(dictArray.isInvalidated, @"dictArray should be invalid after parent deletion.");
+    XCTAssertTrue(dictionary.isInvalidated, @"dictionary should be invalid after parent deletion.");
     [realm commitWriteTransaction];
 }
 
