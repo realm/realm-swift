@@ -560,6 +560,7 @@ RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema
     RLMProperty *property;
     std::vector<std::pair<TableKey, ColKey>> keyPairs;
 
+    realm::TableRef table = info->table();
     NSUInteger start = 0, length = keyPath.length, end = NSNotFound;
     do {
         end = [keyPath rangeOfString:@"." options:0 range:{start, length - start}].location;
@@ -576,19 +577,28 @@ RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema
 
             REALM_ASSERT(property.objectClassName);
 
-            TableKey tk = info->table()->get_key();
-            ColKey ck = info->table()->get_column_key(property.columnName.UTF8String);
-            // How to assert that this is in fact a link?
+            TableKey tk = table->get_key();
+            // turn around
+            ColKey ck;
+            if (property.type == RLMPropertyTypeLinkingObjects) {
+                // crashes here for backlink
+//                ck = table->get_column_key(property.columnName.UTF8String);
+//                table = table->get_opposite_table(ck);
+            } else {
+                ck = table->get_column_key(property.columnName.UTF8String);
+                table = table->get_link_target(ck);
+            }
+
             keyPairs.push_back(std::make_pair(tk, ck));
-            
+//            realm::ObjectSchema test = [objectSchema objectStoreCopy:schema];
             objectSchema = schema[property.objectClassName];
         }
 
         start = end + 1;
     } while (end != NSNotFound);
 
-    TableKey tk = info->table()->get_key();
-    ColKey ck = info->table()->get_column_key(property.columnName.UTF8String);
+    TableKey tk = table->get_key();
+    ColKey ck = table->get_column_key(property.columnName.UTF8String);
     keyPairs.push_back(std::make_pair(tk, ck));
     
     return keyPairs;
