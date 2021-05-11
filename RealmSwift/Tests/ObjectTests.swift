@@ -859,24 +859,30 @@ class ObjectTests: TestCase {
         company.employees.append(employee)
         try! realm.commitWrite()
 
-        // Expect a notification for "employees" when "employee.hired" is changed
-        var token = company.observe(keyPaths: ["employees"], expectChange("hired", false, true))
+        // Expect no notification for "employees" when "employee.hired" is changed
+        var ex = expectation(description: "no change notification")
+        ex.isInverted = true
+        var token = company.observe(keyPaths: ["employees"], { _ in
+            ex.fulfill()
+        })
         try! realm.write({
             employee.hired = true
         })
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 
+        // Went over case with Dominic
         // Expect a notification for "employees.hired" when "employee.hired" is changed
-        token = company.observe(keyPaths: ["employees.hired"], expectChange("hired", true, false))
+        token = company.observe(keyPaths: ["employees.hired"], expectChange("employees", Int?.none, Int?.none))
         try! realm.write({
+            XCTAssertTrue(employee.hired)
             employee.hired = false
         })
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 
         // Expect no notification for "employees.hired" when "employee.age" is changed.
-        var ex = expectation(description: "no change notification")
+        ex = expectation(description: "no change notification")
         ex.isInverted = true
         token = company.observe(keyPaths: ["employees.hired"], { _ in
             ex.fulfill()
@@ -935,7 +941,7 @@ class ObjectTests: TestCase {
         try! realm.commitWrite()
 
         // Expect no notification for "dog" when "person.name" is changed
-        let ex = expectation(description: "no change notification")
+        var ex = expectation(description: "no change notification")
         ex.isInverted = true
         var token = person.observe(keyPaths: ["dog"], { _ in
             ex.fulfill()
@@ -946,8 +952,12 @@ class ObjectTests: TestCase {
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 
-        // Expect notification for "dog" when "dog.dogName" is changed
-        token = person.observe(keyPaths: ["dog"], expectChange("dogName", "", "fido"))
+        // Expect no notification for "dog" when "dog.dogName" is changed
+        ex = expectation(description: "no change notification")
+        ex.isInverted = true
+        token = person.observe(keyPaths: ["dog"], {_ in
+            ex.fulfill()
+        })
         try! realm.write({
             dog.dogName = "fido"
         })
@@ -955,14 +965,15 @@ class ObjectTests: TestCase {
         token.invalidate()
 
         // Expect notification for "dog.dogName" when "dog.dogName" is changed
-        token = person.observe(keyPaths: ["dog.dogName"], expectChange("dogName", "fido", "rex"))
+        token = person.observe(keyPaths: ["dog.dogName"], expectChange("dog", Int?.none, Int?.none))
         try! realm.write({
             dog.dogName = "rex"
         })
         waitForExpectations(timeout: 0.1, handler: nil)
+        token.invalidate()
 
         // Expect notification for "dog.dogName" when "dog" is reassigned.
-        token = person.observe(keyPaths: ["dog.dogName"], expectChange("dogName", Int?.none, Int?.none))
+        token = person.observe(keyPaths: ["dog.dogName"], expectChange("dog", Int?.none, Int?.none))
         try! realm.write({
             let newDog = SwiftDogObject()
             person.dog = newDog
@@ -991,6 +1002,7 @@ class ObjectTests: TestCase {
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 
+        // !!!: This is incorrect. Not supported behavior
         // Expect notification for "owners" when "owner.name" is changed
         token = dog.observe(keyPaths: ["owners"], expectChange("name", "", "Tom"))
         try! realm.write({

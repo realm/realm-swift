@@ -496,7 +496,7 @@ class RealmCollectionTypeTests: TestCase {
             obj.stringCol = "changed"
             try! realm.commitWrite()
         }
-        waitForExpectations(timeout: 0.2, handler: nil)
+        waitForExpectations(timeout: 0.1, handler: nil)
 
         // Expect no notification for `stringCol` key path because only `linkCol.id` will be modified.
         ex = self.expectation(description: "NO change notification")
@@ -508,7 +508,7 @@ class RealmCollectionTypeTests: TestCase {
             obj.linkCol?.id = 2
             try! realm.commitWrite()
         }
-        waitForExpectations(timeout: 0.2, handler: nil)
+        waitForExpectations(timeout: 0.1, handler: nil)
 
         token0.invalidate()
     }
