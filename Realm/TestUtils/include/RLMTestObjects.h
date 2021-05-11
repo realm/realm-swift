@@ -21,7 +21,7 @@
 #if __has_extension(objc_generics)
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS *><CLASS>
 #define RLM_GENERIC_SET(CLASS) RLMSet<CLASS *><CLASS>
-#define RLM_GENERIC_DICTIONARY(KEY, VALUE) RLMDictionary<KEY *, VALUE *><VALUE>
+#define RLM_GENERIC_DICTIONARY(KEY, VALUE) RLMDictionary<KEY, VALUE>
 #else
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS>
 #define RLM_GENERIC_SET(CLASS) RLMSet<CLASS>
@@ -179,7 +179,7 @@ RLM_COLLECTION_TYPE(AllTypesObject)
 @end
 
 @interface DictionaryOfAllTypesObject : RLMObject
-@property RLM_GENERIC_DICTIONARY(NSString, AllTypesObject) *dictionary;
+@property RLM_GENERIC_DICTIONARY(RLMString, AllTypesObject) *dictionary;
 @end
 
 @interface AllOptionalTypes : RLMObject
@@ -400,7 +400,8 @@ RLM_COLLECTION_TYPE(EmployeeObject)
 @property NSString *name;
 @property RLM_GENERIC_ARRAY(EmployeeObject) *employees;
 @property RLM_GENERIC_SET(EmployeeObject) *employeeSet;
-@property RLM_GENERIC_DICTIONARY(NSString, EmployeeObject) *employeeDict;
+@property RLM_GENERIC_DICTIONARY(RLMString, EmployeeObject) *employeeDict;
+
 @end
 
 #pragma mark LinkToCompanyObject
@@ -430,7 +431,7 @@ RLM_COLLECTION_TYPE(DogObject)
 @end
 
 @interface DogDictionaryObject : RLMObject
-@property RLM_GENERIC_DICTIONARY(NSString, DogObject) *dogs;
+@property RLM_GENERIC_DICTIONARY(RLMString, DogObject) *dogs;
 @end
 
 #pragma mark OwnerObject
@@ -494,7 +495,7 @@ RLM_COLLECTION_TYPE(CircleObject);
 #pragma mark CircleDictionaryObject
 
 @interface CircleDictionaryObject : RLMObject
-@property RLM_GENERIC_DICTIONARY(NSString, CircleObject) *circles;
+@property RLM_GENERIC_DICTIONARY(RLMString, CircleObject) *circles;
 @end
 
 #pragma mark ArrayPropertyObject
@@ -521,11 +522,11 @@ RLM_COLLECTION_TYPE(CircleObject);
 
 @interface DictionaryPropertyObject : RLMObject
 
-@property RLM_GENERIC_DICTIONARY(NSString, StringObject) *stringDictionary;
-@property RLM_GENERIC_DICTIONARY(NSString, IntObject) *intDictionary;
-//@property RLM_GENERIC_DICTIONARY(NSString, NSString) *primitiveStringDictionary;
-@property RLMDictionary<NSString *, NSString *> *primitiveStringDictionary;
-@property RLM_GENERIC_DICTIONARY(NSString, EmbeddedIntObject) *embeddedDictionary;
+@property RLM_GENERIC_DICTIONARY(RLMString, StringObject) *stringDictionary;
+@property RLM_GENERIC_DICTIONARY(RLMString, IntObject) *intDictionary;
+@property RLM_GENERIC_DICTIONARY(RLMString, RLMString) *primitiveStringDictionary;
+@property RLM_GENERIC_DICTIONARY(RLMString, EmbeddedIntObject) *embeddedDictionary;
+
 @end
 
 #pragma mark DynamicObject
@@ -618,7 +619,8 @@ RLM_COLLECTION_TYPE(PrimaryIntObject);
 @interface IntegerDictionaryPropertyObject : RLMObject
 
 @property NSInteger number;
-@property RLM_GENERIC_DICTIONARY(NSString, IntObject) *dictionary;
+@property RLM_GENERIC_DICTIONARY(RLMString, IntObject) *dictionary;
+
 @end
 
 @interface NumberObject : RLMObject
@@ -673,7 +675,7 @@ RLM_COLLECTION_TYPE(PrimaryEmployeeObject);
 @property NSString *name;
 @property RLM_GENERIC_ARRAY(PrimaryEmployeeObject) *employees;
 @property RLM_GENERIC_SET(PrimaryEmployeeObject) *employeeSet;
-@property RLM_GENERIC_DICTIONARY(NSString, PrimaryEmployeeObject) *employeeDict;
+@property RLM_GENERIC_DICTIONARY(RLMString, PrimaryEmployeeObject) *employeeDict;
 @property PrimaryEmployeeObject *intern;
 @property LinkToPrimaryEmployeeObject *wrappedIntern;
 @end
@@ -716,7 +718,7 @@ RLM_COLLECTION_TYPE(RenamedProperties2)
 @property (nonatomic) RenamedProperties2 *linkB;
 @property (nonatomic) RLM_GENERIC_ARRAY(RenamedProperties1) *array;
 @property (nonatomic) RLM_GENERIC_SET(RenamedProperties1) *set;
-@property (nonatomic) RLM_GENERIC_DICTIONARY(NSString, RenamedProperties1) *dictionary;
+@property (nonatomic) RLM_GENERIC_DICTIONARY(RLMString, RenamedProperties1) *dictionary;
 @end
 
 @interface LinkToRenamedProperties2 : RLMObject
@@ -724,7 +726,7 @@ RLM_COLLECTION_TYPE(RenamedProperties2)
 @property (nonatomic) RenamedProperties1 *linkD;
 @property (nonatomic) RLM_GENERIC_ARRAY(RenamedProperties2) *array;
 @property (nonatomic) RLM_GENERIC_SET(RenamedProperties2) *set;
-@property (nonatomic) RLM_GENERIC_DICTIONARY(NSString, RenamedProperties2) *dictionary;
+@property (nonatomic) RLM_GENERIC_DICTIONARY(RLMString, RenamedProperties2) *dictionary;
 @end
 
 @interface RenamedPrimaryKey : RLMObject
