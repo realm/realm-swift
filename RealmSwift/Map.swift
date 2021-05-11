@@ -108,7 +108,18 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
 
     public subscript(key: Key) -> Value? {
         get {
-            return rlmDictionary[objcKey(from: key)].map(dynamicBridgeCast)
+            if rlmDictionary.type == .object {
+                let obj = rlmDictionary[objcKey(from: key)]
+                // A Map can keep the key of an object that has been deleted by the Realm.
+                // If the object is deleted it will be stored as NSNull.null so we want to
+                // return that as `nil`.
+                if obj is NSNull {
+                    return nil
+                }
+                return obj.map(dynamicBridgeCast)
+            } else {
+                return rlmDictionary[objcKey(from: key)].map(dynamicBridgeCast)
+            }
         }
         set {
             if newValue == nil {
@@ -454,13 +465,13 @@ extension Map where Value: OptionalProtocol, Value.Wrapped: MinMaxType {
     /**
      Returns the minimum (lowest) value of the dictionary, or `nil` if the dictionary is empty.
      */
-    func min() -> Value.Wrapped? {
+    public func min() -> Value.Wrapped? {
         return _rlmCollection.min(ofProperty: "self").map(dynamicBridgeCast)
     }
     /**
      Returns the maximum (highest) value of the dictionary, or `nil` if the dictionary is empty.
      */
-    func max() -> Value.Wrapped? {
+    public func max() -> Value.Wrapped? {
         return _rlmCollection.max(ofProperty: "self").map(dynamicBridgeCast)
     }
 }

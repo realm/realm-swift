@@ -209,6 +209,7 @@ class ObjectSchemaTests: TestCase {
                 isPrimary = NO;
                 array = NO;
                 set = NO;
+                dictionary = NO;
                 optional = NO;
             }
             arrayCol {
@@ -237,11 +238,12 @@ class ObjectSchemaTests: TestCase {
                 type = object;
                 objectClassName = SwiftBoolObject;
                 linkOriginPropertyName = (null);
-                indexed = NO;\n\t\tisPrimary = NO;
+                indexed = NO;
+                isPrimary = NO;
                 array = NO;
                 set = NO;
                 dictionary = YES;
-                optional = NO;
+                optional = YES;
             }
         }
         """

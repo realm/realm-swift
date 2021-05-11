@@ -109,7 +109,7 @@ public:
     id box(realm::Obj&&);
     id box(realm::object_store::Dictionary&&);
     id box(realm::object_store::Set&&);
-    id box(realm::Mixed v) { return RLMMixedToObjc(v, _realm, _info.isSwiftClass()); }
+    id box(realm::Mixed);
 
     void will_change(realm::Obj const&, realm::Property const&);
     void will_change(realm::Object& obj, realm::Property const& prop) { will_change(obj.obj(), prop); }

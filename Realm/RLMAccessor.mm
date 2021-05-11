@@ -767,6 +767,10 @@ realm::Obj RLMAccessorContext::create_embedded_object() {
     return _parentObject.create_and_set_linked_object(_colKey);
 }
 
+id RLMAccessorContext::box(realm::Mixed v) {
+    return RLMMixedToObjc(v, _realm, &_info);
+}
+
 id RLMAccessorContext::box(realm::List&& l) {
     REALM_ASSERT(_parentObjectInfo);
     REALM_ASSERT(currentProperty);

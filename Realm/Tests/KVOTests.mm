@@ -92,6 +92,8 @@ RLM_COLLECTION_TYPE(KVOLinkObject1)
 @property RLMDictionary<RLMString, RLMDate>       *dateDictionary;
 @property RLMDictionary<RLMString, RLMObjectId>   *objectIdDictionary;
 @property RLMDictionary<RLMString, RLMDecimal128> *decimal128Dictionary;
+@property RLMDictionary<RLMString, RLMUUID>       *uuidDictionary;
+@property RLMDictionary<RLMString, RLMValue>      *anyDictionary;
 @property RLMDictionary<RLMString, KVOObject>     *objectDictionary;
 
 @property NSNumber<RLMInt>    *optIntCol;
@@ -125,6 +127,7 @@ RLM_COLLECTION_TYPE(KVOLinkObject1)
 @property KVOLinkObject1 *obj;
 @property RLMArray<KVOLinkObject1> *array;
 @property RLMSet<KVOLinkObject1> *set;
+@property RLMDictionary<RLMString, KVOLinkObject1> *dictionary;
 @end
 @implementation KVOLinkObject2
 + (NSString *)primaryKey {
@@ -177,6 +180,19 @@ RLM_COLLECTION_TYPE(KVOLinkObject1)
 @property NSMutableSet *uuidSet;
 @property NSMutableSet *anySet;
 
+@property NSMutableDictionary *boolDictionary;
+@property NSMutableDictionary *intDictionary;
+@property NSMutableDictionary *floatDictionary;
+@property NSMutableDictionary *doubleDictionary;
+@property NSMutableDictionary *stringDictionary;
+@property NSMutableDictionary *dataDictionary;
+@property NSMutableDictionary *dateDictionary;
+@property NSMutableDictionary *objectDictionary;
+@property NSMutableDictionary *objectIdDictionary;
+@property NSMutableDictionary *decimal128Dictionary;
+@property NSMutableDictionary *uuidDictionary;
+@property NSMutableDictionary *anyDictionary;
+
 @property NSNumber<RLMInt> *optIntCol;
 @property NSNumber<RLMFloat> *optFloatCol;
 @property NSNumber<RLMDouble> *optDoubleCol;
@@ -189,6 +205,7 @@ RLM_COLLECTION_TYPE(KVOLinkObject1)
 @property PlainKVOObject *obj;
 @property NSMutableArray *array;
 @property NSMutableSet *set;
+@property NSMutableDictionary *dictionary;
 @end
 @implementation PlainLinkObject1
 @end
@@ -197,6 +214,7 @@ RLM_COLLECTION_TYPE(KVOLinkObject1)
 @property PlainLinkObject1 *obj;
 @property NSMutableArray *array;
 @property NSMutableSet *set;
+@property NSMutableDictionary *dictionary;
 @end
 @implementation PlainLinkObject2
 @end
@@ -247,7 +265,6 @@ RLM_COLLECTION_TYPE(KVOLinkObject1)
     _object = nil;
 }
 @end
-
 
 @interface KVOTests : RLMTestCase
 // get an object that should be observed for the given object being mutated
@@ -350,7 +367,7 @@ public:
     } \
 } while (false)
 
-#define AssertSetChanged(s) do { \
+#define AssertCollectionChanged(s) do { \
     AssertNotification(r); \
     XCTAssertTrue(r.empty()); \
 } while (false)
@@ -411,6 +428,9 @@ public:
     obj.objectIdArray = [NSMutableArray array];
     obj.decimal128Array = [NSMutableArray array];
     obj.objectArray = [NSMutableArray array];
+    obj.uuidArray = [NSMutableArray array];
+    obj.anyArray = [NSMutableArray array];
+
     obj.boolSet = [NSMutableSet set];
     obj.intSet = [NSMutableSet set];
     obj.floatSet = [NSMutableSet set];
@@ -421,6 +441,21 @@ public:
     obj.objectIdSet = [NSMutableSet set];
     obj.decimal128Set = [NSMutableSet set];
     obj.objectSet = [NSMutableSet set];
+    obj.uuidSet = [NSMutableSet set];
+    obj.anySet = [NSMutableSet set];
+
+    obj.boolDictionary = [NSMutableDictionary dictionary];
+    obj.intDictionary = [NSMutableDictionary dictionary];
+    obj.floatDictionary = [NSMutableDictionary dictionary];
+    obj.doubleDictionary = [NSMutableDictionary dictionary];
+    obj.stringDictionary = [NSMutableDictionary dictionary];
+    obj.dataDictionary = [NSMutableDictionary dictionary];
+    obj.dateDictionary = [NSMutableDictionary dictionary];
+    obj.objectIdDictionary = [NSMutableDictionary dictionary];
+    obj.decimal128Dictionary = [NSMutableDictionary dictionary];
+    obj.objectDictionary = [NSMutableDictionary dictionary];
+    obj.uuidDictionary = [NSMutableDictionary dictionary];
+    obj.anyDictionary = [NSMutableDictionary dictionary];
     return obj;
 }
 
@@ -429,12 +464,14 @@ public:
     obj1.obj = [self createObject];
     obj1.array = [NSMutableArray new];
     obj1.set = [NSMutableSet new];
+    obj1.dictionary = [NSMutableDictionary new];
 
     PlainLinkObject2 *obj2 = [PlainLinkObject2 new];
     obj2.obj = obj1;
     obj2.array = [NSMutableArray new];
     obj2.set = [NSMutableSet new];
-    
+    obj2.dictionary = [NSMutableDictionary new];
+
     return obj2;
 }
 
@@ -801,7 +838,7 @@ public:
         obj.anyCol = nil;
         AssertChanged(r, @"abc", NSNull.null);
     }
-
+    // Array
     {
         KVORecorder r(self, obj, @"intArray");
         obj.intArray = obj.intArray;
@@ -885,7 +922,7 @@ public:
         r.refresh();
         r.pop_front(); // asserts that there's something to pop
     }
-
+    // Set
     {
         KVORecorder r(self, obj, @"intSet");
         obj.intSet = obj.intSet;
@@ -966,6 +1003,90 @@ public:
     {
         KVORecorder r(self, obj, @"anySet");
         obj.anySet = obj.anySet;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+    // Dictionary
+    {
+        KVORecorder r(self, obj, @"intDictionary");
+        obj.intDictionary = obj.intDictionary;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"boolDictionary");
+        obj.boolDictionary = obj.boolDictionary;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"floatDictionary");
+        obj.floatDictionary = obj.floatDictionary;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"doubleDictionary");
+        obj.doubleDictionary = obj.doubleDictionary;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"stringDictionary");
+        obj.stringDictionary = obj.stringDictionary;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"dataDictionary");
+        obj.dataDictionary = obj.dataDictionary;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"dateDictionary");
+        obj.dateDictionary = obj.dateDictionary;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"objectIdDictionary");
+        obj.objectIdDictionary = obj.objectIdDictionary;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"decimal128Dictionary");
+        obj.decimal128Dictionary = obj.decimal128Dictionary;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"objectDictionary");
+        obj.objectDictionary = obj.objectDictionary;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"uuidDictionary");
+        obj.uuidDictionary = obj.uuidDictionary;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"anyDictionary");
+        obj.anyDictionary = obj.anyDictionary;
         r.refresh();
         r.pop_front(); // asserts that there's something to pop
     }
@@ -1263,6 +1384,13 @@ public:
     }
 
     {
+        KVORecorder r(self, obj, @"objectDictionary");
+        obj[@"objectDictionary"] = obj.objectDictionary;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
         KVORecorder r(self, obj, @"optIntCol");
         obj[@"optIntCol"] = @1;
         AssertChanged(r, NSNull.null, @1);
@@ -1406,21 +1534,21 @@ public:
     id mutator2 = [obj2 mutableSetValueForKey:@"set"];
 
     [mutator addObject:obj.obj];
-    AssertSetChanged();
+    AssertCollectionChanged();
     [mutator removeObject:obj.obj];
-    AssertSetChanged();
+    AssertCollectionChanged();
     [mutator addObject:obj.obj];
-    AssertSetChanged();
+    AssertCollectionChanged();
     [mutator2 addObject:obj2.obj];
     [mutator setSet:mutator2];
-    AssertSetChanged();
+    AssertCollectionChanged();
 
     [mutator intersectSet:mutator2];
-    AssertSetChanged();
+    AssertCollectionChanged();
     [mutator minusSet:mutator2];
-    AssertSetChanged();
+    AssertCollectionChanged();
     [mutator unionSet:mutator2];
-    AssertSetChanged();
+    AssertCollectionChanged();
 }
 
 - (void)testPrimitiveSetKVO {
@@ -1432,21 +1560,71 @@ public:
     id mutator2 = [obj2 mutableSetValueForKey:@"intSet"];
 
     [mutator addObject:@1];
-    AssertSetChanged();
+    AssertCollectionChanged();
     [mutator removeObject:@1];
-    AssertSetChanged();
+    AssertCollectionChanged();
     [mutator addObject:@1];
-    AssertSetChanged();
+    AssertCollectionChanged();
     [mutator2 addObject:@2];
     [mutator setSet:mutator2];
-    AssertSetChanged();
+    AssertCollectionChanged();
 
     [mutator intersectSet:mutator2];
-    AssertSetChanged();
+    AssertCollectionChanged();
     [mutator minusSet:mutator2];
-    AssertSetChanged();
+    AssertCollectionChanged();
     [mutator unionSet:mutator2];
-    AssertSetChanged();
+    AssertCollectionChanged();
+}
+
+- (void)testDictionaryKVO {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVOLinkObject2 *obj2 = [self createLinkObject];
+    KVORecorder r(self, obj, @"dictionary");
+
+    id mutator = [obj valueForKey:@"dictionary"];
+    id mutator2 = [obj2 valueForKey:@"dictionary"];
+
+    // Foundation doesn't expose any notifying proxy classes for NSMutableDictionary
+    // and it doesnt really make sense to create a wrapper purely for testing.
+    // So if `mutator` is NSMutableDictionary return.
+
+    if ([mutator isKindOfClass:[NSMutableDictionary class]]) {
+        return;
+    }
+
+    [mutator setObject:obj.obj forKey:@"key"];
+    AssertCollectionChanged();
+    [mutator removeObjectForKey:@"key"];
+    AssertCollectionChanged();
+    [mutator setObject:obj.obj forKey:@"key2"];
+    AssertCollectionChanged();
+    [mutator2 setObject:obj2.obj forKey:@"key"];
+    [mutator removeAllObjects];
+    AssertCollectionChanged();
+}
+
+- (void)testPrimitiveDictionaryKVO {
+    KVOObject *obj = [self createObject];
+    KVOObject *obj2 = [self createObject];
+    KVORecorder r(self, obj, @"intDictionary");
+
+    id mutator = [obj valueForKey:@"intDictionary"];
+    id mutator2 = [obj2 valueForKey:@"intDictionary"];
+
+    if ([mutator isKindOfClass:[NSMutableDictionary class]]) {
+        return;
+    }
+
+    [mutator setObject:@1 forKey:@"key"];
+    AssertCollectionChanged();
+    [mutator removeObjectForKey:@"key"];
+    AssertCollectionChanged();
+    [mutator setObject:@2 forKey:@"key2"];
+    AssertCollectionChanged();
+    [mutator2 setObject:@3 forKey:@"key"];
+    [mutator removeAllObjects];
+    AssertCollectionChanged();
 }
 
 - (void)testIgnoredProperty {
@@ -1844,6 +2022,137 @@ public:
     [obj.array addObject:linked];
     KVORecorder r(self, obj, @"array");
     XCTAssertThrows([obj.array exchangeObjectAtIndex:2 withObjectAtIndex:3]);
+    // A KVO notification is still sent to observers on the same thread since we
+    // can't cancel willChange, but the data is not very meaningful so don't check it
+    if (!self.collapsesNotifications) {
+        AssertNotification(r);
+    }
+}
+
+- (void)testDeleteObjectInSet {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVOLinkObject1 *linked = obj.obj;
+    [obj.set addObject:linked];
+    KVORecorder r(self, obj, @"set");
+    [self.realm deleteObject:linked];
+    AssertCollectionChanged();
+}
+
+- (void)testDeleteObjectsInSetViaTableClear {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVOLinkObject2 *obj2 = [self createLinkObject];
+    KVORecorder r(self, obj, @"set");
+
+    [obj.set addObject:obj.obj];
+    AssertCollectionChanged();
+
+    [self.realm deleteObjects:[KVOLinkObject1 allObjectsInRealm:self.realm]];
+    AssertCollectionChanged();
+}
+
+- (void)testDeleteObjectsInSetViaTableViewClear {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVOLinkObject2 *obj2 = [self createLinkObject];
+    KVORecorder r(self, obj, @"set");
+    [obj.set addObject:obj2.obj];
+    AssertCollectionChanged();
+
+    RLMResults *results = [KVOLinkObject1 objectsInRealm:self.realm where:@"TRUEPREDICATE"];
+    [results lastObject];
+    [self.realm deleteObjects:results];
+    AssertCollectionChanged();
+}
+
+- (void)testDeleteObjectsInSetViaQueryClear {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVORecorder r(self, obj, @"set");
+    [obj.set addObject:obj.obj];
+    AssertCollectionChanged();
+
+    [self.realm deleteObjects:[KVOLinkObject1 objectsInRealm:self.realm where:@"TRUEPREDICATE"]];
+    AssertCollectionChanged();
+}
+
+- (void)testObserveInvalidSetProperty {
+    KVOObject *obj = [self createObject];
+    RLMSet *set = obj.objectSet;
+    XCTAssertThrows([set addObserver:self forKeyPath:@"self" options:0 context:0]);
+    XCTAssertNoThrow([set addObserver:self forKeyPath:RLMInvalidatedKey options:0 context:0]);
+    XCTAssertNoThrow([set removeObserver:self forKeyPath:RLMInvalidatedKey context:0]);
+}
+
+- (void)testInvalidOperationOnObservedSet {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVOLinkObject1 *linked = obj.obj;
+    [obj.set addObject:linked];
+    KVORecorder r(self, obj, @"set");
+    XCTAssertThrows([obj.set addObject:(id)@1]);
+    // A KVO notification is still sent to observers on the same thread since we
+    // can't cancel willChange, but the data is not very meaningful so don't check it
+    if (!self.collapsesNotifications) {
+        AssertNotification(r);
+    }
+}
+
+- (void)testDeleteObjectInDictionary {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVOLinkObject1 *linked = obj.obj;
+    [obj.dictionary setObject:linked forKey:@"key"];
+    KVORecorder r(self, obj, @"dictionary");
+    [self.realm deleteObject:linked];
+    AssertCollectionChanged();
+}
+
+- (void)testDeleteObjectsInDictionaryViaTableClear {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVOLinkObject2 *obj2 = [self createLinkObject];
+    KVORecorder r(self, obj, @"dictionary");
+
+    [obj.dictionary setObject:obj.obj forKey:@"key"];
+    AssertCollectionChanged();
+
+    [self.realm deleteObjects:[KVOLinkObject1 allObjectsInRealm:self.realm]];
+    AssertCollectionChanged();
+}
+
+- (void)testDeleteObjectsInDictionaryViaTableViewClear {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVOLinkObject2 *obj2 = [self createLinkObject];
+    KVORecorder r(self, obj, @"dictionary");
+    [obj.dictionary setObject:obj2.obj forKey:@"key"];
+    AssertCollectionChanged();
+
+    RLMResults *results = [KVOLinkObject1 objectsInRealm:self.realm where:@"TRUEPREDICATE"];
+    [results lastObject];
+    [self.realm deleteObjects:results];
+    AssertCollectionChanged();
+}
+
+- (void)testDeleteObjectsInDictionaryViaQueryClear {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVORecorder r(self, obj, @"dictionary");
+    [obj.dictionary setObject:obj.obj forKey:@"key"];
+    AssertCollectionChanged();
+
+    [self.realm deleteObjects:[KVOLinkObject1 objectsInRealm:self.realm where:@"TRUEPREDICATE"]];
+    AssertCollectionChanged();
+}
+
+- (void)testObserveInvalidDictionaryProperty {
+    KVOObject *obj = [self createObject];
+    RLMDictionary *dictionary = obj.objectDictionary;
+    XCTAssertThrows([dictionary addObserver:self forKeyPath:@"self" options:0 context:0]);
+    XCTAssertNoThrow([dictionary addObserver:self forKeyPath:RLMInvalidatedKey options:0 context:0]);
+    XCTAssertNoThrow([dictionary removeObserver:self forKeyPath:RLMInvalidatedKey context:0]);
+}
+
+- (void)testInvalidOperationOnObservedDictionary {
+    KVOLinkObject2 *obj = [self createLinkObject];
+    KVOLinkObject2 *obj2 = [self createLinkObject];
+    KVOLinkObject1 *linked = obj.obj;
+    [obj.dictionary setObject:linked forKey:@"key"];
+    KVORecorder r(self, obj, @"dictionary");
+    XCTAssertThrows([obj.dictionary setObject:(id)@1 forKey:@"key"]);
     // A KVO notification is still sent to observers on the same thread since we
     // can't cancel willChange, but the data is not very meaningful so don't check it
     if (!self.collapsesNotifications) {

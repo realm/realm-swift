@@ -1485,8 +1485,8 @@ static RLMDictionary<RLMString, IntObject> *managedTestDictionary() {
     IntObject *o2 = dict.allValues[1];
     [realm deleteObject:o];
     [realm deleteObject:o2];
-    XCTAssertNil(dict[@"0"]);
-    XCTAssertNil(dict[@"1"]);
+    XCTAssertEqualObjects(dict[@"0"], NSNull.null);
+    XCTAssertEqualObjects(dict[@"1"], NSNull.null);
 
     [realm commitWriteTransaction];
 }

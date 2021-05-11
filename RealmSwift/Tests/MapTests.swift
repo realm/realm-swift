@@ -264,7 +264,15 @@ class MapTests: TestCase {
     }
 
     func testDeleteObjectFromMap() {
-        
+        guard let map = map, let str1 = str1 else {
+            fatalError("Test precondition failure")
+        }
+        if let realm = map.realm {
+            map["key"] = str1
+            XCTAssertEqual(map["key"]?.stringCol, str1.stringCol)
+            realm.delete(str1)
+            XCTAssertNil(map["key"])
+        }
     }
 
     func testChangesArePersisted() {

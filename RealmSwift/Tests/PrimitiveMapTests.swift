@@ -606,23 +606,23 @@ class OptionalMinMaxPrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: Pri
         return unsafeDowncast(map!, to: Map<V.Key, V.W?>.self)
     }
 
-//    func testMin() {
-//        XCTAssertNil(map2.min())
-//        for element in values {
-//            map2[element.key] = element.value as? V.W
-//        }
-//        let expected = values[1].value as! V.W
-//        XCTAssertEqual(map2.min(), expected)
-//    }
-//
-//    func testMax() {
-//        XCTAssertNil(map2.max())
-//        for element in values {
-//            map2[element.key] = element.value as? V.W
-//        }
-//        let expected = values[2] as! V.W
-//        XCTAssertEqual(map2.max(), expected)
-//    }
+    func testMin() {
+        XCTAssertNil(map2.min())
+        for element in values {
+            map2[element.key] = element.value as? V.W
+        }
+        let expected = values[1].value as! V.W
+        XCTAssertEqual(map2.min(), expected)
+    }
+
+    func testMax() {
+        XCTAssertNil(map2.max())
+        for element in values {
+            map2[element.key] = element.value as? V.W
+        }
+        let expected = values[2].value as! V.W
+        XCTAssertEqual(map2.max(), expected)
+    }
 }
 
 class AddablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.T: AddableType {

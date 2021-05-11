@@ -244,8 +244,11 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 - (nullable id)objectForKey:(id<RLMDictionaryKey>)key {
     try {
         RLMAccessorContext context(*_objectInfo);
-        return _backingCollection.get(context,
-                                      context.unbox<realm::StringData>(key));
+        auto value = _backingCollection.try_get_any(context.unbox<realm::StringData>(key));
+        if (!value)
+            return nil;
+
+        return context.box(*value);
     }
     catch (realm::KeyNotFound const&) {
         return nil;
@@ -273,8 +276,8 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (void)setObject:(id)obj forKey:(id<RLMDictionaryKey>)key {
-    RLMDictionaryValidateMatchingObjectType(self, key, obj);
     changeDictionary(self, ^{
+        RLMDictionaryValidateMatchingObjectType(self, key, obj);
         RLMAccessorContext context(*_objectInfo);
         _backingCollection.insert(context,
                                   context.unbox<realm::StringData>(key),
@@ -288,8 +291,8 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
         [self removeObjectForKey:key];
         return;
     }
-    RLMDictionaryValidateMatchingObjectType(self, key, obj);
     changeDictionary(self, ^{
+        RLMDictionaryValidateMatchingObjectType(self, key, obj);
         RLMAccessorContext context(*_objectInfo);
         _backingCollection.insert(context,
                                   context.unbox<realm::StringData>(key),
@@ -357,13 +360,13 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (void)setValue:(id)value forKey:(nonnull NSString *)key {
-    RLMDictionaryValidateMatchingObjectType(self, key, value);
-    if (!value) {
-        [self removeObjectForKey:key];
-        return;
-    }
-    RLMAccessorContext context(*_objectInfo);
-    translateErrors([&] {
+    changeDictionary(self, ^{
+        RLMDictionaryValidateMatchingObjectType(self, key, value);
+        if (!value) {
+            [self removeObjectForKey:key];
+            return;
+        }
+        RLMAccessorContext context(*_objectInfo);
         _backingCollection.insert(context, [key UTF8String], value);
     });
 }
