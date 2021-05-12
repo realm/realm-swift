@@ -1278,11 +1278,8 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
         XCTAssertFalse(deleted);
         XCTAssertNil(error);
         XCTAssertEqual(changes.count, 1U);
-
-        for (RLMPropertyChange *prop in changes) {
-            XCTAssertEqualObjects(prop.name, _propertyNames[_obj.boolCol]);
-            XCTAssertEqual([_values[@"boolCol"] boolValue], [prop.value boolValue]);
-        }
+        RLMPropertyChange *prop = changes[0];
+        XCTAssertEqualObjects(prop.name, @"boolCol");
         [ex fulfill];
     } keyPaths:@[@"boolCol"]];
 
@@ -1312,11 +1309,8 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
         XCTAssertFalse(deleted);
         XCTAssertNil(error);
         XCTAssertEqual(changes.count, 1U);
-
-        for (RLMPropertyChange *prop in changes) {
-            XCTAssertEqualObjects(prop.name, _propertyNames[_obj.boolCol]);
-            XCTAssertEqual([_values[@"boolCol"] boolValue], [prop.value boolValue]);
-        }
+        RLMPropertyChange *prop = changes[0];
+        XCTAssertEqualObjects(prop.name, @"boolCol");
         [ex fulfill];
     } keyPaths:@[@"boolCol"]];
 
