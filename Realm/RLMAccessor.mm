@@ -470,7 +470,7 @@ id superGet(RLMObjectBase *obj, NSString *propName) {
 
 // call setter for superclass for property at key
 void superSet(RLMObjectBase *obj, NSString *propName, id val) {
-    typedef void (*setter_type)(RLMObjectBase *, SEL, RLMArray *ar);
+    typedef void (*setter_type)(RLMObjectBase *, SEL, id<RLMCollection> collection);
     RLMProperty *prop = obj->_objectSchema[propName];
     Class superClass = class_getSuperclass(obj.class);
     setter_type superSetter = (setter_type)[superClass instanceMethodForSelector:prop.setterSel];
@@ -529,6 +529,7 @@ id unmanagedSetter(RLMProperty *prop, const char *) {
             collection = [[cls alloc] initWithObjectClassName:prop.objectClassName];
         else
             collection = [[cls alloc] initWithObjectType:prop.type optional:prop.optional];
+
         if (prop.dictionary)
             [collection addEntriesFromDictionary:(id)values];
         else

@@ -34,20 +34,19 @@ class SwiftRLMDictionaryTests: RLMTestCase {
 
         let dObj = SwiftRLMDictionaryPropertyObject.create(in: realm, withValue: [])
         let dict = dObj.dict!
-        
         let dateMinInput = Date()
         let dateMaxInput = dateMinInput.addingTimeInterval(1000)
 
-        dict["0" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["1" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["2" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["3" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["4" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["5" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["6" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["7" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["8" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["9" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["0" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["1" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dict["2" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["3" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dict["4" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["5" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dict["6" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["7" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dict["8" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["9" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
 
         try! realm.commitWriteTransaction()
 
@@ -71,20 +70,20 @@ class SwiftRLMDictionaryTests: RLMTestCase {
 
         let dObj = SwiftRLMDictionaryPropertyObject.create(in: realm, withValue: [])
         let dict = dObj.dict!
-        
+
         let dateMinInput = Date()
         let dateMaxInput = dateMinInput.addingTimeInterval(1000)
 
-        dict["0" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["1" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["2" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["3" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["4" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["5" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["6" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["7" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["8" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["9" as RLMDictionaryKey] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["0" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["1" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dict["2" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["3" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dict["4" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["5" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dict["6" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["7" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dict["8" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["9" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
 
         try! realm.commitWriteTransaction()
 
@@ -178,7 +177,7 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         let dict = dObj.dict!
 
         for i in 0..<1012 {
-            dict[String(i) as RLMDictionaryKey] = makeRlmEmployee(realm, 24, "Mary", true)
+            dict[String(i) as NSString] = makeRlmEmployee(realm, 24, "Mary", true)
         }
 
         try! realm.commitWriteTransaction()
@@ -206,9 +205,9 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         let company = SwiftRLMCompanyObject()
         realm.add(company)
 
-        company.employeeMap!["Joe" as RLMDictionaryKey] = po1
-        company.employeeMap!["John" as RLMDictionaryKey] = po2
-        company.employeeMap!["Jill" as RLMDictionaryKey] = po3
+        company.employeeMap!["Joe" as NSString] = po1
+        company.employeeMap!["John" as NSString] = po2
+        company.employeeMap!["Jill" as NSString] = po3
 
         try! realm.commitWriteTransaction()
 
@@ -216,32 +215,32 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         XCTAssertEqual(peopleInCompany.count, UInt(3), "No links should have been deleted")
 
         realm.beginWriteTransaction()
-        peopleInCompany.removeObject(for: "John" as RLMDictionaryKey) // Should delete link to employee
+        peopleInCompany.removeObject(for: "John" as NSString) // Should delete link to employee
         try! realm.commitWriteTransaction()
 
         XCTAssertEqual(peopleInCompany.count, UInt(2), "link deleted when accessing via links")
 
-        var test = peopleInCompany["Joe" as RLMDictionaryKey]!
+        var test = peopleInCompany["Joe" as NSString]!
         XCTAssertEqual(test.age, po1.age, "Should be equal")
         XCTAssertEqual(test.name, po1.name, "Should be equal")
         XCTAssertEqual(test.hired, po1.hired, "Should be equal")
         // XCTAssertEqual(test, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
 
-        test = peopleInCompany["Jill" as RLMDictionaryKey]!
+        test = peopleInCompany["Jill" as NSString]!
         XCTAssertEqual(test.age, po3.age, "Should be equal")
         XCTAssertEqual(test.name, po3.name, "Should be equal")
         XCTAssertEqual(test.hired, po3.hired, "Should be equal")
         // XCTAssertEqual(test, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
 
         realm.beginWriteTransaction()
-        peopleInCompany["Jill" as RLMDictionaryKey] = nil
+        peopleInCompany["Jill" as NSString] = nil
         XCTAssertEqual(peopleInCompany.count, UInt(1), "1 remaining link")
-        peopleInCompany["Joe" as RLMDictionaryKey] = po2
+        peopleInCompany["Joe" as NSString] = po2
         XCTAssertEqual(peopleInCompany.count, UInt(1), "1 link replaced")
         peopleInCompany.removeAllObjects()
         XCTAssertEqual(peopleInCompany.count, UInt(0), "0 remaining links")
         try! realm.commitWriteTransaction()
-        
+
         let allPeople = SwiftRLMEmployeeObject.allObjects(in: realm)
         XCTAssertEqual(allPeople.count, UInt(3), "Only links should have been deleted, not the employees")
     }
@@ -258,16 +257,16 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         let dateMinInput = Date()
         let dateMaxInput = dateMinInput.addingTimeInterval(1000)
 
-        dict["0" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["1" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["2" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["3" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["4" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["5" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["6" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["7" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["8" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["9" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["0" as NSString] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["1" as NSString] = AggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dict["2" as NSString] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["3" as NSString] = AggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dict["4" as NSString] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["5" as NSString] = AggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dict["6" as NSString] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["7" as NSString] = AggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dict["8" as NSString] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dict["9" as NSString] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
 
         try! realm.commitWriteTransaction()
 
@@ -287,25 +286,25 @@ class SwiftRLMDictionaryTests: RLMTestCase {
     func testObjectAggregate_objc() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        
+
         let dObj = AggregateDictionaryObject.create(in: realm, withValue: [])
 
         let dateMinInput = Date()
         let dateMaxInput = dateMinInput.addingTimeInterval(1000)
 
-        dObj.dictionary!["0" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dObj.dictionary!["1" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dObj.dictionary!["2" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dObj.dictionary!["3" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dObj.dictionary!["4" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dObj.dictionary!["5" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dObj.dictionary!["6" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dObj.dictionary!["7" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dObj.dictionary!["8" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dObj.dictionary!["9" as RLMDictionaryKey] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dObj.dictionary!["0" as NSString] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dObj.dictionary!["1" as NSString] = AggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dObj.dictionary!["2" as NSString] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dObj.dictionary!["3" as NSString] = AggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dObj.dictionary!["4" as NSString] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dObj.dictionary!["5" as NSString] = AggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dObj.dictionary!["6" as NSString] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dObj.dictionary!["7" as NSString] = AggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        dObj.dictionary!["8" as NSString] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        dObj.dictionary!["9" as NSString] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
 
         try! realm.commitWriteTransaction()
-        
+
         XCTAssertEqual(dObj.dictionary!.count, UInt(10), "10 objects added")
 
         let noArray = dObj.dictionary!.objects(where: "boolCol == NO")
@@ -395,7 +394,7 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         let dObj = CompanyObject.create(in: realm, withValue: [])
 
         for i in 0..<1012 {
-            dObj.employeeDict![String(i) as RLMDictionaryKey] = makeEmployee(realm, 24, "Mary", true)
+            dObj.employeeDict![String(i) as NSString] = makeEmployee(realm, 24, "Mary", true)
         }
 
         try! realm.commitWriteTransaction()
@@ -441,17 +440,17 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         XCTAssertEqual(peopleInCompany.count, UInt(3), "No links should have been deleted")
 
         realm.beginWriteTransaction()
-        peopleInCompany["John" as RLMDictionaryKey] = nil // Should delete link to employee
+        peopleInCompany["John" as NSString] = nil // Should delete link to employee
         try! realm.commitWriteTransaction()
 
         XCTAssertEqual(peopleInCompany.count, UInt(2), "link deleted when accessing via links")
 
-        var test = peopleInCompany["Joe" as RLMDictionaryKey]!
+        var test = peopleInCompany["Joe" as NSString]!
         XCTAssertEqual(test.age, po1.age, "Should be equal")
         XCTAssertEqual(test.name!, po1.name!, "Should be equal")
         XCTAssertEqual(test.hired, po1.hired, "Should be equal")
 
-        test = peopleInCompany["Jill" as RLMDictionaryKey]!
+        test = peopleInCompany["Jill" as NSString]!
         XCTAssertEqual(test.age, po3.age, "Should be equal")
         XCTAssertEqual(test.name!, po3.name!, "Should be equal")
         XCTAssertEqual(test.hired, po3.hired, "Should be equal")
@@ -484,11 +483,11 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         let realm = realmWithTestPath()
 
         realm.beginWriteTransaction()
-        
+
         let company = CompanyObject()
-        company.employeeDict["Joe" as RLMDictionaryKey] = makeEmployee(realm, 20, "A", true)
-        company.employeeDict["John" as RLMDictionaryKey] = makeEmployee(realm, 30, "B", false)
-        company.employeeDict["Jill" as RLMDictionaryKey] = makeEmployee(realm, 40, "C", true)
+        company.employeeDict["Joe" as NSString] = makeEmployee(realm, 20, "A", true)
+        company.employeeDict["John" as NSString] = makeEmployee(realm, 30, "B", false)
+        company.employeeDict["Jill" as NSString] = makeEmployee(realm, 40, "C", true)
         realm.add(company)
         try! realm.commitWriteTransaction()
 
