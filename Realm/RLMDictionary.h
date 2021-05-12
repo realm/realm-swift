@@ -29,6 +29,44 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ A `RLMCollectionChange` object encapsulates information about changes to collections
+ that are reported by Realm notifications.
+
+ `RLMCollectionChange` is passed to the notification blocks registered with
+ `-addNotificationBlock` on `RLMArray` and `RLMResults`, and reports what rows in the
+ collection changed since the last time the notification block was called.
+
+ The change information is available in two formats: a simple array of row
+ indices in the collection for each type of change, and an array of index paths
+ in a requested section suitable for passing directly to `UITableView`'s batch
+ update methods. A complete example of updating a `UITableView` named `tv`:
+
+     [tv beginUpdates];
+     [tv deleteRowsAtIndexPaths:[changes deletionsInSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+     [tv insertRowsAtIndexPaths:[changes insertionsInSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+     [tv reloadRowsAtIndexPaths:[changes modificationsInSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+     [tv endUpdates];
+
+ All of the arrays in an `RLMCollectionChange` are always sorted in ascending order.
+ */
+@interface RLMDictionaryChange : NSObject
+/// The indices in the new version of the collection which were newly inserted.
+@property (nonatomic, readonly) NSArray<id<RLMDictionaryKey>> *insertions;
+
+/**
+ The indices in the new version of the collection which were modified.
+
+ For `RLMResults`, this means that one or more of the properties of the object at
+ that index were modified (or an object linked to by that object was
+ modified).
+
+ For `RLMArray`, the array itself being modified to contain a
+ different object at that index will also be reported as a modification.
+ */
+@property (nonatomic, readonly) NSArray<id<RLMDictionaryKey>> *modifications;
+@end
+
+/**
  `RLMDictionary` is a container type in Realm representing a dynamic collection of key-value pairs.
 
  Unlike an `NSDictionary`, `RLMDictionary`s hold a single key and value type.
@@ -318,7 +356,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return A token which must be held for as long as you want updates to be delivered.
  */
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMKeyType <RLMDictionaryKey>, RLMObjectType> *_Nullable dictionary,
-                                                         RLMCollectionChange *_Nullable changes,
+                                                         RLMDictionaryChange *_Nullable changes,
                                                          NSError *_Nullable error))block
 __attribute__((warn_unused_result));
 
@@ -355,7 +393,7 @@ __attribute__((warn_unused_result));
  @return A token which must be held for as long as you want updates to be delivered.
  */
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMKeyType <RLMDictionaryKey>, RLMObjectType> *_Nullable dictionary,
-                                                         RLMCollectionChange *_Nullable changes,
+                                                         RLMDictionaryChange *_Nullable changes,
                                                          NSError *_Nullable error))block
                                          queue:(nullable dispatch_queue_t)queue
 __attribute__((warn_unused_result));

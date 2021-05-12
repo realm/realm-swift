@@ -28,7 +28,6 @@
 #import "RLMSet_Private.hpp"
 #import "RLMSwiftCollectionBase.h"
 
-#import <realm/object-store/collection_notifications.hpp>
 #import <realm/object-store/dictionary.hpp>
 #import <realm/object-store/list.hpp>
 #import <realm/object-store/results.hpp>
@@ -468,15 +467,7 @@ struct CollectionCallbackWrapper {
 };
 } // anonymous namespace
 
-@interface RLMCancellationToken : RLMNotificationToken
-@end
-
-@implementation RLMCancellationToken {
-@public
-    __unsafe_unretained RLMRealm *_realm;
-    realm::NotificationToken _token;
-    std::mutex _mutex;
-}
+@implementation RLMCancellationToken
 
 - (RLMRealm *)realm {
     std::lock_guard<std::mutex> lock(_mutex);
@@ -533,10 +524,10 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
     });
     return token;
 }
+
 @end
 
 // Explicitly instantiate the templated function for the two types we'll use it on
 template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedArray *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
-template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedDictionary *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
 template RLMNotificationToken *RLMAddNotificationBlock<>(RLMManagedSet *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);
 template RLMNotificationToken *RLMAddNotificationBlock<>(RLMResults *, void (^)(id, RLMCollectionChange *, NSError *), dispatch_queue_t);

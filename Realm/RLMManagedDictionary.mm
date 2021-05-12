@@ -36,6 +36,92 @@
 #import <realm/object-store/shared_realm.hpp>
 #import <realm/table_view.hpp>
 
+@interface RLMDictionaryChange()
+- (instancetype)initWithChanges:(realm::DictionaryChangeSet)changes;
+@end
+
+namespace {
+struct DictionaryCallbackWrapper {
+    void (^block)(id, RLMDictionaryChange *, NSError *);
+    id collection;
+
+    void operator()(realm::DictionaryChangeSet const& changes, std::exception_ptr err) {
+        if (err) {
+            try {
+                rethrow_exception(err);
+            }
+            catch (...) {
+                NSError *error = nil;
+                RLMRealmTranslateException(&error);
+                block(nil, nil, error);
+                return;
+            }
+        }
+
+        if (changes.deletions.empty() &&
+            changes.insertions.empty() &&
+            changes.modifications.empty()) {
+            block(collection, nil, nil);
+        }
+        else {
+            block(collection, [[RLMDictionaryChange alloc] initWithChanges:changes], nil);
+        }
+    }
+};
+} //anonymous namespace
+
+@implementation RLMDictionaryChange {
+    realm::DictionaryChangeSet _changes;
+}
+
+- (instancetype)initWithChanges:(realm::DictionaryChangeSet)changes {
+    self = [super init];
+    if (self) {
+        _changes = std::move(changes);
+    }
+    return self;
+}
+
+static NSArray *toArray(std::vector<realm::Mixed> const& v) {
+    NSMutableArray *ret = [NSMutableArray new];
+    for (auto& mixed : v) {
+        switch (mixed.get_type()) {
+            case realm::type_String:
+                [ret addObject:@(mixed.get_string().data())];
+                break;
+            default:
+                // Don't throw so older SDK versions can handle any new key types.
+                break;
+        }
+    }
+    return ret;
+}
+
+- (NSArray *)insertions {
+    return toArray(_changes.insertions);
+}
+
+- (NSArray *)modifications {
+    return toArray(_changes.modifications);
+}
+
+static NSArray *toIndexPathArray(realm::IndexSet const& set, NSUInteger section) {
+    NSMutableArray *ret = [NSMutableArray new];
+    NSUInteger path[2] = {section, 0};
+    for (auto index : set.as_indexes()) {
+        path[1] = index;
+        [ret addObject:[NSIndexPath indexPathWithIndexes:path length:2]];
+    }
+    return ret;
+}
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<RLMDictionaryChange: %p> insertions: %@, modifications: %@",
+            (__bridge void *)self, self.insertions, self.modifications];
+}
+
+@end
+
 @interface RLMManagedCollectionHandoverMetadata : NSObject
 @property (nonatomic) NSString *parentClassName;
 @property (nonatomic) NSString *key;
@@ -243,6 +329,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (nullable id)objectForKey:(id<RLMDictionaryKey>)key {
     try {
+        [self.realm verifyThread];
         RLMAccessorContext context(*_objectInfo);
         auto value = _backingCollection.try_get_any(context.unbox<realm::StringData>(key));
         if (!value)
@@ -501,10 +588,10 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 // http://www.openradar.me/radar?id=6135653276319744
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary *, RLMDictionaryChange *, NSError *))block {
     return RLMAddNotificationBlock(self, block, nil);
 }
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block queue:(dispatch_queue_t)queue {
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary *, RLMDictionaryChange *, NSError *))block queue:(dispatch_queue_t)queue {
     return RLMAddNotificationBlock(self, block, queue);
 }
 #pragma clang diagnostic pop
@@ -537,6 +624,42 @@ realm::object_store::Dictionary& RLMGetBackingCollection(RLMManagedDictionary *s
     return [[RLMManagedDictionary alloc] initWithBackingCollection:std::move(dictionary)
                                                         parentInfo:parentInfo
                                                           property:parentInfo->rlmObjectSchema[metadata.key]];
+}
+
+RLMNotificationToken *RLMAddNotificationBlock(RLMManagedDictionary *collection,
+                                              void (^block)(id, RLMDictionaryChange *, NSError *),
+                                              dispatch_queue_t queue) {
+    RLMRealm *realm = collection.realm;
+    if (!realm) {
+        @throw RLMException(@"Linking objects notifications are only supported on managed objects.");
+    }
+    auto token = [[RLMCancellationToken alloc] init];
+
+    if (!queue) {
+        [realm verifyNotificationsAreSupported:true];
+        token->_realm = realm;
+        token->_token = RLMGetBackingCollection(collection).add_key_based_notification_callback(DictionaryCallbackWrapper{block, collection});
+        return token;
+    }
+
+    RLMThreadSafeReference *tsr = [RLMThreadSafeReference referenceWithThreadConfined:collection];
+    token->_realm = realm;
+    RLMRealmConfiguration *config = realm.configuration;
+    dispatch_async(queue, ^{
+        std::lock_guard<std::mutex> lock(token->_mutex);
+        if (!token->_realm) {
+            return;
+        }
+        NSError *error;
+        RLMRealm *realm = token->_realm = [RLMRealm realmWithConfiguration:config queue:queue error:&error];
+        if (!realm) {
+            block(nil, nil, error);
+            return;
+        }
+        RLMManagedDictionary *collection = [realm resolveThreadSafeReference:tsr];
+        token->_token = RLMGetBackingCollection(collection).add_key_based_notification_callback(DictionaryCallbackWrapper{block, collection});
+    });
+    return token;
 }
 
 @end

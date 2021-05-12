@@ -246,15 +246,15 @@
     DictionaryPropertyObject *intDictionary = [[DictionaryPropertyObject alloc] init];
     IntObject *intObj = [[IntObject alloc] init];
     intObj.intCol = 1;
-    [intDictionary.intDictionary setObject:intObj forKey:@"one"];
-    [intDictionary.intDictionary setObject:intObj forKey:@"two"];
+    [intDictionary.intObjDictionary setObject:intObj forKey:@"one"];
+    [intDictionary.intObjDictionary setObject:intObj forKey:@"two"];
 
-    XCTAssertThrows([intDictionary.intDictionary objectsWhere:@"intCol == 1"], @"Should throw on unmanaged RLMDictionary");
-    XCTAssertThrows(([intDictionary.intDictionary objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on unmanaged RLMDictionary");
-    XCTAssertThrows([intDictionary.intDictionary sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"Should throw on unmanaged RLMDictionary");
+    XCTAssertThrows([intDictionary.intObjDictionary objectsWhere:@"intCol == 1"], @"Should throw on unmanaged RLMDictionary");
+    XCTAssertThrows(([intDictionary.intObjDictionary objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on unmanaged RLMDictionary");
+    XCTAssertThrows([intDictionary.intObjDictionary sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"Should throw on unmanaged RLMDictionary");
 
     // test unmanaged with literals
-    __unused DictionaryPropertyObject *obj = [[DictionaryPropertyObject alloc] initWithValue:@[@{}, @{@"one": [[IntObject alloc] initWithValue:@[@1]]}, @{}]];
+    __unused DictionaryPropertyObject *obj = [[DictionaryPropertyObject alloc] initWithValue:@[@{}, @{}, @{}, @{@"one": [[IntObject alloc] initWithValue:@[@1]]}]];
 }
 
 - (void)testUnmanagedComparision {
@@ -351,19 +351,19 @@
     intObj2.intCol = 1;
     IntObject *intObj3 = [[IntObject alloc] init];
     intObj3.intCol = 2;
-    dict.intDictionary[@"one"] = intObj1;
-    dict.intDictionary[@"two"] = intObj2;
-    [dict.intDictionary setObject:intObj3 forKey:@"three"];
+    dict.intObjDictionary[@"one"] = intObj1;
+    dict.intObjDictionary[@"two"] = intObj2;
+    [dict.intObjDictionary setObject:intObj3 forKey:@"three"];
 
     XCTAssertEqualObjects(dict.stringDictionary[@"one"], stringObj1, @"Objects should be equal");
     XCTAssertEqualObjects([dict.stringDictionary objectForKey:@"two"], stringObj2, @"Objects should be equal");
     XCTAssertEqualObjects(dict.stringDictionary[@"three"], stringObj3, @"Objects should be equal");
     XCTAssertEqual(dict.stringDictionary.count, 3U, @"Should have 3 elements in string dictionary");
 
-    XCTAssertEqualObjects(dict.intDictionary[@"one"], intObj1, @"Objects should be equal");
-    XCTAssertEqualObjects([dict.intDictionary objectForKey:@"two"], intObj2, @"Objects should be equal");
-    XCTAssertEqualObjects(dict.intDictionary[@"three"], intObj3, @"Objects should be equal");
-    XCTAssertEqual(dict.intDictionary.count, 3U, @"Should have 3 elements in int dictionary");
+    XCTAssertEqualObjects(dict.intObjDictionary[@"one"], intObj1, @"Objects should be equal");
+    XCTAssertEqualObjects([dict.intObjDictionary objectForKey:@"two"], intObj2, @"Objects should be equal");
+    XCTAssertEqualObjects(dict.intObjDictionary[@"three"], intObj3, @"Objects should be equal");
+    XCTAssertEqual(dict.intObjDictionary.count, 3U, @"Should have 3 elements in int dictionary");
 
     [dict.stringDictionary removeObjectForKey:@"three"];
 
@@ -709,19 +709,19 @@
     IntObject *intObj1 = [[IntObject alloc] initWithValue:@{@"intCol": @0}];
     IntObject *intObj2 = [[IntObject alloc] initWithValue:@{@"intCol": @1}];
     IntObject *intObj3 = [[IntObject alloc] initWithValue:@{@"intCol": @2}];
-    dict.intDictionary[@"a"] = intObj1;
-    dict.intDictionary[@"b"] = intObj2;
-    dict.intDictionary[@"c"] = intObj3;
+    dict.intObjDictionary[@"a"] = intObj1;
+    dict.intObjDictionary[@"b"] = intObj2;
+    dict.intObjDictionary[@"c"] = intObj3;
 
     XCTAssertEqualObjects(dict.stringDictionary[@"a"], stringObj1, @"Objects should be equal");
     XCTAssertEqualObjects(dict.stringDictionary[@"b"], stringObj2, @"Objects should be equal");
     XCTAssertEqualObjects(dict.stringDictionary[@"c"], stringObj3, @"Objects should be equal");
     XCTAssertEqual(dict.stringDictionary.count, 3U, @"Should have 3 elements in stringDictionary");
     
-    XCTAssertEqualObjects(dict.intDictionary[@"a"], intObj1, @"Objects should be equal");
-    XCTAssertEqualObjects(dict.intDictionary[@"b"], intObj2, @"Objects should be equal");
-    XCTAssertEqualObjects(dict.intDictionary[@"c"], intObj3, @"Objects should be equal");
-    XCTAssertEqual(dict.intDictionary.count, 3U, @"Should have 3 elements in intDictionary");
+    XCTAssertEqualObjects(dict.intObjDictionary[@"a"], intObj1, @"Objects should be equal");
+    XCTAssertEqualObjects(dict.intObjDictionary[@"b"], intObj2, @"Objects should be equal");
+    XCTAssertEqualObjects(dict.intObjDictionary[@"c"], intObj3, @"Objects should be equal");
+    XCTAssertEqual(dict.intObjDictionary.count, 3U, @"Should have 3 elements in intDictionary");
     
     StringObject *stringObj4 = [[StringObject alloc] initWithValue:@{@"stringCol": @"d"}];
     
@@ -732,14 +732,14 @@
 
     IntObject *intObj4 = [[IntObject alloc] initWithValue:@{@"intCol": @3}];
     
-    dict.intDictionary[@"a"] = intObj4;
+    dict.intObjDictionary[@"a"] = intObj4;
 
-    XCTAssertEqualObjects(dict.intDictionary[@"a"], intObj4, @"Objects should be replaced");
-    XCTAssertEqual(dict.intDictionary.count, 3U, @"Should have 3 elements in intDictionary");
+    XCTAssertEqualObjects(dict.intObjDictionary[@"a"], intObj4, @"Objects should be replaced");
+    XCTAssertEqual(dict.intObjDictionary.count, 3U, @"Should have 3 elements in intDictionary");
     
     RLMAssertThrowsWithReasonMatching([dict.stringDictionary setObject:(id)intObj4 forKey:@"a"],
                                       @"IntObject.*StringObject");
-    RLMAssertThrowsWithReasonMatching([dict.intDictionary setObject:(id)stringObj4 forKey:@"a"],
+    RLMAssertThrowsWithReasonMatching([dict.intObjDictionary setObject:(id)stringObj4 forKey:@"a"],
                                       @"StringObject.*IntObject");
 }
 
@@ -963,6 +963,8 @@
     XCTAssertNoThrow(employees[@"eo"]);
     [self dispatchAsyncAndWait:^{
         XCTAssertThrows(company.employeeDict);
+        XCTAssertThrows(employees.allValues);
+        XCTAssertThrows(employees.allKeys);
         XCTAssertThrows(employees[@"eo"]);
     }];
 }
@@ -1145,27 +1147,27 @@
     DictionaryPropertyObject *dict2 = [[DictionaryPropertyObject alloc] init];
     
     // Assigning NSDictionary shallow copies
-    dict1.intDictionary = (id)@{@"io1": io1, @"io2": io2};
-    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"io1"], io1);
+    dict1.intObjDictionary = (id)@{@"io1": io1, @"io2": io2};
+    XCTAssertEqualObjects([dict1.intObjDictionary valueForKey:@"io1"], io1);
     
-    [dict1 setValue:@{@"io1": io1, @"io3": io3} forKey:@"intDictionary"];
-    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"io3"], io3);
+    [dict1 setValue:@{@"io1": io1, @"io3": io3} forKey:@"intObjDictionary"];
+    XCTAssertEqualObjects([dict1.intObjDictionary valueForKey:@"io3"], io3);
     
-    dict1[@"intDictionary"] = @{@"io2": io2, @"io3": io3};
-    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"io3"], io3);
+    dict1[@"intObjDictionary"] = @{@"io2": io2, @"io3": io3};
+    XCTAssertEqualObjects([dict1.intObjDictionary valueForKey:@"io3"], io3);
 
     // Assigning RLMDictionary shallow copies
-    dict2.intDictionary = dict1.intDictionary;
-    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io3"], io3);
+    dict2.intObjDictionary = dict1.intObjDictionary;
+    XCTAssertEqualObjects([dict2.intObjDictionary valueForKey:@"io3"], io3);
 
-    [dict1.intDictionary removeAllObjects];
-    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io3"], io3);
+    [dict1.intObjDictionary removeAllObjects];
+    XCTAssertEqualObjects([dict2.intObjDictionary valueForKey:@"io3"], io3);
 
     // Self-assignment is a no-op
-    dict2.intDictionary = dict2.intDictionary;
-    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io3"], io3);
-    dict2[@"intDictionary"] = dict2[@"intDictionary"];
-    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io3"], io3);
+    dict2.intObjDictionary = dict2.intObjDictionary;
+    XCTAssertEqualObjects([dict2.intObjDictionary valueForKey:@"io3"], io3);
+    dict2[@"intObjDictionary"] = dict2[@"intObjDictionary"];
+    XCTAssertEqualObjects([dict2.intObjDictionary valueForKey:@"io3"], io3);
 }
 
 - (void)testManagedAssignment {
@@ -1180,27 +1182,27 @@
     DictionaryPropertyObject *dict2 = [[DictionaryPropertyObject alloc] init];
 
     // Assigning NSDictonary shallow copies
-    dict1.intDictionary = (id)@{@"io1": io1, @"io2": io2};
-    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"io1"], io1);
+    dict1.intObjDictionary = (id)@{@"io1": io1, @"io2": io2};
+    XCTAssertEqualObjects([dict1.intObjDictionary valueForKey:@"io1"], io1);
     
-    [dict1 setValue:@{@"io1": io1, @"io3": io3} forKey:@"intDictionary"];
-    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"io3"], io3);
+    [dict1 setValue:@{@"io1": io1, @"io3": io3} forKey:@"intObjDictionary"];
+    XCTAssertEqualObjects([dict1.intObjDictionary valueForKey:@"io3"], io3);
     
-    dict1[@"intDictionary"] = @{@"io2": io2, @"io3": io3};
-    XCTAssertEqualObjects([dict1.intDictionary valueForKey:@"io2"], io2);
+    dict1[@"intObjDictionary"] = @{@"io2": io2, @"io3": io3};
+    XCTAssertEqualObjects([dict1.intObjDictionary valueForKey:@"io2"], io2);
     
     // Assigning RLMDictionary shallow copies
-    dict2.intDictionary = dict1.intDictionary;
-    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io2"], io2);
+    dict2.intObjDictionary = dict1.intObjDictionary;
+    XCTAssertEqualObjects([dict2.intObjDictionary valueForKey:@"io2"], io2);
     
-    [dict1.intDictionary removeAllObjects];
-    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io2"], io2);
+    [dict1.intObjDictionary removeAllObjects];
+    XCTAssertEqualObjects([dict2.intObjDictionary valueForKey:@"io2"], io2);
     
     // Self-assignment is a no-op
-    dict2.intDictionary = dict2.intDictionary;
-    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io2"], io2);
-    dict2[@"intDictionary"] = dict2[@"intDictionary"];
-    XCTAssertEqualObjects([dict2.intDictionary valueForKey:@"io2"], io2);
+    dict2.intObjDictionary = dict2.intObjDictionary;
+    XCTAssertEqualObjects([dict2.intObjDictionary valueForKey:@"io2"], io2);
+    dict2[@"intObjDictionary"] = dict2[@"intObjDictionary"];
+    XCTAssertEqualObjects([dict2.intObjDictionary valueForKey:@"io2"], io2);
 
     [realm cancelWriteTransaction];
 }
@@ -1211,10 +1213,10 @@
     DictionaryPropertyObject *dict = [DictionaryPropertyObject createInRealm:realm
                                                                    withValue:@{@"stringDictionary": @{@"a": [[StringObject alloc] initWithValue:@[@"a"]]}}];
 
-    RLMAssertThrowsWithReason(dict.intDictionary = (id)dict.stringDictionary,
-                              @"RLMDictionary<string, StringObject?> does not match expected type 'IntObject?' for property 'DictionaryPropertyObject.intDictionary'.");
-    RLMAssertThrowsWithReason(dict[@"intDictionary"] = dict[@"stringDictionary"],
-                              @"RLMDictionary<string, StringObject?> does not match expected type 'IntObject?' for property 'DictionaryPropertyObject.intDictionary'.");
+    RLMAssertThrowsWithReason(dict.intObjDictionary = (id)dict.stringDictionary,
+                              @"RLMDictionary<string, StringObject?> does not match expected type 'IntObject?' for property 'DictionaryPropertyObject.intObjDictionary'.");
+    RLMAssertThrowsWithReason(dict[@"intObjDictionary"] = dict[@"stringDictionary"],
+                              @"RLMDictionary<string, StringObject?> does not match expected type 'IntObject?' for property 'DictionaryPropertyObject.intObjDictionary'.");
     [realm cancelWriteTransaction];
 }
 
@@ -1224,15 +1226,15 @@
     DictionaryPropertyObject *dict = [DictionaryPropertyObject createInRealm:realm
                                                                    withValue:@{@"stringDictionary": @{@"a": [[StringObject alloc] initWithValue:@[@"a"]]}}];
     [realm commitWriteTransaction];
-    
+
     id expectation = [self expectationWithDescription:@""];
-    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMCollectionChange *change, NSError *error) {
+    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMDictionaryChange *change, NSError *error) {
         XCTAssertNotNil(dictionary);
         XCTAssertNil(change);
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    
+
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
     [(RLMNotificationToken *)token invalidate];
 }
@@ -1242,10 +1244,10 @@
     [realm beginWriteTransaction];
     DictionaryPropertyObject *dict = [DictionaryPropertyObject createInRealm:realm withValue:@{}];
     [realm commitWriteTransaction];
-    
+
     __block bool first = true;
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMCollectionChange *change, NSError *error) {
+    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMDictionaryChange *change, NSError *error) {
         XCTAssertNotNil(dictionary);
         XCTAssert(first ? !change : !!change);
         XCTAssertNil(error);
@@ -1253,7 +1255,7 @@
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    
+
     expectation = [self expectationWithDescription:@""];
     [self dispatchAsyncAndWait:^{
         RLMRealm *realm = self.realmWithTestPath;
@@ -1263,7 +1265,7 @@
         }];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    
+
     [(RLMNotificationToken *)token invalidate];
 }
 
@@ -1274,7 +1276,7 @@
     [realm commitWriteTransaction];
 
     id expectation = [self expectationWithDescription:@""];
-    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMCollectionChange *change, NSError *error) {
+    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMDictionaryChange *change, NSError *error) {
         // will throw if it's incorrectly called a second time due to the
         // unrelated write transaction
         [expectation fulfill];
@@ -1299,9 +1301,9 @@
     [realm beginWriteTransaction];
     DictionaryPropertyObject *dict = [DictionaryPropertyObject createInRealm:realm withValue:@{}];
     [realm commitWriteTransaction];
-    
+
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMCollectionChange *change, NSError *error) {
+    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMDictionaryChange *change, NSError *error) {
         XCTAssertNotNil(dictionary);
         XCTAssertNil(error);
         // will throw if it's called a second time before we create the new
@@ -1309,10 +1311,10 @@
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    
+
     // Turn off autorefresh, so the background commit should not result in a notification
     realm.autorefresh = NO;
-    
+
     // All notification blocks are called as part of a single runloop event, so
     // waiting for this one also waits for the above one to get a chance to run
     [self waitForNotification:RLMRealmRefreshRequiredNotification realm:realm block:^{
@@ -1324,11 +1326,11 @@
             }];
         }];
     }];
-    
+
     expectation = [self expectationWithDescription:@""];
     [realm refresh];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    
+
     [(RLMNotificationToken *)token invalidate];
 }
 
@@ -1339,7 +1341,7 @@
     [realm commitWriteTransaction];
     
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMCollectionChange *change, NSError *error) {
+    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMDictionaryChange *change, NSError *error) {
         XCTAssertNotNil(dictionary);
         XCTAssertNil(error);
         [expectation fulfill];
@@ -1358,7 +1360,7 @@ static RLMDictionary<RLMString, IntObject> *managedTestDictionary() {
     RLMDictionary<RLMString, IntObject> *dict;
     [realm beginWriteTransaction];
     dict = [DictionaryPropertyObject createInDefaultRealmWithValue:
-            @{@"intDictionary": @{@"0": @[@0], @"1": @[@1]}}].intDictionary;
+            @{@"intObjDictionary": @{@"0": @[@0], @"1": @[@1]}}].intObjDictionary;
     [realm commitWriteTransaction];
     return dict;
 }
@@ -1429,7 +1431,7 @@ static RLMDictionary<RLMString, IntObject> *managedTestDictionary() {
 
     RLMAssertThrowsWithReasonMatching([dictionary count], @"invalidated");
     RLMAssertThrowsWithReasonMatching([dictionary allValues], @"invalidated");
-    RLMAssertThrowsWithReasonMatching(dictionary[@"0"], @"invalidated");
+    XCTAssertNil(dictionary[@"new"]);
 
     RLMAssertThrowsWithReasonMatching(dictionary[@"new"] = io, @"invalidated");
     RLMAssertThrowsWithReasonMatching([dictionary setObject:io forKey:@"another"], @"invalidated");
@@ -1440,7 +1442,7 @@ static RLMDictionary<RLMString, IntObject> *managedTestDictionary() {
     RLMAssertThrowsWithReasonMatching([dictionary objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"invalidated");
     RLMAssertThrowsWithReasonMatching([dictionary sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"invalidated");
     RLMAssertThrowsWithReasonMatching([dictionary sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]], @"invalidated");
-    RLMAssertThrowsWithReasonMatching([dictionary valueForKey:@"0"], @"invalidated");
+    XCTAssertNil([dictionary valueForKey:@"new"]);
     RLMAssertThrowsWithReasonMatching([dictionary setValue:io forKey:@"foo"], @"invalidated");
     RLMAssertThrowsWithReasonMatching({for (__unused id obj in dictionary);}, @"invalidated");
 

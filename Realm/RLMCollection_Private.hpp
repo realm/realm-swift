@@ -18,7 +18,10 @@
 
 #import <Realm/RLMCollection_Private.h>
 
+#import <realm/object-store/collection_notifications.hpp>
+
 #import <vector>
+#import <mutex>
 
 namespace realm {
     class List;
@@ -27,7 +30,6 @@ namespace realm {
     class TableView;
     struct CollectionChangeSet;
     struct ColKey;
-    struct NotificationToken;
     namespace object_store {
         class Collection;
         class Dictionary;
@@ -79,6 +81,14 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state, NSUInteger len, id<RL
 
 @interface RLMCollectionChange ()
 - (instancetype)initWithChanges:(realm::CollectionChangeSet)indices;
+@end
+
+@interface RLMCancellationToken : RLMNotificationToken {
+@public
+    __unsafe_unretained RLMRealm *_realm;
+    realm::NotificationToken _token;
+    std::mutex _mutex;
+}
 @end
 
 realm::object_store::Set& RLMGetBackingCollection(RLMManagedSet *);
