@@ -982,7 +982,7 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
 
-    func testBacklinkPropertyKeyPathNotifications() {
+    func testBacklinkPropertyKeyPathNotifications1() {
         let realm = try! Realm()
         realm.beginWrite()
         let person = realm.create(SwiftOwnerObject.self)
@@ -993,7 +993,7 @@ class ObjectTests: TestCase {
         // Expect no notification for "owners" when "dog.dogName" is changed
         let ex = expectation(description: "no change notification")
         ex.isInverted = true
-        var token = dog.observe(keyPaths: ["owners"], { _ in
+        let token = dog.observe(keyPaths: ["owners"], { _ in
             ex.fulfill()
         })
         try! realm.write({
@@ -1001,27 +1001,60 @@ class ObjectTests: TestCase {
         })
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
-
+    }
+    
+    
+    func testBacklinkPropertyKeyPathNotifications2() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let person = realm.create(SwiftOwnerObject.self)
+        let dog = realm.create(SwiftDogObject.self)
+        person.dog = dog
+        try! realm.commitWrite()
+        
         // !!!: This is incorrect. Not supported behavior
         // Expect notification for "owners" when "owner.name" is changed
-        token = dog.observe(keyPaths: ["owners"], expectChange("name", "", "Tom"))
+        let ex = expectation(description: "no change notification")
+        ex.isInverted = true
+        let token = dog.observe(keyPaths: ["owners"], { _ in
+            ex.fulfill()
+        })
         try! realm.write({
             let owner = dog.owners.first!
             owner.name = "Tom"
         })
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
-
+    }
+    
+    func testBacklinkPropertyKeyPathNotifications3() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let person = realm.create(SwiftOwnerObject.self)
+        let dog = realm.create(SwiftDogObject.self)
+        person.dog = dog
+        try! realm.commitWrite()
+        
         // Expect notification for "owners.name" when "owner.name" is changed
-        token = dog.observe(keyPaths: ["owners.name"], expectChange("name", "Tom", "Abe"))
+        let token = dog.observe(keyPaths: ["owners.name"], expectChange("name", "Tom", "Abe"))
         try! realm.write({
             let owner = dog.owners.first!
             owner.name = "Abe"
         })
         waitForExpectations(timeout: 0.1, handler: nil)
-
+        token.invalidate()
+    }
+    
+    func testBacklinkPropertyKeyPathNotifications4() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let person = realm.create(SwiftOwnerObject.self)
+        let dog = realm.create(SwiftDogObject.self)
+        person.dog = dog
+        try! realm.commitWrite()
+        
         // Expect notification for "owners.name" when a new owner is added.
-        token = dog.observe(keyPaths: ["owners.name"], expectChange("name", Int?.none, Int?.none))
+        let token = dog.observe(keyPaths: ["owners.name"], expectChange("name", Int?.none, Int?.none))
         try! realm.write({
             let newPerson = SwiftOwnerObject()
             realm.add(newPerson)
