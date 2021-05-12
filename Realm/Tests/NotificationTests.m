@@ -1396,7 +1396,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     } keyPaths:@[@"employees.hired"]];
 
     [realm beginWriteTransaction];
-    employee.hired = @YES;
+    employee.age = 42;
     [realm commitWriteTransaction];
     [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
