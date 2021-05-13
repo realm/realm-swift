@@ -38,6 +38,7 @@ class SwiftDynamicDefaultObject: Object {
     }
 }
 
+@available(macOS 11.0, *)
 class ObjectTests: TestCase {
     // init() Tests are in ObjectCreationTests.swift
     // init(value:) tests are in ObjectCreationTests.swift

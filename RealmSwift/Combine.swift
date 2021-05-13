@@ -66,6 +66,9 @@ public protocol RealmSubscribable {
     func _observe<S>(on queue: DispatchQueue?, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error
     /// :nodoc:
+    func _observe<S>(_ subscriber: S, keyPaths: [String]?)
+        -> NotificationToken where S: Subscriber, S.Input == Void, S.Failure == Never
+    /// :nodoc:
     func _observe<S>(_ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Void, S.Failure == Never
     // swiftlint:enable identifier_name
@@ -369,10 +372,13 @@ extension ObjectBase: RealmSubscribable {
             }
         }
     }
-
     /// :nodoc:
     public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
         return _observe { _ in _ = subscriber.receive() }
+    }
+    /// :nodoc:
+    public func _observe<S>(_ subscriber: S, keyPaths: [String]?) -> NotificationToken where S : Subscriber, S.Failure == Never, S.Input == Void {
+        return _observe(keyPaths: keyPaths, { _ in _ = subscriber.receive()})
     }
 }
 
@@ -437,6 +443,10 @@ extension RealmCollection {
     /// :nodoc:
     public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
         return observe(keyPaths: nil, on: nil) { _ in _ = subscriber.receive() }
+    }
+
+    public func _observe<S: Subscriber>(_ subscriber: S, keyPaths: [String]? = nil) -> NotificationToken where S.Input == Void, S.Failure == Never {
+        return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
 }
 
@@ -718,6 +728,7 @@ public enum RealmPublishers {
 
         private let subscribable: Subscribable
         private let queue: DispatchQueue?
+//        private let keyPaths: [String]?
         internal init(_ subscribable: Subscribable, queue: DispatchQueue? = nil) {
             precondition(subscribable.realm != nil, "Only managed objects can be published")
             self.subscribable = subscribable

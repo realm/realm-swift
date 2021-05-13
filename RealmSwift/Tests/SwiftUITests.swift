@@ -217,6 +217,40 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(results.wrappedValue.count, 1)
         state.projectedValue.delete()
     }
+    func testObserveObjectKeyPath() {
+        let state = StateRealmObject(wrappedValue: SwiftUIObject(), keyPaths: ["str"])
+        ObservedResults(SwiftUIObject.self,
+                        configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+            .projectedValue.append(state.wrappedValue)
+        assertThrows(state.wrappedValue.str = "bar")
+        state.projectedValue.str.wrappedValue = "bar"
+        XCTAssertEqual(state.projectedValue.wrappedValue.str, "bar")
+
+        assertThrows(state.wrappedValue.int = 1)
+        state.projectedValue.int.wrappedValue = 1
+        XCTAssertEqual(state.projectedValue.wrappedValue.int, 0)
+    }
+//    func testUnobserveObjectKeyPath() {
+//        let state = StateRealmObject(wrappedValue: SwiftUIObject(), keyPaths: ["str"])
+//        ObservedResults(SwiftUIObject.self,
+//                        configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+//            .projectedValue.append(state.wrappedValue)
+//        assertThrows(state.wrappedValue.int = 1)
+//        state.projectedValue.int.wrappedValue = 1
+//        // Expect that a change to `int` isn't observed for [s"tr"] keypath
+//        XCTAssertEqual(state.projectedValue.wrappedValue.int, 0)
+////    }
+    func testObserveDeleteKeyPath() throws {
+        let results = ObservedResults(SwiftUIObject.self,
+                                      configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        let state = StateRealmObject(wrappedValue: SwiftUIObject(), keyPaths: ["str"])
+        XCTAssertEqual(results.wrappedValue.count, 0)
+        state.projectedValue.delete()
+        XCTAssertEqual(results.wrappedValue.count, 0)
+        results.projectedValue.append(state.wrappedValue)
+        XCTAssertEqual(results.wrappedValue.count, 1)
+        state.projectedValue.delete()
+    }
     // MARK: Bind
     func testUnmanagedManagedObjectBind() {
         let object = SwiftUIObject()
