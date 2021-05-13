@@ -1,11 +1,13 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.7.6 Release notes (2021-05-13)
 =============================================================
+
 ### Enhancements
+
 * Realms opened in read-only mode can now be invalidated (although it is
   unlikely to be useful to do so).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+
 * Fix an availability warning when building Realm. The code path which gave the
   warning can not currently be hit, so this did not cause any runtime problems
   ([#7219](https://github.com/realm/realm-cocoa/issues/7219), since 10.7.3).
@@ -37,15 +39,15 @@ x.y.z Release notes (yyyy-MM-dd)
 * Thread-safe references can now be created for read-only Realms.
   ([#5475](https://github.com/realm/realm-cocoa/issues/5475)).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.5.
 * CocoaPods: 1.10 or later.
 
 ### Internal
+
 * Upgraded realm-core from v10.6.0 to v10.7.2
 
 10.7.5 Release notes (2021-05-07)
