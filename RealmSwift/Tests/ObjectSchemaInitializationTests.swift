@@ -27,6 +27,7 @@ import Foundation
     import RealmSwift
 #endif
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class ObjectSchemaInitializationTests: TestCase {
     func testAllValidTypes() {
         let object = SwiftObject()
@@ -422,6 +423,7 @@ class SwiftObjectWithNonOptionalLinkProperty: SwiftFakeObject {
 
 extension Set: RealmOptionalType { }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftObjectWithNonRealmOptionalType: SwiftFakeObject {
     let set = RealmOptional<Set<Int>>()
 }

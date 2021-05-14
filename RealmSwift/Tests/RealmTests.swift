@@ -24,6 +24,7 @@ import XCTest
 #endif
 import Foundation
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class RealmTests: TestCase {
     enum TestError: Error {
         case intentional

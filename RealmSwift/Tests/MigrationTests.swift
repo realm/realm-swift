@@ -339,6 +339,7 @@ class MigrationTests: TestCase {
         }
     }
 
+    @available(*, deprecated) // Silence deprecation warnings for RealmOptional
     func testOptionalsInEnumerate() {
         autoreleasepool {
             let realm = try! Realm()
