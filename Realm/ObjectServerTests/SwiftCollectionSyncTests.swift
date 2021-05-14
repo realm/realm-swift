@@ -424,15 +424,13 @@ class MapSyncTests: SwiftSyncTestCase {
             executeChild()
             waitForDownloads(for: realm)
             checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
-            var object = realm.objects(SwiftCollectionSyncObject.self).first!
-            var collection = object[keyPath: keyPath]
 
             // Run the child again to add the values
             executeChild()
             waitForDownloads(for: realm)
             checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
-            object = realm.objects(SwiftCollectionSyncObject.self).first!
-            collection = object[keyPath: keyPath]
+            let object = realm.objects(SwiftCollectionSyncObject.self).first!
+            let collection = object[keyPath: keyPath]
             XCTAssertEqual(collection.count, values.count)
             for element in values {
                 if let person = element.value as? SwiftPerson, let otherPerson = collection[element.key] as? SwiftPerson {
@@ -457,6 +455,13 @@ class MapSyncTests: SwiftSyncTestCase {
             } else {
                 XCTAssertEqual(collection[keyA], collection[keyB])
             }
+
+            let ex = self.expectation(description: "should remove user")
+            user.remove { error in
+                XCTAssertNil(error)
+                ex.fulfill()
+            }
+            self.wait(for: [ex], timeout: 30)
         } else {
             guard let object = realm.objects(SwiftCollectionSyncObject.self).first else {
                 try realm.write {

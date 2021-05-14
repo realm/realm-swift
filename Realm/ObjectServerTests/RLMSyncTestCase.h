@@ -43,6 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)paul;
 + (instancetype)ringo;
 + (instancetype)george;
++ (instancetype)stuart;
 
 @end
 
