@@ -1054,13 +1054,13 @@ extension AnyRealmCollection: AssistedObjectiveCBridgeable {
 
 // MARK: Collection observation helpers
 
-internal protocol ObservableCollection: RealmCollection {
+internal protocol ObservableCollection {
     associatedtype BackingObjcCollection
     func isSameObjcCollection(_ objc: BackingObjcCollection) -> Bool
     init(objc: BackingObjcCollection)
 }
 
-extension ObservableCollection {
+extension ObservableCollection where Self: RealmCollection {
     // We want to pass the same object instance to the change callback each time.
     // If the callback is being called on the source thread the instance should
     // be `self`, but if it's on a different thread it needs to be a new Swift
@@ -1078,15 +1078,45 @@ extension ObservableCollection {
     }
 
     internal func wrapObserveBlock(_ block: @escaping (RealmCollectionChange<Self>) -> Void) -> ObjcCollectionChange {
-        var list: Self?
-        return { array, change, error in
-            if list == nil, let array = array {
-                list = self.isSameObjcCollection(array) ? self : Self(objc: array)
+        var col: Self?
+        return { collection, change, error in
+            if col == nil, let collection = collection {
+                col = self.isSameObjcCollection(collection) ? self : Self(objc: collection)
             }
-            block(RealmCollectionChange.fromObjc(value: list, change: change, error: error))
+            block(RealmCollectionChange.fromObjc(value: col, change: change, error: error))
         }
     }
 }
+
+extension ObservableCollection where Self: RealmKeyedCollection {
+    // We want to pass the same object instance to the change callback each time.
+    // If the callback is being called on the source thread the instance should
+    // be `self`, but if it's on a different thread it needs to be a new Swift
+    // wrapper for the obj-c type, which we'll construct the first time the
+    // callback is called.
+    internal typealias ObjcChange = (RLMDictionary<AnyObject, AnyObject>?, RLMDictionaryChange?, Error?) -> Void
+
+    internal func wrapDictionaryObserveBlock(_ block: @escaping (RealmDictionaryChange<AnyMap<Key, Value>>) -> Void) -> ObjcChange {
+        var anyCollection: AnyMap<Key, Value>?
+        return { collection, change, error in
+            if anyCollection == nil, let collection = collection as? Self.BackingObjcCollection {
+                anyCollection = AnyMap(self.isSameObjcCollection(collection) ? self : Self(objc: collection))
+            }
+            block(RealmDictionaryChange.fromObjc(value: anyCollection, change: change, error: error))
+        }
+    }
+
+    internal func wrapDictionaryObserveBlock(_ block: @escaping (RealmDictionaryChange<Self>) -> Void) -> ObjcChange {
+        var col: Self?
+        return { collection, change, error in
+            if col == nil, let collection = collection as? Self.BackingObjcCollection {
+                col = self.isSameObjcCollection(collection) ? self : Self(objc: collection)
+            }
+            block(RealmDictionaryChange.fromObjc(value: col, change: change, error: error))
+        }
+    }
+}
+
 extension List: ObservableCollection {
     internal typealias BackingObjcCollection = RLMArray<AnyObject>
     internal func isSameObjcCollection(_ rlmArray: BackingObjcCollection) -> Bool {
@@ -1102,9 +1132,9 @@ extension MutableSet: ObservableCollection {
 }
 
 extension Map: ObservableCollection {
-    internal typealias BackingObjcCollection = RLMDictionary<AnyObject>
+    internal typealias BackingObjcCollection = RLMDictionary<AnyObject, AnyObject>
     internal func isSameObjcCollection(_ rlmDictionary: BackingObjcCollection) -> Bool {
-        return _rlmDictionary === rlmDictionary
+        return _rlmCollection === rlmDictionary
     }
 }
 
