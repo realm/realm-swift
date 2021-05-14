@@ -306,6 +306,12 @@ __attribute__((warn_unused_result));
                                          queue:(nullable dispatch_queue_t)queue
 __attribute__((warn_unused_result));
 
+// TODO: add docs
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults<RLMObjectType> *_Nullable results,
+                                                         RLMCollectionChange *_Nullable change,
+                                                         NSError *_Nullable error))block
+                                      keyPaths:(nullable NSArray<NSString *> *)keyPaths
+__attribute__((warn_unused_result));
 #pragma mark - Aggregating Property Values
 
 /**

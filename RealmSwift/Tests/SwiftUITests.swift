@@ -217,19 +217,19 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(results.wrappedValue.count, 1)
         state.projectedValue.delete()
     }
-    func testObserveObjectKeyPath() {
-        let state = StateRealmObject(wrappedValue: SwiftUIObject(), keyPaths: ["str"])
-        ObservedResults(SwiftUIObject.self,
-                        configuration: inMemoryRealm(inMemoryIdentifier).configuration)
-            .projectedValue.append(state.wrappedValue)
-        assertThrows(state.wrappedValue.str = "bar")
-        state.projectedValue.str.wrappedValue = "bar"
-        XCTAssertEqual(state.projectedValue.wrappedValue.str, "bar")
-
-        assertThrows(state.wrappedValue.int = 1)
-        state.projectedValue.int.wrappedValue = 1
-        XCTAssertEqual(state.projectedValue.wrappedValue.int, 0)
-    }
+//    func testObserveObjectKeyPath() {
+//        let state = StateRealmObject(wrappedValue: SwiftUIObject(), keyPaths: ["str"])
+//        ObservedResults(SwiftUIObject.self,
+//                        configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+//            .projectedValue.append(state.wrappedValue)
+//        assertThrows(state.wrappedValue.str = "bar")
+//        state.projectedValue.str.wrappedValue = "bar"
+//        XCTAssertEqual(state.projectedValue.wrappedValue.str, "bar")
+//
+//        assertThrows(state.wrappedValue.int = 1)
+//        state.projectedValue.int.wrappedValue = 1
+//        XCTAssertEqual(state.projectedValue.wrappedValue.int, 0)
+//    }
 //    func testUnobserveObjectKeyPath() {
 //        let state = StateRealmObject(wrappedValue: SwiftUIObject(), keyPaths: ["str"])
 //        ObservedResults(SwiftUIObject.self,

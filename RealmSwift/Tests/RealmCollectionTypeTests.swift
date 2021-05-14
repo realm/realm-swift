@@ -119,19 +119,24 @@ class RealmCollectionTypeTests: TestCase {
 
     override func setUp() {
         super.setUp()
+        let target1 = CTTLinkTarget()
+        target1.id = 1
 
         let str1 = CTTNullableStringObjectWithLink()
         str1.stringCol = "1"
+        str1.linkCol = target1
         self.str1 = str1
 
         let str2 = CTTNullableStringObjectWithLink()
         str2.stringCol = "2"
+        str2.linkCol = target1
         self.str2 = str2
 
         let realm = realmWithTestPath()
         try! realm.write {
             realm.add(str1)
             realm.add(str2)
+            realm.add(target1)
         }
 
         collection = AnyRealmCollection(getCollection())
@@ -159,7 +164,7 @@ class RealmCollectionTypeTests: TestCase {
 
     func testDescription() {
         // swiftlint:disable:next line_length
-        assertMatches(collection.description, "Results<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
+        assertMatches(collection.description, "Results<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 1;\n\t\t\\};\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 1;\n\t\t\\};\n\t\\}\n\\)")
     }
 
     func testCount() {
@@ -505,7 +510,7 @@ class RealmCollectionTypeTests: TestCase {
             let realm = self.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
-            obj.linkCol?.id = 2
+            obj.linkCol!.id = 2
             try! realm.commitWrite()
         }
         waitForExpectations(timeout: 0.1, handler: nil)
@@ -539,7 +544,7 @@ class RealmCollectionTypeTests: TestCase {
             let realm = self.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
-            obj.linkCol?.id = 2
+            obj.linkCol!.id = 2
             try! realm.commitWrite()
         }
         waitForExpectations(timeout: 0.1, handler: nil)
@@ -1088,7 +1093,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
 
     override func testDescription() {
         // swiftlint:disable:next line_length
-        assertMatches(collection.description, "List<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
+        assertMatches(collection.description, "List<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 1;\n\t\t\\};\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 1;\n\t\t\\};\n\t\\}\n\\)")
     }
 
     func testObserveDirect() {
