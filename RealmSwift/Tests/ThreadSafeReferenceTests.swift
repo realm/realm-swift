@@ -329,4 +329,34 @@ class ThreadSafeReferenceTests: TestCase {
             self.assertAnyRealmCollectionContains(set, keyPath: \.name, items: ["A", "B", "C", "D"])
         }
     }
+
+    func testPassThreadSafeReferenceToAnyMap() {
+        let realm = try! Realm()
+        let company = SwiftCompanyObject()
+        try! realm.write {
+            realm.add(company)
+            company.employeeMap["one"] = SwiftEmployeeObject(value: ["name": "A"])
+            company.employeeMap["two"] = SwiftEmployeeObject(value: ["name": "B"])
+            company.employeeMap["three"] = SwiftEmployeeObject(value: ["name": "C"])
+            company.employeeMap["four"] = SwiftEmployeeObject(value: ["name": "D"])
+        }
+        let anyMap = AnyMap(realm.objects(SwiftCompanyObject.self).first!.employeeMap)
+
+        XCTAssertEqual(4, anyMap.count)
+        XCTAssertEqual("A", anyMap["one"]?.name)
+        XCTAssertEqual("B", anyMap["two"]?.name)
+        XCTAssertEqual("C", anyMap["three"]?.name)
+        XCTAssertEqual("D", anyMap["four"]?.name)
+
+        let anyMapRef = ThreadSafeReference(to: anyMap)
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            let anyMap = self.assertResolve(realm, anyMapRef)!
+            XCTAssertEqual(4, anyMap.count)
+            XCTAssertEqual("A", anyMap["one"]?.name)
+            XCTAssertEqual("B", anyMap["two"]?.name)
+            XCTAssertEqual("C", anyMap["three"]?.name)
+            XCTAssertEqual("D", anyMap["four"]?.name)
+        }
+    }
 }

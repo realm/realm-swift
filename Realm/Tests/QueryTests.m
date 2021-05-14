@@ -1058,7 +1058,7 @@
     SetPropertyObject *set = [SetPropertyObject createInRealm:realm withValue:@[@"name", @[], [IntObject allObjects]]];
     DictionaryPropertyObject *dict = [DictionaryPropertyObject createInRealm:realm withValue:@{}];
     for (IntObject *io in [IntObject allObjects]) {
-        dict.intDictionary[[NSUUID UUID].UUIDString] = io;
+        dict.intObjDictionary[[NSUUID UUID].UUIDString] = io;
     }
     [realm commitWriteTransaction];
 
@@ -1087,8 +1087,8 @@
     XCTAssertEqual(4, [[[desc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
     XCTAssertEqual(3, [[[[desc objectsWhere:@"intCol >= 2"] objectsWhere:@"intCol < 4"] firstObject] intCol]);
 
-    asc = [dict.intDictionary sortedResultsUsingKeyPath:@"intCol" ascending:YES];
-    desc = [dict.intDictionary sortedResultsUsingKeyPath:@"intCol" ascending:NO];
+    asc = [dict.intObjDictionary sortedResultsUsingKeyPath:@"intCol" ascending:YES];
+    desc = [dict.intObjDictionary sortedResultsUsingKeyPath:@"intCol" ascending:NO];
 
     XCTAssertEqual(2, [[[asc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
     XCTAssertEqual(4, [[[desc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
@@ -2003,17 +2003,17 @@
         dpo1.stringDictionary[sobj.stringCol] = sobj;
         IntObject *iobj = [[IntObject alloc] init];
         iobj.intCol = (int)i;
-        dpo1.intDictionary[sobj.stringCol] = iobj;
+        dpo1.intObjDictionary[sobj.stringCol] = iobj;
     }
     [realm beginWriteTransaction];
     [realm addObject:dpo1];
     [realm commitWriteTransaction];
 
-    RLMAssertCount(DictionaryPropertyObject, 0U, @"ANY intDictionary.intCol > 10");
-    RLMAssertCount(DictionaryPropertyObject, 1U, @"ANY intDictionary.intCol > 5");
+    RLMAssertCount(DictionaryPropertyObject, 0U, @"ANY intObjDictionary.intCol > 10");
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"ANY intObjDictionary.intCol > 5");
     RLMAssertCount(DictionaryPropertyObject, 1U, @"ANY stringDictionary.stringCol = '1'");
-    RLMAssertCount(DictionaryPropertyObject, 0U, @"NONE intDictionary.intCol == 5");
-    RLMAssertCount(DictionaryPropertyObject, 1U, @"NONE intDictionary.intCol > 10");
+    RLMAssertCount(DictionaryPropertyObject, 0U, @"NONE intObjDictionary.intCol == 5");
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"NONE intObjDictionary.intCol > 10");
 
     DictionaryPropertyObject *dpo2 = [[DictionaryPropertyObject alloc] init];
     for(NSUInteger i=0; i<4; i++) {
@@ -2022,16 +2022,16 @@
         dpo2.stringDictionary[sobj.stringCol] = sobj;
         IntObject *iobj = [[IntObject alloc] init];
         iobj.intCol = (int)i;
-        dpo2.intDictionary[sobj.stringCol] = iobj;
+        dpo2.intObjDictionary[sobj.stringCol] = iobj;
     }
     [realm beginWriteTransaction];
     [realm addObject:dpo2];
     [realm commitWriteTransaction];
-    RLMAssertCount(DictionaryPropertyObject, 0U, @"ANY intDictionary.intCol > 10");
-    RLMAssertCount(DictionaryPropertyObject, 1U, @"ANY intDictionary.intCol > 5");
-    RLMAssertCount(DictionaryPropertyObject, 2U, @"ANY intDictionary.intCol > 2");
-    RLMAssertCount(DictionaryPropertyObject, 1U, @"NONE intDictionary.intCol == 5");
-    RLMAssertCount(DictionaryPropertyObject, 2U, @"NONE intDictionary.intCol > 10");
+    RLMAssertCount(DictionaryPropertyObject, 0U, @"ANY intObjDictionary.intCol > 10");
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"ANY intObjDictionary.intCol > 5");
+    RLMAssertCount(DictionaryPropertyObject, 2U, @"ANY intObjDictionary.intCol > 2");
+    RLMAssertCount(DictionaryPropertyObject, 1U, @"NONE intObjDictionary.intCol == 5");
+    RLMAssertCount(DictionaryPropertyObject, 2U, @"NONE intObjDictionary.intCol > 10");
 }
 
 - (void)testMultiLevelLinkQuery
@@ -2907,10 +2907,10 @@ static NSData *data(const char *str) {
     RLMRealm *realm = [self realm];
     [realm beginWriteTransaction];
     IntObject *io = [IntObject createInRealm:realm withValue:@[@0]];
-    DictionaryPropertyObject *dpo = [DictionaryPropertyObject createInRealm:realm withValue:@{@"intDictionary": @{@"0": io}}];
+    DictionaryPropertyObject *dpo = [DictionaryPropertyObject createInRealm:realm withValue:@{@"intObjDictionary": @{@"0": io}}];
     [realm commitWriteTransaction];
 
-    RLMResults *results = [dpo.intDictionary objectsWhere:@"TRUEPREDICATE"];
+    RLMResults *results = [dpo.intObjDictionary objectsWhere:@"TRUEPREDICATE"];
     XCTAssertEqual(1U, results.count);
 
     [realm beginWriteTransaction];

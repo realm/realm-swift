@@ -560,7 +560,7 @@ RLM_COLLECTION_TYPE(AggregateObject)
 @end
 
 @interface AggregateDictionaryObject : RLMObject
-@property RLMDictionary<RLMString, AggregateObject> *dictionary;
+@property RLMDictionary<NSString *, AggregateObject *><RLMString, AggregateObject> *dictionary;
 @end
 
 #pragma mark PrimaryStringObject

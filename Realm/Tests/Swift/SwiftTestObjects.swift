@@ -141,7 +141,7 @@ class SwiftRLMDictionaryPropertyObject: RLMObject {
 }
 
 class SwiftRLMDictionaryEmployeeObject: RLMObject {
-    @objc dynamic var dict = RLMDictionary<NSString, SwiftRLMEmployeeObject>(objectClassName: SwiftRLMEmployeeObject.className())
+    @objc dynamic var dict = RLMDictionary<NSObject, SwiftRLMEmployeeObject>(objectClassName: SwiftRLMEmployeeObject.className())
 }
 
 class SwiftRLMDynamicObject: RLMObject {

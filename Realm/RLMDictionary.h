@@ -20,50 +20,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMObject, RLMResults<RLMObjectType>;
+@class RLMObject, RLMResults<RLMObjectType>, RLMDictionaryChange;
 
 @protocol RLMDictionaryKey <NSCopying>
 @end
 
 @interface NSString (RLMDictionaryKey)<RLMDictionaryKey>
-@end
-
-/**
- A `RLMCollectionChange` object encapsulates information about changes to collections
- that are reported by Realm notifications.
-
- `RLMCollectionChange` is passed to the notification blocks registered with
- `-addNotificationBlock` on `RLMArray` and `RLMResults`, and reports what rows in the
- collection changed since the last time the notification block was called.
-
- The change information is available in two formats: a simple array of row
- indices in the collection for each type of change, and an array of index paths
- in a requested section suitable for passing directly to `UITableView`'s batch
- update methods. A complete example of updating a `UITableView` named `tv`:
-
-     [tv beginUpdates];
-     [tv deleteRowsAtIndexPaths:[changes deletionsInSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-     [tv insertRowsAtIndexPaths:[changes insertionsInSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-     [tv reloadRowsAtIndexPaths:[changes modificationsInSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-     [tv endUpdates];
-
- All of the arrays in an `RLMCollectionChange` are always sorted in ascending order.
- */
-@interface RLMDictionaryChange : NSObject
-/// The indices in the new version of the collection which were newly inserted.
-@property (nonatomic, readonly) NSArray<id<RLMDictionaryKey>> *insertions;
-
-/**
- The indices in the new version of the collection which were modified.
-
- For `RLMResults`, this means that one or more of the properties of the object at
- that index were modified (or an object linked to by that object was
- modified).
-
- For `RLMArray`, the array itself being modified to contain a
- different object at that index will also be reported as a modification.
- */
-@property (nonatomic, readonly) NSArray<id<RLMDictionaryKey>> *modifications;
 @end
 
 /**
@@ -306,15 +268,13 @@ NS_ASSUME_NONNULL_BEGIN
  Registers a block to be called each time the dictionary changes.
 
  The block will be asynchronously called with the initial dictionary, and then
- called again after each write transaction which changes any of the objects in
+ called again after each write transaction which changes any of the key-value in
  the dictionary or which objects are in the results.
 
  The `changes` parameter will be `nil` the first time the block is called.
  For each call after that, it will contain information about
- which rows in the dictionary were added, removed or modified. If a write transaction
+ which keys in the dictionary were added or modified. If a write transaction
  did not modify any objects in the dictionary, the block is not called at all.
- See the `RLMCollectionChange` documentation for information on how the changes
- are reported and an example of updating a `UITableView`.
 
  If an error occurs the block will be called with `nil` for the results
  parameter and a non-`nil` error. Currently the only errors that can occur are
@@ -333,8 +293,8 @@ NS_ASSUME_NONNULL_BEGIN
      Person *person = [[Person allObjectsInRealm:realm] firstObject];
      NSLog(@"person.dogs.count: %zu", person.dogs.count); // => 0
      self.token = [person.dogs addNotificationBlock(RLMDictionary<Dog *> *dogs,
-                                                    RLMCollectionChange *changes,
-                                                    NSError *error) {
+                                       RLMDictionaryChange *changes,
+                                       NSError *error) {
          // Only fired once for the example
          NSLog(@"dogs.count: %zu", dogs.count) // => 1
      }];
@@ -355,7 +315,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param block The block to be called each time the dictionary changes.
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMKeyType <RLMDictionaryKey>, RLMObjectType> *_Nullable dictionary,
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMKeyType, RLMObjectType> *_Nullable dictionary,
                                                          RLMDictionaryChange *_Nullable changes,
                                                          NSError *_Nullable error))block
 __attribute__((warn_unused_result));
@@ -369,10 +329,8 @@ __attribute__((warn_unused_result));
 
  The `changes` parameter will be `nil` the first time the block is called.
  For each call after that, it will contain information about
- which rows in the dictionary were added, removed or modified. If a write transaction
+ which keys in the dictionary were added or modified. If a write transaction
  did not modify any objects in the dictionary, the block is not called at all.
- See the `RLMCollectionChange` documentation for information on how the changes
- are reported and an example of updating a `UITableView`.
 
  If an error occurs the block will be called with `nil` for the results
  parameter and a non-`nil` error. Currently the only errors that can occur are
@@ -392,7 +350,7 @@ __attribute__((warn_unused_result));
  @param queue The serial queue to deliver notifications to.
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMKeyType <RLMDictionaryKey>, RLMObjectType> *_Nullable dictionary,
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMDictionary<RLMKeyType, RLMObjectType> *_Nullable dictionary,
                                                          RLMDictionaryChange *_Nullable changes,
                                                          NSError *_Nullable error))block
                                          queue:(nullable dispatch_queue_t)queue
@@ -439,4 +397,22 @@ __attribute__((warn_unused_result));
 + (instancetype)new __attribute__((unavailable("RLMDictionary cannot be created directly")));
 
 @end
+
+/**
+ A `RLMDictionaryChange` object encapsulates information about changes to dictionaries
+ that are reported by Realm notifications.
+
+ `RLMDictionaryChange` is passed to the notification blocks registered with
+ `-addNotificationBlock` on `RLMDictionary`, and reports what keys in the
+ dictionary changed since the last time the notification block was called.
+
+ */
+@interface RLMDictionaryChange : NSObject
+/// The keys in the new version of the dictionary which were newly inserted.
+@property (nonatomic, readonly) NSArray<id<RLMDictionaryKey>> *insertions;
+
+/// The keys in the new version of the dictionary which were modified.
+@property (nonatomic, readonly) NSArray<id<RLMDictionaryKey>> *modifications;
+@end
+
 NS_ASSUME_NONNULL_END

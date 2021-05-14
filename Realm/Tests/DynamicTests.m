@@ -321,7 +321,7 @@
     RLMObject *stringObject1 = [dyrealm createObject:StringObject.className withValue:@[@"string1"]];
     [dyrealm createObject:DictionaryPropertyObject.className withValue:@{
         @"stringDictionary": @{@"0": stringObject, @"1": stringObject1},
-        @"intDictionary": @{@"0": @{@"intCol":@0}, @"1": @{@"intCol":@1}},
+        @"intObjDictionary": @{@"0": @{@"intCol":@0}, @"1": @{@"intCol":@1}},
         @"primitiveStringDictionary": @{},
         @"embeddedDictionary": @{}
     }];

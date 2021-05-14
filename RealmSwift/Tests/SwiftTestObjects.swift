@@ -346,6 +346,7 @@ class SwiftEmployeeObject: Object {
 class SwiftCompanyObject: Object {
     let employees = List<SwiftEmployeeObject>()
     let employeeSet = MutableSet<SwiftEmployeeObject>()
+    let employeeMap = Map<String, SwiftEmployeeObject>()
 }
 
 class SwiftArrayPropertyObject: Object {
