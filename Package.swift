@@ -62,7 +62,8 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
+//        .package(url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
+        .package(url: "https://github.com/realm/realm-core", .branch("js/embedded-migrations"))
     ],
     targets: [
       .target(
