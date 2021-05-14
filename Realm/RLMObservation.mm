@@ -560,7 +560,7 @@ RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema
     RLMProperty *property;
     std::vector<std::pair<TableKey, ColKey>> keyPairs;
 
-    realm::TableRef table = info->table();
+    TableRef table = info->table();
     NSUInteger start = 0, length = keyPath.length, end = NSNotFound;
     do {
         end = [keyPath rangeOfString:@"." options:0 range:{start, length - start}].location;
@@ -583,9 +583,24 @@ RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema
                 ck = table->get_column_key(property.columnName.UTF8String);
                 table = table->get_link_target(ck);
             } else {
-                // crashes here for backlink
-//                ck = table->get_column_key(property.columnName.UTF8String);
-//                table = table->get_opposite_table(ck);
+                // SwiftOwnerObject
+                NSString *targetTableName = objectSchema.className;
+                NSString *originTableName = property.objectClassName;
+                RLMObjectSchema *originTableObjectSchema = schema[originTableName];
+                
+                // Get the table 'SwiftOwnerObject' from the realm.
+                TableRef targetTable = table;
+                NSString *originTableName2 = [NSString stringWithFormat:@"class_%@", originTableName];
+                StringData originTableNameStringData = RLMStringDataWithNSString(originTableName2);
+                TableRef originTable = info->realm->_realm->read_group().get_table(originTableNameStringData);
+                
+                NSString *originForwardLinkColumnName = property.linkOriginPropertyName;
+                StringData originForwardLinkColumnStringData = RLMStringDataWithNSString(originForwardLinkColumnName);
+                ColKey forwardLinkColumnKey = originTable->get_column_key(originForwardLinkColumnStringData);
+                
+                // Get the opposite column for the 'dog' column in 'SwiftOwnerObject'
+                ck = originTable->get_opposite_column(forwardLinkColumnKey);
+                table = originTable;
             }
 
             keyPairs.push_back(std::make_pair(tk, ck));
