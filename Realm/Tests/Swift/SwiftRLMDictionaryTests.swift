@@ -65,32 +65,27 @@ class SwiftRLMDictionaryTests: RLMTestCase {
 
     func testObjectAggregate() {
         let realm = realmWithTestPath()
-
         realm.beginWriteTransaction()
-
-        let dObj = SwiftRLMDictionaryPropertyObject.create(in: realm, withValue: [])
-        let dict = dObj.dict!
-
         let dateMinInput = Date()
         let dateMaxInput = dateMinInput.addingTimeInterval(1000)
-
-        dict["0" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["1" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["2" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["3" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["4" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["5" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["6" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["7" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["8" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["9" as NSString] = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-
+        let dObj = SwiftRLMDictionaryPropertyObject.create(in: realm, withValue: ["dict" : [
+            "0": [0, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "1": [1, 0 as Float, 2.5 as Double, false, dateMaxInput],
+            "2": [0, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "3": [1, 0 as Float, 2.5 as Double, false, dateMaxInput],
+            "4": [0, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "5": [1, 0 as Float, 2.5 as Double, false, dateMaxInput],
+            "6": [0, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "7": [1, 0 as Float, 2.5 as Double, false, dateMaxInput],
+            "8": [0, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "9": [0, 1.2 as Float, 0 as Double, true, dateMinInput]
+        ]])
         try! realm.commitWriteTransaction()
 
         XCTAssertEqual(dObj.dict!.count, UInt(10), "10 objects added")
 
-        let noArray = dict.objects(where: "boolCol == NO")
-        let yesArray = dict.objects(where: "boolCol == YES")
+        let noArray = dObj.dict!.objects(where: "boolCol == NO")
+        let yesArray = dObj.dict!.objects(where: "boolCol == YES")
 
         // SUM ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int sum
@@ -224,13 +219,11 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         XCTAssertEqual(test.age, po1.age, "Should be equal")
         XCTAssertEqual(test.name, po1.name, "Should be equal")
         XCTAssertEqual(test.hired, po1.hired, "Should be equal")
-        // XCTAssertEqual(test, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
 
         test = peopleInCompany["Jill" as NSString]!
         XCTAssertEqual(test.age, po3.age, "Should be equal")
         XCTAssertEqual(test.name, po3.name, "Should be equal")
         XCTAssertEqual(test.hired, po3.hired, "Should be equal")
-        // XCTAssertEqual(test, po3, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
 
         realm.beginWriteTransaction()
         peopleInCompany["Jill" as NSString] = nil
@@ -250,32 +243,27 @@ class SwiftRLMDictionaryTests: RLMTestCase {
     func testFastEnumeration_objc() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-
-        let dObj = AggregateDictionaryObject.create(in: realm, withValue: [])
-        let dict = dObj.dictionary!
-
         let dateMinInput = Date()
         let dateMaxInput = dateMinInput.addingTimeInterval(1000)
-
-        dict["0" as NSString] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["1" as NSString] = AggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["2" as NSString] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["3" as NSString] = AggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["4" as NSString] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["5" as NSString] = AggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["6" as NSString] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["7" as NSString] = AggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dict["8" as NSString] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dict["9" as NSString] = AggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-
+        let dObj = AggregateDictionaryObject.create(in: realm, withValue: ["dictionary" : [
+            "0": [10, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "1": [10, 0 as Float, 2.5 as Double, false, dateMaxInput],
+            "2": [10, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "3": [10, 0 as Float, 2.5 as Double, false, dateMaxInput],
+            "4": [10, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "5": [10, 0 as Float, 2.5 as Double, false, dateMaxInput],
+            "6": [10, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "7": [10, 0 as Float, 2.5 as Double, false, dateMaxInput],
+            "8": [10, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "9": [10, 1.2 as Float, 0 as Double, true, dateMinInput]
+        ]])
         try! realm.commitWriteTransaction()
 
         XCTAssertEqual(dObj.dictionary!.count, UInt(10), "10 objects added")
 
         var totalSum: CInt = 0
-        #warning("Should enumerate (key, value)")
-        for key in dObj.dictionary.allKeys {
-            if let ao = dObj.dictionary[key] as? AggregateObject {
+        for key in dObj.dictionary!.allKeys {
+            if let ao = dObj.dictionary[key] {
                 totalSum += ao.intCol
             }
         }
@@ -286,23 +274,20 @@ class SwiftRLMDictionaryTests: RLMTestCase {
     func testObjectAggregate_objc() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-
-        let dObj = AggregateDictionaryObject.create(in: realm, withValue: [])
-
         let dateMinInput = Date()
         let dateMaxInput = dateMinInput.addingTimeInterval(1000)
-
-        dObj.dictionary!["0" as NSString] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dObj.dictionary!["1" as NSString] = AggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dObj.dictionary!["2" as NSString] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dObj.dictionary!["3" as NSString] = AggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dObj.dictionary!["4" as NSString] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dObj.dictionary!["5" as NSString] = AggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dObj.dictionary!["6" as NSString] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dObj.dictionary!["7" as NSString] = AggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        dObj.dictionary!["8" as NSString] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        dObj.dictionary!["9" as NSString] = AggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-
+        let dObj = AggregateDictionaryObject.create(in: realm, withValue: ["dictionary" : [
+            "0": [0, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "1": [1, 0 as Float, 2.5 as Double, false, dateMaxInput],
+            "2": [0, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "3": [1, 0 as Float, 2.5 as Double, false, dateMaxInput],
+            "4": [0, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "5": [1, 0 as Float, 2.5 as Double, false, dateMaxInput],
+            "6": [0, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "7": [1, 0 as Float, 2.5 as Double, false, dateMaxInput],
+            "8": [0, 1.2 as Float, 0 as Double, true, dateMinInput],
+            "9": [0, 1.2 as Float, 0 as Double, true, dateMinInput]
+        ]])
         try! realm.commitWriteTransaction()
 
         XCTAssertEqual(dObj.dictionary!.count, UInt(10), "10 objects added")
@@ -472,7 +457,7 @@ class SwiftRLMDictionaryTests: RLMTestCase {
                                                                      "Jill": po3]])
         try! realm.commitWriteTransaction()
 
-        let results = company.employeeDict.objects(where: "hired = YES")
+        let results = company.employeeDict.objects(where: "hired = YES").sortedResults(usingKeyPath: "name", ascending: false)
         XCTAssertEqual(UInt(2), results.count)
         XCTAssertEqual(UInt(0), results.index(of: po1));
         XCTAssertEqual(UInt(1), results.index(of: po3));

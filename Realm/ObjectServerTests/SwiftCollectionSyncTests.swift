@@ -409,3 +409,221 @@ class SetSyncTests: SwiftSyncTestCase {
         }
     }
 }
+
+class MapSyncTests: SwiftSyncTestCase {
+
+    private typealias MapKeyPath<T: RealmCollectionValue> = KeyPath<SwiftCollectionSyncObject, Map<String, T>>
+
+    private func roundTrip<T>(keyPath: MapKeyPath<T>, values: Map<String, T>,
+                              partitionValue: String = #function) throws {
+        let user = logInUser(for: basicCredentials(withName: partitionValue, register: isParent))
+        let realm = try openRealm(partitionValue: partitionValue, user: user)
+        if isParent {
+            // Run to add initial empty object
+            checkCount(expected: 0, realm, SwiftCollectionSyncObject.self)
+            executeChild()
+            waitForDownloads(for: realm)
+            checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+            var object = realm.objects(SwiftCollectionSyncObject.self).first!
+            var collection = object[keyPath: keyPath]
+
+            // Run the child again to add the values
+            executeChild()
+            waitForDownloads(for: realm)
+            checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+            object = realm.objects(SwiftCollectionSyncObject.self).first!
+            collection = object[keyPath: keyPath]
+            XCTAssertEqual(collection.count, values.count)
+            for element in values {
+                if let person = element.value as? SwiftPerson, let otherPerson = collection[element.key] as? SwiftPerson {
+                    XCTAssertEqual(person.firstName, otherPerson.firstName, "\(person) is not equal to \(otherPerson)")
+                } else {
+                    XCTAssertEqual(element.value, collection[element.key])
+                }
+            }
+
+            // Run the child again to delete 3 objects
+            executeChild()
+            waitForDownloads(for: realm)
+            XCTAssertEqual(collection.count, 2)
+
+            // Run the child again to modify the first element
+            executeChild()
+            waitForDownloads(for: realm)
+            let keyA = collection.keys[0]
+            let keyB = collection.keys[1]
+            if T.self is SwiftPerson.Type {
+                XCTAssertEqual((collection[keyA] as! SwiftPerson).firstName, (collection[keyB] as! SwiftPerson).firstName)
+            } else {
+                XCTAssertEqual(collection[keyA], collection[keyB])
+            }
+        } else {
+            guard let object = realm.objects(SwiftCollectionSyncObject.self).first else {
+                try realm.write {
+                    realm.add(SwiftCollectionSyncObject())
+                }
+                waitForUploads(for: realm)
+                checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+                return
+            }
+            let collection = object[keyPath: keyPath]
+            if collection.count == 0 {
+                try realm.write {
+                    for entry in values {
+                        collection[entry.key] = entry.value
+                    }
+                }
+                XCTAssertEqual(collection.count, 5)
+            } else if collection.count == values.count {
+                try realm.write {
+                    var i = 0
+                    for entry in values {
+                        collection[entry.key] = nil
+                        i += 1
+                        if i >= 3 {
+                            break
+                        }
+                    }
+                }
+                XCTAssertEqual(collection.count, 2)
+            } else {
+                try realm.write {
+                    let keyA = collection.keys[0]
+                    let keyB = collection.keys[1]
+                    collection[keyA] = collection[keyB]
+                }
+                XCTAssertEqual(collection.count, 2)
+            }
+            waitForUploads(for: realm)
+            checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
+        }
+    }
+
+    func createMap<T>(_ values: [T]) -> Map<String, T> {
+        let map = Map<String, T>()
+        var i = 0
+        for value in values {
+            map[String(i)] = value
+            i+=1
+        }
+        return map
+    }
+
+    func testIntMap() {
+        do {
+            let map = createMap([1, 2, 3, 4, 5])
+            try roundTrip(keyPath: \.intMap, values: map)
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testStringMap() {
+        do {
+            let map = createMap(["Who", "What", "When", "Strings", "Collide"])
+            try roundTrip(keyPath: \.stringMap, values: map)
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testDataMap() {
+        do {
+            let map = createMap([Data(repeating: 1, count: 64),
+                                 Data(repeating: 2, count: 64),
+                                 Data(repeating: 3, count: 64),
+                                      Data(repeating: 4, count: 64),
+                                      Data(repeating: 5, count: 64)])
+            try roundTrip(keyPath: \.dataMap, values: map)
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testDateMap() {
+        do {
+            let map = createMap([Date(timeIntervalSince1970: 10000000),
+                                 Date(timeIntervalSince1970: 20000000),
+                                 Date(timeIntervalSince1970: 30000000),
+                                 Date(timeIntervalSince1970: 40000000),
+                                 Date(timeIntervalSince1970: 50000000)])
+            try roundTrip(keyPath: \.dateMap, values: map)
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testDoubleMap() {
+        do {
+            let map = createMap([123.456, 345.456, 789.456, 888.456, 987.456])
+            try roundTrip(keyPath: \.doubleMap, values: map)
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testObjectIdMap() {
+        do {
+            let map = createMap([ObjectId("6058f12b957ba06156586a7c"),
+                                 ObjectId("6058f12682b2fbb1f334ef1d"),
+                                 ObjectId("6058f12d42e5a393e67538d0"),
+                                 ObjectId("6058f12682b2fbb1f334ef1f"),
+                                 ObjectId("6058f12d42e5a393e67538d1")])
+            try roundTrip(keyPath: \.objectIdMap, values: map)
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testDecimalMap() {
+        do {
+            let map = createMap([Decimal128(123.345),
+                                 Decimal128(213.345),
+                                 Decimal128(321.345),
+                                 Decimal128(333.345),
+                                 Decimal128(444.345)])
+            try roundTrip(keyPath: \.decimalMap, values: map)
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testUuidMap() {
+        do {
+            let map = createMap([UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd")!,
+                                 UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe")!,
+                                 UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff")!,
+                                 UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90ae")!,
+                                 UUID(uuidString: "6b28ec45-b29a-4b0a-bd6a-343c7f6d90bf")!])
+            try roundTrip(keyPath: \.uuidMap, values: map)
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testObjectMap() {
+        do {
+            let map = createMap([SwiftPerson(firstName: "Peter", lastName: "Parker"),
+                                 SwiftPerson(firstName: "Bruce", lastName: "Wayne"),
+                                 SwiftPerson(firstName: "Stephen", lastName: "Strange"),
+                                 SwiftPerson(firstName: "Tony", lastName: "Stark"),
+                                 SwiftPerson(firstName: "Clark", lastName: "Kent")])
+            try roundTrip(keyPath: \.objectMap, values: map)
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
+    func testAnyMap() {
+        do {
+            let map: Map<String, AnyRealmValue> = createMap([.int(12345),
+                                                             .none,
+                                                             .string("Hello"),
+                                                             .double(765.6543),
+                                                             .objectId(ObjectId("507f1f77bcf86cd799439011"))])
+            try roundTrip(keyPath: \.anyMap, values: map)
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
+    }
+}

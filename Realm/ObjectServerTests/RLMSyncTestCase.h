@@ -130,6 +130,22 @@ RLM_COLLECTION_TYPE(Person);
 @property RLM_GENERIC_SET(Person) *otherObjectSet;
 @end
 
+
+@interface RLMDictionarySyncObject : RLMObject
+@property RLMObjectId *_id;
+@property RLMDictionary<RLMString, RLMInt> *intDictionary;
+@property RLMDictionary<RLMString, RLMBool> *boolDictionary;
+@property RLMDictionary<RLMString, RLMString> *stringDictionary;
+@property RLMDictionary<RLMString, RLMData> *dataDictionary;
+@property RLMDictionary<RLMString, RLMDouble> *doubleDictionary;
+@property RLMDictionary<RLMString, RLMObjectId> *objectIdDictionary;
+@property RLMDictionary<RLMString, RLMDecimal128> *decimalDictionary;
+@property RLMDictionary<RLMString, RLMUUID> *uuidDictionary;
+@property RLMDictionary<RLMString, RLMValue> *anyDictionary;
+@property RLMDictionary<RLMString, Person> *objectDictionary;
+
+@end
+
 @interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport
 @end
 

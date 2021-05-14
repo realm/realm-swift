@@ -261,6 +261,26 @@
 
 @end
 
+#pragma mark RLMDictionarySyncObject
+
+@implementation RLMDictionarySyncObject
+
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"_id": [RLMObjectId objectId]};
+}
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
+
++ (NSArray *)requiredProperties {
+    return @[@"intDictionary", @"boolDictionary", @"stringDictionary",
+             @"dataDictionary", @"doubleDictionary", @"objectIdDictionary",
+             @"decimalDictionary", @"uuidDictionary", @"anyDictionary"];
+}
+
+@end
+
 #pragma mark UUIDPrimaryKeyObject
 
 @implementation UUIDPrimaryKeyObject

@@ -105,6 +105,17 @@ public class SwiftCollectionSyncObject: Object {
     public let otherAnySet = MutableSet<AnyRealmValue>()
     public let otherObjectSet = MutableSet<SwiftPerson>()
 
+    public let intMap = Map<String, Int>()
+    public let stringMap = Map<String, String>()
+    public let dataMap = Map<String, Data>()
+    public let dateMap = Map<String, Date>()
+    public let doubleMap = Map<String, Double>()
+    public let objectIdMap = Map<String, ObjectId>()
+    public let decimalMap = Map<String, Decimal128>()
+    public let uuidMap = Map<String, UUID>()
+    public let anyMap = Map<String, AnyRealmValue>()
+    public let objectMap = Map<String, SwiftPerson>()
+
     public override class func primaryKey() -> String? {
         return "_id"
     }
