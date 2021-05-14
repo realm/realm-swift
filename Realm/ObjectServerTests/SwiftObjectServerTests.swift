@@ -2864,8 +2864,8 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         }
 
         app.currentUser?.functions.sum([1, 2, 3, 4, 5]).await(self) { bson in
-            guard case let .int64(sum) = bson else {
-                XCTFail("Should be int64")
+            guard case let .int32(sum) = bson else {
+                XCTFail("Should be int32")
                 return
             }
             XCTAssertEqual(sum, 15)
