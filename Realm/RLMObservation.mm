@@ -582,25 +582,26 @@ RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema
             if (property.type == RLMPropertyTypeObject) {
                 ck = table->get_column_key(property.columnName.UTF8String);
                 table = table->get_link_target(ck);
-            } else {
-                // SwiftOwnerObject
-                NSString *targetTableName = objectSchema.className;
-                NSString *originTableName = property.objectClassName;
-                RLMObjectSchema *originTableObjectSchema = schema[originTableName];
-                
-                // Get the table 'SwiftOwnerObject' from the realm.
-                TableRef targetTable = table;
-                NSString *originTableName2 = [NSString stringWithFormat:@"class_%@", originTableName];
-                StringData originTableNameStringData = RLMStringDataWithNSString(originTableName2);
+            } else if (property.type == RLMPropertyTypeLinkingObjects) {
+                // If the property type is a backlink, subsequent keys must be retrieved from the origin table
+                NSString *originTableName = [NSString stringWithFormat:@"class_%@", property.objectClassName];
+                StringData originTableNameStringData = RLMStringDataWithNSString(originTableName);
                 TableRef originTable = info->realm->_realm->read_group().get_table(originTableNameStringData);
                 
+                // The property from the origin table that links to the current property in the target table
                 NSString *originForwardLinkColumnName = property.linkOriginPropertyName;
                 StringData originForwardLinkColumnStringData = RLMStringDataWithNSString(originForwardLinkColumnName);
                 ColKey forwardLinkColumnKey = originTable->get_column_key(originForwardLinkColumnStringData);
                 
-                // Get the opposite column for the 'dog' column in 'SwiftOwnerObject'
+                // Get the opposite (backlinked) column from the origin table
                 ck = originTable->get_opposite_column(forwardLinkColumnKey);
+                // Reassign table to the origin table so subsequent
+                // iterations can access column keys from origin table
                 table = originTable;
+            } else {
+                // This branch should never be reached. This case should have been caught by precondition above.
+                // How should an error be properly thrown?
+                RLMException(@"Precondition failure");
             }
 
             keyPairs.push_back(std::make_pair(tk, ck));
