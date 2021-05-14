@@ -86,6 +86,12 @@ exclude:
     target: osx-object-server
 
   - xcode_version: 11.3
+    target: swiftpm
+
+  - xcode_version: 11.3
+    target: swiftpm-debug
+
+  - xcode_version: 11.3
     target: swiftpm-address
 
   - xcode_version: 11.7
