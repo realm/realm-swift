@@ -578,19 +578,17 @@ RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema
             REALM_ASSERT(property.objectClassName);
 
             TableKey tk = table->get_key();
-            // turn around
             ColKey ck;
-            if (property.type == RLMPropertyTypeLinkingObjects) {
+            if (property.type == RLMPropertyTypeObject) {
+                ck = table->get_column_key(property.columnName.UTF8String);
+                table = table->get_link_target(ck);
+            } else {
                 // crashes here for backlink
 //                ck = table->get_column_key(property.columnName.UTF8String);
 //                table = table->get_opposite_table(ck);
-            } else {
-                ck = table->get_column_key(property.columnName.UTF8String);
-                table = table->get_link_target(ck);
             }
 
             keyPairs.push_back(std::make_pair(tk, ck));
-//            realm::ObjectSchema test = [objectSchema objectStoreCopy:schema];
             objectSchema = schema[property.objectClassName];
         }
 

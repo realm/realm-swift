@@ -522,7 +522,10 @@ class RealmCollectionTypeTests: TestCase {
             case .update(_, let deletions, let insertions, let modifications):
                 XCTAssertEqual(deletions, [])
                 XCTAssertEqual(insertions, [])
-                XCTAssertEqual(modifications, [0])
+                // The reason two column changes are expected here is because the
+                // single CTTLinkTarget object that is modified is linked to two origin objects.
+                // The 0, 1 index refers to the origin objects.
+                XCTAssertEqual(modifications, [0, 1])
             case .error:
                 XCTFail("error not expected")
             }
@@ -551,72 +554,10 @@ class RealmCollectionTypeTests: TestCase {
             obj.stringCol = "changed"
             try! realm.commitWrite()
         }
-        waitForExpectations(timeout: 0.2, handler: nil)
+        waitForExpectations(timeout: 0.1, handler: nil)
 
         token.invalidate()
     }
-
-    // !!!: Two tokens that filter for different keypaths will both fire.
-    // related to the issue Dominic raised.
-//    func testObserveTwoKeyPaths() {
-//        var ex0 = expectation(description: "initial notification")
-//        let token0 = collection.observe(keyPaths: ["stringCol"])  { (changes: RealmCollectionChange) in
-//            switch changes {
-//            case .initial(let collection):
-//                XCTAssertEqual(collection.count, 2)
-//            case .update:
-//                break
-//            case .error:
-//                XCTFail("error not expected")
-//            }
-//            ex0.fulfill()
-//        }
-//
-//        var ex1 = expectation(description: "initial notification")
-//        let token1 = collection.observe(keyPaths: ["linkCol.id"]) { (changes: RealmCollectionChange) in
-//            switch changes {
-//            case .initial(let collection):
-//                XCTAssertEqual(collection.count, 2)
-//            case .update:
-//                break
-//            case .error:
-//                XCTFail("error not expected")
-//            }
-//            ex1.fulfill()
-//        }
-//        waitForExpectations(timeout: 0.2, handler: nil)
-//
-//        // Only expect a change notification for the token observing `linkCol.id` keypath.
-//        // Expect no notification for `linkCol.id` key path because only `stringCol` will be modified.
-//        ex1 = self.expectation(description: "change notification")
-//        ex0 = self.expectation(description: "NO change notification")
-//        ex0.isInverted = true
-//        dispatchSyncNewThread {
-//            let realm = self.realmWithTestPath()
-//            realm.beginWrite()
-//            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
-//            obj.linkCol?.id = 2
-//            try! realm.commitWrite()
-//        }
-//        waitForExpectations(timeout: 0.2, handler: nil)
-//
-//        // Only expect a change notification for the token observing `linkCol.id` keypath.
-//        // Expect no notification for `stringCol` key path because only `linkCol.is` will be modified.
-//        ex0 = self.expectation(description: "change notification")
-//        ex1 = self.expectation(description: "NO change notification")
-//        ex1.isInverted = true // Inverted expectation causes failure if fulfilled.
-//        dispatchSyncNewThread {
-//            let realm = self.realmWithTestPath()
-//            realm.beginWrite()
-//            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
-//            obj.stringCol = "changed"
-//            try! realm.commitWrite()
-//        }
-//        waitForExpectations(timeout: 0.2, handler: nil)
-//
-//        token0.invalidate()
-//        token1.invalidate()
-//    }
 
     func observeOnQueue<Collection: RealmCollection>(_ collection: Collection) where Collection.Element: Object {
         let sema = DispatchSemaphore(value: 0)
