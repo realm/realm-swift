@@ -139,7 +139,9 @@ class Admin {
 
             private func request(httpMethod: String, data: Any? = nil,
                                  completionHandler: @escaping (Result<Any?, Error>) -> Void) {
-                var request = URLRequest(url: url)
+                var components = URLComponents(url: self.url, resolvingAgainstBaseURL: false)!
+                components.query = "bypass_service_change=SyncProtocolVersionIncrease"
+                var request = URLRequest(url: components.url!)
                 request.httpMethod = httpMethod
                 request.allHTTPHeaderFields = [
                     "Authorization": "Bearer \(accessToken)",
