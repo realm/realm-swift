@@ -122,6 +122,7 @@ final class CodableObject: Object, Codable {
     var uuidOptSet = MutableSet<UUID?>()
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class CodableTests: TestCase {
     let decoder = JSONDecoder()
     let encoder = JSONEncoder()

@@ -31,6 +31,7 @@ class ObjectWithPrivateOptionals: Object {
     @objc dynamic var value = 5
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class ObjectCreationTests: TestCase {
     // MARK: - Init tests
 

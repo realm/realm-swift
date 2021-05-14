@@ -102,6 +102,7 @@ class SwiftObject: Object {
     }
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftOptionalObject: Object {
     @objc dynamic var optNSStringCol: NSString?
     @objc dynamic var optStringCol: String?
@@ -123,6 +124,7 @@ class SwiftOptionalObject: Object {
     @objc dynamic var optObjectCol: SwiftBoolObject?
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftOptionalPrimaryObject: SwiftOptionalObject {
     let id = RealmOptional<Int>()
 
@@ -202,6 +204,7 @@ class SwiftImplicitlyUnwrappedOptionalObject: Object {
     @objc dynamic var optUuidCol: UUID!
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftOptionalDefaultValuesObject: Object {
     @objc dynamic var optNSStringCol: NSString? = "A"
     @objc dynamic var optStringCol: String? = "B"
@@ -333,10 +336,12 @@ class SwiftMutableSetOfSwiftObject: Object {
     let set = MutableSet<SwiftObject>()
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftListOfSwiftOptionalObject: Object {
     let array = List<SwiftOptionalObject>()
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftMutableSetOfSwiftOptionalObject: Object {
     let set = MutableSet<SwiftOptionalObject>()
 }
@@ -412,6 +417,7 @@ class SwiftPrimaryIntObject: Object, SwiftPrimaryKeyObjectType {
     }
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftPrimaryOptionalIntObject: Object, SwiftPrimaryKeyObjectType {
     @objc dynamic var stringCol = ""
     let intCol = RealmOptional<Int>()
@@ -422,6 +428,7 @@ class SwiftPrimaryOptionalIntObject: Object, SwiftPrimaryKeyObjectType {
     }
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftPrimaryInt8Object: Object, SwiftPrimaryKeyObjectType {
     @objc dynamic var stringCol = ""
     @objc dynamic var int8Col: Int8 = 0
@@ -432,6 +439,7 @@ class SwiftPrimaryInt8Object: Object, SwiftPrimaryKeyObjectType {
     }
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftPrimaryOptionalInt8Object: Object, SwiftPrimaryKeyObjectType {
     @objc dynamic var stringCol = ""
     let int8Col = RealmOptional<Int8>()
@@ -452,6 +460,7 @@ class SwiftPrimaryInt16Object: Object, SwiftPrimaryKeyObjectType {
     }
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftPrimaryOptionalInt16Object: Object, SwiftPrimaryKeyObjectType {
     @objc dynamic var stringCol = ""
     let int16Col = RealmOptional<Int16>()
@@ -472,6 +481,7 @@ class SwiftPrimaryInt32Object: Object, SwiftPrimaryKeyObjectType {
     }
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftPrimaryOptionalInt32Object: Object, SwiftPrimaryKeyObjectType {
     @objc dynamic var stringCol = ""
     let int32Col = RealmOptional<Int32>()
@@ -492,6 +502,7 @@ class SwiftPrimaryInt64Object: Object, SwiftPrimaryKeyObjectType {
     }
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftPrimaryOptionalInt64Object: Object, SwiftPrimaryKeyObjectType {
     @objc dynamic var stringCol = ""
     let int64Col = RealmOptional<Int64>()
@@ -545,6 +556,7 @@ class SwiftIndexedPropertiesObject: Object {
     }
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftIndexedOptionalPropertiesObject: Object {
     @objc dynamic var optionalStringCol: String? = ""
     let optionalIntCol = RealmOptional<Int>()
@@ -649,6 +661,7 @@ class SwiftGenericPropsOrderingParent: Object {
 
 // Used to verify that Swift properties (generic and otherwise) are detected properly and
 // added to the schema in the correct order.
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftGenericPropsOrderingObject: SwiftGenericPropsOrderingParent {
     func myFunction() -> Int { return firstNumber + secondNumber + thirdNumber }
     @objc dynamic var dynamicComputed: Int { return 999 }
@@ -677,6 +690,7 @@ class SwiftGenericPropsOrderingObject: SwiftGenericPropsOrderingParent {
 }
 
 // Only exists to allow linking object properties on `SwiftGenericPropsNotLastObject`.
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftGenericPropsOrderingHelper: Object {
     @objc dynamic var first: SwiftGenericPropsOrderingObject?
     @objc dynamic var second: SwiftGenericPropsOrderingObject?
