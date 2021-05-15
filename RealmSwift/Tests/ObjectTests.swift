@@ -38,6 +38,7 @@ class SwiftDynamicDefaultObject: Object {
     }
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class ObjectTests: TestCase {
     // init() Tests are in ObjectCreationTests.swift
     // init(value:) tests are in ObjectCreationTests.swift
