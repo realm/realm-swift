@@ -148,3 +148,5 @@ extension Realm {
         return reference.resolve(in: self)
     }
 }
+extension ThreadSafeReference: UnsafeSendable {
+}

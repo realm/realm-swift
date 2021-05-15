@@ -1401,7 +1401,7 @@ public:
     [mutator addObject:obj.obj];
     AssertSetChanged();
     [mutator2 addObject:obj2.obj];
-    [mutator setSet:mutator2];
+//    [mutator setSet:mutator2];
     AssertSetChanged();
 
     [mutator intersectSet:mutator2];
@@ -1427,7 +1427,7 @@ public:
     [mutator addObject:@1];
     AssertSetChanged();
     [mutator2 addObject:@2];
-    [mutator setSet:mutator2];
+//    [mutator setSet:mutator2];
     AssertSetChanged();
 
     [mutator intersectSet:mutator2];

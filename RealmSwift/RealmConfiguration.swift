@@ -31,7 +31,7 @@ extension Realm {
      of this, you will normally want to cache and reuse a single configuration value for each distinct configuration
      rather than creating a new value each time you open a Realm.
      */
-    @frozen public struct Configuration {
+    @frozen public struct Configuration: UnsafeSendable {
 
         // MARK: Default Configuration
 

@@ -126,6 +126,10 @@ public extension App {
             }
         }
     }
+
+    func login(credentials: Credentials) async throws -> User {
+        try await self.__login(withCredential: ObjectiveCSupport.convert(object: credentials))
+    }
 }
 
 /// Use this delegate to be provided a callback once authentication has succeed or failed

@@ -18,7 +18,7 @@
 
 import Foundation
 
-#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.3.1) && (REALM_HAVE_COMBINE || !SWIFT_PACKAGE)
+#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.3.1) && swift(<5.5) && (REALM_HAVE_COMBINE || !SWIFT_PACKAGE)
 import SwiftUI
 import Combine
 import Realm
@@ -553,19 +553,19 @@ extension EnvironmentValues {
     /// The current `Realm.Configuration` that the view should use.
     public var realmConfiguration: Realm.Configuration {
         get {
-            return self[RealmEnvironmentKey]
+            return self[RealmEnvironmentKey.self]
         }
         set {
-            self[RealmEnvironmentKey] = newValue
+            self[RealmEnvironmentKey.self] = newValue
         }
     }
     /// The current `Realm` that the view should use.
     public var realm: Realm {
         get {
-            return try! Realm(configuration: self[RealmEnvironmentKey])
+            return try! Realm(configuration: self[RealmEnvironmentKey.self])
         }
         set {
-            self[RealmEnvironmentKey] = newValue.configuration
+            self[RealmEnvironmentKey.self] = newValue.configuration
         }
     }
 }

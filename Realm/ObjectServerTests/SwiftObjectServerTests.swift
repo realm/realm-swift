@@ -56,13 +56,18 @@ extension User {
 class SwiftObjectServerTests: SwiftSyncTestCase {
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
-        do {
-            let user = try logInUser(for: basicCredentials())
-            let realm = try openRealm(partitionValue: #function, user: user)
-            XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
-        } catch {
-            XCTFail("Got an error: \(error)")
-        }
+//        _runAsyncMain {
+//            
+//        }
+//        Task.runDetached(operation: {
+//            do {
+//                let user = try await self.app.login(credentials: basicCredentials())
+//                let realm = try openRealm(partitionValue: #function, user: user)
+//                XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
+//            } catch {
+//                XCTFail("Got an error: \(error)")
+//            }
+//        })
     }
 
     func testBasicSwiftSyncWithNilPartitionValue() {

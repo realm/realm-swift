@@ -261,6 +261,35 @@ import Realm.Private
         return ret
     }
 
+    @discardableResult
+    public func asyncWrite<Result>(withoutNotifying tokens: [NotificationToken] = [], _ block: @Sendable () async throws -> Result) async throws -> Result {
+        beginWrite()
+        var ret: Result!
+        do {
+            ret = try await block()
+        } catch let error {
+            if isInWriteTransaction { cancelWrite() }
+            throw error
+        }
+        if isInWriteTransaction { try commitWrite(withoutNotifying: tokens) }
+        return ret
+    }
+
+    @available(macOS 9999, *)
+    public func detachWrite(withoutNotifying tokens: [NotificationToken] = [],
+                            _ block: @Sendable @escaping () async throws -> Void) {
+        detach {
+            let resolved = try Realm(configuration: configuration)
+            resolved.beginWrite()
+            do {
+                try await block()
+            } catch let error {
+                if resolved.isInWriteTransaction { resolved.cancelWrite() }
+                throw error
+            }
+            if resolved.isInWriteTransaction { try resolved.commitWrite(withoutNotifying: tokens) }
+        }
+    }
     /**
      Begins a write transaction on the Realm.
 
@@ -993,3 +1022,53 @@ extension Realm {
 
 /// The type of a block to run for notification purposes when the data in a Realm is modified.
 public typealias NotificationBlock = (_ notification: Realm.Notification, _ realm: Realm) -> Void
+
+@propertyWrapper public class RealmSendable<T: Object>: UnsafeSendable {
+    private var _wrappedValue: ThreadSafeReference<T>
+    public var wrappedValue: T {
+        let value = _wrappedValue.resolve(in: realm)!
+        _wrappedValue = ThreadSafeReference(to: value)
+        return value
+    }
+    private let configuration: Realm.Configuration
+    private var realm: Realm {
+        try! Realm(configuration: configuration)
+    }
+    private var didStartWrite = false
+
+    public init(wrappedValue: T) {
+        self._wrappedValue = ThreadSafeReference(to: wrappedValue)
+        self.configuration = wrappedValue.realm!.configuration
+        if !realm.isInWriteTransaction {
+            realm.beginWrite()
+            didStartWrite = true
+        }
+    }
+
+    deinit {
+        if didStartWrite {
+            try! realm.commitWrite()
+        }
+    }
+}
+
+@available(macOS 9999, *)
+public func detachWrite<T: Object>(withoutNotifying tokens: [NotificationToken] = [],
+                                   to object: T,
+                                   _ block: @Sendable @escaping (T) async throws -> Void) {
+    guard let realm = object.realm else {
+        throwRealmException("Object is invalidated")
+    }
+    let tsr = ThreadSafeReference(to: object)
+    detach {
+        let resolved = try Realm(configuration: realm.configuration)
+        resolved.beginWrite()
+        do {
+            try await block(tsr.resolve(in: resolved)!)
+        } catch let error {
+            if resolved.isInWriteTransaction { resolved.cancelWrite() }
+            throw error
+        }
+        if resolved.isInWriteTransaction { try resolved.commitWrite(withoutNotifying: tokens) }
+    }
+}

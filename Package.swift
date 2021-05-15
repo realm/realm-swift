@@ -1,4 +1,4 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.3
 
 import PackageDescription
 import Foundation
@@ -47,6 +47,7 @@ func combineFlags() -> [SwiftSetting]? {
 
 let package = Package(
     name: "Realm",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v10_10),
         .iOS(.v11),
@@ -56,19 +57,25 @@ let package = Package(
     products: [
         .library(
             name: "Realm",
-            targets: ["Realm"]),
+            targets: ["Realm", "RealmBase"]),
         .library(
             name: "RealmSwift",
             targets: ["Realm", "RealmSwift"]),
+        .executable(name: "AsyncTest", targets: ["AsyncTest"])
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core", .revision("2729433fc8ebbe801e293eddc10915a94e626a4a"))
+//        .package(path: "../core2")
     ],
     targets: [
+        .binaryTarget(
+               name: "RealmBase",
+               path: "core/realm-monorepo.xcframework"
+           ),
       .target(
             name: "Realm",
-            dependencies: ["RealmObjectStore"],
+            dependencies: ["RealmBase"],
             path: ".",
+            exclude: ["examples", "build", "docs", "tools", "Realm/Tests", "RealmSwift", "Realm/ObjectServerTests", "scripts", "Configuration", "SUPPORT.md"],
             sources: [
                 "Realm/RLMAccessor.mm",
                 "Realm/RLMAnalytics.mm",
@@ -130,7 +137,8 @@ let package = Package(
                 "Realm/RLMUserAPIKey.mm"
             ],
             publicHeadersPath: "include",
-            cxxSettings: cxxSettings
+            cxxSettings: cxxSettings,
+            linkerSettings: [.linkedLibrary("z")]
         ),
         .target(
             name: "RealmSwift",
@@ -159,7 +167,8 @@ let package = Package(
                 "TestHost",
                 "PrimitiveArrayPropertyTests.tpl.m",
                 "PrimitiveSetPropertyTests.tpl.m",
-                "PrimitiveRLMValuePropertyTests.tpl.m"
+                "PrimitiveRLMValuePropertyTests.tpl.m",
+                "SwiftUITests.swift"
             ],
             cxxSettings: testCxxSettings
         ),
@@ -222,7 +231,11 @@ let package = Package(
                 "RLMObjectServerPartitionTests.mm"
             ],
             cxxSettings: testCxxSettings
-        )
+        ),
+        .target(name: "AsyncTest",
+                dependencies: ["RealmSwift"],
+                path: "AsyncTest",
+                linkerSettings: [.linkedLibrary("z")])
     ],
     cxxLanguageStandard: .cxx1z
 )
