@@ -16,17 +16,15 @@ Pod::Spec.new do |s|
   s.social_media_url          = 'https://twitter.com/realm'
   s.documentation_url         = "https://realm.io/docs/swift/latest"
   s.license                   = { :type => 'Apache 2.0', :file => 'LICENSE' }
-
-  s.dependency 'Realm', "= #{s.version}"
-  s.source_files = 'RealmSwift/*.swift'
-  s.exclude_files = 'RealmSwift/Nonsync.swift'
-
-  s.preserve_paths            = %w(build.sh)
-
-  s.pod_target_xcconfig = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES' }
-
   s.ios.deployment_target     = '9.0'
   s.osx.deployment_target     = '10.9'
   s.watchos.deployment_target = '2.0'
   s.tvos.deployment_target    = '9.0'
+  s.preserve_paths            = %w(build.sh)
+
+  s.dependency 'Realm', "= #{s.version}"
+  s.source_files = 'RealmSwift/*.swift', 'RealmSwift/Impl/*.swift'
+  s.exclude_files = 'RealmSwift/Nonsync.swift'
+
+  s.pod_target_xcconfig = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES' }
 end

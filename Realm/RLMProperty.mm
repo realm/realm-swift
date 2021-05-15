@@ -126,6 +126,19 @@ static bool rawTypeShouldBeTreatedAsComputedProperty(NSString *rawType) {
     return self;
 }
 
+- (instancetype)initWithName:(NSString *)name
+             createSelectors:(BOOL)createSelectors {
+    self = [super init];
+    if (self) {
+        _name = name;
+        if (createSelectors) {
+            [self updateAccessors];
+        }
+    }
+
+    return self;
+}
+
 - (void)setName:(NSString *)name {
     _name = name;
     [self updateAccessors];
@@ -611,6 +624,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     prop->_getterSel = _getterSel;
     prop->_setterSel = _setterSel;
     prop->_isPrimary = _isPrimary;
+    prop->_swiftAccessor = _swiftAccessor;
     prop->_swiftIvar = _swiftIvar;
     prop->_optional = _optional;
     prop->_linkOriginPropertyName = _linkOriginPropertyName;

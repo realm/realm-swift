@@ -215,10 +215,178 @@ class MigrationTests: TestCase {
                 XCTAssertTrue(newObject!["set"]! is MutableSet<MigrationObject>)
             }
         }
+    }
+
+    func testBasicTypesInEnumerate() {
+        autoreleasepool {
+            let realm = try! Realm()
+            try! realm.write {
+                realm.add(SwiftObject())
+            }
+        }
+
+        migrateAndTestDefaultRealm { migration, _ in
+            migration.enumerateObjects(ofType: "SwiftObject") { oldObject, newObject in
+                XCTAssertTrue(oldObject!.boolCol is Bool)
+                XCTAssertTrue(newObject!.boolCol is Bool)
+                XCTAssertTrue(oldObject!.intCol is Int)
+                XCTAssertTrue(newObject!.intCol is Int)
+                XCTAssertTrue(oldObject!.int8Col is Int)
+                XCTAssertTrue(newObject!.int8Col is Int)
+                XCTAssertTrue(oldObject!.int16Col is Int)
+                XCTAssertTrue(newObject!.int16Col is Int)
+                XCTAssertTrue(oldObject!.int32Col is Int)
+                XCTAssertTrue(newObject!.int32Col is Int)
+                XCTAssertTrue(oldObject!.int64Col is Int)
+                XCTAssertTrue(newObject!.int64Col is Int)
+                XCTAssertTrue(oldObject!.intEnumCol is Int)
+                XCTAssertTrue(newObject!.intEnumCol is Int)
+                XCTAssertTrue(oldObject!.floatCol is Float)
+                XCTAssertTrue(newObject!.floatCol is Float)
+                XCTAssertTrue(oldObject!.doubleCol is Double)
+                XCTAssertTrue(newObject!.doubleCol is Double)
+                XCTAssertTrue(oldObject!.stringCol is String)
+                XCTAssertTrue(newObject!.stringCol is String)
+                XCTAssertTrue(oldObject!.binaryCol is Data)
+                XCTAssertTrue(newObject!.binaryCol is Data)
+                XCTAssertTrue(oldObject!.dateCol is Date)
+                XCTAssertTrue(newObject!.dateCol is Date)
+                XCTAssertTrue(oldObject!.decimalCol is Decimal128)
+                XCTAssertTrue(newObject!.decimalCol is Decimal128)
+                XCTAssertTrue(oldObject!.objectIdCol is ObjectId)
+                XCTAssertTrue(newObject!.objectIdCol is ObjectId)
+                XCTAssertTrue(oldObject!.objectCol is DynamicObject)
+                XCTAssertTrue(newObject!.objectCol is DynamicObject)
+                XCTAssertTrue(oldObject!.uuidCol is UUID)
+                XCTAssertTrue(newObject!.uuidCol is UUID)
+                XCTAssertNil(oldObject!.anyCol)
+                XCTAssertNil(newObject!.anyCol)
+            }
+        }
+    }
+
+    func testAnyInEnumerate() {
+        autoreleasepool {
+            let realm = try! Realm()
+            try! realm.write {
+                realm.add(SwiftObject())
+            }
+        }
+
+        var version = UInt64(1)
+        func write(_ value: @autoclosure () -> AnyRealmValue, test: @escaping (Any?, Any?) -> Void) {
+            autoreleasepool {
+                let realm = try! Realm()
+                try! realm.write {
+                    realm.objects(SwiftObject.self).first!.anyCol.value = value()
+                }
+            }
+            migrateAndTestDefaultRealm(version) { migration, _ in
+                migration.enumerateObjects(ofType: "SwiftObject") { oldObject, newObject in
+                    test(oldObject!.anyCol, newObject!.anyCol)
+                }
+            }
+            version += 1
+        }
+
+        write(.int(1)) { oldValue, newValue in
+            XCTAssertTrue(oldValue is Int)
+            XCTAssertTrue(newValue is Int)
+        }
+        write(.float(1)) { oldValue, newValue in
+            XCTAssertTrue(oldValue is Float)
+            XCTAssertTrue(newValue is Float)
+        }
+        write(.double(1)) { oldValue, newValue in
+            XCTAssertTrue(oldValue is Double)
+            XCTAssertTrue(newValue is Double)
+        }
+        write(.double(1)) { oldValue, newValue in
+            XCTAssertTrue(oldValue is Double)
+            XCTAssertTrue(newValue is Double)
+        }
+        write(.bool(true)) { oldValue, newValue in
+            XCTAssertTrue(oldValue is Bool)
+            XCTAssertTrue(newValue is Bool)
+        }
+        write(.string("")) { oldValue, newValue in
+            XCTAssertTrue(oldValue is String)
+            XCTAssertTrue(newValue is String)
+        }
+        write(.data(Data())) { oldValue, newValue in
+            XCTAssertTrue(oldValue is Data)
+            XCTAssertTrue(newValue is Data)
+        }
+        write(.date(Date())) { oldValue, newValue in
+            XCTAssertTrue(oldValue is Date)
+            XCTAssertTrue(newValue is Date)
+        }
+        write(.objectId(ObjectId())) { oldValue, newValue in
+            XCTAssertTrue(oldValue is ObjectId)
+            XCTAssertTrue(newValue is ObjectId)
+        }
+        write(.decimal128(Decimal128())) { oldValue, newValue in
+            XCTAssertTrue(oldValue is Decimal128)
+            XCTAssertTrue(newValue is Decimal128)
+        }
+        write(.uuid(UUID())) { oldValue, newValue in
+            XCTAssertTrue(oldValue is UUID)
+            XCTAssertTrue(newValue is UUID)
+        }
+        write(.object(SwiftIntObject())) { oldValue, newValue in
+            XCTAssertTrue(oldValue! is DynamicObject)
+            XCTAssertTrue(newValue! is DynamicObject)
+        }
+    }
+
+    @available(*, deprecated) // Silence deprecation warnings for RealmOptional
+    func testOptionalsInEnumerate() {
+        autoreleasepool {
+            let realm = try! Realm()
+            try! realm.write {
+                realm.add(SwiftOptionalObject())
+            }
+        }
+
+        migrateAndTestDefaultRealm { migration, _ in
+            migration.enumerateObjects(ofType: "SwiftOptionalObject") { oldObject, newObject in
+                XCTAssertTrue(oldObject! as AnyObject is MigrationObject)
+                XCTAssertTrue(newObject! as AnyObject is MigrationObject)
+                XCTAssertNil(oldObject!.optNSStringCol)
+                XCTAssertNil(newObject!.optNSStringCol)
+                XCTAssertNil(oldObject!.optStringCol)
+                XCTAssertNil(newObject!.optStringCol)
+                XCTAssertNil(oldObject!.optBinaryCol)
+                XCTAssertNil(newObject!.optBinaryCol)
+                XCTAssertNil(oldObject!.optDateCol)
+                XCTAssertNil(newObject!.optDateCol)
+                XCTAssertNil(oldObject!.optIntCol)
+                XCTAssertNil(newObject!.optIntCol)
+                XCTAssertNil(oldObject!.optInt8Col)
+                XCTAssertNil(newObject!.optInt8Col)
+                XCTAssertNil(oldObject!.optInt16Col)
+                XCTAssertNil(newObject!.optInt16Col)
+                XCTAssertNil(oldObject!.optInt32Col)
+                XCTAssertNil(newObject!.optInt32Col)
+                XCTAssertNil(oldObject!.optInt64Col)
+                XCTAssertNil(newObject!.optInt64Col)
+                XCTAssertNil(oldObject!.optFloatCol)
+                XCTAssertNil(newObject!.optFloatCol)
+                XCTAssertNil(oldObject!.optDoubleCol)
+                XCTAssertNil(newObject!.optDoubleCol)
+                XCTAssertNil(oldObject!.optBoolCol)
+                XCTAssertNil(newObject!.optBoolCol)
+                XCTAssertNil(oldObject!.optDecimalCol)
+                XCTAssertNil(newObject!.optDecimalCol)
+                XCTAssertNil(oldObject!.optObjectIdCol)
+                XCTAssertNil(newObject!.optObjectIdCol)
+            }
+        }
 
         autoreleasepool {
-            try! Realm().write {
-                let soo = SwiftOptionalObject()
+            let realm = try! Realm()
+            try! realm.write {
+                let soo = realm.objects(SwiftOptionalObject.self).first!
                 soo.optNSStringCol = "NSString"
                 soo.optStringCol = "String"
                 soo.optBinaryCol = Data()
@@ -233,42 +401,41 @@ class MigrationTests: TestCase {
                 soo.optDecimalCol = 8.3
                 soo.optObjectIdCol = ObjectId("1234567890bc1234567890bc")
                 soo.optBoolCol.value = true
-                try! Realm().add(soo)
             }
         }
 
-        migrateAndTestDefaultRealm(4) { migration, _ in
+        migrateAndTestDefaultRealm(2) { migration, _ in
             migration.enumerateObjects(ofType: "SwiftOptionalObject") { oldObject, newObject in
                 XCTAssertTrue(oldObject! as AnyObject is MigrationObject)
                 XCTAssertTrue(newObject! as AnyObject is MigrationObject)
-                XCTAssertTrue(oldObject!["optNSStringCol"]! is NSString)
-                XCTAssertTrue(newObject!["optNSStringCol"]! is NSString)
-                XCTAssertTrue(oldObject!["optStringCol"]! is String)
-                XCTAssertTrue(newObject!["optStringCol"]! is String)
-                XCTAssertTrue(oldObject!["optBinaryCol"]! is Data)
-                XCTAssertTrue(newObject!["optBinaryCol"]! is Data)
-                XCTAssertTrue(oldObject!["optDateCol"]! is Date)
-                XCTAssertTrue(newObject!["optDateCol"]! is Date)
-                XCTAssertTrue(oldObject!["optIntCol"]! is Int)
-                XCTAssertTrue(newObject!["optIntCol"]! is Int)
-                XCTAssertTrue(oldObject!["optInt8Col"]! is Int)
-                XCTAssertTrue(newObject!["optInt8Col"]! is Int)
-                XCTAssertTrue(oldObject!["optInt16Col"]! is Int)
-                XCTAssertTrue(newObject!["optInt16Col"]! is Int)
-                XCTAssertTrue(oldObject!["optInt32Col"]! is Int)
-                XCTAssertTrue(newObject!["optInt32Col"]! is Int)
-                XCTAssertTrue(oldObject!["optInt64Col"]! is Int)
-                XCTAssertTrue(newObject!["optInt64Col"]! is Int)
-                XCTAssertTrue(oldObject!["optFloatCol"]! is Float)
-                XCTAssertTrue(newObject!["optFloatCol"]! is Float)
-                XCTAssertTrue(oldObject!["optDoubleCol"]! is Double)
-                XCTAssertTrue(newObject!["optDoubleCol"]! is Double)
-                XCTAssertTrue(oldObject!["optBoolCol"]! is Bool)
-                XCTAssertTrue(newObject!["optBoolCol"]! is Bool)
-                XCTAssertTrue(oldObject!["optDecimalCol"]! is Decimal128)
-                XCTAssertTrue(newObject!["optDecimalCol"]! is Decimal128)
-                XCTAssertTrue(oldObject!["optObjectIdCol"]! is ObjectId)
-                XCTAssertTrue(newObject!["optObjectIdCol"]! is ObjectId)
+                XCTAssertTrue(oldObject!.optNSStringCol! is NSString)
+                XCTAssertTrue(newObject!.optNSStringCol! is NSString)
+                XCTAssertTrue(oldObject!.optStringCol! is String)
+                XCTAssertTrue(newObject!.optStringCol! is String)
+                XCTAssertTrue(oldObject!.optBinaryCol! is Data)
+                XCTAssertTrue(newObject!.optBinaryCol! is Data)
+                XCTAssertTrue(oldObject!.optDateCol! is Date)
+                XCTAssertTrue(newObject!.optDateCol! is Date)
+                XCTAssertTrue(oldObject!.optIntCol! is Int)
+                XCTAssertTrue(newObject!.optIntCol! is Int)
+                XCTAssertTrue(oldObject!.optInt8Col! is Int)
+                XCTAssertTrue(newObject!.optInt8Col! is Int)
+                XCTAssertTrue(oldObject!.optInt16Col! is Int)
+                XCTAssertTrue(newObject!.optInt16Col! is Int)
+                XCTAssertTrue(oldObject!.optInt32Col! is Int)
+                XCTAssertTrue(newObject!.optInt32Col! is Int)
+                XCTAssertTrue(oldObject!.optInt64Col! is Int)
+                XCTAssertTrue(newObject!.optInt64Col! is Int)
+                XCTAssertTrue(oldObject!.optFloatCol! is Float)
+                XCTAssertTrue(newObject!.optFloatCol! is Float)
+                XCTAssertTrue(oldObject!.optDoubleCol! is Double)
+                XCTAssertTrue(newObject!.optDoubleCol! is Double)
+                XCTAssertTrue(oldObject!.optBoolCol! is Bool)
+                XCTAssertTrue(newObject!.optBoolCol! is Bool)
+                XCTAssertTrue(oldObject!.optDecimalCol! is Decimal128)
+                XCTAssertTrue(newObject!.optDecimalCol! is Decimal128)
+                XCTAssertTrue(oldObject!.optObjectIdCol! is ObjectId)
+                XCTAssertTrue(newObject!.optObjectIdCol! is ObjectId)
             }
         }
     }

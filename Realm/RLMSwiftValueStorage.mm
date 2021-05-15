@@ -156,6 +156,9 @@ void RLMInitializeManagedSwiftValueStorage(__unsafe_unretained RLMSwiftValueStor
 void RLMInitializeUnmanagedSwiftValueStorage(__unsafe_unretained RLMSwiftValueStorage *const self,
                                     __unsafe_unretained RLMObjectBase *const parent,
                                     __unsafe_unretained RLMProperty *const prop) {
+    if (parent->_realm) {
+        return;
+    }
     if (!self->_impl) {
         self->_impl.reset(new UnmanagedSwiftValueStorage);
     }

@@ -25,6 +25,7 @@ func nextPrimaryKey() -> Int {
     return pkCounter
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftKVOObject: Object {
     @objc dynamic var pk = nextPrimaryKey() // primary key for equality
     @objc dynamic var ignored: Int = 0
@@ -116,6 +117,7 @@ class SwiftKVOObject: Object {
 
 // Most of the testing of KVO functionality is done in the obj-c tests
 // These tests just verify that it also works on Swift types
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class KVOTests: TestCase {
     var realm: Realm! = nil
 
@@ -465,6 +467,7 @@ class KVOTests: TestCase {
     }
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class KVOPersistedTests: KVOTests {
     override func getObject(_ obj: SwiftKVOObject) -> (SwiftKVOObject, SwiftKVOObject) {
         realm.add(obj)
@@ -472,6 +475,7 @@ class KVOPersistedTests: KVOTests {
     }
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class KVOMultipleAccessorsTests: KVOTests {
     override func getObject(_ obj: SwiftKVOObject) -> (SwiftKVOObject, SwiftKVOObject) {
         realm.add(obj)

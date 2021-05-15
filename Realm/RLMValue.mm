@@ -44,7 +44,7 @@
 @implementation NSNumber (RLMValue)
 
 - (RLMPropertyType)rlm_valueType {
-    if ([self objCType][0] == 'c') {
+    if ([self objCType][0] == 'c' && (self.intValue == 0 || self.intValue == 1)) {
         return RLMPropertyTypeBool;
     }
     else if (numberIsInteger(self)) {

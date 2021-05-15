@@ -505,6 +505,7 @@ class ListTests: TestCase {
         testProperty("objectIdCol") { $0.objectIdCol }
     }
 
+    @available(*, deprecated) // Silence deprecation warnings for RealmOptional
     func testValueForKeyOptional() {
         let realm = try! Realm()
         try! realm.write {
