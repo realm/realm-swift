@@ -377,13 +377,6 @@ extension Results: RealmCollection {
         return RLMIterator(collection: rlmResults)
     }
 
-    /// :nodoc:
-    // swiftlint:disable:next identifier_name
-    public func _asNSFastEnumerator() -> Any {
-        return rlmResults
-
-    }
-
     // MARK: Collection Support
 
     /// The position of the first element in a non-empty collection.

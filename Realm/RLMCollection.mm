@@ -198,22 +198,17 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
     // new List each time
     if (info.rlmObjectSchema.isSwiftClass) {
         auto prop = info.rlmObjectSchema[key];
-        // Grab the actual class for the generic List from an instance of it
-        // so that we can make instances of the List without creating a new
-        // object accessor each time
-        Class cls = [object_getIvar(accessor, prop.swiftIvar) class];
-        RLMAccessorContext context(info);
-        if (prop && prop.collection && prop.swiftIvar) {
-            RLMGetCollectionType(prop, [&](auto type, auto objcType) {
-                for (size_t i = 0; i < count; ++i) {
-                    RLMSwiftCollectionBase *base = [[cls alloc] init];
-                    base._rlmCollection =
-                        RLMManagedCollectionFromCollection<std::decay_t<decltype(*type)>,
-                                                           std::decay_t<decltype(*objcType)>>
-                                                           (info, collection.get(i), prop);
-                    [array addObject:base];
-                }
-            });
+        if (prop.collection && prop.swiftAccessor) {
+            // Grab the actual class for the generic collection from an instance of it
+            // so that we can make instances of the collection without creating a new
+            // object accessor each time
+            Class cls = [[prop.swiftAccessor get:prop on:accessor] class];
+            for (size_t i = 0; i < count; ++i) {
+                RLMSwiftCollectionBase *base = [[cls alloc] init];
+                base._rlmCollection = [[[cls _backingCollectionType] alloc]
+                                       initWithParent:collection.get(i) property:prop parentInfo:info];
+                [array addObject:base];
+            }
             return array;
         }
     }
@@ -224,28 +219,6 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
         [array addObject:[accessor valueForKey:key] ?: NSNull.null];
     }
     return array;
-}
-
-template<typename Fn>
-void RLMGetCollectionType(RLMProperty *prop, Fn&& func) {
-    if (prop.array) {
-        func(((realm::List *)0), ((RLMManagedArray *)0));
-    }
-    else if (prop.set) {
-        func(((realm::object_store::Set *)0), ((RLMManagedSet *)0));
-    }
-    else {
-        REALM_UNREACHABLE();
-    }
-}
-
-template<typename Collection, typename ObjcCollection>
-id RLMManagedCollectionFromCollection(RLMClassInfo& info, realm::Obj&& obj, RLMProperty *prop) {
-    return [[ObjcCollection alloc] initWithBackingCollection:Collection(info.realm->_realm,
-                                                                        obj,
-                                                                        info.tableColumn(prop))
-                                                  parentInfo:&info
-                                                    property:prop];
 }
 
 template NSArray *RLMCollectionValueForKey(realm::Results&, NSString *, RLMClassInfo&);

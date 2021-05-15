@@ -27,9 +27,9 @@ import RealmTestSupport
 #endif
 
 class ListSyncTests: SwiftSyncTestCase {
-    private func roundTrip<T: _ManagedPropertyType>(keyPath: KeyPath<SwiftCollectionSyncObject, List<T>>,
-                                                    values: [T],
-                                                    partitionValue: String = #function) throws {
+    private func roundTrip<T>(keyPath: KeyPath<SwiftCollectionSyncObject, List<T>>,
+                              values: [T],
+                              partitionValue: String = #function) throws {
         let user = logInUser(for: basicCredentials(withName: partitionValue,
                                                    register: isParent))
         let realm = try openRealm(partitionValue: partitionValue, user: user)
@@ -208,13 +208,12 @@ class ListSyncTests: SwiftSyncTestCase {
 }
 
 class SetSyncTests: SwiftSyncTestCase {
-
     private typealias MutableSetKeyPath<T: RealmCollectionValue> = KeyPath<SwiftCollectionSyncObject, MutableSet<T>>
     private typealias MutableSetKeyValues<T: RealmCollectionValue> = (keyPath: MutableSetKeyPath<T>, values: [T])
 
-    private func roundTrip<T: _ManagedPropertyType>(set: MutableSetKeyValues<T>,
-                                                    otherSet: MutableSetKeyValues<T>,
-                                                    partitionValue: String = #function) throws {
+    private func roundTrip<T>(set: MutableSetKeyValues<T>,
+                              otherSet: MutableSetKeyValues<T>,
+                              partitionValue: String = #function) throws {
         let user = logInUser(for: basicCredentials(withName: partitionValue, register: isParent))
         let realm = try openRealm(partitionValue: partitionValue, user: user)
         if isParent {

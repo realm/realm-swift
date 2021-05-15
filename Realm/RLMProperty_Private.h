@@ -64,7 +64,6 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
 @interface RLMProperty () {
 @public
     RLMPropertyType _type;
-    Ivar _swiftIvar;
 }
 
 - (instancetype)initWithName:(NSString *)name
@@ -77,6 +76,9 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
                    linkPropertyDescriptor:(nullable RLMPropertyDescriptor *)linkPropertyDescriptor
                                  property:(objc_property_t)property
                                  instance:(RLMObjectBase *)objectInstance;
+
+- (instancetype)initWithName:(NSString *)name
+             createSelectors:(BOOL)createSelectors;
 
 - (void)updateAccessors;
 
@@ -100,8 +102,8 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
 // getter and setter names
 @property (nonatomic, copy) NSString *getterName;
 @property (nonatomic, copy) NSString *setterName;
-@property (nonatomic) SEL getterSel;
-@property (nonatomic) SEL setterSel;
+@property (nonatomic, nullable) SEL getterSel;
+@property (nonatomic, nullable) SEL setterSel;
 
 - (RLMProperty *)copyWithNewName:(NSString *)name;
 

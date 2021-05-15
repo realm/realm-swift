@@ -67,6 +67,11 @@
     return self;
 }
 
+- (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property {
+    _parentObject = parentObject;
+    _key = property.name;
+}
+
 #pragma mark - Convenience wrappers used for all RLMSet types
 
 - (void)addObjects:(id<NSFastEnumeration>)objects {

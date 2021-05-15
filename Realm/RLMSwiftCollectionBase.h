@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) id<RLMCollection> _rlmCollection;
 
 - (instancetype)init;
++ (Class)_backingCollectionType;
 - (instancetype)initWithCollection:(id<RLMCollection>)collection;
 @end
 

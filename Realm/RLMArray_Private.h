@@ -19,12 +19,19 @@
 #import <Realm/RLMArray.h>
 #import <Realm/RLMConstants.h>
 
+@class RLMObjectBase, RLMProperty;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMArray ()
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
+- (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
+@end
+
+@interface RLMManagedArray : RLMArray
+- (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 @end
 
 void RLMArrayValidateMatchingObjectType(RLMArray *array, id value);

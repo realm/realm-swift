@@ -90,6 +90,15 @@
                                   property:property];
 }
 
+- (RLMManagedSet *)initWithParent:(realm::Obj)parent
+                         property:(__unsafe_unretained RLMProperty *const)property
+                       parentInfo:(RLMClassInfo&)info {
+    auto col = info.tableColumn(property);
+    return [self initWithBackingCollection:realm::object_store::Set(info.realm->_realm, parent, col)
+                                parentInfo:&info
+                                  property:property];
+}
+
 void RLMValidateSetObservationKey(__unsafe_unretained NSString *const keyPath,
                                   __unsafe_unretained RLMSet *const set) {
     if (![keyPath isEqualToString:RLMInvalidatedKey]) {

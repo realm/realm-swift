@@ -268,7 +268,8 @@ build_docs() {
       --module "${module}" \
       --root-url "https://realm.io/docs/${language}/${version}/api/" \
       --output "docs/${language}_output" \
-      --head "$(cat docs/custom_head.html)"
+      --head "$(cat docs/custom_head.html)" \
+      --exclude 'RealmSwift/Impl/*'
 
     rm Realm/RLMPlatform.h
 }
