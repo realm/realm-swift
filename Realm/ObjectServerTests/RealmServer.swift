@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
+import Realm.Private
 import RealmSwift
 import XCTest
 
@@ -48,6 +49,108 @@ extension URLSession {
             return .failure(URLError(.cannotFindHost))
         }
         return result
+    }
+}
+
+private func bsonType(_ type: PropertyType) -> String {
+    switch type {
+    case .UUID: return "uuid"
+    case .any: return "mixed"
+    case .bool: return "bool"
+    case .data: return "binData"
+    case .date: return "date"
+    case .decimal128: return "decimal"
+    case .double: return "double"
+    case .float: return "float"
+    case .int: return "long"
+    case .object: return "object"
+    case .objectId: return "objectId"
+    case .string: return "string"
+    case .linkingObjects: return "linkingObjects"
+    }
+}
+
+private extension Property {
+    func stitchRule(_ schema: Schema) -> [String: Any] {
+        let type: String
+        if self.type == .object {
+            type = bsonType(schema[objectClassName!]!.primaryKeyProperty!.type)
+        } else {
+            type = bsonType(self.type)
+        }
+
+        if isArray {
+            return [
+                "bsonType": "array",
+                "items": [
+                    "bsonType": type
+                ]
+            ]
+        }
+        if isSet {
+            return [
+                "bsonType": "array",
+                "uniqueItems": true,
+                "items": [
+                    "bsonType": type
+                ]
+            ]
+        }
+
+        return [
+            "bsonType": type
+        ]
+    }
+}
+
+private extension ObjectSchema {
+    func stitchRule(_ partitionKeyType: String, _ schema: Schema, id: String? = nil) -> [String: Any] {
+        var stitchProperties: [String: Any] = [
+            "realm_id": [
+                "bsonType": "\(partitionKeyType)"
+            ]
+        ]
+        var relationships: [String: Any] = [:]
+
+        // First pass we only create the primary key property as we can't add
+        // links until the targets of the links exist
+        if id == nil {
+            let pk = primaryKeyProperty!
+            stitchProperties[pk.name] = pk.stitchRule(schema)
+        } else {
+            for property in properties {
+                stitchProperties[property.name] = property.stitchRule(schema)
+
+                if property.type == .object {
+                    relationships[property.name] = [
+                        "ref": "#/relationship/mongodb1/test_data/\(property.objectClassName!)",
+                        "foreign_key": "_id",
+                        "is_list": property.isArray || property.isSet
+                    ]
+                }
+            }
+        }
+
+        return [
+            "_id": id as Any,
+            "database": "test_data",
+            "collection": "\(className)",
+            "roles": [[
+                "name": "default",
+                "apply_when": [:],
+                "insert": true,
+                "delete": true,
+                "additional_fields": [:]
+            ]],
+            "schema": [
+                "properties": stitchProperties,
+                // The server currently only supports non-optional collections
+                // but requires them to be marked as optional
+                "required": properties.compactMap { $0.isOptional || $0.type == .any || $0.isArray || $0.isSet ? nil : $0.name },
+                "title": "\(className)"
+            ],
+            "relationships": relationships
+        ]
     }
 }
 
@@ -591,358 +694,32 @@ public class RealmServer: NSObject {
             throw URLError(.badServerResponse)
         }
 
-        let dogRule: [String: Any] = [
-            "database": "test_data",
-            "collection": "Dog",
-            "roles": [[
-                "name": "default",
-                "apply_when": [:],
-                "insert": true,
-                "delete": true,
-                "additional_fields": [:]
-            ]],
-            "schema": [
-                "properties": [
-                    "_id": [
-                        "bsonType": "objectId"
-                    ],
-                    "breed": [
-                        "bsonType": "string"
-                    ],
-                    "name": [
-                        "bsonType": "string"
-                    ],
-                    "realm_id": [
-                        "bsonType": "\(bsonType)"
-                    ]
-                ],
-                "required": ["name"],
-                "title": "Dog"
-            ]
-        ]
-
-        let personRule: [String: Any] = [
-            "database": "test_data",
-            "collection": "Person",
-            "relationships": [:],
-            "roles": [[
-                "name": "default",
-                "apply_when": [:],
-                "write": true,
-                "insert": true,
-                "delete": true,
-                "additional_fields": [:]
-            ]],
-            "schema": [
-                "properties": [
-                    "_id": [
-                        "bsonType": "objectId"
-                    ],
-                    "age": [
-                        "bsonType": "int"
-                    ],
-                    "firstName": [
-                        "bsonType": "string"
-                    ],
-                    "lastName": [
-                        "bsonType": "string"
-                    ],
-                    "realm_id": [
-                        "bsonType": "\(bsonType)"
-                    ]
-                ],
-                "required": [
-                    "firstName",
-                    "lastName",
-                    "age"
-                ],
-                "title": "Person"
-            ]
-        ]
-
-        let hugeSyncObjectRule: [String: Any] = [
-            "database": "test_data",
-            "collection": "HugeSyncObject",
-            "roles": [[
-                "name": "default",
-                "apply_when": [:],
-                "insert": true,
-                "delete": true,
-                "additional_fields": [:]
-            ]],
-            "schema": [
-                "properties": [
-                    "_id": [
-                        "bsonType": "objectId"
-                    ],
-                    "dataProp": [
-                        "bsonType": "binData"
-                    ],
-                    "realm_id": [
-                        "bsonType": "\(bsonType)"
-                    ]
-                ],
-                "required": [],
-                "title": "HugeSyncObject"
-            ],
-            "relationships": [:]
-        ]
-
-        let uuidPrimaryKeyObjectRule: [String: Any] = [
-            "database": "test_data",
-            "collection": "UUIDPrimaryKeyObject",
-            "roles": [[
-                "name": "default",
-                "apply_when": [:],
-                "insert": true,
-                "delete": true,
-                "additional_fields": [:]
-            ]],
-            "schema": [
-                "properties": [
-                    "_id": [
-                        "bsonType": "uuid"
-                    ],
-                    "strCol": [
-                        "bsonType": "string"
-                    ],
-                    "intCol": [
-                        "bsonType": "int"
-                    ],
-                    "realm_id": [
-                        "bsonType": "\(bsonType)"
-                    ]
-                ],
-                "required": [
-                    "strCol",
-                    "intCol"
-                ],
-                "title": "UUIDPrimaryKeyObject"
-            ],
-            "relationships": [:]
-        ]
-
-        let stringPrimaryKeyObjectRule: [String: Any] = [
-            "database": "test_data",
-            "collection": "StringPrimaryKeyObject",
-            "roles": [[
-                "name": "default",
-                "apply_when": [:],
-                "insert": true,
-                "delete": true,
-                "additional_fields": [:]
-            ]],
-            "schema": [
-                "properties": [
-                    "_id": [
-                        "bsonType": "string"
-                    ],
-                    "strCol": [
-                        "bsonType": "string"
-                    ],
-                    "intCol": [
-                        "bsonType": "int"
-                    ],
-                    "realm_id": [
-                        "bsonType": "\(bsonType)"
-                    ]
-                ],
-                "required": [
-                    "strCol",
-                    "intCol"
-                ],
-                "title": "StringPrimaryKeyObject"
-            ],
-            "relationships": [:]
-        ]
-
-        let intPrimaryKeyObjectRule: [String: Any] = [
-            "database": "test_data",
-            "collection": "IntPrimaryKeyObject",
-            "roles": [[
-                "name": "default",
-                "apply_when": [:],
-                "insert": true,
-                "delete": true,
-                "additional_fields": [:]
-            ]],
-            "schema": [
-                "properties": [
-                    "_id": [
-                        "bsonType": "int"
-                    ],
-                    "strCol": [
-                        "bsonType": "string"
-                    ],
-                    "intCol": [
-                        "bsonType": "int"
-                    ],
-                    "realm_id": [
-                        "bsonType": "\(bsonType)"
-                    ]
-                ],
-                "required": [
-                    "_id",
-                    "strCol",
-                    "intCol"
-                ],
-                "title": "IntPrimaryKeyObject"
-            ],
-            "relationships": [:]
-        ]
-
-        let swiftPerson: [String: Any] = [
-            "database": "test_data",
-            "collection": "SwiftPerson",
-            "roles": [[
-                "name": "default",
-                "apply_when": [:],
-                "insert": true,
-                "delete": true,
-                "additional_fields": [:]
-            ]],
-            "schema": [
-                "properties": [
-                    "_id": [
-                        "bsonType": "objectId"
-                    ],
-                    "age": [
-                        "bsonType": "int"
-                    ],
-                    "firstName": [
-                        "bsonType": "string"
-                    ],
-                    "lastName": [
-                        "bsonType": "string"
-                    ],
-                    "realm_id": [
-                        "bsonType": "\(bsonType)"
-                    ]
-                ],
-                "required": [
-                    "firstName",
-                    "lastName",
-                    "age"
-                ],
-                "title": "SwiftPerson"
-            ],
-            "relationships": [:]
-        ]
-
-        let swiftUUIDPrimaryKeyObjectRule: [String: Any] = [
-            "database": "test_data",
-            "collection": "SwiftUUIDPrimaryKeyObject",
-            "roles": [[
-                "name": "default",
-                "apply_when": [:],
-                "insert": true,
-                "delete": true,
-                "additional_fields": [:]
-            ]],
-            "schema": [
-                "properties": [
-                    "_id": [
-                        "bsonType": "uuid"
-                    ],
-                    "strCol": [
-                        "bsonType": "string"
-                    ],
-                    "intCol": [
-                        "bsonType": "int"
-                    ],
-                    "realm_id": [
-                        "bsonType": "\(bsonType)"
-                    ]
-                ],
-                "required": [
-                    "strCol",
-                    "intCol"
-                ],
-                "title": "SwiftUUIDPrimaryKeyObject"
-            ],
-            "relationships": [:]
-        ]
-
-        let swiftStringPrimaryKeyObjectRule: [String: Any] = [
-            "database": "test_data",
-            "collection": "SwiftStringPrimaryKeyObject",
-            "roles": [[
-                "name": "default",
-                "apply_when": [:],
-                "insert": true,
-                "delete": true,
-                "additional_fields": [:]
-            ]],
-            "schema": [
-                "properties": [
-                    "_id": [
-                        "bsonType": "string"
-                    ],
-                    "strCol": [
-                        "bsonType": "string"
-                    ],
-                    "intCol": [
-                        "bsonType": "int"
-                    ],
-                    "realm_id": [
-                        "bsonType": "\(bsonType)"
-                    ]
-                ],
-                "required": [
-                    "strCol",
-                    "intCol"
-                ],
-                "title": "SwiftStringPrimaryKeyObject"
-            ],
-            "relationships": [:]
-        ]
-
-        let swiftIntPrimaryKeyObjectRule: [String: Any] = [
-            "database": "test_data",
-            "collection": "SwiftIntPrimaryKeyObject",
-            "roles": [[
-                "name": "default",
-                "apply_when": [:],
-                "insert": true,
-                "delete": true,
-                "additional_fields": [:]
-            ]],
-            "schema": [
-                "properties": [
-                    "_id": [
-                        "bsonType": "int"
-                    ],
-                    "strCol": [
-                        "bsonType": "string"
-                    ],
-                    "intCol": [
-                        "bsonType": "int"
-                    ],
-                    "realm_id": [
-                        "bsonType": "\(bsonType)"
-                    ]
-                ],
-                "required": [
-                    "_id",
-                    "strCol",
-                    "intCol"
-                ],
-                "title": "SwiftIntPrimaryKeyObject"
-            ],
-            "relationships": [:]
-        ]
-
         let rules = app.services[serviceId].rules
-        rules.post(on: group, dogRule, failOnError)
-        rules.post(on: group, personRule, failOnError)
-        rules.post(on: group, hugeSyncObjectRule, failOnError)
-        rules.post(on: group, uuidPrimaryKeyObjectRule, failOnError)
-        rules.post(on: group, stringPrimaryKeyObjectRule, failOnError)
-        rules.post(on: group, intPrimaryKeyObjectRule, failOnError)
-        rules.post(on: group, swiftPerson, failOnError)
-        rules.post(on: group, swiftUUIDPrimaryKeyObjectRule, failOnError)
-        rules.post(on: group, swiftStringPrimaryKeyObjectRule, failOnError)
-        rules.post(on: group, swiftIntPrimaryKeyObjectRule, failOnError)
+
+        // Creating the rules is a two-step process where we first add all the
+        // rules and then add properties to them so that we can add relationships
+        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
+        let syncTypes = schema.objectSchema.filter {
+            guard let pk = $0.primaryKeyProperty else { return false }
+            return pk.name == "_id"
+        }
+        var ruleCreations = [Result<Any?, Error>]()
+        for objectSchema in syncTypes {
+            ruleCreations.append(rules.post(objectSchema.stitchRule(bsonType, schema)))
+        }
+
+        var ruleIds: [String: String] = [:]
+        for result in ruleCreations {
+            guard case .success(let data) = result else {
+                fatalError("Failed to create rule: \(result)")
+            }
+            let dict = (data as! [String: String])
+            ruleIds[dict["collection"]!] = dict["_id"]!
+        }
+        for objectSchema in syncTypes {
+            let id = ruleIds[objectSchema.className]!
+            rules[id].put(on: group, data: objectSchema.stitchRule(bsonType, schema, id: id), failOnError)
+        }
 
         app.sync.config.put(on: group, data: [
             "development_mode_enabled": true
