@@ -22,7 +22,7 @@ import Realm
 /**
  A homogenous key-value collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
 */
-public protocol RealmKeyedCollection: _RealmCollectionEnumerator, ThreadConfined, Sequence {
+public protocol RealmKeyedCollection: RealmCollectionBase, Sequence {
     associatedtype Key: MapKeyType
     associatedtype Value: RealmCollectionValue
 
@@ -258,7 +258,7 @@ public protocol RealmKeyedCollection: _RealmCollectionEnumerator, ThreadConfined
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     func observe(on queue: DispatchQueue?,
-                        _ block: @escaping (RealmDictionaryChange<AnyMap<Key, Value>>) -> Void)
+                        _ block: @escaping (RealmDictionaryChange<Self>) -> Void)
         -> NotificationToken
 
     /// :nodoc:
@@ -296,6 +296,93 @@ public protocol RealmKeyedCollection: _RealmCollectionEnumerator, ThreadConfined
     func thaw() -> Self?
 }
 
+public extension RealmKeyedCollection where Value: MinMaxType {
+    /**
+     Returns the minimum (lowest) value of the collection, or `nil` if the collection is empty.
+     */
+    func min() -> Value? {
+        return min(ofProperty: "self")
+    }
+    /**
+     Returns the maximum (highest) value of the collection, or `nil` if the collection is empty.
+     */
+    func max() -> Value? {
+        return max(ofProperty: "self")
+    }
+}
+
+public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapped: MinMaxType {
+    /**
+     Returns the minimum (lowest) value of the collection, or `nil` if the collection is empty.
+     */
+    func min() -> Value.Wrapped? {
+        return min(ofProperty: "self")
+    }
+    /**
+     Returns the maximum (highest) value of the collection, or `nil` if the collection is empty.
+     */
+    func max() -> Value.Wrapped? {
+        return max(ofProperty: "self")
+    }
+}
+
+public extension RealmKeyedCollection where Value: AddableType {
+    /**
+     Returns the sum of the values in the collection, or `nil` if the collection is empty.
+     */
+    func sum() -> Value {
+        return sum(ofProperty: "self")
+    }
+    /**
+     Returns the average of all of the values in the collection.
+     */
+    func average<T: AddableType>() -> T? {
+        return average(ofProperty: "self")
+    }
+}
+
+public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapped: AddableType {
+    /**
+     Returns the sum of the values in the collection, or `nil` if the collection is empty.
+     */
+    func sum() -> Value.Wrapped {
+        return sum(ofProperty: "self")
+    }
+    /**
+     Returns the average of all of the values in the collection.
+     */
+    func average<T: AddableType>() -> T? {
+        return average(ofProperty: "self")
+    }
+}
+
+public extension RealmKeyedCollection where Value: Comparable {
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     Objects are sorted based on their values. For example, to sort a collection of `Date`s from
+     neweset to oldest based, you might call `dates.sorted(ascending: true)`.
+
+     - parameter ascending: The direction to sort in.
+     */
+    func sorted(ascending: Bool = true) -> Results<Value> {
+        return sorted(byKeyPath: "self", ascending: ascending)
+    }
+}
+
+public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapped: Comparable {
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     Objects are sorted based on their values. For example, to sort a collection of `Date`s from
+     neweset to oldest based, you might call `dates.sorted(ascending: true)`.
+
+     - parameter ascending: The direction to sort in.
+     */
+    func sorted(ascending: Bool = true) -> Results<Value> {
+        return sorted(byKeyPath: "self", ascending: ascending)
+    }
+}
 
 /// :nodoc:
 private class _AnyMapBase<Key: MapKeyType, Value: RealmCollectionValue>: AssistedObjectiveCBridgeable {
@@ -327,8 +414,6 @@ private class _AnyMapBase<Key: MapKeyType, Value: RealmCollectionValue>: Assiste
     func max<T: MinMaxType>(ofProperty property: String) -> T? { fatalError() }
     func sum<T: AddableType>(ofProperty property: String) -> T { fatalError() }
     func average<T: AddableType>(ofProperty property: String) -> T? { fatalError() }
-    func observe(on queue: DispatchQueue?, _ block: @escaping (RealmDictionaryChange<Wrapper>) -> Void)
-        -> NotificationToken { fatalError() }
     func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmDictionaryChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
     var isFrozen: Bool { fatalError() }
@@ -397,8 +482,6 @@ private final class _AnyMap<C: RealmKeyedCollection>: _AnyMapBase<C.Key, C.Value
 
     // MARK: Notifications
 
-    override func observe(on queue: DispatchQueue?, _ block: @escaping (RealmDictionaryChange<Wrapper>) -> Void)
-        -> NotificationToken { base.observe(on: queue, block) }
     override func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmDictionaryChange<Wrapper>) -> Void)
         -> NotificationToken { base._observe(queue, block) }
     override var isFrozen: Bool { base.isFrozen }
@@ -431,7 +514,6 @@ private final class _AnyMap<C: RealmKeyedCollection>: _AnyMapBase<C.Key, C.Value
  Instances of `RealmKeyedCollection` forward operations to an opaque underlying collection having the same `Key`, `Value` type.
  */
 public struct AnyMap<Key: MapKeyType, Value: RealmCollectionValue>: RealmKeyedCollection {
-
     /// The type of the objects contained in the collection.
     fileprivate let base: _AnyMapBase<Key, Value>
 
@@ -682,7 +764,7 @@ public struct AnyMap<Key: MapKeyType, Value: RealmCollectionValue>: RealmKeyedCo
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     public func observe(on queue: DispatchQueue?, _ block: @escaping (RealmDictionaryChange<Wrapper>) -> Void)
-        -> NotificationToken { base.observe(on: queue, block) }
+    -> NotificationToken { base._observe(queue, block) }
 
     /// :nodoc:
     // swiftlint:disable:next identifier_name

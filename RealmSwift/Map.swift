@@ -377,7 +377,7 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     public func observe(on queue: DispatchQueue?,
-                        _ block: @escaping (RealmDictionaryChange<AnyMap<Key, Value>>) -> Void)
+                        _ block: @escaping (RealmDictionaryChange<Map>) -> Void)
     -> NotificationToken {
         return rlmDictionary.addNotificationBlock(wrapDictionaryObserveBlock(block), queue: queue)
     }
@@ -519,7 +519,8 @@ extension Map: Sequence {
  A `RealmDictionaryChange` value encapsulates information about changes to dictionaries
  that are reported by Realm notifications.
  */
-@frozen public enum RealmDictionaryChange<Collection> where Collection: RealmKeyedCollection {
+@frozen public enum RealmDictionaryChange<Collection: RealmKeyedCollection> {
+
     /**
      `.initial` indicates that the initial run of the query has completed (if
      applicable), and the collection can now be used without performing any
