@@ -256,6 +256,15 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     }
     /**
      Initialize a RealmState struct for a given thread confined type.
+     - parameter wrappedValue The Map reference to wrap and observe.
+     */
+    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+    public init<Key, Value>(wrappedValue: T) where T == Map<Key, Value> {
+        self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
+        defaultValue = T()
+    }
+    /**
+     Initialize a RealmState struct for a given thread confined type.
      - parameter wrappedValue The ObjectBase reference to wrap and observe.
      */
     @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
@@ -423,6 +432,8 @@ extension Binding where Value: ObjectBase & ThreadConfined {
     }
 }
 
+// MARK: - BoundCollection
+
 /// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public protocol BoundCollection {
@@ -504,6 +515,69 @@ public extension BoundCollection where Value: RealmCollection {
 }
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension Binding: BoundCollection where Value: RealmCollection {
+}
+
+// MARK: - BoundMap
+
+/// :nodoc:
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public protocol BoundMap {
+    /// :nodoc:
+    associatedtype Value
+
+    /// :nodoc:
+    var wrappedValue: Value { get }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension BoundMap where Value: RealmKeyedCollection {
+    typealias Key = Value.Key
+    typealias Element = Value.Value
+
+    // The compiler will not allow us to assign values by subscript as the binding is a get-only
+    // property. To get around this we need an explicit `set` method.
+    /// :nodoc:
+    subscript( key: Key) -> Element? {
+        get {
+            self.wrappedValue[key]
+        }
+    }
+
+    /// :nodoc:
+    func set<K, V>(object: Element?, for key: Key) where Element: ObjectBase & ThreadConfined, Value == Map<K, V> {
+        // If the value is `nil` remove it from the map.
+        guard let value = object else {
+            safeWrite(self.wrappedValue) { map in
+                map.removeObject(for: key)
+            }
+            return
+        }
+        // if the value is unmanaged but the map is managed, we are adding this value to the realm
+        if value.realm == nil && self.wrappedValue.realm != nil {
+            SwiftUIKVO.observedObjects[value]?.cancel()
+        }
+        safeWrite(self.wrappedValue) { map in
+            map[key] = value
+        }
+    }
+
+    /// :nodoc:
+    func set<K, V>(object: Element?, for key: Key) where Value == Map<K, V> {
+        // If the value is `nil` remove it from the map.
+        guard let value = object else {
+            safeWrite(self.wrappedValue) { map in
+                map.removeObject(for: key)
+            }
+            return
+        }
+        safeWrite(self.wrappedValue) { map in
+            map[key] = value
+        }
+    }
+}
+
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+extension Binding: BoundMap where Value: RealmKeyedCollection {
 }
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
