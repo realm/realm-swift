@@ -18,31 +18,60 @@
 
 import Realm
 
+private func isSameCollection(_ lhs: RLMCollection, _ rhs: Any) -> Bool {
+    // Managed isEqual checks if they're backed by the same core field, so it does exactly what we need
+    if lhs.realm != nil {
+        return lhs.isEqual(rhs)
+    }
+    // For unmanaged we want to check if the backing collection is the same instance
+    if let rhs = rhs as? RLMSwiftCollectionBase {
+        return lhs === rhs._rlmCollection
+    }
+    return lhs === rhs as AnyObject
+}
+
 internal protocol MutableRealmCollection {
     func removeAll()
     func add(_ obj: AnyObject)
+    var _rlmCollection: RLMCollection { get }
+
+    // Unmanaged collection properties need a reference to their parent object for
+    // KVO to work because the mutation is done via the collection object but the
+    // observation is on the parent.
+    func setParent(_ object: RLMObjectBase, _ property: RLMProperty)
 }
-internal protocol MutableMapRealmCollection {
-    func removeAll()
-    func add(key: AnyObject, value: AnyObject)
-}
+
 extension List: MutableRealmCollection {
     func add(_ obj: AnyObject) {
         rlmArray.add(obj)
     }
+    func setParent(_ object: RLMObjectBase, _ property: RLMProperty) {
+        rlmArray.setParent(object, property: property)
+    }
 }
+
 extension MutableSet: MutableRealmCollection {
     func add(_ obj: AnyObject) {
         rlmSet.add(obj)
     }
+    func setParent(_ object: RLMObjectBase, _ property: RLMProperty) {
+        rlmSet.setParent(object, property: property)
+    }
 }
+
+internal protocol MutableMapRealmCollection {
+    func removeAll()
+    func add(key: AnyObject, value: AnyObject)
+}
+
 extension Map: MutableMapRealmCollection {
     func add(key: AnyObject, value: AnyObject) {
         rlmDictionary.setObject(value, forKey: key as AnyObject)
     }
 }
 
-internal func assign<C: MutableRealmCollection>(value: Any, to collection: C) {
+internal func assign(value: Any, to collection: MutableRealmCollection) {
+    guard !isSameCollection(collection._rlmCollection, value) else { return }
     collection.removeAll()
     if let enumeration = value as? NSFastEnumeration {
         var iterator = NSFastEnumerationIterator(enumeration)

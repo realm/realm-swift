@@ -112,18 +112,6 @@ internal class LinkingObjectsAccessor<Element: ObjectBase>: RLMManagedPropertyAc
     }
 }
 
-private func isNull(_ value: Any) -> Bool {
-    // nil in Any is bridged to obj-c as NSNull. In the obj-c code we usually
-    // convert NSNull back to nil, which ends up as Optional<Any>.none
-    if value is NSNull {
-        return true
-    }
-    if case Optional<Any>.none = value {
-        return true
-    }
-    return false
-}
-
 @available(*, deprecated)
 internal class RealmOptionalAccessor<Value: RealmOptionalType>: RLMManagedPropertyAccessor {
     private static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> RealmOptional<Value> {
@@ -150,7 +138,7 @@ internal class RealmOptionalAccessor<Value: RealmOptionalType>: RLMManagedProper
 
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
         let bridged: Value?
-        if isNull(value) {
+        if coerceToNil(value) == nil {
             bridged = nil
         } else if let value = value as? Value {
             bridged = value
@@ -227,7 +215,9 @@ internal class ManagedPropertyAccessor<T: _ManagedPropertyType>: RLMManagedPrope
 
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
         let bridged: T
-        if let type = T.self as? CustomObjectiveCBridgeable.Type {
+        if let value = value as? T {
+            bridged = value
+        } else if let type = T.self as? CustomObjectiveCBridgeable.Type {
             bridged = type.bridging(objCValue: value) as! T
         } else {
             bridged = value as! T
@@ -242,9 +232,13 @@ internal class ManagedListAccessor<Element: _ManagedPropertyType>: ManagedProper
         assign(value: value, to: bound(property, parent).pointee.get(parent))
     }
     @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
-        // Promote existing List rather than create a new one as the default
-        // initialize implementation would do
-        bound(property, parent).pointee.get(parent)._rlmCollection = RLMGetSwiftPropertyArray(parent, PropertyKey(property.index))
+        // If we're promoting an unmanaged object which already has a List
+        // initialized, we want to promote that existing List rather than
+        // create a new one
+        let key = PropertyKey(property.index)
+        if let existing = bound(property, parent).pointee.initialize(parent, key: key) {
+            existing._rlmCollection = RLMGetSwiftPropertyArray(parent, key)
+        }
     }
 }
 
@@ -254,7 +248,13 @@ internal class ManagedSetAccessor<Element: _ManagedPropertyType>: ManagedPropert
         assign(value: value, to: bound(property, parent).pointee.get(parent))
     }
     @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
-        bound(property, parent).pointee.get(parent)._rlmCollection = RLMGetSwiftPropertySet(parent, PropertyKey(property.index))
+        // If we're promoting an unmanaged object which already has a MutableSet
+        // initialized, we want to promote that existing MutableSet rather than
+        // create a new one
+        let key = PropertyKey(property.index)
+        if let existing = bound(property, parent).pointee.initialize(parent, key: key) {
+            existing._rlmCollection = RLMGetSwiftPropertyArray(parent, key)
+        }
     }
 }
 

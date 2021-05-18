@@ -184,7 +184,7 @@ extension Object: RealmCollectionValue {
     /// Returns or sets the value of the property with the given name.
     @objc open subscript(key: String) -> Any? {
         get {
-            dynamicGet(object: self, key: key)
+            RLMDynamicGetByName(self, key)
         }
         set {
             dynamicSet(object: self, key: key, value: newValue)
@@ -254,8 +254,8 @@ extension Object: RealmCollectionValue {
         if let dynamic = self as? DynamicObject {
             return dynamic[propertyName] as! List<DynamicObject>
         }
-        return noWarnUnsafeBitCast(dynamicGet(object: self, key: propertyName) as! RLMSwiftCollectionBase,
-                                   to: List<DynamicObject>.self)
+        let list = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
+        return List<DynamicObject>(objc: list._rlmCollection as! RLMArray<AnyObject>)
     }
 
     // MARK: Dynamic set
@@ -277,8 +277,8 @@ extension Object: RealmCollectionValue {
         if let dynamic = self as? DynamicObject {
             return dynamic[propertyName] as! MutableSet<DynamicObject>
         }
-        return noWarnUnsafeBitCast(dynamicGet(object: self, key: propertyName) as! RLMSwiftCollectionBase,
-                                   to: MutableSet<DynamicObject>.self)
+        let set = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
+        return MutableSet<DynamicObject>(objc: set._rlmCollection as! RLMSet<AnyObject>)
     }
 
     // MARK: Dynamic map
@@ -300,8 +300,8 @@ extension Object: RealmCollectionValue {
         if let dynamic = self as? DynamicObject {
             return dynamic[propertyName] as! Map<Key, DynamicObject>
         }
-        return noWarnUnsafeBitCast(dynamicGet(object: self, key: propertyName) as! RLMSwiftCollectionBase,
-                                   to: Map<Key, DynamicObject>.self)
+        let base = RLMDynamicGetByName(self, propertyName) as! RLMSwiftCollectionBase
+        return Map<Key, DynamicObject>(objc: base._rlmCollection as! RLMDictionary<AnyObject, AnyObject>)
     }
 
     // MARK: Comparison
@@ -420,7 +420,7 @@ extension Object: ThreadConfined {
 public final class DynamicObject: Object {
     public override subscript(key: String) -> Any? {
         get {
-            let value = RLMDynamicGetByName(self, key)
+            let value = RLMDynamicGetByName(self, key).flatMap(coerceToNil)
             if let array = value as? RLMArray<AnyObject> {
                 return List<DynamicObject>(objc: array)
             }
@@ -506,21 +506,6 @@ public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSc
         RawValue._rlmPopulateProperty(prop)
     }
     static var _rlmType: PropertyType { RawValue._rlmType }
-}
-
-internal func dynamicGet(object: ObjectBase, key: String) -> Any? {
-    let objectSchema = RLMObjectBaseObjectSchema(object)!
-    guard let prop = objectSchema[key] else {
-        throwRealmException("Invalid property name '\(key) for class \(objectSchema.className)")
-    }
-    if let accessor = prop.swiftAccessor {
-        let value = accessor.get(prop, on: object)
-        return value is NSNull ? nil : value
-    }
-    if RLMObjectBaseRealm(object) == nil {
-        return object.value(forKey: key)
-    }
-    return RLMDynamicGet(object, prop)
 }
 
 internal func dynamicSet(object: ObjectBase, key: String, value: Any?) {

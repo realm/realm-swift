@@ -35,11 +35,8 @@ import Realm
         if next is NSNull {
             return Element._nilValue()
         }
-        if let next = next as? Object? {
-            if next == nil {
-                return nil as Element?
-            }
-            return unsafeBitCast(next, to: Optional<Element>.self)
+        if case Optional<Any>.none = next {
+            return nil
         }
         return dynamicBridgeCast(fromObjectiveC: next as Any)
     }

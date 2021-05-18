@@ -95,7 +95,7 @@ extension List: _ManagedPropertyType, _DefaultConstructible where Element: _Mana
     }
 
     public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
-        return Self(objc: RLMGetSwiftPropertyArray(obj, key))
+        fatalError("List properties cannot be optional")
     }
 
     public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: List) {
@@ -127,7 +127,7 @@ extension MutableSet: _ManagedPropertyType, _DefaultConstructible where Element:
     }
 
     public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
-        return Self(objc: RLMGetSwiftPropertySet(obj, key))
+        fatalError("Set properties cannot be optional")
     }
 
     public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: MutableSet) {
@@ -182,6 +182,9 @@ extension LinkingObjects: _RealmSchemaDiscoverable {
         prop.array = true
         prop.objectClassName = Element.className()
         prop.swiftAccessor = LinkingObjectsAccessor<Element>.self
+        if prop.linkOriginPropertyName == nil {
+            throwRealmException("LinkingObjects<\(prop.objectClassName!)> property '\(prop.name)' must set the origin property name with @Managed(originProperty: \"name\").")
+        }
     }
     public func _rlmPopulateProperty(_ prop: RLMProperty) {
         prop.linkOriginPropertyName = self.propertyName

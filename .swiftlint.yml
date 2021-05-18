@@ -19,6 +19,7 @@ identifier_name:
     - _observe(_:)
     - _realmColumnNames()
     - _realmObjectName()
+    - _rlmCollection
     - _rlmCollection()
     - _rlmDefaultValue()
     - _rlmFromRawValue(_:)

@@ -75,6 +75,18 @@ extension ObjectBase {
     }
 }
 
+internal func coerceToNil(_ value: Any) -> Any? {
+    if value is NSNull {
+        return nil
+    }
+    // nil in Any is bridged to obj-c as NSNull. In the obj-c code we usually
+    // convert NSNull back to nil, which ends up as Optional<Any>.none
+    if case Optional<Any>.none = value {
+        return nil
+    }
+    return value
+}
+
 // MARK: CustomObjectiveCBridgeable
 
 /// :nodoc:
@@ -171,6 +183,9 @@ extension Decimal128: CustomObjectiveCBridgeable {
         if let number = objCValue as? NSNumber {
             return Decimal128(number: number)
         }
+        if let str = objCValue as? String {
+            return (try? Decimal128(string: str)) ?? Decimal128("nan")
+        }
         return objCValue as! Decimal128
     }
     var objCValue: Any {
@@ -182,7 +197,7 @@ extension AnyRealmValue: CustomObjectiveCBridgeable {
         if let any = objCValue as? RLMValue {
             return ObjectiveCSupport.convert(value: any)
         }
-        throwRealmException("objCValue is not bridgable to AnyRealmValue")
+        throwRealmException("objCValue is not bridgeable to AnyRealmValue")
     }
     var objCValue: Any {
         return ObjectiveCSupport.convert(value: self) ?? NSNull()

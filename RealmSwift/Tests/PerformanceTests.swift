@@ -512,105 +512,252 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 
-    func testValueForKeyForListObjects() {
+    // MARK: - Legacy object creation helpers
+
+    func createObjects<T: Object>(_ type: T.Type, _ create: (T, Int) -> Void) -> Realm {
         let realm = try! Realm()
         try! realm.write {
             for value in 0..<10000 {
-                let listObject = SwiftListOfSwiftObject()
-                let object = SwiftObject()
-                object.intCol = value
-                object.stringCol = String(value)
-                listObject.array.append(object)
-                realm.add(listObject)
+                let obj = T()
+                create(obj, value)
+                realm.add(obj)
             }
         }
-        let objects = realm.objects(SwiftListOfSwiftObject.self)
+        return realm
+    }
+
+    func createSwiftListObjects() -> Realm {
+        return createObjects(SwiftListOfSwiftObject.self) { (listObject, value) in
+            let object = SwiftObject()
+            object.intCol = value
+            object.stringCol = String(value)
+            listObject.array.append(object)
+        }
+    }
+
+    func createSwiftMutableSetObjects() -> Realm {
+        return createObjects(SwiftMutableSetOfSwiftObject.self) { (setObject, value) in
+            let object = SwiftObject()
+            object.intCol = value
+            object.stringCol = String(value)
+            setObject.set.insert(object)
+        }
+    }
+
+    func createIntSwiftObjects() -> Realm {
+        return createObjects(SwiftObject.self) { (object, value) in
+            object.intCol = value
+        }
+    }
+
+    func createStringSwiftObjects() -> Realm {
+        return createObjects(SwiftObject.self) { (object, value) in
+            object.stringCol = String(value)
+        }
+    }
+
+    func createOptionalIntObjects() -> Realm {
+        return createObjects(SwiftOptionalObject.self) { (object, value) in
+            object.optIntCol.value = value
+        }
+    }
+
+    func createOptionalStringObjects() -> Realm {
+        return createObjects(SwiftOptionalObject.self) { (object, value) in
+            object.optStringCol = String(value)
+        }
+    }
+
+
+    // MARK: - Legacy value(forKey:) vs. loop
+
+    func testLegacyListObjectsMap() {
+        let objects = createSwiftListObjects().objects(SwiftListOfSwiftObject.self)
+        measure {
+            _ = Array(objects.map { $0.array })
+        }
+    }
+
+    func testLegacyListObjectsValueForKey() {
+        let objects = createSwiftListObjects().objects(SwiftListOfSwiftObject.self)
         measure {
             _ = objects.value(forKeyPath: "array") as! [List<SwiftListOfSwiftObject>]
         }
     }
 
-    func testValueForKeyForMutableSetObjects() {
-        let realm = try! Realm()
-        try! realm.write {
-            for value in 0..<10000 {
-                let setObject = SwiftMutableSetOfSwiftObject()
-                let object = SwiftObject()
-                object.intCol = value
-                object.stringCol = String(value)
-                setObject.set.insert(object)
-                realm.add(setObject)
-            }
+    func testLegacyMutableSetObjectsMap() {
+        let objects = createSwiftMutableSetObjects().objects(SwiftMutableSetOfSwiftObject.self)
+        measure {
+            _ = Array(objects.map { $0.set })
         }
-        let objects = realm.objects(SwiftMutableSetOfSwiftObject.self)
+    }
+
+    func testLegacyMutableSetObjectsValueForKey() {
+        let objects = createSwiftMutableSetObjects().objects(SwiftMutableSetOfSwiftObject.self)
         measure {
             _ = objects.value(forKeyPath: "set") as! [MutableSet<SwiftMutableSetOfSwiftObject>]
         }
     }
 
-    func testValueForKeyForIntObjects() {
-        let realm = try! Realm()
-        try! realm.write {
-            for value in 0..<10000 {
-                autoreleasepool {
-                    let object = SwiftObject()
-                    object.intCol = value
-                    realm.add(object)
-                }
-            }
+    func testLegacyIntObjectsMap() {
+        let objects = createIntSwiftObjects().objects(SwiftObject.self)
+        measure {
+            _ = Array(objects.map { $0.intCol })
         }
-        let objects = realm.objects(SwiftObject.self)
+    }
+
+    func testLegacyIntObjectsValueForKey() {
+        let objects = createIntSwiftObjects().objects(SwiftObject.self)
         measure {
             _ = objects.value(forKeyPath: "intCol") as! [Int]
         }
     }
 
-    func testValueForKeyForStringObjects() {
-        let realm = try! Realm()
-        try! realm.write {
-            for value in 0..<10000 {
-                autoreleasepool {
-                    let object = SwiftObject()
-                    object.stringCol = String(value)
-                    realm.add(object)
-                }
-            }
+    func testLegacyStringObjectsMap() {
+        let objects = createStringSwiftObjects().objects(SwiftObject.self)
+        measure {
+            _ = Array(objects.map { $0.stringCol })
         }
-        let objects = realm.objects(SwiftObject.self)
+    }
+
+    func testLegacyStringObjectsValueForKey() {
+        let objects = createStringSwiftObjects().objects(SwiftObject.self)
         measure {
             _ = objects.value(forKeyPath: "stringCol") as! [String]
         }
     }
 
-    func testValueForKeyForOptionalIntObjects() {
-        let realm = try! Realm()
-        try! realm.write {
-            for value in 0..<10000 {
-                autoreleasepool {
-                    let object = SwiftOptionalObject()
-                    object.optIntCol.value = value
-                    realm.add(object)
-                }
-            }
+    func testLegacyOptionalIntObjectsMap() {
+        let objects = createOptionalIntObjects().objects(SwiftOptionalObject.self)
+        measure {
+            _ = Array(objects.map { $0.optIntCol.value })
         }
-        let objects = realm.objects(SwiftOptionalObject.self)
+    }
+
+    func testLegacyOptionalIntObjectsValueForKey() {
+        let objects = createOptionalIntObjects().objects(SwiftOptionalObject.self)
         measure {
             _ = objects.value(forKeyPath: "optIntCol") as! [Int]
         }
     }
 
-    func testValueForKeyForOptionalStringObjects() {
-        let realm = try! Realm()
-        try! realm.write {
-            for value in 0..<10000 {
-                autoreleasepool {
-                    let object = SwiftOptionalObject()
-                    object.optStringCol = String(value)
-                    realm.add(object)
-                }
-            }
+    func testLegacyOptionalStringObjectsMap() {
+        let objects = createOptionalStringObjects().objects(SwiftOptionalObject.self)
+        measure {
+            _ = Array(objects.map { $0.optStringCol })
         }
-        let objects = realm.objects(SwiftOptionalObject.self)
+    }
+
+    func testLegacyOptionalStringObjectsValueForKey() {
+        let objects = createOptionalStringObjects().objects(SwiftOptionalObject.self)
+        measure {
+            _ = objects.value(forKeyPath: "optStringCol") as! [String]
+        }
+    }
+
+    // MARK: - Modern object creation helpers
+
+    func createModernCollectionObjects() -> Results<ModernCollectionObject> {
+        return createObjects(ModernCollectionObject.self) { (listObject, value) in
+            let object = ModernAllTypesObject()
+            object.intCol = value
+            object.stringCol = String(value)
+            listObject.list.append(object)
+            listObject.set.insert(object)
+            listObject.map[""] = object
+        }.objects(ModernCollectionObject.self)
+    }
+
+    func createModernObjects() -> Results<ModernIntAndStringObject> {
+        return createObjects(ModernIntAndStringObject.self) { (object, value) in
+            object.intCol = value
+            object.stringCol = String(value)
+            object.optIntCol = value
+            object.optStringCol = String(value)
+        }.objects(ModernIntAndStringObject.self)
+    }
+
+    // MARK: - Modern value(forKey:) vs. loop
+
+    func testModernListObjectsMap() {
+        let objects = createModernCollectionObjects()
+        measure {
+            _ = Array(objects.map { $0.list })
+        }
+    }
+
+    func testModernListObjectsValueForKey() {
+        let objects = createModernCollectionObjects()
+        measure {
+            _ = objects.value(forKeyPath: "list") as! [List<ModernAllTypesObject>]
+        }
+    }
+
+    func testModernMutableSetObjectsMap() {
+        let objects = createModernCollectionObjects()
+        measure {
+            _ = Array(objects.map { $0.set })
+        }
+    }
+
+    func testModernMutableSetObjectsValueForKey() {
+        let objects = createModernCollectionObjects()
+        measure {
+            _ = objects.value(forKeyPath: "set") as! [MutableSet<ModernAllTypesObject>]
+        }
+    }
+
+    func testModernIntObjectsMap() {
+        let objects = createModernObjects()
+        measure {
+            _ = Array(objects.map { $0.intCol })
+        }
+    }
+
+    func testModernIntObjectsValueForKey() {
+        let objects = createModernObjects()
+        measure {
+            _ = objects.value(forKeyPath: "intCol") as! [Int]
+        }
+    }
+
+    func testModernStringObjectsMap() {
+        let objects = createModernObjects()
+        measure {
+            _ = Array(objects.map { $0.stringCol })
+        }
+    }
+
+    func testModernStringObjectsValueForKey() {
+        let objects = createModernObjects()
+        measure {
+            _ = objects.value(forKeyPath: "stringCol") as! [String]
+        }
+    }
+
+    func testModernOptionalIntObjectsMap() {
+        let objects = createModernObjects()
+        measure {
+            _ = Array(objects.map { $0.optIntCol })
+        }
+    }
+
+    func testModernOptionalIntObjectsValueForKey() {
+        let objects = createModernObjects()
+        measure {
+            _ = objects.value(forKeyPath: "optIntCol") as! [Int]
+        }
+    }
+
+    func testModernOptionalStringObjectsMap() {
+        let objects = createModernObjects()
+        measure {
+            _ = Array(objects.map { $0.optStringCol })
+        }
+    }
+
+    func testModernOptionalStringObjectsValueForKey() {
+        let objects = createModernObjects()
         measure {
             _ = objects.value(forKeyPath: "optStringCol") as! [String]
         }

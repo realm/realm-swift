@@ -52,8 +52,8 @@ internal extension RLMProperty {
         self.name = name
         self.type = valueType._rlmType
         self.optional = valueType._rlmOptional
-        valueType._rlmPopulateProperty(self)
         value._rlmPopulateProperty(self)
+        valueType._rlmPopulateProperty(self)
         if valueType._rlmRequireObjc {
             self.updateAccessors()
         }
@@ -196,6 +196,9 @@ internal class ObjectUtil {
         RLMSwiftBridgeValue = { (value: Any) -> Any? in
             if let value = value as? CustomObjectiveCBridgeable {
                 return value.objCValue
+            }
+            if let value = value as? RealmEnum {
+                return type(of: value)._rlmToRawValue(value)
             }
             return nil
         }

@@ -697,6 +697,13 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj,
 }
 
 id RLMDynamicGet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained RLMProperty *const prop) {
+    if (auto accessor = prop.swiftAccessor; accessor && [obj isKindOfClass:obj->_objectSchema.objectClass]) {
+        return RLMCoerceToNil([accessor get:prop on:obj]);
+    }
+    if (!obj->_realm) {
+        return [obj valueForKey:prop.name];
+    }
+
     realm::Object o(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
     RLMAccessorContext c(obj);
     c.currentProperty = prop;
@@ -974,35 +981,37 @@ realm::Mixed RLMAccessorContext::unbox(__unsafe_unretained id v, CreatePolicy p,
     return RLMObjcToMixed(v, _realm, p);
 }
 
-template<typename Fn>
-static auto to_optional(__unsafe_unretained id const value, Fn&& fn) {
+template<typename T>
+static auto to_optional(__unsafe_unretained id const value) {
     id v = RLMCoerceToNil(value);
-    return v && v != NSNull.null ? realm::util::make_optional(fn(v)) : realm::util::none;
+    return v && v != NSNull.null
+        ? realm::util::make_optional(RLMStatelessAccessorContext::unbox<T>(v))
+        : realm::util::none;
 }
 
 template<>
 realm::util::Optional<bool> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional(v, [](__unsafe_unretained id v) { return (bool)[v boolValue]; });
+    return to_optional<bool>(v);
 }
 template<>
 realm::util::Optional<double> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional(v, [](__unsafe_unretained id v) { return [v doubleValue]; });
+    return to_optional<double>(v);
 }
 template<>
 realm::util::Optional<float> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional(v, [](__unsafe_unretained id v) { return [v floatValue]; });
+    return to_optional<float>(v);
 }
 template<>
 realm::util::Optional<int64_t> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional(v, [](__unsafe_unretained id v) { return [v longLongValue]; });
+    return to_optional<int64_t>(v);
 }
 template<>
 realm::util::Optional<realm::ObjectId> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional(v, [](__unsafe_unretained RLMObjectId *v) { return v.value; });
+    return to_optional<realm::ObjectId>(v);
 }
 template<>
 realm::util::Optional<realm::UUID> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional(v, [](__unsafe_unretained NSUUID *v) { return [v rlm_uuidValue]; });
+    return to_optional<realm::UUID>(v);
 }
 
 std::pair<realm::Obj, bool>

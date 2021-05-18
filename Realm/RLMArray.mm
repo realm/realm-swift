@@ -38,13 +38,11 @@
 @end
 
 @interface RLMArray () <RLMThreadConfined_Private>
+// Backing array when this instance is unmanaged
+@property NSMutableArray *backingCollection;
 @end
 
-@implementation RLMArray {
-@public
-    // Backing array when this instance is unmanaged
-    NSMutableArray *_backingCollection;
-}
+@implementation RLMArray
 #pragma mark - Initializers
 
 - (instancetype)initWithObjectClassName:(__unsafe_unretained NSString *const)objectClassName
@@ -193,8 +191,8 @@
 template<typename IndexSetFactory>
 static void changeArray(__unsafe_unretained RLMArray *const ar,
                         NSKeyValueChange kind, dispatch_block_t f, IndexSetFactory&& is) {
-    if (!ar->_backingCollection) {
-        ar->_backingCollection = [NSMutableArray new];
+    if (!ar.backingCollection) {
+        ar.backingCollection = [NSMutableArray new];
     }
 
     if (RLMObjectBase *parent = ar->_parentObject) {
@@ -517,9 +515,12 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (BOOL)isEqual:(id)object {
     if (auto array = RLMDynamicCast<RLMArray>(object)) {
-        return !array.realm
-        && ((_backingCollection.count == 0 && array->_backingCollection.count == 0)
-            || [_backingCollection isEqual:array->_backingCollection]);
+        if (array.realm) {
+            return NO;
+        }
+        NSArray *otherCollection = array.backingCollection;
+        return (_backingCollection.count == 0 && otherCollection.count == 0)
+            || [_backingCollection isEqual:otherCollection];
     }
     return NO;
 }

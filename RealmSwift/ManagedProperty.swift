@@ -128,8 +128,14 @@ public struct Managed<Value: _ManagedPropertyType> {
         }
     }
 
-    internal mutating func initialize(_ object: ObjectBase, key: PropertyKey) {
+    @discardableResult
+    internal mutating func initialize(_ object: ObjectBase, key: PropertyKey) -> Value? {
+        if case let .unmanaged(value, _, _) = storage, value is MutableRealmCollection {
+            storage = .managedCached(value: value, key: key)
+            return value
+        }
         storage = .managed(key: key)
+        return nil
     }
 
     internal mutating func get(_ object: ObjectBase) -> Value {
@@ -144,7 +150,7 @@ public struct Managed<Value: _ManagedPropertyType> {
             return value
         case let .managed(key):
             let v = Value._rlmGetProperty(object, key)
-            if v is NeedsParentForObservation {
+            if v is MutableRealmCollection {
                 storage = .managedCached(value: v, key: key)
             }
             return v
@@ -154,6 +160,10 @@ public struct Managed<Value: _ManagedPropertyType> {
     }
 
     internal mutating func set(_ object: ObjectBase, value: Value) {
+        if value is MutableRealmCollection {
+            assign(value: value, to: get(object) as! MutableRealmCollection)
+            return
+        }
         switch storage {
         case let .unmanagedObserved(_, key):
             let name = RLMObjectBaseObjectSchema(object)!.properties[Int(key)].name
@@ -178,7 +188,7 @@ public struct Managed<Value: _ManagedPropertyType> {
         case .unmanagedObserved, .managed, .managedCached:
             return
         }
-        if let value = value as? NeedsParentForObservation {
+        if let value = value as? MutableRealmCollection {
             value.setParent(object, property)
         }
         storage = .unmanagedObserved(value: value, key: PropertyKey(property.index))
@@ -286,25 +296,8 @@ extension Managed: _DiscoverableManagedProperty where Value: _ManagedPropertyTyp
             prop.indexed = indexed || primary
             prop.isPrimary = primary
         default:
-            return
+            fatalError()
         }
-    }
-}
-
-// Unmanaged collection properties need a reference to their parent object for
-// KVO to work because the mutation is done via the collection object but the
-// observation is on the parent.
-private protocol NeedsParentForObservation {
-    func setParent(_ object: RLMObjectBase, _ property: RLMProperty)
-}
-extension List: NeedsParentForObservation {
-    fileprivate func setParent(_ object: RLMObjectBase, _ property: RLMProperty) {
-        rlmArray.setParent(object, property: property)
-    }
-}
-extension MutableSet: NeedsParentForObservation {
-    fileprivate func setParent(_ object: RLMObjectBase, _ property: RLMProperty) {
-        rlmSet.setParent(object, property: property)
     }
 }
 

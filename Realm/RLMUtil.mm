@@ -163,8 +163,7 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
             return [value isKindOfClass:[NSData class]];
         case RLMPropertyTypeAny: {
             return !value
-                || [value conformsToProtocol:@protocol(RLMValue)]
-                || [RLMBridgeSwiftValue(value) conformsToProtocol:@protocol(RLMValue)];
+                || [value conformsToProtocol:@protocol(RLMValue)];
         }
         case RLMPropertyTypeLinkingObjects:
             return YES;
@@ -285,11 +284,15 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
 
 BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
                                  __unsafe_unretained RLMProperty *const property) {
-    return RLMValidateValue(obj,
-                            property.type,
-                            property.optional,
-                            property.collection,
-                            property.objectClassName);
+    if (RLMValidateValue(obj, property.type, property.optional,
+                         property.collection, property.objectClassName)) {
+        return true;
+    }
+    if (id bridged = RLMBridgeSwiftValue(obj)) {
+        return RLMValidateValue(bridged, property.type, property.optional,
+                                property.collection, property.objectClassName);
+    }
+    return false;
 }
 
 NSDictionary *RLMDefaultValuesForObjectSchema(__unsafe_unretained RLMObjectSchema *const objectSchema) {
