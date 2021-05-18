@@ -152,3 +152,14 @@ extension RLMCollection {
         return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args))) as! RLMResults<NSObject>
     }
 }
+
+extension RLMCollection {
+    public subscript(_ key: String) -> AnyObject? {
+        get {
+            (self as! RLMDictionary<NSString, AnyObject>).object(for: key as RLMDictionaryKey)
+        }
+        set {
+            (self as! RLMDictionary<NSString, AnyObject>).setObject(newValue, for: key as RLMDictionaryKey)
+        }
+    }
+}

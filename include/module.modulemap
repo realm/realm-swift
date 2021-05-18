@@ -25,6 +25,7 @@ module Realm {
         header "Realm/RLMSchema_Private.h"
         header "Realm/RLMSet_Private.h"
         header "Realm/RLMSwiftCollectionBase.h"
+        header "Realm/RLMSwiftValueStorage.h"
         header "Realm/RLMSyncConfiguration_Private.h"
         header "Realm/RLMSyncUtil_Private.h"
         header "Realm/RLMUser_Private.h"
