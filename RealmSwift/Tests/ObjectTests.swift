@@ -1036,7 +1036,7 @@ class ObjectTests: TestCase {
         try! realm.commitWrite()
 
         // Expect notification for "owners.name" when "owner.name" is changed
-        let token = dog.observe(keyPaths: ["owners.name"], expectChange("name", "Tom", "Abe"))
+        let token = dog.observe(keyPaths: ["owners.name"], expectChange("owners", String?.none, String?.none))
         try! realm.write({
             let owner = dog.owners.first!
             owner.name = "Abe"

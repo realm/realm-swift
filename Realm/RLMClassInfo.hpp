@@ -79,6 +79,9 @@ public:
     // persisted property.
     realm::ColKey tableColumn(NSString *propertyName) const;
     realm::ColKey tableColumn(RLMProperty *property) const;
+    // Get the opposite table column for the given property. The property must be a valid
+    // computed property.
+    realm::ColKey computedTableColumn(RLMProperty *property) const;
 
     // Get the info for the target of the link at the given property index.
     RLMClassInfo &linkTargetType(size_t propertyIndex);

@@ -66,6 +66,18 @@ realm::ColKey RLMClassInfo::tableColumn(RLMProperty *property) const {
     return objectSchema->persisted_properties[property.index].column_key;
 }
 
+realm::ColKey RLMClassInfo::computedTableColumn(RLMProperty *property) const {
+    StringData propname = RLMStringDataWithNSString(property.linkOriginPropertyName);
+    NSString *originTableName = [NSString stringWithFormat:@"class_%@", property.objectClassName];
+    StringData originTableNameStringData = RLMStringDataWithNSString(originTableName);
+    TableRef originTable = realm.group.get_table(originTableNameStringData);
+    ColKey forwardLinkColumnKey = originTable->get_column_key(RLMStringDataWithNSString(property.linkOriginPropertyName));
+    ColKey opposite = originTable->get_opposite_column(forwardLinkColumnKey);
+    ColKey ck = objectSchema->computed_properties[property.index].column_key;
+//    ColKey oppo = table()->get_opposite_column(ck);
+    return opposite;
+}
+
 RLMClassInfo &RLMClassInfo::linkTargetType(size_t propertyIndex) {
     return realm->_info[rlmObjectSchema.properties[propertyIndex].objectClassName];
 }

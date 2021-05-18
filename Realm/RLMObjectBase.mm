@@ -542,9 +542,17 @@ struct ObjectChangeCallbackWrapper {
             return;
         }
 
+        // FIXME: It's possible for the column key of a persisted property
+        // to equal the column key of a computed property
         auto properties = [NSMutableArray new];
         for (RLMProperty *property in object->_info->rlmObjectSchema.properties) {
             auto columnKey = object->_info->tableColumn(property).value;
+            if (c.columns.count(columnKey)) {
+                [properties addObject:property.name];
+            }
+        }
+        for (RLMProperty *property in object->_info->rlmObjectSchema.computedProperties) {
+            auto columnKey = object->_info->computedTableColumn(property).value;
             if (c.columns.count(columnKey)) {
                 [properties addObject:property.name];
             }
