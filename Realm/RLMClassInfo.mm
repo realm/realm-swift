@@ -74,7 +74,6 @@ realm::ColKey RLMClassInfo::computedTableColumn(RLMProperty *property) const {
     ColKey forwardLinkColumnKey = originTable->get_column_key(RLMStringDataWithNSString(property.linkOriginPropertyName));
     ColKey opposite = originTable->get_opposite_column(forwardLinkColumnKey);
     ColKey ck = objectSchema->computed_properties[property.index].column_key;
-//    ColKey oppo = table()->get_opposite_column(ck);
     return opposite;
 }
 

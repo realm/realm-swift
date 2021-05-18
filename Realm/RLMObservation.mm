@@ -612,7 +612,24 @@ RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema
     } while (end != NSNotFound);
 
     TableKey tk = table->get_key();
-    ColKey ck = table->get_column_key(property.columnName.UTF8String);
+    ColKey ck;
+    // TODO: refactor
+    if (property.type == RLMPropertyTypeLinkingObjects) {
+        // If the property type is a backlink, subsequent keys must be retrieved from the origin table
+        NSString *originTableName = [NSString stringWithFormat:@"class_%@", property.objectClassName];
+        StringData originTableNameStringData = RLMStringDataWithNSString(originTableName);
+        TableRef originTable = info->realm->_realm->read_group().get_table(originTableNameStringData);
+
+        // The property from the origin table that links to the current property in the target table
+        NSString *originForwardLinkColumnName = property.linkOriginPropertyName;
+        StringData originForwardLinkColumnStringData = RLMStringDataWithNSString(originForwardLinkColumnName);
+        ColKey forwardLinkColumnKey = originTable->get_column_key(originForwardLinkColumnStringData);
+
+        // Get the opposite (backlinked) column from the origin table
+        ck = originTable->get_opposite_column(forwardLinkColumnKey);
+    } else {
+        ck = table->get_column_key(property.columnName.UTF8String);
+    }
     keyPairs.push_back(std::make_pair(tk, ck));
     
     return keyPairs;
