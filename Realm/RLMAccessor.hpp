@@ -78,8 +78,7 @@ struct RLMStatelessAccessorContext {
     void enumerate_dictionary(__unsafe_unretained const id v, Func&& func) {
         id enumerable = RLMAsFastEnumeration(v) ?: v;
         for (id key in enumerable) {
-            id value = v[key];
-            func(unbox<realm::StringData>(key), value);
+            func(unbox<realm::StringData>(key), v[key]);
         }
     }
 

@@ -31,16 +31,15 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  `RLMDictionary` is a container type in Realm representing a dynamic collection of key-value pairs.
 
- Unlike an `NSDictionary`, `RLMDictionary`s hold a single key and value type.
+ Unlike `NSDictionary`, `RLMDictionary`s hold a single key and value type.
  This is referred to in these docs as the “type” and “keyType” of the dictionary.
 
- When declaring an `RLMDictionary` property, the object type must be marked as conforming to a
- protocol by the same name as the objects it should contain (see the
- `RLM_COLLECTION_TYPE` macro).
+ When declaring an `RLMDictionary` property, the object type and keyType must be marked as conforming to a
+ protocol by the same name as the objects it should contain.
 
      RLM_COLLECTION_TYPE(ObjectType)
      ...
-     @property RLMDictionary<RLMString, ObjectType> *objectTypeDictionary;
+     @property RLMDictionary<NSString *, ObjectType *><RLMString, ObjectType> *objectTypeDictionary;
 
  `RLMDictionary`s can be queried with the same predicates as `RLMObject` and `RLMResult`s.
 

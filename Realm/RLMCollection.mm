@@ -87,14 +87,10 @@ static const int RLMEnumerationBufferSize = 16;
         _realm = _info->realm;
 
         if (_realm.inWriteTransaction) {
-            // Freezing a Results has very temperamental behavior. It also pins a version of a Realm
-            // which is something we do not want. It seems more efficient to store the keys in a
-            // temporary array.
+            // Freezing a Results of `Dictionary::get_keys()` has very temperamental behavior.
+            // It also pins a version of a Realm which is something we do not want.
+            // It seems more efficient to store the keys in a temporary array.
 
-            // It is more efficient to store the keys as NS types because
-            // if we are to store the key from Results we would need to perform
-            // RLMMixedToObjc on each itteration.
-            //
             // We still need some reference to the Results as we need to know
             // if the parent object is valid or not.
             _snapshot = backingDictionary.get_keys().snapshot();

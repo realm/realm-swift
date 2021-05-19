@@ -512,7 +512,7 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
 }
 
 id unmanagedSetter(RLMProperty *prop, const char *) {
-    // Only RLMArray, RLMDictionary & RLMSet need special handling for the unmanaged setter
+    // Only RLMCollection types need special handling for the unmanaged setter
     if (!prop.collection) {
         return nil;
     }
