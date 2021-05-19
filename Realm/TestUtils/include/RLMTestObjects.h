@@ -327,17 +327,17 @@ RLM_COLLECTION_TYPE(AllTypesObject)
 @end
 
 @interface AllDictionariesObject : RLMObject
-@property RLMDictionary<RLMString, RLMInt> *intDict;
-@property RLMDictionary<RLMString, RLMFloat> *floatDict;
-@property RLMDictionary<RLMString, RLMDouble> *doubleDict;
-@property RLMDictionary<RLMString, RLMBool> *boolDict;
-@property RLMDictionary<RLMString, RLMString> *stringDict;
-@property RLMDictionary<RLMString, RLMDate> *dateDict;
-@property RLMDictionary<RLMString, RLMData> *dataDict;
-@property RLMDictionary<RLMString, RLMDecimal128> *decimalDict;
-@property RLMDictionary<RLMString, RLMObjectId> *objectIdDict;
-@property RLMDictionary<RLMString, RLMUUID> *uuidDict;
-@property RLMDictionary<RLMString, StringObject> *stringObjDict;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMInt> *intDict;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMFloat> *floatDict;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMDouble> *doubleDict;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMBool> *boolDict;
+@property RLMDictionary<NSString *, NSString *><RLMString, RLMString> *stringDict;
+@property RLMDictionary<NSString *, NSDate *><RLMString, RLMDate> *dateDict;
+@property RLMDictionary<NSString *, NSData *><RLMString, RLMData> *dataDict;
+@property RLMDictionary<NSString *, RLMDecimal128 *><RLMString, RLMDecimal128> *decimalDict;
+@property RLMDictionary<NSString *, RLMObjectId *><RLMString, RLMObjectId> *objectIdDict;
+@property RLMDictionary<NSString *, NSUUID *><RLMString, RLMUUID> *uuidDict;
+@property RLMDictionary<NSString *, StringObject *><RLMString, StringObject> *stringObjDict;
 @end
 
 @interface AllPrimitiveDictionaries : RLMObject
@@ -519,11 +519,11 @@ RLM_COLLECTION_TYPE(CircleObject);
 #pragma mark DictionaryPropertyObject
 
 @interface DictionaryPropertyObject : RLMObject
-@property RLMDictionary<RLMString, StringObject> *stringDictionary;
-@property RLMDictionary<RLMString, RLMInt> *intDictionary;
-@property RLMDictionary<RLMString, RLMString> *primitiveStringDictionary;
-@property RLMDictionary<RLMString, EmbeddedIntObject> *embeddedDictionary;
-@property RLMDictionary<RLMString, IntObject> *intObjDictionary;
+@property RLMDictionary<NSString *, StringObject *><RLMString, StringObject> *stringDictionary;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMInt> *intDictionary;
+@property RLMDictionary<NSString *, NSString *><RLMString, RLMString> *primitiveStringDictionary;
+@property RLMDictionary<NSString *, EmbeddedIntObject *><RLMString, EmbeddedIntObject> *embeddedDictionary;
+@property RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *intObjDictionary;
 @end
 
 #pragma mark DynamicObject

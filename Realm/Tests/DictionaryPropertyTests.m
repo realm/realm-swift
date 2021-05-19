@@ -543,7 +543,6 @@
     [realm commitWriteTransaction];
 }
 
-// valueForKey forwards objectForKey to the reciever.
 - (void)testValueForKey {
     // unmanaged
     DictionaryPropertyObject *unmanObj = [DictionaryPropertyObject new];
@@ -555,6 +554,10 @@
 
     [unmanObj.embeddedDictionary setValue:unmanChild2 forKey:@"two"];
     XCTAssertEqual([[unmanObj.embeddedDictionary valueForKey:@"two"][@"intCol"] integerValue], unmanChild2.intCol);
+
+    unmanObj.intDictionary[@"one"] = @1;
+    XCTAssertEqualObjects((@[@"one"]), [unmanObj.intDictionary valueForKey:@"@allKeys"]);
+    XCTAssertEqualObjects((@[@1]), [unmanObj.intDictionary valueForKey:@"@allValues"]);
 
     // managed
     RLMRealm *realm = [self realmWithTestPath];
@@ -570,6 +573,9 @@
     XCTAssertEqual([[obj.embeddedDictionary valueForKey:@"two"][@"intCol"] integerValue], child2.intCol);
 
     [realm commitWriteTransaction];
+    XCTAssertEqualObjects(obj.stringDictionary.realm, [obj.stringDictionary valueForKey:@"@realm"]);
+    XCTAssertEqualObjects((@[@"one"]), [obj.stringDictionary valueForKey:@"@allKeys"]);
+    XCTAssertEqualObjects([child1 stringCol], [[obj.stringDictionary valueForKey:@"@allValues"][0] stringCol]);
 }
 
 - (void)testObjectAggregate {

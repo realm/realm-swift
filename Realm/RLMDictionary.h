@@ -110,7 +110,6 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param key The name of the property.
 
- // Lee we need to match this behaviour
  @discussion If key does not start with “@”, invokes object(forKey:). If key does start
  with “@”, strips the “@” and invokes [super valueForKey:] with the rest of the key.
 

@@ -25,6 +25,8 @@
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
+- (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
+- (nullable id)managedValueForKey:(nonnull NSString *)key;
 
 void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *const dictionary,
                                              __unsafe_unretained id const key, __unsafe_unretained id const value);

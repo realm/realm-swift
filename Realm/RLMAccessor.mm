@@ -479,7 +479,7 @@ void superSet(RLMObjectBase *obj, NSString *propName, id val) {
 
 // getter/setter for unmanaged object
 id unmanagedGetter(RLMProperty *prop, const char *) {
-    // only override getters for RLMArray and linking objects properties
+    // only override getters for RLMCollection and linking objects properties
     if (prop.type == RLMPropertyTypeLinkingObjects) {
         return ^(RLMObjectBase *) { return [RLMResults emptyDetachedResults]; };
     }

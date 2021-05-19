@@ -439,8 +439,9 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (id)valueForKey:(NSString *)key {
-    // Forward to [objectForKey:] as it performs the
-    // same operation as [valueForKey:].
+    if ([key hasPrefix:@"@"]) {
+        return [super managedValueForKey:[key substringFromIndex:1]];
+    }
     return [self objectForKey:key];
 }
 
