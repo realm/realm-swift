@@ -19,7 +19,8 @@
 import XCTest
 import Realm
 import RealmSwift
-// swiftlint:disable identifier_name
+
+// swiftlint:disable type_name identifier_name cyclomatic_complexity
 
 protocol MapValueFactory {
     associatedtype T: RealmCollectionValue
@@ -83,7 +84,7 @@ class PrimitiveMapTestsBase<O: ObjectFactory, V: MapValueFactory>: TestCase {
     }
 }
 
-class MapStringIntFactory: MapValueFactory {
+struct MapStringIntFactory: MapValueFactory {
     static func values() -> [(key: String, value: Int)] {
         [("key1", 123), ("key2", 456), ("key3", 789)]
     }
@@ -93,7 +94,7 @@ class MapStringIntFactory: MapValueFactory {
     }
 }
 
-class MapStringInt8Factory: MapValueFactory {
+struct MapStringInt8Factory: MapValueFactory {
     static func values() -> [(key: String, value: Int8)] {
         [("key1", 4), ("key2", 8), ("key3", 16)]
     }
@@ -103,7 +104,7 @@ class MapStringInt8Factory: MapValueFactory {
     }
 }
 
-class MapStringInt16Factory: MapValueFactory {
+struct MapStringInt16Factory: MapValueFactory {
     static func values() -> [(key: String, value: Int16)] {
         [("key1", 4), ("key2", 8), ("key3", 16)]
     }
@@ -113,7 +114,7 @@ class MapStringInt16Factory: MapValueFactory {
     }
 }
 
-class MapStringInt32Factory: MapValueFactory {
+struct MapStringInt32Factory: MapValueFactory {
     static func values() -> [(key: String, value: Int32)] {
         [("key1", 4), ("key2", 8), ("key3", 16)]
     }
@@ -123,7 +124,7 @@ class MapStringInt32Factory: MapValueFactory {
     }
 }
 
-class MapStringInt64Factory: MapValueFactory {
+struct MapStringInt64Factory: MapValueFactory {
     static func values() -> [(key: String, value: Int64)] {
         [("key1", 4), ("key2", 8), ("key3", 16)]
     }
@@ -133,7 +134,7 @@ class MapStringInt64Factory: MapValueFactory {
     }
 }
 
-class MapStringBoolFactory: MapValueFactory {
+struct MapStringBoolFactory: MapValueFactory {
     static func values() -> [(key: String, value: Bool)] {
         [("key1", false), ("key2", true), ("key3", true)]
     }
@@ -143,7 +144,7 @@ class MapStringBoolFactory: MapValueFactory {
     }
 }
 
-class MapStringFloatFactory: MapValueFactory {
+struct MapStringFloatFactory: MapValueFactory {
     static func values() -> [(key: String, value: Float)] {
         [("key1", 123.456), ("key2", 456.789), ("key3", 789.123456)]
     }
@@ -153,7 +154,7 @@ class MapStringFloatFactory: MapValueFactory {
     }
 }
 
-class MapStringDoubleFactory: MapValueFactory {
+struct MapStringDoubleFactory: MapValueFactory {
     static func values() -> [(key: String, value: Double)] {
         [("key1", 123.456), ("key2", 456.789), ("key3", 789.123456)]
     }
@@ -163,7 +164,7 @@ class MapStringDoubleFactory: MapValueFactory {
     }
 }
 
-class MapStringStringFactory: MapValueFactory {
+struct MapStringStringFactory: MapValueFactory {
     static func values() -> [(key: String, value: String)] {
         [("key1", "AAA"), ("key2", "BBB"), ("key3", "CCC")]
     }
@@ -173,7 +174,7 @@ class MapStringStringFactory: MapValueFactory {
     }
 }
 
-class MapStringDataFactory: MapValueFactory {
+struct MapStringDataFactory: MapValueFactory {
     static func values() -> [(key: String, value: Data)] {
         func data(_ byte: UInt8) -> Data {
             Data.init(repeating: byte, count: 64)
@@ -186,7 +187,7 @@ class MapStringDataFactory: MapValueFactory {
     }
 }
 
-class MapStringDateFactory: MapValueFactory {
+struct MapStringDateFactory: MapValueFactory {
     static func values() -> [(key: String, value: Date)] {
         func date(_ timestamp: TimeInterval) -> Date {
             Date(timeIntervalSince1970: timestamp)
@@ -199,7 +200,7 @@ class MapStringDateFactory: MapValueFactory {
     }
 }
 
-class MapStringObjectIdFactory: MapValueFactory {
+struct MapStringObjectIdFactory: MapValueFactory {
     static func values() -> [(key: String, value: ObjectId)] {
         [("key1", ObjectId.init("6056670f1a2a5b103c9affda")),
          ("key2", ObjectId.init("6056670f1a2a5b103c9affdd")),
@@ -211,12 +212,12 @@ class MapStringObjectIdFactory: MapValueFactory {
     }
 }
 
-class MapStringDecimal128Factory: MapValueFactory {
+struct MapStringDecimal128Factory: MapValueFactory {
     static func values() -> [(key: String, value: Decimal128)] {
         func decima128(_ double: Double) -> Decimal128 {
             Decimal128.init(floatLiteral: double)
         }
-        return [("key1", decima128(123.456)), ("key2" , decima128(993.456789)), ("key3", decima128(9874546.65456489))]
+        return [("key1", decima128(123.456)), ("key2", decima128(993.456789)), ("key3", decima128(9874546.65456489))]
     }
 
     static func map(_ obj: SwiftMapObject) -> Map<String, Decimal128> {
@@ -234,7 +235,7 @@ class MapStringDecimal128Factory: MapValueFactory {
     }
 }
 
-class MapStringUUIDFactory: MapValueFactory {
+struct MapStringUUIDFactory: MapValueFactory {
     static func values() -> [(key: String, value: UUID)] {
         [("key1", UUID(uuidString: "7729028A-FB89-4555-81C3-C55F7DDBA5CF")!),
          ("key2", UUID(uuidString: "0F0359D8-8D74-409D-8561-C8EBE3753635")!),
@@ -246,7 +247,7 @@ class MapStringUUIDFactory: MapValueFactory {
     }
 }
 
-class OptionalMapStringIntFactory: MapValueFactory {
+struct OptionalMapStringIntFactory: MapValueFactory {
     typealias W = Int
 
     static func values() -> [(key: String, value: Int?)] {
@@ -258,7 +259,7 @@ class OptionalMapStringIntFactory: MapValueFactory {
     }
 }
 
-class OptionalMapStringInt8Factory: MapValueFactory {
+struct OptionalMapStringInt8Factory: MapValueFactory {
     typealias W = Int8
 
     static func values() -> [(key: String, value: Int8?)] {
@@ -270,7 +271,7 @@ class OptionalMapStringInt8Factory: MapValueFactory {
     }
 }
 
-class OptionalMapStringInt16Factory: MapValueFactory {
+struct OptionalMapStringInt16Factory: MapValueFactory {
     typealias W = Int16
 
     static func values() -> [(key: String, value: Int16?)] {
@@ -282,7 +283,7 @@ class OptionalMapStringInt16Factory: MapValueFactory {
     }
 }
 
-class OptionalMapStringInt32Factory: MapValueFactory {
+struct OptionalMapStringInt32Factory: MapValueFactory {
     typealias W = Int32
 
     static func values() -> [(key: String, value: Int32?)] {
@@ -294,7 +295,7 @@ class OptionalMapStringInt32Factory: MapValueFactory {
     }
 }
 
-class OptionalMapStringInt64Factory: MapValueFactory {
+struct OptionalMapStringInt64Factory: MapValueFactory {
     typealias W = Int64
 
     static func values() -> [(key: String, value: Int64?)] {
@@ -306,7 +307,7 @@ class OptionalMapStringInt64Factory: MapValueFactory {
     }
 }
 
-class OptionalMapStringBoolFactory: MapValueFactory {
+struct OptionalMapStringBoolFactory: MapValueFactory {
     typealias W = Bool
 
     static func values() -> [(key: String, value: Bool?)] {
@@ -318,7 +319,7 @@ class OptionalMapStringBoolFactory: MapValueFactory {
     }
 }
 
-class OptionalMapStringFloatFactory: MapValueFactory {
+struct OptionalMapStringFloatFactory: MapValueFactory {
     typealias W = Float
 
     static func values() -> [(key: String, value: Float?)] {
@@ -330,7 +331,7 @@ class OptionalMapStringFloatFactory: MapValueFactory {
     }
 }
 
-class OptionalMapStringDoubleFactory: MapValueFactory {
+struct OptionalMapStringDoubleFactory: MapValueFactory {
     typealias W = Double
 
     static func values() -> [(key: String, value: Double?)] {
@@ -342,7 +343,7 @@ class OptionalMapStringDoubleFactory: MapValueFactory {
     }
 }
 
-class OptionalMapStringStringFactory: MapValueFactory {
+struct OptionalMapStringStringFactory: MapValueFactory {
     typealias W = String
 
     static func values() -> [(key: String, value: String?)] {
@@ -354,7 +355,7 @@ class OptionalMapStringStringFactory: MapValueFactory {
     }
 }
 
-class OptionalMapStringDataFactory: MapValueFactory {
+struct OptionalMapStringDataFactory: MapValueFactory {
     typealias W = Data
 
     static func values() -> [(key: String, value: Data?)] {
@@ -369,7 +370,7 @@ class OptionalMapStringDataFactory: MapValueFactory {
     }
 }
 
-class OptionalMapStringDateFactory: MapValueFactory {
+struct OptionalMapStringDateFactory: MapValueFactory {
     typealias W = Date
 
     static func values() -> [(key: String, value: Date?)] {
@@ -384,7 +385,7 @@ class OptionalMapStringDateFactory: MapValueFactory {
     }
 }
 
-class OptionalMapStringObjectIdFactory: MapValueFactory {
+struct OptionalMapStringObjectIdFactory: MapValueFactory {
     typealias W = ObjectId
 
     static func values() -> [(key: String, value: ObjectId?)] {
@@ -398,7 +399,7 @@ class OptionalMapStringObjectIdFactory: MapValueFactory {
     }
 }
 
-class OptionalMapStringDecimal128Factory: MapValueFactory {
+struct OptionalMapStringDecimal128Factory: MapValueFactory {
     typealias W = Decimal128
     typealias AverageType = Decimal128
 
@@ -412,7 +413,6 @@ class OptionalMapStringDecimal128Factory: MapValueFactory {
     static func map(_ obj: SwiftMapObject) -> Map<String, Decimal128?> {
         return obj.decimalOpt
     }
-    
 
     static func doubleValue(_ value: Decimal128) -> Double {
         return value.doubleValue
@@ -425,7 +425,7 @@ class OptionalMapStringDecimal128Factory: MapValueFactory {
     }
 }
 
-class OptionalMapStringUUIDFactory: MapValueFactory {
+struct OptionalMapStringUUIDFactory: MapValueFactory {
     typealias W = UUID
 
     static func values() -> [(key: String, value: UUID?)] {
@@ -632,7 +632,7 @@ class AddablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveM
             map[element.key] = element.value
         }
 
-        let expected = ((values.map{ $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
+        let expected = ((values.map { $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
         XCTAssertEqual(V.doubleValue(t: map.sum()), expected, accuracy: 0.01)
     }
 
@@ -642,7 +642,7 @@ class AddablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveM
             map[element.key] = element.value
         }
 
-        let expected = ((values.map{ $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber)
+        let expected = ((values.map { $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber)
         XCTAssertEqual(V.doubleValue(map.average()!), expected.doubleValue, accuracy: 0.1)
     }
 }
@@ -826,4 +826,3 @@ class ManagedPrimitiveMapTests: TestCase {
         return _defaultTestSuite()
     }
 }
-

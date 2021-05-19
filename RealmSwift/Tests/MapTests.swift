@@ -29,7 +29,7 @@ fileprivate extension Map {
 
 class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase where M.Key == String,
                                                                                   M.Value == SwiftStringObject,
-                                                                                  M.Element == SingleMapEntry<M.Key,M.Value>,
+                                                                                  M.Element == SingleMapEntry<M.Key, M.Value>,
                                                                                   EM.Key == String,
                                                                                   EM.Value == EmbeddedTreeObject1,
                                                                                   EM.Element == SingleMapEntry<EM.Key, EM.Value> {
@@ -455,7 +455,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
             XCTAssertEqual(map.realm, element.value.realm)
         }
 
-        if let _ =  map.realm {
+        if map.realm != nil {
             // This message comes from Core and is incorrect for Dictionary.
             assertThrows((map["unassigned"] = map["0"]),
                          reason: "Cannot add an existing managed embedded object to a List.")
@@ -474,7 +474,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         XCTAssertEqual(obj.value, 1)
         XCTAssertEqual(obj.realm, map.realm)
 
-        if let _ =  map.realm {
+        if map.realm != nil {
             XCTAssertTrue(oldObj!.isInvalidated)
             assertThrows(map["key"] = obj,
                          reason: "Cannot add an existing managed embedded object to a List.")
@@ -535,7 +535,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         map["key2"] = SwiftStringObject(value: ["bananas"])
         map["key3"] = SwiftStringObject(value: ["cockroach"])
 
-        if let _ = map.realm {
+        if map.realm != nil {
             let results: Results<SwiftStringObject> = map.filter(NSPredicate(format: "stringCol = 'apples'"))
             XCTAssertEqual(results.count, 1)
             XCTAssertEqual(results.first!.stringCol, "apples")
@@ -612,17 +612,17 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
                 (o3.value(forKey: key) as! Map<String, T>)["aKey3"] = values[2]
                 realm.add([o, o2, o3])
 
-                if (T.self is Object.Type) {
-                    XCTAssertEqual(realm.objects(SwiftMapObject.self).count, 3)
-                    XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues = %@", o.object).count, 1)
-                    XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues != %@", o.object).count, 2)
+                if T.self is Object.Type {
+                    let stringObj = realm.objects(SwiftStringObject.self).filter("stringCol == 'hello'").first!
+                    XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues = %@", stringObj).count, 1)
+                    XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues != %@", stringObj).count, 2)
                 } else {
                     XCTAssertEqual(realm.objects(SwiftMapObject.self).count, 3)
                     XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues = %@", values[0]).count, 1)
                     XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues != %@", values[0]).count, 2)
                 }
 
-                if (T.self is String.Type) {
+                if T.self is String.Type {
                     XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues =[c] %@", values[0]).count, 2)
                     XCTAssertEqual(realm.objects(SwiftMapObject.self).filter("ANY \(key).@allValues !=[c] %@", values[0]).count, 1)
 
@@ -664,22 +664,19 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     func testNotificationSentInitially() {
         let map = createMap()
         try! realm.commitWrite()
-        if let _ = map.realm {
+        if map.realm != nil {
             let queue = DispatchQueue(label: "testNotificationSentInitially")
             let exp = expectation(description: "does receive notification")
             var token: NotificationToken?
             token = map.observe(on: queue, { change in
-                switch(change) {
+                switch change {
                 case .initial(let map):
                     XCTAssertNotNil(map)
                     exp.fulfill()
-                    break
                 case .update(_, insertions: _, modifications: _):
                     XCTFail("should not get here for this test")
-                    break
                 case .error(_):
                     XCTFail("should not get here for this test")
-                    break
                 }
             })
             waitForExpectations(timeout: 2.0, handler: nil)
@@ -698,11 +695,10 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
             var token: NotificationToken?
             var didInsert = false
             token = map.observe(on: queue, { change in
-                switch(change) {
+                switch change {
                 case .initial(let map):
                     XCTAssertNotNil(map)
                     exp.fulfill()
-                    break
                 case let .update(map, insertions: insertions, modifications: modifications):
                     XCTAssertNotNil(map)
                     if didInsert {
@@ -712,10 +708,8 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
                         didInsert.toggle()
                     }
                     exp.fulfill()
-                    break
                 case .error(_):
                     XCTFail("should not get here for this test")
-                    break
                 }
             })
             waitForExpectations(timeout: 2.0, handler: nil)

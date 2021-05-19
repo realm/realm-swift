@@ -1433,7 +1433,7 @@ class ObjectCreationTests: TestCase {
         if map {
             return [
                 ["trueVal": ["boolCol": "invalid"], "falseVal": ["boolCol": false]],
-                ["trueVal": "invalid", "falseVal": SwiftBoolObject(value: [false])],
+                ["trueVal": "invalid", "falseVal": SwiftBoolObject(value: [false])]
             ]
         }
         if array {

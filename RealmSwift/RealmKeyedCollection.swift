@@ -35,7 +35,7 @@ public protocol RealmKeyedCollection: RealmCollectionBase, Sequence {
     var isInvalidated: Bool { get }
 
     /// Returns the number of key-value pairs in this map.
-    var count: Int  { get }
+    var count: Int { get }
 
      /// A human-readable description of the objects contained in the Map.
     var description: String { get }
@@ -258,8 +258,8 @@ public protocol RealmKeyedCollection: RealmCollectionBase, Sequence {
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     func observe(on queue: DispatchQueue?,
-                        _ block: @escaping (RealmDictionaryChange<Self>) -> Void)
-        -> NotificationToken
+                 _ block: @escaping (RealmDictionaryChange<Self>) -> Void)
+    -> NotificationToken
 
     /// :nodoc:
     // swiftlint:disable:next identifier_name
@@ -390,7 +390,7 @@ private class _AnyMapBase<Key: MapKeyType, Value: RealmCollectionValue>: Assiste
     var realm: Realm? { fatalError() }
     var isInvalidated: Bool { fatalError() }
     var count: Int { fatalError() }
-    var description: String  { fatalError() }
+    var description: String { fatalError() }
     func updateValue(_ value: Value, forKey key: Key) { fatalError() }
     func removeObject(for key: Key) { fatalError() }
     func removeAll() { fatalError() }
@@ -405,7 +405,7 @@ private class _AnyMapBase<Key: MapKeyType, Value: RealmCollectionValue>: Assiste
     func contains(where predicate: @escaping (Key, Value) -> Bool) -> Bool { fatalError() }
     func sorted(ascending: Bool) -> Results<Value> { fatalError() }
     func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Value> { fatalError() }
-    func sorted<S>(by sortDescriptors: S) -> Results<Value> where S : Sequence, S.Element == SortDescriptor { fatalError() }
+    func sorted<S>(by sortDescriptors: S) -> Results<Value> where S: Sequence, S.Element == SortDescriptor { fatalError() }
     var keys: [Key] { fatalError() }
     var values: [Value] { fatalError() }
     subscript(position: MapIndex) -> (Key, Value) { fatalError() }
@@ -414,6 +414,7 @@ private class _AnyMapBase<Key: MapKeyType, Value: RealmCollectionValue>: Assiste
     func max<T: MinMaxType>(ofProperty property: String) -> T? { fatalError() }
     func sum<T: AddableType>(ofProperty property: String) -> T { fatalError() }
     func average<T: AddableType>(ofProperty property: String) -> T? { fatalError() }
+    // swiftlint:disable:next identifier_name
     func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmDictionaryChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
     var isFrozen: Bool { fatalError() }
@@ -437,7 +438,7 @@ private final class _AnyMap<C: RealmKeyedCollection>: _AnyMapBase<C.Key, C.Value
     override var realm: Realm? { base.realm }
     override var isInvalidated: Bool { base.isInvalidated }
     override var count: Int { base.count }
-    override var description: String  { base.description }
+    override var description: String { base.description }
     override var keys: [C.Key] { base.keys }
     override var values: [C.Value] { base.values }
 
@@ -466,7 +467,7 @@ private final class _AnyMap<C: RealmKeyedCollection>: _AnyMapBase<C.Key, C.Value
 
     override func sorted(ascending: Bool) -> Results<C.Value> { base.sorted(ascending: ascending) }
     override func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<C.Value> { base.sorted(byKeyPath: keyPath, ascending: ascending) }
-    override func sorted<S>(by sortDescriptors: S) -> Results<C.Value> where S : Sequence, S.Element == SortDescriptor { base.sorted(by: sortDescriptors) }
+    override func sorted<S>(by sortDescriptors: S) -> Results<C.Value> where S: Sequence, S.Element == SortDescriptor { base.sorted(by: sortDescriptors) }
 
     // MARK: Indexes
 
@@ -544,7 +545,7 @@ public struct AnyMap<Key: MapKeyType, Value: RealmCollectionValue>: RealmKeyedCo
     /// The number of objects in the map.
     public var count: Int { base.count }
     /// A human-readable description of the objects contained in the map.
-    public var description: String  { base.description }
+    public var description: String { base.description }
 
     /// Returns all of the keys in this dictionary.
     public var keys: [Key] { base.keys }
@@ -659,7 +660,7 @@ public struct AnyMap<Key: MapKeyType, Value: RealmCollectionValue>: RealmKeyedCo
 
      - see: `sorted(byKeyPath:ascending:)`
     */
-    public func sorted<S>(by sortDescriptors: S) -> Results<Value> where S : Sequence, S.Element == SortDescriptor { base.sorted(by: sortDescriptors) }
+    public func sorted<S>(by sortDescriptors: S) -> Results<Value> where S: Sequence, S.Element == SortDescriptor { base.sorted(by: sortDescriptors) }
 
     public subscript(position: MapIndex) -> (Key, Value) { base[position] }
     public func index(of object: Value) -> MapIndex? { base.index(of: object) }
@@ -802,7 +803,7 @@ public struct AnyMap<Key: MapKeyType, Value: RealmCollectionValue>: RealmKeyedCo
     // MARK: Sequence Support
 
     /// :nodoc:
-    public func asNSFastEnumerator() -> Any { base.asNSFastEnumerator() }
+    internal func asNSFastEnumerator() -> Any { base.asNSFastEnumerator() }
 
     /// Returns a `RLMMapIterator` that yields successive elements in the collection.
     public func makeIterator() -> RLMMapIterator<SingleMapEntry<Key, Value>> {

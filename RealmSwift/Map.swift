@@ -151,7 +151,7 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
      */
     @nonobjc public func value(forKey key: String) -> AnyObject? {
         return rlmDictionary.value(forKey: key as RLMDictionaryKey)
-            .map { dynamicBridgeCast(fromObjectiveC:$0) }
+            .map { dynamicBridgeCast(fromObjectiveC: $0) }
     }
 
     /**
@@ -161,7 +161,7 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
      */
     @nonobjc public func value(forKeyPath keyPath: String) -> AnyObject? {
         return rlmDictionary.value(forKeyPath: keyPath)
-            .map { dynamicBridgeCast(fromObjectiveC:$0) }
+            .map { dynamicBridgeCast(fromObjectiveC: $0) }
     }
 
     /**

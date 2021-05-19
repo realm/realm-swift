@@ -70,7 +70,7 @@ public protocol _RandomAccessIterator {
      Returns a `RLMCollectionIterator` that yields successive elements in the collection.
      This enables support for sequence-style enumeration of `RLMObject` subclasses in Swift.
      */
-    func makeIterator() -> RLMRandomAccessIterator;
+    func makeIterator() -> RLMRandomAccessIterator
 }
 
 extension _RandomAccessIterator where Self: RLMCollection {
@@ -81,7 +81,7 @@ extension _RandomAccessIterator where Self: RLMCollection {
 
 public typealias RLMDictionarySingleEntry = (key: String, value: RLMObject)
 public protocol _MapIterator {
-    func makeIterator() -> RLMDictionaryIterator;
+    func makeIterator() -> RLMDictionaryIterator
 }
 
 extension _MapIterator where Self: RLMCollection {

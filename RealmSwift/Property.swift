@@ -46,7 +46,7 @@ import Realm
 
     /// Indicates whether this property is a dictionary of the property type.
     public var isMap: Bool { return rlmProperty.dictionary }
-    
+
     /// Indicates whether this property is indexed.
     public var isIndexed: Bool { return rlmProperty.indexed }
 

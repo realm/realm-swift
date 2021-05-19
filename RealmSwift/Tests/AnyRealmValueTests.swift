@@ -1078,7 +1078,7 @@ class AnyRealmValueMapStringDecimal128Factory: MapValueFactory {
         func decima128(_ double: Double) -> AnyRealmValue {
             .decimal128(.init(floatLiteral: double))
         }
-        return [("key1", decima128(123.456)), ("key2" , decima128(993.456789)), ("key3", decima128(9874546.65456489))]
+        return [("key1", decima128(123.456)), ("key2", decima128(993.456789)), ("key3", decima128(9874546.65456489))]
     }
 
     static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
@@ -1273,7 +1273,7 @@ class AddableAnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: Primit
             map[element.key] = element.value
         }
 
-        let expected = ((values.map{ $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber)
+        let expected = ((values.map { $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber)
 
         // An unmanaged collection will return a double
         if case let .double(d) = map.sum() {
@@ -1290,7 +1290,7 @@ class AddableAnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: Primit
             map[element.key] = element.value
         }
 
-        let expected = ((values.map{ $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber)
+        let expected = ((values.map { $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber)
 
         let v: AnyRealmValue? = map.average()
         // An unmanaged collection will return a double

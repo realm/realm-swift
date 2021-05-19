@@ -538,9 +538,7 @@ public extension BoundMap where Value: RealmKeyedCollection {
     // property. To get around this we need an explicit `set` method.
     /// :nodoc:
     subscript( key: Key) -> Element? {
-        get {
-            self.wrappedValue[key]
-        }
+        self.wrappedValue[key]
     }
 
     /// :nodoc:
