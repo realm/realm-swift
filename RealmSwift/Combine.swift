@@ -728,7 +728,6 @@ public enum RealmPublishers {
 
         private let subscribable: Subscribable
         private let queue: DispatchQueue?
-//        private let keyPaths: [String]?
         internal init(_ subscribable: Subscribable, queue: DispatchQueue? = nil) {
             precondition(subscribable.realm != nil, "Only managed objects can be published")
             self.subscribable = subscribable

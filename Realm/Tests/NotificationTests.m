@@ -1272,8 +1272,8 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 
 #pragma mark - Object Notification Key Path Filtering
 
--(void) testModifyObservedKeyPathLocally {
-    id ex = [self expectationWithDescription:@"change notification"];
+- (void)testModifyObservedKeyPathLocally {
+    XCTestExpectation *ex = [self expectationWithDescription:@"change notification"];
     RLMNotificationToken *token = [_obj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
         XCTAssertFalse(deleted);
         XCTAssertNil(error);
@@ -1290,7 +1290,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
--(void) testModifyUnobservedKeyPathLocally {
+- (void)testModifyUnobservedKeyPathLocally {
     XCTestExpectation *ex = [self expectationWithDescription:@"no change notification"];
     ex.inverted = @YES;
     RLMNotificationToken *token = [_obj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
@@ -1303,8 +1303,8 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
--(void) testModifyObservedKeyPathRemotely {
-    id ex = [self expectationWithDescription:@"change notification"];
+- (void)testModifyObservedKeyPathRemotely {
+    XCTestExpectation *ex = [self expectationWithDescription:@"change notification"];
     RLMNotificationToken *token = [_obj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
         XCTAssertFalse(deleted);
         XCTAssertNil(error);
@@ -1325,7 +1325,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
--(void) testModifyUnobservedKeyPathRemotely {
+- (void)testModifyUnobservedKeyPathRemotely {
     XCTestExpectation *ex = [self expectationWithDescription:@"no change notification"];
     ex.inverted = @YES;
 
@@ -1343,8 +1343,8 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
--(void) testModifyObservedKeyPathArrayProperty {
-    id ex = [self expectationWithDescription:@"change notification"];
+- (void)testModifyObservedKeyPathArrayProperty {
+    XCTestExpectation *ex = [self expectationWithDescription:@"change notification"];
 
     RLMRealm *realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];
@@ -1373,7 +1373,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
--(void) testModifyUnobservedKeyPathArrayProperty {
+- (void)testModifyUnobservedKeyPathArrayProperty {
     XCTestExpectation *ex = [self expectationWithDescription:@"no change notification"];
     ex.inverted = @YES;
 

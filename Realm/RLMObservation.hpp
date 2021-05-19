@@ -20,6 +20,7 @@
 
 #import <realm/obj.hpp>
 #import <realm/object-store/binding_context.hpp>
+#import <realm/object-store/impl/deep_change_checker.hpp>
 #import <realm/table.hpp>
 
 @class RLMObjectBase, RLMRealm, RLMSchema, RLMProperty, RLMObjectSchema;
@@ -184,16 +185,13 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
 
 // RLMKeyPathFromString converts a string keypath to a vector of key
 // pairs to be used for deep change checking across links.
-// @Dominic - I couldn't use the objstore definitions because of alias confliction
-using RLMKeyPath = std::vector<std::pair<realm::TableKey, realm::ColKey>>;
-RLMKeyPath RLMKeyPathFromString(RLMRealm *realm,
+realm::KeyPath RLMKeyPathFromString(RLMRealm *realm,
                                 RLMSchema *schema,
                                 RLMObjectSchema *objectSchema,
                                 RLMClassInfo *info,
                                 NSString *keyPath);
 
-using RLMKeyPathArray = std::vector<std::vector<std::pair<realm::TableKey, realm::ColKey>>>;
-RLMKeyPathArray RLMKeyPathArrayFromStringArray(RLMRealm *realm,
+realm::KeyPathArray RLMKeyPathArrayFromStringArray(RLMRealm *realm,
                                                RLMSchema *schema,
                                            RLMObjectSchema *objectSchema,
                                            RLMClassInfo *info,
