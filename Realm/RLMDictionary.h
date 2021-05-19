@@ -209,7 +209,7 @@ NS_ASSUME_NONNULL_BEGIN
 
      NSNumber *min = [object.dictionaryProperty minOfProperty:@"age"];
 
- @warning You cannot use this method on Realm collection, and `NSData` properties.
+ @warning You cannot use this method on `RLMObject`, `RLMDictionary`, and `NSData` properties.
 
  @param property The property whose minimum value is desired. Only properties of
                  types `int`, `float`, `double`, and `NSDate` are supported.
@@ -223,7 +223,7 @@ NS_ASSUME_NONNULL_BEGIN
 
      NSNumber *max = [object.dictionaryProperty maxOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, `RLMArray`,  `RLMSet`, and `NSData` properties.
+ @warning You cannot use this method on `RLMObject`, `RLMDictionary`, and `NSData` properties.
 
  @param property The property whose maximum value is desired. Only properties of
                  types `int`, `float`, `double`, and `NSDate` are supported.
@@ -237,7 +237,7 @@ NS_ASSUME_NONNULL_BEGIN
 
      NSNumber *sum = [object.dictionaryProperty sumOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, `RLMArray`,  `RLMSet and `NSData` properties.
+ @warning You cannot use this method on `RLMObject`, `RLMDictionary`, and `NSData` properties.
 
  @param property The property whose values should be summed. Only properties of
                  types `int`, `float`, and `double` are supported.
@@ -251,7 +251,7 @@ NS_ASSUME_NONNULL_BEGIN
 
      NSNumber *average = [object.dictionaryProperty averageOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, `RLMSet`,  `RLMArray`, and `NSData` properties.
+ @warning You cannot use this method on `RLMObject`, `RLMDictionary`, and `NSData` properties.
 
  @param property The property whose average value should be calculated. Only
                  properties of types `int`, `float`, and `double` are supported.
@@ -403,7 +403,6 @@ __attribute__((warn_unused_result));
  `RLMDictionaryChange` is passed to the notification blocks registered with
  `-addNotificationBlock` on `RLMDictionary`, and reports what keys in the
  dictionary changed since the last time the notification block was called.
-
  */
 @interface RLMDictionaryChange : NSObject
 /// The keys in the new version of the dictionary which were newly inserted.

@@ -824,7 +824,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
         }
     } else if (auto dictionary = RLMDynamicCast<RLMDictionary>(objects)) {
         if (dictionary.type != RLMPropertyTypeObject) {
-            @throw RLMException(@"Cannot delete objects from RLMDictionary<NSString, %@>: only RLMObjects can be deleted.",
+            @throw RLMException(@"Cannot delete objects from RLMDictionary of type %@: only RLMObjects can be deleted.",
                                 RLMTypeToString(dictionary.type));
         }
     }

@@ -50,12 +50,14 @@ class SwiftRLMDictionaryTests: RLMTestCase {
 
         try! realm.commitWriteTransaction()
 
-        XCTAssertEqual(dObj.dict!.count, UInt(10), "10 objects added")
+        XCTAssertEqual(dict.count, UInt(10), "10 objects added")
 
         var totalSum = 0
 
-        for (_, value) in dObj.dict! {
+        for (key, value) in dict {
+            let obj = dict[key] as! SwiftRLMAggregateObject
             if let ao = value as? SwiftRLMAggregateObject {
+                XCTAssertEqual(obj.doubleCol, ao.doubleCol)
                 totalSum += ao.intCol
             }
         }
