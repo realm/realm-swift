@@ -616,8 +616,7 @@ KeyPathArray RLMKeyPathArrayFromStringArray(RLMRealm *realm,
                                                NSArray<NSString *> *keyPaths) {
     KeyPathArray rlmKeyPathArray;
     for (NSString *keyPath in keyPaths) {
-        KeyPath rlmKeyPath = RLMKeyPathFromString(realm ,schema, objectSchema, info, keyPath);
-        rlmKeyPathArray.push_back(rlmKeyPath);
+        rlmKeyPathArray.push_back(RLMKeyPathFromString(realm ,schema, objectSchema, info, keyPath));
     }
     return rlmKeyPathArray;
 }
