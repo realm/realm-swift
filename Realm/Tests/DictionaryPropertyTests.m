@@ -977,7 +977,8 @@
     DogObject *a1 = [DogObject createInDefaultRealmWithValue:@[@"a", @1]];
     DogObject *b2 = [DogObject createInDefaultRealmWithValue:@[@"b", @2]];
     
-    RLMDictionary<RLMString, DogObject> *dict = [DogDictionaryObject createInDefaultRealmWithValue:@[@{@"a1": a1, @"b1": b1, @"a2": a2, @"b2": b2}]].dogs;
+    RLMDictionary<NSString *, DogObject *><RLMString, DogObject> *dict
+        = [DogDictionaryObject createInDefaultRealmWithValue:@[@{@"a1": a1, @"b1": b1, @"a2": a2, @"b2": b2}]].dogs;
     [realm commitWriteTransaction];
     
     RLMResults *notActuallySorted = [dict sortedResultsUsingDescriptors:@[]];
@@ -1104,8 +1105,8 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
-    RLMDictionary<RLMString, EmployeeObject> *employees = [CompanyObject createInDefaultRealmWithValue:@[@"company"]].employeeDict;
-    RLMDictionary<RLMString, RLMInt> *ints = [AllPrimitiveDictionaries createInDefaultRealmWithValue:@[]].intObj;
+    RLMDictionary<NSString *, EmployeeObject *><RLMString, EmployeeObject> *employees = [CompanyObject createInDefaultRealmWithValue:@[@"company"]].employeeDict;
+    RLMDictionary<NSString *, NSNumber *><RLMString, RLMInt> *ints = [AllPrimitiveDictionaries createInDefaultRealmWithValue:@[]].intObj;
     for (NSInteger i = 0; i < 1012; ++i) {
         EmployeeObject *person = [[EmployeeObject alloc] init];
         person.name = @"Mary";
@@ -1355,9 +1356,9 @@
     [(RLMNotificationToken *)token invalidate];
 }
 
-static RLMDictionary<RLMString, IntObject> *managedTestDictionary() {
+static RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *managedTestDictionary() {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    RLMDictionary<RLMString, IntObject> *dict;
+    RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *dict;
     [realm beginWriteTransaction];
     dict = [DictionaryPropertyObject createInDefaultRealmWithValue:
             @{@"intObjDictionary": @{@"0": @[@0], @"1": @[@1]}}].intObjDictionary;
@@ -1366,7 +1367,7 @@ static RLMDictionary<RLMString, IntObject> *managedTestDictionary() {
 }
 
 - (void)testAllMethodsCheckThread {
-    RLMDictionary<RLMString, IntObject> *dict = managedTestDictionary();
+    RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *dict = managedTestDictionary();
     IntObject *io = dict.allValues.firstObject;
     RLMRealm *realm = dict.realm;
     [realm beginWriteTransaction];
@@ -1393,7 +1394,7 @@ static RLMDictionary<RLMString, IntObject> *managedTestDictionary() {
 }
 
 - (void)testAllMethodsCheckForInvalidation {
-    RLMDictionary<RLMString, IntObject> *dictionary = managedTestDictionary();
+    RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *dictionary = managedTestDictionary();
     IntObject *io = dictionary[@"0"];
     RLMRealm *realm = dictionary.realm;
 
@@ -1450,7 +1451,7 @@ static RLMDictionary<RLMString, IntObject> *managedTestDictionary() {
 }
 
 - (void)testMutatingMethodsCheckForWriteTransaction {
-    RLMDictionary<RLMString, IntObject> *dict = managedTestDictionary();
+    RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *dict = managedTestDictionary();
     IntObject *io = dict.allValues.firstObject;
     
     XCTAssertNoThrow([dict objectClassName]);
@@ -1478,7 +1479,7 @@ static RLMDictionary<RLMString, IntObject> *managedTestDictionary() {
 }
 
 - (void)testDeleteObjectFromOutsideDictionary {
-    RLMDictionary<RLMString, IntObject> *dict = managedTestDictionary();
+    RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *dict = managedTestDictionary();
     RLMRealm *realm = dict.realm;
     [realm beginWriteTransaction];
 

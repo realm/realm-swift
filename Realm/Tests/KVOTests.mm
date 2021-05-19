@@ -83,18 +83,18 @@ RLM_COLLECTION_TYPE(KVOLinkObject1)
 @property RLMSet<RLMValue>      *anySet;
 @property RLMSet<KVOObject>     *objectSet;
 
-@property RLMDictionary<RLMString, RLMBool>       *boolDictionary;
-@property RLMDictionary<RLMString, RLMInt>        *intDictionary;
-@property RLMDictionary<RLMString, RLMFloat>      *floatDictionary;
-@property RLMDictionary<RLMString, RLMDouble>     *doubleDictionary;
-@property RLMDictionary<RLMString, RLMString>     *stringDictionary;
-@property RLMDictionary<RLMString, RLMData>       *dataDictionary;
-@property RLMDictionary<RLMString, RLMDate>       *dateDictionary;
-@property RLMDictionary<RLMString, RLMObjectId>   *objectIdDictionary;
-@property RLMDictionary<RLMString, RLMDecimal128> *decimal128Dictionary;
-@property RLMDictionary<RLMString, RLMUUID>       *uuidDictionary;
-@property RLMDictionary<RLMString, RLMValue>      *anyDictionary;
-@property RLMDictionary<RLMString, KVOObject>     *objectDictionary;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMBool>       *boolDictionary;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMInt>        *intDictionary;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMFloat>      *floatDictionary;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMDouble>     *doubleDictionary;
+@property RLMDictionary<NSString *, NSString *><RLMString, RLMString>     *stringDictionary;
+@property RLMDictionary<NSString *, NSData *><RLMString, RLMData>         *dataDictionary;
+@property RLMDictionary<NSString *, NSDate *><RLMString, RLMDate>         *dateDictionary;
+@property RLMDictionary<NSString *, RLMObjectId *><RLMString, RLMObjectId>     *objectIdDictionary;
+@property RLMDictionary<NSString *, RLMDecimal128 *><RLMString, RLMDecimal128> *decimal128Dictionary;
+@property RLMDictionary<NSString *, NSUUID *><RLMString, RLMUUID>         *uuidDictionary;
+@property RLMDictionary<NSString *, NSObject *><RLMString, RLMValue>      *anyDictionary;
+@property RLMDictionary<NSString *, KVOObject *><RLMString, KVOObject>    *objectDictionary;
 
 @property NSNumber<RLMInt>    *optIntCol;
 @property NSNumber<RLMFloat>  *optFloatCol;
@@ -127,7 +127,7 @@ RLM_COLLECTION_TYPE(KVOLinkObject1)
 @property KVOLinkObject1 *obj;
 @property RLMArray<KVOLinkObject1> *array;
 @property RLMSet<KVOLinkObject1> *set;
-@property RLMDictionary<RLMString, KVOLinkObject1> *dictionary;
+@property RLMDictionary<NSString *, KVOLinkObject1 *><RLMString, KVOLinkObject1> *dictionary;
 @end
 @implementation KVOLinkObject2
 + (NSString *)primaryKey {

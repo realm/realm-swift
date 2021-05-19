@@ -479,7 +479,7 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         let sortedByAge = company.employeeDict.sortedResults(usingKeyPath: "age", ascending: true)
         let sortedByName = sortedByAge.sortedResults(usingKeyPath: "name", ascending: false)
 
-        XCTAssertEqual(Int32(20), (sortedByAge[0] as! EmployeeObject).age)
-        XCTAssertEqual(Int32(40), (sortedByName[0] as! EmployeeObject).age)
+        XCTAssertEqual(Int32(20), sortedByAge[0].age)
+        XCTAssertEqual(Int32(40), sortedByName[0].age)
     }
 }

@@ -134,16 +134,16 @@ RLM_COLLECTION_TYPE(Person);
 
 @interface RLMDictionarySyncObject : RLMObject
 @property RLMObjectId *_id;
-@property RLMDictionary<RLMString, RLMInt> *intDictionary;
-@property RLMDictionary<RLMString, RLMBool> *boolDictionary;
-@property RLMDictionary<RLMString, RLMString> *stringDictionary;
-@property RLMDictionary<RLMString, RLMData> *dataDictionary;
-@property RLMDictionary<RLMString, RLMDouble> *doubleDictionary;
-@property RLMDictionary<RLMString, RLMObjectId> *objectIdDictionary;
-@property RLMDictionary<RLMString, RLMDecimal128> *decimalDictionary;
-@property RLMDictionary<RLMString, RLMUUID> *uuidDictionary;
-@property RLMDictionary<RLMString, RLMValue> *anyDictionary;
-@property RLMDictionary<RLMString, Person> *objectDictionary;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMInt> *intDictionary;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMBool> *boolDictionary;
+@property RLMDictionary<NSString *, NSString *><RLMString, RLMString> *stringDictionary;
+@property RLMDictionary<NSString *, NSData *><RLMString, RLMData> *dataDictionary;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMDouble> *doubleDictionary;
+@property RLMDictionary<NSString *, RLMObjectId *><RLMString, RLMObjectId> *objectIdDictionary;
+@property RLMDictionary<NSString *, RLMDecimal128 *><RLMString, RLMDecimal128> *decimalDictionary;
+@property RLMDictionary<NSString *, NSUUID *><RLMString, RLMUUID> *uuidDictionary;
+@property RLMDictionary<NSString *, NSObject *><RLMString, RLMValue> *anyDictionary;
+@property RLMDictionary<NSString *, Person *><RLMString, Person> *objectDictionary;
 
 @end
 
