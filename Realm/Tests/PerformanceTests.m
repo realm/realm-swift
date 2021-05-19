@@ -269,7 +269,11 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [realm beginWriteTransaction];
     DictionaryPropertyObject *dpo = [DictionaryPropertyObject
                                      createInRealm:realm
-                                     withValue:@[@"name", [StringObject allObjectsInRealm:realm], @[]]];
+                                     withValue:@[]];
+    for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
+        NSString *key = [[NSUUID UUID] UUIDString];
+        dpo.stringDictionary[key] = so;
+    }
     [realm commitWriteTransaction];
 
     [self measureBlock:^{
