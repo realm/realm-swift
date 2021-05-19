@@ -180,7 +180,7 @@ NS_ASSUME_NONNULL_BEGIN
   @warning This method may only be called during a write transaction.
 
   @param otherDictionary An enumerable object such as `NSDictionary` or `RLMDictionary` which contains objects of the
-                same type as the receiving dictionary.
+         same type as the receiving dictionary.
  */
 - (void)addEntriesFromDictionary:(id <NSFastEnumeration>)otherDictionary;
 

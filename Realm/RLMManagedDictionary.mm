@@ -105,16 +105,6 @@ static NSArray *toArray(std::vector<realm::Mixed> const& v) {
     return toArray(_changes.modifications);
 }
 
-static NSArray *toIndexPathArray(realm::IndexSet const& set, NSUInteger section) {
-    NSMutableArray *ret = [NSMutableArray new];
-    NSUInteger path[2] = {section, 0};
-    for (auto index : set.as_indexes()) {
-        path[1] = index;
-        [ret addObject:[NSIndexPath indexPathWithIndexes:path length:2]];
-    }
-    return ret;
-}
-
 - (NSString *)description {
     return [NSString stringWithFormat:@"<RLMDictionaryChange: %p> insertions: %@, modifications: %@",
             (__bridge void *)self, self.insertions, self.modifications];
@@ -169,6 +159,15 @@ static NSArray *toIndexPathArray(realm::IndexSet const& set, NSUInteger section)
     auto col = parentObject->_info->tableColumn(property);
     return [self initWithBackingCollection:realm::object_store::Dictionary(realm->_realm, parentObject->_row, col)
                                 parentInfo:parentObject->_info
+                                  property:property];
+}
+
+- (RLMManagedDictionary *)initWithParent:(realm::Obj)parent
+                                property:(__unsafe_unretained RLMProperty *const)property
+                              parentInfo:(RLMClassInfo&)info {
+    auto col = info.tableColumn(property);
+    return [self initWithBackingCollection:realm::object_store::Dictionary(info.realm->_realm, parent, col)
+                                parentInfo:&info
                                   property:property];
 }
 
@@ -418,7 +417,6 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
                                                     id obj, BOOL *stop))block {
     for (id key in [self allKeys]) {
         BOOL stop = false;
-        id value = self[key];
         block(key, self[key], &stop);
         if (stop) {
             break;
@@ -626,9 +624,9 @@ realm::object_store::Dictionary& RLMGetBackingCollection(RLMManagedDictionary *s
                                                           property:parentInfo->rlmObjectSchema[metadata.key]];
 }
 
-RLMNotificationToken *RLMAddNotificationBlock(RLMManagedDictionary *collection,
-                                              void (^block)(id, RLMDictionaryChange *, NSError *),
-                                              dispatch_queue_t queue) {
+static RLMNotificationToken *RLMAddNotificationBlock(RLMManagedDictionary *collection,
+                                                     void (^block)(id, RLMDictionaryChange *, NSError *),
+                                                     dispatch_queue_t queue) {
     RLMRealm *realm = collection.realm;
     if (!realm) {
         @throw RLMException(@"Linking objects notifications are only supported on managed objects.");
