@@ -429,13 +429,8 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
     bool skipFirst = std::is_same_v<RLMCollection, RLMResults>;
     auto token = [[RLMCancellationToken alloc] init];
     
-    realm::KeyPathArray keyPathArray;
-    for (NSString *keyPath in keyPaths) {
-        // ???: Is it possible to hit this when a collection doesn't have an RLMClassinfo?
-        RLMClassInfo *info = collection.objectInfo;
-        RLMKeyPath rlmKeyPath = RLMKeyPathFromString(realm.schema, info->rlmObjectSchema, info, keyPath);
-        keyPathArray.push_back(rlmKeyPath);
-    }
+    RLMClassInfo *info = collection.objectInfo;
+    RLMKeyPathArray keyPathArray = RLMKeyPathArrayFromStringArray(realm ,realm.schema, info->rlmObjectSchema, info, keyPaths);
 
     if (!queue) {
         [realm verifyNotificationsAreSupported:true];

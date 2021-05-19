@@ -186,8 +186,15 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
 // pairs to be used for deep change checking across links.
 // @Dominic - I couldn't use the objstore definitions because of alias confliction
 using RLMKeyPath = std::vector<std::pair<realm::TableKey, realm::ColKey>>;
-RLMKeyPath RLMKeyPathFromString(RLMSchema *schema,
+RLMKeyPath RLMKeyPathFromString(RLMRealm *realm,
+                                RLMSchema *schema,
                                 RLMObjectSchema *objectSchema,
                                 RLMClassInfo *info,
                                 NSString *keyPath);
 
+using RLMKeyPathArray = std::vector<std::vector<std::pair<realm::TableKey, realm::ColKey>>>;
+RLMKeyPathArray RLMKeyPathArrayFromStringArray(RLMRealm *realm,
+                                               RLMSchema *schema,
+                                           RLMObjectSchema *objectSchema,
+                                           RLMClassInfo *info,
+                                           NSArray<NSString *> *keyPath);

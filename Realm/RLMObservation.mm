@@ -556,48 +556,33 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
     }
 }
 
-RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema, RLMClassInfo *info, NSString *keyPath) {
+RLMKeyPath RLMKeyPathFromString(RLMRealm *realm, RLMSchema *schema, RLMObjectSchema *rlmObjectSchema, RLMClassInfo *info, NSString *keyPath) {
     RLMProperty *property;
     std::vector<std::pair<TableKey, ColKey>> keyPairs;
 
-    TableRef table = info->table();
     NSUInteger start = 0, length = keyPath.length, end = NSNotFound;
     do {
         end = [keyPath rangeOfString:@"." options:0 range:{start, length - start}].location;
         NSString *propertyName = [keyPath substringWithRange:{start, end == NSNotFound ? length - start : end - start}];
-        property = objectSchema[propertyName];
+        property = rlmObjectSchema[propertyName];
         RLMPrecondition(property, @"Invalid property name",
                         @"Property '%@' not found in object of type '%@'",
-                        propertyName, objectSchema.className);
+                        propertyName, rlmObjectSchema.className);
 
         if (end != NSNotFound) {
             RLMPrecondition(property.type == RLMPropertyTypeObject || property.type == RLMPropertyTypeLinkingObjects,
                             @"Invalid value", @"Property '%@' is not a link in object of type '%@'",
-                            propertyName, objectSchema.className);
-
+                            propertyName, rlmObjectSchema.className);
             REALM_ASSERT(property.objectClassName);
 
-            TableKey tk = table->get_key();
+            TableKey tk = info->objectSchema->table_key;
             ColKey ck;
             if (property.type == RLMPropertyTypeObject) {
-                ck = table->get_column_key(property.columnName.UTF8String);
-                table = table->get_link_target(ck);
+                ck = info->tableColumn(property.columnName);
+                info = &realm->_info[property.objectClassName];
             } else if (property.type == RLMPropertyTypeLinkingObjects) {
-                // If the property type is a backlink, subsequent keys must be retrieved from the origin table
-                NSString *originTableName = [NSString stringWithFormat:@"class_%@", property.objectClassName];
-                StringData originTableNameStringData = RLMStringDataWithNSString(originTableName);
-                TableRef originTable = info->realm->_realm->read_group().get_table(originTableNameStringData);
-                
-                // The property from the origin table that links to the current property in the target table
-                NSString *originForwardLinkColumnName = property.linkOriginPropertyName;
-                StringData originForwardLinkColumnStringData = RLMStringDataWithNSString(originForwardLinkColumnName);
-                ColKey forwardLinkColumnKey = originTable->get_column_key(originForwardLinkColumnStringData);
-                
-                // Get the opposite (backlinked) column from the origin table
-                ck = originTable->get_opposite_column(forwardLinkColumnKey);
-                // Reassign table to the origin table so subsequent
-                // iterations can access column keys from origin table
-                table = originTable;
+                ck = info->computedTableColumn(property);
+                info = &realm->_info[property.objectClassName];
             } else {
                 // This branch should never be reached. This case should have been caught by precondition above.
                 // How should an error be properly thrown?
@@ -605,33 +590,35 @@ RLMKeyPath RLMKeyPathFromString(RLMSchema *schema, RLMObjectSchema *objectSchema
             }
 
             keyPairs.push_back(std::make_pair(tk, ck));
-            objectSchema = schema[property.objectClassName];
+            rlmObjectSchema = schema[property.objectClassName];
         }
 
         start = end + 1;
     } while (end != NSNotFound);
 
-    TableKey tk = table->get_key();
+    TableKey tk = info->objectSchema->table_key;
     ColKey ck;
-    // TODO: refactor
     if (property.type == RLMPropertyTypeLinkingObjects) {
-        // If the property type is a backlink, subsequent keys must be retrieved from the origin table
-        NSString *originTableName = [NSString stringWithFormat:@"class_%@", property.objectClassName];
-        StringData originTableNameStringData = RLMStringDataWithNSString(originTableName);
-        TableRef originTable = info->realm->_realm->read_group().get_table(originTableNameStringData);
-
-        // The property from the origin table that links to the current property in the target table
-        NSString *originForwardLinkColumnName = property.linkOriginPropertyName;
-        StringData originForwardLinkColumnStringData = RLMStringDataWithNSString(originForwardLinkColumnName);
-        ColKey forwardLinkColumnKey = originTable->get_column_key(originForwardLinkColumnStringData);
-
-        // Get the opposite (backlinked) column from the origin table
-        ck = originTable->get_opposite_column(forwardLinkColumnKey);
+        ck = info->computedTableColumn(property);
     } else {
-        ck = table->get_column_key(property.columnName.UTF8String);
+        ck = info->tableColumn(property.columnName);
     }
     keyPairs.push_back(std::make_pair(tk, ck));
-    
     return keyPairs;
+}
+
+// Some parameters ultimately not used.
+// TODO: clean up unused parameters
+RLMKeyPathArray RLMKeyPathArrayFromStringArray(RLMRealm *realm,
+                                               RLMSchema *schema,
+                                               RLMObjectSchema *objectSchema,
+                                               RLMClassInfo *info,
+                                               NSArray<NSString *> *keyPaths) {
+    RLMKeyPathArray rlmKeyPathArray;
+    for (NSString *keyPath in keyPaths) {
+        RLMKeyPath rlmKeyPath = RLMKeyPathFromString(realm ,schema, objectSchema, info, keyPath);
+        rlmKeyPathArray.push_back(rlmKeyPath);
+    }
+    return rlmKeyPathArray;
 }
 
