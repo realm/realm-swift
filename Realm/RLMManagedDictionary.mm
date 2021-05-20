@@ -438,6 +438,9 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (id)valueForKey:(NSString *)key {
     if ([key hasPrefix:@"@"]) {
+        if ([key isEqualToString:[NSString stringWithFormat:@"@%@", RLMInvalidatedKey]]) {
+            return @(!_backingCollection.is_valid());
+        }
         return [super managedValueForKey:[key substringFromIndex:1]];
     }
     return [self objectForKey:key];

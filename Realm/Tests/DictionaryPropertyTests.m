@@ -558,6 +558,7 @@
     unmanObj.intDictionary[@"one"] = @1;
     XCTAssertEqualObjects((@[@"one"]), [unmanObj.intDictionary valueForKey:@"@allKeys"]);
     XCTAssertEqualObjects((@[@1]), [unmanObj.intDictionary valueForKey:@"@allValues"]);
+    XCTAssertEqualObjects([unmanObj.intDictionary valueForKey:@"@invalidated"], @NO);
 
     // managed
     RLMRealm *realm = [self realmWithTestPath];
@@ -576,6 +577,7 @@
     XCTAssertEqualObjects(obj.stringDictionary.realm, [obj.stringDictionary valueForKey:@"@realm"]);
     XCTAssertEqualObjects((@[@"one"]), [obj.stringDictionary valueForKey:@"@allKeys"]);
     XCTAssertEqualObjects([child1 stringCol], [[obj.stringDictionary valueForKey:@"@allValues"][0] stringCol]);
+    XCTAssertEqualObjects([obj.stringDictionary valueForKey:@"@invalidated"], @NO);
 }
 
 - (void)testObjectAggregate {
@@ -1126,22 +1128,20 @@
 
     RLMAssertMatches(employees.description,
                      @"(?s)RLMDictionary\\<string, EmployeeObject\\> \\<0x[a-z0-9]+\\> \\(\n"
-                     @"\t\\[0\\] \\[[0-9]+\\]: EmployeeObject \\{\n"
+                     @"\\[[0-9]+\\]: EmployeeObject \\{\n"
                      @"\t\tname = Mary;\n"
                      @"\t\tage = 24;\n"
                      @"\t\thired = 1;\n"
                      @"\t\\},\n"
                      @".*\n"
-                     @"\t... 912 objects skipped.\n"
                      @"\\)");
 
     RLMAssertMatches(ints.description,
                      @"(?s)RLMDictionary\\<string, int\\> \\<0x[a-z0-9]+\\> \\(\n"
-                     @"\t\\[0\\] \\[[0-9]+\\]: [0-9]+,\n"
-                     @"\t\\[1\\] \\[[0-9]+\\]: [0-9]+,\n"
+                     @"\\[[0-9]+\\]: [0-9]+,\n"
+                     @"\\[[0-9]+\\]: [0-9]+,\n"
                      @".*\n"
-                     @"\t\\[99\\] \\[[0-9]+\\]: [0-9]+\n"
-                     @"\t... 912 objects skipped.\n"
+                     @"\\[[0-9]+\\]: [0-9]+\n"
                      @"\\)");
 }
 
