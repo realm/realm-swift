@@ -3714,9 +3714,9 @@ static NSData *data(const char *str) {
     [realm beginWriteTransaction];
     StringObject *so1 = [StringObject createInRealm:realm withValue:@[@"value1"]];
     RLMAssertThrowsWithReasonMatching(([realm objects:@"ArrayPropertyObject" where:@"ANY array.@allValues = %@", so1]), @"@allValues is only valid for dictionary");
-    RLMAssertThrowsWithReasonMatching(([realm objects:@"ArrayPropertyObject" where:@"ANY array.@allKeys = %@", so1]), @"@allValues is only valid for dictionary");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"ArrayPropertyObject" where:@"ANY array.@allKeys = %@", so1]), @"@allKeys is only valid for dictionary");
     RLMAssertThrowsWithReasonMatching(([realm objects:@"SetPropertyObject" where:@"ANY set.@allValues = %@", so1]), @"@allValues is only valid for dictionary");
-    RLMAssertThrowsWithReasonMatching(([realm objects:@"SetPropertyObject" where:@"ANY set.@allKeys = %@", so1]), @"@allValues is only valid for dictionary");
+    RLMAssertThrowsWithReasonMatching(([realm objects:@"SetPropertyObject" where:@"ANY set.@allKeys = %@", so1]), @"@allKeys is only valid for dictionary");
     [realm cancelWriteTransaction];
 }
 

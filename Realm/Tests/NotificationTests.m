@@ -329,15 +329,6 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
             for (int i = 0; i < 10; ++i) {
                 IntObject *io = [IntObject createInDefaultRealmWithValue:@[@(i)]];
                 [ArrayPropertyObject createInDefaultRealmWithValue:@[@"", @[], @[io]]];
-                [DictionaryPropertyObject createInDefaultRealmWithValue:@{
-                    @"stringCol": @{},
-                    @"intDictionary": @{@"0": @{@"intCol":@0},
-                                        @"1": @{@"intCol":@1},
-                                        @"2": @{@"intCol":@2},
-                    },
-                    @"primitiveStringDictionary": @{},
-                    @"embeddedDictionary": @{}
-                }];
             }
         }];
     }
@@ -345,15 +336,6 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 
 - (RLMResults *)query {
     return [IntObject objectsWhere:@"intCol > 0 AND intCol < 5"];
-}
-
-- (void)testCrashOnDeleteFromDictionary {
-    ExpectNoChange(self, ^(RLMRealm *realm) {
-        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol > 4"]];
-    });
-    ExpectNoChange(self, ^(RLMRealm *realm) {
-        [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol > 4"]];
-    });
 }
 
 - (void)testDeleteMultiple {

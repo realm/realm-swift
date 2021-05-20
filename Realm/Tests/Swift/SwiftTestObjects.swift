@@ -50,7 +50,7 @@ class SwiftRLMObject: RLMObject {
     @objc dynamic var arrayCol = RLMArray<SwiftRLMBoolObject>(objectClassName: SwiftRLMBoolObject.className())
     @objc dynamic var setCol = RLMSet<SwiftRLMBoolObject>(objectClassName: SwiftRLMBoolObject.className())
     @objc dynamic var uuidCol = UUID(uuidString: "00000000-0000-0000-0000-000000000000")
-    @objc dynamic var rlmValue: RLMValue = NSString(string: "A Mixed Object")
+    @objc dynamic var rlmValue: RLMValue = "A Mixed Object" as NSString
 }
 
 class SwiftRLMOptionalObject: RLMObject {
@@ -141,7 +141,7 @@ class SwiftRLMDictionaryPropertyObject: RLMObject {
 }
 
 class SwiftRLMDictionaryEmployeeObject: RLMObject {
-    @objc dynamic var dict = RLMDictionary<NSObject, SwiftRLMEmployeeObject>(objectClassName: SwiftRLMEmployeeObject.className())
+    @objc dynamic var dict = RLMDictionary<NSString, SwiftRLMEmployeeObject>(objectClassName: SwiftRLMEmployeeObject.className())
 }
 
 class SwiftRLMDynamicObject: RLMObject {

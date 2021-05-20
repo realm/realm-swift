@@ -2611,13 +2611,6 @@ public:
     else if (RLMArray *array = RLMDynamicCast<RLMArray>(value)) {
         return array;
     }
-    else if (RLMSet *set = RLMDynamicCast<RLMSet>(value)) {
-        return array;
-    }
-    else if (RLMDictionary *dictionary = RLMDynamicCast<RLMDictionary>(value)) {
-        XCTFail(@"unsupported type");
-        return dictionary;
-    }
     else {
         XCTFail(@"unsupported type");
         return nil;
