@@ -171,23 +171,21 @@ static NSArray *toArray(std::vector<realm::Mixed> const& v) {
                                   property:property];
 }
 
-template<typename ObjcCollection>
-void RLMCollectionValidateObservationKey(__unsafe_unretained NSString *const keyPath,
-                                         __unsafe_unretained ObjcCollection *const collection) {
+void RLMDictionaryValidateObservationKey(__unsafe_unretained NSString *const keyPath,
+                                         __unsafe_unretained RLMDictionary *const dictionary) {
     if (![keyPath isEqualToString:RLMInvalidatedKey]) {
         @throw RLMException(@"[<%@ %p> addObserver:forKeyPath:options:context:] is not supported. Key path: %@",
-                            [collection class], collection, keyPath);
+                            [dictionary class], dictionary, keyPath);
     }
 }
 
-template<typename ObjcCollection, typename ManagedObjcCollection>
-void RLMEnsureCollectionObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
+void RLMEnsureDictionaryObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
                                         __unsafe_unretained NSString *const keyPath,
-                                        __unsafe_unretained ObjcCollection *const collection,
+                                        __unsafe_unretained RLMDictionary *const dictionary,
                                         __unsafe_unretained id const observed) {
-    RLMCollectionValidateObservationKey<ObjcCollection>(keyPath, collection);
-    if (!info && collection.class == [ManagedObjcCollection class]) {
-        auto lv = static_cast<ManagedObjcCollection *>(collection);
+    RLMDictionaryValidateObservationKey(keyPath, dictionary);
+    if (!info && dictionary.class == [RLMManagedDictionary class]) {
+        auto lv = static_cast<RLMManagedDictionary *>(dictionary);
         info = std::make_unique<RLMObservationInfo>(*lv->_ownerInfo,
                                                     lv->_backingCollection.get_parent_object_key(),
                                                     observed);
@@ -531,7 +529,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
          forKeyPath:(NSString *)keyPath
             options:(NSKeyValueObservingOptions)options
             context:(void *)context {
-    RLMEnsureCollectionObservationInfo<RLMDictionary, RLMManagedDictionary>(_observationInfo, keyPath, self, self);
+    RLMEnsureDictionaryObservationInfo(_observationInfo, keyPath, self, self);
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
