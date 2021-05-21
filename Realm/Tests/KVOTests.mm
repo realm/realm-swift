@@ -2040,7 +2040,6 @@ public:
 
 - (void)testDeleteObjectsInSetViaTableClear {
     KVOLinkObject2 *obj = [self createLinkObject];
-    KVOLinkObject2 *obj2 = [self createLinkObject];
     KVORecorder r(self, obj, @"set");
 
     [obj.set addObject:obj.obj];
@@ -2105,7 +2104,6 @@ public:
 
 - (void)testDeleteObjectsInDictionaryViaTableClear {
     KVOLinkObject2 *obj = [self createLinkObject];
-    KVOLinkObject2 *obj2 = [self createLinkObject];
     KVORecorder r(self, obj, @"dictionary");
 
     [obj.dictionary setObject:obj.obj forKey:@"key"];
@@ -2148,9 +2146,7 @@ public:
 
 - (void)testInvalidOperationOnObservedDictionary {
     KVOLinkObject2 *obj = [self createLinkObject];
-    KVOLinkObject2 *obj2 = [self createLinkObject];
     KVOLinkObject1 *linked = obj.obj;
-    [obj.dictionary setObject:linked forKey:@"key"];
     KVORecorder r(self, obj, @"dictionary");
     XCTAssertThrows([obj.dictionary setObject:(id)@1 forKey:@"key"]);
     // A KVO notification is still sent to observers on the same thread since we

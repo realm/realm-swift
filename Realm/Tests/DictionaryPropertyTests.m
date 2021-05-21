@@ -412,9 +412,9 @@
         XCTFail(@"Should be empty");
     }
 
-    [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(id<RLMDictionaryKey>  _Nonnull key,
-                                                              id  _Nonnull obj,
-                                                              BOOL * _Nonnull stop) {
+    [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(__unused id<RLMDictionaryKey>  _Nonnull key,
+                                                              __unused id  _Nonnull value,
+                                                              __unused BOOL * _Nonnull stop) {
         XCTFail(@"Should be empty");
     }];
 
@@ -460,7 +460,7 @@
 
     [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(id<RLMDictionaryKey>  _Nonnull key,
                                                               EmployeeObject * _Nonnull obj,
-                                                              BOOL * _Nonnull stop) {
+                                                              __unused BOOL * _Nonnull stop) {
         XCTAssertEqual([company.employeeDict[key] name], [obj name]);
         XCTAssertEqual(((EmployeeObject *)company.employeeDict[key]).age, [obj age]);
         XCTAssertEqual([company.employeeDict[key] hired], [obj hired]);
@@ -510,7 +510,7 @@
 
     [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(id<RLMDictionaryKey>  _Nonnull key,
                                                               id  _Nonnull obj,
-                                                              BOOL * _Nonnull stop) {
+                                                              __unused BOOL * _Nonnull stop) {
         [company.employeeDict setObject:obj forKey:key];
     }];
     XCTAssertEqual(totalCount, company.employeeDict.count);
@@ -546,9 +546,9 @@
     [realm commitWriteTransaction];
 
     [realm beginWriteTransaction];
-    [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(id<RLMDictionaryKey>  _Nonnull key,
-                                                              id  _Nonnull obj,
-                                                              BOOL * _Nonnull stop) {
+    [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(__unused id<RLMDictionaryKey>  _Nonnull key,
+                                                              __unused id  _Nonnull obj,
+                                                              __unused BOOL * _Nonnull stop) {
         [realm deleteObjects:company.employees];
     }];
     [realm commitWriteTransaction];
@@ -835,10 +835,10 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
-    EmployeeObject *po1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
     [EmployeeObject createInRealm:realm withValue:@{@"name": @"John", @"age": @30, @"hired": @NO}];
-    EmployeeObject *po3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
-    EmployeeObject *po4 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Bill", @"age": @55, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    [EmployeeObject createInRealm:realm withValue:@{@"name": @"Bill", @"age": @55, @"hired": @YES}];
     
     // create company
     CompanyObject *company = [[CompanyObject alloc] init];
@@ -1294,7 +1294,9 @@
     [realm commitWriteTransaction];
 
     id expectation = [self expectationWithDescription:@""];
-    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMDictionaryChange *change, NSError *error) {
+    id token = [dict.stringDictionary addNotificationBlock:^(__unused RLMDictionary *dictionary,
+                                                             __unused RLMDictionaryChange *change,
+                                                             __unused NSError *error) {
         // will throw if it's incorrectly called a second time due to the
         // unrelated write transaction
         [expectation fulfill];
@@ -1321,7 +1323,9 @@
     [realm commitWriteTransaction];
 
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMDictionaryChange *change, NSError *error) {
+    id token = [dict.stringDictionary addNotificationBlock:^(__unused RLMDictionary *dictionary,
+                                                             __unused RLMDictionaryChange *change,
+                                                             __unused NSError *error) {
         XCTAssertNotNil(dictionary);
         XCTAssertNil(error);
         // will throw if it's called a second time before we create the new
@@ -1359,7 +1363,9 @@
     [realm commitWriteTransaction];
     
     __block id expectation = [self expectationWithDescription:@""];
-    id token = [dict.stringDictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMDictionaryChange *change, NSError *error) {
+    id token = [dict.stringDictionary addNotificationBlock:^(__unused RLMDictionary *dictionary,
+                                                             __unused RLMDictionaryChange *change,
+                                                             __unused NSError *error) {
         XCTAssertNotNil(dictionary);
         XCTAssertNil(error);
         [expectation fulfill];
