@@ -20,6 +20,7 @@ import Foundation
 import Realm
 import Realm.Private
 
+// :nodoc:
 public protocol _MapKey: Hashable {
     static var _rlmType: RLMPropertyType { get }
 }
@@ -53,12 +54,12 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     /// Indicates if the map can no longer be accessed.
     public var isInvalidated: Bool { return _rlmCollection.isInvalidated }
 
-    /// Returns all of the keys in this dictionary.
+    /// Returns all of the keys in this map.
     public var keys: [Key] {
         return rlmDictionary.allKeys.map(dynamicBridgeCast)
     }
 
-    /// Returns all of the values in the dictionary.
+    /// Returns all of the values in this map.
     public var values: [Value] {
         return rlmDictionary.allValues.map(dynamicBridgeCast)
     }
@@ -82,7 +83,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     // MARK: Mutation
 
     /**
-     Updates the value stored in the dictionary for the given key, or adds a new key-value pair if the key does not exist.
+     Updates the value stored in the map for the given key, or adds a new key-value pair if the key does not exist.
 
      - parameter value: a value's key path predicate.
      - parameter forKey: The direction to sort in.
@@ -99,7 +100,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     }
 
     /**
-     Removes all objects from the dictionary. The objects are not removed from the Realm that manages them.
+     Removes all objects from the map. The objects are not removed from the Realm that manages them.
 
      - warning: This method may only be called during a write transaction.
      */
@@ -167,7 +168,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     }
 
     /**
-     Adds a given key-value pair to the dictionary or updates a given key should it already exist.
+     Adds a given key-value pair to the map or updates a given key should it already exist.
 
      - warning: This method can only be called during a write transaction.
 
@@ -209,9 +210,9 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     // MARK: Sorting
 
     /**
-     Returns a `Results` containing the objects in the dictionary, but sorted.
+     Returns a `Results` containing the objects in the map, but sorted.
 
-     Objects are sorted based on their values. For example, to sort a dictionary of `Date`s from
+     Objects are sorted based on their values. For example, to sort a map of `Date`s from
      neweset to oldest based, you might call `dates.sorted(ascending: true)`.
 
      - parameter ascending: The direction to sort in.
@@ -221,9 +222,9 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     }
 
     /**
-     Returns a `Results` containing the objects in the dictionary, but sorted.
+     Returns a `Results` containing the objects in the map, but sorted.
 
-     Objects are sorted based on the values of the given key path. For example, to sort a dictionary of `Student`s from
+     Objects are sorted based on the values of the given key path. For example, to sort a map of `Student`s from
      youngest to oldest based on their `age` property, you might call
      `students.sorted(byKeyPath: "age", ascending: true)`.
 
@@ -238,7 +239,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     }
 
     /**
-     Returns a `Results` containing the objects in the dictionary, but sorted.
+     Returns a `Results` containing the objects in the map, but sorted.
 
      - warning: Dictionaries may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
                 floating point, integer, and string types.
@@ -275,7 +276,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
     /**
      Returns the minimum (lowest) value of the given property among all the objects in the collection, or `nil` if the
-     dictionary is empty.
+     map is empty.
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
@@ -287,7 +288,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
     /**
      Returns the maximum (highest) value of the given property among all the objects in the collection, or `nil` if the
-     dictionary is empty.
+     map is empty.
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
@@ -298,7 +299,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     }
 
     /**
-    Returns the sum of the given property for objects in the collection, or `nil` if the dictionary is empty.
+    Returns the sum of the given property for objects in the collection, or `nil` if the map is empty.
 
     - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
 
@@ -310,7 +311,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
     /**
      Returns the average value of a given property over all the objects in the collection, or `nil` if
-     the dictionary is empty.
+     the map is empty.
 
      - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
 
@@ -323,7 +324,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     // MARK: Notifications
 
     /**
-     Registers a block to be called each time the dictionary changes.
+     Registers a block to be called each time the map changes.
 
      The block will be asynchronously called with the initial results, and then called again after each write
      transaction which changes either any of the objects in the collection, or which objects are in the collection.
@@ -331,7 +332,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
      the objects were added, removed, or modified during each write transaction.
 
-     At the time when the block is called, the dictionary will be fully evaluated and up-to-date, and as long as you do
+     At the time when the block is called, the map will be fully evaluated and up-to-date, and as long as you do
      not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
      perform blocking work.
 
@@ -452,13 +453,13 @@ extension Map where Value: MinMaxType {
 
 extension Map where Value: OptionalProtocol, Value.Wrapped: MinMaxType {
     /**
-     Returns the minimum (lowest) value of the dictionary, or `nil` if the dictionary is empty.
+     Returns the minimum (lowest) value of the map, or `nil` if the map is empty.
      */
     public func min() -> Value.Wrapped? {
         return _rlmCollection.min(ofProperty: "self").map(dynamicBridgeCast)
     }
     /**
-     Returns the maximum (highest) value of the dictionary, or `nil` if the dictionary is empty.
+     Returns the maximum (highest) value of the map, or `nil` if the map is empty.
      */
     public func max() -> Value.Wrapped? {
         return _rlmCollection.max(ofProperty: "self").map(dynamicBridgeCast)
@@ -483,7 +484,7 @@ extension Map where Value: AddableType {
 
 public extension Map where Value: OptionalProtocol, Value.Wrapped: AddableType {
     /**
-     Returns the sum of the values in the dictionary, or `nil` if the dictionary is empty.
+     Returns the sum of the values in the map, or `nil` if the map is empty.
      */
     func sum() -> Value.Wrapped {
         return sum(ofProperty: "self")
