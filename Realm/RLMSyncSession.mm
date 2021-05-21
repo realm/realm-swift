@@ -140,7 +140,7 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
 
 - (RLMUser *)parentUser {
     if (auto session = _session.lock()) {
-        if (auto app = session->user()->sync_manager()->app().lock()) {
+        if (auto app = session->user()->sync_manager().app().lock()) {
             auto rlmApp = [RLMApp appWithId:@(app->config().app_id.data())];
             return [[RLMUser alloc] initWithUser:session->user() app:rlmApp];
         }

@@ -88,7 +88,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 }
 
 - (RLMUser *)user {
-    RLMApp *app = [RLMApp appWithId:@(_config->user->sync_manager()->app().lock()->config().app_id.data())];
+    RLMApp *app = [RLMApp appWithId:@(_config->user->sync_manager().app().lock()->config().app_id.data())];
     return [[RLMUser alloc] initWithUser:_config->user app:app];
 }
 
