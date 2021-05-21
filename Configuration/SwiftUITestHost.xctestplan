@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "AC613D2C-06BC-4F40-AE71-3AEB7D85C05F",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Realm.xcodeproj",
+        "identifier" : "53124AD325B71AF700771CE4",
+        "name" : "SwiftUITestHostUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

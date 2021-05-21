@@ -954,6 +954,11 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
     return self.isFrozen ? self : RLMGetFrozenRealmForSourceRealm(self);
 }
 
+- (RLMRealm *)thaw {
+    [self verifyThread];
+    return self.isFrozen ? [RLMRealm realmWithConfiguration:self.configuration error:nil] : self;
+}
+
 - (RLMRealm *)frozenCopy {
     try {
         RLMRealm *realm = [[RLMRealm alloc] initPrivate];

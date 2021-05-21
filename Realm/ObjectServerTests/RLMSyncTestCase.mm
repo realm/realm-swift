@@ -33,6 +33,8 @@
 #import <realm/object-store/sync/sync_session.hpp>
 #import <realm/object-store/sync/sync_user.hpp>
 
+#if TARGET_OS_OSX
+
 @interface RealmServer : NSObject
 + (RealmServer *)shared;
 + (bool)haveServer;
@@ -428,7 +430,7 @@ static NSURL *syncDirectoryForChildProcess() {
         return [super defaultTestSuite];
 
     }
-    NSLog(@"Skipping sync tests: server is not present. Run `build.sh setup-bass` to install it.");
+    NSLog(@"Skipping sync tests: server is not present. Run `build.sh setup-baas` to install it.");
     return [[XCTestSuite alloc] initWithName:[super defaultTestSuite].name];
 }
 
@@ -558,3 +560,5 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 @end
+
+#endif // TARGET_OS_OSX

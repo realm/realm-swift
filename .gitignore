@@ -12,6 +12,7 @@
 *.libdeps
 *.zip
 *.realm
+!examples/ios/swift/Migration/RealmTemplates/*.realm
 *.realm.lock
 
 # core

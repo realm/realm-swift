@@ -75,10 +75,8 @@ RLMClassInfo &RLMClassInfo::linkTargetType(realm::Property const& property) {
     return linkTargetType(&property - &objectSchema->persisted_properties[0]);
 }
 
-RLMClassInfo &RLMClassInfo::freeze(__unsafe_unretained RLMRealm *const frozenRealm) {
-    REALM_ASSERT(frozenRealm.frozen);
-    // FIXME
-    return frozenRealm->_info[rlmObjectSchema.className];
+RLMClassInfo &RLMClassInfo::resolve(__unsafe_unretained RLMRealm *const realm) {
+    return realm->_info[rlmObjectSchema.className];
 }
 
 RLMSchemaInfo::impl::iterator RLMSchemaInfo::begin() noexcept { return m_objects.begin(); }

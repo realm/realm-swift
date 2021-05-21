@@ -432,6 +432,10 @@ public final class List<Element: RealmCollectionValue>: ListBase {
         return List(objc: _rlmArray.freeze())
     }
 
+    public func thaw() -> List? {
+        return List(objc: _rlmArray.thaw())
+    }
+
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedArray() -> RLMArray<AnyObject> {
         return Element._rlmArray()
@@ -611,23 +615,16 @@ extension List: MutableCollection {
             remove(at: offset)
         }
     }
-
     /// :nodoc:
     public func move(fromOffsets offsets: IndexSet, toOffset destination: Int) {
-        var tmp = [Element]()
         for offset in offsets {
-            tmp.append(self[offset])
-        }
-        insert(contentsOf: tmp, at: destination)
-        for offset in offsets.reversed() {
-            var o = offset
-            if o >= destination {
-                o += tmp.count
+            var d = destination
+            if destination >= count {
+                d = destination - 1
             }
-            remove(at: o)
+            move(from: offset, to: d)
         }
     }
-
 }
 
 // MARK: - Codable

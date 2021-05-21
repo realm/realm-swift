@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#if os(macOS)
+
 import Foundation
 import Network
 
@@ -78,13 +80,19 @@ public class TimeoutProxyServer: NSObject {
     private func copy(from: NWConnection, to: NWConnection) {
         from.receive(minimumIncompleteLength: 1, maximumLength: 8192) { [weak self] (data, context, isComplete, _) in
             guard let data = data else {
-                self?.copy(from: from, to: to)
+                if !isComplete {
+                    self?.copy(from: from, to: to)
+                }
                 return
             }
             to.send(content: data, contentContext: context ?? .defaultMessage,
                     isComplete: isComplete, completion: .contentProcessed({ [weak self] _ in
-                        self?.copy(from: from, to: to)
+                        if !isComplete {
+                            self?.copy(from: from, to: to)
+                        }
                     }))
         }
     }
 }
+
+#endif // os(macOS)

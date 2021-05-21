@@ -1,0 +1,32 @@
+{
+  "configurations" : [
+    {
+      "id" : "736D08E6-5324-45B2-BB40-BB73FB653998",
+      "name" : "Default",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Realm.xcodeproj",
+      "identifier" : "5D659E7D1BE04556006515A0",
+      "name" : "Realm"
+    }
+  },
+  "testTargets" : [
+    {
+      "skippedTests" : [
+        "InterprocessTest\/testChangeInChildTriggersNotificationInParent"
+      ],
+      "target" : {
+        "containerPath" : "container:Realm.xcodeproj",
+        "identifier" : "E8D89BA21955FC6D00CF2B9A",
+        "name" : "Tests"
+      }
+    }
+  ],
+  "version" : 1
+}
