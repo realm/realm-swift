@@ -23,7 +23,7 @@ import Realm
  A homogenous key-value collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
 */
 public protocol RealmKeyedCollection: RealmCollectionBase, Sequence {
-    associatedtype Key: MapKeyType
+    associatedtype Key: _MapKey
     associatedtype Value: RealmCollectionValue
 
     // MARK: Properties
@@ -385,7 +385,7 @@ public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapp
 }
 
 /// :nodoc:
-private class _AnyMapBase<Key: MapKeyType, Value: RealmCollectionValue>: AssistedObjectiveCBridgeable {
+private class _AnyMapBase<Key: _MapKey, Value: RealmCollectionValue>: AssistedObjectiveCBridgeable {
     typealias Wrapper = AnyMap<Key, Value>
     var realm: Realm? { fatalError() }
     var isInvalidated: Bool { fatalError() }
@@ -514,7 +514,7 @@ private final class _AnyMap<C: RealmKeyedCollection>: _AnyMapBase<C.Key, C.Value
 
  Instances of `RealmKeyedCollection` forward operations to an opaque underlying collection having the same `Key`, `Value` type.
  */
-public struct AnyMap<Key: MapKeyType, Value: RealmCollectionValue>: RealmKeyedCollection {
+public struct AnyMap<Key: _MapKey, Value: RealmCollectionValue>: RealmKeyedCollection {
     /// The type of the objects contained in the collection.
     fileprivate let base: _AnyMapBase<Key, Value>
 
@@ -813,7 +813,7 @@ public struct AnyMap<Key: MapKeyType, Value: RealmCollectionValue>: RealmKeyedCo
 
 // MARK: AssistedObjectiveCBridgeable
 
-private struct AnyMapBridgingMetadata<Key: MapKeyType, Value: RealmCollectionValue> {
+private struct AnyMapBridgingMetadata<Key: _MapKey, Value: RealmCollectionValue> {
     var baseMetadata: Any?
     var baseType: _AnyMapBase<Key, Value>.Type
 }

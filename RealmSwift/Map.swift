@@ -20,8 +20,10 @@ import Foundation
 import Realm
 import Realm.Private
 
-public protocol MapKeyType: Hashable { }
-extension String: MapKeyType { }
+public protocol _MapKey: Hashable {
+    static var _rlmType: RLMPropertyType { get }
+}
+extension String: _MapKey { }
 
 /**
  Map is a key-value storage container used to store supported Realm types.
@@ -39,7 +41,7 @@ extension String: MapKeyType { }
  
  Properties of `Map` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
 */
-public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCollectionBase, RealmKeyedCollection {
+public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, Value: RealmCollectionValue {
 
     // MARK: Properties
 
@@ -398,7 +400,15 @@ public final class Map<Key: MapKeyType, Value: RealmCollectionValue>: RLMSwiftCo
 
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedCollection() -> RLMDictionary<AnyObject, AnyObject> {
-        return Value._rlmDictionary()
+        if let type = Value.self as? ObjectBase.Type {
+            return RLMDictionary(objectClassName: type.className())
+        }
+        return RLMDictionary(objectType: Value._rlmType, optional: Value._rlmOptional)
+    }
+
+    /// :nodoc:
+    @objc public override class func _backingCollectionType() -> AnyClass {
+        return RLMManagedDictionary.self
     }
 
     /**
@@ -506,11 +516,6 @@ extension Map: Sequence {
     public func makeIterator() -> RLMMapIterator<SingleMapEntry<Key, Value>> {
         return RLMMapIterator(collection: rlmDictionary)
     }
-
-    /// :nodoc:
-    public func asNSFastEnumerator() -> Any {
-        return _rlmCollection
-    }
 }
 
 // MARK: - Notifications
@@ -562,6 +567,10 @@ extension Map: Sequence {
     }
 }
 
+// MARK: - RealmKeyedCollection Conformance
+
+extension Map: RealmKeyedCollection { }
+
 // MARK: - MapIndex
 
 /// Container type which holds the offset of the element in the Map.
@@ -572,7 +581,7 @@ public struct MapIndex {
 // MARK: - SingleMapEntry
 
 /// Container for holding a single key-value entry in a Map. This is used where a tuple cannot be expressed as a generic arguement.
-public struct SingleMapEntry<Key: MapKeyType, Value: RealmCollectionValue>: RealmMapValue, Hashable {
+public struct SingleMapEntry<Key: _MapKey, Value: RealmCollectionValue>: RealmMapValue, Hashable {
     /// :nodoc:
     public static func == (lhs: SingleMapEntry, rhs: SingleMapEntry) -> Bool {
         return lhs.value == rhs.value

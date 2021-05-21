@@ -45,6 +45,32 @@ import Realm
     }
 }
 
+public protocol RealmMapValue {
+    associatedtype Key: _MapKey
+    associatedtype Value: RealmCollectionValue
+}
+
+@frozen public struct RLMMapIterator<Element: RealmMapValue>: IteratorProtocol {
+
+    private var generatorBase: NSFastEnumerationIterator
+    private var collection: RLMDictionary<AnyObject, AnyObject>
+
+    init(collection: RLMDictionary<AnyObject, AnyObject>) {
+        self.collection = collection
+        generatorBase = NSFastEnumerationIterator(collection)
+    }
+
+    public mutating func next() -> Element? {
+        let next = generatorBase.next()
+        if let next = next as? Element.Key {
+            let key: Element.Key = next
+            let val: Element.Value = dynamicBridgeCast(fromObjectiveC: collection[key as! RLMDictionaryKey]!)
+            return SingleMapEntry(key: key, value: val) as? Element
+        }
+        return nil
+    }
+}
+
 /**
  A `RealmCollectionChange` value encapsulates information about changes to collections
  that are reported by Realm notifications.

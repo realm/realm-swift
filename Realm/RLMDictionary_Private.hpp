@@ -44,12 +44,14 @@ class RLMObservationInfo;
 }
 @end
 
-@interface RLMManagedDictionary : RLMDictionary <RLMFastEnumerable>
+@interface RLMManagedDictionary () <RLMFastEnumerable>
 
-- (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 - (RLMManagedDictionary *)initWithBackingCollection:(realm::object_store::Dictionary)dictionary
                                          parentInfo:(RLMClassInfo *)parentInfo
                                            property:(__unsafe_unretained RLMProperty *const)property;
+- (RLMManagedDictionary *)initWithParent:(realm::Obj)parent
+                                property:(RLMProperty *)property
+                              parentInfo:(RLMClassInfo&)info;
 
 - (bool)isBackedByDictionary:(realm::object_store::Dictionary const&)dictionary;
 

@@ -56,6 +56,17 @@
     }
 }
 
+- (void)testKeyType {
+    DictionaryPropertyObject *unmanaged = [[DictionaryPropertyObject alloc] init];
+    XCTAssertEqual(unmanaged.intDictionary.keyType, RLMPropertyTypeString);
+    RLMRealm *realm = [self realmWithTestPath];
+
+    [realm beginWriteTransaction];
+    DictionaryPropertyObject *managed = [DictionaryPropertyObject createInRealm:realm withValue:@[]];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(managed.intDictionary.keyType, RLMPropertyTypeString);
+}
+
 -(void)testModifyDetatchedDictionary {
     RLMRealm *realm = [self realmWithTestPath];
 

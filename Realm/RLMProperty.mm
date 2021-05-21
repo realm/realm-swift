@@ -101,6 +101,10 @@ static bool rawTypeShouldBeTreatedAsComputedProperty(NSString *rawType) {
         ret->_set = true;
     }
     if (is_dictionary(prop.type)) {
+        // TODO: We need a way to store the dictionary
+        // key type in realm::Property once we support more
+        // key types.
+        ret->_dictionaryKeyType = RLMPropertyTypeString;
         ret->_dictionary = true;
     }
     if (!prop.public_name.empty()) {
@@ -545,6 +549,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     else if ([rawType isEqualToString:@"@\"RLMDictionary\""]) {
         RLMDictionary *value = propertyValue;
         _type = value.type;
+        _dictionaryKeyType = value.keyType;
         _optional = value.optional;
         _dictionary = true;
         _objectClassName = value.objectClassName;
@@ -649,6 +654,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     prop->_array = _array;
     prop->_set = _set;
     prop->_dictionary = _dictionary;
+    prop->_dictionaryKeyType = _dictionaryKeyType;
     prop->_indexed = _indexed;
     prop->_getterName = _getterName;
     prop->_setterName = _setterName;

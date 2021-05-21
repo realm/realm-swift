@@ -113,9 +113,8 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
         Class objectClass = schema[prop.objectClassName].objectClass;
         if (prop.dictionary) {
             NSMutableDictionary *ret = [[NSMutableDictionary alloc] init];
-            for (id el in obj) {
-                id key = el;//coerceToObjectType(el, RLMStr, schema);
-                id val = coerceToObjectType(obj[el], objectClass, schema);
+            for (id key in obj) {
+                id val = coerceToObjectType(obj[key], objectClass, schema);
                 [ret setObject:val forKey:key];
             }
             return ret;

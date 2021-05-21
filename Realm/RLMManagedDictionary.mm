@@ -136,9 +136,9 @@ static NSArray *toArray(std::vector<realm::Mixed> const& v) {
                                          parentInfo:(RLMClassInfo *)parentInfo
                                            property:(__unsafe_unretained RLMProperty *const)property {
     if (property.type == RLMPropertyTypeObject)
-        self = [self initWithObjectClassName:property.objectClassName];
+        self = [self initWithObjectClassName:property.objectClassName keyType:property.dictionaryKeyType];
     else
-        self = [self initWithObjectType:property.type optional:property.optional];
+        self = [self initWithObjectType:property.type optional:property.optional keyType:property.dictionaryKeyType];
     if (self) {
         _realm = parentInfo->realm;
         REALM_ASSERT(dictionary.get_realm() == _realm->_realm);

@@ -25,7 +25,7 @@ import RealmSwift
 protocol MapValueFactory {
     associatedtype T: RealmCollectionValue
     associatedtype W: RealmCollectionValue = T
-    associatedtype Key: MapKeyType
+    associatedtype Key: _MapKey
     associatedtype AverageType: AddableType = Double
     static func map(_ obj: SwiftMapObject) -> Map<Key, T>
     static func values() -> [(key: Key, value: T)]

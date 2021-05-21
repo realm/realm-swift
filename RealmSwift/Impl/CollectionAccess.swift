@@ -22,6 +22,10 @@ internal protocol MutableRealmCollection {
     func removeAll()
     func add(_ obj: AnyObject)
 }
+internal protocol MutableMapRealmCollection {
+    func removeAll()
+    func add(key: AnyObject, value: AnyObject)
+}
 extension List: MutableRealmCollection {
     func add(_ obj: AnyObject) {
         rlmArray.add(obj)
@@ -32,6 +36,11 @@ extension MutableSet: MutableRealmCollection {
         rlmSet.add(obj)
     }
 }
+extension Map: MutableMapRealmCollection {
+    func add(key: AnyObject, value: AnyObject) {
+        rlmDictionary.setObject(value, for: key as! RLMDictionaryKey)
+    }
+}
 
 internal func assign<C: MutableRealmCollection>(value: Any, to collection: C) {
     collection.removeAll()
@@ -39,6 +48,16 @@ internal func assign<C: MutableRealmCollection>(value: Any, to collection: C) {
         var iterator = NSFastEnumerationIterator(enumeration)
         while let obj = iterator.next() {
             collection.add(dynamicBridgeCast(fromSwift: obj) as AnyObject)
+        }
+    }
+}
+
+internal func assign<C: MutableMapRealmCollection>(value: Any, to collection: C) {
+    collection.removeAll()
+    if let enumeration = value as? NSDictionary {
+        var iterator = NSFastEnumerationIterator(enumeration)
+        while let key = iterator.next() {
+            collection.add(key: key as AnyObject, value: dynamicBridgeCast(fromSwift: enumeration[key]) as AnyObject)
         }
     }
 }
@@ -59,6 +78,12 @@ extension List: UntypedCollection {
 extension MutableSet: UntypedCollection {
     internal func asNSFastEnumerator() -> Any {
         return rlmSet
+    }
+}
+
+extension Map: UntypedCollection {
+    internal func asNSFastEnumerator() -> Any {
+        return rlmDictionary
     }
 }
 

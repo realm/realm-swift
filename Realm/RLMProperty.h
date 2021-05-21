@@ -79,7 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL indexed;
 
 /**
- For `RLMObject` and `RLMArray` properties, the name of the class of object stored in the property.
+ For `RLMObject` and `RLMCollection` properties, the name of the class of object stored in the property.
  */
 @property (nonatomic, readonly, copy, nullable) NSString *objectClassName;
 

@@ -262,6 +262,29 @@ extension Object: RealmCollectionValue {
                                    to: MutableSet<DynamicObject>.self)
     }
 
+    // MARK: Dynamic map
+
+    /**
+     Returns a map of `DynamicObject`s for a given property name.
+
+     - warning:  This method is useful only in specialized circumstances, for example, when building
+     components that integrate with Realm. If you are simply building an app on Realm, it is
+     recommended to use instance variables or cast the values returned from key-value coding.
+
+     - parameter propertyName: The name of the property.
+
+     - returns: A map of  `String` with `DynamicObject`s.
+
+     :nodoc:
+     */
+    public func dynamicMap<Key: _MapKey>(_ propertyName: String) -> Map<Key, DynamicObject> {
+        if let dynamic = self as? DynamicObject {
+            return dynamic[propertyName] as! Map<Key, DynamicObject>
+        }
+        return noWarnUnsafeBitCast(dynamicGet(object: self, key: propertyName) as! RLMSwiftCollectionBase,
+                                   to: Map<Key, DynamicObject>.self)
+    }
+
     // MARK: Comparison
     /**
      Returns whether two Realm objects are the same.
@@ -384,6 +407,9 @@ public final class DynamicObject: Object {
             }
             if let set = value as? RLMSet<AnyObject> {
                 return MutableSet<DynamicObject>(objc: set)
+            }
+            if let dictionary = value as? RLMDictionary<AnyObject, AnyObject> {
+                return Map<String, DynamicObject>(objc: dictionary)
             }
             return value
         }

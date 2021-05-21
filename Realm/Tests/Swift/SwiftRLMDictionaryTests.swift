@@ -65,6 +65,16 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         XCTAssertEqual(totalSum, 100, "total sum should be 100")
     }
 
+    func testKeyType() {
+        let unmanaged = SwiftRLMDictionaryPropertyObject()
+        XCTAssertEqual(unmanaged.dict.keyType, .string)
+        let realm = realmWithTestPath()
+        realm.beginWriteTransaction()
+        let managed = SwiftRLMDictionaryPropertyObject.create(in: realm, withValue: [])
+        try! realm.commitWriteTransaction()
+        XCTAssertEqual(managed.dict.keyType, .string)
+    }
+
     func testObjectAggregate() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
@@ -186,8 +196,6 @@ class SwiftRLMDictionaryTests: RLMTestCase {
 
         XCTAssertTrue((description as NSString).range(of: "age").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMDictionary")
         XCTAssertTrue((description as NSString).range(of: "24").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMDictionary")
-
-        XCTAssertTrue((description as NSString).range(of: "12 objects skipped").location != Foundation.NSNotFound, "'12 objects skipped' should be displayed when calling \"description\" on RLMDictionary")
     }
 
     func testDeleteLinksAndObjectsInDictionary() {
@@ -392,8 +400,6 @@ class SwiftRLMDictionaryTests: RLMTestCase {
 
         XCTAssertTrue((description as NSString).range(of: "age").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMDictionary")
         XCTAssertTrue((description as NSString).range(of: "24").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMDictionary")
-
-        XCTAssertTrue((description as NSString).range(of: "912 objects skipped").location != Foundation.NSNotFound, "'912 objects skipped' should be displayed when calling \"description\" on RLMDictionary")
     }
 
     func makeRlmEmployee(_ realm: RLMRealm, _ age: Int32, _ name: String, _ hired: Bool) -> SwiftRLMEmployeeObject {

@@ -22,8 +22,8 @@
 
 @interface RLMDictionary ()
 
-- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
-- (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName keyType:(RLMPropertyType)keyType;
+- (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional keyType:(RLMPropertyType)keyType;
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 - (nullable id)managedValueForKey:(nonnull NSString *)key;
@@ -34,4 +34,8 @@ FOUNDATION_EXTERN NSString *RLMDictionaryDescriptionWithMaxDepth(NSString *name,
                                                                  RLMDictionary *dictionary,
                                                                  NSUInteger depth);
 
+@end
+
+@interface RLMManagedDictionary : RLMDictionary
+- (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 @end
