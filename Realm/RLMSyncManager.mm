@@ -172,7 +172,7 @@ struct CallbackLoggerFactory : public realm::SyncLoggerFactory {
     for (auto&& user : _syncManager->all_users()) {
         for (auto&& session : user->all_sessions()) {
             auto config = session->config();
-            config.custom_http_headers.clear();;
+            config.custom_http_headers.clear();
             for (NSString *key in customRequestHeaders) {
                 config.custom_http_headers.emplace(key.UTF8String, customRequestHeaders[key].UTF8String);
             }

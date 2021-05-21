@@ -10,6 +10,10 @@ def minimum_version(major)
   ->(v) { v.split('.').first.to_i >= major }
 end
 
+def not_11_3
+  ->(v) { v != "11.3" }
+end
+
 targets = {
   'docs' => latest_only,
   'swiftlint' => latest_only,
@@ -18,8 +22,8 @@ targets = {
   'osx-encryption' => oldest_and_latest,
   'osx-object-server' => oldest_and_latest,
 
-  'swiftpm' => all,
-  'swiftpm-debug' => all,
+  'swiftpm' => not_11_3,
+  'swiftpm-debug' => not_11_3,
   'swiftpm-address' => latest_only,
   'swiftpm-thread' => latest_only,
   'swiftpm-ios' => latest_only,
