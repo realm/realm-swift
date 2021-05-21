@@ -64,10 +64,6 @@ struct IntFactory: ValueFactory {
         return obj.int
     }
 
-    static func map(_ obj: SwiftMapObject) -> Map<String, Int> {
-        return obj.int
-    }
-
     static func values() -> [Int] {
         return [1, 2, 3]
     }
@@ -79,10 +75,6 @@ struct Int8Factory: ValueFactory {
     }
 
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int8> {
-        return obj.int8
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, Int8> {
         return obj.int8
     }
 
@@ -100,10 +92,6 @@ struct Int16Factory: ValueFactory {
         return obj.int16
     }
 
-    static func map(_ obj: SwiftMapObject) -> Map<String, Int16> {
-        return obj.int16
-    }
-
     static func values() -> [Int16] {
         return [1, 2, 3]
     }
@@ -115,10 +103,6 @@ struct Int32Factory: ValueFactory {
     }
 
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int32> {
-        return obj.int32
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, Int32> {
         return obj.int32
     }
 
@@ -136,10 +120,6 @@ struct Int64Factory: ValueFactory {
         return obj.int64
     }
 
-    static func map(_ obj: SwiftMapObject) -> Map<String, Int64> {
-        return obj.int64
-    }
-
     static func values() -> [Int64] {
         return [1, 2, 3]
     }
@@ -151,10 +131,6 @@ struct FloatFactory: ValueFactory {
     }
 
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Float> {
-        return obj.float
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, Float> {
         return obj.float
     }
 
@@ -172,10 +148,6 @@ struct DoubleFactory: ValueFactory {
         return obj.double
     }
 
-    static func map(_ obj: SwiftMapObject) -> Map<String, Double> {
-        return obj.double
-    }
-
     static func values() -> [Double] {
         return [1.1, 2.2, 3.3]
     }
@@ -187,10 +159,6 @@ struct StringFactory: ValueFactory {
     }
 
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<String> {
-        return obj.string
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, String> {
         return obj.string
     }
 
@@ -208,10 +176,6 @@ struct DataFactory: ValueFactory {
         return obj.data
     }
 
-    static func map(_ obj: SwiftMapObject) -> Map<String, Data> {
-        return obj.data
-    }
-
     static func values() -> [Data] {
         return ["a".data(using: .utf8)!, "b".data(using: .utf8)!, "c".data(using: .utf8)!]
     }
@@ -223,10 +187,6 @@ struct DateFactory: ValueFactory {
     }
 
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Date> {
-        return obj.date
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, Date> {
         return obj.date
     }
 
@@ -243,10 +203,6 @@ struct DecimalFactory: ValueFactory {
     }
 
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Decimal128> {
-        return obj.decimal
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, Decimal128> {
         return obj.decimal
     }
 
@@ -274,10 +230,6 @@ struct ObjectIdFactory: ValueFactory {
         return obj.objectId
     }
 
-    static func map(_ obj: SwiftMapObject) -> Map<String, ObjectId> {
-        return obj.objectId
-    }
-
     static private let _values = [ObjectId.generate(), ObjectId.generate(), ObjectId.generate()]
     static func values() -> [ObjectId] {
         return _values
@@ -290,10 +242,6 @@ struct UUIDFactory: ValueFactory {
     }
 
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<UUID> {
-        return obj.uuid
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, UUID> {
         return obj.uuid
     }
 
@@ -314,10 +262,6 @@ struct OptionalIntFactory: ValueFactory {
         return obj.intOpt
     }
 
-    static func map(_ obj: SwiftMapObject) -> Map<String, Int?> {
-        return obj.intOpt
-    }
-
     static func values() -> [Int?] {
         return [nil, 1, 3]
     }
@@ -331,10 +275,6 @@ struct OptionalInt8Factory: ValueFactory {
     }
 
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int8?> {
-        return obj.int8Opt
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, Int8?> {
         return obj.int8Opt
     }
 
@@ -354,10 +294,6 @@ struct OptionalInt16Factory: ValueFactory {
         return obj.int16Opt
     }
 
-    static func map(_ obj: SwiftMapObject) -> Map<String, Int16?> {
-        return obj.int16Opt
-    }
-
     static func values() -> [Int16?] {
         return [nil, 1, 3]
     }
@@ -371,10 +307,6 @@ struct OptionalInt32Factory: ValueFactory {
     }
 
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Int32?> {
-        return obj.int32Opt
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, Int32?> {
         return obj.int32Opt
     }
 
@@ -394,10 +326,6 @@ struct OptionalInt64Factory: ValueFactory {
         return obj.int64Opt
     }
 
-    static func map(_ obj: SwiftMapObject) -> Map<String, Int64?> {
-        return obj.int64Opt
-    }
-
     static func values() -> [Int64?] {
         return [nil, 1, 3]
     }
@@ -411,10 +339,6 @@ struct OptionalFloatFactory: ValueFactory {
     }
 
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Float?> {
-        return obj.floatOpt
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, Float?> {
         return obj.floatOpt
     }
 
@@ -434,10 +358,6 @@ struct OptionalDoubleFactory: ValueFactory {
         return obj.doubleOpt
     }
 
-    static func map(_ obj: SwiftMapObject) -> Map<String, Double?> {
-        return obj.doubleOpt
-    }
-
     static func values() -> [Double?] {
         return [nil, 1.1, 3.3]
     }
@@ -451,10 +371,6 @@ struct OptionalStringFactory: ValueFactory {
     }
 
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<String?> {
-        return obj.stringOpt
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, String?> {
         return obj.stringOpt
     }
 
@@ -474,10 +390,6 @@ struct OptionalDataFactory: ValueFactory {
         return obj.dataOpt
     }
 
-    static func map(_ obj: SwiftMapObject) -> Map<String, Data?> {
-        return obj.dataOpt
-    }
-
     static func values() -> [Data?] {
         return [nil, "a".data(using: .utf8), "c".data(using: .utf8)]
     }
@@ -491,10 +403,6 @@ struct OptionalDateFactory: ValueFactory {
     }
 
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Date?> {
-        return obj.dateOpt
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, Date?> {
         return obj.dateOpt
     }
 
@@ -512,10 +420,6 @@ struct OptionalDecimalFactory: ValueFactory {
     }
 
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<Decimal128?> {
-        return obj.decimalOpt
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, Decimal128?> {
         return obj.decimalOpt
     }
 
@@ -545,10 +449,6 @@ struct OptionalObjectIdFactory: ValueFactory {
         return obj.objectIdOpt
     }
 
-    static func map(_ obj: SwiftMapObject) -> Map<String, ObjectId?> {
-        return obj.objectIdOpt
-    }
-
     static func values() -> [ObjectId?] {
         return [nil] + ObjectIdFactory.values().dropLast()
     }
@@ -562,10 +462,6 @@ struct OptionalUUIDFactory: ValueFactory {
     }
 
     static func mutableSet(_ obj: SwiftMutableSetObject) -> MutableSet<UUID?> {
-        return obj.uuidOpt
-    }
-
-    static func map(_ obj: SwiftMapObject) -> Map<String, UUID?> {
         return obj.uuidOpt
     }
 
