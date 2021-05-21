@@ -72,7 +72,7 @@ extension Map: _RealmSchemaDiscoverable where Value: _RealmSchemaDiscoverable {
         prop.dictionary = true
         prop.swiftAccessor = MapAccessor<Key, Value>.self
         prop.dictionaryKeyType = Key._rlmType
-        Element._rlmPopulateProperty(prop)
+        Value._rlmPopulateProperty(prop)
     }
 }
 
