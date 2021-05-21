@@ -137,6 +137,10 @@ class SwiftUITests: XCTestCase {
 
         app.buttons["Realm B"].tap()
         XCTAssertEqual(app.staticTexts["test_text_view"].label, "realm_b")
+        app.buttons["Back"].tap()
+
+        app.buttons["Realm C"].tap()
+        XCTAssertEqual(app.staticTexts["test_text_view"].label, "realm_c")
     }
 
     func testUnmanagedObjectState() {
@@ -149,6 +153,11 @@ class SwiftUITests: XCTestCase {
         app.navigationBars.firstMatch.tap()
         app.buttons["addReminder"].tap()
         XCTAssertEqual(realm.objects(ReminderList.self).first!.name, "test name")
+
+        app.buttons["Next"].tap()
+        app.buttons["Delete"].tap()
+
+        XCTAssertEqual(app.textFields["name"].value as? String, "test name")
     }
 }
 #endif

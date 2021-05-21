@@ -718,7 +718,8 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         const NSUInteger factor = count / 10;
 
         [self observeObject:obj keyPath:@"array"
-                      until:^(ArrayPropertyObject *o) { return o.array.count >= count; }];
+                      until:^(ArrayPropertyObject *obj) { return obj.array.count >= count; }];
+
         RLMArray *array = obj.array;
         [self startMeasuring];
         [realm beginWriteTransaction];

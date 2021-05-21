@@ -112,6 +112,26 @@ class ObjectTests: TestCase {
         XCTAssertTrue(object.isInvalidated)
     }
 
+    func testInvalidatedWithCustomObjectClasses() {
+        var config = Realm.Configuration.defaultConfiguration
+        config.objectTypes = [SwiftObject.self, SwiftBoolObject.self]
+        let realm = try! Realm(configuration: config)
+
+        let object = SwiftObject()
+        XCTAssertFalse(object.isInvalidated)
+
+        try! realm.write {
+            realm.add(object)
+            XCTAssertFalse(object.isInvalidated)
+        }
+
+        try! realm.write {
+            realm.deleteAll()
+            XCTAssertTrue(object.isInvalidated)
+        }
+        XCTAssertTrue(object.isInvalidated)
+    }
+
     func testDescription() {
         let object = SwiftObject()
 

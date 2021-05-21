@@ -40,7 +40,9 @@ private func safeWrite<Value>(_ value: Value, _ block: (Value) -> Void) where Va
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 private func createBinding<T: ThreadConfined, V>(_ value: T,
                                                  forKeyPath keyPath: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
-    precondition(!value.isFrozen, "Should not bind frozen value")
+    guard let value = value.isFrozen ? value.thaw() : value else {
+        throwRealmException("Could not bind value")
+    }
 
     // store last known value outside of the binding so that we can reference it if the parent
     // is invalidated
@@ -88,6 +90,9 @@ internal final class SwiftUIKVO: NSObject {
         }
 
         func cancel() {
+            guard SwiftUIKVO.observedObjects.keys.contains(value) else {
+                return
+            }
             keyPaths.forEach {
                 value.removeObserver(observer, forKeyPath: $0)
             }
@@ -127,7 +132,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
 
     public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
         subscribers.append(AnySubscriber(subscriber))
-        if value.realm != nil, let value = value.thaw() {
+        if value.realm != nil && !value.isInvalidated, let value = value.thaw() {
             // if the value is managed
             let token =  value._observe(subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
