@@ -33,7 +33,7 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         realm.beginWriteTransaction()
 
         let dObj = SwiftRLMDictionaryPropertyObject.create(in: realm, withValue: [])
-        let dict = dObj.dict!
+        let dict = dObj.dict
         let dateMinInput = Date()
         let dateMaxInput = dateMinInput.addingTimeInterval(1000)
 
@@ -94,10 +94,10 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         ]])
         try! realm.commitWriteTransaction()
 
-        XCTAssertEqual(dObj.dict!.count, UInt(10), "10 objects added")
+        XCTAssertEqual(dObj.dict.count, UInt(10), "10 objects added")
 
-        let noArray = dObj.dict!.objects(where: "boolCol == NO")
-        let yesArray = dObj.dict!.objects(where: "boolCol == YES")
+        let noArray = dObj.dict.objects(where: "boolCol == NO")
+        let yesArray = dObj.dict.objects(where: "boolCol == YES")
 
         // SUM ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int sum
@@ -181,7 +181,7 @@ class SwiftRLMDictionaryTests: RLMTestCase {
 
         realm.beginWriteTransaction()
         let dObj = SwiftRLMDictionaryEmployeeObject.create(in: realm, withValue: [])
-        let dict = dObj.dict!
+        let dict = dObj.dict
 
         for i in 0..<1012 {
             dict[String(i) as NSString] = makeRlmEmployee(realm, 24, "Mary", true)
@@ -210,13 +210,13 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         let company = SwiftRLMCompanyObject()
         realm.add(company)
 
-        company.employeeMap!["Joe" as NSString] = po1
-        company.employeeMap!["John" as NSString] = po2
-        company.employeeMap!["Jill" as NSString] = po3
+        company.employeeMap["Joe" as NSString] = po1
+        company.employeeMap["John" as NSString] = po2
+        company.employeeMap["Jill" as NSString] = po3
 
         try! realm.commitWriteTransaction()
 
-        let peopleInCompany = company.employeeMap!
+        let peopleInCompany = company.employeeMap
         XCTAssertEqual(peopleInCompany.count, UInt(3), "No links should have been deleted")
 
         realm.beginWriteTransaction()

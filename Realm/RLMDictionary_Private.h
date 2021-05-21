@@ -18,24 +18,25 @@
 
 #import <Realm/RLMDictionary.h>
 
-#import "RLMObjectBase.h"
+@class RLMObjectBase, RLMProperty;
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMDictionary ()
-
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName keyType:(RLMPropertyType)keyType;
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional keyType:(RLMPropertyType)keyType;
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 - (nullable id)managedValueForKey:(nonnull NSString *)key;
+@end
+
+@interface RLMManagedDictionary : RLMDictionary
+- (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
+@end
 
 void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *const dictionary,
                                              __unsafe_unretained id const key, __unsafe_unretained id const value);
 FOUNDATION_EXTERN NSString *RLMDictionaryDescriptionWithMaxDepth(NSString *name,
                                                                  RLMDictionary *dictionary,
                                                                  NSUInteger depth);
-
-@end
-
-@interface RLMManagedDictionary : RLMDictionary
-- (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
-@end
+NS_ASSUME_NONNULL_END
