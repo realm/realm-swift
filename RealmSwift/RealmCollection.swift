@@ -45,12 +45,18 @@ import Realm
     }
 }
 
-public protocol RealmMapValue {
+/// A container used for storing key-value pairs which are to be used as elements in `RLMMapIterator`.
+public protocol _RealmMapValue {
+    /// The key of this element.
     associatedtype Key: _MapKey
+    /// The value of this element.
     associatedtype Value: RealmCollectionValue
 }
 
-@frozen public struct RLMMapIterator<Element: RealmMapValue>: IteratorProtocol {
+/**
+ An iterator for a `RealmKeyedCollection` instance.
+ */
+@frozen public struct RLMMapIterator<Element: _RealmMapValue>: IteratorProtocol {
 
     private var generatorBase: NSFastEnumerationIterator
     private var collection: RLMDictionary<AnyObject, AnyObject>
@@ -60,6 +66,7 @@ public protocol RealmMapValue {
         generatorBase = NSFastEnumerationIterator(collection)
     }
 
+    /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> Element? {
         let next = generatorBase.next()
         if let next = next as? Element.Key {

@@ -529,9 +529,12 @@ public protocol BoundMap {
     var wrappedValue: Value { get }
 }
 
+/// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension BoundMap where Value: RealmKeyedCollection {
+    /// :nodoc:
     typealias Key = Value.Key
+    /// :nodoc:
     typealias Element = Value.Value
 
     // The compiler will not allow us to assign values by subscript as the binding is a get-only

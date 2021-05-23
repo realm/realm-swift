@@ -20,7 +20,7 @@ import Foundation
 import Realm
 import Realm.Private
 
-// :nodoc:
+/// :nodoc:
 public protocol _MapKey: Hashable {
     static var _rlmType: RLMPropertyType { get }
 }
@@ -576,13 +576,14 @@ extension Map: RealmKeyedCollection { }
 
 /// Container type which holds the offset of the element in the Map.
 public struct MapIndex {
+    /// The position of the element in the Map.
     public var offset: UInt
 }
 
 // MARK: - SingleMapEntry
 
 /// Container for holding a single key-value entry in a Map. This is used where a tuple cannot be expressed as a generic arguement.
-public struct SingleMapEntry<Key: _MapKey, Value: RealmCollectionValue>: RealmMapValue, Hashable {
+public struct SingleMapEntry<Key: _MapKey, Value: RealmCollectionValue>: _RealmMapValue, Hashable {
     /// :nodoc:
     public static func == (lhs: SingleMapEntry, rhs: SingleMapEntry) -> Bool {
         return lhs.value == rhs.value

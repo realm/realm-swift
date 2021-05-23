@@ -23,7 +23,9 @@ import Realm
  A homogenous key-value collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
 */
 public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConvertible {
+    /// The type of key associated with this collection
     associatedtype Key: _MapKey
+    /// The type of value associated with this collection.
     associatedtype Value: RealmCollectionValue
 
     // MARK: Properties
@@ -62,6 +64,11 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
      */
     func removeAll()
 
+    /**
+     Returns the value for a given key, or sets a value for a key should the subscript be used for an assign.
+
+     - parameter key: The key.
+     */
     subscript(key: Key) -> Value? { get set }
 
     // MARK: KVC
@@ -153,9 +160,15 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
     /// Returns all of the values in the dictionary.
     var values: [Value] { get }
 
+    /**
+     Returns the object at the given `position`.
+
+     - parameter position: The position of the element in the collection.
+     */
     subscript(position: MapIndex) -> (Key, Value) { get }
 
-    /// :nodoc:
+    /// Returns the position of an element in the collection.
+    /// - Parameter object: The object to find.
     func index(of object: Value) -> MapIndex?
 
     // MARK: Aggregate Operations
@@ -664,7 +677,15 @@ public struct AnyMap<Key: _MapKey, Value: RealmCollectionValue>: RealmKeyedColle
     */
     public func sorted<S>(by sortDescriptors: S) -> Results<Value> where S: Sequence, S.Element == SortDescriptor { base.sorted(by: sortDescriptors) }
 
+    /**
+     Returns the object at the given `position`.
+
+     - parameter position: The position of the element in the collection.
+     */
     public subscript(position: MapIndex) -> (Key, Value) { base[position] }
+
+    /// Returns the position of an element in the collection.
+    /// - Parameter object: The object to find.
     public func index(of object: Value) -> MapIndex? { base.index(of: object) }
 
     // MARK: Aggregate Operations

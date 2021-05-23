@@ -117,6 +117,9 @@ public struct RLMCollectionIterator: IteratorProtocol {
     }
 }
 
+/**
+ This struct enables sequence-style enumeration for RLMDictionary in Swift via `RLMDictionary.makeIterator`
+ */
 public struct RLMDictionaryIterator: IteratorProtocol {
     private var iteratorBase: NSFastEnumerationIterator
     private let dictionary: RLMDictionary<AnyObject, AnyObject>
@@ -159,6 +162,7 @@ extension RLMCollection {
 }
 
 extension RLMCollection {
+    /// Allows for subscript support with RLMDictionary.
     public subscript(_ key: String) -> AnyObject? {
         get {
             (self as! RLMDictionary<NSString, AnyObject>).object(for: key as RLMDictionaryKey)

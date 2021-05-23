@@ -165,6 +165,29 @@ extension Publisher {
             }
     }
 
+    /// Freezes all Realm collection changesets from the upstream publisher.
+    ///
+    /// Freezing a Realm collection changeset makes the included collection
+    /// reference no longer live-update when writes are made to the Realm and
+    /// makes it safe to pass freely between threads without using
+    /// `.threadSafeReference()`. It also guarantees that the frozen collection
+    /// contained in the changset will always match the change information,
+    /// which is not always the case when using thread-safe references.
+    ///
+    /// ```
+    /// // Get a changeset publisher for a collection
+    /// let cancellable = myMap.changesetPublisher
+    ///    // Convert to frozen changesets
+    ///    .freeze()
+    ///    // Unlike live objects, frozen objects can be sent to a concurrent queue
+    ///    .receive(on: DispatchQueue.global())
+    ///    .sink { changeset in
+    ///        // Do something with the frozen changeset
+    ///    }
+    /// ```
+    ///
+    /// - returns: A publisher that publishes frozen copies of the changesets
+    ///            which the upstream publisher publishes.
     public func freeze<T: RealmKeyedCollection>()
         -> Publishers.Map<Self, RealmDictionaryChange<T>> where Output == RealmDictionaryChange<T> {
             return map {
@@ -240,6 +263,7 @@ extension Publisher {
         -> RealmPublishers.MakeThreadSafeObjectChangeset<Self, T> where Output == ObjectChange<T> {
         RealmPublishers.MakeThreadSafeObjectChangeset(self)
     }
+
     /// Enables passing Realm collection changesets to a different dispatch queue.
     ///
     /// Each call to `receive(on:)` on a publisher which emits Realm
@@ -267,6 +291,28 @@ extension Publisher {
         RealmPublishers.MakeThreadSafeCollectionChangeset(self)
     }
 
+    /// Enables passing Realm collection changesets to a different dispatch queue.
+    ///
+    /// Each call to `receive(on:)` on a publisher which emits Realm
+    /// thread-confined objects must be proceeded by a call to
+    /// `.threadSafeReference()`. The returned publisher handles the required
+    /// logic to pass the thread-confined object to the new queue. Only serial
+    /// dispatch queues are supported and using other schedulers will result in
+    /// a fatal error.
+    ///
+    /// For example, to subscribe on a background thread, do some work there,
+    /// then pass the collection changeset to the main thread you can do:
+    ///
+    ///     let cancellable = myCollection.changesetPublisher
+    ///         .subscribe(on: DispatchQueue(label: "background queue")
+    ///         .print()
+    ///         .threadSafeReference()
+    ///         .receive(on: DispatchQueue.main)
+    ///         .sink { collectionChange in
+    ///             // Do things with the collection on the main thread
+    ///         }
+    ///
+    /// - returns: A publisher that supports `receive(on:)` for thread-confined objects.
     public func threadSafeReference<T: RealmKeyedCollection>()
         -> RealmPublishers.MakeThreadSafeKeyedCollectionChangeset<Self, T> where Output == RealmDictionaryChange<T> {
         RealmPublishers.MakeThreadSafeKeyedCollectionChangeset(self)
