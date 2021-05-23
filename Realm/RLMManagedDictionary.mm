@@ -355,7 +355,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (NSUInteger)indexOfObject:(id)value {
     return translateErrors([&] {
-        return _backingCollection.find_any(value);
+        return _backingCollection.find_any(RLMObjcToMixed(value));
     });
 }
 

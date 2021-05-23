@@ -165,7 +165,7 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
      - parameter position: The position of the element in the collection.
      */
-    subscript(position: MapIndex) -> (Key, Value) { get }
+    subscript(position: MapIndex) -> (key: Key, value: Value) { get }
 
     /// Returns the position of an element in the collection.
     /// - Parameter object: The object to find.
@@ -421,7 +421,7 @@ private class _AnyMapBase<Key: _MapKey, Value: RealmCollectionValue>: AssistedOb
     func sorted<S>(by sortDescriptors: S) -> Results<Value> where S: Sequence, S.Element == SortDescriptor { fatalError() }
     var keys: [Key] { fatalError() }
     var values: [Value] { fatalError() }
-    subscript(position: MapIndex) -> (Key, Value) { fatalError() }
+    subscript(position: MapIndex) -> (key: Key, value: Value) { fatalError() }
     func index(of object: Value) -> MapIndex? { fatalError() }
     func min<T: MinMaxType>(ofProperty property: String) -> T? { fatalError() }
     func max<T: MinMaxType>(ofProperty property: String) -> T? { fatalError() }
@@ -484,7 +484,7 @@ private final class _AnyMap<C: RealmKeyedCollection>: _AnyMapBase<C.Key, C.Value
 
     // MARK: Indexes
 
-    override subscript(position: MapIndex) -> (C.Key, C.Value) { base[position] }
+    override subscript(position: MapIndex) -> (key: C.Key, value: C.Value) { base[position] }
     override func index(of object: C.Value) -> MapIndex? { base.index(of: object) }
 
     // MARK: Aggregate Operations
@@ -682,7 +682,7 @@ public struct AnyMap<Key: _MapKey, Value: RealmCollectionValue>: RealmKeyedColle
 
      - parameter position: The position of the element in the collection.
      */
-    public subscript(position: MapIndex) -> (Key, Value) { base[position] }
+    public subscript(position: MapIndex) -> (key: Key, value: Value) { base[position] }
 
     /// Returns the position of an element in the collection.
     /// - Parameter object: The object to find.

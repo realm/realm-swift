@@ -22,9 +22,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObject, RLMResults<RLMObjectType>, RLMDictionaryChange;
 
+/// A protocol defining a key type for RLMDictionary.
 @protocol RLMDictionaryKey <NSCopying>
 @end
-
+/// :nodoc:
 @interface NSString (RLMDictionaryKey)<RLMDictionaryKey>
 @end
 

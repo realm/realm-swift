@@ -259,17 +259,22 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
         return rlmDictionary.addNotificationBlock(wrapDictionaryObserveBlock(block), queue: queue)
     }
 
-    /// :nodoc:
-    public func index(of object: Value) -> MapIndex? {
-        return MapIndex(offset: rlmDictionary.index(of: dynamicBridgeCast(fromSwift: object)))
-    }
+    /**
+     Returns the object at the given `position`.
 
-    /// :nodoc:
-    public subscript(position: MapIndex) -> (Key, Value) {
-        precondition((position.offset >= count && position.offset < count),
+     - parameter position: The position of the element in the collection.
+     */
+    public subscript(position: MapIndex) -> (key: Key, value: Value) {
+        precondition((position.offset >= 0 && position.offset < count),
                      "Attempting to access Map elements using an invalid index.")
         let key = keys[Int(position.offset)]
         return (key, self[key]!)
+    }
+
+    /// Returns the position of an element in the collection.
+    /// - Parameter object: The object to find.
+    public func index(of object: Value) -> MapIndex? {
+        return MapIndex(offset: rlmDictionary.index(of: dynamicBridgeCast(fromSwift: object)))
     }
 
     // MARK: Aggregate Operations

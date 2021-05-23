@@ -579,6 +579,25 @@ class PrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTests
         map[values[0].key] = values[0].value
         XCTAssertEqual(values[0].value, map.object(forKey: values[0].key as AnyObject) as! V.T)
     }
+
+    func testMapIndex() {
+        XCTAssertEqual(0, map.count)
+        for element in values {
+            map[element.key] = element.value
+        }
+        let index1 = map.index(of: values[0].value)
+        XCTAssertNotNil(index1)
+        XCTAssertTrue(0...2 ~= index1!.offset)
+        let index2 = map.index(of: values[1].value)
+        XCTAssertNotNil(index2)
+        XCTAssertTrue(0...2 ~= index2!.offset)
+        let index3 = map.index(of: values[2].value)
+        XCTAssertNotNil(index3)
+        XCTAssertTrue(0...2 ~= index3!.offset)
+        XCTAssertEqual(map[index1!].value, map[map[index1!].key])
+        XCTAssertEqual(map[index2!].value, map[map[index2!].key])
+        XCTAssertEqual(map[index3!].value, map[map[index3!].key])
+    }
 }
 
 class MinMaxPrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.T: MinMaxType {
