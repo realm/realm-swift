@@ -402,9 +402,9 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedCollection() -> RLMDictionary<AnyObject, AnyObject> {
         if let type = Value.self as? ObjectBase.Type {
-            return RLMDictionary(objectClassName: type.className())
+            return RLMDictionary(objectClassName: type.className(), keyType: Key._rlmType)
         }
-        return RLMDictionary(objectType: Value._rlmType, optional: Value._rlmOptional)
+        return RLMDictionary(objectType: Value._rlmType, optional: Value._rlmOptional, keyType: Key._rlmType)
     }
 
     /// :nodoc:

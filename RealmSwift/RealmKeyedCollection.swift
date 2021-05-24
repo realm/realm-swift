@@ -22,7 +22,7 @@ import Realm
 /**
  A homogenous key-value collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
 */
-public protocol RealmKeyedCollection: RealmCollectionBase, Sequence {
+public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConvertible {
     associatedtype Key: _MapKey
     associatedtype Value: RealmCollectionValue
 
@@ -489,7 +489,9 @@ private final class _AnyMap<C: RealmKeyedCollection>: _AnyMapBase<C.Key, C.Value
 
     // MARK: Sequence Support
 
-    override func asNSFastEnumerator() -> Any { base.asNSFastEnumerator() }
+    override func asNSFastEnumerator() -> Any {
+        return (base as! UntypedCollection).asNSFastEnumerator()
+    }
     override func makeIterator() -> RLMMapIterator<SingleMapEntry<C.Key, C.Value>> {
         base.makeIterator() as! RLMMapIterator<SingleMapEntry<C.Key, C.Value>>
     }
