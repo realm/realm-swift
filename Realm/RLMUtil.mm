@@ -466,13 +466,14 @@ id RLMMixedToObjc(realm::Mixed const& mixed,
             return [[RLMObjectId alloc] initWithValue:mixed.get<realm::ObjectId>()];
         case realm::type_TypedLink:
             return RLMObjectFromObjLink(realm, mixed.get<realm::ObjLink>(), classInfo->isSwiftClass());
-        case realm::type_Link:
-        case realm::type_LinkList: {
+        case realm::type_Link: {
             auto obj = classInfo->table()->get_object((mixed).get<realm::ObjKey>());
             return RLMCreateObjectAccessor(*classInfo, std::move(obj));
         }
         case realm::type_UUID:
             return [[NSUUID alloc] initWithRealmUUID:mixed.get<realm::UUID>()];
+        case realm::type_LinkList:
+            REALM_UNREACHABLE();
         default:
             @throw RLMException(@"Invalid data type for RLMPropertyTypeAny property.");
     }
