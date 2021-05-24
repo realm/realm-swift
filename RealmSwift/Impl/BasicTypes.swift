@@ -79,6 +79,17 @@ extension UUID: _RealmSchemaDiscoverable {
 
 extension AnyRealmValue: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { .any }
+    public static func _rlmPopulateProperty(_ prop: RLMProperty) {
+        if prop.optional {
+            var type = "AnyRealmValue"
+            if prop.array {
+                type = "List<AnyRealmValue>"
+            } else if prop.set {
+                type = "MutableSet<AnyRealmValue>"
+            }
+            throwRealmException("\(type) property '\(prop.name)' must not be marked as optional: nil values are represented as AnyRealmValue.none")
+        }
+    }
 }
 
 extension NSString: _RealmSchemaDiscoverable {
