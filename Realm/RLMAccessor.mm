@@ -491,10 +491,12 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
             return ^(RLMObjectBase *obj) {
                 id val = superGet(obj, propName);
                 if (!val) {
-                    if (prop.dictionary)
+                    if (prop.dictionary) {
                         val = [[cls alloc] initWithObjectClassName:objectClassName keyType:prop.dictionaryKeyType];
-                    else
+                    }
+                    else {
                         val = [[cls alloc] initWithObjectClassName:objectClassName];
+                    }
                     superSet(obj, propName, val);
                 }
                 return val;

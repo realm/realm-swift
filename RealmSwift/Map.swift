@@ -111,18 +111,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     /// :nodoc:
     public subscript(key: Key) -> Value? {
         get {
-            if rlmDictionary.type == .object {
-                let obj = rlmDictionary[objcKey(from: key)]
-                // A Map can keep the key of an object that has been deleted by the Realm.
-                // If the object is deleted it will be stored as NSNull.null so we want to
-                // return that as `nil`.
-                if obj is NSNull {
-                    return nil
-                }
-                return obj.map(dynamicBridgeCast)
-            } else {
-                return rlmDictionary[objcKey(from: key)].map(dynamicBridgeCast)
-            }
+            return rlmDictionary[objcKey(from: key)].map(dynamicBridgeCast)
         }
         set {
             if newValue == nil {
