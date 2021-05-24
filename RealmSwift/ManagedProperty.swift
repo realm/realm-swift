@@ -185,6 +185,32 @@ public struct Managed<Value: _ManagedPropertyType> {
     }
 }
 
+extension Managed: Decodable where Value: Decodable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        storage = try .unmanaged(value: container.decode(Value.self), indexed: false, primary: false)
+    }
+}
+
+extension Managed: Encodable where Value: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        switch storage {
+        case .unmanaged(let value, _, _):
+            try value.encode(to: encoder)
+        case .unmanagedObserved(let value, _):
+            try value.encode(to: encoder)
+        case .unmanagedNoDefault:
+            try Value._rlmDefaultValue().encode(to: encoder)
+        default:
+            // We need a reference to the parent object to be able to read from
+            // a managed property. There's probably a way to do this with some
+            // sort of custom adapter that keeps track of the current parent
+            // at each level of recursion, but it's not trivial.
+            throw EncodingError.invalidValue(self, .init(codingPath: encoder.codingPath, debugDescription: "Only unmanaged Realm objects can be encoded using automatic Codable synthesis. You must explicitly define encode(to:) on your model class to support managed Realm objects."))
+        }
+    }
+}
+
 /// A type which can be indexed.
 ///
 /// This protocol is merely a tag and declaring additional types as conforming
