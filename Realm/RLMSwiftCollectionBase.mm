@@ -79,6 +79,11 @@
     return [(RLMArray *)self._rlmCollection objectsAtIndexes:indexes];
 }
 
+// Only in use for RLMDictionary
+- (id)objectForKeyedSubscript:(id)key {
+    return [(RLMDictionary *)self._rlmCollection objectForKeyedSubscript:key];
+}
+
 - (BOOL)isEqual:(id)object {
     if (auto base = RLMDynamicCast<RLMSwiftCollectionBase>(object)) {
         return !base._rlmCollection.realm

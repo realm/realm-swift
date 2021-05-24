@@ -48,8 +48,6 @@
 		02E334C31A5F41C7009F8810 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBA1955FE0100FDED82 /* DynamicTests.m */; };
 		0C3BD4B325C1BDF1007CFDD3 /* RLMDictionary.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C3BD4B125C1BDF1007CFDD3 /* RLMDictionary.mm */; };
 		0C3BD4B425C1BDF1007CFDD3 /* RLMDictionary.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C3BD4B125C1BDF1007CFDD3 /* RLMDictionary.mm */; };
-		0C3BD4B525C1BDF1007CFDD3 /* RLMDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C3BD4B225C1BDF1007CFDD3 /* RLMDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		0C3BD4B625C1BDF1007CFDD3 /* RLMDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C3BD4B225C1BDF1007CFDD3 /* RLMDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0C3BD4D325C1C5AB007CFDD3 /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3BD4D225C1C5AB007CFDD3 /* Map.swift */; };
 		0C3BD50325C1DE6F007CFDD3 /* RLMDictionary_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C3BD50125C1DE6F007CFDD3 /* RLMDictionary_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		0C5796A225643D7500744CAE /* RLMUUID.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C57969F25643D7500744CAE /* RLMUUID.mm */; };
@@ -112,6 +110,12 @@
 		3F1D8D78265B075100593ABA /* RealmPropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1D8D76265B075000593ABA /* RealmPropertyTests.swift */; };
 		3F1D8DCB265B077800593ABA /* PrimitiveRLMValuePropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F1D8D8E265B076C00593ABA /* PrimitiveRLMValuePropertyTests.m */; };
 		3F1D8DFF265B078200593ABA /* RLMValueTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F1D8D8D265B076C00593ABA /* RLMValueTests.m */; };
+		3F1D903F265C073100593ABA /* RLMSwiftValueStorage.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF44460526121B2A00BAFDB4 /* RLMSwiftValueStorage.mm */; };
+		3F1D9068265C077C00593ABA /* RLMDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C3BD4B225C1BDF1007CFDD3 /* RLMDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3F1D9073265C077E00593ABA /* RLMDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C3BD4B225C1BDF1007CFDD3 /* RLMDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3F1D9092265C07A600593ABA /* RLMSwiftValueStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = CF44460626121B2A00BAFDB4 /* RLMSwiftValueStorage.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		3F1D9093265C07A700593ABA /* RLMSwiftValueStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = CF44460626121B2A00BAFDB4 /* RLMSwiftValueStorage.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		3F1D90BC265C08F800593ABA /* RLMSwiftValueStorage.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF44460526121B2A00BAFDB4 /* RLMSwiftValueStorage.mm */; };
 		3F1F47821B9612B300CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F1F47831B9656B900CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F222C4E1E26F51300CA0713 /* ThreadSafeReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F222C4D1E26F51300CA0713 /* ThreadSafeReference.swift */; };
@@ -422,8 +426,6 @@
 		CF087567260B98CF00B9BE60 /* SwiftCollectionSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF087566260B98CF00B9BE60 /* SwiftCollectionSyncTests.swift */; };
 		CF08757D260B98E100B9BE60 /* RLMCollectionSyncTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF08757C260B98E100B9BE60 /* RLMCollectionSyncTests.mm */; };
 		CF330BBE24E57D5F00F07EE2 /* RLMWatchTestUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = CF330BBD24E57D5F00F07EE2 /* RLMWatchTestUtility.m */; };
-		CF44460726121B2A00BAFDB4 /* RLMSwiftValueStorage.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF44460526121B2A00BAFDB4 /* RLMSwiftValueStorage.mm */; };
-		CF44460826121B2A00BAFDB4 /* RLMSwiftValueStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = CF44460626121B2A00BAFDB4 /* RLMSwiftValueStorage.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CF44461E26121C6800BAFDB4 /* RealmProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF44461D26121C6800BAFDB4 /* RealmProperty.swift */; };
 		CF6E0482242A141200DB7F14 /* RLMEmailPasswordAuth.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0480242A141200DB7F14 /* RLMEmailPasswordAuth.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF6E0483242A141200DB7F14 /* RLMEmailPasswordAuth.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0481242A141200DB7F14 /* RLMEmailPasswordAuth.mm */; };
@@ -479,8 +481,6 @@
 		CFAEF766242B672700EAF721 /* RLMUserAPIKey.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFAEF764242B672700EAF721 /* RLMUserAPIKey.mm */; };
 		CFB4313A243DF87100471C18 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB43139243DF87100471C18 /* App.swift */; };
 		CFB674A324EEE9CB00FBF0B8 /* WatchTestUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB674A224EEE9CB00FBF0B8 /* WatchTestUtility.swift */; };
-		CFBB9B13261E6B7500FC7C77 /* RLMSwiftValueStorage.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF44460526121B2A00BAFDB4 /* RLMSwiftValueStorage.mm */; };
-		CFBB9B1E261E6B8A00FC7C77 /* RLMSwiftValueStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = CF44460626121B2A00BAFDB4 /* RLMSwiftValueStorage.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CFD8D12025BB0B8B0037FE4D /* RLMManagedSet.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFD8D11F25BB0B8B0037FE4D /* RLMManagedSet.mm */; };
 		CFD8D13325BB0B900037FE4D /* RLMManagedSet.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFD8D11F25BB0B8B0037FE4D /* RLMManagedSet.mm */; };
 		CFE9CE31265554FB00BF96D6 /* MutableSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF986D8E25AE3C980039D287 /* MutableSet.swift */; };
@@ -1773,9 +1773,7 @@
 				5D659EAC1BE04556006515A0 /* RLMConstants.h in Headers */,
 				4993220A24129DCE00A0EC8E /* RLMCredentials.h in Headers */,
 				3F4F3ADD23F71C790048DB43 /* RLMDecimal128.h in Headers */,
-				0C3BD4B525C1BDF1007CFDD3 /* RLMDictionary.h in Headers */,
-				0C3BD4B525C1BDF1007CFDD3 /* RLMDictionary.h in Headers */,
-				0C3BD4B525C1BDF1007CFDD3 /* RLMDictionary.h in Headers */,
+				3F1D9068265C077C00593ABA /* RLMDictionary.h in Headers */,
 				0CED6DB82655087200B80277 /* RLMDictionary_Private.h in Headers */,
 				CF6E0482242A141200DB7F14 /* RLMEmailPasswordAuth.h in Headers */,
 				3FC3F912241808B400E27322 /* RLMEmbeddedObject.h in Headers */,
@@ -1816,8 +1814,7 @@
 				CF986D1E25AE3B090039D287 /* RLMSet_Private.h in Headers */,
 				5D659EAE1BE04556006515A0 /* RLMSwiftCollectionBase.h in Headers */,
 				5D659EC91BE04556006515A0 /* RLMSwiftSupport.h in Headers */,
-				CF44460826121B2A00BAFDB4 /* RLMSwiftValueStorage.h in Headers */,
-				CF44460826121B2A00BAFDB4 /* RLMSwiftValueStorage.h in Headers */,
+				3F1D9092265C07A600593ABA /* RLMSwiftValueStorage.h in Headers */,
 				1A0512771D8746CD00806AEC /* RLMSyncConfiguration.h in Headers */,
 				3F336E8B1DA2FA15006CB5A0 /* RLMSyncConfiguration_Private.h in Headers */,
 				1AF7EA961D340AF70001A9B5 /* RLMSyncManager.h in Headers */,
@@ -1859,9 +1856,7 @@
 				5DD755AA1BE056DE002800DA /* RLMConstants.h in Headers */,
 				4993220B24129DCE00A0EC8E /* RLMCredentials.h in Headers */,
 				3F4F3ADE23F71C790048DB43 /* RLMDecimal128.h in Headers */,
-				0C3BD4B625C1BDF1007CFDD3 /* RLMDictionary.h in Headers */,
-				0C3BD4B625C1BDF1007CFDD3 /* RLMDictionary.h in Headers */,
-				0C3BD4B625C1BDF1007CFDD3 /* RLMDictionary.h in Headers */,
+				3F1D9073265C077E00593ABA /* RLMDictionary.h in Headers */,
 				0C3BD50325C1DE6F007CFDD3 /* RLMDictionary_Private.h in Headers */,
 				0C3BD50325C1DE6F007CFDD3 /* RLMDictionary_Private.h in Headers */,
 				CF6E048D242A4B7400DB7F14 /* RLMEmailPasswordAuth.h in Headers */,
@@ -1903,7 +1898,7 @@
 				CF986D1F25AE3B090039D287 /* RLMSet_Private.h in Headers */,
 				5DD755AC1BE056DE002800DA /* RLMSwiftCollectionBase.h in Headers */,
 				5DD755C71BE056DE002800DA /* RLMSwiftSupport.h in Headers */,
-				CFBB9B1E261E6B8A00FC7C77 /* RLMSwiftValueStorage.h in Headers */,
+				3F1D9093265C07A700593ABA /* RLMSwiftValueStorage.h in Headers */,
 				1A0512761D8746CD00806AEC /* RLMSyncConfiguration.h in Headers */,
 				3F336E8A1DA2FA14006CB5A0 /* RLMSyncConfiguration_Private.h in Headers */,
 				1A7DE7071D38474F0029F0AE /* RLMSyncManager.h in Headers */,
@@ -2492,6 +2487,7 @@
 				0C3BD4B325C1BDF1007CFDD3 /* RLMDictionary.mm in Sources */,
 				CF6E0483242A141200DB7F14 /* RLMEmailPasswordAuth.mm in Sources */,
 				3FC3F914241808B400E27322 /* RLMEmbeddedObject.mm in Sources */,
+				3F1D90BC265C08F800593ABA /* RLMSwiftValueStorage.mm in Sources */,
 				CF76F7FD24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm in Sources */,
 				CF76F7E724816AAB00890DD2 /* RLMFindOptions.mm in Sources */,
 				5D659E881BE04556006515A0 /* RLMManagedArray.mm in Sources */,
@@ -2522,8 +2518,6 @@
 				CF986D2025AE3B090039D287 /* RLMSet.mm in Sources */,
 				5D659E8A1BE04556006515A0 /* RLMSwiftCollectionBase.mm in Sources */,
 				5D659E991BE04556006515A0 /* RLMSwiftSupport.m in Sources */,
-				CF44460726121B2A00BAFDB4 /* RLMSwiftValueStorage.mm in Sources */,
-				CF44460726121B2A00BAFDB4 /* RLMSwiftValueStorage.mm in Sources */,
 				1A3623681D8384BA00945A54 /* RLMSyncConfiguration.mm in Sources */,
 				1AF7EA971D340AF70001A9B5 /* RLMSyncManager.mm in Sources */,
 				1AD3870D1D4A7FBB00479110 /* RLMSyncSession.mm in Sources */,
@@ -2682,7 +2676,7 @@
 				CF986D2125AE3B090039D287 /* RLMSet.mm in Sources */,
 				5DD755881BE056DE002800DA /* RLMSwiftCollectionBase.mm in Sources */,
 				5DD755971BE056DE002800DA /* RLMSwiftSupport.m in Sources */,
-				CFBB9B13261E6B7500FC7C77 /* RLMSwiftValueStorage.mm in Sources */,
+				3F1D903F265C073100593ABA /* RLMSwiftValueStorage.mm in Sources */,
 				1A0512721D873F3300806AEC /* RLMSyncConfiguration.mm in Sources */,
 				1A90FCBB1D3D37F50086A57F /* RLMSyncManager.mm in Sources */,
 				1A7003081D5270C400FD9EE3 /* RLMSyncSession.mm in Sources */,
