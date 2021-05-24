@@ -24,9 +24,9 @@ import Combine
 
 @objcMembers class SwiftUIObject: Object, ObjectKeyIdentifiable {
     var list = RealmSwift.List<SwiftBoolObject>()
-    var map = RealmSwift.Map<String, SwiftBoolObject>()
+    var map = Map<String, SwiftBoolObject?>()
     var primitiveList = RealmSwift.List<Int>()
-    var primitiveMap = RealmSwift.Map<String, Int>()
+    var primitiveMap = Map<String, Int>()
     dynamic var str = "foo"
     dynamic var int = 0
 

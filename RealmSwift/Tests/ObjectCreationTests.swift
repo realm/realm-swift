@@ -1326,7 +1326,7 @@ class ObjectCreationTests: TestCase {
         object.setCol.forEach { obj in
             XCTAssertTrue(boolObjectListValues.contains(obj.boolCol))
         }
-        for value in object.mapCol.map({ $0.value.boolCol }) {
+        for value in object.mapCol.map({ $0.value!.boolCol }) {
             XCTAssertTrue(boolObjectListValues.contains(value))
         }
     }

@@ -52,7 +52,7 @@ class ObjectiveCSupportTests: TestCase {
         XCTAssertEqual(unsafeBitCast(rlmSet.allObjects[0], to: SwiftObject.self).floatCol, 1.23)
         XCTAssertEqual(rlmSet.count, 1)
 
-        let map = Map<String, SwiftObject>()
+        let map = Map<String, SwiftObject?>()
         map["0"] = SwiftObject()
         let rlmDictionary = ObjectiveCSupport.convert(object: map)
         XCTAssert(rlmDictionary.isKind(of: RLMDictionary<AnyObject, AnyObject>.self))

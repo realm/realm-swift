@@ -273,7 +273,7 @@ extension Object: RealmCollectionValue {
 
      - parameter propertyName: The name of the property.
 
-     - returns: A map of  `String` with `DynamicObject`s.
+     - returns: A map with a given key type with `DynamicObject` as the value.
 
      :nodoc:
      */

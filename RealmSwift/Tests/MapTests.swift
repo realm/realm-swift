@@ -28,10 +28,10 @@ fileprivate extension Map {
 }
 
 class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase where M.Key == String,
-                                                                                  M.Value == SwiftStringObject,
+                                                                                  M.Value == SwiftStringObject?,
                                                                                   M.Element == SingleMapEntry<M.Key, M.Value>,
                                                                                   EM.Key == String,
-                                                                                  EM.Value == EmbeddedTreeObject1,
+                                                                                  EM.Value == EmbeddedTreeObject1?,
                                                                                   EM.Element == SingleMapEntry<EM.Key, EM.Value> {
     var str1: SwiftStringObject?
     var str2: SwiftStringObject?
@@ -191,7 +191,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         var str = ""
 
         for obj in map {
-            str += obj.value.stringCol
+            str += obj.value!.stringCol
             map[obj.key] = str2
         }
         XCTAssertEqual(str, "111111")
@@ -215,8 +215,8 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         map["key1"] = str1
         map["key2"] = str2
         XCTAssertEqual(2, map.count)
-        XCTAssertEqual("1", map["key1"]!.stringCol)
-        XCTAssertEqual("2", map["key2"]!.stringCol)
+        XCTAssertEqual("1", map["key1"]!!.stringCol)
+        XCTAssertEqual("2", map["key2"]!!.stringCol)
     }
 
     func testInsert() {
@@ -227,11 +227,11 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
 
         XCTAssertEqual(0, map.count)
 
-        XCTAssertNil(map[str1.stringCol])
+        XCTAssertNil(map[str1.stringCol] ?? nil)
         map[str1.stringCol] = str1
         XCTAssertEqual(1, map.count)
 
-        XCTAssertNil(map[str2.stringCol])
+        XCTAssertNil(map[str2.stringCol] ?? nil)
         map[str2.stringCol] = str2
         XCTAssertEqual(2, map.count)
     }
@@ -244,19 +244,19 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
 
         map[str1.stringCol] = str1
         XCTAssertEqual(1, map.count)
-        XCTAssertNotNil(map[str1.stringCol])
+        XCTAssertNotNil(map[str1.stringCol] ?? nil)
 
         map.removeObject(for: str1.stringCol)
         XCTAssertEqual(0, map.count)
-        XCTAssertNil(map[str1.stringCol])
+        XCTAssertNil(map[str1.stringCol] ?? nil)
 
         map[str1.stringCol] = str1
         XCTAssertEqual(1, map.count)
-        XCTAssertNotNil(map[str1.stringCol])
+        XCTAssertNotNil(map[str1.stringCol] ?? nil)
 
         map[str1.stringCol] = nil
         XCTAssertEqual(0, map.count)
-        XCTAssertNil(map[str1.stringCol])
+        XCTAssertNil(map[str1.stringCol] ?? nil)
     }
 
     func testRemoveAll() {
@@ -279,9 +279,9 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         }
         if let realm = map.realm {
             map["key"] = str1
-            XCTAssertEqual(map["key"]?.stringCol, str1.stringCol)
+            XCTAssertEqual(map["key"]!!.stringCol, str1.stringCol)
             realm.delete(str1)
-            XCTAssertNil(map["key"])
+            XCTAssertNil(map["key"] ?? nil)
         }
     }
 
@@ -295,8 +295,8 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         map["key2"] = str2
         if let realm = map.realm {
             let mapFromResults = realm.objects(SwiftMapPropertyObject.self).first!.map
-            XCTAssertEqual(map["key"]!.stringCol, mapFromResults["key"]!.stringCol)
-            XCTAssertEqual(map["key2"]!.stringCol, mapFromResults["key2"]!.stringCol)
+            XCTAssertEqual(map["key"]!!.stringCol, mapFromResults["key"]!!.stringCol)
+            XCTAssertEqual(map["key2"]!!.stringCol, mapFromResults["key2"]!!.stringCol)
         }
     }
 
@@ -313,15 +313,15 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         map[str1.stringCol] = str1
 
         XCTAssertEqual(map.count, 3)
-        XCTAssertEqual(map["a"]!.stringCol, "a")
-        XCTAssertEqual(map["b"]!.stringCol, "b")
-        XCTAssertEqual(map[str1.stringCol]!.stringCol, str1.stringCol)
+        XCTAssertEqual(map["a"]!!.stringCol, "a")
+        XCTAssertEqual(map["b"]!!.stringCol, "b")
+        XCTAssertEqual(map[str1.stringCol]!!.stringCol, str1.stringCol)
 
         let ex = expectation(description: "does enumerate")
         ex.expectedFulfillmentCount = 3
         for object in map {
             XCTAssertTrue(object.key.description.utf16.count > 0, "Object should have description")
-            XCTAssertTrue(object.value.description.utf16.count > 0, "Object should have description")
+            XCTAssertTrue(object.value!.description.utf16.count > 0, "Object should have description")
             ex.fulfill()
         }
         waitForExpectations(timeout: 1, handler: nil)
@@ -339,7 +339,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         let ex = expectation(description: "does enumerate")
         ex.expectedFulfillmentCount = 10
         for element in map {
-            XCTAssertEqual(element.key, element.value.stringCol)
+            XCTAssertEqual(element.key, element.value!.stringCol)
             ex.fulfill()
         }
         waitForExpectations(timeout: 1, handler: nil)
@@ -362,34 +362,34 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         }
 
         let mapObjects = realm.objects(SwiftMapOfSwiftObject.self)
-        let mapsOfObjects = mapObjects.value(forKeyPath: "map") as! [Map<String, SwiftObject>]
+        let mapsOfObjects = mapObjects.value(forKeyPath: "map") as! [Map<String, SwiftObject?>]
         let objects = realm.objects(SwiftObject.self)
 
-        func testProperty<T: Equatable>(line: UInt = #line, fn: @escaping (SwiftObject) -> T) {
+        func testProperty<T: Equatable>(line: UInt = #line, fn: @escaping (SwiftObject?) -> T) {
             let properties: [T] = Array(mapObjects.flatMap {
                 $0.map.values.map(fn)
             })
             let kvcProperties: [T] = Array(mapsOfObjects.flatMap { $0.values.map(fn) })
             XCTAssertEqual(properties, kvcProperties, line: line)
         }
-        func testProperty<T: Equatable>(_ name: String, line: UInt = #line, fn: @escaping (SwiftObject) -> T) {
+        func testProperty<T: Equatable>(_ name: String, line: UInt = #line, fn: @escaping (SwiftObject?) -> T) {
             let properties = Array(objects.compactMap(fn))
             let mapsOfObjects = objects.value(forKeyPath: name) as! [T]
             let kvcProperties = Array(mapsOfObjects.compactMap { $0 })
             XCTAssertEqual(properties, kvcProperties, line: line)
         }
 
-        testProperty { $0.intCol }
-        testProperty { $0.doubleCol }
-        testProperty { $0.stringCol }
-        testProperty { $0.decimalCol }
-        testProperty { $0.objectIdCol }
+        testProperty { $0!.intCol }
+        testProperty { $0!.doubleCol }
+        testProperty { $0!.stringCol }
+        testProperty { $0!.decimalCol }
+        testProperty { $0!.objectIdCol }
 
-        testProperty("intCol") { $0.intCol }
-        testProperty("doubleCol") { $0.doubleCol }
-        testProperty("stringCol") { $0.stringCol }
-        testProperty("decimalCol") { $0.decimalCol }
-        testProperty("objectIdCol") { $0.objectIdCol }
+        testProperty("intCol") { $0!.intCol }
+        testProperty("doubleCol") { $0!.doubleCol }
+        testProperty("stringCol") { $0!.stringCol }
+        testProperty("decimalCol") { $0!.decimalCol }
+        testProperty("objectIdCol") { $0!.objectIdCol }
     }
 
     @available(*, deprecated) // Silence deprecation warnings for RealmOptional
@@ -412,36 +412,36 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         }
 
         let mapObjects = realm.objects(SwiftMapOfSwiftOptionalObject.self)
-        let mapsOfObjects = mapObjects.value(forKeyPath: "map") as! [Map<String, SwiftOptionalObject>]
+        let mapsOfObjects = mapObjects.value(forKeyPath: "map") as! [Map<String, SwiftOptionalObject?>]
         let objects = realm.objects(SwiftOptionalObject.self)
 
-        func testProperty<T: Equatable>(line: UInt = #line, fn: @escaping (SwiftOptionalObject) -> T) {
+        func testProperty<T: Equatable>(line: UInt = #line, fn: @escaping (SwiftOptionalObject?) -> T) {
             let properties: [T] = mapObjects.flatMap { $0.map.values.map(fn) }
             let kvcProperties: [T] = mapsOfObjects.flatMap { $0.values.map(fn) }
             XCTAssertEqual(properties, kvcProperties, line: line)
         }
-        func testProperty<T: Equatable>(_ name: String, line: UInt = #line, fn: @escaping (SwiftOptionalObject) -> T) {
+        func testProperty<T: Equatable>(_ name: String, line: UInt = #line, fn: @escaping (SwiftOptionalObject?) -> T) {
             let properties = Array(objects.compactMap(fn))
             let mapsOfObjects = objects.value(forKeyPath: name) as! [T]
             let kvcProperties = Array(mapsOfObjects.compactMap { $0 })
             XCTAssertEqual(properties, kvcProperties, line: line)
         }
 
-        testProperty { $0.optIntCol.value }
-        testProperty { $0.optInt8Col.value }
-        testProperty { $0.optDoubleCol.value }
-        testProperty { $0.optStringCol }
-        testProperty { $0.optNSStringCol }
-        testProperty { $0.optDecimalCol }
-        testProperty { $0.optObjectCol }
+        testProperty { $0!.optIntCol.value }
+        testProperty { $0!.optInt8Col.value }
+        testProperty { $0!.optDoubleCol.value }
+        testProperty { $0!.optStringCol }
+        testProperty { $0!.optNSStringCol }
+        testProperty { $0!.optDecimalCol }
+        testProperty { $0!.optObjectCol }
 
-        testProperty("optIntCol") { $0.optIntCol.value }
-        testProperty("optInt8Col") { $0.optInt8Col.value }
-        testProperty("optDoubleCol") { $0.optDoubleCol.value }
-        testProperty("optStringCol") { $0.optStringCol }
-        testProperty("optNSStringCol") { $0.optNSStringCol }
-        testProperty("optDecimalCol") { $0.optDecimalCol }
-        testProperty("optObjectCol") { $0.optObjectCol }
+        testProperty("optIntCol") { $0!.optIntCol.value }
+        testProperty("optInt8Col") { $0!.optInt8Col.value }
+        testProperty("optDoubleCol") { $0!.optDoubleCol.value }
+        testProperty("optStringCol") { $0!.optStringCol }
+        testProperty("optNSStringCol") { $0!.optNSStringCol }
+        testProperty("optDecimalCol") { $0!.optDecimalCol }
+        testProperty("optObjectCol") { $0!.optObjectCol }
     }
 
     func testAppendEmbedded() {
@@ -452,8 +452,8 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         XCTAssertEqual(10, map.count)
 
         for element in map {
-            XCTAssertEqual(Int(element.key), element.value.value)
-            XCTAssertEqual(map.realm, element.value.realm)
+            XCTAssertEqual(Int(element.key), element.value!.value)
+            XCTAssertEqual(map.realm, element.value!.realm)
         }
 
         if map.realm != nil {
@@ -471,12 +471,12 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         let oldObj = map["key"]
         let obj = EmbeddedTreeObject1(value: [1])
         map["key"] = obj
-        XCTAssertTrue(map["key"]!.isSameObject(as: obj))
+        XCTAssertTrue(map["key"]!!.isSameObject(as: obj))
         XCTAssertEqual(obj.value, 1)
         XCTAssertEqual(obj.realm, map.realm)
 
         if map.realm != nil {
-            XCTAssertTrue(oldObj!.isInvalidated)
+            XCTAssertTrue(oldObj!!.isInvalidated)
             assertThrows(map["key"] = obj,
                          reason: "Cannot add an existing managed embedded object to a List.")
         }
@@ -537,15 +537,15 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         map["key3"] = SwiftStringObject(value: ["cockroach"])
 
         if map.realm != nil {
-            let results: Results<SwiftStringObject> = map.filter(NSPredicate(format: "stringCol = 'apples'"))
+            let results: Results<SwiftStringObject?> = map.filter(NSPredicate(format: "stringCol = 'apples'"))
             XCTAssertEqual(results.count, 1)
-            XCTAssertEqual(results.first!.stringCol, "apples")
+            XCTAssertEqual(results.first!!.stringCol, "apples")
 
-            let results2: Results<SwiftStringObject> = map.sorted(byKeyPath: "stringCol", ascending: true)
+            let results2: Results<SwiftStringObject?> = map.sorted(byKeyPath: "stringCol", ascending: true)
             XCTAssertEqual(results2.count, 3)
-            XCTAssertEqual(results2[0].stringCol, "apples")
-            XCTAssertEqual(results2[1].stringCol, "bananas")
-            XCTAssertEqual(results2[2].stringCol, "cockroach")
+            XCTAssertEqual(results2[0]!.stringCol, "apples")
+            XCTAssertEqual(results2[1]!.stringCol, "bananas")
+            XCTAssertEqual(results2[2]!.stringCol, "cockroach")
         } else {
             assertThrows(map.filter(NSPredicate(format: "stringCol = 'apples'")))
             assertThrows(map.sorted(byKeyPath: "stringCol", ascending: false))
@@ -733,27 +733,27 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     }
 }
 
-class MapStandaloneTests: MapTests<Map<String, SwiftStringObject>, Map<String, EmbeddedTreeObject1>> {
-    override func createMap() -> Map<String, SwiftStringObject> {
+class MapStandaloneTests: MapTests<Map<String, SwiftStringObject?>, Map<String, EmbeddedTreeObject1?>> {
+    override func createMap() -> Map<String, SwiftStringObject?> {
         let mapObj = SwiftMapPropertyObject()
         XCTAssertNil(mapObj.realm)
         return mapObj.map
     }
 
-    override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1> {
-        return Map<String, EmbeddedTreeObject1>()
+    override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1?> {
+        return Map<String, EmbeddedTreeObject1?>()
     }
 }
 
-class MapNewlyAddedTests: MapTests<Map<String, SwiftStringObject>, Map<String, EmbeddedTreeObject1>> {
-    override func createMap() -> Map<String, SwiftStringObject> {
+class MapNewlyAddedTests: MapTests<Map<String, SwiftStringObject?>, Map<String, EmbeddedTreeObject1?>> {
+    override func createMap() -> Map<String, SwiftStringObject?> {
         let mapObj = SwiftMapPropertyObject()
         realm.add(mapObj)
         XCTAssertNotNil(mapObj.realm)
         return mapObj.map
     }
 
-    override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1> {
+    override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1?> {
         let parent = EmbeddedParentObject()
         let map = parent.map
         realm.add(parent)
@@ -761,8 +761,8 @@ class MapNewlyAddedTests: MapTests<Map<String, SwiftStringObject>, Map<String, E
     }
 }
 
-class MapNewlyCreatedTests: MapTests<Map<String, SwiftStringObject>, Map<String, EmbeddedTreeObject1>> {
-    override func createMap() -> Map<String, SwiftStringObject> {
+class MapNewlyCreatedTests: MapTests<Map<String, SwiftStringObject?>, Map<String, EmbeddedTreeObject1?>> {
+    override func createMap() -> Map<String, SwiftStringObject?> {
         let mapObj = realm.create(SwiftMapPropertyObject.self, value: ["name", [], []])
         try! realm.commitWrite()
         realm.beginWrite()
@@ -770,13 +770,13 @@ class MapNewlyCreatedTests: MapTests<Map<String, SwiftStringObject>, Map<String,
         return mapObj.map
     }
 
-    override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1> {
+    override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1?> {
         return realm.create(EmbeddedParentObject.self, value: []).map
     }
 }
 
-class MapRetrievedTests: MapTests<Map<String, SwiftStringObject>, Map<String, EmbeddedTreeObject1>> {
-    override func createMap() -> Map<String, SwiftStringObject> {
+class MapRetrievedTests: MapTests<Map<String, SwiftStringObject?>, Map<String, EmbeddedTreeObject1?>> {
+    override func createMap() -> Map<String, SwiftStringObject?> {
         realm.create(SwiftMapPropertyObject.self, value: ["name", [:], [:]])
         try! realm.commitWrite()
         let mapObj = realm.objects(SwiftMapPropertyObject.self).first!
@@ -786,33 +786,33 @@ class MapRetrievedTests: MapTests<Map<String, SwiftStringObject>, Map<String, Em
         return mapObj.map
     }
 
-    override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1> {
+    override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1?> {
         realm.create(EmbeddedParentObject.self, value: [])
         return realm.objects(EmbeddedParentObject.self).first!.map
     }
 }
 
-class AnyMapStandaloneTests: MapTests<AnyMap<String, SwiftStringObject>, AnyMap<String, EmbeddedTreeObject1>> {
-    override func createMap() -> AnyMap<String, SwiftStringObject> {
+class AnyMapStandaloneTests: MapTests<AnyMap<String, SwiftStringObject?>, AnyMap<String, EmbeddedTreeObject1?>> {
+    override func createMap() -> AnyMap<String, SwiftStringObject?> {
         let mapObj = SwiftMapPropertyObject()
         XCTAssertNil(mapObj.realm)
         return AnyMap(mapObj.map)
     }
 
-    override func createEmbeddedMap() -> AnyMap<String, EmbeddedTreeObject1> {
-        return AnyMap(Map<String, EmbeddedTreeObject1>())
+    override func createEmbeddedMap() -> AnyMap<String, EmbeddedTreeObject1?> {
+        return AnyMap(Map<String, EmbeddedTreeObject1?>())
     }
 }
 
-class AnyMapNewlyAddedTests: MapTests<AnyMap<String, SwiftStringObject>, AnyMap<String, EmbeddedTreeObject1>> {
-    override func createMap() -> AnyMap<String, SwiftStringObject> {
+class AnyMapNewlyAddedTests: MapTests<AnyMap<String, SwiftStringObject?>, AnyMap<String, EmbeddedTreeObject1?>> {
+    override func createMap() -> AnyMap<String, SwiftStringObject?> {
         let mapObj = SwiftMapPropertyObject()
         realm.add(mapObj)
         XCTAssertNotNil(mapObj.realm)
         return AnyMap(mapObj.map)
     }
 
-    override func createEmbeddedMap() -> AnyMap<String, EmbeddedTreeObject1> {
+    override func createEmbeddedMap() -> AnyMap<String, EmbeddedTreeObject1?> {
         let parent = EmbeddedParentObject()
         let map = parent.map
         realm.add(parent)
@@ -822,8 +822,8 @@ class AnyMapNewlyAddedTests: MapTests<AnyMap<String, SwiftStringObject>, AnyMap<
     }
 }
 
-class AnyMapNewlyCreatedTests: MapTests<AnyMap<String, SwiftStringObject>, AnyMap<String, EmbeddedTreeObject1>> {
-    override func createMap() -> AnyMap<String, SwiftStringObject> {
+class AnyMapNewlyCreatedTests: MapTests<AnyMap<String, SwiftStringObject?>, AnyMap<String, EmbeddedTreeObject1?>> {
+    override func createMap() -> AnyMap<String, SwiftStringObject?> {
         let mapObj = realm.create(SwiftMapPropertyObject.self, value: ["name", [], []])
         try! realm.commitWrite()
         realm.beginWrite()
@@ -831,15 +831,15 @@ class AnyMapNewlyCreatedTests: MapTests<AnyMap<String, SwiftStringObject>, AnyMa
         return AnyMap(mapObj.map)
     }
 
-    override func createEmbeddedMap() -> AnyMap<String, EmbeddedTreeObject1> {
+    override func createEmbeddedMap() -> AnyMap<String, EmbeddedTreeObject1?> {
         let map = realm.create(EmbeddedParentObject.self, value: []).map
         XCTAssertNotNil(map.realm)
         return AnyMap(map)
     }
 }
 
-class AnyMapRetrievedTests: MapTests<AnyMap<String, SwiftStringObject>, AnyMap<String, EmbeddedTreeObject1>> {
-    override func createMap() -> AnyMap<String, SwiftStringObject> {
+class AnyMapRetrievedTests: MapTests<AnyMap<String, SwiftStringObject?>, AnyMap<String, EmbeddedTreeObject1?>> {
+    override func createMap() -> AnyMap<String, SwiftStringObject?> {
         realm.create(SwiftMapPropertyObject.self, value: ["name", [:], [:]])
         try! realm.commitWrite()
         let mapObj = realm.objects(SwiftMapPropertyObject.self).first!
@@ -849,7 +849,7 @@ class AnyMapRetrievedTests: MapTests<AnyMap<String, SwiftStringObject>, AnyMap<S
         return AnyMap(mapObj.map)
     }
 
-    override func createEmbeddedMap() -> AnyMap<String, EmbeddedTreeObject1> {
+    override func createEmbeddedMap() -> AnyMap<String, EmbeddedTreeObject1?> {
         realm.create(EmbeddedParentObject.self, value: [])
         let map = realm.objects(EmbeddedParentObject.self).first!.map
         XCTAssertNotNil(map.realm)

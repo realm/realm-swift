@@ -78,7 +78,7 @@ class SwiftObject: Object {
 
     let arrayCol = List<SwiftBoolObject>()
     let setCol = MutableSet<SwiftBoolObject>()
-    let mapCol = Map<String, SwiftBoolObject>()
+    let mapCol = Map<String, SwiftBoolObject?>()
 
     class func defaultValues() -> [String: Any] {
         return  [
@@ -210,7 +210,7 @@ class SwiftMapObject: Object {
     let decimal = Map<String, Decimal128>()
     let objectId = Map<String, ObjectId>()
     let uuid = Map<String, UUID>()
-    let object = Map<String, SwiftStringObject>()
+    let object = Map<String, SwiftStringObject?>()
     let any = Map<String, AnyRealmValue>()
 
     let intOpt = Map<String, Int?>()
@@ -346,7 +346,7 @@ class SwiftEmployeeObject: Object {
 class SwiftCompanyObject: Object {
     let employees = List<SwiftEmployeeObject>()
     let employeeSet = MutableSet<SwiftEmployeeObject>()
-    let employeeMap = Map<String, SwiftEmployeeObject>()
+    let employeeMap = Map<String, SwiftEmployeeObject?>()
 }
 
 class SwiftArrayPropertyObject: Object {
@@ -363,8 +363,8 @@ class SwiftMutableSetPropertyObject: Object {
 
 class SwiftMapPropertyObject: Object {
     @objc dynamic var name = ""
-    let map = Map<String, SwiftStringObject>()
-    let intMap = Map<String, SwiftIntObject>()
+    let map = Map<String, SwiftStringObject?>()
+    let intMap = Map<String, SwiftIntObject?>()
 }
 
 class SwiftDoubleListOfSwiftObject: Object {
@@ -380,12 +380,12 @@ class SwiftMutableSetOfSwiftObject: Object {
 }
 
 class SwiftMapOfSwiftObject: Object {
-    let map = Map<String, SwiftObject>()
+    let map = Map<String, SwiftObject?>()
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftMapOfSwiftOptionalObject: Object {
-    let map = Map<String, SwiftOptionalObject>()
+    let map = Map<String, SwiftOptionalObject?>()
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
@@ -799,7 +799,7 @@ class LinkToSwiftRenamedProperties2: Object {
 class EmbeddedParentObject: Object {
     @objc dynamic var object: EmbeddedTreeObject1?
     let array = List<EmbeddedTreeObject1>()
-    let map = Map<String, EmbeddedTreeObject1>()
+    let map = Map<String, EmbeddedTreeObject1?>()
 }
 
 class EmbeddedPrimaryParentObject: Object {

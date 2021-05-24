@@ -343,20 +343,20 @@ class ThreadSafeReferenceTests: TestCase {
         let anyMap = AnyMap(realm.objects(SwiftCompanyObject.self).first!.employeeMap)
 
         XCTAssertEqual(4, anyMap.count)
-        XCTAssertEqual("A", anyMap["one"]?.name)
-        XCTAssertEqual("B", anyMap["two"]?.name)
-        XCTAssertEqual("C", anyMap["three"]?.name)
-        XCTAssertEqual("D", anyMap["four"]?.name)
+        XCTAssertEqual("A", anyMap["one"]!!.name)
+        XCTAssertEqual("B", anyMap["two"]!!.name)
+        XCTAssertEqual("C", anyMap["three"]!!.name)
+        XCTAssertEqual("D", anyMap["four"]!!.name)
 
         let anyMapRef = ThreadSafeReference(to: anyMap)
         dispatchSyncNewThread {
             let realm = try! Realm()
             let anyMap = self.assertResolve(realm, anyMapRef)!
             XCTAssertEqual(4, anyMap.count)
-            XCTAssertEqual("A", anyMap["one"]?.name)
-            XCTAssertEqual("B", anyMap["two"]?.name)
-            XCTAssertEqual("C", anyMap["three"]?.name)
-            XCTAssertEqual("D", anyMap["four"]?.name)
+            XCTAssertEqual("A", anyMap["one"]!!.name)
+            XCTAssertEqual("B", anyMap["two"]!!.name)
+            XCTAssertEqual("C", anyMap["three"]!!.name)
+            XCTAssertEqual("D", anyMap["four"]!!.name)
         }
     }
 }

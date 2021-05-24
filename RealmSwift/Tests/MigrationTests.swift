@@ -1017,7 +1017,7 @@ class MigrationTests: TestCase {
         XCTAssertEqual(object.setCol.count, 1)
         XCTAssertEqual(object.setCol[0].boolCol, false)
         XCTAssertEqual(object.mapCol.count, 1)
-        XCTAssertEqual(object.mapCol["key"]!.boolCol, false)
+        XCTAssertEqual(object.mapCol["key"]!?.boolCol, false)
 
         // make sure we added new bool objects as object property and in the list
         XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 10)

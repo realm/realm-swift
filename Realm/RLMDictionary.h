@@ -291,7 +291,7 @@ NS_ASSUME_NONNULL_BEGIN
 
      Person *person = [[Person allObjectsInRealm:realm] firstObject];
      NSLog(@"person.dogs.count: %zu", person.dogs.count); // => 0
-     self.token = [person.dogs addNotificationBlock(RLMDictionary<Dog *> *dogs,
+     self.token = [person.dogs addNotificationBlock(RLMDictionary<NSString *, Dog *> *dogs,
                                        RLMDictionaryChange *changes,
                                        NSError *error) {
          // Only fired once for the example

@@ -406,7 +406,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedCollection() -> RLMDictionary<AnyObject, AnyObject> {
-        if let type = Value.self as? ObjectBase.Type {
+        if let type = Value.self as? OptionalObject.Type {
             return RLMDictionary(objectClassName: type.className(), keyType: Key._rlmType)
         }
         return RLMDictionary(objectType: Value._rlmType, optional: Value._rlmOptional, keyType: Key._rlmType)
@@ -601,4 +601,13 @@ public struct SingleMapEntry<Key: _MapKey, Value: RealmCollectionValue>: _RealmM
     public var key: Self.Key
     /// :nodoc:
     public var value: Self.Value
+}
+
+private protocol OptionalObject {
+    static func className() -> String
+}
+extension Optional: OptionalObject where Wrapped: ObjectBase {
+    static func className() -> String {
+        Wrapped.className()
+    }
 }

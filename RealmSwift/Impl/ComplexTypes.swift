@@ -31,6 +31,9 @@ extension Object: _RealmSchemaDiscoverable {
         if prop.optional && prop.set {
             throwRealmException("MutableSet<\(className())> property '\(prop.name)' must not be marked as optional.")
         }
+        if !prop.optional && prop.dictionary {
+            throwRealmException("Map<String, \(className())> property '\(prop.name)' must be marked as optional.")
+        }
         prop.objectClassName = className()
     }
 }

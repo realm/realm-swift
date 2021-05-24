@@ -1840,25 +1840,25 @@ private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: Combin
     }
 }
 
-extension Map: CombineTestCollection where Key == String, Value == SwiftIntObject {
+extension Map: CombineTestCollection where Key == String, Value == SwiftIntObject? {
     static func getCollection(_ realm: Realm) -> Map<Key, Value> {
         return try! realm.write { realm.create(SwiftMapPropertyObject.self, value: []).intMap }
     }
 
     func appendObject() {
         let key = UUID().uuidString
-        self[key] = realm!.create(Value.self, value: [])
+        self[key] = realm!.create(SwiftIntObject.self, value: [])
     }
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class ManagedMapPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
-        return CombineMapPublisherTests<Map<String, SwiftIntObject>>.testSuite("Map")
+        return CombineMapPublisherTests<Map<String, SwiftIntObject?>>.testSuite("Map")
     }
 }
 
-extension AnyMap: CombineTestCollection where Key == String, Value == SwiftIntObject {
+extension AnyMap: CombineTestCollection where Key == String, Value == SwiftIntObject? {
     static func getCollection(_ realm: Realm) -> AnyMap<Key, Value> {
         let obj = try! realm.write { realm.create(SwiftMapPropertyObject.self, value: []).intMap }
         return AnyMap(obj)
@@ -1866,14 +1866,14 @@ extension AnyMap: CombineTestCollection where Key == String, Value == SwiftIntOb
 
     func appendObject() {
         let key = UUID().uuidString
-        self.setValue(realm!.create(Value.self, value: []), forKey: key)
+        self.setValue(realm!.create(SwiftIntObject.self, value: []), forKey: key)
     }
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class AnyMapPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
-        return CombineMapPublisherTests<AnyMap<String, SwiftIntObject>>.testSuite("AnyMap")
+        return CombineMapPublisherTests<AnyMap<String, SwiftIntObject?>>.testSuite("AnyMap")
     }
 }
 
