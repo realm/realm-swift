@@ -20,7 +20,7 @@ import XCTest
 import RealmSwift
 
 fileprivate extension Map {
-    func addTestObjects(from dictionary: [Key: Value]) where Key: Hashable {
+    func addTestObjects(from dictionary: [Key: Value]) {
         dictionary.forEach { (k, v) in
             self[k] = v
         }
