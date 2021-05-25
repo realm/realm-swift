@@ -495,14 +495,14 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         let objects = ["obj": obj, "obj2": obj2, "obj3": obj3]
         let objects2 = ["obj": obj, "obj2": obj2]
 
-        let map1 = Map<String, SwiftIntObject>()
-        let map2 = Map<String, SwiftIntObject>()
+        let map1 = Map<String, SwiftIntObject?>()
+        let map2 = Map<String, SwiftIntObject?>()
         XCTAssertEqual(map1, map2, "Empty instances should be equal by `==` operator")
 
         map1.addTestObjects(from: objects)
         map2.addTestObjects(from: objects)
 
-        let map3 = Map<String, SwiftIntObject>()
+        let map3 = Map<String, SwiftIntObject?>()
         map3.addTestObjects(from: objects2)
 
         XCTAssertTrue(map1 !== map2, "instances should not be identical")
@@ -516,16 +516,16 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         map3["obj3"] = obj3
         XCTAssertEqual(map1, map3, "instances should be equal by `==` operator")
 
-        XCTAssertEqual(Dictionary<String, SwiftIntObject>(_immutableCocoaDictionary: map1),
-                       Dictionary<String, SwiftIntObject>(_immutableCocoaDictionary: map2),
+        XCTAssertEqual(Dictionary<String, SwiftIntObject?>(_immutableCocoaDictionary: map1),
+                       Dictionary<String, SwiftIntObject?>(_immutableCocoaDictionary: map2),
                        "instances converted to Swift.Dictionary should be equal")
-        XCTAssertEqual(Dictionary<String, SwiftIntObject>(_immutableCocoaDictionary: map1),
-                       Dictionary<String, SwiftIntObject>(_immutableCocoaDictionary: map3),
+        XCTAssertEqual(Dictionary<String, SwiftIntObject?>(_immutableCocoaDictionary: map1),
+                       Dictionary<String, SwiftIntObject?>(_immutableCocoaDictionary: map3),
                        "instances converted to Swift.Dictionary should be equal")
         map3["obj3"] = nil
         map1["obj3"] = nil
-        XCTAssertEqual(Dictionary<String, SwiftIntObject>(_immutableCocoaDictionary: map1),
-                       Dictionary<String, SwiftIntObject>(_immutableCocoaDictionary: map3),
+        XCTAssertEqual(Dictionary<String, SwiftIntObject?>(_immutableCocoaDictionary: map1),
+                       Dictionary<String, SwiftIntObject?>(_immutableCocoaDictionary: map3),
                        "instances should be equal by `==` operator")
     }
 
@@ -596,7 +596,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
             test(on: "decimal", value: Decimal128(floatLiteral: 123.456))
             test(on: "objectId", value: ObjectId())
             test(on: "uuid", value: UUID())
-            test(on: "object", value: SwiftStringObject(value: ["hello"]))
+            test(on: "object", value: Optional<SwiftStringObject>(SwiftStringObject(value: ["hello"])))
         }
     }
 
@@ -656,9 +656,9 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
                  UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD88")!,
                  UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD87")!)
             test(on: "object",
-                 values: SwiftStringObject(value: ["hello"]),
-                 SwiftStringObject(value: ["there"]),
-                 SwiftStringObject(value: ["bye"]))
+                 values: Optional<SwiftStringObject>(SwiftStringObject(value: ["hello"])),
+                 Optional<SwiftStringObject>(SwiftStringObject(value: ["there"])),
+                 Optional<SwiftStringObject>(SwiftStringObject(value: ["bye"])))
         }
     }
 
