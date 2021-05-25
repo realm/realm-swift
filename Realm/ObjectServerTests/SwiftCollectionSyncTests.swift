@@ -608,11 +608,11 @@ class MapSyncTests: SwiftSyncTestCase {
 
     func testObjectMap() {
         do {
-            let map = createMap([SwiftPerson(firstName: "Peter", lastName: "Parker"),
-                                 SwiftPerson(firstName: "Bruce", lastName: "Wayne"),
-                                 SwiftPerson(firstName: "Stephen", lastName: "Strange"),
-                                 SwiftPerson(firstName: "Tony", lastName: "Stark"),
-                                 SwiftPerson(firstName: "Clark", lastName: "Kent")])
+            let map = createMap([SwiftPerson(firstName: "Peter", lastName: "Parker") as SwiftPerson?,
+                                 SwiftPerson(firstName: "Bruce", lastName: "Wayne") as SwiftPerson?,
+                                 SwiftPerson(firstName: "Stephen", lastName: "Strange") as SwiftPerson?,
+                                 SwiftPerson(firstName: "Tony", lastName: "Stark") as SwiftPerson?,
+                                 SwiftPerson(firstName: "Clark", lastName: "Kent") as SwiftPerson?])
             try roundTrip(keyPath: \.objectMap, values: map)
         } catch {
             XCTFail(error.localizedDescription)
