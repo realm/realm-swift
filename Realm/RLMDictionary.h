@@ -22,13 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObject, RLMResults<RLMObjectType>, RLMDictionaryChange;
 
-/// A protocol defining a key type for RLMDictionary.
-@protocol RLMDictionaryKey <NSCopying>
-@end
-/// :nodoc:
-@interface NSString (RLMDictionaryKey)<RLMDictionaryKey>
-@end
-
 /**
  `RLMDictionary` is a container type in Realm representing a dynamic collection of key-value pairs.
 
@@ -86,7 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy, nullable) NSString *objectClassName;
 
 /**
- The Realm which manages the dictionary. Returns `nil` for unmanaged dictionary.RLMDictionaryKey
+ The Realm which manages the dictionary. Returns `nil` for unmanaged dictionary.
  */
 @property (nonatomic, readonly, nullable) RLMRealm *realm;
 
@@ -116,17 +109,17 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return A value associated with a given key or `nil`.
  */
-- (nullable id)valueForKey:(nonnull RLMKeyType <RLMDictionaryKey>)key;
+- (nullable id)valueForKey:(nonnull RLMKeyType)key;
 
 /**
  Returns an object, if present, for a given key in the dictionary.
  */
-- (nullable RLMObjectType)objectForKey:(nonnull RLMKeyType <RLMDictionaryKey>)key;
+- (nullable RLMObjectType)objectForKey:(nonnull RLMKeyType)key;
 
 /**
  Returns an array containing the dictionary’s keys.
  */
-@property(readonly, copy) NSArray<RLMKeyType <RLMDictionaryKey>> *allKeys;
+@property(readonly, copy) NSArray<RLMKeyType> *allKeys;
 
 /**
  Returns an array containing the dictionary’s values.
@@ -134,12 +127,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property(readonly, copy) NSArray<RLMObjectType> *allValues;
 
 /// :nodoc:
-- (nullable RLMObjectType)objectForKeyedSubscript:(RLMKeyType <RLMDictionaryKey>)key;
+- (nullable RLMObjectType)objectForKeyedSubscript:(RLMKeyType)key;
 
 /**
  Applies a given block object to the each key-value pair of the dictionary
  */
-- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(RLMKeyType <RLMDictionaryKey> key, RLMObjectType obj, BOOL *stop))block;
+- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(RLMKeyType key, RLMObjectType obj, BOOL *stop))block;
 
 #pragma mark - Adding, Removing, and Replacing Objects in a Dictionary
 
@@ -161,17 +154,17 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Removes a given key and its associated value from the dictionary.
  */
-- (void)removeObjectForKey:(RLMKeyType <RLMDictionaryKey>)key;
+- (void)removeObjectForKey:(RLMKeyType)key;
 
 /**
  Adds a given key-value pair to the dictionary.
  */
-- (void)setObject:(nullable RLMObjectType)obj forKeyedSubscript:(RLMKeyType <RLMDictionaryKey>)key;
+- (void)setObject:(nullable RLMObjectType)obj forKeyedSubscript:(RLMKeyType)key;
 
 /**
  Adds a given key-value pair to the dictionary.
  */
-- (void)setObject:(nullable RLMObjectType)anObject forKey:(RLMKeyType <RLMDictionaryKey>)aKey;
+- (void)setObject:(nullable RLMObjectType)anObject forKey:(RLMKeyType)aKey;
 
 /**
   Adds to the receiving dictionary the entries from another dictionary.
@@ -407,10 +400,10 @@ __attribute__((warn_unused_result));
  */
 @interface RLMDictionaryChange : NSObject
 /// The keys in the new version of the dictionary which were newly inserted.
-@property (nonatomic, readonly) NSArray<id<RLMDictionaryKey>> *insertions;
+@property (nonatomic, readonly) NSArray<id> *insertions;
 
 /// The keys in the new version of the dictionary which were modified.
-@property (nonatomic, readonly) NSArray<id<RLMDictionaryKey>> *modifications;
+@property (nonatomic, readonly) NSArray<id> *modifications;
 @end
 
 NS_ASSUME_NONNULL_END

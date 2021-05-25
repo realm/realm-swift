@@ -93,8 +93,7 @@ void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *
         @throw RLMException(@"Invalid nil key for dictionary expecting key of type '%@'.",
                             dictionary->_objectClassName ?: RLMTypeToString(dictionary.keyType));
     }
-    if (![key conformsToProtocol:@protocol(RLMDictionaryKey)] ||
-        !RLMValidateValue(key, dictionary.keyType, false, false, nil)) {
+    if (!RLMValidateValue(key, dictionary.keyType, false, false, nil)) {
         @throw RLMException(@"Invalid key '%@' of type '%@' for expected type '%@'.",
                             key, [key class], RLMTypeToString(dictionary.keyType));
     }
@@ -157,11 +156,11 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
     return _backingCollection.allValues;
 }
 
-- (nullable id)objectForKey:(id<RLMDictionaryKey>)key {
+- (nullable id)objectForKey:(id)key {
     return [_backingCollection objectForKey:key];
 }
 
-- (nullable id)objectForKeyedSubscript:(id<RLMDictionaryKey>)key {
+- (nullable id)objectForKeyedSubscript:(id)key {
     return [_backingCollection objectForKey:key];
 }
 
@@ -185,14 +184,14 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
     });
 }
 
-- (void)setObject:(id)obj forKeyedSubscript:(id<RLMDictionaryKey>)key {
+- (void)setObject:(id)obj forKeyedSubscript:(id)key {
     changeDictionary(self, ^{
         RLMDictionaryValidateMatchingObjectType(self, key, obj);
         _backingCollection[(id)key] = obj;
     });
 }
 
-- (void)setObject:(id)obj forKey:(id<RLMDictionaryKey>)key {
+- (void)setObject:(id)obj forKey:(id)key {
     changeDictionary(self, ^{
         RLMDictionaryValidateMatchingObjectType(self, key, obj);
         [_backingCollection setObject:obj forKey:key];
@@ -211,20 +210,15 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
     });
 }
 
-- (void)removeObjectForKey:(id<RLMDictionaryKey>)key {
+- (void)removeObjectForKey:(id)key {
     changeDictionary(self, ^{
         [_backingCollection removeObjectForKey:key];
     });
 }
 
-- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id <RLMDictionaryKey> key,
+- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id key,
                                                     id obj, BOOL *stop))block {
     [_backingCollection enumerateKeysAndObjectsUsingBlock:block];
-}
-
-// Only for use with RLMManagedDictionary.
-- (nullable id)managedValueForKey:(nonnull NSString *)key {
-    return [super valueForKey:key];
 }
 
 - (nullable id)valueForKey:(nonnull NSString *)key {

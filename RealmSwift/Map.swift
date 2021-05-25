@@ -96,7 +96,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      Removes the given key and its associated object.
      */
     public func removeObject(for key: Key) {
-        rlmDictionary.removeObject(for: objcKey(from: key))
+        rlmDictionary.removeObject(forKey: objcKey(from: key))
     }
 
     /**
@@ -129,7 +129,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      - parameter key: The key to the property whose values are desired.
      */
     @objc public func object(forKey key: AnyObject) -> AnyObject? {
-        return rlmDictionary.object(for: key as! RLMDictionaryKey)
+        return rlmDictionary.object(forKey: key as AnyObject)
     }
 
     // MARK: KVC
@@ -142,7 +142,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      - parameter key: The key to the property whose values are desired.
      */
     @nonobjc public func value(forKey key: String) -> AnyObject? {
-        return rlmDictionary.value(forKey: key as RLMDictionaryKey)
+        return rlmDictionary.value(forKey: key as AnyObject)
             .map { dynamicBridgeCast(fromObjectiveC: $0) }
     }
 
@@ -421,11 +421,8 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
         _rlmCollection as! RLMDictionary
     }
 
-    private func objcKey(from swiftKey: Key) -> RLMDictionaryKey {
-        guard let key = swiftKey as? RLMDictionaryKey else {
-            throwRealmException("Could not cast \(String(describing: swiftKey.self)) to RLMDictionaryKey")
-        }
-        return key
+    private func objcKey(from swiftKey: Key) -> AnyObject {
+        return swiftKey as AnyObject
     }
 }
 

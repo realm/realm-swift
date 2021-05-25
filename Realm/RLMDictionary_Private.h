@@ -27,7 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional keyType:(RLMPropertyType)keyType;
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
-- (nullable id)managedValueForKey:(nonnull NSString *)key;
 @end
 
 @interface RLMManagedDictionary : RLMDictionary

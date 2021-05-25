@@ -278,7 +278,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (NSArray *)allKeys {
     return translateErrors([&] {
-        NSMutableArray<id<RLMDictionaryKey>> *keys = [NSMutableArray array];
+        NSMutableArray<id> *keys = [NSMutableArray array];
         auto keyResult = _backingCollection.get_keys();
         for (size_t i=0; i<keyResult.size(); i++) {
             [keys addObject:RLMStringDataToNSString(keyResult.get<realm::StringData>(i))];
@@ -324,7 +324,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 #pragma mark - Object Retrieval
 
-- (nullable id)objectForKey:(id<RLMDictionaryKey>)key {
+- (nullable id)objectForKey:(id)key {
     try {
         [self.realm verifyThread];
         RLMAccessorContext context(*_objectInfo);
@@ -342,7 +342,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     }
 }
 
-- (nullable id)objectForKeyedSubscript:(id<RLMDictionaryKey>)key {
+- (nullable id)objectForKeyedSubscript:(id)key {
     return [self objectForKey:key];
 }
 
@@ -359,7 +359,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     });
 }
 
-- (void)setObject:(id)obj forKey:(id<RLMDictionaryKey>)key {
+- (void)setObject:(id)obj forKey:(id)key {
     changeDictionary(self, ^{
         RLMDictionaryValidateMatchingObjectType(self, key, obj);
         RLMAccessorContext context(*_objectInfo);
@@ -369,7 +369,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     });
 }
 
-- (void)setObject:(id)obj forKeyedSubscript:(id<RLMDictionaryKey>)key {
+- (void)setObject:(id)obj forKeyedSubscript:(id)key {
     // passing `nil` to the subscript should delete the object.
     if (!obj) {
         [self removeObjectForKey:key];
@@ -396,7 +396,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     }
 }
 
-- (void)removeObjectForKey:(id<RLMDictionaryKey>)key {
+- (void)removeObjectForKey:(id)key {
     try {
         changeDictionary(self, ^{
             RLMAccessorContext context(*_objectInfo);
@@ -411,7 +411,7 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     }
 }
 
-- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id <RLMDictionaryKey> key,
+- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id key,
                                                     id obj, BOOL *stop))block {
     for (id key in [self allKeys]) {
         BOOL stop = false;
@@ -437,11 +437,8 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (id)valueForKey:(NSString *)key {
-    if ([key hasPrefix:@"@"]) {
-        if ([key isEqualToString:[NSString stringWithFormat:@"@%@", RLMInvalidatedKey]]) {
-            return @(!_backingCollection.is_valid());
-        }
-        return [super managedValueForKey:[key substringFromIndex:1]];
+    if ([key isEqualToString:[NSString stringWithFormat:@"@%@", RLMInvalidatedKey]]) {
+        return @(!_backingCollection.is_valid());
     }
     return [self objectForKey:key];
 }

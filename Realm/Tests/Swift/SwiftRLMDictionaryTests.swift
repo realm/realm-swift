@@ -220,7 +220,7 @@ class SwiftRLMDictionaryTests: RLMTestCase {
         XCTAssertEqual(peopleInCompany.count, UInt(3), "No links should have been deleted")
 
         realm.beginWriteTransaction()
-        peopleInCompany.removeObject(for: "John" as NSString) // Should delete link to employee
+        peopleInCompany.removeObject(forKey: "John" as NSString) // Should delete link to employee
         try! realm.commitWriteTransaction()
 
         XCTAssertEqual(peopleInCompany.count, UInt(2), "link deleted when accessing via links")

@@ -131,8 +131,8 @@ public struct RLMDictionaryIterator: IteratorProtocol {
 
     public mutating func next() -> RLMDictionarySingleEntry? {
         let key = iteratorBase.next()
-        if let key = key as? RLMDictionaryKey {
-            return (key: key as! String, value: dictionary[key]) as? RLMDictionarySingleEntry
+        if let key = key {
+            return (key: key as Any, value: dictionary[key as AnyObject]) as? RLMDictionarySingleEntry
         }
         if key != nil {
             fatalError("unsupported key type")
@@ -165,10 +165,10 @@ extension RLMCollection {
     /// Allows for subscript support with RLMDictionary.
     public subscript(_ key: String) -> AnyObject? {
         get {
-            (self as! RLMDictionary<NSString, AnyObject>).object(for: key as RLMDictionaryKey)
+            (self as! RLMDictionary<NSString, AnyObject>).object(forKey: key as NSString)
         }
         set {
-            (self as! RLMDictionary<NSString, AnyObject>).setObject(newValue, for: key as RLMDictionaryKey)
+            (self as! RLMDictionary<NSString, AnyObject>).setObject(newValue, forKey: key as NSString)
         }
     }
 }

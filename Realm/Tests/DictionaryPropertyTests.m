@@ -412,8 +412,8 @@
         XCTFail(@"Should be empty");
     }
 
-    [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(__unused id<RLMDictionaryKey>  _Nonnull key,
-                                                              __unused id  _Nonnull value,
+    [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(__unused id  _Nonnull key,
+                                                              __unused id _Nonnull value,
                                                               __unused BOOL * _Nonnull stop) {
         XCTFail(@"Should be empty");
     }];
@@ -458,7 +458,7 @@
     }
     XCTAssertNil(objects[0], @"Object should have been released");
 
-    [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(id<RLMDictionaryKey>  _Nonnull key,
+    [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key,
                                                               EmployeeObject * _Nonnull obj,
                                                               __unused BOOL * _Nonnull stop) {
         XCTAssertEqual([company.employeeDict[key] name], [obj name]);
@@ -508,8 +508,8 @@
     XCTAssertEqual(totalCount, count);
     XCTAssertEqual(totalCount, company.employeeDict.count);
 
-    [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(id<RLMDictionaryKey>  _Nonnull key,
-                                                              id  _Nonnull obj,
+    [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key,
+                                                              id _Nonnull obj,
                                                               __unused BOOL * _Nonnull stop) {
         [company.employeeDict setObject:obj forKey:key];
     }];
@@ -546,8 +546,8 @@
     [realm commitWriteTransaction];
 
     [realm beginWriteTransaction];
-    [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(__unused id<RLMDictionaryKey>  _Nonnull key,
-                                                              __unused id  _Nonnull obj,
+    [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(__unused id _Nonnull key,
+                                                              __unused id _Nonnull obj,
                                                               __unused BOOL * _Nonnull stop) {
         [realm deleteObjects:company.employees];
     }];
@@ -567,8 +567,6 @@
     XCTAssertEqual([[unmanObj.embeddedDictionary valueForKey:@"two"][@"intCol"] integerValue], unmanChild2.intCol);
 
     unmanObj.intDictionary[@"one"] = @1;
-    XCTAssertEqualObjects((@[@"one"]), [unmanObj.intDictionary valueForKey:@"@allKeys"]);
-    XCTAssertEqualObjects((@[@1]), [unmanObj.intDictionary valueForKey:@"@allValues"]);
     XCTAssertEqualObjects([unmanObj.intDictionary valueForKey:@"@invalidated"], @NO);
 
     // managed
@@ -585,9 +583,6 @@
     XCTAssertEqual([[obj.embeddedDictionary valueForKey:@"two"][@"intCol"] integerValue], child2.intCol);
 
     [realm commitWriteTransaction];
-    XCTAssertEqualObjects(obj.stringDictionary.realm, [obj.stringDictionary valueForKey:@"@realm"]);
-    XCTAssertEqualObjects((@[@"one"]), [obj.stringDictionary valueForKey:@"@allKeys"]);
-    XCTAssertEqualObjects([child1 stringCol], [[obj.stringDictionary valueForKey:@"@allValues"][0] stringCol]);
     XCTAssertEqualObjects([obj.stringDictionary valueForKey:@"@invalidated"], @NO);
 }
 

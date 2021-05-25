@@ -38,7 +38,7 @@ extension MutableSet: MutableRealmCollection {
 }
 extension Map: MutableMapRealmCollection {
     func add(key: AnyObject, value: AnyObject) {
-        rlmDictionary.setObject(value, for: key as! RLMDictionaryKey)
+        rlmDictionary.setObject(value, forKey: key as AnyObject)
     }
 }
 
