@@ -457,9 +457,17 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         }
 
         if map.realm != nil {
-            // This message comes from Core and is incorrect for Dictionary.
-            assertThrows((map["unassigned"] = map["0"]),
-                         reason: "Cannot add an existing managed embedded object to a List.")
+
+            if map is AnyMap<String, EmbeddedTreeObject1?> {
+                // There is an issue with expecting exceptions combined with
+                // using subscripts with AnyMap.
+                assertThrows((map.setValue(map["0"] as Any?, forKey: "unassigned")),
+                             reason: "Cannot add an existing managed embedded object to a List.")
+            } else {
+                // This message comes from Core and is incorrect for Dictionary.
+                assertThrows((map["unassigned"] = map["0"]),
+                             reason: "Cannot add an existing managed embedded object to a List.")
+            }
         }
         realm.cancelWrite()
     }
@@ -477,8 +485,15 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
 
         if map.realm != nil {
             XCTAssertTrue(oldObj!!.isInvalidated)
-            assertThrows(map["key"] = obj,
-                         reason: "Cannot add an existing managed embedded object to a List.")
+            if map is AnyMap<String, EmbeddedTreeObject1?> {
+                // There is an issue with expecting exceptions combined with
+                // using subscripts with AnyMap.
+                assertThrows(map.setValue(map["key"] as Any?, forKey: "key"),
+                             reason: "Cannot add an existing managed embedded object to a List.")
+            } else {
+                assertThrows(map["key"] = obj,
+                             reason: "Cannot add an existing managed embedded object to a List.")
+            }
         }
 
         realm.cancelWrite()
