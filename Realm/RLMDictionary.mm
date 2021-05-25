@@ -450,12 +450,6 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
     @throw RLMException(@"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
 }
 
-- (nonnull id)objectAtIndex:(NSUInteger)index {
-    validateDictionaryBounds(self, index);
-    NSString *key = _backingCollection.allKeys[index];
-    return _backingCollection[key];
-}
-
 - (NSUInteger)indexOfObject:(id)value {
     return [_backingCollection.allValues indexOfObject:value];
 }

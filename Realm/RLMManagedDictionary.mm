@@ -325,32 +325,19 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 #pragma mark - Object Retrieval
 
 - (nullable id)objectForKey:(id)key {
-    try {
+    return translateErrors([&] {
         [self.realm verifyThread];
         RLMAccessorContext context(*_objectInfo);
         auto value = _backingCollection.try_get_any(context.unbox<realm::StringData>(key));
         if (!value)
-            return nil;
+            return (id)nil;
 
         return context.box(*value);
-    }
-    catch (realm::KeyNotFound const&) {
-        return nil;
-    }
-    catch (...) {
-        throwError(nil, nil);
-    }
+    });
 }
 
 - (nullable id)objectForKeyedSubscript:(id)key {
     return [self objectForKey:key];
-}
-
-- (nonnull id)objectAtIndex:(NSUInteger)index {
-    return translateErrors([&] {
-        auto key = _backingCollection.get_pair(index).first;
-        return RLMStringDataToNSString(key);
-    });
 }
 
 - (NSUInteger)indexOfObject:(id)value {
@@ -413,9 +400,12 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id key,
                                                     id obj, BOOL *stop))block {
-    for (id key in [self allKeys]) {
+    auto keyResult = _backingCollection.get_keys();
+    RLMAccessorContext c(*_objectInfo);
+    for (size_t i = 0; i < keyResult.size(); i++) {
         BOOL stop = false;
-        block(key, self[key], &stop);
+        id aKey = keyResult.get(c, i);
+        block(aKey, self[aKey], &stop);
         if (stop) {
             break;
         }
@@ -627,9 +617,6 @@ static RLMNotificationToken *RLMAddNotificationBlock(RLMManagedDictionary *colle
                                                      void (^block)(id, RLMDictionaryChange *, NSError *),
                                                      dispatch_queue_t queue) {
     RLMRealm *realm = collection.realm;
-    if (!realm) {
-        @throw RLMException(@"Linking objects notifications are only supported on managed objects.");
-    }
     auto token = [[RLMCancellationToken alloc] init];
 
     if (!queue) {

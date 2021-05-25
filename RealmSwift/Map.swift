@@ -115,8 +115,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
         }
         set {
             if newValue == nil {
-                // explicity set nil so it doesnt become NSNull
-                rlmDictionary[objcKey(from: key)] = nil
+                rlmDictionary.removeObject(forKey: key as AnyObject)
             } else {
                 rlmDictionary[objcKey(from: key)] = dynamicBridgeCast(fromSwift: newValue) as AnyObject
             }
@@ -143,7 +142,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      */
     @nonobjc public func value(forKey key: String) -> AnyObject? {
         return rlmDictionary.value(forKey: key as AnyObject)
-            .map { dynamicBridgeCast(fromObjectiveC: $0) }
+            .map(dynamicBridgeCast)
     }
 
     /**

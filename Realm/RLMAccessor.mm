@@ -488,11 +488,12 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
         Class cls = RLMCollectionClassForProperty(prop, false);
         if (prop.type == RLMPropertyTypeObject) {
             NSString *objectClassName = prop.objectClassName;
+            RLMPropertyType keyType = prop.dictionaryKeyType;
             return ^(RLMObjectBase *obj) {
                 id val = superGet(obj, propName);
                 if (!val) {
                     if (prop.dictionary) {
-                        val = [[cls alloc] initWithObjectClassName:objectClassName keyType:prop.dictionaryKeyType];
+                        val = [[cls alloc] initWithObjectClassName:objectClassName keyType:keyType];
                     }
                     else {
                         val = [[cls alloc] initWithObjectClassName:objectClassName];

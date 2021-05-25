@@ -495,7 +495,6 @@ static double average(NSDictionary *dictionary) {
     RLMDictionary *dictionary = managed.intObj;
     [self dispatchAsyncAndWait:^{
         RLMAssertThrowsWithReason([dictionary count], @"thread");
-        RLMAssertThrowsWithReason([dictionary objectAtIndex:0], @"thread");
         RLMAssertThrowsWithReason(dictionary[@"0"], @"thread");
         RLMAssertThrowsWithReason([dictionary count], @"thread");
 
@@ -526,7 +525,6 @@ static double average(NSDictionary *dictionary) {
     XCTAssertNoThrow([dictionary isInvalidated]);
     
     RLMAssertThrowsWithReason([dictionary count], @"invalidated");
-    RLMAssertThrowsWithReason([dictionary objectAtIndex:0], @"invalidated");
     XCTAssertNil(dictionary[@"0"]);
     RLMAssertThrowsWithReason([dictionary count], @"invalidated");
 
@@ -557,7 +555,6 @@ static double average(NSDictionary *dictionary) {
     XCTAssertNoThrow([dictionary isInvalidated]);
 
     XCTAssertNoThrow([dictionary count]);
-    XCTAssertNoThrow([dictionary objectAtIndex:0]);
     XCTAssertNoThrow(dictionary[@"0"]);
     XCTAssertNoThrow([dictionary count]);
 

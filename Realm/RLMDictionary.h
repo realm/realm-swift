@@ -178,22 +178,52 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Querying a Dictionary
 
-/// :nodoc:
+/**
+ Returns all the objects matching the given predicate in the dictionary.
+
+ @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
+
+ @return                An `RLMResults` of objects that match the given predicate.
+ */
 - (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat, ...;
 
 /// :nodoc:
 - (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 
-/// :nodoc:
+/**
+ Returns all the objects matching the given predicate in the dictionary.
+
+ @param predicate   The predicate with which to filter the objects.
+
+ @return            An `RLMResults` of objects that match the given predicate
+ */
 - (RLMResults<RLMObjectType> *)objectsWithPredicate:(NSPredicate *)predicate;
 
-/// :nodoc:
-- (RLMResults<RLMObjectType> *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending;
+/**
+ Returns a sorted `RLMResults` from the dictionary.
 
-/// :nodoc:
+ @param keyPath     The key path to sort by.
+ @param ascending   The direction to sort in.
+
+ @return    An `RLMResults` sorted by the specified key path.
+ */- (RLMResults<RLMObjectType> *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending;
+
+/**
+ Returns a sorted `RLMResults` from the dictionary.
+
+ @param properties  An array of `RLMSortDescriptor`s to sort by.
+
+ @return    An `RLMResults` sorted by the specified properties.
+ */
 - (RLMResults<RLMObjectType> *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties;
 
-/// :nodoc:
+/**
+ Returns a distinct `RLMResults` from the dictionary.
+
+ @param keyPaths     The key paths to distinct on.
+
+ @return    An `RLMResults` with the distinct values of the keypath(s).
+ */
 - (RLMResults<RLMObjectType> *)distinctResultsUsingKeyPaths:(NSArray<NSString *> *)keyPaths;
 
 #pragma mark - Aggregating Property Values
@@ -284,7 +314,7 @@ NS_ASSUME_NONNULL_BEGIN
 
      Person *person = [[Person allObjectsInRealm:realm] firstObject];
      NSLog(@"person.dogs.count: %zu", person.dogs.count); // => 0
-     self.token = [person.dogs addNotificationBlock(RLMDictionary<NSString *, Dog *> *dogs,
+     self.token = [person.dogs addNotificationBlock(RLMDictionary<NSString *, Dog *><RLMString, Dog> *dogs,
                                        RLMDictionaryChange *changes,
                                        NSError *error) {
          // Only fired once for the example
