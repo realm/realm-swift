@@ -68,7 +68,8 @@
     if (property.type == RLMPropertyTypeObject)
         self = [self initWithObjectClassName:property.objectClassName];
     else
-        self = [self initWithObjectType:property.type optional:property.optional];
+        self = [self initWithObjectType:property.type
+                               optional:property.optional];
     if (self) {
         _realm = parentInfo->realm;
         REALM_ASSERT(list.get_realm() == _realm->_realm);

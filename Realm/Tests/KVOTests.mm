@@ -2146,7 +2146,6 @@ public:
 
 - (void)testInvalidOperationOnObservedDictionary {
     KVOLinkObject2 *obj = [self createLinkObject];
-    KVOLinkObject1 *linked = obj.obj;
     KVORecorder r(self, obj, @"dictionary");
     XCTAssertThrows([obj.dictionary setObject:(id)@1 forKey:@"key"]);
     // A KVO notification is still sent to observers on the same thread since we

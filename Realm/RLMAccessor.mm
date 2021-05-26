@@ -492,12 +492,7 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
             return ^(RLMObjectBase *obj) {
                 id val = superGet(obj, propName);
                 if (!val) {
-                    if (prop.dictionary) {
-                        val = [[cls alloc] initWithObjectClassName:objectClassName keyType:keyType];
-                    }
-                    else {
-                        val = [[cls alloc] initWithObjectClassName:objectClassName];
-                    }
+                    val = [[cls alloc] initWithObjectClassName:objectClassName keyType:keyType];
                     superSet(obj, propName, val);
                 }
                 return val;
@@ -509,11 +504,7 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
         return ^(RLMObjectBase *obj) {
             id val = superGet(obj, propName);
             if (!val) {
-                if (prop.dictionary) {
-                    val = [[cls alloc] initWithObjectType:type optional:optional keyType:dictionaryKeyType];
-                } else {
-                    val = [[cls alloc] initWithObjectType:type optional:optional];
-                }
+                val = [[cls alloc] initWithObjectType:type optional:optional keyType:dictionaryKeyType];
                 superSet(obj, propName, val);
             }
             return val;
@@ -537,16 +528,10 @@ id unmanagedSetter(RLMProperty *prop, const char *) {
         id collection;
             // make copy when setting (as is the case for all other variants)
         if (prop.type == RLMPropertyTypeObject) {
-            if (prop.dictionary)
-                collection = [[cls alloc] initWithObjectClassName:prop.objectClassName keyType:prop.dictionaryKeyType];
-            else
-                collection = [[cls alloc] initWithObjectClassName:prop.objectClassName];
+            collection = [[cls alloc] initWithObjectClassName:prop.objectClassName keyType:prop.dictionaryKeyType];
         }
         else {
-            if (prop.dictionary)
-                collection = [[cls alloc] initWithObjectType:prop.type optional:prop.optional keyType:prop.dictionaryKeyType];
-            else
-                collection = [[cls alloc] initWithObjectType:prop.type optional:prop.optional];
+            collection = [[cls alloc] initWithObjectType:prop.type optional:prop.optional keyType:prop.dictionaryKeyType];
         }
 
         if (prop.dictionary)
