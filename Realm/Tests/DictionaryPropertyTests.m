@@ -467,55 +467,6 @@
     }];
 }
 
-- (void)testModifyDuringEnumeration {
-    RLMRealm *realm = self.realmWithTestPath;
-
-    [realm beginWriteTransaction];
-    CompanyObject *company = [[CompanyObject alloc] init];
-    company.name = @"name";
-    [realm addObject:company];
-
-    const size_t totalCount = 40;
-    for (size_t i = 0; i < totalCount; ++i) {
-        NSString *key = [NSString stringWithFormat:@"item%zu", i];
-        company.employeeDict[key] = [EmployeeObject createInRealm:realm
-                                                        withValue:@[@"name", @(i), @NO]];
-    }
-
-    size_t count = 0;
-    for (id key in company.employeeDict) {
-        ++count;
-        [company.employeeDict removeObjectForKey:key];
-    }
-    XCTAssertEqual(totalCount, count);
-    XCTAssertEqual(company.employeeDict.count, 0);
-
-    [realm cancelWriteTransaction];
-
-    // Unmanaged dictionary
-    company = [[CompanyObject alloc] init];
-    for (size_t i = 0; i < totalCount; ++i) {
-        NSString *key = [NSString stringWithFormat:@"item%zu", i];
-        company.employeeDict[key] = [[EmployeeObject alloc] initWithValue:@[@"name", @(i), @NO]];
-    }
-
-    count = 0;
-    for (id key in company.employeeDict) {
-        id eo = company.employeeDict[key];
-        ++count;
-        company.employeeDict[key] = eo;
-    }
-    XCTAssertEqual(totalCount, count);
-    XCTAssertEqual(totalCount, company.employeeDict.count);
-
-    [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key,
-                                                              id _Nonnull obj,
-                                                              __unused BOOL * _Nonnull stop) {
-        [company.employeeDict setObject:obj forKey:key];
-    }];
-    XCTAssertEqual(totalCount, company.employeeDict.count);
-}
-
 - (void)testDeleteDuringEnumeration {
     RLMRealm *realm = self.realmWithTestPath;
 
