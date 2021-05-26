@@ -705,7 +705,6 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         var map = createMap()
         try! realm.commitWrite()
         if let realm = map.realm {
-            //realm.cancelWrite()
             let queue = DispatchQueue(label: "testNotificationSentInitially")
             var exp = expectation(description: "does receive notification")
             var token: NotificationToken?
