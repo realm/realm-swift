@@ -454,6 +454,10 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
     return [_backingCollection.allValues indexOfObject:value];
 }
 
+- (id)objectAtIndex:(NSUInteger)index {
+    @throw RLMException(@"This method is not available on RLMDictionary.");
+}
+
 #pragma clang diagnostic pop // unused parameter warning
 
 #pragma mark - Thread Confined Protocol Conformance
@@ -532,16 +536,6 @@ NSString *RLMDictionaryDescriptionWithMaxDepth(NSString *name,
     }
     [str appendFormat:@"\n)"];
     return str;
-}
-
-static void validateDictionaryBounds(__unsafe_unretained RLMDictionary *const dictionary,
-                                     NSUInteger index,
-                                     bool allowOnePastEnd=false) {
-    NSUInteger max = dictionary.count + allowOnePastEnd;
-    if (index >= max) {
-        @throw RLMException(@"Index %llu is out of bounds (must be less than %llu).",
-                            (unsigned long long)index, (unsigned long long)max);
-    }
 }
 
 @end

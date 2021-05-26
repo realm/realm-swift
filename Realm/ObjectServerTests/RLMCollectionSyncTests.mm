@@ -436,13 +436,13 @@
             RLMRunChildAndWait();
             [self waitForDownloadsForRealm:realm];
             CHECK_COUNT(1, RLMDictionarySyncObject, realm);
-            XCTAssertEqual(propertyGetter(obj).count, 2);
+            XCTAssertEqual((int)propertyGetter(obj).count, 2);
             
             // Run the child again to modify the first element
             RLMRunChildAndWait();
             [self waitForDownloadsForRealm:realm];
             CHECK_COUNT(1, RLMDictionarySyncObject, realm);
-            XCTAssertEqual(propertyGetter(obj).count, 2);
+            XCTAssertEqual((int)propertyGetter(obj).count, 2);
             id keyA = [propertyGetter(obj) allKeys][0];
             id keyB = [propertyGetter(obj) allKeys][1];
             if (isObject) {
