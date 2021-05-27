@@ -253,10 +253,10 @@ class ObjectSchemaInitializationTests: TestCase {
     }
 
     #if DEBUG // this test depends on @testable import
-    func assertType<T: _RealmSchemaDiscoverable>(_ value: T, _ propertyType: PropertyType,
-                                                 optional: Bool = false, list: Bool = false,
-                                                 set: Bool = false, objectType: String? = nil,
-                                                 hasSelectors: Bool = true, line: UInt = #line) {
+    func assertType<T: SchemaDiscoverable>(_ value: T, _ propertyType: PropertyType,
+                                           optional: Bool = false, list: Bool = false,
+                                           set: Bool = false, objectType: String? = nil,
+                                           hasSelectors: Bool = true, line: UInt = #line) {
         let prop = RLMProperty(name: "property", value: value)
         XCTAssertEqual(prop.type, propertyType, line: line)
         XCTAssertEqual(prop.optional, optional, line: line)
@@ -416,6 +416,8 @@ class ObjectSchemaInitializationTests: TestCase {
         assertType(Decimal128.self, .decimal128)
         assertType(ObjectId.self, .objectId)
         assertType(AnyRealmValue.self, .any)
+        assertType(ModernIntEnum.self, .int)
+        assertType(ModernStringEnum.self, .string)
 
         assertType(Int?.self, .int, optional: true)
         assertType(Int8?.self, .int, optional: true)
@@ -433,6 +435,8 @@ class ObjectSchemaInitializationTests: TestCase {
         assertType(ObjectId?.self, .objectId, optional: true)
         assertType(Object?.self, .object, optional: true, objectType: "RealmSwiftObject")
         assertType(EmbeddedObject?.self, .object, optional: true, objectType: "RealmSwiftEmbeddedObject")
+        assertType(ModernIntEnum?.self, .int, optional: true)
+        assertType(ModernStringEnum?.self, .string, optional: true)
 
         assertType(List<Int>.self, .int, list: true)
         assertType(List<Int8>.self, .int, list: true)

@@ -91,14 +91,19 @@ internal func coerceToNil(_ value: Any) -> Any? {
 
 /// :nodoc:
 public func dynamicBridgeCast<T>(fromObjectiveC x: Any) -> T {
+    return failableDynamicBridgeCast(fromObjectiveC: x)!
+}
+
+/// :nodoc:
+public func failableDynamicBridgeCast<T>(fromObjectiveC x: Any) -> T? {
     if T.self == DynamicObject.self {
         return unsafeBitCast(x as AnyObject, to: T.self)
     } else if let bridgeableType = T.self as? CustomObjectiveCBridgeable.Type {
-        return bridgeableType.bridging(objCValue: x) as! T
+        return bridgeableType.bridging(objCValue: x) as? T
     } else if let bridgeableType = T.self as? RealmEnum.Type {
-        return bridgeableType._rlmFromRawValue(x) as! T
+        return bridgeableType._rlmFromRawValue(x).flatMap { $0 as? T }
     } else {
-        return x as! T
+        return x as? T
     }
 }
 
@@ -166,9 +171,8 @@ extension Optional: CustomObjectiveCBridgeable {
     internal static func bridging(objCValue: Any) -> Optional {
         if objCValue as AnyObject is NSNull {
             return nil
-        } else {
-            return .some(dynamicBridgeCast(fromObjectiveC: objCValue))
         }
+        return failableDynamicBridgeCast(fromObjectiveC: objCValue)
     }
     internal var objCValue: Any {
         if let value = self {

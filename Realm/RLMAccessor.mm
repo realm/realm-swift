@@ -932,37 +932,42 @@ id RLMAccessorContext::box(realm::Results&& r) {
 using realm::ObjKey;
 using realm::CreatePolicy;
 
+template<typename T>
+static T *bridged(__unsafe_unretained id const value) {
+    return [value isKindOfClass:[T class]] ? value : RLMBridgeSwiftValue(value);
+}
+
 template<>
 realm::Timestamp RLMStatelessAccessorContext::unbox(__unsafe_unretained id const value) {
     id v = RLMCoerceToNil(value);
-    return RLMTimestampForNSDate(v);
+    return RLMTimestampForNSDate(bridged<NSDate>(v));
 }
 
 template<>
 bool RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return [v boolValue];
+    return [bridged<NSNumber>(v) boolValue];
 }
 template<>
 double RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return [v doubleValue];
+    return [bridged<NSNumber>(v) doubleValue];
 }
 template<>
 float RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return [v floatValue];
+    return [bridged<NSNumber>(v) floatValue];
 }
 template<>
 long long RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return [v longLongValue];
+    return [bridged<NSNumber>(v) longLongValue];
 }
 template<>
 realm::BinaryData RLMStatelessAccessorContext::unbox(id v) {
     v = RLMCoerceToNil(v);
-    return RLMBinaryDataForNSData(v);
+    return RLMBinaryDataForNSData(bridged<NSData>(v));
 }
 template<>
 realm::StringData RLMStatelessAccessorContext::unbox(id v) {
     v = RLMCoerceToNil(v);
-    return RLMStringDataWithNSString(v);
+    return RLMStringDataWithNSString(bridged<NSString>(v));
 }
 template<>
 realm::Decimal128 RLMStatelessAccessorContext::unbox(id v) {
@@ -970,11 +975,11 @@ realm::Decimal128 RLMStatelessAccessorContext::unbox(id v) {
 }
 template<>
 realm::ObjectId RLMStatelessAccessorContext::unbox(id v) {
-    return static_cast<RLMObjectId *>(v).value;
+    return bridged<RLMObjectId>(v).value;
 }
 template<>
 realm::UUID RLMStatelessAccessorContext::unbox(id v) {
-    return RLMObjcToUUID(v);
+    return RLMObjcToUUID(bridged<NSUUID>(v));
 }
 template<>
 realm::Mixed RLMAccessorContext::unbox(__unsafe_unretained id v, CreatePolicy p, ObjKey) {
@@ -984,9 +989,8 @@ realm::Mixed RLMAccessorContext::unbox(__unsafe_unretained id v, CreatePolicy p,
 template<typename T>
 static auto to_optional(__unsafe_unretained id const value) {
     id v = RLMCoerceToNil(value);
-    return v && v != NSNull.null
-        ? realm::util::make_optional(RLMStatelessAccessorContext::unbox<T>(v))
-        : realm::util::none;
+    return v ? realm::util::make_optional(RLMStatelessAccessorContext::unbox<T>(v))
+             : realm::util::none;
 }
 
 template<>

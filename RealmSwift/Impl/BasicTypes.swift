@@ -21,63 +21,63 @@ import Realm.Private
 
 // MARK: - Property Types
 
-extension Int: _RealmSchemaDiscoverable {
+extension Int: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .int }
 }
 
-extension Int8: _RealmSchemaDiscoverable {
+extension Int8: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .int }
 }
 
-extension Int16: _RealmSchemaDiscoverable {
+extension Int16: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .int }
 }
 
-extension Int32: _RealmSchemaDiscoverable {
+extension Int32: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .int }
 }
 
-extension Int64: _RealmSchemaDiscoverable {
+extension Int64: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .int }
 }
 
-extension Bool: _RealmSchemaDiscoverable {
+extension Bool: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .bool }
 }
 
-extension Float: _RealmSchemaDiscoverable {
+extension Float: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .float }
 }
 
-extension Double: _RealmSchemaDiscoverable {
+extension Double: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .double }
 }
 
-extension String: _RealmSchemaDiscoverable {
+extension String: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .string }
 }
 
-extension Data: _RealmSchemaDiscoverable {
+extension Data: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .data }
 }
 
-extension ObjectId: _RealmSchemaDiscoverable {
+extension ObjectId: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .objectId }
 }
 
-extension Decimal128: _RealmSchemaDiscoverable {
+extension Decimal128: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .decimal128 }
 }
 
-extension Date: _RealmSchemaDiscoverable {
+extension Date: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .date }
 }
 
-extension UUID: _RealmSchemaDiscoverable {
+extension UUID: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .UUID }
 }
 
-extension AnyRealmValue: _RealmSchemaDiscoverable {
+extension AnyRealmValue: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .any }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         if prop.optional {
@@ -92,15 +92,15 @@ extension AnyRealmValue: _RealmSchemaDiscoverable {
     }
 }
 
-extension NSString: _RealmSchemaDiscoverable {
+extension NSString: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .string }
 }
 
-extension NSData: _RealmSchemaDiscoverable {
+extension NSData: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .data }
 }
 
-extension NSDate: _RealmSchemaDiscoverable {
+extension NSDate: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .date }
 }
 
@@ -233,7 +233,7 @@ extension ObjectId: _ManagedPropertyType, _DefaultConstructible, PrimaryKeyPrope
 
     @inlinable
     public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> ObjectId? {
-        return RLMGetSwiftPropertyObjectId(obj, key).map(dynamicBridgeCast)
+        return RLMGetSwiftPropertyObjectId(obj, key).flatMap(failableDynamicBridgeCast)
     }
 
     @inlinable
@@ -254,7 +254,7 @@ extension Decimal128: _ManagedPropertyType, _DefaultConstructible {
 
     @inlinable
     public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Decimal128? {
-        return RLMGetSwiftPropertyDecimal128(obj, key).map(dynamicBridgeCast)
+        return RLMGetSwiftPropertyDecimal128(obj, key).flatMap(failableDynamicBridgeCast)
     }
 
     @inlinable

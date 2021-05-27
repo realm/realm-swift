@@ -293,7 +293,9 @@ internal class ManagedEnumAccessor<T: _ManagedPropertyType>: ManagedPropertyAcce
 
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
         let bridged: T.RawValue
-        if let type = T.RawValue.self as? CustomObjectiveCBridgeable.Type {
+        if let value = value as? T {
+            bridged = value.rawValue
+        } else if let type = T.RawValue.self as? CustomObjectiveCBridgeable.Type {
             bridged = type.bridging(objCValue: value) as! T.RawValue
         } else {
             bridged = value as! T.RawValue

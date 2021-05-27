@@ -540,6 +540,9 @@ realm::Decimal128 RLMObjcToDecimal128(__unsafe_unretained id const value) {
                 return realm::Decimal128(number.longLongValue);
             }
         }
+        if (id bridged = RLMBridgeSwiftValue(value); bridged != value) {
+            return RLMObjcToDecimal128(bridged);
+        }
     }
     catch (std::exception const& e) {
         @throw RLMException(@"Cannot convert value '%@' of type '%@' to decimal128: %s",

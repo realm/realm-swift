@@ -49,6 +49,8 @@ class ModernObjectCreationTests: TestCase {
             ],
             "anyCol": AnyRealmValue.int(20),
             "uuidCol": UUID(),
+            "intEnumCol": ModernIntEnum.value2,
+            "stringEnumCol": ModernStringEnum.value3,
 
             "optBoolCol": false,
             "optIntCol": 30,
@@ -64,6 +66,8 @@ class ModernObjectCreationTests: TestCase {
             "optDecimalCol": 38 as Decimal128,
             "optObjectIdCol": ObjectId.generate(),
             "optUuidCol": UUID(),
+            "optIntEnumCol": ModernIntEnum.value1,
+            "optStringEnumCol": ModernStringEnum.value1,
 
             "arrayBool": [],
             "arrayInt": [],
@@ -186,6 +190,8 @@ class ModernObjectCreationTests: TestCase {
         XCTAssertEqual(obj.objectCol!.pk, (values["objectCol"] as! ModernAllTypesObject?)!.pk)
         XCTAssertEqual(obj.anyCol, values["anyCol"] as! AnyRealmValue)
         XCTAssertEqual(obj.uuidCol, values["uuidCol"] as! UUID)
+        XCTAssertEqual(obj.intEnumCol, values["intEnumCol"] as! ModernIntEnum)
+        XCTAssertEqual(obj.stringEnumCol, values["stringEnumCol"] as! ModernStringEnum)
 
         XCTAssertEqual(obj.optBoolCol, values["optBoolCol"] as! Bool?)
         XCTAssertEqual(obj.optIntCol, values["optIntCol"] as! Int?)
@@ -201,6 +207,8 @@ class ModernObjectCreationTests: TestCase {
         XCTAssertEqual(obj.optDecimalCol, values["optDecimalCol"] as! Decimal128?)
         XCTAssertEqual(obj.optObjectIdCol, values["optObjectIdCol"] as! ObjectId?)
         XCTAssertEqual(obj.optUuidCol, values["optUuidCol"] as! UUID?)
+        XCTAssertEqual(obj.optIntEnumCol, values["optIntEnumCol"] as! ModernIntEnum?)
+        XCTAssertEqual(obj.optStringEnumCol, values["optStringEnumCol"] as! ModernStringEnum?)
 
         XCTAssertEqual(Array(obj.arrayBool), values["arrayBool"] as! [Bool])
         XCTAssertEqual(Array(obj.arrayInt), values["arrayInt"] as! [Int])
@@ -251,6 +259,8 @@ class ModernObjectCreationTests: TestCase {
         XCTAssertEqual(obj.arrayCol.count, 0)
         XCTAssertEqual(obj.setCol.count, 0)
         XCTAssertEqual(obj.anyCol, .none)
+        XCTAssertEqual(obj.intEnumCol, .value1)
+        XCTAssertEqual(obj.stringEnumCol, .value1)
 
         XCTAssertNil(obj.optIntCol)
         XCTAssertNil(obj.optInt8Col)
@@ -266,6 +276,8 @@ class ModernObjectCreationTests: TestCase {
         XCTAssertNil(obj.optDecimalCol)
         XCTAssertNil(obj.optObjectIdCol)
         XCTAssertNil(obj.optUuidCol)
+        XCTAssertNil(obj.optIntEnumCol)
+        XCTAssertNil(obj.optStringEnumCol)
 
         XCTAssertEqual(obj.arrayBool.count, 0)
         XCTAssertEqual(obj.arrayInt.count, 0)

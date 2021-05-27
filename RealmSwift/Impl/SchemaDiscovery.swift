@@ -38,7 +38,8 @@ public protocol _RealmSchemaDiscoverable {
     static func _rlmPopulateProperty(_ prop: RLMProperty)
 }
 
-extension _RealmSchemaDiscoverable {
+internal protocol SchemaDiscoverable: _RealmSchemaDiscoverable {}
+extension SchemaDiscoverable {
     public static var _rlmOptional: Bool { false }
     public static var _rlmRequireObjc: Bool { true }
     public func _rlmPopulateProperty(_ prop: RLMProperty) { }

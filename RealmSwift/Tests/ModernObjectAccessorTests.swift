@@ -52,6 +52,8 @@ class ModernObjectAccessorTests: TestCase {
         test(\.objectIdCol, oid1, oid2)
         test(\.uuidCol, uuid)
         test(\.objectCol, ModernAllTypesObject(), nil)
+        test(\.intEnumCol, .value1, .value2)
+        test(\.stringEnumCol, .value1, .value2)
 
         test(\.optBoolCol, true, false, nil)
         test(\.optIntCol, Int.min, 0, Int.max, nil)
@@ -67,6 +69,8 @@ class ModernObjectAccessorTests: TestCase {
         test(\.optDecimalCol, "inf", 1, 0, "0", -1, "-inf", nil)
         test(\.optObjectIdCol, oid1, oid2, nil)
         test(\.optUuidCol, uuid, nil)
+        test(\.optIntEnumCol, .value1, .value2, nil)
+        test(\.optStringEnumCol, .value1, .value2, nil)
 
         test(\.anyCol, .none, .int(1), .bool(false), .float(2.2),
                            .double(3.3), .string("str"), .data(data), .date(date),
@@ -77,6 +81,9 @@ class ModernObjectAccessorTests: TestCase {
         XCTAssertTrue(object.decimalCol.isNaN)
         object.optDecimalCol = "nan"
         XCTAssertTrue(object.optDecimalCol!.isNaN)
+
+        object["optIntEnumCol"] = 10
+        XCTAssertNil(object.optIntEnumCol)
     }
 
     func setAndTestAllPropertiesViaSubscript(_ object: ModernAllTypesObject) {
@@ -135,12 +142,22 @@ class ModernObjectAccessorTests: TestCase {
         testConversion("decimalCol", "4.4", 4.4 as Decimal128)
         testConversion("decimalCol", Decimal(5.5), 5.5 as Decimal128)
 
+        testConversion("intEnumCol", ModernIntEnum.value1, ModernIntEnum.value1.rawValue)
+        testConversion("intEnumCol", ModernIntEnum.value2, ModernIntEnum.value2.rawValue)
+        testConversion("stringEnumCol", ModernStringEnum.value1, ModernStringEnum.value1.rawValue)
+        testConversion("stringEnumCol", ModernStringEnum.value2, ModernStringEnum.value2.rawValue)
+
         testConversion("optDecimalCol", 1, 1 as Decimal128)
         testConversion("optDecimalCol", 2.2 as Float, 2.2 as Decimal128)
         testConversion("optDecimalCol", 3.3 as Double, 3.3 as Decimal128)
         testConversion("optDecimalCol", "4.4", 4.4 as Decimal128)
         testConversion("optDecimalCol", Decimal(5.5), 5.5 as Decimal128)
         testConversion("optDecimalCol", NSNull(), nil as Decimal128?)
+
+        testConversion("optIntEnumCol", ModernIntEnum.value2, ModernIntEnum.value2.rawValue)
+        testConversion("optIntEnumCol", nil as ModernIntEnum? as Any, nil as ModernIntEnum?)
+        testConversion("optStringEnumCol", ModernStringEnum.value1, ModernStringEnum.value1.rawValue)
+        testConversion("optStringEnumCol", nil as ModernStringEnum? as Any, nil as ModernStringEnum?)
 
         let obj = ModernAllTypesObject()
 //        testConversion("anyCol", AnyRealmValue.none, nil as Any?)
@@ -160,6 +177,9 @@ class ModernObjectAccessorTests: TestCase {
         XCTAssertTrue((object["decimalCol"] as! Decimal128).isNaN)
         object["optDecimalCol"] = Decimal128("nan")
         XCTAssertTrue((object["optDecimalCol"] as! Decimal128).isNaN)
+
+        object["optIntEnumCol"] = 10
+        XCTAssertNil(object["optIntEnumCol"])
     }
 
     func get(_ object: ObjectBase, _ propertyName: String) -> Any {
@@ -247,12 +267,22 @@ class ModernObjectAccessorTests: TestCase {
         testConversion("decimalCol", "4.4", 4.4 as Decimal128)
         testConversion("decimalCol", Decimal(5.5), 5.5 as Decimal128)
 
+        testConversion("intEnumCol", ModernIntEnum.value1, ModernIntEnum.value1.rawValue)
+        testConversion("intEnumCol", ModernIntEnum.value2, ModernIntEnum.value2.rawValue)
+        testConversion("stringEnumCol", ModernStringEnum.value1, ModernStringEnum.value1.rawValue)
+        testConversion("stringEnumCol", ModernStringEnum.value2, ModernStringEnum.value2.rawValue)
+
         testConversion("optDecimalCol", 1, 1 as Decimal128)
         testConversion("optDecimalCol", 2.2 as Float, 2.2 as Decimal128)
         testConversion("optDecimalCol", 3.3 as Double, 3.3 as Decimal128)
         testConversion("optDecimalCol", "4.4", 4.4 as Decimal128)
         testConversion("optDecimalCol", Decimal(5.5), 5.5 as Decimal128)
         testConversion("optDecimalCol", NSNull(), nil as Decimal128?)
+
+        testConversion("optIntEnumCol", ModernIntEnum.value2, ModernIntEnum.value2.rawValue)
+        testConversion("optIntEnumCol", nil as ModernIntEnum? as Any, nil as ModernIntEnum?)
+        testConversion("optStringEnumCol", ModernStringEnum.value1, ModernStringEnum.value1.rawValue)
+        testConversion("optStringEnumCol", nil as ModernStringEnum? as Any, nil as ModernStringEnum?)
 
         let obj = ModernAllTypesObject()
 //        testConversion("anyCol", AnyRealmValue.none, nil as Any?)
@@ -267,7 +297,6 @@ class ModernObjectAccessorTests: TestCase {
         testConversion("anyCol", AnyRealmValue.objectId(oid1), oid1)
         testConversion("anyCol", AnyRealmValue.decimal128(5), Decimal128(5))
         testConversion("anyCol", AnyRealmValue.uuid(uuid), uuid)
-
 
         object["decimalCol"] = Decimal128("nan")
         XCTAssertTrue((object["decimalCol"] as! Decimal128).isNaN)

@@ -42,6 +42,8 @@ class ModernAllTypesObject: Object {
     @Managed var setCol: MutableSet<ModernAllTypesObject>
     @Managed var anyCol: AnyRealmValue
     @Managed var uuidCol: UUID
+    @Managed var intEnumCol: ModernIntEnum
+    @Managed var stringEnumCol: ModernStringEnum
 
     @Managed var optIntCol: Int?
     @Managed var optInt8Col: Int8?
@@ -57,6 +59,8 @@ class ModernAllTypesObject: Object {
     @Managed var optDecimalCol: Decimal128?
     @Managed var optObjectIdCol: ObjectId?
     @Managed var optUuidCol: UUID?
+    @Managed var optIntEnumCol: ModernIntEnum?
+    @Managed var optStringEnumCol: ModernStringEnum?
 
     @Managed var arrayBool: List<Bool>
     @Managed var arrayInt: List<Int>
@@ -121,14 +125,18 @@ class ModernAllTypesObject: Object {
     @Managed var setOptDecimal: MutableSet<Decimal128?>
     @Managed var setOptObjectId: MutableSet<ObjectId?>
     @Managed var setOptUuid: MutableSet<UUID?>
-
-    // enum
 }
 
-// @objc enum IntEnum: Int, RealmEnum, Codable {
-//     case value1 = 1
-//     case value2 = 3
-// }
+enum ModernIntEnum: Int, Codable, PersistableEnum {
+    case value1 = 1
+    case value2 = 3
+    case value3 = 5
+}
+enum ModernStringEnum: String, Codable, PersistableEnum {
+    case value1 = "a"
+    case value2 = "c"
+    case value3 = "e"
+}
 
 class ModernImplicitlyUnwrappedOptionalObject: Object {
     @Managed var optStringCol: String!

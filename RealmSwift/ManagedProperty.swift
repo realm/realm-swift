@@ -221,6 +221,29 @@ extension Managed: Encodable where Value: Encodable {
     }
 }
 
+/**
+ An enum type which can be used with @Managed.
+
+ Persisting an enum in Realm requires that it have a raw value and that the raw value by a type which Realm can store.
+ The enum also has to be explicitly marked as conforming to this protocol as Swift does not let us do so implicitly.
+
+ ```
+ enum IntEnum: Int, PersistableEnum {
+    case first = 1
+    case second = 2
+    case third = 7
+ }
+ enum StringEnum: String, PersistableEnum {
+    case first = "a"
+    case second = "b"
+    case third = "g"
+ }
+ ```
+
+ If the Realm contains a value which is not a valid member of the enum (such as if it was written by a different sync client which disagrees on which values are valid), optional enum properties will return `nil`, and non-optional properties will abort the process.
+ */
+public protocol PersistableEnum: _ManagedPropertyType, RawRepresentable, CaseIterable, RealmEnum {}
+
 /// A type which can be indexed.
 ///
 /// This protocol is merely a tag and declaring additional types as conforming

@@ -489,7 +489,7 @@ public protocol RealmEnum: RealmOptionalType, _RealmSchemaDiscoverable {
     /// :nodoc:
     static func _rlmToRawValue(_ value: Any) -> Any
     /// :nodoc:
-    static func _rlmFromRawValue(_ value: Any) -> Any
+    static func _rlmFromRawValue(_ value: Any) -> Any?
 }
 
 // MARK: - Implementation
@@ -499,8 +499,8 @@ public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSc
     static func _rlmToRawValue(_ value: Any) -> Any {
         return (value as! Self).rawValue
     }
-    static func _rlmFromRawValue(_ value: Any) -> Any {
-        return Self.init(rawValue: value as! RawValue)!
+    static func _rlmFromRawValue(_ value: Any) -> Any? {
+        return Self(rawValue: value as! RawValue)
     }
     static func _rlmPopulateProperty(_ prop: RLMProperty) {
         RawValue._rlmPopulateProperty(prop)

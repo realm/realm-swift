@@ -19,7 +19,7 @@
 import Realm
 import Realm.Private
 
-extension Object: _RealmSchemaDiscoverable, _ManagedPropertyType, _DefaultConstructible {
+extension Object: SchemaDiscoverable, _ManagedPropertyType, _DefaultConstructible {
     public static var _rlmType: PropertyType { .object }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         if !prop.optional && !prop.collection {
@@ -55,7 +55,7 @@ extension Object: _RealmSchemaDiscoverable, _ManagedPropertyType, _DefaultConstr
     }
 }
 
-extension EmbeddedObject: _RealmSchemaDiscoverable, _ManagedPropertyType, _DefaultConstructible {
+extension EmbeddedObject: SchemaDiscoverable, _ManagedPropertyType, _DefaultConstructible {
     public static var _rlmType: PropertyType { .object }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         Object._rlmPopulateProperty(prop)
@@ -78,7 +78,7 @@ extension EmbeddedObject: _RealmSchemaDiscoverable, _ManagedPropertyType, _Defau
     }
 }
 
-extension List: _RealmSchemaDiscoverable where Element: _RealmSchemaDiscoverable {
+extension List: SchemaDiscoverable where Element: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Element._rlmType }
     public static var _rlmOptional: Bool { Element._rlmOptional }
     public static var _rlmRequireObjc: Bool { false }
@@ -110,7 +110,7 @@ extension List: _ManagedPropertyType, _DefaultConstructible where Element: _Mana
     }
 }
 
-extension MutableSet: _RealmSchemaDiscoverable where Element: _RealmSchemaDiscoverable {
+extension MutableSet: SchemaDiscoverable where Element: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Element._rlmType }
     public static var _rlmOptional: Bool { Element._rlmOptional }
     public static var _rlmRequireObjc: Bool { false }
@@ -142,7 +142,7 @@ extension MutableSet: _ManagedPropertyType, _DefaultConstructible where Element:
     }
 }
 
-extension Map: _RealmSchemaDiscoverable where Value: _RealmSchemaDiscoverable {
+extension Map: SchemaDiscoverable where Value: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Value._rlmType }
     public static var _rlmOptional: Bool { Value._rlmOptional }
     public static var _rlmRequireObjc: Bool { false }
@@ -175,7 +175,7 @@ extension Map: _ManagedPropertyType, _DefaultConstructible where Value: _Managed
     }
 }
 
-extension LinkingObjects: _RealmSchemaDiscoverable {
+extension LinkingObjects: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .linkingObjects }
     public static var _rlmRequireObjc: Bool { false }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
@@ -192,7 +192,7 @@ extension LinkingObjects: _RealmSchemaDiscoverable {
 }
 
 @available(*, deprecated)
-extension RealmOptional: _RealmSchemaDiscoverable where Value: _RealmSchemaDiscoverable {
+extension RealmOptional: SchemaDiscoverable, _RealmSchemaDiscoverable where Value: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Value._rlmType }
     public static var _rlmOptional: Bool { true }
     public static var _rlmRequireObjc: Bool { false }
@@ -225,7 +225,7 @@ extension LinkingObjects: _ManagedPropertyType where Element: _ManagedPropertyTy
     }
 }
 
-extension Optional: _RealmSchemaDiscoverable where Wrapped: _RealmSchemaDiscoverable {
+extension Optional: SchemaDiscoverable, _RealmSchemaDiscoverable where Wrapped: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Wrapped._rlmType }
     public static var _rlmOptional: Bool { true }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
@@ -253,7 +253,7 @@ extension Optional: _ManagedPropertyType where Wrapped: _ManagedPropertyType {
 extension Optional: PrimaryKeyProperty where Wrapped: PrimaryKeyProperty {}
 extension Optional: IndexableProperty where Wrapped: IndexableProperty {}
 
-extension RealmProperty: _RealmSchemaDiscoverable where Value: _RealmSchemaDiscoverable {
+extension RealmProperty: _RealmSchemaDiscoverable, SchemaDiscoverable where Value: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Value._rlmType }
     public static var _rlmOptional: Bool { Value._rlmOptional }
     public static var _rlmRequireObjc: Bool { false }
@@ -264,7 +264,11 @@ extension RealmProperty: _RealmSchemaDiscoverable where Value: _RealmSchemaDisco
 }
 
 extension RawRepresentable where RawValue: _RealmSchemaDiscoverable {
-    static public func _rlmPopulateProperty(_ prop: RLMProperty) {
+    public static var _rlmType: PropertyType { RawValue._rlmType }
+    public static var _rlmOptional: Bool { RawValue._rlmOptional }
+    public static var _rlmRequireObjc: Bool { false }
+    public func _rlmPopulateProperty(_ prop: RLMProperty) { }
+    public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         RawValue._rlmPopulateProperty(prop)
     }
 }
@@ -284,9 +288,8 @@ extension RawRepresentable where Self: _ManagedPropertyType, RawValue: _ManagedP
     }
 }
 
-// FIXME: use CaseIterable?
-extension RawRepresentable where RawValue: _DefaultConstructible {
+extension RawRepresentable where Self: CaseIterable {
     public static func _rlmDefaultValue() -> Self {
-        return Self(rawValue: .init())!
+        return self.allCases.first!
     }
 }
