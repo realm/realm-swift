@@ -30,8 +30,8 @@ class RLMSchemaInfo;
 namespace realm {
     class History;
     class SharedGroup;
-    class TableKey;
-    class ColKey;
+    struct TableKey;
+    struct ColKey;
 }
 
 // RLMObservationInfo stores all of the KVO-related data for RLMObjectBase and

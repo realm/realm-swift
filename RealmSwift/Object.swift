@@ -214,9 +214,9 @@ extension Object: RealmCollectionValue {
 
      If no key paths are given, the block will be executed on any insertion,
      modification, or deletion for all object properties and nested linked
-     properties (up to a depth of 4). If a key path or key paths are provided,
+     properties. If a key path or key paths are provided,
      then the block will be called for changes which occur on those key paths,
-     or links to those key paths (up to a depth of four). For example, if:
+     or links to those key paths. For example, if:
      ```swift
      class Dog: Object {
          @objc dynamic var name: String = ""
@@ -240,7 +240,7 @@ extension Object: RealmCollectionValue {
      will trigger the block.
 
      - note: Multiple notification tokens on the same object which filter for
-     separate key paths are *do not* filter exclusively. If one key path
+     separate key paths *do not* filter exclusively. If one key path
      change is satisified for one notification token, then all notification
      token blocks for that object will execute.
 
@@ -265,7 +265,7 @@ extension Object: RealmCollectionValue {
      the containing Realm is read-only.
      - parameter keyPaths: The object properties which trigger the block to
      be called when they are modified. If `nil`, notifications will be delivered for
-     any property change on the object.
+     any property change on the object. See comments above for more detail on linked properties.
      - parameter queue: The serial dispatch queue to receive notification on. If
      `nil`, notifications are delivered to the current thread.
      - parameter block: The block to call with information about changes to the object.

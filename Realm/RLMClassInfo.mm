@@ -67,7 +67,8 @@ realm::ColKey RLMClassInfo::tableColumn(RLMProperty *property) const {
 }
 
 realm::ColKey RLMClassInfo::computedTableColumn(RLMProperty *property) const {
-    // Retrieve the class info and table key for the property type on the target.
+    // Retrieve the table key and class info for the origin property
+    // that corresponds to the target property.
     RLMClassInfo originInfo = realm->_info[property.objectClassName];
     TableKey originTableKey = originInfo.objectSchema->table_key;
 

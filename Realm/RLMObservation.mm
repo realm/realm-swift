@@ -558,7 +558,7 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
 
 KeyPath RLMKeyPathFromString(RLMRealm *realm, RLMSchema *schema, RLMObjectSchema *rlmObjectSchema, RLMClassInfo *info, NSString *keyPath) {
     RLMProperty *property;
-    std::vector<std::pair<TableKey, ColKey>> keyPairs;
+    KeyPath keyPairs;
 
     NSUInteger start = 0, length = keyPath.length, end = NSNotFound;
     do {
@@ -614,10 +614,10 @@ KeyPathArray RLMKeyPathArrayFromStringArray(RLMRealm *realm,
                                                RLMObjectSchema *objectSchema,
                                                RLMClassInfo *info,
                                                NSArray<NSString *> *keyPaths) {
-    KeyPathArray rlmKeyPathArray;
+    KeyPathArray keyPathArray;
     for (NSString *keyPath in keyPaths) {
-        rlmKeyPathArray.push_back(RLMKeyPathFromString(realm ,schema, objectSchema, info, keyPath));
+        keyPathArray.push_back(RLMKeyPathFromString(realm ,schema, objectSchema, info, keyPath));
     }
-    return rlmKeyPathArray;
+    return keyPathArray;
 }
 

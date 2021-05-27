@@ -137,7 +137,6 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
         if value.realm != nil && !value.isInvalidated, let value = value.thaw() {
             // if the value is managed
             let token = value._observe(subscriber, keyPaths: keyPaths)
-//            let token = value._observe(subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
         } else if let value = value as? ObjectBase, !value.isInvalidated {
             // else if the value is unmanaged
@@ -168,10 +167,6 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 
     var objectWillChange: ObservableStoragePublisher<ObservedType>
     var keyPaths: [String]?
-//    init(_ value: ObservedType) {
-//        self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
-//        self.objectWillChange = ObservableStoragePublisher(value, keyPaths)
-//    }
     init(_ value: ObservedType, _ keyPaths: [String]? = nil) {
         self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
         self.keyPaths = keyPaths
@@ -346,12 +341,6 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     public var projectedValue: Self {
         return self
     }
-
-    // Keypaths that filter notification callback execution
-    // Not the same keyPath as which can filter sortDescriptor
-    //    private var keyPaths: [String]? {
-    //
-    //    }
 
     /// :nodoc:
     public init(_ type: ResultType.Type,
