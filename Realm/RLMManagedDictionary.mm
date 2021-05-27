@@ -36,17 +36,35 @@
 #import <realm/object-store/shared_realm.hpp>
 #import <realm/table_view.hpp>
 
-@interface RLMDictionaryChange()
-- (instancetype)initWithChanges:(realm::DictionaryChangeSet)changes;
+@interface RLMManagedDictionary () <RLMThreadConfined_Private> {
+    @public
+    realm::object_store::Dictionary _backingCollection;
+}
+@end
+
+@interface RLMDictionaryChange ()
+- (instancetype)initWithChanges:(realm::DictionaryChangeSet)changes previous:(realm::Dictionary&)collection;
 @end
 
 namespace {
 struct DictionaryCallbackWrapper {
     void (^block)(id, RLMDictionaryChange *, NSError *);
-    id collection;
+    RLMManagedDictionary *collection;
+    realm::TransactionRef previousTransaction;
+    std::shared_ptr<realm::Dictionary> previousDictionary;
+
+    DictionaryCallbackWrapper(void (^block)(id, RLMDictionaryChange *, NSError *), RLMManagedDictionary *dictionary)
+    : block(block)
+    , collection(dictionary)
+    {
+        previousTransaction = static_cast<realm::Transaction&>(collection.realm.group).duplicate();
+        previousDictionary.reset(static_cast<realm::Dictionary*>(previousTransaction->import_copy_of(collection->_backingCollection.get_impl()).release()));
+
+    }
 
     void operator()(realm::DictionaryChangeSet const& changes, std::exception_ptr err) {
         if (err) {
+            previousTransaction->end_read();
             try {
                 rethrow_exception(err);
             }
@@ -64,7 +82,13 @@ struct DictionaryCallbackWrapper {
             block(collection, nil, nil);
         }
         else {
-            block(collection, [[RLMDictionaryChange alloc] initWithChanges:changes], nil);
+            block(collection, [[RLMDictionaryChange alloc] initWithChanges:changes previous:*previousDictionary], nil);
+        }
+        if (collection.isInvalidated) {
+            previousTransaction->end_read();
+        }
+        else {
+            previousTransaction->advance_read(static_cast<realm::Transaction&>(collection.realm.group).get_version_of_current_transaction());
         }
     }
 };
@@ -72,12 +96,22 @@ struct DictionaryCallbackWrapper {
 
 @implementation RLMDictionaryChange {
     realm::DictionaryChangeSet _changes;
+    NSArray<id> *_deletions;
 }
 
-- (instancetype)initWithChanges:(realm::DictionaryChangeSet)changes {
+- (instancetype)initWithChanges:(realm::DictionaryChangeSet)changes previous:(realm::Dictionary&)dictionary {
     self = [super init];
     if (self) {
         _changes = std::move(changes);
+        if (_changes.deletions.empty()) {
+            _deletions = @[];
+        }
+        else {
+            NSMutableArray *array = [NSMutableArray arrayWithCapacity:_changes.deletions.size()];
+            for (auto index : _changes.deletions) {
+                [array addObject:@(dictionary.get_key(index).get_string().data())];
+            }
+        }
     }
     return self;
 }
@@ -120,12 +154,8 @@ static NSArray *toArray(std::vector<realm::Mixed> const& v) {
 @implementation RLMManagedCollectionHandoverMetadata
 @end
 
-@interface RLMManagedDictionary () <RLMThreadConfined_Private>
-@end
-
 @implementation RLMManagedDictionary {
 @public
-    realm::object_store::Dictionary _backingCollection;
     RLMRealm *_realm;
     RLMClassInfo *_objectInfo;
     RLMClassInfo *_ownerInfo;
