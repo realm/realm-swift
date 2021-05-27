@@ -96,6 +96,15 @@ private extension Property {
                 ]
             ]
         }
+        if isMap {
+            return [
+                "bsonType": "object",
+                "properties": [:],
+                "additionalProperties": [
+                    "bsonType": type
+                ]
+            ]
+        }
 
         return [
             "bsonType": type
@@ -125,7 +134,7 @@ private extension ObjectSchema {
                     relationships[property.name] = [
                         "ref": "#/relationship/mongodb1/test_data/\(property.objectClassName!)",
                         "foreign_key": "_id",
-                        "is_list": property.isArray || property.isSet
+                        "is_list": property.isArray || property.isSet || property.isMap
                     ]
                 }
             }
@@ -146,7 +155,7 @@ private extension ObjectSchema {
                 "properties": stitchProperties,
                 // The server currently only supports non-optional collections
                 // but requires them to be marked as optional
-                "required": properties.compactMap { $0.isOptional || $0.type == .any || $0.isArray || $0.isSet ? nil : $0.name },
+                "required": properties.compactMap { $0.isOptional || $0.type == .any || $0.isArray || $0.isMap || $0.isSet ? nil : $0.name },
                 "title": "\(className)"
             ],
             "relationships": relationships
