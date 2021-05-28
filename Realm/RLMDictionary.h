@@ -435,6 +435,7 @@ __attribute__((warn_unused_result));
 /// The keys in the new version of the dictionary which were modified.
 @property (nonatomic, readonly) NSArray<id> *modifications;
 
+/// The keys which were deleted from the old version.
 @property (nonatomic, readonly) NSArray<id> *deletions;
 @end
 
