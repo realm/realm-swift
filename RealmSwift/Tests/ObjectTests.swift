@@ -872,7 +872,6 @@ class ObjectTests: TestCase {
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 
-        // Went over case with Dominic
         // Expect a notification for "employees.hired" when "employee.hired" is changed
         token = company.observe(keyPaths: ["employees.hired"], expectChange("employees", Int?.none, Int?.none))
         try! realm.write({
@@ -942,7 +941,42 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
 
-    func testLinkPropertyKeyPathNotifications() {
+    func testLinkPropertyKeyPathNotifications0() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let person = realm.create(SwiftOwnerObject.self)
+        let dog = realm.create(SwiftDogObject.self)
+        person.dog = dog
+        try! realm.commitWrite()
+
+        // Expect notification for "dog.dogName" when "dog.dogName" is changed
+        let token = person.observe(keyPaths: ["dog.dogName"], expectChange("dog", Int?.none, Int?.none))
+        try! realm.write({
+            dog.dogName = "rex"
+        })
+        waitForExpectations(timeout: 0.1, handler: nil)
+        token.invalidate()
+    }
+
+    func testLinkPropertyKeyPathNotifications1() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let person = realm.create(SwiftOwnerObject.self)
+        let dog = realm.create(SwiftDogObject.self)
+        person.dog = dog
+        try! realm.commitWrite()
+
+        // Expect notification for "dog.dogName" when "dog" is reassigned.
+        let token = person.observe(keyPaths: ["dog.dogName"], expectChange("dog", Int?.none, Int?.none))
+        try! realm.write({
+            let newDog = SwiftDogObject()
+            person.dog = newDog
+        })
+        waitForExpectations(timeout: 0.1, handler: nil)
+        token.invalidate()
+    }
+
+    func testLinkPropertyKeyPathNotifications2() {
         let realm = try! Realm()
         realm.beginWrite()
         let person = realm.create(SwiftOwnerObject.self)
@@ -951,9 +985,9 @@ class ObjectTests: TestCase {
         try! realm.commitWrite()
 
         // Expect no notification for "dog" when "person.name" is changed
-        var ex = expectation(description: "no change notification")
+        let ex = expectation(description: "no change notification")
         ex.isInverted = true
-        var token = person.observe(keyPaths: ["dog"], { _ in
+        let token = person.observe(keyPaths: ["dog"], { _ in
             ex.fulfill()
         })
         try! realm.write({
@@ -961,32 +995,24 @@ class ObjectTests: TestCase {
         })
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
+    }
+
+    func testLinkPropertyKeyPathNotifications3() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let person = realm.create(SwiftOwnerObject.self)
+        let dog = realm.create(SwiftDogObject.self)
+        person.dog = dog
+        try! realm.commitWrite()
 
         // Expect no notification for "dog" when "dog.dogName" is changed
-        ex = expectation(description: "no change notification")
+        let ex = expectation(description: "no change notification")
         ex.isInverted = true
-        token = person.observe(keyPaths: ["dog"], {_ in
+        let token = person.observe(keyPaths: ["dog"], {_ in
             ex.fulfill()
         })
         try! realm.write({
             dog.dogName = "fido"
-        })
-        waitForExpectations(timeout: 0.1, handler: nil)
-        token.invalidate()
-
-        // Expect notification for "dog.dogName" when "dog.dogName" is changed
-        token = person.observe(keyPaths: ["dog.dogName"], expectChange("dog", Int?.none, Int?.none))
-        try! realm.write({
-            dog.dogName = "rex"
-        })
-        waitForExpectations(timeout: 0.1, handler: nil)
-        token.invalidate()
-
-        // Expect notification for "dog.dogName" when "dog" is reassigned.
-        token = person.observe(keyPaths: ["dog.dogName"], expectChange("dog", Int?.none, Int?.none))
-        try! realm.write({
-            let newDog = SwiftDogObject()
-            person.dog = newDog
         })
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()

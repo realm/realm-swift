@@ -475,7 +475,7 @@ class RealmCollectionTypeTests: TestCase {
         token2.invalidate()
     }
 
-    func testObserveKeyPath() {
+    func testObserveKeyPath0() {
         var ex = expectation(description: "initial notification")
         let token0 = collection.observe(keyPaths: ["stringCol"]) { (changes: RealmCollectionChange) in
             switch changes {
@@ -502,6 +502,25 @@ class RealmCollectionTypeTests: TestCase {
             try! realm.commitWrite()
         }
         waitForExpectations(timeout: 0.1, handler: nil)
+        token0.invalidate()
+    }
+
+    func testObserveKeyPath1() {
+        var ex = expectation(description: "initial notification")
+        let token0 = collection.observe(keyPaths: ["stringCol"]) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update(_, let deletions, let insertions, let modifications):
+                XCTAssertEqual(deletions, [])
+                XCTAssertEqual(insertions, [])
+                XCTAssertEqual(modifications, [0])
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
 
         // Expect no notification for `stringCol` key path because only `linkCol.id` will be modified.
         ex = self.expectation(description: "NO change notification")
@@ -514,11 +533,10 @@ class RealmCollectionTypeTests: TestCase {
             try! realm.commitWrite()
         }
         waitForExpectations(timeout: 0.1, handler: nil)
-
         token0.invalidate()
     }
 
-    func testObserveKeyPathWithLink() {
+    func testObserveKeyPathWithLink0() {
         var ex = expectation(description: "initial notification")
         let token = collection.observe(keyPaths: ["linkCol.id"]) { (changes: RealmCollectionChange) in
             switch changes {
@@ -548,6 +566,28 @@ class RealmCollectionTypeTests: TestCase {
             try! realm.commitWrite()
         }
         waitForExpectations(timeout: 0.1, handler: nil)
+        token.invalidate()
+    }
+
+    func testObserveKeyPathWithLink1() {
+        var ex = expectation(description: "initial notification")
+        let token = collection.observe(keyPaths: ["linkCol.id"]) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update(_, let deletions, let insertions, let modifications):
+                XCTAssertEqual(deletions, [])
+                XCTAssertEqual(insertions, [])
+                // The reason two column changes are expected here is because the
+                // single CTTLinkTarget object that is modified is linked to two origin objects.
+                // The 0, 1 index refers to the origin objects.
+                XCTAssertEqual(modifications, [0, 1])
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
 
         // Expect no notification for `linkCol.id` key path because only `stringCol` will be modified.
         ex = self.expectation(description: "NO change notification")
@@ -560,7 +600,6 @@ class RealmCollectionTypeTests: TestCase {
             try! realm.commitWrite()
         }
         waitForExpectations(timeout: 0.1, handler: nil)
-
         token.invalidate()
     }
 
@@ -1212,11 +1251,19 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         assertThrows(collection.observe { _ in })
     }
 
-    override func testObserveKeyPath() {
+    override func testObserveKeyPath0() {
         assertThrows(collection.observe { _ in })
     }
 
-    override func testObserveKeyPathWithLink() {
+    override func testObserveKeyPath1() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObserveKeyPathWithLink0() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObserveKeyPathWithLink1() {
         assertThrows(collection.observe { _ in })
     }
 

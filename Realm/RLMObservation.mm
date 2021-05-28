@@ -556,7 +556,11 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
     }
 }
 
-KeyPath RLMKeyPathFromString(RLMRealm *realm, RLMSchema *schema, RLMObjectSchema *rlmObjectSchema, RLMClassInfo *info, NSString *keyPath) {
+KeyPath KeyPathFromString(RLMRealm *realm,
+                          RLMSchema *schema,
+                          RLMObjectSchema *rlmObjectSchema,
+                          RLMClassInfo *info,
+                          NSString *keyPath) {
     RLMProperty *property;
     KeyPath keyPairs;
 
@@ -584,9 +588,10 @@ KeyPath RLMKeyPathFromString(RLMRealm *realm, RLMSchema *schema, RLMObjectSchema
                 ck = info->computedTableColumn(property);
                 info = &realm->_info[property.objectClassName];
             } else {
-                // This branch should never be reached. This case should have been caught by precondition above.
-                // How should an error be properly thrown?
-                RLMException(@"Precondition failure");
+                // This branch should never be reached. This case should be
+                // caught by the precondition above.
+                RLMException(@"Property '%@' is not a link in object of type '%@'",
+                             propertyName, rlmObjectSchema.className);
             }
 
             keyPairs.push_back(std::make_pair(tk, ck));
@@ -609,14 +614,14 @@ KeyPath RLMKeyPathFromString(RLMRealm *realm, RLMSchema *schema, RLMObjectSchema
 
 // Some parameters ultimately not used.
 // TODO: clean up unused parameters
-KeyPathArray RLMKeyPathArrayFromStringArray(RLMRealm *realm,
-                                               RLMSchema *schema,
-                                               RLMObjectSchema *objectSchema,
-                                               RLMClassInfo *info,
-                                               NSArray<NSString *> *keyPaths) {
+KeyPathArray KeyPathArrayFromStringArray(RLMRealm *realm,
+                                         RLMSchema *schema,
+                                         RLMObjectSchema *objectSchema,
+                                         RLMClassInfo *info,
+                                         NSArray<NSString *> *keyPaths) {
     KeyPathArray keyPathArray;
     for (NSString *keyPath in keyPaths) {
-        keyPathArray.push_back(RLMKeyPathFromString(realm ,schema, objectSchema, info, keyPath));
+        keyPathArray.push_back(KeyPathFromString(realm ,schema, objectSchema, info, keyPath));
     }
     return keyPathArray;
 }

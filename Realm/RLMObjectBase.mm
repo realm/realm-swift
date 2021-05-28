@@ -697,7 +697,7 @@ RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
         @throw RLMException(@"Only objects which are managed by a Realm support change notifications");
     }
 
-    KeyPathArray keyPathArray = RLMKeyPathArrayFromStringArray(obj.realm, obj.realm.schema, obj->_objectSchema, obj->_info, keyPaths);
+    KeyPathArray keyPathArray = KeyPathArrayFromStringArray(obj.realm, obj.realm.schema, obj->_objectSchema, obj->_info, keyPaths);
 
     if (!queue) {
         [obj->_realm verifyNotificationsAreSupported:true];
