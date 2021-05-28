@@ -114,8 +114,10 @@ class CombinePublisherTestCase: TestCase {
     }
 
     override func tearDown() {
-        if let cancellable = cancellable, let notificationToken = notificationToken {
+        if let cancellable = cancellable {
             cancellable.cancel()
+        }
+        if let notificationToken = notificationToken {
             notificationToken.invalidate()
         }
         realm.invalidate()
