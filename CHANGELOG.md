@@ -4,6 +4,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
+* Fix a runtime crash which happens in some Xcode version (Xcode < 12, reported in Xcode 12.5), where SwiftUI is not weak linked by default. This fix only works for Cocoapods projects.
+  ([#7234](https://github.com/realm/realm-cocoa/issues/7234)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * None.
 
