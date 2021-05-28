@@ -17,6 +17,8 @@ Pod::Spec.new do |s|
   s.documentation_url         = "https://realm.io/docs/swift/latest"
   s.license                   = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
+  #s.weak_frameworks = 'SwiftUI'
+
   s.dependency 'Realm', "= #{s.version}"
   s.source_files = 'RealmSwift/*.swift'
   s.exclude_files = 'RealmSwift/Nonsync.swift'
