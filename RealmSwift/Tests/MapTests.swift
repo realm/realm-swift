@@ -689,7 +689,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
                 case .initial(let map):
                     XCTAssertNotNil(map)
                     exp.fulfill()
-                case .update(_, insertions: _, modifications: _):
+                case .update(_, deletions: _, insertions: _, modifications: _):
                     XCTFail("should not get here for this test")
                 case .error(_):
                     XCTFail("should not get here for this test")
@@ -709,15 +709,21 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
             var exp = expectation(description: "does receive notification")
             var token: NotificationToken?
             var didInsert = false
+            var didModify = false
+            var didDelete = false
             token = map.observe(on: queue, { change in
                 switch change {
                 case .initial(let map):
                     XCTAssertNotNil(map)
                     exp.fulfill()
-                case let .update(map, insertions: insertions, modifications: modifications):
+                case let .update(map, deletions: deletions, insertions: insertions, modifications: modifications):
                     XCTAssertNotNil(map)
-                    if didInsert {
+                    if didModify && !didDelete {
+                        XCTAssertEqual(deletions, ["myNewKey"])
+                        didDelete.toggle()
+                    } else if didInsert {
                         XCTAssertEqual(modifications, ["myNewKey"])
+                        didModify.toggle()
                     } else {
                         XCTAssertEqual(insertions, ["anotherNewKey", "myNewKey"])
                         didInsert.toggle()
@@ -734,12 +740,19 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
             map["anotherNewKey"] = SwiftStringObject(value: ["two"])
             try! realm.commitWrite()
             waitForExpectations(timeout: 2.0, handler: nil)
+            XCTAssertTrue(didInsert)
             exp = expectation(description: "does receive notification")
             realm.beginWrite()
             map["myNewKey"] = SwiftStringObject(value: ["three"])
             try! realm.commitWrite()
             waitForExpectations(timeout: 2.0, handler: nil)
-            XCTAssertTrue(didInsert)
+            exp = expectation(description: "does receive notification")
+            XCTAssertTrue(didModify)
+            realm.beginWrite()
+            map["myNewKey"] = nil
+            try! realm.commitWrite()
+            waitForExpectations(timeout: 2.0, handler: nil)
+            XCTAssertTrue(didDelete)
 
             token?.invalidate()
             realm.beginWrite()

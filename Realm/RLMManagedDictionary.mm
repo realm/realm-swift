@@ -109,8 +109,17 @@ struct DictionaryCallbackWrapper {
         else {
             NSMutableArray *array = [NSMutableArray arrayWithCapacity:_changes.deletions.size()];
             for (auto index : _changes.deletions) {
-                [array addObject:@(dictionary.get_key(index).get_string().data())];
+                realm::Mixed key = dictionary.get_key(index);
+                switch (key.get_type()) {
+                    case realm::type_String:
+                        [array addObject:@(key.get_string().data())];
+                        break;
+                    default:
+                        // Don't throw so older SDK versions can handle any new key types.
+                        break;
+                }
             }
+            _deletions = array;
         }
     }
     return self;
@@ -140,8 +149,8 @@ static NSArray *toArray(std::vector<realm::Mixed> const& v) {
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<RLMDictionaryChange: %p> insertions: %@, modifications: %@",
-            (__bridge void *)self, self.insertions, self.modifications];
+    return [NSString stringWithFormat:@"<RLMDictionaryChange: %p> insertions: %@, deletions: %@, modifications: %@",
+            (__bridge void *)self, self.insertions, self.deletions, self.modifications];
 }
 
 @end

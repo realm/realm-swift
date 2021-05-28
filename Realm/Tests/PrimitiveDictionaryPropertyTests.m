@@ -4830,6 +4830,7 @@ static double average(NSDictionary *dictionary) {
     [realm commitWriteTransaction];
 
     __block bool first = true;
+    __block bool second = false;
     __block id expectation = [self expectationWithDescription:@""];
     id token = [managed.intObj addNotificationBlock:^(RLMDictionary *dictionary, RLMDictionaryChange *change, NSError *error) {
         XCTAssertNotNil(dictionary);
@@ -4837,8 +4838,10 @@ static double average(NSDictionary *dictionary) {
         if (first) {
             XCTAssertNil(change);
         }
-        else {
+        else if (!second) {
             XCTAssertEqualObjects(change.insertions, @[@"testKey"]);
+        } else {
+            XCTAssertEqualObjects(change.deletions, @[@"testKey"]);
         }
 
         first = false;
@@ -4852,6 +4855,17 @@ static double average(NSDictionary *dictionary) {
         [r transactionWithBlock:^{
             RLMDictionary *dictionary = [(AllPrimitiveDictionaries *)[AllPrimitiveDictionaries allObjectsInRealm:r].firstObject intObj];
             dictionary[@"testKey"] = @0;
+        }];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    second = true;
+    expectation = [self expectationWithDescription:@""];
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *r = [RLMRealm defaultRealm];
+        [r transactionWithBlock:^{
+            RLMDictionary *dictionary = [(AllPrimitiveDictionaries *)[AllPrimitiveDictionaries allObjectsInRealm:r].firstObject intObj];
+            [dictionary removeObjectForKey:@"testKey"];
         }];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];

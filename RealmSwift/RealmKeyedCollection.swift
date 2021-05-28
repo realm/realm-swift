@@ -271,13 +271,13 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     func observe(on queue: DispatchQueue?,
-                 _ block: @escaping (RealmDictionaryChange<Self>) -> Void)
+                 _ block: @escaping (RealmMapChange<Self>) -> Void)
     -> NotificationToken
 
     /// :nodoc:
     // swiftlint:disable:next identifier_name
     func _observe(_ queue: DispatchQueue?,
-                  _ block: @escaping (RealmDictionaryChange<AnyMap<Key, Value>>) -> Void)
+                  _ block: @escaping (RealmMapChange<AnyMap<Key, Value>>) -> Void)
         -> NotificationToken
 
     // MARK: Frozen Objects
@@ -428,7 +428,7 @@ private class _AnyMapBase<Key: _MapKey, Value: RealmCollectionValue>: AssistedOb
     func sum<T: AddableType>(ofProperty property: String) -> T { fatalError() }
     func average<T: AddableType>(ofProperty property: String) -> T? { fatalError() }
     // swiftlint:disable:next identifier_name
-    func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmDictionaryChange<Wrapper>) -> Void)
+    func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmMapChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
     var isFrozen: Bool { fatalError() }
     func freeze() -> Wrapper { fatalError() }
@@ -496,7 +496,7 @@ private final class _AnyMap<C: RealmKeyedCollection>: _AnyMapBase<C.Key, C.Value
 
     // MARK: Notifications
 
-    override func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmDictionaryChange<Wrapper>) -> Void)
+    override func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmMapChange<Wrapper>) -> Void)
         -> NotificationToken { base._observe(queue, block) }
     override var isFrozen: Bool { base.isFrozen }
 
@@ -787,12 +787,12 @@ public struct AnyMap<Key: _MapKey, Value: RealmCollectionValue>: RealmKeyedColle
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe(on queue: DispatchQueue?, _ block: @escaping (RealmDictionaryChange<Wrapper>) -> Void)
+    public func observe(on queue: DispatchQueue?, _ block: @escaping (RealmMapChange<Wrapper>) -> Void)
     -> NotificationToken { base._observe(queue, block) }
 
     /// :nodoc:
     // swiftlint:disable:next identifier_name
-    public func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmDictionaryChange<Wrapper>) -> Void)
+    public func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmMapChange<Wrapper>) -> Void)
         -> NotificationToken { base._observe(queue, block) }
 
     // MARK: Frozen Objects

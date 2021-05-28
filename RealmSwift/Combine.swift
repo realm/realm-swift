@@ -189,13 +189,13 @@ extension Publisher {
     /// - returns: A publisher that publishes frozen copies of the changesets
     ///            which the upstream publisher publishes.
     public func freeze<T: RealmKeyedCollection>()
-        -> Publishers.Map<Self, RealmDictionaryChange<T>> where Output == RealmDictionaryChange<T> {
+        -> Publishers.Map<Self, RealmMapChange<T>> where Output == RealmMapChange<T> {
             return map {
                 switch $0 {
                 case .initial(let collection):
                     return .initial(collection.freeze())
-                case .update(let collection, insertions: let insertions, modifications: let modifications):
-                    return .update(collection.freeze(), insertions: insertions, modifications: modifications)
+                case .update(let collection, deletions: let deletions, insertions: let insertions, modifications: let modifications):
+                    return .update(collection.freeze(), deletions: deletions, insertions: insertions, modifications: modifications)
                 case .error(let error):
                     return .error(error)
                 }
@@ -314,7 +314,7 @@ extension Publisher {
     ///
     /// - returns: A publisher that supports `receive(on:)` for thread-confined objects.
     public func threadSafeReference<T: RealmKeyedCollection>()
-        -> RealmPublishers.MakeThreadSafeKeyedCollectionChangeset<Self, T> where Output == RealmDictionaryChange<T> {
+        -> RealmPublishers.MakeThreadSafeKeyedCollectionChangeset<Self, T> where Output == RealmMapChange<T> {
         RealmPublishers.MakeThreadSafeKeyedCollectionChangeset(self)
     }
 }
@@ -570,7 +570,7 @@ extension RealmKeyedCollection {
                 switch change {
                 case .initial(let collection):
                     _ = subscriber.receive(collection)
-                case .update(let collection, insertions: _, modifications: _):
+                case .update(let collection, deletions: _, insertions: _, modifications: _):
                     _ = subscriber.receive(collection)
                 case .error(let error):
                     subscriber.receive(completion: .failure(error))
@@ -1459,8 +1459,8 @@ public enum RealmPublishers {
     ///
     /// Create this publisher using the `changesetPublisher` property on RealmCollection.
     @frozen public struct MapChangeset<Collection: RealmKeyedCollection>: Publisher {
-        public typealias Output = RealmDictionaryChange<Collection>
-        /// This publisher reports error via the `.error` case of RealmDictionaryChange.
+        public typealias Output = RealmMapChange<Collection>
+        /// This publisher reports error via the `.error` case of RealmMapChange.
         public typealias Failure = Never
 
         private let collection: Collection
@@ -1610,7 +1610,7 @@ public enum RealmPublishers {
         }
     }
 
-    /// A publisher which emits RealmDictionaryChange<T> each time the observed object is modified
+    /// A publisher which emits RealmMapChange<T> each time the observed object is modified
     ///
     /// `receive(on:)` and `subscribe(on:)` can be called directly on this
     /// publisher, and calling `.threadSafeReference()` is only required if
@@ -1619,7 +1619,7 @@ public enum RealmPublishers {
     ///
     /// Create this publisher using the `changesetPublisher` property on RealmCollection.
     public class MapChangesetWithToken<Collection: RealmKeyedCollection, T>: Publisher {
-        public typealias Output = RealmDictionaryChange<Collection>
+        public typealias Output = RealmMapChange<Collection>
         /// This publisher reports error via the `.error` case of RealmCollectionChange.
         public typealias Failure = Never
 
@@ -1721,8 +1721,8 @@ public enum RealmPublishers {
     }
 
     /// A helper publisher created by calling `.threadSafeReference()` on a
-    /// publisher which emits `RealmDictionaryChange`.
-    @frozen public struct MakeThreadSafeKeyedCollectionChangeset<Upstream: Publisher, T: RealmKeyedCollection>: Publisher where Upstream.Output == RealmDictionaryChange<T> {
+    /// publisher which emits `RealmMapChange`.
+    @frozen public struct MakeThreadSafeKeyedCollectionChangeset<Upstream: Publisher, T: RealmKeyedCollection>: Publisher where Upstream.Output == RealmMapChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -1816,8 +1816,8 @@ public enum RealmPublishers {
     /// serial dispatch queue.
     ///
     /// Create using `.threadSafeReference().receive(on: queue)` on a publisher
-    /// that emits `RealmDictionaryChange`.
-    @frozen public struct DeferredHandoverKeyedCollectionChangeset<Upstream: Publisher, T: RealmKeyedCollection, S: Scheduler>: Publisher where Upstream.Output == RealmDictionaryChange<T> {
+    /// that emits `RealmMapChange`.
+    @frozen public struct DeferredHandoverKeyedCollectionChangeset<Upstream: Publisher, T: RealmKeyedCollection, S: Scheduler>: Publisher where Upstream.Output == RealmMapChange<T> {
         /// :nodoc:
         public typealias Failure = Upstream.Failure
         /// :nodoc:
@@ -1831,9 +1831,9 @@ public enum RealmPublishers {
         }
 
         private enum Handover {
-            case passthrough(_ change: RealmDictionaryChange<T>)
+            case passthrough(_ change: RealmMapChange<T>)
             case initial(_ tsr: ThreadSafeReference<T>, config: RLMRealmConfiguration)
-            case update(_ tsr: ThreadSafeReference<T>, insertions: [T.Key], modifications: [T.Key], config: RLMRealmConfiguration)
+            case update(_ tsr: ThreadSafeReference<T>, deletions: [T.Key], insertions: [T.Key], modifications: [T.Key], config: RLMRealmConfiguration)
         }
 
         /// :nodoc:
@@ -1845,9 +1845,9 @@ public enum RealmPublishers {
                     case .initial(let collection):
                         guard let realm = collection.realm, !realm.isFrozen else { return .passthrough(change) }
                         return .initial(ThreadSafeReference(to: collection), config: realm.rlmRealm.configuration)
-                    case .update(let collection, insertions: let insertions, modifications: let modifications):
+                    case .update(let collection, deletions: let deletions, insertions: let insertions, modifications: let modifications):
                         guard let realm = collection.realm, !realm.isFrozen else { return .passthrough(change) }
-                        return .update(ThreadSafeReference(to: collection), insertions: insertions, modifications: modifications, config: realm.rlmRealm.configuration)
+                        return .update(ThreadSafeReference(to: collection), deletions: deletions, insertions: insertions, modifications: modifications, config: realm.rlmRealm.configuration)
                     case .error:
                         return .passthrough(change)
                     }
@@ -1862,9 +1862,9 @@ public enum RealmPublishers {
                             return .initial(resolved)
                         }
                         return nil
-                    case .update(let tsr, insertions: let insertions, modifications: let modifications, config: let config):
+                    case .update(let tsr, deletions: let deletions, insertions: let insertions, modifications: let modifications, config: let config):
                         if let resolved = realm(config, scheduler)?.resolve(tsr) {
-                            return .update(resolved, insertions: insertions, modifications: modifications)
+                            return .update(resolved, deletions: deletions, insertions: insertions, modifications: modifications)
                         }
                         return nil
                     }

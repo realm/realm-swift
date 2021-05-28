@@ -1400,14 +1400,13 @@ private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: Combin
         }
     }
 
-    func checkChangeset(_ change: RealmDictionaryChange<Collection>, calls: Int, frozen: Bool = false) {
+    func checkChangeset(_ change: RealmMapChange<Collection>, calls: Int, frozen: Bool = false) {
         switch change {
         case .initial(let collection):
             XCTAssertEqual(collection.isFrozen, frozen)
             XCTAssertEqual(calls, 0)
             XCTAssertEqual(collection.count, 0)
-        case .update(let collection, insertions: let insertions,
-                     modifications: let modifications):
+        case .update(let collection, deletions: _, insertions: let insertions, modifications: let modifications):
             XCTAssertEqual(collection.isFrozen, frozen)
             XCTAssertEqual(collection.count, calls)
             // one insertion at a time

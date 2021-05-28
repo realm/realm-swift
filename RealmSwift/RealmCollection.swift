@@ -1129,23 +1129,23 @@ extension ObservableCollection where Self: RealmKeyedCollection {
     // callback is called.
     internal typealias ObjcChange = (RLMDictionary<AnyObject, AnyObject>?, RLMDictionaryChange?, Error?) -> Void
 
-    internal func wrapDictionaryObserveBlock(_ block: @escaping (RealmDictionaryChange<AnyMap<Key, Value>>) -> Void) -> ObjcChange {
+    internal func wrapDictionaryObserveBlock(_ block: @escaping (RealmMapChange<AnyMap<Key, Value>>) -> Void) -> ObjcChange {
         var anyCollection: AnyMap<Key, Value>?
         return { collection, change, error in
             if anyCollection == nil, let collection = collection as? Self.BackingObjcCollection {
                 anyCollection = AnyMap(self.isSameObjcCollection(collection) ? self : Self(objc: collection))
             }
-            block(RealmDictionaryChange.fromObjc(value: anyCollection, change: change, error: error))
+            block(RealmMapChange.fromObjc(value: anyCollection, change: change, error: error))
         }
     }
 
-    internal func wrapDictionaryObserveBlock(_ block: @escaping (RealmDictionaryChange<Self>) -> Void) -> ObjcChange {
+    internal func wrapDictionaryObserveBlock(_ block: @escaping (RealmMapChange<Self>) -> Void) -> ObjcChange {
         var col: Self?
         return { collection, change, error in
             if col == nil, let collection = collection as? Self.BackingObjcCollection {
                 col = self.isSameObjcCollection(collection) ? self : Self(objc: collection)
             }
-            block(RealmDictionaryChange.fromObjc(value: col, change: change, error: error))
+            block(RealmMapChange.fromObjc(value: col, change: change, error: error))
         }
     }
 }

@@ -242,7 +242,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     /// :nodoc:
     // swiftlint:disable:next identifier_name
     public func _observe(_ queue: DispatchQueue?,
-                         _ block: @escaping (RealmDictionaryChange<AnyMap<Key, Value>>) -> Void)
+                         _ block: @escaping (RealmMapChange<AnyMap<Key, Value>>) -> Void)
         -> NotificationToken {
         return rlmDictionary.addNotificationBlock(wrapDictionaryObserveBlock(block), queue: queue)
     }
@@ -373,7 +373,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     public func observe(on queue: DispatchQueue?,
-                        _ block: @escaping (RealmDictionaryChange<Map>) -> Void)
+                        _ block: @escaping (RealmMapChange<Map>) -> Void)
     -> NotificationToken {
         return rlmDictionary.addNotificationBlock(wrapDictionaryObserveBlock(block), queue: queue)
     }
@@ -512,10 +512,10 @@ extension Map: Sequence {
 // MARK: - Notifications
 
 /**
- A `RealmDictionaryChange` value encapsulates information about changes to dictionaries
+ A `RealmMapChange` value encapsulates information about changes to dictionaries
  that are reported by Realm notifications.
  */
-@frozen public enum RealmDictionaryChange<Collection: RealmKeyedCollection> {
+@frozen public enum RealmMapChange<Collection: RealmKeyedCollection> {
 
     /**
      `.initial` indicates that the initial run of the query has completed (if
@@ -531,10 +531,11 @@ extension Map: Sequence {
 
      All three of the change arrays are always sorted in ascending order.
 
-     - parameter insertions:    The indices in the new collection which were added in this version.
-     - parameter modifications: The indices of the objects in the new collection which were modified in this version.
+     - parameter deletions:     The keys in the previous version of the collection which were removed from this one.
+     - parameter insertions:    The keys in the new collection which were added in this version.
+     - parameter modifications: The keys of the objects in the new collection which were modified in this version.
      */
-    case update(Collection, insertions: [Collection.Key], modifications: [Collection.Key])
+    case update(Collection, deletions: [Collection.Key], insertions: [Collection.Key], modifications: [Collection.Key])
 
     /**
      If an error occurs, notification blocks are called one time with a `.error`
@@ -545,12 +546,13 @@ extension Map: Sequence {
      */
     case error(Error)
 
-    static func fromObjc(value: Collection?, change: RLMDictionaryChange?, error: Error?) -> RealmDictionaryChange {
+    static func fromObjc(value: Collection?, change: RLMDictionaryChange?, error: Error?) -> RealmMapChange {
         if let error = error {
             return .error(error)
         }
         if let change = change {
             return .update(value!,
+                           deletions: change.deletions as! [Collection.Key],
                            insertions: change.insertions as! [Collection.Key],
                            modifications: change.modifications as! [Collection.Key])
         }
