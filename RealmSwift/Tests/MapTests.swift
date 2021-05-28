@@ -705,7 +705,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         var map = createMap()
         try! realm.commitWrite()
         if map.realm != nil {
-            let queue = DispatchQueue(label: "testNotificationSentInitially")
+            let queue = DispatchQueue(label: "testNotificationSentAfterCommit")
             var exp = expectation(description: "does receive notification")
             var token: NotificationToken?
             var didInsert = false
@@ -755,7 +755,6 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
             XCTAssertTrue(didDelete)
 
             token?.invalidate()
-            realm.beginWrite()
         }
     }
 }
