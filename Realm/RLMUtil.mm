@@ -86,6 +86,14 @@ id<NSFastEnumeration> RLMAsFastEnumeration(__unsafe_unretained id obj) {
     return nil;
 }
 
+id (*RLMSwiftBridgeValue)(id);
+id RLMBridgeSwiftValue(__unsafe_unretained id value) {
+    if (!value || !RLMSwiftBridgeValue) {
+        return nil;
+    }
+    return RLMSwiftBridgeValue(value);
+}
+
 bool RLMIsSwiftObjectClass(Class cls) {
     static Class s_swiftObjectClass = NSClassFromString(@"RealmSwiftObject");
     static Class s_swiftEmbeddedObjectClass = NSClassFromString(@"RealmSwiftEmbeddedObject");
@@ -155,7 +163,8 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
             return [value isKindOfClass:[NSData class]];
         case RLMPropertyTypeAny: {
             return !value
-                || [value conformsToProtocol:@protocol(RLMValue)];
+                || [value conformsToProtocol:@protocol(RLMValue)]
+                || [RLMBridgeSwiftValue(value) conformsToProtocol:@protocol(RLMValue)];
         }
         case RLMPropertyTypeLinkingObjects:
             return YES;
@@ -412,14 +421,21 @@ BOOL RLMIsRunningInPlayground() {
     return [[NSBundle mainBundle].bundleIdentifier hasPrefix:@"com.apple.dt.playground."];
 }
 
-realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
-                            __unsafe_unretained RLMRealm *realm,
+realm::Mixed RLMObjcToMixed(__unsafe_unretained id const value,
+                            __unsafe_unretained RLMRealm *const realm,
                             realm::CreatePolicy createPolicy) {
-    if (!v || v == NSNull.null) {
+    if (!value || value == NSNull.null) {
         return realm::Mixed();
     }
+    id v;
+    if ([value conformsToProtocol:@protocol(RLMValue)]) {
+        v = value;
+    }
+    else {
+        v = RLMBridgeSwiftValue(value);
+        REALM_ASSERT([v conformsToProtocol:@protocol(RLMValue)]);
+    }
 
-    REALM_ASSERT([v conformsToProtocol:@protocol(RLMValue)]);
     RLMPropertyType type = [v rlm_valueType];
     return switch_on_type(static_cast<realm::PropertyType>(type), realm::util::overload{[&](realm::Obj*) {
         // The RLMObjectBase may be unmanaged and therefor has no RLMClassInfo attached.

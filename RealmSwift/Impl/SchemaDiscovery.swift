@@ -159,6 +159,12 @@ internal class ObjectUtil {
             }
             return nil
         }
+        RLMSwiftBridgeValue = { (value: Any) -> Any? in
+            if let value = value as? CustomObjectiveCBridgeable {
+                return value.objCValue
+            }
+            return nil
+        }
     }()
 
     internal class func getSwiftProperties(_ cls: RLMObjectBase.Type) -> [RLMProperty] {

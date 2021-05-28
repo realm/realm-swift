@@ -6,6 +6,10 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * None.
+* Calling `-[RLMRealm deleteObjects:]` on a `RLMDictionary` cleared the
+  dictionary but did not actually delete the objects in the dictionary (since v10.8.0).
+* AnyRealmValue enum values are now supported in more places when creating
+  objects.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

@@ -101,6 +101,7 @@ static inline T RLMCoerceToNil(__unsafe_unretained T obj) {
 }
 
 id<NSFastEnumeration> RLMAsFastEnumeration(id obj);
+id RLMBridgeSwiftValue(id obj);
 
 bool RLMIsSwiftObjectClass(Class cls);
 
