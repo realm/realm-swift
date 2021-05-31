@@ -119,11 +119,9 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
 
     private var subscribers = [AnySubscriber<Void, Never>]()
     private let value: ObjectType
-    private let keyPaths: [String]?
 
-    init(_ value: ObjectType, _ keyPaths: [String]?) {
+    init(_ value: ObjectType) {
         self.value = value
-        self.keyPaths = keyPaths
     }
 
     func send() {
@@ -136,7 +134,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
         subscribers.append(AnySubscriber(subscriber))
         if value.realm != nil && !value.isInvalidated, let value = value.thaw() {
             // if the value is managed
-            let token = value._observe(subscriber, keyPaths: keyPaths)
+            let token =  value._observe(subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
         } else if let value = value as? ObjectBase, !value.isInvalidated {
             // else if the value is unmanaged
@@ -160,17 +158,15 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         willSet {
             if newValue != value {
                 objectWillChange.send()
-                self.objectWillChange = ObservableStoragePublisher(newValue, keyPaths)
+                self.objectWillChange = ObservableStoragePublisher(newValue)
             }
         }
     }
 
     var objectWillChange: ObservableStoragePublisher<ObservedType>
-    var keyPaths: [String]?
-    init(_ value: ObservedType, _ keyPaths: [String]? = nil) {
+    init(_ value: ObservedType) {
         self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
-        self.keyPaths = keyPaths
-        self.objectWillChange = ObservableStoragePublisher(value, keyPaths)
+        self.objectWillChange = ObservableStoragePublisher(value)
     }
 }
 
@@ -255,12 +251,6 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
         defaultValue = T()
     }
-    // TODO: need docs
-    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-    public init<Value>(wrappedValue: T, keyPaths: [String]?) where T == List<Value> {
-        self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue, keyPaths))
-        defaultValue = T()
-    }
     /**
      Initialize a RealmState struct for a given thread confined type.
      - parameter wrappedValue The ObjectBase reference to wrap and observe.
@@ -268,12 +258,6 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
     public init(wrappedValue: T) where T: ObjectKeyIdentifiable {
         self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
-        defaultValue = T()
-    }
-    // TODO: need docs
-    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-    public init(wrappedValue: T, keyPaths: [String]?) where T: ObjectKeyIdentifiable {
-        self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue, keyPaths))
         defaultValue = T()
     }
 }
@@ -319,8 +303,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     }
 
     @Environment(\.realmConfiguration) var configuration
-    // ???: Best way to initialize storage? Might have to happen in init?
-    @ObservedObject private var storage: Storage
+    @ObservedObject private var storage = Storage(Results(RLMResults.emptyDetached()))
     /// :nodoc:
     @State public var filter: NSPredicate? {
         willSet {
@@ -341,14 +324,11 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     public var projectedValue: Self {
         return self
     }
-
     /// :nodoc:
     public init(_ type: ResultType.Type,
                 configuration: Realm.Configuration? = nil,
                 filter: NSPredicate? = nil,
-                sortDescriptor: SortDescriptor? = nil,
-                keyPaths: [String]? = nil) {
-        self.storage = Storage(Results(RLMResults.emptyDetached()), keyPaths)
+                sortDescriptor: SortDescriptor? = nil) {
         self.storage.configuration = configuration
         self.filter = filter
         self.sortDescriptor = sortDescriptor

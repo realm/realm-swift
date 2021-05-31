@@ -217,18 +217,6 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(results.wrappedValue.count, 1)
         state.projectedValue.delete()
     }
-
-    func testObserveDeleteKeyPath() throws {
-        let results = ObservedResults(SwiftUIObject.self,
-                                      configuration: inMemoryRealm(inMemoryIdentifier).configuration)
-        let state = StateRealmObject(wrappedValue: SwiftUIObject(), keyPaths: ["str"])
-        XCTAssertEqual(results.wrappedValue.count, 0)
-        state.projectedValue.delete()
-        XCTAssertEqual(results.wrappedValue.count, 0)
-        results.projectedValue.append(state.wrappedValue)
-        XCTAssertEqual(results.wrappedValue.count, 1)
-        state.projectedValue.delete()
-    }
     // MARK: Bind
     func testUnmanagedManagedObjectBind() {
         let object = SwiftUIObject()
