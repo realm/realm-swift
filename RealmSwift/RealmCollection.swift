@@ -1121,12 +1121,12 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      */
     public func observe(keyPaths: [String]? = nil, on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
-    -> NotificationToken { return base._observe(keyPaths, queue, block) }
+        -> NotificationToken { return base._observe(keyPaths, queue, block) }
 
     /// :nodoc:
     // swiftlint:disable:next identifier_name
     public func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
-    -> NotificationToken { return base._observe(keyPaths, queue, block) }
+        -> NotificationToken { return base._observe(keyPaths, queue, block) }
 
     // MARK: Frozen Objects
 

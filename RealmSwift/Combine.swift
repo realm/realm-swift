@@ -427,7 +427,6 @@ extension RealmCollection {
     public func _observe<S>(on queue: DispatchQueue? = nil, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
             // FIXME: we could skip some pointless work in converting the changeset to the Swift type here
-        // !!!: Couldn't have default argument in RealmCollection.observe
         return observe(keyPaths: nil, on: queue) { change in
                 switch change {
                 case .initial(let collection):
