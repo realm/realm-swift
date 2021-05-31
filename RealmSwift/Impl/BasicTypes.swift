@@ -104,9 +104,9 @@ extension NSDate: SchemaDiscoverable {
     public static var _rlmType: PropertyType { .date }
 }
 
-// MARK: - Managed property getters/setters
+// MARK: - Modern property getters/setters
 
-public protocol _Int: BinaryInteger, _ManagedPropertyType, _DefaultConstructible, PrimaryKeyProperty, IndexableProperty {
+public protocol _Int: BinaryInteger, _Persistable, _DefaultConstructible, _PrimaryKey, _Indexable {
 }
 
 extension _Int {
@@ -134,7 +134,7 @@ extension Int16: _Int {}
 extension Int32: _Int {}
 extension Int64: _Int {}
 
-extension Bool: _ManagedPropertyType, _DefaultConstructible, PrimaryKeyProperty, IndexableProperty {
+extension Bool: _Persistable, _DefaultConstructible, _PrimaryKey, _Indexable {
     @inlinable
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Bool {
         return RLMGetSwiftPropertyBool(obj, key)
@@ -153,7 +153,7 @@ extension Bool: _ManagedPropertyType, _DefaultConstructible, PrimaryKeyProperty,
     }
 }
 
-extension Float: _ManagedPropertyType, _DefaultConstructible {
+extension Float: _Persistable, _DefaultConstructible {
     @inlinable
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Float {
         return RLMGetSwiftPropertyFloat(obj, key)
@@ -172,7 +172,7 @@ extension Float: _ManagedPropertyType, _DefaultConstructible {
     }
 }
 
-extension Double: _ManagedPropertyType, _DefaultConstructible {
+extension Double: _Persistable, _DefaultConstructible {
     @inlinable
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Double {
         return RLMGetSwiftPropertyDouble(obj, key)
@@ -191,7 +191,7 @@ extension Double: _ManagedPropertyType, _DefaultConstructible {
     }
 }
 
-extension String: _ManagedPropertyType, _DefaultConstructible, PrimaryKeyProperty, IndexableProperty {
+extension String: _Persistable, _DefaultConstructible, _PrimaryKey, _Indexable {
     @inlinable
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> String {
         return RLMGetSwiftPropertyString(obj, key)!
@@ -208,7 +208,7 @@ extension String: _ManagedPropertyType, _DefaultConstructible, PrimaryKeyPropert
     }
 }
 
-extension Data: _ManagedPropertyType, _DefaultConstructible {
+extension Data: _Persistable, _DefaultConstructible {
     @inlinable
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Data {
         return RLMGetSwiftPropertyData(obj, key)!
@@ -225,7 +225,7 @@ extension Data: _ManagedPropertyType, _DefaultConstructible {
     }
 }
 
-extension ObjectId: _ManagedPropertyType, _DefaultConstructible, PrimaryKeyProperty, IndexableProperty {
+extension ObjectId: _Persistable, _DefaultConstructible, _PrimaryKey, _Indexable {
     @inlinable
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> ObjectId {
         return RLMGetSwiftPropertyObjectId(obj, key) as! ObjectId
@@ -246,7 +246,7 @@ extension ObjectId: _ManagedPropertyType, _DefaultConstructible, PrimaryKeyPrope
     }
 }
 
-extension Decimal128: _ManagedPropertyType, _DefaultConstructible {
+extension Decimal128: _Persistable, _DefaultConstructible {
     @inlinable
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Decimal128 {
         return RLMGetSwiftPropertyDecimal128(obj, key) as! Decimal128
@@ -263,7 +263,7 @@ extension Decimal128: _ManagedPropertyType, _DefaultConstructible {
     }
 }
 
-extension Date: _ManagedPropertyType, _DefaultConstructible, IndexableProperty {
+extension Date: _Persistable, _DefaultConstructible, _Indexable {
     @inlinable
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Date {
         return RLMGetSwiftPropertyDate(obj, key)!
@@ -280,7 +280,7 @@ extension Date: _ManagedPropertyType, _DefaultConstructible, IndexableProperty {
     }
 }
 
-extension UUID: _ManagedPropertyType, _DefaultConstructible, PrimaryKeyProperty {
+extension UUID: _Persistable, _DefaultConstructible, _PrimaryKey {
     @inlinable
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> UUID {
         return RLMGetSwiftPropertyUUID(obj, key)!
@@ -297,7 +297,7 @@ extension UUID: _ManagedPropertyType, _DefaultConstructible, PrimaryKeyProperty 
     }
 }
 
-extension AnyRealmValue: _ManagedPropertyType, _DefaultConstructible {
+extension AnyRealmValue: _Persistable, _DefaultConstructible {
     @inlinable
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> AnyRealmValue {
         return ObjectiveCSupport.convert(value: RLMGetSwiftPropertyAny(obj, key))

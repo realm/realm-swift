@@ -384,11 +384,11 @@ class ObjectSchemaInitializationTests: TestCase {
         assertType(MutableSet<Object>(), .object, set: true, objectType: "RealmSwiftObject", hasSelectors: false)
     }
 
-    func assertType<T: _ManagedPropertyType>(_ type: T.Type, _ propertyType: PropertyType,
-                                             optional: Bool = false, list: Bool = false,
-                                             set: Bool = false, map: Bool = false,
-                                             objectType: String? = nil, line: UInt = #line) {
-        let prop = RLMProperty(name: "_property", value: Managed<T>())
+    func assertType<T: _Persistable>(_ type: T.Type, _ propertyType: PropertyType,
+                                     optional: Bool = false, list: Bool = false,
+                                     set: Bool = false, map: Bool = false,
+                                     objectType: String? = nil, line: UInt = #line) {
+        let prop = RLMProperty(name: "_property", value: Persisted<T>())
         XCTAssertEqual(prop.name, "property", line: line)
         XCTAssertEqual(prop.type, propertyType, line: line)
         XCTAssertEqual(prop.optional, optional, line: line)
@@ -537,52 +537,52 @@ class ObjectSchemaInitializationTests: TestCase {
         assertType(Map<String, Object?>.self, .object, optional: true, map: true, objectType: "RealmSwiftObject")
         assertType(Map<String, EmbeddedObject?>.self, .object, optional: true, map: true, objectType: "RealmSwiftEmbeddedObject")
 
-        assertThrows(RLMProperty(name: "_name", value: Managed<AnyRealmValue?>()),
+        assertThrows(RLMProperty(name: "_name", value: Persisted<AnyRealmValue?>()),
                      reason: "AnyRealmValue property 'name' must not be marked as optional: nil values are represented as AnyRealmValue.none")
-        assertThrows(RLMProperty(name: "_name", value: Managed<List<AnyRealmValue?>>()),
+        assertThrows(RLMProperty(name: "_name", value: Persisted<List<AnyRealmValue?>>()),
                      reason: "List<AnyRealmValue> property 'name' must not be marked as optional: nil values are represented as AnyRealmValue.none")
-        assertThrows(RLMProperty(name: "_name", value: Managed<MutableSet<AnyRealmValue?>>()),
+        assertThrows(RLMProperty(name: "_name", value: Persisted<MutableSet<AnyRealmValue?>>()),
                      reason: "MutableSet<AnyRealmValue> property 'name' must not be marked as optional: nil values are represented as AnyRealmValue.none")
 
-        assertThrows(RLMProperty(name: "_name", value: Managed<Object>()),
+        assertThrows(RLMProperty(name: "_name", value: Persisted<Object>()),
                      reason: "Object property 'name' must be marked as optional.")
-        assertThrows(RLMProperty(name: "_name", value: Managed<List<Object?>>()),
+        assertThrows(RLMProperty(name: "_name", value: Persisted<List<Object?>>()),
                      reason: "List<RealmSwiftObject> property 'name' must not be marked as optional.")
-        assertThrows(RLMProperty(name: "_name", value: Managed<MutableSet<Object?>>()),
+        assertThrows(RLMProperty(name: "_name", value: Persisted<MutableSet<Object?>>()),
                      reason: "MutableSet<RealmSwiftObject> property 'name' must not be marked as optional.")
-        assertThrows(RLMProperty(name: "_name", value: Managed<LinkingObjects<Object>>()),
-                     reason: "LinkingObjects<RealmSwiftObject> property 'name' must set the origin property name with @Managed(originProperty: \"name\").")
+        assertThrows(RLMProperty(name: "_name", value: Persisted<LinkingObjects<Object>>()),
+                     reason: "LinkingObjects<RealmSwiftObject> property 'name' must set the origin property name with @Persisted(originProperty: \"name\").")
 
-        assertThrows(RLMProperty(name: "_name", value: Managed<EmbeddedObject>()),
+        assertThrows(RLMProperty(name: "_name", value: Persisted<EmbeddedObject>()),
                      reason: "Object property 'name' must be marked as optional.")
-        assertThrows(RLMProperty(name: "_name", value: Managed<List<EmbeddedObject?>>()),
+        assertThrows(RLMProperty(name: "_name", value: Persisted<List<EmbeddedObject?>>()),
                      reason: "List<RealmSwiftObject> property 'name' must not be marked as optional.")
-        assertThrows(RLMProperty(name: "_name", value: Managed<MutableSet<EmbeddedObject?>>()),
+        assertThrows(RLMProperty(name: "_name", value: Persisted<MutableSet<EmbeddedObject?>>()),
                      reason: "MutableSet<RealmSwiftObject> property 'name' must not be marked as optional.")
-        assertThrows(RLMProperty(name: "_name", value: Managed<LinkingObjects<EmbeddedObject>>()),
+        assertThrows(RLMProperty(name: "_name", value: Persisted<LinkingObjects<EmbeddedObject>>()),
                      reason: "LinkingObjects<RealmSwiftEmbeddedObject> property 'name' must set the origin property name with @Persisted(originProperty: \"name\").")
-        assertThrows(RLMProperty(name: "_name", value: Managed<Map<String, Object>>()),
+        assertThrows(RLMProperty(name: "_name", value: Persisted<Map<String, Object>>()),
                      reason: "Map<String, RealmSwiftObject> property 'name' must be marked as optional.")
-        assertThrows(RLMProperty(name: "_name", value: Managed<Map<String, EmbeddedObject>>()),
+        assertThrows(RLMProperty(name: "_name", value: Persisted<Map<String, EmbeddedObject>>()),
                      reason: "Map<String, RealmSwiftObject> property 'name' must be marked as optional.")
     }
 
     func testModernIndexed() {
-        XCTAssertFalse(RLMProperty(name: "_property", value: Managed<Int>()).indexed)
-        XCTAssertFalse(RLMProperty(name: "_property", value: Managed<Int>(wrappedValue: 1)).indexed)
-        XCTAssertFalse(RLMProperty(name: "_property", value: Managed<Int>(indexed: false)).indexed)
-        XCTAssertFalse(RLMProperty(name: "_property", value: Managed<Int>(wrappedValue: 1, indexed: false)).indexed)
-        XCTAssertTrue(RLMProperty(name: "_property", value: Managed<Int>(indexed: true)).indexed)
-        XCTAssertTrue(RLMProperty(name: "_property", value: Managed<Int>(wrappedValue: 1, indexed: true)).indexed)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<Int>()).indexed)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<Int>(wrappedValue: 1)).indexed)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<Int>(indexed: false)).indexed)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<Int>(wrappedValue: 1, indexed: false)).indexed)
+        XCTAssertTrue(RLMProperty(name: "_property", value: Persisted<Int>(indexed: true)).indexed)
+        XCTAssertTrue(RLMProperty(name: "_property", value: Persisted<Int>(wrappedValue: 1, indexed: true)).indexed)
     }
 
     func testModernPrimary() {
-        XCTAssertFalse(RLMProperty(name: "_property", value: Managed<Int>()).isPrimary)
-        XCTAssertFalse(RLMProperty(name: "_property", value: Managed<Int>(wrappedValue: 1)).isPrimary)
-        XCTAssertFalse(RLMProperty(name: "_property", value: Managed<Int>(primaryKey: false)).isPrimary)
-        XCTAssertFalse(RLMProperty(name: "_property", value: Managed<Int>(wrappedValue: 1, primaryKey: false)).isPrimary)
-        XCTAssertTrue(RLMProperty(name: "_property", value: Managed<Int>(primaryKey: true)).isPrimary)
-        XCTAssertTrue(RLMProperty(name: "_property", value: Managed<Int>(wrappedValue: 1, primaryKey: true)).isPrimary)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<Int>()).isPrimary)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<Int>(wrappedValue: 1)).isPrimary)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<Int>(primaryKey: false)).isPrimary)
+        XCTAssertFalse(RLMProperty(name: "_property", value: Persisted<Int>(wrappedValue: 1, primaryKey: false)).isPrimary)
+        XCTAssertTrue(RLMProperty(name: "_property", value: Persisted<Int>(primaryKey: true)).isPrimary)
+        XCTAssertTrue(RLMProperty(name: "_property", value: Persisted<Int>(wrappedValue: 1, primaryKey: true)).isPrimary)
     }
     #endif // DEBUG
 }
@@ -663,6 +663,6 @@ class SwiftObjectWithDynamicManagedLazyProperty: SwiftFakeObject {
 }
 
 class SwiftObjectWithMultiplePrimaryKeys: SwiftFakeObject {
-    @Managed(primaryKey: true) var pk1: Int
-    @Managed(primaryKey: true) var pk2: Int
+    @Persisted(primaryKey: true) var pk1: Int
+    @Persisted(primaryKey: true) var pk2: Int
 }

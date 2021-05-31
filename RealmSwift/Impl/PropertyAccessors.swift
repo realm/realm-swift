@@ -192,9 +192,9 @@ internal class RealmPropertyAccessor<Value: RealmPropertyType>: RLMManagedProper
 
 // MARK: - Modern Property Accessors
 
-internal class ManagedPropertyAccessor<T: _ManagedPropertyType>: RLMManagedPropertyAccessor {
-    fileprivate static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> UnsafeMutablePointer<Managed<T>> {
-        return ptr(property, obj).assumingMemoryBound(to: Managed<T>.self)
+internal class PersistedPropertyAccessor<T: _Persistable>: RLMManagedPropertyAccessor {
+    fileprivate static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> UnsafeMutablePointer<Persisted<T>> {
+        return ptr(property, obj).assumingMemoryBound(to: Persisted<T>.self)
     }
 
     @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
@@ -226,7 +226,7 @@ internal class ManagedPropertyAccessor<T: _ManagedPropertyType>: RLMManagedPrope
     }
 }
 
-internal class ManagedListAccessor<Element: _ManagedPropertyType>: ManagedPropertyAccessor<List<Element>>
+internal class PersistedListAccessor<Element: _Persistable>: PersistedPropertyAccessor<List<Element>>
         where Element: RealmCollectionValue {
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
         assign(value: value, to: bound(property, parent).pointee.get(parent))
@@ -242,7 +242,7 @@ internal class ManagedListAccessor<Element: _ManagedPropertyType>: ManagedProper
     }
 }
 
-internal class ManagedSetAccessor<Element: _ManagedPropertyType>: ManagedPropertyAccessor<MutableSet<Element>>
+internal class PersistedSetAccessor<Element: _Persistable>: PersistedPropertyAccessor<MutableSet<Element>>
         where Element: RealmCollectionValue {
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
         assign(value: value, to: bound(property, parent).pointee.get(parent))
@@ -258,20 +258,23 @@ internal class ManagedSetAccessor<Element: _ManagedPropertyType>: ManagedPropert
     }
 }
 
-internal class ManagedMapAccessor<Key: _MapKey, Value: _ManagedPropertyType>: ManagedPropertyAccessor<Map<Key, Value>>
+internal class PersistedMapAccessor<Key: _MapKey, Value: _Persistable>: PersistedPropertyAccessor<Map<Key, Value>>
         where Value: RealmCollectionValue {
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
         assign(value: value, to: bound(property, parent).pointee.get(parent))
     }
     @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
-        bound(property, parent).pointee.get(parent)._rlmCollection = RLMGetSwiftPropertyMap(parent, PropertyKey(property.index))
+        let key = PropertyKey(property.index)
+        if let existing = bound(property, parent).pointee.initialize(parent, key: key) {
+            existing._rlmCollection = RLMGetSwiftPropertyMap(parent, PropertyKey(property.index))
+        }
     }
 }
 
-internal class ManagedLinkingObjectsAccessor<Element: ObjectBase>: RLMManagedPropertyAccessor
-        where Element: RealmCollectionValue, Element: _ManagedPropertyType {
-    private static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> UnsafeMutablePointer<Managed<LinkingObjects<Element>>> {
-        return ptr(property, obj).assumingMemoryBound(to: Managed<LinkingObjects<Element>>.self)
+internal class PersistedLinkingObjectsAccessor<Element: ObjectBase>: RLMManagedPropertyAccessor
+        where Element: RealmCollectionValue, Element: _Persistable {
+    private static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> UnsafeMutablePointer<Persisted<LinkingObjects<Element>>> {
+        return ptr(property, obj).assumingMemoryBound(to: Persisted<LinkingObjects<Element>>.self)
     }
 
     @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
@@ -285,7 +288,7 @@ internal class ManagedLinkingObjectsAccessor<Element: ObjectBase>: RLMManagedPro
     }
 }
 
-internal class ManagedEnumAccessor<T: _ManagedPropertyType>: ManagedPropertyAccessor<T>
+internal class PersistedEnumAccessor<T: _Persistable>: PersistedPropertyAccessor<T>
         where T: RawRepresentable {
     @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
         return bound(property, parent).pointee.get(parent).rawValue

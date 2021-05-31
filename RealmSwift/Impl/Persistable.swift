@@ -25,11 +25,11 @@ import Realm.Private
 // this to the ColKey.
 public typealias PropertyKey = UInt16
 
-// A tag protocol used in schema discovery to find @Managed properties
-public protocol _DiscoverableManagedProperty: _RealmSchemaDiscoverable {}
+// A tag protocol used in schema discovery to find @Persisted properties
+public protocol _DiscoverablePersistedProperty: _RealmSchemaDiscoverable {}
 
-// A type which can be stored by the @Managed property wrapper
-public protocol _ManagedPropertyType: _RealmSchemaDiscoverable {
+// A type which can be stored by the @Persisted property wrapper
+public protocol _Persistable: _RealmSchemaDiscoverable {
     // Read a value of this type from the target object
     static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Self
     // Read an optional value of this type from the target object
@@ -39,13 +39,13 @@ public protocol _ManagedPropertyType: _RealmSchemaDiscoverable {
     // Get the zero/empty/nil value for this type. Used to supply a default
     // when the user does not declare one in their model.
     static func _rlmDefaultValue() -> Self
-    // Set the swiftAccessor for this type if the default ManagedPropertyAccessor
+    // Set the swiftAccessor for this type if the default PersistedPropertyAccessor
     // is not suitable.
     static func _rlmSetAccessor(_ prop: RLMProperty)
 }
-extension _ManagedPropertyType {
+extension _Persistable {
     static public func _rlmSetAccessor(_ prop: RLMProperty) {
-        prop.swiftAccessor = ManagedPropertyAccessor<Self>.self
+        prop.swiftAccessor = PersistedPropertyAccessor<Self>.self
     }
 }
 
@@ -54,6 +54,6 @@ extension _ManagedPropertyType {
 public protocol _DefaultConstructible {
     init()
 }
-extension _ManagedPropertyType where Self: _DefaultConstructible {
+extension _Persistable where Self: _DefaultConstructible {
     public static func _rlmDefaultValue() -> Self { .init() }
 }

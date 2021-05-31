@@ -26,12 +26,12 @@ private func nextDynamicDefaultSeed() -> Int {
     return dynamicDefaultSeed
 }
 class ModernDynamicDefaultObject: Object {
-    @Managed(primaryKey: true) var intCol = nextDynamicDefaultSeed()
-    @Managed var floatCol = Float(nextDynamicDefaultSeed())
-    @Managed var doubleCol = Double(nextDynamicDefaultSeed())
-    @Managed var dateCol = Date(timeIntervalSinceReferenceDate: TimeInterval(nextDynamicDefaultSeed()))
-    @Managed var stringCol = UUID().uuidString
-    @Managed var binaryCol = UUID().uuidString.data(using: .utf8)
+    @Persisted(primaryKey: true) var intCol = nextDynamicDefaultSeed()
+    @Persisted var floatCol = Float(nextDynamicDefaultSeed())
+    @Persisted var doubleCol = Double(nextDynamicDefaultSeed())
+    @Persisted var dateCol = Date(timeIntervalSinceReferenceDate: TimeInterval(nextDynamicDefaultSeed()))
+    @Persisted var stringCol = UUID().uuidString
+    @Persisted var binaryCol = UUID().uuidString.data(using: .utf8)
 }
 
 class ModernObjectTests: TestCase {

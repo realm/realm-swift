@@ -19,7 +19,7 @@
 import Realm
 import Realm.Private
 
-/// @Managed is used to declare properties on Object subclasses which should be
+/// @Persisted is used to declare properties on Object subclasses which should be
 /// managed by Realm.
 ///
 /// Example of usage:
@@ -30,31 +30,31 @@ import Realm.Private
 ///     // Optional types, zero for numeric types, false for Bool,
 ///     // an empty string/data, and a new random value for UUID
 ///     // and ObjectID.
-///     @Managed var basicIntProperty: Int
+///     @Persisted var basicIntProperty: Int
 ///
 ///     // Custom default values can be specified with the
 ///     // standard Swift syntax
-///     @Managed var intWithCustomDefault: Int = 5
+///     @Persisted var intWithCustomDefault: Int = 5
 ///
 ///     // Properties can be indexed by passing `indexed: true`
 ///     // to the initializer.
-///     @Managed(indexed: true) var indexedString: String
+///     @Persisted(indexed: true) var indexedString: String
 ///
 ///     // Properties can set as the class's primary key by
 ///     // passing `primary: true` to the initializer
-///     @Managed(primary: true) var _id: ObjectId
+///     @Persisted(primary: true) var _id: ObjectId
 ///
 ///     // List and set properties should always be declared
 ///     // with `: List` rather than `= List()`
-///     @Managed var listProperty: List<Int>
-///     @Managed var setProperty: MutableSet<MyObject>
+///     @Persisted var listProperty: List<Int>
+///     @Persisted var setProperty: MutableSet<MyObject>
 ///
 ///     // LinkingObjects properties require setting the source
 ///     // object link property name in the initializer
-///     @Managed(originProperty: "outgoingLink")
+///     @Persisted(originProperty: "outgoingLink")
 ///     var incomingLinks: LinkingObjects<OtherModel>
 ///
-///     // Properties which are not marked with @Managed will
+///     // Properties which are not marked with @Persisted will
 ///     // be ignored entirely by Realm.
 ///     var ignoredProperty = true
 /// }
@@ -85,20 +85,20 @@ import Realm.Private
 ///  `ObjectID.generate()`, as doing so will result in extra ObjectIDs being
 ///  generated and then discarded when reading from a Realm.
 ///
-///  If a class has at least one @Managed property, all other properties will be
+///  If a class has at least one @Persisted property, all other properties will be
 ///  ignored by Realm. This means that they will not be persisted and will not
 ///  be usable in queries and other operations such as sorting and aggregates
 ///  which require a managed property.
 ///
-///  @Managed cannot be used anywhere other than as a property on an Object or
+///  @Persisted cannot be used anywhere other than as a property on an Object or
 ///  EmbeddedObject subclass and trying to use it in other places will result in
 ///  runtime errors.
 @propertyWrapper
-public struct Managed<Value: _ManagedPropertyType> {
+public struct Persisted<Value: _Persistable> {
     private var storage: PropertyStorage<Value>
 
     /// :nodoc:
-    @available(*, unavailable, message: "@Managed can only be used as a property on a Realm object")
+    @available(*, unavailable, message: "@Persisted can only be used as a property on a Realm object")
     public var wrappedValue: Value {
         get { fatalError("called wrappedValue getter") }
         // swiftlint:disable:next unused_setter_value
@@ -195,14 +195,14 @@ public struct Managed<Value: _ManagedPropertyType> {
     }
 }
 
-extension Managed: Decodable where Value: Decodable {
+extension Persisted: Decodable where Value: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         storage = try .unmanaged(value: container.decode(Value.self), indexed: false, primary: false)
     }
 }
 
-extension Managed: Encodable where Value: Encodable {
+extension Persisted: Encodable where Value: Encodable {
     public func encode(to encoder: Encoder) throws {
         switch storage {
         case .unmanaged(let value, _, _):
@@ -222,7 +222,7 @@ extension Managed: Encodable where Value: Encodable {
 }
 
 /**
- An enum type which can be used with @Managed.
+ An enum type which can be used with @Persisted.
 
  Persisting an enum in Realm requires that it have a raw value and that the raw value by a type which Realm can store.
  The enum also has to be explicitly marked as conforming to this protocol as Swift does not let us do so implicitly.
@@ -242,15 +242,15 @@ extension Managed: Encodable where Value: Encodable {
 
  If the Realm contains a value which is not a valid member of the enum (such as if it was written by a different sync client which disagrees on which values are valid), optional enum properties will return `nil`, and non-optional properties will abort the process.
  */
-public protocol PersistableEnum: _ManagedPropertyType, RawRepresentable, CaseIterable, RealmEnum {}
+public protocol PersistableEnum: _Persistable, RawRepresentable, CaseIterable, RealmEnum {}
 
 /// A type which can be indexed.
 ///
 /// This protocol is merely a tag and declaring additional types as conforming
 /// to it will simply result in runtime errors rather than compile-time errors.
-public protocol IndexableProperty {}
+public protocol _Indexable {}
 
-extension Managed where Value: IndexableProperty {
+extension Persisted where Value: _Indexable {
     /// Declares an indexed property which is lazily initialized to the type's default value.
     public init(indexed: Bool) {
         storage = .unmanagedNoDefault(indexed: indexed)
@@ -265,9 +265,9 @@ extension Managed where Value: IndexableProperty {
 ///
 /// This protocol is merely a tag and declaring additional types as conforming
 /// to it will simply result in runtime errors rather than compile-time errors.
-public protocol PrimaryKeyProperty {}
+public protocol _PrimaryKey {}
 
-extension Managed where Value: PrimaryKeyProperty {
+extension Persisted where Value: _PrimaryKey {
     /// Declares the primary key property which is lazily initialized to the type's default value.
     public init(primaryKey: Bool) {
         storage = .unmanagedNoDefault(primary: primaryKey)
@@ -285,7 +285,7 @@ public protocol LinkingObjectsProtocol {
     init(fromType: Element.Type, property: String)
     associatedtype Element
 }
-extension Managed where Value: LinkingObjectsProtocol {
+extension Persisted where Value: LinkingObjectsProtocol {
     /// Declares a LinkingObjects property with the given origin property name.
     ///
     /// - param originProperty: The name of the property on the linking object type which links to this object.
@@ -298,7 +298,7 @@ extension LinkingObjects: LinkingObjectsProtocol {}
 // MARK: - Implementation
 
 /// :nodoc:
-extension Managed: _DiscoverableManagedProperty where Value: _ManagedPropertyType {
+extension Persisted: _DiscoverablePersistedProperty where Value: _Persistable {
     public static var _rlmType: PropertyType { Value._rlmType }
     public static var _rlmOptional: Bool { Value._rlmOptional }
     public static var _rlmRequireObjc: Bool { false }

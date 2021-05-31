@@ -19,7 +19,7 @@
 import Realm
 import Realm.Private
 
-extension Object: SchemaDiscoverable, _ManagedPropertyType, _DefaultConstructible {
+extension Object: SchemaDiscoverable, _Persistable, _DefaultConstructible {
     public static var _rlmType: PropertyType { .object }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         if !prop.optional && !prop.collection {
@@ -55,7 +55,7 @@ extension Object: SchemaDiscoverable, _ManagedPropertyType, _DefaultConstructibl
     }
 }
 
-extension EmbeddedObject: SchemaDiscoverable, _ManagedPropertyType, _DefaultConstructible {
+extension EmbeddedObject: SchemaDiscoverable, _Persistable, _DefaultConstructible {
     public static var _rlmType: PropertyType { .object }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         Object._rlmPopulateProperty(prop)
@@ -89,7 +89,7 @@ extension List: SchemaDiscoverable where Element: _RealmSchemaDiscoverable {
     }
 }
 
-extension List: _ManagedPropertyType, _DefaultConstructible where Element: _ManagedPropertyType {
+extension List: _Persistable, _DefaultConstructible where Element: _Persistable {
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
         return Self(objc: RLMGetSwiftPropertyArray(obj, key))
     }
@@ -106,7 +106,7 @@ extension List: _ManagedPropertyType, _DefaultConstructible where Element: _Mana
     }
 
     static public func _rlmSetAccessor(_ prop: RLMProperty) {
-        prop.swiftAccessor = ManagedListAccessor<Element>.self
+        prop.swiftAccessor = PersistedListAccessor<Element>.self
     }
 }
 
@@ -121,7 +121,7 @@ extension MutableSet: SchemaDiscoverable where Element: _RealmSchemaDiscoverable
     }
 }
 
-extension MutableSet: _ManagedPropertyType, _DefaultConstructible where Element: _ManagedPropertyType {
+extension MutableSet: _Persistable, _DefaultConstructible where Element: _Persistable {
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
         return Self(objc: RLMGetSwiftPropertySet(obj, key))
     }
@@ -138,7 +138,7 @@ extension MutableSet: _ManagedPropertyType, _DefaultConstructible where Element:
     }
 
     static public func _rlmSetAccessor(_ prop: RLMProperty) {
-        prop.swiftAccessor = ManagedSetAccessor<Element>.self
+        prop.swiftAccessor = PersistedSetAccessor<Element>.self
     }
 }
 
@@ -154,7 +154,7 @@ extension Map: SchemaDiscoverable where Value: _RealmSchemaDiscoverable {
     }
 }
 
-extension Map: _ManagedPropertyType, _DefaultConstructible where Value: _ManagedPropertyType {
+extension Map: _Persistable, _DefaultConstructible where Value: _Persistable {
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
         return Self(objc: RLMGetSwiftPropertyMap(obj, key))
     }
@@ -171,7 +171,7 @@ extension Map: _ManagedPropertyType, _DefaultConstructible where Value: _Managed
     }
 
     static public func _rlmSetAccessor(_ prop: RLMProperty) {
-        prop.swiftAccessor = ManagedMapAccessor<Key, Value>.self
+        prop.swiftAccessor = PersistedMapAccessor<Key, Value>.self
     }
 }
 
@@ -183,7 +183,7 @@ extension LinkingObjects: SchemaDiscoverable {
         prop.objectClassName = Element.className()
         prop.swiftAccessor = LinkingObjectsAccessor<Element>.self
         if prop.linkOriginPropertyName == nil {
-            throwRealmException("LinkingObjects<\(prop.objectClassName!)> property '\(prop.name)' must set the origin property name with @Managed(originProperty: \"name\").")
+            throwRealmException("LinkingObjects<\(prop.objectClassName!)> property '\(prop.name)' must set the origin property name with @Persisted(originProperty: \"name\").")
         }
     }
     public func _rlmPopulateProperty(_ prop: RLMProperty) {
@@ -202,7 +202,7 @@ extension RealmOptional: SchemaDiscoverable, _RealmSchemaDiscoverable where Valu
     }
 }
 
-extension LinkingObjects: _ManagedPropertyType where Element: _ManagedPropertyType {
+extension LinkingObjects: _Persistable where Element: _Persistable {
     public static func _rlmDefaultValue() -> Self {
         fatalError("LinkingObjects properties must set the origin property name")
     }
@@ -221,7 +221,7 @@ extension LinkingObjects: _ManagedPropertyType where Element: _ManagedPropertyTy
     }
 
     static public func _rlmSetAccessor(_ prop: RLMProperty) {
-        prop.swiftAccessor = ManagedLinkingObjectsAccessor<Element>.self
+        prop.swiftAccessor = PersistedLinkingObjectsAccessor<Element>.self
     }
 }
 
@@ -233,7 +233,7 @@ extension Optional: SchemaDiscoverable, _RealmSchemaDiscoverable where Wrapped: 
     }
 }
 
-extension Optional: _ManagedPropertyType where Wrapped: _ManagedPropertyType {
+extension Optional: _Persistable where Wrapped: _Persistable {
     public static func _rlmDefaultValue() -> Self { return .none }
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Wrapped? {
         return Wrapped._rlmGetPropertyOptional(obj, key)
@@ -250,8 +250,8 @@ extension Optional: _ManagedPropertyType where Wrapped: _ManagedPropertyType {
     }
 }
 
-extension Optional: PrimaryKeyProperty where Wrapped: PrimaryKeyProperty {}
-extension Optional: IndexableProperty where Wrapped: IndexableProperty {}
+extension Optional: _PrimaryKey where Wrapped: _PrimaryKey {}
+extension Optional: _Indexable where Wrapped: _Indexable {}
 
 extension RealmProperty: _RealmSchemaDiscoverable, SchemaDiscoverable where Value: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Value._rlmType }
@@ -273,7 +273,7 @@ extension RawRepresentable where RawValue: _RealmSchemaDiscoverable {
     }
 }
 
-extension RawRepresentable where Self: _ManagedPropertyType, RawValue: _ManagedPropertyType {
+extension RawRepresentable where Self: _Persistable, RawValue: _Persistable {
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Self {
         return Self(rawValue: RawValue._rlmGetProperty(obj, key))!
     }
@@ -284,7 +284,7 @@ extension RawRepresentable where Self: _ManagedPropertyType, RawValue: _ManagedP
         RawValue._rlmSetProperty(obj, key, value.rawValue)
     }
     public static func _rlmSetAccessor(_ prop: RLMProperty) {
-        prop.swiftAccessor = ManagedEnumAccessor<Self>.self
+        prop.swiftAccessor = PersistedEnumAccessor<Self>.self
     }
 }
 

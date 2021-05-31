@@ -21,110 +21,110 @@ import RealmSwift
 import Realm
 
 class ModernAllTypesObject: Object {
-    @Managed(primaryKey: true) var pk: ObjectId
+    @Persisted(primaryKey: true) var pk: ObjectId
     var ignored: Int = 1
 
-    @Managed var boolCol: Bool
-    @Managed var intCol: Int
-    @Managed var int8Col: Int8 = 1
-    @Managed var int16Col: Int16 = 2
-    @Managed var int32Col: Int32 = 3
-    @Managed var int64Col: Int64 = 4
-    @Managed var floatCol: Float = 5
-    @Managed var doubleCol: Double = 6
-    @Managed var stringCol: String
-    @Managed var binaryCol: Data
-    @Managed var dateCol: Date
-    @Managed var decimalCol: Decimal128
-    @Managed var objectIdCol: ObjectId
-    @Managed var objectCol: ModernAllTypesObject?
-    @Managed var arrayCol: List<ModernAllTypesObject>
-    @Managed var setCol: MutableSet<ModernAllTypesObject>
-    @Managed var anyCol: AnyRealmValue
-    @Managed var uuidCol: UUID
-    @Managed var intEnumCol: ModernIntEnum
-    @Managed var stringEnumCol: ModernStringEnum
+    @Persisted var boolCol: Bool
+    @Persisted var intCol: Int
+    @Persisted var int8Col: Int8 = 1
+    @Persisted var int16Col: Int16 = 2
+    @Persisted var int32Col: Int32 = 3
+    @Persisted var int64Col: Int64 = 4
+    @Persisted var floatCol: Float = 5
+    @Persisted var doubleCol: Double = 6
+    @Persisted var stringCol: String
+    @Persisted var binaryCol: Data
+    @Persisted var dateCol: Date
+    @Persisted var decimalCol: Decimal128
+    @Persisted var objectIdCol: ObjectId
+    @Persisted var objectCol: ModernAllTypesObject?
+    @Persisted var arrayCol: List<ModernAllTypesObject>
+    @Persisted var setCol: MutableSet<ModernAllTypesObject>
+    @Persisted var anyCol: AnyRealmValue
+    @Persisted var uuidCol: UUID
+    @Persisted var intEnumCol: ModernIntEnum
+    @Persisted var stringEnumCol: ModernStringEnum
 
-    @Managed var optIntCol: Int?
-    @Managed var optInt8Col: Int8?
-    @Managed var optInt16Col: Int16?
-    @Managed var optInt32Col: Int32?
-    @Managed var optInt64Col: Int64?
-    @Managed var optFloatCol: Float?
-    @Managed var optDoubleCol: Double?
-    @Managed var optBoolCol: Bool?
-    @Managed var optStringCol: String?
-    @Managed var optBinaryCol: Data?
-    @Managed var optDateCol: Date?
-    @Managed var optDecimalCol: Decimal128?
-    @Managed var optObjectIdCol: ObjectId?
-    @Managed var optUuidCol: UUID?
-    @Managed var optIntEnumCol: ModernIntEnum?
-    @Managed var optStringEnumCol: ModernStringEnum?
+    @Persisted var optIntCol: Int?
+    @Persisted var optInt8Col: Int8?
+    @Persisted var optInt16Col: Int16?
+    @Persisted var optInt32Col: Int32?
+    @Persisted var optInt64Col: Int64?
+    @Persisted var optFloatCol: Float?
+    @Persisted var optDoubleCol: Double?
+    @Persisted var optBoolCol: Bool?
+    @Persisted var optStringCol: String?
+    @Persisted var optBinaryCol: Data?
+    @Persisted var optDateCol: Date?
+    @Persisted var optDecimalCol: Decimal128?
+    @Persisted var optObjectIdCol: ObjectId?
+    @Persisted var optUuidCol: UUID?
+    @Persisted var optIntEnumCol: ModernIntEnum?
+    @Persisted var optStringEnumCol: ModernStringEnum?
 
-    @Managed var arrayBool: List<Bool>
-    @Managed var arrayInt: List<Int>
-    @Managed var arrayInt8: List<Int8>
-    @Managed var arrayInt16: List<Int16>
-    @Managed var arrayInt32: List<Int32>
-    @Managed var arrayInt64: List<Int64>
-    @Managed var arrayFloat: List<Float>
-    @Managed var arrayDouble: List<Double>
-    @Managed var arrayString: List<String>
-    @Managed var arrayBinary: List<Data>
-    @Managed var arrayDate: List<Date>
-    @Managed var arrayDecimal: List<Decimal128>
-    @Managed var arrayObjectId: List<ObjectId>
-    @Managed var arrayAny: List<AnyRealmValue>
-    @Managed var arrayUuid: List<UUID>
-    @Managed var arrayObject: List<ModernAllTypesObject>
+    @Persisted var arrayBool: List<Bool>
+    @Persisted var arrayInt: List<Int>
+    @Persisted var arrayInt8: List<Int8>
+    @Persisted var arrayInt16: List<Int16>
+    @Persisted var arrayInt32: List<Int32>
+    @Persisted var arrayInt64: List<Int64>
+    @Persisted var arrayFloat: List<Float>
+    @Persisted var arrayDouble: List<Double>
+    @Persisted var arrayString: List<String>
+    @Persisted var arrayBinary: List<Data>
+    @Persisted var arrayDate: List<Date>
+    @Persisted var arrayDecimal: List<Decimal128>
+    @Persisted var arrayObjectId: List<ObjectId>
+    @Persisted var arrayAny: List<AnyRealmValue>
+    @Persisted var arrayUuid: List<UUID>
+    @Persisted var arrayObject: List<ModernAllTypesObject>
 
-    @Managed var arrayOptBool: List<Bool?>
-    @Managed var arrayOptInt: List<Int?>
-    @Managed var arrayOptInt8: List<Int8?>
-    @Managed var arrayOptInt16: List<Int16?>
-    @Managed var arrayOptInt32: List<Int32?>
-    @Managed var arrayOptInt64: List<Int64?>
-    @Managed var arrayOptFloat: List<Float?>
-    @Managed var arrayOptDouble: List<Double?>
-    @Managed var arrayOptString: List<String?>
-    @Managed var arrayOptBinary: List<Data?>
-    @Managed var arrayOptDate: List<Date?>
-    @Managed var arrayOptDecimal: List<Decimal128?>
-    @Managed var arrayOptObjectId: List<ObjectId?>
-    @Managed var arrayOptUuid: List<UUID?>
+    @Persisted var arrayOptBool: List<Bool?>
+    @Persisted var arrayOptInt: List<Int?>
+    @Persisted var arrayOptInt8: List<Int8?>
+    @Persisted var arrayOptInt16: List<Int16?>
+    @Persisted var arrayOptInt32: List<Int32?>
+    @Persisted var arrayOptInt64: List<Int64?>
+    @Persisted var arrayOptFloat: List<Float?>
+    @Persisted var arrayOptDouble: List<Double?>
+    @Persisted var arrayOptString: List<String?>
+    @Persisted var arrayOptBinary: List<Data?>
+    @Persisted var arrayOptDate: List<Date?>
+    @Persisted var arrayOptDecimal: List<Decimal128?>
+    @Persisted var arrayOptObjectId: List<ObjectId?>
+    @Persisted var arrayOptUuid: List<UUID?>
 
-    @Managed var setBool: MutableSet<Bool>
-    @Managed var setInt: MutableSet<Int>
-    @Managed var setInt8: MutableSet<Int8>
-    @Managed var setInt16: MutableSet<Int16>
-    @Managed var setInt32: MutableSet<Int32>
-    @Managed var setInt64: MutableSet<Int64>
-    @Managed var setFloat: MutableSet<Float>
-    @Managed var setDouble: MutableSet<Double>
-    @Managed var setString: MutableSet<String>
-    @Managed var setBinary: MutableSet<Data>
-    @Managed var setDate: MutableSet<Date>
-    @Managed var setDecimal: MutableSet<Decimal128>
-    @Managed var setObjectId: MutableSet<ObjectId>
-    @Managed var setAny: MutableSet<AnyRealmValue>
-    @Managed var setUuid: MutableSet<UUID>
-    @Managed var setObject: MutableSet<ModernAllTypesObject>
+    @Persisted var setBool: MutableSet<Bool>
+    @Persisted var setInt: MutableSet<Int>
+    @Persisted var setInt8: MutableSet<Int8>
+    @Persisted var setInt16: MutableSet<Int16>
+    @Persisted var setInt32: MutableSet<Int32>
+    @Persisted var setInt64: MutableSet<Int64>
+    @Persisted var setFloat: MutableSet<Float>
+    @Persisted var setDouble: MutableSet<Double>
+    @Persisted var setString: MutableSet<String>
+    @Persisted var setBinary: MutableSet<Data>
+    @Persisted var setDate: MutableSet<Date>
+    @Persisted var setDecimal: MutableSet<Decimal128>
+    @Persisted var setObjectId: MutableSet<ObjectId>
+    @Persisted var setAny: MutableSet<AnyRealmValue>
+    @Persisted var setUuid: MutableSet<UUID>
+    @Persisted var setObject: MutableSet<ModernAllTypesObject>
 
-    @Managed var setOptBool: MutableSet<Bool?>
-    @Managed var setOptInt: MutableSet<Int?>
-    @Managed var setOptInt8: MutableSet<Int8?>
-    @Managed var setOptInt16: MutableSet<Int16?>
-    @Managed var setOptInt32: MutableSet<Int32?>
-    @Managed var setOptInt64: MutableSet<Int64?>
-    @Managed var setOptFloat: MutableSet<Float?>
-    @Managed var setOptDouble: MutableSet<Double?>
-    @Managed var setOptString: MutableSet<String?>
-    @Managed var setOptBinary: MutableSet<Data?>
-    @Managed var setOptDate: MutableSet<Date?>
-    @Managed var setOptDecimal: MutableSet<Decimal128?>
-    @Managed var setOptObjectId: MutableSet<ObjectId?>
-    @Managed var setOptUuid: MutableSet<UUID?>
+    @Persisted var setOptBool: MutableSet<Bool?>
+    @Persisted var setOptInt: MutableSet<Int?>
+    @Persisted var setOptInt8: MutableSet<Int8?>
+    @Persisted var setOptInt16: MutableSet<Int16?>
+    @Persisted var setOptInt32: MutableSet<Int32?>
+    @Persisted var setOptInt64: MutableSet<Int64?>
+    @Persisted var setOptFloat: MutableSet<Float?>
+    @Persisted var setOptDouble: MutableSet<Double?>
+    @Persisted var setOptString: MutableSet<String?>
+    @Persisted var setOptBinary: MutableSet<Data?>
+    @Persisted var setOptDate: MutableSet<Date?>
+    @Persisted var setOptDecimal: MutableSet<Decimal128?>
+    @Persisted var setOptObjectId: MutableSet<ObjectId?>
+    @Persisted var setOptUuid: MutableSet<UUID?>
 }
 
 enum ModernIntEnum: Int, Codable, PersistableEnum {
@@ -139,19 +139,19 @@ enum ModernStringEnum: String, Codable, PersistableEnum {
 }
 
 class ModernImplicitlyUnwrappedOptionalObject: Object {
-    @Managed var optStringCol: String!
-    @Managed var optBinaryCol: Data!
-    @Managed var optDateCol: Date!
-    @Managed var optDecimalCol: Decimal128!
-    @Managed var optObjectIdCol: ObjectId!
-    @Managed var optObjectCol: ModernImplicitlyUnwrappedOptionalObject!
-    @Managed var optUuidCol: UUID!
+    @Persisted var optStringCol: String!
+    @Persisted var optBinaryCol: Data!
+    @Persisted var optDateCol: Date!
+    @Persisted var optDecimalCol: Decimal128!
+    @Persisted var optObjectIdCol: ObjectId!
+    @Persisted var optObjectCol: ModernImplicitlyUnwrappedOptionalObject!
+    @Persisted var optUuidCol: UUID!
 }
 
 class ModernLinkToPrimaryStringObject: Object {
-    @Managed var pk = ""
-    @Managed var object: ModernPrimaryStringObject?
-    @Managed var objects: List<ModernPrimaryStringObject>
+    @Persisted var pk = ""
+    @Persisted var object: ModernPrimaryStringObject?
+    @Persisted var objects: List<ModernPrimaryStringObject>
 
     override class func primaryKey() -> String? {
         return "pk"
@@ -160,7 +160,7 @@ class ModernLinkToPrimaryStringObject: Object {
 
 class ModernUTF8Object: Object {
     // swiftlint:disable:next identifier_name
-    @Managed var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
+    @Persisted var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 }
 
 protocol ModernPrimaryKeyObject: Object {
@@ -169,71 +169,71 @@ protocol ModernPrimaryKeyObject: Object {
 }
 
 class ModernPrimaryStringObject: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: String
+    @Persisted(primaryKey: true) var pk: String
 }
 
 class ModernPrimaryOptionalStringObject: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: String?
+    @Persisted(primaryKey: true) var pk: String?
 }
 
 class ModernPrimaryIntObject: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: Int
+    @Persisted(primaryKey: true) var pk: Int
 }
 
 class ModernPrimaryOptionalIntObject: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: Int?
+    @Persisted(primaryKey: true) var pk: Int?
 }
 
 class ModernPrimaryInt8Object: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: Int8
+    @Persisted(primaryKey: true) var pk: Int8
 }
 
 class ModernPrimaryOptionalInt8Object: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: Int8?
+    @Persisted(primaryKey: true) var pk: Int8?
 }
 
 class ModernPrimaryInt16Object: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: Int16
+    @Persisted(primaryKey: true) var pk: Int16
 }
 
 class ModernPrimaryOptionalInt16Object: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: Int16?
+    @Persisted(primaryKey: true) var pk: Int16?
 }
 
 class ModernPrimaryInt32Object: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: Int32
+    @Persisted(primaryKey: true) var pk: Int32
 }
 
 class ModernPrimaryOptionalInt32Object: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: Int32?
+    @Persisted(primaryKey: true) var pk: Int32?
 }
 
 class ModernPrimaryInt64Object: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: Int64
+    @Persisted(primaryKey: true) var pk: Int64
 }
 
 class ModernPrimaryOptionalInt64Object: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: Int64?
+    @Persisted(primaryKey: true) var pk: Int64?
 }
 
 class ModernPrimaryUUIDObject: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: UUID
+    @Persisted(primaryKey: true) var pk: UUID
 }
 
 class ModernPrimaryOptionalUUIDObject: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: UUID?
+    @Persisted(primaryKey: true) var pk: UUID?
 }
 
 class ModernPrimaryObjectIdObject: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: ObjectId
+    @Persisted(primaryKey: true) var pk: ObjectId
 }
 
 class ModernPrimaryOptionalObjectIdObject: Object, ModernPrimaryKeyObject {
-    @Managed(primaryKey: true) var pk: ObjectId?
+    @Persisted(primaryKey: true) var pk: ObjectId?
 }
 
 class ModernCustomInitializerObject: Object {
-    @Managed var stringCol: String
+    @Persisted var stringCol: String
 
     init(stringVal: String) {
         stringCol = stringVal
@@ -247,7 +247,7 @@ class ModernCustomInitializerObject: Object {
 }
 
 class ModernConvenienceInitializerObject: Object {
-    @Managed var stringCol = ""
+    @Persisted var stringCol = ""
 
     convenience init(stringCol: String) {
         self.init()
@@ -257,12 +257,12 @@ class ModernConvenienceInitializerObject: Object {
 
 @objc(ModernObjcRenamedObject)
 class ModernObjcRenamedObject: Object {
-    @Managed var stringCol = ""
+    @Persisted var stringCol = ""
 }
 
 @objc(ModernObjcRenamedObjectWithTotallyDifferentName)
 class ModernObjcArbitrarilyRenamedObject: Object {
-    @Managed var boolCol = false
+    @Persisted var boolCol = false
 }
 
 class ModernIntAndStringObject: Object {
@@ -279,19 +279,19 @@ class ModernCollectionObject: Object {
 }
 
 class ModernCircleObject: Object {
-    @Managed var obj: ModernCircleObject?
-    @Managed var array: List<ModernCircleObject>
+    @Persisted var obj: ModernCircleObject?
+    @Persisted var array: List<ModernCircleObject>
 }
 
 class ModernEmbeddedParentObject: Object {
-    @Managed var object: ModernEmbeddedTreeObject1?
-    @Managed var array: List<ModernEmbeddedTreeObject1>
+    @Persisted var object: ModernEmbeddedTreeObject1?
+    @Persisted var array: List<ModernEmbeddedTreeObject1>
 }
 
 class ModernEmbeddedPrimaryParentObject: Object {
-    @Managed(primaryKey: true) var pk: Int = 0
-    @Managed var object: ModernEmbeddedTreeObject1?
-    @Managed var array: List<ModernEmbeddedTreeObject1>
+    @Persisted(primaryKey: true) var pk: Int = 0
+    @Persisted var object: ModernEmbeddedTreeObject1?
+    @Persisted var array: List<ModernEmbeddedTreeObject1>
 }
 
 protocol ModernEmbeddedTreeObject: EmbeddedObject {
@@ -299,26 +299,26 @@ protocol ModernEmbeddedTreeObject: EmbeddedObject {
 }
 
 class ModernEmbeddedTreeObject1: EmbeddedObject, ModernEmbeddedTreeObject {
-    @Managed var value = 0
-    @Managed var child: ModernEmbeddedTreeObject2?
-    @Managed var children: List<ModernEmbeddedTreeObject2>
+    @Persisted var value = 0
+    @Persisted var child: ModernEmbeddedTreeObject2?
+    @Persisted var children: List<ModernEmbeddedTreeObject2>
 
-    @Managed(originProperty: "object") var parent1: LinkingObjects<ModernEmbeddedParentObject>
-    @Managed(originProperty: "array") var parent2: LinkingObjects<ModernEmbeddedParentObject>
+    @Persisted(originProperty: "object") var parent1: LinkingObjects<ModernEmbeddedParentObject>
+    @Persisted(originProperty: "array") var parent2: LinkingObjects<ModernEmbeddedParentObject>
 }
 
 class ModernEmbeddedTreeObject2: EmbeddedObject, ModernEmbeddedTreeObject {
-    @Managed var value = 0
-    @Managed var child: ModernEmbeddedTreeObject3?
-    @Managed var children: List<ModernEmbeddedTreeObject3>
+    @Persisted var value = 0
+    @Persisted var child: ModernEmbeddedTreeObject3?
+    @Persisted var children: List<ModernEmbeddedTreeObject3>
 
-    @Managed(originProperty: "child") var parent3: LinkingObjects<ModernEmbeddedTreeObject1>
-    @Managed(originProperty: "children") var parent4: LinkingObjects<ModernEmbeddedTreeObject1>
+    @Persisted(originProperty: "child") var parent3: LinkingObjects<ModernEmbeddedTreeObject1>
+    @Persisted(originProperty: "children") var parent4: LinkingObjects<ModernEmbeddedTreeObject1>
 }
 
 class ModernEmbeddedTreeObject3: EmbeddedObject, ModernEmbeddedTreeObject {
-    @Managed var value = 0
+    @Persisted var value = 0
 
-    @Managed(originProperty: "child") var parent3: LinkingObjects<ModernEmbeddedTreeObject2>
-    @Managed(originProperty: "children") var parent4: LinkingObjects<ModernEmbeddedTreeObject2>
+    @Persisted(originProperty: "child") var parent3: LinkingObjects<ModernEmbeddedTreeObject2>
+    @Persisted(originProperty: "children") var parent4: LinkingObjects<ModernEmbeddedTreeObject2>
 }
