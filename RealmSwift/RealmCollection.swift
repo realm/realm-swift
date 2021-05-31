@@ -35,10 +35,7 @@ import Realm
         if next is NSNull {
             return Element._nilValue()
         }
-        if case Optional<Any>.none = next {
-            return nil
-        }
-        return dynamicBridgeCast(fromObjectiveC: next as Any)
+        return next.map(dynamicBridgeCast)
     }
 }
 

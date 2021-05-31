@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
+import Realm
 import RealmSwift
 import Foundation
 
@@ -94,6 +95,14 @@ class ObjectTests: TestCase {
     func testSharedSchemaManaged() {
         let object = SwiftObject()
         XCTAssertEqual(type(of: object).sharedSchema(), SwiftObject.sharedSchema())
+    }
+
+    func testBaseClassesDoNotHaveSharedSchema() {
+        XCTAssertNil(ObjectBase.sharedSchema())
+        XCTAssertNil(Object.sharedSchema())
+        XCTAssertNil(EmbeddedObject.sharedSchema())
+        XCTAssertNil(RLMObject.sharedSchema())
+        XCTAssertNil(RLMEmbeddedObject.sharedSchema())
     }
 
     func testInvalidated() {

@@ -154,8 +154,7 @@ class ObjectSchemaInitializationTests: TestCase {
     }
 
     func testInvalidObjects() {
-        // Should be able to get a schema for a non-RLMObjectBase subclass
-        let schema = RLMObjectSchema(forObjectClass: SwiftFakeObjectSubclass.self)
+        let schema = SwiftFakeObjectSubclass.sharedSchema()!
         XCTAssertEqual(schema.properties.count, 2)
 
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithAnyObject.self),

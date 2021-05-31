@@ -54,27 +54,34 @@ class ModernObjectTests: TestCase {
                         "optInt32Col", "optInt64Col", "optFloatCol",
                         "optDoubleCol", "optBoolCol", "optStringCol",
                         "optBinaryCol", "optDateCol", "optDecimalCol",
-                        "optObjectIdCol", "optUuidCol", "optObjectCol",
-                        "optIntEnumCol", "optStringEnumCol", "arrayBool",
-                        "arrayInt", "arrayInt8", "arrayInt16", "arrayInt32",
+                        "optObjectIdCol", "optUuidCol", "optIntEnumCol",
+                        "optStringEnumCol", "arrayBool", "arrayInt",
+                        "arrayInt8", "arrayInt16", "arrayInt32",
                         "arrayInt64", "arrayFloat", "arrayDouble",
                         "arrayString", "arrayBinary", "arrayDate",
                         "arrayDecimal", "arrayObjectId", "arrayAny",
-                        "arrayUuid", "arrayObject", "arrayOptBool",
-                        "arrayOptInt", "arrayOptInt8", "arrayOptInt16",
-                        "arrayOptInt32", "arrayOptInt64", "arrayOptFloat",
-                        "arrayOptDouble", "arrayOptString",
-                        "arrayOptBinary", "arrayOptDate", "arrayOptDecimal",
-                        "arrayOptObjectId", "arrayOptUuid", "setBool",
-                        "setInt", "setInt8", "setInt16", "setInt32",
-                        "setInt64", "setFloat", "setDouble", "setString",
-                        "setBinary", "setDate", "setDecimal", "setObjectId",
-                        "setAny", "setUuid", "setObject", "setOptBool",
-                        "setOptInt", "setOptInt8", "setOptInt16",
-                        "setOptInt32", "setOptInt64", "setOptFloat",
-                        "setOptDouble", "setOptString", "setOptBinary",
-                        "setOptDate", "setOptDecimal", "setOptObjectId",
-                        "setOptUuid"])
+                        "arrayUuid", "arrayOptBool", "arrayOptInt",
+                        "arrayOptInt8", "arrayOptInt16", "arrayOptInt32",
+                        "arrayOptInt64", "arrayOptFloat", "arrayOptDouble",
+                        "arrayOptString", "arrayOptBinary", "arrayOptDate",
+                        "arrayOptDecimal", "arrayOptObjectId",
+                        "arrayOptUuid", "setBool", "setInt", "setInt8",
+                        "setInt16", "setInt32", "setInt64", "setFloat",
+                        "setDouble", "setString", "setBinary", "setDate",
+                        "setDecimal", "setObjectId", "setAny", "setUuid",
+                        "setOptBool", "setOptInt", "setOptInt8",
+                        "setOptInt16", "setOptInt32", "setOptInt64",
+                        "setOptFloat", "setOptDouble", "setOptString",
+                        "setOptBinary", "setOptDate", "setOptDecimal",
+                        "setOptObjectId", "setOptUuid", "mapBool", "mapInt",
+                        "mapInt8", "mapInt16", "mapInt32", "mapInt64",
+                        "mapFloat", "mapDouble", "mapString", "mapBinary",
+                        "mapDate", "mapDecimal", "mapObjectId", "mapAny",
+                        "mapUuid", "mapOptBool", "mapOptInt", "mapOptInt8",
+                        "mapOptInt16", "mapOptInt32", "mapOptInt64",
+                        "mapOptFloat", "mapOptDouble", "mapOptString",
+                        "mapOptBinary", "mapOptDate", "mapOptDecimal",
+                        "mapOptObjectId", "mapOptUuid"])
     }
 
     func testObjectSchemaForObjectWithConvenienceInitializer() {
@@ -146,6 +153,42 @@ class ModernObjectTests: TestCase {
             assertDifferentPropertyValues(realm.create(ModernDynamicDefaultObject.self),
                                           realm.create(ModernDynamicDefaultObject.self))
         }
+    }
+
+    func testWillSetDidSet() {
+        let obj = SetterObservers()
+        var calls = 0
+        obj.willSetCallback = {
+            XCTAssertEqual(obj.value, 0)
+            calls += 1
+        }
+        obj.didSetCallback = {
+            XCTAssertEqual(obj.value, 1)
+            calls += 1
+        }
+        obj.value = 1
+        XCTAssertEqual(calls, 2)
+
+        let realm = try! Realm()
+        realm.beginWrite()
+        realm.add(obj)
+
+        obj.willSetCallback = {
+            XCTAssertEqual(obj.value, 1)
+            calls += 1
+        }
+        obj.didSetCallback = {
+            XCTAssertEqual(obj.value, 2)
+            calls += 1
+        }
+        obj.value = 2
+        XCTAssertEqual(calls, 4)
+
+        realm.cancelWrite()
+
+        // The callbacks form a circular reference and so need to be removed
+        obj.willSetCallback = nil
+        obj.didSetCallback = nil
     }
 
     #if false

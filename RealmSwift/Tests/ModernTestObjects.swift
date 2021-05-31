@@ -77,7 +77,6 @@ class ModernAllTypesObject: Object {
     @Persisted var arrayObjectId: List<ObjectId>
     @Persisted var arrayAny: List<AnyRealmValue>
     @Persisted var arrayUuid: List<UUID>
-    @Persisted var arrayObject: List<ModernAllTypesObject>
 
     @Persisted var arrayOptBool: List<Bool?>
     @Persisted var arrayOptInt: List<Int?>
@@ -109,7 +108,6 @@ class ModernAllTypesObject: Object {
     @Persisted var setObjectId: MutableSet<ObjectId>
     @Persisted var setAny: MutableSet<AnyRealmValue>
     @Persisted var setUuid: MutableSet<UUID>
-    @Persisted var setObject: MutableSet<ModernAllTypesObject>
 
     @Persisted var setOptBool: MutableSet<Bool?>
     @Persisted var setOptInt: MutableSet<Int?>
@@ -125,6 +123,40 @@ class ModernAllTypesObject: Object {
     @Persisted var setOptDecimal: MutableSet<Decimal128?>
     @Persisted var setOptObjectId: MutableSet<ObjectId?>
     @Persisted var setOptUuid: MutableSet<UUID?>
+
+    @Persisted var mapBool: Map<String, Bool>
+    @Persisted var mapInt: Map<String, Int>
+    @Persisted var mapInt8: Map<String, Int8>
+    @Persisted var mapInt16: Map<String, Int16>
+    @Persisted var mapInt32: Map<String, Int32>
+    @Persisted var mapInt64: Map<String, Int64>
+    @Persisted var mapFloat: Map<String, Float>
+    @Persisted var mapDouble: Map<String, Double>
+    @Persisted var mapString: Map<String, String>
+    @Persisted var mapBinary: Map<String, Data>
+    @Persisted var mapDate: Map<String, Date>
+    @Persisted var mapDecimal: Map<String, Decimal128>
+    @Persisted var mapObjectId: Map<String, ObjectId>
+    @Persisted var mapAny: Map<String, AnyRealmValue>
+    @Persisted var mapUuid: Map<String, UUID>
+
+    @Persisted var mapOptBool: Map<String, Bool?>
+    @Persisted var mapOptInt: Map<String, Int?>
+    @Persisted var mapOptInt8: Map<String, Int8?>
+    @Persisted var mapOptInt16: Map<String, Int16?>
+    @Persisted var mapOptInt32: Map<String, Int32?>
+    @Persisted var mapOptInt64: Map<String, Int64?>
+    @Persisted var mapOptFloat: Map<String, Float?>
+    @Persisted var mapOptDouble: Map<String, Double?>
+    @Persisted var mapOptString: Map<String, String?>
+    @Persisted var mapOptBinary: Map<String, Data?>
+    @Persisted var mapOptDate: Map<String, Date?>
+    @Persisted var mapOptDecimal: Map<String, Decimal128?>
+    @Persisted var mapOptObjectId: Map<String, ObjectId?>
+    @Persisted var mapOptUuid: Map<String, UUID?>
+
+    @Persisted(originProperty: "objectCol")
+    var linkingObjects: LinkingObjects<ModernAllTypesObject>
 }
 
 enum ModernIntEnum: Int, Codable, PersistableEnum {
@@ -303,8 +335,10 @@ class ModernEmbeddedTreeObject1: EmbeddedObject, ModernEmbeddedTreeObject {
     @Persisted var child: ModernEmbeddedTreeObject2?
     @Persisted var children: List<ModernEmbeddedTreeObject2>
 
-    @Persisted(originProperty: "object") var parent1: LinkingObjects<ModernEmbeddedParentObject>
-    @Persisted(originProperty: "array") var parent2: LinkingObjects<ModernEmbeddedParentObject>
+    @Persisted(originProperty: "object")
+    var parent1: LinkingObjects<ModernEmbeddedParentObject>
+    @Persisted(originProperty: "array")
+    var parent2: LinkingObjects<ModernEmbeddedParentObject>
 }
 
 class ModernEmbeddedTreeObject2: EmbeddedObject, ModernEmbeddedTreeObject {
@@ -312,13 +346,31 @@ class ModernEmbeddedTreeObject2: EmbeddedObject, ModernEmbeddedTreeObject {
     @Persisted var child: ModernEmbeddedTreeObject3?
     @Persisted var children: List<ModernEmbeddedTreeObject3>
 
-    @Persisted(originProperty: "child") var parent3: LinkingObjects<ModernEmbeddedTreeObject1>
-    @Persisted(originProperty: "children") var parent4: LinkingObjects<ModernEmbeddedTreeObject1>
+    @Persisted(originProperty: "child")
+    var parent3: LinkingObjects<ModernEmbeddedTreeObject1>
+    @Persisted(originProperty: "children")
+    var parent4: LinkingObjects<ModernEmbeddedTreeObject1>
 }
 
 class ModernEmbeddedTreeObject3: EmbeddedObject, ModernEmbeddedTreeObject {
     @Persisted var value = 0
 
-    @Persisted(originProperty: "child") var parent3: LinkingObjects<ModernEmbeddedTreeObject2>
-    @Persisted(originProperty: "children") var parent4: LinkingObjects<ModernEmbeddedTreeObject2>
+    @Persisted(originProperty: "child")
+    var parent3: LinkingObjects<ModernEmbeddedTreeObject2>
+    @Persisted(originProperty: "children")
+    var parent4: LinkingObjects<ModernEmbeddedTreeObject2>
+}
+
+class SetterObservers: Object {
+    @Persisted var value: Int {
+        willSet {
+            willSetCallback?()
+        }
+        didSet {
+            didSetCallback?()
+        }
+    }
+
+    var willSetCallback: (() -> Void)?
+    var didSetCallback: (() -> Void)?
 }

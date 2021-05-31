@@ -59,17 +59,6 @@ extension MutableSet: MutableRealmCollection {
     }
 }
 
-internal protocol MutableMapRealmCollection {
-    func removeAll()
-    func add(key: AnyObject, value: AnyObject)
-}
-
-extension Map: MutableMapRealmCollection {
-    func add(key: AnyObject, value: AnyObject) {
-        rlmDictionary.setObject(value, forKey: key as AnyObject)
-    }
-}
-
 internal func assign(value: Any, to collection: MutableRealmCollection) {
     guard !isSameCollection(collection._rlmCollection, value) else { return }
     collection.removeAll()
@@ -81,13 +70,11 @@ internal func assign(value: Any, to collection: MutableRealmCollection) {
     }
 }
 
-internal func assign<C: MutableMapRealmCollection>(value: Any, to collection: C) {
+internal func assign<Key: _MapKey, Value: RealmCollectionValue>(value: Any, to collection: Map<Key, Value>) {
+    guard !isSameCollection(collection._rlmCollection, value) else { return }
     collection.removeAll()
-    if let enumeration = value as? NSDictionary {
-        var iterator = NSFastEnumerationIterator(enumeration)
-        while let key = iterator.next() {
-            collection.add(key: key as AnyObject, value: dynamicBridgeCast(fromSwift: enumeration[key]) as AnyObject)
-        }
+    if let enumeration = value as? NSFastEnumeration {
+        collection.rlmDictionary.addEntries(fromDictionary: enumeration)
     }
 }
 

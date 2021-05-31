@@ -214,7 +214,7 @@ extension LinkingObjects: _Persistable where Element: _Persistable {
     }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> LinkingObjects {
-        let prop = RLMObjectBaseObjectSchema(obj)!.properties[Int(key)]
+        let prop = RLMObjectBaseObjectSchema(obj)!.computedProperties[Int(key)]
         return Self(propertyName: prop.name, handle: RLMLinkingObjectsHandle(object: obj, property: prop))
     }
 

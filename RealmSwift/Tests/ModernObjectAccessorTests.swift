@@ -84,6 +84,14 @@ class ModernObjectAccessorTests: TestCase {
 
         object["optIntEnumCol"] = 10
         XCTAssertNil(object.optIntEnumCol)
+
+        object.objectCol = ModernAllTypesObject()
+        if object.realm == nil {
+            XCTAssertEqual(object.objectCol!.linkingObjects.count, 0)
+        } else {
+            XCTAssertEqual(object.objectCol!.linkingObjects.count, 1)
+            XCTAssertEqual(object.objectCol!.linkingObjects[0], object)
+        }
     }
 
     func setAndTestAllPropertiesViaSubscript(_ object: ModernAllTypesObject) {
@@ -160,7 +168,6 @@ class ModernObjectAccessorTests: TestCase {
         testConversion("optStringEnumCol", nil as ModernStringEnum? as Any, nil as ModernStringEnum?)
 
         let obj = ModernAllTypesObject()
-//        testConversion("anyCol", AnyRealmValue.none, nil as Any?)
         testConversion("anyCol", AnyRealmValue.int(1), 1)
         testConversion("anyCol", AnyRealmValue.bool(false), false)
         testConversion("anyCol", AnyRealmValue.float(2.2), 2.2 as Float)
@@ -173,6 +180,17 @@ class ModernObjectAccessorTests: TestCase {
         testConversion("anyCol", AnyRealmValue.decimal128(5), Decimal128(5))
         testConversion("anyCol", AnyRealmValue.uuid(uuid), uuid)
 
+        object["anyCol"] = AnyRealmValue.none
+        if case Optional<Any>.none = object["anyCol"] {
+        } else {
+            XCTFail("\(String(describing: object["anyCol"])) should be nil")
+        }
+        object.setValue(AnyRealmValue.none, forKey: "anyCol")
+        if case Optional<Any>.none = object["anyCol"] {
+        } else {
+            XCTFail("\(String(describing: object["anyCol"])) should be nil")
+        }
+
         object["decimalCol"] = Decimal128("nan")
         XCTAssertTrue((object["decimalCol"] as! Decimal128).isNaN)
         object["optDecimalCol"] = Decimal128("nan")
@@ -180,6 +198,15 @@ class ModernObjectAccessorTests: TestCase {
 
         object["optIntEnumCol"] = 10
         XCTAssertNil(object["optIntEnumCol"])
+
+        object.objectCol = ModernAllTypesObject()
+        let linkingObjects = (object["objectCol"]! as! ModernAllTypesObject)["linkingObjects"] as! LinkingObjects<ModernAllTypesObject>
+        if object.realm == nil {
+            XCTAssertEqual(linkingObjects.count, 0)
+        } else {
+            XCTAssertEqual(linkingObjects.count, 1)
+            XCTAssertEqual(linkingObjects[0], object)
+        }
     }
 
     func get(_ object: ObjectBase, _ propertyName: String) -> Any {
@@ -192,7 +219,9 @@ class ModernObjectAccessorTests: TestCase {
     }
 
     func assertEqual<T: Equatable>(_ lhs: Any, _ rhs: T) {
-        if lhs is NSNull {
+        if rhs is NSNull {
+            XCTAssertTrue(lhs is NSNull)
+        } else if lhs is NSNull {
             XCTAssertEqual((T.self as! ExpressibleByNilLiteral.Type).init(nilLiteral: ()) as! T, rhs)
         } else {
             XCTAssertEqual(lhs as! T, rhs)
@@ -285,7 +314,7 @@ class ModernObjectAccessorTests: TestCase {
         testConversion("optStringEnumCol", nil as ModernStringEnum? as Any, nil as ModernStringEnum?)
 
         let obj = ModernAllTypesObject()
-//        testConversion("anyCol", AnyRealmValue.none, nil as Any?)
+        testConversion("anyCol", AnyRealmValue.none, NSNull())
         testConversion("anyCol", AnyRealmValue.int(1), 1)
         testConversion("anyCol", AnyRealmValue.bool(false), false)
         testConversion("anyCol", AnyRealmValue.float(2.2), 2.2 as Float)
@@ -335,11 +364,6 @@ class ModernObjectAccessorTests: TestCase {
             set(object, name, list2)
             XCTAssertEqual(Array(list), values)
             XCTAssertFalse(list2 === get(object, name) as AnyObject)
-
-//            list.removeAll()
-//            set(object, name, list2.filter("TRUEPREDICATE"))
-//            XCTAssertEqual(Array(list), values)
-//            XCTAssertFalse(list2 === get(object, name) as AnyObject)
 
             set(object, name, get(object, name))
             XCTAssertEqual(Array(list), values)

@@ -631,19 +631,20 @@ Class RLMUnmanagedAccessorClassForObjectClass(Class objectClass, RLMObjectSchema
 // base object
 void RLMReplaceClassNameMethod(Class accessorClass, NSString *className) {
     Class metaClass = object_getClass(accessorClass);
-    IMP imp = imp_implementationWithBlock(^(Class){ return className; });
+    IMP imp = imp_implementationWithBlock(^(Class) { return className; });
     class_addMethod(metaClass, @selector(className), imp, "@@:");
 }
 
 // implement the shared schema method
 void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema *schema) {
+    REALM_ASSERT(accessorClass != [RealmSwiftObject class]);
     Class metaClass = object_getClass(accessorClass);
     IMP imp = imp_implementationWithBlock(^(Class cls) {
         if (cls == accessorClass) {
             return schema;
         }
 
-        // If we aren't being called directly on the class this was overriden
+        // If we aren't being called directly on the class this was overridden
         // for, the class is either a subclass which we haven't initialized yet,
         // or it's a runtime-generated class which should use the parent's
         // schema. We check for the latter by checking if the immediate

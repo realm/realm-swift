@@ -95,16 +95,15 @@ id RLMBridgeSwiftValue(__unsafe_unretained id value) {
 }
 
 bool RLMIsSwiftObjectClass(Class cls) {
-    static Class s_swiftObjectClass = NSClassFromString(@"RealmSwiftObject");
-    static Class s_swiftEmbeddedObjectClass = NSClassFromString(@"RealmSwiftEmbeddedObject");
-    return [cls isSubclassOfClass:s_swiftObjectClass] || [cls isSubclassOfClass:s_swiftEmbeddedObjectClass];
+    return [cls isSubclassOfClass:RealmSwiftObject.class]
+        || [cls isSubclassOfClass:RealmSwiftEmbeddedObject.class];
 }
 
-BOOL RLMValidateValue(__unsafe_unretained id const value,
-                      RLMPropertyType type,
-                      bool optional,
-                      bool collection,
-                      __unsafe_unretained NSString *const objectClassName) {
+static BOOL validateValue(__unsafe_unretained id const value,
+                          RLMPropertyType type,
+                          bool optional,
+                          bool collection,
+                          __unsafe_unretained NSString *const objectClassName) {
     if (optional && !RLMCoerceToNil(value)) {
         return YES;
     }
@@ -185,6 +184,21 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
     }
     @throw RLMException(@"Invalid RLMPropertyType specified");
 }
+
+id RLMValidateValue(__unsafe_unretained id const value,
+                    RLMPropertyType type, bool optional, bool collection,
+                    __unsafe_unretained NSString *const objectClassName) {
+    if (validateValue(value, type, optional, collection, objectClassName)) {
+        return value ?: NSNull.null;
+    }
+    if (id bridged = RLMBridgeSwiftValue(value)) {
+        if (validateValue(bridged, type, optional, collection, objectClassName)) {
+            return bridged ?: NSNull.null;
+        }
+    }
+    return nil;
+ }
+
 
 void RLMThrowTypeError(__unsafe_unretained id const obj,
                        __unsafe_unretained RLMObjectSchema *const objectSchema,
@@ -284,15 +298,7 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
 
 BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
                                  __unsafe_unretained RLMProperty *const property) {
-    if (RLMValidateValue(obj, property.type, property.optional,
-                         property.collection, property.objectClassName)) {
-        return true;
-    }
-    if (id bridged = RLMBridgeSwiftValue(obj)) {
-        return RLMValidateValue(bridged, property.type, property.optional,
-                                property.collection, property.objectClassName);
-    }
-    return false;
+    return RLMValidateValue(obj, property.type, property.optional, property.collection, property.objectClassName) != nil;
 }
 
 NSDictionary *RLMDefaultValuesForObjectSchema(__unsafe_unretained RLMObjectSchema *const objectSchema) {
@@ -436,6 +442,9 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id const value,
     }
     else {
         v = RLMBridgeSwiftValue(value);
+        if (v == NSNull.null) {
+            return realm::Mixed();
+        }
         REALM_ASSERT([v conformsToProtocol:@protocol(RLMValue)]);
     }
 
@@ -452,9 +461,8 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id const value,
     }, [&](auto t) {
         RLMStatelessAccessorContext c;
         return realm::Mixed(c.unbox<std::decay_t<decltype(*t)>>(v));
-    }, [&](realm::Mixed*) {
+    }, [&](realm::Mixed*) -> realm::Mixed {
         REALM_UNREACHABLE();
-        return realm::Mixed();
     }});
 }
 

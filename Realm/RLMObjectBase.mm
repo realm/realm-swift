@@ -385,7 +385,7 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 }
 
 + (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key {
-    RLMProperty *prop = [class_getSuperclass(self.class) sharedSchema][key];
+    RLMProperty *prop = [self.class sharedSchema][key];
     if (isManagedAccessorClass(self)) {
         // Managed accessors explicitly call willChange/didChange for managed
         // properties, so we don't want KVO to override the setters to do that
