@@ -483,7 +483,7 @@ class MapSyncTests: SwiftSyncTestCase {
                 try realm.write {
                     var i = 0
                     for entry in values {
-                        collection[entry.key] = nil
+                        collection.removeObject(for: entry.key)
                         i += 1
                         if i >= 3 {
                             break

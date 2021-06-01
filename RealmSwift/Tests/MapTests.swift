@@ -773,6 +773,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
             waitForExpectations(timeout: 2.0, handler: nil)
             XCTAssertTrue(didDelete)
             token?.invalidate()
+            token = nil
         }
     }
 }
