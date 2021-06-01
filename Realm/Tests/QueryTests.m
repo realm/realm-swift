@@ -2918,7 +2918,7 @@ static NSData *data(const char *str) {
     [realm commitWriteTransaction];
 
     XCTAssertEqual(0U, results.count);
-    XCTAssertThrows(results.firstObject, @"No such object");
+    XCTAssertNil(results.firstObject);
 }
 
 - (void)testSubqueries

@@ -1112,7 +1112,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     });
 }
 
-- (void)fixme_testDeleteDictionary {
+- (void)testDeleteDictionary {
     ExpectChange(self, @[@0, @1, @2, @3], @[], @[], ^(RLMRealm *realm) {
         [realm deleteObjects:[DictionaryPropertyObject allObjectsInRealm:realm]];
     });
