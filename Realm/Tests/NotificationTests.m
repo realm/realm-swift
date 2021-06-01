@@ -1285,14 +1285,14 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 
     [_obj.realm beginWriteTransaction];
     XCTAssertNotEqual(_obj.boolCol, [_values[@"boolCol"] boolValue]);
-    _obj.boolCol = _values[@"boolCol"];
+    _obj.boolCol = [_values[@"boolCol"] boolValue];
     [_obj.realm commitWriteTransaction];
     [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 - (void)testModifyUnobservedKeyPathLocally {
     XCTestExpectation *ex = [self expectationWithDescription:@"no change notification"];
-    ex.inverted = @YES;
+    ex.inverted = true;
     RLMNotificationToken *token = [_obj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
         [ex fulfill];
     } keyPaths:@[@"boolCol"]];
@@ -1319,7 +1319,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
         AllTypesObject *obj = [[AllTypesObject allObjectsInRealm:realm] firstObject];
         [realm beginWriteTransaction];
         XCTAssertNotEqual(obj.boolCol, [_values[@"boolCol"] boolValue]);
-        obj.boolCol = _values[@"boolCol"];
+        obj.boolCol = [_values[@"boolCol"] boolValue];
         [realm commitWriteTransaction];
     }];
     [self waitForExpectationsWithTimeout:0.1 handler:nil];
@@ -1327,7 +1327,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 
 - (void)testModifyUnobservedKeyPathRemotely {
     XCTestExpectation *ex = [self expectationWithDescription:@"no change notification"];
-    ex.inverted = @YES;
+    ex.inverted = true;
 
     RLMNotificationToken *token = [_obj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
         [ex fulfill];
@@ -1368,14 +1368,14 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
     } keyPaths:@[@"employees.hired"]];
 
     [realm beginWriteTransaction];
-    employee.hired = @YES;
+    employee.hired = true;
     [realm commitWriteTransaction];
     [self waitForExpectationsWithTimeout:0.1 handler:nil];
 }
 
 - (void)testModifyUnobservedKeyPathArrayProperty {
     XCTestExpectation *ex = [self expectationWithDescription:@"no change notification"];
-    ex.inverted = @YES;
+    ex.inverted = true;
 
     RLMRealm *realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];

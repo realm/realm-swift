@@ -164,6 +164,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     }
 
     var objectWillChange: ObservableStoragePublisher<ObservedType>
+
     init(_ value: ObservedType) {
         self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
         self.objectWillChange = ObservableStoragePublisher(value)
