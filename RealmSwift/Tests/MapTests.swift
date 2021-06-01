@@ -272,8 +272,10 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         XCTAssertNotNil(map[str1.stringCol] ?? nil)
 
         map[str1.stringCol] = nil
-        XCTAssertEqual(0, map.count)
+        XCTAssertEqual(1, map.count)
         XCTAssertNil(map[str1.stringCol] ?? nil)
+        map.removeObject(for: str1.stringCol)
+        XCTAssertEqual(0, map.count)
     }
 
     func testRemoveAll() {
