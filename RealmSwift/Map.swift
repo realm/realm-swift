@@ -114,7 +114,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
             return rlmDictionary[objcKey(from: key)].map(dynamicBridgeCast)
         }
         set {
-            if newValue == nil {
+            if newValue == nil && !Value._rlmOptional {
                 rlmDictionary.removeObject(forKey: key as AnyObject)
             } else {
                 rlmDictionary[objcKey(from: key)] = dynamicBridgeCast(fromSwift: newValue) as AnyObject

@@ -104,6 +104,23 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         XCTAssertEqual(obj.string["key"], "str")
     }
 
+    func testSettingNil() {
+        let obj = SwiftMapObject()
+        obj.intOpt["one"] = 1
+        XCTAssertEqual(obj.intOpt["one"], 1)
+        obj.intOpt["one"] = nil
+        XCTAssertNil(obj.intOpt["one"]!)
+        XCTAssertEqual(obj.intOpt.count, 1)
+        obj.intOpt.removeObject(for: "one")
+        XCTAssertEqual(obj.intOpt.count, 0)
+
+        obj.int["one"] = 5
+        XCTAssertEqual(obj.int["one"], 5)
+        obj.int["one"] = nil
+        XCTAssertNil(obj.int["one"])
+        XCTAssertEqual(obj.int.count, 0)
+    }
+
     func testPrimitiveIterationAcrossNil() {
         let obj = SwiftMapObject()
 
