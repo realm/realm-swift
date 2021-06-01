@@ -92,6 +92,7 @@ using namespace realm;
     _primaryKeyProperty.isPrimary = NO;
     primaryKeyProperty.isPrimary = YES;
     _primaryKeyProperty = primaryKeyProperty;
+    _primaryKeyProperty.indexed = YES;
 }
 
 + (instancetype)schemaForObjectClass:(Class)objectClass {
