@@ -1,3 +1,25 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* None.
+
+### Fixed
+* Fix a runtime crash which happens in some Xcode version (Xcode < 12, reported in Xcode 12.5), where SwiftUI is not weak linked by default. This fix only works for Cocoapods projects.
+  ([#7234](https://github.com/realm/realm-cocoa/issues/7234)
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
 10.7.6 Release notes (2021-05-13)
 =============================================================
 
