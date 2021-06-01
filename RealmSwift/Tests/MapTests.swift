@@ -763,14 +763,13 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
             map["myNewKey"] = SwiftStringObject(value: ["three"])
             try! realm.commitWrite()
             waitForExpectations(timeout: 2.0, handler: nil)
-            exp = expectation(description: "does receive notification")
             XCTAssertTrue(didModify)
+            exp = expectation(description: "does receive notification")
             realm.beginWrite()
-            map["myNewKey"] = nil
+            map.removeObject(for: "myNewKey")
             try! realm.commitWrite()
             waitForExpectations(timeout: 2.0, handler: nil)
             XCTAssertTrue(didDelete)
-
             token?.invalidate()
         }
     }
