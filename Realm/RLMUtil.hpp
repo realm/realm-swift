@@ -20,8 +20,6 @@
 #import <Realm/RLMSwiftValueStorage.h>
 #import <Realm/RLMValue.h>
 
-#import "RLMClassInfo.hpp"
-
 #import <objc/runtime.h>
 
 #import <realm/array.hpp>
@@ -36,6 +34,8 @@ class Decimal128;
 class Mixed;
 class RealmFileException;
 }
+
+class RLMClassInfo;
 
 @class RLMObjectSchema;
 @class RLMProperty;

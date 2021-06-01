@@ -32,6 +32,8 @@ extension String: _MapKey { }
  Map is a generic type that is parameterized on the type it stores. This can be either an Object
  subclass or one of the following types: Bool, Int, Int8, Int16, Int32, Int64, Float, Double,
  String, Data, Date, Decimal128, and ObjectId (and their optional versions)
+
+ - Note: Optional versions of the above types *except* `Object` are only supported in non-synchronized Realms.
  
  Map only supports String as a key.
  
@@ -85,6 +87,11 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     /**
      Updates the value stored in the map for the given key, or adds a new key-value pair if the key does not exist.
 
+     - Note:If the value being added to the map is an unmanaged object and the map is managed
+            then that unmanaged object will be added to the Realm.
+
+     - warning: This method may only be called during a write transaction.
+
      - parameter value: a value's key path predicate.
      - parameter forKey: The direction to sort in.
      */
@@ -93,7 +100,10 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     }
 
     /**
-     Removes the given key and its associated object.
+     Removes the given key and its associated object, only if the key exists in the map. If the key does not
+     exist, the map will not be modified.
+
+     - warning: This method may only be called during a write transaction.
      */
     public func removeObject(for key: Key) {
         rlmDictionary.removeObject(forKey: objcKey(from: key))
@@ -108,7 +118,18 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
         rlmDictionary.removeAllObjects()
     }
 
-    /// :nodoc:
+    /**
+     Returns the value for a given key, or sets a value for a key should the subscript be used for an assign.
+
+     - Note:If the value being added to the map is an unmanaged object and the map is managed
+            then that unmanaged object will be added to the Realm.
+
+     - Note:If the value being assigned for a key is `nil` then that key will be removed from the map.
+
+     - warning: This method may only be called during a write transaction.
+
+     - parameter key: The key.
+     */
     public subscript(key: Key) -> Value? {
         get {
             return rlmDictionary[objcKey(from: key)].map(dynamicBridgeCast)
@@ -170,9 +191,11 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     // MARK: Filtering
 
     /**
-     Returns a `Results` containing all matching key-value pairs the given predicate in the Map.
+     Returns a `Results` containing all matching values in the map with the given predicate.
 
-     - parameter predicate: The predicate with which to filter the objects.
+     - Note: This will return the values in the map, and not the key-value pairs.
+
+     - parameter predicate: The predicate with which to filter the values.
      */
     public func filter(_ predicate: NSPredicate) -> Results<Value> {
         return Results<Value>(rlmDictionary.objects(with: predicate))
@@ -229,7 +252,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     /**
      Returns a `Results` containing the objects in the map, but sorted.
 
-     - warning: Dictionaries may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+     - warning: Map's may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
                 floating point, integer, and string types.
 
      - see: `sorted(byKeyPath:ascending:)`
@@ -237,32 +260,6 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Value>
         where S.Iterator.Element == SortDescriptor {
             return Results<Value>(_rlmCollection.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
-    }
-
-    /// :nodoc:
-    // swiftlint:disable:next identifier_name
-    public func _observe(_ queue: DispatchQueue?,
-                         _ block: @escaping (RealmMapChange<AnyMap<Key, Value>>) -> Void)
-        -> NotificationToken {
-        return rlmDictionary.addNotificationBlock(wrapDictionaryObserveBlock(block), queue: queue)
-    }
-
-    /**
-     Returns the object at the given `position`.
-
-     - parameter position: The position of the element in the collection.
-     */
-    public subscript(position: MapIndex) -> (key: Key, value: Value) {
-        precondition((position.offset >= 0 && position.offset < count),
-                     "Attempting to access Map elements using an invalid index.")
-        let key = keys[Int(position.offset)]
-        return (key, self[key]!)
-    }
-
-    /// Returns the position of an element in the collection.
-    /// - Parameter object: The object to find.
-    public func index(of object: Value) -> MapIndex? {
-        return MapIndex(offset: rlmDictionary.index(of: dynamicBridgeCast(fromSwift: object)))
     }
 
     // MARK: Aggregate Operations
@@ -319,11 +316,11 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     /**
      Registers a block to be called each time the map changes.
 
-     The block will be asynchronously called with the initial results, and then called again after each write
-     transaction which changes either any of the objects in the collection, or which objects are in the collection.
+     The block will be asynchronously called with the initial map, and then called again after each write
+     transaction which changes either any of the keys or values in the map.
 
-     The `change` parameter that is passed to the block reports, in the form of indices within the collection, which of
-     the objects were added, removed, or modified during each write transaction.
+     The `change` parameter that is passed to the block reports, in the form of keys within the map, which of
+     the key-value pairs were added, removed, or modified during each write transaction.
 
      At the time when the block is called, the map will be fully evaluated and up-to-date, and as long as you do
      not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
@@ -339,13 +336,14 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      will reflect the state of the Realm after the write transaction.
 
      ```swift
-     let results = realm.objects(Dog.self)
-     print("dogs.count: \(dogs?.count)") // => 0
-     let token = dogs.observe { changes in
+     let myStringMap = myObject.stringMap
+     print("myStringMap.count: \(myStringMap?.count)") // => 0
+     let token = myStringMap.observe { changes in
          switch changes {
-         case .initial(let dogs):
-             // Will print "dogs.count: 1"
-             print("dogs.count: \(dogs.count)")
+         case .initial(let myStringMap):
+             // Will print "myStringMap.count: 1"
+             print("myStringMap.count: \(myStringMap.count)")
+            print("Dog Name: \(myStringMap["nameOfDog"])") // => "Rex"
              break
          case .update:
              // Will not be hit in this example
@@ -355,9 +353,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
          }
      }
      try! realm.write {
-         let dog = Dog()
-         dog.name = "Rex"
-         person.dogs["foo"] = dog
+         myStringMap["nameOfDog"] = "Rex"
      }
      // end of run loop execution context
      ```
@@ -380,14 +376,43 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
     // MARK: Frozen Objects
 
+    /**
+     Indicates if the `Map` is frozen.
+
+     Frozen `Map`s are immutable and can be accessed from any thread. Frozen `Map`s
+     are created by calling `-freeze` on a managed live `Map`. Unmanaged `Map`s are
+     never frozen.
+     */
     public var isFrozen: Bool {
         return _rlmCollection.isFrozen
     }
 
+    /**
+     Returns a frozen (immutable) snapshot of a `Map`.
+
+     The frozen copy is an immutable `Map` which contains the same data as this
+     `Map` currently contains, but will not update when writes are made to the
+     containing Realm. Unlike live `Map`s, frozen `Map`s can be accessed from any
+     thread.
+
+     - warning: This method cannot be called during a write transaction, or when the
+                containing Realm is read-only.
+     - warning: This method may only be called on a managed `Map`.
+     - warning: Holding onto a frozen `Map` for an extended period while performing
+                write transaction on the Realm may result in the Realm file growing
+                to large sizes. See `RLMRealmConfiguration.maximumNumberOfActiveVersions`
+                for more information.
+     */
     public func freeze() -> Map {
         return Map(objc: rlmDictionary.freeze())
     }
 
+    /**
+     Returns a live version of this frozen `Map`.
+
+     This method resolves a reference to a live copy of the same frozen `Map`.
+     If called on a live `Map`, will return itself.
+    */
     public func thaw() -> Map? {
         return Map(objc: rlmDictionary.thaw())
     }
@@ -526,10 +551,8 @@ extension Map: Sequence {
 
     /**
      `.update` indicates that a write transaction has been committed which
-     either changed which objects are in the collection, and/or modified one
+     either changed which keys are in the collection, or the values of the objects for those keys in the collection, and/or modified one
      or more of the objects in the collection.
-
-     All three of the change arrays are always sorted in ascending order.
 
      - parameter deletions:     The keys in the previous version of the collection which were removed from this one.
      - parameter insertions:    The keys in the new collection which were added in this version.
@@ -584,9 +607,9 @@ public struct SingleMapEntry<Key: _MapKey, Value: RealmCollectionValue>: _RealmM
     public func hash(into hasher: inout Hasher) {
         hasher.combine(key)
     }
-    /// :nodoc:
+    /// The key for this Map entry.
     public var key: Self.Key
-    /// :nodoc:
+    /// The value for this Map entry.
     public var value: Self.Value
 }
 

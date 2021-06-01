@@ -112,62 +112,107 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable id)valueForKey:(nonnull RLMKeyType)key;
 
 /**
- Returns an object, if present, for a given key in the dictionary.
- */
-- (nullable RLMObjectType)objectForKey:(nonnull RLMKeyType)key;
-
-/**
  Returns an array containing the dictionary’s keys.
+
+ @note The order of the elements in the array is not defined.
  */
 @property(readonly, copy) NSArray<RLMKeyType> *allKeys;
 
 /**
  Returns an array containing the dictionary’s values.
+
+ @note The order of the elements in the array is not defined.
  */
 @property(readonly, copy) NSArray<RLMObjectType> *allValues;
 
-/// :nodoc:
+/**
+ Returns the value associated with a given key.
+
+ @note `nil` will be returned if no value is associated with a given key. NSNull will be returned
+       where null is associated with the key.
+
+ @param key The key for which to return the corresponding value.
+
+ @return The value associated with key.
+ */
+- (nullable RLMObjectType)objectForKey:(nonnull RLMKeyType)key;
+
+/**
+ Returns the value associated with a given key.
+
+ @note `nil` will be returned if no value is associated with a given key. NSNull will be returned
+       where null is associated with the key.
+
+ @param key The key for which to return the corresponding value.
+
+ @return The value associated with key.
+ */
 - (nullable RLMObjectType)objectForKeyedSubscript:(RLMKeyType)key;
 
 /**
- Applies a given block object to the each key-value pair of the dictionary
+ Applies a given block object to the each key-value pair of the dictionary.
+
+ @param block A block object to operate on entries in the dictionary.
+
+ @note If the block sets *stop to YES, the enumeration stops.
  */
 - (void)enumerateKeysAndObjectsUsingBlock:(void (^)(RLMKeyType key, RLMObjectType obj, BOOL *stop))block;
 
 #pragma mark - Adding, Removing, and Replacing Objects in a Dictionary
 
 /**
- Replace the contents of a dictionary with the contents of another dictionary - NSDictionary or RLMDictionary
+ Replace the contents of a dictionary with the contents of another dictionary - NSDictionary or RLMDictionary.
+
+ This will remove all elements in this dictionary and then apply each element from the given dictionary.
+
+ @warning This method may only be called during a write transaction.
  */
 - (void)setDictionary:(id)otherDictionary;
 
 /**
- Delete all contents in the dictionary.
+ Removes all contents in the dictionary.
+
+ @warning This method may only be called during a write transaction.
  */
 - (void)removeAllObjects;
 
 /**
- Removes from the dictionary entries specified by elements in a given array.
+ Removes from the dictionary entries specified by elements in a given array. If a given key does not
+ exist, no mutation will happen for that key.
+
+ @warning This method may only be called during a write transaction.
  */
 - (void)removeObjectsForKeys:(NSArray<RLMKeyType> *)keyArray;
 
 /**
- Removes a given key and its associated value from the dictionary.
+ Removes a given key and its associated value from the dictionary. If the key does not exist the dictionary
+ will not be modified.
+
+ @warning This method may only be called during a write transaction.
  */
 - (void)removeObjectForKey:(RLMKeyType)key;
 
 /**
- Adds a given key-value pair to the dictionary.
+ Adds a given key-value pair to the dictionary if the key is not present, or updates the value for the given key
+ if the key already present.
+
+ @warning This method may only be called during a write transaction.
  */
 - (void)setObject:(nullable RLMObjectType)obj forKeyedSubscript:(RLMKeyType)key;
 
 /**
- Adds a given key-value pair to the dictionary.
+ Adds a given key-value pair to the dictionary if the key is not present, or updates the value for the given key
+ if the key already present.
+
+ @warning This method may only be called during a write transaction.
  */
 - (void)setObject:(nullable RLMObjectType)anObject forKey:(RLMKeyType)aKey;
 
 /**
   Adds to the receiving dictionary the entries from another dictionary.
+
+  @note If the receiving dictionary contains the same key(s) as the otherDictionary, then
+        the receiving dictionary will update each key-value pair for the matching key.
  
   @warning This method may only be called during a write transaction.
 
@@ -179,7 +224,9 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Querying a Dictionary
 
 /**
- Returns all the objects matching the given predicate in the dictionary.
+ Returns all the values matching the given predicate in the dictionary.
+
+ @note The keys in the dictionary are ignored when quering values, and they will not be returned in the `RLMResults`.
 
  @param predicateFormat A predicate format string, optionally followed by a variable number of arguments.
 
@@ -191,7 +238,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (RLMResults<RLMObjectType> *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 
 /**
- Returns all the objects matching the given predicate in the dictionary.
+ Returns all the values matching the given predicate in the dictionary.
+
+ @note The keys in the dictionary are ignored when quering values, and they will not be returned in the `RLMResults`.
 
  @param predicate   The predicate with which to filter the objects.
 
@@ -200,7 +249,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (RLMResults<RLMObjectType> *)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
- Returns a sorted `RLMResults` from the dictionary.
+ Returns a sorted RLMResults of all values in the dictionary.
+
+ @note The keys in the dictionary are ignored when sorting values, and they will not be returned in the `RLMResults`.
 
  @param keyPath     The key path to sort by.
  @param ascending   The direction to sort in.
@@ -209,7 +260,9 @@ NS_ASSUME_NONNULL_BEGIN
  */- (RLMResults<RLMObjectType> *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending;
 
 /**
- Returns a sorted `RLMResults` from the dictionary.
+ Returns a sorted RLMResults of all values in the dictionary.
+
+ @note The keys in the dictionary are ignored when sorting values, and they will not be returned in the `RLMResults`.
 
  @param properties  An array of `RLMSortDescriptor`s to sort by.
 
@@ -218,7 +271,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (RLMResults<RLMObjectType> *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties;
 
 /**
- Returns a distinct `RLMResults` from the dictionary.
+ Returns a distinct `RLMResults` from all values in the dictionary.
+
+ @note The keys in the dictionary are ignored, and they will not be returned in the `RLMResults`.
 
  @param keyPaths     The key paths to distinct on.
 
@@ -233,7 +288,7 @@ NS_ASSUME_NONNULL_BEGIN
 
      NSNumber *min = [object.dictionaryProperty minOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, `RLMDictionary`, and `NSData` properties.
+ @warning You cannot use this method on `RLMObject`, and `NSData` properties.
 
  @param property The property whose minimum value is desired. Only properties of
                  types `int`, `float`, `double`, and `NSDate` are supported.
@@ -247,7 +302,7 @@ NS_ASSUME_NONNULL_BEGIN
 
      NSNumber *max = [object.dictionaryProperty maxOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, `RLMDictionary`, and `NSData` properties.
+ @warning You cannot use this method on `RLMObject`, and `NSData` properties.
 
  @param property The property whose maximum value is desired. Only properties of
                  types `int`, `float`, `double`, and `NSDate` are supported.
@@ -261,7 +316,7 @@ NS_ASSUME_NONNULL_BEGIN
 
      NSNumber *sum = [object.dictionaryProperty sumOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, `RLMDictionary`, and `NSData` properties.
+ @warning You cannot use this method on `RLMObject`, and `NSData` properties.
 
  @param property The property whose values should be summed. Only properties of
                  types `int`, `float`, and `double` are supported.
@@ -275,7 +330,7 @@ NS_ASSUME_NONNULL_BEGIN
 
      NSNumber *average = [object.dictionaryProperty averageOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, `RLMDictionary`, and `NSData` properties.
+ @warning You cannot use this method on `RLMObject`, and `NSData` properties.
 
  @param property The property whose average value should be calculated. Only
                  properties of types `int`, `float`, and `double` are supported.
@@ -290,13 +345,13 @@ NS_ASSUME_NONNULL_BEGIN
  Registers a block to be called each time the dictionary changes.
 
  The block will be asynchronously called with the initial dictionary, and then
- called again after each write transaction which changes any of the key-value in
- the dictionary or which objects are in the results.
+ called again after each write transaction which changes any of the keys or values
+ within the dictionary.
 
  The `changes` parameter will be `nil` the first time the block is called.
  For each call after that, it will contain information about
- which keys in the dictionary were added or modified. If a write transaction
- did not modify any objects in the dictionary, the block is not called at all.
+ which keys in the dictionary were added, modified or deleted. If a write transaction
+ did not modify any keys or values in the dictionary, the block is not called at all.
 
  If an error occurs the block will be called with `nil` for the results
  parameter and a non-`nil` error. Currently the only errors that can occur are
@@ -318,12 +373,12 @@ NS_ASSUME_NONNULL_BEGIN
                                        RLMDictionaryChange *changes,
                                        NSError *error) {
          // Only fired once for the example
-         NSLog(@"dogs.count: %zu", dogs.count) // => 1
+         NSLog(@"dogs.count: %zu", dogs.count); // => 1
      }];
      [realm transactionWithBlock:^{
          Dog *dog = [[Dog alloc] init];
          dog.name = @"Rex";
-         [person.dogs addObject:dog];
+         person.dogs[@"frenchBulldog"] = dog;
      }];
      // end of run loop execution context
 

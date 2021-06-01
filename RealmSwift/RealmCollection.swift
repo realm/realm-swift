@@ -45,7 +45,7 @@ import Realm
     }
 }
 
-/// A container used for storing key-value pairs which are to be used as elements in `RLMMapIterator`.
+/// :nodoc:
 public protocol _RealmMapValue {
     /// The key of this element.
     associatedtype Key: _MapKey
@@ -1128,16 +1128,6 @@ extension ObservableCollection where Self: RealmKeyedCollection {
     // wrapper for the obj-c type, which we'll construct the first time the
     // callback is called.
     internal typealias ObjcChange = (RLMDictionary<AnyObject, AnyObject>?, RLMDictionaryChange?, Error?) -> Void
-
-    internal func wrapDictionaryObserveBlock(_ block: @escaping (RealmMapChange<AnyMap<Key, Value>>) -> Void) -> ObjcChange {
-        var anyCollection: AnyMap<Key, Value>?
-        return { collection, change, error in
-            if anyCollection == nil, let collection = collection as? Self.BackingObjcCollection {
-                anyCollection = AnyMap(self.isSameObjcCollection(collection) ? self : Self(objc: collection))
-            }
-            block(RealmMapChange.fromObjc(value: anyCollection, change: change, error: error))
-        }
-    }
 
     internal func wrapDictionaryObserveBlock(_ block: @escaping (RealmMapChange<Self>) -> Void) -> ObjcChange {
         var col: Self?

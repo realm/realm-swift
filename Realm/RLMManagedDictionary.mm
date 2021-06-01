@@ -128,14 +128,7 @@ struct DictionaryCallbackWrapper {
 static NSArray *toArray(std::vector<realm::Mixed> const& v) {
     NSMutableArray *ret = [NSMutableArray new];
     for (auto& mixed : v) {
-        switch (mixed.get_type()) {
-            case realm::type_String:
-                [ret addObject:@(mixed.get_string().data())];
-                break;
-            default:
-                // Don't throw so older SDK versions can handle any new key types.
-                break;
-        }
+        [ret addObject:RLMMixedToObjc(mixed)];
     }
     return ret;
 }
@@ -317,8 +310,8 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (NSArray *)allKeys {
     return translateErrors([&] {
-        NSMutableArray<id> *keys = [NSMutableArray array];
         auto keyResult = _backingCollection.get_keys();
+        NSMutableArray<id> *keys = [NSMutableArray arrayWithCapacity:keyResult.size()];
         for (size_t i=0; i<keyResult.size(); i++) {
             [keys addObject:RLMStringDataToNSString(keyResult.get<realm::StringData>(i))];
         }
@@ -377,12 +370,6 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 
 - (nullable id)objectForKeyedSubscript:(id)key {
     return [self objectForKey:key];
-}
-
-- (NSUInteger)indexOfObject:(id)value {
-    return translateErrors([&] {
-        return _backingCollection.find_any(RLMObjcToMixed(value));
-    });
 }
 
 - (void)setObject:(id)obj forKey:(id)key {

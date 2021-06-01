@@ -584,9 +584,6 @@ extension RealmKeyedCollection {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-extension AnyMap: RealmSubscribable {}
-
 // MARK: Subscriptions
 
 /// A subscription which wraps a Realm notification.
@@ -1369,7 +1366,7 @@ public enum RealmPublishers {
         }
     }
 
-    /// A publisher which emits collection change each time the observed object is modified
+    /// A publisher which emits RealmCollectionChange<T> each time the observed object is modified
     ///
     /// `receive(on:)` and `subscribe(on:)` can be called directly on this
     /// publisher, and calling `.threadSafeReference()` is only required if
@@ -1450,7 +1447,7 @@ public enum RealmPublishers {
         }
     }
 
-    /// A publisher which emits collection change each time the observed object is modified
+    /// A publisher which emits RealmMapChange<Key, Value> each time the observed object is modified
     ///
     /// `receive(on:)` and `subscribe(on:)` can be called directly on this
     /// publisher, and calling `.threadSafeReference()` is only required if

@@ -90,11 +90,6 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         obj.int["keyB"] = 6
         obj.int["keyC"] = 7
         obj.int["keyD"] = 8
-        let index = obj.int.index(of: 7)
-        XCTAssertNotNil(index)
-        // Ordering in a dictionary is not guaranteed. So at least check
-        // the indexes fall into the correct range.
-        XCTAssert((index!.offset >= 0) && (index!.offset <= 3))
         XCTAssertEqual(obj.int.max(), 8)
         XCTAssertEqual(obj.int.min(), 5)
         XCTAssertEqual(obj.int.sum(), 26)
@@ -457,17 +452,9 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         }
 
         if map.realm != nil {
-
-            if map is AnyMap<String, EmbeddedTreeObject1?> {
-                // There is an issue with expecting exceptions combined with
-                // using subscripts with AnyMap.
-                assertThrows((map.setValue(map["0"] as Any?, forKey: "unassigned")),
-                             reason: "Cannot add an existing managed embedded object to a List.")
-            } else {
-                // This message comes from Core and is incorrect for Dictionary.
-                assertThrows((map["unassigned"] = map["0"]),
-                             reason: "Cannot add an existing managed embedded object to a List.")
-            }
+            // This message comes from Core and is incorrect for Dictionary.
+            assertThrows((map["unassigned"] = map["0"]),
+                         reason: "Cannot add an existing managed embedded object to a List.")
         }
         realm.cancelWrite()
     }
@@ -485,15 +472,8 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
 
         if map.realm != nil {
             XCTAssertTrue(oldObj!!.isInvalidated)
-            if map is AnyMap<String, EmbeddedTreeObject1?> {
-                // There is an issue with expecting exceptions combined with
-                // using subscripts with AnyMap.
-                assertThrows(map.setValue(map["key"] as Any?, forKey: "key"),
-                             reason: "Cannot add an existing managed embedded object to a List.")
-            } else {
-                assertThrows(map["key"] = obj,
-                             reason: "Cannot add an existing managed embedded object to a List.")
-            }
+            assertThrows(map["key"] = obj,
+                         reason: "Cannot add an existing managed embedded object to a List.")
         }
 
         realm.cancelWrite()
@@ -816,70 +796,5 @@ class MapRetrievedTests: MapTests<Map<String, SwiftStringObject?>, Map<String, E
     override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1?> {
         realm.create(EmbeddedParentObject.self, value: [])
         return realm.objects(EmbeddedParentObject.self).first!.map
-    }
-}
-
-class AnyMapStandaloneTests: MapTests<AnyMap<String, SwiftStringObject?>, AnyMap<String, EmbeddedTreeObject1?>> {
-    override func createMap() -> AnyMap<String, SwiftStringObject?> {
-        let mapObj = SwiftMapPropertyObject()
-        XCTAssertNil(mapObj.realm)
-        return AnyMap(mapObj.map)
-    }
-
-    override func createEmbeddedMap() -> AnyMap<String, EmbeddedTreeObject1?> {
-        return AnyMap(Map<String, EmbeddedTreeObject1?>())
-    }
-}
-
-class AnyMapNewlyAddedTests: MapTests<AnyMap<String, SwiftStringObject?>, AnyMap<String, EmbeddedTreeObject1?>> {
-    override func createMap() -> AnyMap<String, SwiftStringObject?> {
-        let mapObj = SwiftMapPropertyObject()
-        realm.add(mapObj)
-        XCTAssertNotNil(mapObj.realm)
-        return AnyMap(mapObj.map)
-    }
-
-    override func createEmbeddedMap() -> AnyMap<String, EmbeddedTreeObject1?> {
-        let parent = EmbeddedParentObject()
-        let map = parent.map
-        realm.add(parent)
-        let any = AnyMap(map)
-        XCTAssertNotNil(any.realm)
-        return any
-    }
-}
-
-class AnyMapNewlyCreatedTests: MapTests<AnyMap<String, SwiftStringObject?>, AnyMap<String, EmbeddedTreeObject1?>> {
-    override func createMap() -> AnyMap<String, SwiftStringObject?> {
-        let mapObj = realm.create(SwiftMapPropertyObject.self, value: ["name", [], []])
-        try! realm.commitWrite()
-        realm.beginWrite()
-        XCTAssertNotNil(mapObj.realm)
-        return AnyMap(mapObj.map)
-    }
-
-    override func createEmbeddedMap() -> AnyMap<String, EmbeddedTreeObject1?> {
-        let map = realm.create(EmbeddedParentObject.self, value: []).map
-        XCTAssertNotNil(map.realm)
-        return AnyMap(map)
-    }
-}
-
-class AnyMapRetrievedTests: MapTests<AnyMap<String, SwiftStringObject?>, AnyMap<String, EmbeddedTreeObject1?>> {
-    override func createMap() -> AnyMap<String, SwiftStringObject?> {
-        realm.create(SwiftMapPropertyObject.self, value: ["name", [:], [:]])
-        try! realm.commitWrite()
-        let mapObj = realm.objects(SwiftMapPropertyObject.self).first!
-
-        XCTAssertNotNil(mapObj.realm)
-        realm.beginWrite()
-        return AnyMap(mapObj.map)
-    }
-
-    override func createEmbeddedMap() -> AnyMap<String, EmbeddedTreeObject1?> {
-        realm.create(EmbeddedParentObject.self, value: [])
-        let map = realm.objects(EmbeddedParentObject.self).first!.map
-        XCTAssertNotNil(map.realm)
-        return AnyMap(map)
     }
 }

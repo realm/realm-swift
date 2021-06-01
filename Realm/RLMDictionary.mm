@@ -149,18 +149,24 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 }
 
 - (NSArray *)allKeys {
-    return _backingCollection.allKeys;
+    return _backingCollection.allKeys ?: @[];
 }
 
 - (NSArray *)allValues {
-    return _backingCollection.allValues;
+    return _backingCollection.allValues ?: @[];
 }
 
 - (nullable id)objectForKey:(id)key {
+    if (!_backingCollection) {
+        _backingCollection = [NSMutableDictionary new];
+    }
     return [_backingCollection objectForKey:key];
 }
 
 - (nullable id)objectForKeyedSubscript:(id)key {
+    if (!_backingCollection) {
+        _backingCollection = [NSMutableDictionary new];
+    }
     return [_backingCollection objectForKey:key];
 }
 
@@ -177,6 +183,7 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 
 - (void)setDictionary:(id)dictionary {
     changeDictionary(self, ^{
+        [self removeAllObjects];
         [dictionary enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull value, BOOL *) {
             RLMDictionaryValidateMatchingObjectType(self, key, value);
             self[key] = value;
@@ -451,7 +458,7 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 }
 
 - (NSUInteger)indexOfObject:(id)value {
-    return [_backingCollection.allValues indexOfObject:value];
+    @throw RLMException(@"This method is not available on RLMDictionary.");
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
@@ -499,7 +506,7 @@ NSString *RLMDictionaryDescriptionWithMaxDepth(NSString *name,
                 [dictionary objectClassName] ?: RLMTypeToString([dictionary type]),
                 (void *)dictionary];
     size_t index = 0, skipped = 0;
-    for (id key in dictionary.allKeys) {
+    for (id key in dictionary) {
         id value = dictionary[key];
         NSString *keyDesc;
         if ([key respondsToSelector:@selector(descriptionWithMaxDepth:)]) {

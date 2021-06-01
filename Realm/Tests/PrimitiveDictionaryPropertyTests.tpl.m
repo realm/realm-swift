@@ -558,7 +558,6 @@ static double average(NSDictionary *dictionary) {
     XCTAssertNoThrow(dictionary[@"0"]);
     XCTAssertNoThrow([dictionary count]);
 
-    XCTAssertNoThrow([dictionary indexOfObject:@1]);
     XCTAssertNoThrow([dictionary sortedResultsUsingKeyPath:@"self" ascending:YES]);
     XCTAssertNoThrow([dictionary sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]]);
     XCTAssertNoThrow(dictionary[@"0"]);
