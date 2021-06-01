@@ -69,6 +69,28 @@ internal class SetAccessor<Element: RealmCollectionValue>: RLMManagedPropertyAcc
     }
 }
 
+internal class MapAccessor<Key: _MapKey, Value: RealmCollectionValue>: RLMManagedPropertyAccessor {
+    private static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> Map<Key, Value> {
+        return ptr(property, obj).assumingMemoryBound(to: Map<Key, Value>.self).pointee
+    }
+
+    @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
+        bound(property, parent)._rlmCollection = RLMManagedDictionary(parent: parent, property: property)
+    }
+
+    @objc override class func observe(_ property: RLMProperty, on parent: RLMObjectBase) {
+        bound(property, parent).rlmDictionary.setParent(parent, property: property)
+    }
+
+    @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
+        return bound(property, parent)
+    }
+
+    @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
+        assign(value: value, to: bound(property, parent))
+    }
+}
+
 internal class LinkingObjectsAccessor<Element: ObjectBase>: RLMManagedPropertyAccessor
         where Element: RealmCollectionValue {
     private static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> UnsafeMutablePointer<LinkingObjects<Element>> {

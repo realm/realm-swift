@@ -237,6 +237,8 @@ class AnyRealmValueObjectTests: TestCase {
     }
 }
 
+// MARK: - Factories
+
 class BaseAnyRealmValueFactory {
     static func array(_ obj: SwiftListObject) -> List<AnyRealmValue> {
         return obj.any
@@ -330,6 +332,8 @@ class AnyRealmValueUUIDFactory: BaseAnyRealmValueFactory, ValueFactory {
          .uuid(UUID(uuidString: "0F0359D8-8D74-409D-8561-C8EBE3753636")!)]
     }
 }
+
+// MARK: - List tests
 
 class AnyRealmValueListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T == AnyRealmValue {
 
@@ -656,6 +660,8 @@ class ManagedAnyRealmValueListTests: TestCase {
     }
 }
 
+// MARK: - Set tests
+
 class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.T == AnyRealmValue {
 
     private func assertEqual(_ obj: AnyRealmValue, _ anotherObj: AnyRealmValue) {
@@ -678,36 +684,36 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: ValueFactory>: Primitive
     func testValueForKey() {
         XCTAssertEqual(mutableSet.value(forKey: "self").count, 0)
         mutableSet.insert(values[0])
-        let kvo = (mutableSet.value(forKey: "self") as [AnyObject]).first!
+        let kvc = (mutableSet.value(forKey: "self") as [AnyObject]).first!
         switch values[0] {
         case let .object(o):
-            if let obj = kvo as? SwiftStringObject {
+            if let obj = kvc as? SwiftStringObject {
                 XCTAssertEqual(obj.stringCol, (o as! SwiftStringObject).stringCol)
             } else {
                 XCTFail("not an object")
             }
         case let .bool(b):
-            XCTAssertEqual(kvo as! Bool, b)
+            XCTAssertEqual(kvc as! Bool, b)
         case let .data(d):
-            XCTAssertEqual(kvo as! Data, d)
+            XCTAssertEqual(kvc as! Data, d)
         case let .date(d):
-            XCTAssertEqual(kvo as! Date, d)
+            XCTAssertEqual(kvc as! Date, d)
         case let .decimal128(d):
-            XCTAssertEqual(kvo as! Decimal128, d)
+            XCTAssertEqual(kvc as! Decimal128, d)
         case let .double(d):
-            XCTAssertEqual(kvo as! Double, d)
+            XCTAssertEqual(kvc as! Double, d)
         case let .float(f):
-            XCTAssertEqual(kvo as! Float, f)
+            XCTAssertEqual(kvc as! Float, f)
         case let .int(i):
-            XCTAssertEqual(kvo as! Int, i)
+            XCTAssertEqual(kvc as! Int, i)
         case .none:
-            XCTAssertNil(kvo)
+            XCTAssertNil(kvc)
         case let .objectId(o):
-            XCTAssertEqual(kvo as! ObjectId, o)
+            XCTAssertEqual(kvc as! ObjectId, o)
         case let .string(s):
-            XCTAssertEqual(kvo as! String, s)
+            XCTAssertEqual(kvc as! String, s)
         case let .uuid(u):
-            XCTAssertEqual(kvo as! UUID, u)
+            XCTAssertEqual(kvc as! UUID, u)
         }
 
         assertThrows(mutableSet.value(forKey: "not self"), named: "NSUnknownKeyException")
@@ -954,6 +960,390 @@ class ManagedAnyRealmValueMutableSetTests: TestCase {
     class func _defaultTestSuite() -> XCTestSuite {
         let suite = XCTestSuite(name: "Managed Primitive Sets")
         addAnyRealmValueMutableSetTests(suite, ManagedObjectFactory.self)
+        return suite
+    }
+
+    override class var defaultTestSuite: XCTestSuite {
+        return _defaultTestSuite()
+    }
+}
+
+// MARK: - Map tests
+
+class AnyRealmValueMapStringIntFactory: MapValueFactory {
+    static func values() -> [(key: String, value: AnyRealmValue)] {
+        [("key1", .int(123)), ("key2", .int(456)), ("key3", .int(789))]
+    }
+
+    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
+        return obj.any
+    }
+}
+
+class AnyRealmValueMapStringBoolFactory: MapValueFactory {
+    static func values() -> [(key: String, value: AnyRealmValue)] {
+        [("key1", .bool(true)), ("key2", .bool(false)), ("key3", .none)]
+    }
+
+    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
+        return obj.any
+    }
+}
+
+class AnyRealmValueMapStringFloatFactory: MapValueFactory {
+    static func values() -> [(key: String, value: AnyRealmValue)] {
+        [("key1", .float(123.456)), ("key2", .float(456.789)), ("key3", .float(789.123456))]
+    }
+
+    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
+        return obj.any
+    }
+}
+
+class AnyRealmValueMapStringDoubleFactory: MapValueFactory {
+    static func values() -> [(key: String, value: AnyRealmValue)] {
+        [("key1", .double(123.456)), ("key2", .double(456.789)), ("key3", .double(789.123456))]
+    }
+
+    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
+        return obj.any
+    }
+}
+
+class AnyRealmValueMapStringStringFactory: MapValueFactory {
+    static func values() -> [(key: String, value: AnyRealmValue)] {
+        [("key1", .string("Hello There")), ("key2", .string("This is")), ("key3", .string("A test..."))]
+    }
+
+    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
+        return obj.any
+    }
+}
+
+class AnyRealmValueMapStringDataFactory: MapValueFactory {
+    static func values() -> [(key: String, value: AnyRealmValue)] {
+        func data(_ byte: UInt8) -> AnyRealmValue {
+            .data(Data.init(repeating: byte, count: 64))
+        }
+        return [("key1", data(11)), ("key2", data(22)), ("key3", data(33))]
+    }
+
+    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
+        return obj.any
+    }
+}
+
+class AnyRealmValueMapStringDateFactory: MapValueFactory {
+    static func values() -> [(key: String, value: AnyRealmValue)] {
+        func date(_ timestamp: TimeInterval) -> AnyRealmValue {
+            .date(Date(timeIntervalSince1970: timestamp))
+        }
+        return [("key1", date(1614445927)), ("key2", date(1614555927)), ("key3", date(1614665927))]
+    }
+
+    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
+        return obj.any
+    }
+}
+
+class AnyRealmValueMapStringObjectFactory: MapValueFactory {
+    static func values() -> [(key: String, value: AnyRealmValue)] {
+        func object(_ string: String) -> AnyRealmValue {
+            let o = SwiftStringObject()
+            o.stringCol = string
+            return .object(o)
+        }
+        return [("key1", object("Hello")), ("key2", object("I am")), ("key3", object("an object"))]
+    }
+
+    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
+        return obj.any
+    }
+}
+
+class AnyRealmValueMapStringObjectIdFactory: MapValueFactory {
+    static func values() -> [(key: String, value: AnyRealmValue)] {
+        [("key1", .objectId(.init("6056670f1a2a5b103c9affda"))),
+         ("key2", .objectId(.init("6056670f1a2a5b103c9affdd"))),
+         ("key3", .objectId(.init("605667111a2a5b103c9affe1")))]
+    }
+
+    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
+        return obj.any
+    }
+}
+
+class AnyRealmValueMapStringDecimal128Factory: MapValueFactory {
+    static func values() -> [(key: String, value: AnyRealmValue)] {
+        func decima128(_ double: Double) -> AnyRealmValue {
+            .decimal128(.init(floatLiteral: double))
+        }
+        return [("key1", decima128(123.456)), ("key2", decima128(993.456789)), ("key3", decima128(9874546.65456489))]
+    }
+
+    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
+        return obj.any
+    }
+}
+
+class AnyRealmValueMapStringUUIDFactory: MapValueFactory {
+    static func values() -> [(key: String, value: AnyRealmValue)] {
+        [("key1", .uuid(UUID(uuidString: "7729028A-FB89-4555-81C3-C55F7DDBA5CF")!)),
+         ("key2", .uuid(UUID(uuidString: "0F0359D8-8D74-409D-8561-C8EBE3753635")!)),
+         ("key3", .uuid(UUID(uuidString: "0F0359D8-8D74-409D-8561-C8EBE3753636")!))]
+    }
+
+    static func map(_ obj: SwiftMapObject) -> Map<String, AnyRealmValue> {
+        return obj.any
+    }
+}
+
+class AnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.T == AnyRealmValue {
+    func testInvalidated() {
+        XCTAssertFalse(map.isInvalidated)
+        if let realm = obj.realm {
+            realm.delete(obj)
+            XCTAssertTrue(map.isInvalidated)
+        }
+    }
+
+    // KVC requires the key to be a string.
+    func testValueForKey() {
+        if let key = values[0].key as? String {
+            XCTAssertNil(map.value(forKey: key))
+            map[values[0].key] = values[0].value
+            let kvc: AnyObject? = map.value(forKey: key)
+            switch values[0].value {
+            case let .object(o):
+                if let obj = kvc as? SwiftStringObject {
+                    XCTAssertEqual(obj.stringCol, (o as! SwiftStringObject).stringCol)
+                } else {
+                    XCTFail("not an object")
+                }
+            case let .bool(b):
+                XCTAssertEqual(kvc as! Bool, b)
+            case let .data(d):
+                XCTAssertEqual(kvc as! Data, d)
+            case let .date(d):
+                XCTAssertEqual(kvc as! Date, d)
+            case let .decimal128(d):
+                XCTAssertEqual(kvc as! Decimal128, d)
+            case let .double(d):
+                XCTAssertEqual(kvc as! Double, d)
+            case let .float(f):
+                XCTAssertEqual(kvc as! Float, f)
+            case let .int(i):
+                XCTAssertEqual(kvc as! Int, i)
+            case .none:
+                XCTAssertNil(kvc)
+            case let .objectId(o):
+                XCTAssertEqual(kvc as! ObjectId, o)
+            case let .string(s):
+                XCTAssertEqual(kvc as! String, s)
+            case let .uuid(u):
+                XCTAssertEqual(kvc as! UUID, u)
+            }
+        }
+    }
+
+    func assertValue(_ value: V.T, key: V.Key) {
+        if case let .object(o) = map[key] {
+            XCTAssertTrue(map.contains(where: { key, value in
+                return key == key && (value.object(SwiftStringObject.self)!.stringCol == o["stringCol"] as! String)
+            }))
+        } else {
+            XCTAssertTrue(map.contains(where: { k, v in
+                return k == key && v == value
+            }))
+        }
+    }
+
+    func testInsert() {
+        XCTAssertEqual(0, map.count)
+
+        map[values[0].key] = values[0].value
+        XCTAssertEqual(1, map.count)
+        XCTAssertEqual(1, map.keys.count)
+        XCTAssertEqual(1, map.values.count)
+        XCTAssertTrue(Set([values[0].key]).isSubset(of: map.keys))
+        assertValue(values[0].value, key: values[0].key)
+
+        map[values[1].key] = values[1].value
+        XCTAssertEqual(2, map.count)
+        XCTAssertEqual(2, map.keys.count)
+        XCTAssertEqual(2, map.values.count)
+        XCTAssertTrue(Set([values[0].key, values[1].key]).isSubset(of: map.keys))
+        assertValue(values[1].value, key: values[1].key)
+
+        map[values[2].key] = values[2].value
+        XCTAssertEqual(3, map.count)
+        XCTAssertEqual(3, map.keys.count)
+        XCTAssertEqual(3, map.values.count)
+        XCTAssertTrue(Set(values.map { $0.key }).isSubset(of: map.keys))
+        assertValue(values[2].value, key: values[2].key)
+    }
+
+    func testRemove() {
+        XCTAssertEqual(0, map.count)
+        for element in values {
+            map[element.key] = element.value
+        }
+        XCTAssertEqual(3, map.count)
+        XCTAssertEqual(3, map.keys.count)
+        XCTAssertEqual(3, map.values.count)
+        XCTAssertTrue(Set(values.map { $0.key }).isSubset(of: map.keys))
+
+        // KVC requires a string for the key
+        if V.Key.self is String.Type {
+            if let key = values[0].key as? String {
+                map.setValue(nil, forKey: key)
+                XCTAssertNil(map.value(forKey: key))
+            }
+        }
+        map.removeAll()
+        XCTAssertEqual(0, map.count)
+
+        for element in values {
+            map[element.key] = element.value
+        }
+
+        map[values[1].key] = nil
+        XCTAssertNil(map[values[1].key])
+        map.removeObject(for: values[2].key)
+        // make sure the key was deleted
+        XCTAssertTrue(Set([values[0].key]).isSubset(of: map.keys))
+    }
+
+    func testSubscript() {
+        // setter
+        XCTAssertEqual(0, map.count)
+        map[values[0].key] = values[0].value
+        map[values[1].key] = values[1].value
+        map[values[2].key] = values[2].value
+        XCTAssertEqual(3, map.count)
+        XCTAssertEqual(3, map.keys.count)
+        XCTAssertEqual(3, map.values.count)
+        XCTAssertTrue(Set(values.map { $0.key }).isSubset(of: map.keys))
+        map[values[0].key] = values[0].value
+        map[values[1].key] = nil
+        map[values[2].key] = values[2].value
+        XCTAssertEqual(2, map.count)
+        XCTAssertEqual(2, map.keys.count)
+        XCTAssertEqual(2, map.values.count)
+        XCTAssertTrue(Set([values[0].key, values[2].key]).isSubset(of: map.keys))
+        map[values[0].key] = AnyRealmValue.none
+        XCTAssertEqual(2, map.count)
+        XCTAssertEqual(2, map.keys.count)
+        XCTAssertEqual(2, map.values.count)
+        XCTAssertTrue(Set([values[0].key, values[2].key]).isSubset(of: map.keys))
+        // getter
+        map.removeAll()
+        XCTAssertNil(map[values[0].key])
+        map[values[0].key] = values[0].value
+        if case let .object(o) = map[values[0].key] {
+            XCTAssertEqual(values[0].value.object(SwiftStringObject.self)!.stringCol, (o as! SwiftStringObject).stringCol)
+        } else {
+            XCTAssertEqual(values[0].value, map[values[0].key])
+        }
+    }
+}
+
+class MinMaxAnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.T == AnyRealmValue {
+    func testMin() {
+        XCTAssertNil(map.min())
+        for element in values {
+            map[element.key] = element.value
+        }
+        XCTAssertEqual(map.min(), values.first?.value)
+    }
+
+    func testMax() {
+        XCTAssertNil(map.max())
+        for element in values {
+            map[element.key] = element.value
+        }
+        XCTAssertEqual(map.max(), values.last?.value)
+    }
+}
+
+class AddableAnyRealmValueMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.T == AnyRealmValue {
+    func testSum() {
+        XCTAssertEqual(map.sum().intValue, 0)
+        for element in values {
+            map[element.key] = element.value
+        }
+
+        let expected = ((values.map { $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber)
+
+        // An unmanaged collection will return a double
+        if case let .double(d) = map.sum() {
+            XCTAssertEqual(d, expected.doubleValue)
+        } else if case let .decimal128(d) = map.sum() {
+            // A managed collection of AnyRealmValue will return a Decimal128 for `sum()`
+            XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
+        }
+    }
+
+    func testAverage() {
+        XCTAssertNil(map.average() as V.AverageType?)
+        for element in values {
+            map[element.key] = element.value
+        }
+
+        let expected = ((values.map { $0.value }.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber)
+
+        let v: AnyRealmValue? = map.average()
+        // An unmanaged collection will return a double
+        if case let .double(d) = v {
+            XCTAssertEqual(d, expected.doubleValue)
+        } else if case let .decimal128(d) = v {
+            // A managed collection of AnyRealmValue will return a Decimal128 for `avg()`
+            XCTAssertEqual(d.doubleValue, expected.doubleValue, accuracy: 0.1)
+        }
+    }
+}
+
+func addAnyRealmValueMapTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
+    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringIntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringBoolFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringStringFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringDataFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringDateFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringObjectFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringObjectIdFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AnyRealmValueMapTests<OF, AnyRealmValueMapStringUUIDFactory>._defaultTestSuite().tests.map(suite.addTest)
+
+    _ = MinMaxAnyRealmValueMapTests<OF, AnyRealmValueMapStringIntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueMapTests<OF, AnyRealmValueMapStringFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueMapTests<OF, AnyRealmValueMapStringDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueMapTests<OF, AnyRealmValueMapStringDateFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxAnyRealmValueMapTests<OF, AnyRealmValueMapStringDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+
+    _ = AddableAnyRealmValueMapTests<OF, AnyRealmValueMapStringIntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddableAnyRealmValueMapTests<OF, AnyRealmValueMapStringFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddableAnyRealmValueMapTests<OF, AnyRealmValueMapStringDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddableAnyRealmValueMapTests<OF, AnyRealmValueMapStringDecimal128Factory>._defaultTestSuite().tests.map(suite.addTest)
+}
+
+class UnmanagedAnyRealmValueMapTests: TestCase {
+    class func _defaultTestSuite() -> XCTestSuite {
+        let suite = XCTestSuite(name: "Unmanaged AnyRealmValue Maps")
+        addAnyRealmValueMapTests(suite, UnmanagedObjectFactory.self)
+        return suite
+    }
+
+    override class var defaultTestSuite: XCTestSuite {
+        return _defaultTestSuite()
+    }
+}
+
+class ManagedAnyRealmValueMapTests: TestCase {
+    class func _defaultTestSuite() -> XCTestSuite {
+        let suite = XCTestSuite(name: "Managed AnyRealmValue Maps")
+        addAnyRealmValueMapTests(suite, ManagedObjectFactory.self)
         return suite
     }
 

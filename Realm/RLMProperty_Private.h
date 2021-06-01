@@ -89,6 +89,7 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
 @property (nonatomic, readwrite) BOOL optional;
 @property (nonatomic, readwrite) BOOL array;
 @property (nonatomic, readwrite) BOOL set;
+@property (nonatomic, readwrite) BOOL dictionary;
 @property (nonatomic, copy, nullable) NSString *objectClassName;
 @property (nonatomic, copy, nullable) NSString *linkOriginPropertyName;
 
@@ -98,6 +99,7 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
 @property (nonatomic, assign) BOOL isPrimary;
 @property (nonatomic, assign, nullable) Ivar swiftIvar;
 @property (nonatomic, assign, nullable) Class swiftAccessor;
+@property (nonatomic, readwrite, assign) RLMPropertyType dictionaryKeyType;
 
 // getter and setter names
 @property (nonatomic, copy) NSString *getterName;

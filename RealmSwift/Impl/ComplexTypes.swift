@@ -31,6 +31,9 @@ extension Object: _RealmSchemaDiscoverable {
         if prop.optional && prop.set {
             throwRealmException("MutableSet<\(className())> property '\(prop.name)' must not be marked as optional.")
         }
+        if !prop.optional && prop.dictionary {
+            throwRealmException("Map<String, \(className())> property '\(prop.name)' must be marked as optional.")
+        }
         prop.objectClassName = className()
     }
 }
@@ -61,6 +64,18 @@ extension MutableSet: _RealmSchemaDiscoverable where Element: _RealmSchemaDiscov
         prop.set = true
         prop.swiftAccessor = SetAccessor<Element>.self
         Element._rlmPopulateProperty(prop)
+    }
+}
+
+extension Map: _RealmSchemaDiscoverable where Value: _RealmSchemaDiscoverable {
+    public static var _rlmType: PropertyType { Value._rlmType }
+    public static var _rlmOptional: Bool { Value._rlmOptional }
+    public static var _rlmRequireObjc: Bool { false }
+    public static func _rlmPopulateProperty(_ prop: RLMProperty) {
+        prop.dictionary = true
+        prop.swiftAccessor = MapAccessor<Key, Value>.self
+        prop.dictionaryKeyType = Key._rlmType
+        Value._rlmPopulateProperty(prop)
     }
 }
 

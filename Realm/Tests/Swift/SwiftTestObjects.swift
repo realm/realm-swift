@@ -50,7 +50,7 @@ class SwiftRLMObject: RLMObject {
     @objc dynamic var arrayCol = RLMArray<SwiftRLMBoolObject>(objectClassName: SwiftRLMBoolObject.className())
     @objc dynamic var setCol = RLMSet<SwiftRLMBoolObject>(objectClassName: SwiftRLMBoolObject.className())
     @objc dynamic var uuidCol = UUID(uuidString: "00000000-0000-0000-0000-000000000000")
-    @objc dynamic var rlmValue: RLMValue = NSString("A Mixed Object")
+    @objc dynamic var rlmValue: RLMValue = "A Mixed Object" as NSString
 }
 
 class SwiftRLMOptionalObject: RLMObject {
@@ -117,6 +117,7 @@ class SwiftRLMEmployeeObject: RLMObject {
 class SwiftRLMCompanyObject: RLMObject {
     @objc dynamic var employees = RLMArray<SwiftRLMEmployeeObject>(objectClassName: SwiftRLMEmployeeObject.className())
     @objc dynamic var employeeSet = RLMSet<SwiftRLMEmployeeObject>(objectClassName: SwiftRLMEmployeeObject.className())
+    @objc dynamic var employeeMap = RLMDictionary<NSString, SwiftRLMEmployeeObject>(objectClassName: SwiftRLMEmployeeObject.className(), keyType: .string)
 }
 
 class SwiftRLMAggregateSet: RLMObject {
@@ -133,6 +134,14 @@ class SwiftRLMSetPropertyObject: RLMObject {
     @objc dynamic var name = ""
     @objc dynamic var set = RLMSet<SwiftRLMStringObject>(objectClassName: SwiftRLMStringObject.className())
     @objc dynamic var intSet = RLMSet<SwiftRLMIntObject>(objectClassName: SwiftRLMIntObject.className())
+}
+
+class SwiftRLMDictionaryPropertyObject: RLMObject {
+    @objc dynamic var dict = RLMDictionary<NSString, SwiftRLMAggregateObject>(objectClassName: SwiftRLMAggregateObject.className(), keyType: .string)
+}
+
+class SwiftRLMDictionaryEmployeeObject: RLMObject {
+    @objc dynamic var dict = RLMDictionary<NSString, SwiftRLMEmployeeObject>(objectClassName: SwiftRLMEmployeeObject.className(), keyType: .string)
 }
 
 class SwiftRLMDynamicObject: RLMObject {

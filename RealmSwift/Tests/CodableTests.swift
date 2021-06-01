@@ -19,6 +19,7 @@
 import XCTest
 import RealmSwift
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 final class CodableObject: Object, Codable {
     @objc dynamic var string: String = ""
     @objc dynamic var data: Data = Data()

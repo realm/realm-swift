@@ -18,7 +18,10 @@
 
 #import <Realm/RLMCollection_Private.h>
 
+#import <realm/object-store/collection_notifications.hpp>
+
 #import <vector>
+#import <mutex>
 
 namespace realm {
     class List;
@@ -26,14 +29,15 @@ namespace realm {
     class Results;
     class TableView;
     struct CollectionChangeSet;
-    struct NotificationToken;
+    struct ColKey;
     namespace object_store {
-        class Set;
         class Collection;
+        class Dictionary;
+        class Set;
     }
 }
 class RLMClassInfo;
-@class RLMFastEnumerator, RLMManagedArray, RLMManagedSet, RLMProperty, RLMObjectBase;
+@class RLMFastEnumerator, RLMManagedArray, RLMManagedSet, RLMManagedDictionary, RLMProperty, RLMObjectBase;
 
 @protocol RLMFastEnumerable
 @property (nonatomic, readonly) RLMRealm *realm;
@@ -51,6 +55,10 @@ class RLMClassInfo;
 
 - (instancetype)initWithBackingCollection:(realm::object_store::Collection const&)backingCollection
                                collection:(id)collection
+                                classInfo:(RLMClassInfo&)info;
+
+- (instancetype)initWithBackingDictionary:(realm::object_store::Dictionary const&)backingDictionary
+                               dictionary:(RLMManagedDictionary *)dictionary
                                 classInfo:(RLMClassInfo&)info;
 
 - (instancetype)initWithResults:(realm::Results&)results
@@ -75,7 +83,16 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state, NSUInteger len, id<RL
 - (instancetype)initWithChanges:(realm::CollectionChangeSet)indices;
 @end
 
+@interface RLMCancellationToken : RLMNotificationToken {
+@public
+    __unsafe_unretained RLMRealm *_realm;
+    realm::NotificationToken _token;
+    std::mutex _mutex;
+}
+@end
+
 realm::object_store::Set& RLMGetBackingCollection(RLMManagedSet *);
+realm::object_store::Dictionary& RLMGetBackingCollection(RLMManagedDictionary *);
 realm::List& RLMGetBackingCollection(RLMManagedArray *);
 realm::Results& RLMGetBackingCollection(RLMResults *);
 
@@ -89,10 +106,11 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
 
 std::vector<std::pair<std::string, bool>> RLMSortDescriptorsToKeypathArray(NSArray<RLMSortDescriptor *> *properties);
 
-template<typename Collection, typename ObjcCollection>
-id RLMManagedCollectionFromCollection(RLMClassInfo* info, realm::Obj&& obj, RLMProperty *prop);
-template<typename Fn>
-void RLMGetCollectionType(RLMProperty *prop, Fn&& func);
+realm::ColKey columnForProperty(NSString *propertyName,
+                                realm::object_store::Collection const& backingCollection,
+                                RLMClassInfo *objectInfo,
+                                RLMPropertyType propertyType,
+                                RLMCollectionType collectionType);
 
 static inline bool canAggregate(RLMPropertyType type, bool allowDate) {
     switch (type) {

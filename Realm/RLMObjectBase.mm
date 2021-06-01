@@ -111,7 +111,15 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
     }
     if (prop.type == RLMPropertyTypeObject) {
         Class objectClass = schema[prop.objectClassName].objectClass;
-        if (prop.collection) {
+        if (prop.dictionary) {
+            NSMutableDictionary *ret = [[NSMutableDictionary alloc] init];
+            for (id key in obj) {
+                id val = coerceToObjectType(obj[key], objectClass, schema);
+                [ret setObject:val forKey:key];
+            }
+            return ret;
+        }
+        else if (prop.collection) {
             NSMutableArray *ret = [[NSMutableArray alloc] init];
             for (id el in obj) {
                 [ret addObject:coerceToObjectType(el, objectClass, schema)];

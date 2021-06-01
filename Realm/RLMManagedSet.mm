@@ -66,7 +66,8 @@
     if (property.type == RLMPropertyTypeObject)
         self = [self initWithObjectClassName:property.objectClassName];
     else
-        self = [self initWithObjectType:property.type optional:property.optional];
+        self = [self initWithObjectType:property.type
+                               optional:property.optional];
     if (self) {
         _realm = parentInfo->realm;
         REALM_ASSERT(set.get_realm() == _realm->_realm);
@@ -410,35 +411,25 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     }
 }
 
-- (realm::ColKey)columnForProperty:(NSString *)propertyName {
-    if (_backingSet.get_type() == realm::PropertyType::Object) {
-        return _objectInfo->tableColumn(propertyName);
-    }
-    if (![propertyName isEqualToString:@"self"]) {
-        @throw RLMException(@"Sets of '%@' can only be aggregated on \"self\"", RLMTypeToString(_type));
-    }
-    return {};
-}
-
 - (id)minOfProperty:(NSString *)property {
-    auto column = [self columnForProperty:property];
+    auto column = columnForProperty(property, _backingSet, _objectInfo, _type, RLMCollectionTypeSet);
     auto value = translateErrors(self, [&] { return _backingSet.min(column); }, @"minOfProperty");
     return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)maxOfProperty:(NSString *)property {
-    auto column = [self columnForProperty:property];
+    auto column = columnForProperty(property, _backingSet, _objectInfo, _type, RLMCollectionTypeSet);
     auto value = translateErrors(self, [&] { return _backingSet.max(column); }, @"maxOfProperty");
     return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)sumOfProperty:(NSString *)property {
-    auto column = [self columnForProperty:property];
+    auto column = columnForProperty(property, _backingSet, _objectInfo, _type, RLMCollectionTypeSet);
     return RLMMixedToObjc(translateErrors(self, [&] { return _backingSet.sum(column); }, @"sumOfProperty"));
 }
 
 - (id)averageOfProperty:(NSString *)property {
-    auto column = [self columnForProperty:property];
+    auto column = columnForProperty(property, _backingSet, _objectInfo, _type, RLMCollectionTypeSet);
     auto value = translateErrors(self, [&] { return _backingSet.average(column); }, @"averageOfProperty");
     return value ? RLMMixedToObjc(*value) : nil;
 }

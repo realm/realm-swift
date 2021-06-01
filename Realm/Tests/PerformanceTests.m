@@ -263,6 +263,27 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     }];
 }
 
+- (void)testEnumerateAndAccessDictionaryPropertySlow {
+    RLMRealm *realm = [self getStringObjects:5];
+
+    [realm beginWriteTransaction];
+    DictionaryPropertyObject *dpo = [DictionaryPropertyObject
+                                     createInRealm:realm
+                                     withValue:@[]];
+    for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
+        NSString *key = [[NSUUID UUID] UUIDString];
+        dpo.stringDictionary[key] = so;
+    }
+    [realm commitWriteTransaction];
+
+    [self measureBlock:^{
+        RLMDictionary *d = dpo.stringDictionary;
+        for (NSUInteger i = 0; i < d.count; ++i) {
+            (void)d.count;
+        }
+    }];
+}
+
 - (void)testEnumerateAndMutateAll {
     RLMRealm *realm = [self getStringObjects:5];
 

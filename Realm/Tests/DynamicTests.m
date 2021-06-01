@@ -309,6 +309,45 @@
     [dyrealm commitWriteTransaction];
 }
 
+- (void)testDynamicDictionary {
+    @autoreleasepool {
+        // open realm in autoreleasepool to create tables and then dispose
+        [RLMRealm realmWithURL:RLMTestRealmURL()];
+    }
+    RLMRealm *dyrealm = [self realmWithTestPathAndSchema:nil];
+    [dyrealm beginWriteTransaction];
+
+    RLMObject *stringObject = [dyrealm createObject:StringObject.className withValue:@[@"string"]];
+    RLMObject *stringObject1 = [dyrealm createObject:StringObject.className withValue:@[@"string1"]];
+    [dyrealm createObject:DictionaryPropertyObject.className withValue:@{
+        @"stringDictionary": @{@"0": stringObject, @"1": stringObject1},
+        @"intObjDictionary": @{@"0": @{@"intCol":@0}, @"1": @{@"intCol":@1}},
+        @"primitiveStringDictionary": @{},
+        @"embeddedDictionary": @{}
+    }];
+
+    RLMResults<RLMObject *> *results = [dyrealm allObjects:DictionaryPropertyObject.className];
+    XCTAssertEqual(1U, results.count);
+    RLMObject *dictionaryObj = results.firstObject;
+    RLMDictionary<NSString *, RLMObject *> *dictionary = dictionaryObj[@"stringDictionary"];
+
+    XCTAssertEqual(2U, dictionary.count);
+    XCTAssertEqualObjects(dictionary[@"0"][@"stringCol"], stringObject[@"stringCol"]);
+    XCTAssertEqualObjects(dictionary[@"1"][@"stringCol"], stringObject1[@"stringCol"]);
+
+    dictionaryObj[@"stringDictionary"][@"0"] = nil;
+    XCTAssertEqual(1U, dictionary.count);
+
+    dictionaryObj[@"stringDictionary"] = @{};
+    XCTAssertEqual(0U, dictionary.count);
+
+    dictionaryObj[@"stringDictionary"] = @{@"0": stringObject, @"1": stringObject1};
+    XCTAssertEqualObjects(dictionary.allValues[0][@"stringCol"], stringObject[@"stringCol"]);
+    XCTAssertEqualObjects(dictionary.allValues[1][@"stringCol"], stringObject1[@"stringCol"]);
+
+    [dyrealm commitWriteTransaction];
+}
+
 - (void)testOptionalProperties {
     @autoreleasepool {
         // open realm in autoreleasepool to create tables and then dispose

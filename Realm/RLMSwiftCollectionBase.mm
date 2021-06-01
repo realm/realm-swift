@@ -25,6 +25,7 @@
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSet_Private.hpp"
+#import "RLMDictionary_Private.hpp"
 
 @interface RLMArray (KVO)
 - (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes;
@@ -76,6 +77,11 @@
 // Only in use for RLMArray
 - (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
     return [(RLMArray *)self._rlmCollection objectsAtIndexes:indexes];
+}
+
+// Only in use for RLMDictionary
+- (id)objectForKeyedSubscript:(id)key {
+    return [(RLMDictionary *)self._rlmCollection objectForKeyedSubscript:key];
 }
 
 - (BOOL)isEqual:(id)object {

@@ -142,6 +142,9 @@
 @implementation ArrayOfAllTypesObject
 @end
 
+@implementation DictionaryOfAllTypesObject
+@end
+
 @implementation SetOfAllTypesObject
 @end
 
@@ -169,7 +172,22 @@
 @implementation AllOptionalPrimitiveArrays
 @end
 
+@implementation AllDictionariesObject
+@end
+
 @implementation AllOptionalPrimitiveSets
+@end
+
+@implementation AllPrimitiveDictionaries
++ (NSArray *)requiredProperties {
+    return @[@"intObj", @"floatObj", @"doubleObj", @"boolObj", @"stringObj",
+             @"dateObj", @"dataObj", @"decimalObj", @"objectIdObj", @"uuidObj",
+             @"intObj2", @"floatObj2", @"doubleObj2", @"boolObj2", @"stringObj2",
+             @"dateObj2", @"dataObj2", @"decimalObj2", @"objectIdObj2", @"uuidObj2"];
+}
+@end
+
+@implementation AllOptionalPrimitiveDictionaries
 @end
 
 @implementation AllOptionalTypesPK
@@ -270,6 +288,11 @@
 @implementation CircleSetObject
 @end
 
+#pragma mark CircleDictionaryObject
+
+@implementation CircleDictionaryObject
+@end
+
 #pragma mark ArrayPropertyObject
 
 @implementation ArrayPropertyObject
@@ -278,6 +301,11 @@
 #pragma mark SetPropertyObject
 
 @implementation SetPropertyObject
+@end
+
+#pragma mark DictionaryPropertyObject
+
+@implementation DictionaryPropertyObject
 @end
 
 #pragma mark DynamicTestObject
@@ -292,6 +320,8 @@
 @implementation AggregateArrayObject
 @end
 @implementation AggregateSetObject
+@end
+@implementation AggregateDictionaryObject
 @end
 
 #pragma mark PrimaryStringObject
@@ -352,6 +382,10 @@
 @implementation IntegerSetPropertyObject
 @end
 
+#pragma mark IntegerDictionaryPropertyObject
+
+@implementation IntegerDictionaryPropertyObject
+@end
 
 @implementation NumberObject
 @end

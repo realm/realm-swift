@@ -832,6 +832,44 @@ class ObjectAccessorTests: TestCase {
         XCTAssertEqual((get(object, "int") as! MutableSet<Int>).count, 0)
     }
 
+    func setAndTestMapViaAccessor(_ object: ObjectBase) {
+        XCTAssertTrue(get(object, "int") is Map<String, Int>)
+        XCTAssertTrue(get(object, "int8") is Map<String, Int8>)
+        XCTAssertTrue(get(object, "int16") is Map<String, Int16>)
+        XCTAssertTrue(get(object, "int32") is Map<String, Int32>)
+        XCTAssertTrue(get(object, "int64") is Map<String, Int64>)
+        XCTAssertTrue(get(object, "float") is Map<String, Float>)
+        XCTAssertTrue(get(object, "double") is Map<String, Double>)
+        XCTAssertTrue(get(object, "string") is Map<String, String>)
+        XCTAssertTrue(get(object, "data") is Map<String, Data>)
+        XCTAssertTrue(get(object, "date") is Map<String, Date>)
+        XCTAssertTrue(get(object, "decimal") is Map<String, Decimal128>)
+        XCTAssertTrue(get(object, "objectId") is Map<String, ObjectId>)
+        XCTAssertTrue(get(object, "uuid") is Map<String, UUID>)
+        XCTAssertTrue(get(object, "any") is Map<String, AnyRealmValue>)
+
+        XCTAssertTrue(get(object, "intOpt") is Map<String, Int?>)
+        XCTAssertTrue(get(object, "int8Opt") is Map<String, Int8?>)
+        XCTAssertTrue(get(object, "int16Opt") is Map<String, Int16?>)
+        XCTAssertTrue(get(object, "int32Opt") is Map<String, Int32?>)
+        XCTAssertTrue(get(object, "int64Opt") is Map<String, Int64?>)
+        XCTAssertTrue(get(object, "floatOpt") is Map<String, Float?>)
+        XCTAssertTrue(get(object, "doubleOpt") is Map<String, Double?>)
+        XCTAssertTrue(get(object, "stringOpt") is Map<String, String?>)
+        XCTAssertTrue(get(object, "dataOpt") is Map<String, Data?>)
+        XCTAssertTrue(get(object, "dateOpt") is Map<String, Date?>)
+        XCTAssertTrue(get(object, "decimalOpt") is Map<String, Decimal128?>)
+        XCTAssertTrue(get(object, "objectIdOpt") is Map<String, ObjectId?>)
+        XCTAssertTrue(get(object, "uuidOpt") is Map<String, UUID?>)
+
+        set(object, "int", ["one": 1, "two": 2, "three": 3])
+        XCTAssertEqual((get(object, "int") as! Map<String, Int>)["one"], 1)
+        XCTAssertEqual((get(object, "int") as! Map<String, Int>)["two"], 2)
+        XCTAssertEqual((get(object, "int") as! Map<String, Int>)["three"], 3)
+        set(object, "int", NSNull())
+        XCTAssertEqual((get(object, "int") as! Map<String, Int>).count, 0)
+    }
+
     func testUnmanagedAccessors() {
         setAndTestAllPropertiesViaNormalAccess(SwiftObject(), SwiftOptionalObject())
         setAndTestAllPropertiesViaSubscript(SwiftObject(), SwiftOptionalObject())
@@ -841,6 +879,7 @@ class ObjectAccessorTests: TestCase {
         setAndTestRealmOptionalViaAccessor(SwiftOptionalObject())
         setAndTestListViaAccessor(SwiftListObject())
         setAndTestSetViaAccessor(SwiftMutableSetObject())
+        setAndTestMapViaAccessor(SwiftMapObject())
     }
 
     func testManagedAccessors() {
@@ -856,6 +895,7 @@ class ObjectAccessorTests: TestCase {
         setAndTestRealmOptionalViaAccessor(optionalObject)
         setAndTestListViaAccessor(realm.create(SwiftListObject.self))
         setAndTestSetViaAccessor(realm.create(SwiftMutableSetObject.self))
+        setAndTestMapViaAccessor(realm.create(SwiftMapObject.self))
         realm.cancelWrite()
     }
 

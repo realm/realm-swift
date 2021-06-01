@@ -147,6 +147,15 @@
     return george;
 }
 
++ (instancetype)stuart {
+    Person *stuart = [[Person alloc] init];
+    stuart._id = [RLMObjectId objectId];
+    stuart.age = 30;
+    stuart.firstName = @"Stuart";
+    stuart.lastName = @"Sutcliffe";
+    return stuart;
+}
+
 @end
 
 #pragma mark HugeSyncObject
@@ -257,6 +266,26 @@
              @"otherStringSet", @"otherDataSet",
              @"otherDoubleSet", @"otherObjectIdSet",
              @"otherDecimalSet", @"otherUuidSet", @"otherAnySet"];
+}
+
+@end
+
+#pragma mark RLMDictionarySyncObject
+
+@implementation RLMDictionarySyncObject
+
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"_id": [RLMObjectId objectId]};
+}
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
+
++ (NSArray *)requiredProperties {
+    return @[@"intDictionary", @"boolDictionary", @"stringDictionary",
+             @"dataDictionary", @"doubleDictionary", @"objectIdDictionary",
+             @"decimalDictionary", @"uuidDictionary", @"anyDictionary"];
 }
 
 @end
@@ -510,7 +539,7 @@ static NSURL *syncDirectoryForChildProcess() {
     c.encryptionKey = encryptionKey;
     c.objectClasses = @[Dog.self, Person.self, HugeSyncObject.self, RLMSetSyncObject.self,
                         RLMArraySyncObject.self, UUIDPrimaryKeyObject.self, StringPrimaryKeyObject.self,
-                        IntPrimaryKeyObject.self, AllTypesSyncObject.self];
+                        IntPrimaryKeyObject.self, AllTypesSyncObject.self, RLMDictionarySyncObject.self];
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.stopPolicy = stopPolicy;
     c.syncConfiguration = syncConfig;

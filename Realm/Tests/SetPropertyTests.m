@@ -853,7 +853,7 @@
 
     // collection
     XCTAssertEqualObjects([c1.employeeSet valueForKeyPath:@"@unionOfObjects.name"],
-                          (@[@"C", @"A", @"B"]));
+                          (@[@"A", @"B", @"C"]));
 
     XCTAssertEqualObjects([[c1.employeeSet valueForKeyPath:@"@distinctUnionOfObjects.name"] sortedArrayUsingSelector:@selector(compare:)],
                           (@[@"A", @"B", @"C"]));

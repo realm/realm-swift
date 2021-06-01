@@ -1,4 +1,25 @@
 x.y.z Release notes (yyyy-MM-dd)
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* Add `RLMDictionary`/`Map<>` datatype. This is a Dictionary collection type used for storing key-value pairs in a collection.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
+
+### Internal
+* Upgraded realm-core from v11.0.0-beta.4 to v11.0.0-beta.5
+
+10.8.0-beta.0 Release notes (2021-05-07)
 =============================================================
 ### Enhancements
 * Add `RLMSet`/`MutableSet<>` datatype. This is a Set collection type used for storing distinct values in a collection.

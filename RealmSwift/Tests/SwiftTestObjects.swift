@@ -78,6 +78,7 @@ class SwiftObject: Object {
 
     let arrayCol = List<SwiftBoolObject>()
     let setCol = MutableSet<SwiftBoolObject>()
+    let mapCol = Map<String, SwiftBoolObject?>()
 
     class func defaultValues() -> [String: Any] {
         return  [
@@ -97,7 +98,8 @@ class SwiftObject: Object {
             "objectCol": [false],
             "uuidCol": UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
             "arrayCol": [],
-            "setCol": []
+            "setCol": [],
+            "mapCol": [:]
         ]
     }
 }
@@ -191,6 +193,40 @@ class SwiftMutableSetObject: Object {
     let decimalOpt = MutableSet<Decimal128?>()
     let objectIdOpt = MutableSet<ObjectId?>()
     let uuidOpt = MutableSet<UUID?>()
+}
+
+class SwiftMapObject: Object {
+    let int = Map<String, Int>()
+    let int8 = Map<String, Int8>()
+    let int16 = Map<String, Int16>()
+    let int32 = Map<String, Int32>()
+    let int64 = Map<String, Int64>()
+    let float = Map<String, Float>()
+    let double = Map<String, Double>()
+    let bool = Map<String, Bool>()
+    let string = Map<String, String>()
+    let data = Map<String, Data>()
+    let date = Map<String, Date>()
+    let decimal = Map<String, Decimal128>()
+    let objectId = Map<String, ObjectId>()
+    let uuid = Map<String, UUID>()
+    let object = Map<String, SwiftStringObject?>()
+    let any = Map<String, AnyRealmValue>()
+
+    let intOpt = Map<String, Int?>()
+    let int8Opt = Map<String, Int8?>()
+    let int16Opt = Map<String, Int16?>()
+    let int32Opt = Map<String, Int32?>()
+    let int64Opt = Map<String, Int64?>()
+    let floatOpt = Map<String, Float?>()
+    let doubleOpt = Map<String, Double?>()
+    let boolOpt = Map<String, Bool?>()
+    let stringOpt = Map<String, String?>()
+    let dataOpt = Map<String, Data?>()
+    let dateOpt = Map<String, Date?>()
+    let decimalOpt = Map<String, Decimal128?>()
+    let objectIdOpt = Map<String, ObjectId?>()
+    let uuidOpt = Map<String, UUID?>()
 }
 
 class SwiftImplicitlyUnwrappedOptionalObject: Object {
@@ -310,6 +346,7 @@ class SwiftEmployeeObject: Object {
 class SwiftCompanyObject: Object {
     let employees = List<SwiftEmployeeObject>()
     let employeeSet = MutableSet<SwiftEmployeeObject>()
+    let employeeMap = Map<String, SwiftEmployeeObject?>()
 }
 
 class SwiftArrayPropertyObject: Object {
@@ -324,6 +361,12 @@ class SwiftMutableSetPropertyObject: Object {
     let intSet = MutableSet<SwiftIntObject>()
 }
 
+class SwiftMapPropertyObject: Object {
+    @objc dynamic var name = ""
+    let map = Map<String, SwiftStringObject?>()
+    let intMap = Map<String, SwiftIntObject?>()
+}
+
 class SwiftDoubleListOfSwiftObject: Object {
     let array = List<SwiftListOfSwiftObject>()
 }
@@ -334,6 +377,15 @@ class SwiftListOfSwiftObject: Object {
 
 class SwiftMutableSetOfSwiftObject: Object {
     let set = MutableSet<SwiftObject>()
+}
+
+class SwiftMapOfSwiftObject: Object {
+    let map = Map<String, SwiftObject?>()
+}
+
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
+class SwiftMapOfSwiftOptionalObject: Object {
+    let map = Map<String, SwiftOptionalObject?>()
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
@@ -747,6 +799,7 @@ class LinkToSwiftRenamedProperties2: Object {
 class EmbeddedParentObject: Object {
     @objc dynamic var object: EmbeddedTreeObject1?
     let array = List<EmbeddedTreeObject1>()
+    let map = Map<String, EmbeddedTreeObject1?>()
 }
 
 class EmbeddedPrimaryParentObject: Object {

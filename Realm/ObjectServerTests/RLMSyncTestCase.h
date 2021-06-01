@@ -43,6 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)paul;
 + (instancetype)ringo;
 + (instancetype)george;
++ (instancetype)stuart;
 
 @end
 
@@ -128,6 +129,22 @@ RLM_COLLECTION_TYPE(Person);
 @property RLMSet<RLMUUID> *otherUuidSet;
 @property RLMSet<RLMValue> *otherAnySet;
 @property RLM_GENERIC_SET(Person) *otherObjectSet;
+@end
+
+
+@interface RLMDictionarySyncObject : RLMObject
+@property RLMObjectId *_id;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMInt> *intDictionary;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMBool> *boolDictionary;
+@property RLMDictionary<NSString *, NSString *><RLMString, RLMString> *stringDictionary;
+@property RLMDictionary<NSString *, NSData *><RLMString, RLMData> *dataDictionary;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMDouble> *doubleDictionary;
+@property RLMDictionary<NSString *, RLMObjectId *><RLMString, RLMObjectId> *objectIdDictionary;
+@property RLMDictionary<NSString *, RLMDecimal128 *><RLMString, RLMDecimal128> *decimalDictionary;
+@property RLMDictionary<NSString *, NSUUID *><RLMString, RLMUUID> *uuidDictionary;
+@property RLMDictionary<NSString *, NSObject *><RLMString, RLMValue> *anyDictionary;
+@property RLMDictionary<NSString *, Person *><RLMString, Person> *objectDictionary;
+
 @end
 
 @interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport

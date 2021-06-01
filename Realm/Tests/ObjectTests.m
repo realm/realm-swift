@@ -859,7 +859,7 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
 
     [realm beginWriteTransaction];
     PrimaryEmployeeObject *eo = [PrimaryEmployeeObject createInRealm:realm withValue:@[@"Samuel", @19, @NO]];
-    PrimaryCompanyObject *co = [PrimaryCompanyObject createInRealm:realm withValue:@[@"Realm", @[eo], @[eo], eo, @[eo]]];
+    PrimaryCompanyObject *co = [PrimaryCompanyObject createInRealm:realm withValue:@[@"Realm", @[eo], @[eo], @{ @"key": eo }, eo, @[eo]]];
     [realm commitWriteTransaction];
 
     [realm beginWriteTransaction];

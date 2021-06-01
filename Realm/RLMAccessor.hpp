@@ -75,8 +75,11 @@ struct RLMStatelessAccessorContext {
     }
 
     template<typename Func>
-    void enumerate_dictionary(__unsafe_unretained const id, Func&&) {
-        REALM_COMPILER_HINT_UNREACHABLE();
+    void enumerate_dictionary(__unsafe_unretained const id v, Func&& func) {
+        id enumerable = RLMAsFastEnumeration(v) ?: v;
+        for (id key in enumerable) {
+            func(unbox<realm::StringData>(key), v[key]);
+        }
     }
 
     bool is_null(id v) { return v == NSNull.null; }
@@ -105,7 +108,7 @@ public:
     id box(realm::Obj&&);
     id box(realm::object_store::Dictionary&&);
     id box(realm::object_store::Set&&);
-    id box(realm::Mixed v) { return RLMMixedToObjc(v, _realm, _info.isSwiftClass()); }
+    id box(realm::Mixed);
 
     void will_change(realm::Obj const&, realm::Property const&);
     void will_change(realm::Object& obj, realm::Property const& prop) { will_change(obj.obj(), prop); }

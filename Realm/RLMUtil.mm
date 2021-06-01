@@ -21,6 +21,7 @@
 #import "RLMArray_Private.hpp"
 #import "RLMAccessor.hpp"
 #import "RLMDecimal128_Private.hpp"
+#import "RLMDictionary_Private.h"
 #import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
@@ -57,6 +58,10 @@ static inline RLMArray *asRLMArray(__unsafe_unretained id const value) {
 
 static inline RLMSet *asRLMSet(__unsafe_unretained id const value) {
     return RLMDynamicCast<RLMSet>(value) ?: RLMDynamicCast<RLMSwiftCollectionBase>(value)._rlmCollection;
+}
+
+static inline RLMDictionary *asRLMDictionary(__unsafe_unretained id const value) {
+    return RLMDynamicCast<RLMDictionary>(value) ?: RLMDynamicCast<RLMSwiftCollectionBase>(value)._rlmCollection;
 }
 
 static inline bool checkCollectionType(__unsafe_unretained id<RLMCollection> const collection,
@@ -102,6 +107,9 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
         }
         else if (auto rlmSet = asRLMSet(value)) {
             return checkCollectionType(rlmSet, type, optional, objectClassName);
+        }
+        else if (auto rlmDictionary = asRLMDictionary(value)) {
+            return checkCollectionType(rlmDictionary, type, optional, objectClassName);
         }
         if (id enumeration = RLMAsFastEnumeration(value)) {
             // check each element for compliance
@@ -176,7 +184,7 @@ void RLMThrowTypeError(__unsafe_unretained id const obj,
     @throw RLMException(@"Invalid value '%@' of type '%@' for '%@%s'%s property '%@.%@'.",
                         obj, [obj class],
                         prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
-                        prop.array ? " array" : "", objectSchema.className, prop.name);
+                        prop.array ? " array" : prop.set ? " set" : prop.dictionary ? " dictionary" : "", objectSchema.className, prop.name);
 }
 
 void RLMValidateValueForProperty(__unsafe_unretained id const obj,
@@ -223,10 +231,30 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
             }
             return;
         }
+        else if (RLMDictionary *dictionary = asRLMDictionary(obj)) {
+            if (!checkCollectionType(dictionary, prop.type, prop.optional, prop.objectClassName)) {
+                @throw RLMException(@"RLMDictionary<%@, %@%s> does not match expected type '%@%s' for property '%@.%@'.",
+                                    RLMTypeToString(dictionary.keyType),
+                                    dictionary.objectClassName ?: RLMTypeToString(dictionary.type), dictionary.optional ? "?" : "",
+                                    prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
+                                    objectSchema.className, prop.name);
+            }
+            return;
+        }
 
-        for (id value in enumeration) {
-            if (!RLMValidateValue(value, prop.type, prop.optional, false, prop.objectClassName)) {
-                RLMThrowTypeError(value, objectSchema, prop);
+        if (prop.dictionary) {
+            for (id key in enumeration) {
+                id value = enumeration[key];
+                if (!RLMValidateValue(value, prop.type, prop.optional, false, prop.objectClassName)) {
+                    RLMThrowTypeError(value, objectSchema, prop);
+                }
+            }
+        }
+        else {
+            for (id value in enumeration) {
+                if (!RLMValidateValue(value, prop.type, prop.optional, false, prop.objectClassName)) {
+                    RLMThrowTypeError(value, objectSchema, prop);
+                }
             }
         }
         return;
@@ -413,7 +441,7 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id v,
 
 id RLMMixedToObjc(realm::Mixed const& mixed,
                   __unsafe_unretained RLMRealm *realm,
-                  bool parentIsSwiftObject) {
+                  RLMClassInfo *classInfo) {
     if (mixed.is_null()) {
         return NSNull.null;
     }
@@ -437,12 +465,15 @@ id RLMMixedToObjc(realm::Mixed const& mixed,
         case realm::type_ObjectId:
             return [[RLMObjectId alloc] initWithValue:mixed.get<realm::ObjectId>()];
         case realm::type_TypedLink:
-            return RLMObjectFromObjLink(realm, mixed.get<realm::ObjLink>(), parentIsSwiftObject);
-        case realm::type_Link:
-        case realm::type_LinkList:
-            REALM_UNREACHABLE();
+            return RLMObjectFromObjLink(realm, mixed.get<realm::ObjLink>(), classInfo->isSwiftClass());
+        case realm::type_Link: {
+            auto obj = classInfo->table()->get_object((mixed).get<realm::ObjKey>());
+            return RLMCreateObjectAccessor(*classInfo, std::move(obj));
+        }
         case realm::type_UUID:
             return [[NSUUID alloc] initWithRealmUUID:mixed.get<realm::UUID>()];
+        case realm::type_LinkList:
+            REALM_UNREACHABLE();
         default:
             @throw RLMException(@"Invalid data type for RLMPropertyTypeAny property.");
     }

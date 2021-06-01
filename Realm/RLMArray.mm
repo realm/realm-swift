@@ -47,6 +47,15 @@
 }
 #pragma mark - Initializers
 
+- (instancetype)initWithObjectClassName:(__unsafe_unretained NSString *const)objectClassName
+                                keyType:(__unused RLMPropertyType)keyType {
+    return [self initWithObjectClassName:objectClassName];
+}
+- (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional
+                           keyType:(__unused RLMPropertyType)keyType {
+    return [self initWithObjectType:type optional:optional];
+}
+
 - (instancetype)initWithObjectClassName:(__unsafe_unretained NSString *const)objectClassName {
     REALM_ASSERT([objectClassName length] > 0);
     self = [super init];
