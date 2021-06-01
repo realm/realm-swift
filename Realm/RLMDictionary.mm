@@ -108,18 +108,22 @@ void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *
         }
         return;
     }
-    auto valueObject = RLMDynamicCast<RLMObjectBase>(value);
-    if (!valueObject) {
+
+    if (auto valueObject = RLMDynamicCast<RLMObjectBase>(value)) {
+        if (!valueObject->_objectSchema) {
+            @throw RLMException(@"Object cannot be inserted unless the schema is initialized. "
+                                "This can happen if you try to insert objects into a RLMDictionary / Map from a default value or from an overriden unmanaged initializer (`init()`) or if the key is uninitialized.");
+        }
+        if (![dictionary->_objectClassName isEqualToString:valueObject->_objectSchema.className]) {
+            @throw RLMException(@"Value of type '%@' does not match RLMDictionary value type '%@'.",
+                                valueObject->_objectSchema.className, dictionary->_objectClassName);
+        }
+        return;
+    }
+
+    if (![value isKindOfClass:NSNull.class]) {
         @throw RLMException(@"Value of type '%@' does not match RLMDictionary value type '%@'.",
                             [value className], dictionary->_objectClassName);
-    }
-    if (!valueObject->_objectSchema) {
-        @throw RLMException(@"Object cannot be inserted unless the schema is initialized. "
-                            "This can happen if you try to insert objects into a RLMDictionary / Map from a default value or from an overriden unmanaged initializer (`init()`) or if the key is uninitialized.");
-    }
-    if (![dictionary->_objectClassName isEqualToString:valueObject->_objectSchema.className]) {
-        @throw RLMException(@"Value of type '%@' does not match RLMDictionary value type '%@'.",
-                            valueObject->_objectSchema.className, dictionary->_objectClassName);
     }
 }
 

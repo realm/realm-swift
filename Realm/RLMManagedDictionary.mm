@@ -126,7 +126,7 @@ struct DictionaryCallbackWrapper {
 }
 
 static NSArray *toArray(std::vector<realm::Mixed> const& v) {
-    NSMutableArray *ret = [NSMutableArray new];
+    NSMutableArray *ret = [[NSMutableArray alloc] initWithCapacity:v.size()];
     for (auto& mixed : v) {
         [ret addObject:RLMMixedToObjc(mixed)];
     }

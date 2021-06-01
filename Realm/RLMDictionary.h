@@ -288,10 +288,8 @@ NS_ASSUME_NONNULL_BEGIN
 
      NSNumber *min = [object.dictionaryProperty minOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, and `NSData` properties.
-
  @param property The property whose minimum value is desired. Only properties of
-                 types `int`, `float`, `double`, and `NSDate` are supported.
+                 types `int`, `float`, `double`, `NSDate`, `RLMValue` and `RLMDecimal128` are supported.
 
  @return The minimum value of the property, or `nil` if the dictionary is empty.
  */
@@ -302,10 +300,8 @@ NS_ASSUME_NONNULL_BEGIN
 
      NSNumber *max = [object.dictionaryProperty maxOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, and `NSData` properties.
-
- @param property The property whose maximum value is desired. Only properties of
-                 types `int`, `float`, `double`, and `NSDate` are supported.
+ @param property The property whose minimum value is desired. Only properties of
+                 types `int`, `float`, `double`, `NSDate`, `RLMValue` and `RLMDecimal128` are supported.
 
  @return The maximum value of the property, or `nil` if the dictionary is empty.
  */
@@ -316,10 +312,8 @@ NS_ASSUME_NONNULL_BEGIN
 
      NSNumber *sum = [object.dictionaryProperty sumOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, and `NSData` properties.
-
- @param property The property whose values should be summed. Only properties of
-                 types `int`, `float`, and `double` are supported.
+ @param property The property whose minimum value is desired. Only properties of
+                 types `int`, `float`, `double`, `RLMValue` and  `RLMDecimal128` are supported.
 
  @return The sum of the given property.
  */
@@ -330,10 +324,8 @@ NS_ASSUME_NONNULL_BEGIN
 
      NSNumber *average = [object.dictionaryProperty averageOfProperty:@"age"];
 
- @warning You cannot use this method on `RLMObject`, and `NSData` properties.
-
- @param property The property whose average value should be calculated. Only
-                 properties of types `int`, `float`, and `double` are supported.
+ @param property The property whose minimum value is desired. Only properties of
+                 types `int`, `float`, `double`, `NSDate`, `RLMValue` and `RLMDecimal128` are supported.
 
  @return The average value of the given property, or `nil` if the dictionary is empty.
  */

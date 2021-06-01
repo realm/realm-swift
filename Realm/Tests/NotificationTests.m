@@ -1028,10 +1028,10 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 }
 @end
 
-@interface LinkViewDictionaryChangesetTests : RLMTestCase <ChangesetTestCase>
+@interface DictionaryChangesetTests : RLMTestCase <ChangesetTestCase>
 @end
 
-@implementation LinkViewDictionaryChangesetTests
+@implementation DictionaryChangesetTests
 - (void)prepare {
     @autoreleasepool {
         RLMRealm *realm = [RLMRealm defaultRealm];

@@ -428,35 +428,13 @@
 
     XCTAssertEqual(company.employeeDict.count, 30U);
 
-    // NSStrings dont have the same lifecycle as Realm objects and won't
-    // be released as long as objects is in the scope. The same goes for an RLMArray<RLMString>
-    // collection.
-    __weak id objects[30];
     NSInteger count = 0;
     for (id key in company.employeeDict) {
         XCTAssertNotNil(key, @"Object is not nil and accessible");
-        if (count > 16) {
-            // 16 is the size of blocks fast enumeration happens to ask for at
-            // the moment, but of course that's just an implementation detail
-            // that may change
-            XCTAssertNotNil(objects[count - 16]);
-        }
-        objects[count++] = key;
+        count++;
     }
 
     XCTAssertEqual(count, 30, @"should have enumerated 30 objects");
-
-    for (int i = 0; i < count; i++) {
-        XCTAssertNotNil(objects[i], @"Object should have not been released");
-    }
-
-    @autoreleasepool {
-        for (id key in company.employeeDict) {
-            objects[0] = company.employeeDict[key];
-            break;
-        }
-    }
-    XCTAssertNil(objects[0], @"Object should have been released");
 
     [company.employeeDict enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key,
                                                               EmployeeObject * _Nonnull obj,

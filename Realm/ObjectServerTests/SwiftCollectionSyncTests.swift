@@ -506,10 +506,8 @@ class MapSyncTests: SwiftSyncTestCase {
 
     func createMap<T>(_ values: [T]) -> Map<String, T> {
         let map = Map<String, T>()
-        var i = 0
-        for value in values {
+        for (i, value) in values.enumerated() {
             map[String(i)] = value
-            i+=1
         }
         return map
     }
@@ -606,6 +604,8 @@ class MapSyncTests: SwiftSyncTestCase {
         }
     }
 
+    // FIXME: We need to add a test where a value in a map of objects is `null`. currently the server
+    // is throwing a bad changeset error when that happens.
     func testObjectMap() {
         do {
             let map = createMap([SwiftPerson(firstName: "Peter", lastName: "Parker") as SwiftPerson?,
