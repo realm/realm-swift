@@ -540,11 +540,7 @@ class PrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTests
         }
 
         map[values[1].key] = nil
-        if V.T._rlmOptional {
-            XCTAssertEqual(map[values[1].key], V.T._nilValue())
-        } else {
-            XCTAssertNil(map[values[1].key])
-        }
+        XCTAssertNil(map[values[1].key])
         map.removeObject(for: values[2].key)
         // make sure the key was deleted
         XCTAssertTrue(Set([values[0].key]).isSubset(of: map.keys))
@@ -563,14 +559,13 @@ class PrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTests
         map[values[0].key] = values[0].value
         map[values[1].key] = nil
         map[values[2].key] = values[2].value
-        let expectedCount = V.T._rlmOptional ? 3 : 2
-        XCTAssertEqual(expectedCount, map.count)
-        XCTAssertEqual(expectedCount, map.keys.count)
-        XCTAssertEqual(expectedCount, map.values.count)
+        XCTAssertEqual(2, map.count)
+        XCTAssertEqual(2, map.keys.count)
+        XCTAssertEqual(2, map.values.count)
         XCTAssertTrue(Set([values[0].key, values[2].key]).isSubset(of: map.keys))
-        XCTAssertEqual(expectedCount, map.count)
-        XCTAssertEqual(expectedCount, map.keys.count)
-        XCTAssertEqual(expectedCount, map.values.count)
+        XCTAssertEqual(2, map.count)
+        XCTAssertEqual(2, map.keys.count)
+        XCTAssertEqual(2, map.values.count)
         XCTAssertTrue(Set([values[0].key, values[2].key]).isSubset(of: map.keys))
         // getter
         map.removeAll()

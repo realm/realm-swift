@@ -104,23 +104,6 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         XCTAssertEqual(obj.string["key"], "str")
     }
 
-    func testSettingNil() {
-        let obj = SwiftMapObject()
-        obj.intOpt["one"] = 1
-        XCTAssertEqual(obj.intOpt["one"], 1)
-        obj.intOpt["one"] = nil
-        XCTAssertNil(obj.intOpt["one"]!)
-        XCTAssertEqual(obj.intOpt.count, 1)
-        obj.intOpt.removeObject(for: "one")
-        XCTAssertEqual(obj.intOpt.count, 0)
-
-        obj.int["one"] = 5
-        XCTAssertEqual(obj.int["one"], 5)
-        obj.int["one"] = nil
-        XCTAssertNil(obj.int["one"])
-        XCTAssertEqual(obj.int.count, 0)
-    }
-
     func testPrimitiveIterationAcrossNil() {
         let obj = SwiftMapObject()
 
@@ -272,10 +255,8 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         XCTAssertNotNil(map[str1.stringCol] ?? nil)
 
         map[str1.stringCol] = nil
-        XCTAssertEqual(1, map.count)
-        XCTAssertNil(map[str1.stringCol] ?? nil)
-        map.removeObject(for: str1.stringCol)
         XCTAssertEqual(0, map.count)
+        XCTAssertNil(map[str1.stringCol] ?? nil)
     }
 
     func testRemoveAll() {
@@ -716,7 +697,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
             })
             waitForExpectations(timeout: 2.0, handler: nil)
             token?.invalidate()
-            realm.beginWrite()
+            token = nil
         }
     }
 
@@ -765,13 +746,14 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
             map["myNewKey"] = SwiftStringObject(value: ["three"])
             try! realm.commitWrite()
             waitForExpectations(timeout: 2.0, handler: nil)
-            XCTAssertTrue(didModify)
             exp = expectation(description: "does receive notification")
+            XCTAssertTrue(didModify)
             realm.beginWrite()
-            map.removeObject(for: "myNewKey")
+            map["myNewKey"] = nil
             try! realm.commitWrite()
             waitForExpectations(timeout: 2.0, handler: nil)
             XCTAssertTrue(didDelete)
+
             token?.invalidate()
             token = nil
         }

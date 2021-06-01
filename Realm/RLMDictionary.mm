@@ -108,13 +108,6 @@ void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *
         }
         return;
     }
-
-    // dictionaries of Object are always optional, so if a nil / null value
-    // is to be stored then it is fine.
-    if (!value || [value isKindOfClass:NSNull.class]) {
-        return;
-    }
-
     auto valueObject = RLMDynamicCast<RLMObjectBase>(value);
     if (!valueObject) {
         @throw RLMException(@"Value of type '%@' does not match RLMDictionary value type '%@'.",
