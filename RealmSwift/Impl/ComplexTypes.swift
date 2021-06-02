@@ -19,7 +19,7 @@
 import Realm
 import Realm.Private
 
-extension Object: _RealmSchemaDiscoverable {
+extension Object: _RealmSchemaDiscoverable, _ManagedPropertyType, _DefaultConstructible {
     public static var _rlmType: PropertyType { .object }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         if !prop.optional && !prop.collection {
@@ -36,12 +36,45 @@ extension Object: _RealmSchemaDiscoverable {
         }
         prop.objectClassName = className()
     }
+
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
+        fatalError("Non-optional Object properties are not allowed.")
+    }
+
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
+//        FIXME: gives Assertion failed: (LocalSelf && "no local self metadata"), function getLocalSelfMetadata, file /src/swift-source/swift/lib/IRGen/GenHeap.cpp, line 1686.
+//        return RLMGetSwiftPropertyObject(obj, key).map(dynamicBridgeCast)
+        if let value = RLMGetSwiftPropertyObject(obj, key) {
+            return (value as! Self)
+        }
+        return nil
+    }
+
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: Object) {
+        RLMSetSwiftPropertyObject(obj, key, value)
+    }
 }
 
-extension EmbeddedObject: _RealmSchemaDiscoverable {
+extension EmbeddedObject: _RealmSchemaDiscoverable, _ManagedPropertyType, _DefaultConstructible {
     public static var _rlmType: PropertyType { .object }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
+        Object._rlmPopulateProperty(prop)
         prop.objectClassName = className()
+    }
+
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
+        fatalError("Non-optional EmbeddedObject properties are not allowed.")
+    }
+
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
+        if let value = RLMGetSwiftPropertyObject(obj, key) {
+            return (value as! Self)
+        }
+        return nil
+    }
+
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: EmbeddedObject) {
+        RLMSetSwiftPropertyObject(obj, key, value)
     }
 }
 
@@ -56,6 +89,27 @@ extension List: _RealmSchemaDiscoverable where Element: _RealmSchemaDiscoverable
     }
 }
 
+extension List: _ManagedPropertyType, _DefaultConstructible where Element: _ManagedPropertyType {
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
+        return Self(objc: RLMGetSwiftPropertyArray(obj, key))
+    }
+
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
+        return Self(objc: RLMGetSwiftPropertyArray(obj, key))
+    }
+
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: List) {
+        let array = RLMGetSwiftPropertyArray(obj, key)
+        if array.isEqual(value.rlmArray) { return }
+        array.removeAllObjects()
+        array.addObjects(value.rlmArray)
+    }
+
+    static public func _rlmSetAccessor(_ prop: RLMProperty) {
+        prop.swiftAccessor = ManagedListAccessor<Element>.self
+    }
+}
+
 extension MutableSet: _RealmSchemaDiscoverable where Element: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Element._rlmType }
     public static var _rlmOptional: Bool { Element._rlmOptional }
@@ -64,6 +118,27 @@ extension MutableSet: _RealmSchemaDiscoverable where Element: _RealmSchemaDiscov
         prop.set = true
         prop.swiftAccessor = SetAccessor<Element>.self
         Element._rlmPopulateProperty(prop)
+    }
+}
+
+extension MutableSet: _ManagedPropertyType, _DefaultConstructible where Element: _ManagedPropertyType {
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
+        return Self(objc: RLMGetSwiftPropertySet(obj, key))
+    }
+
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
+        return Self(objc: RLMGetSwiftPropertySet(obj, key))
+    }
+
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: MutableSet) {
+        let set = RLMGetSwiftPropertySet(obj, key)
+        if set.isEqual(value.rlmSet) { return }
+        set.removeAllObjects()
+        set.addObjects(value.rlmSet)
+    }
+
+    static public func _rlmSetAccessor(_ prop: RLMProperty) {
+        prop.swiftAccessor = ManagedSetAccessor<Element>.self
     }
 }
 
@@ -76,6 +151,27 @@ extension Map: _RealmSchemaDiscoverable where Value: _RealmSchemaDiscoverable {
         prop.swiftAccessor = MapAccessor<Key, Value>.self
         prop.dictionaryKeyType = Key._rlmType
         Value._rlmPopulateProperty(prop)
+    }
+}
+
+extension Map: _ManagedPropertyType, _DefaultConstructible where Value: _ManagedPropertyType {
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
+        return Self(objc: RLMGetSwiftPropertyMap(obj, key))
+    }
+
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Self? {
+        return Self(objc: RLMGetSwiftPropertyMap(obj, key))
+    }
+
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: Map) {
+        let map = RLMGetSwiftPropertyMap(obj, key)
+        if map.isEqual(value.rlmDictionary) { return }
+        map.removeAllObjects()
+        map.addEntries(fromDictionary: value.rlmDictionary)
+    }
+
+    static public func _rlmSetAccessor(_ prop: RLMProperty) {
+        prop.swiftAccessor = ManagedMapAccessor<Key, Value>.self
     }
 }
 
@@ -103,6 +199,29 @@ extension RealmOptional: _RealmSchemaDiscoverable where Value: _RealmSchemaDisco
     }
 }
 
+extension LinkingObjects: _ManagedPropertyType where Element: _ManagedPropertyType {
+    public static func _rlmDefaultValue() -> Self {
+        fatalError("LinkingObjects properties must set the origin property name")
+    }
+
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> LinkingObjects {
+        let prop = RLMObjectBaseObjectSchema(obj)!.properties[Int(key)]
+        return Self(propertyName: prop.name, handle: RLMLinkingObjectsHandle(object: obj, property: prop))
+    }
+
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> LinkingObjects? {
+        fatalError("LinkingObjects properties cannot be optional")
+    }
+
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: LinkingObjects) {
+        fatalError("LinkingObjects properties are read-only")
+    }
+
+    static public func _rlmSetAccessor(_ prop: RLMProperty) {
+        prop.swiftAccessor = ManagedLinkingObjectsAccessor<Element>.self
+    }
+}
+
 extension Optional: _RealmSchemaDiscoverable where Wrapped: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Wrapped._rlmType }
     public static var _rlmOptional: Bool { true }
@@ -111,6 +230,26 @@ extension Optional: _RealmSchemaDiscoverable where Wrapped: _RealmSchemaDiscover
     }
 }
 
+extension Optional: _ManagedPropertyType where Wrapped: _ManagedPropertyType {
+    public static func _rlmDefaultValue() -> Self { return .none }
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Wrapped? {
+        return Wrapped._rlmGetPropertyOptional(obj, key)
+    }
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: UInt16) -> Wrapped?? {
+        fatalError("Double-optional properties are not supported")
+    }
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: UInt16, _ value: Wrapped?) {
+        if let value = value {
+            Wrapped._rlmSetProperty(obj, key, value)
+        } else {
+            RLMSetSwiftPropertyNil(obj, key)
+        }
+    }
+}
+
+extension Optional: PrimaryKeyProperty where Wrapped: PrimaryKeyProperty {}
+extension Optional: IndexableProperty where Wrapped: IndexableProperty {}
+
 extension RealmProperty: _RealmSchemaDiscoverable where Value: _RealmSchemaDiscoverable {
     public static var _rlmType: PropertyType { Value._rlmType }
     public static var _rlmOptional: Bool { Value._rlmOptional }
@@ -118,5 +257,33 @@ extension RealmProperty: _RealmSchemaDiscoverable where Value: _RealmSchemaDisco
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         Value._rlmPopulateProperty(prop)
         prop.swiftAccessor = RealmPropertyAccessor<Value>.self
+    }
+}
+
+extension RawRepresentable where RawValue: _RealmSchemaDiscoverable {
+    static public func _rlmPopulateProperty(_ prop: RLMProperty) {
+        RawValue._rlmPopulateProperty(prop)
+    }
+}
+
+extension RawRepresentable where Self: _ManagedPropertyType, RawValue: _ManagedPropertyType {
+    public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Self {
+        return Self(rawValue: RawValue._rlmGetProperty(obj, key))!
+    }
+    public static func _rlmGetPropertyOptional(_ obj: ObjectBase, _ key: PropertyKey) -> Self? {
+        return RawValue._rlmGetPropertyOptional(obj, key).flatMap(Self.init)
+    }
+    public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: Self) {
+        RawValue._rlmSetProperty(obj, key, value.rawValue)
+    }
+    public static func _rlmSetAccessor(_ prop: RLMProperty) {
+        prop.swiftAccessor = ManagedEnumAccessor<Self>.self
+    }
+}
+
+// FIXME: use CaseIterable?
+extension RawRepresentable where RawValue: _DefaultConstructible {
+    public static func _rlmDefaultValue() -> Self {
+        return Self(rawValue: .init())!
     }
 }

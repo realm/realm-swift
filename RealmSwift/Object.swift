@@ -28,41 +28,49 @@ import Realm.Private
 
  ```swift
  class Dog: Object {
-     @objc dynamic var name: String = ""
-     @objc dynamic var adopted: Bool = false
-     let siblings = List<Dog>()
+     @Persisted var name: String
+     @Persisted var adopted: Bool
+     @Persisted var siblings: List<Dog>
  }
  ```
 
  ### Supported property types
 
- - `String`, `NSString`
- - `Int`
- - `Int8`, `Int16`, `Int32`, `Int64`
+ - `String`
+ - `Int`, `Int8`, `Int16`, `Int32`, `Int64`
  - `Float`
  - `Double`
  - `Bool`
- - `Date`, `NSDate`
- - `Data`, `NSData`
+ - `Date`
+ - `Data`
  - `Decimal128`
  - `ObjectId`
  - `UUID`
- - `@objc enum` which has been delcared as conforming to `RealmEnum`.
- - `RealmOptional<Value>` for optional numeric properties
+ - `AnyRealmValue`
+ - Any RawRepresentable enum whose raw type is a legal property type. Enums
+   must explicitly be marked as conforming to `PersistableEnum`.
  - `Object` subclasses, to model many-to-one relationships
  - `EmbeddedObject` subclasses, to model owning one-to-one relationships
- - `List<Element>`, to model many-to-many relationships
 
- `String`, `NSString`, `Date`, `NSDate`, `Data`, `NSData`, `UUID`, `NSUUID`, `Decimal128` and `ObjectId`  properties
- can be declared as optional. `Object` and `EmbeddedObject` subclasses *must* be declared as optional.
- `Int`, `Int8`, `Int16`, `Int32`, `Int64`, `Float`, `Double`, `Bool`,  enum, and `List` properties cannot.
- To store an optional number, use `RealmOptional<Int>`, `RealmOptional<Float>`, `RealmOptional<Double>`, or
- `RealmOptional<Bool>` instead, which wraps an optional numeric value. Lists cannot be optional at all.
+ All of the types above may also be `Optional`, with the exception of
+ `AnyRealmValue`. `Object` and `EmbeddedObject` subclasses *must* be Optional.
 
- All property types except for `List` and `RealmOptional` *must* be declared as `@objc dynamic var`. `List` and
- `RealmOptional` properties must be declared as non-dynamic `let` properties. Swift `lazy` properties are not allowed.
+ In addition to individual values, three different collection types are supported:
+ - `List<Element>`: an ordered mutable collection similar to `Array`.
+ - `MutableSet<Element>`: an unordered uniquing collection similar to `Set`.
+ - `Map<String, Element>`: an unordered key-value collection similar to `Dictionary`.
 
- Note that none of the restrictions listed above apply to properties that are configured to be ignored by Realm.
+ The Element type of collections may be any of the supported non-collection
+ property types listed above. Collections themselves may not be Optional, but
+ the values inside them may be, except for lists and sets of `Object` or
+ `EmbeddedObject` subclasses.
+
+ Finally, `LinkingObjects` properties can be used to track which objects link
+ to this one.
+
+ All properties which should be stored by Realm must be explicitly marked with
+ `@Persisted`. Any properties not marked with `@Persisted` will be ignored
+ entirely by Realm, and may be of any type.
 
  ### Querying
 
@@ -135,18 +143,26 @@ extension Object: RealmCollectionValue {
     /**
      Override this method to specify the name of a property to be used as the primary key.
 
-     Only properties of types `String` and `Int` can be designated as the primary key. Primary key properties enforce
-     uniqueness for each value whenever the property is set, which incurs minor overhead. Indexes are created
-     automatically for primary key properties.
+     Only properties of types `String`, `Int`, `ObjectId` and `UUID` can be
+     designated as the primary key. Primary key properties enforce uniqueness
+     for each value whenever the property is set, which incurs minor overhead.
+     Indexes are created automatically for primary key properties.
 
-     - returns: The name of the property designated as the primary key, or `nil` if the model has no primary key.
+     - warning: This function is only applicable to legacy property declarations
+                using `@objc`. When using `@Persisted`, use
+                `@Persisted(primaryKey: true)` instead.
+     - returns: The name of the property designated as the primary key, or
+                `nil` if the model has no primary key.
      */
     @objc open class func primaryKey() -> String? { return nil }
 
     /**
-     Override this method to specify the names of properties to ignore. These properties will not be managed by
-     the Realm that manages the object.
+     Override this method to specify the names of properties to ignore. These
+     properties will not be managed by the Realm that manages the object.
 
+     - warning: This function is only applicable to legacy property declarations
+                using `@objc`. When using `@Persisted`, any properties not
+                marked with `@Persisted` are automatically ignored.
      - returns: An array of property names to ignore.
      */
     @objc open class func ignoredProperties() -> [String] { return [] }
@@ -156,6 +172,9 @@ extension Object: RealmCollectionValue {
 
      Only string, integer, boolean, `Date`, and `NSDate` properties are supported.
 
+     - warning: This function is only applicable to legacy property declarations
+                using `@objc`. When using `@Persisted`, use
+                `@Persisted(indexed: true)` instead.
      - returns: An array of property names.
      */
     @objc open class func indexedProperties() -> [String] { return [] }

@@ -25,6 +25,8 @@ private func ptr(_ property: RLMProperty, _ obj: RLMObjectBase) -> UnsafeMutable
     return Unmanaged.passUnretained(obj).toOpaque().advanced(by: ivar_getOffset(property.swiftIvar!))
 }
 
+// MARK: - Legacy Property Accessors
+
 internal class ListAccessor<Element: RealmCollectionValue>: RLMManagedPropertyAccessor {
     private static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> List<Element> {
         return ptr(property, obj).assumingMemoryBound(to: List<Element>.self).pointee
@@ -197,5 +199,105 @@ internal class RealmPropertyAccessor<Value: RealmPropertyType>: RLMManagedProper
             fatalError("Unexpected value '\(value)' of type '\(type(of: value))' for '\(Value.self)' property")
         }
         bound(property, parent).value = bridged
+    }
+}
+
+// MARK: - Modern Property Accessors
+
+internal class ManagedPropertyAccessor<T: _ManagedPropertyType>: RLMManagedPropertyAccessor {
+    fileprivate static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> UnsafeMutablePointer<Managed<T>> {
+        return ptr(property, obj).assumingMemoryBound(to: Managed<T>.self)
+    }
+
+    @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
+        bound(property, parent).pointee.initialize(parent, key: PropertyKey(property.index))
+    }
+
+    @objc override class func observe(_ property: RLMProperty, on parent: RLMObjectBase) {
+        bound(property, parent).pointee.observe(parent, property: property)
+    }
+
+    @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
+        let v = bound(property, parent).pointee.get(parent)
+        if let v = v as? CustomObjectiveCBridgeable {
+            return v.objCValue
+        }
+        return v
+    }
+
+    @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
+        let bridged: T
+        if let type = T.self as? CustomObjectiveCBridgeable.Type {
+            bridged = type.bridging(objCValue: value) as! T
+        } else {
+            bridged = value as! T
+        }
+        bound(property, parent).pointee.set(parent, value: bridged)
+    }
+}
+
+internal class ManagedListAccessor<Element: _ManagedPropertyType>: ManagedPropertyAccessor<List<Element>>
+        where Element: RealmCollectionValue {
+    @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
+        assign(value: value, to: bound(property, parent).pointee.get(parent))
+    }
+    @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
+        // Promote existing List rather than create a new one as the default
+        // initialize implementation would do
+        bound(property, parent).pointee.get(parent)._rlmCollection = RLMGetSwiftPropertyArray(parent, PropertyKey(property.index))
+    }
+}
+
+internal class ManagedSetAccessor<Element: _ManagedPropertyType>: ManagedPropertyAccessor<MutableSet<Element>>
+        where Element: RealmCollectionValue {
+    @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
+        assign(value: value, to: bound(property, parent).pointee.get(parent))
+    }
+    @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
+        bound(property, parent).pointee.get(parent)._rlmCollection = RLMGetSwiftPropertySet(parent, PropertyKey(property.index))
+    }
+}
+
+internal class ManagedMapAccessor<Key: _MapKey, Value: _ManagedPropertyType>: ManagedPropertyAccessor<Map<Key, Value>>
+        where Value: RealmCollectionValue {
+    @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
+        assign(value: value, to: bound(property, parent).pointee.get(parent))
+    }
+    @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
+        bound(property, parent).pointee.get(parent)._rlmCollection = RLMGetSwiftPropertyMap(parent, PropertyKey(property.index))
+    }
+}
+
+internal class ManagedLinkingObjectsAccessor<Element: ObjectBase>: RLMManagedPropertyAccessor
+        where Element: RealmCollectionValue, Element: _ManagedPropertyType {
+    private static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> UnsafeMutablePointer<Managed<LinkingObjects<Element>>> {
+        return ptr(property, obj).assumingMemoryBound(to: Managed<LinkingObjects<Element>>.self)
+    }
+
+    @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
+        bound(property, parent).pointee.initialize(parent, key: PropertyKey(property.index))
+    }
+    @objc override class func observe(_ property: RLMProperty, on parent: RLMObjectBase) {
+        // N/A: unmanaged LinkingObjects are always empty
+    }
+    @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
+        return bound(property, parent).pointee.get(parent)
+    }
+}
+
+internal class ManagedEnumAccessor<T: _ManagedPropertyType>: ManagedPropertyAccessor<T>
+        where T: RawRepresentable {
+    @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
+        return bound(property, parent).pointee.get(parent).rawValue
+    }
+
+    @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
+        let bridged: T.RawValue
+        if let type = T.RawValue.self as? CustomObjectiveCBridgeable.Type {
+            bridged = type.bridging(objCValue: value) as! T.RawValue
+        } else {
+            bridged = value as! T.RawValue
+        }
+        bound(property, parent).pointee.set(parent, value: T(rawValue: bridged)!)
     }
 }

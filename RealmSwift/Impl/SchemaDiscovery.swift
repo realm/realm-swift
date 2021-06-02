@@ -19,12 +19,23 @@
 import Foundation
 import Realm.Private
 
+// A type which we can get the runtime schema information from
 public protocol _RealmSchemaDiscoverable {
+    // The Realm property type associated with this type
     static var _rlmType: PropertyType { get }
     static var _rlmOptional: Bool { get }
+    // Does this type require @objc for legacy declarations? Not used for modern
+    // declarations as no types use @objc.
+    static var _rlmRequireObjc: Bool { get }
+
+    // Set any fields of the property applicable to this type other than type/optional.
+    // There are both static and non-static versions of this function because
+    // some times need data from an instance (e.g. LinkingObjects, where the
+    // source property name is runtime data and not part of the type), while
+    // wrappers like Optional need to be able to recur to the wrapped type
+    // without creating an instance of that.
     func _rlmPopulateProperty(_ prop: RLMProperty)
     static func _rlmPopulateProperty(_ prop: RLMProperty)
-    static var _rlmRequireObjc: Bool { get }
 }
 
 extension _RealmSchemaDiscoverable {
@@ -32,17 +43,6 @@ extension _RealmSchemaDiscoverable {
     public static var _rlmRequireObjc: Bool { true }
     public func _rlmPopulateProperty(_ prop: RLMProperty) { }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) { }
-}
-
-// If the property is a storage property for a lazy Swift property, return
-// the base property name (e.g. `foo.storage` becomes `foo`). Otherwise, nil.
-private func baseName(forLazySwiftProperty name: String) -> String? {
-    // A Swift lazy var shows up as two separate children on the reflection tree:
-    // one named 'x', and another that is optional and is named "$__lazy_storage_$_propName"
-    if let storageRange = name.range(of: "$__lazy_storage_$_", options: [.anchored]) {
-        return String(name[storageRange.upperBound...])
-    }
-    return nil
 }
 
 internal extension RLMProperty {
@@ -60,11 +60,34 @@ internal extension RLMProperty {
     }
 }
 
-private func getProperties(_ cls: RLMObjectBase.Type) -> [RLMProperty] {
-    let object = cls.init()
+private func getModernProperties(_ object: ObjectBase) -> [RLMProperty] {
+    return Mirror(reflecting: object).children.compactMap { prop in
+        guard let label = prop.label else { return nil }
+        guard let value = prop.value as? _DiscoverableManagedProperty else {
+            return nil
+        }
+        let property = RLMProperty(name: label, value: value)
+        property.swiftIvar = class_getInstanceVariable(type(of: object), label)
+        return property
+    }
+}
+
+// If the property is a storage property for a lazy Swift property, return
+// the base property name (e.g. `foo.storage` becomes `foo`). Otherwise, nil.
+private func baseName(forLazySwiftProperty name: String) -> String? {
+    // A Swift lazy var shows up as two separate children on the reflection tree:
+    // one named 'x', and another that is optional and is named "$__lazy_storage_$_propName"
+    if let storageRange = name.range(of: "$__lazy_storage_$_", options: [.anchored]) {
+        return String(name[storageRange.upperBound...])
+    }
+    return nil
+}
+
+private func getLegacyProperties(_ object: ObjectBase, _ cls: ObjectBase.Type) -> [RLMProperty] {
     let indexedProperties: Set<String>
     let ignoredPropNames: Set<String>
     let columnNames = cls._realmColumnNames()
+    // FIXME: ignored properties on EmbeddedObject appear to not be supported?
     if let realmObject = object as? Object {
         indexedProperties = Set(type(of: realmObject).indexedProperties())
         ignoredPropNames = Set(type(of: realmObject).ignoredProperties())
@@ -148,6 +171,17 @@ private func getProperties(_ cls: RLMObjectBase.Type) -> [RLMProperty] {
         property.updateAccessors()
         return property
     }
+}
+
+private func getProperties(_ cls: RLMObjectBase.Type) -> [RLMProperty] {
+    // Check for any modern properties and only scan for legacy properties if
+    // none are found.
+    let object = cls.init()
+    let props = getModernProperties(object)
+    if props.count > 0 {
+        return props
+    }
+    return getLegacyProperties(object, cls)
 }
 
 internal class ObjectUtil {

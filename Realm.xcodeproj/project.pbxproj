@@ -171,6 +171,8 @@
 		3F73BC981E3A879E00FE80B6 /* NSError+RLMSync.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC941E3A878500FE80B6 /* NSError+RLMSync.m */; };
 		3F7556751BE95A0C0058BC7E /* AsyncTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556731BE95A050058BC7E /* AsyncTests.mm */; };
 		3F7556761BE95A0D0058BC7E /* AsyncTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556731BE95A050058BC7E /* AsyncTests.mm */; };
+		3F83E9A12630A0D200FC9623 /* ManagedProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F83E9A02630A0D200FC9623 /* ManagedProperty.swift */; };
+		3F83E9A42630A14800FC9623 /* RLMSwiftProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F83E9A22630A14800FC9623 /* RLMSwiftProperty.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3F8824FD1E5E335000586B35 /* MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610011BE98D880021E04F /* MigrationTests.swift */; };
 		3F8824FE1E5E335000586B35 /* ObjectAccessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610021BE98D880021E04F /* ObjectAccessorTests.swift */; };
 		3F8824FF1E5E335000586B35 /* ObjectCreationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610031BE98D880021E04F /* ObjectCreationTests.swift */; };
@@ -216,7 +218,6 @@
 		3FB6ABD92416A27000E318C2 /* Decimal128.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB6ABD82416A27000E318C2 /* Decimal128.swift */; };
 		3FBEF67B1C63D66100F6935B /* RLMCollection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FBEF6791C63D66100F6935B /* RLMCollection.mm */; };
 		3FBEF67C1C63D66400F6935B /* RLMCollection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FBEF6791C63D66100F6935B /* RLMCollection.mm */; };
-		3FC3371D2637687300D4CCC4 /* CollectionAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC3371C2637687300D4CCC4 /* CollectionAccess.swift */; };
 		3FC3F912241808B400E27322 /* RLMEmbeddedObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FC3F910241808B300E27322 /* RLMEmbeddedObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3FC3F913241808B400E27322 /* RLMEmbeddedObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FC3F910241808B300E27322 /* RLMEmbeddedObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3FC3F914241808B400E27322 /* RLMEmbeddedObject.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FC3F911241808B300E27322 /* RLMEmbeddedObject.mm */; };
@@ -225,6 +226,12 @@
 		3FCB1A7522A9B0A2003807FB /* CodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FCB1A7422A9B0A2003807FB /* CodableTests.swift */; };
 		3FDCFEB619F6A8D3005E414A /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
 		3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
+		3FE267D5264308680030F83C /* CollectionAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE267CF264308670030F83C /* CollectionAccess.swift */; };
+		3FE267D6264308680030F83C /* ComplexTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE267D0264308680030F83C /* ComplexTypes.swift */; };
+		3FE267D7264308680030F83C /* BasicTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE267D1264308680030F83C /* BasicTypes.swift */; };
+		3FE267D8264308680030F83C /* ManagedPropertyType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE267D2264308680030F83C /* ManagedPropertyType.swift */; };
+		3FE267D9264308680030F83C /* PropertyAccessors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE267D3264308680030F83C /* PropertyAccessors.swift */; };
+		3FE267DA264308680030F83C /* SchemaDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE267D4264308680030F83C /* SchemaDiscovery.swift */; };
 		3FE2BE0323D8CAD1002860E9 /* CombineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE2BE0223D8CAD1002860E9 /* CombineTests.swift */; };
 		3FE5818622C2B4B900BA10E7 /* ObjectiveCSupport+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE5818422C2B4B900BA10E7 /* ObjectiveCSupport+Sync.swift */; };
 		3FE5819622C2CCA700BA10E7 /* RLMMultiProcessTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F558C8522C29A03002F0F30 /* RLMMultiProcessTestCase.m */; };
@@ -761,10 +768,6 @@
 		3F2E66611CA0B9D5004761D5 /* NotificationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationTests.m; sourceTree = "<group>"; };
 		3F35027722C43C5200FDC1E5 /* TestHost-static.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "TestHost-static.xcconfig"; sourceTree = "<group>"; };
 		3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMSwiftSupport.m; path = Realm/RLMSwiftSupport.m; sourceTree = SOURCE_ROOT; };
-		3F48201D26307CE2005B40E8 /* SchemaDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaDiscovery.swift; sourceTree = "<group>"; };
-		3F48201E26307CE2005B40E8 /* PropertyAccessors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PropertyAccessors.swift; sourceTree = "<group>"; };
-		3F48201F26307CE2005B40E8 /* ComplexTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComplexTypes.swift; sourceTree = "<group>"; };
-		3F48202026307CE2005B40E8 /* BasicTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BasicTypes.swift; sourceTree = "<group>"; };
 		3F4E324B1B98C6C700183A69 /* RLMSchema_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSchema_Private.hpp; sourceTree = "<group>"; };
 		3F4F3ACF23F71C790048DB43 /* RLMDecimal128.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMDecimal128.mm; sourceTree = "<group>"; };
 		3F4F3AD023F71C790048DB43 /* RLMObjectId.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectId.h; sourceTree = "<group>"; };
@@ -794,6 +797,8 @@
 		3F73BC931E3A878500FE80B6 /* NSError+RLMSync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSError+RLMSync.h"; sourceTree = "<group>"; };
 		3F73BC941E3A878500FE80B6 /* NSError+RLMSync.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSError+RLMSync.m"; sourceTree = "<group>"; };
 		3F7556731BE95A050058BC7E /* AsyncTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AsyncTests.mm; sourceTree = "<group>"; };
+		3F83E9A02630A0D200FC9623 /* ManagedProperty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManagedProperty.swift; sourceTree = "<group>"; };
+		3F83E9A22630A14800FC9623 /* RLMSwiftProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftProperty.h; sourceTree = "<group>"; };
 		3F9816292317763000C3543D /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		3F9863B91D36876B00641C98 /* RLMClassInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMClassInfo.mm; sourceTree = "<group>"; };
 		3F9863BA1D36876B00641C98 /* RLMClassInfo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMClassInfo.hpp; sourceTree = "<group>"; };
@@ -803,11 +808,16 @@
 		3FB6ABD82416A27000E318C2 /* Decimal128.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Decimal128.swift; sourceTree = "<group>"; };
 		3FBEF6781C63D66100F6935B /* RLMCollection_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMCollection_Private.hpp; sourceTree = "<group>"; };
 		3FBEF6791C63D66100F6935B /* RLMCollection.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMCollection.mm; sourceTree = "<group>"; };
-		3FC3371C2637687300D4CCC4 /* CollectionAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionAccess.swift; sourceTree = "<group>"; };
 		3FC3F910241808B300E27322 /* RLMEmbeddedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMEmbeddedObject.h; sourceTree = "<group>"; };
 		3FC3F911241808B300E27322 /* RLMEmbeddedObject.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMEmbeddedObject.mm; sourceTree = "<group>"; };
 		3FC3F9162419B63100E27322 /* EmbeddedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmbeddedObject.swift; sourceTree = "<group>"; };
 		3FCB1A7422A9B0A2003807FB /* CodableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableTests.swift; sourceTree = "<group>"; };
+		3FE267CF264308670030F83C /* CollectionAccess.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionAccess.swift; sourceTree = "<group>"; };
+		3FE267D0264308680030F83C /* ComplexTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComplexTypes.swift; sourceTree = "<group>"; };
+		3FE267D1264308680030F83C /* BasicTypes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BasicTypes.swift; sourceTree = "<group>"; };
+		3FE267D2264308680030F83C /* ManagedPropertyType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManagedPropertyType.swift; sourceTree = "<group>"; };
+		3FE267D3264308680030F83C /* PropertyAccessors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PropertyAccessors.swift; sourceTree = "<group>"; };
+		3FE267D4264308680030F83C /* SchemaDiscovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchemaDiscovery.swift; sourceTree = "<group>"; };
 		3FE2BE0223D8CAD1002860E9 /* CombineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombineTests.swift; sourceTree = "<group>"; };
 		3FE5818322C2B4B900BA10E7 /* Nonsync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Nonsync.swift; sourceTree = "<group>"; };
 		3FE5818422C2B4B900BA10E7 /* ObjectiveCSupport+Sync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ObjectiveCSupport+Sync.swift"; sourceTree = "<group>"; };
@@ -1229,11 +1239,12 @@
 		3F48201C26307CE2005B40E8 /* Impl */ = {
 			isa = PBXGroup;
 			children = (
-				3F48202026307CE2005B40E8 /* BasicTypes.swift */,
-				3FC3371C2637687300D4CCC4 /* CollectionAccess.swift */,
-				3F48201F26307CE2005B40E8 /* ComplexTypes.swift */,
-				3F48201E26307CE2005B40E8 /* PropertyAccessors.swift */,
-				3F48201D26307CE2005B40E8 /* SchemaDiscovery.swift */,
+				3FE267D1264308680030F83C /* BasicTypes.swift */,
+				3FE267CF264308670030F83C /* CollectionAccess.swift */,
+				3FE267D0264308680030F83C /* ComplexTypes.swift */,
+				3FE267D2264308680030F83C /* ManagedPropertyType.swift */,
+				3FE267D3264308680030F83C /* PropertyAccessors.swift */,
+				3FE267D4264308680030F83C /* SchemaDiscovery.swift */,
 			);
 			path = Impl;
 			sourceTree = "<group>";
@@ -1325,6 +1336,7 @@
 				29B7FDF51C0DA6560023224E /* Error.swift */,
 				5D1534B71CCFF545008976D7 /* LinkingObjects.swift */,
 				5D660FE41BE98D670021E04F /* List.swift */,
+				3F83E9A02630A0D200FC9623 /* ManagedProperty.swift */,
 				0C3BD4D225C1C5AB007CFDD3 /* Map.swift */,
 				5D660FE51BE98D670021E04F /* Migration.swift */,
 				CF76F80124816B3800890DD2 /* MongoClient.swift */,
@@ -1681,6 +1693,7 @@
 				CF986D1C25AE3B090039D287 /* RLMSet_Private.hpp */,
 				023B19551A3BA90D0067FB81 /* RLMSwiftCollectionBase.h */,
 				023B19561A3BA90D0067FB81 /* RLMSwiftCollectionBase.mm */,
+				3F83E9A22630A14800FC9623 /* RLMSwiftProperty.h */,
 				3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */,
 				3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */,
 				CF44460626121B2A00BAFDB4 /* RLMSwiftValueStorage.h */,
@@ -1795,6 +1808,7 @@
 				CF986D2425AE3B090039D287 /* RLMSet.h in Headers */,
 				CF986D1E25AE3B090039D287 /* RLMSet_Private.h in Headers */,
 				5D659EAE1BE04556006515A0 /* RLMSwiftCollectionBase.h in Headers */,
+				3F83E9A42630A14800FC9623 /* RLMSwiftProperty.h in Headers */,
 				5D659EC91BE04556006515A0 /* RLMSwiftSupport.h in Headers */,
 				3F1D9092265C07A600593ABA /* RLMSwiftValueStorage.h in Headers */,
 				1A0512771D8746CD00806AEC /* RLMSyncConfiguration.h in Headers */,
@@ -2522,16 +2536,18 @@
 				5D660FF11BE98D670021E04F /* Aliases.swift in Sources */,
 				681EE33B25EE8E1400A9DEC5 /* AnyRealmValue.swift in Sources */,
 				CFB4313A243DF87100471C18 /* App.swift in Sources */,
-				3F48202426307CE2005B40E8 /* BasicTypes.swift in Sources */,
+				3FE267D7264308680030F83C /* BasicTypes.swift in Sources */,
 				4996EA9E2465BB8A003A1F51 /* BSON.swift in Sources */,
-				3FC3371D2637687300D4CCC4 /* CollectionAccess.swift in Sources */,
+				3FE267D5264308680030F83C /* CollectionAccess.swift in Sources */,
 				3F102CBD23DBC68300108FD2 /* Combine.swift in Sources */,
-				3F48202326307CE2005B40E8 /* ComplexTypes.swift in Sources */,
+				3FE267D6264308680030F83C /* ComplexTypes.swift in Sources */,
 				3FB6ABD92416A27000E318C2 /* Decimal128.swift in Sources */,
 				3FC3F9172419B63200E27322 /* EmbeddedObject.swift in Sources */,
 				29B7FDF61C0DA6560023224E /* Error.swift in Sources */,
 				5D1534B81CCFF545008976D7 /* LinkingObjects.swift in Sources */,
 				5D660FF21BE98D670021E04F /* List.swift in Sources */,
+				3F83E9A12630A0D200FC9623 /* ManagedProperty.swift in Sources */,
+				3FE267D8264308680030F83C /* ManagedPropertyType.swift in Sources */,
 				0C3BD4D325C1C5AB007CFDD3 /* Map.swift in Sources */,
 				5D660FF31BE98D670021E04F /* Migration.swift in Sources */,
 				CF76F80224816B3800890DD2 /* MongoClient.swift in Sources */,
@@ -2545,7 +2561,7 @@
 				5D660FF51BE98D670021E04F /* ObjectSchema.swift in Sources */,
 				5D660FF61BE98D670021E04F /* Optional.swift in Sources */,
 				5D660FF71BE98D670021E04F /* Property.swift in Sources */,
-				3F48202226307CE2005B40E8 /* PropertyAccessors.swift in Sources */,
+				3FE267D9264308680030F83C /* PropertyAccessors.swift in Sources */,
 				5D660FF81BE98D670021E04F /* Realm.swift in Sources */,
 				1AB605D31D495927007F53DE /* RealmCollection.swift in Sources */,
 				5D660FFA1BE98D670021E04F /* RealmConfiguration.swift in Sources */,
@@ -2554,7 +2570,7 @@
 				5D660FFB1BE98D670021E04F /* Results.swift in Sources */,
 				68A7B91D2543538B00C703BC /* RLMSupport.swift in Sources */,
 				5D660FFC1BE98D670021E04F /* Schema.swift in Sources */,
-				3F48202126307CE2005B40E8 /* SchemaDiscovery.swift in Sources */,
+				3FE267DA264308680030F83C /* SchemaDiscovery.swift in Sources */,
 				5D660FFD1BE98D670021E04F /* SortDescriptor.swift in Sources */,
 				535EA9E225B0919800DBF3CD /* SwiftUI.swift in Sources */,
 				1AFEF8431D52D2C900495005 /* Sync.swift in Sources */,

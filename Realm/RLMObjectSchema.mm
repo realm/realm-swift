@@ -70,13 +70,18 @@ using namespace realm;
 }
 
 - (void)_propertiesDidChange {
+    _primaryKeyProperty = nil;
     NSMutableDictionary *map = [NSMutableDictionary dictionaryWithCapacity:_properties.count + _computedProperties.count];
     NSUInteger index = 0;
     for (RLMProperty *prop in _properties) {
         prop.index = index++;
         map[prop.name] = prop;
         if (prop.isPrimary) {
-            self.primaryKeyProperty = prop;
+            if (_primaryKeyProperty) {
+                @throw RLMException(@"Properties '%@' and '%@' are both marked as the primary key of '%@'",
+                                    prop.name, _primaryKeyProperty.name, _className);
+            }
+            _primaryKeyProperty = prop;
         }
     }
     index = 0;

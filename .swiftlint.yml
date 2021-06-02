@@ -20,10 +20,15 @@ identifier_name:
     - _realmColumnNames()
     - _realmObjectName()
     - _rlmCollection()
+    - _rlmDefaultValue()
     - _rlmFromRawValue(_:)
+    - _rlmGetProperty(_:_:)
+    - _rlmGetPropertyOptional(_:_:)
     - _rlmOptional
     - _rlmPopulateProperty(_:)
     - _rlmRequireObjc
+    - _rlmSetAccessor(_:)
+    - _rlmSetProperty(_:_:_:)
     - _rlmToRawValue(_:)
     - _rlmType
     - id
