@@ -179,8 +179,8 @@
 }
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMObjectChangeBlock)block
-                                         queue:(dispatch_queue_t)queue
-                                      keyPaths:(NSArray<NSString *> *)keyPaths {
+                                      keyPaths:(NSArray<NSString *> *)keyPaths
+                                         queue:(dispatch_queue_t)queue {
     return RLMObjectAddNotificationBlock(self, keyPaths, queue, block);
 
 }

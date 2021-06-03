@@ -77,8 +77,7 @@ extension ObjectBase {
      If no key paths are given, the block will be executed on any insertion,
      modification, or deletion for all object properties and nested linked
      properties. If a key path or key paths are provided,
-     then the block will be called for changes which occur on those key paths,
-     or links to those key paths. For example, if:
+     then the block will be called for changes which occur on those key paths. For example, if:
      ```swift
      class Dog: Object {
          @objc dynamic var name: String = ""
@@ -91,14 +90,15 @@ extension ObjectBase {
         // ...
      })
      ```
-     - The above notification block would be called for changes to the
+     - The above notification block fires for changes to the
      `adopted` property, but not for any changes made to `name`.
      - If the observed key path were `["siblings"]`, then any insertion,
-     deletion, or modification to the `siblings` list or objects contained
-     in that list trigger the block.
+     deletion, or modification to the `siblings` list trigger the block. A change to
+     `someSibling.name` would not trigger the block (where `someSibling`
+     is an element contained in `siblings`)
      - If the observed key path were `["siblings.name"]`, then any insertion or
      deletion to the `siblings` list would trigger the block. For objects
-     contained in the `siblings`, only modifications to their `name` property
+     contained in the `siblings` list, only modifications to their `name` property
      will trigger the block.
 
      - note: Multiple notification tokens on the same object which filter for
