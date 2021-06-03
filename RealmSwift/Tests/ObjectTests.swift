@@ -1089,7 +1089,7 @@ class ObjectTests: TestCase {
         try! realm.commitWrite()
 
         // Expect notification for "owners" when a new owner is added.
-        let token = dog.observe(keyPaths: ["owners"], expectChange("name", Int?.none, Int?.none))
+        let token = dog.observe(keyPaths: ["owners"], expectChange("owners", Int?.none, Int?.none))
         try! realm.write({
             let newPerson = SwiftOwnerObject()
             realm.add(newPerson)
@@ -1108,7 +1108,7 @@ class ObjectTests: TestCase {
         try! realm.commitWrite()
 
         // Expect notification for "owners.name" when a new owner is added.
-        let token = dog.observe(keyPaths: ["owners.name"], expectChange("name", Int?.none, Int?.none))
+        let token = dog.observe(keyPaths: ["owners.name"], expectChange("owners", Int?.none, Int?.none))
         try! realm.write({
             let newPerson = SwiftOwnerObject()
             realm.add(newPerson)
