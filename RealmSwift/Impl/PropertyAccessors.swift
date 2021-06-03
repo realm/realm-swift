@@ -21,8 +21,9 @@ import Realm.Private
 
 // Get a pointer to the given property's ivar on the object. This is similar to
 // object_getIvar() but returns a pointer to the value rather than the value.
+@_transparent
 private func ptr(_ property: RLMProperty, _ obj: RLMObjectBase) -> UnsafeMutableRawPointer {
-    return Unmanaged.passUnretained(obj).toOpaque().advanced(by: ivar_getOffset(property.swiftIvar!))
+    return Unmanaged.passUnretained(obj).toOpaque().advanced(by: property.swiftIvar)
 }
 
 // MARK: - Legacy Property Accessors
@@ -206,11 +207,7 @@ internal class PersistedPropertyAccessor<T: _Persistable>: RLMManagedPropertyAcc
     }
 
     @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
-        let v = bound(property, parent).pointee.get(parent)
-        if let v = v as? CustomObjectiveCBridgeable {
-            return v.objCValue
-        }
-        return v
+        return bound(property, parent).pointee.get(parent)
     }
 
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
@@ -226,17 +223,23 @@ internal class PersistedPropertyAccessor<T: _Persistable>: RLMManagedPropertyAcc
     }
 }
 
+internal class BridgedPersistedPropertyAccessor<T: _Persistable>: PersistedPropertyAccessor<T> where T: CustomObjectiveCBridgeable {
+    @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
+        return bound(property, parent).pointee.get(parent).objCValue
+    }
+}
+
 internal class PersistedListAccessor<Element: _Persistable>: PersistedPropertyAccessor<List<Element>>
         where Element: RealmCollectionValue {
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
         assign(value: value, to: bound(property, parent).pointee.get(parent))
     }
-    @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
-        // If we're promoting an unmanaged object which already has a List
-        // initialized, we want to promote that existing List rather than
-        // create a new one
+
+    // When promoting an existing object to managed we want to promote the existing
+    // Swift collection object if it exists
+    @objc override class func promote(_ property: RLMProperty, on parent: RLMObjectBase) {
         let key = PropertyKey(property.index)
-        if let existing = bound(property, parent).pointee.initialize(parent, key: key) {
+        if let existing = bound(property, parent).pointee.initializeCollection(parent, key: key) {
             existing._rlmCollection = RLMGetSwiftPropertyArray(parent, key)
         }
     }
@@ -247,12 +250,9 @@ internal class PersistedSetAccessor<Element: _Persistable>: PersistedPropertyAcc
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
         assign(value: value, to: bound(property, parent).pointee.get(parent))
     }
-    @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
-        // If we're promoting an unmanaged object which already has a MutableSet
-        // initialized, we want to promote that existing MutableSet rather than
-        // create a new one
+    @objc override class func promote(_ property: RLMProperty, on parent: RLMObjectBase) {
         let key = PropertyKey(property.index)
-        if let existing = bound(property, parent).pointee.initialize(parent, key: key) {
+        if let existing = bound(property, parent).pointee.initializeCollection(parent, key: key) {
             existing._rlmCollection = RLMGetSwiftPropertyArray(parent, key)
         }
     }
@@ -263,9 +263,9 @@ internal class PersistedMapAccessor<Key: _MapKey, Value: _Persistable>: Persiste
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
         assign(value: value, to: bound(property, parent).pointee.get(parent))
     }
-    @objc override class func initialize(_ property: RLMProperty, on parent: RLMObjectBase) {
+    @objc override class func promote(_ property: RLMProperty, on parent: RLMObjectBase) {
         let key = PropertyKey(property.index)
-        if let existing = bound(property, parent).pointee.initialize(parent, key: key) {
+        if let existing = bound(property, parent).pointee.initializeCollection(parent, key: key) {
             existing._rlmCollection = RLMGetSwiftPropertyMap(parent, PropertyKey(property.index))
         }
     }

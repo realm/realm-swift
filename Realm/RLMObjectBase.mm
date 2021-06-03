@@ -498,7 +498,7 @@ id RLMObjectFreeze(RLMObjectBase *obj) {
     if (!frozen->_row.is_valid()) {
         @throw RLMException(@"Cannot freeze an object in the same write transaction as it was created in.");
     }
-    RLMInitializeSwiftAccessorGenerics(frozen);
+    RLMInitializeSwiftAccessor(frozen, false);
     return frozen;
 }
 
@@ -516,7 +516,7 @@ id RLMObjectThaw(RLMObjectBase *obj) {
     if (!live->_row.is_valid()) {
         return nil;
     }
-    RLMInitializeSwiftAccessorGenerics(live);
+    RLMInitializeSwiftAccessor(live, false);
     return live;
 }
 

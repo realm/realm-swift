@@ -90,6 +90,8 @@ extension List: SchemaDiscoverable where Element: _RealmSchemaDiscoverable {
 }
 
 extension List: _Persistable, _DefaultConstructible where Element: _Persistable {
+    public static var _rlmRequiresCaching: Bool { true }
+
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
         return Self(objc: RLMGetSwiftPropertyArray(obj, key))
     }
@@ -105,7 +107,7 @@ extension List: _Persistable, _DefaultConstructible where Element: _Persistable 
         array.addObjects(value.rlmArray)
     }
 
-    static public func _rlmSetAccessor(_ prop: RLMProperty) {
+    public static func _rlmSetAccessor(_ prop: RLMProperty) {
         prop.swiftAccessor = PersistedListAccessor<Element>.self
     }
 }
@@ -122,6 +124,8 @@ extension MutableSet: SchemaDiscoverable where Element: _RealmSchemaDiscoverable
 }
 
 extension MutableSet: _Persistable, _DefaultConstructible where Element: _Persistable {
+    public static var _rlmRequiresCaching: Bool { true }
+
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
         return Self(objc: RLMGetSwiftPropertySet(obj, key))
     }
@@ -137,7 +141,7 @@ extension MutableSet: _Persistable, _DefaultConstructible where Element: _Persis
         set.addObjects(value.rlmSet)
     }
 
-    static public func _rlmSetAccessor(_ prop: RLMProperty) {
+    public static func _rlmSetAccessor(_ prop: RLMProperty) {
         prop.swiftAccessor = PersistedSetAccessor<Element>.self
     }
 }
@@ -155,6 +159,8 @@ extension Map: SchemaDiscoverable where Value: _RealmSchemaDiscoverable {
 }
 
 extension Map: _Persistable, _DefaultConstructible where Value: _Persistable {
+    public static var _rlmRequiresCaching: Bool { true }
+
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Self {
         return Self(objc: RLMGetSwiftPropertyMap(obj, key))
     }
@@ -170,7 +176,7 @@ extension Map: _Persistable, _DefaultConstructible where Value: _Persistable {
         map.addEntries(fromDictionary: value.rlmDictionary)
     }
 
-    static public func _rlmSetAccessor(_ prop: RLMProperty) {
+    public static func _rlmSetAccessor(_ prop: RLMProperty) {
         prop.swiftAccessor = PersistedMapAccessor<Key, Value>.self
     }
 }
@@ -220,7 +226,7 @@ extension LinkingObjects: _Persistable where Element: _Persistable {
         fatalError("LinkingObjects properties are read-only")
     }
 
-    static public func _rlmSetAccessor(_ prop: RLMProperty) {
+    public static func _rlmSetAccessor(_ prop: RLMProperty) {
         prop.swiftAccessor = PersistedLinkingObjectsAccessor<Element>.self
     }
 }
@@ -247,6 +253,9 @@ extension Optional: _Persistable where Wrapped: _Persistable {
         } else {
             RLMSetSwiftPropertyNil(obj, key)
         }
+    }
+    public static func _rlmSetAccessor(_ prop: RLMProperty) {
+        Wrapped._rlmSetAccessor(prop)
     }
 }
 
@@ -284,7 +293,11 @@ extension RawRepresentable where Self: _Persistable, RawValue: _Persistable {
         RawValue._rlmSetProperty(obj, key, value.rawValue)
     }
     public static func _rlmSetAccessor(_ prop: RLMProperty) {
-        prop.swiftAccessor = PersistedEnumAccessor<Self>.self
+        if prop.optional {
+            prop.swiftAccessor = BridgedPersistedPropertyAccessor<Optional<Self>>.self
+        } else {
+            prop.swiftAccessor = PersistedEnumAccessor<Self>.self
+        }
     }
 }
 

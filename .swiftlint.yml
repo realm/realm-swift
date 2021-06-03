@@ -28,6 +28,7 @@ identifier_name:
     - _rlmOptional
     - _rlmPopulateProperty(_:)
     - _rlmRequireObjc
+    - _rlmRequiresCaching
     - _rlmSetAccessor(_:)
     - _rlmSetProperty(_:_:_:)
     - _rlmToRawValue(_:)

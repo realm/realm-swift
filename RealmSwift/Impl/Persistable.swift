@@ -42,10 +42,19 @@ public protocol _Persistable: _RealmSchemaDiscoverable {
     // Set the swiftAccessor for this type if the default PersistedPropertyAccessor
     // is not suitable.
     static func _rlmSetAccessor(_ prop: RLMProperty)
+    // Do the values of this type need to be cached on the Persisted?
+    static var _rlmRequiresCaching: Bool { get }
 }
 extension _Persistable {
-    static public func _rlmSetAccessor(_ prop: RLMProperty) {
-        prop.swiftAccessor = PersistedPropertyAccessor<Self>.self
+    public static func _rlmSetAccessor(_ prop: RLMProperty) {
+        if prop.optional {
+            prop.swiftAccessor = PersistedPropertyAccessor<Optional<Self>>.self
+        } else {
+            prop.swiftAccessor = PersistedPropertyAccessor<Self>.self
+        }
+    }
+    public static var _rlmRequiresCaching: Bool {
+        false
     }
 }
 

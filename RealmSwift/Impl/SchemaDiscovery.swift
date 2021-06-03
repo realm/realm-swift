@@ -68,7 +68,7 @@ private func getModernProperties(_ object: ObjectBase) -> [RLMProperty] {
             return nil
         }
         let property = RLMProperty(name: label, value: value)
-        property.swiftIvar = class_getInstanceVariable(type(of: object), label)
+        property.swiftIvar = ivar_getOffset(class_getInstanceVariable(type(of: object), label)!)
         return property
     }
 }
@@ -166,7 +166,7 @@ private func getLegacyProperties(_ object: ObjectBase, _ cls: ObjectBase.Type) -
             // Implicitly ignore non-@objc dynamic properties
             return nil
         } else {
-            property.swiftIvar = class_getInstanceVariable(cls, label)
+            property.swiftIvar = ivar_getOffset(class_getInstanceVariable(cls, label)!)
         }
 
         property.updateAccessors()

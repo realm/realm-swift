@@ -74,8 +74,10 @@ NS_RETURNS_RETAINED;
 //
 
 
-// switch List<> properties from being backed by unmanaged RLMArrays to RLMManagedArray
-void RLMInitializeSwiftAccessorGenerics(RLMObjectBase *object);
+// Perform the per-property accessor initialization for a managed RealmSwiftObject
+// promotingExisting should be true if the object was previously used as an
+// unmanaged object, and false if it is a newly created object.
+void RLMInitializeSwiftAccessor(RLMObjectBase *object, bool promotingExisting);
 
 #ifdef __cplusplus
 }

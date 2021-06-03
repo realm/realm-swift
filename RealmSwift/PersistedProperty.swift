@@ -128,9 +128,12 @@ public struct Persisted<Value: _Persistable> {
         }
     }
 
-    @discardableResult
-    internal mutating func initialize(_ object: ObjectBase, key: PropertyKey) -> Value? {
-        if case let .unmanaged(value, _, _) = storage, value is MutableRealmCollection {
+    internal mutating func initialize(_ object: ObjectBase, key: PropertyKey) {
+        storage = .managed(key: key)
+    }
+
+    internal mutating func initializeCollection(_ object: ObjectBase, key: PropertyKey) -> Value? {
+        if case let .unmanaged(value, _, _) = storage {
             storage = .managedCached(value: value, key: key)
             return value
         }
@@ -150,7 +153,7 @@ public struct Persisted<Value: _Persistable> {
             return value
         case let .managed(key):
             let v = Value._rlmGetProperty(object, key)
-            if v is MutableRealmCollection {
+            if Value._rlmRequiresCaching {
                 storage = .managedCached(value: v, key: key)
             }
             return v

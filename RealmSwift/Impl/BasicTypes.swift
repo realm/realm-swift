@@ -311,4 +311,8 @@ extension AnyRealmValue: _Persistable, _DefaultConstructible {
     public static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: AnyRealmValue) {
         RLMSetSwiftPropertyAny(obj, key, value.objCValue as! RLMValue)
     }
+
+    public static func _rlmSetAccessor(_ prop: RLMProperty) {
+        prop.swiftAccessor = BridgedPersistedPropertyAccessor<Self>.self
+    }
 }

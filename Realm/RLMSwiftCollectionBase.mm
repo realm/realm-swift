@@ -95,6 +95,10 @@
     return NO;
 }
 
+- (BOOL)conformsToProtocol:(Protocol *)aProtocol {
+    return aProtocol == @protocol(NSFastEnumeration) || [self._rlmCollection conformsToProtocol:aProtocol];
+}
+
 @end
 
 #pragma clang diagnostic pop
