@@ -941,7 +941,7 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
 
-    func testLinkPropertyKeyPathNotifications0() {
+    func testLinkPropertyKeyPathNotifications1() {
         let realm = try! Realm()
         realm.beginWrite()
         let person = realm.create(SwiftOwnerObject.self)
@@ -958,7 +958,7 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
 
-    func testLinkPropertyKeyPathNotifications1() {
+    func testLinkPropertyKeyPathNotifications2() {
         let realm = try! Realm()
         realm.beginWrite()
         let person = realm.create(SwiftOwnerObject.self)
@@ -976,7 +976,7 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
 
-    func testLinkPropertyKeyPathNotifications2() {
+    func testLinkPropertyKeyPathNotifications3() {
         let realm = try! Realm()
         realm.beginWrite()
         let person = realm.create(SwiftOwnerObject.self)
@@ -997,7 +997,7 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
 
-    func testLinkPropertyKeyPathNotifications3() {
+    func testLinkPropertyKeyPathNotifications4() {
         let realm = try! Realm()
         realm.beginWrite()
         let person = realm.create(SwiftOwnerObject.self)

@@ -475,7 +475,7 @@ class RealmCollectionTypeTests: TestCase {
         token2.invalidate()
     }
 
-    func testObserveKeyPath0() {
+    func testObserveKeyPath1() {
         var ex = expectation(description: "initial notification")
         let token0 = collection.observe(keyPaths: ["stringCol"]) { (changes: RealmCollectionChange) in
             switch changes {
@@ -505,7 +505,7 @@ class RealmCollectionTypeTests: TestCase {
         token0.invalidate()
     }
 
-    func testObserveKeyPath1() {
+    func testObserveKeyPath2() {
         var ex = expectation(description: "initial notification")
         let token0 = collection.observe(keyPaths: ["stringCol"]) { (changes: RealmCollectionChange) in
             switch changes {
@@ -536,7 +536,7 @@ class RealmCollectionTypeTests: TestCase {
         token0.invalidate()
     }
 
-    func testObserveKeyPathWithLink0() {
+    func testObserveKeyPathWithLink1() {
         var ex = expectation(description: "initial notification")
         let token = collection.observe(keyPaths: ["linkCol.id"]) { (changes: RealmCollectionChange) in
             switch changes {
@@ -569,7 +569,7 @@ class RealmCollectionTypeTests: TestCase {
         token.invalidate()
     }
 
-    func testObserveKeyPathWithLink1() {
+    func testObserveKeyPathWithLink2() {
         var ex = expectation(description: "initial notification")
         let token = collection.observe(keyPaths: ["linkCol.id"]) { (changes: RealmCollectionChange) in
             switch changes {
@@ -1251,19 +1251,19 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         assertThrows(collection.observe { _ in })
     }
 
-    override func testObserveKeyPath0() {
-        assertThrows(collection.observe { _ in })
-    }
-
     override func testObserveKeyPath1() {
         assertThrows(collection.observe { _ in })
     }
 
-    override func testObserveKeyPathWithLink0() {
+    override func testObserveKeyPath2() {
         assertThrows(collection.observe { _ in })
     }
 
     override func testObserveKeyPathWithLink1() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObserveKeyPathWithLink2() {
         assertThrows(collection.observe { _ in })
     }
 
