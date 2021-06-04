@@ -19,7 +19,7 @@
 import Realm
 import Realm.Private
 
-extension Object: SchemaDiscoverable, _Persistable, _DefaultConstructible {
+extension Object: SchemaDiscoverable, _OptionalPersistable, _DefaultConstructible {
     public static var _rlmType: PropertyType { .object }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         if !prop.optional && !prop.collection {
@@ -55,7 +55,7 @@ extension Object: SchemaDiscoverable, _Persistable, _DefaultConstructible {
     }
 }
 
-extension EmbeddedObject: SchemaDiscoverable, _Persistable, _DefaultConstructible {
+extension EmbeddedObject: SchemaDiscoverable, _OptionalPersistable, _DefaultConstructible {
     public static var _rlmType: PropertyType { .object }
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         Object._rlmPopulateProperty(prop)
@@ -239,7 +239,7 @@ extension Optional: SchemaDiscoverable, _RealmSchemaDiscoverable where Wrapped: 
     }
 }
 
-extension Optional: _Persistable where Wrapped: _Persistable {
+extension Optional: _Persistable where Wrapped: _OptionalPersistable {
     public static func _rlmDefaultValue() -> Self { return .none }
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Wrapped? {
         return Wrapped._rlmGetPropertyOptional(obj, key)
@@ -282,7 +282,7 @@ extension RawRepresentable where RawValue: _RealmSchemaDiscoverable {
     }
 }
 
-extension RawRepresentable where Self: _Persistable, RawValue: _Persistable {
+extension RawRepresentable where Self: _OptionalPersistable, RawValue: _OptionalPersistable {
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: PropertyKey) -> Self {
         return Self(rawValue: RawValue._rlmGetProperty(obj, key))!
     }

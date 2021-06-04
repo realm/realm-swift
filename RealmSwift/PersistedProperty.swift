@@ -245,7 +245,7 @@ extension Persisted: Encodable where Value: Encodable {
 
  If the Realm contains a value which is not a valid member of the enum (such as if it was written by a different sync client which disagrees on which values are valid), optional enum properties will return `nil`, and non-optional properties will abort the process.
  */
-public protocol PersistableEnum: _Persistable, RawRepresentable, CaseIterable, RealmEnum {}
+public protocol PersistableEnum: _OptionalPersistable, RawRepresentable, CaseIterable, RealmEnum {}
 
 /// A type which can be indexed.
 ///

@@ -46,15 +46,22 @@ public protocol _Persistable: _RealmSchemaDiscoverable {
     static var _rlmRequiresCaching: Bool { get }
 }
 extension _Persistable {
+    public static var _rlmRequiresCaching: Bool {
+        false
+    }
+}
+
+// A tag protocol for persistable types which can appear inside Optional
+public protocol _OptionalPersistable: _Persistable {
+}
+
+extension _OptionalPersistable {
     public static func _rlmSetAccessor(_ prop: RLMProperty) {
         if prop.optional {
             prop.swiftAccessor = PersistedPropertyAccessor<Optional<Self>>.self
         } else {
             prop.swiftAccessor = PersistedPropertyAccessor<Self>.self
         }
-    }
-    public static var _rlmRequiresCaching: Bool {
-        false
     }
 }
 

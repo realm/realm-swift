@@ -537,13 +537,6 @@ class ObjectSchemaInitializationTests: TestCase {
         assertType(Map<String, Object?>.self, .object, optional: true, map: true, objectType: "RealmSwiftObject")
         assertType(Map<String, EmbeddedObject?>.self, .object, optional: true, map: true, objectType: "RealmSwiftEmbeddedObject")
 
-        assertThrows(RLMProperty(name: "_name", value: Persisted<AnyRealmValue?>()),
-                     reason: "AnyRealmValue property 'name' must not be marked as optional: nil values are represented as AnyRealmValue.none")
-        assertThrows(RLMProperty(name: "_name", value: Persisted<List<AnyRealmValue?>>()),
-                     reason: "List<AnyRealmValue> property 'name' must not be marked as optional: nil values are represented as AnyRealmValue.none")
-        assertThrows(RLMProperty(name: "_name", value: Persisted<MutableSet<AnyRealmValue?>>()),
-                     reason: "MutableSet<AnyRealmValue> property 'name' must not be marked as optional: nil values are represented as AnyRealmValue.none")
-
         assertThrows(RLMProperty(name: "_name", value: Persisted<Object>()),
                      reason: "Object property 'name' must be marked as optional.")
         assertThrows(RLMProperty(name: "_name", value: Persisted<List<Object?>>()),
