@@ -678,6 +678,10 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
             waitForExpectations(timeout: 2.0, handler: nil)
             token?.invalidate()
             token = nil
+
+            realm.beginWrite()
+            realm.delete(realm.objects(SwiftStringObject.self))
+            realm.delete(realm.objects(SwiftMapPropertyObject.self))
         }
     }
 
@@ -738,6 +742,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
             token = nil
             realm.beginWrite()
             realm.delete(realm.objects(SwiftStringObject.self))
+            realm.delete(realm.objects(SwiftMapPropertyObject.self))
         }
     }
 }
