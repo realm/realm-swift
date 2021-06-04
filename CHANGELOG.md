@@ -1,3 +1,22 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* None.
+
+### Fixed
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
+
+### Internal
+* Upgraded realm-core from v11.0.0-beta.6 to v11.0.0
+
 10.8.0-beta.2 Release notes (2021-06-01)
 =============================================================
 
