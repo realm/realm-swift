@@ -736,6 +736,8 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
 
             token?.invalidate()
             token = nil
+            realm.beginWrite()
+            realm.delete(realm.objects(SwiftStringObject.self))
         }
     }
 }
