@@ -428,7 +428,6 @@ static NSURL *syncDirectoryForChildProcess() {
 + (XCTestSuite *)defaultTestSuite {
     if ([RealmServer haveServer]) {
         return [super defaultTestSuite];
-
     }
     NSLog(@"Skipping sync tests: server is not present. Run `build.sh setup-baas` to install it.");
     return [[XCTestSuite alloc] initWithName:[super defaultTestSuite].name];

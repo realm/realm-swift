@@ -1,5 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
+Xcode 12.2 is now the minimum supported version.
+
 ### Enhancements
 * None.
 

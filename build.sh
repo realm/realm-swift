@@ -127,12 +127,8 @@ xc() {
 
 xctest() {
   local scheme="$1"
-  local test_plan="$(echo $1 | tr -d ' ')"
-  if (( $(xcode_version_major) < 12 )); then
-    test_plan="${test_plan}Xcode11"
-  fi
-  xc -scheme "$scheme" -testPlan "$test_plan" "${@:2}" build-for-testing
-  xc -scheme "$scheme" -testPlan "$test_plan" "${@:2}" test-without-building
+  xc -scheme "$scheme" "${@:2}" build-for-testing
+  xc -scheme "$scheme" "${@:2}" test-without-building
 }
 
 build_combined() {
@@ -360,17 +356,6 @@ download_common() {
         if [ ! -f core/version.txt ]; then
             printf %s "${version}" > core/version.txt
         fi
-
-        # Xcode 11 dsymutil crashes when given debugging symbols created by
-        # Xcode 12. Check if this breaks, and strip them if so.
-        local test_lib=core/realm-monorepo.xcframework/ios-*-simulator/librealm-monorepo.a
-        xcrun clang++ -Wl,-all_load -g -arch x86_64 -shared -target ios13.0 \
-          -isysroot $(xcrun --sdk iphonesimulator --show-sdk-path) -o tmp.dylib \
-          $test_lib -lz -framework Security
-        if ! dsymutil tmp.dylib -o tmp.dSYM 2> /dev/null; then
-            find core -name '*.a' -exec strip -x "{}" \; 2> /dev/null
-        fi
-        rm -r tmp.dylib tmp.dSYM
 
         mv core "${versioned_dir}"
     )
@@ -1367,6 +1352,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.5.
 * CocoaPods: 1.10 or later.
+* Xcode: 12.2-12.5.
 
 ### Internal
 * Upgraded realm-core from ? to ?

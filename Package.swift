@@ -1,4 +1,4 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.3
 
 import PackageDescription
 import Foundation
@@ -36,15 +36,6 @@ let testCxxSettings: [CXXSetting] = cxxSettings + [
     .headerSearchPath(".."),
 ]
 
-// SPM is supposed to weak-link frameworks that rely on a newer deployment
-// target than the package's, but doesn't do so correctly for Combine
-func combineFlags() -> [SwiftSetting]? {
-    if #available(macOS 10.15, *) {
-        return [.define("REALM_HAVE_COMBINE")]
-    }
-    return nil
-}
-
 // Xcode 12.5's xctest crashes when reading obj-c metadata if the Swift tests
 // aren't built targeting macOS 11. We still want all of the non-test code to
 // target the normal lower version, though.
@@ -56,10 +47,60 @@ func hostMachineArch() -> String {
 }
 let testSwiftSettings: [SwiftSetting]?
 #if swift(>=5.4)
-testSwiftSettings = [.unsafeFlags(["-target", "\(hostMachineArch())-apple-macosx11.0"])] + (combineFlags() ?? [])
+testSwiftSettings = [.unsafeFlags(["-target", "\(hostMachineArch())-apple-macosx11.0"])]
 #else
-testSwiftSettings = combineFlags()
+testSwiftSettings = nil
 #endif
+
+// SPM requires all targets to explicitly include or exclude every file, which
+// gets very awkward when we have four targets building from a single directory
+let objectServerTestSources = [
+    "Object-Server-Tests-Bridging-Header.h",
+    "ObjectServerTests-Info.plist",
+    "RLMBSONTests.mm",
+    "RLMObjectServerTests.mm",
+    "RLMSyncTestCase.h",
+    "RLMSyncTestCase.mm",
+    "RLMTestUtils.h",
+    "RLMTestUtils.m",
+    "RLMUser+ObjectServerTests.h",
+    "RLMUser+ObjectServerTests.mm",
+    "RLMWatchTestUtility.h",
+    "RLMWatchTestUtility.m",
+    "RealmServer.swift",
+    "SwiftBSONTests.swift",
+    "SwiftObjectServerTests.swift",
+    "SwiftSyncTestCase.swift",
+    "TimeoutProxyServer.swift",
+    "WatchTestUtility.swift",
+    "certificates",
+    "include",
+    "setup_baas.rb",
+]
+
+func objectServerTestSupportTarget(name: String, dependencies: [Target.Dependency], sources: [String]) -> Target {
+    .target(
+        name: name,
+        dependencies: dependencies,
+        path: "Realm/ObjectServerTests",
+        exclude: objectServerTestSources.filter { !sources.contains($0) },
+        sources: sources,
+        cxxSettings: testCxxSettings,
+        swiftSettings: testSwiftSettings
+    )
+}
+
+func objectServerTestTarget(name: String, sources: [String]) -> Target {
+    .testTarget(
+        name: name,
+        dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftSyncTestSupport"],
+        path: "Realm/ObjectServerTests",
+        exclude: objectServerTestSources.filter { !sources.contains($0) },
+        sources: sources,
+        cxxSettings: testCxxSettings,
+        swiftSettings: testSwiftSettings
+    )
+}
 
 let package = Package(
     name: "Realm",
@@ -78,13 +119,48 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
+        .package(name: "RealmDatabase", url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!))
     ],
     targets: [
       .target(
             name: "Realm",
-            dependencies: ["RealmObjectStore"],
+            dependencies: [.product(name: "RealmObjectStore", package: "RealmDatabase")],
             path: ".",
+            exclude: [
+                "CHANGELOG.md",
+                "CONTRIBUTING.md",
+                "Carthage",
+                "Configuration",
+                "Jenkinsfile.releasability",
+                "LICENSE",
+                "Package.resolved",
+                "Package.swift",
+                "README.md",
+                "Realm.podspec",
+                "Realm.xcodeproj",
+                "Realm/ObjectServerTests",
+                "Realm/RLMPlatform.h",
+                "Realm/RLMPlatform.h.in",
+                "Realm/Realm-Info.plist",
+                "Realm/Swift/RLMSupport.swift",
+                "Realm/TestUtils",
+                "Realm/Tests",
+                "RealmSwift",
+                "RealmSwift.podspec",
+                "SUPPORT.md",
+                "build",
+                "build.sh",
+                "contrib",
+                "core",
+                "dependencies.list",
+                "docs",
+                "examples",
+                "include",
+                "logo.png",
+                "plugin",
+                "scripts",
+                "tools",
+            ],
             sources: [
                 "Realm/RLMAccessor.mm",
                 "Realm/RLMAnalytics.mm",
@@ -149,10 +225,10 @@ let package = Package(
             dependencies: ["Realm"],
             path: "RealmSwift",
             exclude: [
+                "Nonsync.swift",
+                "RealmSwift-Info.plist",
                 "Tests",
-                "Nonsync.swift"
-            ],
-            swiftSettings: combineFlags()
+            ]
         ),
         .target(
             name: "RealmTestSupport",
@@ -165,11 +241,14 @@ let package = Package(
             dependencies: ["Realm", "RealmTestSupport"],
             path: "Realm/Tests",
             exclude: [
+                "PrimitiveArrayPropertyTests.tpl.m",
+                "RealmTests-Info.plist",
                 "Swift",
                 "SwiftUITestHost",
                 "SwiftUITestHostUITests",
                 "TestHost",
-                "PrimitiveArrayPropertyTests.tpl.m",
+                "fileformat-pre-null.realm",
+                "tests.py",
             ],
             cxxSettings: testCxxSettings
         ),
@@ -183,7 +262,7 @@ let package = Package(
             name: "RealmSwiftTests",
             dependencies: ["RealmSwift", "RealmTestSupport"],
             path: "RealmSwift/Tests",
-            exclude: ["TestUtils.mm"],
+            exclude: ["TestUtils.mm", "RealmSwiftTests-Info.plist"],
             swiftSettings: testSwiftSettings
         ),
 
@@ -191,45 +270,35 @@ let package = Package(
         // Swift which is used by both the obj-c and swift test code. SPM
         // doesn't support mixed targets, so this ends up requiring four
         // different targest.
-        .target(
+        objectServerTestSupportTarget(
             name: "RealmSyncTestSupport",
             dependencies: ["Realm", "RealmSwift", "RealmTestSupport"],
-            path: "Realm/ObjectServerTests",
-            sources: ["RLMSyncTestCase.mm", "RLMUser+ObjectServerTests.mm"],
-            cxxSettings: testCxxSettings
+            sources: ["RLMSyncTestCase.mm", "RLMUser+ObjectServerTests.mm"]
         ),
-        .target(
+        objectServerTestSupportTarget(
             name: "RealmSwiftSyncTestSupport",
             dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport"],
-            path: "Realm/ObjectServerTests",
             sources: [
                  "SwiftSyncTestCase.swift",
                  "TimeoutProxyServer.swift",
                  "WatchTestUtility.swift",
                  "RealmServer.swift"
-            ],
-            swiftSettings: testSwiftSettings
+            ]
         ),
-        .testTarget(
+        objectServerTestTarget(
             name: "SwiftObjectServerTests",
-            dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftSyncTestSupport"],
-            path: "Realm/ObjectServerTests",
             sources: [
                  "SwiftObjectServerTests.swift",
                  "SwiftBSONTests.swift"
-            ],
-            swiftSettings: testSwiftSettings
+            ]
         ),
-        .testTarget(
+        objectServerTestTarget(
             name: "ObjcObjectServerTests",
-            dependencies: ["RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftSyncTestSupport"],
-            path: "Realm/ObjectServerTests",
             sources: [
                 "RLMBSONTests.mm",
                 "RLMObjectServerTests.mm",
                 "RLMWatchTestUtility.m"
-            ],
-            cxxSettings: testCxxSettings
+            ]
         )
     ],
     cxxLanguageStandard: .cxx1z

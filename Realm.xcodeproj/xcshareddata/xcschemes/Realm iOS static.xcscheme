@@ -68,15 +68,6 @@
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-      <TestPlans>
-         <TestPlanReference
-            reference = "container:Configuration/RealmiOSstatic.xctestplan"
-            default = "YES">
-         </TestPlanReference>
-         <TestPlanReference
-            reference = "container:Configuration/RealmiOSstaticXcode11.xctestplan">
-         </TestPlanReference>
-      </TestPlans>
       <Testables>
          <TestableReference
             skipped = "NO">

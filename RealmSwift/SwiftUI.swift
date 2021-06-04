@@ -18,7 +18,7 @@
 
 import Foundation
 
-#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.3.1) && (REALM_HAVE_COMBINE || !SWIFT_PACKAGE)
+#if canImport(SwiftUI) && canImport(Combine)
 import SwiftUI
 import Combine
 import Realm

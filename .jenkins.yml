@@ -4,8 +4,6 @@
 # This is a generated file produced by scripts/pr-ci-matrix.rb.
 
 xcode_version:
- - 11.3
- - 11.7
  - 12.2
  - 12.4
  - 12.5
@@ -43,71 +41,29 @@ configuration:
 
 exclude:
 
-  - xcode_version: 11.3
-    target: docs
-
-  - xcode_version: 11.7
-    target: docs
-
   - xcode_version: 12.2
     target: docs
 
   - xcode_version: 12.4
     target: docs
 
-  - xcode_version: 11.3
-    target: swiftlint
-
-  - xcode_version: 11.7
-    target: swiftlint
-
   - xcode_version: 12.2
     target: swiftlint
 
   - xcode_version: 12.4
     target: swiftlint
-
-  - xcode_version: 11.7
-    target: osx-encryption
-
-  - xcode_version: 12.2
-    target: osx-encryption
 
   - xcode_version: 12.4
     target: osx-encryption
 
-  - xcode_version: 11.7
-    target: osx-object-server
-
-  - xcode_version: 12.2
-    target: osx-object-server
-
   - xcode_version: 12.4
     target: osx-object-server
 
-  - xcode_version: 11.3
-    target: swiftpm
-
-  - xcode_version: 11.3
-    target: swiftpm-debug
-
-  - xcode_version: 11.3
-    target: swiftpm-address
-
-  - xcode_version: 11.7
-    target: swiftpm-address
-
   - xcode_version: 12.2
     target: swiftpm-address
 
   - xcode_version: 12.4
     target: swiftpm-address
-
-  - xcode_version: 11.3
-    target: swiftpm-thread
-
-  - xcode_version: 11.7
-    target: swiftpm-thread
 
   - xcode_version: 12.2
     target: swiftpm-thread
@@ -115,89 +71,35 @@ exclude:
   - xcode_version: 12.4
     target: swiftpm-thread
 
-  - xcode_version: 11.3
-    target: swiftpm-ios
-
-  - xcode_version: 11.7
-    target: swiftpm-ios
-
   - xcode_version: 12.2
     target: swiftpm-ios
 
   - xcode_version: 12.4
     target: swiftpm-ios
-
-  - xcode_version: 11.7
-    target: ios-static
-
-  - xcode_version: 12.2
-    target: ios-static
 
   - xcode_version: 12.4
     target: ios-static
 
-  - xcode_version: 11.7
-    target: ios-dynamic
-
-  - xcode_version: 12.2
-    target: ios-dynamic
-
   - xcode_version: 12.4
     target: ios-dynamic
-
-  - xcode_version: 11.7
-    target: watchos
-
-  - xcode_version: 12.2
-    target: watchos
 
   - xcode_version: 12.4
     target: watchos
 
-  - xcode_version: 11.7
-    target: tvos
-
-  - xcode_version: 12.2
-    target: tvos
-
   - xcode_version: 12.4
     target: tvos
-
-  - xcode_version: 11.7
-    target: ios-swift
-
-  - xcode_version: 12.2
-    target: ios-swift
 
   - xcode_version: 12.4
     target: ios-swift
 
-  - xcode_version: 11.7
-    target: tvos-swift
-
-  - xcode_version: 12.2
-    target: tvos-swift
-
   - xcode_version: 12.4
     target: tvos-swift
 
-  - xcode_version: 11.3
-    target: osx-swift-evolution
-
-  - xcode_version: 11.7
-    target: osx-swift-evolution
-
   - xcode_version: 12.2
     target: osx-swift-evolution
 
   - xcode_version: 12.4
     target: osx-swift-evolution
-
-  - xcode_version: 11.3
-    target: ios-swift-evolution
-
-  - xcode_version: 11.7
-    target: ios-swift-evolution
 
   - xcode_version: 12.2
     target: ios-swift-evolution
@@ -205,80 +107,32 @@ exclude:
   - xcode_version: 12.4
     target: ios-swift-evolution
 
-  - xcode_version: 11.3
-    target: tvos-swift-evolution
-
-  - xcode_version: 11.7
-    target: tvos-swift-evolution
-
   - xcode_version: 12.2
     target: tvos-swift-evolution
 
   - xcode_version: 12.4
     target: tvos-swift-evolution
-
-  - xcode_version: 11.7
-    target: catalyst
-
-  - xcode_version: 12.2
-    target: catalyst
 
   - xcode_version: 12.4
     target: catalyst
 
-  - xcode_version: 11.7
-    target: catalyst-swift
-
-  - xcode_version: 12.2
-    target: catalyst-swift
-
   - xcode_version: 12.4
     target: catalyst-swift
-
-  - xcode_version: 11.3
-    target: xcframework
-
-  - xcode_version: 11.7
-    target: xcframework
 
   - xcode_version: 12.2
     target: xcframework
 
   - xcode_version: 12.4
     target: xcframework
-
-  - xcode_version: 11.7
-    target: cocoapods-ios
-
-  - xcode_version: 12.2
-    target: cocoapods-ios
 
   - xcode_version: 12.4
     target: cocoapods-ios
 
-  - xcode_version: 11.7
-    target: cocoapods-ios-dynamic
-
-  - xcode_version: 12.2
-    target: cocoapods-ios-dynamic
-
   - xcode_version: 12.4
     target: cocoapods-ios-dynamic
 
-  - xcode_version: 11.7
-    target: cocoapods-watchos
-
-  - xcode_version: 12.2
-    target: cocoapods-watchos
-
   - xcode_version: 12.4
     target: cocoapods-watchos
-
-  - xcode_version: 11.3
-    target: swiftui-ios
-
-  - xcode_version: 11.7
-    target: swiftui-ios
 
   - xcode_version: 12.2
     target: swiftui-ios
