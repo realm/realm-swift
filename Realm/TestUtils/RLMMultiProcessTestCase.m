@@ -140,6 +140,7 @@
     [env removeObjectForKey:@"XCTestConfigurationFilePath"];
     [env removeObjectForKey:@"XCTestSessionIdentifier"];
     [env removeObjectForKey:@"XPC_SERVICE_NAME"];
+    [env removeObjectForKey:@"XCTestBundlePath"];
 
     NSTask *task = [[NSTask alloc] init];
     task.launchPath = self.xctestPath;
