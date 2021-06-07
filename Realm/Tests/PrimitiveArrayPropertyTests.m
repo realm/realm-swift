@@ -5446,7 +5446,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertThrowsWithReason(array[0] = @0, @"thread");
         RLMAssertThrowsWithReason([array valueForKey:@"self"], @"thread");
         RLMAssertThrowsWithReason([array setValue:@1 forKey:@"self"], @"thread");
-        RLMAssertThrowsWithReason({for (__unused id obj in array);}, @"thread");
+        RLMAssertThrowsWithReason(({for (__unused id obj in array);}), @"thread");
     }];
 }
 
@@ -5485,7 +5485,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertThrowsWithReason(array[0] = @0, @"invalidated");
     RLMAssertThrowsWithReason([array valueForKey:@"self"], @"invalidated");
     RLMAssertThrowsWithReason([array setValue:@1 forKey:@"self"], @"invalidated");
-    RLMAssertThrowsWithReason({for (__unused id obj in array);}, @"invalidated");
+    RLMAssertThrowsWithReason(({for (__unused id obj in array);}), @"invalidated");
 
     [realm beginWriteTransaction];
 }
@@ -5513,7 +5513,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertNoThrow([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]]);
     XCTAssertNoThrow(array[0]);
     XCTAssertNoThrow([array valueForKey:@"self"]);
-    XCTAssertNoThrow({for (__unused id obj in array);});
+    XCTAssertNoThrow(({for (__unused id obj in array);}));
 
 
     RLMAssertThrowsWithReason([array addObject:@0], @"write transaction");

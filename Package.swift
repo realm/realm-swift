@@ -68,7 +68,6 @@ let objectServerTestSources = [
     "RLMWatchTestUtility.h",
     "RLMWatchTestUtility.m",
     "RealmServer.swift",
-    "SwiftBSONTests.swift",
     "SwiftObjectServerTests.swift",
     "SwiftSyncTestCase.swift",
     "TimeoutProxyServer.swift",
@@ -262,7 +261,7 @@ let package = Package(
             name: "RealmSwiftTests",
             dependencies: ["RealmSwift", "RealmTestSupport"],
             path: "RealmSwift/Tests",
-            exclude: ["TestUtils.mm", "RealmSwiftTests-Info.plist"],
+            exclude: ["RealmSwiftTests-Info.plist"],
             swiftSettings: testSwiftSettings
         ),
 
@@ -287,10 +286,7 @@ let package = Package(
         ),
         objectServerTestTarget(
             name: "SwiftObjectServerTests",
-            sources: [
-                 "SwiftObjectServerTests.swift",
-                 "SwiftBSONTests.swift"
-            ]
+            sources: ["SwiftObjectServerTests.swift"]
         ),
         objectServerTestTarget(
             name: "ObjcObjectServerTests",

@@ -13,6 +13,7 @@ Xcode 12.2 is now the minimum supported version.
 * None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Fix warnings when building with Xcode 13 beta 1.
 
 ### Compatibility
 * Realm Studio: 10.0.0 or later.

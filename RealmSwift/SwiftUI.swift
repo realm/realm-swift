@@ -475,7 +475,7 @@ public extension BoundCollection where Value: RealmCollection {
         }
     }
     /// :nodoc:
-    func append<V>(_ value: Value.Element) where Value == List<V>, Value.Element: RealmCollectionValue {
+    func append<V>(_ value: Value.Element) where Value == List<V> {
         safeWrite(self.wrappedValue) { list in
             list.append(value)
         }
