@@ -7,6 +7,7 @@ xcode_version:
  - 12.2
  - 12.4
  - 12.5
+ - 13.0
 target:
  - docs
  - swiftlint
@@ -47,16 +48,28 @@ exclude:
   - xcode_version: 12.4
     target: docs
 
+  - xcode_version: 12.5
+    target: docs
+
   - xcode_version: 12.2
     target: swiftlint
 
   - xcode_version: 12.4
     target: swiftlint
 
+  - xcode_version: 12.5
+    target: swiftlint
+
   - xcode_version: 12.4
     target: osx-encryption
 
+  - xcode_version: 12.5
+    target: osx-encryption
+
   - xcode_version: 12.4
+    target: osx-object-server
+
+  - xcode_version: 12.5
     target: osx-object-server
 
   - xcode_version: 12.2
@@ -65,34 +78,61 @@ exclude:
   - xcode_version: 12.4
     target: swiftpm-address
 
+  - xcode_version: 12.5
+    target: swiftpm-address
+
   - xcode_version: 12.2
     target: swiftpm-thread
 
   - xcode_version: 12.4
+    target: swiftpm-thread
+
+  - xcode_version: 12.5
     target: swiftpm-thread
 
   - xcode_version: 12.2
     target: swiftpm-ios
 
   - xcode_version: 12.4
+    target: swiftpm-ios
+
+  - xcode_version: 12.5
     target: swiftpm-ios
 
   - xcode_version: 12.4
     target: ios-static
 
+  - xcode_version: 12.5
+    target: ios-static
+
   - xcode_version: 12.4
+    target: ios-dynamic
+
+  - xcode_version: 12.5
     target: ios-dynamic
 
   - xcode_version: 12.4
     target: watchos
 
+  - xcode_version: 12.5
+    target: watchos
+
   - xcode_version: 12.4
+    target: tvos
+
+  - xcode_version: 12.5
     target: tvos
 
   - xcode_version: 12.4
     target: ios-swift
 
+  - xcode_version: 12.5
+    target: ios-swift
+
   - xcode_version: 12.4
+    target: tvos-swift
+
+  - xcode_version: 12.5
     target: tvos-swift
 
   - xcode_version: 12.2
@@ -101,22 +141,37 @@ exclude:
   - xcode_version: 12.4
     target: osx-swift-evolution
 
+  - xcode_version: 12.5
+    target: osx-swift-evolution
+
   - xcode_version: 12.2
     target: ios-swift-evolution
 
   - xcode_version: 12.4
+    target: ios-swift-evolution
+
+  - xcode_version: 12.5
     target: ios-swift-evolution
 
   - xcode_version: 12.2
     target: tvos-swift-evolution
 
   - xcode_version: 12.4
+    target: tvos-swift-evolution
+
+  - xcode_version: 12.5
     target: tvos-swift-evolution
 
   - xcode_version: 12.4
     target: catalyst
 
+  - xcode_version: 12.5
+    target: catalyst
+
   - xcode_version: 12.4
+    target: catalyst-swift
+
+  - xcode_version: 12.5
     target: catalyst-swift
 
   - xcode_version: 12.2
@@ -125,17 +180,32 @@ exclude:
   - xcode_version: 12.4
     target: xcframework
 
+  - xcode_version: 12.5
+    target: xcframework
+
   - xcode_version: 12.4
+    target: cocoapods-ios
+
+  - xcode_version: 12.5
     target: cocoapods-ios
 
   - xcode_version: 12.4
     target: cocoapods-ios-dynamic
 
+  - xcode_version: 12.5
+    target: cocoapods-ios-dynamic
+
   - xcode_version: 12.4
+    target: cocoapods-watchos
+
+  - xcode_version: 12.5
     target: cocoapods-watchos
 
   - xcode_version: 12.2
     target: swiftui-ios
 
   - xcode_version: 12.4
+    target: swiftui-ios
+
+  - xcode_version: 12.5
     target: swiftui-ios
