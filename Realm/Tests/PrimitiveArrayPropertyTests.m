@@ -3676,329 +3676,334 @@ static double average(NSArray *values) {
         [self addObjects];
     }
 
-    {
+    // This is wrapped in a block to work around a compiler bug in Xcode 12.5:
+    // in release builds, reads on `values` will read the wrong local variable,
+    // resulting in a crash when it tries to send a message to some unitialized
+    // stack space. Putting them in separate obj-c blocks prevents this
+    // incorrect optimization.
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@NO, @YES];
     for (id value in unmanaged.boolObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, unmanaged.boolObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@2, @3];
     for (id value in unmanaged.intObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, unmanaged.intObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@2.2f, @3.3f];
     for (id value in unmanaged.floatObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, unmanaged.floatObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@2.2, @3.3];
     for (id value in unmanaged.doubleObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, unmanaged.doubleObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@"a", @"b"];
     for (id value in unmanaged.stringObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, unmanaged.stringObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[data(1), data(2)];
     for (id value in unmanaged.dataObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, unmanaged.dataObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[date(1), date(2)];
     for (id value in unmanaged.dateObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, unmanaged.dateObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[decimal128(2), decimal128(3)];
     for (id value in unmanaged.decimalObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, unmanaged.decimalObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[objectId(1), objectId(2)];
     for (id value in unmanaged.objectIdObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, unmanaged.objectIdObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@NO, @YES, NSNull.null];
     for (id value in optUnmanaged.boolObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optUnmanaged.boolObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@2, @3, NSNull.null];
     for (id value in optUnmanaged.intObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optUnmanaged.intObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@2.2f, @3.3f, NSNull.null];
     for (id value in optUnmanaged.floatObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optUnmanaged.floatObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@2.2, @3.3, NSNull.null];
     for (id value in optUnmanaged.doubleObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optUnmanaged.doubleObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@"a", @"b", NSNull.null];
     for (id value in optUnmanaged.stringObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optUnmanaged.stringObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[data(1), data(2), NSNull.null];
     for (id value in optUnmanaged.dataObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optUnmanaged.dataObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[date(1), date(2), NSNull.null];
     for (id value in optUnmanaged.dateObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optUnmanaged.dateObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[decimal128(2), decimal128(3), NSNull.null];
     for (id value in optUnmanaged.decimalObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optUnmanaged.decimalObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[objectId(1), objectId(2), NSNull.null];
     for (id value in optUnmanaged.objectIdObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optUnmanaged.objectIdObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@NO, @YES];
     for (id value in managed.boolObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, managed.boolObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@2, @3];
     for (id value in managed.intObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, managed.intObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@2.2f, @3.3f];
     for (id value in managed.floatObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, managed.floatObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@2.2, @3.3];
     for (id value in managed.doubleObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, managed.doubleObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@"a", @"b"];
     for (id value in managed.stringObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, managed.stringObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[data(1), data(2)];
     for (id value in managed.dataObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, managed.dataObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[date(1), date(2)];
     for (id value in managed.dateObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, managed.dateObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[decimal128(2), decimal128(3)];
     for (id value in managed.decimalObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, managed.decimalObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[objectId(1), objectId(2)];
     for (id value in managed.objectIdObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, managed.objectIdObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@NO, @YES, NSNull.null];
     for (id value in optManaged.boolObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optManaged.boolObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@2, @3, NSNull.null];
     for (id value in optManaged.intObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optManaged.intObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@2.2f, @3.3f, NSNull.null];
     for (id value in optManaged.floatObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optManaged.floatObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@2.2, @3.3, NSNull.null];
     for (id value in optManaged.doubleObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optManaged.doubleObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[@"a", @"b", NSNull.null];
     for (id value in optManaged.stringObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optManaged.stringObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[data(1), data(2), NSNull.null];
     for (id value in optManaged.dataObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optManaged.dataObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[date(1), date(2), NSNull.null];
     for (id value in optManaged.dateObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optManaged.dateObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[decimal128(2), decimal128(3), NSNull.null];
     for (id value in optManaged.decimalObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optManaged.decimalObj.count);
-    }
+    }();
     
-    {
+    ^{
     NSUInteger i = 0;
     NSArray *values = @[objectId(1), objectId(2), NSNull.null];
     for (id value in optManaged.objectIdObj) {
     uncheckedAssertEqualObjects(values[i++ % values.count], value);
     }
     uncheckedAssertEqual(i, optManaged.objectIdObj.count);
-    }
+    }();
     
 }
 
