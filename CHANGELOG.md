@@ -6,21 +6,177 @@ x.y.z Release notes (yyyy-MM-dd)
 - `[App.emailPasswordAuth retryCustomConfirmation:completion:]`
 
 ### Fixed
+* Fix a runtime crash which happens in some Xcode version (Xcode < 12, reported in Xcode 12.5), where SwiftUI is not weak linked by default. This fix only works for Cocoapods projects.
+  ([#7234](https://github.com/realm/realm-cocoa/issues/7234)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* Adjust the header paths for the podspec to avoid accidentally finding a file
-  which isn't part of the pod that produced warnings when importing the
-  framework. ([#7113](https://github.com/realm/realm-cocoa/issues/7113), since 10.5.2).
+* None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 12.4.
+* Carthage release for Swift is built with Xcode 12.5.
 * CocoaPods: 1.10 or later.
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.7.6 Release notes (2021-05-13)
+=============================================================
+
+### Enhancements
+
+* Realms opened in read-only mode can now be invalidated (although it is
+  unlikely to be useful to do so).
+
+### Fixed
+
+* Fix an availability warning when building Realm. The code path which gave the
+  warning can not currently be hit, so this did not cause any runtime problems
+  ([#7219](https://github.com/realm/realm-cocoa/issues/7219), since 10.7.3).
+* Proactively check the expiry time on the access token and refresh it before
+  attempting to initiate a sync session. This prevents some error logs from
+  appearing on the client such as: "ERROR: Connection[1]: Websocket: Expected
+  HTTP response 101 Switching Protocols, but received: HTTP/1.1 401
+  Unauthorized" ([RCORE-473](https://jira.mongodb.org/browse/RCORE-473), since v10.0.0)
+* Fix a race condition which could result in a skipping notifications failing
+  to skip if several commits using notification skipping were made in
+  succession (since v5.0.0).
+* Fix a crash on exit inside TableRecycler which could happen if Realms were
+  open on background threads when the app exited.
+  ([Core #4600](https://github.com/realm/realm-core/issues/4600), since v5.0.0)
+* Fix errors related to "uncaught exception in notifier thread:
+  N5realm11KeyNotFoundE: No such object" which could happen on sycnronized
+  Realms if a linked object was deleted by another client.
+  ([JS #3611](https://github.com/realm/realm-js/issues/3611), since v10.0.0).
+* Reading a link to an object which has been deleted by a different client via
+  a string-based interface (such as value(forKey:) or the subscript operator on
+  DynamicObject) could return an invalid object rather than nil.
+  ([Core #4687](https://github.com/realm/realm-core/pull/4687), since v10.0.0)
+* Recreate the sync metadata Realm if the encryption key for it is missing from
+  the keychain rather than crashing. This can happen if a device is restored
+  from an unencrypted backup, which restores app data but not the app's
+  keychain entries, and results in all cached logics for sync users being
+  discarded but no data being lost.
+  [Core #4285](https://github.com/realm/realm-core/pull/4285)
+* Thread-safe references can now be created for read-only Realms.
+  ([#5475](https://github.com/realm/realm-cocoa/issues/5475)).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.6.0 to v10.7.2
+
+10.7.5 Release notes (2021-05-07)
+=============================================================
+
+### Fixed
+
+* Iterating over frozen collections on multiple threads at the same time could
+  throw a "count underflow" NSInternalInconsistencyException.
+  ([#7237](https://github.com/realm/realm-cocoa/issues/7237), since v5.0.0).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
+
+10.7.4 Release notes (2021-04-26)
+=============================================================
+
+### Enhancements
+
+* Add Xcode 12.5 binaries to the release package.
+
+### Fixed
+
+* Add the Info.plist file to the XCFrameworks in the Carthage xcframwork
+  package ([#7216](https://github.com/realm/realm-cocoa/issues/7216), since 10.7.3).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
+
+10.7.3 Release notes (2021-04-22)
+=============================================================
+
+### Enhancements
+
+* Package a prebuilt XCFramework for Carthage. Carthage 0.38 and later will
+  download this instead of the old frameworks when using `--use-xcframeworks`.
+* We now make a backup of the realm file prior to any file format upgrade. The
+  backup is retained for 3 months. Backups from before a file format upgrade
+  allows for better analysis of any upgrade failure. We also restore a backup,
+  if a) an attempt is made to open a realm file whith a "future" file format
+  and b) a backup file exist that fits the current file format.
+  ([Core #4166](https://github.com/realm/realm-core/pull/4166))
+* The error message when the intial steps of opening a Realm file fails is now
+  more descriptive.
+* Make conversion of Decimal128 to/from string work for numbers with more than
+  19 significant digits. This means that Decimal128's initializer which takes a
+  string will now never throw, as it previously threw only for out-of-bounds
+  values. The initializer is still marked as `throws` for
+  backwards compatibility.
+  ([#4548](https://github.com/realm/realm-core/issues/4548))
+
+### Fixed
+
+* Adjust the header paths for the podspec to avoid accidentally finding a file
+  which isn't part of the pod that produced warnings when importing the
+  framework. ([#7113](https://github.com/realm/realm-cocoa/issues/7113), since 10.5.2).
+* Fixed a crash that would occur when observing unmanaged Objects in multiple
+  views in SwiftUI. When using `@StateRealmObject` or `@ObservedObject` across
+  multiple views with an unmanaged object, each view would subscribe to the
+  object. As each view unsubscribed (generally when trailing back through the
+  view stack), our propertyWrappers would attempt to remove the KVOs for each
+  cancellation, when it should only be done once. We now correctly remove KVOs
+  only once. ([#7131](https://github.com/realm/realm-cocoa/issues/7131))
+* Fixed `isInvalidated` not returning correct value after object deletion from
+  Realm when using a custom schema. The object's Object Schema was not updated
+  when the object was added to the realm. We now correctly update the object
+  schema when adding it to the realm.
+  ([#7181](https://github.com/realm/realm-cocoa/issues/7181))
+* Syncing large Decimal128 values would cause "Assertion failed: cx.w[1] == 0"
+  ([Core #4519](https://github.com/realm/realm-core/issues/4519), since v10.0.0).
+* Potential/unconfirmed fix for crashes associated with failure to memory map
+  (low on memory, low on virtual address space). For example
+  ([#4514](https://github.com/realm/realm-core/issues/4514), since v5.0.0).
+* Fix assertion failures such as "!m_notifier_skip_version.version" or
+  "m_notifier_sg->get_version() + 1 == new_version.version" when performing
+  writes inside change notification callbacks. Previously refreshing the Realm
+  by beginning a write transaction would skip delivering notifications, leaving
+  things in an inconsistent state. Notifications are now delivered recursively
+  when needed instead. ([Cocoa #7165](https://github.com/realm/realm-cocoa/issues/7165)).
+* Fix collection notification reporting for modifications. This could be
+  observed by receiving the wrong indices of modifications on sorted or
+  distinct results, or notification blocks sometimes not being called when only
+  modifications have occured.
+  ([#4573](https://github.com/realm/realm-core/pull/4573) since v5.0.0).
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.5.5 to v10.6.0
+* Add additional debug validation to file map management that will hopefully
+  catch cases where we unmap something which is still in use.
 
 10.7.2 Release notes (2021-03-08)
 =============================================================

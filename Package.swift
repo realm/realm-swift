@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "10.5.5"
-let cocoaVersionStr = "10.7.2"
+let coreVersionStr = "10.7.2"
+let cocoaVersionStr = "10.7.6"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -44,6 +44,22 @@ func combineFlags() -> [SwiftSetting]? {
     }
     return nil
 }
+
+// Xcode 12.5's xctest crashes when reading obj-c metadata if the Swift tests
+// aren't built targeting macOS 11. We still want all of the non-test code to
+// target the normal lower version, though.
+func hostMachineArch() -> String {
+    var systemInfo = utsname()
+    uname(&systemInfo)
+    let machineBytes = Mirror(reflecting: systemInfo.machine).children.map { UInt8($0.value as! Int8) }.prefix { $0 != 0 }
+    return String(bytes: machineBytes, encoding: .utf8)!
+}
+let testSwiftSettings: [SwiftSetting]?
+#if swift(>=5.4)
+testSwiftSettings = [.unsafeFlags(["-target", "\(hostMachineArch())-apple-macosx11.0"])] + (combineFlags() ?? [])
+#else
+testSwiftSettings = combineFlags()
+#endif
 
 let package = Package(
     name: "Realm",
@@ -160,14 +176,15 @@ let package = Package(
         .testTarget(
             name: "RealmObjcSwiftTests",
             dependencies: ["Realm", "RealmTestSupport"],
-            path: "Realm/Tests/Swift"
+            path: "Realm/Tests/Swift",
+            swiftSettings: testSwiftSettings
         ),
         .testTarget(
             name: "RealmSwiftTests",
             dependencies: ["RealmSwift", "RealmTestSupport"],
             path: "RealmSwift/Tests",
             exclude: ["TestUtils.mm"],
-            swiftSettings: combineFlags()
+            swiftSettings: testSwiftSettings
         ),
 
         // Object server tests have support code written in both obj-c and
@@ -190,7 +207,8 @@ let package = Package(
                  "TimeoutProxyServer.swift",
                  "WatchTestUtility.swift",
                  "RealmServer.swift"
-            ]
+            ],
+            swiftSettings: testSwiftSettings
         ),
         .testTarget(
             name: "SwiftObjectServerTests",
@@ -200,7 +218,7 @@ let package = Package(
                  "SwiftObjectServerTests.swift",
                  "SwiftBSONTests.swift"
             ],
-            swiftSettings: combineFlags()
+            swiftSettings: testSwiftSettings
         ),
         .testTarget(
             name: "ObjcObjectServerTests",

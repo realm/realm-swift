@@ -1185,4 +1185,11 @@ static RLMResults<IntObject *> *testResults() {
     XCTAssertEqual([frozen objectsWhere:@"intCol = 3"].count, 0);
 }
 
+- (void)testMultithreadedFrozenResultsEnumeration {
+    RLMResults *frozen = [testResults() freeze];
+    dispatch_apply(100, DISPATCH_APPLY_AUTO, ^(__unused size_t i) {
+        for (__unused id obj in frozen);
+    });
+}
+
 @end
