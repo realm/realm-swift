@@ -499,7 +499,12 @@ static double average(NSArray *values) {
         [self addObjects];
     }
 
-    { ^nl NSUInteger i = 0; ^nl NSArray *values = $values; ^nl for (id value in $array) { ^nl uncheckedAssertEqualObjects(values[i++ % values.count], value); ^nl } ^nl uncheckedAssertEqual(i, $array.count); ^nl } ^nl 
+    // This is wrapped in a block to work around a compiler bug in Xcode 12.5:
+    // in release builds, reads on `values` will read the wrong local variable,
+    // resulting in a crash when it tries to send a message to some unitialized
+    // stack space. Putting them in separate obj-c blocks prevents this
+    // incorrect optimization.
+    ^{ ^nl NSUInteger i = 0; ^nl NSArray *values = $values; ^nl for (id value in $array) { ^nl uncheckedAssertEqualObjects(values[i++ % values.count], value); ^nl } ^nl uncheckedAssertEqual(i, $array.count); ^nl }(); ^nl 
 }
 
 - (void)testValueForKeySelf {
