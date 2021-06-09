@@ -294,6 +294,24 @@ public extension EmailPasswordAuth {
     }
 
     /**
+     Retries custom confirmation function for a given email address.
+
+     @param email The email address of the user to retry custom confirmation logic.
+     @returns A publisher that eventually return `Result.success` or `Error`.
+     */
+    func retryCustomConfirmation(email: String) -> Future<Void, Error> {
+        return Future<Void, Error> { promise in
+            self.retryCustomConfirmation(email) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
+                }
+            }
+        }
+    }
+
+    /**
      Sends a password reset email to the given email address.
      @param email The email address of the user to send a password reset email for.
      @returns A publisher that eventually return `Result.success` or `Error`.

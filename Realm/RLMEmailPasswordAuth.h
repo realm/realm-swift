@@ -57,15 +57,6 @@ NS_ASSUME_NONNULL_BEGIN
          completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
 /**
- Retries custom confirmation function for a given email address.
-
- @param email The email address of the user to retry custom confirmation logic.
- @param completion A callback to be invoked once the call is complete.
- */
-- (void)retryCustomConfirmation:(NSString *)email
-                     completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
-
-/**
  Re-sends a confirmation email to a user that has registered but
  not yet confirmed their email address.
 
@@ -73,6 +64,15 @@ NS_ASSUME_NONNULL_BEGIN
  @param completionHandler A callback to be invoked once the call is complete.
 */
 - (void)resendConfirmationEmail:(NSString *)email
+                     completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
+
+/**
+ Retries custom confirmation function for a given email address.
+
+ @param email The email address of the user to retry custom confirmation logic.
+ @param completionHandler A callback to be invoked once the call is complete.
+ */
+- (void)retryCustomConfirmation:(NSString *)email
                      completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
 /**

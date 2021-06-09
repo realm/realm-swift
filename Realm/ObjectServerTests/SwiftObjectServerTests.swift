@@ -902,7 +902,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let retryCustomEx = expectation(description: "Retry custom confirmation")
 
-        app.emailPasswordAuth.retryCustomConfirmation("atoken") { (error) in
+        app.emailPasswordAuth.retryCustomConfirmation(email) { (error) in
             XCTAssertNotNil(error)
             retryCustomEx.fulfill()
         }
@@ -2385,6 +2385,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         auth.registerUser(email: email, password: password).await(self)
         auth.confirmUser("atoken", tokenId: "atokenid").awaitFailure(self)
         auth.resendConfirmationEmail(email: "atoken").awaitFailure(self)
+        auth.retryCustomConfirmation(email: email).awaitFailure(self)
         auth.sendResetPasswordEmail(email: "atoken").awaitFailure(self)
         auth.resetPassword(to: "password", token: "atoken", tokenId: "tokenId").awaitFailure(self)
         auth.callResetPasswordFunction(email: email, password: randomString(10), args: [[:]]).awaitFailure(self)
