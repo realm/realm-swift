@@ -62,14 +62,6 @@ static double average(NSDictionary *dictionary) {
     count(values, &sum, &c);
     return sum / c;
 }
-@interface NSUUID (RLMUUIDCompateTests)
-- (NSComparisonResult)compare:(NSUUID *)other;
-@end
-@implementation NSUUID (RLMUUIDCompateTests)
-- (NSComparisonResult)compare:(NSUUID *)other {
-    return [[self UUIDString] compare:other.UUIDString];
-}
-@end
 
 @interface LinkToAllPrimitiveDictionaries : RLMObject
 @property (nonatomic) AllPrimitiveDictionaries *link;
@@ -249,7 +241,7 @@ static double average(NSDictionary *dictionary) {
     // Fail on set nil for non-optional
     %noany %r RLMAssertThrowsWithReason([$dictionary setObject:(id)NSNull.null forKey:$firstKey], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
-    %noany RLMAssertThrowsWithReason([$dictionary setObject:(id)$wrong forKey:$firstKey], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %noany RLMAssertThrowsWithReason([$dictionary setObject:(id)$wrong forKey:$firstKey], ^n @"Invalid value '$wdesc' of type '" $wtype "' for expected type '$type'");
     %noany %r RLMAssertThrowsWithReason([$dictionary setObject:(id)NSNull.null forKey:$firstKey], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     $dictionary[$firstKey] = $v0;
@@ -261,7 +253,7 @@ static double average(NSDictionary *dictionary) {
 #pragma clang diagnostic pop
 
 - (void)testAddObjects {
-    %noany RLMAssertThrowsWithReason([$dictionary addEntriesFromDictionary:@{$firstKey: $wrong}], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %noany RLMAssertThrowsWithReason([$dictionary addEntriesFromDictionary:@{$firstKey: $wrong}], ^n @"Invalid value '$wdesc' of type '" $wtype "' for expected type '$type'");
     %noany %r RLMAssertThrowsWithReason([$dictionary addEntriesFromDictionary:@{$firstKey: (id)NSNull.null}], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
@@ -432,7 +424,7 @@ static double average(NSDictionary *dictionary) {
 }
 
 - (void)testSetValueForKey {
-    %noany RLMAssertThrowsWithReason([$dictionary setValue:$wrong forKey:$k0], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %noany RLMAssertThrowsWithReason([$dictionary setValue:$wrong forKey:$k0], ^n @"Invalid value '$wdesc' of type '" $wtype "' for expected type '$type'");
     %noany %r RLMAssertThrowsWithReason([$dictionary setValue:(id)NSNull.null forKey:@"self"], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
@@ -511,7 +503,7 @@ static double average(NSDictionary *dictionary) {
         RLMAssertThrowsWithReason(dictionary[@"thread"] = @0, @"thread");
         RLMAssertThrowsWithReason([dictionary valueForKey:@"self"], @"thread");
         RLMAssertThrowsWithReason([dictionary setValue:@1 forKey:@"self"], @"thread");
-        RLMAssertThrowsWithReason({for (__unused id obj in dictionary);}, @"thread");
+        RLMAssertThrowsWithReason(({for (__unused id obj in dictionary);}), @"thread");
     }];
 }
 
@@ -523,7 +515,7 @@ static double average(NSDictionary *dictionary) {
     XCTAssertNoThrow([dictionary objectClassName]);
     XCTAssertNoThrow([dictionary realm]);
     XCTAssertNoThrow([dictionary isInvalidated]);
-    
+
     RLMAssertThrowsWithReason([dictionary count], @"invalidated");
     XCTAssertNil(dictionary[@"0"]);
     RLMAssertThrowsWithReason([dictionary count], @"invalidated");
@@ -540,7 +532,7 @@ static double average(NSDictionary *dictionary) {
     RLMAssertThrowsWithReason(dictionary[@"invalidated"] = @0, @"invalidated");
     XCTAssertNil([dictionary valueForKey:@"self"]);
     RLMAssertThrowsWithReason([dictionary setValue:@1 forKey:@"self"], @"invalidated");
-    RLMAssertThrowsWithReason({for (__unused id obj in dictionary);}, @"invalidated");
+    RLMAssertThrowsWithReason(({for (__unused id obj in dictionary);}), @"invalidated");
 
     [realm beginWriteTransaction];
 }
@@ -562,8 +554,8 @@ static double average(NSDictionary *dictionary) {
     XCTAssertNoThrow([dictionary sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]]);
     XCTAssertNoThrow(dictionary[@"0"]);
     XCTAssertNoThrow([dictionary valueForKey:@"self"]);
-    XCTAssertNoThrow({for (__unused id obj in dictionary);});
-    
+    XCTAssertNoThrow(({for (__unused id obj in dictionary);}));
+
     RLMAssertThrowsWithReason([dictionary setObject:@0 forKey:@"testKey"], @"write transaction");
     RLMAssertThrowsWithReason([dictionary addEntriesFromDictionary:@{@"testKey": @0}], @"write transaction");
     RLMAssertThrowsWithReason([dictionary removeObjectForKey:@"testKey"], @"write transaction");
@@ -711,7 +703,7 @@ static double average(NSDictionary *dictionary) {
 
 - (void)createObject {
     %r %man id $prop = @{$k0: $v0};
-    
+
     id obj = [AllPrimitiveDictionaries createInRealm:realm withValue: @{
         %r %man @"$prop": $prop,
     }];

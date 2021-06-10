@@ -1335,7 +1335,7 @@ static RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *managedTest
         RLMAssertThrowsWithReasonMatching(dict[@"thread"], @"thread");
         RLMAssertThrowsWithReasonMatching(dict[@"thread"] = io, @"thread");
         RLMAssertThrowsWithReasonMatching([dict valueForKey:@"intCol"], @"thread");
-        RLMAssertThrowsWithReasonMatching({for (__unused id obj in dict);}, @"thread");
+        RLMAssertThrowsWithReasonMatching(({for (__unused id obj in dict);}), @"thread");
     }];
     [realm cancelWriteTransaction];
 }
@@ -1366,7 +1366,7 @@ static RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *managedTest
     XCTAssertNoThrow([dictionary sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
     XCTAssertNoThrow([dictionary valueForKey:@"0"]);
     XCTAssertNoThrow([dictionary setValue:io forKey:@"foo"]);
-    XCTAssertNoThrow({for (__unused id obj in dictionary);});
+    XCTAssertNoThrow(({for (__unused id obj in dictionary);}));
 
     [realm cancelWriteTransaction];
     [realm invalidate];
@@ -1392,7 +1392,7 @@ static RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *managedTest
     RLMAssertThrowsWithReasonMatching([dictionary sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]], @"invalidated");
     XCTAssertNil([dictionary valueForKey:@"new"]);
     RLMAssertThrowsWithReasonMatching([dictionary setValue:io forKey:@"foo"], @"invalidated");
-    RLMAssertThrowsWithReasonMatching({for (__unused id obj in dictionary);}, @"invalidated");
+    RLMAssertThrowsWithReasonMatching(({for (__unused id obj in dictionary);}), @"invalidated");
 
     [realm cancelWriteTransaction];
 }
@@ -1414,7 +1414,7 @@ static RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *managedTest
     XCTAssertNoThrow([dict sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
     XCTAssertNoThrow(dict[@"0"]);
     XCTAssertNoThrow([dict valueForKey:@"intCol"]);
-    XCTAssertNoThrow({for (__unused id obj in dict);});
+    XCTAssertNoThrow(({for (__unused id obj in dict);}));
     
     RLMAssertThrowsWithReasonMatching([dict setObject:io forKey:@"thread"], @"write transaction");
     RLMAssertThrowsWithReasonMatching([dict removeObjectForKey:@"thread"], @"write transaction");

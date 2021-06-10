@@ -99,7 +99,7 @@ types = [{'class': t[0],
           'values': '@[' + ', '.join(t[3]) + ']',
           'values2': '@[' + ', '.join(t[4]) + ']',
           'first': t[3][0], 'last': t[3][2] if len(t[3]) == 3 else t[3][1],
-          'wrong': '@"a"', 'wdesc': 'a', 'wtype': '__NSCFConstantString',
+          'wrong': '@"a"', 'wdesc': 'a', 'wtype': 'RLMConstantString',
           'type': type_name(t[2], t[1]),
           'tags': set(t[5])
           }
@@ -118,7 +118,7 @@ for t in types:
 for string_type in (t for t in types if 'string' in t['tags']):
     string_type['wrong'] = '@2'
     string_type['wdesc'] = '2'
-    string_type['wtype'] = '__NSCFNumber'
+    string_type['wtype'] = 'RLMConstantInt'
 
 # We extract the type name from the property name, but object id and decimal128
 # don't have names that work for this

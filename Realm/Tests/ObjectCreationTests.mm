@@ -376,9 +376,9 @@
     RLMAssertThrowsWithReason([[AllPrimitiveSets alloc] initWithValue:@{@"intObj": @[NSNull.null]}],
                              @"Invalid value '<null>' of type 'NSNull' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason([[AllPrimitiveSets alloc] initWithValue:@{@"intObj": @[@1.1]}],
-                             @"Invalid value '1.1' of type '__NSCFNumber' for 'int' set property 'AllPrimitiveSets.intObj'.");
+                             @"Invalid value '1.1' of type '" RLMConstantDouble "' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason([[AllPrimitiveSets alloc] initWithValue:@{@"intObj": @[@"0"]}],
-                             @"Invalid value '0' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
+                             @"Invalid value '0' of type '" RLMConstantString "' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason([[AllPrimitiveSets alloc] initWithValue:@{@"intObj": @1}],
                              @"Invalid value (1) for 'int' set property 'AllPrimitiveSets.intObj': value is not enumerable.");
 }
@@ -973,10 +973,10 @@
                              @"Invalid value '<null>' of type 'NSNull' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason([AllPrimitiveSets createInRealm:realm
                                        withValue:@{@"intObj": @[@1.1]}],
-                             @"Invalid value '1.1' of type '__NSCFNumber' for 'int' set property 'AllPrimitiveSets.intObj'.");
+                             @"Invalid value '1.1' of type '" RLMConstantDouble "' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason([AllPrimitiveSets createInRealm:realm
                                        withValue:@{@"intObj": @[@"0"]}],
-                             @"Invalid value '0' of type '__NSCFConstantString' for 'int' set property 'AllPrimitiveSets.intObj'.");
+                             @"Invalid value '0' of type '" RLMConstantString "' for 'int' set property 'AllPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason([AllPrimitiveSets createInRealm:realm
                                        withValue:@{@"intObj": @1}],
                              @"Invalid value (1) for 'int' set property 'AllPrimitiveSets.intObj': value is not enumerable.");
@@ -1072,10 +1072,10 @@
 
     RLMAssertThrowsWithReason([AllOptionalPrimitiveSets createInRealm:realm
                                                             withValue:@{@"intObj": @[@1.1]}],
-                              @"Invalid value '1.1' of type '__NSCFNumber' for 'int?' set property 'AllOptionalPrimitiveSets.intObj'.");
+                              @"Invalid value '1.1' of type '" RLMConstantDouble "' for 'int?' set property 'AllOptionalPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason([AllOptionalPrimitiveSets createInRealm:realm
                                                             withValue:@{@"intObj": @[@"0"]}],
-                              @"Invalid value '0' of type '__NSCFConstantString' for 'int?' set property 'AllOptionalPrimitiveSets.intObj'.");
+                              @"Invalid value '0' of type '" RLMConstantString "' for 'int?' set property 'AllOptionalPrimitiveSets.intObj'.");
     RLMAssertThrowsWithReason([AllOptionalPrimitiveSets createInRealm:realm
                                                             withValue:@{@"intObj": @1}],
                               @"Invalid value (1) for 'int?' set property 'AllOptionalPrimitiveSets.intObj': value is not enumerable.");

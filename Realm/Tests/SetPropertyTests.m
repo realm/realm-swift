@@ -1314,7 +1314,7 @@ static RLMSet<IntObject *> *managedTestSet() {
         RLMAssertThrowsWithReasonMatching(set.allObjects[0], @"thread");
         RLMAssertThrowsWithReasonMatching([set valueForKey:@"intCol"], @"thread");
         RLMAssertThrowsWithReasonMatching([set setValue:@1 forKey:@"intCol"], @"thread");
-        RLMAssertThrowsWithReasonMatching({for (__unused id obj in set);}, @"thread");
+        RLMAssertThrowsWithReasonMatching(({for (__unused id obj in set);}), @"thread");
     }];
     [realm cancelWriteTransaction];
 }
@@ -1346,7 +1346,7 @@ static RLMSet<IntObject *> *managedTestSet() {
     XCTAssertNoThrow(set.allObjects[0]);
     XCTAssertNoThrow([set valueForKey:@"intCol"]);
     XCTAssertNoThrow([set setValue:@1 forKey:@"intCol"]);
-    XCTAssertNoThrow({for (__unused id obj in set);});
+    XCTAssertNoThrow(({for (__unused id obj in set);}));
 
     [realm cancelWriteTransaction];
     [realm invalidate];
@@ -1372,7 +1372,7 @@ static RLMSet<IntObject *> *managedTestSet() {
     RLMAssertThrowsWithReasonMatching(set.allObjects[0], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set valueForKey:@"intCol"], @"invalidated");
     RLMAssertThrowsWithReasonMatching([set setValue:@1 forKey:@"intCol"], @"invalidated");
-    RLMAssertThrowsWithReasonMatching({for (__unused id obj in set);}, @"invalidated");
+    RLMAssertThrowsWithReasonMatching(({for (__unused id obj in set);}), @"invalidated");
 
     [realm cancelWriteTransaction];
 }
@@ -1393,7 +1393,7 @@ static RLMSet<IntObject *> *managedTestSet() {
     XCTAssertNoThrow([set sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
     XCTAssertNoThrow([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
     XCTAssertNoThrow([set valueForKey:@"intCol"]);
-    XCTAssertNoThrow({for (__unused id obj in set);});
+    XCTAssertNoThrow(({for (__unused id obj in set);}));
 
 
     RLMAssertThrowsWithReasonMatching([set addObject:io], @"write transaction");

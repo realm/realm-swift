@@ -210,7 +210,7 @@ static double average(NSArray *values) {
 }
 
 - (void)testAddObject {
-    %noany RLMAssertThrowsWithReason([$set addObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %noany RLMAssertThrowsWithReason([$set addObject:$wrong], ^n @"Invalid value '$wdesc' of type '" $wtype "' for expected type '$type'");
     %noany %r RLMAssertThrowsWithReason([$set addObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [$set addObject:$v0];
@@ -221,7 +221,7 @@ static double average(NSArray *values) {
 }
 
 - (void)testAddObjects {
-    %noany RLMAssertThrowsWithReason([$set addObjects:@[$wrong]], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %noany RLMAssertThrowsWithReason([$set addObjects:@[$wrong]], ^n @"Invalid value '$wdesc' of type '" $wtype "' for expected type '$type'");
     %noany %r RLMAssertThrowsWithReason([$set addObjects:@[NSNull.null]], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
@@ -570,7 +570,7 @@ static double average(NSArray *values) {
 
 - (void)testSetValueForKey {
     RLMAssertThrowsWithReason([$allSets setValue:@0 forKey:@"not self"], ^n @"this class is not key value coding-compliant for the key not self.");
-    %noany RLMAssertThrowsWithReason([$set setValue:$wrong forKey:@"self"], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    %noany RLMAssertThrowsWithReason([$set setValue:$wrong forKey:@"self"], ^n @"Invalid value '$wdesc' of type '" $wtype "' for expected type '$type'");
     %noany %r RLMAssertThrowsWithReason([$set setValue:NSNull.null forKey:@"self"], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
@@ -668,7 +668,7 @@ static double average(NSArray *values) {
         RLMAssertThrowsWithReason(set.allObjects[0], @"thread");
         RLMAssertThrowsWithReason([set valueForKey:@"self"], @"thread");
         RLMAssertThrowsWithReason([set setValue:@1 forKey:@"self"], @"thread");
-        RLMAssertThrowsWithReason({for (__unused id obj in set);}, @"thread");
+        RLMAssertThrowsWithReason(({for (__unused id obj in set);}), @"thread");
     }];
 }
 
@@ -692,7 +692,7 @@ static double average(NSArray *values) {
     RLMAssertThrowsWithReason(set.allObjects[0], @"invalidated");
     RLMAssertThrowsWithReason([set valueForKey:@"self"], @"invalidated");
     RLMAssertThrowsWithReason([set setValue:@1 forKey:@"self"], @"invalidated");
-    RLMAssertThrowsWithReason({for (__unused id obj in set);}, @"invalidated");
+    RLMAssertThrowsWithReason(({for (__unused id obj in set);}), @"invalidated");
 
     [realm beginWriteTransaction];
 }
@@ -711,7 +711,7 @@ static double average(NSArray *values) {
     XCTAssertNoThrow([set sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]]);
     XCTAssertNoThrow(set.allObjects[0]);
     XCTAssertNoThrow([set valueForKey:@"self"]);
-    XCTAssertNoThrow({for (__unused id obj in set);});
+    XCTAssertNoThrow(({for (__unused id obj in set);}));
 
 
     RLMAssertThrowsWithReason([set addObject:@0], @"write transaction");
