@@ -907,22 +907,18 @@ class RealmTests: TestCase {
         XCTAssertEqual(object.isInvalidated, true)
     }
 
-    func testWriteCopyToPath() {
-        let realm = try! Realm()
-        try! realm.write {
+    func testWriteCopyToPath() throws {
+        let realm = try Realm()
+        try realm.write {
             realm.add(SwiftObject())
         }
         let fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("copy.realm")
-        do {
-            try realm.writeCopy(toFile: fileURL)
-        } catch {
-            XCTFail("writeCopyToURL failed")
-        }
-        autoreleasepool {
-            let copy = try! Realm(fileURL: fileURL)
+        try realm.writeCopy(toFile: fileURL)
+        try autoreleasepool {
+            let copy = try Realm(fileURL: fileURL)
             XCTAssertEqual(1, copy.objects(SwiftObject.self).count)
         }
-        try! FileManager.default.removeItem(at: fileURL)
+        try FileManager.default.removeItem(at: fileURL)
     }
 
     func testEquals() {

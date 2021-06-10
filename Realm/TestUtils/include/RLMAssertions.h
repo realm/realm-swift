@@ -18,6 +18,18 @@
 
 #import <XCTest/XCTest.h>
 
+#if __clang_major__ >= 13
+#define RLMConstantInt "NSConstantIntegerNumber"
+#define RLMConstantDouble "NSConstantDoubleNumber"
+#define RLMConstantFloat "NSConstantFloatNumber"
+#define RLMConstantString "__NSCFConstantString"
+#else
+#define RLMConstantInt "__NSCFNumber"
+#define RLMConstantDouble "__NSCFNumber"
+#define RLMConstantFloat "__NSCFNumber"
+#define RLMConstantString "__NSCFConstantString"
+#endif
+
 FOUNDATION_EXTERN
 void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,
                                             __attribute__((noescape)) dispatch_block_t block,

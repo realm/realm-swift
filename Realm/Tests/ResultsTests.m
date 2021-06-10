@@ -930,7 +930,7 @@ static vm_size_t get_resident_size() {
     XCTAssertNoThrow([results averageOfProperty:@"intCol"]);
     XCTAssertNoThrow(results[0]);
     XCTAssertNoThrow([results valueForKey:@"intCol"]);
-    XCTAssertNoThrow({for (__unused id obj in results);});
+    XCTAssertNoThrow(({for (__unused id obj in results);}));
 
     [realm invalidate];
 
@@ -951,7 +951,7 @@ static vm_size_t get_resident_size() {
     XCTAssertThrows([results averageOfProperty:@"intCol"]);
     XCTAssertThrows(results[0]);
     XCTAssertThrows([results valueForKey:@"intCol"]);
-    XCTAssertThrows({for (__unused id obj in results);});
+    XCTAssertThrows(({for (__unused id obj in results);}));
 }
 
 - (void)testResultsDependingOnDeletedLinkView {

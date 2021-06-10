@@ -19,7 +19,7 @@
 
 import XCTest
 import RealmSwift
-#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.3.1)
+
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 class SwiftUITests: XCTestCase {
     var realm: Realm!
@@ -160,4 +160,3 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(app.textFields["name"].value as? String, "test name")
     }
 }
-#endif

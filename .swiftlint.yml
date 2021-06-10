@@ -46,6 +46,7 @@ disabled_rules:
   - nesting
   - syntactic_sugar
   - todo
+  - trailing_comma
   - type_body_length
   - vertical_whitespace
   # swiftlint complains about superfluous disable commands when the violation

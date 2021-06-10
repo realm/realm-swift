@@ -18,7 +18,7 @@
 
 import Foundation
 
-#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.3.1) && (REALM_HAVE_COMBINE || !SWIFT_PACKAGE)
+#if canImport(SwiftUI) && canImport(Combine)
 import SwiftUI
 import Combine
 import Realm
@@ -488,7 +488,7 @@ public extension BoundCollection where Value: RealmCollection {
         }
     }
     /// :nodoc:
-    func append<V>(_ value: Value.Element) where Value == List<V>, Value.Element: RealmCollectionValue {
+    func append<V>(_ value: Value.Element) where Value == List<V> {
         safeWrite(self.wrappedValue) { list in
             list.append(value)
         }

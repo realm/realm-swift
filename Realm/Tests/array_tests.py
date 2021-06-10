@@ -77,15 +77,14 @@ types = [
 def type_name(propertyName, optional):
     if 'any' in propertyName:
         return 'mixed'
-    else:
-        return propertyName.replace('Obj', '') + ('?' if 'opt' in optional else '')
+    return propertyName.replace('Obj', '') + ('?' if 'opt' in optional else '')
 
 types = [{'class': t[0], 'obj': t[1], 'prop': t[2], 'v0': t[3][0], 'v1': t[3][1],
           'array': t[1] + '.' + t[2],
           'values2': '@[' + ', '.join(t[3] * 2) + ']',
           'values': '@[' + ', '.join(t[3]) + ']',
           'first': t[3][0], 'last': t[3][2] if len(t[3]) == 3 else t[3][1],
-          'wrong': '@"a"', 'wdesc': 'a', 'wtype': '__NSCFConstantString',
+          'wrong': '@"a"', 'wdesc': 'a', 'wtype': 'RLMConstantString',
           'type': type_name(t[2], t[1]),
           'tags': set(t[4]),
           }
@@ -104,7 +103,7 @@ for t in types:
 for string_type in (t for t in types if 'string' in t['tags']):
     string_type['wrong'] = '@2'
     string_type['wdesc'] = '2'
-    string_type['wtype'] = '__NSCFNumber'
+    string_type['wtype'] = 'RLMConstantInt'
 
 # We extract the type name from the property name, but object id and decimal128
 # don't have names that work for this

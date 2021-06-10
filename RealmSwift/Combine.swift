@@ -24,8 +24,8 @@ import Realm.Private
 
 /// A protocol which defines a default identity for Realm Objects
 ///
-/// Declaraing your Object subclass as conforming to this protocol will supply
-/// a default implemention for `Identifiable`'s `id` which works for Realm
+/// Declaring your Object subclass as conforming to this protocol will supply
+/// a default implementation for `Identifiable`'s `id` which works for Realm
 /// Objects:
 ///
 ///     // Automatically conforms to `Identifiable`

@@ -1,25 +1,3 @@
-x.y.z Release notes (yyyy-MM-dd)
-=============================================================
-### Enhancements
-* Dictionary notificaion changes for deletions are now calculated in Core rather than Cocoa ([Core #4723](https://github.com/realm/realm-core/pull/4723).
-
-### Fixed
-* Fix a runtime crash which happens in some Xcode version (Xcode < 12, reported in Xcode 12.5), where SwiftUI is not weak linked by default. This fix only works for Cocoapods projects.
-  ([#7234](https://github.com/realm/realm-cocoa/issues/7234)
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
-### Compatibility
-* Realm Studio: 10.0.0 or later.
-* APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 12.5.
-* CocoaPods: 1.10 or later.
-
-### Internal
-* Upgraded realm-core from v11.0.0-beta.6 to v11.0.1
-
 10.8.0-beta.2 Release notes (2021-06-01)
 =============================================================
 
@@ -65,6 +43,31 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Internal
 
 * Upgraded realm-core from v10.7.2 to v10.8.0-beta.5
+
+10.7.7 Release notes (2021-06-10)
+=============================================================
+
+Xcode 12.2 is now the minimum supported version.
+
+### Enhancements
+
+* Add Xcode 13 beta 1 binaries to the release package.
+
+### Fixed
+
+* Fix a runtime crash which happens in some Xcode version (Xcode < 12, reported
+  in Xcode 12.5), where SwiftUI is not weak linked by default. This fix only
+  works for Cocoapods projects.
+  ([#7234](https://github.com/realm/realm-cocoa/issues/7234)
+* Fix warnings when building with Xcode 13 beta 1.
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 1.
 
 10.7.6 Release notes (2021-05-13)
 =============================================================
