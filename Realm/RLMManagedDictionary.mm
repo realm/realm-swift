@@ -43,7 +43,7 @@
 @end
 
 @interface RLMDictionaryChange ()
-- (instancetype)initWithChanges:(realm::DictionaryChangeSet)changes previous:(realm::Dictionary&)collection;
+- (instancetype)initWithChanges:(realm::DictionaryChangeSet)changes;
 @end
 
 namespace {
@@ -82,7 +82,7 @@ struct DictionaryCallbackWrapper {
             block(collection, nil, nil);
         }
         else {
-            block(collection, [[RLMDictionaryChange alloc] initWithChanges:changes previous:*previousDictionary], nil);
+            block(collection, [[RLMDictionaryChange alloc] initWithChanges:changes], nil);
         }
         if (collection.isInvalidated) {
             previousTransaction->end_read();
@@ -96,31 +96,12 @@ struct DictionaryCallbackWrapper {
 
 @implementation RLMDictionaryChange {
     realm::DictionaryChangeSet _changes;
-    NSArray<id> *_deletions;
 }
 
-- (instancetype)initWithChanges:(realm::DictionaryChangeSet)changes previous:(realm::Dictionary&)dictionary {
+- (instancetype)initWithChanges:(realm::DictionaryChangeSet)changes {
     self = [super init];
     if (self) {
         _changes = std::move(changes);
-        if (_changes.deletions.empty()) {
-            _deletions = @[];
-        }
-        else {
-            NSMutableArray *array = [NSMutableArray arrayWithCapacity:_changes.deletions.size()];
-            for (auto index : _changes.deletions) {
-                realm::Mixed key = dictionary.get_key(index);
-                switch (key.get_type()) {
-                    case realm::type_String:
-                        [array addObject:@(key.get_string().data())];
-                        break;
-                    default:
-                        // Don't throw so older SDK versions can handle any new key types.
-                        break;
-                }
-            }
-            _deletions = array;
-        }
     }
     return self;
 }
@@ -135,6 +116,10 @@ static NSArray *toArray(std::vector<realm::Mixed> const& v) {
 
 - (NSArray *)insertions {
     return toArray(_changes.insertions);
+}
+
+- (NSArray *)deletions {
+    return toArray(_changes.deletions);
 }
 
 - (NSArray *)modifications {

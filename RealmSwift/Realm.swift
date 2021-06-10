@@ -616,6 +616,19 @@ import Realm.Private
 
      - warning: This method may only be called during a write transaction.
 
+     - parameter objects: A map of objects to delete.
+
+     :nodoc:
+     */
+    public func delete<Key: _MapKey, Value: ObjectBase>(_ map: Map<Key, Value?>) {
+        rlmRealm.deleteObjects(map._rlmCollection)
+    }
+
+    /**
+     Deletes zero or more objects from the Realm.
+
+     - warning: This method may only be called during a write transaction.
+
      - parameter objects: A `Results` containing the objects to be deleted.
 
      :nodoc:

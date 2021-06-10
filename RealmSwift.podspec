@@ -22,6 +22,8 @@ Pod::Spec.new do |s|
   s.tvos.deployment_target    = '9.0'
   s.preserve_paths            = %w(build.sh)
 
+  s.weak_frameworks = 'SwiftUI'
+
   s.dependency 'Realm', "= #{s.version}"
   s.source_files = 'RealmSwift/*.swift', 'RealmSwift/Impl/*.swift'
   s.exclude_files = 'RealmSwift/Nonsync.swift'
