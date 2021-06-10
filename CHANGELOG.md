@@ -1,3 +1,65 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+
+NOTE: This version upgrades the Realm file format version. Realm files opened
+will be automatically upgraded and cannot be read by versions older than
+v10.8.0-beta.3. This upgrade should be a fairly fast one. Note that we now
+automatically create a backup of the pre-upgrade Realm.
+
+### Fixed
+* Setting a collection with a nullable value type to null would hit an
+  assertion failure instead of clearing the collection.
+* Fixed an incorrect detection of multiple incoming links in a migration when
+  changing a table to embedded and removing a link to it at the same time.
+  ([#4694](https://github.com/realm/realm-core/issues/4694) since 10.0.0-beta.2)
+* Fixed a divergent merge on Set when one client clears the Set and another
+  client inserts and deletes objects.
+  ([#4720](https://github.com/realm/realm-core/issues/4720))
+* Partially revert to pre-v5.0.0 handling of primary keys to fix a performance
+  regression. v5.0.0 made primary keys determine the position in the low-level
+  table where newly added objects would be inserted, which eliminated the need
+  for a separate index on the primary key. This made some use patterns slightly
+  faster, but also made some reasonable things dramatically slower.
+  ([#4522](https://github.com/realm/realm-core/issues/4522))
+* Observing a dictionary holding links to objects would crash.
+  ([#4711](https://github.com/realm/realm-core/issues/4711), since v11.0.0-beta.0)
+* Deleting objects pointed to by a Dictionary may result in a crash.
+  ([#4632](https://github.com/realm/realm-core/issues/4632), since v11.0.0-beta.0)
+* Comparing dictionaries from different realms could sometimes return equality
+  ([#4629](https://github.com/realm/realm-core/issues/4629), since v11.0.0-beta.0)
+* Changed the average of an empty set from 0 to null to match the other
+  collections. ([#4678](https://github.com/realm/realm-core/issues/4678), since v11.0.0-beta.0)
+* Changed the sum of an empty dictionary from null to 0 to match the other
+  collections. ([#4678](https://github.com/realm/realm-core/issues/4678), since v11.0.0-beta.0)
+* Fix the order of a sorted set of mixed values.
+  ([#4662](https://github.com/realm/realm-core/pull/4662), since v11.0.0-beta.0)
+* Use same rules for handling numeric values in sets as MongoDB uses to avoid
+  strange behavior when using sync. All numeric values are compared using the
+  value irregardless of the type, rather than things like int(1) and float(1)
+  being considered different values.
+  ([#4686](https://github.com/realm/realm-core/pull/4686), since v11.0.0-beta.0)
+* Fixed an incorrect detection of multiple incoming links in a migration when
+  changing a table to embedded and removing a link to it at the same time.
+  ([#4694](https://github.com/realm/realm-core/issues/4694) since 10.0.0-beta.2)
+* Fix collection notification reporting for modifications. This could be
+  observed by receiving the wrong indices of modifications on sorted or
+  distinct results, or notification blocks sometimes not being called when only
+  modifications have occured.
+  ([#4573](https://github.com/realm/realm-core/pull/4573) since v6).
+* Fix incorrect sync instruction emission when replacing an existing embedded
+  object with another embedded object.([Core #4740](https://github.com/realm/realm-core/issues/4740)
+* Fix crash when changing the nullability of a classes's primary key property.
+  ([Core #4759](https://github.com/realm/realm-core/issues/4759), since v10.8.0-beta.0)
+
+### Compatibility
+* Realm Studio: Currently no released version with support for this version.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 1.
+
+### Internal
+* Upgraded realm-core from v11.0.0-beta.6 to v11.0.3
+
 10.8.0-beta.2 Release notes (2021-06-01)
 =============================================================
 

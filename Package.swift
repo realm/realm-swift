@@ -3,7 +3,7 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "11.0.1"
+let coreVersionStr = "11.0.3"
 let cocoaVersionStr = "10.8.0-beta.2"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
@@ -127,7 +127,7 @@ let package = Package(
     targets: [
       .target(
             name: "Realm",
-            dependencies: [.product(name: "RealmObjectStore", package: "RealmDatabase")],
+            dependencies: [.product(name: "RealmCore", package: "RealmDatabase")],
             path: ".",
             exclude: [
                 "CHANGELOG.md",
