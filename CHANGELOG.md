@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Dictionary notificaion changes for deletions are now calculated in Core rather than Cocoa ([Core #4723](https://github.com/realm/realm-core/pull/4723).
 
 ### Fixed
 * Fix a runtime crash which happens in some Xcode version (Xcode < 12, reported in Xcode 12.5), where SwiftUI is not weak linked by default. This fix only works for Cocoapods projects.
