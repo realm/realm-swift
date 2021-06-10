@@ -827,6 +827,10 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
             @throw RLMException(@"Cannot delete objects from RLMDictionary of type %@: only RLMObjects can be deleted.",
                                 RLMTypeToString(dictionary.type));
         }
+        for (RLMObject *obj in dictionary.allValues) {
+            RLMDeleteObjectFromRealm(obj, self);
+        }
+        return;
     }
     for (RLMObject *obj in objects) {
         if (![obj isKindOfClass:RLMObjectBase.class]) {

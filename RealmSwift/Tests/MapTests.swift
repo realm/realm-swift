@@ -27,21 +27,16 @@ fileprivate extension Map {
     }
 }
 
-class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase where M.Key == String,
-                                                                                  M.Value == SwiftStringObject?,
-                                                                                  M.Element == SingleMapEntry<M.Key, M.Value>,
-                                                                                  EM.Key == String,
-                                                                                  EM.Value == EmbeddedTreeObject1?,
-                                                                                  EM.Element == SingleMapEntry<EM.Key, EM.Value> {
+class MapTests: TestCase {
     var str1: SwiftStringObject?
     var str2: SwiftStringObject?
     var realm: Realm!
 
-    func createMap() -> M {
+    func createMap() -> Map<String, SwiftStringObject?> {
         fatalError("abstract")
     }
 
-    func createEmbeddedMap() -> EM {
+    func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1?> {
         fatalError("abstract")
     }
 
@@ -179,7 +174,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
         guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
-        var map = createMap()
+        let map = createMap()
         for i in 0...5 {
             map["key\(i)"] = str1
         }
@@ -193,7 +188,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     }
 
     func testMapDescription() {
-        var map = createMap()
+        let map = createMap()
         for i in 0...5 {
             map["key\(i)"] = SwiftStringObject(value: [String(i)])
         }
@@ -203,7 +198,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     }
 
     func testAppendObject() {
-        var map = createMap()
+        let map = createMap()
         guard let str1 = str1, let str2 = str2  else {
             fatalError("Test precondition failure")
         }
@@ -215,7 +210,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     }
 
     func testInsert() {
-        var map = createMap()
+        let map = createMap()
         guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
@@ -232,7 +227,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     }
 
     func testRemove() {
-        var map = createMap()
+        let map = createMap()
         guard let str1 = str1 else {
             fatalError("Test precondition failure")
         }
@@ -255,7 +250,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     }
 
     func testRemoveAll() {
-        var map = createMap()
+        let map = createMap()
         guard let str1 = str1 else {
             fatalError("Test precondition failure")
         }
@@ -268,7 +263,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     }
 
     func testDeleteObjectFromMap() {
-        var map = createMap()
+        let map = createMap()
         guard let str1 = str1 else {
             fatalError("Test precondition failure")
         }
@@ -281,7 +276,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     }
 
     func testChangesArePersisted() {
-        var map = createMap()
+        let map = createMap()
         guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
@@ -296,7 +291,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     }
 
     func testPopulateEmptyMap() {
-        var map = createMap()
+        let map = createMap()
         guard let str1 = str1 else {
             fatalError("Test precondition failure")
         }
@@ -323,7 +318,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     }
 
     func testEnumeratingMap() {
-        var map = createMap()
+        let map = createMap()
         for i in 0..<10 {
             map["key\(i)"] = SwiftStringObject(value: ["key\(i)"])
         }
@@ -440,7 +435,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     }
 
     func testAppendEmbedded() {
-        var map = createEmbeddedMap()
+        let map = createEmbeddedMap()
         for i in 0..<10 {
             map["\(i)"] = EmbeddedTreeObject1(value: [i])
         }
@@ -460,7 +455,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     }
 
     func testSetEmbedded() {
-        var map = createEmbeddedMap()
+        let map = createEmbeddedMap()
         map["key"] = EmbeddedTreeObject1(value: [0])
 
         let oldObj = map["key"]
@@ -525,7 +520,7 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     }
 
     func testFilter() {
-        var map = createMap()
+        let map = createMap()
 
         map["key"] = SwiftStringObject(value: ["apples"])
         map["key2"] = SwiftStringObject(value: ["bananas"])
@@ -660,94 +655,93 @@ class MapTests<M: RealmKeyedCollection, EM: RealmKeyedCollection>: TestCase wher
     func testNotificationSentInitially() {
         let map = createMap()
         try! realm.commitWrite()
-        if map.realm != nil {
-            let queue = DispatchQueue(label: "testNotificationSentInitially")
-            let exp = expectation(description: "does receive notification")
-            var token: NotificationToken?
-            token = map.observe(on: queue, { change in
-                switch change {
-                case .initial(let map):
-                    XCTAssertNotNil(map)
-                    exp.fulfill()
-                case .update(_, deletions: _, insertions: _, modifications: _):
-                    XCTFail("should not get here for this test")
-                case .error(_):
-                    XCTFail("should not get here for this test")
-                }
-            })
-            waitForExpectations(timeout: 2.0, handler: nil)
-            token?.invalidate()
-            token = nil
+        let queue = DispatchQueue(label: "testNotificationSentInitially")
+        let exp = expectation(description: "does receive notification")
+        var token: NotificationToken?
+        token = map.observe(on: queue, { change in
+            switch change {
+            case .initial(let map):
+                XCTAssertNotNil(map)
+                exp.fulfill()
+            case .update(_, deletions: _, insertions: _, modifications: _):
+                XCTFail("should not get here for this test")
+            case .error(_):
+                XCTFail("should not get here for this test")
+            }
+        })
+        waitForExpectations(timeout: 2.0, handler: nil)
+        token?.invalidate()
+        token = nil
 
-            realm.beginWrite()
-            realm.delete(realm.objects(SwiftStringObject.self))
-            realm.delete(realm.objects(SwiftMapPropertyObject.self))
-        }
+        realm.beginWrite()
+        realm.delete(map)
+        realm.delete(realm.objects(SwiftStringObject.self))
+        realm.delete(realm.objects(SwiftMapPropertyObject.self))
     }
 
     func testNotificationSentAfterCommit() {
-        var map = createMap()
+        let map = createMap()
         try! realm.commitWrite()
-        if map.realm != nil {
-            let queue = DispatchQueue(label: "testNotificationSentAfterCommit")
-            var exp = expectation(description: "does receive notification")
-            var token: NotificationToken?
-            var didInsert = false
-            var didModify = false
-            var didDelete = false
-            token = map.observe(on: queue, { change in
-                switch change {
-                case .initial(let map):
-                    XCTAssertNotNil(map)
-                    exp.fulfill()
-                case let .update(map, deletions: deletions, insertions: insertions, modifications: modifications):
-                    XCTAssertNotNil(map)
-                    if didModify && !didDelete {
-                        XCTAssertEqual(deletions, ["myNewKey"])
-                        didDelete.toggle()
-                    } else if didInsert {
-                        XCTAssertEqual(modifications, ["myNewKey"])
-                        didModify.toggle()
-                    } else {
-                        XCTAssertEqual(insertions, ["anotherNewKey", "myNewKey"])
-                        didInsert.toggle()
-                    }
-                    exp.fulfill()
-                case .error(_):
-                    XCTFail("should not get here for this test")
+        let queue = DispatchQueue(label: "testNotificationSentAfterCommit")
+        var exp = expectation(description: "does receive notification")
+        var token: NotificationToken?
+        var didInsert = false
+        var didModify = false
+        var didDelete = false
+        token = map.observe(on: queue, { change in
+            switch change {
+            case .initial(let map):
+                XCTAssertNotNil(map)
+                exp.fulfill()
+            case let .update(map, deletions: deletions, insertions: insertions, modifications: modifications):
+                XCTAssertNotNil(map)
+                if didModify && !didDelete {
+                    XCTAssertEqual(deletions, ["myNewKey"])
+                    didDelete.toggle()
+                } else if didInsert {
+                    XCTAssertEqual(modifications, ["myNewKey"])
+                    didModify.toggle()
+                } else {
+                    XCTAssertEqual(insertions, ["anotherNewKey", "myNewKey"])
+                    didInsert.toggle()
                 }
-            })
-            waitForExpectations(timeout: 2.0, handler: nil)
-            exp = expectation(description: "does receive notification")
-            realm.beginWrite()
-            map["myNewKey"] = SwiftStringObject(value: ["one"])
-            map["anotherNewKey"] = SwiftStringObject(value: ["two"])
-            try! realm.commitWrite()
-            waitForExpectations(timeout: 2.0, handler: nil)
-            XCTAssertTrue(didInsert)
-            exp = expectation(description: "does receive notification")
-            realm.beginWrite()
-            map["myNewKey"] = SwiftStringObject(value: ["three"])
-            try! realm.commitWrite()
-            waitForExpectations(timeout: 2.0, handler: nil)
-            exp = expectation(description: "does receive notification")
-            XCTAssertTrue(didModify)
-            realm.beginWrite()
-            map["myNewKey"] = nil
-            try! realm.commitWrite()
-            waitForExpectations(timeout: 2.0, handler: nil)
-            XCTAssertTrue(didDelete)
+                exp.fulfill()
+            case .error(_):
+                XCTFail("should not get here for this test")
+            }
+        })
+        waitForExpectations(timeout: 2.0, handler: nil)
+        exp = expectation(description: "does receive notification")
+        realm.beginWrite()
+        map["myNewKey"] = SwiftStringObject(value: ["one"])
+        map["anotherNewKey"] = SwiftStringObject(value: ["two"])
+        try! realm.commitWrite()
+        waitForExpectations(timeout: 2.0, handler: nil)
+        XCTAssertTrue(didInsert)
+        exp = expectation(description: "does receive notification")
+        realm.beginWrite()
+        map["myNewKey"] = SwiftStringObject(value: ["three"])
+        try! realm.commitWrite()
+        waitForExpectations(timeout: 2.0, handler: nil)
+        exp = expectation(description: "does receive notification")
+        XCTAssertTrue(didModify)
+        realm.beginWrite()
+        map["myNewKey"] = nil
+        try! realm.commitWrite()
+        waitForExpectations(timeout: 2.0, handler: nil)
+        XCTAssertTrue(didDelete)
 
-            token?.invalidate()
-            token = nil
-            realm.beginWrite()
-            realm.delete(realm.objects(SwiftStringObject.self))
-            realm.delete(realm.objects(SwiftMapPropertyObject.self))
-        }
+        token?.invalidate()
+        token = nil
+        realm.beginWrite()
+        //realm.delete
+        realm.delete(map)
+        realm.delete(realm.objects(SwiftStringObject.self))
+        realm.delete(realm.objects(SwiftMapPropertyObject.self))
     }
 }
 
-class MapStandaloneTests: MapTests<Map<String, SwiftStringObject?>, Map<String, EmbeddedTreeObject1?>> {
+class MapStandaloneTests: MapTests {
     override func createMap() -> Map<String, SwiftStringObject?> {
         let mapObj = SwiftMapPropertyObject()
         XCTAssertNil(mapObj.realm)
@@ -757,9 +751,12 @@ class MapStandaloneTests: MapTests<Map<String, SwiftStringObject?>, Map<String, 
     override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1?> {
         return Map<String, EmbeddedTreeObject1?>()
     }
+
+    override func testNotificationSentInitially() { }
+    override func testNotificationSentAfterCommit() { }
 }
 
-class MapNewlyAddedTests: MapTests<Map<String, SwiftStringObject?>, Map<String, EmbeddedTreeObject1?>> {
+class MapNewlyAddedTests: MapTests {
     override func createMap() -> Map<String, SwiftStringObject?> {
         let mapObj = SwiftMapPropertyObject()
         realm.add(mapObj)
@@ -775,7 +772,7 @@ class MapNewlyAddedTests: MapTests<Map<String, SwiftStringObject?>, Map<String, 
     }
 }
 
-class MapNewlyCreatedTests: MapTests<Map<String, SwiftStringObject?>, Map<String, EmbeddedTreeObject1?>> {
+class MapNewlyCreatedTests: MapTests {
     override func createMap() -> Map<String, SwiftStringObject?> {
         let mapObj = realm.create(SwiftMapPropertyObject.self, value: ["name", [], []])
         try! realm.commitWrite()
@@ -789,7 +786,7 @@ class MapNewlyCreatedTests: MapTests<Map<String, SwiftStringObject?>, Map<String
     }
 }
 
-class MapRetrievedTests: MapTests<Map<String, SwiftStringObject?>, Map<String, EmbeddedTreeObject1?>> {
+class MapRetrievedTests: MapTests {
     override func createMap() -> Map<String, SwiftStringObject?> {
         realm.create(SwiftMapPropertyObject.self, value: ["name", [:], [:]])
         try! realm.commitWrite()
