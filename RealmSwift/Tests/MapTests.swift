@@ -734,7 +734,6 @@ class MapTests: TestCase {
         token?.invalidate()
         token = nil
         realm.beginWrite()
-        //realm.delete
         realm.delete(map)
         realm.delete(realm.objects(SwiftStringObject.self))
         realm.delete(realm.objects(SwiftMapPropertyObject.self))
