@@ -224,7 +224,7 @@ static double average(NSArray *values) {
 }
 
 - (void)testAddObject {
-    RLMAssertThrowsWithReason([$array addObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    RLMAssertThrowsWithReason([$array addObject:$wrong], ^n @"Invalid value '$wdesc' of type '" $wtype "' for expected type '$type'");
     %r RLMAssertThrowsWithReason([$array addObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [$array addObject:$v0];
@@ -235,7 +235,7 @@ static double average(NSArray *values) {
 }
 
 - (void)testAddObjects {
-    RLMAssertThrowsWithReason([$array addObjects:@[$wrong]], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    RLMAssertThrowsWithReason([$array addObjects:@[$wrong]], ^n @"Invalid value '$wdesc' of type '" $wtype "' for expected type '$type'");
     %r RLMAssertThrowsWithReason([$array addObjects:@[NSNull.null]], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
@@ -245,7 +245,7 @@ static double average(NSArray *values) {
 }
 
 - (void)testInsertObject {
-    RLMAssertThrowsWithReason([$array insertObject:$wrong atIndex:0], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    RLMAssertThrowsWithReason([$array insertObject:$wrong atIndex:0], ^n @"Invalid value '$wdesc' of type '" $wtype "' for expected type '$type'");
     %r RLMAssertThrowsWithReason([$array insertObject:NSNull.null atIndex:0], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
     RLMAssertThrowsWithReason([$array insertObject:$v0 atIndex:1], ^n @"Index 1 is out of bounds (must be less than 1).");
 
@@ -302,7 +302,7 @@ static double average(NSArray *values) {
 
     %o [$array replaceObjectAtIndex:0 withObject:NSNull.null]; ^nl XCTAssertEqualObjects($array[0], NSNull.null);
 
-    RLMAssertThrowsWithReason([$array replaceObjectAtIndex:0 withObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    RLMAssertThrowsWithReason([$array replaceObjectAtIndex:0 withObject:$wrong], ^n @"Invalid value '$wdesc' of type '" $wtype "' for expected type '$type'");
     %r RLMAssertThrowsWithReason([$array replaceObjectAtIndex:0 withObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 }
 
@@ -331,7 +331,7 @@ static double average(NSArray *values) {
 - (void)testIndexOfObject {
     XCTAssertEqual(NSNotFound, [$array indexOfObject:$v0]);
 
-    RLMAssertThrowsWithReason([$array indexOfObject:$wrong], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    RLMAssertThrowsWithReason([$array indexOfObject:$wrong], ^n @"Invalid value '$wdesc' of type '" $wtype "' for expected type '$type'");
 
     %r RLMAssertThrowsWithReason([$array indexOfObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
     %o XCTAssertEqual(NSNotFound, [$array indexOfObject:NSNull.null]);
@@ -575,7 +575,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 
 - (void)testSetValueForKey {
     RLMAssertThrowsWithReason([$allArrays setValue:@0 forKey:@"not self"], ^n @"this class is not key value coding-compliant for the key not self.");
-    RLMAssertThrowsWithReason([$array setValue:$wrong forKey:@"self"], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
+    RLMAssertThrowsWithReason([$array setValue:$wrong forKey:@"self"], ^n @"Invalid value '$wdesc' of type '" $wtype "' for expected type '$type'");
     %r RLMAssertThrowsWithReason([$array setValue:NSNull.null forKey:@"self"], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
@@ -687,7 +687,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertThrowsWithReason(array[0] = @0, @"thread");
         RLMAssertThrowsWithReason([array valueForKey:@"self"], @"thread");
         RLMAssertThrowsWithReason([array setValue:@1 forKey:@"self"], @"thread");
-        RLMAssertThrowsWithReason({for (__unused id obj in array);}, @"thread");
+        RLMAssertThrowsWithReason(({for (__unused id obj in array);}), @"thread");
     }];
 }
 
@@ -726,7 +726,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertThrowsWithReason(array[0] = @0, @"invalidated");
     RLMAssertThrowsWithReason([array valueForKey:@"self"], @"invalidated");
     RLMAssertThrowsWithReason([array setValue:@1 forKey:@"self"], @"invalidated");
-    RLMAssertThrowsWithReason({for (__unused id obj in array);}, @"invalidated");
+    RLMAssertThrowsWithReason(({for (__unused id obj in array);}), @"invalidated");
 
     [realm beginWriteTransaction];
 }
@@ -754,7 +754,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertNoThrow([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]]);
     XCTAssertNoThrow(array[0]);
     XCTAssertNoThrow([array valueForKey:@"self"]);
-    XCTAssertNoThrow({for (__unused id obj in array);});
+    XCTAssertNoThrow(({for (__unused id obj in array);}));
 
 
     RLMAssertThrowsWithReason([array addObject:@0], @"write transaction");

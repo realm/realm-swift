@@ -57,20 +57,20 @@ extension FindOptions {
     /// Limits the fields to return for all matching documents.
     public var projection: Document? {
         get {
-            return ObjectiveCSupport.convert(object: __projection)?.documentValue
+            return __projection.map(ObjectiveCSupport.convertBson)??.documentValue
         }
         set {
-            __projection = newValue.map(AnyBSON.init).map(ObjectiveCSupport.convert) as? RLMBSON
+            __projection = newValue.map(AnyBSON.init).map(ObjectiveCSupport.convertBson)
         }
     }
 
     /// The order in which to return matching documents.
     public var sort: Document? {
         get {
-            return ObjectiveCSupport.convert(object: __sort)?.documentValue
+            return __sort.map(ObjectiveCSupport.convertBson)??.documentValue
         }
         set {
-            __sort = newValue.map(AnyBSON.init).map(ObjectiveCSupport.convert) as? RLMBSON
+            __sort = newValue.map(AnyBSON.init).map(ObjectiveCSupport.convertBson)
         }
     }
 
@@ -106,20 +106,20 @@ extension FindOneAndModifyOptions {
     /// Limits the fields to return for all matching documents.
     public var projection: Document? {
         get {
-            return ObjectiveCSupport.convert(object: __projection)?.documentValue
+            return __projection.map(ObjectiveCSupport.convertBson)??.documentValue
         }
         set {
-            __projection = newValue.map(AnyBSON.init).map(ObjectiveCSupport.convert) as? RLMBSON
+            __projection = newValue.map(AnyBSON.init).map(ObjectiveCSupport.convertBson)
         }
     }
 
     /// The order in which to return matching documents.
     public var sort: Document? {
         get {
-            return ObjectiveCSupport.convert(object: __sort)?.documentValue
+            return __sort.map(ObjectiveCSupport.convertBson)??.documentValue
         }
         set {
-            __sort = newValue.map(AnyBSON.init).map(ObjectiveCSupport.convert) as? RLMBSON
+            __sort = newValue.map(AnyBSON.init).map(ObjectiveCSupport.convertBson)
         }
     }
 
@@ -204,9 +204,9 @@ public protocol ChangeEventDelegate: AnyObject {
     /// - Parameter changeStream: The `ChangeStream` subscribing to the stream changes.
     func changeStreamDidOpen(_ changeStream: ChangeStream )
     /// The stream has been closed.
-    /// - Parameter error: If an error occured when closing the stream, an error will be passed.
+    /// - Parameter error: If an error occurred when closing the stream, an error will be passed.
     func changeStreamDidClose(with error: Error?)
-    /// A error has occured while streaming.
+    /// A error has occurred while streaming.
     /// - Parameter error: The streaming error.
     func changeStreamDidReceive(error: Error)
     /// Invoked when a change event has been received.
@@ -273,7 +273,7 @@ extension MongoCollection {
     public func insertOne(_ document: Document, _ completion: @escaping MongoInsertBlock) {
         let bson = ObjectiveCSupport.convert(object: .document(document))
         self.__insertOneDocument(bson as! [String: RLMBSON]) { objectId, error in
-            if let objectId = ObjectiveCSupport.convert(object: objectId) {
+            if let o = objectId.map(ObjectiveCSupport.convert), let objectId = o {
                 completion(.success(objectId))
             } else {
                 completion(.failure(error ?? Realm.Error.callFailed))

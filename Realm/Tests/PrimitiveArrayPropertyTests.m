@@ -426,77 +426,77 @@ static double average(NSArray *values) {
 
 - (void)testAddObject {
     RLMAssertThrowsWithReason([unmanaged.boolObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool'");
     RLMAssertThrowsWithReason([unmanaged.intObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int'");
     RLMAssertThrowsWithReason([unmanaged.floatObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float'");
     RLMAssertThrowsWithReason([unmanaged.doubleObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double'");
     RLMAssertThrowsWithReason([unmanaged.stringObj addObject:@2],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string'");
     RLMAssertThrowsWithReason([unmanaged.dataObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data'");
     RLMAssertThrowsWithReason([unmanaged.dateObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date'");
     RLMAssertThrowsWithReason([unmanaged.decimalObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128'");
     RLMAssertThrowsWithReason([unmanaged.objectIdObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id'");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool?'");
     RLMAssertThrowsWithReason([optUnmanaged.intObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int?'");
     RLMAssertThrowsWithReason([optUnmanaged.floatObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float?'");
     RLMAssertThrowsWithReason([optUnmanaged.doubleObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double?'");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj addObject:@2],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string?'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string?'");
     RLMAssertThrowsWithReason([optUnmanaged.dataObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data?'");
     RLMAssertThrowsWithReason([optUnmanaged.dateObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date?'");
     RLMAssertThrowsWithReason([optUnmanaged.decimalObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128?'");
     RLMAssertThrowsWithReason([optUnmanaged.objectIdObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id?'");
     RLMAssertThrowsWithReason([managed.boolObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool'");
     RLMAssertThrowsWithReason([managed.intObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int'");
     RLMAssertThrowsWithReason([managed.floatObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float'");
     RLMAssertThrowsWithReason([managed.doubleObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double'");
     RLMAssertThrowsWithReason([managed.stringObj addObject:@2],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string'");
     RLMAssertThrowsWithReason([managed.dataObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data'");
     RLMAssertThrowsWithReason([managed.dateObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date'");
     RLMAssertThrowsWithReason([managed.decimalObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128'");
     RLMAssertThrowsWithReason([managed.objectIdObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id'");
     RLMAssertThrowsWithReason([optManaged.boolObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool?'");
     RLMAssertThrowsWithReason([optManaged.intObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int?'");
     RLMAssertThrowsWithReason([optManaged.floatObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float?'");
     RLMAssertThrowsWithReason([optManaged.doubleObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double?'");
     RLMAssertThrowsWithReason([optManaged.stringObj addObject:@2],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string?'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string?'");
     RLMAssertThrowsWithReason([optManaged.dataObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data?'");
     RLMAssertThrowsWithReason([optManaged.dateObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date?'");
     RLMAssertThrowsWithReason([optManaged.decimalObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128?'");
     RLMAssertThrowsWithReason([optManaged.objectIdObj addObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id?'");
     RLMAssertThrowsWithReason([unmanaged.boolObj addObject:NSNull.null],
                               @"Invalid value '<null>' of type 'NSNull' for expected type 'bool'");
     RLMAssertThrowsWithReason([unmanaged.intObj addObject:NSNull.null],
@@ -647,77 +647,77 @@ static double average(NSArray *values) {
 
 - (void)testAddObjects {
     RLMAssertThrowsWithReason([unmanaged.boolObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool'");
     RLMAssertThrowsWithReason([unmanaged.intObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int'");
     RLMAssertThrowsWithReason([unmanaged.floatObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float'");
     RLMAssertThrowsWithReason([unmanaged.doubleObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double'");
     RLMAssertThrowsWithReason([unmanaged.stringObj addObjects:@[@2]],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string'");
     RLMAssertThrowsWithReason([unmanaged.dataObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data'");
     RLMAssertThrowsWithReason([unmanaged.dateObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date'");
     RLMAssertThrowsWithReason([unmanaged.decimalObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128'");
     RLMAssertThrowsWithReason([unmanaged.objectIdObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id'");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool?'");
     RLMAssertThrowsWithReason([optUnmanaged.intObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int?'");
     RLMAssertThrowsWithReason([optUnmanaged.floatObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float?'");
     RLMAssertThrowsWithReason([optUnmanaged.doubleObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double?'");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj addObjects:@[@2]],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string?'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string?'");
     RLMAssertThrowsWithReason([optUnmanaged.dataObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data?'");
     RLMAssertThrowsWithReason([optUnmanaged.dateObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date?'");
     RLMAssertThrowsWithReason([optUnmanaged.decimalObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128?'");
     RLMAssertThrowsWithReason([optUnmanaged.objectIdObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id?'");
     RLMAssertThrowsWithReason([managed.boolObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool'");
     RLMAssertThrowsWithReason([managed.intObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int'");
     RLMAssertThrowsWithReason([managed.floatObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float'");
     RLMAssertThrowsWithReason([managed.doubleObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double'");
     RLMAssertThrowsWithReason([managed.stringObj addObjects:@[@2]],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string'");
     RLMAssertThrowsWithReason([managed.dataObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data'");
     RLMAssertThrowsWithReason([managed.dateObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date'");
     RLMAssertThrowsWithReason([managed.decimalObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128'");
     RLMAssertThrowsWithReason([managed.objectIdObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id'");
     RLMAssertThrowsWithReason([optManaged.boolObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool?'");
     RLMAssertThrowsWithReason([optManaged.intObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int?'");
     RLMAssertThrowsWithReason([optManaged.floatObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float?'");
     RLMAssertThrowsWithReason([optManaged.doubleObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double?'");
     RLMAssertThrowsWithReason([optManaged.stringObj addObjects:@[@2]],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string?'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string?'");
     RLMAssertThrowsWithReason([optManaged.dataObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data?'");
     RLMAssertThrowsWithReason([optManaged.dateObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date?'");
     RLMAssertThrowsWithReason([optManaged.decimalObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128?'");
     RLMAssertThrowsWithReason([optManaged.objectIdObj addObjects:@[@"a"]],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id?'");
     RLMAssertThrowsWithReason([unmanaged.boolObj addObjects:@[NSNull.null]],
                               @"Invalid value '<null>' of type 'NSNull' for expected type 'bool'");
     RLMAssertThrowsWithReason([unmanaged.intObj addObjects:@[NSNull.null]],
@@ -850,77 +850,77 @@ static double average(NSArray *values) {
 
 - (void)testInsertObject {
     RLMAssertThrowsWithReason([unmanaged.boolObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool'");
     RLMAssertThrowsWithReason([unmanaged.intObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int'");
     RLMAssertThrowsWithReason([unmanaged.floatObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float'");
     RLMAssertThrowsWithReason([unmanaged.doubleObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double'");
     RLMAssertThrowsWithReason([unmanaged.stringObj insertObject:@2 atIndex:0],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string'");
     RLMAssertThrowsWithReason([unmanaged.dataObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data'");
     RLMAssertThrowsWithReason([unmanaged.dateObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date'");
     RLMAssertThrowsWithReason([unmanaged.decimalObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128'");
     RLMAssertThrowsWithReason([unmanaged.objectIdObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id'");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool?'");
     RLMAssertThrowsWithReason([optUnmanaged.intObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int?'");
     RLMAssertThrowsWithReason([optUnmanaged.floatObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float?'");
     RLMAssertThrowsWithReason([optUnmanaged.doubleObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double?'");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj insertObject:@2 atIndex:0],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string?'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string?'");
     RLMAssertThrowsWithReason([optUnmanaged.dataObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data?'");
     RLMAssertThrowsWithReason([optUnmanaged.dateObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date?'");
     RLMAssertThrowsWithReason([optUnmanaged.decimalObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128?'");
     RLMAssertThrowsWithReason([optUnmanaged.objectIdObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id?'");
     RLMAssertThrowsWithReason([managed.boolObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool'");
     RLMAssertThrowsWithReason([managed.intObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int'");
     RLMAssertThrowsWithReason([managed.floatObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float'");
     RLMAssertThrowsWithReason([managed.doubleObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double'");
     RLMAssertThrowsWithReason([managed.stringObj insertObject:@2 atIndex:0],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string'");
     RLMAssertThrowsWithReason([managed.dataObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data'");
     RLMAssertThrowsWithReason([managed.dateObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date'");
     RLMAssertThrowsWithReason([managed.decimalObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128'");
     RLMAssertThrowsWithReason([managed.objectIdObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id'");
     RLMAssertThrowsWithReason([optManaged.boolObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool?'");
     RLMAssertThrowsWithReason([optManaged.intObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int?'");
     RLMAssertThrowsWithReason([optManaged.floatObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float?'");
     RLMAssertThrowsWithReason([optManaged.doubleObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double?'");
     RLMAssertThrowsWithReason([optManaged.stringObj insertObject:@2 atIndex:0],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string?'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string?'");
     RLMAssertThrowsWithReason([optManaged.dataObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data?'");
     RLMAssertThrowsWithReason([optManaged.dateObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date?'");
     RLMAssertThrowsWithReason([optManaged.decimalObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128?'");
     RLMAssertThrowsWithReason([optManaged.objectIdObj insertObject:@"a" atIndex:0],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id?'");
     RLMAssertThrowsWithReason([unmanaged.boolObj insertObject:NSNull.null atIndex:0],
                               @"Invalid value '<null>' of type 'NSNull' for expected type 'bool'");
     RLMAssertThrowsWithReason([unmanaged.intObj insertObject:NSNull.null atIndex:0],
@@ -1895,77 +1895,77 @@ static double average(NSArray *values) {
     XCTAssertEqualObjects(optManaged.objectIdObj[0], NSNull.null);
 
     RLMAssertThrowsWithReason([unmanaged.boolObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool'");
     RLMAssertThrowsWithReason([unmanaged.intObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int'");
     RLMAssertThrowsWithReason([unmanaged.floatObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float'");
     RLMAssertThrowsWithReason([unmanaged.doubleObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double'");
     RLMAssertThrowsWithReason([unmanaged.stringObj replaceObjectAtIndex:0 withObject:@2],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string'");
     RLMAssertThrowsWithReason([unmanaged.dataObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data'");
     RLMAssertThrowsWithReason([unmanaged.dateObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date'");
     RLMAssertThrowsWithReason([unmanaged.decimalObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128'");
     RLMAssertThrowsWithReason([unmanaged.objectIdObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id'");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool?'");
     RLMAssertThrowsWithReason([optUnmanaged.intObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int?'");
     RLMAssertThrowsWithReason([optUnmanaged.floatObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float?'");
     RLMAssertThrowsWithReason([optUnmanaged.doubleObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double?'");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj replaceObjectAtIndex:0 withObject:@2],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string?'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string?'");
     RLMAssertThrowsWithReason([optUnmanaged.dataObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data?'");
     RLMAssertThrowsWithReason([optUnmanaged.dateObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date?'");
     RLMAssertThrowsWithReason([optUnmanaged.decimalObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128?'");
     RLMAssertThrowsWithReason([optUnmanaged.objectIdObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id?'");
     RLMAssertThrowsWithReason([managed.boolObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool'");
     RLMAssertThrowsWithReason([managed.intObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int'");
     RLMAssertThrowsWithReason([managed.floatObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float'");
     RLMAssertThrowsWithReason([managed.doubleObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double'");
     RLMAssertThrowsWithReason([managed.stringObj replaceObjectAtIndex:0 withObject:@2],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string'");
     RLMAssertThrowsWithReason([managed.dataObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data'");
     RLMAssertThrowsWithReason([managed.dateObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date'");
     RLMAssertThrowsWithReason([managed.decimalObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128'");
     RLMAssertThrowsWithReason([managed.objectIdObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id'");
     RLMAssertThrowsWithReason([optManaged.boolObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool?'");
     RLMAssertThrowsWithReason([optManaged.intObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int?'");
     RLMAssertThrowsWithReason([optManaged.floatObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float?'");
     RLMAssertThrowsWithReason([optManaged.doubleObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double?'");
     RLMAssertThrowsWithReason([optManaged.stringObj replaceObjectAtIndex:0 withObject:@2],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string?'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string?'");
     RLMAssertThrowsWithReason([optManaged.dataObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data?'");
     RLMAssertThrowsWithReason([optManaged.dateObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date?'");
     RLMAssertThrowsWithReason([optManaged.decimalObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128?'");
     RLMAssertThrowsWithReason([optManaged.objectIdObj replaceObjectAtIndex:0 withObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id?'");
     RLMAssertThrowsWithReason([unmanaged.boolObj replaceObjectAtIndex:0 withObject:NSNull.null],
                               @"Invalid value '<null>' of type 'NSNull' for expected type 'bool'");
     RLMAssertThrowsWithReason([unmanaged.intObj replaceObjectAtIndex:0 withObject:NSNull.null],
@@ -2293,77 +2293,77 @@ static double average(NSArray *values) {
     XCTAssertEqual(NSNotFound, [optManaged.objectIdObj indexOfObject:objectId(1)]);
 
     RLMAssertThrowsWithReason([unmanaged.boolObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool'");
     RLMAssertThrowsWithReason([unmanaged.intObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int'");
     RLMAssertThrowsWithReason([unmanaged.floatObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float'");
     RLMAssertThrowsWithReason([unmanaged.doubleObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double'");
     RLMAssertThrowsWithReason([unmanaged.stringObj indexOfObject:@2],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string'");
     RLMAssertThrowsWithReason([unmanaged.dataObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data'");
     RLMAssertThrowsWithReason([unmanaged.dateObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date'");
     RLMAssertThrowsWithReason([unmanaged.decimalObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128'");
     RLMAssertThrowsWithReason([unmanaged.objectIdObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id'");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool?'");
     RLMAssertThrowsWithReason([optUnmanaged.intObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int?'");
     RLMAssertThrowsWithReason([optUnmanaged.floatObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float?'");
     RLMAssertThrowsWithReason([optUnmanaged.doubleObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double?'");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj indexOfObject:@2],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string?'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string?'");
     RLMAssertThrowsWithReason([optUnmanaged.dataObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data?'");
     RLMAssertThrowsWithReason([optUnmanaged.dateObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date?'");
     RLMAssertThrowsWithReason([optUnmanaged.decimalObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128?'");
     RLMAssertThrowsWithReason([optUnmanaged.objectIdObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id?'");
     RLMAssertThrowsWithReason([managed.boolObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool'");
     RLMAssertThrowsWithReason([managed.intObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int'");
     RLMAssertThrowsWithReason([managed.floatObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float'");
     RLMAssertThrowsWithReason([managed.doubleObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double'");
     RLMAssertThrowsWithReason([managed.stringObj indexOfObject:@2],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string'");
     RLMAssertThrowsWithReason([managed.dataObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data'");
     RLMAssertThrowsWithReason([managed.dateObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date'");
     RLMAssertThrowsWithReason([managed.decimalObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128'");
     RLMAssertThrowsWithReason([managed.objectIdObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id'");
     RLMAssertThrowsWithReason([optManaged.boolObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool?'");
     RLMAssertThrowsWithReason([optManaged.intObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int?'");
     RLMAssertThrowsWithReason([optManaged.floatObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float?'");
     RLMAssertThrowsWithReason([optManaged.doubleObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double?'");
     RLMAssertThrowsWithReason([optManaged.stringObj indexOfObject:@2],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string?'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string?'");
     RLMAssertThrowsWithReason([optManaged.dataObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data?'");
     RLMAssertThrowsWithReason([optManaged.dateObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date?'");
     RLMAssertThrowsWithReason([optManaged.decimalObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128?'");
     RLMAssertThrowsWithReason([optManaged.objectIdObj indexOfObject:@"a"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id?'");
 
     RLMAssertThrowsWithReason([unmanaged.boolObj indexOfObject:NSNull.null],
                               @"Invalid value '<null>' of type 'NSNull' for expected type 'bool'");
@@ -4503,77 +4503,77 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                                   @"this class is not key value coding-compliant for the key not self.");
     }
     RLMAssertThrowsWithReason([unmanaged.boolObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool'");
     RLMAssertThrowsWithReason([unmanaged.intObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int'");
     RLMAssertThrowsWithReason([unmanaged.floatObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float'");
     RLMAssertThrowsWithReason([unmanaged.doubleObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double'");
     RLMAssertThrowsWithReason([unmanaged.stringObj setValue:@2 forKey:@"self"],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string'");
     RLMAssertThrowsWithReason([unmanaged.dataObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data'");
     RLMAssertThrowsWithReason([unmanaged.dateObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date'");
     RLMAssertThrowsWithReason([unmanaged.decimalObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128'");
     RLMAssertThrowsWithReason([unmanaged.objectIdObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id'");
     RLMAssertThrowsWithReason([optUnmanaged.boolObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool?'");
     RLMAssertThrowsWithReason([optUnmanaged.intObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int?'");
     RLMAssertThrowsWithReason([optUnmanaged.floatObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float?'");
     RLMAssertThrowsWithReason([optUnmanaged.doubleObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double?'");
     RLMAssertThrowsWithReason([optUnmanaged.stringObj setValue:@2 forKey:@"self"],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string?'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string?'");
     RLMAssertThrowsWithReason([optUnmanaged.dataObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data?'");
     RLMAssertThrowsWithReason([optUnmanaged.dateObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date?'");
     RLMAssertThrowsWithReason([optUnmanaged.decimalObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128?'");
     RLMAssertThrowsWithReason([optUnmanaged.objectIdObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id?'");
     RLMAssertThrowsWithReason([managed.boolObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool'");
     RLMAssertThrowsWithReason([managed.intObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int'");
     RLMAssertThrowsWithReason([managed.floatObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float'");
     RLMAssertThrowsWithReason([managed.doubleObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double'");
     RLMAssertThrowsWithReason([managed.stringObj setValue:@2 forKey:@"self"],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string'");
     RLMAssertThrowsWithReason([managed.dataObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data'");
     RLMAssertThrowsWithReason([managed.dateObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date'");
     RLMAssertThrowsWithReason([managed.decimalObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128'");
     RLMAssertThrowsWithReason([managed.objectIdObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id'");
     RLMAssertThrowsWithReason([optManaged.boolObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'bool?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'bool?'");
     RLMAssertThrowsWithReason([optManaged.intObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'int?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'int?'");
     RLMAssertThrowsWithReason([optManaged.floatObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'float?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'float?'");
     RLMAssertThrowsWithReason([optManaged.doubleObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'double?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'double?'");
     RLMAssertThrowsWithReason([optManaged.stringObj setValue:@2 forKey:@"self"],
-                              @"Invalid value '2' of type '__NSCFNumber' for expected type 'string?'");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for expected type 'string?'");
     RLMAssertThrowsWithReason([optManaged.dataObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'data?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'data?'");
     RLMAssertThrowsWithReason([optManaged.dateObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'date?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'date?'");
     RLMAssertThrowsWithReason([optManaged.decimalObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'decimal128?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'decimal128?'");
     RLMAssertThrowsWithReason([optManaged.objectIdObj setValue:@"a" forKey:@"self"],
-                              @"Invalid value 'a' of type '__NSCFConstantString' for expected type 'object id?'");
+                              @"Invalid value 'a' of type '" RLMConstantString "' for expected type 'object id?'");
     RLMAssertThrowsWithReason([unmanaged.boolObj setValue:NSNull.null forKey:@"self"],
                               @"Invalid value '<null>' of type 'NSNull' for expected type 'bool'");
     RLMAssertThrowsWithReason([unmanaged.intObj setValue:NSNull.null forKey:@"self"],
@@ -5446,7 +5446,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
         RLMAssertThrowsWithReason(array[0] = @0, @"thread");
         RLMAssertThrowsWithReason([array valueForKey:@"self"], @"thread");
         RLMAssertThrowsWithReason([array setValue:@1 forKey:@"self"], @"thread");
-        RLMAssertThrowsWithReason({for (__unused id obj in array);}, @"thread");
+        RLMAssertThrowsWithReason(({for (__unused id obj in array);}), @"thread");
     }];
 }
 
@@ -5485,7 +5485,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     RLMAssertThrowsWithReason(array[0] = @0, @"invalidated");
     RLMAssertThrowsWithReason([array valueForKey:@"self"], @"invalidated");
     RLMAssertThrowsWithReason([array setValue:@1 forKey:@"self"], @"invalidated");
-    RLMAssertThrowsWithReason({for (__unused id obj in array);}, @"invalidated");
+    RLMAssertThrowsWithReason(({for (__unused id obj in array);}), @"invalidated");
 
     [realm beginWriteTransaction];
 }
@@ -5513,7 +5513,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     XCTAssertNoThrow([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]]);
     XCTAssertNoThrow(array[0]);
     XCTAssertNoThrow([array valueForKey:@"self"]);
-    XCTAssertNoThrow({for (__unused id obj in array);});
+    XCTAssertNoThrow(({for (__unused id obj in array);}));
 
 
     RLMAssertThrowsWithReason([array addObject:@0], @"write transaction");

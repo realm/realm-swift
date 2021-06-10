@@ -2042,8 +2042,6 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
     }
 }
 
-#if REALM_HAVE_COMBINE || !SWIFT_PACKAGE
-
 // XCTest doesn't care about the @available on the class and will try to run
 // the tests even on older versions. Putting this check inside `defaultTestSuite`
 // results in a warning about it being redundant due to the enclosing check, so
@@ -2790,6 +2788,5 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         client.deregisterDevice(user: app.currentUser!).await(self)
     }
 }
-#endif
 
 #endif // os(macOS)

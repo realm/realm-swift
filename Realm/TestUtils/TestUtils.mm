@@ -144,10 +144,19 @@ void (RLMAssertExceptionReason)(XCTestCase *self,
     if (!exception) {
         return;
     }
-    if ([exception.reason rangeOfString:(expected)].location == NSNotFound) {
-        NSString *desc = [NSString stringWithFormat:@"The expression %@ threw an exception with reason '%@', but expected to contain '%@'", expression, exception.reason ?: @"<nil>", expected];
-        [self recordFailureWithDescription:desc inFile:fileName atLine:lineNumber expected:NO];
+    if ([exception.reason rangeOfString:(expected)].location != NSNotFound) {
+        return;
     }
+
+    auto location = [[XCTSourceCodeContext alloc] initWithLocation:[[XCTSourceCodeLocation alloc] initWithFilePath:fileName lineNumber:lineNumber]];
+    NSString *desc = [NSString stringWithFormat:@"The expression %@ threw an exception with reason '%@', but expected to contain '%@'", expression, exception.reason ?: @"<nil>", expected];
+    auto issue = [[XCTIssue alloc] initWithType:XCTIssueTypeAssertionFailure
+                             compactDescription:desc
+                            detailedDescription:nil
+                              sourceCodeContext:location
+                                associatedError:nil
+                                    attachments:@[]];
+    [self recordIssue:issue];
 }
 
 bool RLMHasCachedRealmForPath(NSString *path) {

@@ -289,7 +289,7 @@
     RLMAssertThrowsWithReason([[AllPrimitiveArrays alloc] initWithValue:@{@"intObj": @[NSNull.null]}],
                              @"Invalid value '<null>' of type 'NSNull' for 'int' array property 'AllPrimitiveArrays.intObj'.");
     RLMAssertThrowsWithReason([[AllPrimitiveArrays alloc] initWithValue:@{@"intObj": @[@1.1]}],
-                             @"Invalid value '1.1' of type '__NSCFNumber' for 'int' array property 'AllPrimitiveArrays.intObj'.");
+                             @"Invalid value '1.1' of type '" RLMConstantDouble "' for 'int' array property 'AllPrimitiveArrays.intObj'.");
     RLMAssertThrowsWithReason([[AllPrimitiveArrays alloc] initWithValue:@{@"intObj": @[@"0"]}],
                              @"Invalid value '0' of type '__NSCFConstantString' for 'int' array property 'AllPrimitiveArrays.intObj'.");
     RLMAssertThrowsWithReason([[AllPrimitiveArrays alloc] initWithValue:@{@"intObj": @1}],
@@ -396,24 +396,24 @@
 - (void)testInitValidatesNumberTypes {
     XCTAssertNoThrow(([[NumberObject alloc] initWithValue:@{}]));
     RLMAssertThrowsWithReason(([[NumberObject alloc] initWithValue:@{@"intObj": @1.1}]),
-                              @"Invalid value '1.1' of type '__NSCFNumber' for 'int?' property 'NumberObject.intObj'.");
+                              @"Invalid value '1.1' of type '" RLMConstantDouble "' for 'int?' property 'NumberObject.intObj'.");
     RLMAssertThrowsWithReason(([[NumberObject alloc] initWithValue:@{@"intObj": @1.1f}]),
-                              @"Invalid value '1.1' of type '__NSCFNumber' for 'int?' property 'NumberObject.intObj'.");
+                              @"Invalid value '1.1' of type '" RLMConstantFloat "' for 'int?' property 'NumberObject.intObj'.");
 
     XCTAssertNoThrow(([[NumberObject alloc] initWithValue:@{@"boolObj": @YES}]));
     XCTAssertNoThrow(([[NumberObject alloc] initWithValue:@{@"boolObj": @1}]));
     XCTAssertNoThrow(([[NumberObject alloc] initWithValue:@{@"boolObj": @0}]));
     // This error is kinda bad....
     RLMAssertThrowsWithReason(([[NumberObject alloc] initWithValue:@{@"boolObj": @1.0}]),
-                              @"Invalid value '1' of type '__NSCFNumber' for 'bool?' property 'NumberObject.boolObj'.");
+                              @"Invalid value '1' of type '" RLMConstantDouble "' for 'bool?' property 'NumberObject.boolObj'.");
     RLMAssertThrowsWithReason(([[NumberObject alloc] initWithValue:@{@"boolObj": @1.0f}]),
-                              @"Invalid value '1' of type '__NSCFNumber' for 'bool?' property 'NumberObject.boolObj'.");
+                              @"Invalid value '1' of type '" RLMConstantFloat "' for 'bool?' property 'NumberObject.boolObj'.");
     RLMAssertThrowsWithReason(([[NumberObject alloc] initWithValue:@{@"boolObj": @2}]),
-                              @"Invalid value '2' of type '__NSCFNumber' for 'bool?' property 'NumberObject.boolObj'.");
+                              @"Invalid value '2' of type '" RLMConstantInt "' for 'bool?' property 'NumberObject.boolObj'.");
 
     XCTAssertNoThrow(([[NumberObject alloc] initWithValue:@{@"floatObj": @1.1}]));
     RLMAssertThrowsWithReasonMatching(([[NumberObject alloc] initWithValue:@{@"floatObj": @DBL_MAX}]),
-                                      @"Invalid value '.*' of type '__NSCFNumber' for 'float\\?' property 'NumberObject.floatObj'");
+                                      @"Invalid value '.*' of type '" RLMConstantDouble "' for 'float\\?' property 'NumberObject.floatObj'");
 
     XCTAssertNoThrow(([[NumberObject alloc] initWithValue:@{@"doubleObj": @DBL_MAX}]));
 }
@@ -742,7 +742,7 @@
                              @"Invalid value '<null>' of type 'NSNull' for 'int' array property 'AllPrimitiveArrays.intObj'.");
     RLMAssertThrowsWithReason([AllPrimitiveArrays createInRealm:realm
                                        withValue:@{@"intObj": @[@1.1]}],
-                             @"Invalid value '1.1' of type '__NSCFNumber' for 'int' array property 'AllPrimitiveArrays.intObj'.");
+                             @"Invalid value '1.1' of type '" RLMConstantDouble "' for 'int' array property 'AllPrimitiveArrays.intObj'.");
     RLMAssertThrowsWithReason([AllPrimitiveArrays createInRealm:realm
                                        withValue:@{@"intObj": @[@"0"]}],
                              @"Invalid value '0' of type '__NSCFConstantString' for 'int' array property 'AllPrimitiveArrays.intObj'.");
@@ -790,9 +790,9 @@
     auto realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];
 
-    RLMAssertThrowsWithReason([AllOptionalPrimitiveArrays createInRealm:realm
-                                       withValue:@{@"intObj": @[@1.1]}],
-                             @"Invalid value '1.1' of type '__NSCFNumber' for 'int?' array property 'AllOptionalPrimitiveArrays.intObj'.");
+    RLMAssertThrowsWithReasonMatching([AllOptionalPrimitiveArrays createInRealm:realm
+                                                                      withValue:@{@"intObj": @[@1.1]}],
+                                      @"Invalid value '1.1' of type '.*NS.*Number' for 'int\\?' array property 'AllOptionalPrimitiveArrays.intObj'.");
     RLMAssertThrowsWithReason([AllOptionalPrimitiveArrays createInRealm:realm
                                        withValue:@{@"intObj": @[@"0"]}],
                              @"Invalid value '0' of type '__NSCFConstantString' for 'int?' array property 'AllOptionalPrimitiveArrays.intObj'.");
