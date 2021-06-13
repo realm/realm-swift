@@ -145,10 +145,12 @@ static bool rawTypeShouldBeTreatedAsComputedProperty(NSString *rawType) {
 }
 
 static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char *type) {
-    if (strncmp(type, "RLM", 3)) {
+    static const char *ClassPrefix = "RLM";
+
+    if (strncmp(type, ClassPrefix, strlen(ClassPrefix))) {
         return realm::none;
     }
-    type += 3;
+    type += strlen(ClassPrefix);
     if (strcmp(type, "Int>\"") == 0) {
         return RLMPropertyTypeInt;
     }
