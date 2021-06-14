@@ -1,17 +1,42 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.8.0 Release notes (2021-06-14)
 =============================================================
 
-NOTE: This version upgrades the Realm file format version. Realm files opened
-will be automatically upgraded and cannot be read by versions older than
-v10.8.0-beta.3. This upgrade should be a fairly fast one. Note that we now
+NOTE: This version upgrades the Realm file format version to add support for
+the new data types and to adjust how primary keys are handled. Realm files
+opened will be automatically upgraded and cannot be read by versions older than
+v10.8.0. This upgrade should be a fairly fast one. Note that we now
 automatically create a backup of the pre-upgrade Realm.
 
+### Enhancements
+
+* Add support for the `UUID` and `NSUUID` data types. These types can be used
+  for the primary key property of Object classes.
+* Add two new collection types to complement the existing `RLMArray`/`List` type:
+  - `RLMSet<T>` in Objective-C and `MutableSet<T>` in Swift are mutable
+    unordered collections of distinct objects, similar to the built-in
+    `NSMutableSet` and `Set`. The values in a set may be any non-collection
+    type which can be stored as a Realm property. Sets are guaranteed to never
+    contain two objects which compare equal to each other, including when
+    conflicting writes are merged by sync.
+  - `RLMDictionary<NSString *, T>` in Objective-C and `Map<String, T>` are
+    mutable key-value dictionaries, similar to the built-in
+    `NSMutableDictionary` and `Dictionary`. The values in a dictionary may be
+    any non-collection type which can be stored as a Realm property. The keys
+    must currently always be a string.
+* Add support for dynamically typed properties which can store a value of any
+  of the non-collection types supported by Realm, including Object subclasses
+  (but not EmbeddedObject subclasses). These are declared with
+  `@property id<RLMValue> propertyName;` in Objective-C and
+  `let propertyName = RealmProperty<AnyRealmValue>()` in Swift.
+
 ### Fixed
-* Setting a collection with a nullable value type to null would hit an
-  assertion failure instead of clearing the collection.
+
+* Setting a collection with a nullable value type to null via one of the
+  dynamic interfaces would hit an assertion failure instead of clearing the
+  collection.
 * Fixed an incorrect detection of multiple incoming links in a migration when
   changing a table to embedded and removing a link to it at the same time.
-  ([#4694](https://github.com/realm/realm-core/issues/4694) since 10.0.0-beta.2)
+  ([#4694](https://github.com/realm/realm-core/issues/4694) since v10.0.0-beta.2)
 * Fixed a divergent merge on Set when one client clears the Set and another
   client inserts and deletes objects.
   ([#4720](https://github.com/realm/realm-core/issues/4720))
@@ -21,44 +46,34 @@ automatically create a backup of the pre-upgrade Realm.
   for a separate index on the primary key. This made some use patterns slightly
   faster, but also made some reasonable things dramatically slower.
   ([#4522](https://github.com/realm/realm-core/issues/4522))
-* Observing a dictionary holding links to objects would crash.
-  ([#4711](https://github.com/realm/realm-core/issues/4711), since v11.0.0-beta.0)
-* Deleting objects pointed to by a Dictionary may result in a crash.
-  ([#4632](https://github.com/realm/realm-core/issues/4632), since v11.0.0-beta.0)
-* Comparing dictionaries from different realms could sometimes return equality
-  ([#4629](https://github.com/realm/realm-core/issues/4629), since v11.0.0-beta.0)
-* Changed the average of an empty set from 0 to null to match the other
-  collections. ([#4678](https://github.com/realm/realm-core/issues/4678), since v11.0.0-beta.0)
-* Changed the sum of an empty dictionary from null to 0 to match the other
-  collections. ([#4678](https://github.com/realm/realm-core/issues/4678), since v11.0.0-beta.0)
-* Fix the order of a sorted set of mixed values.
-  ([#4662](https://github.com/realm/realm-core/pull/4662), since v11.0.0-beta.0)
-* Use same rules for handling numeric values in sets as MongoDB uses to avoid
-  strange behavior when using sync. All numeric values are compared using the
-  value irregardless of the type, rather than things like int(1) and float(1)
-  being considered different values.
-  ([#4686](https://github.com/realm/realm-core/pull/4686), since v11.0.0-beta.0)
 * Fixed an incorrect detection of multiple incoming links in a migration when
   changing a table to embedded and removing a link to it at the same time.
-  ([#4694](https://github.com/realm/realm-core/issues/4694) since 10.0.0-beta.2)
+  ([#4694](https://github.com/realm/realm-core/issues/4694) since v10.0.0-beta.2)
 * Fix collection notification reporting for modifications. This could be
   observed by receiving the wrong indices of modifications on sorted or
   distinct results, or notification blocks sometimes not being called when only
   modifications have occured.
-  ([#4573](https://github.com/realm/realm-core/pull/4573) since v6).
+  ([#4573](https://github.com/realm/realm-core/pull/4573) since v5.0.0).
 * Fix incorrect sync instruction emission when replacing an existing embedded
   object with another embedded object.([Core #4740](https://github.com/realm/realm-core/issues/4740)
-* Fix crash when changing the nullability of a classes's primary key property.
-  ([Core #4759](https://github.com/realm/realm-core/issues/4759), since v10.8.0-beta.0)
+
+### Deprecations
+
+* `RealmOptional<T>` has been deprecated in favor of `RealmProperty<T?>`.
+  `RealmProperty` is functionality identical to `RealmOptional` when storing
+  optional numeric types, but can also store the new `AnyRealmValue` type.
 
 ### Compatibility
-* Realm Studio: Currently no released version with support for this version.
+
+* Realm Studio: 11.0.0 or later. Note that this version of Realm Studio has not
+  yet been released at the time of this release.
 * Carthage release for Swift is built with Xcode 12.5.
 * CocoaPods: 1.10 or later.
 * Xcode: 12.2-13.0 beta 1.
 
 ### Internal
-* Upgraded realm-core from v11.0.0-beta.6 to v11.0.3
+
+* Upgraded realm-core from v10.7.2 to v11.0.3
 
 10.8.0-beta.2 Release notes (2021-06-01)
 =============================================================
