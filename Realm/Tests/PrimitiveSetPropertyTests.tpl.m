@@ -108,77 +108,77 @@ static double average(NSArray *values) {
 }
 
 - (void)testCount {
-    XCTAssertEqual(unmanaged.intObj.count, 0U);
+    uncheckedAssertEqual(unmanaged.intObj.count, 0U);
     [unmanaged.intObj addObject:@1];
-    XCTAssertEqual(unmanaged.intObj.count, 1U);
+    uncheckedAssertEqual(unmanaged.intObj.count, 1U);
 }
 
 - (void)testType {
-    XCTAssertEqual(unmanaged.boolObj.type, RLMPropertyTypeBool);
-    XCTAssertEqual(unmanaged.intObj.type, RLMPropertyTypeInt);
-    XCTAssertEqual(unmanaged.floatObj.type, RLMPropertyTypeFloat);
-    XCTAssertEqual(unmanaged.doubleObj.type, RLMPropertyTypeDouble);
-    XCTAssertEqual(unmanaged.stringObj.type, RLMPropertyTypeString);
-    XCTAssertEqual(unmanaged.dataObj.type, RLMPropertyTypeData);
-    XCTAssertEqual(unmanaged.dateObj.type, RLMPropertyTypeDate);
-    XCTAssertEqual(optUnmanaged.boolObj.type, RLMPropertyTypeBool);
-    XCTAssertEqual(optUnmanaged.intObj.type, RLMPropertyTypeInt);
-    XCTAssertEqual(optUnmanaged.floatObj.type, RLMPropertyTypeFloat);
-    XCTAssertEqual(optUnmanaged.doubleObj.type, RLMPropertyTypeDouble);
-    XCTAssertEqual(optUnmanaged.stringObj.type, RLMPropertyTypeString);
-    XCTAssertEqual(optUnmanaged.dataObj.type, RLMPropertyTypeData);
-    XCTAssertEqual(optUnmanaged.dateObj.type, RLMPropertyTypeDate);
+    uncheckedAssertEqual(unmanaged.boolObj.type, RLMPropertyTypeBool);
+    uncheckedAssertEqual(unmanaged.intObj.type, RLMPropertyTypeInt);
+    uncheckedAssertEqual(unmanaged.floatObj.type, RLMPropertyTypeFloat);
+    uncheckedAssertEqual(unmanaged.doubleObj.type, RLMPropertyTypeDouble);
+    uncheckedAssertEqual(unmanaged.stringObj.type, RLMPropertyTypeString);
+    uncheckedAssertEqual(unmanaged.dataObj.type, RLMPropertyTypeData);
+    uncheckedAssertEqual(unmanaged.dateObj.type, RLMPropertyTypeDate);
+    uncheckedAssertEqual(optUnmanaged.boolObj.type, RLMPropertyTypeBool);
+    uncheckedAssertEqual(optUnmanaged.intObj.type, RLMPropertyTypeInt);
+    uncheckedAssertEqual(optUnmanaged.floatObj.type, RLMPropertyTypeFloat);
+    uncheckedAssertEqual(optUnmanaged.doubleObj.type, RLMPropertyTypeDouble);
+    uncheckedAssertEqual(optUnmanaged.stringObj.type, RLMPropertyTypeString);
+    uncheckedAssertEqual(optUnmanaged.dataObj.type, RLMPropertyTypeData);
+    uncheckedAssertEqual(optUnmanaged.dateObj.type, RLMPropertyTypeDate);
 }
 
 - (void)testOptional {
-    XCTAssertFalse(unmanaged.boolObj.optional);
-    XCTAssertFalse(unmanaged.intObj.optional);
-    XCTAssertFalse(unmanaged.floatObj.optional);
-    XCTAssertFalse(unmanaged.doubleObj.optional);
-    XCTAssertFalse(unmanaged.stringObj.optional);
-    XCTAssertFalse(unmanaged.dataObj.optional);
-    XCTAssertFalse(unmanaged.dateObj.optional);
-    XCTAssertTrue(optUnmanaged.boolObj.optional);
-    XCTAssertTrue(optUnmanaged.intObj.optional);
-    XCTAssertTrue(optUnmanaged.floatObj.optional);
-    XCTAssertTrue(optUnmanaged.doubleObj.optional);
-    XCTAssertTrue(optUnmanaged.stringObj.optional);
-    XCTAssertTrue(optUnmanaged.dataObj.optional);
-    XCTAssertTrue(optUnmanaged.dateObj.optional);
+    uncheckedAssertFalse(unmanaged.boolObj.optional);
+    uncheckedAssertFalse(unmanaged.intObj.optional);
+    uncheckedAssertFalse(unmanaged.floatObj.optional);
+    uncheckedAssertFalse(unmanaged.doubleObj.optional);
+    uncheckedAssertFalse(unmanaged.stringObj.optional);
+    uncheckedAssertFalse(unmanaged.dataObj.optional);
+    uncheckedAssertFalse(unmanaged.dateObj.optional);
+    uncheckedAssertTrue(optUnmanaged.boolObj.optional);
+    uncheckedAssertTrue(optUnmanaged.intObj.optional);
+    uncheckedAssertTrue(optUnmanaged.floatObj.optional);
+    uncheckedAssertTrue(optUnmanaged.doubleObj.optional);
+    uncheckedAssertTrue(optUnmanaged.stringObj.optional);
+    uncheckedAssertTrue(optUnmanaged.dataObj.optional);
+    uncheckedAssertTrue(optUnmanaged.dateObj.optional);
 }
 
 - (void)testObjectClassName {
-    XCTAssertNil(unmanaged.boolObj.objectClassName);
-    XCTAssertNil(unmanaged.intObj.objectClassName);
-    XCTAssertNil(unmanaged.floatObj.objectClassName);
-    XCTAssertNil(unmanaged.doubleObj.objectClassName);
-    XCTAssertNil(unmanaged.stringObj.objectClassName);
-    XCTAssertNil(unmanaged.dataObj.objectClassName);
-    XCTAssertNil(unmanaged.dateObj.objectClassName);
-    XCTAssertNil(optUnmanaged.boolObj.objectClassName);
-    XCTAssertNil(optUnmanaged.intObj.objectClassName);
-    XCTAssertNil(optUnmanaged.floatObj.objectClassName);
-    XCTAssertNil(optUnmanaged.doubleObj.objectClassName);
-    XCTAssertNil(optUnmanaged.stringObj.objectClassName);
-    XCTAssertNil(optUnmanaged.dataObj.objectClassName);
-    XCTAssertNil(optUnmanaged.dateObj.objectClassName);
+    uncheckedAssertNil(unmanaged.boolObj.objectClassName);
+    uncheckedAssertNil(unmanaged.intObj.objectClassName);
+    uncheckedAssertNil(unmanaged.floatObj.objectClassName);
+    uncheckedAssertNil(unmanaged.doubleObj.objectClassName);
+    uncheckedAssertNil(unmanaged.stringObj.objectClassName);
+    uncheckedAssertNil(unmanaged.dataObj.objectClassName);
+    uncheckedAssertNil(unmanaged.dateObj.objectClassName);
+    uncheckedAssertNil(optUnmanaged.boolObj.objectClassName);
+    uncheckedAssertNil(optUnmanaged.intObj.objectClassName);
+    uncheckedAssertNil(optUnmanaged.floatObj.objectClassName);
+    uncheckedAssertNil(optUnmanaged.doubleObj.objectClassName);
+    uncheckedAssertNil(optUnmanaged.stringObj.objectClassName);
+    uncheckedAssertNil(optUnmanaged.dataObj.objectClassName);
+    uncheckedAssertNil(optUnmanaged.dateObj.objectClassName);
 }
 
 - (void)testRealm {
-    XCTAssertNil(unmanaged.boolObj.realm);
-    XCTAssertNil(unmanaged.intObj.realm);
-    XCTAssertNil(unmanaged.floatObj.realm);
-    XCTAssertNil(unmanaged.doubleObj.realm);
-    XCTAssertNil(unmanaged.stringObj.realm);
-    XCTAssertNil(unmanaged.dataObj.realm);
-    XCTAssertNil(unmanaged.dateObj.realm);
-    XCTAssertNil(optUnmanaged.boolObj.realm);
-    XCTAssertNil(optUnmanaged.intObj.realm);
-    XCTAssertNil(optUnmanaged.floatObj.realm);
-    XCTAssertNil(optUnmanaged.doubleObj.realm);
-    XCTAssertNil(optUnmanaged.stringObj.realm);
-    XCTAssertNil(optUnmanaged.dataObj.realm);
-    XCTAssertNil(optUnmanaged.dateObj.realm);
+    uncheckedAssertNil(unmanaged.boolObj.realm);
+    uncheckedAssertNil(unmanaged.intObj.realm);
+    uncheckedAssertNil(unmanaged.floatObj.realm);
+    uncheckedAssertNil(unmanaged.doubleObj.realm);
+    uncheckedAssertNil(unmanaged.stringObj.realm);
+    uncheckedAssertNil(unmanaged.dataObj.realm);
+    uncheckedAssertNil(unmanaged.dateObj.realm);
+    uncheckedAssertNil(optUnmanaged.boolObj.realm);
+    uncheckedAssertNil(optUnmanaged.intObj.realm);
+    uncheckedAssertNil(optUnmanaged.floatObj.realm);
+    uncheckedAssertNil(optUnmanaged.doubleObj.realm);
+    uncheckedAssertNil(optUnmanaged.stringObj.realm);
+    uncheckedAssertNil(optUnmanaged.dataObj.realm);
+    uncheckedAssertNil(optUnmanaged.dateObj.realm);
 }
 
 - (void)testInvalidated {
@@ -186,9 +186,9 @@ static double average(NSArray *values) {
     @autoreleasepool {
         AllPrimitiveSets *obj = [[AllPrimitiveSets alloc] init];
         set = obj.intObj;
-        XCTAssertFalse(set.invalidated);
+        uncheckedAssertFalse(set.invalidated);
     }
-    XCTAssertFalse(set.invalidated);
+    uncheckedAssertFalse(set.invalidated);
 }
 
 - (void)testDeleteObjectsInRealm {
@@ -200,13 +200,13 @@ static double average(NSArray *values) {
                               @"Index 0 is out of bounds (must be less than 0).");
 
     [unmanaged.intObj addObject:@1];
-    XCTAssertEqualObjects([unmanaged.intObj objectAtIndex:0], @1);
+    uncheckedAssertEqualObjects([unmanaged.intObj objectAtIndex:0], @1);
 }
 
 - (void)testContainsObject {
-    XCTAssertFalse([$set containsObject:$v0]);
+    uncheckedAssertFalse([$set containsObject:$v0]);
     [$set addObject:$v0];
-    XCTAssertTrue([$set containsObject:$v0]);
+    uncheckedAssertTrue([$set containsObject:$v0]);
 }
 
 - (void)testAddObject {
@@ -214,10 +214,10 @@ static double average(NSArray *values) {
     %noany %r RLMAssertThrowsWithReason([$set addObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [$set addObject:$v0];
-    XCTAssertTrue([$set containsObject:$v0]);
+    uncheckedAssertTrue([$set containsObject:$v0]);
 
     %o [$set addObject:NSNull.null];
-    %o XCTAssertTrue([$set containsObject:NSNull.null]);
+    %o uncheckedAssertTrue([$set containsObject:NSNull.null]);
 }
 
 - (void)testAddObjects {
@@ -225,42 +225,42 @@ static double average(NSArray *values) {
     %noany %r RLMAssertThrowsWithReason([$set addObjects:@[NSNull.null]], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
-    XCTAssertTrue([$set containsObject:$v0]);
-    XCTAssertTrue([$set containsObject:$v1]);
-    %o XCTAssertTrue([$set containsObject:$v2]);
+    uncheckedAssertTrue([$set containsObject:$v0]);
+    uncheckedAssertTrue([$set containsObject:$v1]);
+    %o uncheckedAssertTrue([$set containsObject:$v2]);
 }
 
 - (void)testRemoveObject {
     [self addObjects];
-    %r XCTAssertEqual($set.count, 2U);
-    %o XCTAssertEqual($set.count, 3U);
+    %r uncheckedAssertEqual($set.count, 2U);
+    %o uncheckedAssertEqual($set.count, 3U);
 
     [$allSets removeObject:$allSets.allObjects[0]];
-    %r XCTAssertEqual($set.count, 1U);
-    %o XCTAssertEqual($set.count, 2U);
+    %r uncheckedAssertEqual($set.count, 1U);
+    %o uncheckedAssertEqual($set.count, 2U);
 }
 
 - (void)testIndexOfObjectSorted {
     %man %r [$set addObjects:@[$v0, $v1, $v0, $v1]];
     %man %o [$set addObjects:@[$v0, $v1, NSNull.null, $v1, $v0]];
     // ordering can't be guaranteed in set, so just verify the indexes are between 0 and 1
-    %man %r XCTAssertTrue([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1] == 0U || ^n [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1] == 1U);
-    %man %r XCTAssertTrue([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0] == 0U || ^n [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0] == 1U);
+    %man %r uncheckedAssertTrue([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1] == 0U || ^n [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1] == 1U);
+    %man %r uncheckedAssertTrue([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0] == 0U || ^n [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0] == 1U);
 
-    %man %o XCTAssertTrue([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1] == 0U || ^n [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1] == 1U);
-    %man %o XCTAssertTrue([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0] == 0U || ^n [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0] == 1U);
+    %man %o uncheckedAssertTrue([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1] == 0U || ^n [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1] == 1U);
+    %man %o uncheckedAssertTrue([[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0] == 0U || ^n [[$set sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0] == 1U);
 }
 
 - (void)testIndexOfObjectDistinct {
     %man %r [$set addObjects:@[$v0, $v0, $v1]];
     %man %o [$set addObjects:@[$v0, $v0, NSNull.null, $v1, $v0]];
     // ordering can't be guaranteed in set, so just verify the indexes are between 0 and 1
-    %man %r XCTAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0] == 1U);
-    %man %r XCTAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1] == 1U);
+    %man %r uncheckedAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0] == 1U);
+    %man %r uncheckedAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1] == 1U);
 
-    %man %o XCTAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0] == 1U);
-    %man %o XCTAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1] == 1U);
-    %man %o XCTAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null] == 1U);
+    %man %o uncheckedAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0] == 1U);
+    %man %o uncheckedAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1] == 1U);
+    %man %o uncheckedAssertTrue([[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null] == 0U || ^n [[$set distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null] == 1U);
 }
 
 - (void)testSort {
@@ -271,14 +271,14 @@ static double average(NSArray *values) {
     %man %r [$set addObjects:@[$v0, $v1, $v0]];
     %man %o [$set addObjects:@[$v0, $v1, NSNull.null, $v1, $v0]];
 
-    %man %r XCTAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingDescriptors:@[]] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v0, $v1]]));
-    %man %o XCTAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingDescriptors:@[]] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v0, $v1]]));
+    %man %r uncheckedAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingDescriptors:@[]] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v0, $v1]]));
+    %man %o uncheckedAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingDescriptors:@[]] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v0, $v1]]));
 
-    %man %r XCTAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v1, $v0]]));
-    %man %o XCTAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v1, $v0]]));
+    %man %r uncheckedAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v1, $v0]]));
+    %man %o uncheckedAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v1, $v0]]));
 
-    %man %r XCTAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v0, $v1]]));
-    %man %o XCTAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[NSNull.null, $v1]]));
+    %man %r uncheckedAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[$v0, $v1]]));
+    %man %o uncheckedAssertEqualObjects([NSSet setWithArray:[[[$set sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"] allObjects]], ^n ([NSSet setWithArray:@[NSNull.null, $v1]]));
 }
 
 - (void)testFilter {
@@ -314,22 +314,22 @@ static double average(NSArray *values) {
     %man [$set setSet:$set2];
     [realm commitWriteTransaction];
 
-    %unman %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %unman %r %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
-    %unman %r %nomaxvalues XCTAssertEqual($set.count, 2U);
-    %unman %r %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v4]]));
-    %unman %o %maxtwovalues XCTAssertEqual($set.count, 3U);
-    %unman %o %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v2]]));
-    %unman %o %nomaxvalues XCTAssertEqual($set.count, 3U);
-    %unman %o %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v3, $v4]]));
-    %man %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %man %r %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
-    %man %r %nomaxvalues XCTAssertEqual($set.count, 2U);
-    %man %r %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v1, $v4]]));
-    %man %o %maxtwovalues XCTAssertEqual($set.count, 3U);
-    %man %o %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, %v2]]));
-    %man %o %nomaxvalues XCTAssertEqual($set.count, 3U);
-    %man %o %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, %v3, %v4]]));
+    %unman %r %maxtwovalues uncheckedAssertEqual($set.count, 2U);
+    %unman %r %maxtwovalues uncheckedAssertEqualObjects($set.allObjects, (@[$v0, $v1]));
+    %unman %r %nomaxvalues uncheckedAssertEqual($set.count, 2U);
+    %unman %r %nomaxvalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v4]]));
+    %unman %o %maxtwovalues uncheckedAssertEqual($set.count, 3U);
+    %unman %o %maxtwovalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v2]]));
+    %unman %o %nomaxvalues uncheckedAssertEqual($set.count, 3U);
+    %unman %o %nomaxvalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v3, $v4]]));
+    %man %r %maxtwovalues uncheckedAssertEqual($set.count, 2U);
+    %man %r %maxtwovalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
+    %man %r %nomaxvalues uncheckedAssertEqual($set.count, 2U);
+    %man %r %nomaxvalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v1, $v4]]));
+    %man %o %maxtwovalues uncheckedAssertEqual($set.count, 3U);
+    %man %o %maxtwovalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, %v2]]));
+    %man %o %nomaxvalues uncheckedAssertEqual($set.count, 3U);
+    %man %o %nomaxvalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, %v3, %v4]]));
 }
 
 - (void)testUnion {
@@ -351,22 +351,22 @@ static double average(NSArray *values) {
     %man [$set unionSet:$set2];
     [realm commitWriteTransaction];
 
-    %unman %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %unman %r %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
-    %unman %r %nomaxvalues XCTAssertEqual($set.count, 3U);
-    %unman %r %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v4]]));
-    %unman %o %maxtwovalues XCTAssertEqual($set.count, 3U);
-    %unman %o %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v2]]));
-    %unman %o %nomaxvalues XCTAssertEqual($set.count, 4U);
-    %unman %o %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v3, $v4]]));
-    %man %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %man %r %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
-    %man %r %nomaxvalues XCTAssertEqual($set.count, 3U);
-    %man %r %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v4]]));
-    %man %o %maxtwovalues XCTAssertEqual($set.count, 3U);
-    %man %o %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, %v2]]));
-    %man %o %nomaxvalues XCTAssertEqual($set.count, 4U);
-    %man %o %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, %v3, %v4]]));
+    %unman %r %maxtwovalues uncheckedAssertEqual($set.count, 2U);
+    %unman %r %maxtwovalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
+    %unman %r %nomaxvalues uncheckedAssertEqual($set.count, 3U);
+    %unman %r %nomaxvalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v4]]));
+    %unman %o %maxtwovalues uncheckedAssertEqual($set.count, 3U);
+    %unman %o %maxtwovalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v2]]));
+    %unman %o %nomaxvalues uncheckedAssertEqual($set.count, 4U);
+    %unman %o %nomaxvalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v3, $v4]]));
+    %man %r %maxtwovalues uncheckedAssertEqual($set.count, 2U);
+    %man %r %maxtwovalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
+    %man %r %nomaxvalues uncheckedAssertEqual($set.count, 3U);
+    %man %r %nomaxvalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, $v4]]));
+    %man %o %maxtwovalues uncheckedAssertEqual($set.count, 3U);
+    %man %o %maxtwovalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, %v2]]));
+    %man %o %nomaxvalues uncheckedAssertEqual($set.count, 4U);
+    %man %o %nomaxvalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1, %v3, %v4]]));
 }
 
 - (void)testIntersect {
@@ -382,8 +382,8 @@ static double average(NSArray *values) {
     %unman %o [$set2 addObjects:@[$v3, $v4, NSNull.null]];
 
     %man XCTAssertThrows([$set intersectSet:$set2]);
-    %man XCTAssertTrue([$set intersectsSet:$set2]);
-    %unman XCTAssertTrue([$set intersectsSet:$set2]);
+    %man uncheckedAssertTrue([$set intersectsSet:$set2]);
+    %unman uncheckedAssertTrue([$set intersectsSet:$set2]);
 
     %unman [$set intersectSet:$set2];
 
@@ -391,22 +391,22 @@ static double average(NSArray *values) {
     %man [$set intersectSet:$set2];
     [realm commitWriteTransaction];
 
-    %unman %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %unman %r %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
-    %unman %r %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %unman %r %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0]));
-    %unman %o %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %unman %o %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
-    %unman %o %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %unman %o %nomaxvalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0]]));
-    %man %r %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %man %r %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
-    %man %r %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %man %r %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v1]));
-    %man %o %maxtwovalues XCTAssertEqual($set.count, 2U);
-    %man %o %maxtwovalues XCTAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
-    %man %o %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %man %o %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0]));
+    %unman %r %maxtwovalues uncheckedAssertEqual($set.count, 2U);
+    %unman %r %maxtwovalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
+    %unman %r %nomaxvalues uncheckedAssertEqual($set.count, 1U);
+    %unman %r %nomaxvalues uncheckedAssertEqualObjects($set.allObjects, (@[$v0]));
+    %unman %o %maxtwovalues uncheckedAssertEqual($set.count, 2U);
+    %unman %o %maxtwovalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
+    %unman %o %nomaxvalues uncheckedAssertEqual($set.count, 1U);
+    %unman %o %nomaxvalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0]]));
+    %man %r %maxtwovalues uncheckedAssertEqual($set.count, 2U);
+    %man %r %maxtwovalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
+    %man %r %nomaxvalues uncheckedAssertEqual($set.count, 1U);
+    %man %r %nomaxvalues uncheckedAssertEqualObjects($set.allObjects, (@[$v1]));
+    %man %o %maxtwovalues uncheckedAssertEqual($set.count, 2U);
+    %man %o %maxtwovalues uncheckedAssertEqualObjects([NSSet setWithArray:$set.allObjects], ([NSSet setWithArray:@[$v0, $v1]]));
+    %man %o %nomaxvalues uncheckedAssertEqual($set.count, 1U);
+    %man %o %nomaxvalues uncheckedAssertEqualObjects($set.allObjects, (@[$v0]));
 }
 
 - (void)testMinus {
@@ -429,22 +429,22 @@ static double average(NSArray *values) {
     %man [$set minusSet:$set2];
     [realm commitWriteTransaction];
 
-    %unman %r %maxtwovalues XCTAssertEqual($set.count, 0U);
-    %unman %r %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[]));
-    %unman %r %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %unman %r %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v1]));
-    %unman %o %maxtwovalues XCTAssertEqual($set.count, 0U);
-    %unman %o %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[]));
-    %unman %o %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %unman %o %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v1]));
-    %man %r %maxtwovalues XCTAssertEqual($set.count, 0U);
-    %man %r %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[]));
-    %man %r %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %man %r %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v0]));
-    %man %o %maxtwovalues XCTAssertEqual($set.count, 0U);
-    %man %o %maxtwovalues XCTAssertEqualObjects($set.allObjects, (@[]));
-    %man %o %nomaxvalues XCTAssertEqual($set.count, 1U);
-    %man %o %nomaxvalues XCTAssertEqualObjects($set.allObjects, (@[$v1]));
+    %unman %r %maxtwovalues uncheckedAssertEqual($set.count, 0U);
+    %unman %r %maxtwovalues uncheckedAssertEqualObjects($set.allObjects, (@[]));
+    %unman %r %nomaxvalues uncheckedAssertEqual($set.count, 1U);
+    %unman %r %nomaxvalues uncheckedAssertEqualObjects($set.allObjects, (@[$v1]));
+    %unman %o %maxtwovalues uncheckedAssertEqual($set.count, 0U);
+    %unman %o %maxtwovalues uncheckedAssertEqualObjects($set.allObjects, (@[]));
+    %unman %o %nomaxvalues uncheckedAssertEqual($set.count, 1U);
+    %unman %o %nomaxvalues uncheckedAssertEqualObjects($set.allObjects, (@[$v1]));
+    %man %r %maxtwovalues uncheckedAssertEqual($set.count, 0U);
+    %man %r %maxtwovalues uncheckedAssertEqualObjects($set.allObjects, (@[]));
+    %man %r %nomaxvalues uncheckedAssertEqual($set.count, 1U);
+    %man %r %nomaxvalues uncheckedAssertEqualObjects($set.allObjects, (@[$v0]));
+    %man %o %maxtwovalues uncheckedAssertEqual($set.count, 0U);
+    %man %o %maxtwovalues uncheckedAssertEqualObjects($set.allObjects, (@[]));
+    %man %o %nomaxvalues uncheckedAssertEqual($set.count, 1U);
+    %man %o %nomaxvalues uncheckedAssertEqualObjects($set.allObjects, (@[$v1]));
 }
 
 - (void)testIsSubsetOfSet {
@@ -459,57 +459,57 @@ static double average(NSArray *values) {
     %unman %r [$set2 addObjects:@[$v0, $v1, $v3, $v4]];
     %unman %o [$set2 addObjects:@[$v0, $v1, $v3, $v4, NSNull.null]];
 
-    %maxtwovalues %r %man XCTAssertTrue([$set2 isSubsetOfSet:$set]);
-    %maxtwovalues %r %unman XCTAssertTrue([$set2 isSubsetOfSet:$set]);
-    %maxtwovalues %o %man XCTAssertFalse([$set2 isSubsetOfSet:$set]);
-    %maxtwovalues %o %unman XCTAssertFalse([$set2 isSubsetOfSet:$set]);
+    %maxtwovalues %r %man uncheckedAssertTrue([$set2 isSubsetOfSet:$set]);
+    %maxtwovalues %r %unman uncheckedAssertTrue([$set2 isSubsetOfSet:$set]);
+    %maxtwovalues %o %man uncheckedAssertFalse([$set2 isSubsetOfSet:$set]);
+    %maxtwovalues %o %unman uncheckedAssertFalse([$set2 isSubsetOfSet:$set]);
 
-    %maxtwovalues %r %man XCTAssertTrue([$set isSubsetOfSet:$set2]);
-    %maxtwovalues %r %unman XCTAssertTrue([$set isSubsetOfSet:$set2]);
-    %maxtwovalues %o %man XCTAssertTrue([$set isSubsetOfSet:$set2]);
-    %maxtwovalues %o %unman XCTAssertTrue([$set isSubsetOfSet:$set2]);
+    %maxtwovalues %r %man uncheckedAssertTrue([$set isSubsetOfSet:$set2]);
+    %maxtwovalues %r %unman uncheckedAssertTrue([$set isSubsetOfSet:$set2]);
+    %maxtwovalues %o %man uncheckedAssertTrue([$set isSubsetOfSet:$set2]);
+    %maxtwovalues %o %unman uncheckedAssertTrue([$set isSubsetOfSet:$set2]);
 
-    %nomaxvalues %man XCTAssertTrue([$set isSubsetOfSet:$set2]);
-    %nomaxvalues %unman XCTAssertTrue([$set isSubsetOfSet:$set2]);
-    %nomaxvalues %man XCTAssertFalse([$set2 isSubsetOfSet:$set]);
-    %nomaxvalues %unman XCTAssertFalse([$set2 isSubsetOfSet:$set]);
+    %nomaxvalues %man uncheckedAssertTrue([$set isSubsetOfSet:$set2]);
+    %nomaxvalues %unman uncheckedAssertTrue([$set isSubsetOfSet:$set2]);
+    %nomaxvalues %man uncheckedAssertFalse([$set2 isSubsetOfSet:$set]);
+    %nomaxvalues %unman uncheckedAssertFalse([$set2 isSubsetOfSet:$set]);
 }
 
 - (void)testMin {
     %noany %nominmax %unman RLMAssertThrowsWithReason([$set minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type set");
     %noany %nominmax %man RLMAssertThrowsWithReason([$set minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type set '$class.$prop'");
 
-    %minmax XCTAssertNil([$set minOfProperty:@"self"]);
+    %minmax uncheckedAssertNil([$set minOfProperty:@"self"]);
 
     [self addObjects];
 
-    %minmax %unman %r XCTAssertEqualObjects([$set minOfProperty:@"self"], $v0);
-    %minmax %unman %o XCTAssertEqualObjects([$set minOfProperty:@"self"], $v1);
+    %minmax %unman %r uncheckedAssertEqualObjects([$set minOfProperty:@"self"], $v0);
+    %minmax %unman %o uncheckedAssertEqualObjects([$set minOfProperty:@"self"], $v1);
 
-    %minmax %man %r XCTAssertEqualObjects([$set minOfProperty:@"self"], $v0);
-    %minmax %man %o XCTAssertEqualObjects([$set minOfProperty:@"self"], $v1);
+    %minmax %man %r uncheckedAssertEqualObjects([$set minOfProperty:@"self"], $v0);
+    %minmax %man %o uncheckedAssertEqualObjects([$set minOfProperty:@"self"], $v1);
 }
 
 - (void)testMax {
     %noany %nominmax %unman RLMAssertThrowsWithReason([$set maxOfProperty:@"self"], ^n @"maxOfProperty: is not supported for $type set");
     %noany %nominmax %man RLMAssertThrowsWithReason([$set maxOfProperty:@"self"], ^n @"maxOfProperty: is not supported for $type set '$class.$prop'");
 
-    %minmax XCTAssertNil([$set maxOfProperty:@"self"]);
+    %minmax uncheckedAssertNil([$set maxOfProperty:@"self"]);
 
     [self addObjects];
 
-    %minmax %unman %r XCTAssertEqualObjects([$set maxOfProperty:@"self"], $v1);
-    %minmax %unman %o XCTAssertEqualObjects([$set maxOfProperty:@"self"], $v2);
+    %minmax %unman %r uncheckedAssertEqualObjects([$set maxOfProperty:@"self"], $v1);
+    %minmax %unman %o uncheckedAssertEqualObjects([$set maxOfProperty:@"self"], $v2);
 
-    %minmax %man %r XCTAssertEqualObjects([$set maxOfProperty:@"self"], $v1);
-    %minmax %man %o XCTAssertEqualObjects([$set maxOfProperty:@"self"], $v2);
+    %minmax %man %r uncheckedAssertEqualObjects([$set maxOfProperty:@"self"], $v1);
+    %minmax %man %o uncheckedAssertEqualObjects([$set maxOfProperty:@"self"], $v2);
 }
 
 - (void)testSum {
     %noany %nosum %unman RLMAssertThrowsWithReason([$set sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type set");
     %noany %nosum %man RLMAssertThrowsWithReason([$set sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type set '$class.$prop'");
 
-    %sum XCTAssertEqualObjects([$set sumOfProperty:@"self"], @0);
+    %sum uncheckedAssertEqualObjects([$set sumOfProperty:@"self"], @0);
 
     [self addObjects];
 
@@ -520,7 +520,7 @@ static double average(NSArray *values) {
     %noany %noavg %unman RLMAssertThrowsWithReason([$set averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type set");
     %noany %noavg %man RLMAssertThrowsWithReason([$set averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type set '$class.$prop'");
 
-    %avg XCTAssertNil([$set averageOfProperty:@"self"]);
+    %avg uncheckedAssertNil([$set averageOfProperty:@"self"]);
 
     [self addObjects];
 
@@ -532,40 +532,45 @@ static double average(NSArray *values) {
         [self addObjects];
     }
 
-    { ^nl NSArray *values = $values; ^nl for (id value in $set) { ^nl XCTAssertTrue([[NSSet setWithArray:values] containsObject:value]); ^nl } ^nl } ^nl
+    // This is wrapped in a block to work around a compiler bug in Xcode 12.5:
+    // in release builds, reads on `values` will read the wrong local variable,
+    // resulting in a crash when it tries to send a message to some unitialized
+    // stack space. Putting them in separate obj-c blocks prevents this
+    // incorrect optimization.
+    ^{ ^nl NSArray *values = $values; ^nl for (id value in $set) { ^nl uncheckedAssertTrue([[NSSet setWithArray:values] containsObject:value]); ^nl } ^nl }(); ^nl
 }
 
 - (void)testValueForKeySelf {
-    XCTAssertEqualObjects([[$allSets valueForKey:@"self"] allObjects], @[]);
+    uncheckedAssertEqualObjects([[$allSets valueForKey:@"self"] allObjects], @[]);
 
     [self addObjects];
 
-    XCTAssertEqualObjects([NSSet setWithArray:[[$set valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values]));
+    uncheckedAssertEqualObjects([NSSet setWithArray:[[$set valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values]));
 }
 
 - (void)testValueForKeyNumericAggregates {
-    %minmax XCTAssertNil([$set valueForKeyPath:@"@min.self"]);
-    %minmax XCTAssertNil([$set valueForKeyPath:@"@max.self"]);
-    %sum XCTAssertEqualObjects([$set valueForKeyPath:@"@sum.self"], @0);
-    %avg XCTAssertNil([$set valueForKeyPath:@"@avg.self"]);
+    %minmax uncheckedAssertNil([$set valueForKeyPath:@"@min.self"]);
+    %minmax uncheckedAssertNil([$set valueForKeyPath:@"@max.self"]);
+    %sum uncheckedAssertEqualObjects([$set valueForKeyPath:@"@sum.self"], @0);
+    %avg uncheckedAssertNil([$set valueForKeyPath:@"@avg.self"]);
 
     [self addObjects];
 
-    %minmax %unman %r XCTAssertEqualObjects([$set valueForKeyPath:@"@min.self"], $v0);
-    %minmax %unman %o XCTAssertEqualObjects([$set valueForKeyPath:@"@max.self"], $v2);
+    %minmax %unman %r uncheckedAssertEqualObjects([$set valueForKeyPath:@"@min.self"], $v0);
+    %minmax %unman %o uncheckedAssertEqualObjects([$set valueForKeyPath:@"@max.self"], $v2);
 
-    %minmax %man %r XCTAssertEqualObjects([$set valueForKeyPath:@"@min.self"], $v0);
-    %minmax %man %o XCTAssertEqualObjects([$set valueForKeyPath:@"@max.self"], $v2);
+    %minmax %man %r uncheckedAssertEqualObjects([$set valueForKeyPath:@"@min.self"], $v0);
+    %minmax %man %o uncheckedAssertEqualObjects([$set valueForKeyPath:@"@max.self"], $v2);
 
     %sum XCTAssertEqualWithAccuracy([[$set valueForKeyPath:@"@sum.self"] doubleValue], sum($values), .001);
     %avg XCTAssertEqualWithAccuracy([[$set valueForKeyPath:@"@avg.self"] doubleValue], average($values), .001);
 }
 
 - (void)testValueForKeyLength {
-    XCTAssertEqualObjects([[$allSets valueForKey:@"length"] allObjects], @[]);
+    uncheckedAssertEqualObjects([[$allSets valueForKey:@"length"] allObjects], @[]);
 
     [self addObjects];
-    %string XCTAssertEqualObjects([$set valueForKey:@"length"], ([[NSSet setWithArray:$values] valueForKey:@"length"]));
+    %string uncheckedAssertEqualObjects([$set valueForKey:@"length"], ([[NSSet setWithArray:$values] valueForKey:@"length"]));
 }
 
 - (void)testSetValueForKey {
@@ -580,47 +585,47 @@ static double average(NSArray *values) {
 
     RLMAssertThrowsWithReason($set.allObjects[1], @"index 1 beyond bounds [0 .. 0]");
 
-    XCTAssertEqualObjects($set.allObjects[0], $v0);
-    %o XCTAssertEqualObjects($set.allObjects[0], $v0);
+    uncheckedAssertEqualObjects($set.allObjects[0], $v0);
+    %o uncheckedAssertEqualObjects($set.allObjects[0], $v0);
 
     %o [$set setValue:NSNull.null forKey:@"self"];
-    %o XCTAssertEqualObjects($set.allObjects[0], NSNull.null);
+    %o uncheckedAssertEqualObjects($set.allObjects[0], NSNull.null);
 }
 
 - (void)testAssignment {
-    $set = (id)@[$v1]; ^nl XCTAssertEqualObjects($set.allObjects[0], $v1);
+    $set = (id)@[$v1]; ^nl uncheckedAssertEqualObjects($set.allObjects[0], $v1);
 
     // Should replace and not append
-    $set = (id)$values; ^nl XCTAssertEqualObjects([NSSet setWithArray:[[$set valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values])); ^nl
+    $set = (id)$values; ^nl uncheckedAssertEqualObjects([NSSet setWithArray:[[$set valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values])); ^nl
 
     // Should not clear the set
-    $set = $set; ^nl XCTAssertEqualObjects([NSSet setWithArray:[[$set valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values])); ^nl
+    $set = $set; ^nl uncheckedAssertEqualObjects([NSSet setWithArray:[[$set valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values])); ^nl
 
     [unmanaged.intObj removeAllObjects];
     unmanaged.intObj = managed.intObj;
-    XCTAssertEqualObjects([NSSet setWithArray:[[unmanaged.intObj valueForKey:@"self"] allObjects]], ([NSSet setWithArray:@[@2, @3]]));
+    uncheckedAssertEqualObjects([NSSet setWithArray:[[unmanaged.intObj valueForKey:@"self"] allObjects]], ([NSSet setWithArray:@[@2, @3]]));
 
     [managed.intObj removeAllObjects];
     managed.intObj = unmanaged.intObj;
-    XCTAssertEqualObjects([NSSet setWithArray:[[managed.intObj valueForKey:@"self"] allObjects]], ([NSSet setWithArray:@[@2, @3]]));
+    uncheckedAssertEqualObjects([NSSet setWithArray:[[managed.intObj valueForKey:@"self"] allObjects]], ([NSSet setWithArray:@[@2, @3]]));
 }
 
 - (void)testDynamicAssignment {
-    $obj[@"$prop"] = (id)@[$v1]; ^nl XCTAssertEqualObjects(((RLMSet *)$obj[@"$prop"]).allObjects[0], $v1);
+    $obj[@"$prop"] = (id)@[$v1]; ^nl uncheckedAssertEqualObjects(((RLMSet *)$obj[@"$prop"]).allObjects[0], $v1);
 
     // Should replace and not append
-    $obj[@"$prop"] = (id)$values; ^nl XCTAssertEqualObjects([NSSet setWithArray:[[$obj[@"$prop"] valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values])); ^nl
+    $obj[@"$prop"] = (id)$values; ^nl uncheckedAssertEqualObjects([NSSet setWithArray:[[$obj[@"$prop"] valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values])); ^nl
 
     // Should not clear the set
-    $obj[@"$prop"] = $obj[@"$prop"]; ^nl XCTAssertEqualObjects([NSSet setWithArray:[[$obj[@"$prop"] valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values])); ^nl
+    $obj[@"$prop"] = $obj[@"$prop"]; ^nl uncheckedAssertEqualObjects([NSSet setWithArray:[[$obj[@"$prop"] valueForKey:@"self"] allObjects]], ([NSSet setWithArray:$values])); ^nl
 
     [unmanaged[@"intObj"] removeAllObjects];
     unmanaged[@"intObj"] = managed.intObj;
-    XCTAssertEqualObjects([NSSet setWithArray:[[unmanaged[@"intObj"] valueForKey:@"self"] allObjects]], ([NSSet setWithArray:@[@2, @3]]));
+    uncheckedAssertEqualObjects([NSSet setWithArray:[[unmanaged[@"intObj"] valueForKey:@"self"] allObjects]], ([NSSet setWithArray:@[@2, @3]]));
 
     [managed[@"intObj"] removeAllObjects];
     managed[@"intObj"] = unmanaged.intObj;
-    XCTAssertEqualObjects([NSSet setWithArray:[[managed[@"intObj"] valueForKey:@"self"] allObjects]], ([NSSet setWithArray:@[@2, @3]]));
+    uncheckedAssertEqualObjects([NSSet setWithArray:[[managed[@"intObj"] valueForKey:@"self"] allObjects]], ([NSSet setWithArray:@[@2, @3]]));
 }
 
 - (void)testInvalidAssignment {
@@ -723,15 +728,15 @@ static double average(NSArray *values) {
 
 - (void)testDeleteOwningObject {
     RLMSet *set = managed.intObj;
-    XCTAssertFalse(set.isInvalidated);
+    uncheckedAssertFalse(set.isInvalidated);
     [realm deleteObject:managed];
-    XCTAssertTrue(set.isInvalidated);
+    uncheckedAssertTrue(set.isInvalidated);
 }
 
 #pragma mark - Queries
 
 #define RLMAssertCount(cls, expectedCount, ...) \
-    XCTAssertEqual(expectedCount, ([cls objectsInRealm:realm where:__VA_ARGS__].count))
+    uncheckedAssertEqual(expectedCount, ([cls objectsInRealm:realm where:__VA_ARGS__].count))
 
 - (void)createObjectWithValueIndex:(NSUInteger)index {
     NSRange range = {index, 1};
@@ -1237,8 +1242,8 @@ static double average(NSArray *values) {
     id expectation = [self expectationWithDescription:@""];
     id token = [managed.intObj addNotificationBlock:^(RLMSet *set, RLMCollectionChange *change, NSError *error) {
         XCTAssertNotNil(set);
-        XCTAssertNil(change);
-        XCTAssertNil(error);
+        uncheckedAssertNil(change);
+        uncheckedAssertNil(error);
         [expectation fulfill];
     }];
 
@@ -1253,12 +1258,12 @@ static double average(NSArray *values) {
     __block id expectation = [self expectationWithDescription:@""];
     id token = [managed.intObj addNotificationBlock:^(RLMSet *set, RLMCollectionChange *change, NSError *error) {
         XCTAssertNotNil(set);
-        XCTAssertNil(error);
+        uncheckedAssertNil(error);
         if (first) {
-            XCTAssertNil(change);
+            uncheckedAssertNil(change);
         }
         else {
-            XCTAssertEqualObjects(change.insertions, @[@0]);
+            uncheckedAssertEqualObjects(change.insertions, @[@0]);
         }
 
         first = false;
@@ -1309,7 +1314,7 @@ static double average(NSArray *values) {
     __block id expectation = [self expectationWithDescription:@""];
     id token = [managed.intObj addNotificationBlock:^(RLMSet *set, __unused RLMCollectionChange *change, NSError *error) {
         XCTAssertNotNil(set);
-        XCTAssertNil(error);
+        uncheckedAssertNil(error);
         // will throw if it's called a second time before we create the new
         // expectation object immediately before manually refreshing
         [expectation fulfill];
@@ -1346,13 +1351,13 @@ static double average(NSArray *values) {
     __block id expectation = [self expectationWithDescription:@""];
     id token = [managed.intObj addNotificationBlock:^(RLMSet *set, RLMCollectionChange *change, NSError *error) {
         XCTAssertNotNil(set);
-        XCTAssertNil(error);
+        uncheckedAssertNil(error);
         if (first) {
-            XCTAssertNil(change);
+            uncheckedAssertNil(change);
             first = false;
         }
         else {
-            XCTAssertEqualObjects(change.deletions, (@[@0, @1]));
+            uncheckedAssertEqualObjects(change.deletions, (@[@0, @1]));
         }
         [expectation fulfill];
     }];

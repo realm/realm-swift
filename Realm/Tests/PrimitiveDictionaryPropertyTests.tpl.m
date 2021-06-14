@@ -110,77 +110,77 @@ static double average(NSDictionary *dictionary) {
 }
 
 - (void)testCount {
-    XCTAssertEqual(unmanaged.intObj.count, 0U);
+    uncheckedAssertEqual(unmanaged.intObj.count, 0U);
     unmanaged.intObj[@"testVal"] = @1;
-    XCTAssertEqual(unmanaged.intObj.count, 1U);
+    uncheckedAssertEqual(unmanaged.intObj.count, 1U);
 }
 
 - (void)testType {
-    XCTAssertEqual(unmanaged.boolObj.type, RLMPropertyTypeBool);
-    XCTAssertEqual(unmanaged.intObj.type, RLMPropertyTypeInt);
-    XCTAssertEqual(unmanaged.floatObj.type, RLMPropertyTypeFloat);
-    XCTAssertEqual(unmanaged.doubleObj.type, RLMPropertyTypeDouble);
-    XCTAssertEqual(unmanaged.stringObj.type, RLMPropertyTypeString);
-    XCTAssertEqual(unmanaged.dataObj.type, RLMPropertyTypeData);
-    XCTAssertEqual(unmanaged.dateObj.type, RLMPropertyTypeDate);
-    XCTAssertEqual(optUnmanaged.boolObj.type, RLMPropertyTypeBool);
-    XCTAssertEqual(optUnmanaged.intObj.type, RLMPropertyTypeInt);
-    XCTAssertEqual(optUnmanaged.floatObj.type, RLMPropertyTypeFloat);
-    XCTAssertEqual(optUnmanaged.doubleObj.type, RLMPropertyTypeDouble);
-    XCTAssertEqual(optUnmanaged.stringObj.type, RLMPropertyTypeString);
-    XCTAssertEqual(optUnmanaged.dataObj.type, RLMPropertyTypeData);
-    XCTAssertEqual(optUnmanaged.dateObj.type, RLMPropertyTypeDate);
+    uncheckedAssertEqual(unmanaged.boolObj.type, RLMPropertyTypeBool);
+    uncheckedAssertEqual(unmanaged.intObj.type, RLMPropertyTypeInt);
+    uncheckedAssertEqual(unmanaged.floatObj.type, RLMPropertyTypeFloat);
+    uncheckedAssertEqual(unmanaged.doubleObj.type, RLMPropertyTypeDouble);
+    uncheckedAssertEqual(unmanaged.stringObj.type, RLMPropertyTypeString);
+    uncheckedAssertEqual(unmanaged.dataObj.type, RLMPropertyTypeData);
+    uncheckedAssertEqual(unmanaged.dateObj.type, RLMPropertyTypeDate);
+    uncheckedAssertEqual(optUnmanaged.boolObj.type, RLMPropertyTypeBool);
+    uncheckedAssertEqual(optUnmanaged.intObj.type, RLMPropertyTypeInt);
+    uncheckedAssertEqual(optUnmanaged.floatObj.type, RLMPropertyTypeFloat);
+    uncheckedAssertEqual(optUnmanaged.doubleObj.type, RLMPropertyTypeDouble);
+    uncheckedAssertEqual(optUnmanaged.stringObj.type, RLMPropertyTypeString);
+    uncheckedAssertEqual(optUnmanaged.dataObj.type, RLMPropertyTypeData);
+    uncheckedAssertEqual(optUnmanaged.dateObj.type, RLMPropertyTypeDate);
 }
 
 - (void)testOptional {
-    XCTAssertFalse(unmanaged.boolObj.optional);
-    XCTAssertFalse(unmanaged.intObj.optional);
-    XCTAssertFalse(unmanaged.floatObj.optional);
-    XCTAssertFalse(unmanaged.doubleObj.optional);
-    XCTAssertFalse(unmanaged.stringObj.optional);
-    XCTAssertFalse(unmanaged.dataObj.optional);
-    XCTAssertFalse(unmanaged.dateObj.optional);
-    XCTAssertTrue(optUnmanaged.boolObj.optional);
-    XCTAssertTrue(optUnmanaged.intObj.optional);
-    XCTAssertTrue(optUnmanaged.floatObj.optional);
-    XCTAssertTrue(optUnmanaged.doubleObj.optional);
-    XCTAssertTrue(optUnmanaged.stringObj.optional);
-    XCTAssertTrue(optUnmanaged.dataObj.optional);
-    XCTAssertTrue(optUnmanaged.dateObj.optional);
+    uncheckedAssertFalse(unmanaged.boolObj.optional);
+    uncheckedAssertFalse(unmanaged.intObj.optional);
+    uncheckedAssertFalse(unmanaged.floatObj.optional);
+    uncheckedAssertFalse(unmanaged.doubleObj.optional);
+    uncheckedAssertFalse(unmanaged.stringObj.optional);
+    uncheckedAssertFalse(unmanaged.dataObj.optional);
+    uncheckedAssertFalse(unmanaged.dateObj.optional);
+    uncheckedAssertTrue(optUnmanaged.boolObj.optional);
+    uncheckedAssertTrue(optUnmanaged.intObj.optional);
+    uncheckedAssertTrue(optUnmanaged.floatObj.optional);
+    uncheckedAssertTrue(optUnmanaged.doubleObj.optional);
+    uncheckedAssertTrue(optUnmanaged.stringObj.optional);
+    uncheckedAssertTrue(optUnmanaged.dataObj.optional);
+    uncheckedAssertTrue(optUnmanaged.dateObj.optional);
 }
 
 - (void)testObjectClassName {
-    XCTAssertNil(unmanaged.boolObj.objectClassName);
-    XCTAssertNil(unmanaged.intObj.objectClassName);
-    XCTAssertNil(unmanaged.floatObj.objectClassName);
-    XCTAssertNil(unmanaged.doubleObj.objectClassName);
-    XCTAssertNil(unmanaged.stringObj.objectClassName);
-    XCTAssertNil(unmanaged.dataObj.objectClassName);
-    XCTAssertNil(unmanaged.dateObj.objectClassName);
-    XCTAssertNil(optUnmanaged.boolObj.objectClassName);
-    XCTAssertNil(optUnmanaged.intObj.objectClassName);
-    XCTAssertNil(optUnmanaged.floatObj.objectClassName);
-    XCTAssertNil(optUnmanaged.doubleObj.objectClassName);
-    XCTAssertNil(optUnmanaged.stringObj.objectClassName);
-    XCTAssertNil(optUnmanaged.dataObj.objectClassName);
-    XCTAssertNil(optUnmanaged.dateObj.objectClassName);
+    uncheckedAssertNil(unmanaged.boolObj.objectClassName);
+    uncheckedAssertNil(unmanaged.intObj.objectClassName);
+    uncheckedAssertNil(unmanaged.floatObj.objectClassName);
+    uncheckedAssertNil(unmanaged.doubleObj.objectClassName);
+    uncheckedAssertNil(unmanaged.stringObj.objectClassName);
+    uncheckedAssertNil(unmanaged.dataObj.objectClassName);
+    uncheckedAssertNil(unmanaged.dateObj.objectClassName);
+    uncheckedAssertNil(optUnmanaged.boolObj.objectClassName);
+    uncheckedAssertNil(optUnmanaged.intObj.objectClassName);
+    uncheckedAssertNil(optUnmanaged.floatObj.objectClassName);
+    uncheckedAssertNil(optUnmanaged.doubleObj.objectClassName);
+    uncheckedAssertNil(optUnmanaged.stringObj.objectClassName);
+    uncheckedAssertNil(optUnmanaged.dataObj.objectClassName);
+    uncheckedAssertNil(optUnmanaged.dateObj.objectClassName);
 }
 
 - (void)testRealm {
-    XCTAssertNil(unmanaged.boolObj.realm);
-    XCTAssertNil(unmanaged.intObj.realm);
-    XCTAssertNil(unmanaged.floatObj.realm);
-    XCTAssertNil(unmanaged.doubleObj.realm);
-    XCTAssertNil(unmanaged.stringObj.realm);
-    XCTAssertNil(unmanaged.dataObj.realm);
-    XCTAssertNil(unmanaged.dateObj.realm);
-    XCTAssertNil(optUnmanaged.boolObj.realm);
-    XCTAssertNil(optUnmanaged.intObj.realm);
-    XCTAssertNil(optUnmanaged.floatObj.realm);
-    XCTAssertNil(optUnmanaged.doubleObj.realm);
-    XCTAssertNil(optUnmanaged.stringObj.realm);
-    XCTAssertNil(optUnmanaged.dataObj.realm);
-    XCTAssertNil(optUnmanaged.dateObj.realm);
+    uncheckedAssertNil(unmanaged.boolObj.realm);
+    uncheckedAssertNil(unmanaged.intObj.realm);
+    uncheckedAssertNil(unmanaged.floatObj.realm);
+    uncheckedAssertNil(unmanaged.doubleObj.realm);
+    uncheckedAssertNil(unmanaged.stringObj.realm);
+    uncheckedAssertNil(unmanaged.dataObj.realm);
+    uncheckedAssertNil(unmanaged.dateObj.realm);
+    uncheckedAssertNil(optUnmanaged.boolObj.realm);
+    uncheckedAssertNil(optUnmanaged.intObj.realm);
+    uncheckedAssertNil(optUnmanaged.floatObj.realm);
+    uncheckedAssertNil(optUnmanaged.doubleObj.realm);
+    uncheckedAssertNil(optUnmanaged.stringObj.realm);
+    uncheckedAssertNil(optUnmanaged.dataObj.realm);
+    uncheckedAssertNil(optUnmanaged.dateObj.realm);
 }
 
 - (void)testInvalidated {
@@ -188,9 +188,9 @@ static double average(NSDictionary *dictionary) {
     @autoreleasepool {
         AllPrimitiveDictionaries *obj = [[AllPrimitiveDictionaries alloc] init];
         dictionary = obj.intObj;
-        XCTAssertFalse(dictionary.invalidated);
+        uncheckedAssertFalse(dictionary.invalidated);
     }
-    XCTAssertFalse(dictionary.invalidated);
+    uncheckedAssertFalse(dictionary.invalidated);
 }
 
 - (void)testDeleteObjectsInRealm {
@@ -203,38 +203,38 @@ static double average(NSDictionary *dictionary) {
 
 - (void)testSetObject {
     // Managed non-optional
-    %man %r XCTAssertNil($dictionary[$firstKey]);
+    %man %r uncheckedAssertNil($dictionary[$firstKey]);
     %man %r XCTAssertNoThrow($dictionary[$firstKey] = $firstValue);
-    %man %r XCTAssertEqualObjects($dictionary[$firstKey], $firstValue);
+    %man %r uncheckedAssertEqualObjects($dictionary[$firstKey], $firstValue);
     %noany %man %r RLMAssertThrowsWithReason($dictionary[$firstKey] = (id)NSNull.null, @"Invalid value '<null>' of type 'NSNull' for expected type '$type'.");
     %man %r XCTAssertNoThrow($dictionary[$firstKey] = nil);
-    %man %r XCTAssertNil($dictionary[$firstKey]);
+    %man %r uncheckedAssertNil($dictionary[$firstKey]);
 
     // Managed optional
-    %man %o XCTAssertNil($dictionary[$firstKey]);
+    %man %o uncheckedAssertNil($dictionary[$firstKey]);
     %man %o XCTAssertNoThrow($dictionary[$firstKey] = $firstValue);
-    %man %o XCTAssertEqualObjects($dictionary[$firstKey], $firstValue);
+    %man %o uncheckedAssertEqualObjects($dictionary[$firstKey], $firstValue);
     %man %o XCTAssertNoThrow($dictionary[$firstKey] = (id)NSNull.null);
-    %man %o XCTAssertEqualObjects($dictionary[$firstKey], (id)NSNull.null);
+    %man %o uncheckedAssertEqualObjects($dictionary[$firstKey], (id)NSNull.null);
     %man %o XCTAssertNoThrow($dictionary[$firstKey] = nil);
-    %man %o XCTAssertNil($dictionary[$firstKey]);
+    %man %o uncheckedAssertNil($dictionary[$firstKey]);
 
     // Unmanaged non-optional
-    %unman %r XCTAssertNil($dictionary[$firstKey]);
+    %unman %r uncheckedAssertNil($dictionary[$firstKey]);
     %unman %r XCTAssertNoThrow($dictionary[$firstKey] = $firstValue);
-    %unman %r XCTAssertEqualObjects($dictionary[$firstKey], $firstValue);
+    %unman %r uncheckedAssertEqualObjects($dictionary[$firstKey], $firstValue);
     %noany %unman %r RLMAssertThrowsWithReason($dictionary[$firstKey] = (id)NSNull.null, @"Invalid value '<null>' of type 'NSNull' for expected type '$type'.");
     %unman %r XCTAssertNoThrow($dictionary[$firstKey] = nil);
-    %unman %r XCTAssertNil($dictionary[$firstKey]);
+    %unman %r uncheckedAssertNil($dictionary[$firstKey]);
 
     // Unmanaged optional
-    %unman %o XCTAssertNil($dictionary[$firstKey]);
+    %unman %o uncheckedAssertNil($dictionary[$firstKey]);
     %unman %o XCTAssertNoThrow($dictionary[$firstKey] = $firstValue);
-    %unman %o XCTAssertEqualObjects($dictionary[$firstKey], $firstValue);
+    %unman %o uncheckedAssertEqualObjects($dictionary[$firstKey], $firstValue);
     %unman %o XCTAssertNoThrow($dictionary[$firstKey] = (id)NSNull.null);
-    %unman %o XCTAssertEqual($dictionary[$firstKey], (id)NSNull.null);
+    %unman %o uncheckedAssertEqual($dictionary[$firstKey], (id)NSNull.null);
     %unman %o XCTAssertNoThrow($dictionary[$firstKey] = nil);
-    %unman %o XCTAssertNil($dictionary[$firstKey]);
+    %unman %o uncheckedAssertNil($dictionary[$firstKey]);
 
     // Fail with nil key
     RLMAssertThrowsWithReason([$dictionary setObject:$firstValue forKey:nil], ^n @"Invalid nil key for dictionary expecting key of type 'string'.");
@@ -245,10 +245,10 @@ static double average(NSDictionary *dictionary) {
     %noany %r RLMAssertThrowsWithReason([$dictionary setObject:(id)NSNull.null forKey:$firstKey], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     $dictionary[$firstKey] = $v0;
-    XCTAssertEqualObjects($dictionary[$firstKey], $v0);
+    uncheckedAssertEqualObjects($dictionary[$firstKey], $v0);
 
     %o $dictionary[$firstKey] = (id)NSNull.null;
-    %o XCTAssertEqualObjects($dictionary[$firstKey], (id)NSNull.null);
+    %o uncheckedAssertEqualObjects($dictionary[$firstKey], (id)NSNull.null);
 }
 #pragma clang diagnostic pop
 
@@ -257,71 +257,71 @@ static double average(NSDictionary *dictionary) {
     %noany %r RLMAssertThrowsWithReason([$dictionary addEntriesFromDictionary:@{$firstKey: (id)NSNull.null}], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
     [self addObjects];
-    XCTAssertEqualObjects($dictionary[$k0], $v0);
-    XCTAssertEqualObjects($dictionary[$k1], $v1);
-    %o XCTAssertEqualObjects($dictionary[$k1], (id)NSNull.null);
+    uncheckedAssertEqualObjects($dictionary[$k0], $v0);
+    uncheckedAssertEqualObjects($dictionary[$k1], $v1);
+    %o uncheckedAssertEqualObjects($dictionary[$k1], (id)NSNull.null);
 }
 
 - (void)testRemoveObject {
     [self addObjects];
-    %r XCTAssertEqual($dictionary.count, 2U);
-    %o XCTAssertEqual($dictionary.count, 2U);
+    %r uncheckedAssertEqual($dictionary.count, 2U);
+    %o uncheckedAssertEqual($dictionary.count, 2U);
 
-    XCTAssertEqualObjects($dictionary[$k0], $v0);
+    uncheckedAssertEqualObjects($dictionary[$k0], $v0);
 
     [$dictionary removeObjectForKey:$k0];
 
-    %r XCTAssertEqual($dictionary.count, 1U);
-    %o XCTAssertEqual($dictionary.count, 1U);
+    %r uncheckedAssertEqual($dictionary.count, 1U);
+    %o uncheckedAssertEqual($dictionary.count, 1U);
 
-    XCTAssertNil($dictionary[$k0]);
+    uncheckedAssertNil($dictionary[$k0]);
 }
 
 - (void)testRemoveObjects {
     [self addObjects];
-    XCTAssertEqual($dictionary.count, 2U);
+    uncheckedAssertEqual($dictionary.count, 2U);
 
-    XCTAssertEqualObjects($dictionary[$k0], $v0);
+    uncheckedAssertEqualObjects($dictionary[$k0], $v0);
 
     [$dictionary removeObjectsForKeys:@[$k0, $k1]];
 
-    XCTAssertEqual($dictionary.count, 0U);
-    XCTAssertNil($dictionary[$k0]);
+    uncheckedAssertEqual($dictionary.count, 0U);
+    uncheckedAssertNil($dictionary[$k0]);
 }
 
 - (void)testUpdateObjects {
     [self addObjects];
-    XCTAssertEqual($dictionary.count, 2U);
+    uncheckedAssertEqual($dictionary.count, 2U);
 
-    XCTAssertEqualObjects($dictionary[$k0], $v0);
-    XCTAssertEqualObjects($dictionary[$k1], $v1);
+    uncheckedAssertEqualObjects($dictionary[$k0], $v0);
+    uncheckedAssertEqualObjects($dictionary[$k1], $v1);
 
     $dictionary[$k1] = $dictionary[$k0];
     $dictionary[$k0] = $dictionary[$k1];
 
-    XCTAssertEqualObjects($dictionary[$k1], $v0);
+    uncheckedAssertEqualObjects($dictionary[$k1], $v0);
 }
 
 - (void)testIndexOfObjectSorted {
     [$dictionary addEntriesFromDictionary:@{ $k0: $v0, $k1: $v1 }];
 
-    %man %o XCTAssertEqual(0U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
-    %man %o XCTAssertEqual(1U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:(id)$v1]);
-    %man %r XCTAssertEqual(1U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
-    %man %r XCTAssertEqual(0U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1]);
+    %man %o uncheckedAssertEqual(0U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
+    %man %o uncheckedAssertEqual(1U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:(id)$v1]);
+    %man %r uncheckedAssertEqual(1U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
+    %man %r uncheckedAssertEqual(0U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1]);
 
-    %man %o XCTAssertEqual(1U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:(id)NSNull.null]);
+    %man %o uncheckedAssertEqual(1U, [[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:(id)NSNull.null]);
 }
 
 - (void)testIndexOfObjectDistinct {
     [$dictionary addEntriesFromDictionary:@{ $k0: $v0, $k1: $v1 }];
 
-    %man %r XCTAssertEqual(1U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
-    %man %r XCTAssertEqual(0U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1]);
+    %man %r uncheckedAssertEqual(1U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
+    %man %r uncheckedAssertEqual(0U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1]);
 
-    %man %o XCTAssertEqual(1U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
-    %man %o XCTAssertEqual(0U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)$v1]);
-    %man %o XCTAssertEqual(0U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
+    %man %o uncheckedAssertEqual(1U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
+    %man %o uncheckedAssertEqual(0U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)$v1]);
+    %man %o uncheckedAssertEqual(0U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
 }
 
 - (void)testSort {
@@ -331,13 +331,13 @@ static double average(NSDictionary *dictionary) {
 
     [$dictionary addEntriesFromDictionary:@{ $k0: $v0, $k1: $v1 }];
 
-    %man XCTAssertEqualObjects([[$dictionary sortedResultsUsingDescriptors:@[]] valueForKey:@"self"], ^n (@[$v1, $v0]));
+    %man uncheckedAssertEqualObjects([[$dictionary sortedResultsUsingDescriptors:@[]] valueForKey:@"self"], ^n (@[$v1, $v0]));
 
-    %man %r XCTAssertEqualObjects([[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"], ^n (@[$v1, $v0]));
-    %man %o XCTAssertEqualObjects([[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"], ^n (@[$v0, $v1]));
+    %man %r uncheckedAssertEqualObjects([[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"], ^n (@[$v1, $v0]));
+    %man %o uncheckedAssertEqualObjects([[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"], ^n (@[$v0, $v1]));
 
-    %man %r XCTAssertEqualObjects([[$dictionary sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"], ^n (@[$v0, $v1]));
-    %man %o XCTAssertEqualObjects([[$dictionary sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"], ^n (@[$v1, $v0]));
+    %man %r uncheckedAssertEqualObjects([[$dictionary sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"], ^n (@[$v0, $v1]));
+    %man %o uncheckedAssertEqualObjects([[$dictionary sortedResultsUsingKeyPath:@"self" ascending:YES] valueForKey:@"self"], ^n (@[$v1, $v0]));
 }
 
 - (void)testFilter {
@@ -359,30 +359,30 @@ static double average(NSDictionary *dictionary) {
     %noany %nominmax %unman RLMAssertThrowsWithReason([$dictionary minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type dictionary");
     %noany %nominmax %man RLMAssertThrowsWithReason([$dictionary minOfProperty:@"self"], ^n @"minOfProperty: is not supported for $type dictionary '$class.$prop'");
 
-    %minmax XCTAssertNil([$dictionary minOfProperty:@"self"]);
+    %minmax uncheckedAssertNil([$dictionary minOfProperty:@"self"]);
 
     [self addObjects];
 
-    %minmax XCTAssertEqualObjects([$dictionary minOfProperty:@"self"], $v0);
+    %minmax uncheckedAssertEqualObjects([$dictionary minOfProperty:@"self"], $v0);
 }
 
 - (void)testMax {
     %noany %nominmax %unman RLMAssertThrowsWithReason([$dictionary maxOfProperty:@"self"], ^n @"maxOfProperty: is not supported for $type dictionary");
     %noany %nominmax %man RLMAssertThrowsWithReason([$dictionary maxOfProperty:@"self"], ^n @"maxOfProperty: is not supported for $type dictionary '$class.$prop'");
 
-    %minmax XCTAssertNil([$dictionary maxOfProperty:@"self"]);
+    %minmax uncheckedAssertNil([$dictionary maxOfProperty:@"self"]);
 
     [self addObjects];
 
-    %r %minmax XCTAssertEqualObjects([$dictionary maxOfProperty:@"self"], $v1);
-    %o %minmax XCTAssertEqualObjects([$dictionary maxOfProperty:@"self"], $v0);
+    %r %minmax uncheckedAssertEqualObjects([$dictionary maxOfProperty:@"self"], $v1);
+    %o %minmax uncheckedAssertEqualObjects([$dictionary maxOfProperty:@"self"], $v0);
 }
 
 - (void)testSum {
     %noany %nosum %unman RLMAssertThrowsWithReason([$dictionary sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type dictionary");
     %noany %nosum %man RLMAssertThrowsWithReason([$dictionary sumOfProperty:@"self"], ^n @"sumOfProperty: is not supported for $type dictionary '$class.$prop'");
 
-    %sum XCTAssertEqualObjects([$dictionary sumOfProperty:@"self"], @0);
+    %sum uncheckedAssertEqualObjects([$dictionary sumOfProperty:@"self"], @0);
 
     [self addObjects];
 
@@ -393,7 +393,7 @@ static double average(NSDictionary *dictionary) {
     %noany %noavg %unman RLMAssertThrowsWithReason([$dictionary averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type dictionary");
     %noany %noavg %man RLMAssertThrowsWithReason([$dictionary averageOfProperty:@"self"], ^n @"averageOfProperty: is not supported for $type dictionary '$class.$prop'");
 
-    %avg XCTAssertNil([$dictionary averageOfProperty:@"self"]);
+    %avg uncheckedAssertNil([$dictionary averageOfProperty:@"self"]);
 
     [self addObjects];
 
@@ -405,20 +405,25 @@ static double average(NSDictionary *dictionary) {
         [self addObjects];
     }
 
-    { ^nl NSDictionary *values = $values; ^nl for (id key in $dictionary) { ^nl     id value = $dictionary[key]; ^nl     XCTAssertEqualObjects(values[key], value); ^nl } ^nl XCTAssertEqual(values.count, $dictionary.count); ^nl } ^nl 
+    // This is wrapped in a block to work around a compiler bug in Xcode 12.5:
+    // in release builds, reads on `values` will read the wrong local variable,
+    // resulting in a crash when it tries to send a message to some unitialized
+    // stack space. Putting them in separate obj-c blocks prevents this
+    // incorrect optimization.
+    ^{ ^nl NSDictionary *values = $values; ^nl for (id key in $dictionary) { ^nl     id value = $dictionary[key]; ^nl     uncheckedAssertEqualObjects(values[key], value); ^nl } ^nl uncheckedAssertEqual(values.count, $dictionary.count); ^nl }(); ^nl 
 }
 
 - (void)testValueForKeyNumericAggregates {
-    %minmax XCTAssertNil([$dictionary valueForKeyPath:@"@min.self"]);
-    %minmax XCTAssertNil([$dictionary valueForKeyPath:@"@max.self"]);
-    %sum XCTAssertEqualObjects([$dictionary valueForKeyPath:@"@sum.self"], @0);
-    %avg XCTAssertNil([$dictionary valueForKeyPath:@"@avg.self"]);
+    %minmax uncheckedAssertNil([$dictionary valueForKeyPath:@"@min.self"]);
+    %minmax uncheckedAssertNil([$dictionary valueForKeyPath:@"@max.self"]);
+    %sum uncheckedAssertEqualObjects([$dictionary valueForKeyPath:@"@sum.self"], @0);
+    %avg uncheckedAssertNil([$dictionary valueForKeyPath:@"@avg.self"]);
 
     [self addObjects];
 
-    %minmax XCTAssertEqualObjects([$dictionary valueForKeyPath:@"@min.self"], $v0);
-    %r %minmax XCTAssertEqualObjects([$dictionary valueForKeyPath:@"@max.self"], $v1);
-    %o %minmax XCTAssertEqualObjects([$dictionary valueForKeyPath:@"@max.self"], $v0);
+    %minmax uncheckedAssertEqualObjects([$dictionary valueForKeyPath:@"@min.self"], $v0);
+    %r %minmax uncheckedAssertEqualObjects([$dictionary valueForKeyPath:@"@max.self"], $v1);
+    %o %minmax uncheckedAssertEqualObjects([$dictionary valueForKeyPath:@"@max.self"], $v0);
     %sum XCTAssertEqualWithAccuracy([[$dictionary valueForKeyPath:@"@sum.self"] doubleValue], sum($values), .001);
     %avg XCTAssertEqualWithAccuracy([[$dictionary valueForKeyPath:@"@avg.self"] doubleValue], average($values), .001);
 }
@@ -429,26 +434,26 @@ static double average(NSDictionary *dictionary) {
 
     [self addObjects];
 
-    XCTAssertEqualObjects($dictionary[$k0], $v0);
+    uncheckedAssertEqualObjects($dictionary[$k0], $v0);
 
     %o [$dictionary setValue:(id)NSNull.null forKey:$k0];
-    %o XCTAssertEqualObjects($dictionary[$k0], (id)NSNull.null);
+    %o uncheckedAssertEqualObjects($dictionary[$k0], (id)NSNull.null);
 }
 
 - (void)testAssignment {
-    $dictionary = (id)@{$k1: $v1}; ^nl XCTAssertEqualObjects($dictionary[$k1], $v1);
+    $dictionary = (id)@{$k1: $v1}; ^nl uncheckedAssertEqualObjects($dictionary[$k1], $v1);
 
     [unmanaged.intObj removeAllObjects];
     unmanaged.intObj = managed.intObj;
 
-    XCTAssertEqual(unmanaged.intObj.count, 1);
-    XCTAssertEqualObjects(unmanaged.intObj.allValues, managed.intObj.allValues);
+    uncheckedAssertEqual(unmanaged.intObj.count, 1);
+    uncheckedAssertEqualObjects(unmanaged.intObj.allValues, managed.intObj.allValues);
 
     [managed.intObj removeAllObjects];
     managed.intObj = unmanaged.intObj;
 
-    XCTAssertEqual(managed.intObj.count, 1);
-    XCTAssertEqualObjects(managed.intObj.allValues, unmanaged.intObj.allValues);
+    uncheckedAssertEqual(managed.intObj.count, 1);
+    uncheckedAssertEqualObjects(managed.intObj.allValues, unmanaged.intObj.allValues);
 }
 
 - (void)testInvalidAssignment {
@@ -517,7 +522,7 @@ static double average(NSDictionary *dictionary) {
     XCTAssertNoThrow([dictionary isInvalidated]);
 
     RLMAssertThrowsWithReason([dictionary count], @"invalidated");
-    XCTAssertNil(dictionary[@"0"]);
+    uncheckedAssertNil(dictionary[@"0"]);
     RLMAssertThrowsWithReason([dictionary count], @"invalidated");
 
     RLMAssertThrowsWithReason([dictionary setObject:@0 forKey:@"thread"], @"invalidated");
@@ -530,7 +535,7 @@ static double average(NSDictionary *dictionary) {
     RLMAssertThrowsWithReason([dictionary sortedResultsUsingKeyPath:@"self" ascending:YES], @"invalidated");
     RLMAssertThrowsWithReason([dictionary sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"self" ascending:YES]]], @"invalidated");
     RLMAssertThrowsWithReason(dictionary[@"invalidated"] = @0, @"invalidated");
-    XCTAssertNil([dictionary valueForKey:@"self"]);
+    uncheckedAssertNil([dictionary valueForKey:@"self"]);
     RLMAssertThrowsWithReason([dictionary setValue:@1 forKey:@"self"], @"invalidated");
     RLMAssertThrowsWithReason(({for (__unused id obj in dictionary);}), @"invalidated");
 
@@ -569,9 +574,9 @@ static double average(NSDictionary *dictionary) {
 
 - (void)testDeleteOwningObject {
     RLMDictionary *dictionary = managed.intObj;
-    XCTAssertFalse(dictionary.isInvalidated);
+    uncheckedAssertFalse(dictionary.isInvalidated);
     [realm deleteObject:managed];
-    XCTAssertTrue(dictionary.isInvalidated);
+    uncheckedAssertTrue(dictionary.isInvalidated);
 }
 
 #pragma clang diagnostic ignored "-Warc-retain-cycles"
@@ -582,8 +587,8 @@ static double average(NSDictionary *dictionary) {
     id expectation = [self expectationWithDescription:@""];
     id token = [managed.intObj addNotificationBlock:^(RLMDictionary *dictionary, RLMDictionaryChange *change, NSError *error) {
         XCTAssertNotNil(dictionary);
-        XCTAssertNil(change);
-        XCTAssertNil(error);
+        uncheckedAssertNil(change);
+        uncheckedAssertNil(error);
         [expectation fulfill];
     }];
 
@@ -599,14 +604,14 @@ static double average(NSDictionary *dictionary) {
     __block id expectation = [self expectationWithDescription:@""];
     id token = [managed.intObj addNotificationBlock:^(RLMDictionary *dictionary, RLMDictionaryChange *change, NSError *error) {
         XCTAssertNotNil(dictionary);
-        XCTAssertNil(error);
+        uncheckedAssertNil(error);
         if (first) {
-            XCTAssertNil(change);
+            uncheckedAssertNil(change);
         }
         else if (!second) {
-            XCTAssertEqualObjects(change.insertions, @[@"testKey"]);
+            uncheckedAssertEqualObjects(change.insertions, @[@"testKey"]);
         } else {
-            XCTAssertEqualObjects(change.deletions, @[@"testKey"]);
+            uncheckedAssertEqualObjects(change.deletions, @[@"testKey"]);
         }
 
         first = false;
@@ -668,7 +673,7 @@ static double average(NSDictionary *dictionary) {
     __block id expectation = [self expectationWithDescription:@""];
     id token = [managed.intObj addNotificationBlock:^(RLMDictionary *dictionary, __unused RLMDictionaryChange *change, NSError *error) {
         XCTAssertNotNil(dictionary);
-        XCTAssertNil(error);
+        uncheckedAssertNil(error);
         // will throw if it's called a second time before we create the new
         // expectation object immediately before manually refreshing
         [expectation fulfill];
@@ -699,7 +704,7 @@ static double average(NSDictionary *dictionary) {
 #pragma mark - Queries
 
 #define RLMAssertCount(cls, expectedCount, ...) \
-    XCTAssertEqual(expectedCount, ([cls objectsInRealm:realm where:__VA_ARGS__].count))
+    uncheckedAssertEqual(expectedCount, ([cls objectsInRealm:realm where:__VA_ARGS__].count))
 
 - (void)createObject {
     %r %man id $prop = @{$k0: $v0};

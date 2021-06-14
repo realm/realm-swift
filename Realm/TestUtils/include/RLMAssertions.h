@@ -147,3 +147,32 @@ FOUNDATION_EXTERN bool RLMHasCachedRealmForPath(NSString *path);
     NSError *macro_excErr = (NSError *)(macro_exception.userInfo[NSUnderlyingErrorKey]);                 \
     RLMValidateRealmError(macro_excErr, macro_errnum, nil, macro_underlying_string);                     \
 })
+
+// XCTest assertions wrap each assertion in a try/catch to provide nice
+// reporting if an assertion unexpectedly throws an exception. This is normally
+// quite nice, but becomes a problem with the very large number of assertions
+// in the primitive collection test files builds. Replacing these with
+// assertions which do not try/catch cuts those files' build times by about
+// 75%. The normal XCTest assertions should still be used by default in places
+// where it does not cause problems.
+#define uncheckedAssertEqual(ex1, ex2) do { \
+    __typeof__(ex1) value1 = (ex1); \
+    __typeof__(ex2) value2 = (ex2); \
+    if (value1 != value2) { \
+        NSValue *box1 = [NSValue value:&value1 withObjCType:@encode(__typeof__(ex1))]; \
+        NSValue *box2 = [NSValue value:&value2 withObjCType:@encode(__typeof__(ex2))]; \
+        _XCTRegisterFailure(nil, _XCTFailureDescription(_XCTAssertion_Equal, 0, @#ex1, @#ex2, _XCTDescriptionForValue(box1), _XCTDescriptionForValue(box2))); \
+    } \
+} while (0)
+
+#define uncheckedAssertEqualObjects(ex1, ex2) do { \
+    id value1 = (ex1); \
+    id value2 = (ex2); \
+    if (value1 != value2 && ![(id)value1 isEqual:value2]) { \
+        _XCTRegisterFailure(nil, _XCTFailureDescription(_XCTAssertion_EqualObjects, 0, @#ex1, @#ex2, value1, value2)); \
+    } \
+} while (0)
+
+#define uncheckedAssertTrue(ex) uncheckedAssertEqual(ex, true)
+#define uncheckedAssertFalse(ex) uncheckedAssertEqual(ex, false)
+#define uncheckedAssertNil(ex) uncheckedAssertEqual(ex, nil)
