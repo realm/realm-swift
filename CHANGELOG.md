@@ -4,7 +4,9 @@ x.y.z Release notes (yyyy-MM-dd)
 Replace Xcode 14.3 binaries with 14.3.1, which has important bug fixes for Swift Concurrency.
 
 ### Enhancements
-* None.
+* Adjust the error message for private `Object` subclasses and subclasses
+  nested inside other types to explain how to make them work rather than state
+  that it's impossible. ([#5662](https://github.com/realm/realm-cocoa/issues/5662)).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)

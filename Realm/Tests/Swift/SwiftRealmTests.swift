@@ -163,8 +163,8 @@ class SwiftRLMRealmTests: RLMTestCase {
             try! realm.commitWriteTransaction()
 
             let objects = SwiftRLMStringObject.allObjects(in: realm)
-            XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type StringObject")
-            XCTAssertEqual((objects[0] as! SwiftRLMStringObject).stringCol, "string", "Value of first column should be 'string'")
+            XCTAssertEqual(objects.count, UInt(1))
+            XCTAssertEqual((objects[0] as! SwiftRLMStringObject).stringCol, "string")
         }
 
         waitForExpectations(timeout: 2.0, handler: nil)
@@ -172,8 +172,8 @@ class SwiftRLMRealmTests: RLMTestCase {
 
         // get object
         let objects = SwiftRLMStringObject.allObjects(in: realm)
-        XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type RLMTestObject")
-        XCTAssertEqual((objects[0] as! SwiftRLMStringObject).stringCol, "string", "Value of first column should be 'string'")
+        XCTAssertEqual(objects.count, UInt(1))
+        XCTAssertEqual((objects[0] as! SwiftRLMStringObject).stringCol, "string")
     }
 
     // Objective-C models

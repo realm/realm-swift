@@ -132,6 +132,35 @@ class NoProps: FakeObject {
     // no @objc properties
 }
 
+@MainActor
+class RequiresObjcName: RLMObject {
+    static var enable = false
+    @MainActor
+    override class func _realmIgnoreClass() -> Bool {
+        return !enable
+    }
+}
+
+class ClassWrappingObjectSubclass {
+    class Inner: RequiresObjcName {
+        @objc dynamic var value = 0
+    }
+}
+struct StructWrappingObjectSubclass {
+    class Inner: RequiresObjcName {
+        @objc dynamic var value = 0
+    }
+}
+enum EnumWrappingObjectSubclass {
+    class Inner: RequiresObjcName {
+        @objc dynamic var value = 0
+    }
+}
+
+private class PrivateClassWithoutExplicitObjcName: RequiresObjcName {
+    @objc dynamic var value = 0
+}
+
 class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
     func testWorksAtAll() {
         if isParent {
@@ -247,6 +276,24 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
     func testInvalidObjectTypeForRLMArray() {
         assertThrowsWithReasonMatching(RLMObjectSchema(forObjectClass: InvalidArrayType.self),
                                        "RLMArray\\<invalid class\\>")
+    }
+
+    @MainActor
+    func testInvalidNestedClass() {
+        if isParent {
+            XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
+            return
+        }
+
+        RequiresObjcName.enable = true
+        assertThrowsWithReasonMatching(RLMSchema.sharedSchema(for: ClassWrappingObjectSubclass.Inner.self),
+                                       "Object subclass '.*' must explicitly set the class's objective-c name with @objc\\(ClassName\\) because it is not a top-level public class.")
+        assertThrowsWithReasonMatching(RLMSchema.sharedSchema(for: StructWrappingObjectSubclass.Inner.self),
+                                       "Object subclass '.*' must explicitly set the class's objective-c name with @objc\\(ClassName\\) because it is not a top-level public class.")
+        assertThrowsWithReasonMatching(RLMSchema.sharedSchema(for: EnumWrappingObjectSubclass.Inner.self),
+                                       "Object subclass '.*' must explicitly set the class's objective-c name with @objc\\(ClassName\\) because it is not a top-level public class.")
+        assertThrowsWithReasonMatching(RLMSchema.sharedSchema(for: PrivateClassWithoutExplicitObjcName.self),
+                                               "Object subclass '.*' must explicitly set the class's objective-c name with @objc\\(ClassName\\) because it is not a top-level public class.")
     }
 }
 

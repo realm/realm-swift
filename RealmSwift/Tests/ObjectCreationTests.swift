@@ -902,6 +902,15 @@ class ObjectCreationTests: TestCase {
         realmB.cancelWrite()
     }
 
+    func testCreateObjectWithNestedEmbeddedType() throws {
+        let realm = try Realm()
+        let obj = try realm.write {
+            realm.create(ObjectWithNestedEmbeddedObject.self, value: [1, [2]])
+        }
+        XCTAssertEqual(obj.value, 1)
+        XCTAssertEqual(obj.inner!.value, 2)
+    }
+
     // test null object
     // test null list
 
