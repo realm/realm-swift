@@ -83,7 +83,7 @@ static RLMObjectSchema *RLMRegisterClass(Class cls) {
     RLMObjectSchema *schema = [RLMObjectSchema schemaForObjectClass:cls];
     s_sharedSchemaState = prevState;
 
-    // set unmanaged class on shared shema for unmanaged object creation
+    // set unmanaged class on shared schema for unmanaged object creation
     schema.unmanagedClass = RLMUnmanagedAccessorClassForObjectClass(schema.objectClass, schema);
 
     // override sharedSchema class methods for performance

@@ -134,24 +134,6 @@ static bool rawTypeShouldBeTreatedAsComputedProperty(NSString *rawType) {
     return self;
 }
 
-- (instancetype)initWithName:(NSString *)name
-             createSelectors:(BOOL)createSelectors {
-    self = [super init];
-    if (self) {
-        _name = name;
-        if (createSelectors) {
-            [self updateAccessors];
-        }
-    }
-
-    return self;
-}
-
-- (void)setName:(NSString *)name {
-    _name = name;
-    [self updateAccessors];
-}
-
 - (void)updateAccessors {
     // populate getter/setter names if generic
     if (!_getterName) {
