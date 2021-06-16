@@ -218,7 +218,7 @@ static BOOL encryptTests(void) {
     return _bgQueue;
 }
 
-- (void)dispatchAsync:(dispatch_block_t)block {
+- (void)dispatchAsync:(RLM_SWIFT_SENDABLE dispatch_block_t)block {
     dispatch_async(self.bgQueue, ^{
         @autoreleasepool {
             block();
@@ -226,7 +226,7 @@ static BOOL encryptTests(void) {
     });
 }
 
-- (void)dispatchAsyncAndWait:(dispatch_block_t)block {
+- (void)dispatchAsyncAndWait:(RLM_SWIFT_SENDABLE dispatch_block_t)block {
     [self dispatchAsync:block];
     dispatch_sync(_bgQueue, ^{});
 }

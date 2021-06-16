@@ -55,4 +55,13 @@ class SchemaTests: TestCase {
         XCTAssertNil(schema["DynamicObject"])
         XCTAssertNil(schema["MigrationObject"])
     }
+
+    func testValidNestedClass() throws {
+        let privateSubclass = try XCTUnwrap(schema["PrivateObjectSubclass"])
+        XCTAssertEqual(privateSubclass.className, "PrivateObjectSubclass")
+
+        let parent = try XCTUnwrap(schema["ObjectWithNestedEmbeddedObject"])
+        XCTAssertEqual(parent.properties[1].objectClassName, "ObjectWithNestedEmbeddedObject_NestedInnerClass")
+        XCTAssertNotNil(schema["ObjectWithNestedEmbeddedObject_NestedInnerClass"])
+    }
 }
