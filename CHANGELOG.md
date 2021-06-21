@@ -7,6 +7,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * Importing the Realm swift package produced several warnings about excluded
   files not existing. ([#7295](https://github.com/realm/realm-cocoa/issues/7295), since v10.8.0).
+* Update the root URL for the API docs so that the links go to the place where
+  new versions of the docs are being published.
+  ([#7299](https://github.com/realm/realm-cocoa/issues/7299), since v10.6.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
