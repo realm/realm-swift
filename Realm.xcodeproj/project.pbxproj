@@ -2309,10 +2309,10 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/build/bin/assisted_agg",
-				"$(SRCROOT)/build/bin/create_user",
-				"$(SRCROOT)/build/bin/stitch_server",
-				"$(SRCROOT)/build/bin/update_doc",
+				"$(SRCROOT)/.baas/bin/assisted_agg",
+				"$(SRCROOT)/.baas/bin/create_user",
+				"$(SRCROOT)/.baas/bin/stitch_server",
+				"$(SRCROOT)/.baas/bin/update_doc",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
