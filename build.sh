@@ -262,7 +262,7 @@ build_docs() {
       --module-version "${version}" \
       --xcodebuild-arguments "${xcodebuild_arguments}" \
       --module "${module}" \
-      --root-url "https://realm.io/docs/${language}/${version}/api/" \
+      --root-url "https://docs.mongodb.com/realm-sdks/${language}/${version}/" \
       --output "docs/${language}_output" \
       --head "$(cat docs/custom_head.html)" \
       --exclude 'RealmSwift/Impl/*'
