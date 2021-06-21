@@ -538,7 +538,10 @@ static NSString *randomEmail() {
     [self manuallySetAccessTokenForUser:user value:[self badAccessToken]];
     [self manuallySetRefreshTokenForUser:user value:[self badAccessToken]];
 
-    [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+    [self immediatelyOpenRealmForPartitionValue:NSStringFromSelector(_cmd)
+                                           user:user
+                                  encryptionKey:nil
+                                     stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
 
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
 }
