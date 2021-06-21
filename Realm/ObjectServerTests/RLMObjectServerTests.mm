@@ -1748,10 +1748,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     // Create a large object and then delete it in the next transaction so that
     // the file is bloated
     @autoreleasepool {
-        RLMRealm *realm = [self immediatelyOpenRealmForPartitionValue:partitionValue
-                                                                 user:user
-                                                        encryptionKey:nil
-                                                           stopPolicy:RLMSyncStopPolicyImmediately];
+        RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
         [realm beginWriteTransaction];
         [realm addObject:[HugeSyncObject hugeSyncObject]];
         [realm commitWriteTransaction];
@@ -1760,12 +1757,11 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         [realm beginWriteTransaction];
         [realm deleteAllObjects];
         [realm commitWriteTransaction];
-        [self waitForUploadsForRealm:realm];
-        [self waitForDownloadsForRealm:realm];
-        [realm.syncSession suspend];
 
         path = realm.configuration.pathOnDisk;
     }
+
+    RLMWaitForRealmToClose(path);
 
     auto fileManager = NSFileManager.defaultManager;
     auto initialSize = [[fileManager attributesOfItemAtPath:path error:nil][NSFileSize] unsignedLongLongValue];
