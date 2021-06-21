@@ -539,6 +539,9 @@ The prebuilt binary for Carthage is now build with Xcode 14.0.1.
   characters ([Core #5825](https://github.com/realm/realm-core/issues/5825), since v2.2.0)
 * Accented characters are now handled by case-insensitive but
   diacritic-sensitive queries. ([Core #5825](https://github.com/realm/realm-core/issues/5825), since v2.2.0)
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* None.
+* Copy EmbeddedObject for embedded object property on initializing unmanaged object ([#6921](https://github.com/realm/realm-cocoa/issues/6921)
 
 ### Breaking Changes
 
