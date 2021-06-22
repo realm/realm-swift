@@ -1100,6 +1100,8 @@ case "$COMMAND" in
             export REALM_SKIP_PRELAUNCH=1
 
             if [[ "$target" = *"server"* ]] || [[ "$target" = "swiftpm"* ]]; then
+                mkdir .baas
+                mv build/stitch .baas
                 source "$(brew --prefix nvm)/nvm.sh" --no-use
                 nvm install 13.14.0
                 sh build.sh setup-baas

@@ -5,7 +5,8 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Importing the Realm swift package produced several warnings about excluded
+  files not existing. ([#7295](https://github.com/realm/realm-cocoa/issues/7295), since v10.8.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

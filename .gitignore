@@ -24,10 +24,6 @@ realm-core-*-xcframework
 # sh build.sh test
 build/
 
-# sh build.sh ios-framework
-# sh build.sh package-examples
-*/Realm.framework
-Realm.framework
 
 # sh build.sh cocoapods-setup
 /include
@@ -66,30 +62,6 @@ build.log
 /test/version_tmp/
 /tmp/
 
-## Specific to RubyMotion:
-.dat*
-.repl_history
-build/
-
-## Documentation cache and generated files:
-/.yardoc/
-/_yardoc/
-/doc/
-/rdoc/
-
-## Environment normalisation:
-/.bundle/
-/lib/bundler/man/
-
-# for a library or gem, you might want to ignore these files since the code is
-# intended to run in multiple environments; otherwise, check them in:
-# Gemfile.lock
-# .ruby-version
-# .ruby-gemset
-
-# unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
-.rvmrc
-
 ## Carthage
 # Cartfiles are ignored because they're generated on demand in the installation examples
 Cartfile
@@ -101,7 +73,7 @@ SwiftVersion.swift
 examples/ios/objc/Draw/Constants.h
 
 ## Sync testing
-/stitch
+/.baas
 
 ## Swiftpm
 .swiftpm
