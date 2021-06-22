@@ -28,4 +28,10 @@ void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key
 FOUNDATION_EXTERN NSString *RLMDescriptionWithMaxDepth(NSString *name, id<RLMCollection> collection, NSUInteger depth);
 FOUNDATION_EXTERN id _Nullable (*_Nullable RLMSwiftAsFastEnumeration)(id);
 
+typedef RLM_CLOSED_ENUM(int32_t, RLMCollectionType) {
+    RLMCollectionTypeArray = 0,
+    RLMCollectionTypeSet = 1,
+    RLMCollectionTypeDictionary = 2
+};
+
 NS_ASSUME_NONNULL_END

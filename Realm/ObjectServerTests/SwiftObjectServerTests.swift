@@ -46,7 +46,7 @@ class SwiftHugeSyncObject: Object {
 extension User {
     func configuration(testName: String) -> Realm.Configuration {
         var config = self.configuration(partitionValue: testName)
-        config.objectTypes = [SwiftPerson.self, SwiftHugeSyncObject.self]
+        config.objectTypes = [SwiftPerson.self, SwiftHugeSyncObject.self, SwiftTypesSyncObject.self]
         return config
     }
 }
@@ -82,18 +82,92 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let realm = try openRealm(partitionValue: #function, user: user)
             if isParent {
                 checkCount(expected: 0, realm, SwiftPerson.self)
+                checkCount(expected: 0, realm, SwiftTypesSyncObject.self)
                 executeChild()
                 waitForDownloads(for: realm)
-                checkCount(expected: 3, realm, SwiftPerson.self)
+                checkCount(expected: 4, realm, SwiftPerson.self)
+                checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
+
+                let obj = realm.objects(SwiftTypesSyncObject.self).first!
+                XCTAssertEqual(obj.boolCol, true)
+                XCTAssertEqual(obj.intCol, 1)
+                XCTAssertEqual(obj.doubleCol, 1.1)
+                XCTAssertEqual(obj.stringCol, "string")
+                XCTAssertEqual(obj.binaryCol, "string".data(using: String.Encoding.utf8)!)
+                XCTAssertEqual(obj.decimalCol, Decimal128(1))
+                XCTAssertEqual(obj.dateCol, Date(timeIntervalSince1970: -1))
+                XCTAssertEqual(obj.longCol, Int64(1))
+                XCTAssertEqual(obj.uuidCol, UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)
+                XCTAssertEqual(obj.anyCol.value.intValue, 1)
+                XCTAssertEqual(obj.objectCol!.firstName, "George")
+
             } else {
                 // Add objects
                 try realm.write {
                     realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
                     realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
                     realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                    realm.add(SwiftTypesSyncObject(person: SwiftPerson(firstName: "George", lastName: "Harrison")))
                 }
                 waitForUploads(for: realm)
-                checkCount(expected: 3, realm, SwiftPerson.self)
+                checkCount(expected: 4, realm, SwiftPerson.self)
+                checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
+
+            }
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    func testSwiftRountripForDistinctPrimaryKey() {
+        do {
+            let user = try logInUser(for: basicCredentials())
+            let realm = try openRealm(partitionValue: #function, user: user)
+            if isParent {
+                checkCount(expected: 0, realm, SwiftPerson.self) // ObjectId
+                checkCount(expected: 0, realm, SwiftUUIDPrimaryKeyObject.self)
+                checkCount(expected: 0, realm, SwiftStringPrimaryKeyObject.self)
+                checkCount(expected: 0, realm, SwiftIntPrimaryKeyObject.self)
+                executeChild()
+                waitForDownloads(for: realm)
+                checkCount(expected: 1, realm, SwiftPerson.self)
+                checkCount(expected: 1, realm, SwiftUUIDPrimaryKeyObject.self)
+                checkCount(expected: 1, realm, SwiftStringPrimaryKeyObject.self)
+                checkCount(expected: 1, realm, SwiftIntPrimaryKeyObject.self)
+
+                let swiftOjectIdPrimaryKeyObject = realm.object(ofType: SwiftPerson.self,
+                                                                forPrimaryKey: ObjectId("1234567890ab1234567890ab"))!
+                XCTAssertEqual(swiftOjectIdPrimaryKeyObject.firstName, "Ringo")
+                XCTAssertEqual(swiftOjectIdPrimaryKeyObject.lastName, "Starr")
+
+                let swiftUUIDPrimaryKeyObject = realm.object(ofType: SwiftUUIDPrimaryKeyObject.self,
+                                                             forPrimaryKey: UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)!
+                XCTAssertEqual(swiftUUIDPrimaryKeyObject.strCol, "Steve")
+                XCTAssertEqual(swiftUUIDPrimaryKeyObject.intCol, 10)
+
+                let swiftStringPrimaryKeyObject = realm.object(ofType: SwiftStringPrimaryKeyObject.self,
+                                                               forPrimaryKey: "1234567890ab1234567890ab")!
+                XCTAssertEqual(swiftStringPrimaryKeyObject.strCol, "Paul")
+                XCTAssertEqual(swiftStringPrimaryKeyObject.intCol, 20)
+
+                let swiftIntPrimaryKeyObject = realm.object(ofType: SwiftIntPrimaryKeyObject.self,
+                                                            forPrimaryKey: 1234567890)!
+                XCTAssertEqual(swiftIntPrimaryKeyObject.strCol, "Jackson")
+                XCTAssertEqual(swiftIntPrimaryKeyObject.intCol, 30)
+            } else {
+                try realm.write {
+                    let swiftPerson = SwiftPerson(firstName: "Ringo", lastName: "Starr")
+                    swiftPerson._id = ObjectId("1234567890ab1234567890ab")
+                    realm.add(swiftPerson)
+                    realm.add(SwiftUUIDPrimaryKeyObject(id: UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!, strCol: "Steve", intCol: 10))
+                    realm.add(SwiftStringPrimaryKeyObject(id: "1234567890ab1234567890ab", strCol: "Paul", intCol: 20))
+                    realm.add(SwiftIntPrimaryKeyObject(id: 1234567890, strCol: "Jackson", intCol: 30))
+                }
+                waitForUploads(for: realm)
+                checkCount(expected: 1, realm, SwiftPerson.self)
+                checkCount(expected: 1, realm, SwiftUUIDPrimaryKeyObject.self)
+                checkCount(expected: 1, realm, SwiftStringPrimaryKeyObject.self)
+                checkCount(expected: 1, realm, SwiftIntPrimaryKeyObject.self)
             }
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
@@ -109,6 +183,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 executeChild()
                 waitForDownloads(for: realm)
                 checkCount(expected: 3, realm, SwiftPerson.self)
+
                 try realm.write {
                     realm.deleteAll()
                 }
@@ -138,17 +213,21 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
                     realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
                     realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                    realm.add(SwiftTypesSyncObject(person: SwiftPerson(firstName: "George", lastName: "Harrison")))
                 }
                 waitForUploads(for: realm)
-                checkCount(expected: 3, realm, SwiftPerson.self)
+                checkCount(expected: 4, realm, SwiftPerson.self)
+                checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
                 executeChild()
             } else {
-                checkCount(expected: 3, realm, SwiftPerson.self)
+                checkCount(expected: 4, realm, SwiftPerson.self)
+                checkCount(expected: 1, realm, SwiftTypesSyncObject.self)
                 try realm.write {
                     realm.deleteAll()
                 }
                 waitForUploads(for: realm)
                 checkCount(expected: 0, realm, SwiftPerson.self)
+                checkCount(expected: 0, realm, SwiftTypesSyncObject.self)
             }
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
@@ -182,10 +261,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 checkCount(expected: 2, realmB, SwiftPerson.self)
                 checkCount(expected: 5, realmC, SwiftPerson.self)
 
-                XCTAssertEqual(realmA.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count,
-                               1)
-                XCTAssertEqual(realmB.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count,
-                               0)
+                XCTAssertEqual(realmA.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count, 1)
+                XCTAssertEqual(realmB.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count, 0)
             } else {
                 // Add objects.
                 try realmA.write {
@@ -1097,7 +1174,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 return
             }
 
-            guard case let .int64(sum) = bson else {
+            guard case let .int32(sum) = bson else {
                 XCTFail(error!.localizedDescription)
                 return
             }
@@ -1480,10 +1557,10 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
         let insertManyEx = expectation(description: "Insert many documents")
-        collection.insertMany([document]) { result in
+        collection.insertMany([document, document]) { result in
             switch result {
             case .success(let objectIds):
-                XCTAssertEqual(objectIds.count, 1)
+                XCTAssertEqual(objectIds.count, 2)
             case .failure:
                 XCTFail("Should insert")
             }
@@ -1504,37 +1581,33 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         }
         wait(for: [findOneDeleteEx1], timeout: 4.0)
 
-        // FIXME: It seems there is a possible server bug that does not handle
-        // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
-        // "expected pre-image to match projection matcher"
-        // https://jira.mongodb.org/browse/REALMC-6878
-        /*
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], false, false)
         let findOneDeleteEx2 = expectation(description: "Find one document and delete")
-        collection.findOneAndDelete(filter: document, options: options1) { (document, error) in
-            // Document does not exist, but should not return an error because of that
-            XCTAssertNil(document)
-            XCTAssertNil(error)
-            findOneDeleteEx2.fulfill()
+        collection.findOneAndDelete(filter: document, options: options1) { result in
+            switch result {
+            case .success(let document):
+                XCTAssertNotNil(document)
+                XCTAssertEqual(document!["name"]??.stringValue, "fido")
+                findOneDeleteEx2.fulfill()
+            case .failure:
+                XCTFail("Should find")
+            }
         }
         wait(for: [findOneDeleteEx2], timeout: 4.0)
-        */
 
-        // FIXME: It seems there is a possible server bug that does not handle
-        // `projection` in `FindOneAndModifyOptions` correctly. The returned error is:
-        // "expected pre-image to match projection matcher"
-        // https://jira.mongodb.org/browse/REALMC-6878
-        /*
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
         let findOneDeleteEx3 = expectation(description: "Find one document and delete")
-        collection.findOneAndDelete(filter: document, options: options2) { (document, error) in
-            XCTAssertNotNil(document)
-            XCTAssertEqual(document!["name"] as! String, "fido")
-            XCTAssertNil(error)
-            findOneDeleteEx3.fulfill()
+        collection.findOneAndDelete(filter: document, options: options2) { result in
+            switch result {
+            case .success(let document):
+                // Document does not exist, but should not return an error because of that
+                XCTAssertNil(document)
+                findOneDeleteEx3.fulfill()
+            case .failure:
+                XCTFail("Should find")
+            }
         }
         wait(for: [findOneDeleteEx3], timeout: 4.0)
-        */
 
         let findEx = expectation(description: "Find documents")
         collection.find(filter: [:]) { result in
@@ -2042,7 +2115,65 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
     }
 }
 
-#if REALM_HAVE_COMBINE || !SWIFT_PACKAGE
+class AnyRealmValueSyncTests: SwiftSyncTestCase {
+    /// The purpose of this test is to confirm that when an Object is set on a mixed Column and an old
+    /// version of an app does not have that Realm Object / Schema we can still access that object via
+    /// `AnyRealmValue.dynamicSchema`.
+    func testMissingSchema() {
+        do {
+            let user = try logInUser(for: basicCredentials())
+
+            if !isParent {
+                // Imagine this is v2 of an app with 3 classes
+                var config = user.configuration(partitionValue: #function)
+                config.objectTypes = [SwiftPerson.self, SwiftAnyRealmValueObject.self, SwiftMissingObject.self]
+                let realm = try openRealm(configuration: config)
+                try realm.write {
+                    let so1 = SwiftPerson()
+                    so1.firstName = "Rick"
+                    so1.lastName = "Sanchez"
+                    let so2 = SwiftPerson()
+                    so2.firstName = "Squidward"
+                    so2.lastName = "Tentacles"
+
+                    let syncObj2 = SwiftMissingObject()
+                    syncObj2.objectCol = so1
+                    syncObj2.anyCol.value = .object(so1)
+
+                    let syncObj = SwiftMissingObject()
+                    syncObj.objectCol = so1
+                    syncObj.anyCol.value = .object(syncObj2)
+                    let obj = SwiftAnyRealmValueObject()
+                    obj.anyCol.value = .object(syncObj)
+                    obj.otherAnyCol.value = .object(so2)
+                    realm.add(obj)
+                }
+                waitForUploads(for: realm)
+                return
+            }
+            executeChild()
+
+            // Imagine this is v1 of an app with just 2 classes, `SwiftMissingObject`
+            // did not exist when this version was shipped,
+            // but v2 managed to sync `SwiftMissingObject` to this Realm.
+            var config = user.configuration(partitionValue: #function)
+            config.objectTypes = [SwiftAnyRealmValueObject.self, SwiftPerson.self]
+            let realm = try openRealm(configuration: config)
+            let obj = realm.objects(SwiftAnyRealmValueObject.self).first
+            // SwiftMissingObject.anyCol -> SwiftMissingObject.anyCol -> SwiftPerson.firstName
+            let anyCol = ((obj!.anyCol.value.dynamicObject?.anyCol as? Object)?["anyCol"] as? Object)
+            XCTAssertEqual((anyCol?["firstName"] as? String), "Rick")
+            try! realm.write {
+                anyCol?["firstName"] = "Morty"
+            }
+            XCTAssertEqual((anyCol?["firstName"] as? String), "Morty")
+            let objectCol = (obj!.anyCol.value.dynamicObject?.objectCol as? Object)
+            XCTAssertEqual((objectCol?["firstName"] as? String), "Morty")
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+}
 
 // XCTest doesn't care about the @available on the class and will try to run
 // the tests even on older versions. Putting this check inside `defaultTestSuite`
@@ -2458,9 +2589,9 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    func testAsyncOpenStandaloneCombine() {
-        autoreleasepool {
-            let realm = try! Realm()
+    func testAsyncOpenStandaloneCombine() throws {
+        try autoreleasepool {
+            let realm = try Realm()
             try! realm.write {
                 (0..<10000).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket")) }
             }
@@ -2731,8 +2862,8 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         }
 
         app.currentUser?.functions.sum([1, 2, 3, 4, 5]).await(self) { bson in
-            guard case let .int64(sum) = bson else {
-                XCTFail("Should be int64")
+            guard case let .int32(sum) = bson else {
+                XCTFail("Should be int32")
                 return
             }
             XCTAssertEqual(sum, 15)
@@ -2790,6 +2921,5 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         client.deregisterDevice(user: app.currentUser!).await(self)
     }
 }
-#endif
 
 #endif // os(macOS)

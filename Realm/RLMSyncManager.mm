@@ -73,7 +73,7 @@ RLMSyncLogLevel logLevelForLevel(Level logLevel) {
 #pragma mark - Loggers
 
 struct CocoaSyncLogger : public realm::util::RootLogger {
-    void do_log(Level, std::string message) override {
+    void do_log(Level, const std::string& message) override {
         NSLog(@"Sync: %@", RLMStringDataToNSString(message));
     }
 };
@@ -88,7 +88,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 
 struct CallbackLogger : public realm::util::RootLogger {
     RLMSyncLogFunction logFn;
-    void do_log(Level level, std::string message) override {
+    void do_log(Level level, const std::string& message) override {
         @autoreleasepool {
             logFn(logLevelForLevel(level), RLMStringDataToNSString(message));
         }

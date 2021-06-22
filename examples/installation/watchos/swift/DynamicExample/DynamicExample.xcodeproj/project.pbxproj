@@ -218,7 +218,7 @@
 		E8645B7C1C7913D600C241AA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1250;
+				LastUpgradeCheck = 1300;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					E8645B831C7913D600C241AA = {
@@ -433,7 +433,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				FRAMEWORK_SEARCH_PATHS = "../../../realm-swift-latest/watchos/swift-11.3";
+				FRAMEWORK_SEARCH_PATHS = "../../../realm-swift-latest/watchos/swift-12.2";
 				INFOPLIST_FILE = "DynamicExample WatchKit Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.DynamicExample.watchkitapp.watchkitextension;
@@ -450,7 +450,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				FRAMEWORK_SEARCH_PATHS = "../../../realm-swift-latest/watchos/swift-11.3";
+				FRAMEWORK_SEARCH_PATHS = "../../../realm-swift-latest/watchos/swift-12.2";
 				INFOPLIST_FILE = "DynamicExample WatchKit Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.DynamicExample.watchkitapp.watchkitextension;

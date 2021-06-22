@@ -31,6 +31,7 @@ class ObjectWithPrivateOptionals: Object {
     @objc dynamic var value = 5
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class ObjectCreationTests: TestCase {
     // MARK: - Init tests
 
@@ -47,14 +48,16 @@ class ObjectCreationTests: TestCase {
         XCTAssertNil(object.realm)
         XCTAssertNil(object.objectCol!.realm)
         XCTAssertNil(object.arrayCol.realm)
+        XCTAssertNil(object.setCol.realm)
+        XCTAssertNil(object.mapCol.realm)
     }
 
     func testInitWithOptionalWithoutDefaults() {
         let object = SwiftOptionalObject()
         for prop in object.objectSchema.properties {
             let value = object[prop.name]
-            if let value = value as? RLMOptionalBase {
-                XCTAssertNil(RLMGetOptional(value))
+            if let value = value as? RLMSwiftValueStorage {
+                XCTAssertNil(RLMGetSwiftValueStorage(value))
             } else {
                 XCTAssertNil(value)
             }
@@ -84,13 +87,17 @@ class ObjectCreationTests: TestCase {
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
-            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
+            "uuidCol": UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
+            "anyCol": "hello",
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "setCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "mapCol": ["trueVal": SwiftBoolObject(value: [true]), "falseVal": SwiftBoolObject(value: [false])]
            ]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
-            for validValue in validValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
+            for validValue in validValuesForSwiftObjectType(props[propNum].type, (props[propNum].isArray || props[propNum].isSet), props[propNum].isMap) {
                 // update dict with valid value and init
                 var values = baselineValues
                 values[props[propNum].name] = validValue
@@ -102,7 +109,7 @@ class ObjectCreationTests: TestCase {
 
         // test with invalid dictionary literals
         for propNum in 0..<props.count {
-            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
+            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, (props[propNum].isArray || props[propNum].isSet), props[propNum].isMap) {
                 // update dict with invalid value and init
                 var values = baselineValues
                 values[props[propNum].name] = invalidValue
@@ -124,13 +131,14 @@ class ObjectCreationTests: TestCase {
         let baselineValues: [Any] = [true, 1, Int8(1), Int16(1), Int32(1), Int64(1), IntEnum.value1.rawValue, 1.1 as Float,
                                      11.1, "b", "b".data(using: String.Encoding.utf8)!,
                                      Date(timeIntervalSince1970: 2), Decimal128(number: 123),
-                                     ObjectId.generate(), ["boolCol": true], [[true], [false]]]
-
+                                     ObjectId.generate(), ["boolCol": true],
+                                     UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
+                                     "anyCol", [[true], [false]], [[true], [false]],
+                                     ["trueVal": ["boolCol": true], "falseVal": ["boolCol": false]]]
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
-            for validValue in validValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
-                // update dict with valid value and init
+            for validValue in validValuesForSwiftObjectType(props[propNum].type, (props[propNum].isArray || props[propNum].isSet), props[propNum].isMap) {
                 var values = baselineValues
                 values[propNum] = validValue
                 let object = SwiftObject(value: values)
@@ -141,7 +149,7 @@ class ObjectCreationTests: TestCase {
 
         // test with invalid dictionary literals
         for propNum in 0..<props.count {
-            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
+            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, (props[propNum].isArray || props[propNum].isSet), props[propNum].isMap) {
                 // update dict with invalid value and init
                 var values = baselineValues
                 values[propNum] = invalidValue
@@ -244,13 +252,15 @@ class ObjectCreationTests: TestCase {
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
-            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "setCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "mapCol": ["trueVal": ["boolCol": true], "falseVal": ["boolCol": false]]
         ]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
-            for validValue in validValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
+            for validValue in validValuesForSwiftObjectType(props[propNum].type, (props[propNum].isArray || props[propNum].isSet), props[propNum].isMap) {
                 // update dict with valid value and init
                 var values = baselineValues
                 values[props[propNum].name] = validValue
@@ -266,7 +276,7 @@ class ObjectCreationTests: TestCase {
 
         // test with invalid dictionary literals
         for propNum in 0..<props.count {
-            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
+            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, (props[propNum].isArray || props[propNum].isSet), props[propNum].isMap) {
                 // update dict with invalid value and init
                 var values = baselineValues
                 values[props[propNum].name] = invalidValue
@@ -294,13 +304,15 @@ class ObjectCreationTests: TestCase {
         let baselineValues: [Any] = [true, 1, Int8(1), Int16(1), Int32(1), Int64(1), IntEnum.value1.rawValue, 1.1 as Float,
                                      11.1, "b", "b".data(using: String.Encoding.utf8)!,
                                      Date(timeIntervalSince1970: 2), Decimal128(number: 123),
-                                     ObjectId.generate(), ["boolCol": true], [[true], [false]]]
+                                     ObjectId.generate(), ["boolCol": true],
+                                     UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
+                                     "anyCol", [[true], [false]], [[true], [false]],
+                                     ["trueVal": ["boolCol": true], "falseVal": ["boolCol": false]]]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
-            for validValue in validValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
-                // update dict with valid value and init
+            for validValue in validValuesForSwiftObjectType(props[propNum].type, (props[propNum].isArray || props[propNum].isSet), props[propNum].isMap) {
                 var values = baselineValues
                 values[propNum] = validValue
                 try! Realm().beginWrite()
@@ -315,7 +327,7 @@ class ObjectCreationTests: TestCase {
 
         // test with invalid array literals
         for propNum in 0..<props.count {
-            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
+            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, (props[propNum].isArray || props[propNum].isSet), props[propNum].isMap) {
                 // update dict with invalid value and init
                 var values = baselineValues
                 values[propNum] = invalidValue
@@ -418,7 +430,9 @@ class ObjectCreationTests: TestCase {
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
-            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "setCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "mapCol": ["trueVal": SwiftBoolObject(value: [true]), "falseVal": SwiftBoolObject(value: [false])]
         ]
 
         realmWithTestPath().beginWrite()
@@ -450,26 +464,46 @@ class ObjectCreationTests: TestCase {
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
-            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "setCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "mapCol": ["trueVal": SwiftBoolObject(value: [true]), "falseVal": SwiftBoolObject(value: [false])]
         ]
 
         let realmA = realmWithTestPath()
         let realmB = try! Realm()
 
-        var realmAObject: SwiftListOfSwiftObject?
+        var realmAListObject: SwiftListOfSwiftObject?
         try! realmA.write {
             let array = [SwiftObject(value: values), SwiftObject(value: values)]
-            realmAObject = realmA.create(SwiftListOfSwiftObject.self, value: ["array": array])
+            realmAListObject = realmA.create(SwiftListOfSwiftObject.self, value: ["array": array])
         }
 
-        var realmBObject: SwiftListOfSwiftObject!
+        var realmBListObject: SwiftListOfSwiftObject!
         try! realmB.write {
-            realmBObject = realmB.create(SwiftListOfSwiftObject.self, value: realmAObject!)
+            realmBListObject = realmB.create(SwiftListOfSwiftObject.self, value: realmAListObject!)
         }
 
-        XCTAssertNotEqual(realmAObject, realmBObject)
-        XCTAssertEqual(realmBObject.array.count, 2)
-        for swiftObject in realmBObject.array {
+        XCTAssertNotEqual(realmAListObject, realmBListObject)
+        XCTAssertEqual(realmBListObject.array.count, 2)
+        for swiftObject in realmBListObject.array {
+            verifySwiftObjectWithDictionaryLiteral(swiftObject, dictionary: values, boolObjectValue: true,
+                boolObjectListValues: [true, false])
+        }
+
+        var realmASetObject: SwiftMutableSetOfSwiftObject?
+        try! realmA.write {
+            let set = [SwiftObject(value: values), SwiftObject(value: values)]
+            realmASetObject = realmA.create(SwiftMutableSetOfSwiftObject.self, value: ["set": set])
+        }
+
+        var realmBSetObject: SwiftMutableSetOfSwiftObject!
+        try! realmB.write {
+            realmBSetObject = realmB.create(SwiftMutableSetOfSwiftObject.self, value: realmASetObject!)
+        }
+
+        XCTAssertNotEqual(realmASetObject, realmBSetObject)
+        XCTAssertEqual(realmBSetObject.set.count, 2)
+        for swiftObject in realmBSetObject.set {
             verifySwiftObjectWithDictionaryLiteral(swiftObject, dictionary: values, boolObjectValue: true,
                 boolObjectListValues: [true, false])
         }
@@ -519,7 +553,8 @@ class ObjectCreationTests: TestCase {
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
             "objectCol": NSNull(),
-            "arrayCol": NSNull()
+            "arrayCol": NSNull(),
+            "setCol": NSNull()
         ]
 
         realmWithTestPath().beginWrite()
@@ -528,6 +563,7 @@ class ObjectCreationTests: TestCase {
 
         XCTAssert(object.objectCol == nil) // XCTAssertNil caused a NULL deref inside _swift_getClass
         XCTAssertEqual(object.arrayCol.count, 0)
+        XCTAssertEqual(object.setCol.count, 0)
     }
 
     func testCreateWithObjcName() {
@@ -1215,12 +1251,15 @@ class ObjectCreationTests: TestCase {
         let v: [Any] = [
             // Superclass's columns
             [["intCol": 42], ["intCol": 9001]],
+            [["intCol": 42], ["intCol": 9001]],
             100,
             200,
             // Class's columns
             1,
             [["stringCol": "hello"], ["stringCol": "world"]],
+            [["stringCol": "hello"], ["stringCol": "world"]],
             2,
+            [["stringCol": "goodbye"], ["stringCol": "cruel"], ["stringCol": "world"]],
             [["stringCol": "goodbye"], ["stringCol": "cruel"], ["stringCol": "world"]],
             NSNull(),
             3,
@@ -1236,6 +1275,10 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.secondArray[0].stringCol, "goodbye")
         XCTAssertEqual(object.secondArray[1].stringCol, "cruel")
         XCTAssertEqual(object.secondArray[2].stringCol, "world")
+        XCTAssertTrue(object.firstSet.count == 2)
+        assertSetContains(object.firstSet, keyPath: \.stringCol, items: ["hello", "world"])
+        XCTAssertTrue(object.secondSet.count == 3)
+        assertSetContains(object.secondSet, keyPath: \.stringCol, items: ["goodbye", "cruel", "world"])
         XCTAssertEqual(object.firstOptionalNumber.value, nil)
         XCTAssertEqual(object.secondOptionalNumber.value, 300)
         XCTAssertTrue(object.parentFirstList.count == 2)
@@ -1276,8 +1319,15 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.objectIdCol, (array[13] as! ObjectId))
         XCTAssertEqual(object.objectCol!.boolCol, boolObjectValue)
         XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
+        XCTAssertEqual(object.setCol.count, boolObjectListValues.count)
         for i in 0..<boolObjectListValues.count {
             XCTAssertEqual(object.arrayCol[i].boolCol, boolObjectListValues[i])
+        }
+        object.setCol.forEach { obj in
+            XCTAssertTrue(boolObjectListValues.contains(obj.boolCol))
+        }
+        for value in object.mapCol.map({ $0.value!.boolCol }) {
+            XCTAssertTrue(boolObjectListValues.contains(value))
         }
     }
 
@@ -1298,8 +1348,12 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.objectIdCol, (dictionary["objectIdCol"] as! ObjectId))
         XCTAssertEqual(object.objectCol!.boolCol, boolObjectValue)
         XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
+        XCTAssertEqual(object.setCol.count, boolObjectListValues.count)
+        XCTAssertEqual(object.mapCol.count, boolObjectListValues.count)
+
         for i in 0..<boolObjectListValues.count {
             XCTAssertEqual(object.arrayCol[i].boolCol, boolObjectListValues[i])
+            XCTAssertTrue(boolObjectListValues.contains(object.setCol[i].boolCol))
         }
     }
 
@@ -1324,6 +1378,7 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.optDecimalCol, (dictionary["optDecimalCol"] as! Decimal128?))
         XCTAssertEqual(object.optObjectIdCol, (dictionary["optObjectIdCol"] as! ObjectId?))
         XCTAssertEqual(object.optObjectCol?.boolCol, boolObjectValue)
+        XCTAssertEqual(object.optUuidCol, (dictionary["optUuidCol"] as! UUID?))
     }
 
     private func defaultSwiftObjectValuesWithReplacements(_ replace: [String: Any]) -> [String: Any] {
@@ -1335,10 +1390,17 @@ class ObjectCreationTests: TestCase {
     }
 
     // return an array of valid values that can be used to initialize each type
-    private func validValuesForSwiftObjectType(_ type: PropertyType, _ array: Bool) -> [Any] {
+    private func validValuesForSwiftObjectType(_ type: PropertyType, _ array: Bool, _ map: Bool) -> [Any] {
         try! Realm().beginWrite()
         let persistedObject = try! Realm().create(SwiftBoolObject.self, value: [true])
         try! Realm().commitWrite()
+        if map {
+            return [
+                ["trueVal": ["boolCol": true], "falseVal": ["boolCol": false]],
+                ["trueVal": SwiftBoolObject(value: [true]), "falseVal": SwiftBoolObject(value: [false])],
+                ["trueVal": persistedObject, "falseVal": [false]]
+            ]
+        }
         if array {
             return [
                 [[true], [false]],
@@ -1358,15 +1420,22 @@ class ObjectCreationTests: TestCase {
         case .object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
         case .objectId: return [ObjectId("1234567890ab1234567890ab")]
         case .decimal128: return [1, "2", Decimal128(number: 3)]
-        case .any: fatalError("not supported")
+        case .any:      return ["hello"]
         case .linkingObjects: fatalError("not supported")
+        case .UUID: return [UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!, UUID(uuidString: "00000000-0000-0000-0000-000000000000")!]
         }
     }
 
-    private func invalidValuesForSwiftObjectType(_ type: PropertyType, _ array: Bool) -> [Any] {
+    private func invalidValuesForSwiftObjectType(_ type: PropertyType, _ array: Bool, _ map: Bool) -> [Any] {
         try! Realm().beginWrite()
         let persistedObject = try! Realm().create(SwiftIntObject.self)
         try! Realm().commitWrite()
+        if map {
+            return [
+                ["trueVal": ["boolCol": "invalid"], "falseVal": ["boolCol": false]],
+                ["trueVal": "invalid", "falseVal": SwiftBoolObject(value: [false])]
+            ]
+        }
         if array {
             return ["invalid", [["a"]], [["boolCol": "a"]], [[SwiftIntObject()]], [[persistedObject]]]
         }
@@ -1381,8 +1450,9 @@ class ObjectCreationTests: TestCase {
         case .object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
         case .objectId: return ["invalid", 123]
         case .decimal128: return ["invalid"]
-        case .any: fatalError("not supported")
+        case .any: return [List<String>()]
         case .linkingObjects: fatalError("not supported")
+        case .UUID: return ["invalid"]
         }
     }
 }

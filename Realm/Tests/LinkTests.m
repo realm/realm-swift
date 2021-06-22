@@ -19,11 +19,18 @@
 #import "RLMTestCase.h"
 #import "RLMRealm_Dynamic.h"
 
-RLM_ARRAY_TYPE(CircularArrayObject)
+RLM_COLLECTION_TYPE(CircularArrayObject)
 @interface CircularArrayObject : RLMObject
 @property RLM_GENERIC_ARRAY(CircularArrayObject) *array;
 @end
 @implementation CircularArrayObject
+@end
+
+RLM_COLLECTION_TYPE(CircularSetObject)
+@interface CircularSetObject : RLMObject
+@property RLM_GENERIC_SET(CircularSetObject) *set;
+@end
+@implementation CircularSetObject
 @end
 
 @interface LinkTests : RLMTestCase
@@ -202,6 +209,26 @@ RLM_ARRAY_TYPE(CircularArrayObject)
         CircularArrayObject *obj0 = [[CircularArrayObject alloc] initWithValue:@[@[]]];
         CircularArrayObject *obj1 = [[CircularArrayObject alloc] initWithValue:@[@[obj0]]];
         [obj0.array addObject:obj1];
+
+        weakObj0 = obj0;
+        weakObj1 = obj1;
+
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm beginWriteTransaction];
+        [realm addObject:obj0];
+        [realm commitWriteTransaction];
+    }
+
+    XCTAssertNil(weakObj0);
+    XCTAssertNil(weakObj1);
+}
+
+- (void)testAddingCircularReferenceInSetDoesNotLeakSourceObjects {
+    CircularSetObject __weak *weakObj0, __weak *weakObj1;
+    @autoreleasepool {
+        CircularSetObject *obj0 = [[CircularSetObject alloc] initWithValue:@[@[]]];
+        CircularSetObject *obj1 = [[CircularSetObject alloc] initWithValue:@[@[obj0]]];
+        [obj0.set addObject:obj1];
 
         weakObj0 = obj0;
         weakObj1 = obj1;

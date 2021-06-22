@@ -48,7 +48,7 @@ public extension ObjectiveCSupport {
         case .jwt(let token):
             return RLMCredentials(jwt: token)
         case .function(let payload):
-            return RLMCredentials(functionPayload: ObjectiveCSupport.convert(object: AnyBSON(payload))! as! [String: RLMBSON])
+            return RLMCredentials(functionPayload: ObjectiveCSupport.convert(object: AnyBSON(payload)) as! [String: RLMBSON])
         case .userAPIKey(let APIKey):
             return RLMCredentials(userAPIKey: APIKey)
         case .serverAPIKey(let serverAPIKey):

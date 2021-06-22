@@ -24,6 +24,7 @@ import XCTest
 #endif
 import Foundation
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class RealmTests: TestCase {
     enum TestError: Error {
         case intentional
@@ -459,6 +460,21 @@ class RealmTests: TestCase {
         XCTAssertEqual(0, realm.objects(SwiftEmployeeObject.self).count)
     }
 
+    func testDeleteMutableSetOfObjects() {
+        let realm = try! Realm()
+        XCTAssertEqual(0, realm.objects(SwiftCompanyObject.self).count)
+        try! realm.write {
+            let obj = SwiftCompanyObject()
+            obj.employeeSet.insert(SwiftEmployeeObject())
+            realm.add(obj)
+            XCTAssertEqual(1, realm.objects(SwiftEmployeeObject.self).count)
+            realm.delete(obj.employeeSet)
+            XCTAssertEqual(0, obj.employeeSet.count)
+            XCTAssertEqual(0, realm.objects(SwiftEmployeeObject.self).count)
+        }
+        XCTAssertEqual(0, realm.objects(SwiftEmployeeObject.self).count)
+    }
+
     func testDeleteResults() {
         let realm = try! Realm(fileURL: testRealmURL())
         XCTAssertEqual(0, realm.objects(SwiftCompanyObject.self).count)
@@ -552,6 +568,7 @@ class RealmTests: TestCase {
         XCTAssertEqual(object["optDecimalCol"] as! Decimal128?, dictionary["optDecimalCol"] as! Decimal128?)
         XCTAssertEqual(object["optObjectIdCol"] as! ObjectId?, dictionary["optObjectIdCol"] as! ObjectId?)
         XCTAssertEqual((object["optObjectCol"] as? SwiftBoolObject)?.boolCol, true)
+        XCTAssertEqual(object["optUuidCol"] as! UUID, dictionary["optUuidCol"] as! UUID)
     }
 
     func testIterateDynamicObjects() {
@@ -603,6 +620,33 @@ class RealmTests: TestCase {
         XCTAssertEqual(intArray.last!["intCol"] as? Int, 2)
 
         for object in intArray {
+            XCTAssertEqual(object["intCol"] as? Int, 2)
+        }
+    }
+
+    func testDynamicObjectMutableSetProperties() {
+        try! Realm().write {
+            try! Realm().create(SwiftMutableSetPropertyObject.self, value: ["string", [["set"]], [[2]]])
+        }
+
+        let object = try! Realm().dynamicObjects("SwiftMutableSetPropertyObject")[0]
+
+        XCTAssertEqual(object["name"] as? String, "string")
+
+        let set = object["set"] as! MutableSet<DynamicObject>
+        XCTAssertEqual(set.first!["stringCol"] as? String, "set")
+        XCTAssertEqual(set.last!["stringCol"] as? String, "set")
+
+        for object in set {
+            XCTAssertEqual(object["stringCol"] as? String, "set")
+        }
+
+        let intSet = object["intSet"] as! MutableSet<DynamicObject>
+        XCTAssertEqual(intSet[0]["intCol"] as? Int, 2)
+        XCTAssertEqual(intSet.first!["intCol"] as? Int, 2)
+        XCTAssertEqual(intSet.last!["intCol"] as? Int, 2)
+
+        for object in intSet {
             XCTAssertEqual(object["intCol"] as? Int, 2)
         }
     }
@@ -694,6 +738,42 @@ class RealmTests: TestCase {
 
         let missingObject = realm.object(ofType: SwiftPrimaryOptionalStringObject.self, forPrimaryKey: "z")
         XCTAssertNil(missingObject)
+    }
+
+    func testUUIDPrimaryKey() {
+        let realm = try! Realm()
+        try! realm.write {
+            realm.create(SwiftPrimaryUUIDObject.self, value: [UUID(uuidString: "8a12daba-8b23-11eb-8dcd-0242ac130003")!, "a"])
+            realm.create(SwiftPrimaryUUIDObject.self, value: [UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!, "b"])
+        }
+
+        let object1 = realm.object(ofType: SwiftPrimaryUUIDObject.self, forPrimaryKey: UUID(uuidString: "8a12daba-8b23-11eb-8dcd-0242ac130003")!)!
+        XCTAssertNotNil(object1)
+        XCTAssertEqual(object1.stringCol, "a")
+
+        let object2 = realm.object(ofType: SwiftPrimaryUUIDObject.self, forPrimaryKey: UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)!
+        XCTAssertNotNil(object2)
+        XCTAssertEqual(object2.stringCol, "b")
+
+        XCTAssertNil(realm.object(ofType: SwiftPrimaryUUIDObject.self, forPrimaryKey: UUID(uuidString: "4ee1fa48-8b23-11eb-8dcd-0242ac130003")!))
+    }
+
+    func testObjectIdPrimaryKey() {
+        let realm = try! Realm()
+        try! realm.write {
+            realm.create(SwiftPrimaryObjectIdObject.self, value: [ObjectId("1234567890ab1234567890aa"), 1])
+            realm.create(SwiftPrimaryObjectIdObject.self, value: [ObjectId("1234567890ab1234567890ab"), 2])
+        }
+
+        let object1 = realm.object(ofType: SwiftPrimaryObjectIdObject.self, forPrimaryKey: ObjectId("1234567890ab1234567890aa"))!
+        XCTAssertNotNil(object1)
+        XCTAssertEqual(object1.intCol, 1)
+
+        let object2 = realm.object(ofType: SwiftPrimaryObjectIdObject.self, forPrimaryKey: ObjectId("1234567890ab1234567890ab"))!
+        XCTAssertNotNil(object2)
+        XCTAssertEqual(object2.intCol, 2)
+
+        XCTAssertNil(realm.object(ofType: SwiftPrimaryObjectIdObject.self, forPrimaryKey: ObjectId("1234567890ab1234567890ac")))
     }
 
     func testDynamicObjectForPrimaryKey() {
@@ -827,22 +907,18 @@ class RealmTests: TestCase {
         XCTAssertEqual(object.isInvalidated, true)
     }
 
-    func testWriteCopyToPath() {
-        let realm = try! Realm()
-        try! realm.write {
+    func testWriteCopyToPath() throws {
+        let realm = try Realm()
+        try realm.write {
             realm.add(SwiftObject())
         }
         let fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("copy.realm")
-        do {
-            try realm.writeCopy(toFile: fileURL)
-        } catch {
-            XCTFail("writeCopyToURL failed")
-        }
-        autoreleasepool {
-            let copy = try! Realm(fileURL: fileURL)
+        try realm.writeCopy(toFile: fileURL)
+        try autoreleasepool {
+            let copy = try Realm(fileURL: fileURL)
             XCTAssertEqual(1, copy.objects(SwiftObject.self).count)
         }
-        try! FileManager.default.removeItem(at: fileURL)
+        try FileManager.default.removeItem(at: fileURL)
     }
 
     func testEquals() {

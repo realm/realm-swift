@@ -4,8 +4,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* Fix a runtime crash which happens in some Xcode version (Xcode < 12, reported in Xcode 12.5), where SwiftUI is not weak linked by default. This fix only works for Cocoapods projects.
-  ([#7234](https://github.com/realm/realm-cocoa/issues/7234)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * None.
 
@@ -16,9 +14,158 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.5.
 * CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 1.
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.8.0 Release notes (2021-06-14)
+=============================================================
+
+NOTE: This version upgrades the Realm file format version to add support for
+the new data types and to adjust how primary keys are handled. Realm files
+opened will be automatically upgraded and cannot be read by versions older than
+v10.8.0. This upgrade should be a fairly fast one. Note that we now
+automatically create a backup of the pre-upgrade Realm.
+
+### Enhancements
+
+* Add support for the `UUID` and `NSUUID` data types. These types can be used
+  for the primary key property of Object classes.
+* Add two new collection types to complement the existing `RLMArray`/`List` type:
+  - `RLMSet<T>` in Objective-C and `MutableSet<T>` in Swift are mutable
+    unordered collections of distinct objects, similar to the built-in
+    `NSMutableSet` and `Set`. The values in a set may be any non-collection
+    type which can be stored as a Realm property. Sets are guaranteed to never
+    contain two objects which compare equal to each other, including when
+    conflicting writes are merged by sync.
+  - `RLMDictionary<NSString *, T>` in Objective-C and `Map<String, T>` are
+    mutable key-value dictionaries, similar to the built-in
+    `NSMutableDictionary` and `Dictionary`. The values in a dictionary may be
+    any non-collection type which can be stored as a Realm property. The keys
+    must currently always be a string.
+* Add support for dynamically typed properties which can store a value of any
+  of the non-collection types supported by Realm, including Object subclasses
+  (but not EmbeddedObject subclasses). These are declared with
+  `@property id<RLMValue> propertyName;` in Objective-C and
+  `let propertyName = RealmProperty<AnyRealmValue>()` in Swift.
+
+### Fixed
+
+* Setting a collection with a nullable value type to null via one of the
+  dynamic interfaces would hit an assertion failure instead of clearing the
+  collection.
+* Fixed an incorrect detection of multiple incoming links in a migration when
+  changing a table to embedded and removing a link to it at the same time.
+  ([#4694](https://github.com/realm/realm-core/issues/4694) since v10.0.0-beta.2)
+* Fixed a divergent merge on Set when one client clears the Set and another
+  client inserts and deletes objects.
+  ([#4720](https://github.com/realm/realm-core/issues/4720))
+* Partially revert to pre-v5.0.0 handling of primary keys to fix a performance
+  regression. v5.0.0 made primary keys determine the position in the low-level
+  table where newly added objects would be inserted, which eliminated the need
+  for a separate index on the primary key. This made some use patterns slightly
+  faster, but also made some reasonable things dramatically slower.
+  ([#4522](https://github.com/realm/realm-core/issues/4522))
+* Fixed an incorrect detection of multiple incoming links in a migration when
+  changing a table to embedded and removing a link to it at the same time.
+  ([#4694](https://github.com/realm/realm-core/issues/4694) since v10.0.0-beta.2)
+* Fix collection notification reporting for modifications. This could be
+  observed by receiving the wrong indices of modifications on sorted or
+  distinct results, or notification blocks sometimes not being called when only
+  modifications have occured.
+  ([#4573](https://github.com/realm/realm-core/pull/4573) since v5.0.0).
+* Fix incorrect sync instruction emission when replacing an existing embedded
+  object with another embedded object.([Core #4740](https://github.com/realm/realm-core/issues/4740)
+
+### Deprecations
+
+* `RealmOptional<T>` has been deprecated in favor of `RealmProperty<T?>`.
+  `RealmProperty` is functionality identical to `RealmOptional` when storing
+  optional numeric types, but can also store the new `AnyRealmValue` type.
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later. Note that this version of Realm Studio has not
+  yet been released at the time of this release.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 1.
+
+### Internal
+
+* Upgraded realm-core from v10.7.2 to v11.0.3
+
+10.8.0-beta.2 Release notes (2021-06-01)
+=============================================================
+
+### Enhancements
+
+* Add `RLMDictionary`/`Map<>` datatype. This is a Dictionary collection type used for storing key-value pairs in a collection.
+
+### Compatibility
+
+* Realm Studio: 11.0.0-beta.1 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v11.0.0-beta.4 to v11.0.0-beta.6
+
+10.8.0-beta.0 Release notes (2021-05-07)
+=============================================================
+
+### Enhancements
+
+* Add `RLMSet`/`MutableSet<>` datatype. This is a Set collection type used for storing distinct values in a collection.
+* Add support for `id<RLMValue>`/`AnyRealmValue`.
+* Add support for `UUID`/`NSUUID` data type.
+
+### Fixed
+
+* None.
+
+### Deprecations
+
+* `RealmOptional` has been deprecated in favor of `RealmProperty`.
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.4.
+* CocoaPods: 1.10 or later.
+
+### Internal
+
+* Upgraded realm-core from v10.7.2 to v10.8.0-beta.5
+
+10.7.7 Release notes (2021-06-10)
+=============================================================
+
+Xcode 12.2 is now the minimum supported version.
+
+### Enhancements
+
+* Add Xcode 13 beta 1 binaries to the release package.
+
+### Fixed
+
+* Fix a runtime crash which happens in some Xcode version (Xcode < 12, reported
+  in Xcode 12.5), where SwiftUI is not weak linked by default. This fix only
+  works for Cocoapods projects.
+  ([#7234](https://github.com/realm/realm-cocoa/issues/7234)
+* Fix warnings when building with Xcode 13 beta 1.
+
+### Compatibility
+
+* Realm Studio: 10.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 1.
 
 10.7.6 Release notes (2021-05-13)
 =============================================================

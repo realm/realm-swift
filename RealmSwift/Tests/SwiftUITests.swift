@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.3.1) && (REALM_HAVE_COMBINE || !SWIFT_PACKAGE)
+#if canImport(SwiftUI) && canImport(Combine)
 import XCTest
 import RealmSwift
 import SwiftUI
@@ -24,7 +24,9 @@ import Combine
 
 @objcMembers class SwiftUIObject: Object, ObjectKeyIdentifiable {
     var list = RealmSwift.List<SwiftBoolObject>()
+    var map = Map<String, SwiftBoolObject?>()
     var primitiveList = RealmSwift.List<Int>()
+    var primitiveMap = Map<String, Int>()
     dynamic var str = "foo"
     dynamic var int = 0
 
@@ -44,7 +46,9 @@ private let inMemoryIdentifier = "swiftui-tests"
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 class SwiftUITests: TestCase {
+
     // MARK: - List Operations
+
     func testManagedUnmanagedListAppendPrimitive() throws {
         let object = SwiftUIObject()
         let state = StateRealmObject(wrappedValue: object.primitiveList)
@@ -125,6 +129,98 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(state.wrappedValue.count, 1)
 
         state.projectedValue.remove(at: 0)
+        XCTAssertEqual(state.wrappedValue.count, 0)
+    }
+
+    // MARK: - Map Operations
+
+    func testManagedUnmanagedMapAppendPrimitive() throws {
+        let object = SwiftUIObject()
+        let state = StateRealmObject(wrappedValue: object.primitiveMap)
+        XCTAssertEqual(state.wrappedValue.count, 0)
+        state.projectedValue.set(object: 1, for: "one")
+        XCTAssertEqual(state.wrappedValue.count, 1)
+        XCTAssertEqual(state.projectedValue["one"], 1)
+
+        let realm = inMemoryRealm(inMemoryIdentifier)
+        try realm.write { realm.add(object) }
+
+        state.projectedValue.set(object: 2, for: "two")
+        state.projectedValue.set(object: 3, for: "two")
+        XCTAssertEqual(state.wrappedValue.count, 2)
+        XCTAssertEqual(state.projectedValue["two"], 3)
+    }
+
+    func testManagedUnmanagedMapAppendUnmanagedObject() throws {
+        let object = SwiftUIObject()
+        let state = StateRealmObject(wrappedValue: object.map)
+        XCTAssertEqual(state.wrappedValue.count, 0)
+        state.projectedValue.set(object: SwiftBoolObject(), for: "one")
+        XCTAssertEqual(state.wrappedValue.count, 1)
+
+        let realm = inMemoryRealm(inMemoryIdentifier)
+        try realm.write { realm.add(object) }
+
+        state.projectedValue.set(object: SwiftBoolObject(), for: "two")
+        XCTAssertEqual(state.wrappedValue.count, 2)
+    }
+
+    func testManagedMapAppendUnmanagedObservedObject() throws {
+        let object = SwiftUIObject()
+        var state = StateRealmObject(wrappedValue: object.map)
+        XCTAssertEqual(state.wrappedValue.count, 0)
+
+        let realm = inMemoryRealm(inMemoryIdentifier)
+        try realm.write { realm.add(object) }
+
+        state.update()
+        state.projectedValue.set(object: SwiftBoolObject(), for: "one")
+        XCTAssertEqual(state.wrappedValue.count, 1)
+    }
+
+    func testManagedUnmanagedMapRemovePrimitive() throws {
+        let object = SwiftUIObject()
+        let state = StateRealmObject(wrappedValue: object.primitiveMap)
+        XCTAssertEqual(state.wrappedValue.count, 0)
+        state.projectedValue.set(object: 1, for: "one")
+        XCTAssertEqual(state.wrappedValue.count, 1)
+
+        let realm = inMemoryRealm(inMemoryIdentifier)
+        try realm.write { realm.add(object) }
+
+        state.projectedValue.set(object: 2, for: "two")
+        XCTAssertEqual(state.wrappedValue.count, 2)
+
+        state.projectedValue.set(object: nil, for: "one")
+        XCTAssertEqual(state.wrappedValue.count, 1)
+        XCTAssertEqual(state.wrappedValue.keys, ["two"])
+    }
+
+    func testManagedUnmanagedMapRemoveUnmanagedObject() throws {
+        let object = SwiftUIObject()
+        let state = StateRealmObject(wrappedValue: object.map)
+        XCTAssertEqual(state.wrappedValue.count, 0)
+        state.projectedValue.set(object: SwiftBoolObject(), for: "one")
+        XCTAssertEqual(state.wrappedValue.count, 1)
+        state.projectedValue.set(object: nil, for: "one")
+        XCTAssertEqual(state.wrappedValue.count, 0)
+    }
+
+    func testManagedMapAppendRemoveObservedObject() throws {
+        let object = SwiftUIObject()
+        var state = StateRealmObject(wrappedValue: object.map)
+        XCTAssertEqual(state.wrappedValue.count, 0)
+
+        let realm = inMemoryRealm(inMemoryIdentifier)
+        try realm.write { realm.add(object) }
+
+        state.update()
+        state.projectedValue.set(object: SwiftBoolObject(), for: "one")
+        XCTAssertEqual(state.wrappedValue.count, 1)
+
+        XCTAssertEqual(state.wrappedValue.count, 1)
+
+        state.projectedValue.set(object: nil, for: "one")
         XCTAssertEqual(state.wrappedValue.count, 0)
     }
 

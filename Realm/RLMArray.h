@@ -30,10 +30,10 @@ NS_ASSUME_NONNULL_BEGIN
 
  When declaring an `RLMArray` property, the type must be marked as conforming to a
  protocol by the same name as the objects it should contain (see the
- `RLM_ARRAY_TYPE` macro). In addition, the property can be declared using Objective-C
+ `RLM_COLLECTION_TYPE` macro). In addition, the property can be declared using Objective-C
  generics for better compile-time type safety.
 
-     RLM_ARRAY_TYPE(ObjectType)
+     RLM_COLLECTION_TYPE(ObjectType)
      ...
      @property RLMArray<ObjectType *><ObjectType> *arrayOfObjectTypes;
 
@@ -55,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
  object. Instead, you can call the mutation methods on the `RLMArray` directly.
  */
 
-@interface RLMArray<RLMObjectType> : NSObject<RLMCollection, NSFastEnumeration>
+@interface RLMArray<RLMObjectType> : NSObject<RLMCollection>
 
 #pragma mark - Properties
 

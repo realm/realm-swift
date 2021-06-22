@@ -144,10 +144,19 @@ void (RLMAssertExceptionReason)(XCTestCase *self,
     if (!exception) {
         return;
     }
-    if ([exception.reason rangeOfString:(expected)].location == NSNotFound) {
-        NSString *desc = [NSString stringWithFormat:@"The expression %@ threw an exception with reason '%@', but expected to contain '%@'", expression, exception.reason ?: @"<nil>", expected];
-        [self recordFailureWithDescription:desc inFile:fileName atLine:lineNumber expected:NO];
+    if ([exception.reason rangeOfString:(expected)].location != NSNotFound) {
+        return;
     }
+
+    auto location = [[XCTSourceCodeContext alloc] initWithLocation:[[XCTSourceCodeLocation alloc] initWithFilePath:fileName lineNumber:lineNumber]];
+    NSString *desc = [NSString stringWithFormat:@"The expression %@ threw an exception with reason '%@', but expected to contain '%@'", expression, exception.reason ?: @"<nil>", expected];
+    auto issue = [[XCTIssue alloc] initWithType:XCTIssueTypeAssertionFailure
+                             compactDescription:desc
+                            detailedDescription:nil
+                              sourceCodeContext:location
+                                associatedError:nil
+                                    attachments:@[]];
+    [self recordIssue:issue];
 }
 
 bool RLMHasCachedRealmForPath(NSString *path) {
@@ -202,3 +211,15 @@ RLMUser *RLMDummyUser() {
     RLMApp *app = [RLMApp appWithId:@"dummy"];
     return app.allUsers.allValues.firstObject;
 }
+
+// Xcode 13 adds -[NSUUID compare:] so this warns about the category
+// implementing a method which already exists, but we can't use just the
+// built-in one yet.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
+@implementation NSUUID (RLMUUIDCompareTests)
+- (NSComparisonResult)compare:(NSUUID *)other {
+    return [[self UUIDString] compare:other.UUIDString];
+}
+@end
+#pragma clang diagnostic pop

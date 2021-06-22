@@ -168,7 +168,7 @@ static NSDictionary *RLMAnalyticsPayload() {
     }
 
     // If we found a bundle ID anywhere, hash it as it could contain sensitive
-    // information (e.g. the name of an unnanounced product)
+    // information (e.g. the name of an unannounced product)
     if (hashedBundleID) {
         NSData *data = [hashedBundleID dataUsingEncoding:NSUTF8StringEncoding];
         hashedBundleID = RLMHashData(data.bytes, data.length);
@@ -180,6 +180,7 @@ static NSDictionary *RLMAnalyticsPayload() {
 
     static NSString *kUnknownString = @"unknown";
     NSString *hashedMACAddress = RLMMACAddress() ?: kUnknownString;
+    NSDictionary *info = appBundle.infoDictionary;
 
     return @{
              @"event": @"Run",
@@ -207,10 +208,10 @@ static NSDictionary *RLMAnalyticsPayload() {
 #endif
                      @"Clang Version": @__clang_version__,
                      @"Clang Major Version": @__clang_major__,
-                     // Current OS version the app is targetting
+                     // Current OS version the app is targeting
                      @"Target OS Version": osVersionString,
-                     // Minimum OS version the app is targetting
-                     @"Target OS Minimum Version": appBundle.infoDictionary[@"MinimumOSVersion"] ?: kUnknownString,
+                     // Minimum OS version the app is targeting
+                     @"Target OS Minimum Version": info[@"MinimumOSVersion"] ?: info[@"LSMinimumSystemVersion"] ?: kUnknownString,
 
                      // Host OS version being built on
                      @"Host OS Type": @"osx",

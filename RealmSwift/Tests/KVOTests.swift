@@ -25,6 +25,7 @@ func nextPrimaryKey() -> Int {
     return pkCounter
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftKVOObject: Object {
     @objc dynamic var pk = nextPrimaryKey() // primary key for equality
     @objc dynamic var ignored: Int = 0
@@ -43,10 +44,15 @@ class SwiftKVOObject: Object {
     @objc dynamic var objectIdCol = ObjectId()
     @objc dynamic var objectCol: SwiftKVOObject?
     let arrayCol = List<SwiftKVOObject>()
+    let setCol = MutableSet<SwiftKVOObject>()
     let optIntCol = RealmOptional<Int>()
     let optFloatCol = RealmOptional<Float>()
     let optDoubleCol = RealmOptional<Double>()
     let optBoolCol = RealmOptional<Bool>()
+    let otherIntCol = RealmProperty<Int?>()
+    let otherFloatCol = RealmProperty<Float?>()
+    let otherDoubleCol = RealmProperty<Double?>()
+    let otherBoolCol = RealmProperty<Bool?>()
     @objc dynamic var optStringCol: String?
     @objc dynamic var optBinaryCol: Data?
     @objc dynamic var optDateCol: Date?
@@ -79,12 +85,65 @@ class SwiftKVOObject: Object {
     let arrayOptDecimal = List<Decimal128?>()
     let arrayOptObjectId = List<ObjectId?>()
 
+    let setBool = MutableSet<Bool>()
+    let setInt8 = MutableSet<Int8>()
+    let setInt16 = MutableSet<Int16>()
+    let setInt32 = MutableSet<Int32>()
+    let setInt64 = MutableSet<Int64>()
+    let setFloat = MutableSet<Float>()
+    let setDouble = MutableSet<Double>()
+    let setString = MutableSet<String>()
+    let setBinary = MutableSet<Data>()
+    let setDate = MutableSet<Date>()
+    let setDecimal = MutableSet<Decimal128>()
+    let setObjectId = MutableSet<ObjectId>()
+
+    let setOptBool = MutableSet<Bool?>()
+    let setOptInt8 = MutableSet<Int8?>()
+    let setOptInt16 = MutableSet<Int16?>()
+    let setOptInt32 = MutableSet<Int32?>()
+    let setOptInt64 = MutableSet<Int64?>()
+    let setOptFloat = MutableSet<Float?>()
+    let setOptDouble = MutableSet<Double?>()
+    let setOptString = MutableSet<String?>()
+    let setOptBinary = MutableSet<Data?>()
+    let setOptDate = MutableSet<Date?>()
+    let setOptDecimal = MutableSet<Decimal128?>()
+    let setOptObjectId = MutableSet<ObjectId?>()
+
+    let mapBool = Map<String, Bool>()
+    let mapInt8 = Map<String, Int8>()
+    let mapInt16 = Map<String, Int16>()
+    let mapInt32 = Map<String, Int32>()
+    let mapInt64 = Map<String, Int64>()
+    let mapFloat = Map<String, Float>()
+    let mapDouble = Map<String, Double>()
+    let mapString = Map<String, String>()
+    let mapBinary = Map<String, Data>()
+    let mapDate = Map<String, Date>()
+    let mapDecimal = Map<String, Decimal128>()
+    let mapObjectId = Map<String, ObjectId>()
+
+    let mapOptBool = Map<String, Bool?>()
+    let mapOptInt8 = Map<String, Int8?>()
+    let mapOptInt16 = Map<String, Int16?>()
+    let mapOptInt32 = Map<String, Int32?>()
+    let mapOptInt64 = Map<String, Int64?>()
+    let mapOptFloat = Map<String, Float?>()
+    let mapOptDouble = Map<String, Double?>()
+    let mapOptString = Map<String, String?>()
+    let mapOptBinary = Map<String, Data?>()
+    let mapOptDate = Map<String, Date?>()
+    let mapOptDecimal = Map<String, Decimal128?>()
+    let mapOptObjectId = Map<String, ObjectId?>()
+
     override class func primaryKey() -> String { return "pk" }
     override class func ignoredProperties() -> [String] { return ["ignored"] }
 }
 
 // Most of the testing of KVO functionality is done in the obj-c tests
 // These tests just verify that it also works on Swift types
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class KVOTests: TestCase {
     var realm: Realm! = nil
 
@@ -118,8 +177,8 @@ class KVOTests: TestCase {
         XCTAssert(changeDictionary != nil, "Did not get a notification", file: (fileName), line: lineNumber)
         guard changeDictionary != nil else { return }
 
-        let actualOld = changeDictionary![.oldKey]! as? T
-        let actualNew = changeDictionary![.newKey]! as? T
+        let actualOld = changeDictionary![.oldKey] as? T
+        let actualNew = changeDictionary![.newKey] as? T
 
         XCTAssert(old == actualOld,
                   "Old value: expected \(String(describing: old)), got \(String(describing: actualOld))",
@@ -189,6 +248,16 @@ class KVOTests: TestCase {
         changeDictionary = nil
     }
 
+    func observeSetChange(_ obj: SwiftKVOObject, _ key: String,
+                          fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
+        obj.addObserver(self, forKeyPath: key, options: [], context: nil)
+        block()
+        obj.removeObserver(self, forKeyPath: key)
+
+        XCTAssert(changeDictionary != nil, "Did not get a notification", file: (fileName), line: lineNumber)
+        guard changeDictionary != nil else { return }
+    }
+
     func getObject(_ obj: SwiftKVOObject) -> (SwiftKVOObject, SwiftKVOObject) {
         return (obj, obj)
     }
@@ -223,6 +292,8 @@ class KVOTests: TestCase {
 
         observeListChange(obs, "arrayCol", .insertion) { obj.arrayCol.append(obj) }
         observeListChange(obs, "arrayCol", .removal) { obj.arrayCol.removeAll() }
+        observeSetChange(obs, "setCol") { obj.setCol.insert(obj) }
+        observeSetChange(obs, "setCol") { obj.setCol.remove(obj) }
 
         observeChange(obs, "optIntCol", nil, 10) { obj.optIntCol.value = 10 }
         observeChange(obs, "optFloatCol", nil, 10.0) { obj.optFloatCol.value = 10 }
@@ -234,6 +305,11 @@ class KVOTests: TestCase {
         observeChange(obs, "optDecimalCol", nil, decimal) { obj.optDecimalCol = decimal }
         observeChange(obs, "optObjectIdCol", nil, objectId) { obj.optObjectIdCol = objectId }
 
+        observeChange(obs, "otherIntCol", nil, 10) { obj.otherIntCol.value = 10 }
+        observeChange(obs, "otherFloatCol", nil, 10.0) { obj.otherFloatCol.value = 10 }
+        observeChange(obs, "otherDoubleCol", nil, 10.0) { obj.otherDoubleCol.value = 10 }
+        observeChange(obs, "otherBoolCol", nil, true) { obj.otherBoolCol.value = true }
+
         observeChange(obs, "optIntCol", 10, nil) { obj.optIntCol.value = nil }
         observeChange(obs, "optFloatCol", 10.0, nil) { obj.optFloatCol.value = nil }
         observeChange(obs, "optDoubleCol", 10.0, nil) { obj.optDoubleCol.value = nil }
@@ -243,6 +319,11 @@ class KVOTests: TestCase {
         observeChange(obs, "optDateCol", date, nil) { obj.optDateCol = nil }
         observeChange(obs, "optDecimalCol", decimal, nil) { obj.optDecimalCol = nil }
         observeChange(obs, "optObjectIdCol", objectId, nil) { obj.optObjectIdCol = nil }
+
+        observeChange(obs, "otherIntCol", 10, nil) { obj.otherIntCol.value = nil }
+        observeChange(obs, "otherFloatCol", 10.0, nil) { obj.otherFloatCol.value = nil }
+        observeChange(obs, "otherDoubleCol", 10.0, nil) { obj.otherDoubleCol.value = nil }
+        observeChange(obs, "otherBoolCol", true, nil) { obj.otherBoolCol.value = nil }
 
         observeListChange(obs, "arrayBool", .insertion) { obj.arrayBool.append(true) }
         observeListChange(obs, "arrayInt8", .insertion) { obj.arrayInt8.append(10) }
@@ -280,6 +361,76 @@ class KVOTests: TestCase {
         observeListChange(obs, "arrayOptBinary", .insertion) { obj.arrayOptBinary.insert(nil, at: 0) }
         observeListChange(obs, "arrayOptDecimal", .insertion) { obj.arrayOptDecimal.insert(nil, at: 0) }
         observeListChange(obs, "arrayOptObjectId", .insertion) { obj.arrayOptObjectId.insert(nil, at: 0) }
+
+        observeSetChange(obs, "setBool") { obj.setBool.insert(true) }
+        observeSetChange(obs, "setInt8") { obj.setInt8.insert(10) }
+        observeSetChange(obs, "setInt16") { obj.setInt16.insert(10) }
+        observeSetChange(obs, "setInt32") { obj.setInt32.insert(10) }
+        observeSetChange(obs, "setInt64") { obj.setInt64.insert(10) }
+        observeSetChange(obs, "setFloat") { obj.setFloat.insert(10) }
+        observeSetChange(obs, "setDouble") { obj.setDouble.insert(10) }
+        observeSetChange(obs, "setString") { obj.setString.insert("abc") }
+        observeSetChange(obs, "setDecimal") { obj.setDecimal.insert(decimal) }
+        observeSetChange(obs, "setObjectId") { obj.setObjectId.insert(objectId) }
+
+        observeSetChange(obs, "setOptBool") { obj.setOptBool.insert(true) }
+        observeSetChange(obs, "setOptInt8") { obj.setOptInt8.insert(10) }
+        observeSetChange(obs, "setOptInt16") { obj.setOptInt16.insert(10) }
+        observeSetChange(obs, "setOptInt32") { obj.setOptInt32.insert(10) }
+        observeSetChange(obs, "setOptInt64") { obj.setOptInt64.insert(10) }
+        observeSetChange(obs, "setOptFloat") { obj.setOptFloat.insert(10) }
+        observeSetChange(obs, "setOptDouble") { obj.setOptDouble.insert(10) }
+        observeSetChange(obs, "setOptString") { obj.setOptString.insert("abc") }
+        observeSetChange(obs, "setOptBinary") { obj.setOptBinary.insert(data) }
+        observeSetChange(obs, "setOptDate") { obj.setOptDate.insert(date) }
+        observeSetChange(obs, "setOptDecimal") { obj.setOptDecimal.insert(decimal) }
+        observeSetChange(obs, "setOptObjectId") { obj.setOptObjectId.insert(objectId) }
+
+        observeSetChange(obs, "setOptBool") { obj.setOptBool.insert(nil) }
+        observeSetChange(obs, "setOptInt8") { obj.setOptInt8.insert(nil) }
+        observeSetChange(obs, "setOptInt16") { obj.setOptInt16.insert(nil) }
+        observeSetChange(obs, "setOptInt32") { obj.setOptInt32.insert(nil) }
+        observeSetChange(obs, "setOptInt64") { obj.setOptInt64.insert(nil) }
+        observeSetChange(obs, "setOptFloat") { obj.setOptFloat.insert(nil) }
+        observeSetChange(obs, "setOptDouble") { obj.setOptDouble.insert(nil) }
+        observeSetChange(obs, "setOptString") { obj.setOptString.insert(nil) }
+        observeSetChange(obs, "setOptDate") { obj.setOptDate.insert(nil) }
+        observeSetChange(obs, "setOptBinary") { obj.setOptBinary.insert(nil) }
+        observeSetChange(obs, "setOptDecimal") { obj.setOptDecimal.insert(nil) }
+        observeSetChange(obs, "setOptObjectId") { obj.setOptObjectId.insert(nil) }
+
+        observeSetChange(obs, "mapBool") { obj.mapBool["key"] = true }
+        observeSetChange(obs, "mapInt8") { obj.mapInt8["key"] = 10 }
+        observeSetChange(obs, "mapInt16") { obj.mapInt16["key"] = 10 }
+        observeSetChange(obs, "mapInt32") { obj.mapInt32["key"] = 10 }
+        observeSetChange(obs, "mapInt64") { obj.mapInt64["key"] = 10 }
+        observeSetChange(obs, "mapFloat") { obj.mapFloat["key"] = 10 }
+        observeSetChange(obs, "mapDouble") { obj.mapDouble["key"] = 10 }
+        observeSetChange(obs, "mapString") { obj.mapString["key"] = "abc" }
+        observeSetChange(obs, "mapDecimal") { obj.mapDecimal["key"] = decimal }
+        observeSetChange(obs, "mapObjectId") { obj.mapObjectId["key"] = objectId }
+
+        observeSetChange(obs, "mapOptBool") { obj.mapOptBool["key"] = true }
+        observeSetChange(obs, "mapOptInt8") { obj.mapOptInt8["key"] = 10 }
+        observeSetChange(obs, "mapOptInt16") { obj.mapOptInt16["key"] = 10 }
+        observeSetChange(obs, "mapOptInt32") { obj.mapOptInt32["key"] = 10 }
+        observeSetChange(obs, "mapOptInt64") { obj.mapOptInt64["key"] = 10 }
+        observeSetChange(obs, "mapOptFloat") { obj.mapOptFloat["key"] = 10 }
+        observeSetChange(obs, "mapOptDouble") { obj.mapOptDouble["key"] = 10 }
+        observeSetChange(obs, "mapOptString") { obj.mapOptString["key"] = "abc" }
+        observeSetChange(obs, "mapOptDecimal") { obj.mapOptDecimal["key"] = decimal }
+        observeSetChange(obs, "mapOptObjectId") { obj.mapOptObjectId["key"] = objectId }
+
+        observeSetChange(obs, "mapOptBool") { obj.mapOptBool["key"] = nil }
+        observeSetChange(obs, "mapOptInt8") { obj.mapOptInt8["key"] = nil }
+        observeSetChange(obs, "mapOptInt16") { obj.mapOptInt16["key"] = nil }
+        observeSetChange(obs, "mapOptInt32") { obj.mapOptInt32["key"] = nil }
+        observeSetChange(obs, "mapOptInt64") { obj.mapOptInt64["key"] = nil }
+        observeSetChange(obs, "mapOptFloat") { obj.mapOptFloat["key"] = nil }
+        observeSetChange(obs, "mapOptDouble") { obj.mapOptDouble["key"] = nil }
+        observeSetChange(obs, "mapOptString") { obj.mapOptString["key"] = nil }
+        observeSetChange(obs, "mapOptDecimal") { obj.mapOptDecimal["key"] = nil }
+        observeSetChange(obs, "mapOptObjectId") { obj.mapOptObjectId["key"] = nil }
 
         if obs.realm == nil {
             return
@@ -375,6 +526,7 @@ class KVOTests: TestCase {
     }
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class KVOPersistedTests: KVOTests {
     override func getObject(_ obj: SwiftKVOObject) -> (SwiftKVOObject, SwiftKVOObject) {
         realm.add(obj)
@@ -382,6 +534,7 @@ class KVOPersistedTests: KVOTests {
     }
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class KVOMultipleAccessorsTests: KVOTests {
     override func getObject(_ obj: SwiftKVOObject) -> (SwiftKVOObject, SwiftKVOObject) {
         realm.add(obj)
