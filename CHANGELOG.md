@@ -1,19 +1,24 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)` and `[App.emailPasswordAuth retryCustomConfirmation:completion:]`. These functions add support for retrying a [custom confirmation](https://docs.mongodb.com/realm/authentication/email-password/#run-a-confirmation-function) function.
+* Update Xcode 12.5 to Xcode 12.5.1.
+* Add `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)` and `[App.emailPasswordAuth retryCustomConfirmation:completion:]`. 
+  These functions support retrying a [custom confirmation](https://docs.mongodb.com/realm/authentication/email-password/#run-a-confirmation-function) function.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * Importing the Realm swift package produced several warnings about excluded
   files not existing. ([#7295](https://github.com/realm/realm-cocoa/issues/7295), since v10.8.0).
+* Update the root URL for the API docs so that the links go to the place where
+  new versions of the docs are being published.
+  ([#7299](https://github.com/realm/realm-cocoa/issues/7299), since v10.6.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 12.5.
+* Carthage release for Swift is built with Xcode 12.5.1.
 * CocoaPods: 1.10 or later.
 * Xcode: 12.2-13.0 beta 1.
 
