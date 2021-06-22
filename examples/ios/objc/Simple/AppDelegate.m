@@ -29,7 +29,7 @@
 // No need for implementation
 @end
 
-RLM_ARRAY_TYPE(Dog)
+RLM_COLLECTION_TYPE(Dog)
 
 @interface Person : RLMObject
 @property NSString      *name;

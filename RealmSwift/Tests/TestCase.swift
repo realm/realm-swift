@@ -202,6 +202,26 @@ class TestCase: RLMTestCaseBase {
         RLMAssertMatches(self, block, regexString, message, fileName, lineNumber)
     }
 
+    /// Check that a `MutableSet` contains all expected elements.
+    func assertSetContains<T, U>(_ set: MutableSet<T>, keyPath: KeyPath<T, U>, items: [U]) where U: Hashable {
+        var itemMap = Dictionary(uniqueKeysWithValues: items.map { ($0, false)})
+        set.map { $0[keyPath: keyPath]}.forEach {
+            itemMap[$0] = items.contains($0)
+        }
+        // ensure all items are present in the set.
+        XCTAssertFalse(itemMap.values.contains(false))
+    }
+
+    /// Check that an `AnyRealmCollection` contains all expected elements.
+    func assertAnyRealmCollectionContains<T, U>(_ set: AnyRealmCollection<T>, keyPath: KeyPath<T, U>, items: [U]) where U: Hashable {
+        var itemMap = Dictionary(uniqueKeysWithValues: items.map { ($0, false)})
+        set.map { $0[keyPath: keyPath]}.forEach {
+            itemMap[$0] = items.contains($0)
+        }
+        // ensure all items are present in the set.
+        XCTAssertFalse(itemMap.values.contains(false))
+    }
+
     private func realmFilePrefix() -> String {
         let name: String? = self.name
         return name!.trimmingCharacters(in: CharacterSet(charactersIn: "-[]"))

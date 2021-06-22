@@ -46,13 +46,14 @@ import Realm.Private
  - `Data`, `NSData`
  - `Decimal128`
  - `ObjectId`
+ - `UUID`
  - `@objc enum` which has been delcared as conforming to `RealmEnum`.
  - `RealmOptional<Value>` for optional numeric properties
  - `Object` subclasses, to model many-to-one relationships
  - `EmbeddedObject` subclasses, to model owning one-to-one relationships
  - `List<Element>`, to model many-to-many relationships
 
- `String`, `NSString`, `Date`, `NSDate`, `Data`, `NSData`, `Decimal128`, and `ObjectId`  properties
+ `String`, `NSString`, `Date`, `NSDate`, `Data`, `NSData`, `UUID`, `NSUUID`, `Decimal128` and `ObjectId`  properties
  can be declared as optional. `Object` and `EmbeddedObject` subclasses *must* be declared as optional.
  `Int`, `Int8`, `Int16`, `Int32`, `Int64`, `Float`, `Double`, `Bool`,  enum, and `List` properties cannot.
  To store an optional number, use `RealmOptional<Int>`, `RealmOptional<Float>`, `RealmOptional<Double>`, or
@@ -73,11 +74,6 @@ import Realm.Private
  */
 public typealias Object = RealmSwiftObject
 extension Object: RealmCollectionValue {
-    /// :nodoc:
-    public static func _rlmArray() -> RLMArray<AnyObject> {
-        return RLMArray(objectClassName: className())
-    }
-
     // MARK: Initializers
 
     /**
@@ -169,32 +165,11 @@ extension Object: RealmCollectionValue {
     /// Returns or sets the value of the property with the given name.
     @objc open subscript(key: String) -> Any? {
         get {
-            if realm == nil {
-                return value(forKey: key)
-            }
-            return dynamicGet(key: key)
+            dynamicGet(object: self, key: key)
         }
-        set(value) {
-            if realm == nil {
-                setValue(value, forKey: key)
-            } else {
-                RLMDynamicValidatedSet(self, key, value)
-            }
+        set {
+            dynamicSet(object: self, key: key, value: newValue)
         }
-    }
-
-    private func dynamicGet(key: String) -> Any? {
-        let objectSchema = RLMObjectBaseObjectSchema(self)!
-        guard let prop = objectSchema[key] else {
-            throwRealmException("Invalid property name '\(key) for class \(objectSchema.className)")
-        }
-        if let accessor = prop.swiftAccessor {
-            return accessor.get(Unmanaged.passUnretained(self).toOpaque() + ivar_getOffset(prop.swiftIvar!))
-        }
-        if let ivar = prop.swiftIvar, prop.array {
-            return object_getIvar(self, ivar)
-        }
-        return RLMDynamicGet(self, prop)
     }
 
     // MARK: Notifications
@@ -260,8 +235,54 @@ extension Object: RealmCollectionValue {
         if let dynamic = self as? DynamicObject {
             return dynamic[propertyName] as! List<DynamicObject>
         }
-        return noWarnUnsafeBitCast(dynamicGet(key: propertyName) as! RLMListBase,
+        return noWarnUnsafeBitCast(dynamicGet(object: self, key: propertyName) as! RLMSwiftCollectionBase,
                                    to: List<DynamicObject>.self)
+    }
+
+    // MARK: Dynamic set
+
+    /**
+     Returns a set of `DynamicObject`s for a given property name.
+
+     - warning:  This method is useful only in specialized circumstances, for example, when building
+     components that integrate with Realm. If you are simply building an app on Realm, it is
+     recommended to use instance variables or cast the values returned from key-value coding.
+
+     - parameter propertyName: The name of the property.
+
+     - returns: A set of `DynamicObject`s.
+
+     :nodoc:
+     */
+    public func dynamicMutableSet(_ propertyName: String) -> MutableSet<DynamicObject> {
+        if let dynamic = self as? DynamicObject {
+            return dynamic[propertyName] as! MutableSet<DynamicObject>
+        }
+        return noWarnUnsafeBitCast(dynamicGet(object: self, key: propertyName) as! RLMSwiftCollectionBase,
+                                   to: MutableSet<DynamicObject>.self)
+    }
+
+    // MARK: Dynamic map
+
+    /**
+     Returns a map of `DynamicObject`s for a given property name.
+
+     - warning:  This method is useful only in specialized circumstances, for example, when building
+     components that integrate with Realm. If you are simply building an app on Realm, it is
+     recommended to use instance variables or cast the values returned from key-value coding.
+
+     - parameter propertyName: The name of the property.
+
+     - returns: A map with a given key type with `DynamicObject` as the value.
+
+     :nodoc:
+     */
+    public func dynamicMap<Key: _MapKey>(_ propertyName: String) -> Map<Key, DynamicObject> {
+        if let dynamic = self as? DynamicObject {
+            return dynamic[propertyName] as! Map<Key, DynamicObject>
+        }
+        return noWarnUnsafeBitCast(dynamicGet(object: self, key: propertyName) as! RLMSwiftCollectionBase,
+                                   to: Map<Key, DynamicObject>.self)
     }
 
     // MARK: Comparison
@@ -323,7 +344,6 @@ extension Object: ThreadConfined {
     }
 }
 
-
 /**
  Information about a specific property which changed in an `Object` change notification.
  */
@@ -376,6 +396,8 @@ extension Object: ThreadConfined {
 
 /// Object interface which allows untyped getters and setters for Objects.
 /// :nodoc:
+@objc(RealmSwiftDynamicObject)
+@dynamicMemberLookup
 public final class DynamicObject: Object {
     public override subscript(key: String) -> Any? {
         get {
@@ -383,10 +405,25 @@ public final class DynamicObject: Object {
             if let array = value as? RLMArray<AnyObject> {
                 return List<DynamicObject>(objc: array)
             }
+            if let set = value as? RLMSet<AnyObject> {
+                return MutableSet<DynamicObject>(objc: set)
+            }
+            if let dictionary = value as? RLMDictionary<AnyObject, AnyObject> {
+                return Map<String, DynamicObject>(objc: dictionary)
+            }
             return value
         }
         set(value) {
             RLMDynamicValidatedSet(self, key, value)
+        }
+    }
+
+    public subscript(dynamicMember member: String) -> Any? {
+        get {
+            self[member]
+        }
+        set(value) {
+            self[member] = value
         }
     }
 
@@ -403,6 +440,10 @@ public final class DynamicObject: Object {
     /// :nodoc:
     public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false
+    }
+
+    override public class func sharedSchema() -> RLMObjectSchema? {
+        nil
     }
 }
 
@@ -425,382 +466,57 @@ public final class DynamicObject: Object {
  }
  ```
  */
-public protocol RealmEnum: RealmOptionalType, _ManagedPropertyType {
+public protocol RealmEnum: RealmOptionalType, _RealmSchemaDiscoverable {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     static func _rlmToRawValue(_ value: Any) -> Any
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     static func _rlmFromRawValue(_ value: Any) -> Any
 }
 
 // MARK: - Implementation
 
 /// :nodoc:
-public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
+public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _RealmSchemaDiscoverable {
     static func _rlmToRawValue(_ value: Any) -> Any {
         return (value as! Self).rawValue
     }
-    // swiftlint:disable:next identifier_name
     static func _rlmFromRawValue(_ value: Any) -> Any {
         return Self.init(rawValue: value as! RawValue)!
     }
-    // swiftlint:disable:next identifier_name
-    static func _rlmProperty(_ prop: RLMProperty) {
-        RawValue._rlmProperty(prop)
+    static func _rlmPopulateProperty(_ prop: RLMProperty) {
+        RawValue._rlmPopulateProperty(prop)
     }
+    static var _rlmType: PropertyType { RawValue._rlmType }
 }
 
-// A type which can be a managed property on a Realm object
-/// :nodoc:
-public protocol _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    func _rlmProperty(_ prop: RLMProperty)
-    // swiftlint:disable:next identifier_name
-    static func _rlmProperty(_ prop: RLMProperty)
-    // swiftlint:disable:next identifier_name
-    static func _rlmRequireObjc() -> Bool
-}
-/// :nodoc:
-extension _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public func _rlmProperty(_ prop: RLMProperty) { }
-    // swiftlint:disable:next identifier_name
-    public static func _rlmRequireObjc() -> Bool { return true }
+internal func dynamicGet(object: ObjectBase, key: String) -> Any? {
+    let objectSchema = RLMObjectBaseObjectSchema(object)!
+    guard let prop = objectSchema[key] else {
+        throwRealmException("Invalid property name '\(key) for class \(objectSchema.className)")
+    }
+    if let accessor = prop.swiftAccessor {
+        let value = accessor.get(prop, on: object)
+        return value is NSNull ? nil : value
+    }
+    if RLMObjectBaseRealm(object) == nil {
+        return object.value(forKey: key)
+    }
+    return RLMDynamicGet(object, prop)
 }
 
-/// :nodoc:
-extension Int: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .int
+internal func dynamicSet(object: ObjectBase, key: String, value: Any?) {
+    let bridgedValue: Any?
+    if let v1 = value, let v2 = v1 as? CustomObjectiveCBridgeable {
+        bridgedValue = v2.objCValue
+    } else if let v1 = value, let v2 = v1 as? RealmEnum {
+        bridgedValue = type(of: v2)._rlmToRawValue(v2)
+    } else {
+        bridgedValue = value
     }
-}
-/// :nodoc:
-extension Int8: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .int
-    }
-}
-/// :nodoc:
-extension Int16: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .int
-    }
-}
-/// :nodoc:
-extension Int32: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .int
-    }
-}
-/// :nodoc:
-extension Int64: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .int
-    }
-}
-/// :nodoc:
-extension Float: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .float
-    }
-}
-/// :nodoc:
-extension Double: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .double
-    }
-}
-/// :nodoc:
-extension Bool: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .bool
-    }
-}
-/// :nodoc:
-extension String: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .string
-    }
-}
-/// :nodoc:
-extension NSString: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .string
-    }
-}
-/// :nodoc:
-extension Data: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .data
-    }
-}
-/// :nodoc:
-extension NSData: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .data
-    }
-}
-/// :nodoc:
-extension Date: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .date
-    }
-}
-/// :nodoc:
-extension NSDate: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .date
-    }
-}
-/// :nodoc:
-extension Decimal128: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .decimal128
-    }
-}
-/// :nodoc:
-extension ObjectId: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.type = .objectId
-    }
-}
-
-/// :nodoc:
-extension Object: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        if !prop.optional && !prop.array {
-            throwRealmException("Object property '\(prop.name)' must be marked as optional.")
-        }
-        if prop.optional && prop.array {
-            throwRealmException("List<\(className())> property '\(prop.name)' must not be marked as optional.")
-        }
-        prop.type = .object
-        prop.objectClassName = className()
-    }
-}
-
-/// :nodoc:
-extension EmbeddedObject: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        Object._rlmProperty(prop)
-        prop.objectClassName = className()
-    }
-}
-
-/// :nodoc:
-extension List: _ManagedPropertyType where Element: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.array = true
-        Element._rlmProperty(prop)
-    }
-    // swiftlint:disable:next identifier_name
-    public static func _rlmRequireObjc() -> Bool { return false }
-}
-
-/// :nodoc:
-class LinkingObjectsAccessor<Element: ObjectBase>: RLMManagedPropertyAccessor where Element: RealmCollectionValue {
-    @objc override class func initializeObject(_ ptr: UnsafeMutableRawPointer,
-                                               parent: RLMObjectBase, property: RLMProperty) {
-        ptr.assumingMemoryBound(to: LinkingObjects<Element>.self).pointee.handle = RLMLinkingObjectsHandle(object: parent, property: property)
-    }
-    @objc override class func get(_ ptr: UnsafeMutableRawPointer) -> Any {
-        return ptr.assumingMemoryBound(to: LinkingObjects<Element>.self).pointee
-    }
-}
-
-/// :nodoc:
-extension LinkingObjects: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.array = true
-        prop.type = .linkingObjects
-        prop.objectClassName = Element.className()
-        prop.swiftAccessor = LinkingObjectsAccessor<Element>.self
-    }
-    // swiftlint:disable:next identifier_name
-    public func _rlmProperty(_ prop: RLMProperty) {
-        prop.linkOriginPropertyName = self.propertyName
-    }
-    // swiftlint:disable:next identifier_name
-    public static func _rlmRequireObjc() -> Bool { return false }
-}
-
-/// :nodoc:
-extension Optional: _ManagedPropertyType where Wrapped: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.optional = true
-        Wrapped._rlmProperty(prop)
-    }
-}
-
-/// :nodoc:
-extension RealmOptional: _ManagedPropertyType where Value: _ManagedPropertyType {
-    // swiftlint:disable:next identifier_name
-    public static func _rlmProperty(_ prop: RLMProperty) {
-        prop.optional = true
-        Value._rlmProperty(prop)
-    }
-    // swiftlint:disable:next identifier_name
-    public static func _rlmRequireObjc() -> Bool { return false }
-}
-
-/// :nodoc:
-internal class ObjectUtil {
-    private static let runOnce: Void = {
-        RLMSwiftAsFastEnumeration = { (obj: Any) -> Any? in
-            // Intermediate cast to AnyObject due to https://bugs.swift.org/browse/SR-8651
-            if let collection = obj as AnyObject as? _RealmCollectionEnumerator {
-                return collection._asNSFastEnumerator()
-            }
-            return nil
-        }
-    }()
-
-    // If the property is a storage property for a lazy Swift property, return
-    // the base property name (e.g. `foo.storage` becomes `foo`). Otherwise, nil.
-    private static func baseName(forLazySwiftProperty name: String) -> String? {
-        // A Swift lazy var shows up as two separate children on the reflection tree:
-        // one named 'x', and another that is optional and is named 'x.storage'. Note
-        // that '.' is illegal in either a Swift or Objective-C property name.
-        if let storageRange = name.range(of: ".storage", options: [.anchored, .backwards]) {
-            return String(name[..<storageRange.lowerBound])
-        }
-        // Xcode 11 changed the name of the storage property to "$__lazy_storage_$_propName"
-        if let storageRange = name.range(of: "$__lazy_storage_$_", options: [.anchored]) {
-            return String(name[storageRange.upperBound...])
-        }
-        return nil
-    }
-
-    // Reflect an object, returning only children representing managed Realm properties.
-    private static func getNonIgnoredMirrorChildren(for object: Any) -> [Mirror.Child] {
-        let ignoredPropNames: Set<String>
-        if let realmObject = object as? Object {
-            ignoredPropNames = Set(type(of: realmObject).ignoredProperties())
-        } else {
-            ignoredPropNames = Set()
-        }
-        return Mirror(reflecting: object).children.filter { (prop: Mirror.Child) -> Bool in
-            guard let label = prop.label else {
-                return false
-            }
-            if ignoredPropNames.contains(label) {
-                return false
-            }
-            if let lazyBaseName = baseName(forLazySwiftProperty: label) {
-                if ignoredPropNames.contains(lazyBaseName) {
-                    return false
-                }
-                // Managed lazy property; not currently supported.
-                // FIXME: revisit this once Swift gets property behaviors/property macros.
-                throwRealmException("Lazy managed property '\(lazyBaseName)' is not allowed on a Realm Swift object"
-                    + " class. Either add the property to the ignored properties list or make it non-lazy.")
-            }
-            return true
-        }
-    }
-
-    internal class func getSwiftProperties(_ cls: RLMObjectBase.Type) -> [RLMProperty] {
-        _ = ObjectUtil.runOnce
-
-        let object = cls.init()
-
-        var indexedProperties: Set<String>!
-        let columnNames = cls._realmColumnNames()
-        if let realmObject = object as? Object {
-            indexedProperties = Set(type(of: realmObject).indexedProperties())
-        } else {
-            indexedProperties = Set()
-        }
-
-        return getNonIgnoredMirrorChildren(for: object).compactMap { prop in
-            guard let label = prop.label else { return nil }
-            var rawValue = prop.value
-            if let value = rawValue as? RealmEnum {
-                rawValue = type(of: value)._rlmToRawValue(value)
-            }
-
-            guard let value = rawValue as? _ManagedPropertyType else {
-                if class_getProperty(cls, label) != nil {
-                    throwRealmException("Property \(cls).\(label) is declared as \(type(of: prop.value)), which is not a supported managed Object property type. If it is not supposed to be a managed property, either add it to `ignoredProperties()` or do not declare it as `@objc dynamic`. See https://realm.io/docs/swift/latest/api/Classes/Object.html for more information.")
-                }
-                if prop.value as? RealmOptionalProtocol != nil {
-                    throwRealmException("Property \(cls).\(label) has unsupported RealmOptional type \(type(of: prop.value)). Extending RealmOptionalType with custom types is not currently supported. ")
-                }
-                return nil
-            }
-
-            RLMValidateSwiftPropertyName(label)
-            let valueType = type(of: value)
-
-            let property = RLMProperty()
-            property.name = label
-            property.indexed = indexedProperties.contains(label)
-            property.columnName = columnNames?[label]
-            valueType._rlmProperty(property)
-            value._rlmProperty(property)
-
-            if let objcProp = class_getProperty(cls, label) {
-                var count: UInt32 = 0
-                let attrs = property_copyAttributeList(objcProp, &count)!
-                defer {
-                    free(attrs)
-                }
-                var computed = true
-                for i in 0..<Int(count) {
-                    let attr = attrs[i]
-                    switch attr.name[0] {
-                    case Int8(UInt8(ascii: "R")): // Read only
-                        return nil
-                    case Int8(UInt8(ascii: "V")): // Ivar name
-                        computed = false
-                    case Int8(UInt8(ascii: "G")): // Getter name
-                        property.getterName = String(cString: attr.value)
-                    case Int8(UInt8(ascii: "S")): // Setter name
-                        property.setterName = String(cString: attr.value)
-                    default:
-                        break
-                    }
-                }
-
-                // If there's no ivar name and no ivar with the same name as
-                // the property then this is a computed property and we should
-                // implicitly ignore it
-                if computed && class_getInstanceVariable(cls, label) == nil {
-                    return nil
-                }
-            } else if valueType._rlmRequireObjc() {
-                // Implicitly ignore non-@objc dynamic properties
-                return nil
-            } else {
-                property.swiftIvar = class_getInstanceVariable(cls, label)
-            }
-
-            property.updateAccessors()
-            return property
-        }
+    if RLMObjectBaseRealm(object) == nil {
+        object.setValue(bridgedValue, forKey: key)
+    } else {
+        RLMDynamicValidatedSet(object, key, bridgedValue)
     }
 }
 

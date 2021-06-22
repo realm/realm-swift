@@ -40,6 +40,8 @@
                                                 @"\tindexed = NO;\n"
                                                 @"\tisPrimary = NO;\n"
                                                 @"\tarray = NO;\n"
+                                                @"\tset = NO;\n"
+                                                @"\tdictionary = NO;\n"
                                                 @"\toptional = YES;\n"
                                                 @"}");
 }
@@ -65,6 +67,9 @@ static RLMProperty *makeProperty(NSString *name, RLMPropertyType type, NSString 
             @"objectIdCol": makeProperty(@"objectIdCol", RLMPropertyTypeObjectId, nil, NO),
             @"decimalCol":  makeProperty(@"decimalCol", RLMPropertyTypeDecimal128, nil, NO),
             @"objectCol":   makeProperty(@"objectCol", RLMPropertyTypeObject, @"StringObject", YES),
+            @"uuidCol":     makeProperty(@"uuidCol", RLMPropertyTypeUUID, nil, NO),
+            @"anyCol":      makeProperty(@"anyCol", RLMPropertyTypeAny, nil, NO),
+            @"mixedObjectCol": makeProperty(@"mixedObjectCol", RLMPropertyTypeObject, @"MixedObject", YES),
         };
         XCTAssertEqual(objectSchema.properties.count, expectedProperties.allKeys.count);
         for (NSString *propertyName in expectedProperties) {
@@ -83,6 +88,7 @@ static RLMProperty *makeProperty(NSString *name, RLMPropertyType type, NSString 
             @"date":      makeProperty(@"date", RLMPropertyTypeDate, nil, YES),
             @"objectId":  makeProperty(@"objectId", RLMPropertyTypeObjectId, nil, YES),
             @"decimal":   makeProperty(@"decimal", RLMPropertyTypeDecimal128, nil, YES),
+            @"uuidCol":   makeProperty(@"uuidCol", RLMPropertyTypeUUID, nil, YES),
         };
         XCTAssertEqual(objectSchema.properties.count, expectedProperties.allKeys.count);
         for (NSString *propertyName in expectedProperties) {

@@ -20,6 +20,7 @@
 
 #import "RLMAnalytics.hpp"
 #import "RLMArray_Private.hpp"
+#import "RLMDictionary_Private.hpp"
 #import "RLMMigration_Private.h"
 #import "RLMObject_Private.h"
 #import "RLMObject_Private.hpp"
@@ -33,6 +34,7 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
+#import "RLMSet_Private.hpp"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
@@ -80,6 +82,13 @@ void RLMSetSkipBackupAttribute(bool value) {
 
 static void RLMAddSkipBackupAttributeToItemAtPath(std::string_view path) {
     [[NSURL fileURLWithPath:@(path.data())] setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:nil];
+}
+
+void RLMWaitForRealmToClose(NSString *path) {
+    NSString *lockfilePath = [path stringByAppendingString:@".lock"];
+    File lockfile(lockfilePath.UTF8String, File::mode_Update);
+    lockfile.set_fifo_path([path stringByAppendingString:@".management/lock.fifo"].UTF8String);
+    lockfile.lock_exclusive();
 }
 
 @implementation RLMRealmNotificationToken
@@ -815,6 +824,20 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
             @throw RLMException(@"Cannot delete objects from RLMArray<%@>: only RLMObjects can be deleted.",
                                 RLMTypeToString(array.type));
         }
+    } else if (auto set = RLMDynamicCast<RLMSet>(objects)) {
+        if (set.type != RLMPropertyTypeObject) {
+            @throw RLMException(@"Cannot delete objects from RLMSet<%@>: only RLMObjects can be deleted.",
+                                RLMTypeToString(set.type));
+        }
+    } else if (auto dictionary = RLMDynamicCast<RLMDictionary>(objects)) {
+        if (dictionary.type != RLMPropertyTypeObject) {
+            @throw RLMException(@"Cannot delete objects from RLMDictionary of type %@: only RLMObjects can be deleted.",
+                                RLMTypeToString(dictionary.type));
+        }
+        for (RLMObject *obj in dictionary.allValues) {
+            RLMDeleteObjectFromRealm(obj, self);
+        }
+        return;
     }
     for (RLMObject *obj in objects) {
         if (![obj isKindOfClass:RLMObjectBase.class]) {

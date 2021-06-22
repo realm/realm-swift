@@ -17,11 +17,17 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
-import RealmSwift
 import Realm.Private
 import Realm.Dynamic
 import Foundation
 
+#if DEBUG
+    @testable import RealmSwift
+#else
+    import RealmSwift
+#endif
+
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class ObjectSchemaInitializationTests: TestCase {
     func testAllValidTypes() {
         let object = SwiftObject()
@@ -86,6 +92,22 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertFalse(dateCol!.isOptional)
         XCTAssertNil(dateCol!.objectClassName)
 
+        let uuidCol = objectSchema["uuidCol"]
+        XCTAssertNotNil(uuidCol)
+        XCTAssertEqual(uuidCol!.name, "uuidCol")
+        XCTAssertEqual(uuidCol!.type, PropertyType.UUID)
+        XCTAssertFalse(uuidCol!.isIndexed)
+        XCTAssertFalse(uuidCol!.isOptional)
+        XCTAssertNil(uuidCol!.objectClassName)
+
+        let anyCol = objectSchema["anyCol"]
+        XCTAssertNotNil(anyCol)
+        XCTAssertEqual(anyCol!.name, "anyCol")
+        XCTAssertEqual(anyCol!.type, PropertyType.any)
+        XCTAssertFalse(anyCol!.isIndexed)
+        XCTAssertFalse(anyCol!.isOptional)
+        XCTAssertNil(anyCol!.objectClassName)
+
         let objectCol = objectSchema["objectCol"]
         XCTAssertNotNil(objectCol)
         XCTAssertEqual(objectCol!.name, "objectCol")
@@ -103,14 +125,32 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertFalse(arrayCol!.isOptional)
         XCTAssertEqual(objectCol!.objectClassName!, "SwiftBoolObject")
 
+        let setCol = objectSchema["setCol"]
+        XCTAssertNotNil(setCol)
+        XCTAssertEqual(setCol!.name, "setCol")
+        XCTAssertEqual(setCol!.type, PropertyType.object)
+        XCTAssertTrue(setCol!.isSet)
+        XCTAssertFalse(setCol!.isIndexed)
+        XCTAssertFalse(setCol!.isOptional)
+        XCTAssertEqual(setCol!.objectClassName!, "SwiftBoolObject")
+
         let dynamicArrayCol = SwiftCompanyObject().objectSchema["employees"]
         XCTAssertNotNil(dynamicArrayCol)
         XCTAssertEqual(dynamicArrayCol!.name, "employees")
         XCTAssertEqual(dynamicArrayCol!.type, PropertyType.object)
         XCTAssertTrue(dynamicArrayCol!.isArray)
         XCTAssertFalse(dynamicArrayCol!.isIndexed)
-        XCTAssertFalse(arrayCol!.isOptional)
+        XCTAssertFalse(dynamicArrayCol!.isOptional)
         XCTAssertEqual(dynamicArrayCol!.objectClassName!, "SwiftEmployeeObject")
+
+        let dynamicSetCol = SwiftCompanyObject().objectSchema["employeeSet"]
+        XCTAssertNotNil(dynamicSetCol)
+        XCTAssertEqual(dynamicSetCol!.name, "employeeSet")
+        XCTAssertEqual(dynamicSetCol!.type, PropertyType.object)
+        XCTAssertTrue(dynamicSetCol!.isSet)
+        XCTAssertFalse(dynamicSetCol!.isIndexed)
+        XCTAssertFalse(dynamicSetCol!.isOptional)
+        XCTAssertEqual(dynamicSetCol!.objectClassName!, "SwiftEmployeeObject")
     }
 
     func testInvalidObjects() {
@@ -181,7 +221,7 @@ class ObjectSchemaInitializationTests: TestCase {
 
         let types = Set(schema.properties.map { $0.type })
         XCTAssertEqual(types, Set([.string, .string, .data, .date, .object, .int,
-                                   .float, .double, .bool, .decimal128, .objectId]))
+                                   .float, .double, .bool, .decimal128, .objectId, .UUID]))
     }
 
     func testImplicitlyUnwrappedOptionalsAreParsedAsOptionals() {
@@ -193,6 +233,7 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertTrue(schema["optDateCol"]!.isOptional)
         XCTAssertTrue(schema["optDecimalCol"]!.isOptional)
         XCTAssertTrue(schema["optObjectIdCol"]!.isOptional)
+        XCTAssertTrue(schema["optUuidCol"]!.isOptional)
     }
 
     func testNonRealmOptionalTypesDeclaredAsRealmOptional() {
@@ -205,6 +246,124 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(schema.properties.count, 1)
         XCTAssertNotNil(schema["_urlBacking"])
     }
+
+    #if DEBUG // this test depends on @testable import
+    func assertType<T: _RealmSchemaDiscoverable>(_ value: T, _ propertyType: PropertyType,
+                                                 optional: Bool = false, list: Bool = false,
+                                                 set: Bool = false, objectType: String? = nil,
+                                                 hasSelectors: Bool = true, line: UInt = #line) {
+        let prop = RLMProperty(name: "property", value: value)
+        XCTAssertEqual(prop.type, propertyType, line: line)
+        XCTAssertEqual(prop.optional, optional, line: line)
+        XCTAssertEqual(prop.array, list, line: line)
+        XCTAssertEqual(prop.set, set, line: line)
+        XCTAssertEqual(prop.objectClassName, objectType, line: line)
+
+        if hasSelectors {
+            XCTAssertNotNil(prop.getterSel, line: line)
+            XCTAssertNotNil(prop.setterSel, line: line)
+        } else {
+            XCTAssertNil(prop.getterSel, line: line)
+            XCTAssertNil(prop.setterSel, line: line)
+        }
+    }
+
+    func testPropertyPopulation() {
+        assertType(Int(), .int)
+        assertType(Int8(), .int)
+        assertType(Int16(), .int)
+        assertType(Int32(), .int)
+        assertType(Int64(), .int)
+        assertType(Bool(), .bool)
+        assertType(Float(), .float)
+        assertType(Double(), .double)
+        assertType(String(), .string)
+        assertType(Data(), .data)
+        assertType(Date(), .date)
+        assertType(UUID(), .UUID)
+        assertType(Decimal128(), .decimal128)
+        assertType(ObjectId(), .objectId)
+
+        assertType(Optional<Int>.none, .int, optional: true)
+        assertType(Optional<Int8>.none, .int, optional: true)
+        assertType(Optional<Int16>.none, .int, optional: true)
+        assertType(Optional<Int32>.none, .int, optional: true)
+        assertType(Optional<Int64>.none, .int, optional: true)
+        assertType(Optional<Bool>.none, .bool, optional: true)
+        assertType(Optional<Float>.none, .float, optional: true)
+        assertType(Optional<Double>.none, .double, optional: true)
+        assertType(Optional<String>.none, .string, optional: true)
+        assertType(Optional<Data>.none, .data, optional: true)
+        assertType(Optional<Date>.none, .date, optional: true)
+        assertType(Optional<UUID>.none, .UUID, optional: true)
+        assertType(Optional<Decimal128>.none, .decimal128, optional: true)
+        assertType(Optional<ObjectId>.none, .objectId, optional: true)
+
+        assertType(RealmProperty<Int?>(), .int, optional: true, hasSelectors: false)
+        assertType(RealmProperty<Int8?>(), .int, optional: true, hasSelectors: false)
+        assertType(RealmProperty<Int16?>(), .int, optional: true, hasSelectors: false)
+        assertType(RealmProperty<Int32?>(), .int, optional: true, hasSelectors: false)
+        assertType(RealmProperty<Int64?>(), .int, optional: true, hasSelectors: false)
+        assertType(RealmProperty<Bool?>(), .bool, optional: true, hasSelectors: false)
+        assertType(RealmProperty<Float?>(), .float, optional: true, hasSelectors: false)
+        assertType(RealmProperty<Double?>(), .double, optional: true, hasSelectors: false)
+
+        assertType(List<Int>(), .int, list: true, hasSelectors: false)
+        assertType(List<Int8>(), .int, list: true, hasSelectors: false)
+        assertType(List<Int16>(), .int, list: true, hasSelectors: false)
+        assertType(List<Int32>(), .int, list: true, hasSelectors: false)
+        assertType(List<Int64>(), .int, list: true, hasSelectors: false)
+        assertType(List<Bool>(), .bool, list: true, hasSelectors: false)
+        assertType(List<Float>(), .float, list: true, hasSelectors: false)
+        assertType(List<Double>(), .double, list: true, hasSelectors: false)
+        assertType(List<String>(), .string, list: true, hasSelectors: false)
+        assertType(List<Data>(), .data, list: true, hasSelectors: false)
+        assertType(List<Date>(), .date, list: true, hasSelectors: false)
+        assertType(List<UUID>(), .UUID, list: true, hasSelectors: false)
+        assertType(List<Decimal128>(), .decimal128, list: true, hasSelectors: false)
+        assertType(List<ObjectId>(), .objectId, list: true, hasSelectors: false)
+
+        assertType(List<Int?>(), .int, optional: true, list: true, hasSelectors: false)
+        assertType(List<Int8?>(), .int, optional: true, list: true, hasSelectors: false)
+        assertType(List<Int16?>(), .int, optional: true, list: true, hasSelectors: false)
+        assertType(List<Int32?>(), .int, optional: true, list: true, hasSelectors: false)
+        assertType(List<Int64?>(), .int, optional: true, list: true, hasSelectors: false)
+        assertType(List<Bool?>(), .bool, optional: true, list: true, hasSelectors: false)
+        assertType(List<Float?>(), .float, optional: true, list: true, hasSelectors: false)
+        assertType(List<Double?>(), .double, optional: true, list: true, hasSelectors: false)
+        assertType(List<String?>(), .string, optional: true, list: true, hasSelectors: false)
+        assertType(List<Data?>(), .data, optional: true, list: true, hasSelectors: false)
+        assertType(List<Date?>(), .date, optional: true, list: true, hasSelectors: false)
+        assertType(List<UUID?>(), .UUID, optional: true, list: true, hasSelectors: false)
+        assertType(List<Decimal128?>(), .decimal128, optional: true, list: true, hasSelectors: false)
+        assertType(List<ObjectId?>(), .objectId, optional: true, list: true, hasSelectors: false)
+
+        assertType(MutableSet<Int?>(), .int, optional: true, set: true, hasSelectors: false)
+        assertType(MutableSet<Int8?>(), .int, optional: true, set: true, hasSelectors: false)
+        assertType(MutableSet<Int16?>(), .int, optional: true, set: true, hasSelectors: false)
+        assertType(MutableSet<Int32?>(), .int, optional: true, set: true, hasSelectors: false)
+        assertType(MutableSet<Int64?>(), .int, optional: true, set: true, hasSelectors: false)
+        assertType(MutableSet<Bool?>(), .bool, optional: true, set: true, hasSelectors: false)
+        assertType(MutableSet<Float?>(), .float, optional: true, set: true, hasSelectors: false)
+        assertType(MutableSet<Double?>(), .double, optional: true, set: true, hasSelectors: false)
+        assertType(MutableSet<String?>(), .string, optional: true, set: true, hasSelectors: false)
+        assertType(MutableSet<Data?>(), .data, optional: true, set: true, hasSelectors: false)
+        assertType(MutableSet<Date?>(), .date, optional: true, set: true, hasSelectors: false)
+        assertType(MutableSet<UUID?>(), .UUID, optional: true, set: true, hasSelectors: false)
+        assertType(MutableSet<Decimal128?>(), .decimal128, optional: true, set: true, hasSelectors: false)
+        assertType(MutableSet<ObjectId?>(), .objectId, optional: true, set: true, hasSelectors: false)
+
+        assertThrows(RLMProperty(name: "name", value: Object()),
+                     reason: "Object property 'name' must be marked as optional.")
+        assertThrows(RLMProperty(name: "name", value: List<Object?>()),
+                     reason: "List<RealmSwiftObject> property 'name' must not be marked as optional.")
+        assertThrows(RLMProperty(name: "name", value: MutableSet<Object?>()),
+                     reason: "MutableSet<RealmSwiftObject> property 'name' must not be marked as optional.")
+        assertType(Object?.none, .object, optional: true, objectType: "RealmSwiftObject")
+        assertType(List<Object>(), .object, list: true, objectType: "RealmSwiftObject", hasSelectors: false)
+        assertType(MutableSet<Object>(), .object, set: true, objectType: "RealmSwiftObject", hasSelectors: false)
+    }
+    #endif // DEBUG
 }
 
 class SwiftFakeObject: Object {
@@ -264,6 +423,7 @@ class SwiftObjectWithNonOptionalLinkProperty: SwiftFakeObject {
 
 extension Set: RealmOptionalType { }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftObjectWithNonRealmOptionalType: SwiftFakeObject {
     let set = RealmOptional<Set<Int>>()
 }

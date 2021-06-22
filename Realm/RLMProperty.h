@@ -38,6 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol RLMDecimal128 @end
 /// :nodoc:
 @protocol RLMObjectId @end
+/// :nodoc:
+@protocol RLMUUID @end
 
 /// :nodoc:
 @interface NSNumber ()<RLMInt, RLMBool, RLMDouble, RLMFloat>
@@ -77,7 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL indexed;
 
 /**
- For `RLMObject` and `RLMArray` properties, the name of the class of object stored in the property.
+ For `RLMObject` and `RLMCollection` properties, the name of the class of object stored in the property.
  */
 @property (nonatomic, readonly, copy, nullable) NSString *objectClassName;
 
@@ -95,6 +97,21 @@ NS_ASSUME_NONNULL_BEGIN
  Indicates whether this property is an array.
  */
 @property (nonatomic, readonly) BOOL array;
+
+/**
+ Indicates whether this property is a set.
+ */
+@property (nonatomic, readonly) BOOL set;
+
+/**
+ Indicates whether this property is a dictionary.
+ */
+@property (nonatomic, readonly) BOOL dictionary;
+
+/**
+ Indicates whether this property is an array or set.
+ */
+@property (nonatomic, readonly) BOOL collection;
 
 #pragma mark - Methods
 

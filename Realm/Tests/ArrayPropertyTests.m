@@ -339,7 +339,8 @@
     XCTAssertTrue([obj.stringObj isKindOfClass:[RLMArray class]]);
     XCTAssertTrue([obj.dataObj isKindOfClass:[RLMArray class]]);
     XCTAssertTrue([obj.dateObj isKindOfClass:[RLMArray class]]);
-
+    XCTAssertTrue([obj.uuidObj isKindOfClass:[RLMArray class]]);
+    
     [obj.intObj addObject:@1];
     XCTAssertEqualObjects(obj.intObj[0], @1);
     XCTAssertThrows([obj.intObj addObject:@""]);
@@ -355,7 +356,8 @@
     XCTAssertTrue([obj.stringObj isKindOfClass:[RLMArray class]]);
     XCTAssertTrue([obj.dataObj isKindOfClass:[RLMArray class]]);
     XCTAssertTrue([obj.dateObj isKindOfClass:[RLMArray class]]);
-
+    XCTAssertTrue([obj.uuidObj isKindOfClass:[RLMArray class]]);
+    
     [obj.intObj addObject:@5];
     XCTAssertEqualObjects(obj.intObj.firstObject, @5);
     [realm cancelWriteTransaction];
@@ -914,8 +916,8 @@
     EmployeeObject *e2 = [PrimaryEmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
     EmployeeObject *e3 = [PrimaryEmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
     EmployeeObject *e4 = [PrimaryEmployeeObject createInRealm:realm withValue:@{@"name": @"D", @"age": @50, @"hired": @YES}];
-    PrimaryCompanyObject *c1 = [PrimaryCompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employees": @[e1, e2, e3, e2]}];
-    PrimaryCompanyObject *c2 = [PrimaryCompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG 2", @"employees": @[e1, e4]}];
+    PrimaryCompanyObject *c1 = [PrimaryCompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employees": @[e1, e2, e3, e2], @"employeeSet": @[]}];
+    PrimaryCompanyObject *c2 = [PrimaryCompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG 2", @"employees": @[e1, e4], @"employeeSet": @[]}];
 
     ArrayOfPrimaryCompanies *companies = [ArrayOfPrimaryCompanies createInRealm:realm withValue:@[@[c1, c2]]];
     [realm commitWriteTransaction];
@@ -1036,7 +1038,7 @@
 - (void)testSortByRenamedColumns {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    id value = @{@"array": @[@[@1, @"c"], @[@2, @"b"], @[@3, @"a"]]};
+    id value = @{@"array": @[@[@1, @"c"], @[@2, @"b"], @[@3, @"a"]], @"set": @[]};
     LinkToRenamedProperties1 *obj = [LinkToRenamedProperties1 createInRealm:realm withValue:value];
 
     // FIXME: sorting has to use the column names because the parsing is done by
@@ -1408,7 +1410,7 @@ static RLMArray<IntObject *> *managedTestArray() {
         RLMAssertThrowsWithReasonMatching(array[0] = io, @"thread");
         RLMAssertThrowsWithReasonMatching([array valueForKey:@"intCol"], @"thread");
         RLMAssertThrowsWithReasonMatching([array setValue:@1 forKey:@"intCol"], @"thread");
-        RLMAssertThrowsWithReasonMatching({for (__unused id obj in array);}, @"thread");
+        RLMAssertThrowsWithReasonMatching(({for (__unused id obj in array);}), @"thread");
     }];
     [realm cancelWriteTransaction];
 }
@@ -1451,7 +1453,7 @@ static RLMArray<IntObject *> *managedTestArray() {
     XCTAssertNoThrow(array[0] = io);
     XCTAssertNoThrow([array valueForKey:@"intCol"]);
     XCTAssertNoThrow([array setValue:@1 forKey:@"intCol"]);
-    XCTAssertNoThrow({for (__unused id obj in array);});
+    XCTAssertNoThrow(({for (__unused id obj in array);}));
 
     [realm cancelWriteTransaction];
     [realm invalidate];
@@ -1488,7 +1490,7 @@ static RLMArray<IntObject *> *managedTestArray() {
     RLMAssertThrowsWithReasonMatching(array[0] = io, @"invalidated");
     RLMAssertThrowsWithReasonMatching([array valueForKey:@"intCol"], @"invalidated");
     RLMAssertThrowsWithReasonMatching([array setValue:@1 forKey:@"intCol"], @"invalidated");
-    RLMAssertThrowsWithReasonMatching({for (__unused id obj in array);}, @"invalidated");
+    RLMAssertThrowsWithReasonMatching(({for (__unused id obj in array);}), @"invalidated");
 
     [realm cancelWriteTransaction];
 }
@@ -1515,7 +1517,7 @@ static RLMArray<IntObject *> *managedTestArray() {
     XCTAssertNoThrow([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
     XCTAssertNoThrow(array[0]);
     XCTAssertNoThrow([array valueForKey:@"intCol"]);
-    XCTAssertNoThrow({for (__unused id obj in array);});
+    XCTAssertNoThrow(({for (__unused id obj in array);}));
 
 
     RLMAssertThrowsWithReasonMatching([array addObject:io], @"write transaction");

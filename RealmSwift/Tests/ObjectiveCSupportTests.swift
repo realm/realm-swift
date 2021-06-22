@@ -45,6 +45,20 @@ class ObjectiveCSupportTests: TestCase {
         XCTAssertEqual(unsafeBitCast(rlmArray.firstObject(), to: SwiftObject.self).floatCol, 1.23)
         XCTAssertEqual(rlmArray.count, 1)
 
+        let set = MutableSet<SwiftObject>()
+        set.insert(SwiftObject())
+        let rlmSet = ObjectiveCSupport.convert(object: set)
+        XCTAssert(rlmSet.isKind(of: RLMSet<AnyObject>.self))
+        XCTAssertEqual(unsafeBitCast(rlmSet.allObjects[0], to: SwiftObject.self).floatCol, 1.23)
+        XCTAssertEqual(rlmSet.count, 1)
+
+        let map = Map<String, SwiftObject?>()
+        map["0"] = SwiftObject()
+        let rlmDictionary = ObjectiveCSupport.convert(object: map)
+        XCTAssert(rlmDictionary.isKind(of: RLMDictionary<AnyObject, AnyObject>.self))
+        XCTAssertEqual(unsafeBitCast(rlmDictionary.allValues[0], to: SwiftObject.self).floatCol, 1.23)
+        XCTAssertEqual(rlmDictionary.count, 1)
+
         let rlmRealm = ObjectiveCSupport.convert(object: realm)
         XCTAssert(rlmRealm.isKind(of: RLMRealm.self))
         XCTAssertEqual(rlmRealm.allObjects("SwiftObject").count, 1)
@@ -94,5 +108,27 @@ class ObjectiveCSupportTests: TestCase {
         XCTAssertEqual(realm.configuration.deleteRealmIfMigrationNeeded,
                        ObjectiveCSupport.convert(object: realm.configuration).deleteRealmIfMigrationNeeded,
                        "Configuration.deleteRealmIfMigrationNeeded must be equal to RLMConfiguration.deleteRealmIfMigrationNeeded")
+    }
+
+    func testAnyRealmValueSupport() {
+        let obj = SwiftObject()
+        let expected: [(RLMValue, AnyRealmValue)] = [
+            (NSNumber(1234), .int(1234)),
+            (NSNumber(value: true), .bool(true)),
+            (NSNumber(value: Float(1234.4567)), .float(1234.4567)),
+            (NSNumber(value: Double(1234.4567)), .double(1234.4567)),
+            (NSString("hello"), .string("hello")),
+            (NSData(data: Data.init(repeating: 0, count: 64)), .data(Data.init(repeating: 0, count: 64))),
+            (NSDate.init(timeIntervalSince1970: 1000000), .date(Date.init(timeIntervalSince1970: 1000000))),
+            (try! RLMObjectId(string: "60425fff91d7a195d5ddac1b"), .objectId(try! ObjectId(string: "60425fff91d7a195d5ddac1b"))),
+            (RLMDecimal128(number: 1234.4567), .decimal128(Decimal128(floatLiteral: 1234.4567))),
+            (NSUUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89")!, .uuid(UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89")!)),
+            (obj, .object(obj))
+        ]
+
+        func testObjCSupport(_ objCValue: RLMValue, value: AnyRealmValue) {
+            XCTAssertEqual(ObjectiveCSupport.convert(value: objCValue), value)
+        }
+        expected.forEach { testObjCSupport($0.0, value: $0.1) }
     }
 }

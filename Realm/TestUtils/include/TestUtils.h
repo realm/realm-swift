@@ -31,3 +31,8 @@ FOUNDATION_EXTERN void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,
 // Return a fake sync user which can be used to create sync configurations
 // for tests which don't actually need to talk to the server
 FOUNDATION_EXTERN RLMUser *RLMDummyUser(void);
+
+@interface NSUUID (RLMUUIDCompareTests)
+- (NSComparisonResult)compare:(NSUUID *)other;
+@end
+

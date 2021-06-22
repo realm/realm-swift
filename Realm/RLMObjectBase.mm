@@ -21,14 +21,14 @@
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
 #import "RLMDecimal128.h"
-#import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObservation.hpp"
-#import "RLMOptionalBase.h"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMSet_Private.hpp"
+#import "RLMSwiftCollectionBase.h"
 #import "RLMSwiftSupport.h"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
@@ -48,15 +48,15 @@ static bool isManagedAccessorClass(Class cls) {
     return strncmp(className, accessorClassPrefix, sizeof(accessorClassPrefix) - 1) == 0;
 }
 
-static bool maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
+static void maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
     Class cls = obj.class;
     if (isManagedAccessorClass(cls)) {
-        return false;
+        return;
     }
 
     obj->_objectSchema = [cls sharedSchema];
     if (!obj->_objectSchema) {
-        return false;
+        return;
     }
 
     // set default values
@@ -69,14 +69,12 @@ static bool maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
 
     // set unmanaged accessor class
     object_setClass(obj, obj->_objectSchema.unmanagedClass);
-    return true;
 }
 
 @interface RLMObjectBase () <RLMThreadConfined, RLMThreadConfined_Private>
 @end
 
 @implementation RLMObjectBase
-// unmanaged init
 - (instancetype)init {
     if ((self = [super init])) {
         maybeInitObjectSchemaForUnmanaged(self);
@@ -111,7 +109,15 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
     }
     if (prop.type == RLMPropertyTypeObject) {
         Class objectClass = schema[prop.objectClassName].objectClass;
-        if (prop.array) {
+        if (prop.dictionary) {
+            NSMutableDictionary *ret = [[NSMutableDictionary alloc] init];
+            for (id key in obj) {
+                id val = coerceToObjectType(obj[key], objectClass, schema);
+                [ret setObject:val forKey:key];
+            }
+            return ret;
+        }
+        else if (prop.collection) {
             NSMutableArray *ret = [[NSMutableArray alloc] init];
             for (id el in obj) {
                 [ret addObject:coerceToObjectType(el, objectClass, schema)];
@@ -120,7 +126,7 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
         }
         return coerceToObjectType(obj, objectClass, schema);
     }
-    else if (prop.type == RLMPropertyTypeDecimal128 && !prop.array) {
+    else if (prop.type == RLMPropertyTypeDecimal128 && !prop.collection) {
         return [[RLMDecimal128 alloc] initWithValue:obj];
     }
     return obj;
@@ -185,11 +191,8 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 // Generic Swift properties can't be dynamic, so KVO doesn't work for them by default
 - (id)valueForUndefinedKey:(NSString *)key {
     RLMProperty *prop = _objectSchema[key];
-    if (Class accessor = prop.swiftAccessor) {
-        return [accessor get:(char *)(__bridge void *)self + ivar_getOffset(prop.swiftIvar)];
-    }
-    if (Ivar ivar = prop.swiftIvar) {
-        return RLMCoerceToNil(object_getIvar(self, ivar));
+    if (Class swiftAccessor = prop.swiftAccessor) {
+        return RLMCoerceToNil([swiftAccessor get:prop on:self]);
     }
     return [super valueForUndefinedKey:key];
 }
@@ -197,23 +200,18 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key {
     value = RLMCoerceToNil(value);
     RLMProperty *property = _objectSchema[key];
-    if (Ivar ivar = property.swiftIvar) {
-        if (property.array) {
-            value = RLMAsFastEnumeration(value);
-            RLMArray *array = [object_getIvar(self, ivar) _rlmArray];
-            [array removeAllObjects];
-
-            if (value) {
-                [array addObjects:validatedObjectForProperty(value, _objectSchema, property,
-                                                             RLMSchema.partialPrivateSharedSchema)];
-            }
+    if (property.collection) {
+        if (id enumerable = RLMAsFastEnumeration(value)) {
+            value = validatedObjectForProperty(value, _objectSchema, property,
+                                               RLMSchema.partialPrivateSharedSchema);
         }
-        else if (property.optional) {
-            RLMSetOptional(object_getIvar(self, ivar), value);
-        }
-        return;
     }
-    [super setValue:value forUndefinedKey:key];
+    if (auto swiftAccessor = property.swiftAccessor) {
+        [swiftAccessor set:property on:self to:value];
+    }
+    else {
+        [super setValue:value forUndefinedKey:key];
+    }
 }
 
 // overridden at runtime per-class for performance
@@ -294,7 +292,7 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 
 - (BOOL)isInvalidated {
     // if not unmanaged and our accessor has been detached, we have been deleted
-    return self.class == _objectSchema.accessorClass && !_row.is_valid();
+    return _info && !_row.is_valid();
 }
 
 - (BOOL)isEqual:(id)object {
@@ -358,6 +356,14 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
         return obj;
     }
     return [super mutableArrayValueForKey:key];
+}
+
+- (id)mutableSetValueForKey:(NSString *)key {
+    id obj = [self valueForKey:key];
+    if ([obj isKindOfClass:[RLMSet class]]) {
+        return obj;
+    }
+    return [super mutableSetValueForKey:key];
 }
 
 - (void)addObserver:(id)observer

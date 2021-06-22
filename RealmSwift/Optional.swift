@@ -43,14 +43,15 @@ extension Bool: RealmOptionalType {}
 
  To change the underlying value stored by a `RealmOptional` instance, mutate the instance's `value` property.
  */
-public final class RealmOptional<Value: RealmOptionalType>: RLMOptionalBase {
+@available(*, deprecated, renamed: "RealmProperty", message: "RealmOptional<T> has been deprecated, use RealmProperty<T?> instead.")
+public final class RealmOptional<Value: RealmOptionalType>: RLMSwiftValueStorage {
     /// The value the optional represents.
     public var value: Value? {
         get {
-            return RLMGetOptional(self).map(dynamicBridgeCast)
+            return RLMGetSwiftValueStorage(self).map(dynamicBridgeCast)
         }
         set {
-            RLMSetOptional(self, newValue.map(dynamicBridgeCast))
+            RLMSetSwiftValueStorage(self, newValue.map(dynamicBridgeCast))
         }
     }
 
@@ -65,12 +66,14 @@ public final class RealmOptional<Value: RealmOptionalType>: RLMOptionalBase {
     }
 }
 
+@available(*, deprecated, message: "RealmOptional has been deprecated, use RealmProperty<T?> instead.")
 extension RealmOptional: Equatable where Value: Equatable {
     public static func == (lhs: RealmOptional<Value>, rhs: RealmOptional<Value>) -> Bool {
         return lhs.value == rhs.value
     }
 }
 
+@available(*, deprecated, message: "RealmOptional has been deprecated, use RealmProperty<T?> instead.")
 extension RealmOptional: Codable where Value: Codable {
     public convenience init(from decoder: Decoder) throws {
         self.init()
@@ -86,4 +89,5 @@ extension RealmOptional: Codable where Value: Codable {
 }
 
 internal protocol RealmOptionalProtocol { }
+@available(*, deprecated, message: "RealmOptional has been deprecated, use RealmProperty<T?> instead.")
 extension RealmOptional: RealmOptionalProtocol { }

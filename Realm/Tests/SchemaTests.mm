@@ -55,9 +55,9 @@
 @implementation SchemaTestClassSecondChild
 @end
 
-RLM_ARRAY_TYPE(SchemaTestClassBase)
-RLM_ARRAY_TYPE(SchemaTestClassFirstChild)
-RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
+RLM_COLLECTION_TYPE(SchemaTestClassBase)
+RLM_COLLECTION_TYPE(SchemaTestClassFirstChild)
+RLM_COLLECTION_TYPE(SchemaTestClassSecondChild)
 
 @interface SchemaTestClassLink : RLMObject
 @property SchemaTestClassBase *base;
@@ -67,6 +67,11 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @property RLM_GENERIC_ARRAY(SchemaTestClassBase) *baseArray;
 @property RLM_GENERIC_ARRAY(SchemaTestClassFirstChild) *childArray;
 @property RLM_GENERIC_ARRAY(SchemaTestClassSecondChild) *secondChildArray;
+
+@property RLM_GENERIC_SET(SchemaTestClassBase) *baseSet;
+@property RLM_GENERIC_SET(SchemaTestClassFirstChild) *childSet;
+@property RLM_GENERIC_SET(SchemaTestClassSecondChild) *secondChildSet;
+
 @end
 @implementation SchemaTestClassLink
 @end
@@ -81,7 +86,7 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 }
 @end
 
-RLM_ARRAY_TYPE(NonDefaultObject);
+RLM_COLLECTION_TYPE(NonDefaultObject);
 
 @interface NonDefaultArrayObject : RLMObject
 @property RLM_GENERIC_ARRAY(NonDefaultObject) *array;
@@ -235,7 +240,7 @@ RLM_ARRAY_TYPE(NonDefaultObject);
 }
 @end
 
-RLM_ARRAY_TYPE(SchemaTestsLinkSource)
+RLM_COLLECTION_TYPE(SchemaTestsLinkSource)
 
 @interface InvalidReadWriteLinkingObjectsProperty : FakeObject
 @property RLMLinkingObjects *linkingObjects;
@@ -269,7 +274,7 @@ RLM_ARRAY_TYPE(SchemaTestsLinkSource)
 
 @end
 
-RLM_ARRAY_TYPE(NotARealClass)
+RLM_COLLECTION_TYPE(NotARealClass)
 
 @interface InvalidLinkingObjectsPropertyProtocol : FakeObject
 @property (readonly) RLMLinkingObjects<NotARealClass> *linkingObjects;
@@ -427,11 +432,13 @@ RLM_ARRAY_TYPE(NotARealClass)
                                                             @"secondChildCol": @"IntObject"});
         checkSchema(schema, @"SchemaTestClassLink", @{@"base": @"SchemaTestClassBase",
                                                       @"baseArray": @"SchemaTestClassBase",
+                                                      @"baseSet": @"SchemaTestClassBase",
                                                       @"child": @"SchemaTestClassFirstChild",
                                                       @"childArray": @"SchemaTestClassFirstChild",
+                                                      @"childSet": @"SchemaTestClassFirstChild",
                                                       @"secondChild": @"SchemaTestClassSecondChild",
-                                                      @"secondChildArray": @"SchemaTestClassSecondChild"});
-
+                                                      @"secondChildArray": @"SchemaTestClassSecondChild",
+                                                      @"secondChildSet": @"SchemaTestClassSecondChild"});
 
         // Test creating objects of each class
         [self deleteFiles];
@@ -460,6 +467,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     NSArray *expectedTypes = @[@"AllTypesObject",
                                @"LinkToAllTypesObject",
                                @"StringObject",
+                               @"MixedObject",
                                @"IntObject"];
 
     NSString *unexpectedType = @"__$ThisTypeShouldNotOccur$__";
@@ -546,6 +554,8 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tintCol {\n"
@@ -553,6 +563,8 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tfloatCol {\n"
@@ -560,6 +572,8 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tdoubleCol {\n"
@@ -567,6 +581,8 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tstringCol {\n"
@@ -574,6 +590,8 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tbinaryCol {\n"
@@ -581,6 +599,8 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tdateCol {\n"
@@ -588,6 +608,8 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tcBoolCol {\n"
@@ -595,6 +617,8 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tlongCol {\n"
@@ -602,6 +626,8 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tdecimalCol {\n"
@@ -609,6 +635,8 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tobjectIdCol {\n"
@@ -616,6 +644,17 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
+                                              @"\t\t\toptional = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tuuidCol {\n"
+                                              @"\t\t\ttype = uuid;\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tobjectCol {\n"
@@ -625,7 +664,29 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = YES;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tmixedObjectCol {\n"
+                                              @"\t\t\ttype = object;\n"
+                                              @"\t\t\tobjectClassName = MixedObject;\n"
+                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
+                                              @"\t\t\toptional = YES;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tanyCol {\n"
+                                              @"\t\t\ttype = mixed;\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
+                                              @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tlinkingObjectsCol {\n"
                                               @"\t\t\ttype = linking objects;\n"
@@ -634,6 +695,8 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = YES;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
@@ -643,6 +706,8 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
@@ -652,6 +717,8 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
+                                              @"\t\t\tset = NO;\n"
+                                              @"\t\t\tdictionary = NO;\n"
                                               @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
