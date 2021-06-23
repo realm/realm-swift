@@ -509,10 +509,14 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 }
 
 - (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
-    if (!_backingCollection) {
-        _backingCollection = [NSMutableArray new];
+    try {
+        if (!_backingCollection) {
+            _backingCollection = [NSMutableArray new];
+        }
+        return [_backingCollection objectsAtIndexes:indexes];
+    } catch(...) {
+        return nil;
     }
-    return [_backingCollection objectsAtIndexes:indexes];
 }
 
 - (BOOL)isEqual:(id)object {

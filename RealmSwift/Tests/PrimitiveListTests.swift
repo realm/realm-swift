@@ -557,6 +557,14 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
 
     }
 
+    func testObjectsAtIndexes() {
+        assertThrows(array.objects(at: [1,2,3]), reason: "Indexes for List are out of bounds.")
+        array.append(objectsIn: values)
+        let objs = array.objects(at: [1,2])
+        XCTAssertEqual(objs.first, objs.first)
+        XCTAssertEqual(objs.last, objs.last)
+    }
+
     func testValueForKey() {
         XCTAssertEqual(array.value(forKey: "self").count, 0)
         array.append(objectsIn: values)
