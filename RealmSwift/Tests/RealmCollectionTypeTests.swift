@@ -215,8 +215,8 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testObjectsAtIndexes() {
-        assertThrows(collection.objects(at: [0,10]))
-        let objs = collection.objects(at: [0,1])
+        assertThrows(collection.objects(at: [0, 10]))
+        let objs = collection.objects(at: [0, 1])
         assertEqual(str1, objs[0])
         assertEqual(str2, objs[1])
     }
