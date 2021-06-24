@@ -48,15 +48,15 @@ static bool isManagedAccessorClass(Class cls) {
     return strncmp(className, accessorClassPrefix, sizeof(accessorClassPrefix) - 1) == 0;
 }
 
-static bool maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
+static void maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
     Class cls = obj.class;
     if (isManagedAccessorClass(cls)) {
-        return false;
+        return;
     }
 
     obj->_objectSchema = [cls sharedSchema];
     if (!obj->_objectSchema) {
-        return false;
+        return;
     }
 
     // set default values
@@ -69,14 +69,12 @@ static bool maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
 
     // set unmanaged accessor class
     object_setClass(obj, obj->_objectSchema.unmanagedClass);
-    return true;
 }
 
 @interface RLMObjectBase () <RLMThreadConfined, RLMThreadConfined_Private>
 @end
 
 @implementation RLMObjectBase
-// unmanaged init
 - (instancetype)init {
     if ((self = [super init])) {
         maybeInitObjectSchemaForUnmanaged(self);
@@ -294,7 +292,7 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 
 - (BOOL)isInvalidated {
     // if not unmanaged and our accessor has been detached, we have been deleted
-    return self.class == _objectSchema.accessorClass && !_row.is_valid();
+    return _info && !_row.is_valid();
 }
 
 - (BOOL)isEqual:(id)object {

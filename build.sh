@@ -262,7 +262,7 @@ build_docs() {
       --module-version "${version}" \
       --xcodebuild-arguments "${xcodebuild_arguments}" \
       --module "${module}" \
-      --root-url "https://realm.io/docs/${language}/${version}/api/" \
+      --root-url "https://docs.mongodb.com/realm-sdks/${language}/${version}/" \
       --output "docs/${language}_output" \
       --head "$(cat docs/custom_head.html)" \
       --exclude 'RealmSwift/Impl/*'
@@ -1100,6 +1100,8 @@ case "$COMMAND" in
             export REALM_SKIP_PRELAUNCH=1
 
             if [[ "$target" = *"server"* ]] || [[ "$target" = "swiftpm"* ]]; then
+                mkdir .baas
+                mv build/stitch .baas
                 source "$(brew --prefix nvm)/nvm.sh" --no-use
                 nvm install 13.14.0
                 sh build.sh setup-baas
@@ -1351,7 +1353,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 12.5.
+* Carthage release for Swift is built with Xcode 12.5.1.
 * CocoaPods: 1.10 or later.
 * Xcode: 12.2-13.0 beta 1.
 

@@ -48,11 +48,15 @@ private func baseName(forLazySwiftProperty name: String) -> String? {
 internal extension RLMProperty {
     convenience init(name: String, value: _RealmSchemaDiscoverable) {
         let valueType = Swift.type(of: value)
-        self.init(name: name, createSelectors: valueType._rlmRequireObjc)
+        self.init()
+        self.name = name
         self.type = valueType._rlmType
         self.optional = valueType._rlmOptional
         valueType._rlmPopulateProperty(self)
         value._rlmPopulateProperty(self)
+        if valueType._rlmRequireObjc {
+            self.updateAccessors()
+        }
     }
 }
 

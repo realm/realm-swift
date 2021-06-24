@@ -546,6 +546,9 @@ void addMethod(Class cls, __unsafe_unretained RLMProperty *const prop,
                id (*getter)(RLMProperty *, const char *),
                id (*setter)(RLMProperty *, const char *)) {
     SEL sel = prop.getterSel;
+    if (!sel) {
+        return;
+    }
     auto getterMethod = class_getInstanceMethod(cls, sel);
     if (!getterMethod) {
         return;
@@ -595,6 +598,20 @@ Class createAccessorClass(Class objectClass,
 
     return accClass;
 }
+
+bool requiresUnmanagedAccessor(RLMObjectSchema *schema) {
+    for (RLMProperty *prop in schema.properties) {
+        if (prop.collection && !prop.swiftIvar) {
+            return true;
+        }
+    }
+    for (RLMProperty *prop in schema.computedProperties) {
+        if (prop.collection && !prop.swiftIvar) {
+            return true;
+        }
+    }
+    return false;
+}
 } // anonymous namespace
 
 #pragma mark - Public Interface
@@ -604,6 +621,9 @@ Class RLMManagedAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *
 }
 
 Class RLMUnmanagedAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
+    if (!requiresUnmanagedAccessor(schema)) {
+        return objectClass;
+    }
     return createAccessorClass(objectClass, schema,
                                [@"RLM:Unmanaged " stringByAppendingString:schema.className].UTF8String,
                                unmanagedGetter, unmanagedSetter);

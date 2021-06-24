@@ -417,7 +417,7 @@ public class RealmServer: NSObject {
         .deletingLastPathComponent() // RealmServer.swift
         .deletingLastPathComponent() // ObjectServerTests
         .deletingLastPathComponent() // Realm
-    private static let buildDir = rootUrl.appendingPathComponent("build")
+    private static let buildDir = rootUrl.appendingPathComponent(".baas")
     private static let binDir = buildDir.appendingPathComponent("bin")
 
     /// The directory where mongo stores its files. This is a unique value so that
@@ -433,9 +433,7 @@ public class RealmServer: NSObject {
 
     /// Check if the BaaS files are present and we can run the server
     @objc public class func haveServer() -> Bool {
-        let goDir = RealmServer.rootUrl
-            .appendingPathComponent("build")
-            .appendingPathComponent("stitch")
+        let goDir = RealmServer.buildDir.appendingPathComponent("stitch")
         return FileManager.default.fileExists(atPath: goDir.path)
     }
 
@@ -518,12 +516,11 @@ public class RealmServer: NSObject {
     }
 
     private func launchServerProcess() throws {
-        let buildDir = RealmServer.rootUrl.appendingPathComponent("build")
-        let binDir = buildDir.appendingPathComponent("bin").path
-        let libDir = buildDir.appendingPathComponent("lib").path
+        let binDir = Self.buildDir.appendingPathComponent("bin").path
+        let libDir = Self.buildDir.appendingPathComponent("lib").path
         let binPath = "$PATH:\(binDir)"
 
-        let stitchRoot = RealmServer.rootUrl.path + "/build/go/src/github.com/10gen/stitch"
+        let stitchRoot = RealmServer.buildDir.path + "/go/src/github.com/10gen/stitch"
 
         // create the admin user
         let userProcess = Process()

@@ -77,9 +77,6 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
                                  property:(objc_property_t)property
                                  instance:(RLMObjectBase *)objectInstance;
 
-- (instancetype)initWithName:(NSString *)name
-             createSelectors:(BOOL)createSelectors;
-
 - (void)updateAccessors;
 
 // private setters
