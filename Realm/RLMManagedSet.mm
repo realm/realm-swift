@@ -525,11 +525,12 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSet *, RLMCollectionChange *, NSError *))block {
-    return RLMAddNotificationBlock(self, block, nil);
+    return RLMAddNotificationBlock(self, nil, block, nil);
 }
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSet *, RLMCollectionChange *, NSError *))block queue:(dispatch_queue_t)queue {
-    return RLMAddNotificationBlock(self, block, queue);
+    return RLMAddNotificationBlock(self, nil, block, queue);
 }
+// TODO: need keypaths version
 #pragma clang diagnostic pop
 
 realm::object_store::Set& RLMGetBackingCollection(RLMManagedSet *self) {

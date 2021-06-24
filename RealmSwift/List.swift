@@ -412,11 +412,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
     public func observe(keyPaths: [String]? = nil,
                         on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<List>) -> Void) -> NotificationToken {
-<<<<<<< HEAD
-        return _rlmArray.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
-=======
-        return rlmArray.addNotificationBlock(wrapObserveBlock(block), queue: queue)
->>>>>>> master
+        return rlmArray.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
     }
 
     // MARK: Frozen Objects
@@ -537,11 +533,7 @@ extension List: RealmCollection {
                          _ queue: DispatchQueue?,
                          _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
         -> NotificationToken {
-<<<<<<< HEAD
-            return _rlmArray.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
-=======
-            return rlmArray.addNotificationBlock(wrapObserveBlock(block), queue: queue)
->>>>>>> master
+            return rlmArray.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
     }
 }
 
