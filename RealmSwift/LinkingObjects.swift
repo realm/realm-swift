@@ -117,6 +117,8 @@ import Realm
     /**
      Returns an array containing the objects in the linking objects at the indexes specified by a given index set.
 
+     - warning Throws if an index supplied in the IndexSet is out of bounds.
+
      - parameter indexes: The indexes in the linking objects to select objects from.
      */
     public func objects(at indexes: IndexSet) -> [Element] {

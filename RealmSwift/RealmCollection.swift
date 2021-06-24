@@ -275,6 +275,8 @@ public protocol RealmCollection: RealmCollectionBase {
     /**
      Returns an array containing the objects in the collection at the indexes specified by a given index set.
 
+     - warning Throws if an index supplied in the IndexSet is out of bounds.
+
      - parameter indexes: The indexes in the collection to select objects from.
      */
     func objects(at indexes: IndexSet) -> [Element]
@@ -842,6 +844,8 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
 
     /**
      Returns an array containing the objects in the collection at the indexes specified by a given index set.
+
+     - warning Throws if an index supplied in the IndexSet is out of bounds.
 
      - parameter indexes: The indexes in the collection to select objects from.
      */

@@ -117,6 +117,8 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
     /**
      Returns an array containing the objects in the array at the indexes specified by a given index set.
 
+     - warning Throws if an index supplied in the IndexSet is out of bounds.
+
      - parameter indexes: The indexes in the list to select objects from.
      */
     public func objects(at indexes: IndexSet) -> [Element] {
