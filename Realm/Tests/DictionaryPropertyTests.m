@@ -1495,8 +1495,8 @@ static RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *managedTest
 
 - (void)testAddEntriesFromDictionaryUnmanaged {
     RLMDictionary<NSString *, StringObject *> *dict = [[DictionaryPropertyObject alloc] init].stringDictionary;
-    RLMAssertThrowsWithReason([dict addEntriesFromDictionary:@[@"string"]],
-                              @"Cannot add entries from object of class 'NSConstantArray'");
+    RLMAssertThrowsWithReasonMatching([dict addEntriesFromDictionary:@[@"string"]],
+                                      @"Cannot add entries from object of class '.*Array.*'");
     RLMAssertThrowsWithReason([dict addEntriesFromDictionary:@{@"": [[IntObject alloc] init]}],
                               @"Value of type 'IntObject' does not match RLMDictionary value type 'StringObject'.");
     RLMAssertThrowsWithReason([dict addEntriesFromDictionary:@{@1: [[StringObject alloc] init]}],
@@ -1537,8 +1537,8 @@ static RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *managedTest
     [dict.realm beginWriteTransaction];
     [dict removeAllObjects];
 
-    RLMAssertThrowsWithReason([dict addEntriesFromDictionary:@[@"string"]],
-                              @"Cannot add entries from object of class 'NSConstantArray'");
+    RLMAssertThrowsWithReasonMatching([dict addEntriesFromDictionary:@[@"string"]],
+                                      @"Cannot add entries from object of class '.*Array.*'");
     RLMAssertThrowsWithReason([dict addEntriesFromDictionary:@{@"": [[StringObject alloc] init]}],
                               @"Value of type 'StringObject' does not match RLMDictionary value type 'IntObject'.");
     RLMAssertThrowsWithReason([dict addEntriesFromDictionary:@{@1: [[IntObject alloc] init]}],
@@ -1578,8 +1578,8 @@ static RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *managedTest
 
 - (void)testSetDictionaryUnmanaged {
     RLMDictionary<NSString *, StringObject *> *dict = [[DictionaryPropertyObject alloc] init].stringDictionary;
-    RLMAssertThrowsWithReason([dict setDictionary:@[@"string"]],
-                              @"Cannot set dictionary to object of class 'NSConstantArray'");
+    RLMAssertThrowsWithReasonMatching([dict setDictionary:@[@"string"]],
+                                      @"Cannot set dictionary to object of class '.*Array.*'");
     RLMAssertThrowsWithReason([dict setDictionary:@{@"": [[IntObject alloc] init]}],
                               @"Value of type 'IntObject' does not match RLMDictionary value type 'StringObject'.");
     RLMAssertThrowsWithReason([dict setDictionary:@{@1: [[StringObject alloc] init]}],
@@ -1624,8 +1624,8 @@ static RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *managedTest
     [dict.realm beginWriteTransaction];
     [dict removeAllObjects];
 
-    RLMAssertThrowsWithReason([dict setDictionary:@[@"string"]],
-                              @"Cannot set dictionary to object of class 'NSConstantArray'");
+    RLMAssertThrowsWithReasonMatching([dict setDictionary:@[@"string"]],
+                                      @"Cannot set dictionary to object of class '.*Array.*'");
     RLMAssertThrowsWithReason([dict setDictionary:@{@"": [[StringObject alloc] init]}],
                               @"Value of type 'StringObject' does not match RLMDictionary value type 'IntObject'.");
     RLMAssertThrowsWithReason([dict setDictionary:@{@1: [[IntObject alloc] init]}],

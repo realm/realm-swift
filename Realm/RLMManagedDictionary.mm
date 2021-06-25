@@ -506,7 +506,6 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
             _realm.group.get_object(value.get_link()).remove();
         }
         _backingCollection.remove_all();
-
     });
 }
 
