@@ -184,6 +184,10 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 }
 
 - (void)setDictionary:(id)dictionary {
+    if (dictionary && ![dictionary respondsToSelector:@selector(enumerateKeysAndObjectsUsingBlock:)]) {
+        @throw RLMException(@"Cannot set dictionary to object of class '%@'", [dictionary className]);
+    }
+
     changeDictionary(self, ^{
         [_backingCollection removeAllObjects];
         [dictionary enumerateKeysAndObjectsUsingBlock:^(id key, id value, BOOL *) {
@@ -264,7 +268,7 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
         return;
     }
     if (![otherDictionary respondsToSelector:@selector(enumerateKeysAndObjectsUsingBlock:)]) {
-        @throw RLMException(@"Cannot add entries from the object of class '%@'", [otherDictionary className]);
+        @throw RLMException(@"Cannot add entries from object of class '%@'", [otherDictionary className]);
     }
 
     changeDictionary(self, ^{

@@ -408,28 +408,34 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
     }
 }
 
-- (void)setDictionary:(id)dictionary {
-    changeDictionary(self, ^{
-        RLMAccessorContext c(*_objectInfo);
-        _backingCollection.assign(c, dictionary);
-    });
-}
-
-- (void)addEntriesFromDictionary:(id)otherDictionary {
-    if (!otherDictionary) {
+- (void)mergeDictionary:(id)dictionary clear:(bool)clear {
+    if (!clear && !dictionary) {
         return;
     }
-    if (![otherDictionary respondsToSelector:@selector(enumerateKeysAndObjectsUsingBlock:)]) {
-        @throw RLMException(@"Cannot add entries from the object of class '%@'", [otherDictionary className]);
+    if (dictionary && ![dictionary respondsToSelector:@selector(enumerateKeysAndObjectsUsingBlock:)]) {
+        @throw RLMException(@"Cannot %@ object of class '%@'",
+                            clear ? @"set dictionary to" : @"add entries from",
+                            [dictionary className]);
     }
 
     changeDictionary(self, ^{
         RLMAccessorContext c(*_objectInfo);
-        [otherDictionary enumerateKeysAndObjectsUsingBlock:[&](id key, id value, BOOL *) {
+        if (clear) {
+            _backingCollection.remove_all();
+        }
+        [dictionary enumerateKeysAndObjectsUsingBlock:[&](id key, id value, BOOL *) {
             RLMDictionaryValidateMatchingObjectType(self, key, value);
             _backingCollection.insert(c, c.unbox<realm::StringData>(key), value);
         }];
     });
+}
+
+- (void)setDictionary:(id)dictionary {
+    [self mergeDictionary:dictionary clear:true];
+}
+
+- (void)addEntriesFromDictionary:(id)otherDictionary {
+    [self mergeDictionary:otherDictionary clear:false];
 }
 
 #pragma mark - KVC
