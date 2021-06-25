@@ -26,7 +26,7 @@
     
 @implementation DictionaryPropertyTests
 
--(void)testPopulateEmptyDictionary {
+- (void)testPopulateEmptyDictionary {
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
@@ -1491,6 +1491,180 @@ static RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *managedTest
         [dict removeObjectForKey:dict.allKeys.lastObject];
     }];
     XCTAssertEqual(frozen.count, 2);
+}
+
+- (void)testAddEntriesFromDictionaryUnmanaged {
+    RLMDictionary<NSString *, StringObject *> *dict = [[DictionaryPropertyObject alloc] init].stringDictionary;
+    RLMAssertThrowsWithReasonMatching([dict addEntriesFromDictionary:@[@"string"]],
+                                      @"Cannot add entries from object of class '.*Array.*'");
+    RLMAssertThrowsWithReason([dict addEntriesFromDictionary:@{@"": [[IntObject alloc] init]}],
+                              @"Value of type 'IntObject' does not match RLMDictionary value type 'StringObject'.");
+    RLMAssertThrowsWithReason([dict addEntriesFromDictionary:@{@1: [[StringObject alloc] init]}],
+                              @"Invalid key '1' of type '" RLMConstantInt "' for expected type 'string'.");
+
+    // Adding nil is a no-op
+    XCTAssertNoThrow([dict addEntriesFromDictionary:self.nonLiteralNil]);
+    XCTAssertEqual(dict.count, 0U);
+
+    // Add into empty adds those entries
+    [dict addEntriesFromDictionary:@{@"a": [[StringObject alloc] initWithValue:@[@"1"]],
+                                     @"b": [[StringObject alloc] initWithValue:@[@"2"]]}];
+    XCTAssertEqual(dict.count, 2U);
+    XCTAssertEqualObjects(dict[@"a"].stringCol, @"1");
+    XCTAssertEqualObjects(dict[@"b"].stringCol, @"2");
+
+    // Duplicate keys overwrite the old values and leave any non-duplicates
+    [dict addEntriesFromDictionary:@{@"a": [[StringObject alloc] initWithValue:@[@"3"]],
+                                     @"c": [[StringObject alloc] initWithValue:@[@"4"]]}];
+    XCTAssertEqual(dict.count, 3U);
+    XCTAssertEqualObjects(dict[@"a"].stringCol, @"3");
+    XCTAssertEqualObjects(dict[@"b"].stringCol, @"2");
+    XCTAssertEqualObjects(dict[@"c"].stringCol, @"4");
+
+    // Add from a RLMDictionary rather than a NSDictionary
+    RLMDictionary<NSString *, StringObject *> *dict2 = [[DictionaryPropertyObject alloc] init].stringDictionary;
+    dict2[@"d"] = [[StringObject alloc] initWithValue:@[@"5"]];
+    [dict addEntriesFromDictionary:dict2];
+    XCTAssertEqual(dict.count, 4U);
+    XCTAssertEqualObjects(dict[@"a"].stringCol, @"3");
+    XCTAssertEqualObjects(dict[@"b"].stringCol, @"2");
+    XCTAssertEqualObjects(dict[@"c"].stringCol, @"4");
+    XCTAssertEqualObjects(dict[@"d"].stringCol, @"5");
+}
+
+- (void)testAddEntriesFromDictionaryManaged {
+    RLMDictionary<NSString *, IntObject *> *dict = managedTestDictionary();
+    [dict.realm beginWriteTransaction];
+    [dict removeAllObjects];
+
+    RLMAssertThrowsWithReasonMatching([dict addEntriesFromDictionary:@[@"string"]],
+                                      @"Cannot add entries from object of class '.*Array.*'");
+    RLMAssertThrowsWithReason([dict addEntriesFromDictionary:@{@"": [[StringObject alloc] init]}],
+                              @"Value of type 'StringObject' does not match RLMDictionary value type 'IntObject'.");
+    RLMAssertThrowsWithReason([dict addEntriesFromDictionary:@{@1: [[IntObject alloc] init]}],
+                              @"Invalid key '1' of type '" RLMConstantInt "' for expected type 'string'.");
+
+    // Adding nil is a no-op
+    XCTAssertNoThrow([dict addEntriesFromDictionary:self.nonLiteralNil]);
+    XCTAssertEqual(dict.count, 0U);
+
+    // Add into empty adds those entries
+    [dict addEntriesFromDictionary:@{@"a": [[IntObject alloc] initWithValue:@[@1]],
+                                     @"b": [[IntObject alloc] initWithValue:@[@2]]}];
+    XCTAssertEqual(dict.count, 2U);
+    XCTAssertEqual(dict[@"a"].intCol, 1);
+    XCTAssertEqual(dict[@"b"].intCol, 2);
+
+    // Duplicate keys overwrite the old values and leave any non-duplicates
+    [dict addEntriesFromDictionary:@{@"a": [[IntObject alloc] initWithValue:@[@3]],
+                                     @"c": [[IntObject alloc] initWithValue:@[@4]]}];
+    XCTAssertEqual(dict.count, 3U);
+    XCTAssertEqual(dict[@"a"].intCol, 3);
+    XCTAssertEqual(dict[@"b"].intCol, 2);
+    XCTAssertEqual(dict[@"c"].intCol, 4);
+
+    // Add from a RLMDictionary rather than a NSDictionary
+    RLMDictionary<NSString *, IntObject *> *dict2 = [[DictionaryPropertyObject alloc] init].intObjDictionary;
+    dict2[@"d"] = [[IntObject alloc] initWithValue:@[@5]];
+    [dict addEntriesFromDictionary:dict2];
+    XCTAssertEqual(dict.count, 4U);
+    XCTAssertEqual(dict[@"a"].intCol, 3);
+    XCTAssertEqual(dict[@"b"].intCol, 2);
+    XCTAssertEqual(dict[@"c"].intCol, 4);
+    XCTAssertEqual(dict[@"d"].intCol, 5);
+
+    [dict.realm cancelWriteTransaction];
+}
+
+- (void)testSetDictionaryUnmanaged {
+    RLMDictionary<NSString *, StringObject *> *dict = [[DictionaryPropertyObject alloc] init].stringDictionary;
+    RLMAssertThrowsWithReasonMatching([dict setDictionary:@[@"string"]],
+                                      @"Cannot set dictionary to object of class '.*Array.*'");
+    RLMAssertThrowsWithReason([dict setDictionary:@{@"": [[IntObject alloc] init]}],
+                              @"Value of type 'IntObject' does not match RLMDictionary value type 'StringObject'.");
+    RLMAssertThrowsWithReason([dict setDictionary:@{@1: [[StringObject alloc] init]}],
+                              @"Invalid key '1' of type '" RLMConstantInt "' for expected type 'string'.");
+
+    // Set into empty adds those entries
+    [dict setDictionary:@{@"a": [[StringObject alloc] initWithValue:@[@"1"]],
+                          @"b": [[StringObject alloc] initWithValue:@[@"2"]]}];
+    XCTAssertEqual(dict.count, 2U);
+    XCTAssertEqualObjects(dict[@"a"].stringCol, @"1");
+    XCTAssertEqualObjects(dict[@"b"].stringCol, @"2");
+
+    // New dictionary replaces the old one entirely
+    [dict setDictionary:@{@"a": [[StringObject alloc] initWithValue:@[@"3"]],
+                          @"c": [[StringObject alloc] initWithValue:@[@"4"]]}];
+    XCTAssertEqual(dict.count, 2U);
+    XCTAssertEqualObjects(dict[@"a"].stringCol, @"3");
+    XCTAssertEqualObjects(dict[@"c"].stringCol, @"4");
+
+    // Setting to nil clears
+    XCTAssertNoThrow([dict setDictionary:self.nonLiteralNil]);
+    XCTAssertEqual(dict.count, 0U);
+
+    // Self-setting clears
+    [dict setDictionary:@{@"a": [[StringObject alloc] initWithValue:@[@"3"]],
+                          @"c": [[StringObject alloc] initWithValue:@[@"4"]]}];
+    XCTAssertEqual(dict.count, 2U);
+    [dict setDictionary:dict];
+    XCTAssertEqual(dict.count, 0U);
+
+    // Type error clears
+    [dict setDictionary:@{@"a": [[StringObject alloc] initWithValue:@[@"3"]],
+                          @"c": [[StringObject alloc] initWithValue:@[@"4"]]}];
+    XCTAssertEqual(dict.count, 2U);
+    RLMAssertThrowsWithReason([dict setDictionary:@{@"": [[IntObject alloc] init]}],
+                              @"Value of type 'IntObject' does not match RLMDictionary value type 'StringObject'.");
+    XCTAssertEqual(dict.count, 0U);
+}
+
+- (void)testSetDictionaryManaged {
+    RLMDictionary<NSString *, IntObject *> *dict = managedTestDictionary();
+    [dict.realm beginWriteTransaction];
+    [dict removeAllObjects];
+
+    RLMAssertThrowsWithReasonMatching([dict setDictionary:@[@"string"]],
+                                      @"Cannot set dictionary to object of class '.*Array.*'");
+    RLMAssertThrowsWithReason([dict setDictionary:@{@"": [[StringObject alloc] init]}],
+                              @"Value of type 'StringObject' does not match RLMDictionary value type 'IntObject'.");
+    RLMAssertThrowsWithReason([dict setDictionary:@{@1: [[IntObject alloc] init]}],
+                              @"Invalid key '1' of type '" RLMConstantInt "' for expected type 'string'.");
+
+    // Set into empty adds those entries
+    [dict setDictionary:@{@"a": [[IntObject alloc] initWithValue:@[@1]],
+                          @"b": [[IntObject alloc] initWithValue:@[@2]]}];
+    XCTAssertEqual(dict.count, 2U);
+    XCTAssertEqual(dict[@"a"].intCol, 1);
+    XCTAssertEqual(dict[@"b"].intCol, 2);
+
+    // New dictionary replaces the old one entirely
+    [dict setDictionary:@{@"a": [[IntObject alloc] initWithValue:@[@3]],
+                          @"c": [[IntObject alloc] initWithValue:@[@4]]}];
+    XCTAssertEqual(dict.count, 2U);
+    XCTAssertEqual(dict[@"a"].intCol, 3);
+    XCTAssertEqual(dict[@"c"].intCol, 4);
+
+    // Setting to nil clears
+    XCTAssertNoThrow([dict setDictionary:self.nonLiteralNil]);
+    XCTAssertEqual(dict.count, 0U);
+
+    // Self-setting clears
+    [dict setDictionary:@{@"a": [[IntObject alloc] initWithValue:@[@3]],
+                          @"c": [[IntObject alloc] initWithValue:@[@4]]}];
+    XCTAssertEqual(dict.count, 2U);
+    [dict setDictionary:dict];
+    XCTAssertEqual(dict.count, 0U);
+
+    // Type error clears
+    [dict setDictionary:@{@"a": [[IntObject alloc] initWithValue:@[@3]],
+                          @"c": [[IntObject alloc] initWithValue:@[@4]]}];
+    XCTAssertEqual(dict.count, 2U);
+    RLMAssertThrowsWithReason([dict setDictionary:@{@"": [[StringObject alloc] init]}],
+                              @"Value of type 'StringObject' does not match RLMDictionary value type 'IntObject'.");
+    XCTAssertEqual(dict.count, 0U);
+
+    [dict.realm cancelWriteTransaction];
 }
 
 @end

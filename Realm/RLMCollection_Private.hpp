@@ -48,7 +48,7 @@ class RLMClassInfo;
 - (RLMFastEnumerator *)fastEnumerator;
 @end
 
-// An object which encapulates the shared logic for fast-enumerating RLMArray
+// An object which encapsulates the shared logic for fast-enumerating RLMArray
 // RLMSet and RLMResults, and has a buffer to store strong references to the current
 // set of enumerated items
 @interface RLMFastEnumerator : NSObject
