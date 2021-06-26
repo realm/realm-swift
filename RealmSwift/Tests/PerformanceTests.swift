@@ -39,7 +39,7 @@ private let isRunningOnDevice = TARGET_IPHONE_SIMULATOR == 0
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftPerformanceTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
-        #if !DEBUG && os(iOS)
+        #if !DEBUG && os(iOS) && !targetEnvironment(macCatalyst)
             if isRunningOnDevice {
                 return super.defaultTestSuite
             }
