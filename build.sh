@@ -410,7 +410,7 @@ download_common() {
         if ! [ -f $test_lib ]; then
             test_lib="core/librealm-sync-ios-dbg.a"
         fi
-        clang++ -Wl,-all_load -g -arch x86_64 -shared -target ios13.0 \
+        xcrun clang++ -Wl,-all_load -g -arch x86_64 -shared -target ios13.0 \
           -isysroot $(xcrun --sdk iphonesimulator --show-sdk-path) -o tmp.dylib \
           $test_lib -lz -framework Security
         if ! dsymutil tmp.dylib -o tmp.dSYM 2> /dev/null; then
