@@ -374,3 +374,14 @@ class SetterObservers: Object {
     var willSetCallback: (() -> Void)?
     var didSetCallback: (() -> Void)?
 }
+
+class ObjectWithArcMethodCategoryNames: Object {
+    // @objc properties with these names would crash with asan (and unreliably
+    // without it) because they would not have the correct behavior for the
+    // inferred ARC method family.
+    @Persisted var newValue: String
+    @Persisted var allocValue: String
+    @Persisted var copyValue: String
+    @Persisted var mutableCopyValue: String
+    @Persisted var initValue: String
+}

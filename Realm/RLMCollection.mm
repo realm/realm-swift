@@ -293,6 +293,10 @@ void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key
     }
 }
 
+void RLMAssignToCollection(id<RLMCollection> collection, id value) {
+    [(id)collection replaceAllObjectsWithObjects:value];
+}
+
 NSString *RLMDescriptionWithMaxDepth(NSString *name,
                                      id<RLMCollection> collection,
                                      NSUInteger depth) {

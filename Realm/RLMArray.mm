@@ -360,6 +360,22 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
     });
 }
 
+- (void)replaceAllObjectsWithObjects:(NSArray *)objects {
+    if (_backingCollection.count) {
+        changeArray(self, NSKeyValueChangeRemoval, NSMakeRange(0, _backingCollection.count), ^{
+            [_backingCollection removeAllObjects];
+        });
+    }
+    if (![objects respondsToSelector:@selector(count)] || !objects.count) {
+        return;
+    }
+    changeArray(self, NSKeyValueChangeInsertion, NSMakeRange(0, objects.count), ^{
+        for (id object in objects) {
+            [_backingCollection addObject:object];
+        }
+    });
+}
+
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
     va_list args;
     va_start(args, predicateFormat);

@@ -100,6 +100,8 @@ public struct Persisted<Value: _Persistable> {
     /// :nodoc:
     @available(*, unavailable, message: "@Persisted can only be used as a property on a Realm object")
     public var wrappedValue: Value {
+        // The static subscript below is called instead of this when the property
+        // wrapper is used on an ObjectBase subclass, which is the only thing we support.
         get { fatalError("called wrappedValue getter") }
         // swiftlint:disable:next unused_setter_value
         set { fatalError("called wrappedValue setter") }
@@ -128,12 +130,23 @@ public struct Persisted<Value: _Persistable> {
         }
     }
 
+    // Called via RLMInitializeSwiftAccessor() to initialize the wrapper on a
+    // newly created managed accessor object.
     internal mutating func initialize(_ object: ObjectBase, key: PropertyKey) {
         storage = .managed(key: key)
     }
 
+    // Collection types use this instead of the above because when promoting a
+    // unmanaged object to a managed object we want to reuse the existing collection
+    // object if it exists. Currently it always will exist because we read the
+    // value of the property first, but there's a potential optimization to
+    // skip initializing it on that read.
     internal mutating func initializeCollection(_ object: ObjectBase, key: PropertyKey) -> Value? {
         if case let .unmanaged(value, _, _) = storage {
+            storage = .managedCached(value: value, key: key)
+            return value
+        }
+        if case let .unmanagedObserved(value, _) = storage {
             storage = .managedCached(value: value, key: key)
             return value
         }
@@ -154,6 +167,10 @@ public struct Persisted<Value: _Persistable> {
         case let .managed(key):
             let v = Value._rlmGetProperty(object, key)
             if Value._rlmRequiresCaching {
+                // Collection types are initialized once and stored on the
+                // object rather than on every access. Non-collection types
+                // cannot be cached without some mechanism for knowing when to
+                // reread them which we don't currently have.
                 storage = .managedCached(value: v, key: key)
             }
             return v
@@ -164,7 +181,7 @@ public struct Persisted<Value: _Persistable> {
 
     internal mutating func set(_ object: ObjectBase, value: Value) {
         if value is MutableRealmCollection {
-            assign(value: value, to: get(object) as! MutableRealmCollection)
+            (get(object) as! MutableRealmCollection).assign(value)
             return
         }
         switch storage {
@@ -191,6 +208,8 @@ public struct Persisted<Value: _Persistable> {
         case .unmanagedObserved, .managed, .managedCached:
             return
         }
+        // Mutating a collection triggers a KVO notification on the parent, so
+        // we need to ensure that the collection has a pointer to its parent.
         if let value = value as? MutableRealmCollection {
             value.setParent(object, property)
         }
@@ -327,9 +346,28 @@ extension Persisted: _DiscoverablePersistedProperty where Value: _Persistable {
     }
 }
 
-// The actual storage for modern properties on objects
+// The actual storage for modern properties on objects.
+//
+// A newly created @Persisted will be either .unmanaged or .unmanagedNoDefault
+// depending on whether the user supplied a default value with `= value` when
+// defining the property. .unmanagedNoDefault turns into .unmanaged the first
+// time the property is read from, using a default value generated for the type.
+// If an unmanaged object is observed, that specific property is switched to
+// .unmanagedObserved so that the property can look up its name in the setter.
+//
+// When a new managed accessor is created, all properties are set to .managed.
+// When an existing unmanaged object is added to a Realm, existing non-collection
+// properties are set to .unmanaged, and collections are set to .managedCached,
+// reusing the existing instance of the collection (which are themselves promoted
+// to managed).
+//
+// The indexed and primary members of the unmanaged cases are used only for
+// schema discovery and are not always preserved once the Persisted is actually
+// used for anything.
 private enum PropertyStorage<T> {
-    // An unmanaged value. This can be either
+    // An unmanaged value. This is used as the initial state if the user did
+    // supply a default value, or if an unmanaged property is read or written
+    // (but not observed).
     case unmanaged(value: T, indexed: Bool = false, primary: Bool = false)
 
     // The property is unmanaged and does not yet have a value. This state is
@@ -341,7 +379,8 @@ private enum PropertyStorage<T> {
     // The property is unmanaged and the parent object has (or previously had)
     // KVO observers, so we performed the additional initialization to set the
     // property key on each property. We do not track indexed/primary in this
-    // state because those are needed only for schema discovery.
+    // state because those are needed only for schema discovery. An unmanaged
+    // property never transitions from this state back to .unmanaged.
     case unmanagedObserved(value: T, key: PropertyKey)
 
     // The property is managed and so only needs to store the key to get/set

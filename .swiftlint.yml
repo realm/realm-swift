@@ -49,6 +49,7 @@ disabled_rules:
   - force_cast
   - force_try
   - function_body_length
+  - function_parameter_count
   - line_length
   - nesting
   - syntactic_sugar

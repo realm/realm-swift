@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
+- (void)replaceAllObjectsWithObjects:(NSArray *)objects;
 @end
 
 @interface RLMManagedArray : RLMArray

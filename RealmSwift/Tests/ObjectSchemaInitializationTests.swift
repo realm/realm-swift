@@ -158,17 +158,17 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertEqual(schema.properties.count, 2)
 
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithAnyObject.self),
-                     "Should throw when not ignoring a property of a type we can't persist")
+                     reason: "Property SwiftObjectWithAnyObject.anyObject is declared as NSObject")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithStringArray.self),
-                     "Should throw when not ignoring a property of a type we can't persist")
+                     reason: "Property SwiftObjectWithStringArray.stringArray is declared as Array<String>")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithOptionalStringArray.self),
-                     "Should throw when not ignoring a property of a type we can't persist")
+                     reason: "Property SwiftObjectWithOptionalStringArray.stringArray is declared as Optional<Array<String>>")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithBadPropertyName.self),
-                     "Should throw when not ignoring a property with a name we don't support")
+                     reason: "Property names beginning with 'new' are not supported.")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithManagedLazyProperty.self),
-                     "Should throw when not ignoring a lazy property")
+                     reason: "Lazy managed property 'foobar' is not allowed on a Realm Swift object class.")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithDynamicManagedLazyProperty.self),
-                     "Should throw when not ignoring a lazy property")
+                     reason: "Lazy managed property 'foobar' is not allowed on a Realm Swift object class.")
 
         // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
         _ = RLMObjectSchema(forObjectClass: SwiftObjectWithEnum.self)
@@ -176,11 +176,18 @@ class ObjectSchemaInitializationTests: TestCase {
         _ = RLMObjectSchema(forObjectClass: SwiftObjectWithStruct.self)
 
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithDatePrimaryKey.self),
-            "Should throw when setting a non int/string primary key")
+                     reason: "Property 'date' cannot be made the primary key of 'SwiftObjectWithDatePrimaryKey'")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNSURL.self),
-            "Should throw when not ignoring a property of a type we can't persist")
+                     reason: "Property SwiftObjectWithNSURL.url is declared as NSURL")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonOptionalLinkProperty.self),
-            "Should throw when not marking a link property as optional")
+                     reason: "Object property 'objectCol' must be marked as optional.")
+
+        assertThrows(RLMObjectSchema(forObjectClass: OptionalAnyRealmValueList.self),
+                     reason: "List<AnyRealmValue> property 'invalid' must not be marked as optional")
+        assertThrows(RLMObjectSchema(forObjectClass: OptionalAnyRealmValueSet.self),
+                     reason: "MutableSet<AnyRealmValue> property 'invalid' must not be marked as optional")
+        assertThrows(RLMObjectSchema(forObjectClass: OptionalAnyRealmValueDictionary.self),
+                     reason: "Map<String, AnyRealmValue> property 'invalid' must not be marked as optional")
     }
 
     func testPrimaryKey() {
@@ -657,4 +664,14 @@ class SwiftObjectWithDynamicManagedLazyProperty: SwiftFakeObject {
 class SwiftObjectWithMultiplePrimaryKeys: SwiftFakeObject {
     @Persisted(primaryKey: true) var pk1: Int
     @Persisted(primaryKey: true) var pk2: Int
+}
+
+class OptionalAnyRealmValueList: SwiftFakeObject {
+    let invalid = List<AnyRealmValue?>()
+}
+class OptionalAnyRealmValueSet: SwiftFakeObject {
+    let invalid = MutableSet<AnyRealmValue?>()
+}
+class OptionalAnyRealmValueDictionary: SwiftFakeObject {
+    let invalid = Map<String, AnyRealmValue?>()
 }

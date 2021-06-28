@@ -65,7 +65,8 @@ class ModernKVOTests: TestCase {
         changeDictionary = nil
     }
 
-    func observeListChange(_ obj: NSObject, _ key: String, _ kind: NSKeyValueChange, _ indexes: NSIndexSet = NSIndexSet(index: 0),
+    func observeListChange(_ obj: NSObject, _ key: String, _ kind: NSKeyValueChange,
+                           _ indexes: NSIndexSet = NSIndexSet(index: 0),
                            fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         obj.addObserver(self, forKeyPath: key, options: [.old, .new], context: nil)
         block()
@@ -81,6 +82,57 @@ class ModernKVOTests: TestCase {
                   file: (fileName), line: lineNumber)
 
         changeDictionary = nil
+    }
+
+    class CompoundListObserver: NSObject {
+        let key: String
+        let deletions: [Int]
+        let insertions: [Int]
+        public var count = 0
+
+        init(_ key: String, _ deletions: [Int], _ insertions: [Int]) {
+            self.key = key
+            self.deletions = deletions
+            self.insertions = insertions
+        }
+
+        override func observeValue(forKeyPath keyPath: String?, of object: Any?,
+                                   change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+            XCTAssertEqual(keyPath, key)
+            XCTAssertNotNil(object)
+            XCTAssertNotNil(change)
+            guard let change = change else { return }
+            XCTAssertNotNil(change[.kindKey])
+            guard let kind = (change[.kindKey] as? UInt).map(NSKeyValueChange.init(rawValue:)) else { return }
+            if count == 0 {
+                XCTAssertEqual(kind, .removal)
+                XCTAssertEqual(Array(change[.indexesKey]! as! NSIndexSet), deletions)
+            } else if count == 1 {
+                XCTAssertEqual(kind, .insertion)
+                XCTAssertEqual(Array(change[.indexesKey]! as! NSIndexSet), insertions)
+            } else {
+                XCTFail("too many notifications")
+            }
+            count += 1
+        }
+    }
+
+    func observeCompoundListChange(_ obs: NSObject, _ obj: NSObject, _ key: String,
+                                   _ values: NSArray, deletions: [Int], insertions: [Int]) {
+        let observer = CompoundListObserver(key, deletions, insertions)
+        if deletions.count == 0 {
+            observer.count = 1
+        }
+
+        obs.addObserver(observer, forKeyPath: key, options: [.old, .new], context: nil)
+        obj.setValue(values, forKey: key)
+        obs.removeObserver(observer, forKeyPath: key)
+
+        if insertions.count > 0 {
+            XCTAssertEqual(observer.count, 2)
+        } else {
+            XCTAssertEqual(observer.count, 1)
+        }
     }
 
     func observeSetChange(_ obj: ModernAllTypesObject, _ key: String,
@@ -237,6 +289,18 @@ class ModernKVOTests: TestCase {
         observeSetChange(obs, "setOptDecimal") { obj.setOptDecimal.insert(nil) }
         observeSetChange(obs, "setOptObjectId") { obj.setOptObjectId.insert(nil) }
         observeSetChange(obs, "setOptUuid") { obj.setOptUuid.insert(nil) }
+
+        obj.arrayInt32.removeAll()
+        observeCompoundListChange(obj, obs, "arrayInt32", [1],
+                                  deletions: [], insertions: [0])
+        observeCompoundListChange(obj, obs, "arrayInt32", [1],
+                                  deletions: [0], insertions: [0])
+        observeCompoundListChange(obj, obs, "arrayInt32", [1, 2, 3],
+                                  deletions: [0], insertions: [0, 1, 2])
+        observeCompoundListChange(obj, obs, "arrayInt32", [],
+                                  deletions: [0, 1, 2], insertions: [])
+        observeCompoundListChange(obj, obs, "arrayInt32", [],
+                                  deletions: [], insertions: [])
 
         if obs.realm == nil {
             return

@@ -259,6 +259,18 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
     });
 }
 
+- (void)replaceAllObjectsWithObjects:(NSArray *)objects {
+    changeSet(self, ^{
+        [_backingCollection removeAllObjects];
+        if (!objects || (id)objects == NSNull.null) {
+            return;
+        }
+        for (id object in objects) {
+            [_backingCollection addObject:object];
+        }
+    });
+}
+
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
     va_list args;
     va_start(args, predicateFormat);

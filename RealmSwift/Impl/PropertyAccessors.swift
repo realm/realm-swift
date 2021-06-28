@@ -46,7 +46,7 @@ internal class ListAccessor<Element: RealmCollectionValue>: RLMManagedPropertyAc
     }
 
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
-        assign(value: value, to: bound(property, parent))
+        bound(property, parent).assign(value)
     }
 }
 
@@ -68,7 +68,7 @@ internal class SetAccessor<Element: RealmCollectionValue>: RLMManagedPropertyAcc
     }
 
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
-        assign(value: value, to: bound(property, parent))
+        bound(property, parent).assign(value)
     }
 }
 
@@ -90,7 +90,7 @@ internal class MapAccessor<Key: _MapKey, Value: RealmCollectionValue>: RLMManage
     }
 
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
-        assign(value: value, to: bound(property, parent))
+        bound(property, parent).assign(value)
     }
 }
 
@@ -105,8 +105,7 @@ internal class LinkingObjectsAccessor<Element: ObjectBase>: RLMManagedPropertyAc
             RLMLinkingObjectsHandle(object: parent, property: property)
     }
     @objc override class func observe(_ property: RLMProperty, on parent: RLMObjectBase) {
-        bound(property, parent).pointee.handle =
-            RLMLinkingObjectsHandle(object: parent, property: property)
+        // Don't need to do anything here as unmanaged LinkingObjects are always empty
     }
     @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
         return bound(property, parent).pointee
@@ -232,7 +231,7 @@ internal class BridgedPersistedPropertyAccessor<T: _Persistable>: PersistedPrope
 internal class PersistedListAccessor<Element: _Persistable>: PersistedPropertyAccessor<List<Element>>
         where Element: RealmCollectionValue {
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
-        assign(value: value, to: bound(property, parent).pointee.get(parent))
+        bound(property, parent).pointee.get(parent).assign(value)
     }
 
     // When promoting an existing object to managed we want to promote the existing
@@ -248,7 +247,7 @@ internal class PersistedListAccessor<Element: _Persistable>: PersistedPropertyAc
 internal class PersistedSetAccessor<Element: _Persistable>: PersistedPropertyAccessor<MutableSet<Element>>
         where Element: RealmCollectionValue {
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
-        assign(value: value, to: bound(property, parent).pointee.get(parent))
+        bound(property, parent).pointee.get(parent).assign(value)
     }
     @objc override class func promote(_ property: RLMProperty, on parent: RLMObjectBase) {
         let key = PropertyKey(property.index)
@@ -261,7 +260,7 @@ internal class PersistedSetAccessor<Element: _Persistable>: PersistedPropertyAcc
 internal class PersistedMapAccessor<Key: _MapKey, Value: _Persistable>: PersistedPropertyAccessor<Map<Key, Value>>
         where Value: RealmCollectionValue {
     @objc override class func set(_ property: RLMProperty, on parent: RLMObjectBase, to value: Any) {
-        assign(value: value, to: bound(property, parent).pointee.get(parent))
+        bound(property, parent).pointee.get(parent).assign(value)
     }
     @objc override class func promote(_ property: RLMProperty, on parent: RLMObjectBase) {
         let key = PropertyKey(property.index)

@@ -505,12 +505,109 @@ class ModernObjectAccessorTests: TestCase {
              .decimal128(5), .uuid(uuid))
     }
 
+    func assertMapEquals<T: RealmCollectionValue>(_ map: Map<String, T>, _ expected: Array<T>) {
+        XCTAssertEqual(map.count, expected.count)
+        for (i, value) in expected.enumerated() {
+            XCTAssertEqual(map["\(i)"], value)
+        }
+    }
+
+    func setAndTestMap(_ object: ModernAllTypesObject) {
+        func test<T: RealmCollectionValue>(_ name: String,
+                                           _ keyPath: ReferenceWritableKeyPath<ModernAllTypesObject, Map<String, T>>,
+                                           _ values: T...) {
+            var dictValues = [String: T]()
+            for (i, value) in values.enumerated() {
+                dictValues["\(i)"] = value
+            }
+
+            // Getter should return correct type
+            XCTAssertTrue(get(object, name) is Map<String, T>)
+            // Getter should return the same object each time
+            XCTAssertTrue(get(object, name) as AnyObject === get(object, name) as AnyObject)
+
+            // Which should be the same object as is obtained from reading the property directly
+            let collection = object[keyPath: keyPath]
+            XCTAssertTrue(get(object, name) as! Map<String, T> === collection)
+
+            // Assigning a collection to the property should copy the contents of the list, and not set
+            // the property pointing to the assigned collection
+            let collection2 = Map<String, T>()
+            collection2.merge(dictValues) { $1 }
+            object[keyPath: keyPath] = collection2
+            assertMapEquals(collection, values)
+            XCTAssertFalse(collection2 === get(object, name) as AnyObject)
+
+            // Self-assignment should be a no-op and not clear the collection
+            object[keyPath: keyPath] = object[keyPath: keyPath]
+            assertMapEquals(collection, values)
+            object.setValue(object.value(forKey: name), forKey: name)
+            assertMapEquals(collection, values)
+
+            // setting via the accessor directly should do the same thing as assigning to the
+            // property
+            collection.removeAll()
+            set(object, name, collection2)
+            assertMapEquals(collection, values)
+            XCTAssertFalse(collection2 === get(object, name) as AnyObject)
+            set(object, name, get(object, name))
+            assertMapEquals(collection, values)
+
+            // The accessor should accept any enumerable type and not just map, so we should be
+            // able to assign a dictionary directly
+            collection.removeAll()
+            set(object, name, dictValues)
+            assertMapEquals(collection, values)
+            XCTAssertTrue(get(object, name) as! Map<String, T> === collection)
+
+            // Assigning null to a map clears it
+            set(object, name, NSNull())
+            XCTAssertEqual(collection.count, 0)
+        }
+
+        test("mapBool", \.mapBool, false, true)
+        test("mapInt", \.mapInt, Int.min, 0, Int.max)
+        test("mapInt8", \.mapInt8, Int8.min, 0, Int8.max)
+        test("mapInt16", \.mapInt16, Int16.min, 0, Int16.max)
+        test("mapInt32", \.mapInt32, Int32.min, 0, Int32.max)
+        test("mapInt64", \.mapInt64, Int64.min, 0, Int64.max)
+        test("mapFloat", \.mapFloat, -Float.greatestFiniteMagnitude, 0, Float.greatestFiniteMagnitude)
+        test("mapDouble", \.mapDouble, -Double.greatestFiniteMagnitude, 0, Double.greatestFiniteMagnitude)
+        test("mapString", \.mapString, "a", "b", "c")
+        test("mapBinary", \.mapBinary, data)
+        test("mapDate", \.mapDate, date)
+        test("mapDecimal", \.mapDecimal, Decimal128(1), Decimal128(2))
+        test("mapObjectId", \.mapObjectId, oid1, oid2)
+        test("mapUuid", \.mapUuid, uuid)
+
+        test("mapOptBool", \.mapOptBool, false, true, nil)
+        test("mapOptInt", \.mapOptInt, Int.min, 0, Int.max, nil)
+        test("mapOptInt8", \.mapOptInt8, Int8.min, 0, Int8.max, nil)
+        test("mapOptInt16", \.mapOptInt16, Int16.min, 0, Int16.max, nil)
+        test("mapOptInt32", \.mapOptInt32, Int32.min, 0, Int32.max, nil)
+        test("mapOptInt64", \.mapOptInt64, Int64.min, 0, Int64.max, nil)
+        test("mapOptFloat", \.mapOptFloat, -Float.greatestFiniteMagnitude, 0, Float.greatestFiniteMagnitude, nil)
+        test("mapOptDouble", \.mapOptDouble, -Double.greatestFiniteMagnitude, 0, Double.greatestFiniteMagnitude, nil)
+        test("mapOptString", \.mapOptString, "a", "b", "c", nil)
+        test("mapOptBinary", \.mapOptBinary, data, nil)
+        test("mapOptDate", \.mapOptDate, date, nil)
+        test("mapOptDecimal", \.mapOptDecimal, Decimal128(1), Decimal128(2), nil)
+        test("mapOptObjectId", \.mapOptObjectId, oid1, oid2, nil)
+        test("mapOptUuid", \.mapOptUuid, uuid, nil)
+
+        let obj = ModernAllTypesObject()
+        test("mapAny", \.mapAny, .none, .int(1), .bool(false), .float(2.2), .double(3.3),
+             .string("str"), .data(data), .date(date), .object(obj), .objectId(oid1),
+             .decimal128(5), .uuid(uuid))
+    }
+
     func testUnmanagedAccessors() {
         setAndTestAllPropertiesViaNormalAccess(ModernAllTypesObject())
         setAndTestAllPropertiesViaSubscript(ModernAllTypesObject())
         setAndTestAllPropertiesViaAccessor(ModernAllTypesObject())
         setAndTestList(ModernAllTypesObject())
         setAndTestSet(ModernAllTypesObject())
+        setAndTestMap(ModernAllTypesObject())
     }
 
     func testManagedAccessorsReadFromRealm() {
@@ -522,6 +619,7 @@ class ModernObjectAccessorTests: TestCase {
         setAndTestAllPropertiesViaAccessor(object)
         setAndTestList(object)
         setAndTestSet(object)
+        setAndTestMap(object)
         realm.cancelWrite()
     }
 
@@ -535,6 +633,7 @@ class ModernObjectAccessorTests: TestCase {
         setAndTestAllPropertiesViaAccessor(object)
         setAndTestList(object)
         setAndTestSet(object)
+        setAndTestMap(object)
         realm.cancelWrite()
     }
 
@@ -569,5 +668,19 @@ class ModernObjectAccessorTests: TestCase {
         self.assertThrows(obj.arrayInt.removeAll(), reason: "invalidated")
         self.assertThrows(obj.int8Col = 5, reason: "invalidated")
         self.assertThrows(obj.arrayInt8 = List<Int8>(), reason: "invalidated")
+    }
+
+    func testObjectWithArcMethodFamilies() {
+        let obj = ObjectWithArcMethodCategoryNames()
+        obj.allocValue = "a"
+        obj.initValue = "b"
+        obj.copyValue = "c"
+        obj.mutableCopyValue = "d"
+        obj.newValue = "e"
+        XCTAssertEqual(obj.allocValue, "a")
+        XCTAssertEqual(obj.initValue, "b")
+        XCTAssertEqual(obj.copyValue, "c")
+        XCTAssertEqual(obj.mutableCopyValue, "d")
+        XCTAssertEqual(obj.newValue, "e")
     }
 }

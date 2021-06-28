@@ -486,6 +486,15 @@ class ModernObjectCreationTests: TestCase {
         verifyObject(obj)
     }
 
+    func testAddDefault() {
+        let obj = ModernAllTypesObject()
+        let realm = try! Realm()
+        try! realm.write {
+            realm.add(obj)
+        }
+        verifyDefault(obj)
+    }
+
     func testAdd() {
         let obj = ModernAllTypesObject(value: values!)
         let realm = try! Realm()

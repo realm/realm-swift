@@ -429,7 +429,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 }
 
 - (void)setDictionary:(id)dictionary {
-    [self mergeDictionary:dictionary clear:true];
+    [self mergeDictionary:RLMCoerceToNil(dictionary) clear:true];
 }
 
 - (void)addEntriesFromDictionary:(id)otherDictionary {

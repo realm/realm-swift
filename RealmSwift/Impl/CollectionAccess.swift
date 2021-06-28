@@ -31,9 +31,7 @@ private func isSameCollection(_ lhs: RLMCollection, _ rhs: Any) -> Bool {
 }
 
 internal protocol MutableRealmCollection {
-    func removeAll()
-    func add(_ obj: AnyObject)
-    var _rlmCollection: RLMCollection { get }
+    func assign(_ value: Any)
 
     // Unmanaged collection properties need a reference to their parent object for
     // KVO to work because the mutation is done via the collection object but the
@@ -42,8 +40,9 @@ internal protocol MutableRealmCollection {
 }
 
 extension List: MutableRealmCollection {
-    func add(_ obj: AnyObject) {
-        rlmArray.add(obj)
+    func assign(_ value: Any) {
+        guard !isSameCollection(_rlmCollection, value) else { return }
+        RLMAssignToCollection(_rlmCollection, value)
     }
     func setParent(_ object: RLMObjectBase, _ property: RLMProperty) {
         rlmArray.setParent(object, property: property)
@@ -51,30 +50,22 @@ extension List: MutableRealmCollection {
 }
 
 extension MutableSet: MutableRealmCollection {
-    func add(_ obj: AnyObject) {
-        rlmSet.add(obj)
+    func assign(_ value: Any) {
+        guard !isSameCollection(_rlmCollection, value) else { return }
+        RLMAssignToCollection(_rlmCollection, value)
     }
     func setParent(_ object: RLMObjectBase, _ property: RLMProperty) {
         rlmSet.setParent(object, property: property)
     }
 }
 
-internal func assign(value: Any, to collection: MutableRealmCollection) {
-    guard !isSameCollection(collection._rlmCollection, value) else { return }
-    collection.removeAll()
-    if let enumeration = value as? NSFastEnumeration {
-        var iterator = NSFastEnumerationIterator(enumeration)
-        while let obj = iterator.next() {
-            collection.add(dynamicBridgeCast(fromSwift: obj) as AnyObject)
-        }
+extension Map: MutableRealmCollection {
+    func assign(_ value: Any) {
+        guard !isSameCollection(_rlmCollection, value) else { return }
+        rlmDictionary.setDictionary(value)
     }
-}
-
-internal func assign<Key: _MapKey, Value: RealmCollectionValue>(value: Any, to collection: Map<Key, Value>) {
-    guard !isSameCollection(collection._rlmCollection, value) else { return }
-    collection.removeAll()
-    if let enumeration = value as? NSFastEnumeration {
-        collection.rlmDictionary.addEntries(fromDictionary: enumeration)
+    func setParent(_ object: RLMObjectBase, _ property: RLMProperty) {
+        rlmDictionary.setParent(object, property: property)
     }
 }
 

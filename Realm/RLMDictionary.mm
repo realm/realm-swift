@@ -187,7 +187,10 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 }
 
 - (void)setDictionary:(id)dictionary {
-    if (dictionary && ![dictionary respondsToSelector:@selector(enumerateKeysAndObjectsUsingBlock:)]) {
+    if (!dictionary || dictionary == NSNull.null) {
+        return [self removeAllObjects];
+    }
+    if (![dictionary respondsToSelector:@selector(enumerateKeysAndObjectsUsingBlock:)]) {
         @throw RLMException(@"Cannot set dictionary to object of class '%@'", [dictionary className]);
     }
 

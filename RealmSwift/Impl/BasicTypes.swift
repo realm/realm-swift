@@ -86,6 +86,8 @@ extension AnyRealmValue: SchemaDiscoverable {
                 type = "List<AnyRealmValue>"
             } else if prop.set {
                 type = "MutableSet<AnyRealmValue>"
+            } else if prop.dictionary {
+                type = "Map<String, AnyRealmValue>"
             }
             throwRealmException("\(type) property '\(prop.name)' must not be marked as optional: nil values are represented as AnyRealmValue.none")
         }
