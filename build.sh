@@ -689,7 +689,7 @@ case "$COMMAND" in
                 # -all_load makes every object file in the input get linked
                 # into the shared library.
                 ar -d $realm_lib feature_token.cpp.o 2> /dev/null || true
-                clang++ -shared $architectures \
+                xcrun clang++ -shared $architectures \
                     -target ${target} \
                     -isysroot $(xcrun --sdk ${sdk} --show-sdk-path) \
                     -install_name "$install_name" \
