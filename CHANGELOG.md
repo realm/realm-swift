@@ -47,6 +47,10 @@ x.y.z Release notes (yyyy-MM-dd)
   does not change what data is stored in the Realm file and so does not require
   a migration (as long as you don't also change the schema in the process, of
   course).
+* Add `Map.merge()`, which adds the key-value pairs from another Map or
+  Dictionary to the map.
+* Add `Map.asKeyValueSequence()` which returns an adaptor that can be used with
+  generic functions that operate on Dictionary-styled sequences.
 
 ### Fixed
 * AnyRealmValue enum values are now supported in more places when creating

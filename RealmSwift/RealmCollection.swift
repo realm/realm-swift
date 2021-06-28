@@ -73,6 +73,30 @@ public protocol _RealmMapValue {
 }
 
 /**
+ An iterator for `Map<Key, Value>` which produces `(key: Key, value: Value)` pairs for each entry in the map.
+ */
+@frozen public struct RLMKeyValueIterator<Key: _MapKey, Value: RealmCollectionValue>: IteratorProtocol {
+    private var generatorBase: NSFastEnumerationIterator
+    private var collection: RLMDictionary<AnyObject, AnyObject>
+    public typealias Element = (key: Key, value: Value)
+
+    init(collection: RLMDictionary<AnyObject, AnyObject>) {
+        self.collection = collection
+        generatorBase = NSFastEnumerationIterator(collection)
+    }
+
+    /// Advance to the next element and return it, or `nil` if no next element exists.
+    public mutating func next() -> Element? {
+        let next = generatorBase.next()
+        if let key = next as? Key,
+           let value = collection[key as AnyObject].map(dynamicBridgeCast) as? Value {
+            return (key: key, value: value)
+        }
+        return nil
+    }
+}
+
+/**
  A `RealmCollectionChange` value encapsulates information about changes to collections
  that are reported by Realm notifications.
 
