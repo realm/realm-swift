@@ -756,6 +756,10 @@ uint64_t RLMObjectBaseGetCombineId(__unsafe_unretained RLMObjectBase *const obj)
 
 @implementation RealmSwiftObject
 + (BOOL)accessInstanceVariablesDirectly {
+    // By default KVO will try to directly read ivars if a thing with a matching
+    // name is observed and there's no objc property with that name. This
+    // crashes when it tries to read a property wrapper ivar, and is never
+    // useful for Swift classes.
     return NO;
 }
 @end
