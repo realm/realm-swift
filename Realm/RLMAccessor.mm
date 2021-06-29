@@ -988,7 +988,7 @@ realm::Mixed RLMAccessorContext::unbox(__unsafe_unretained id v, CreatePolicy p,
 }
 
 template<typename T>
-static auto to_optional(__unsafe_unretained id const value) {
+static auto toOptional(__unsafe_unretained id const value) {
     id v = RLMCoerceToNil(value);
     return v ? realm::util::make_optional(RLMStatelessAccessorContext::unbox<T>(v))
              : realm::util::none;
@@ -996,27 +996,27 @@ static auto to_optional(__unsafe_unretained id const value) {
 
 template<>
 realm::util::Optional<bool> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional<bool>(v);
+    return toOptional<bool>(v);
 }
 template<>
 realm::util::Optional<double> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional<double>(v);
+    return toOptional<double>(v);
 }
 template<>
 realm::util::Optional<float> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional<float>(v);
+    return toOptional<float>(v);
 }
 template<>
 realm::util::Optional<int64_t> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional<int64_t>(v);
+    return toOptional<int64_t>(v);
 }
 template<>
 realm::util::Optional<realm::ObjectId> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional<realm::ObjectId>(v);
+    return toOptional<realm::ObjectId>(v);
 }
 template<>
 realm::util::Optional<realm::UUID> RLMStatelessAccessorContext::unbox(__unsafe_unretained id const v) {
-    return to_optional<realm::UUID>(v);
+    return toOptional<realm::UUID>(v);
 }
 
 std::pair<realm::Obj, bool>
