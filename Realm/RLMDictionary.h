@@ -166,6 +166,7 @@ NS_ASSUME_NONNULL_BEGIN
  This will remove all elements in this dictionary and then apply each element from the given dictionary.
 
  @warning This method may only be called during a write transaction.
+ @warning If otherDictionary is self this will result in an empty dictionary.
  */
 - (void)setDictionary:(id)otherDictionary;
 

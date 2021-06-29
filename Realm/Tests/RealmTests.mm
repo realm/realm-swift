@@ -433,59 +433,68 @@
 
     // delete objects
     RLMResults *objects = [StringObject allObjectsInRealm:realm];
-    XCTAssertEqual(objects.count, 3U, @"Expecting 3 objects");
+    XCTAssertEqual(objects.count, 3U);
     [realm beginWriteTransaction];
     [realm deleteObjects:[StringObject objectsInRealm:realm where:@"stringCol != 'a'"]];
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 1U, @"Expecting 0 objects");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 1U);
     [realm deleteObjects:objects];
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 0U, @"Expecting 0 objects");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 0U);
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 0U, @"Expecting 0 objects");
-    XCTAssertThrows(strObj.stringCol, @"Object should be invalidated");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 0U);
+    RLMAssertThrowsWithReason(strObj.stringCol, @"invalidated");
 
-    // add objects to linkView
+    // add objects to collections
     [realm beginWriteTransaction];
     ArrayPropertyObject *arrayObj = [ArrayPropertyObject createInRealm:realm withValue:@[@"name", @[@[@"a"], @[@"b"], @[@"c"]], @[]]];
     SetPropertyObject *setObj = [SetPropertyObject createInRealm:realm withValue:@[@"name", @[@[@"d"], @[@"e"], @[@"f"]], @[]]];
+    DictionaryPropertyObject *dictObj = [DictionaryPropertyObject createInRealm:realm withValue:@{@"stringDictionary": @{@"a": @[@"b"]}}];
     [StringObject createInRealm:realm withValue:@[@"g"]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 7U, @"Expecting 7 objects");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 8U);
 
-    // remove from linkView
+    // delete via collections
     [realm beginWriteTransaction];
     [realm deleteObjects:arrayObj.array];
     [realm deleteObjects:setObj.set];
+    [realm deleteObjects:dictObj.stringDictionary];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 1U, @"Expecting 1 object");
-    XCTAssertEqual(arrayObj.array.count, 0U, @"Expecting 0 objects");
-    XCTAssertEqual(setObj.set.count, 0U, @"Expecting 0 objects");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 1U);
+    XCTAssertEqual(arrayObj.array.count, 0U);
+    XCTAssertEqual(setObj.set.count, 0U);
+    XCTAssertEqual(dictObj.stringDictionary.count, 0U);
 
     // remove NSArray
     NSArray *arrayOfLastObject = @[[[StringObject allObjectsInRealm:realm] lastObject]];
     [realm beginWriteTransaction];
     [realm deleteObjects:arrayOfLastObject];
     [realm commitWriteTransaction];
-    XCTAssertEqual(objects.count, 0U, @"Expecting 0 objects");
+    XCTAssertEqual(objects.count, 0U);
 
-    // add objects to linkView
+    // add objects to collections
     [realm beginWriteTransaction];
     [arrayObj.array addObject:[StringObject createInRealm:realm withValue:@[@"a"]]];
     [arrayObj.array addObject:[[StringObject alloc] initWithValue:@[@"b"]]];
     [setObj.set addObject:[StringObject createInRealm:realm withValue:@[@"c"]]];
     [setObj.set addObject:[[StringObject alloc] initWithValue:@[@"d"]]];
+    dictObj.stringDictionary[@"b"] = [[StringObject alloc] initWithValue:@[@"e"]];
     [realm commitWriteTransaction];
 
     // remove objects from realm
-    XCTAssertEqual(arrayObj.array.count, 2U, @"Expecting 2 objects");
-    XCTAssertEqual(setObj.set.count, 2U, @"Expecting 2 objects");
+    XCTAssertEqual(arrayObj.array.count, 2U);
+    XCTAssertEqual(setObj.set.count, 2U);
+    XCTAssertEqual(dictObj.stringDictionary.count, 1U);
     [realm beginWriteTransaction];
     [realm deleteObjects:[StringObject allObjectsInRealm:realm]];
     [realm commitWriteTransaction];
-    XCTAssertEqual(arrayObj.array.count, 0U, @"Expecting 0 objects");
-    XCTAssertEqual(setObj.set.count, 0U, @"Expecting 0 objects");
+    XCTAssertEqual(arrayObj.array.count, 0U);
+    XCTAssertEqual(setObj.set.count, 0U);
+    // deleting the target objects in a dictionary sets them to null rather than
+    // removing the entries
+    XCTAssertEqual(dictObj.stringDictionary.count, 1U);
+    XCTAssertEqual((id)dictObj.stringDictionary[@"b"], NSNull.null);
 }
 
 - (void)testAddManagedObjectToOtherRealm {

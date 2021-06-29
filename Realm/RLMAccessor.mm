@@ -1058,17 +1058,17 @@ RLMOptionalId RLMAccessorContext::default_value_for_property(realm::ObjectSchema
 }
 
 bool RLMStatelessAccessorContext::is_same_list(realm::List const& list,
-                                               __unsafe_unretained id const v) const noexcept {
+                                               __unsafe_unretained id const v) noexcept {
     return [v respondsToSelector:@selector(isBackedByList:)] && [v isBackedByList:list];
 }
 
 bool RLMStatelessAccessorContext::is_same_set(realm::object_store::Set const& set,
-                                              __unsafe_unretained id const v) const noexcept {
+                                              __unsafe_unretained id const v) noexcept {
     return [v respondsToSelector:@selector(isBackedBySet:)] && [v isBackedBySet:set];
 }
 
 bool RLMStatelessAccessorContext::is_same_dictionary(realm::object_store::Dictionary const& dict,
-                                                     __unsafe_unretained id const v) const noexcept {
+                                                     __unsafe_unretained id const v) noexcept {
     return [v respondsToSelector:@selector(isBackedByDictionary:)] && [v isBackedByDictionary:dict];
 }
 #pragma clang diagnostic push
