@@ -444,6 +444,16 @@ class KVOTests: TestCase {
         observeChange(obs2, "arrayCol.invalidated", false, true) {
             self.realm.delete(obj2)
         }
+
+        let (obj3, obs3) = getObject(SwiftKVOObject())
+        observeChange(obs3, "setCol.invalidated", false, true) {
+            self.realm.delete(obj3)
+        }
+
+        let (obj4, obs4) = getObject(SwiftKVOObject())
+        observeChange(obs4, "mapBool.invalidated", false, true) {
+            self.realm.delete(obj4)
+        }
     }
 
     func testTypedObservation() {

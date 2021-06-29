@@ -290,6 +290,47 @@ class ModernKVOTests: TestCase {
         observeSetChange(obs, "setOptObjectId") { obj.setOptObjectId.insert(nil) }
         observeSetChange(obs, "setOptUuid") { obj.setOptUuid.insert(nil) }
 
+        observeSetChange(obs, "mapBool") { obj.mapBool[""] = true }
+        observeSetChange(obs, "mapInt8") { obj.mapInt8[""] = 10 }
+        observeSetChange(obs, "mapInt16") { obj.mapInt16[""] = 10 }
+        observeSetChange(obs, "mapInt32") { obj.mapInt32[""] = 10 }
+        observeSetChange(obs, "mapInt64") { obj.mapInt64[""] = 10 }
+        observeSetChange(obs, "mapFloat") { obj.mapFloat[""] = 10 }
+        observeSetChange(obs, "mapDouble") { obj.mapDouble[""] = 10 }
+        observeSetChange(obs, "mapString") { obj.mapString[""] = "abc" }
+        observeSetChange(obs, "mapDecimal") { obj.mapDecimal[""] = decimal }
+        observeSetChange(obs, "mapObjectId") { obj.mapObjectId[""] = objectId }
+        observeSetChange(obs, "mapUuid") { obj.mapUuid[""] = uuid }
+        observeSetChange(obs, "mapAny") { obj.mapAny[""] = AnyRealmValue.none }
+
+        observeSetChange(obs, "mapOptBool") { obj.mapOptBool[""] = true }
+        observeSetChange(obs, "mapOptInt8") { obj.mapOptInt8[""] = 10 }
+        observeSetChange(obs, "mapOptInt16") { obj.mapOptInt16[""] = 10 }
+        observeSetChange(obs, "mapOptInt32") { obj.mapOptInt32[""] = 10 }
+        observeSetChange(obs, "mapOptInt64") { obj.mapOptInt64[""] = 10 }
+        observeSetChange(obs, "mapOptFloat") { obj.mapOptFloat[""] = 10 }
+        observeSetChange(obs, "mapOptDouble") { obj.mapOptDouble[""] = 10 }
+        observeSetChange(obs, "mapOptString") { obj.mapOptString[""] = "abc" }
+        observeSetChange(obs, "mapOptBinary") { obj.mapOptBinary[""] = data }
+        observeSetChange(obs, "mapOptDate") { obj.mapOptDate[""] = date }
+        observeSetChange(obs, "mapOptDecimal") { obj.mapOptDecimal[""] = decimal }
+        observeSetChange(obs, "mapOptObjectId") { obj.mapOptObjectId[""] = objectId }
+        observeSetChange(obs, "mapOptUuid") { obj.mapOptUuid[""] = uuid }
+
+        observeSetChange(obs, "mapOptBool") { obj.mapOptBool[""] = nil }
+        observeSetChange(obs, "mapOptInt8") { obj.mapOptInt8[""] = nil }
+        observeSetChange(obs, "mapOptInt16") { obj.mapOptInt16[""] = nil }
+        observeSetChange(obs, "mapOptInt32") { obj.mapOptInt32[""] = nil }
+        observeSetChange(obs, "mapOptInt64") { obj.mapOptInt64[""] = nil }
+        observeSetChange(obs, "mapOptFloat") { obj.mapOptFloat[""] = nil }
+        observeSetChange(obs, "mapOptDouble") { obj.mapOptDouble[""] = nil }
+        observeSetChange(obs, "mapOptString") { obj.mapOptString[""] = nil }
+        observeSetChange(obs, "mapOptDate") { obj.mapOptDate[""] = nil }
+        observeSetChange(obs, "mapOptBinary") { obj.mapOptBinary[""] = nil }
+        observeSetChange(obs, "mapOptDecimal") { obj.mapOptDecimal[""] = nil }
+        observeSetChange(obs, "mapOptObjectId") { obj.mapOptObjectId[""] = nil }
+        observeSetChange(obs, "mapOptUuid") { obj.mapOptUuid[""] = nil }
+
         obj.arrayInt32.removeAll()
         observeCompoundListChange(obj, obs, "arrayInt32", [1],
                                   deletions: [], insertions: [0])
@@ -320,6 +361,10 @@ class ModernKVOTests: TestCase {
             self.realm.delete(obj3)
         }
 
+        let (obj4, obs4) = getObject(ModernAllTypesObject())
+        observeChange(obs4, "mapAny.invalidated", false, true) {
+            self.realm.delete(obj4)
+        }
     }
 
     func testReadSharedSchemaFromObservedObject() {

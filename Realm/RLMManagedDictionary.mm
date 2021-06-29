@@ -451,7 +451,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 }
 
 - (id)valueForKey:(NSString *)key {
-    if ([key isEqualToString:@"@invalidated"]) {
+    if ([key isEqualToString:RLMInvalidatedKey]) {
         return @(!_backingCollection.is_valid());
     }
     return [self objectForKey:key];

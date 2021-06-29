@@ -58,6 +58,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Declaring a property as `RealmProperty<AnyRealmValue?>` will now report an
   error during schema discovery rather than doing broken things when the
   property is used.
+* Observing the `invalidated` property of `RLMDictionary`/`Map` via KVO did not
+  set old/new values correctly in the notification (since 10.8.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
