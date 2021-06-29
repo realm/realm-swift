@@ -108,7 +108,7 @@ extension NSDate: SchemaDiscoverable {
 
 // MARK: - Modern property getters/setters
 
-public protocol _Int: BinaryInteger, _OptionalPersistable, _DefaultConstructible, _PrimaryKey, _Indexable {
+private protocol _Int: BinaryInteger, _OptionalPersistable, _DefaultConstructible, _PrimaryKey, _Indexable {
 }
 
 extension _Int {

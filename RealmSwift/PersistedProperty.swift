@@ -320,7 +320,7 @@ extension LinkingObjects: LinkingObjectsProtocol {}
 // MARK: - Implementation
 
 /// :nodoc:
-extension Persisted: _DiscoverablePersistedProperty where Value: _Persistable {
+extension Persisted: DiscoverablePersistedProperty where Value: _Persistable {
     public static var _rlmType: PropertyType { Value._rlmType }
     public static var _rlmOptional: Bool { Value._rlmOptional }
     public static var _rlmRequireObjc: Bool { false }

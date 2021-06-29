@@ -26,7 +26,7 @@ import Realm.Private
 public typealias PropertyKey = UInt16
 
 // A tag protocol used in schema discovery to find @Persisted properties
-public protocol _DiscoverablePersistedProperty: _RealmSchemaDiscoverable {}
+internal protocol DiscoverablePersistedProperty: _RealmSchemaDiscoverable {}
 
 // A type which can be stored by the @Persisted property wrapper
 public protocol _Persistable: _RealmSchemaDiscoverable {

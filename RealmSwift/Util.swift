@@ -95,7 +95,8 @@ public func dynamicBridgeCast<T>(fromObjectiveC x: Any) -> T {
 }
 
 /// :nodoc:
-public func failableDynamicBridgeCast<T>(fromObjectiveC x: Any) -> T? {
+@usableFromInline
+internal func failableDynamicBridgeCast<T>(fromObjectiveC x: Any) -> T? {
     if let value = x as? T {
         return value
     } else if T.self == DynamicObject.self {

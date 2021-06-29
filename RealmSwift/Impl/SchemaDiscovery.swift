@@ -64,7 +64,7 @@ internal extension RLMProperty {
 private func getModernProperties(_ object: ObjectBase) -> [RLMProperty] {
     return Mirror(reflecting: object).children.compactMap { prop in
         guard let label = prop.label else { return nil }
-        guard let value = prop.value as? _DiscoverablePersistedProperty else {
+        guard let value = prop.value as? DiscoverablePersistedProperty else {
             return nil
         }
         let property = RLMProperty(name: label, value: value)
