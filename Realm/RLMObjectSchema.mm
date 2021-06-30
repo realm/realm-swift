@@ -39,7 +39,9 @@ using namespace realm;
 @property (nonatomic, readwrite) NSString *className;
 @end
 
-@implementation RLMObjectSchema
+@implementation RLMObjectSchema {
+    std::string _objectStoreName;
+}
 
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties {
     self = [super init];
@@ -323,9 +325,16 @@ using namespace realm;
     return [self.objectClass _realmObjectName] ?: _className;
 }
 
+- (std::string const&)objectStoreName {
+    if (_objectStoreName.empty()) {
+        _objectStoreName = self.objectName.UTF8String;
+    }
+    return _objectStoreName;
+}
+
 - (realm::ObjectSchema)objectStoreCopy:(RLMSchema *)schema {
     ObjectSchema objectSchema;
-    objectSchema.name = self.objectName.UTF8String;
+    objectSchema.name = self.objectStoreName;
     objectSchema.primary_key = _primaryKeyProperty ? _primaryKeyProperty.columnName.UTF8String : "";
     objectSchema.is_embedded = ObjectSchema::IsEmbedded(_isEmbedded);
     for (RLMProperty *prop in _properties) {
