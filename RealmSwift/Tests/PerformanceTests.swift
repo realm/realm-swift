@@ -25,6 +25,8 @@ private func createStringObjects(_ factor: Int) -> Realm {
         for _ in 0..<(1000 * factor) {
             realm.create(SwiftStringObject.self, value: ["a"])
             realm.create(SwiftStringObject.self, value: ["b"])
+            realm.create(SwiftIntObject.self, value: [1])
+            realm.create(SwiftIntObject.self, value: [2])
         }
     }
     return realm
@@ -51,8 +53,8 @@ class SwiftPerformanceTests: TestCase {
         super.setUp()
         autoreleasepool {
             smallRealm = createStringObjects(1)
-            mediumRealm = createStringObjects(5)
-            largeRealm = createStringObjects(50)
+            mediumRealm = createStringObjects(50)
+            largeRealm = createStringObjects(500)
         }
     }
 
@@ -107,7 +109,7 @@ class SwiftPerformanceTests: TestCase {
             let realm = self.realmWithTestPath()
             self.startMeasuring()
             try! realm.write {
-                for _ in 0..<5000 {
+                for _ in 0..<10000 {
                     let obj = SwiftStringObject()
                     obj.stringCol = "a"
                     realm.add(obj)
@@ -122,7 +124,7 @@ class SwiftPerformanceTests: TestCase {
         inMeasureBlock {
             let realm = self.realmWithTestPath()
             self.startMeasuring()
-            for _ in 0..<50 {
+            for _ in 0..<500 {
                 try! realm.write {
                     _ = realm.create(SwiftStringObject.self, value: ["a"])
                 }
@@ -137,7 +139,7 @@ class SwiftPerformanceTests: TestCase {
             let realm = self.realmWithTestPath()
             self.startMeasuring()
             try! realm.write {
-                for _ in 0..<5000 {
+                for _ in 0..<10000 {
                     realm.create(SwiftStringObject.self, value: ["a"])
                 }
             }
@@ -149,7 +151,7 @@ class SwiftPerformanceTests: TestCase {
     func testCountWhereQuery() {
         let realm = copyRealmToTestPath(largeRealm)
         measure {
-            for _ in 0..<50 {
+            for _ in 0..<500 {
                 let results = realm.objects(SwiftStringObject.self).filter("stringCol = 'a'")
                 _ = results.count
             }
@@ -159,7 +161,7 @@ class SwiftPerformanceTests: TestCase {
     func testCountWhereTableView() {
         let realm = copyRealmToTestPath(mediumRealm)
         measure {
-            for _ in 0..<50 {
+            for _ in 0..<500 {
                 let results = realm.objects(SwiftStringObject.self).filter("stringCol = 'a'")
                 _ = results.first
                 _ = results.count
@@ -191,6 +193,26 @@ class SwiftPerformanceTests: TestCase {
             let results = realm.objects(SwiftStringObject.self)
             for i in 0..<results.count {
                 _ = results[i].stringCol
+            }
+        }
+    }
+
+
+    func testEnumerateAndAccessAllInts() {
+        let realm = copyRealmToTestPath(largeRealm)
+        measure {
+            for intObject in realm.objects(SwiftIntObject.self) {
+                _ = intObject.intCol
+            }
+        }
+    }
+
+    func testEnumerateAndAccessAllSlowInts() {
+        let realm = copyRealmToTestPath(largeRealm)
+        measure {
+            let results = realm.objects(SwiftIntObject.self)
+            for i in 0..<results.count {
+                _ = results[i].intCol
             }
         }
     }
@@ -312,12 +334,12 @@ class SwiftPerformanceTests: TestCase {
     func testUnindexedStringLookup() {
         let realm = realmWithTestPath()
         try! realm.write {
-            for i in 0..<1000 {
+            for i in 0..<10000 {
                 realm.create(SwiftStringObject.self, value: [i.description])
             }
         }
         measure {
-            for i in 0..<1000 {
+            for i in 0..<10000 {
                 _ = realm.objects(SwiftStringObject.self).filter("stringCol = %@", i.description).first
             }
         }
@@ -326,12 +348,12 @@ class SwiftPerformanceTests: TestCase {
     func testIndexedStringLookup() {
         let realm = realmWithTestPath()
         try! realm.write {
-            for i in 0..<1000 {
+            for i in 0..<10000 {
                 realm.create(SwiftIndexedPropertiesObject.self, value: [i.description, i])
             }
         }
         measure {
-            for i in 0..<1000 {
+            for i in 0..<10000 {
                 _ = realm.objects(SwiftIndexedPropertiesObject.self).filter("stringCol = %@", i.description).first
             }
         }
@@ -373,7 +395,7 @@ class SwiftPerformanceTests: TestCase {
         }
 
         measure {
-            for _ in 0..<250 {
+            for _ in 0..<2500 {
                 autoreleasepool {
                     _ = try! Realm()
                 }
@@ -384,7 +406,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testRealmCreationUncached() {
         measure {
-            for _ in 0..<50 {
+            for _ in 0..<500 {
                 autoreleasepool {
                     _ = try! Realm()
                 }
@@ -400,7 +422,7 @@ class SwiftPerformanceTests: TestCase {
             try! realm.commitWrite()
 
             self.startMeasuring()
-            while object.intCol < 100 {
+            while object.intCol < 500 {
                 try! realm.write { object.intCol += 1 }
             }
             self.stopMeasuring()
@@ -416,7 +438,7 @@ class SwiftPerformanceTests: TestCase {
 
             let token = realm.observe { _, _ in }
             self.startMeasuring()
-            while object.intCol < 100 {
+            while object.intCol < 500 {
                 try! realm.write { object.intCol += 1 }
             }
             self.stopMeasuring()
@@ -425,7 +447,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testCommitWriteTransactionWithCrossThreadNotification() {
-        let stopValue = 100
+        let stopValue = 1000
         inMeasureBlock {
             let realm = inMemoryRealm("test")
             realm.beginWrite()
@@ -463,7 +485,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testCrossThreadSyncLatency() {
-        let stopValue = 500
+        let stopValue = 5000
         let queue = DispatchQueue(label: "background")
         let semaphore = DispatchSemaphore(value: 0)
 
