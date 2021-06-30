@@ -31,11 +31,14 @@ import Realm
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> Element? {
-        let next = generatorBase.next()
+        guard let next = generatorBase.next() else { return nil }
+        if let value = next as? Element {
+            return value
+        }
         if next is NSNull {
             return Element._nilValue()
         }
-        return next.map(dynamicBridgeCast)
+        return dynamicBridgeCast(fromObjectiveC: next) as Element
     }
 }
 
