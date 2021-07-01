@@ -87,7 +87,7 @@ static void RLMAddSkipBackupAttributeToItemAtPath(std::string_view path) {
 void RLMWaitForRealmToClose(NSString *path) {
     NSString *lockfilePath = [path stringByAppendingString:@".lock"];
     File lockfile(lockfilePath.UTF8String, File::mode_Update);
-    lockfile.set_fifo_path([path stringByAppendingString:@".management/lock.fifo"].UTF8String);
+    lockfile.set_fifo_path([path stringByAppendingString:@".management"].UTF8String, "lock.fifo");
     lockfile.lock_exclusive();
 }
 

@@ -1,14 +1,31 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)` and `[App.emailPasswordAuth retryCustomConfirmation:completion:]`. 
-  These functions support retrying a [custom confirmation](https://docs.mongodb.com/realm/authentication/email-password/#run-a-confirmation-function) function.
+* Add `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)` and
+  `[App.emailPasswordAuth retryCustomConfirmation:completion:]`. These
+  functions support retrying a [custom confirmation](https://docs.mongodb.com/realm/authentication/email-password/#run-a-confirmation-function)
+  function.
 * Improve performance of many Dictionary operations, especially when KVO is being used.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * Calling `-[RLMRealm deleteObjects:]` on a `RLMDictionary` cleared the
   dictionary but did not actually delete the objects in the dictionary (since v10.8.0).
+* Rix an assertion failure when observing a `List<AnyRealmValue>` contains
+  object links. ([Core #4767](https://github.com/realm/realm-core/issues/4767), since v10.8.0)
+* Fix an assertion failure when observing a `RLMDictionary`/`Map` which links
+  to an object which was deleting by a different sync client.
+  ([Core #4770](https://github.com/realm/realm-core/pull/4770), since v10.8.0)
+* Fix an endless recursive loop that could cause a stack overflow when
+  computing changes on a set of objects which contained cycles.
+  ([Core #4770](https://github.com/realm/realm-core/pull/4770), since v10.8.0).
+* Hash collisions in dictionaries were not handled properly.
+  ([Core #4776](https://github.com/realm/realm-core/issues/4776), since v10.8.0).
+* Fix a crash after clearing a list or set of AnyRealmValue containing links to
+  objects ([Core #4774](https://github.com/realm/realm-core/issues/4774), since v10.8.0)
+* Trying to refresh a user token which had been revoked by an admin lead to an
+  infinite loop and then a crash. This situation now properly logs the user out
+  and reports an error. ([Core #4745](https://github.com/realm/realm-core/issues/4745), since v10.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
