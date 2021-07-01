@@ -330,3 +330,17 @@ class ThreadSafeReferenceTests: TestCase {
         }
     }
 }
+
+class Dog: Object {
+    @Persisted var name: String
+}
+class Person: Object {
+    @Persisted var dogs: List<Dog>
+}
+
+class ObjectKeyPathTests: TestCase {
+    func testGetName() {
+        XCTAssertEqual(Object._name(for: \Person.dogs[0].name), "dogs.name")
+        XCTAssertEqual(Object._name(for: \ModernEmbeddedTreeObject1.value), "value")
+    }
+}

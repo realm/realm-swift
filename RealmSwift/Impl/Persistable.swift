@@ -38,7 +38,7 @@ public protocol _Persistable: _RealmSchemaDiscoverable {
     static func _rlmSetProperty(_ obj: ObjectBase, _ key: PropertyKey, _ value: Self)
     // Get the zero/empty/nil value for this type. Used to supply a default
     // when the user does not declare one in their model.
-    static func _rlmDefaultValue() -> Self
+    static func _rlmDefaultValue(_ doNotReturnNilValue: Bool) -> Self
     // Set the swiftAccessor for this type if the default PersistedPropertyAccessor
     // is not suitable.
     static func _rlmSetAccessor(_ prop: RLMProperty)
@@ -52,7 +52,8 @@ extension _Persistable {
 }
 
 // A tag protocol for persistable types which can appear inside Optional
-public protocol _OptionalPersistable: _Persistable {
+public protocol _OptionalPersistable: _Persistable, _DefaultConstructible {
+//    init()
 }
 
 extension _OptionalPersistable {
@@ -71,5 +72,7 @@ public protocol _DefaultConstructible {
     init()
 }
 extension _Persistable where Self: _DefaultConstructible {
-    public static func _rlmDefaultValue() -> Self { .init() }
+    public static func _rlmDefaultValue(_ doNotReturnNilValue: Bool) -> Self {
+        .init()
+    }
 }

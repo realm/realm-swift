@@ -540,3 +540,13 @@ extension Object: AssistedObjectiveCBridgeable {
         return (objectiveCValue: unsafeCastToRLMObject(), metadata: nil)
     }
 }
+
+extension Object {
+    public static func _name<T: ObjectBase>(for keyPath: PartialKeyPath<T>) -> String {
+        let traceObject = T()
+        traceObject.lastAccessedNames = NSMutableArray()
+        traceObject.prepareForRecording()
+        _ = traceObject[keyPath: keyPath]
+        return traceObject.lastAccessedNames!.componentsJoined(by: ".")
+    }
+}

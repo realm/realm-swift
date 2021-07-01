@@ -75,6 +75,15 @@ static void maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
 @end
 
 @implementation RLMObjectBase
+
+- (void)prepareForRecording {
+    for (RLMProperty *property in self.objectSchema.properties) {
+        if (property.swiftAccessor) {
+            [property.swiftAccessor observe:property on: self];
+        }
+    }
+}
+
 - (instancetype)init {
     if ((self = [super init])) {
         maybeInitObjectSchemaForUnmanaged(self);

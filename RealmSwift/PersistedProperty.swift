@@ -159,10 +159,23 @@ public struct Persisted<Value: _Persistable> {
         case let .unmanaged(value, _, _):
             return value
         case .unmanagedNoDefault:
-            let value = Value._rlmDefaultValue()
+            let value = Value._rlmDefaultValue(false)
             storage = .unmanaged(value: value)
             return value
-        case let .unmanagedObserved(value, _):
+        case let .unmanagedObserved(value, key):
+            let name = RLMObjectBaseObjectSchema(object)!.properties[Int(key)].name
+            if object.lastAccessedNames != nil {
+                object.lastAccessedNames!.add(name)
+                let value = Value._rlmDefaultValue(true)
+                if let value = value as? ObjectBase {
+                    value.lastAccessedNames = object.lastAccessedNames
+                    value.prepareForRecording()
+                }
+                if let value = value as? RLMSwiftCollectionBase {
+                    value.lastAccessedNames = object.lastAccessedNames
+                }
+                return value
+            }
             return value
         case let .managed(key):
             let v = Value._rlmGetProperty(object, key)
@@ -204,7 +217,7 @@ public struct Persisted<Value: _Persistable> {
         case let .unmanaged(v, _, _):
             value = v
         case .unmanagedNoDefault:
-            value = Value._rlmDefaultValue()
+            value = Value._rlmDefaultValue(false)
         case .unmanagedObserved, .managed, .managedCached:
             return
         }
@@ -232,7 +245,7 @@ extension Persisted: Encodable where Value: Encodable {
         case .unmanagedObserved(let value, _):
             try value.encode(to: encoder)
         case .unmanagedNoDefault:
-            try Value._rlmDefaultValue().encode(to: encoder)
+            try Value._rlmDefaultValue(false).encode(to: encoder)
         default:
             // We need a reference to the parent object to be able to read from
             // a managed property. There's probably a way to do this with some
@@ -394,3 +407,4 @@ private enum PropertyStorage<T> {
     // and is required for KVO to work correctly.
     case managedCached(value: T, key: PropertyKey)
 }
+

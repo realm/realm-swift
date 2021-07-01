@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMObjectBase : NSObject
 
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
+@property (nonatomic, nullable) NSMutableArray* lastAccessedNames;
 
 - (instancetype)init NS_DESIGNATED_INITIALIZER;
 
@@ -38,6 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable NSString *)_realmObjectName;
 + (nullable NSDictionary<NSString *, NSString *> *)_realmColumnNames;
+
+- (void)prepareForRecording;
 
 @end
 

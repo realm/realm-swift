@@ -163,11 +163,18 @@ enum ModernIntEnum: Int, Codable, PersistableEnum {
     case value1 = 1
     case value2 = 3
     case value3 = 5
+
+    init() {
+        self = .value1
+    }
 }
 enum ModernStringEnum: String, Codable, PersistableEnum {
     case value1 = "a"
     case value2 = "c"
     case value3 = "e"
+    init() {
+        self = .value1
+    }
 }
 
 class ModernImplicitlyUnwrappedOptionalObject: Object {
