@@ -188,6 +188,14 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      */
     public subscript(key: Key) -> Value? {
         get {
+            if lastAccessedNames != nil {
+                let value = Value._rlmDefaultValue(true)
+                if let value = value as? ObjectBase {
+                    value.lastAccessedNames = lastAccessedNames
+                    value.prepareForRecording()
+                }
+                return value
+            }
             return rlmDictionary[objcKey(from: key)].map(dynamicBridgeCast)
         }
         set {

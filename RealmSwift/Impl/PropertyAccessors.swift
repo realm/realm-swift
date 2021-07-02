@@ -281,6 +281,9 @@ internal class PersistedLinkingObjectsAccessor<Element: ObjectBase>: RLMManagedP
     }
     @objc override class func observe(_ property: RLMProperty, on parent: RLMObjectBase) {
         // N/A: unmanaged LinkingObjects are always empty
+        if parent.lastAccessedNames != nil {
+            bound(property, parent).pointee.observe(parent, property: property)
+        }
     }
     @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
         return bound(property, parent).pointee.get(parent)

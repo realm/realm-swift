@@ -52,9 +52,7 @@ extension _Persistable {
 }
 
 // A tag protocol for persistable types which can appear inside Optional
-public protocol _OptionalPersistable: _Persistable, _DefaultConstructible {
-//    init()
-}
+public protocol _OptionalPersistable: _Persistable, _DefaultConstructible { }
 
 extension _OptionalPersistable {
     public static func _rlmSetAccessor(_ prop: RLMProperty) {

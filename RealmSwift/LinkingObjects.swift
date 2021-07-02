@@ -104,6 +104,12 @@ import Realm
      - parameter index: The index.
      */
     public subscript(index: Int) -> Element {
+        if lastAccessedNames != nil {
+            let value = Element._rlmDefaultValue(true)
+            value.lastAccessedNames = lastAccessedNames
+            value.prepareForRecording()
+            return value
+        }
         throwForNegativeIndex(index)
         return unsafeBitCast(rlmResults[UInt(index)], to: Element.self)
     }
@@ -355,6 +361,7 @@ import Realm
 
     internal var propertyName: String
     internal var handle: RLMLinkingObjectsHandle?
+    internal var lastAccessedNames: NSMutableArray?
 }
 
 extension LinkingObjects: RealmCollection {
@@ -403,5 +410,33 @@ extension LinkingObjects: AssistedObjectiveCBridgeable {
 
     internal var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (objectiveCValue: handle!.results, metadata: nil)
+    }
+}
+
+internal protocol KeyPathStringCollection {
+    var lastAccessedNames: NSMutableArray? { get set }
+    mutating func setLastAccessedNames(lastAccessedNames: NSMutableArray)
+}
+
+extension LinkingObjects: KeyPathStringCollection {
+    mutating func setLastAccessedNames(lastAccessedNames: NSMutableArray) {
+        self.lastAccessedNames = lastAccessedNames
+    }
+}
+extension List: KeyPathStringCollection {
+    func setLastAccessedNames(lastAccessedNames: NSMutableArray) {
+        self.lastAccessedNames = lastAccessedNames
+    }
+}
+
+extension MutableSet: KeyPathStringCollection {
+    func setLastAccessedNames(lastAccessedNames: NSMutableArray) {
+        self.lastAccessedNames = lastAccessedNames
+    }
+}
+
+extension Map: KeyPathStringCollection {
+    func setLastAccessedNames(lastAccessedNames: NSMutableArray) {
+        self.lastAccessedNames = lastAccessedNames
     }
 }

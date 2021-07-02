@@ -210,7 +210,11 @@ extension RealmOptional: SchemaDiscoverable, _RealmSchemaDiscoverable where Valu
 
 extension LinkingObjects: _Persistable where Element: _Persistable {
     public static func _rlmDefaultValue(_ doNotReturnNilValue: Bool) -> Self {
-        fatalError("LinkingObjects properties must set the origin property name")
+        if doNotReturnNilValue {
+            return Self.init(propertyName: "", handle: nil)
+        } else {
+            fatalError("LinkingObjects properties must set the origin property name")
+        }
     }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> LinkingObjects {

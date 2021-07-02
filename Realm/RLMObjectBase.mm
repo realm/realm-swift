@@ -82,6 +82,11 @@ static void maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
             [property.swiftAccessor observe:property on: self];
         }
     }
+    for (RLMProperty *property in self.objectSchema.computedProperties) {
+        if (property.swiftAccessor) {
+            [property.swiftAccessor observe:property on: self];
+        }
+    }
 }
 
 - (instancetype)init {
