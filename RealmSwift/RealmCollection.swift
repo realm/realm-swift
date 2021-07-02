@@ -231,7 +231,7 @@ extension AnyRealmValue: RealmCollectionValue {
 }
 
 extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue,
-                                                Wrapped: _DefaultConstructible {
+                                               Wrapped: _DefaultConstructible {
     public static func _rlmDefaultValue(_ doNotReturnNilValue: Bool) -> Optional<Wrapped> {
         if doNotReturnNilValue {
             return Wrapped()
