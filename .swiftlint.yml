@@ -12,17 +12,23 @@ identifier_name:
     warning: 0
     error: 0
   excluded:
+    - _id
     - _nilValue()
     - _nsError
     - _nsErrorDomain
     - _observe(_:)
     - _realmColumnNames()
     - _realmObjectName()
-    - _rlmArray()
+    - _rlmCollection()
+    - _rlmFromRawValue(_:)
+    - _rlmOptional
+    - _rlmPopulateProperty(_:)
+    - _rlmRequireObjc
+    - _rlmToRawValue(_:)
+    - _rlmType
     - id
     - pk
     - to
-    - _id
 disabled_rules:
   - block_based_kvo
   # SwiftLint expects a space following a double slash comment: "//".
@@ -40,6 +46,7 @@ disabled_rules:
   - nesting
   - syntactic_sugar
   - todo
+  - trailing_comma
   - type_body_length
   - vertical_whitespace
   # swiftlint complains about superfluous disable commands when the violation

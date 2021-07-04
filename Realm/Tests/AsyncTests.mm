@@ -919,7 +919,7 @@
     }];
 }
 
-- (void)testTransactionsAfterDeletingLinkView {
+- (void)testTransactionsAfterDeletingArrayLinkView {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     IntObject *io = [IntObject createInRealm:realm withValue:@[@5]];
@@ -949,6 +949,43 @@
         RLMRealm *realm = [RLMRealm defaultRealm];
         [realm transactionWithBlock:^{
             [ArrayPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
+        }];
+    }];
+
+    [token1 invalidate];
+    [token2 invalidate];
+}
+
+- (void)testTransactionsAfterDeletingSetLinkView {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    IntObject *io = [IntObject createInRealm:realm withValue:@[@5]];
+    SetPropertyObject *spo = [SetPropertyObject createInRealm:realm withValue:@[@"", @[], @[io]]];
+    [realm commitWriteTransaction];
+
+    RLMNotificationToken *token1 = [self subscribeAndWaitForInitial:spo.intSet block:^(RLMSet *set) {
+        XCTAssertTrue(set.invalidated);
+    }];
+    RLMResults *asResults = [spo.intSet objectsWhere:@"intCol = 5"];
+    RLMNotificationToken *token2 = [self subscribeAndWaitForInitial:asResults block:^(RLMResults *results) {
+        XCTAssertEqual(results.count, 0U);
+    }];
+
+    // Delete the object containing the RLMArray with notifiers
+    [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [realm deleteObject:[SetPropertyObject allObjectsInRealm:realm].firstObject];
+        }];
+    }];
+
+    // Perform another transaction while the notifiers are still alive as
+    // transactions deleting the RLMArray and transactions with the RLMArray
+    // already deleted hit different code paths
+    [self waitForNotification:RLMRealmDidChangeNotification realm:realm block:^{
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [SetPropertyObject createInRealm:realm withValue:@[@"", @[], @[]]];
         }];
     }];
 

@@ -32,7 +32,7 @@ class ObjectSchemaTests: TestCase {
         XCTAssertEqual(propertyNames,
                        ["boolCol", "intCol", "int8Col", "int16Col", "int32Col", "int64Col", "intEnumCol", "floatCol", "doubleCol",
                         "stringCol", "binaryCol", "dateCol", "decimalCol",
-                        "objectIdCol", "objectCol", "arrayCol"]
+                        "objectIdCol", "objectCol", "uuidCol", "anyCol", "arrayCol", "setCol", "mapCol"]
         )
     }
 
@@ -55,126 +55,198 @@ class ObjectSchemaTests: TestCase {
 
     func testDescription() {
         let objectSchema = swiftObjectSchema
-        let expected =
-            "SwiftObject {\n" +
-            "    boolCol {\n" +
-            "        type = bool;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    intCol {\n" +
-            "        type = int;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    int8Col {\n" +
-            "        type = int;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    int16Col {\n" +
-            "        type = int;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    int32Col {\n" +
-            "        type = int;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    int64Col {\n" +
-            "        type = int;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    intEnumCol {\n" +
-            "        type = int;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    floatCol {\n" +
-            "        type = float;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    doubleCol {\n" +
-            "        type = double;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    stringCol {\n" +
-            "        type = string;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    binaryCol {\n" +
-            "        type = data;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    dateCol {\n" +
-            "        type = date;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    decimalCol {\n" +
-            "        type = decimal128;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    objectIdCol {\n" +
-            "        type = object id;\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "    objectCol {\n" +
-            "        type = object;\n" +
-            "        objectClassName = SwiftBoolObject;\n" +
-            "        linkOriginPropertyName = (null);\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = NO;\n" +
-            "        optional = YES;\n" +
-            "    }\n" +
-            "    arrayCol {\n" +
-            "        type = object;\n" +
-            "        objectClassName = SwiftBoolObject;\n" +
-            "        linkOriginPropertyName = (null);\n" +
-            "        indexed = NO;\n" +
-            "        isPrimary = NO;\n" +
-            "        array = YES;\n" +
-            "        optional = NO;\n" +
-            "    }\n" +
-            "}"
-
+        let expected = """
+        SwiftObject {
+            boolCol {
+                type = bool;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            intCol {
+                type = int;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            int8Col {
+                type = int;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            int16Col {
+                type = int;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            int32Col {
+                type = int;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            int64Col {
+                type = int;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            intEnumCol {
+                type = int;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            floatCol {
+                type = float;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            doubleCol {
+                type = double;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            stringCol {
+                type = string;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            binaryCol {
+                type = data;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            dateCol {
+                type = date;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            decimalCol {
+                type = decimal128;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            objectIdCol {
+                type = object id;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            objectCol {
+                type = object;
+                objectClassName = SwiftBoolObject;
+                linkOriginPropertyName = (null);
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = YES;
+            }
+            uuidCol {
+                type = uuid;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            anyCol {
+                type = mixed;
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            arrayCol {
+                type = object;
+                objectClassName = SwiftBoolObject;
+                linkOriginPropertyName = (null);
+                indexed = NO;
+                isPrimary = NO;
+                array = YES;
+                set = NO;
+                dictionary = NO;
+                optional = NO;
+            }
+            setCol {
+                type = object;
+                objectClassName = SwiftBoolObject;
+                linkOriginPropertyName = (null);
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = YES;
+                dictionary = NO;
+                optional = NO;
+            }
+            mapCol {
+                type = object;
+                objectClassName = SwiftBoolObject;
+                linkOriginPropertyName = (null);
+                indexed = NO;
+                isPrimary = NO;
+                array = NO;
+                set = NO;
+                dictionary = YES;
+                optional = YES;
+            }
+        }
+        """
         XCTAssertEqual(objectSchema.description, expected.replacingOccurrences(of: "    ", with: "\t"))
     }
 

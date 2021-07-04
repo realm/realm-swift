@@ -36,6 +36,7 @@ private var largeRealm: Realm!
 
 private let isRunningOnDevice = TARGET_IPHONE_SIMULATOR == 0
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftPerformanceTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         #if !DEBUG && os(iOS)
@@ -208,6 +209,20 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 
+    func testEnumerateAndAccessMutableSetProperty() {
+        let realm = copyRealmToTestPath(largeRealm)
+        realm.beginWrite()
+        let setPropertyObject = realm.create(SwiftMutableSetPropertyObject.self,
+                                             value: ["name", realm.objects(SwiftStringObject.self).map { $0 } as NSArray, []])
+        try! realm.commitWrite()
+
+        measure {
+            for stringObject in setPropertyObject.set {
+                _ = stringObject.stringCol
+            }
+        }
+    }
+
     func testEnumerateAndAccessArrayPropertySlow() {
         let realm = copyRealmToTestPath(largeRealm)
         realm.beginWrite()
@@ -219,6 +234,21 @@ class SwiftPerformanceTests: TestCase {
             let list = arrayPropertyObject.array
             for i in 0..<list.count {
                 _ = list[i].stringCol
+            }
+        }
+    }
+
+    func testEnumerateAndAccessMutableSetPropertySlow() {
+        let realm = copyRealmToTestPath(largeRealm)
+        realm.beginWrite()
+        let setPropertyObject = realm.create(SwiftMutableSetPropertyObject.self,
+                                             value: ["name", realm.objects(SwiftStringObject.self).map { $0 } as NSArray, []])
+        try! realm.commitWrite()
+
+        measure {
+            let set = setPropertyObject.set
+            for i in 0..<set.count {
+                _ = set[i].stringCol
             }
         }
     }
@@ -474,11 +504,7 @@ class SwiftPerformanceTests: TestCase {
             self.startMeasuring()
             try! realm.write { object.intCol += 1 }
             while object.intCol < stopValue {
-                #if swift(>=4.2)
-                    RunLoop.current.run(mode: RunLoop.Mode.default, before: Date.distantFuture)
-                #else
-                    RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date.distantFuture)
-                #endif
+                RunLoop.current.run(mode: RunLoop.Mode.default, before: Date.distantFuture)
             }
             queue.sync {}
             self.stopMeasuring()
@@ -501,6 +527,24 @@ class SwiftPerformanceTests: TestCase {
         let objects = realm.objects(SwiftListOfSwiftObject.self)
         measure {
             _ = objects.value(forKeyPath: "array") as! [List<SwiftListOfSwiftObject>]
+        }
+    }
+
+    func testValueForKeyForMutableSetObjects() {
+        let realm = try! Realm()
+        try! realm.write {
+            for value in 0..<10000 {
+                let setObject = SwiftMutableSetOfSwiftObject()
+                let object = SwiftObject()
+                object.intCol = value
+                object.stringCol = String(value)
+                setObject.set.insert(object)
+                realm.add(setObject)
+            }
+        }
+        let objects = realm.objects(SwiftMutableSetOfSwiftObject.self)
+        measure {
+            _ = objects.value(forKeyPath: "set") as! [MutableSet<SwiftMutableSetOfSwiftObject>]
         }
     }
 

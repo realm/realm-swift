@@ -20,8 +20,10 @@
 
 #if __has_extension(objc_generics)
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS *><CLASS>
+#define RLM_GENERIC_SET(CLASS) RLMSet<CLASS *><CLASS>
 #else
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS>
+#define RLM_GENERIC_SET(CLASS) RLMSet<CLASS>
 #endif
 
 #pragma mark - Abstract Objects
@@ -92,8 +94,8 @@
 @property NSString *stringCol;
 @end
 
-RLM_ARRAY_TYPE(StringObject)
-RLM_ARRAY_TYPE(IntObject)
+RLM_COLLECTION_TYPE(StringObject)
+RLM_COLLECTION_TYPE(IntObject)
 
 @interface LinkStringObject : RLMObject
 @property StringObject *objectCol;
@@ -117,7 +119,7 @@ RLM_ARRAY_TYPE(IntObject)
 @interface EmbeddedIntObject : RLMEmbeddedObject
 @property int intCol;
 @end
-RLM_ARRAY_TYPE(EmbeddedIntObject)
+RLM_COLLECTION_TYPE(EmbeddedIntObject)
 
 @interface EmbeddedIntParentObject : RLMObject
 @property int pk;
@@ -125,10 +127,18 @@ RLM_ARRAY_TYPE(EmbeddedIntObject)
 @property RLMArray<EmbeddedIntObject> *array;
 @end
 
+@interface UuidObject: RLMObject
+@property NSUUID *uuidCol;
+@end
+
+@interface MixedObject: RLMObject
+@property id<RLMValue> anyCol;
+@property RLMArray<RLMValue> *anyArray;
+@end
+
 #pragma mark AllTypesObject
 
 @interface AllTypesObject : RLMObject
-
 @property BOOL          boolCol;
 @property int           intCol;
 @property float         floatCol;
@@ -140,14 +150,19 @@ RLM_ARRAY_TYPE(EmbeddedIntObject)
 @property int64_t       longCol;
 @property RLMDecimal128 *decimalCol;
 @property RLMObjectId  *objectIdCol;
+@property NSUUID       *uuidCol;
 @property StringObject *objectCol;
+@property MixedObject  *mixedObjectCol;
 @property (readonly) RLMLinkingObjects *linkingObjectsCol;
+@property id<RLMValue> anyCol;
 
 + (NSDictionary *)values:(int)i stringObject:(StringObject *)so;
-
++ (NSDictionary *)values:(int)i
+            stringObject:(StringObject *)so
+             mixedObject:(MixedObject *)mo;
 @end
 
-RLM_ARRAY_TYPE(AllTypesObject)
+RLM_COLLECTION_TYPE(AllTypesObject)
 
 @interface LinkToAllTypesObject : RLMObject
 @property AllTypesObject *allTypesCol;
@@ -155,6 +170,14 @@ RLM_ARRAY_TYPE(AllTypesObject)
 
 @interface ArrayOfAllTypesObject : RLMObject
 @property RLM_GENERIC_ARRAY(AllTypesObject) *array;
+@end
+
+@interface SetOfAllTypesObject : RLMObject
+@property RLM_GENERIC_SET(AllTypesObject) *set;
+@end
+
+@interface DictionaryOfAllTypesObject : RLMObject
+@property RLMDictionary<NSString *, AllTypesObject*><RLMString, AllTypesObject> *dictionary;
 @end
 
 @interface AllOptionalTypes : RLMObject
@@ -167,6 +190,7 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property NSDate *date;
 @property RLMDecimal128 *decimal;
 @property RLMObjectId *objectId;
+@property NSUUID *uuidCol;
 @end
 
 @interface AllOptionalTypesPK : RLMObject
@@ -181,6 +205,7 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property NSDate *date;
 @property RLMDecimal128 *decimal;
 @property RLMObjectId *objectId;
+@property NSUUID *uuidCol;
 @end
 
 @interface AllPrimitiveArrays : RLMObject
@@ -193,6 +218,17 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLMArray<RLMData> *dataObj;
 @property RLMArray<RLMDecimal128> *decimalObj;
 @property RLMArray<RLMObjectId> *objectIdObj;
+@property RLMArray<RLMUUID> *uuidObj;
+@property RLMArray<RLMValue> *anyBoolObj;
+@property RLMArray<RLMValue> *anyIntObj;
+@property RLMArray<RLMValue> *anyFloatObj;
+@property RLMArray<RLMValue> *anyDoubleObj;
+@property RLMArray<RLMValue> *anyStringObj;
+@property RLMArray<RLMValue> *anyDataObj;
+@property RLMArray<RLMValue> *anyDateObj;
+@property RLMArray<RLMValue> *anyDecimalObj;
+@property RLMArray<RLMValue> *anyObjectIdObj;
+@property RLMArray<RLMValue> *anyUUIDObj;
 @end
 
 @interface AllOptionalPrimitiveArrays : RLMObject
@@ -205,6 +241,139 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLMArray<RLMData> *dataObj;
 @property RLMArray<RLMDecimal128> *decimalObj;
 @property RLMArray<RLMObjectId> *objectIdObj;
+@property RLMArray<RLMUUID> *uuidObj;
+@end
+
+@interface AllPrimitiveSets : RLMObject
+@property RLMSet<RLMInt> *intObj;
+@property RLMSet<RLMInt> *intObj2;
+@property RLMSet<RLMFloat> *floatObj;
+@property RLMSet<RLMFloat> *floatObj2;
+@property RLMSet<RLMDouble> *doubleObj;
+@property RLMSet<RLMDouble> *doubleObj2;
+@property RLMSet<RLMBool> *boolObj;
+@property RLMSet<RLMBool> *boolObj2;
+@property RLMSet<RLMString> *stringObj;
+@property RLMSet<RLMString> *stringObj2;
+@property RLMSet<RLMDate> *dateObj;
+@property RLMSet<RLMDate> *dateObj2;
+@property RLMSet<RLMData> *dataObj;
+@property RLMSet<RLMData> *dataObj2;
+@property RLMSet<RLMDecimal128> *decimalObj;
+@property RLMSet<RLMDecimal128> *decimalObj2;
+@property RLMSet<RLMObjectId> *objectIdObj;
+@property RLMSet<RLMObjectId> *objectIdObj2;
+@property RLMSet<RLMUUID> *uuidObj;
+@property RLMSet<RLMUUID> *uuidObj2;
+
+@property RLMSet<RLMValue> *anyBoolObj;
+@property RLMSet<RLMValue> *anyBoolObj2;
+@property RLMSet<RLMValue> *anyIntObj;
+@property RLMSet<RLMValue> *anyIntObj2;
+@property RLMSet<RLMValue> *anyFloatObj;
+@property RLMSet<RLMValue> *anyFloatObj2;
+@property RLMSet<RLMValue> *anyDoubleObj;
+@property RLMSet<RLMValue> *anyDoubleObj2;
+@property RLMSet<RLMValue> *anyStringObj;
+@property RLMSet<RLMValue> *anyStringObj2;
+@property RLMSet<RLMValue> *anyDataObj;
+@property RLMSet<RLMValue> *anyDataObj2;
+@property RLMSet<RLMValue> *anyDateObj;
+@property RLMSet<RLMValue> *anyDateObj2;
+@property RLMSet<RLMValue> *anyDecimalObj;
+@property RLMSet<RLMValue> *anyDecimalObj2;
+@property RLMSet<RLMValue> *anyObjectIdObj;
+@property RLMSet<RLMValue> *anyObjectIdObj2;
+@property RLMSet<RLMValue> *anyUUIDObj;
+@property RLMSet<RLMValue> *anyUUIDObj2;
+
+@end
+
+@interface AllOptionalPrimitiveSets : RLMObject
+@property RLMSet<RLMInt> *intObj;
+@property RLMSet<RLMInt> *intObj2;
+@property RLMSet<RLMFloat> *floatObj;
+@property RLMSet<RLMFloat> *floatObj2;
+@property RLMSet<RLMDouble> *doubleObj;
+@property RLMSet<RLMDouble> *doubleObj2;
+@property RLMSet<RLMBool> *boolObj;
+@property RLMSet<RLMBool> *boolObj2;
+@property RLMSet<RLMString> *stringObj;
+@property RLMSet<RLMString> *stringObj2;
+@property RLMSet<RLMDate> *dateObj;
+@property RLMSet<RLMDate> *dateObj2;
+@property RLMSet<RLMData> *dataObj;
+@property RLMSet<RLMData> *dataObj2;
+@property RLMSet<RLMDecimal128> *decimalObj;
+@property RLMSet<RLMDecimal128> *decimalObj2;
+@property RLMSet<RLMObjectId> *objectIdObj;
+@property RLMSet<RLMObjectId> *objectIdObj2;
+@property RLMSet<RLMUUID> *uuidObj;
+@property RLMSet<RLMUUID> *uuidObj2;
+@end
+
+@interface AllPrimitiveRLMValues : RLMObject
+@property id<RLMValue> nullVal;
+@property id<RLMValue> intVal;
+@property id<RLMValue> floatVal;
+@property id<RLMValue> doubleVal;
+@property id<RLMValue> boolVal;
+@property id<RLMValue> stringVal;
+@property id<RLMValue> dateVal;
+@property id<RLMValue> dataVal;
+@property id<RLMValue> decimalVal;
+@property id<RLMValue> objectIdVal;
+@property id<RLMValue> uuidVal;
+@end
+
+@interface AllDictionariesObject : RLMObject
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMInt> *intDict;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMFloat> *floatDict;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMDouble> *doubleDict;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMBool> *boolDict;
+@property RLMDictionary<NSString *, NSString *><RLMString, RLMString> *stringDict;
+@property RLMDictionary<NSString *, NSDate *><RLMString, RLMDate> *dateDict;
+@property RLMDictionary<NSString *, NSData *><RLMString, RLMData> *dataDict;
+@property RLMDictionary<NSString *, RLMDecimal128 *><RLMString, RLMDecimal128> *decimalDict;
+@property RLMDictionary<NSString *, RLMObjectId *><RLMString, RLMObjectId> *objectIdDict;
+@property RLMDictionary<NSString *, NSUUID *><RLMString, RLMUUID> *uuidDict;
+@property RLMDictionary<NSString *, StringObject *><RLMString, StringObject> *stringObjDict;
+@end
+
+@interface AllPrimitiveDictionaries : RLMObject
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMInt> *intObj;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMFloat> *floatObj;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMDouble> *doubleObj;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMBool> *boolObj;
+@property RLMDictionary<NSString *, NSString *><RLMString, RLMString> *stringObj;
+@property RLMDictionary<NSString *, NSDate *><RLMString, RLMDate> *dateObj;
+@property RLMDictionary<NSString *, NSData *><RLMString, RLMData> *dataObj;
+@property RLMDictionary<NSString *, RLMDecimal128 *><RLMString, RLMDecimal128> *decimalObj;
+@property RLMDictionary<NSString *, RLMObjectId *><RLMString, RLMObjectId> *objectIdObj;
+@property RLMDictionary<NSString *, NSUUID *><RLMString, RLMUUID> *uuidObj;
+@property RLMDictionary<NSString *, NSObject *><RLMString, RLMValue> *anyBoolObj;
+@property RLMDictionary<NSString *, NSObject *><RLMString, RLMValue> *anyIntObj;
+@property RLMDictionary<NSString *, NSObject *><RLMString, RLMValue> *anyFloatObj;
+@property RLMDictionary<NSString *, NSObject *><RLMString, RLMValue> *anyDoubleObj;
+@property RLMDictionary<NSString *, NSObject *><RLMString, RLMValue> *anyStringObj;
+@property RLMDictionary<NSString *, NSObject *><RLMString, RLMValue> *anyDataObj;
+@property RLMDictionary<NSString *, NSObject *><RLMString, RLMValue> *anyDateObj;
+@property RLMDictionary<NSString *, NSObject *><RLMString, RLMValue> *anyDecimalObj;
+@property RLMDictionary<NSString *, NSObject *><RLMString, RLMValue> *anyObjectIdObj;
+@property RLMDictionary<NSString *, NSObject *><RLMString, RLMValue> *anyUUIDObj;
+@end
+
+@interface AllOptionalPrimitiveDictionaries : RLMObject
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMInt> *intObj;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMFloat> *floatObj;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMDouble> *doubleObj;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMBool> *boolObj;
+@property RLMDictionary<NSString *, NSString *><RLMString, RLMString> *stringObj;
+@property RLMDictionary<NSString *, NSDate *><RLMString, RLMDate> *dateObj;
+@property RLMDictionary<NSString *, NSData *><RLMString, RLMData> *dataObj;
+@property RLMDictionary<NSString *, RLMDecimal128 *><RLMString, RLMDecimal128> *decimalObj;
+@property RLMDictionary<NSString *, RLMObjectId *><RLMString, RLMObjectId> *objectIdObj;
+@property RLMDictionary<NSString *, NSUUID *><RLMString, RLMUUID> *uuidObj;
 @end
 
 #pragma mark - Real Life Objects
@@ -220,7 +389,7 @@ RLM_ARRAY_TYPE(AllTypesObject)
 
 @end
 
-RLM_ARRAY_TYPE(EmployeeObject)
+RLM_COLLECTION_TYPE(EmployeeObject)
 
 #pragma mark CompanyObject
 
@@ -228,6 +397,8 @@ RLM_ARRAY_TYPE(EmployeeObject)
 
 @property NSString *name;
 @property RLM_GENERIC_ARRAY(EmployeeObject) *employees;
+@property RLM_GENERIC_SET(EmployeeObject) *employeeSet;
+@property RLMDictionary<NSString *, EmployeeObject *><RLMString, EmployeeObject> *employeeDict;
 
 @end
 
@@ -247,12 +418,19 @@ RLM_ARRAY_TYPE(EmployeeObject)
 @property (readonly) RLMLinkingObjects *owners;
 @end
 
-RLM_ARRAY_TYPE(DogObject)
+RLM_COLLECTION_TYPE(DogObject)
 
 @interface DogArrayObject : RLMObject
 @property RLM_GENERIC_ARRAY(DogObject) *dogs;
 @end
 
+@interface DogSetObject : RLMObject
+@property RLM_GENERIC_SET(DogObject) *dogs;
+@end
+
+@interface DogDictionaryObject : RLMObject
+@property RLMDictionary<NSString *, DogObject *><RLMString, DogObject> *dogs;
+@end
 
 #pragma mark OwnerObject
 
@@ -298,12 +476,24 @@ RLM_ARRAY_TYPE(DogObject)
 
 @end
 
-RLM_ARRAY_TYPE(CircleObject);
+RLM_COLLECTION_TYPE(CircleObject);
 
 #pragma mark CircleArrayObject
 
 @interface CircleArrayObject : RLMObject
 @property RLM_GENERIC_ARRAY(CircleObject) *circles;
+@end
+
+#pragma mark CircleSetObject
+
+@interface CircleSetObject : RLMObject
+@property RLM_GENERIC_SET(CircleObject) *circles;
+@end
+
+#pragma mark CircleDictionaryObject
+
+@interface CircleDictionaryObject : RLMObject
+@property RLMDictionary<NSString *, CircleObject *><RLMString, CircleObject> *circles;
 @end
 
 #pragma mark ArrayPropertyObject
@@ -314,6 +504,26 @@ RLM_ARRAY_TYPE(CircleObject);
 @property RLM_GENERIC_ARRAY(StringObject) *array;
 @property RLM_GENERIC_ARRAY(IntObject) *intArray;
 
+@end
+
+#pragma mark SetPropertyObject
+
+@interface SetPropertyObject : RLMObject
+
+@property NSString *name;
+@property RLM_GENERIC_SET(StringObject) *set;
+@property RLM_GENERIC_SET(IntObject) *intSet;
+
+@end
+
+#pragma mark DictionaryPropertyObject
+
+@interface DictionaryPropertyObject : RLMObject
+@property RLMDictionary<NSString *, StringObject *><RLMString, StringObject> *stringDictionary;
+@property RLMDictionary<NSString *, NSNumber *><RLMString, RLMInt> *intDictionary;
+@property RLMDictionary<NSString *, NSString *><RLMString, RLMString> *primitiveStringDictionary;
+@property RLMDictionary<NSString *, EmbeddedIntObject *><RLMString, EmbeddedIntObject> *embeddedDictionary;
+@property RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *intObjDictionary;
 @end
 
 #pragma mark DynamicObject
@@ -334,12 +544,21 @@ RLM_ARRAY_TYPE(CircleObject);
 @property double  doubleCol;
 @property BOOL    boolCol;
 @property NSDate *dateCol;
+@property id<RLMValue> anyCol;
 
 @end
 
-RLM_ARRAY_TYPE(AggregateObject)
+RLM_COLLECTION_TYPE(AggregateObject)
 @interface AggregateArrayObject : RLMObject
 @property RLMArray<AggregateObject *><AggregateObject> *array;
+@end
+
+@interface AggregateSetObject : RLMObject
+@property RLMSet<AggregateObject *><AggregateObject> *set;
+@end
+
+@interface AggregateDictionaryObject : RLMObject
+@property RLMDictionary<NSString *, AggregateObject *><RLMString, AggregateObject> *dictionary;
 @end
 
 #pragma mark PrimaryStringObject
@@ -357,7 +576,7 @@ RLM_ARRAY_TYPE(AggregateObject)
 @interface PrimaryIntObject : RLMObject
 @property int intCol;
 @end
-RLM_ARRAY_TYPE(PrimaryIntObject);
+RLM_COLLECTION_TYPE(PrimaryIntObject);
 
 @interface PrimaryInt64Object : RLMObject
 @property int64_t int64Col;
@@ -380,6 +599,24 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 
 @property NSInteger number;
 @property RLM_GENERIC_ARRAY(IntObject) *array;
+
+@end
+
+#pragma mark IntegerSetPropertyObject
+
+@interface IntegerSetPropertyObject : RLMObject
+
+@property NSInteger number;
+@property RLM_GENERIC_SET(IntObject) *set;
+
+@end
+
+#pragma mark IntegerDictionaryPropertyObject
+
+@interface IntegerDictionaryPropertyObject : RLMObject
+
+@property NSInteger number;
+@property RLMDictionary<NSString *, IntObject *><RLMString, IntObject> *dictionary;
 
 @end
 
@@ -414,7 +651,7 @@ RLM_ARRAY_TYPE(PrimaryIntObject);
 #pragma mark PersonObject
 
 @class PersonObject;
-RLM_ARRAY_TYPE(PersonObject);
+RLM_COLLECTION_TYPE(PersonObject);
 
 @interface PersonObject : RLMObject
 @property NSString *name;
@@ -425,7 +662,7 @@ RLM_ARRAY_TYPE(PersonObject);
 
 @interface PrimaryEmployeeObject : EmployeeObject
 @end
-RLM_ARRAY_TYPE(PrimaryEmployeeObject);
+RLM_COLLECTION_TYPE(PrimaryEmployeeObject);
 
 @interface LinkToPrimaryEmployeeObject : RLMObject
 @property PrimaryEmployeeObject *wrapped;
@@ -434,13 +671,19 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 @interface PrimaryCompanyObject : RLMObject
 @property NSString *name;
 @property RLM_GENERIC_ARRAY(PrimaryEmployeeObject) *employees;
+@property RLM_GENERIC_SET(PrimaryEmployeeObject) *employeeSet;
+@property RLMDictionary<NSString *, PrimaryEmployeeObject *><RLMString, PrimaryEmployeeObject> *employeeDict;
 @property PrimaryEmployeeObject *intern;
 @property LinkToPrimaryEmployeeObject *wrappedIntern;
 @end
-RLM_ARRAY_TYPE(PrimaryCompanyObject);
+RLM_COLLECTION_TYPE(PrimaryCompanyObject);
 
 @interface ArrayOfPrimaryCompanies : RLMObject
 @property RLM_GENERIC_ARRAY(PrimaryCompanyObject) *companies;
+@end
+
+@interface SetOfPrimaryCompanies : RLMObject
+@property RLM_GENERIC_SET(PrimaryCompanyObject) *companies;
 @end
 
 #pragma mark ComputedPropertyNotExplicitlyIgnoredObject
@@ -464,19 +707,23 @@ RLM_ARRAY_TYPE(PrimaryCompanyObject);
 @property (readonly, nonatomic) RLMLinkingObjects *linking2;
 @end
 
-RLM_ARRAY_TYPE(RenamedProperties1)
-RLM_ARRAY_TYPE(RenamedProperties2)
+RLM_COLLECTION_TYPE(RenamedProperties1)
+RLM_COLLECTION_TYPE(RenamedProperties2)
 
 @interface LinkToRenamedProperties1 : RLMObject
 @property (nonatomic) RenamedProperties1 *linkA;
 @property (nonatomic) RenamedProperties2 *linkB;
 @property (nonatomic) RLM_GENERIC_ARRAY(RenamedProperties1) *array;
+@property (nonatomic) RLM_GENERIC_SET(RenamedProperties1) *set;
+@property (nonatomic) RLMDictionary<NSString *, RenamedProperties1 *><RLMString, RenamedProperties1> *dictionary;
 @end
 
 @interface LinkToRenamedProperties2 : RLMObject
 @property (nonatomic) RenamedProperties2 *linkC;
 @property (nonatomic) RenamedProperties1 *linkD;
 @property (nonatomic) RLM_GENERIC_ARRAY(RenamedProperties2) *array;
+@property (nonatomic) RLM_GENERIC_SET(RenamedProperties2) *set;
+@property (nonatomic) RLMDictionary<NSString *, RenamedProperties2 *><RLMString, RenamedProperties2> *dictionary;
 @end
 
 @interface RenamedPrimaryKey : RLMObject

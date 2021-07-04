@@ -20,6 +20,7 @@
 
 #import "RLMAnalytics.hpp"
 #import "RLMArray_Private.hpp"
+#import "RLMDictionary_Private.hpp"
 #import "RLMMigration_Private.h"
 #import "RLMObject_Private.h"
 #import "RLMObject_Private.hpp"
@@ -33,6 +34,7 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
+#import "RLMSet_Private.hpp"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
@@ -80,6 +82,13 @@ void RLMSetSkipBackupAttribute(bool value) {
 
 static void RLMAddSkipBackupAttributeToItemAtPath(std::string_view path) {
     [[NSURL fileURLWithPath:@(path.data())] setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:nil];
+}
+
+void RLMWaitForRealmToClose(NSString *path) {
+    NSString *lockfilePath = [path stringByAppendingString:@".lock"];
+    File lockfile(lockfilePath.UTF8String, File::mode_Update);
+    lockfile.set_fifo_path([path stringByAppendingString:@".management"].UTF8String, "lock.fifo");
+    lockfile.lock_exclusive();
 }
 
 @implementation RLMRealmNotificationToken
@@ -139,6 +148,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 }
 
 @implementation RLMRealm {
+    std::mutex _collectionEnumeratorMutex;
     NSHashTable<RLMFastEnumerator *> *_collectionEnumerators;
     bool _sendingNotifications;
 }
@@ -750,6 +760,9 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
 }
 
 - (BOOL)refresh {
+    if (_realm->config().immutable()) {
+        @throw RLMException(@"Read-only Realms do not change and cannot be refreshed.");
+    }
     try {
         return _realm->refresh();
     }
@@ -811,6 +824,20 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
             @throw RLMException(@"Cannot delete objects from RLMArray<%@>: only RLMObjects can be deleted.",
                                 RLMTypeToString(array.type));
         }
+    } else if (auto set = RLMDynamicCast<RLMSet>(objects)) {
+        if (set.type != RLMPropertyTypeObject) {
+            @throw RLMException(@"Cannot delete objects from RLMSet<%@>: only RLMObjects can be deleted.",
+                                RLMTypeToString(set.type));
+        }
+    } else if (auto dictionary = RLMDynamicCast<RLMDictionary>(objects)) {
+        if (dictionary.type != RLMPropertyTypeObject) {
+            @throw RLMException(@"Cannot delete objects from RLMDictionary of type %@: only RLMObjects can be deleted.",
+                                RLMTypeToString(dictionary.type));
+        }
+        for (RLMObject *obj in dictionary.allValues) {
+            RLMDeleteObjectFromRealm(obj, self);
+        }
+        return;
     }
     for (RLMObject *obj in objects) {
         if (![obj isKindOfClass:RLMObjectBase.class]) {
@@ -976,6 +1003,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
 }
 
 - (void)registerEnumerator:(RLMFastEnumerator *)enumerator {
+    std::lock_guard lock(_collectionEnumeratorMutex);
     if (!_collectionEnumerators) {
         _collectionEnumerators = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
     }
@@ -983,10 +1011,12 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
 }
 
 - (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator {
+    std::lock_guard lock(_collectionEnumeratorMutex);
     [_collectionEnumerators removeObject:enumerator];
 }
 
 - (void)detachAllEnumerators {
+    std::lock_guard lock(_collectionEnumeratorMutex);
     for (RLMFastEnumerator *enumerator in _collectionEnumerators) {
         [enumerator detach];
     }

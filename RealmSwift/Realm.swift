@@ -608,7 +608,20 @@ import Realm.Private
      :nodoc:
      */
     public func delete<Element: ObjectBase>(_ objects: List<Element>) {
-        rlmRealm.deleteObjects(objects._rlmArray)
+        rlmRealm.deleteObjects(objects._rlmCollection)
+    }
+
+    /**
+     Deletes zero or more objects from the Realm.
+
+     - warning: This method may only be called during a write transaction.
+
+     - parameter objects: A map of objects to delete.
+
+     :nodoc:
+     */
+    public func delete<Key: _MapKey, Value: ObjectBase>(_ map: Map<Key, Value?>) {
+        rlmRealm.deleteObjects(map._rlmCollection)
     }
 
     /**
@@ -881,8 +894,7 @@ import Realm.Private
      and a new read transaction is implicitly begun the next time data is read from the Realm.
 
      Calling this method multiple times in a row without reading any data from the
-     Realm, or before ever reading any data from the Realm, is a no-op. This method
-     may not be called on a read-only Realm.
+     Realm, or before ever reading any data from the Realm, is a no-op.
      */
     public func invalidate() {
         rlmRealm.invalidate()

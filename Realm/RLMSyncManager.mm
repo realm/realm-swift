@@ -73,7 +73,7 @@ RLMSyncLogLevel logLevelForLevel(Level logLevel) {
 #pragma mark - Loggers
 
 struct CocoaSyncLogger : public realm::util::RootLogger {
-    void do_log(Level, std::string message) override {
+    void do_log(Level, const std::string& message) override {
         NSLog(@"Sync: %@", RLMStringDataToNSString(message));
     }
 };
@@ -88,7 +88,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 
 struct CallbackLogger : public realm::util::RootLogger {
     RLMSyncLogFunction logFn;
-    void do_log(Level level, std::string message) override {
+    void do_log(Level level, const std::string& message) override {
         @autoreleasepool {
             logFn(logLevelForLevel(level), RLMStringDataToNSString(message));
         }
@@ -172,7 +172,7 @@ struct CallbackLoggerFactory : public realm::SyncLoggerFactory {
     for (auto&& user : _syncManager->all_users()) {
         for (auto&& session : user->all_sessions()) {
             auto config = session->config();
-            config.custom_http_headers.clear();;
+            config.custom_http_headers.clear();
             for (NSString *key in customRequestHeaders) {
                 config.custom_http_headers.emplace(key.UTF8String, customRequestHeaders[key].UTF8String);
             }

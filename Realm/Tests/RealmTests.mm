@@ -433,52 +433,68 @@
 
     // delete objects
     RLMResults *objects = [StringObject allObjectsInRealm:realm];
-    XCTAssertEqual(objects.count, 3U, @"Expecting 3 objects");
+    XCTAssertEqual(objects.count, 3U);
     [realm beginWriteTransaction];
     [realm deleteObjects:[StringObject objectsInRealm:realm where:@"stringCol != 'a'"]];
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 1U, @"Expecting 0 objects");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 1U);
     [realm deleteObjects:objects];
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 0U, @"Expecting 0 objects");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 0U);
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 0U, @"Expecting 0 objects");
-    XCTAssertThrows(strObj.stringCol, @"Object should be invalidated");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 0U);
+    RLMAssertThrowsWithReason(strObj.stringCol, @"invalidated");
 
-    // add objects to linkView
+    // add objects to collections
     [realm beginWriteTransaction];
-    ArrayPropertyObject *obj = [ArrayPropertyObject createInRealm:realm withValue:@[@"name", @[@[@"a"], @[@"b"], @[@"c"]], @[]]];
-    [StringObject createInRealm:realm withValue:@[@"d"]];
+    ArrayPropertyObject *arrayObj = [ArrayPropertyObject createInRealm:realm withValue:@[@"name", @[@[@"a"], @[@"b"], @[@"c"]], @[]]];
+    SetPropertyObject *setObj = [SetPropertyObject createInRealm:realm withValue:@[@"name", @[@[@"d"], @[@"e"], @[@"f"]], @[]]];
+    DictionaryPropertyObject *dictObj = [DictionaryPropertyObject createInRealm:realm withValue:@{@"stringDictionary": @{@"a": @[@"b"]}}];
+    [StringObject createInRealm:realm withValue:@[@"g"]];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 4U, @"Expecting 4 objects");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 8U);
 
-    // remove from linkView
+    // delete via collections
     [realm beginWriteTransaction];
-    [realm deleteObjects:obj.array];
+    [realm deleteObjects:arrayObj.array];
+    [realm deleteObjects:setObj.set];
+    [realm deleteObjects:dictObj.stringDictionary];
     [realm commitWriteTransaction];
 
-    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 1U, @"Expecting 1 object");
-    XCTAssertEqual(obj.array.count, 0U, @"Expecting 0 objects");
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], 1U);
+    XCTAssertEqual(arrayObj.array.count, 0U);
+    XCTAssertEqual(setObj.set.count, 0U);
+    XCTAssertEqual(dictObj.stringDictionary.count, 0U);
 
     // remove NSArray
     NSArray *arrayOfLastObject = @[[[StringObject allObjectsInRealm:realm] lastObject]];
     [realm beginWriteTransaction];
     [realm deleteObjects:arrayOfLastObject];
     [realm commitWriteTransaction];
-    XCTAssertEqual(objects.count, 0U, @"Expecting 0 objects");
+    XCTAssertEqual(objects.count, 0U);
 
-    // add objects to linkView
+    // add objects to collections
     [realm beginWriteTransaction];
-    [obj.array addObject:[StringObject createInRealm:realm withValue:@[@"a"]]];
-    [obj.array addObject:[[StringObject alloc] initWithValue:@[@"b"]]];
+    [arrayObj.array addObject:[StringObject createInRealm:realm withValue:@[@"a"]]];
+    [arrayObj.array addObject:[[StringObject alloc] initWithValue:@[@"b"]]];
+    [setObj.set addObject:[StringObject createInRealm:realm withValue:@[@"c"]]];
+    [setObj.set addObject:[[StringObject alloc] initWithValue:@[@"d"]]];
+    dictObj.stringDictionary[@"b"] = [[StringObject alloc] initWithValue:@[@"e"]];
     [realm commitWriteTransaction];
 
     // remove objects from realm
-    XCTAssertEqual(obj.array.count, 2U, @"Expecting 2 objects");
+    XCTAssertEqual(arrayObj.array.count, 2U);
+    XCTAssertEqual(setObj.set.count, 2U);
+    XCTAssertEqual(dictObj.stringDictionary.count, 1U);
     [realm beginWriteTransaction];
     [realm deleteObjects:[StringObject allObjectsInRealm:realm]];
     [realm commitWriteTransaction];
-    XCTAssertEqual(obj.array.count, 0U, @"Expecting 0 objects");
+    XCTAssertEqual(arrayObj.array.count, 0U);
+    XCTAssertEqual(setObj.set.count, 0U);
+    // deleting the target objects in a dictionary sets them to null rather than
+    // removing the entries
+    XCTAssertEqual(dictObj.stringDictionary.count, 1U);
+    XCTAssertEqual((id)dictObj.stringDictionary[@"b"], NSNull.null);
 }
 
 - (void)testAddManagedObjectToOtherRealm {
@@ -995,7 +1011,7 @@
     [token invalidate];
 }
 
-- (void)testBeginWriteTransactionFromWithinCollectionChangedNotification {
+- (void)FIXME_testBeginWriteTransactionFromWithinCollectionChangedNotification {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     auto createObject = ^{
@@ -1252,14 +1268,20 @@
     XCTAssertThrows([array count]);
 }
 
-- (void)testInvalidateOnReadOnlyRealmIsError
+- (void)testInvalidateOnReadOnlyRealm
 {
     @autoreleasepool {
-        // Create the file
-        [self realmWithTestPath];
+        RLMRealm *realm = [self realmWithTestPath];
+        [realm transactionWithBlock:^{
+            [IntObject createInRealm:realm withValue:@[@0]];
+        }];
     }
     RLMRealm *realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
-    XCTAssertThrows([realm invalidate]);
+    IntObject *io = [[IntObject allObjectsInRealm:realm] firstObject];
+    [realm invalidate];
+    XCTAssertTrue(io.isInvalidated);
+    // Starts a new read transaction
+    XCTAssertFalse([[[IntObject allObjectsInRealm:realm] firstObject] isInvalidated]);
 }
 
 - (void)testInvalidateBeforeReadDoesNotAssert
@@ -1491,7 +1513,7 @@
 
     // wait for background realm to be created
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    bgDone = [self expectationWithDescription:@"background queue done"];;
+    bgDone = [self expectationWithDescription:@"background queue done"];
 
     [realm beginWriteTransaction];
     [StringObject createInRealm:realm withValue:@[@"string"]];

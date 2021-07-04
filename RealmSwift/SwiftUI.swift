@@ -18,7 +18,7 @@
 
 import Foundation
 
-#if canImport(SwiftUI) && canImport(Combine) && swift(>=5.3.1) && (REALM_HAVE_COMBINE || !SWIFT_PACKAGE)
+#if canImport(SwiftUI) && canImport(Combine)
 import SwiftUI
 import Combine
 import Realm
@@ -52,7 +52,7 @@ private func createBinding<T: ThreadConfined, V>(_ value: T,
             return lastValue
         }
         lastValue = value[keyPath: keyPath]
-        if let value = lastValue as? ListBase & ThreadConfined, !value.isInvalidated && value.realm != nil {
+        if let value = lastValue as? RLMSwiftCollectionBase & ThreadConfined, !value.isInvalidated && value.realm != nil {
             return value.freeze() as! V
         }
         return lastValue
@@ -213,10 +213,11 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     /// :nodoc:
     public var wrappedValue: T {
         get {
-            if storage.value.realm == nil {
+            let value = storage.value
+            if value.realm == nil {
                 // if unmanaged return the unmanaged value
-                return storage.value
-            } else if storage.value.isInvalidated {
+                return value
+            } else if value.isInvalidated {
                 // if invalidated, return the default value
                 return defaultValue
             }
@@ -226,7 +227,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
             // during some timeframe. The ObjectType is frozen so that
             // SwiftUI can cache state. other access points will thaw
             // the ObjectType
-            return storage.value.freeze()
+            return value.freeze()
         }
         nonmutating set {
             storage.value = newValue
@@ -235,10 +236,11 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     /// :nodoc:
     public var projectedValue: Binding<T> {
         Binding(get: {
-            if self.storage.value.isInvalidated {
+            let value = self.storage.value
+            if value.isInvalidated {
                 return self.defaultValue
             }
-            return self.storage.value
+            return value
         }, set: { newValue in
             self.storage.value = newValue
         })
@@ -249,6 +251,15 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
      */
     @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
     public init<Value>(wrappedValue: T) where T == List<Value> {
+        self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
+        defaultValue = T()
+    }
+    /**
+     Initialize a RealmState struct for a given thread confined type.
+     - parameter wrappedValue The Map reference to wrap and observe.
+     */
+    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+    public init<Key, Value>(wrappedValue: T) where T == Map<Key, Value> {
         self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
         defaultValue = T()
     }
@@ -416,10 +427,12 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Binding where Value: ObjectBase & ThreadConfined {
     /// :nodoc:
-    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _ManagedPropertyType {
+    public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> {
         createBinding(wrappedValue, forKeyPath: member)
     }
 }
+
+// MARK: - BoundCollection
 
 /// :nodoc:
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
@@ -475,7 +488,7 @@ public extension BoundCollection where Value: RealmCollection {
         }
     }
     /// :nodoc:
-    func append<V>(_ value: Value.Element) where Value == List<V>, Value.Element: RealmCollectionValue {
+    func append<V>(_ value: Value.Element) where Value == List<V> {
         safeWrite(self.wrappedValue) { list in
             list.append(value)
         }
@@ -502,6 +515,70 @@ public extension BoundCollection where Value: RealmCollection {
 }
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension Binding: BoundCollection where Value: RealmCollection {
+}
+
+// MARK: - BoundMap
+
+/// :nodoc:
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public protocol BoundMap {
+    /// :nodoc:
+    associatedtype Value
+
+    /// :nodoc:
+    var wrappedValue: Value { get }
+}
+
+/// :nodoc:
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension BoundMap where Value: RealmKeyedCollection {
+    /// :nodoc:
+    typealias Key = Value.Key
+    /// :nodoc:
+    typealias Element = Value.Value
+
+    // The compiler will not allow us to assign values by subscript as the binding is a get-only
+    // property. To get around this we need an explicit `set` method.
+    /// :nodoc:
+    subscript( key: Key) -> Element? {
+        self.wrappedValue[key]
+    }
+
+    /// :nodoc:
+    func set<K, V>(object: Element?, for key: Key) where Element: ObjectBase & ThreadConfined, Value == Map<K, V> {
+        // If the value is `nil` remove it from the map.
+        guard let value = object else {
+            safeWrite(self.wrappedValue) { map in
+                map.removeObject(for: key)
+            }
+            return
+        }
+        // if the value is unmanaged but the map is managed, we are adding this value to the realm
+        if value.realm == nil && self.wrappedValue.realm != nil {
+            SwiftUIKVO.observedObjects[value]?.cancel()
+        }
+        safeWrite(self.wrappedValue) { map in
+            map[key] = value
+        }
+    }
+
+    /// :nodoc:
+    func set<K, V>(object: Element?, for key: Key) where Value == Map<K, V> {
+        // If the value is `nil` remove it from the map.
+        guard let value = object else {
+            safeWrite(self.wrappedValue) { map in
+                map.removeObject(for: key)
+            }
+            return
+        }
+        safeWrite(self.wrappedValue) { map in
+            map[key] = value
+        }
+    }
+}
+
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+extension Binding: BoundMap where Value: RealmKeyedCollection {
 }
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
@@ -537,7 +614,7 @@ extension ThreadConfined where Self: ObjectBase {
      - parameter keyPath The key path to the member property.
      - returns A `Binding` to the member property.
      */
-    public func bind<V: _ManagedPropertyType>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V> {
+    public func bind<V>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V> {
         createBinding(self.realm != nil ? self.thaw() ?? self : self, forKeyPath: keyPath)
     }
 }

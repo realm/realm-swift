@@ -38,6 +38,7 @@ class SwiftDynamicDefaultObject: Object {
     }
 }
 
+@available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class ObjectTests: TestCase {
     // init() Tests are in ObjectCreationTests.swift
     // init(value:) tests are in ObjectCreationTests.swift
@@ -72,7 +73,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual(schema.properties.map { $0.name },
                        ["boolCol", "intCol", "int8Col", "int16Col", "int32Col", "int64Col", "intEnumCol", "floatCol", "doubleCol",
                         "stringCol", "binaryCol", "dateCol", "decimalCol",
-                        "objectIdCol", "objectCol", "arrayCol"]
+                        "objectIdCol", "objectCol", "uuidCol", "anyCol", "arrayCol", "setCol", "mapCol"]
         )
     }
 
@@ -136,21 +137,22 @@ class ObjectTests: TestCase {
         let object = SwiftObject()
 
         // swiftlint:disable line_length
-        assertMatches(object.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tint8Col = 123;\n\tint16Col = 123;\n\tint32Col = 123;\n\tint64Col = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <.*61.*>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tdecimalCol = 1.23E6;\n\tobjectIdCol = 1234567890ab1234567890ab;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
+        assertMatches(object.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tint8Col = 123;\n\tint16Col = 123;\n\tint32Col = 123;\n\tint64Col = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <.*61.*>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tdecimalCol = 1.23E6;\n\tobjectIdCol = 1234567890ab1234567890ab;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tuuidCol = 137DECC8-B300-4954-A233-F89909F4FD89;\n\tanyCol = \\(null\\);\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\tsetCol = MutableSet<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\tmapCol = Map<string, SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
 
         let recursiveObject = SwiftRecursiveObject()
         recursiveObject.objects.append(recursiveObject)
-        assertMatches(recursiveObject.description, "SwiftRecursiveObject \\{\n\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t\\}\n\t\t\t\\);\n\t\t\\}\n\t\\);\n\\}")
+        recursiveObject.objectSet.insert(recursiveObject)
+        assertMatches(recursiveObject.description, "SwiftRecursiveObject \\{\n\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t\tobjectSet = <Maximum depth exceeded>;\n\t\t\t\t\\}\n\t\t\t\\);\n\t\t\tobjectSet = MutableSet<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t\tobjectSet = <Maximum depth exceeded>;\n\t\t\t\t\\}\n\t\t\t\\);\n\t\t\\}\n\t\\);\n\tobjectSet = MutableSet<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t\tobjectSet = <Maximum depth exceeded>;\n\t\t\t\t\\}\n\t\t\t\\);\n\t\t\tobjectSet = MutableSet<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t\tobjectSet = <Maximum depth exceeded>;\n\t\t\t\t\\}\n\t\t\t\\);\n\t\t\\}\n\t\\);\n\\}")
 
         let renamedObject = LinkToSwiftRenamedProperties1()
         renamedObject.linkA = SwiftRenamedProperties1()
-        assertMatches(renamedObject.description, "LinkToSwiftRenamedProperties1 \\{\n\tlinkA = SwiftRenamedProperties1 \\{\n\t\tpropA = 0;\n\t\tpropB = ;\n\t\\};\n\tlinkB = \\(null\\);\n\tarray1 = List<SwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
+        assertMatches(renamedObject.description, "LinkToSwiftRenamedProperties1 \\{\n\tlinkA = SwiftRenamedProperties1 \\{\n\t\tpropA = 0;\n\t\tpropB = ;\n\t\\};\n\tlinkB = \\(null\\);\n\tarray1 = List<SwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\tset1 = MutableSet<SwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
         assertMatches(renamedObject.linkA!.linking1.description, "LinkingObjects<LinkToSwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\n\\)")
 
         let realm = try! Realm()
         try! realm.write { realm.add(renamedObject) }
-        assertMatches(renamedObject.description, "LinkToSwiftRenamedProperties1 \\{\n\tlinkA = SwiftRenamedProperties1 \\{\n\t\tpropA = 0;\n\t\tpropB = ;\n\t\\};\n\tlinkB = \\(null\\);\n\tarray1 = List<SwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
-        assertMatches(renamedObject.linkA!.linking1.description, "LinkingObjects<LinkToSwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\\[0\\] LinkToSwiftRenamedProperties1 \\{\n\t\tlinkA = SwiftRenamedProperties1 \\{\n\t\t\tpropA = 0;\n\t\t\tpropB = ;\n\t\t\\};\n\t\tlinkB = \\(null\\);\n\t\tarray1 = List<SwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\\}\n\\)")
+        assertMatches(renamedObject.description, "LinkToSwiftRenamedProperties1 \\{\n\tlinkA = SwiftRenamedProperties1 \\{\n\t\tpropA = 0;\n\t\tpropB = ;\n\t\\};\n\tlinkB = \\(null\\);\n\tarray1 = List<SwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\tset1 = MutableSet<SwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
+        assertMatches(renamedObject.linkA!.linking1.description, "LinkingObjects<LinkToSwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\\[0\\] LinkToSwiftRenamedProperties1 \\{\n\t\tlinkA = SwiftRenamedProperties1 \\{\n\t\t\tpropA = 0;\n\t\t\tpropB = ;\n\t\t\\};\n\t\tlinkB = \\(null\\);\n\t\tarray1 = List<SwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\tset1 = MutableSet<SwiftRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\\}\n\\)")
         // swiftlint:enable line_length
     }
 
@@ -160,6 +162,8 @@ class ObjectTests: TestCase {
         XCTAssertNil(SwiftStringObject().objectSchema.primaryKeyProperty)
         XCTAssertEqual(SwiftPrimaryStringObject.primaryKey()!, "stringCol")
         XCTAssertEqual(SwiftPrimaryStringObject().objectSchema.primaryKeyProperty!.name, "stringCol")
+        XCTAssertEqual(SwiftPrimaryUUIDObject().objectSchema.primaryKeyProperty!.name, "uuidCol")
+        XCTAssertEqual(SwiftPrimaryObjectIdObject().objectSchema.primaryKeyProperty!.name, "objectIdCol")
     }
 
     func testCannotUpdatePrimaryKey() {
@@ -181,6 +185,16 @@ class ObjectTests: TestCase {
         stringObj.stringCol = "b" // can change primary key unattached
         XCTAssertEqual("b", stringObj.stringCol)
 
+        let uuidObj = SwiftPrimaryUUIDObject()
+        uuidObj.uuidCol = UUID(uuidString: "8a12daba-8b23-11eb-8dcd-0242ac130003")!
+        uuidObj.uuidCol = UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!
+        XCTAssertEqual(UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!, uuidObj.uuidCol)
+
+        let objectIdObj = SwiftPrimaryObjectIdObject()
+        objectIdObj.objectIdCol = ObjectId("1234567890ab1234567890aa")
+        objectIdObj.objectIdCol = ObjectId("1234567890ab1234567890ab")
+        XCTAssertEqual(ObjectId("1234567890ab1234567890ab"), objectIdObj.objectIdCol)
+
         try! realm.write {
             realm.add(intObj)
             assertThrows(intObj.intCol = 2, reasonMatching: primaryKeyReason)
@@ -196,6 +210,16 @@ class ObjectTests: TestCase {
             assertThrows(stringObj.stringCol = "c", reasonMatching: primaryKeyReason)
             assertThrows(stringObj["stringCol"] = "c", reasonMatching: primaryKeyReason)
             assertThrows(stringObj.setValue("c", forKey: "stringCol"), reasonMatching: primaryKeyReason)
+
+            realm.add(uuidObj)
+            assertThrows(uuidObj.uuidCol = UUID(uuidString: "4ee1fa48-8b23-11eb-8dcd-0242ac130003")!, reasonMatching: primaryKeyReason)
+            assertThrows(uuidObj["uuidCol"] = UUID(uuidString: "4ee1fa48-8b23-11eb-8dcd-0242ac130003")!, reasonMatching: primaryKeyReason)
+            assertThrows(uuidObj.setValue(UUID(uuidString: "4ee1fa48-8b23-11eb-8dcd-0242ac130003")!, forKey: "uuidCol"), reasonMatching: primaryKeyReason)
+
+            realm.add(objectIdObj)
+            assertThrows(objectIdObj.objectIdCol = ObjectId("1234567890ab1234567890ac"), reasonMatching: primaryKeyReason)
+            assertThrows(objectIdObj["objectIdCol"] = ObjectId("1234567890ab1234567890ac"), reasonMatching: primaryKeyReason)
+            assertThrows(objectIdObj.setValue(ObjectId("1234567890ab1234567890ac"), forKey: "objectIdCol"), reasonMatching: primaryKeyReason)
         }
     }
 
@@ -207,7 +231,7 @@ class ObjectTests: TestCase {
 
     func testIndexedProperties() {
         XCTAssertEqual(Object.indexedProperties(), [], "indexed properties should default to []")
-        XCTAssertEqual(SwiftIndexedPropertiesObject.indexedProperties().count, 8)
+        XCTAssertEqual(SwiftIndexedPropertiesObject.indexedProperties().count, 10)
 
         let objectSchema = SwiftIndexedPropertiesObject().objectSchema
         XCTAssertTrue(objectSchema["stringCol"]!.isIndexed)
@@ -218,6 +242,8 @@ class ObjectTests: TestCase {
         XCTAssertTrue(objectSchema["int64Col"]!.isIndexed)
         XCTAssertTrue(objectSchema["boolCol"]!.isIndexed)
         XCTAssertTrue(objectSchema["dateCol"]!.isIndexed)
+        XCTAssertTrue(objectSchema["uuidCol"]!.isIndexed)
+        XCTAssertTrue(objectSchema["anyCol"]!.isIndexed)
 
         XCTAssertFalse(objectSchema["floatCol"]!.isIndexed)
         XCTAssertFalse(objectSchema["doubleCol"]!.isIndexed)
@@ -226,7 +252,7 @@ class ObjectTests: TestCase {
 
     func testIndexedOptionalProperties() {
         XCTAssertEqual(Object.indexedProperties(), [], "indexed properties should default to []")
-        XCTAssertEqual(SwiftIndexedOptionalPropertiesObject.indexedProperties().count, 8)
+        XCTAssertEqual(SwiftIndexedOptionalPropertiesObject.indexedProperties().count, 9)
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalStringCol"]!.isIndexed)
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDateCol"]!.isIndexed)
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalBoolCol"]!.isIndexed)
@@ -235,6 +261,7 @@ class ObjectTests: TestCase {
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalInt16Col"]!.isIndexed)
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalInt32Col"]!.isIndexed)
         XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalInt64Col"]!.isIndexed)
+        XCTAssertTrue(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalUUIDCol"]!.isIndexed)
 
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDataCol"]!.isIndexed)
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalFloatCol"]!.isIndexed)
@@ -270,6 +297,8 @@ class ObjectTests: TestCase {
             XCTAssertEqual(object.value(forKey: "floatCol") as! Float?, 1.23 as Float)
             XCTAssertEqual(object.value(forKey: "doubleCol") as! Double?, 12.3)
             XCTAssertEqual(object.value(forKey: "stringCol") as! String?, "a")
+            XCTAssertEqual(object.value(forKey: "uuidCol") as! UUID?, UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!)
+            XCTAssertNil(object.value(forKey: "anyCol"))
 
             let expected = object.value(forKey: "binaryCol") as! Data
             let actual = "a".data(using: String.Encoding.utf8)!
@@ -278,6 +307,7 @@ class ObjectTests: TestCase {
             XCTAssertEqual(object.value(forKey: "dateCol") as! Date?, Date(timeIntervalSince1970: 1))
             XCTAssertEqual((object.value(forKey: "objectCol")! as! SwiftBoolObject).boolCol, false)
             XCTAssert(object.value(forKey: "arrayCol")! is List<SwiftBoolObject>)
+            XCTAssert(object.value(forKey: "setCol")! is MutableSet<SwiftBoolObject>)
         }
 
         test(SwiftObject())
@@ -305,6 +335,7 @@ class ObjectTests: TestCase {
             XCTAssertNil(object.value(forKey: "optDoubleCol"))
             XCTAssertNil(object.value(forKey: "optBoolCol"))
             XCTAssertNil(object.value(forKey: "optEnumCol"))
+            XCTAssertNil(object.value(forKey: "optUuidCol"))
         }
 
         test(SwiftOptionalObject())
@@ -331,6 +362,8 @@ class ObjectTests: TestCase {
             XCTAssertNil((object.value(forKey: "date") as! List<Date>).first)
             XCTAssertNil((object.value(forKey: "decimal") as! List<Decimal128>).first)
             XCTAssertNil((object.value(forKey: "objectId") as! List<ObjectId>).first)
+            XCTAssertNil((object.value(forKey: "uuid") as! List<UUID>).first)
+            XCTAssertNil((object.value(forKey: "any") as! List<AnyRealmValue>).first)
 
             // The `as Any?` casts below are only to silence the warning about it
             // happening implicitly and are not functionally required
@@ -346,6 +379,7 @@ class ObjectTests: TestCase {
             XCTAssertNil((object.value(forKey: "dateOpt") as! List<Date?>).first as Any?)
             XCTAssertNil((object.value(forKey: "decimalOpt") as! List<Decimal128?>).first as Any?)
             XCTAssertNil((object.value(forKey: "objectIdOpt") as! List<ObjectId?>).first as Any?)
+            XCTAssertNil((object.value(forKey: "uuidOpt") as! List<UUID?>).first as Any?)
         }
 
         test(SwiftListObject())
@@ -353,6 +387,48 @@ class ObjectTests: TestCase {
         try! realm.write {
             test(realm.create(SwiftListObject.self, value: [:]))
             let addedObj = SwiftListObject()
+            realm.add(addedObj)
+            test(addedObj)
+        }
+    }
+
+    func testValueForKeyMutableSet() {
+        let test: (SwiftMutableSetObject) -> Void = { object in
+            XCTAssertEqual((object.value(forKey: "int") as! MutableSet<Int>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int8") as! MutableSet<Int8>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int16") as! MutableSet<Int16>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int32") as! MutableSet<Int32>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int64") as! MutableSet<Int64>).count, 0)
+            XCTAssertEqual((object.value(forKey: "float") as! MutableSet<Float>).count, 0)
+            XCTAssertEqual((object.value(forKey: "double") as! MutableSet<Double>).count, 0)
+            XCTAssertEqual((object.value(forKey: "string") as! MutableSet<String>).count, 0)
+            XCTAssertEqual((object.value(forKey: "data") as! MutableSet<Data>).count, 0)
+            XCTAssertEqual((object.value(forKey: "date") as! MutableSet<Date>).count, 0)
+            XCTAssertEqual((object.value(forKey: "decimal") as! MutableSet<Decimal128>).count, 0)
+            XCTAssertEqual((object.value(forKey: "objectId") as! MutableSet<ObjectId>).count, 0)
+            XCTAssertEqual((object.value(forKey: "uuid") as! MutableSet<UUID>).count, 0)
+            XCTAssertEqual((object.value(forKey: "any") as! MutableSet<AnyRealmValue>).count, 0)
+
+            XCTAssertEqual((object.value(forKey: "intOpt") as! MutableSet<Int?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int8Opt") as! MutableSet<Int8?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int16Opt") as! MutableSet<Int16?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int32Opt") as! MutableSet<Int32?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "int64Opt") as! MutableSet<Int64?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "floatOpt") as! MutableSet<Float?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "doubleOpt") as! MutableSet<Double?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "stringOpt") as! MutableSet<String?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "dataOpt") as! MutableSet<Data?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "dateOpt") as! MutableSet<Date?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "decimalOpt") as! MutableSet<Decimal128?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "objectIdOpt") as! MutableSet<ObjectId?>).count, 0)
+            XCTAssertEqual((object.value(forKey: "uuidOpt") as! MutableSet<UUID?>).count, 0)
+        }
+
+        test(SwiftMutableSetObject())
+        let realm = try! Realm()
+        try! realm.write {
+            test(realm.create(SwiftMutableSetObject.self, value: [:]))
+            let addedObj = SwiftMutableSetObject()
             realm.add(addedObj)
             test(addedObj)
         }
@@ -386,12 +462,25 @@ class ObjectTests: TestCase {
         XCTAssertEqual(object.name, "foo")
         XCTAssertEqual(object.array[0].stringCol, "bar")
         XCTAssertEqual(object.intArray[0].intCol, 50)
+
+        let json2: [String: Any] = ["name": "foo", "set": [["stringCol": "bar"]], "intSet": [["intCol": 50]]]
+        let object2 = SwiftMutableSetPropertyObject()
+        json2.keys.forEach { key in
+            object2.setValue(json2[key], forKey: key)
+        }
+        XCTAssertEqual(object2.name, "foo")
+        XCTAssertEqual(object2.set[0].stringCol, "bar")
+        XCTAssertEqual(object2.intSet[0].intCol, 50)
     }
 
     func testSettingUnmanagedObjectValuesWithBadSwiftDictionary() {
         let json: [String: Any] = ["name": "foo", "array": [["stringCol": NSObject()]], "intArray": [["intCol": 50]]]
         let object = SwiftArrayPropertyObject()
         assertThrows({ json.keys.forEach { key in object.setValue(json[key], forKey: key) } }())
+
+        let json2: [String: Any] = ["name": "foo", "set": [["stringCol": NSObject()]], "intSet": [["intCol": 50]]]
+        let object2 = SwiftMutableSetPropertyObject()
+        assertThrows({ json2.keys.forEach { key in object2.setValue(json2[key], forKey: key) } }())
     }
 
     func setAndTestAllTypes(_ setter: (SwiftObject, Any?, String) -> Void,
@@ -430,7 +519,18 @@ class ObjectTests: TestCase {
         setter(object, Date(timeIntervalSince1970: 333), "dateCol")
         XCTAssertEqual(getter(object, "dateCol") as! Date?, Date(timeIntervalSince1970: 333))
 
+        setter(object, UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89"), "uuidCol")
+        XCTAssertEqual(getter(object, "uuidCol") as! UUID?, UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89"))
+
+        setter(object, "hello", "anyCol")
+        XCTAssertEqual(getter(object, "anyCol") as! String, "hello")
+
         let boolObject = SwiftBoolObject(value: [true])
+
+        setter(object, boolObject, "anyCol")
+        assertEqual(getter(object, "anyCol") as? SwiftBoolObject, boolObject)
+        XCTAssertEqual((getter(object, "anyCol") as! SwiftBoolObject).boolCol, true)
+
         setter(object, boolObject, "objectCol")
         assertEqual(getter(object, "objectCol") as? SwiftBoolObject, boolObject)
         XCTAssertEqual((getter(object, "objectCol") as! SwiftBoolObject).boolCol, true)
@@ -455,6 +555,27 @@ class ObjectTests: TestCase {
         setter(object, [boolObject], "arrayCol")
         setter(object, NSNull(), "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 0)
+
+        let set = MutableSet<SwiftBoolObject>()
+        set.insert(boolObject)
+        setter(object, set, "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>).count, 1)
+        assertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>)[0], boolObject)
+
+        set.removeAll()
+        setter(object, set, "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>).count, 0)
+
+        setter(object, [boolObject], "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>).count, 1)
+        assertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>)[0], boolObject)
+
+        setter(object, nil, "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>).count, 0)
+
+        setter(object, [boolObject], "setCol")
+        setter(object, NSNull(), "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>).count, 0)
     }
 
     func dynamicSetAndTestAllTypes(_ setter: (DynamicObject, Any?, String) -> Void,
@@ -494,9 +615,21 @@ class ObjectTests: TestCase {
         setter(object, Date(timeIntervalSince1970: 333), "dateCol")
         XCTAssertEqual((getter(object, "dateCol") as! Date), Date(timeIntervalSince1970: 333))
 
+        setter(object, UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89"), "uuidCol")
+        XCTAssertEqual(getter(object, "uuidCol") as! UUID?, UUID(uuidString: "137DECC8-B300-4954-A233-F89909F4FD89"))
+
+        setter(object, "hello", "anyCol")
+        XCTAssertEqual((getter(object, "anyCol") as! String), "hello")
+
+        setter(object, boolObject, "anyCol")
+        assertEqual((getter(object, "anyCol") as! DynamicObject), boolObject)
+        XCTAssertEqual(((getter(object, "anyCol") as! DynamicObject)["boolCol"] as! Bool), true)
+        XCTAssertEqual(((getter(object, "anyCol") as! DynamicObject).boolCol as! Bool), true)
+
         setter(object, boolObject, "objectCol")
         assertEqual((getter(object, "objectCol") as! DynamicObject), boolObject)
         XCTAssertEqual(((getter(object, "objectCol") as! DynamicObject)["boolCol"] as! Bool), true)
+        XCTAssertEqual(((getter(object, "objectCol") as! DynamicObject).boolCol as! Bool), true)
 
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 1)
@@ -513,6 +646,22 @@ class ObjectTests: TestCase {
 
         setter(object, nil, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 0)
+
+        setter(object, [boolObject], "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<DynamicObject>).count, 1)
+        assertEqual((getter(object, "setCol") as! MutableSet<DynamicObject>)[0], boolObject)
+
+        let set = getter(object, "setCol") as! MutableSet<DynamicObject>
+        set.removeAll()
+        setter(object, set, "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<DynamicObject>).count, 0)
+
+        setter(object, [boolObject], "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<DynamicObject>).count, 1)
+        assertEqual((getter(object, "setCol") as! MutableSet<DynamicObject>)[0], boolObject)
+
+        setter(object, nil, "setCol")
+        XCTAssertEqual((getter(object, "setCol") as! MutableSet<DynamicObject>).count, 0)
     }
 
     // Yields a read-write migration `SwiftObject` to the given block
@@ -579,6 +728,18 @@ class ObjectTests: TestCase {
         }
     }
 
+    func testDynamicMemberSubscript() {
+        withMigrationObject { migrationObject, migration in
+            let boolObject = migration.create("SwiftBoolObject", value: [true])
+            migrationObject.anyCol = boolObject
+            self.assertEqual(migrationObject.anyCol as? DynamicObject, boolObject)
+            migrationObject.objectCol = boolObject
+            self.assertEqual(migrationObject.objectCol as? DynamicObject, boolObject)
+            migrationObject.anyCol = 12345
+            XCTAssertEqual(migrationObject.anyCol as! Int, 12345)
+        }
+    }
+
     func testDynamicList() {
         let realm = try! Realm()
         let arrayObject = SwiftArrayPropertyObject()
@@ -594,6 +755,29 @@ class ObjectTests: TestCase {
         assertEqual(dynamicArray[1], str2)
         XCTAssertEqual(arrayObject.dynamicList("intArray").count, 0)
         assertThrows(arrayObject.dynamicList("noSuchList"))
+    }
+
+    func testDynamicMutableSet() {
+        let realm = try! Realm()
+        let setObject = SwiftMutableSetPropertyObject()
+        let str1 = SwiftStringObject()
+        let str2 = SwiftStringObject()
+        setObject.set.insert(objectsIn: [str1, str2])
+        try! realm.write {
+            realm.add(setObject)
+        }
+        let dynamicSet = setObject.dynamicMutableSet("set")
+        XCTAssertEqual(dynamicSet.count, 2)
+
+        XCTAssertTrue(dynamicSet.map { (o) in
+            o.isSameObject(as: str1)
+        }.contains(true))
+        XCTAssertTrue(dynamicSet.map { (o) in
+            o.isSameObject(as: str2)
+        }.contains(true))
+
+        XCTAssertEqual(setObject.dynamicMutableSet("intSet").count, 0)
+        assertThrows(setObject.dynamicMutableSet("noSuchSet"))
     }
 
     func testObjectiveCTypeProperties() {
@@ -708,6 +892,25 @@ class ObjectTests: TestCase {
             try! realm.write {
                 let obj = realm.objects(SwiftRecursiveObject.self).first!
                 obj.objects.append(obj)
+            }
+        }
+
+        waitForExpectations(timeout: 2)
+        token.invalidate()
+    }
+
+    func testMutableSetPropertyNotifications() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let object = realm.create(SwiftRecursiveObject.self, value: [[]])
+        try! realm.commitWrite()
+
+        let token = object.observe(expectChange("objectSet", Int?.none, Int?.none))
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write {
+                let obj = realm.objects(SwiftRecursiveObject.self).first!
+                obj.objectSet.insert(obj)
             }
         }
 
@@ -944,12 +1147,14 @@ class ObjectTests: TestCase {
     func testFreezeDynamicObject() {
         let realm = try! Realm()
         try! realm.write {
-            realm.create(SwiftObject.self, value: ["arrayCol": [[true]]])
+            realm.create(SwiftObject.self, value: ["arrayCol": [[true]], "setCol": [[true]]])
         }
         let obj = realm.dynamicObjects("SwiftObject").first!.freeze()
         XCTAssertTrue(obj.isFrozen)
         XCTAssertTrue(obj.dynamicList("arrayCol").isFrozen)
         XCTAssertTrue(obj.dynamicList("arrayCol").first!.isFrozen)
+        XCTAssertTrue(obj.dynamicMutableSet("setCol").isFrozen)
+        XCTAssertTrue(obj.dynamicMutableSet("setCol").first!.isFrozen)
     }
 
     func testFreezeAllPropertyTypes() {
@@ -964,7 +1169,9 @@ class ObjectTests: TestCase {
                     "stringCol": "b",
                     "binaryCol": "b".data(using: String.Encoding.utf8)!,
                     "dateCol": Date(timeIntervalSince1970: 2),
-                    "objectCol": [true]
+                    "objectCol": [true],
+                    "uuidCol": UUID(),
+                    "anyCol": "hello"
                 ]),
                 realm.create(SwiftOptionalObject.self, value: [
                     "optNSStringCol": "NSString",
@@ -1000,7 +1207,10 @@ class ObjectTests: TestCase {
                     "doubleOpt": [17.17, nil],
                     "stringOpt": ["18", nil],
                     "dataOpt": ["19".data(using: String.Encoding.utf8)!, nil],
-                    "dateOpt": [Date(timeIntervalSince1970: 20), nil]
+                    "dateOpt": [Date(timeIntervalSince1970: 20), nil],
+                    "uuid": [UUID()],
+                    "uuidOpt": [UUID(), nil],
+                    "any": ["hello", nil]
                 ])
             )
         }
@@ -1014,6 +1224,8 @@ class ObjectTests: TestCase {
         XCTAssertEqual(obj.binaryCol, frozenObj.binaryCol)
         XCTAssertEqual(obj.dateCol, frozenObj.dateCol)
         XCTAssertEqual(obj.objectCol?.boolCol, frozenObj.objectCol?.boolCol)
+        XCTAssertEqual(obj.uuidCol, frozenObj.uuidCol)
+        XCTAssertEqual(obj.anyCol.value, frozenObj.anyCol.value)
 
         let frozenOptObj = optObj.freeze()
         XCTAssertEqual(optObj.optNSStringCol, frozenOptObj.optNSStringCol)
@@ -1029,6 +1241,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual(optObj.optDoubleCol.value, frozenOptObj.optDoubleCol.value)
         XCTAssertEqual(optObj.optBoolCol.value, frozenOptObj.optBoolCol.value)
         XCTAssertEqual(optObj.optEnumCol.value, frozenOptObj.optEnumCol.value)
+        XCTAssertEqual(optObj.optUuidCol, frozenOptObj.optUuidCol)
 
         let frozenListObj = listObj.freeze()
         XCTAssertEqual(Array(listObj.int), Array(frozenListObj.int))
@@ -1051,6 +1264,9 @@ class ObjectTests: TestCase {
         XCTAssertEqual(Array(listObj.stringOpt), Array(frozenListObj.stringOpt))
         XCTAssertEqual(Array(listObj.dataOpt), Array(frozenListObj.dataOpt))
         XCTAssertEqual(Array(listObj.dateOpt), Array(frozenListObj.dateOpt))
+        XCTAssertEqual(Array(listObj.uuid), Array(frozenListObj.uuid))
+        XCTAssertEqual(Array(listObj.uuidOpt), Array(frozenListObj.uuidOpt))
+        XCTAssertEqual(Array(listObj.any.map { $0 }), Array(frozenListObj.any.map { $0 }))
     }
 
     func testThaw() {

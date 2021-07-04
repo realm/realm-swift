@@ -72,10 +72,6 @@
 #import "RLMVersion.h"
 #endif
 
-#if REALM_ENABLE_SYNC
-#import <realm/sync/version.hpp>
-#endif
-
 // Declared for RealmSwiftObjectUtil
 @interface NSObject (SwiftVersion)
 + (NSString *)swiftVersion;
@@ -172,7 +168,7 @@ static NSDictionary *RLMAnalyticsPayload() {
     }
 
     // If we found a bundle ID anywhere, hash it as it could contain sensitive
-    // information (e.g. the name of an unnanounced product)
+    // information (e.g. the name of an unannounced product)
     if (hashedBundleID) {
         NSData *data = [hashedBundleID dataUsingEncoding:NSUTF8StringEncoding];
         hashedBundleID = RLMHashData(data.bytes, data.length);
@@ -184,6 +180,7 @@ static NSDictionary *RLMAnalyticsPayload() {
 
     static NSString *kUnknownString = @"unknown";
     NSString *hashedMACAddress = RLMMACAddress() ?: kUnknownString;
+    NSDictionary *info = appBundle.infoDictionary;
 
     return @{
              @"event": @"Run",
@@ -200,9 +197,6 @@ static NSDictionary *RLMAnalyticsPayload() {
                      @"Binding": @"cocoa",
                      @"Language": isSwift ? @"swift" : @"objc",
                      @"Realm Version": REALM_COCOA_VERSION,
-#if REALM_ENABLE_SYNC
-                     @"Sync Version": @(REALM_SYNC_VER_STRING),
-#endif
 #if TARGET_OS_WATCH
                      @"Target OS Type": @"watchos",
 #elif TARGET_OS_TV
@@ -214,10 +208,10 @@ static NSDictionary *RLMAnalyticsPayload() {
 #endif
                      @"Clang Version": @__clang_version__,
                      @"Clang Major Version": @__clang_major__,
-                     // Current OS version the app is targetting
+                     // Current OS version the app is targeting
                      @"Target OS Version": osVersionString,
-                     // Minimum OS version the app is targetting
-                     @"Target OS Minimum Version": appBundle.infoDictionary[@"MinimumOSVersion"] ?: kUnknownString,
+                     // Minimum OS version the app is targeting
+                     @"Target OS Minimum Version": info[@"MinimumOSVersion"] ?: info[@"LSMinimumSystemVersion"] ?: kUnknownString,
 
                      // Host OS version being built on
                      @"Host OS Type": @"osx",

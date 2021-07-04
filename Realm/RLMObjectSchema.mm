@@ -18,14 +18,13 @@
 
 #import "RLMObjectSchema_Private.hpp"
 
-#import "RLMArray.h"
 #import "RLMEmbeddedObject.h"
-#import "RLMListBase.h"
 #import "RLMObject_Private.h"
 #import "RLMProperty_Private.hpp"
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
+#import "RLMSwiftCollectionBase.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
@@ -93,6 +92,7 @@ using namespace realm;
     _primaryKeyProperty.isPrimary = NO;
     primaryKeyProperty.isPrimary = YES;
     _primaryKeyProperty = primaryKeyProperty;
+    _primaryKeyProperty.indexed = YES;
 }
 
 + (instancetype)schemaForObjectClass:(Class)objectClass {
@@ -160,21 +160,26 @@ using namespace realm;
         if (!schema.primaryKeyProperty) {
             @throw RLMException(@"Primary key property '%@' does not exist on object '%@'", primaryKey, className);
         }
-        if (schema.primaryKeyProperty.type != RLMPropertyTypeInt && schema.primaryKeyProperty.type != RLMPropertyTypeString && schema.primaryKeyProperty.type != RLMPropertyTypeObjectId) {
-            @throw RLMException(@"Property '%@' cannot be made the primary key of '%@' because it is not a 'string', 'int', or 'objectId' property.",
+        if (schema.primaryKeyProperty.type != RLMPropertyTypeInt &&
+            schema.primaryKeyProperty.type != RLMPropertyTypeString &&
+            schema.primaryKeyProperty.type != RLMPropertyTypeObjectId &&
+            schema.primaryKeyProperty.type != RLMPropertyTypeUUID) {
+            @throw RLMException(@"Property '%@' cannot be made the primary key of '%@' because it is not a 'string', 'int', 'objectId', or 'uuid' property.",
                                 primaryKey, className);
         }
     }
 
     for (RLMProperty *prop in schema.properties) {
-        if (prop.optional && prop.array && (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeLinkingObjects)) {
+        if (prop.optional && prop.collection && !prop.dictionary && (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeLinkingObjects)) {
             // FIXME: message is awkward
             @throw RLMException(@"Property '%@.%@' cannot be made optional because optional '%@' properties are not supported.",
                                 className, prop.name, RLMTypeToString(prop.type));
         }
     }
 
-    if ([objectClass shouldIncludeInDefaultSchema] && schema.isSwiftClass && schema.properties.count == 0) {
+    if ([objectClass shouldIncludeInDefaultSchema]
+        && schema.isSwiftClass
+        && schema.properties.count == 0) {
         @throw RLMException(@"No properties are defined for '%@'. Did you remember to mark them with '@objc' in your model?", schema.className);
     }
     return schema;
@@ -228,7 +233,7 @@ using namespace realm;
     if (auto requiredProperties = [objectClass requiredProperties]) {
         for (RLMProperty *property in propArray) {
             bool required = [requiredProperties containsObject:property.name];
-            if (required && property.type == RLMPropertyTypeObject && !property.array) {
+            if (required && property.type == RLMPropertyTypeObject && (!property.collection || property.dictionary)) {
                 @throw RLMException(@"Object properties cannot be made required, "
                                     "but '+[%@ requiredProperties]' included '%@'", objectClass, property.name);
             }
@@ -237,9 +242,12 @@ using namespace realm;
     }
 
     for (RLMProperty *property in propArray) {
-        if (!property.optional && property.type == RLMPropertyTypeObject && !property.array) {
+        if (!property.optional && property.type == RLMPropertyTypeObject && !property.collection) {
             @throw RLMException(@"The `%@.%@` property must be marked as being optional.",
                                 [objectClass className], property.name);
+        }
+        if (property.type == RLMPropertyTypeAny) {
+            property.optional = NO;
         }
     }
 
@@ -359,7 +367,7 @@ using namespace realm;
 
     NSMutableArray *genericProperties = [NSMutableArray new];
     for (RLMProperty *prop in _properties) {
-        if (prop->_swiftIvar) {
+        if (prop.swiftAccessor) {
             [genericProperties addObject:prop];
         }
     }

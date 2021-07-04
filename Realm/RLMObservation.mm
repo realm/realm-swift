@@ -20,11 +20,13 @@
 
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
-#import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
+#import "RLMSet_Private.hpp"
+#import "RLMSwiftCollectionBase.h"
+#import "RLMSwiftValueStorage.h"
 
 #import <realm/group.hpp>
 
@@ -181,16 +183,11 @@ void RLMObservationInfo::recordObserver(realm::Obj& objectRow, RLMClassInfo *obj
     NSUInteger sep = [keyPath rangeOfString:@"."].location;
     NSString *key = sep == NSNotFound ? keyPath : [keyPath substringToIndex:sep];
     RLMProperty *prop = objectSchema[key];
-    if (prop && prop.array) {
-        id value = valueForKey(key);
-        RLMArray *array = [value isKindOfClass:[RLMListBase class]] ? [value _rlmArray] : value;
-        array->_key = key;
-        array->_parentObject = object;
+    if (auto swiftAccessor = prop.swiftAccessor) {
+        [swiftAccessor observe:prop on:object];
     }
-    else if (auto swiftIvar = prop.swiftIvar) {
-        if (auto optional = RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, swiftIvar))) {
-            RLMInitializeUnmanagedOptional(optional, object, prop);
-        }
+    else if (prop.collection) {
+        [valueForKey(key) setParent:object property:prop];
     }
 }
 
@@ -224,8 +221,8 @@ id RLMObservationInfo::valueForKey(NSString *key) {
     // We need to return the same object each time for observing over keypaths
     // to work, so we store a cache of them here. We can't just cache them on
     // the object as that leads to retain cycles.
-    if (lastProp.array) {
-        RLMArray *value = cachedObjects[key];
+    if (lastProp.collection) {
+        id value = cachedObjects[key];
         if (!value) {
             value = getSuper();
             if (!cachedObjects) {

@@ -25,7 +25,7 @@
 @property NSInteger age;
 @property (readonly) RLMLinkingObjects *owners;
 @end
-RLM_ARRAY_TYPE(Dog)
+RLM_COLLECTION_TYPE(Dog)
 
 @interface Person : RLMObject
 @property NSString      *name;
