@@ -601,6 +601,38 @@ class ListTests: TestCase {
 
         list.realm?.cancelWrite()
     }
+    
+    func testListEquality() {
+        let list1 = List<Int>()
+        list1.append(objectsIn: [1, 2, 3])
+        XCTAssertEqual(list1, list1)
+        
+        let list2 = List<Int>()
+        list2.append(objectsIn: [1, 2, 3])
+        XCTAssertEqual(list1, list2)
+        
+        let realm = try! Realm()
+        
+        let listObj = SwiftListObject(value: ["int": list1])
+        
+        try! realm.write {
+            realm.add(listObj)
+        }
+        
+        XCTAssertEqual(listObj.int, listObj.int)
+        XCTAssertNotEqual(list1, listObj.int)
+        XCTAssertEqual(list1, list2)
+        
+        let listObj2 = SwiftListObject(value: ["int": list2])
+        
+        try! realm.write {
+            realm.add(listObj2)
+        }
+        
+        XCTAssertEqual(listObj2.int, listObj2.int)
+        XCTAssertNotEqual(listObj2.int, list2)
+        XCTAssertEqual(list1, list2)
+    }
 
     func testUnmanagedListComparison() {
         let obj = SwiftIntObject()

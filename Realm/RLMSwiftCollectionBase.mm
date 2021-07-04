@@ -85,10 +85,14 @@
 }
 
 - (BOOL)isEqual:(id)object {
-    if (auto base = RLMDynamicCast<RLMSwiftCollectionBase>(object)) {
-        return !base._rlmCollection.realm
-        && ((self._rlmCollection.count == 0 && base._rlmCollection.count == 0) ||
-            [self._rlmCollection isEqual:base._rlmCollection]);
+    if (auto other = RLMDynamicCast<RLMSwiftCollectionBase>(object)) {
+        if ((self == other) || (self._rlmCollection == other._rlmCollection)) {
+            return YES;
+        }
+        if (self._rlmCollection.realm != other._rlmCollection.realm) {
+            return NO;
+        }
+        return !self._rlmCollection.realm && [self._rlmCollection isEqual:other._rlmCollection];
     }
     return NO;
 }
