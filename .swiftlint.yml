@@ -14,6 +14,7 @@ identifier_name:
   excluded:
     - _id
     - _nilValue()
+    - _name(for:)
     - _nsError
     - _nsErrorDomain
     - _observe(_:)
@@ -22,6 +23,7 @@ identifier_name:
     - _rlmCollection
     - _rlmCollection()
     - _rlmDefaultValue()
+    - _rlmDefaultValue(_:)
     - _rlmFromRawValue(_:)
     - _rlmGetProperty(_:_:)
     - _rlmGetPropertyOptional(_:_:)

@@ -40,8 +40,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSString *)_realmObjectName;
 + (nullable NSDictionary<NSString *, NSString *> *)_realmColumnNames;
 
-- (void)prepareForRecording;
-
 @end
 
 /**

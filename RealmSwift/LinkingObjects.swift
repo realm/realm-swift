@@ -417,6 +417,6 @@ extension LinkingObjects: AssistedObjectiveCBridgeable {
 
 extension LinkingObjects: KeyPathStringCollection {
     var key: String? {
-        handle?.propertyKey
+        return handle?.propertyKey
     }
 }

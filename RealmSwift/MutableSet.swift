@@ -543,6 +543,6 @@ extension MutableSet: AssistedObjectiveCBridgeable {
 
 extension MutableSet: KeyPathStringCollection {
     var key: String? {
-        self.propertyKey
+        return propertyKey
     }
 }

@@ -685,6 +685,6 @@ extension List: AssistedObjectiveCBridgeable {
 
 extension List: KeyPathStringCollection {
     var key: String? {
-        self.propertyKey
+        return propertyKey
     }
 }
