@@ -680,3 +680,11 @@ extension List: AssistedObjectiveCBridgeable {
         return (objectiveCValue: _rlmCollection, metadata: nil)
     }
 }
+
+// MARK: Key Path Strings
+
+extension List: KeyPathStringCollection {
+    var key: String? {
+        self.propertyKey
+    }
+}

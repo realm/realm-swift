@@ -413,30 +413,10 @@ extension LinkingObjects: AssistedObjectiveCBridgeable {
     }
 }
 
-internal protocol KeyPathStringCollection {
-    var lastAccessedNames: NSMutableArray? { get set }
-    mutating func setLastAccessedNames(lastAccessedNames: NSMutableArray)
-}
+// MARK: Key Path Strings
 
 extension LinkingObjects: KeyPathStringCollection {
-    mutating func setLastAccessedNames(lastAccessedNames: NSMutableArray) {
-        self.lastAccessedNames = lastAccessedNames
-    }
-}
-extension List: KeyPathStringCollection {
-    func setLastAccessedNames(lastAccessedNames: NSMutableArray) {
-        self.lastAccessedNames = lastAccessedNames
-    }
-}
-
-extension MutableSet: KeyPathStringCollection {
-    func setLastAccessedNames(lastAccessedNames: NSMutableArray) {
-        self.lastAccessedNames = lastAccessedNames
-    }
-}
-
-extension Map: KeyPathStringCollection {
-    func setLastAccessedNames(lastAccessedNames: NSMutableArray) {
-        self.lastAccessedNames = lastAccessedNames
+    var key: String? {
+        handle?.propertyKey
     }
 }

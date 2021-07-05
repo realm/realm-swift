@@ -541,12 +541,45 @@ extension Object: AssistedObjectiveCBridgeable {
     }
 }
 
-extension Object {
+// MARK: Key Path Strings
+
+extension ObjectBase {
+    /**
+     Gets the components of a given key path as a string.
+
+     - warning: Objects that declare properties with the old `@objc dynamic` syntax are not fully supported
+     by this function, and it is recommened that you use `@Persisted` to declare your properties if you wish to use
+     this function to its full benefit.
+
+     Example:
+     ```
+     let name = ObjectBase._name(for: \Person.dogs[0].name) // "dogs.name"
+     // Note that the above KeyPath expression is only supported with properties declared
+     // with `@Persisted`.
+     let nested = ObjectBase._name(for: \Person.address.city.zip) // "address.city.zip"
+     ```
+     */
     public static func _name<T: ObjectBase>(for keyPath: PartialKeyPath<T>) -> String {
+        if let name = keyPath._kvcKeyPathString {
+            return name
+        }
         let traceObject = T()
         traceObject.lastAccessedNames = NSMutableArray()
         traceObject.prepareForRecording()
-        _ = traceObject[keyPath: keyPath]
+        let obj = traceObject[keyPath: keyPath]
+        let schema = RLMObjectSchema.init(forObjectClass: T.self)
+        // if both getter and setter are nil then this class uses @Persisted
+        let modernAccessor = schema.properties.allSatisfy { $0.getterSel == nil && $0.setterSel == nil }
+        if !modernAccessor {
+            if let obj = obj as? KeyPathStringCollection, let key = obj.key {
+                traceObject.lastAccessedNames?.add(key)
+            }
+
+            if let obj = obj as? RLMSwiftValueStorage {
+                traceObject.lastAccessedNames?.add(RLMGetPropertyName(obj))
+            }
+
+        }
         return traceObject.lastAccessedNames!.componentsJoined(by: ".")
     }
 }

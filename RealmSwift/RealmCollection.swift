@@ -1205,3 +1205,14 @@ extension LinkingObjects: ObservableCollection {
         return objc === rlmResults
     }
 }
+
+// MARK: Key Path Strings
+
+
+/// Tag protocol which allows a collection to produce its property name
+internal protocol KeyPathStringCollection {
+    /// A mutable array referenced from the enclosing parent that contains the last accessed property names.
+    var lastAccessedNames: NSMutableArray? { get set }
+    /// The property name for this collection.
+    var key: String? { get }
+}

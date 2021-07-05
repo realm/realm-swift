@@ -704,3 +704,11 @@ extension Optional: OptionalObject where Wrapped: ObjectBase {
         Wrapped.className()
     }
 }
+
+// MARK: Key Path Strings
+
+extension Map: KeyPathStringCollection {
+    var key: String? {
+        self.propertyKey
+    }
+}

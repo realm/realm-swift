@@ -179,7 +179,7 @@ public struct Persisted<Value: _Persistable> {
                 }
 
                 if var value = value as? KeyPathStringCollection {
-                    value.setLastAccessedNames(lastAccessedNames: object.lastAccessedNames!)
+                    value.lastAccessedNames = object.lastAccessedNames!
                     return value as! Value
                 }
                 return value

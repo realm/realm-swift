@@ -538,3 +538,11 @@ extension MutableSet: AssistedObjectiveCBridgeable {
         return (objectiveCValue: rlmSet, metadata: nil)
     }
 }
+
+// MARK: Key Path Strings
+
+extension MutableSet: KeyPathStringCollection {
+    var key: String? {
+        self.propertyKey
+    }
+}

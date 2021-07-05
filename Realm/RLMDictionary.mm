@@ -424,6 +424,12 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
+#pragma mark - Key Path Strings
+
+- (NSString *)propertyName {
+    return _key;
+}
+
 #pragma mark - Methods unsupported on unmanaged RLMDictionary instances
 
 #pragma clang diagnostic push
