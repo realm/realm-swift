@@ -197,7 +197,8 @@ public protocol RealmCollectionValue: Hashable, _RealmSchemaDiscoverable {
     // Iterating over collections requires mapping NSNull to nil, but we can't
     // just do `nil as T` because of non-nullable collections
     static func _nilValue() -> Self
-
+    // Get the zero/empty/nil value for this type. Used to supply a default
+    // when the user does not declare one in their model.
     static func _rlmDefaultValue(_ doNotReturnNilValue: Bool) -> Self
 }
 
@@ -232,6 +233,7 @@ extension AnyRealmValue: RealmCollectionValue {
 
 extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue,
                                                Wrapped: _DefaultConstructible {
+    /// :nodoc:
     public static func _rlmDefaultValue(_ doNotReturnNilValue: Bool) -> Optional<Wrapped> {
         if doNotReturnNilValue {
             return Wrapped()
