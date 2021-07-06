@@ -385,7 +385,15 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 }
 
 + (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key {
-    if (isManagedAccessorClass(self) && [class_getSuperclass(self.class) sharedSchema][key]) {
+    RLMProperty *prop = [self.class sharedSchema][key];
+    if (isManagedAccessorClass(self)) {
+        // Managed accessors explicitly call willChange/didChange for managed
+        // properties, so we don't want KVO to override the setters to do that
+        return !prop;
+    }
+    if (prop.swiftAccessor) {
+        // Properties with swift accessors don't have obj-c getters/setters and
+        // will explode if KVO tries to override them
         return NO;
     }
 
@@ -490,7 +498,7 @@ id RLMObjectFreeze(RLMObjectBase *obj) {
     if (!frozen->_row.is_valid()) {
         @throw RLMException(@"Cannot freeze an object in the same write transaction as it was created in.");
     }
-    RLMInitializeSwiftAccessorGenerics(frozen);
+    RLMInitializeSwiftAccessor(frozen, false);
     return frozen;
 }
 
@@ -508,7 +516,7 @@ id RLMObjectThaw(RLMObjectBase *obj) {
     if (!live->_row.is_valid()) {
         return nil;
     }
-    RLMInitializeSwiftAccessorGenerics(live);
+    RLMInitializeSwiftAccessor(live, false);
     return live;
 }
 
@@ -747,7 +755,17 @@ uint64_t RLMObjectBaseGetCombineId(__unsafe_unretained RLMObjectBase *const obj)
 }
 
 @implementation RealmSwiftObject
++ (BOOL)accessInstanceVariablesDirectly {
+    // By default KVO will try to directly read ivars if a thing with a matching
+    // name is observed and there's no objc property with that name. This
+    // crashes when it tries to read a property wrapper ivar, and is never
+    // useful for Swift classes.
+    return NO;
+}
 @end
 
 @implementation RealmSwiftEmbeddedObject
++ (BOOL)accessInstanceVariablesDirectly {
+    return NO;
+}
 @end

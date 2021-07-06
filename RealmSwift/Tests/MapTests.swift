@@ -19,17 +19,9 @@
 import XCTest
 import RealmSwift
 
-fileprivate extension Map {
-    func addTestObjects(from dictionary: [Key: Value]) {
-        dictionary.forEach { (k, v) in
-            self[k] = v
-        }
-    }
-}
-
 class MapTests: TestCase {
-    var str1: SwiftStringObject?
-    var str2: SwiftStringObject?
+    var str1: SwiftStringObject!
+    var str2: SwiftStringObject!
     var realm: Realm!
 
     func createMap() -> Map<String, SwiftStringObject?> {
@@ -171,9 +163,6 @@ class MapTests: TestCase {
     }
 
     func testFastEnumerationWithMutation() {
-        guard let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failure")
-        }
         let map = createMap()
         for i in 0...5 {
             map["key\(i)"] = str1
@@ -199,9 +188,6 @@ class MapTests: TestCase {
 
     func testAppendObject() {
         let map = createMap()
-        guard let str1 = str1, let str2 = str2  else {
-            fatalError("Test precondition failure")
-        }
         map["key1"] = str1
         map["key2"] = str2
         XCTAssertEqual(2, map.count)
@@ -211,49 +197,38 @@ class MapTests: TestCase {
 
     func testInsert() {
         let map = createMap()
-        guard let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failure")
-        }
-
         XCTAssertEqual(0, map.count)
 
-        XCTAssertNil(map[str1.stringCol] ?? nil)
+        XCTAssertNil(map[str1.stringCol] as Any?)
         map[str1.stringCol] = str1
         XCTAssertEqual(1, map.count)
 
-        XCTAssertNil(map[str2.stringCol] ?? nil)
+        XCTAssertNil(map[str2.stringCol] as Any?)
         map[str2.stringCol] = str2
         XCTAssertEqual(2, map.count)
     }
 
     func testRemove() {
         let map = createMap()
-        guard let str1 = str1 else {
-            fatalError("Test precondition failure")
-        }
-
         map[str1.stringCol] = str1
         XCTAssertEqual(1, map.count)
-        XCTAssertNotNil(map[str1.stringCol] ?? nil)
+        XCTAssertNotNil(map[str1.stringCol] as Any?)
 
         map.removeObject(for: str1.stringCol)
         XCTAssertEqual(0, map.count)
-        XCTAssertNil(map[str1.stringCol] ?? nil)
+        XCTAssertNil(map[str1.stringCol] as Any?)
 
         map[str1.stringCol] = str1
         XCTAssertEqual(1, map.count)
-        XCTAssertNotNil(map[str1.stringCol] ?? nil)
+        XCTAssertNotNil(map[str1.stringCol] as Any?)
 
         map[str1.stringCol] = nil
         XCTAssertEqual(0, map.count)
-        XCTAssertNil(map[str1.stringCol] ?? nil)
+        XCTAssertNil(map[str1.stringCol] as Any?)
     }
 
     func testRemoveAll() {
         let map = createMap()
-        guard let str1 = str1 else {
-            fatalError("Test precondition failure")
-        }
         for i in 0..<5 {
             map[String(i)] = str1
         }
@@ -264,9 +239,6 @@ class MapTests: TestCase {
 
     func testDeleteObjectFromMap() {
         let map = createMap()
-        guard let str1 = str1 else {
-            fatalError("Test precondition failure")
-        }
         if let realm = map.realm {
             map["key"] = str1
             XCTAssertEqual(map["key"]!!.stringCol, str1.stringCol)
@@ -275,12 +247,45 @@ class MapTests: TestCase {
         }
     }
 
+    func testMerge() {
+        let map = createMap()
+        map["a"] = str1
+
+        map.merge(["b": str2], uniquingKeysWith: { (old, _) in
+            XCTFail("combine called with no duplicates")
+            return old
+        })
+        XCTAssertEqual(map.count, 2)
+        XCTAssertTrue(str1.isSameObject(as: map["a"]!!))
+        XCTAssertTrue(str2.isSameObject(as: map["b"]!!))
+
+        // Does not actually update because the combine function picks the existing value
+        map.merge(["b": str1], uniquingKeysWith: { (old, _) in
+            return old
+        })
+        XCTAssertEqual(map.count, 2)
+        XCTAssertTrue(str1.isSameObject(as: map["a"]!!))
+        XCTAssertTrue(str2.isSameObject(as: map["b"]!!))
+
+        // Does actually update
+        map.merge(["b": str1], uniquingKeysWith: { (_, new) in
+            return new
+        })
+        XCTAssertEqual(map.count, 2)
+        XCTAssertTrue(str1.isSameObject(as: map["a"]!!))
+        XCTAssertTrue(str1.isSameObject(as: map["b"]!!))
+
+        // Creating an entirely new value is valid too
+        map.merge(["a": str1], uniquingKeysWith: { (_, _) in
+            return SwiftStringObject(value: ["c"])
+        })
+        XCTAssertEqual(map.count, 2)
+        XCTAssertEqual(map["a"]!!.stringCol, "c")
+        XCTAssertTrue(str1.isSameObject(as: map["b"]!!))
+    }
+
     func testChangesArePersisted() {
         let map = createMap()
-        guard let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failure")
-        }
-
         map["key"] = str1
         map["key2"] = str2
         if let realm = map.realm {
@@ -292,10 +297,6 @@ class MapTests: TestCase {
 
     func testPopulateEmptyMap() {
         let map = createMap()
-        guard let str1 = str1 else {
-            fatalError("Test precondition failure")
-        }
-
         XCTAssertEqual(map.count, 0, "Should start with no array elements.")
 
         map["a"] = SwiftStringObject(value: ["a"])
@@ -307,14 +308,13 @@ class MapTests: TestCase {
         XCTAssertEqual(map["b"]!!.stringCol, "b")
         XCTAssertEqual(map[str1.stringCol]!!.stringCol, str1.stringCol)
 
-        let ex = expectation(description: "does enumerate")
-        ex.expectedFulfillmentCount = 3
+        var count = 0
         for object in map {
             XCTAssertTrue(object.key.description.utf16.count > 0, "Object should have description")
             XCTAssertTrue(object.value!.description.utf16.count > 0, "Object should have description")
-            ex.fulfill()
+            count += 1
         }
-        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertEqual(count, 3)
     }
 
     func testEnumeratingMap() {
@@ -322,17 +322,22 @@ class MapTests: TestCase {
         for i in 0..<10 {
             map["key\(i)"] = SwiftStringObject(value: ["key\(i)"])
         }
-        try! realm?.commitWrite()
 
         XCTAssertEqual(10, map.count)
 
-        let ex = expectation(description: "does enumerate")
-        ex.expectedFulfillmentCount = 10
+        var expected = Set((0..<10).map { "key\($0)" })
         for element in map {
             XCTAssertEqual(element.key, element.value!.stringCol)
-            ex.fulfill()
+            expected.remove(element.key)
         }
-        waitForExpectations(timeout: 1, handler: nil)
+        XCTAssertEqual(expected.count, 0)
+
+        expected = Set((0..<10).map { "key\($0)" })
+        for (key, value) in map.asKeyValueSequence() {
+            XCTAssertEqual(key, value!.stringCol)
+            expected.remove(key)
+        }
+        XCTAssertEqual(expected.count, 0)
     }
 
     func testValueForKey() {
@@ -489,11 +494,11 @@ class MapTests: TestCase {
         let map2 = Map<String, SwiftIntObject?>()
         XCTAssertEqual(map1, map2, "Empty instances should be equal by `==` operator")
 
-        map1.addTestObjects(from: objects)
-        map2.addTestObjects(from: objects)
+        map1.merge(objects) { (a, _) in a }
+        map2.merge(objects) { (a, _) in a }
 
         let map3 = Map<String, SwiftIntObject?>()
-        map3.addTestObjects(from: objects2)
+        map3.merge(objects2) { (a, _) in a }
 
         XCTAssertTrue(map1 !== map2, "instances should not be identical")
 

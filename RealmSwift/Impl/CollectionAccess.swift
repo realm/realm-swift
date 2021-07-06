@@ -18,47 +18,54 @@
 
 import Realm
 
+private func isSameCollection(_ lhs: RLMCollection, _ rhs: Any) -> Bool {
+    // Managed isEqual checks if they're backed by the same core field, so it does exactly what we need
+    if lhs.realm != nil {
+        return lhs.isEqual(rhs)
+    }
+    // For unmanaged we want to check if the backing collection is the same instance
+    if let rhs = rhs as? RLMSwiftCollectionBase {
+        return lhs === rhs._rlmCollection
+    }
+    return lhs === rhs as AnyObject
+}
+
 internal protocol MutableRealmCollection {
-    func removeAll()
-    func add(_ obj: AnyObject)
+    func assign(_ value: Any)
+
+    // Unmanaged collection properties need a reference to their parent object for
+    // KVO to work because the mutation is done via the collection object but the
+    // observation is on the parent.
+    func setParent(_ object: RLMObjectBase, _ property: RLMProperty)
 }
-internal protocol MutableMapRealmCollection {
-    func removeAll()
-    func add(key: AnyObject, value: AnyObject)
-}
+
 extension List: MutableRealmCollection {
-    func add(_ obj: AnyObject) {
-        rlmArray.add(obj)
+    func assign(_ value: Any) {
+        guard !isSameCollection(_rlmCollection, value) else { return }
+        RLMAssignToCollection(_rlmCollection, value)
+    }
+    func setParent(_ object: RLMObjectBase, _ property: RLMProperty) {
+        rlmArray.setParent(object, property: property)
     }
 }
+
 extension MutableSet: MutableRealmCollection {
-    func add(_ obj: AnyObject) {
-        rlmSet.add(obj)
+    func assign(_ value: Any) {
+        guard !isSameCollection(_rlmCollection, value) else { return }
+        RLMAssignToCollection(_rlmCollection, value)
     }
-}
-extension Map: MutableMapRealmCollection {
-    func add(key: AnyObject, value: AnyObject) {
-        rlmDictionary.setObject(value, forKey: key as AnyObject)
-    }
-}
-
-internal func assign<C: MutableRealmCollection>(value: Any, to collection: C) {
-    collection.removeAll()
-    if let enumeration = value as? NSFastEnumeration {
-        var iterator = NSFastEnumerationIterator(enumeration)
-        while let obj = iterator.next() {
-            collection.add(dynamicBridgeCast(fromSwift: obj) as AnyObject)
-        }
+    func setParent(_ object: RLMObjectBase, _ property: RLMProperty) {
+        rlmSet.setParent(object, property: property)
     }
 }
 
-internal func assign<C: MutableMapRealmCollection>(value: Any, to collection: C) {
-    collection.removeAll()
-    if let enumeration = value as? NSDictionary {
-        var iterator = NSFastEnumerationIterator(enumeration)
-        while let key = iterator.next() {
-            collection.add(key: key as AnyObject, value: dynamicBridgeCast(fromSwift: enumeration[key]) as AnyObject)
-        }
+extension Map: MutableRealmCollection {
+    func assign(_ value: Any) {
+        guard !isSameCollection(_rlmCollection, value) else { return }
+        rlmDictionary.setDictionary(value)
+    }
+    func setParent(_ object: RLMObjectBase, _ property: RLMProperty) {
+        rlmDictionary.setParent(object, property: property)
     }
 }
 

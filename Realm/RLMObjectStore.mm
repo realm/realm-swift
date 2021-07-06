@@ -81,7 +81,7 @@ void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *const realm) {
     }
 }
 
-void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const object) {
+void RLMInitializeSwiftAccessor(__unsafe_unretained RLMObjectBase *const object, bool promoteExisting) {
     if (!object || !object->_row || !object->_objectSchema->_isSwiftClass) {
         return;
     }
@@ -91,8 +91,15 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
         return;
     }
 
-    for (RLMProperty *prop in object->_objectSchema.swiftGenericProperties) {
-        [prop.swiftAccessor initialize:prop on:object];
+    if (promoteExisting) {
+        for (RLMProperty *prop in object->_objectSchema.swiftGenericProperties) {
+            [prop.swiftAccessor promote:prop on:object];
+        }
+    }
+    else {
+        for (RLMProperty *prop in object->_objectSchema.swiftGenericProperties) {
+            [prop.swiftAccessor initialize:prop on:object];
+        }
     }
 }
 
@@ -146,7 +153,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         return value;
     }
     object->_row = std::move(obj);
-    RLMInitializeSwiftAccessorGenerics(object);
+    RLMInitializeSwiftAccessor(object, false);
     return object;
 }
 
@@ -244,6 +251,6 @@ RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, int64_t key) {
 RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, realm::Obj&& obj) {
     RLMObjectBase *accessor = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, &info);
     accessor->_row = std::move(obj);
-    RLMInitializeSwiftAccessorGenerics(accessor);
+    RLMInitializeSwiftAccessor(accessor, false);
     return accessor;
 }

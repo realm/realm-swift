@@ -88,7 +88,7 @@ class ObjectCreationTests: TestCase {
             "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
             "uuidCol": UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
-            "anyCol": "hello",
+            "anyCol": AnyRealmValue.string("hello"),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
             "setCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
             "mapCol": ["trueVal": SwiftBoolObject(value: [true]), "falseVal": SwiftBoolObject(value: [false])]
@@ -254,7 +254,8 @@ class ObjectCreationTests: TestCase {
             "objectCol": SwiftBoolObject(value: [true]),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
             "setCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
-            "mapCol": ["trueVal": ["boolCol": true], "falseVal": ["boolCol": false]]
+            "mapCol": ["trueVal": ["boolCol": true], "falseVal": ["boolCol": false]],
+            "anyCol": AnyRealmValue.double(10)
         ]
 
         // test with valid dictionary literals

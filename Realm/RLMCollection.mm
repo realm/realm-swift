@@ -216,11 +216,11 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
     }
 
     RLMObject *accessor = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, &info);
+    auto prop = info.rlmObjectSchema[key];
 
-    // List properties need to be handled specially since we need to create a
-    // new List each time
+    // Collection properties need to be handled specially since we need to create
+    // a new collection each time
     if (info.rlmObjectSchema.isSwiftClass) {
-        auto prop = info.rlmObjectSchema[key];
         if (prop.collection && prop.swiftAccessor) {
             // Grab the actual class for the generic collection from an instance of it
             // so that we can make instances of the collection without creating a new
@@ -236,9 +236,12 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
         }
     }
 
+    auto swiftAccessor = prop.swiftAccessor;
     for (size_t i = 0; i < count; i++) {
         accessor->_row = collection.get(i);
-        RLMInitializeSwiftAccessorGenerics(accessor);
+        if (swiftAccessor) {
+            [swiftAccessor initialize:prop on:accessor];
+        }
         [array addObject:[accessor valueForKey:key] ?: NSNull.null];
     }
     return array;
@@ -285,9 +288,13 @@ void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key
     RLMObject *accessor = RLMCreateManagedAccessor(info->rlmObjectSchema.accessorClass, info);
     for (size_t i = 0; i < tv.size(); i++) {
         accessor->_row = tv[i];
-        RLMInitializeSwiftAccessorGenerics(accessor);
+        RLMInitializeSwiftAccessor(accessor, false);
         [accessor setValue:value forKey:key];
     }
+}
+
+void RLMAssignToCollection(id<RLMCollection> collection, id value) {
+    [(id)collection replaceAllObjectsWithObjects:value];
 }
 
 NSString *RLMDescriptionWithMaxDepth(NSString *name,

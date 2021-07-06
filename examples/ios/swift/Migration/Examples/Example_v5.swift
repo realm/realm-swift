@@ -36,15 +36,15 @@ let schemaVersion = 5
 // Here we create `Pet` and migrate its data from `Dog` so simulate renaming the table.
 
 class Pet: Object {
-    @objc enum Kind: Int, RealmEnum {
+    enum Kind: Int, PersistableEnum {
         case unspecified
         case dog
         case chicken
         case cow
     }
 
-    @objc dynamic var name = ""
-    @objc dynamic var kind = Kind.unspecified
+    @Persisted var name = ""
+    @Persisted var kind = Kind.unspecified
 
     convenience init(name: String, kind: Kind) {
         self.init()
@@ -54,10 +54,10 @@ class Pet: Object {
 }
 
 class Person: Object {
-    @objc dynamic var fullName = ""
-    @objc dynamic var age = 0
-    @objc dynamic var address: Address?
-    let pets = List<Pet>()
+    @Persisted var fullName = ""
+    @Persisted var age = 0
+    @Persisted var address: Address?
+    @Persisted var pets: List<Pet>
     convenience init(fullName: String, age: Int, address: Address?) {
         self.init()
         self.fullName = fullName
@@ -67,9 +67,10 @@ class Person: Object {
 }
 
 class Address: EmbeddedObject {
-    @objc dynamic var street = ""
-    @objc dynamic var city = ""
-    let residents: LinkingObjects = LinkingObjects(fromType: Person.self, property: "address")
+    @Persisted var street = ""
+    @Persisted var city = ""
+    @Persisted(originProperty: "address")
+    var residents: LinkingObjects<Person>
     convenience init(street: String, city: String) {
         self.init()
         self.street = street

@@ -94,7 +94,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - parameter value: The object value.
      - parameter key:   The name of the property whose value should be set on each object.
     */
-    public override func setValue(_ value: Any?, forKey key: String) {
+    public func setValue(_ value: Any?, forKey key: String) {
         return rlmSet.setValue(value, forKeyPath: key)
     }
 

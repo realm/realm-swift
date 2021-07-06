@@ -84,7 +84,7 @@ import Realm
      - parameter object: The object whose index is being queried.
      */
     public func index(of object: Element) -> Int? {
-        return notFoundToNil(index: rlmResults.index(of: object.unsafeCastToRLMObject()))
+        return notFoundToNil(index: rlmResults.index(of: object))
     }
 
     /**

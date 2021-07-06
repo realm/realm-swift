@@ -20,16 +20,9 @@ import UIKit
 import RealmSwift
 
 class DemoObject: Object {
-    @objc dynamic var title = ""
-    @objc dynamic var date = NSDate()
+    @Persisted var title: String
+    @Persisted var date: Date
 }
-
-#if !swift(>=4.2)
-extension UITableViewCell {
-    typealias CellStyle = UITableViewCellStyle
-    typealias EditingStyle = UITableViewCellEditingStyle
-}
-#endif
 
 class Cell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String!) {
@@ -42,7 +35,6 @@ class Cell: UITableViewCell {
 }
 
 class TableViewController: UITableViewController {
-
     let realm = try! Realm()
     let results = try! Realm().objects(DemoObject.self).sorted(byKeyPath: "date")
     var notificationToken: NotificationToken?

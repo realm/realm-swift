@@ -87,27 +87,33 @@ static bool RLMValidateKeyType(RLMPropertyType keyType) {
     }
 }
 
-void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *const dictionary,
-                                             __unsafe_unretained id const key,
-                                             __unsafe_unretained id const value) {
+id RLMDictionaryKey(__unsafe_unretained RLMDictionary *const dictionary,
+                    __unsafe_unretained id const key) {
     if (!key) {
         @throw RLMException(@"Invalid nil key for dictionary expecting key of type '%@'.",
                             dictionary->_objectClassName ?: RLMTypeToString(dictionary.keyType));
     }
-    if (!RLMValidateValue(key, dictionary.keyType, false, false, nil)) {
+    id validated = RLMValidateValue(key, dictionary.keyType, false, false, nil);
+    if (!validated) {
         @throw RLMException(@"Invalid key '%@' of type '%@' for expected type '%@'.",
                             key, [key class], RLMTypeToString(dictionary.keyType));
     }
+    return validated;
+}
+
+id RLMDictionaryValue(__unsafe_unretained RLMDictionary *const dictionary,
+                      __unsafe_unretained id const value) {
     if (!value) {
-        return;
+        return value;
     }
     if (dictionary->_type != RLMPropertyTypeObject) {
-        if (!RLMValidateValue(value, dictionary->_type, dictionary->_optional, false, nil)) {
+        id validated = RLMValidateValue(value, dictionary->_type, dictionary->_optional, false, nil);
+        if (!validated) {
             @throw RLMException(@"Invalid value '%@' of type '%@' for expected type '%@%s'.",
                                 value, [value class], RLMTypeToString(dictionary->_type),
                                 dictionary->_optional ? "?" : "");
         }
-        return;
+        return validated;
     }
 
     if (auto valueObject = RLMDynamicCast<RLMObjectBase>(value)) {
@@ -119,13 +125,13 @@ void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *
             @throw RLMException(@"Value of type '%@' does not match RLMDictionary value type '%@'.",
                                 valueObject->_objectSchema.className, dictionary->_objectClassName);
         }
-        return;
     }
-
-    if (![value isKindOfClass:NSNull.class]) {
+    else if (![value isKindOfClass:NSNull.class]) {
         @throw RLMException(@"Value of type '%@' does not match RLMDictionary value type '%@'.",
                             [value className], dictionary->_objectClassName);
     }
+
+    return value;
 }
 
 static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary,
@@ -177,22 +183,22 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 }
 
 - (void)setValue:(nullable id)value forKey:(nonnull NSString *)key {
-    RLMDictionaryValidateMatchingObjectType(self, key, value);
-    changeDictionary(self, ^{
-        [_backingCollection setValue:value forKey:key];
-    });
+    [self setObject:value forKeyedSubscript:key];
 }
 
 - (void)setDictionary:(id)dictionary {
-    if (dictionary && ![dictionary respondsToSelector:@selector(enumerateKeysAndObjectsUsingBlock:)]) {
+    if (!dictionary || dictionary == NSNull.null) {
+        return [self removeAllObjects];
+    }
+    if (![dictionary respondsToSelector:@selector(enumerateKeysAndObjectsUsingBlock:)]) {
         @throw RLMException(@"Cannot set dictionary to object of class '%@'", [dictionary className]);
     }
 
     changeDictionary(self, ^{
         [_backingCollection removeAllObjects];
         [dictionary enumerateKeysAndObjectsUsingBlock:^(id key, id value, BOOL *) {
-            RLMDictionaryValidateMatchingObjectType(self, key, value);
-            [_backingCollection setObject:value forKey:key];
+            [_backingCollection setObject:RLMDictionaryValue(self, value)
+                                   forKey:RLMDictionaryKey(self, key)];
         }];
     });
 }
@@ -207,9 +213,9 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 }
 
 - (void)setObject:(id)obj forKey:(id)key {
-    RLMDictionaryValidateMatchingObjectType(self, key, obj);
     changeDictionary(self, ^{
-        [_backingCollection setObject:obj forKey:key];
+        [_backingCollection setObject:RLMDictionaryValue(self, obj)
+                               forKey:RLMDictionaryKey(self, key)];
     });
 }
 
@@ -236,8 +242,7 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 }
 
 - (nullable id)valueForKey:(nonnull NSString *)key {
-    // `invalidated` should be accessed with a `@` prefix when using RLMDictionary.
-    if ([key isEqualToString:@"@invalidated"]) {
+    if ([key isEqualToString:RLMInvalidatedKey]) {
         return @NO; // Unmanaged dictionaries are never invalidated
     }
     if (!_backingCollection) {
@@ -273,8 +278,7 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 
     changeDictionary(self, ^{
         [otherDictionary enumerateKeysAndObjectsUsingBlock:^(id key, id value, BOOL *) {
-            RLMDictionaryValidateMatchingObjectType(self, key, value);
-            _backingCollection[key] = value;
+            _backingCollection[RLMDictionaryKey(self, key)] = RLMDictionaryValue(self, value);
         }];
     });
 }

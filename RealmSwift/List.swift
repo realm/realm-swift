@@ -20,6 +20,12 @@ import Foundation
 import Realm
 import Realm.Private
 
+extension RLMSwiftCollectionBase: Equatable {
+    public static func == (lhs: RLMSwiftCollectionBase, rhs: RLMSwiftCollectionBase) -> Bool {
+        return lhs.isEqual(rhs)
+    }
+}
+
 /**
  `List` is the container type in Realm used to define to-many relationships.
 
@@ -142,7 +148,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      - parameter value: The object value.
      - parameter key:   The name of the property whose value should be set on each object.
     */
-    public override func setValue(_ value: Any?, forKey key: String) {
+    public func setValue(_ value: Any?, forKey key: String) {
         return rlmArray.setValue(value, forKeyPath: key)
     }
 

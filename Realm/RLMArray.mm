@@ -41,8 +41,8 @@
 @end
 
 @implementation RLMArray {
-@public
     // Backing array when this instance is unmanaged
+    @public
     NSMutableArray *_backingCollection;
 }
 #pragma mark - Initializers
@@ -362,6 +362,22 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
     });
 }
 
+- (void)replaceAllObjectsWithObjects:(NSArray *)objects {
+    if (_backingCollection.count) {
+        changeArray(self, NSKeyValueChangeRemoval, NSMakeRange(0, _backingCollection.count), ^{
+            [_backingCollection removeAllObjects];
+        });
+    }
+    if (![objects respondsToSelector:@selector(count)] || !objects.count) {
+        return;
+    }
+    changeArray(self, NSKeyValueChangeInsertion, NSMakeRange(0, objects.count), ^{
+        for (id object in objects) {
+            [_backingCollection addObject:object];
+        }
+    });
+}
+
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ... {
     va_list args;
     va_start(args, predicateFormat);
@@ -517,9 +533,12 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (BOOL)isEqual:(id)object {
     if (auto array = RLMDynamicCast<RLMArray>(object)) {
-        return !array.realm
-        && ((_backingCollection.count == 0 && array->_backingCollection.count == 0)
-            || [_backingCollection isEqual:array->_backingCollection]);
+        if (array.realm) {
+            return NO;
+        }
+        NSArray *otherCollection = array->_backingCollection;
+        return (_backingCollection.count == 0 && otherCollection.count == 0)
+            || [_backingCollection isEqual:otherCollection];
     }
     return NO;
 }

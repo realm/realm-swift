@@ -25,6 +25,8 @@ private func createStringObjects(_ factor: Int) -> Realm {
         for _ in 0..<(1000 * factor) {
             realm.create(SwiftStringObject.self, value: ["a"])
             realm.create(SwiftStringObject.self, value: ["b"])
+            realm.create(SwiftIntObject.self, value: [1])
+            realm.create(SwiftIntObject.self, value: [2])
         }
     }
     return realm
@@ -39,7 +41,7 @@ private let isRunningOnDevice = TARGET_IPHONE_SIMULATOR == 0
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftPerformanceTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
-        #if !DEBUG && os(iOS)
+        #if !DEBUG && os(iOS) && !targetEnvironment(macCatalyst)
             if isRunningOnDevice {
                 return super.defaultTestSuite
             }
@@ -51,8 +53,8 @@ class SwiftPerformanceTests: TestCase {
         super.setUp()
         autoreleasepool {
             smallRealm = createStringObjects(1)
-            mediumRealm = createStringObjects(5)
-            largeRealm = createStringObjects(50)
+            mediumRealm = createStringObjects(50)
+            largeRealm = createStringObjects(500)
         }
     }
 
@@ -107,7 +109,7 @@ class SwiftPerformanceTests: TestCase {
             let realm = self.realmWithTestPath()
             self.startMeasuring()
             try! realm.write {
-                for _ in 0..<5000 {
+                for _ in 0..<10000 {
                     let obj = SwiftStringObject()
                     obj.stringCol = "a"
                     realm.add(obj)
@@ -122,7 +124,7 @@ class SwiftPerformanceTests: TestCase {
         inMeasureBlock {
             let realm = self.realmWithTestPath()
             self.startMeasuring()
-            for _ in 0..<50 {
+            for _ in 0..<500 {
                 try! realm.write {
                     _ = realm.create(SwiftStringObject.self, value: ["a"])
                 }
@@ -137,7 +139,7 @@ class SwiftPerformanceTests: TestCase {
             let realm = self.realmWithTestPath()
             self.startMeasuring()
             try! realm.write {
-                for _ in 0..<5000 {
+                for _ in 0..<10000 {
                     realm.create(SwiftStringObject.self, value: ["a"])
                 }
             }
@@ -149,7 +151,7 @@ class SwiftPerformanceTests: TestCase {
     func testCountWhereQuery() {
         let realm = copyRealmToTestPath(largeRealm)
         measure {
-            for _ in 0..<50 {
+            for _ in 0..<500 {
                 let results = realm.objects(SwiftStringObject.self).filter("stringCol = 'a'")
                 _ = results.count
             }
@@ -159,7 +161,7 @@ class SwiftPerformanceTests: TestCase {
     func testCountWhereTableView() {
         let realm = copyRealmToTestPath(mediumRealm)
         measure {
-            for _ in 0..<50 {
+            for _ in 0..<500 {
                 let results = realm.objects(SwiftStringObject.self).filter("stringCol = 'a'")
                 _ = results.first
                 _ = results.count
@@ -191,6 +193,26 @@ class SwiftPerformanceTests: TestCase {
             let results = realm.objects(SwiftStringObject.self)
             for i in 0..<results.count {
                 _ = results[i].stringCol
+            }
+        }
+    }
+
+
+    func testEnumerateAndAccessAllInts() {
+        let realm = copyRealmToTestPath(largeRealm)
+        measure {
+            for intObject in realm.objects(SwiftIntObject.self) {
+                _ = intObject.intCol
+            }
+        }
+    }
+
+    func testEnumerateAndAccessAllSlowInts() {
+        let realm = copyRealmToTestPath(largeRealm)
+        measure {
+            let results = realm.objects(SwiftIntObject.self)
+            for i in 0..<results.count {
+                _ = results[i].intCol
             }
         }
     }
@@ -312,12 +334,12 @@ class SwiftPerformanceTests: TestCase {
     func testUnindexedStringLookup() {
         let realm = realmWithTestPath()
         try! realm.write {
-            for i in 0..<1000 {
+            for i in 0..<10000 {
                 realm.create(SwiftStringObject.self, value: [i.description])
             }
         }
         measure {
-            for i in 0..<1000 {
+            for i in 0..<10000 {
                 _ = realm.objects(SwiftStringObject.self).filter("stringCol = %@", i.description).first
             }
         }
@@ -326,12 +348,12 @@ class SwiftPerformanceTests: TestCase {
     func testIndexedStringLookup() {
         let realm = realmWithTestPath()
         try! realm.write {
-            for i in 0..<1000 {
+            for i in 0..<10000 {
                 realm.create(SwiftIndexedPropertiesObject.self, value: [i.description, i])
             }
         }
         measure {
-            for i in 0..<1000 {
+            for i in 0..<10000 {
                 _ = realm.objects(SwiftIndexedPropertiesObject.self).filter("stringCol = %@", i.description).first
             }
         }
@@ -373,7 +395,7 @@ class SwiftPerformanceTests: TestCase {
         }
 
         measure {
-            for _ in 0..<250 {
+            for _ in 0..<2500 {
                 autoreleasepool {
                     _ = try! Realm()
                 }
@@ -384,7 +406,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testRealmCreationUncached() {
         measure {
-            for _ in 0..<50 {
+            for _ in 0..<500 {
                 autoreleasepool {
                     _ = try! Realm()
                 }
@@ -400,7 +422,7 @@ class SwiftPerformanceTests: TestCase {
             try! realm.commitWrite()
 
             self.startMeasuring()
-            while object.intCol < 100 {
+            while object.intCol < 500 {
                 try! realm.write { object.intCol += 1 }
             }
             self.stopMeasuring()
@@ -416,7 +438,7 @@ class SwiftPerformanceTests: TestCase {
 
             let token = realm.observe { _, _ in }
             self.startMeasuring()
-            while object.intCol < 100 {
+            while object.intCol < 500 {
                 try! realm.write { object.intCol += 1 }
             }
             self.stopMeasuring()
@@ -425,7 +447,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testCommitWriteTransactionWithCrossThreadNotification() {
-        let stopValue = 100
+        let stopValue = 1000
         inMeasureBlock {
             let realm = inMemoryRealm("test")
             realm.beginWrite()
@@ -463,7 +485,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testCrossThreadSyncLatency() {
-        let stopValue = 500
+        let stopValue = 5000
         let queue = DispatchQueue(label: "background")
         let semaphore = DispatchSemaphore(value: 0)
 
@@ -512,105 +534,252 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 
-    func testValueForKeyForListObjects() {
+    // MARK: - Legacy object creation helpers
+
+    func createObjects<T: Object>(_ type: T.Type, _ create: (T, Int) -> Void) -> Realm {
         let realm = try! Realm()
         try! realm.write {
             for value in 0..<10000 {
-                let listObject = SwiftListOfSwiftObject()
-                let object = SwiftObject()
-                object.intCol = value
-                object.stringCol = String(value)
-                listObject.array.append(object)
-                realm.add(listObject)
+                let obj = T()
+                create(obj, value)
+                realm.add(obj)
             }
         }
-        let objects = realm.objects(SwiftListOfSwiftObject.self)
+        return realm
+    }
+
+    func createSwiftListObjects() -> Realm {
+        return createObjects(SwiftListOfSwiftObject.self) { (listObject, value) in
+            let object = SwiftObject()
+            object.intCol = value
+            object.stringCol = String(value)
+            listObject.array.append(object)
+        }
+    }
+
+    func createSwiftMutableSetObjects() -> Realm {
+        return createObjects(SwiftMutableSetOfSwiftObject.self) { (setObject, value) in
+            let object = SwiftObject()
+            object.intCol = value
+            object.stringCol = String(value)
+            setObject.set.insert(object)
+        }
+    }
+
+    func createIntSwiftObjects() -> Realm {
+        return createObjects(SwiftObject.self) { (object, value) in
+            object.intCol = value
+        }
+    }
+
+    func createStringSwiftObjects() -> Realm {
+        return createObjects(SwiftObject.self) { (object, value) in
+            object.stringCol = String(value)
+        }
+    }
+
+    func createOptionalIntObjects() -> Realm {
+        return createObjects(SwiftOptionalObject.self) { (object, value) in
+            object.optIntCol.value = value
+        }
+    }
+
+    func createOptionalStringObjects() -> Realm {
+        return createObjects(SwiftOptionalObject.self) { (object, value) in
+            object.optStringCol = String(value)
+        }
+    }
+
+
+    // MARK: - Legacy value(forKey:) vs. loop
+
+    func testLegacyListObjectsMap() {
+        let objects = createSwiftListObjects().objects(SwiftListOfSwiftObject.self)
+        measure {
+            _ = Array(objects.map { $0.array })
+        }
+    }
+
+    func testLegacyListObjectsValueForKey() {
+        let objects = createSwiftListObjects().objects(SwiftListOfSwiftObject.self)
         measure {
             _ = objects.value(forKeyPath: "array") as! [List<SwiftListOfSwiftObject>]
         }
     }
 
-    func testValueForKeyForMutableSetObjects() {
-        let realm = try! Realm()
-        try! realm.write {
-            for value in 0..<10000 {
-                let setObject = SwiftMutableSetOfSwiftObject()
-                let object = SwiftObject()
-                object.intCol = value
-                object.stringCol = String(value)
-                setObject.set.insert(object)
-                realm.add(setObject)
-            }
+    func testLegacyMutableSetObjectsMap() {
+        let objects = createSwiftMutableSetObjects().objects(SwiftMutableSetOfSwiftObject.self)
+        measure {
+            _ = Array(objects.map { $0.set })
         }
-        let objects = realm.objects(SwiftMutableSetOfSwiftObject.self)
+    }
+
+    func testLegacyMutableSetObjectsValueForKey() {
+        let objects = createSwiftMutableSetObjects().objects(SwiftMutableSetOfSwiftObject.self)
         measure {
             _ = objects.value(forKeyPath: "set") as! [MutableSet<SwiftMutableSetOfSwiftObject>]
         }
     }
 
-    func testValueForKeyForIntObjects() {
-        let realm = try! Realm()
-        try! realm.write {
-            for value in 0..<10000 {
-                autoreleasepool {
-                    let object = SwiftObject()
-                    object.intCol = value
-                    realm.add(object)
-                }
-            }
+    func testLegacyIntObjectsMap() {
+        let objects = createIntSwiftObjects().objects(SwiftObject.self)
+        measure {
+            _ = Array(objects.map { $0.intCol })
         }
-        let objects = realm.objects(SwiftObject.self)
+    }
+
+    func testLegacyIntObjectsValueForKey() {
+        let objects = createIntSwiftObjects().objects(SwiftObject.self)
         measure {
             _ = objects.value(forKeyPath: "intCol") as! [Int]
         }
     }
 
-    func testValueForKeyForStringObjects() {
-        let realm = try! Realm()
-        try! realm.write {
-            for value in 0..<10000 {
-                autoreleasepool {
-                    let object = SwiftObject()
-                    object.stringCol = String(value)
-                    realm.add(object)
-                }
-            }
+    func testLegacyStringObjectsMap() {
+        let objects = createStringSwiftObjects().objects(SwiftObject.self)
+        measure {
+            _ = Array(objects.map { $0.stringCol })
         }
-        let objects = realm.objects(SwiftObject.self)
+    }
+
+    func testLegacyStringObjectsValueForKey() {
+        let objects = createStringSwiftObjects().objects(SwiftObject.self)
         measure {
             _ = objects.value(forKeyPath: "stringCol") as! [String]
         }
     }
 
-    func testValueForKeyForOptionalIntObjects() {
-        let realm = try! Realm()
-        try! realm.write {
-            for value in 0..<10000 {
-                autoreleasepool {
-                    let object = SwiftOptionalObject()
-                    object.optIntCol.value = value
-                    realm.add(object)
-                }
-            }
+    func testLegacyOptionalIntObjectsMap() {
+        let objects = createOptionalIntObjects().objects(SwiftOptionalObject.self)
+        measure {
+            _ = Array(objects.map { $0.optIntCol.value })
         }
-        let objects = realm.objects(SwiftOptionalObject.self)
+    }
+
+    func testLegacyOptionalIntObjectsValueForKey() {
+        let objects = createOptionalIntObjects().objects(SwiftOptionalObject.self)
         measure {
             _ = objects.value(forKeyPath: "optIntCol") as! [Int]
         }
     }
 
-    func testValueForKeyForOptionalStringObjects() {
-        let realm = try! Realm()
-        try! realm.write {
-            for value in 0..<10000 {
-                autoreleasepool {
-                    let object = SwiftOptionalObject()
-                    object.optStringCol = String(value)
-                    realm.add(object)
-                }
-            }
+    func testLegacyOptionalStringObjectsMap() {
+        let objects = createOptionalStringObjects().objects(SwiftOptionalObject.self)
+        measure {
+            _ = Array(objects.map { $0.optStringCol })
         }
-        let objects = realm.objects(SwiftOptionalObject.self)
+    }
+
+    func testLegacyOptionalStringObjectsValueForKey() {
+        let objects = createOptionalStringObjects().objects(SwiftOptionalObject.self)
+        measure {
+            _ = objects.value(forKeyPath: "optStringCol") as! [String]
+        }
+    }
+
+    // MARK: - Modern object creation helpers
+
+    func createModernCollectionObjects() -> Results<ModernCollectionObject> {
+        return createObjects(ModernCollectionObject.self) { (listObject, value) in
+            let object = ModernAllTypesObject()
+            object.intCol = value
+            object.stringCol = String(value)
+            listObject.list.append(object)
+            listObject.set.insert(object)
+            listObject.map[""] = object
+        }.objects(ModernCollectionObject.self)
+    }
+
+    func createModernObjects() -> Results<ModernIntAndStringObject> {
+        return createObjects(ModernIntAndStringObject.self) { (object, value) in
+            object.intCol = value
+            object.stringCol = String(value)
+            object.optIntCol = value
+            object.optStringCol = String(value)
+        }.objects(ModernIntAndStringObject.self)
+    }
+
+    // MARK: - Modern value(forKey:) vs. loop
+
+    func testModernListObjectsMap() {
+        let objects = createModernCollectionObjects()
+        measure {
+            _ = Array(objects.map { $0.list })
+        }
+    }
+
+    func testModernListObjectsValueForKey() {
+        let objects = createModernCollectionObjects()
+        measure {
+            _ = objects.value(forKeyPath: "list") as! [List<ModernAllTypesObject>]
+        }
+    }
+
+    func testModernMutableSetObjectsMap() {
+        let objects = createModernCollectionObjects()
+        measure {
+            _ = Array(objects.map { $0.set })
+        }
+    }
+
+    func testModernMutableSetObjectsValueForKey() {
+        let objects = createModernCollectionObjects()
+        measure {
+            _ = objects.value(forKeyPath: "set") as! [MutableSet<ModernAllTypesObject>]
+        }
+    }
+
+    func testModernIntObjectsMap() {
+        let objects = createModernObjects()
+        measure {
+            _ = Array(objects.map { $0.intCol })
+        }
+    }
+
+    func testModernIntObjectsValueForKey() {
+        let objects = createModernObjects()
+        measure {
+            _ = objects.value(forKeyPath: "intCol") as! [Int]
+        }
+    }
+
+    func testModernStringObjectsMap() {
+        let objects = createModernObjects()
+        measure {
+            _ = Array(objects.map { $0.stringCol })
+        }
+    }
+
+    func testModernStringObjectsValueForKey() {
+        let objects = createModernObjects()
+        measure {
+            _ = objects.value(forKeyPath: "stringCol") as! [String]
+        }
+    }
+
+    func testModernOptionalIntObjectsMap() {
+        let objects = createModernObjects()
+        measure {
+            _ = Array(objects.map { $0.optIntCol })
+        }
+    }
+
+    func testModernOptionalIntObjectsValueForKey() {
+        let objects = createModernObjects()
+        measure {
+            _ = objects.value(forKeyPath: "optIntCol") as! [Int]
+        }
+    }
+
+    func testModernOptionalStringObjectsMap() {
+        let objects = createModernObjects()
+        measure {
+            _ = Array(objects.map { $0.optStringCol })
+        }
+    }
+
+    func testModernOptionalStringObjectsValueForKey() {
+        let objects = createModernObjects()
         measure {
             _ = objects.value(forKeyPath: "optStringCol") as! [String]
         }

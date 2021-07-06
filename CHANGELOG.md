@@ -1,11 +1,65 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add a new property wrapper-based declaration syntax for properties on Realm
+  Swift object classes. Rather than using `@objc dynamic` or the
+  `RealmProperty` wrapper type, properties can now be declared with `@Persisted
+  var property: T`, where `T` is any of the supported property types, including
+  optional numbers and collections. This has a few benefits:
+
+    - All property types are now declared in the same way. No more remembering
+      that this type requires `@objc dynamic var` while this other type
+      requires `let`, and the `RealmProperty` or `RealmOptional` helper is no
+      longer needed for types not supported by Objective-C.
+    - No more overriding class methods like `primaryKey()`,
+      `indexedProperties()` or `ignoredProperties()`. The primary key and
+      indexed flags are set directly in the property declaration with
+      `@Persisted(primaryKey: true) _id: ObjectId` or `@Persisted(indexed:
+      true) indexedProperty: Int`. If any `@Persisted` properties are present,
+      all other properties are implicitly ignored.
+    - Some performance problems have been fixed. Declaring collection
+      properties as `let listProp = List<T>()` resulted in the `List<T>` object
+      being created eagerly when the parent object is read, which could cause
+      performance problems if a class has a large number of `List` or
+      `RealmOptional` properties. `@Persisted var list: List<T>` allows us to
+      defer creating the `List<T>` until it's accessed, improving performance
+      when looping over objects and using only some of the properties.
+
+      Similarly, `let _id = ObjectId.generate()` was a convenient way to
+      declare a sync-compatible primary key, but resulted in new ObjectIds
+      being generated in some scenarios where the value would never actually be
+      used. `@Persisted var _id: ObjectId` has the same behavior of
+      automatically generating primary keys, but allows us to only generate it
+      when actually needed.
+    - More types of enums are supported. Any `RawRepresentable` enum whose raw
+      type is a type supported by Realm can be stored in an `@Persisted`
+      project, rather than just `@objc` enums. Enums must be declared as
+      conforming to the `PersistableEnum` protocol, and still cannot (yet) be
+      used in collections.
+    - `willSet` and `didSet` can be used with `@Persistable` properties, while
+      they previously did not work on managed Realm objects.
+
+  While we expect the switch to the new syntax to be very simple for most
+  users, we plan to support the existing objc-based declaration syntax for the
+  foreseeable future. The new style and old style cannot be mixed within a
+  single class, but new classes can use the new syntax while existing classes
+  continue to use the old syntax. Updating an existing class to the new syntax
+  does not change what data is stored in the Realm file and so does not require
+  a migration (as long as you don't also change the schema in the process, of
+  course).
+* Add `Map.merge()`, which adds the key-value pairs from another Map or
+  Dictionary to the map.
+* Add `Map.asKeyValueSequence()` which returns an adaptor that can be used with
+  generic functions that operate on Dictionary-styled sequences.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* AnyRealmValue enum values are now supported in more places when creating
+  objects.
+* Declaring a property as `RealmProperty<AnyRealmValue?>` will now report an
+  error during schema discovery rather than doing broken things when the
+  property is used.
+* Observing the `invalidated` property of `RLMDictionary`/`Map` via KVO did not
+  set old/new values correctly in the notification (since 10.8.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
