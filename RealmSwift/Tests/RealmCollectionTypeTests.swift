@@ -521,10 +521,8 @@ class RealmCollectionTypeTests: TestCase {
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 2)
-            case .update(_, let deletions, let insertions, let modifications):
-                XCTAssertEqual(deletions, [])
-                XCTAssertEqual(insertions, [])
-                XCTAssertEqual(modifications, [0])
+            case .update:
+                XCTFail("update not expected")
             case .error:
                 XCTFail("error not expected")
             }
@@ -585,13 +583,8 @@ class RealmCollectionTypeTests: TestCase {
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 2)
-            case .update(_, let deletions, let insertions, let modifications):
-                XCTAssertEqual(deletions, [])
-                XCTAssertEqual(insertions, [])
-                // The reason two column changes are expected here is because the
-                // single CTTLinkTarget object that is modified is linked to two origin objects.
-                // The 0, 1 index refers to the origin objects.
-                XCTAssertEqual(modifications, [0, 1])
+            case .update:
+                XCTFail("update not expected")
             case .error:
                 XCTFail("error not expected")
             }
@@ -1594,6 +1587,22 @@ class MutableSetUnmanagedRealmCollectionTypeTests: MutableSetRealmCollectionType
     override func testObserveDirectOnQueue() {
         let collection = collectionBase()
         assertThrows(collection.observe(on: DispatchQueue(label: "bg")) { _ in })
+    }
+
+    override func testObserveKeyPath1() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObserveKeyPath2() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObserveKeyPathWithLink1() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObserveKeyPathWithLink2() {
+        assertThrows(collection.observe { _ in })
     }
 
     func testFreeze() {

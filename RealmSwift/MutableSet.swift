@@ -357,7 +357,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     //!!!: actually implement
-    public func observe(keyPaths: [String]?,
+    public func observe(keyPaths: [String]? = nil,
                         on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<MutableSet>) -> Void) -> NotificationToken {
         return rlmSet.addNotificationBlock(wrapObserveBlock(block), queue: queue)
