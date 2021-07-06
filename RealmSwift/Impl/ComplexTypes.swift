@@ -310,8 +310,8 @@ extension RawRepresentable where Self: _OptionalPersistable, RawValue: _Optional
     }
 }
 
-extension RawRepresentable where Self: CaseIterable {
-    public static func _rlmDefaultValue() -> Self {
+extension PersistableEnum {
+    public static func _rlmDefaultValue(_ doNotReturnNilValue: Bool) -> Self {
         return self.allCases.first!
     }
 }
