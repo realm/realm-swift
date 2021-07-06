@@ -774,11 +774,11 @@ void QueryBuilder::add_diacritic_sensitive_string_constraint(NSPredicateOperator
         // conversion from Columns<StringData> to Mixed. This is due to the fact that all values on a
         // dictionary column are boxed in Mixed.
         if constexpr (is_any_v<T, Mixed, BinaryData, StringData>) {
-            do_add_diacritic_sensitive_string_constraint(operatorType, predicateOptions, std::move(column), value);
+            do_add_diacritic_sensitive_string_constraint(operatorType, predicateOptions, std::forward<C>(column), value);
         }
     }
     else {
-        do_add_diacritic_sensitive_string_constraint(operatorType, predicateOptions, std::move(column), value);
+        do_add_diacritic_sensitive_string_constraint(operatorType, predicateOptions, std::forward<C>(column), value);
     }
 }
 
@@ -788,7 +788,7 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
                                          C&& column,
                                          T value) {
     if (!(predicateOptions & NSDiacriticInsensitivePredicateOption)) {
-        add_diacritic_sensitive_string_constraint(operatorType, predicateOptions, std::move(column), value);
+        add_diacritic_sensitive_string_constraint(operatorType, predicateOptions, std::forward<C>(column), value);
         return;
     }
 
