@@ -177,12 +177,6 @@ class KeyPathTests: TestCase {
         XCTAssertEqual(ObjectBase._name(for: \ModernKeyPathObject.map[""]??.objectCol), "map.objectCol")
         XCTAssertEqual(ObjectBase._name(for: \ModernKeyPathObject.map[""]??.objectCol?.linkingObjects), "map.objectCol.linkingObjects")
         XCTAssertEqual(ObjectBase._name(for: \ModernKeyPathObject.map[""]??.objectCol?.linkingObjects[0].boolCol), "map.objectCol.linkingObjects.boolCol")
-
-        XCTAssertEqual(ObjectBase._name(for: \ModernAllTypesObject.objectCol?.linkingObjects), "objectCol.linkingObjects")
-        XCTAssertEqual(ObjectBase._name(for: \ModernAllTypesObject.objectCol?.linkingObjects[0].boolCol), "objectCol.linkingObjects.boolCol")
-        XCTAssertEqual(ObjectBase._name(for: \ModernAllTypesObject.objectCol?.linkingObjects[0].objectCol?.linkingObjects[0].boolCol),
-                       "objectCol.linkingObjects.objectCol.linkingObjects.boolCol")
-
     }
 
     func testModernObjectNested() {
@@ -318,6 +312,9 @@ class KeyPathTests: TestCase {
         XCTAssertEqual(ObjectBase._name(for: \ModernAllTypesObject.objectCol?.mapOptUuid), "objectCol.mapOptUuid")
 
         XCTAssertEqual(ObjectBase._name(for: \ModernAllTypesObject.objectCol?.linkingObjects), "objectCol.linkingObjects")
+        XCTAssertEqual(ObjectBase._name(for: \ModernAllTypesObject.objectCol?.linkingObjects[0].boolCol), "objectCol.linkingObjects.boolCol")
+        XCTAssertEqual(ObjectBase._name(for: \ModernAllTypesObject.objectCol?.linkingObjects[0].objectCol?.linkingObjects[0].boolCol),
+                       "objectCol.linkingObjects.objectCol.linkingObjects.boolCol")
     }
 
     func testOldObjectSyntax() {
@@ -433,12 +430,6 @@ class KeyPathTests: TestCase {
     }
 }
 
-class SwiftOldSyntaxCollectionObject: Object {
-    let arrayCol = List<Int>()
-    let arrayObjCol = List<SwiftObject>()
-    let arrayEmbeddedCol = List<EmbeddedTreeObject1>()
-}
-
 class SwiftOldSyntaxAllTypesObject: Object {
     @objc dynamic var boolCol = false
     @objc dynamic var intCol = 123
@@ -457,7 +448,6 @@ class SwiftOldSyntaxAllTypesObject: Object {
     @objc dynamic var objectCol: SwiftBoolObject? = SwiftBoolObject()
     @objc dynamic var uuidCol: UUID = UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!
     @objc dynamic var embeddedCol: SwiftOldSyntaxAllTypesEmbeddedObject? = SwiftOldSyntaxAllTypesEmbeddedObject()
-    @objc dynamic var collectionCol: SwiftOldSyntaxCollectionObject? = SwiftOldSyntaxCollectionObject()
 
     let anyCol = RealmProperty<AnyRealmValue>()
 
@@ -499,10 +489,6 @@ class SwiftOldSyntaxAllTypesEmbeddedObject: EmbeddedObject {
 
     let arrayEmbeddedCol = List<EmbeddedTreeObject3>()
     let mapEmbeddedCol = Map<String, EmbeddedTreeObject1?>()
-}
-
-class ModernKeyPathStringParentObject: Object {
-    @Persisted var embeddedCol: ModernAllTypesEmbeddedObject?
 }
 
 class ModernKeyPathObject: Object {
