@@ -571,14 +571,13 @@ extension ObjectBase {
         // if both getter and setter are nil then this class uses @Persisted
         let modernAccessor = schema.properties.allSatisfy { $0.getterSel == nil && $0.setterSel == nil }
         if !modernAccessor {
-            if let obj = obj as? KeyPathStringCollection, let key = obj.key {
-                traceObject.lastAccessedNames?.add(key)
+            if let obj = obj as? KeyPathStringCollection {
+                traceObject.lastAccessedNames?.add(obj.key)
             }
 
             if let obj = obj as? RLMSwiftValueStorage {
                 traceObject.lastAccessedNames?.add(RLMGetPropertyName(obj))
             }
-
         }
         return traceObject.lastAccessedNames!.componentsJoined(by: ".")
     }

@@ -708,7 +708,7 @@ extension Optional: OptionalObject where Wrapped: ObjectBase {
 // MARK: Key Path Strings
 
 extension Map: KeyPathStringCollection {
-    var key: String? {
+    var key: String {
         return propertyKey
     }
 }

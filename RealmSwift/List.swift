@@ -684,7 +684,7 @@ extension List: AssistedObjectiveCBridgeable {
 // MARK: Key Path Strings
 
 extension List: KeyPathStringCollection {
-    var key: String? {
+    var key: String {
         return propertyKey
     }
 }

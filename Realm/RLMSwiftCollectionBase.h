@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMSwiftCollectionBase : NSProxy <NSFastEnumeration>
 @property (nonatomic, strong) id<RLMCollection> _rlmCollection;
 @property (nonatomic, nullable) NSMutableArray* lastAccessedNames;
-@property (nonatomic, nullable) NSString *propertyKey;
+@property (nonatomic, readonly) NSString *propertyKey;
 
 - (instancetype)init;
 + (Class)_backingCollectionType;

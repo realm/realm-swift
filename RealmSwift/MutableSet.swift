@@ -542,7 +542,7 @@ extension MutableSet: AssistedObjectiveCBridgeable {
 // MARK: Key Path Strings
 
 extension MutableSet: KeyPathStringCollection {
-    var key: String? {
+    var key: String {
         return propertyKey
     }
 }
