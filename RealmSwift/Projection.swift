@@ -30,6 +30,9 @@ public enum ProjectedProperty {
     case keyPath(projectedName: String, keyPath: String)
 }
 
+// this is implementation based on dynamic member lookup
+// the better version should hide the initial lookup of the rlmProperty
+// behind the property wrapper. Also it allow to strongly define the projection property type
 @dynamicMemberLookup
 open class RealmProjection<T: Object> {
 
