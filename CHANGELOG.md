@@ -53,6 +53,8 @@ x.y.z Release notes (yyyy-MM-dd)
   generic functions that operate on Dictionary-styled sequences.
 
 ### Fixed
+* `RealmProperty<T?>` would crash when decoding a `null` json value.
+  ([Cocoa #7323](https://github.com/realm/realm-cocoa/issues/7323), since v10.8.0)
 * AnyRealmValue enum values are now supported in more places when creating
   objects.
 * Declaring a property as `RealmProperty<AnyRealmValue?>` will now report an

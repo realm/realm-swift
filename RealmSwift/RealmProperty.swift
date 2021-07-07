@@ -69,10 +69,8 @@ extension RealmProperty: Equatable where Value: Equatable {
 extension RealmProperty: Codable where Value: Codable {
     public convenience init(from decoder: Decoder) throws {
         self.init()
-        // `try decoder.singleValueContainer().decode(Value?.self)` incorrectly
-        // rejects null values: https://bugs.swift.org/browse/SR-7404
         let container = try decoder.singleValueContainer()
-        self.value = try container.decode(Value.self)
+        self.value = container.decodeNil() ? Value.nilValue() : try container.decode(Value.self)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -81,7 +79,17 @@ extension RealmProperty: Codable where Value: Codable {
 }
 
 /// A protocol describing types that can parameterize a `RealmPropertyType`.
-public protocol RealmPropertyType {}
+public protocol RealmPropertyType {
+    static func nilValue() -> Self
+}
 
-extension AnyRealmValue: RealmPropertyType {}
-extension Optional: RealmPropertyType where Wrapped: RealmOptionalType {}
+extension AnyRealmValue: RealmPropertyType {
+    public static func nilValue() -> AnyRealmValue {
+        .none
+    }
+}
+extension Optional: RealmPropertyType where Wrapped: RealmOptionalType {
+    public static func nilValue() -> Optional<Wrapped> {
+        Self.none
+    }
+}
