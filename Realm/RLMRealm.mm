@@ -819,17 +819,20 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
         [idObjects deleteObjectsFromRealm];
         return;
     }
+
     if (auto array = RLMDynamicCast<RLMArray>(objects)) {
         if (array.type != RLMPropertyTypeObject) {
             @throw RLMException(@"Cannot delete objects from RLMArray<%@>: only RLMObjects can be deleted.",
                                 RLMTypeToString(array.type));
         }
-    } else if (auto set = RLMDynamicCast<RLMSet>(objects)) {
+    }
+    else if (auto set = RLMDynamicCast<RLMSet>(objects)) {
         if (set.type != RLMPropertyTypeObject) {
             @throw RLMException(@"Cannot delete objects from RLMSet<%@>: only RLMObjects can be deleted.",
                                 RLMTypeToString(set.type));
         }
-    } else if (auto dictionary = RLMDynamicCast<RLMDictionary>(objects)) {
+    }
+    else if (auto dictionary = RLMDynamicCast<RLMDictionary>(objects)) {
         if (dictionary.type != RLMPropertyTypeObject) {
             @throw RLMException(@"Cannot delete objects from RLMDictionary of type %@: only RLMObjects can be deleted.",
                                 RLMTypeToString(dictionary.type));

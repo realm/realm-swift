@@ -941,7 +941,7 @@ case "$COMMAND" in
             workspace="${workspace/swift/swift-$REALM_XCODE_VERSION}"
         fi
 
-        examples="Simple TableView Migration Backlink GroupedTableView Encryption"
+        examples="Simple TableView Migration Backlink GroupedTableView Encryption AppClip AppClipParent"
         versions="0 1 2 3 4 5"
         for example in $examples; do
             if [ "$example" = "Migration" ]; then

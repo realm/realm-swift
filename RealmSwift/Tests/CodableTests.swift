@@ -123,6 +123,99 @@ final class CodableObject: Object, Codable {
     var uuidOptSet = MutableSet<UUID?>()
 }
 
+final class ModernCodableObject: Object, Codable {
+    @Persisted var string: String
+    @Persisted var data: Data
+    @Persisted var date: Date
+    @Persisted var int: Int
+    @Persisted var int8: Int8
+    @Persisted var int16: Int16
+    @Persisted var int32: Int32
+    @Persisted var int64: Int64
+    @Persisted var float: Float
+    @Persisted var double: Double
+    @Persisted var bool: Bool
+    @Persisted var decimal: Decimal128
+    @Persisted var objectId: ObjectId
+    @Persisted var uuid: UUID
+
+    @Persisted var stringOpt: String?
+    @Persisted var dataOpt: Data?
+    @Persisted var dateOpt: Date?
+    @Persisted var decimalOpt: Decimal128?
+    @Persisted var objectIdOpt: ObjectId?
+    @Persisted var intOpt: Int?
+    @Persisted var int8Opt: Int8?
+    @Persisted var int16Opt: Int16?
+    @Persisted var int32Opt: Int32?
+    @Persisted var int64Opt: Int64?
+    @Persisted var floatOpt: Float?
+    @Persisted var doubleOpt: Double?
+    @Persisted var boolOpt: Bool?
+
+    @Persisted var uuidOpt: UUID?
+
+    @Persisted var boolList: List<Bool>
+    @Persisted var intList: List<Int>
+    @Persisted var int8List: List<Int8>
+    @Persisted var int16List: List<Int16>
+    @Persisted var int32List: List<Int32>
+    @Persisted var int64List: List<Int64>
+    @Persisted var floatList: List<Float>
+    @Persisted var doubleList: List<Double>
+    @Persisted var stringList: List<String>
+    @Persisted var dataList: List<Data>
+    @Persisted var dateList: List<Date>
+    @Persisted var decimalList: List<Decimal128>
+    @Persisted var objectIdList: List<ObjectId>
+    @Persisted var uuidList: List<UUID>
+
+    @Persisted var boolOptList: List<Bool?>
+    @Persisted var intOptList: List<Int?>
+    @Persisted var int8OptList: List<Int8?>
+    @Persisted var int16OptList: List<Int16?>
+    @Persisted var int32OptList: List<Int32?>
+    @Persisted var int64OptList: List<Int64?>
+    @Persisted var floatOptList: List<Float?>
+    @Persisted var doubleOptList: List<Double?>
+    @Persisted var stringOptList: List<String?>
+    @Persisted var dataOptList: List<Data?>
+    @Persisted var dateOptList: List<Date?>
+    @Persisted var decimalOptList: List<Decimal128?>
+    @Persisted var objectIdOptList: List<ObjectId?>
+    @Persisted var uuidOptList: List<UUID?>
+
+    @Persisted var boolSet: MutableSet<Bool>
+    @Persisted var intSet: MutableSet<Int>
+    @Persisted var int8Set: MutableSet<Int8>
+    @Persisted var int16Set: MutableSet<Int16>
+    @Persisted var int32Set: MutableSet<Int32>
+    @Persisted var int64Set: MutableSet<Int64>
+    @Persisted var floatSet: MutableSet<Float>
+    @Persisted var doubleSet: MutableSet<Double>
+    @Persisted var stringSet: MutableSet<String>
+    @Persisted var dataSet: MutableSet<Data>
+    @Persisted var dateSet: MutableSet<Date>
+    @Persisted var decimalSet: MutableSet<Decimal128>
+    @Persisted var objectIdSet: MutableSet<ObjectId>
+    @Persisted var uuidSet: MutableSet<UUID>
+
+    @Persisted var boolOptSet: MutableSet<Bool?>
+    @Persisted var intOptSet: MutableSet<Int?>
+    @Persisted var int8OptSet: MutableSet<Int8?>
+    @Persisted var int16OptSet: MutableSet<Int16?>
+    @Persisted var int32OptSet: MutableSet<Int32?>
+    @Persisted var int64OptSet: MutableSet<Int64?>
+    @Persisted var floatOptSet: MutableSet<Float?>
+    @Persisted var doubleOptSet: MutableSet<Double?>
+    @Persisted var stringOptSet: MutableSet<String?>
+    @Persisted var dataOptSet: MutableSet<Data?>
+    @Persisted var dateOptSet: MutableSet<Date?>
+    @Persisted var decimalOptSet: MutableSet<Decimal128?>
+    @Persisted var objectIdOptSet: MutableSet<ObjectId?>
+    @Persisted var uuidOptSet: MutableSet<UUID?>
+}
+
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class CodableTests: TestCase {
     let decoder = JSONDecoder()
@@ -383,5 +476,210 @@ class CodableTests: TestCase {
 
         let encoder = JSONEncoder()
         XCTAssertEqual(try! String(data: encoder.encode(obj), encoding: .utf8), expected)
+    }
+
+    func testModernObject() {
+        let str = """
+        {
+            "bool": true,
+            "string": "abc",
+            "int": 123,
+            "int8": 123,
+            "int16": 123,
+            "int32": 123,
+            "int64": 123,
+            "float": 2.5,
+            "double": 2.5,
+            "date": 2.5,
+            "data": "\(Data("def".utf8).base64EncodedString())",
+            "decimal": "1.5e2",
+            "objectId": "1234567890abcdef12345678",
+            "uuid": "00000000-0000-0000-0000-000000000000",
+
+            "boolOpt": true,
+            "stringOpt": "abc",
+            "intOpt": 123,
+            "int8Opt": 123,
+            "int16Opt": 123,
+            "int32Opt": 123,
+            "int64Opt": 123,
+            "floatOpt": 2.5,
+            "doubleOpt": 2.5,
+            "dateOpt": 2.5,
+            "dataOpt": "\(Data("def".utf8).base64EncodedString())",
+            "decimalOpt": "1.5e2",
+            "objectIdOpt": "1234567890abcdef12345678",
+            "uuidOpt": "00000000-0000-0000-0000-000000000000",
+
+            "otherBool": true,
+            "otherInt": 123,
+            "otherInt8": 123,
+            "otherInt16": 123,
+            "otherInt32": 123,
+            "otherInt64": 123,
+            "otherFloat": 2.5,
+            "otherDouble": 2.5,
+            "otherEnum": 1,
+
+            "boolList": [true],
+            "stringList": ["abc"],
+            "intList": [123],
+            "int8List": [123],
+            "int16List": [123],
+            "int32List": [123],
+            "int64List": [123],
+            "floatList": [2.5],
+            "doubleList": [2.5],
+            "dateList": [2.5],
+            "dataList": ["\(Data("def".utf8).base64EncodedString())"],
+            "decimalList": ["1.5e2"],
+            "objectIdList": ["1234567890abcdef12345678"],
+            "uuidList": ["00000000-0000-0000-0000-000000000000"],
+
+            "boolOptList": [true],
+            "stringOptList": ["abc"],
+            "intOptList": [123],
+            "int8OptList": [123],
+            "int16OptList": [123],
+            "int32OptList": [123],
+            "int64OptList": [123],
+            "floatOptList": [2.5],
+            "doubleOptList": [2.5],
+            "dateOptList": [2.5],
+            "dataOptList": ["\(Data("def".utf8).base64EncodedString())"],
+            "decimalOptList": ["1.5e2"],
+            "objectIdOptList": ["1234567890abcdef12345678"],
+            "uuidOptList": ["00000000-0000-0000-0000-000000000000"],
+
+            "boolSet": [true],
+            "stringSet": ["abc"],
+            "intSet": [123],
+            "int8Set": [123],
+            "int16Set": [123],
+            "int32Set": [123],
+            "int64Set": [123],
+            "floatSet": [2.5],
+            "doubleSet": [2.5],
+            "dateSet": [2.5],
+            "dataSet": ["\(Data("def".utf8).base64EncodedString())"],
+            "decimalSet": ["1.5e2"],
+            "objectIdSet": ["1234567890abcdef12345678"],
+            "uuidSet": ["00000000-0000-0000-0000-000000000000"],
+
+            "boolOptSet": [true],
+            "stringOptSet": ["abc"],
+            "intOptSet": [123],
+            "int8OptSet": [123],
+            "int16OptSet": [123],
+            "int32OptSet": [123],
+            "int64OptSet": [123],
+            "floatOptSet": [2.5],
+            "doubleOptSet": [2.5],
+            "dateOptSet": [2.5],
+            "dataOptSet": ["\(Data("def".utf8).base64EncodedString())"],
+            "decimalOptSet": ["1.5e2"],
+            "objectIdOptSet": ["1234567890abcdef12345678"],
+            "uuidOptSet": ["00000000-0000-0000-0000-000000000000"],
+        }
+        """
+        let decoder = JSONDecoder()
+        let obj = try! decoder.decode(ModernCodableObject.self, from: Data(str.utf8))
+
+        XCTAssertEqual(obj.bool, true)
+        XCTAssertEqual(obj.int, 123)
+        XCTAssertEqual(obj.int8, 123)
+        XCTAssertEqual(obj.int16, 123)
+        XCTAssertEqual(obj.int32, 123)
+        XCTAssertEqual(obj.int64, 123)
+        XCTAssertEqual(obj.float, 2.5)
+        XCTAssertEqual(obj.double, 2.5)
+        XCTAssertEqual(obj.string, "abc")
+        XCTAssertEqual(obj.date, Date(timeIntervalSinceReferenceDate: 2.5))
+        XCTAssertEqual(obj.data, Data("def".utf8))
+        XCTAssertEqual(obj.decimal, "1.5e2")
+        XCTAssertEqual(obj.objectId, ObjectId("1234567890abcdef12345678"))
+
+        XCTAssertEqual(obj.boolOpt, true)
+        XCTAssertEqual(obj.intOpt, 123)
+        XCTAssertEqual(obj.int8Opt, 123)
+        XCTAssertEqual(obj.int16Opt, 123)
+        XCTAssertEqual(obj.int32Opt, 123)
+        XCTAssertEqual(obj.int64Opt, 123)
+        XCTAssertEqual(obj.floatOpt, 2.5)
+        XCTAssertEqual(obj.doubleOpt, 2.5)
+        XCTAssertEqual(obj.stringOpt, "abc")
+        XCTAssertEqual(obj.dateOpt, Date(timeIntervalSinceReferenceDate: 2.5))
+        XCTAssertEqual(obj.dataOpt, Data("def".utf8))
+        XCTAssertEqual(obj.decimalOpt, "1.5e2")
+        XCTAssertEqual(obj.objectIdOpt, ObjectId("1234567890abcdef12345678"))
+
+        XCTAssertEqual(obj.boolList.first, true)
+        XCTAssertEqual(obj.intList.first, 123)
+        XCTAssertEqual(obj.int8List.first, 123)
+        XCTAssertEqual(obj.int16List.first, 123)
+        XCTAssertEqual(obj.int32List.first, 123)
+        XCTAssertEqual(obj.int64List.first, 123)
+        XCTAssertEqual(obj.floatList.first, 2.5)
+        XCTAssertEqual(obj.doubleList.first, 2.5)
+        XCTAssertEqual(obj.stringList.first, "abc")
+        XCTAssertEqual(obj.dateList.first, Date(timeIntervalSinceReferenceDate: 2.5))
+        XCTAssertEqual(obj.dataList.first, Data("def".utf8))
+        XCTAssertEqual(obj.decimalList.first, "1.5e2")
+        XCTAssertEqual(obj.objectIdList.first, ObjectId("1234567890abcdef12345678"))
+
+        XCTAssertEqual(obj.boolOptList.first, true)
+        XCTAssertEqual(obj.intOptList.first, 123)
+        XCTAssertEqual(obj.int8OptList.first, 123)
+        XCTAssertEqual(obj.int16OptList.first, 123)
+        XCTAssertEqual(obj.int32OptList.first, 123)
+        XCTAssertEqual(obj.int64OptList.first, 123)
+        XCTAssertEqual(obj.floatOptList.first, 2.5)
+        XCTAssertEqual(obj.doubleOptList.first, 2.5)
+        XCTAssertEqual(obj.stringOptList.first, "abc")
+        XCTAssertEqual(obj.dateOptList.first, Date(timeIntervalSinceReferenceDate: 2.5))
+        XCTAssertEqual(obj.dataOptList.first, Data("def".utf8))
+        XCTAssertEqual(obj.decimalOptList.first, "1.5e2")
+        XCTAssertEqual(obj.objectIdOptList.first, ObjectId("1234567890abcdef12345678"))
+
+        XCTAssertEqual(obj.boolSet.first, true)
+        XCTAssertEqual(obj.intSet.first, 123)
+        XCTAssertEqual(obj.int8Set.first, 123)
+        XCTAssertEqual(obj.int16Set.first, 123)
+        XCTAssertEqual(obj.int32Set.first, 123)
+        XCTAssertEqual(obj.int64Set.first, 123)
+        XCTAssertEqual(obj.floatSet.first, 2.5)
+        XCTAssertEqual(obj.doubleSet.first, 2.5)
+        XCTAssertEqual(obj.stringSet.first, "abc")
+        XCTAssertEqual(obj.dateSet.first, Date(timeIntervalSinceReferenceDate: 2.5))
+        XCTAssertEqual(obj.dataSet.first, Data("def".utf8))
+        XCTAssertEqual(obj.decimalSet.first, "1.5e2")
+        XCTAssertEqual(obj.objectIdSet.first, ObjectId("1234567890abcdef12345678"))
+
+        XCTAssertEqual(obj.boolOptSet.first, true)
+        XCTAssertEqual(obj.intOptSet.first, 123)
+        XCTAssertEqual(obj.int8OptSet.first, 123)
+        XCTAssertEqual(obj.int16OptSet.first, 123)
+        XCTAssertEqual(obj.int32OptSet.first, 123)
+        XCTAssertEqual(obj.int64OptSet.first, 123)
+        XCTAssertEqual(obj.floatOptSet.first, 2.5)
+        XCTAssertEqual(obj.doubleOptSet.first, 2.5)
+        XCTAssertEqual(obj.stringOptSet.first, "abc")
+        XCTAssertEqual(obj.dateOptSet.first, Date(timeIntervalSinceReferenceDate: 2.5))
+        XCTAssertEqual(obj.dataOptSet.first, Data("def".utf8))
+        XCTAssertEqual(obj.decimalOptSet.first, "1.5e2")
+        XCTAssertEqual(obj.objectIdOptSet.first, ObjectId("1234567890abcdef12345678"))
+
+        let expected = #"{"doubleOptList":[2.5],"decimalOptList":["1.5E2"],"objectId":"1234567890abcdef12345678","doubleOpt":2.5,"int32":123,"stringOptList":["abc"],"stringSet":["abc"],"stringOptSet":["abc"],"doubleList":[2.5],"floatOpt":2.5,"boolOpt":true,"doubleSet":[2.5],"doubleOptSet":[2.5],"uuid":"00000000-0000-0000-0000-000000000000","decimalList":["1.5E2"],"boolOptList":[true],"date":2.5,"uuidOpt":"00000000-0000-0000-0000-000000000000","float":2.5,"boolSet":[true],"dataOpt":"ZGVm","floatSet":[2.5],"uuidSet":["00000000-0000-0000-0000-000000000000"],"int16OptList":[123],"int16List":[123],"dateOptList":[2.5],"int64List":[123],"intList":[123],"int64Opt":123,"int":123,"int64OptList":[123],"intSet":[123],"dataSet":["ZGVm"],"int16OptSet":[123],"decimalOpt":"1.5E2","int64Set":[123],"int8List":[123],"int32Opt":123,"objectIdOpt":"1234567890abcdef12345678","dataList":["ZGVm"],"dateOptSet":[2.5],"objectIdOptSet":["1234567890abcdef12345678"],"int32Set":[123],"int8OptSet":[123],"boolOptSet":[true],"uuidList":["00000000-0000-0000-0000-000000000000"],"floatOptSet":[2.5],"int16":123,"dateList":[2.5],"decimalSet":["1.5E2"],"dataOptSet":["ZGVm"],"dataOptList":["ZGVm"],"string":"abc","intOptSet":[123],"data":[100,101,102],"decimal":"1.5E2","floatList":[2.5],"objectIdOptList":["1234567890abcdef12345678"],"intOptList":[123],"int8OptList":[123],"decimalOptSet":["1.5E2"],"bool":true,"objectIdList":["1234567890abcdef12345678"],"uuidOptList":["00000000-0000-0000-0000-000000000000"],"uuidOptSet":["00000000-0000-0000-0000-000000000000"],"intOpt":123,"int64OptSet":[123],"floatOptList":[2.5],"int32OptList":[123],"objectIdSet":["1234567890abcdef12345678"],"boolList":[true],"int32List":[123],"int32OptSet":[123],"int8":123,"double":2.5,"int16Opt":123,"dateOpt":2.5,"int64":123,"int8Opt":123,"stringList":["abc"],"stringOpt":"abc","dateSet":[2.5],"int16Set":[123],"int8Set":[123]}"#
+
+        let encoder = JSONEncoder()
+        let encoded = try! String(data: encoder.encode(obj), encoding: .utf8)!
+        XCTAssertEqual(encoded, expected)
+
+        let realm = try! Realm()
+        try! realm.write {
+            realm.add(obj)
+        }
+
+        XCTAssertThrowsError(try encoder.encode(obj))
     }
 }

@@ -321,6 +321,21 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     });
 }
 
+- (void)replaceAllObjectsWithObjects:(NSArray *)objects {
+    if (auto count = self.count) {
+        changeArray(self, NSKeyValueChangeRemoval, NSMakeRange(0, count), ^{
+            _backingList.remove_all();
+        });
+    }
+    if (![objects respondsToSelector:@selector(count)] || !objects.count) {
+        return;
+    }
+    changeArray(self, NSKeyValueChangeInsertion, NSMakeRange(0, objects.count), ^{
+        RLMAccessorContext context(*_objectInfo);
+        _backingList.assign(context, objects);
+    });
+}
+
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)object {
     RLMArrayValidateMatchingObjectType(self, object);
     changeArray(self, NSKeyValueChangeReplacement, index, ^{

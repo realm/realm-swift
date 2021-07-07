@@ -19,17 +19,10 @@
 import UIKit
 import RealmSwift
 
-#if !swift(>=4.2)
-extension UITableViewCell {
-    typealias CellStyle = UITableViewCellStyle
-    typealias EditingStyle = UITableViewCellEditingStyle
-}
-#endif
-
 class DemoObject: Object {
-    @objc dynamic var title = ""
-    @objc dynamic var date = NSDate()
-    @objc dynamic var sectionTitle = ""
+    @Persisted var title: String
+    @Persisted var date: Date
+    @Persisted var sectionTitle: String
 }
 
 class Cell: UITableViewCell {
@@ -46,7 +39,6 @@ var sectionTitles = ["A", "B", "C"]
 var objectsBySection = [Results<DemoObject>]()
 
 class TableViewController: UITableViewController {
-
     var notificationToken: NotificationToken?
     var realm: Realm!
 
@@ -61,7 +53,7 @@ class TableViewController: UITableViewController {
             self.tableView.reloadData()
         }
         for section in sectionTitles {
-            let unsortedObjects = realm.objects(DemoObject.self).filter("sectionTitle == '\(section)'")
+            let unsortedObjects = realm.objects(DemoObject.self).filter("sectionTitle == %@", section)
             let sortedObjects = unsortedObjects.sorted(byKeyPath: "date", ascending: true)
             objectsBySection.append(sortedObjects)
         }

@@ -19,11 +19,18 @@ identifier_name:
     - _observe(_:)
     - _realmColumnNames()
     - _realmObjectName()
+    - _rlmCollection
     - _rlmCollection()
+    - _rlmDefaultValue()
     - _rlmFromRawValue(_:)
+    - _rlmGetProperty(_:_:)
+    - _rlmGetPropertyOptional(_:_:)
     - _rlmOptional
     - _rlmPopulateProperty(_:)
     - _rlmRequireObjc
+    - _rlmRequiresCaching
+    - _rlmSetAccessor(_:)
+    - _rlmSetProperty(_:_:_:)
     - _rlmToRawValue(_:)
     - _rlmType
     - id
@@ -42,6 +49,7 @@ disabled_rules:
   - force_cast
   - force_try
   - function_body_length
+  - function_parameter_count
   - line_length
   - nesting
   - syntactic_sugar

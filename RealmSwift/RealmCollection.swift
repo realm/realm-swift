@@ -31,17 +31,14 @@ import Realm
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> Element? {
-        let next = generatorBase.next()
+        guard let next = generatorBase.next() else { return nil }
+        if let value = next as? Element {
+            return value
+        }
         if next is NSNull {
             return Element._nilValue()
         }
-        if let next = next as? Object? {
-            if next == nil {
-                return nil as Element?
-            }
-            return unsafeBitCast(next, to: Optional<Element>.self)
-        }
-        return dynamicBridgeCast(fromObjectiveC: next as Any)
+        return dynamicBridgeCast(fromObjectiveC: next) as Element
     }
 }
 
@@ -73,6 +70,30 @@ public protocol _RealmMapValue {
             let key: Element.Key = next
             let val: Element.Value = dynamicBridgeCast(fromObjectiveC: collection[key as AnyObject]!)
             return SingleMapEntry(key: key, value: val) as? Element
+        }
+        return nil
+    }
+}
+
+/**
+ An iterator for `Map<Key, Value>` which produces `(key: Key, value: Value)` pairs for each entry in the map.
+ */
+@frozen public struct RLMKeyValueIterator<Key: _MapKey, Value: RealmCollectionValue>: IteratorProtocol {
+    private var generatorBase: NSFastEnumerationIterator
+    private var collection: RLMDictionary<AnyObject, AnyObject>
+    public typealias Element = (key: Key, value: Value)
+
+    init(collection: RLMDictionary<AnyObject, AnyObject>) {
+        self.collection = collection
+        generatorBase = NSFastEnumerationIterator(collection)
+    }
+
+    /// Advance to the next element and return it, or `nil` if no next element exists.
+    public mutating func next() -> Element? {
+        let next = generatorBase.next()
+        if let key = next as? Key,
+           let value = collection[key as AnyObject].map(dynamicBridgeCast) as? Value {
+            return (key: key, value: value)
         }
         return nil
     }

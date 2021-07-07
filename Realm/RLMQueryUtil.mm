@@ -20,7 +20,7 @@
 
 #import "RLMDecimal128_Private.hpp"
 #import "RLMObjectId_Private.hpp"
-#import "RLMObjectSchema_Private.h"
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMPredicateUtil.hpp"
 #import "RLMProperty_Private.h"
@@ -241,7 +241,7 @@ bool isNSNull(T) {
 
 Table& get_table(Group& group, RLMObjectSchema *objectSchema)
 {
-    return *ObjectStore::table_for_object_type(group, objectSchema.objectName.UTF8String);
+    return *ObjectStore::table_for_object_type(group, objectSchema.objectStoreName);
 }
 
 // A reference to a column within a query. Can be resolved to a Columns<T> for use in query expressions.
@@ -774,11 +774,11 @@ void QueryBuilder::add_diacritic_sensitive_string_constraint(NSPredicateOperator
         // conversion from Columns<StringData> to Mixed. This is due to the fact that all values on a
         // dictionary column are boxed in Mixed.
         if constexpr (is_any_v<T, Mixed, BinaryData, StringData>) {
-            do_add_diacritic_sensitive_string_constraint(operatorType, predicateOptions, std::move(column), value);
+            do_add_diacritic_sensitive_string_constraint(operatorType, predicateOptions, std::forward<C>(column), value);
         }
     }
     else {
-        do_add_diacritic_sensitive_string_constraint(operatorType, predicateOptions, std::move(column), value);
+        do_add_diacritic_sensitive_string_constraint(operatorType, predicateOptions, std::forward<C>(column), value);
     }
 }
 
@@ -788,7 +788,7 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
                                          C&& column,
                                          T value) {
     if (!(predicateOptions & NSDiacriticInsensitivePredicateOption)) {
-        add_diacritic_sensitive_string_constraint(operatorType, predicateOptions, std::move(column), value);
+        add_diacritic_sensitive_string_constraint(operatorType, predicateOptions, std::forward<C>(column), value);
         return;
     }
 

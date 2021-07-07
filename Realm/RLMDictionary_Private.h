@@ -33,9 +33,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 @end
 
-void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *const dictionary,
-                                             __unsafe_unretained id const key, __unsafe_unretained id const value);
 FOUNDATION_EXTERN NSString *RLMDictionaryDescriptionWithMaxDepth(NSString *name,
                                                                  RLMDictionary *dictionary,
                                                                  NSUInteger depth);
+id RLMDictionaryKey(RLMDictionary *dictionary, id key) REALM_HIDDEN;
+id RLMDictionaryValue(RLMDictionary *dictionary, id value) REALM_HIDDEN;
+
 NS_ASSUME_NONNULL_END

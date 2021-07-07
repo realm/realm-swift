@@ -352,11 +352,9 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 
 - (void)setObject:(id)obj forKey:(id)key {
     changeDictionary(self, ^{
-        RLMDictionaryValidateMatchingObjectType(self, key, obj);
-        RLMAccessorContext context(*_objectInfo);
-        _backingCollection.insert(context,
-                                  context.unbox<realm::StringData>(key),
-                                  obj);
+        RLMAccessorContext c(*_objectInfo);
+        _backingCollection.insert(c, c.unbox<realm::StringData>(RLMDictionaryKey(self, key)),
+                                  RLMDictionaryValue(self, obj));
     });
 }
 
@@ -424,14 +422,14 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
             _backingCollection.remove_all();
         }
         [dictionary enumerateKeysAndObjectsUsingBlock:[&](id key, id value, BOOL *) {
-            RLMDictionaryValidateMatchingObjectType(self, key, value);
-            _backingCollection.insert(c, c.unbox<realm::StringData>(key), value);
+            _backingCollection.insert(c, c.unbox<realm::StringData>(RLMDictionaryKey(self, key)),
+                                      RLMDictionaryValue(self, value));
         }];
     });
 }
 
 - (void)setDictionary:(id)dictionary {
-    [self mergeDictionary:dictionary clear:true];
+    [self mergeDictionary:RLMCoerceToNil(dictionary) clear:true];
 }
 
 - (void)addEntriesFromDictionary:(id)otherDictionary {
@@ -453,7 +451,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 }
 
 - (id)valueForKey:(NSString *)key {
-    if ([key isEqualToString:@"@invalidated"]) {
+    if ([key isEqualToString:RLMInvalidatedKey]) {
         return @(!_backingCollection.is_valid());
     }
     return [self objectForKey:key];

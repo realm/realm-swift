@@ -94,7 +94,7 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
 @property (nonatomic, readwrite, nullable) NSString *columnName;
 @property (nonatomic, assign) NSUInteger index;
 @property (nonatomic, assign) BOOL isPrimary;
-@property (nonatomic, assign, nullable) Ivar swiftIvar;
+@property (nonatomic, assign) ptrdiff_t swiftIvar;
 @property (nonatomic, assign, nullable) Class swiftAccessor;
 @property (nonatomic, readwrite, assign) RLMPropertyType dictionaryKeyType;
 

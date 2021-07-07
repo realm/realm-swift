@@ -110,7 +110,7 @@ class RealmTests: TestCase {
 
     #if !SWIFT_PACKAGE && DEBUG
     func testFileFormatUpgradeRequiredButDisabled() {
-        var config = Realm.Configuration()
+        var config = Realm.Configuration.defaultConfiguration
         let bundledRealmPath = Bundle(for: RealmTests.self).path(forResource: "fileformat-pre-null.realm",
                                                                  ofType: nil)!
         try! FileManager.default.copyItem(atPath: bundledRealmPath, toPath: config.fileURL!.path)
