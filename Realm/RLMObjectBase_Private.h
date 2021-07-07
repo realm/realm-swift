@@ -26,7 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMObjectBase ()
 + (void)initializeLinkedObjectSchemas;
 + (bool)isEmbedded;
+// Key Path Strings
 - (void)prepareForRecording;
+@property (nonatomic, nullable) NSMutableArray* lastAccessedNames;
 @end
 
 NS_ASSUME_NONNULL_END

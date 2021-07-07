@@ -28,7 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMObjectBase : NSObject
 
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
-@property (nonatomic, nullable) NSMutableArray* lastAccessedNames;
 
 - (instancetype)init NS_DESIGNATED_INITIALIZER;
 

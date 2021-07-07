@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMObject_Private.hpp"
+#import "RLMObjectBase_Private.h"
 
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
@@ -75,19 +76,6 @@ static void maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
 @end
 
 @implementation RLMObjectBase
-
-- (void)prepareForRecording {
-    for (RLMProperty *property in self.objectSchema.properties) {
-        if (property.swiftAccessor) {
-            [property.swiftAccessor observe:property on: self];
-        }
-    }
-    for (RLMProperty *property in self.objectSchema.computedProperties) {
-        if (property.swiftAccessor) {
-            [property.swiftAccessor observe:property on: self];
-        }
-    }
-}
 
 - (instancetype)init {
     if ((self = [super init])) {
@@ -422,6 +410,21 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 
 - (id)objectiveCMetadata {
     return nil;
+}
+
+#pragma mark - Key Path Strings
+
+- (void)prepareForRecording {
+    for (RLMProperty *property in self.objectSchema.properties) {
+        if (property.swiftAccessor) {
+            [property.swiftAccessor observe:property on: self];
+        }
+    }
+    for (RLMProperty *property in self.objectSchema.computedProperties) {
+        if (property.swiftAccessor) {
+            [property.swiftAccessor observe:property on: self];
+        }
+    }
 }
 
 + (instancetype)objectWithThreadSafeReference:(realm::ThreadSafeReference)reference
