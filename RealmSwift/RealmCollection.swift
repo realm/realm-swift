@@ -192,12 +192,7 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
 /// actually work. Most of the logic for how to store values in Realm is not
 /// implemented in Swift and there is currently no extension mechanism for
 /// supporting more types.
-public protocol RealmCollectionValue: Hashable, _RealmSchemaDiscoverable {
-    /// :nodoc:
-    // Iterating over collections requires mapping NSNull to nil, but we can't
-    // just do `nil as T` because of non-nullable collections
-    static func _nilValue() -> Self
-}
+public protocol RealmCollectionValue: Hashable, _RealmSchemaDiscoverable { }
 
 extension RealmCollectionValue {
     /// :nodoc:

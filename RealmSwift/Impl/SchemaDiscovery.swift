@@ -36,7 +36,6 @@ public protocol _RealmSchemaDiscoverable {
     // without creating an instance of that.
     func _rlmPopulateProperty(_ prop: RLMProperty)
     static func _rlmPopulateProperty(_ prop: RLMProperty)
-    /// :nodoc:
     // Iterating over collections requires mapping NSNull to nil, but we can't
     // just do `nil as T` because of non-nullable collections. RealmProperty also
     // relies on this for the same reason.
