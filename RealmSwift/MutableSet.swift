@@ -464,7 +464,7 @@ extension MutableSet: RealmCollection {
                          _ queue: DispatchQueue?,
                          _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
         -> NotificationToken {
-            return rlmSet.addNotificationBlock(wrapObserveBlock(block), queue: queue)
+            return rlmSet.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
     }
 
     // MARK: Object Retrieval
