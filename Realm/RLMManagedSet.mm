@@ -544,6 +544,7 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
                                          queue:(nullable dispatch_queue_t)queue {
     return RLMAddNotificationBlock(self, keyPaths, block, queue);
 }
+
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMSet *, RLMCollectionChange *, NSError *))block
                                       keyPaths:(nullable NSArray<NSString *> *)keyPaths {
     return RLMAddNotificationBlock(self, keyPaths, block, nil);
