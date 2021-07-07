@@ -52,7 +52,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
     /// Indicates if the list can no longer be accessed.
     public var isInvalidated: Bool { return _rlmCollection.isInvalidated }
 
-    /// Contains the last accessed properties when tracing the key path.
+    /// Contains the last accessed property names when tracing the key path.
     internal var lastAccessedNames: NSMutableArray?
 
     internal var rlmArray: RLMArray<AnyObject> {

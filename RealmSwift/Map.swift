@@ -48,7 +48,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
     // MARK: Properties
 
-    /// Contains the last accessed properties when tracing the key path.
+    /// Contains the last accessed property names when tracing the key path.
     internal var lastAccessedNames: NSMutableArray?
 
     /// The Realm which manages the map, or `nil` if the map is unmanaged.

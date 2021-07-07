@@ -85,7 +85,8 @@ public:
     }
 
     NSString* propertyName() override {
-        return @(_propertyName.c_str());
+        // Should never be called on a managed object.
+        REALM_UNREACHABLE();
     }
 
 private:
