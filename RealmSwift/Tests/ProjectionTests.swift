@@ -1,9 +1,20 @@
+////////////////////////////////////////////////////////////////////////////
 //
-//  File.swift
+// Copyright 2021 Realm Inc.
 //
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//  Created by Pavel Yakimenko on 01/07/2021.
+// http://www.apache.org/licenses/LICENSE-2.0
 //
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
 
 import Foundation
 import Realm
@@ -13,26 +24,7 @@ import XCTest
 #if canImport(RealmTestSupport)
 import RealmTestSupport
 #endif
-//import XCTest
-//
-//import RealmSwift
-//
-//#if canImport(RealmTestSupport)
-//import RealmTestSupport
-//#endif
 
-//class SwiftEmployeeObject: Object {
-//    @objc dynamic var name = ""
-//    @objc dynamic var age = 0
-//    @objc dynamic var hired = false
-//
-//    convenience init(_ age: Int, _ name: String, _ hired: Bool) {
-//        self.init()
-//        self.age = age
-//        self.name = name
-//        self.hired = hired
-//    }
-//}
 extension SwiftEmployeeObject {
     convenience init(_ age: Int, _ name: String, _ hired: Bool) {
         self.init()
