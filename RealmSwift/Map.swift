@@ -48,6 +48,9 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
     // MARK: Properties
 
+    /// Contains the last accessed properties when tracing the key path.
+    internal var lastAccessedNames: NSMutableArray?
+
     /// The Realm which manages the map, or `nil` if the map is unmanaged.
     public var realm: Realm? {
         return _rlmCollection.realm.map { Realm($0) }
@@ -709,6 +712,6 @@ extension Optional: OptionalObject where Wrapped: ObjectBase {
 
 extension Map: KeyPathStringCollection {
     var key: String {
-        return propertyKey
+        return _propertyKey
     }
 }

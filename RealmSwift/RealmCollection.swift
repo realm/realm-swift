@@ -1215,6 +1215,6 @@ extension LinkingObjects: ObservableCollection {
 internal protocol KeyPathStringCollection {
     /// A mutable array referenced from the enclosing parent that contains the last accessed property names.
     var lastAccessedNames: NSMutableArray? { get set }
-    /// The property name for this collection.
+    /// The property name for this collection, this is only used for collections declared with the old syntax.
     var key: String { get }
 }

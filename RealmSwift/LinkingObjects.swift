@@ -420,6 +420,6 @@ extension LinkingObjects: KeyPathStringCollection {
         guard let handle = handle else {
             throwRealmException("Cannot get property key for linking objects.")
         }
-        return handle.propertyKey
+        return handle._propertyKey
     }
 }

@@ -576,7 +576,7 @@ extension ObjectBase {
             }
 
             if let obj = obj as? RLMSwiftValueStorage {
-                traceObject.lastAccessedNames?.add(RLMGetPropertyName(obj))
+                traceObject.lastAccessedNames?.add(RLMSwiftValueStorageGetPropertyName(obj))
             }
         }
         return traceObject.lastAccessedNames!.componentsJoined(by: ".")

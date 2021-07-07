@@ -99,7 +99,7 @@
     return aProtocol == @protocol(NSFastEnumeration) || [self._rlmCollection conformsToProtocol:aProtocol];
 }
 
-- (NSString *)propertyKey {
+- (NSString *)_propertyKey {
     return [(id)self._rlmCollection propertyName];
 }
 
@@ -178,7 +178,7 @@
     return _results;
 }
 
-- (NSString *)propertyKey {
+- (NSString *)_propertyKey {
     return _property.name;
 }
 

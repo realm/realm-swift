@@ -174,7 +174,7 @@ void RLMInitializeUnmanagedSwiftValueStorage(__unsafe_unretained RLMSwiftValueSt
     static_cast<UnmanagedSwiftValueStorage&>(*self->_impl).attach(parent, prop.name);
 }
 
-NSString* RLMGetPropertyName(RLMSwiftValueStorage *const self) {
+NSString* RLMSwiftValueStorageGetPropertyName(RLMSwiftValueStorage *const self) {
     return self->_impl->propertyName();
 }
 
