@@ -279,6 +279,7 @@ class CodableTests: TestCase {
             "otherFloat": \(nullRealmProperty ? "null" : "2.5"),
             "otherDouble": \(nullRealmProperty ? "null" : "2.5"),
             "otherEnum": \(nullRealmProperty ? "null" : "1"),
+            "otherAny": \(nullRealmProperty ? "null" : "1"),
 
             "boolList": [true],
             "stringList": ["abc"],
@@ -390,6 +391,7 @@ class CodableTests: TestCase {
         XCTAssertEqual(obj.otherInt64.value, nil)
         XCTAssertEqual(obj.otherFloat.value, nil)
         XCTAssertEqual(obj.otherDouble.value, nil)
+        XCTAssertEqual(obj.otherDouble.value, .none)
     }
 
     func testObject() {
@@ -432,6 +434,7 @@ class CodableTests: TestCase {
         XCTAssertEqual(obj.otherInt64.value, 123)
         XCTAssertEqual(obj.otherFloat.value, 2.5)
         XCTAssertEqual(obj.otherDouble.value, 2.5)
+        XCTAssertEqual(obj.otherEnum.value, .value1)
 
         XCTAssertEqual(obj.boolList.first, true)
         XCTAssertEqual(obj.intList.first, 123)

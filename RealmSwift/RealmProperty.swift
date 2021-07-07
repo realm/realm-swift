@@ -28,7 +28,7 @@ import Realm
  - Note:
  An `RealmProperty` should not be declared as `@objc dynamic` on a Realm Object. Use `let` instead.
  */
-public final class RealmProperty<Value: RealmPropertyType>: RLMSwiftValueStorage {
+public final class RealmProperty<Value: RealmPropertyType>: RLMSwiftValueStorage where Value: _RealmSchemaDiscoverable {
     /**
      Used for getting / setting the underlying value.
 
@@ -66,11 +66,11 @@ extension RealmProperty: Equatable where Value: Equatable {
     }
 }
 
-extension RealmProperty: Codable where Value: Codable {
+extension RealmProperty: Codable where Value: Codable, Value: _RealmSchemaDiscoverable {
     public convenience init(from decoder: Decoder) throws {
         self.init()
         let container = try decoder.singleValueContainer()
-        self.value = container.decodeNil() ? Value.nilValue() : try container.decode(Value.self)
+        self.value = container.decodeNil() ? Value._nilValue() : try container.decode(Value.self)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -79,17 +79,12 @@ extension RealmProperty: Codable where Value: Codable {
 }
 
 /// A protocol describing types that can parameterize a `RealmPropertyType`.
-public protocol RealmPropertyType {
-    static func nilValue() -> Self
-}
+public protocol RealmPropertyType { }
 
-extension AnyRealmValue: RealmPropertyType {
-    public static func nilValue() -> AnyRealmValue {
-        .none
-    }
-}
-extension Optional: RealmPropertyType where Wrapped: RealmOptionalType {
-    public static func nilValue() -> Optional<Wrapped> {
-        Self.none
+extension AnyRealmValue: RealmPropertyType { }
+extension Optional: RealmPropertyType where Wrapped: RealmOptionalType { }
+extension Optional {
+    public static func _nilValue() -> Self {
+        return .none
     }
 }

@@ -153,7 +153,7 @@ internal class RealmOptionalAccessor<Value: RealmOptionalType>: RLMManagedProper
     }
 }
 
-internal class RealmPropertyAccessor<Value: RealmPropertyType>: RLMManagedPropertyAccessor {
+internal class RealmPropertyAccessor<Value: RealmPropertyType>: RLMManagedPropertyAccessor where Value: _RealmSchemaDiscoverable {
     private static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> RealmProperty<Value> {
         return ptr(property, obj).assumingMemoryBound(to: RealmProperty<Value>.self).pointee
     }
