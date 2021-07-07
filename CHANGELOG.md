@@ -1,6 +1,29 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* None.
+
+### Fixed
+* `RealmProperty<T?>` would crash when decoding a `null` json value.
+  ([Cocoa #7323](https://github.com/realm/realm-cocoa/issues/7323), since v10.8.0)
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 2.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
+10.10.0 Release notes (2021-07-07)
+=============================================================
+
+### Enhancements
+
 * Add a new property wrapper-based declaration syntax for properties on Realm
   Swift object classes. Rather than using `@objc dynamic` or the
   `RealmProperty` wrapper type, properties can now be declared with `@Persisted
@@ -53,8 +76,6 @@ x.y.z Release notes (yyyy-MM-dd)
   generic functions that operate on Dictionary-styled sequences.
 
 ### Fixed
-* `RealmProperty<T?>` would crash when decoding a `null` json value.
-  ([Cocoa #7323](https://github.com/realm/realm-cocoa/issues/7323), since v10.8.0)
 * AnyRealmValue enum values are now supported in more places when creating
   objects.
 * Declaring a property as `RealmProperty<AnyRealmValue?>` will now report an
@@ -63,17 +84,13 @@ x.y.z Release notes (yyyy-MM-dd)
 * Observing the `invalidated` property of `RLMDictionary`/`Map` via KVO did not
   set old/new values correctly in the notification (since 10.8.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.5.1.
 * CocoaPods: 1.10 or later.
 * Xcode: 12.2-13.0 beta 2.
-
-### Internal
-* Upgraded realm-core from ? to ?
 
 10.9.0 Release notes (2021-07-01)
 =============================================================
