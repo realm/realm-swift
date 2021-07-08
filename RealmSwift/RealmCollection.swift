@@ -202,10 +202,10 @@ public protocol RealmCollectionValue: Hashable, _RealmSchemaDiscoverable {
     // the lastAccessedNames array.
     static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self
     // Get the zero/empty/nil value for this type. Used to supply a default
-    // when the user does not declare one in their model. When `forceDefaultInstanciation`
+    // when the user does not declare one in their model. When `forceDefaultInstantiation`
     // is true we *must* return a non-nil, default instance of `Self`. The latter is
     // used in conjunction with key path string tracing.
-    static func _rlmDefaultValue(_ forceDefaultInstanciation: Bool) -> Self
+    static func _rlmDefaultValue(_ forceDefaultInstantiation: Bool) -> Self
 }
 
 extension RealmCollectionValue {
@@ -249,8 +249,8 @@ extension AnyRealmValue: RealmCollectionValue {
 extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue,
                                                Wrapped: _DefaultConstructible {
     /// :nodoc:
-    public static func _rlmDefaultValue(_ forceDefaultInstanciation: Bool) -> Optional<Wrapped> {
-        if forceDefaultInstanciation {
+    public static func _rlmDefaultValue(_ forceDefaultInstantiation: Bool) -> Optional<Wrapped> {
+        if forceDefaultInstantiation {
             return Wrapped()
         }
         return .none

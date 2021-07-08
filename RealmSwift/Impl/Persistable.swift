@@ -42,10 +42,10 @@ public protocol _Persistable: _RealmSchemaDiscoverable {
     // Do the values of this type need to be cached on the Persisted?
     static var _rlmRequiresCaching: Bool { get }
     // Get the zero/empty/nil value for this type. Used to supply a default
-    // when the user does not declare one in their model. When `forceDefaultInstanciation`
+    // when the user does not declare one in their model. When `forceDefaultInstantiation`
     // is true we *must* return a non-nil, default instance of `Self`. The latter is
     // used in conjunction with key path string tracing.
-    static func _rlmDefaultValue(_ forceDefaultInstanciation: Bool) -> Self
+    static func _rlmDefaultValue(_ forceDefaultInstantiation: Bool) -> Self
 }
 extension _Persistable {
     public static var _rlmRequiresCaching: Bool {
@@ -72,7 +72,7 @@ public protocol _DefaultConstructible {
     init()
 }
 extension _Persistable where Self: _DefaultConstructible {
-    public static func _rlmDefaultValue(_ forceDefaultInstanciation: Bool) -> Self {
+    public static func _rlmDefaultValue(_ forceDefaultInstantiation: Bool) -> Self {
         .init()
     }
 }

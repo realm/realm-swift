@@ -536,14 +536,14 @@ extension Object: AssistedObjectiveCBridgeable {
     }
 }
 
-// MARK: Key Path Strings
-
 extension ObjectBase {
 
     /// The object schema which lists the managed properties for the object.
     public var objectSchema: ObjectSchema {
         return ObjectSchema(RLMObjectBaseObjectSchema(self)!)
     }
+
+    // MARK: Key Path Strings
 
     /**
      Gets the components of a given key path as a string.

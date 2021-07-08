@@ -29,7 +29,7 @@ namespace {
 struct SwiftValueStorageBase {
     virtual id get() = 0;
     virtual void set(id) = 0;
-    virtual NSString* propertyName() = 0;
+    virtual NSString *propertyName() = 0;
     virtual ~SwiftValueStorageBase() = default;
 };
 
@@ -55,7 +55,7 @@ public:
         }
     }
 
-    NSString* propertyName() override {
+    NSString *propertyName() override {
         return _property;
     }
 
