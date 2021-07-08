@@ -201,6 +201,7 @@ public protocol RealmCollectionValue: Hashable, _RealmSchemaDiscoverable {
     // If we are in key path tracing mode, instantiate an empty object and forward
     // the lastAccessedNames array.
     static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self
+    /// :nodoc:
     // Get the zero/empty/nil value for this type. Used to supply a default
     // when the user does not declare one in their model. When `forceDefaultInstantiation`
     // is true we *must* return a non-nil, default instance of `Self`. The latter is
