@@ -49,6 +49,6 @@ FOUNDATION_EXTERN void RLMInitializeUnmanagedSwiftValueStorage(RLMSwiftValueStor
 
 /// Gets the property name for the RealmProperty instance. This is required for tracing the key path on
 /// objects that use the legacy property declaration syntax.
-FOUNDATION_EXTERN NSString* RLMSwiftValueStorageGetPropertyName(RLMSwiftValueStorage *);
+FOUNDATION_EXTERN NSString *RLMSwiftValueStorageGetPropertyName(RLMSwiftValueStorage *);
 
 NS_ASSUME_NONNULL_END

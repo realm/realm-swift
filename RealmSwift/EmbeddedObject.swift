@@ -95,11 +95,6 @@ extension EmbeddedObject: RealmCollectionValue {
         return nil
     }
 
-    /// The object schema which lists the managed properties for the object.
-    public var objectSchema: ObjectSchema {
-        return ObjectSchema(RLMObjectBaseObjectSchema(self)!)
-    }
-
     /// Indicates if the object can no longer be accessed because it is now invalid.
     ///
     /// An object can no longer be accessed if the object has been deleted from the Realm that manages it, or if

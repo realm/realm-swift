@@ -26,6 +26,7 @@ identifier_name:
     - _rlmFromRawValue(_:)
     - _rlmGetProperty(_:_:)
     - _rlmGetPropertyOptional(_:_:)
+    - _rlmKeyPathRecorder(with:)
     - _rlmOptional
     - _rlmPopulateProperty(_:)
     - _rlmRequireObjc

@@ -474,13 +474,8 @@ extension MutableSet: RealmCollection {
                 convenience should not be relied on.
      */
     public subscript(position: Int) -> Element {
-        if lastAccessedNames != nil {
-            let value = Element._rlmDefaultValue(true)
-            if let value = value as? ObjectBase {
-                value.lastAccessedNames = lastAccessedNames
-                value.prepareForRecording()
-            }
-            return value
+        if let lastAccessedNames = lastAccessedNames {
+            return Element._rlmKeyPathRecorder(with: lastAccessedNames)
         }
         throwForNegativeIndex(position)
         return dynamicBridgeCast(fromObjectiveC: rlmSet.object(at: UInt(position)))

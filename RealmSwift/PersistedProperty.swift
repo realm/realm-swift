@@ -163,13 +163,13 @@ public struct Persisted<Value: _Persistable> {
             storage = .unmanaged(value: value)
             return value
         case let .unmanagedObserved(value, key):
-            var name: String = ""
-            if Value._rlmType == .linkingObjects {
-                name = RLMObjectBaseObjectSchema(object)!.computedProperties[Int(key)].name
-            } else {
-                name = RLMObjectBaseObjectSchema(object)!.properties[Int(key)].name
-            }
             if object.lastAccessedNames != nil {
+                var name: String = ""
+                if Value._rlmType == .linkingObjects {
+                    name = RLMObjectBaseObjectSchema(object)!.computedProperties[Int(key)].name
+                } else {
+                    name = RLMObjectBaseObjectSchema(object)!.properties[Int(key)].name
+                }
                 object.lastAccessedNames!.add(name)
                 let value = Value._rlmDefaultValue(true)
 

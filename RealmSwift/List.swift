@@ -106,13 +106,8 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      */
     public subscript(position: Int) -> Element {
         get {
-            if lastAccessedNames != nil {
-                let value = Element._rlmDefaultValue(true)
-                if let value = value as? ObjectBase {
-                    value.lastAccessedNames = lastAccessedNames
-                    value.prepareForRecording()
-                }
-                return value
+            if let lastAccessedNames = lastAccessedNames {
+                return Element._rlmKeyPathRecorder(with: lastAccessedNames)
             }
             throwForNegativeIndex(position)
             return dynamicBridgeCast(fromObjectiveC: _rlmCollection.object(at: UInt(position)))

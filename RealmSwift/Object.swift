@@ -115,11 +115,6 @@ extension Object: RealmCollectionValue {
         return nil
     }
 
-    /// The object schema which lists the managed properties for the object.
-    public var objectSchema: ObjectSchema {
-        return ObjectSchema(RLMObjectBaseObjectSchema(self)!)
-    }
-
     /// Indicates if the object can no longer be accessed because it is now invalid.
     ///
     /// An object can no longer be accessed if the object has been deleted from the Realm that manages it, or if
@@ -544,6 +539,12 @@ extension Object: AssistedObjectiveCBridgeable {
 // MARK: Key Path Strings
 
 extension ObjectBase {
+
+    /// The object schema which lists the managed properties for the object.
+    public var objectSchema: ObjectSchema {
+        return ObjectSchema(RLMObjectBaseObjectSchema(self)!)
+    }
+
     /**
      Gets the components of a given key path as a string.
 
@@ -567,10 +568,8 @@ extension ObjectBase {
         traceObject.lastAccessedNames = NSMutableArray()
         traceObject.prepareForRecording()
         let obj = traceObject[keyPath: keyPath]
-        let schema = RLMObjectSchema.init(forObjectClass: T.self)
-        // if both getter and setter are nil then this class uses @Persisted
-        let modernAccessor = schema.properties.allSatisfy { $0.getterSel == nil && $0.setterSel == nil }
-        if !modernAccessor {
+        let isLegacy = traceObject.objectSchema.rlmObjectSchema.properties.allSatisfy { $0.isLegacy }
+        if isLegacy {
             if let obj = obj as? KeyPathStringCollection {
                 traceObject.lastAccessedNames?.add(obj.key)
             }
@@ -580,5 +579,11 @@ extension ObjectBase {
             }
         }
         return traceObject.lastAccessedNames!.componentsJoined(by: ".")
+    }
+
+    internal func prepareForRecording() {
+        (objectSchema.rlmObjectSchema.properties + objectSchema.rlmObjectSchema.computedProperties)
+            .map { (prop: $0, accessor: $0.swiftAccessor) }
+            .forEach { $0.accessor?.observe($0.prop, on: self) }
     }
 }

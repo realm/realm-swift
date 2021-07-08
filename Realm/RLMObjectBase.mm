@@ -412,21 +412,6 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     return nil;
 }
 
-#pragma mark - Key Path Strings
-
-- (void)prepareForRecording {
-    for (RLMProperty *property in self.objectSchema.properties) {
-        if (property.swiftAccessor) {
-            [property.swiftAccessor observe:property on: self];
-        }
-    }
-    for (RLMProperty *property in self.objectSchema.computedProperties) {
-        if (property.swiftAccessor) {
-            [property.swiftAccessor observe:property on: self];
-        }
-    }
-}
-
 + (instancetype)objectWithThreadSafeReference:(realm::ThreadSafeReference)reference
                                      metadata:(__unused id)metadata
                                         realm:(RLMRealm *)realm {

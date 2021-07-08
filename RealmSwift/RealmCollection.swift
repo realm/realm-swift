@@ -198,15 +198,29 @@ public protocol RealmCollectionValue: Hashable, _RealmSchemaDiscoverable {
     // just do `nil as T` because of non-nullable collections
     static func _nilValue() -> Self
     /// :nodoc:
+    // If we are in key path tracing mode, instantiate an empty object and forward
+    // the lastAccessedNames array.
+    static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self
     // Get the zero/empty/nil value for this type. Used to supply a default
-    // when the user does not declare one in their model.
-    static func _rlmDefaultValue(_ doNotReturnNilValue: Bool) -> Self
+    // when the user does not declare one in their model. When `forceDefaultInstanciation`
+    // is true we *must* return a non-nil, default instance of `Self`. The latter is
+    // used in conjunction with key path string tracing.
+    static func _rlmDefaultValue(_ forceDefaultInstanciation: Bool) -> Self
 }
 
 extension RealmCollectionValue {
     /// :nodoc:
     public static func _nilValue() -> Self {
         fatalError("unexpected NSNull for non-Optional type")
+    }
+    /// :nodoc:
+    public static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self {
+        let value = Self._rlmDefaultValue(true)
+        if let value = value as? ObjectBase {
+            value.lastAccessedNames = lastAccessedNames
+            value.prepareForRecording()
+        }
+        return value
     }
 }
 
@@ -235,8 +249,8 @@ extension AnyRealmValue: RealmCollectionValue {
 extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue,
                                                Wrapped: _DefaultConstructible {
     /// :nodoc:
-    public static func _rlmDefaultValue(_ doNotReturnNilValue: Bool) -> Optional<Wrapped> {
-        if doNotReturnNilValue {
+    public static func _rlmDefaultValue(_ forceDefaultInstanciation: Bool) -> Optional<Wrapped> {
+        if forceDefaultInstanciation {
             return Wrapped()
         }
         return .none
