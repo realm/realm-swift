@@ -84,7 +84,7 @@ public:
         _object.set_property_value(_ctx, _propertyName, value ?: NSNull.null);
     }
 
-    NSString* propertyName() override {
+    NSString *propertyName() override {
         // Should never be called on a managed object.
         REALM_UNREACHABLE();
     }
