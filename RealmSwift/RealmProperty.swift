@@ -84,6 +84,7 @@ public protocol RealmPropertyType { }
 extension AnyRealmValue: RealmPropertyType { }
 extension Optional: RealmPropertyType where Wrapped: RealmOptionalType { }
 extension Optional {
+    /// :nodoc:
     public static func _nilValue() -> Self {
         return .none
     }
