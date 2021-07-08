@@ -36,6 +36,16 @@ public protocol _RealmSchemaDiscoverable {
     // without creating an instance of that.
     func _rlmPopulateProperty(_ prop: RLMProperty)
     static func _rlmPopulateProperty(_ prop: RLMProperty)
+    // Iterating over collections requires mapping NSNull to nil, but we can't
+    // just do `nil as T` because of non-nullable collections. RealmProperty also
+    // relies on this for the same reason.
+    static func _nilValue() -> Self
+}
+
+extension _RealmSchemaDiscoverable {
+    public static func _nilValue() -> Self {
+        fatalError("Should never have nil value")
+    }
 }
 
 internal protocol SchemaDiscoverable: _RealmSchemaDiscoverable {}
