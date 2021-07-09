@@ -46,10 +46,31 @@ public protocol _Persistable: _RealmSchemaDiscoverable {
     // is true we *must* return a non-nil, default instance of `Self`. The latter is
     // used in conjunction with key path string tracing.
     static func _rlmDefaultValue(_ forceDefaultInstantiation: Bool) -> Self
+    // If we are in key path tracing mode, instantiate an empty object and forward
+    // the lastAccessedNames array.
+    static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self
 }
+
 extension _Persistable {
     public static var _rlmRequiresCaching: Bool {
         false
+    }
+}
+
+extension _RealmSchemaDiscoverable where Self: _Persistable {
+    public static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self {
+        let value = Self._rlmDefaultValue(true)
+
+        if let value = value as? ObjectBase {
+            value.lastAccessedNames = lastAccessedNames
+            value.prepareForRecording()
+        }
+
+        if var value = value as? KeyPathStringCollection {
+            value.lastAccessedNames = lastAccessedNames
+            return value as! Self
+        }
+        return value
     }
 }
 

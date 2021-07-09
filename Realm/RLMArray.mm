@@ -78,6 +78,7 @@
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property {
     _parentObject = parentObject;
     _key = property.name;
+    _isLegacyProperty = property.isLegacy;
 }
 
 #pragma mark - Convenience wrappers used for all RLMArray types
@@ -619,6 +620,10 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (NSString *)propertyName {
     return _key;
+}
+
+- (BOOL)isLegacyProperty {
+    return _isLegacyProperty;
 }
 
 @end

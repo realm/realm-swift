@@ -163,26 +163,15 @@ public struct Persisted<Value: _Persistable> {
             storage = .unmanaged(value: value)
             return value
         case let .unmanagedObserved(value, key):
-            if object.lastAccessedNames != nil {
+            if let lastAccessedNames = object.lastAccessedNames {
                 var name: String = ""
                 if Value._rlmType == .linkingObjects {
                     name = RLMObjectBaseObjectSchema(object)!.computedProperties[Int(key)].name
                 } else {
                     name = RLMObjectBaseObjectSchema(object)!.properties[Int(key)].name
                 }
-                object.lastAccessedNames!.add(name)
-                let value = Value._rlmDefaultValue(true)
-
-                if let value = value as? ObjectBase {
-                    value.lastAccessedNames = object.lastAccessedNames
-                    value.prepareForRecording()
-                }
-
-                if var value = value as? KeyPathStringCollection {
-                    value.lastAccessedNames = object.lastAccessedNames!
-                    return value as! Value
-                }
-                return value
+                lastAccessedNames.add(name)
+                return Value._rlmKeyPathRecorder(with: lastAccessedNames)
             }
             return value
         case let .managed(key):

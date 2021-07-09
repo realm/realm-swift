@@ -416,10 +416,10 @@ extension LinkingObjects: AssistedObjectiveCBridgeable {
 // MARK: Key Path Strings
 
 extension LinkingObjects: KeyPathStringCollection {
-    var key: String {
+    var propertyInformation: (key: String, isLegacy: Bool)? {
         guard let handle = handle else {
-            throwRealmException("Cannot get property key for linking objects.")
+            return nil
         }
-        return handle._propertyKey
+        return (key: handle._propertyKey, isLegacy: handle._isLegacyProperty)
     }
 }

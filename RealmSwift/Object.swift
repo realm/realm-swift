@@ -567,16 +567,15 @@ extension ObjectBase {
         let traceObject = T()
         traceObject.lastAccessedNames = NSMutableArray()
         traceObject.prepareForRecording()
-        let obj = traceObject[keyPath: keyPath]
-        let isLegacy = traceObject.objectSchema.rlmObjectSchema.properties.allSatisfy { $0.isLegacy }
-        if isLegacy {
-            if let obj = obj as? KeyPathStringCollection {
-                traceObject.lastAccessedNames?.add(obj.key)
-            }
+        let value = traceObject[keyPath: keyPath]
+        if let collection = value as? KeyPathStringCollection,
+           let propertyInfo = collection.propertyInformation,
+           propertyInfo.isLegacy {
+            traceObject.lastAccessedNames?.add(propertyInfo.key)
+        }
 
-            if let obj = obj as? RLMSwiftValueStorage {
-                traceObject.lastAccessedNames?.add(RLMSwiftValueStorageGetPropertyName(obj))
-            }
+        if let storage = value as? RLMSwiftValueStorage {
+            traceObject.lastAccessedNames?.add(RLMSwiftValueStorageGetPropertyName(storage))
         }
         return traceObject.lastAccessedNames!.componentsJoined(by: ".")
     }

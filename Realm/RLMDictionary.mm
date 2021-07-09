@@ -76,6 +76,7 @@
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property {
     _parentObject = parentObject;
     _key = property.name;
+    _isLegacyProperty = property.isLegacy;
 }
 
 static bool RLMValidateKeyType(RLMPropertyType keyType) {
@@ -428,6 +429,10 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 
 - (NSString *)propertyName {
     return _key;
+}
+
+- (BOOL)isLegacyProperty {
+    return _isLegacyProperty;
 }
 
 #pragma mark - Methods unsupported on unmanaged RLMDictionary instances

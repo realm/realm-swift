@@ -194,10 +194,6 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
 /// supporting more types.
 public protocol RealmCollectionValue: Hashable, _RealmSchemaDiscoverable {
     /// :nodoc:
-    // If we are in key path tracing mode, instantiate an empty object and forward
-    // the lastAccessedNames array.
-    static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self
-    /// :nodoc:
     // Get the zero/empty/nil value for this type. Used to supply a default
     // when the user does not declare one in their model. When `forceDefaultInstantiation`
     // is true we *must* return a non-nil, default instance of `Self`. The latter is
@@ -1226,6 +1222,7 @@ extension LinkingObjects: ObservableCollection {
 internal protocol KeyPathStringCollection {
     /// A mutable array referenced from the enclosing parent that contains the last accessed property names.
     var lastAccessedNames: NSMutableArray? { get set }
-    /// The property name for this collection, this is only used for collections declared with the old syntax.
-    var key: String { get }
+    /// `key` is the property name for this collection.
+    /// `isLegacy` will be true if the property is declared with old property syntax.
+    var propertyInformation: (key: String, isLegacy: Bool)? { get }
 }

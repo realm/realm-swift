@@ -103,6 +103,10 @@
     return [(id)self._rlmCollection propertyName];
 }
 
+- (BOOL)_isLegacyProperty {
+    return (BOOL)(size_t)[(id)self._rlmCollection performSelector:@selector(isLegacyProperty)];
+}
+
 @end
 
 #pragma clang diagnostic pop
@@ -180,6 +184,10 @@
 
 - (NSString *)_propertyKey {
     return _property.name;
+}
+
+- (BOOL)_isLegacyProperty {
+    return _property.isLegacy;
 }
 
 @end
