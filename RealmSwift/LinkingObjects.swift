@@ -104,11 +104,8 @@ import Realm
      - parameter index: The index.
      */
     public subscript(index: Int) -> Element {
-        if lastAccessedNames != nil {
-            let value = Element._rlmDefaultValue(true)
-            value.lastAccessedNames = lastAccessedNames
-            value.prepareForRecording()
-            return value
+        if let lastAccessedNames = lastAccessedNames {
+            return Element._rlmKeyPathRecorder(with: lastAccessedNames)
         }
         throwForNegativeIndex(index)
         return unsafeBitCast(rlmResults[UInt(index)], to: Element.self)
