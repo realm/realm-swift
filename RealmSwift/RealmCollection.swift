@@ -194,10 +194,6 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
 /// supporting more types.
 public protocol RealmCollectionValue: Hashable, _RealmSchemaDiscoverable {
     /// :nodoc:
-    // Iterating over collections requires mapping NSNull to nil, but we can't
-    // just do `nil as T` because of non-nullable collections
-    static func _nilValue() -> Self
-    /// :nodoc:
     // If we are in key path tracing mode, instantiate an empty object and forward
     // the lastAccessedNames array.
     static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self

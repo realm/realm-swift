@@ -237,43 +237,8 @@ class CodableTests: TestCase {
         return try! String(data: encoder.encode([value]), encoding: .utf8)!
     }
 
-    func testBool() {
-        XCTAssertEqual(true, decode(Bool.self, "[true]").value)
-        XCTAssertNil(decode(Bool.self, "[null]").value)
-        XCTAssertEqual(encode(true), "[true]")
-        XCTAssertEqual(encode(nil as Bool?), "[null]")
-    }
-
-    func testInt() {
-        XCTAssertEqual(1, decode(Int.self, "[1]").value)
-        XCTAssertNil(decode(Int.self, "[null]").value)
-        XCTAssertEqual(encode(10), "[10]")
-        XCTAssertEqual(encode(nil as Int?), "[null]")
-    }
-
-    func testFloat() {
-        XCTAssertEqual(2.2, decode(Float.self, "[2.2]").value)
-        XCTAssertNil(decode(Float.self, "[null]").value)
-        XCTAssertEqual(encode(2.25), "[2.25]")
-        XCTAssertEqual(encode(nil as Float?), "[null]")
-    }
-
-    func testDouble() {
-        XCTAssertEqual(2.2, decode(Double.self, "[2.2]").value)
-        XCTAssertNil(decode(Double.self, "[null]").value)
-        XCTAssertEqual(encode(2.25), "[2.25]")
-        XCTAssertEqual(encode(nil as Double?), "[null]")
-    }
-
-    func testDecimal() {
-        XCTAssertEqual("2.2", decode(Decimal128.self, "[2.2]"))
-        XCTAssertEqual("1234567890e123", decode(Decimal128.self, "[\"1234567890e123\"]"))
-        XCTAssertEqual(nil, decode(Decimal128?.self, "[null]"))
-        XCTAssertEqual("[\"1.234567890E132\"]", encode("1234567890e123" as Decimal128))
-    }
-
-    func testObject() {
-        let str = """
+    func legacyObjectString(_ nullRealmProperty: Bool = false) -> String {
+        """
         {
             "bool": true,
             "string": "abc",
@@ -305,15 +270,16 @@ class CodableTests: TestCase {
             "objectIdOpt": "1234567890abcdef12345678",
             "uuidOpt": "00000000-0000-0000-0000-000000000000",
 
-            "otherBool": true,
-            "otherInt": 123,
-            "otherInt8": 123,
-            "otherInt16": 123,
-            "otherInt32": 123,
-            "otherInt64": 123,
-            "otherFloat": 2.5,
-            "otherDouble": 2.5,
-            "otherEnum": 1,
+            "otherBool": \(nullRealmProperty ? "null" : "true"),
+            "otherInt": \(nullRealmProperty ? "null" : "123"),
+            "otherInt8": \(nullRealmProperty ? "null" : "123"),
+            "otherInt16": \(nullRealmProperty ? "null" : "123"),
+            "otherInt32": \(nullRealmProperty ? "null" : "123"),
+            "otherInt64": \(nullRealmProperty ? "null" : "123"),
+            "otherFloat": \(nullRealmProperty ? "null" : "2.5"),
+            "otherDouble": \(nullRealmProperty ? "null" : "2.5"),
+            "otherEnum": \(nullRealmProperty ? "null" : "1"),
+            "otherAny": \(nullRealmProperty ? "null" : "1"),
 
             "boolList": [true],
             "stringList": ["abc"],
@@ -376,8 +342,61 @@ class CodableTests: TestCase {
             "uuidOptSet": ["00000000-0000-0000-0000-000000000000"],
         }
         """
+    }
+
+    func testBool() {
+        XCTAssertEqual(true, decode(Bool.self, "[true]").value)
+        XCTAssertNil(decode(Bool.self, "[null]").value)
+        XCTAssertEqual(encode(true), "[true]")
+        XCTAssertEqual(encode(nil as Bool?), "[null]")
+    }
+
+    func testInt() {
+        XCTAssertEqual(1, decode(Int.self, "[1]").value)
+        XCTAssertNil(decode(Int.self, "[null]").value)
+        XCTAssertEqual(encode(10), "[10]")
+        XCTAssertEqual(encode(nil as Int?), "[null]")
+    }
+
+    func testFloat() {
+        XCTAssertEqual(2.2, decode(Float.self, "[2.2]").value)
+        XCTAssertNil(decode(Float.self, "[null]").value)
+        XCTAssertEqual(encode(2.25), "[2.25]")
+        XCTAssertEqual(encode(nil as Float?), "[null]")
+    }
+
+    func testDouble() {
+        XCTAssertEqual(2.2, decode(Double.self, "[2.2]").value)
+        XCTAssertNil(decode(Double.self, "[null]").value)
+        XCTAssertEqual(encode(2.25), "[2.25]")
+        XCTAssertEqual(encode(nil as Double?), "[null]")
+    }
+
+    func testDecimal() {
+        XCTAssertEqual("2.2", decode(Decimal128.self, "[2.2]"))
+        XCTAssertEqual("1234567890e123", decode(Decimal128.self, "[\"1234567890e123\"]"))
+        XCTAssertEqual(nil, decode(Decimal128?.self, "[null]"))
+        XCTAssertEqual("[\"1.234567890E132\"]", encode("1234567890e123" as Decimal128))
+    }
+
+    func testNullableRealmProperty() {
         let decoder = JSONDecoder()
-        let obj = try! decoder.decode(CodableObject.self, from: Data(str.utf8))
+        let obj = try! decoder.decode(CodableObject.self, from: Data(legacyObjectString(true).utf8))
+
+        XCTAssertEqual(obj.otherBool.value, nil)
+        XCTAssertEqual(obj.otherInt.value, nil)
+        XCTAssertEqual(obj.otherInt8.value, nil)
+        XCTAssertEqual(obj.otherInt16.value, nil)
+        XCTAssertEqual(obj.otherInt32.value, nil)
+        XCTAssertEqual(obj.otherInt64.value, nil)
+        XCTAssertEqual(obj.otherFloat.value, nil)
+        XCTAssertEqual(obj.otherDouble.value, nil)
+        XCTAssertEqual(obj.otherDouble.value, .none)
+    }
+
+    func testObject() {
+        let decoder = JSONDecoder()
+        let obj = try! decoder.decode(CodableObject.self, from: Data(legacyObjectString().utf8))
 
         XCTAssertEqual(obj.bool, true)
         XCTAssertEqual(obj.int, 123)
@@ -415,6 +434,7 @@ class CodableTests: TestCase {
         XCTAssertEqual(obj.otherInt64.value, 123)
         XCTAssertEqual(obj.otherFloat.value, 2.5)
         XCTAssertEqual(obj.otherDouble.value, 2.5)
+        XCTAssertEqual(obj.otherEnum.value, .value1)
 
         XCTAssertEqual(obj.boolList.first, true)
         XCTAssertEqual(obj.intList.first, 123)
