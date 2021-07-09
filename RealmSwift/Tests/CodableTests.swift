@@ -221,14 +221,14 @@ class CodableTests: TestCase {
     let decoder = JSONDecoder()
     let encoder = JSONEncoder()
 
-    func decode<T: RealmOptionalType & Codable>(_ type: T.Type, _ str: String) -> RealmOptional<T> {
+    func decode<T: RealmOptionalType & Codable & _RealmSchemaDiscoverable>(_ type: T.Type, _ str: String) -> RealmOptional<T> {
         return decode(RealmOptional<T>.self, str)
     }
     func decode<T: Codable>(_ type: T.Type, _ str: String) -> T {
         return try! decoder.decode([T].self, from: str.data(using: .utf8)!).first!
     }
 
-    func encode<T: RealmOptionalType & Codable>(_ value: T?) -> String {
+    func encode<T: RealmOptionalType & Codable & _RealmSchemaDiscoverable>(_ value: T?) -> String {
         let opt = RealmOptional<T>()
         opt.value = value
         return try! String(data: encoder.encode([opt]), encoding: .utf8)!
@@ -701,5 +701,155 @@ class CodableTests: TestCase {
         }
 
         XCTAssertThrowsError(try encoder.encode(obj))
+    }
+
+    func testModernObjectNil() {
+        let str = """
+        {
+            "bool": true,
+            "string": "abc",
+            "int": 123,
+            "int8": 123,
+            "int16": 123,
+            "int32": 123,
+            "int64": 123,
+            "float": 2.5,
+            "double": 2.5,
+            "date": 2.5,
+            "data": "\(Data("def".utf8).base64EncodedString())",
+            "decimal": "1.5e2",
+            "objectId": "1234567890abcdef12345678",
+            "uuid": "00000000-0000-0000-0000-000000000000",
+
+            "boolOpt": null,
+            "stringOpt": null,
+            "intOpt": null,
+            "int8Opt": null,
+            "int16Opt": null,
+            "int32Opt": null,
+            "int64Opt": null,
+            "floatOpt": null,
+            "doubleOpt": null,
+            "dateOpt": null,
+            "dataOpt": null,
+            "decimalOpt": null,
+            "objectIdOpt": null,
+            "uuidOpt": null,
+
+            "otherBool": true,
+            "otherInt": 123,
+            "otherInt8": 123,
+            "otherInt16": 123,
+            "otherInt32": 123,
+            "otherInt64": 123,
+            "otherFloat": 2.5,
+            "otherDouble": 2.5,
+            "otherEnum": 1,
+
+            "boolList": [true],
+            "stringList": ["abc"],
+            "intList": [123],
+            "int8List": [123],
+            "int16List": [123],
+            "int32List": [123],
+            "int64List": [123],
+            "floatList": [2.5],
+            "doubleList": [2.5],
+            "dateList": [2.5],
+            "dataList": ["\(Data("def".utf8).base64EncodedString())"],
+            "decimalList": ["1.5e2"],
+            "objectIdList": ["1234567890abcdef12345678"],
+            "uuidList": ["00000000-0000-0000-0000-000000000000"],
+
+            "boolOptList": [null],
+            "stringOptList": [null],
+            "intOptList": [null],
+            "int8OptList": [null],
+            "int16OptList": [null],
+            "int32OptList": [null],
+            "int64OptList": [null],
+            "floatOptList": [null],
+            "doubleOptList": [null],
+            "dateOptList": [null],
+            "dataOptList": [null],
+            "decimalOptList": [null],
+            "objectIdOptList": [null],
+            "uuidOptList": [null],
+
+            "boolSet": [true],
+            "stringSet": ["abc"],
+            "intSet": [123],
+            "int8Set": [123],
+            "int16Set": [123],
+            "int32Set": [123],
+            "int64Set": [123],
+            "floatSet": [2.5],
+            "doubleSet": [2.5],
+            "dateSet": [2.5],
+            "dataSet": ["\(Data("def".utf8).base64EncodedString())"],
+            "decimalSet": ["1.5e2"],
+            "objectIdSet": ["1234567890abcdef12345678"],
+            "uuidSet": ["00000000-0000-0000-0000-000000000000"],
+
+            "boolOptSet": [null],
+            "stringOptSet": [null],
+            "intOptSet": [null],
+            "int8OptSet": [null],
+            "int16OptSet": [null],
+            "int32OptSet": [null],
+            "int64OptSet": [null],
+            "floatOptSet": [null],
+            "doubleOptSet": [null],
+            "dateOptSet": [null],
+            "dataOptSet": [null],
+            "decimalOptSet": [null],
+            "objectIdOptSet": [null],
+            "uuidOptSet": [null],
+        }
+        """
+        let decoder = JSONDecoder()
+        let obj = try! decoder.decode(ModernCodableObject.self, from: Data(str.utf8))
+
+        XCTAssertNil(obj.boolOpt)
+        XCTAssertNil(obj.intOpt)
+        XCTAssertNil(obj.int8Opt)
+        XCTAssertNil(obj.int16Opt)
+        XCTAssertNil(obj.int32Opt)
+        XCTAssertNil(obj.int64Opt)
+        XCTAssertNil(obj.floatOpt)
+        XCTAssertNil(obj.doubleOpt)
+        XCTAssertNil(obj.stringOpt)
+        XCTAssertNil(obj.dateOpt)
+        XCTAssertNil(obj.dataOpt)
+        XCTAssertNil(obj.decimalOpt)
+        XCTAssertNil(obj.objectIdOpt)
+
+        XCTAssertNil(obj.boolOptList.first!)
+        XCTAssertNil(obj.intOptList.first!)
+        XCTAssertNil(obj.int8OptList.first!)
+        XCTAssertNil(obj.int16OptList.first!)
+        XCTAssertNil(obj.int32OptList.first!)
+        XCTAssertNil(obj.int64OptList.first!)
+        XCTAssertNil(obj.floatOptList.first!)
+        XCTAssertNil(obj.doubleOptList.first!)
+        XCTAssertNil(obj.stringOptList.first!)
+        XCTAssertNil(obj.dateOptList.first!)
+        XCTAssertNil(obj.dataOptList.first!)
+        XCTAssertNil(obj.decimalOptList.first!)
+        XCTAssertNil(obj.objectIdOptList.first!)
+
+        XCTAssertNil(obj.boolOptSet.first!)
+        XCTAssertNil(obj.intOptSet.first!)
+        XCTAssertNil(obj.int8OptSet.first!)
+        XCTAssertNil(obj.int16OptSet.first!)
+        XCTAssertNil(obj.int32OptSet.first!)
+        XCTAssertNil(obj.int64OptSet.first!)
+        XCTAssertNil(obj.floatOptSet.first!)
+        XCTAssertNil(obj.doubleOptSet.first!)
+        XCTAssertNil(obj.stringOptSet.first!)
+        XCTAssertNil(obj.dateOptSet.first!)
+        XCTAssertNil(obj.dataOptSet.first!)
+        XCTAssertNil(obj.decimalOptSet.first!)
+        XCTAssertNil(obj.objectIdOptSet.first!)
     }
 }

@@ -69,8 +69,7 @@ extension RealmProperty: Equatable where Value: Equatable {
 extension RealmProperty: Codable where Value: Codable, Value: _RealmSchemaDiscoverable {
     public convenience init(from decoder: Decoder) throws {
         self.init()
-        let container = try decoder.singleValueContainer()
-        self.value = container.decodeNil() ? Value._nilValue() : try container.decode(Value.self)
+        self.value = try decoder.decodeOptional(Value.self)
     }
 
     public func encode(to encoder: Encoder) throws {

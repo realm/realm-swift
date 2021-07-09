@@ -219,8 +219,7 @@ public struct Persisted<Value: _Persistable> {
 
 extension Persisted: Decodable where Value: Decodable {
     public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        storage = try .unmanaged(value: container.decode(Value.self), indexed: false, primary: false)
+        storage = .unmanaged(value: try decoder.decodeOptional(Value.self), indexed: false, primary: false)
     }
 }
 
