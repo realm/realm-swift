@@ -450,6 +450,8 @@ r `User.linkUser` methods.
   required to bump your schema version and are using `@ObservedResults`.
 * Sync user profiles now correctly persist between runs.
 
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
 ### Compatibility
 
 * Realm Studio: 11.0.0 or later.
