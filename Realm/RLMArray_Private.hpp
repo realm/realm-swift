@@ -40,8 +40,6 @@ class RLMObservationInfo;
 @public
     // The name of the property which this RLMArray represents
     NSString *_key;
-    // YES if the property is declared with old property syntax.
-    BOOL _isLegacyProperty;
     __weak RLMObjectBase *_parentObject;
 }
 @end

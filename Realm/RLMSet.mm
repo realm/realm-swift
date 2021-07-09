@@ -468,10 +468,6 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
     return _key;
 }
 
-- (BOOL)isLegacyProperty {
-    return _isLegacyProperty;
-}
-
 #pragma mark - Methods unsupported on unmanaged RLMSet instances
 
 #pragma clang diagnostic push

@@ -622,10 +622,6 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
     return _key;
 }
 
-- (BOOL)isLegacyProperty {
-    return _isLegacyProperty;
-}
-
 @end
 
 @implementation RLMSortDescriptor
