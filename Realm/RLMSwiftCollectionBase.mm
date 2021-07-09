@@ -99,14 +99,6 @@
     return aProtocol == @protocol(NSFastEnumeration) || [self._rlmCollection conformsToProtocol:aProtocol];
 }
 
-- (NSString *)_propertyKey {
-    return [(id)self._rlmCollection propertyName];
-}
-
-- (BOOL)_isLegacyProperty {
-    return (BOOL)(size_t)[(id)self._rlmCollection performSelector:@selector(isLegacyProperty)];
-}
-
 @end
 
 #pragma clang diagnostic pop

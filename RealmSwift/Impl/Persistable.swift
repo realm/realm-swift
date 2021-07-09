@@ -64,6 +64,7 @@ extension _RealmSchemaDiscoverable where Self: _Persistable {
         if let value = value as? ObjectBase {
             value.lastAccessedNames = lastAccessedNames
             value.prepareForRecording()
+            return value as! Self
         }
 
         if var value = value as? KeyPathStringCollection {

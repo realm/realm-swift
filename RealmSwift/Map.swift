@@ -707,6 +707,6 @@ extension Optional: OptionalObject where Wrapped: ObjectBase {
 
 extension Map: KeyPathStringCollection {
     var propertyInformation: (key: String, isLegacy: Bool)? {
-        return (key: _propertyKey, isLegacy: _isLegacyProperty)
+        return (key: rlmDictionary.propertyKey, isLegacy: rlmDictionary.isLegacyProperty)
     }
 }

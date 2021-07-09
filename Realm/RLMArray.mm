@@ -618,7 +618,7 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 #pragma mark - Key Path Strings
 
-- (NSString *)propertyName {
+- (NSString *)propertyKey {
     return _key;
 }
 

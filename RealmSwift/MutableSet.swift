@@ -541,6 +541,6 @@ extension MutableSet: AssistedObjectiveCBridgeable {
 
 extension MutableSet: KeyPathStringCollection {
     var propertyInformation: (key: String, isLegacy: Bool)? {
-        return (key: _propertyKey, isLegacy: _isLegacyProperty)
+        return (key: rlmSet.propertyKey, isLegacy: rlmSet.isLegacyProperty)
     }
 }

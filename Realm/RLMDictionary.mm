@@ -427,7 +427,7 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 
 #pragma mark - Key Path Strings
 
-- (NSString *)propertyName {
+- (NSString *)propertyKey {
     return _key;
 }
 

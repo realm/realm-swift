@@ -29,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 - (void)replaceAllObjectsWithObjects:(NSArray *)objects;
+@property (nonatomic, readonly) BOOL isLegacyProperty;
+@property (nonatomic, readonly) NSString *propertyKey;
 @end
 
 @interface RLMManagedArray : RLMArray

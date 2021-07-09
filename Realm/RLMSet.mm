@@ -464,7 +464,7 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
 
 #pragma mark - Key Path Strings
 
-- (NSString *)propertyName {
+- (NSString *)propertyKey {
     return _key;
 }
 

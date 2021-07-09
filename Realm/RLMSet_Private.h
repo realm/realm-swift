@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
+@property (nonatomic, readonly) BOOL isLegacyProperty;
+@property (nonatomic, readonly) NSString *propertyKey;
 @end
 
 void RLMSetValidateMatchingObjectType(RLMSet *set, id value);
