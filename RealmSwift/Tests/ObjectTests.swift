@@ -1093,20 +1093,29 @@ class ObjectTests: TestCase {
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 
-        // Expect notification for "employees" when an employee is added.
-        token = company.observe(keyPaths: ["employees"], expectChange("employees", Int?.none, Int?.none))
+        // Expect notification for "employees.hired" when an employee is added.
+        token = company.observe(keyPaths: ["employees.hired"], expectChange("employees", Int?.none, Int?.none))
         try! realm.write({
             let employee2 = realm.create(SwiftEmployeeObject.self)
             company.employees.append(employee2)
         })
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
-
-        // Expect notification for "employees.hired" when an employee is added.
+        
+        // Expect notification for "employees.hired" when an employee is reassigned.
         token = company.observe(keyPaths: ["employees.hired"], expectChange("employees", Int?.none, Int?.none))
         try! realm.write({
             let employee3 = realm.create(SwiftEmployeeObject.self)
-            company.employees.append(employee3)
+            company.employees[0] = employee3
+        })
+        waitForExpectations(timeout: 0.1, handler: nil)
+        token.invalidate()
+
+        // Expect notification for "employees" when an employee is added.
+        token = company.observe(keyPaths: ["employees"], expectChange("employees", Int?.none, Int?.none))
+        try! realm.write({
+            let employee4 = realm.create(SwiftEmployeeObject.self)
+            company.employees.append(employee4)
         })
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
@@ -1114,8 +1123,8 @@ class ObjectTests: TestCase {
         // Expect notification for "employees" when an employee is reassigned.
         token = company.observe(keyPaths: ["employees"], expectChange("employees", Int?.none, Int?.none))
         try! realm.write({
-            let employee4 = realm.create(SwiftEmployeeObject.self)
-            company.employees[0] = employee4
+            let employee5 = realm.create(SwiftEmployeeObject.self)
+            company.employees[0] = employee5
         })
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
@@ -1210,7 +1219,6 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
 
-    // TODO: Zero index test names for whole test suite
     func testBacklinkPropertyKeyPathNotifications1() {
         let realm = try! Realm()
         realm.beginWrite()
