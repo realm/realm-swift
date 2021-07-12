@@ -60,7 +60,7 @@ token = dog.observe { change in
     switch change {
     case .change(let properties):
         for property in properties {
-            print("Property '(property.name)' changed to '(property.newValue!)'");
+            print("Property '\(property.name)' changed to '\(property.newValue!)'");
         }
     case .error(let error):
         print("An error occurred: (error)")
