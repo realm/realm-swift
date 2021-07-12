@@ -20,11 +20,11 @@ class Dog: Object {
     @Persisted var age: Int
 }
 class Person: Object {
-    @Persisted(primary: true) var _id: String
+    @Persisted(primaryKey: true) var _id: String
     @Persisted var name: String
     @Persisted var age: Int
     // Create relationships by pointing an Object field to another Class
-    @Persisted let dogs: List<Dog>
+    @Persisted var dogs: List<Dog>
 }
 // Use them like regular Swift objects
 let dog = Dog()
