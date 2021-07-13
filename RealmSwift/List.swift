@@ -52,6 +52,9 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
     /// Indicates if the list can no longer be accessed.
     public var isInvalidated: Bool { return _rlmCollection.isInvalidated }
 
+    /// Contains the last accessed property names when tracing the key path.
+    internal var lastAccessedNames: NSMutableArray?
+
     internal var rlmArray: RLMArray<AnyObject> {
         _rlmCollection as! RLMArray
     }
@@ -103,6 +106,9 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      */
     public subscript(position: Int) -> Element {
         get {
+            if let lastAccessedNames = lastAccessedNames {
+                return Element._rlmKeyPathRecorder(with: lastAccessedNames)
+            }
             throwForNegativeIndex(position)
             return dynamicBridgeCast(fromObjectiveC: _rlmCollection.object(at: UInt(position)))
         }
@@ -670,5 +676,13 @@ extension List: AssistedObjectiveCBridgeable {
 
     internal var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (objectiveCValue: _rlmCollection, metadata: nil)
+    }
+}
+
+// MARK: Key Path Strings
+
+extension List: PropertyNameConvertible {
+    var propertyInformation: (key: String, isLegacy: Bool)? {
+        return (key: rlmArray.propertyKey, isLegacy: rlmArray.isLegacyProperty)
     }
 }

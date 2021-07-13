@@ -14,6 +14,7 @@ identifier_name:
   excluded:
     - _id
     - _nilValue()
+    - _name(for:)
     - _nsError
     - _nsErrorDomain
     - _observe(_:)
@@ -21,10 +22,11 @@ identifier_name:
     - _realmObjectName()
     - _rlmCollection
     - _rlmCollection()
-    - _rlmDefaultValue()
+    - _rlmDefaultValue(_:)
     - _rlmFromRawValue(_:)
     - _rlmGetProperty(_:_:)
     - _rlmGetPropertyOptional(_:_:)
+    - _rlmKeyPathRecorder(with:)
     - _rlmOptional
     - _rlmPopulateProperty(_:)
     - _rlmRequireObjc
