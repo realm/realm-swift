@@ -539,7 +539,7 @@ extension MutableSet: AssistedObjectiveCBridgeable {
 
 // MARK: Key Path Strings
 
-extension MutableSet: KeyPathStringCollection {
+extension MutableSet: PropertyNameConvertible {
     var propertyInformation: (key: String, isLegacy: Bool)? {
         return (key: rlmSet.propertyKey, isLegacy: rlmSet.isLegacyProperty)
     }

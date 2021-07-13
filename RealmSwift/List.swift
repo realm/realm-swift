@@ -681,7 +681,7 @@ extension List: AssistedObjectiveCBridgeable {
 
 // MARK: Key Path Strings
 
-extension List: KeyPathStringCollection {
+extension List: PropertyNameConvertible {
     var propertyInformation: (key: String, isLegacy: Bool)? {
         return (key: rlmArray.propertyKey, isLegacy: rlmArray.isLegacyProperty)
     }

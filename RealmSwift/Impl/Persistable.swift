@@ -42,10 +42,10 @@ public protocol _Persistable: _RealmSchemaDiscoverable {
     // Do the values of this type need to be cached on the Persisted?
     static var _rlmRequiresCaching: Bool { get }
     // Get the zero/empty/nil value for this type. Used to supply a default
-    // when the user does not declare one in their model. When `forceDefaultInstantiation`
+    // when the user does not declare one in their model. When `forceDefaultInitialization`
     // is true we *must* return a non-nil, default instance of `Self`. The latter is
     // used in conjunction with key path string tracing.
-    static func _rlmDefaultValue(_ forceDefaultInstantiation: Bool) -> Self
+    static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self
     // If we are in key path tracing mode, instantiate an empty object and forward
     // the lastAccessedNames array.
     static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self
@@ -67,7 +67,7 @@ extension _RealmSchemaDiscoverable where Self: _Persistable {
             return value as! Self
         }
 
-        if var value = value as? KeyPathStringCollection {
+        if var value = value as? PropertyNameConvertible {
             value.lastAccessedNames = lastAccessedNames
             return value as! Self
         }
@@ -94,7 +94,7 @@ public protocol _DefaultConstructible {
     init()
 }
 extension _Persistable where Self: _DefaultConstructible {
-    public static func _rlmDefaultValue(_ forceDefaultInstantiation: Bool) -> Self {
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
         .init()
     }
 }

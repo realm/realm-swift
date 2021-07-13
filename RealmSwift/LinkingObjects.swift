@@ -412,7 +412,7 @@ extension LinkingObjects: AssistedObjectiveCBridgeable {
 
 // MARK: Key Path Strings
 
-extension LinkingObjects: KeyPathStringCollection {
+extension LinkingObjects: PropertyNameConvertible {
     var propertyInformation: (key: String, isLegacy: Bool)? {
         guard let handle = handle else {
             return nil

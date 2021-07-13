@@ -195,10 +195,10 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
 public protocol RealmCollectionValue: Hashable, _RealmSchemaDiscoverable {
     /// :nodoc:
     // Get the zero/empty/nil value for this type. Used to supply a default
-    // when the user does not declare one in their model. When `forceDefaultInstantiation`
+    // when the user does not declare one in their model. When `forceDefaultInitialization`
     // is true we *must* return a non-nil, default instance of `Self`. The latter is
     // used in conjunction with key path string tracing.
-    static func _rlmDefaultValue(_ forceDefaultInstantiation: Bool) -> Self
+    static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self
 }
 
 extension RealmCollectionValue {
@@ -242,8 +242,8 @@ extension AnyRealmValue: RealmCollectionValue {
 extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue,
                                                Wrapped: _DefaultConstructible {
     /// :nodoc:
-    public static func _rlmDefaultValue(_ forceDefaultInstantiation: Bool) -> Optional<Wrapped> {
-        if forceDefaultInstantiation {
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Optional<Wrapped> {
+        if forceDefaultInitialization {
             return Wrapped()
         }
         return .none
@@ -1219,7 +1219,7 @@ extension LinkingObjects: ObservableCollection {
 // MARK: Key Path Strings
 
 /// Tag protocol which allows a collection to produce its property name
-internal protocol KeyPathStringCollection {
+internal protocol PropertyNameConvertible {
     /// A mutable array referenced from the enclosing parent that contains the last accessed property names.
     var lastAccessedNames: NSMutableArray? { get set }
     /// `key` is the property name for this collection.
