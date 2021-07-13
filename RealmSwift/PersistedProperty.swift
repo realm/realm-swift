@@ -159,20 +159,10 @@ public struct Persisted<Value: _Persistable> {
         case let .unmanaged(value, _, _):
             return value
         case .unmanagedNoDefault:
-            let value = Value._rlmDefaultValue(false)
+            let value = Value._rlmDefaultValue()
             storage = .unmanaged(value: value)
             return value
-        case let .unmanagedObserved(value, key):
-            if let lastAccessedNames = object.lastAccessedNames {
-                var name: String = ""
-                if Value._rlmType == .linkingObjects {
-                    name = RLMObjectBaseObjectSchema(object)!.computedProperties[Int(key)].name
-                } else {
-                    name = RLMObjectBaseObjectSchema(object)!.properties[Int(key)].name
-                }
-                lastAccessedNames.add(name)
-                return Value._rlmKeyPathRecorder(with: lastAccessedNames)
-            }
+        case let .unmanagedObserved(value, _):
             return value
         case let .managed(key):
             let v = Value._rlmGetProperty(object, key)
@@ -214,7 +204,7 @@ public struct Persisted<Value: _Persistable> {
         case let .unmanaged(v, _, _):
             value = v
         case .unmanagedNoDefault:
-            value = Value._rlmDefaultValue(false)
+            value = Value._rlmDefaultValue()
         case .unmanagedObserved, .managed, .managedCached:
             return
         }
@@ -241,7 +231,7 @@ extension Persisted: Encodable where Value: Encodable {
         case .unmanagedObserved(let value, _):
             try value.encode(to: encoder)
         case .unmanagedNoDefault:
-            try Value._rlmDefaultValue(false).encode(to: encoder)
+            try Value._rlmDefaultValue().encode(to: encoder)
         default:
             // We need a reference to the parent object to be able to read from
             // a managed property. There's probably a way to do this with some
@@ -273,12 +263,7 @@ extension Persisted: Encodable where Value: Encodable {
 
  If the Realm contains a value which is not a valid member of the enum (such as if it was written by a different sync client which disagrees on which values are valid), optional enum properties will return `nil`, and non-optional properties will abort the process.
  */
-public protocol PersistableEnum: _OptionalPersistable, RawRepresentable, CaseIterable, RealmEnum { }
-
-extension PersistableEnum {
-    /// :nodoc:
-    public init() { self = Self.allCases.first! }
-}
+public protocol PersistableEnum: _OptionalPersistable, RawRepresentable, CaseIterable, RealmEnum {}
 
 /// A type which can be indexed.
 ///

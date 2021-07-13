@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMObject_Private.hpp"
-#import "RLMObjectBase_Private.h"
 
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
@@ -76,7 +75,6 @@ static void maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
 @end
 
 @implementation RLMObjectBase
-
 - (instancetype)init {
     if ((self = [super init])) {
         maybeInitObjectSchemaForUnmanaged(self);

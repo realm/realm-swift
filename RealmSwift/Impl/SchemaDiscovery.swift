@@ -179,7 +179,6 @@ private func getLegacyProperties(_ object: ObjectBase, _ cls: ObjectBase.Type) -
             property.swiftIvar = ivar_getOffset(class_getInstanceVariable(cls, label)!)
         }
 
-        property.isLegacy = true
         property.updateAccessors()
         return property
     }

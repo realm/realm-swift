@@ -46,9 +46,6 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
     /// Indicates if the set can no longer be accessed.
     public var isInvalidated: Bool { return rlmSet.isInvalidated }
 
-    /// Contains the last accessed property names when tracing the key path.
-    internal var lastAccessedNames: NSMutableArray?
-
     internal var rlmSet: RLMSet<AnyObject> {
         _rlmCollection as! RLMSet
     }
@@ -474,9 +471,6 @@ extension MutableSet: RealmCollection {
                 convenience should not be relied on.
      */
     public subscript(position: Int) -> Element {
-        if let lastAccessedNames = lastAccessedNames {
-            return Element._rlmKeyPathRecorder(with: lastAccessedNames)
-        }
         throwForNegativeIndex(position)
         return dynamicBridgeCast(fromObjectiveC: rlmSet.object(at: UInt(position)))
     }
@@ -534,13 +528,5 @@ extension MutableSet: AssistedObjectiveCBridgeable {
 
     internal var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (objectiveCValue: rlmSet, metadata: nil)
-    }
-}
-
-// MARK: Key Path Strings
-
-extension MutableSet: PropertyNameConvertible {
-    var propertyInformation: (key: String, isLegacy: Bool)? {
-        return (key: rlmSet.propertyKey, isLegacy: rlmSet.isLegacyProperty)
     }
 }

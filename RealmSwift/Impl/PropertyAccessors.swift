@@ -105,9 +105,7 @@ internal class LinkingObjectsAccessor<Element: ObjectBase>: RLMManagedPropertyAc
             RLMLinkingObjectsHandle(object: parent, property: property)
     }
     @objc override class func observe(_ property: RLMProperty, on parent: RLMObjectBase) {
-        if parent.lastAccessedNames != nil {
-            bound(property, parent).pointee.handle = RLMLinkingObjectsHandle(object: parent, property: property)
-        }
+        // Don't need to do anything here as unmanaged LinkingObjects are always empty
     }
     @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
         return bound(property, parent).pointee
@@ -282,9 +280,7 @@ internal class PersistedLinkingObjectsAccessor<Element: ObjectBase>: RLMManagedP
         bound(property, parent).pointee.initialize(parent, key: PropertyKey(property.index))
     }
     @objc override class func observe(_ property: RLMProperty, on parent: RLMObjectBase) {
-        if parent.lastAccessedNames != nil {
-            bound(property, parent).pointee.observe(parent, property: property)
-        }
+        // N/A: unmanaged LinkingObjects are always empty
     }
     @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
         return bound(property, parent).pointee.get(parent)

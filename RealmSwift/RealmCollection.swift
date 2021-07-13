@@ -192,28 +192,12 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
 /// actually work. Most of the logic for how to store values in Realm is not
 /// implemented in Swift and there is currently no extension mechanism for
 /// supporting more types.
-public protocol RealmCollectionValue: Hashable, _RealmSchemaDiscoverable {
-    /// :nodoc:
-    // Get the zero/empty/nil value for this type. Used to supply a default
-    // when the user does not declare one in their model. When `forceDefaultInitialization`
-    // is true we *must* return a non-nil, default instance of `Self`. The latter is
-    // used in conjunction with key path string tracing.
-    static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self
-}
+public protocol RealmCollectionValue: Hashable, _RealmSchemaDiscoverable { }
 
 extension RealmCollectionValue {
     /// :nodoc:
     public static func _nilValue() -> Self {
         fatalError("unexpected NSNull for non-Optional type")
-    }
-    /// :nodoc:
-    public static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self {
-        let value = Self._rlmDefaultValue(true)
-        if let value = value as? ObjectBase {
-            value.lastAccessedNames = lastAccessedNames
-            value.prepareForRecording()
-        }
-        return value
     }
 }
 
@@ -239,16 +223,7 @@ extension AnyRealmValue: RealmCollectionValue {
     }
 }
 
-extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue,
-                                               Wrapped: _DefaultConstructible {
-    /// :nodoc:
-    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Optional<Wrapped> {
-        if forceDefaultInitialization {
-            return Wrapped()
-        }
-        return .none
-    }
-
+extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue {
     /// :nodoc:
     public static func _nilValue() -> Optional {
         return nil
@@ -1214,15 +1189,4 @@ extension LinkingObjects: ObservableCollection {
     internal func isSameObjcCollection(_ objc: RLMResults<AnyObject>) -> Bool {
         return objc === rlmResults
     }
-}
-
-// MARK: Key Path Strings
-
-/// Tag protocol which allows a collection to produce its property name
-internal protocol PropertyNameConvertible {
-    /// A mutable array referenced from the enclosing parent that contains the last accessed property names.
-    var lastAccessedNames: NSMutableArray? { get set }
-    /// `key` is the property name for this collection.
-    /// `isLegacy` will be true if the property is declared with old property syntax.
-    var propertyInformation: (key: String, isLegacy: Bool)? { get }
 }
