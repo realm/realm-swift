@@ -428,7 +428,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
                         on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmMapChange<Map>) -> Void)
     -> NotificationToken {
-        return rlmDictionary.addNotificationBlock(wrapDictionaryObserveBlock(block), queue: queue)
+        return rlmDictionary.addNotificationBlock(wrapDictionaryObserveBlock(block), keyPaths: keyPaths, queue: queue)
     }
 
     // MARK: Frozen Objects
