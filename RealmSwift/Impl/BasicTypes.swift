@@ -108,7 +108,7 @@ extension NSDate: SchemaDiscoverable {
 
 // MARK: - Modern property getters/setters
 
-private protocol _Int: BinaryInteger, _OptionalPersistable, _DefaultConstructible, _PrimaryKey, _Indexable {
+private protocol _Int: BinaryInteger, _OptionalPersistable, _PrimaryKey, _Indexable {
 }
 
 extension _Int {
@@ -243,7 +243,7 @@ extension ObjectId: _OptionalPersistable, _DefaultConstructible, _PrimaryKey, _I
         RLMSetSwiftPropertyObjectId(obj, key, (value))
     }
 
-    public static func _rlmDefaultValue() -> ObjectId {
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> ObjectId {
         return Self.generate()
     }
 }

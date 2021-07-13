@@ -117,11 +117,15 @@
     if (!(self = [super init])) {
         return nil;
     }
-    auto& obj = object->_row;
-    _tableKey = obj.get_table()->get_key();
-    _objKey = obj.get_key();
-    _info = object->_info;
-    _realm = object->_realm;
+    // KeyPath strings will invoke this initializer with an unmanaged object
+    // so guard against that.
+    if (object->_realm) {
+        auto& obj = object->_row;
+        _tableKey = obj.get_table()->get_key();
+        _objKey = obj.get_key();
+        _info = object->_info;
+        _realm = object->_realm;
+    }
     _property = prop;
 
     return self;
@@ -168,6 +172,14 @@
     _results = [RLMLinkingObjects resultsWithObjectInfo:objectInfo results:std::move(results)];
     _realm = nil;
     return _results;
+}
+
+- (NSString *)_propertyKey {
+    return _property.name;
+}
+
+- (BOOL)_isLegacyProperty {
+    return _property.isLegacy;
 }
 
 @end

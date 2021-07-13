@@ -48,6 +48,9 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
     // MARK: Properties
 
+    /// Contains the last accessed property names when tracing the key path.
+    internal var lastAccessedNames: NSMutableArray?
+
     /// The Realm which manages the map, or `nil` if the map is unmanaged.
     public var realm: Realm? {
         return _rlmCollection.realm.map { Realm($0) }
@@ -188,6 +191,9 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      */
     public subscript(key: Key) -> Value? {
         get {
+            if let lastAccessedNames = lastAccessedNames {
+                return Value._rlmKeyPathRecorder(with: lastAccessedNames)
+            }
             return rlmDictionary[objcKey(from: key)].map(dynamicBridgeCast)
         }
         set {
@@ -694,5 +700,13 @@ private protocol OptionalObject {
 extension Optional: OptionalObject where Wrapped: ObjectBase {
     static func className() -> String {
         Wrapped.className()
+    }
+}
+
+// MARK: Key Path Strings
+
+extension Map: PropertyNameConvertible {
+    var propertyInformation: (key: String, isLegacy: Bool)? {
+        return (key: rlmDictionary.propertyKey, isLegacy: rlmDictionary.isLegacyProperty)
     }
 }

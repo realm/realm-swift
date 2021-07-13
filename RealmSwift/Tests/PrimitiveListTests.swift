@@ -724,7 +724,7 @@ class MinMaxPrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveList
     }
 }
 
-class OptionalMinMaxPrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.W: MinMaxType {
+class OptionalMinMaxPrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.W: MinMaxType, V.W: _DefaultConstructible {
     // V.T and V.W? are the same thing, but the type system doesn't know that
     // and the protocol constraint is on V.W
     var array2: List<V.W?> {
@@ -766,7 +766,7 @@ class AddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveLis
     }
 }
 
-class OptionalAddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.W: AddableType {
+class OptionalAddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.W: AddableType, V.W: _DefaultConstructible {
     // V.T and V.W? are the same thing, but the type system doesn't know that
     // and the protocol constraint is on V.W
     var array2: List<V.W?> {
@@ -810,7 +810,7 @@ class SortablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveLi
     }
 }
 
-class OptionalSortablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.W: Comparable {
+class OptionalSortablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.W: Comparable, V.W: _DefaultConstructible {
     func testSorted() {
         var shuffled = values!
         shuffled.removeFirst()
