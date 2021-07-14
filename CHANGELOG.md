@@ -32,22 +32,6 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Cocoa #7323](https://github.com/realm/realm-cocoa/issues/7323), since v10.8.0)
 * `@Persisted<T?>` would crash when decoding a `null` value.
   ([#7332](https://github.com/realm/realm-cocoa/issues/7332), since v10.10.0).
-
-### Deprecations
-
-* Deprecated:
-    - `RealmCollection.min(ofProperty:)`
-    - `RealmCollection.max(ofProperty:)`
-    - `RealmCollection.average(ofProperty:)`
-    - `RealmCollection.sum(ofProperty:)`
-    - `RealmCollection.sorted(byKeyPath:, ascending:)`
-  In favor of their type safe counterparts. String based keyPaths are more error prone,
-  and the current versions of these methods allow for using string based keyPaths on types
-  that were potentially unsupported.
-  
-  If previously using any of the above methods by passing in "self" (a valid keyPath for
-  `AddableType`, `MinMaxType`, and `Comparable` types), migrate to using the above methods
-  with no arguments, e.g., `myIntList.min()`.
   
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

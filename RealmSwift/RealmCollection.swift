@@ -351,7 +351,6 @@ public protocol RealmCollection: RealmCollectionBase {
      - parameter keyPath:   The key path to sort by.
      - parameter ascending: The direction to sort in.
      */
-    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for lists of objects.")
     func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element>
 
     /**
@@ -376,7 +375,6 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for lists of objects.")
     func min<T: MinMaxType>(ofProperty property: String) -> T?
 
     /**
@@ -387,7 +385,6 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for lists of objects.")
     func max<T: MinMaxType>(ofProperty property: String) -> T?
 
     /**
@@ -397,7 +394,6 @@ public protocol RealmCollection: RealmCollectionBase {
 
     - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
     */
-    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for lists of objects.")
     func sum<T: AddableType>(ofProperty property: String) -> T
 
     /**
@@ -408,7 +404,6 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter property: The name of a property whose values should be summed.
      */
-    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for lists of objects.")
     func average<T: AddableType>(ofProperty property: String) -> T?
 
 

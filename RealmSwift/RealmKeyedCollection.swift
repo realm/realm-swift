@@ -143,7 +143,6 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
      - parameter ascending: The direction to sort in.
      */
-    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 to account for non-optional Result elements.")
     func sorted(ascending: Bool) -> Results<Value>
 
     /**
@@ -159,7 +158,6 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
      - parameter keyPath:  The key path to sort by.
      - parameter ascending: The direction to sort in.
      */
-    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for dictionaries of objects.")
     func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Value>
 
     /**
@@ -189,7 +187,6 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for dictionaries of objects.")
     func min<T: MinMaxType>(ofProperty property: String) -> T?
 
     /**
@@ -200,7 +197,6 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for dictionaries of objects.")
     func max<T: MinMaxType>(ofProperty property: String) -> T?
 
     /**
@@ -210,7 +206,6 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
     - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
     */
-    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for dictionaries of objects.")
     func sum<T: AddableType>(ofProperty property: String) -> T
 
     /**
@@ -221,7 +216,6 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
      - parameter property: The name of a property whose values should be summed.
      */
-    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for dictionaries of objects.")
     func average<T: AddableType>(ofProperty property: String) -> T?
 
     // MARK: Notifications
