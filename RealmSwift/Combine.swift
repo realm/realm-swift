@@ -598,7 +598,7 @@ extension RealmKeyedCollection {
     
     /// :nodoc:
     public func _observe<S: Subscriber>(_ subscriber: S, keyPaths: [String]? = nil) -> NotificationToken where S.Input == Void, S.Failure == Never {
-        return observe(keyPaths: nil, on: nil) { _ in _ = subscriber.receive() }
+        return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
 }
 
