@@ -104,6 +104,9 @@ import Realm
      - parameter index: The index.
      */
     public subscript(index: Int) -> Element {
+        if let lastAccessedNames = lastAccessedNames {
+            return Element._rlmKeyPathRecorder(with: lastAccessedNames)
+        }
         throwForNegativeIndex(index)
         return unsafeBitCast(rlmResults[UInt(index)], to: Element.self)
     }
@@ -356,6 +359,7 @@ import Realm
 
     internal var propertyName: String
     internal var handle: RLMLinkingObjectsHandle?
+    internal var lastAccessedNames: NSMutableArray?
 }
 
 extension LinkingObjects: RealmCollection {
@@ -405,5 +409,16 @@ extension LinkingObjects: AssistedObjectiveCBridgeable {
 
     internal var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (objectiveCValue: handle!.results, metadata: nil)
+    }
+}
+
+// MARK: Key Path Strings
+
+extension LinkingObjects: PropertyNameConvertible {
+    var propertyInformation: (key: String, isLegacy: Bool)? {
+        guard let handle = handle else {
+            return nil
+        }
+        return (key: handle._propertyKey, isLegacy: handle._isLegacyProperty)
     }
 }

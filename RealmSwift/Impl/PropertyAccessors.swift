@@ -105,7 +105,9 @@ internal class LinkingObjectsAccessor<Element: ObjectBase>: RLMManagedPropertyAc
             RLMLinkingObjectsHandle(object: parent, property: property)
     }
     @objc override class func observe(_ property: RLMProperty, on parent: RLMObjectBase) {
-        // Don't need to do anything here as unmanaged LinkingObjects are always empty
+        if parent.lastAccessedNames != nil {
+            bound(property, parent).pointee.handle = RLMLinkingObjectsHandle(object: parent, property: property)
+        }
     }
     @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
         return bound(property, parent).pointee
@@ -153,7 +155,7 @@ internal class RealmOptionalAccessor<Value: RealmOptionalType>: RLMManagedProper
     }
 }
 
-internal class RealmPropertyAccessor<Value: RealmPropertyType>: RLMManagedPropertyAccessor {
+internal class RealmPropertyAccessor<Value: RealmPropertyType>: RLMManagedPropertyAccessor where Value: _RealmSchemaDiscoverable {
     private static func bound(_ property: RLMProperty, _ obj: RLMObjectBase) -> RealmProperty<Value> {
         return ptr(property, obj).assumingMemoryBound(to: RealmProperty<Value>.self).pointee
     }
@@ -280,7 +282,9 @@ internal class PersistedLinkingObjectsAccessor<Element: ObjectBase>: RLMManagedP
         bound(property, parent).pointee.initialize(parent, key: PropertyKey(property.index))
     }
     @objc override class func observe(_ property: RLMProperty, on parent: RLMObjectBase) {
-        // N/A: unmanaged LinkingObjects are always empty
+        if parent.lastAccessedNames != nil {
+            bound(property, parent).pointee.observe(parent, property: property)
+        }
     }
     @objc override class func get(_ property: RLMProperty, on parent: RLMObjectBase) -> Any {
         return bound(property, parent).pointee.get(parent)

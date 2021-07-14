@@ -80,6 +80,7 @@
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property {
     _parentObject = parentObject;
     _key = property.name;
+    _isLegacyProperty = property.isLegacy;
 }
 
 #pragma mark - Convenience wrappers used for all RLMSet types
@@ -459,6 +460,12 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
         @throw RLMException(@"Object of type '%@' does not match RLMSet type '%@'.",
                             object->_objectSchema.className, set->_objectClassName);
     }
+}
+
+#pragma mark - Key Path Strings
+
+- (NSString *)propertyKey {
+    return _key;
 }
 
 #pragma mark - Methods unsupported on unmanaged RLMSet instances

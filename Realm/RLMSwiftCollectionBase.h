@@ -41,6 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)thaw;
 
 @property (nonatomic, readonly) RLMLinkingObjects *results;
+@property (nonatomic, readonly) NSString *_propertyKey;
+@property (nonatomic, readonly) BOOL _isLegacyProperty;
 @end
 
 NS_ASSUME_NONNULL_END
