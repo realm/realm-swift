@@ -1,7 +1,31 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add type safe methods for:
+    - `RealmCollection.min(ofProperty:)`
+    - `RealmCollection.max(ofProperty:)`
+    - `RealmCollection.average(ofProperty:)`
+    - `RealmCollection.sum(ofProperty:)`
+    - `RealmCollection.sorted(byKeyPath:, ascending:)`
+    - `Results.distinct(by:)`
+    - `SortDescriptor.init(keyPath:, ascending:)
+    
+  Calling these methods can now be done via Swift keyPaths, like so:
+  ```swift
+  class Person: Object {
+    @Persisted var name: String
+    @Persisted var age: Int
+  }
+  
+  let persons = realm.objects(Person.self)
+  persons.min(ofProperty: \.age)
+  persons.max(ofProperty: \.age)
+  persons.average(ofProperty: \.age)
+  persons.sum(ofProperty: \.age)
+  persons.sorted(byKeyPath: \.age)
+  persons.sorted(by: [SortDescriptor(keyPath: \Person.age)])
+  persons.distinct(by: [\Person.age])
+  ``` 
 
 ### Fixed
 * `RealmProperty<T?>` would crash when decoding a `null` json value.
@@ -9,6 +33,22 @@ x.y.z Release notes (yyyy-MM-dd)
 * `@Persisted<T?>` would crash when decoding a `null` value.
   ([#7332](https://github.com/realm/realm-cocoa/issues/7332), since v10.10.0).
 
+### Deprecations
+
+* Deprecated:
+    - `RealmCollection.min(ofProperty:)`
+    - `RealmCollection.max(ofProperty:)`
+    - `RealmCollection.average(ofProperty:)`
+    - `RealmCollection.sum(ofProperty:)`
+    - `RealmCollection.sorted(byKeyPath:, ascending:)`
+  In favor of their type safe counterparts. String based keyPaths are more error prone,
+  and the current versions of these methods allow for using string based keyPaths on types
+  that were potentially unsupported.
+  
+  If previously using any of the above methods by passing in "self" (a valid keyPath for
+  `AddableType`, `MinMaxType`, and `Comparable` types), migrate to using the above methods
+  with no arguments, e.g., `myIntList.min()`.
+  
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility

@@ -351,6 +351,7 @@ public protocol RealmCollection: RealmCollectionBase {
      - parameter keyPath:   The key path to sort by.
      - parameter ascending: The direction to sort in.
      */
+    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for lists of objects.")
     func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element>
 
     /**
@@ -375,6 +376,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter property: The name of a property whose minimum value is desired.
      */
+    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for lists of objects.")
     func min<T: MinMaxType>(ofProperty property: String) -> T?
 
     /**
@@ -385,6 +387,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter property: The name of a property whose minimum value is desired.
      */
+    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for lists of objects.")
     func max<T: MinMaxType>(ofProperty property: String) -> T?
 
     /**
@@ -394,6 +397,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
     - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
     */
+    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for lists of objects.")
     func sum<T: AddableType>(ofProperty property: String) -> T
 
     /**
@@ -404,6 +408,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter property: The name of a property whose values should be summed.
      */
+    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for lists of objects.")
     func average<T: AddableType>(ofProperty property: String) -> T?
 
 
@@ -528,6 +533,93 @@ public protocol RealmCollection: RealmCollectionBase {
      If called on a live collection, will return itself.
     */
     func thaw() -> Self?
+}
+
+// MARK: Aggregatable
+
+public protocol Aggregatable: RealmCollection where Element: ObjectBase {
+    /**
+     Returns the minimum (lowest) value of the given property among all the objects in the collection, or `nil` if the
+     collection is empty.
+
+     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+
+     - parameter property: The name of a property whose minimum value is desired.
+     */
+    func min<T: MinMaxType>(ofProperty property: KeyPath<Element, T>) -> T?
+
+    /**
+     Returns the maximum (highest) value of the given property among all the objects in the collection, or `nil` if the
+     collection is empty.
+
+     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+
+     - parameter property: The name of a property whose minimum value is desired.
+     */
+    func max<T: MinMaxType>(ofProperty property: KeyPath<Element, T>) -> T?
+
+    /**
+    Returns the sum of the given property for objects in the collection, or `nil` if the collection is empty.
+
+    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
+    */
+    func sum<T: AddableType>(ofProperty property: KeyPath<Element, T>) -> T
+
+    /**
+     Returns the average value of a given property over all the objects in the collection, or `nil` if
+     the collection is empty.
+
+     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
+
+     - parameter property: The name of a property whose values should be summed.
+     */
+    func average<T: AddableType>(ofProperty property: KeyPath<Element, T>) -> T?
+}
+
+public protocol Sortable: RealmCollection where Element: ObjectBase {
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     Objects are sorted based on the values of the given key path. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call
+     `students.sorted(byKeyPath: "age", ascending: true)`.
+
+     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+                floating point, integer, and string types.
+
+     - parameter keyPath:   The key path to sort by.
+     - parameter ascending: The direction to sort in.
+     */
+    func sorted<T: Comparable>(byKeyPath keyPath: KeyPath<Element, T>, ascending: Bool) -> Results<Element>
+
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     Objects are sorted based on the values of the given key path. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call
+     `students.sorted(byKeyPath: "age", ascending: true)`.
+
+     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+                floating point, integer, and string types.
+
+     - parameter keyPath:   The key path to sort by.
+     - parameter ascending: The direction to sort in.
+     */
+    func sorted<T: Comparable>(byKeyPath keyPath: KeyPath<Element, Optional<T>>, ascending: Bool) -> Results<Element>
+
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+                floating point, integer, and string types.
+
+     - see: `sorted(byKeyPath:ascending:)`
+
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
+     */
+    func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor
 }
 
 public extension RealmCollection {
@@ -1233,4 +1325,32 @@ internal protocol PropertyNameConvertible {
     /// `key` is the property name for this collection.
     /// `isLegacy` will be true if the property is declared with old property syntax.
     var propertyInformation: (key: String, isLegacy: Bool)? { get }
+}
+
+extension AnyRealmCollection: Aggregatable where Element: ObjectBase {
+    public func min<T>(ofProperty property: KeyPath<Element, T>) -> T? where T : MinMaxType {
+        self.min(ofProperty: _name(for: property))
+    }
+
+    public func max<T>(ofProperty property: KeyPath<Element, T>) -> T? where T : MinMaxType {
+        self.max(ofProperty: _name(for: property))
+    }
+
+    public func sum<T>(ofProperty property: KeyPath<Element, T>) -> T where T : AddableType {
+        self.sum(ofProperty: _name(for: property))
+    }
+
+    public func average<T>(ofProperty property: KeyPath<Element, T>) -> T? where T : AddableType {
+        self.average(ofProperty: _name(for: property))
+    }
+}
+
+extension AnyRealmCollection: Sortable where Element: ObjectBase {
+    public func sorted<T>(byKeyPath keyPath: KeyPath<Element, Optional<T>>, ascending: Bool) -> Results<Element> where T : Comparable {
+        sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
+    }
+
+    public func sorted<T>(byKeyPath keyPath: KeyPath<Element, T>, ascending: Bool) -> Results<Element> where T : Comparable {
+        sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
+    }
 }

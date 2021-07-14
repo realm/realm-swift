@@ -544,3 +544,36 @@ extension MutableSet: PropertyNameConvertible {
         return (key: rlmSet.propertyKey, isLegacy: rlmSet.isLegacyProperty)
     }
 }
+
+
+// MARK: Aggregatable
+
+extension MutableSet: Aggregatable where Element: ObjectBase {
+    public func min<T>(ofProperty property: KeyPath<Element, T>) -> T? where T : MinMaxType {
+        min(ofProperty: _name(for: property))
+    }
+
+    public func max<T>(ofProperty property: KeyPath<Element, T>) -> T? where T : MinMaxType {
+        max(ofProperty: _name(for: property))
+    }
+
+    public func sum<T>(ofProperty property: KeyPath<Element, T>) -> T where T : AddableType {
+        sum(ofProperty: _name(for: property))
+    }
+
+    public func average<T>(ofProperty property: KeyPath<Element, T>) -> T? where T : AddableType {
+        average(ofProperty: _name(for: property))
+    }
+}
+
+// MARK: Sortable
+
+extension MutableSet: Sortable where Element: ObjectBase {
+    public func sorted<T>(byKeyPath keyPath: KeyPath<Element, T>, ascending: Bool) -> Results<Element> where T : Comparable {
+        sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
+    }
+
+    public func sorted<T>(byKeyPath keyPath: KeyPath<Element, Optional<T>>, ascending: Bool) -> Results<Element> where T : Comparable {
+        sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
+    }
+}
