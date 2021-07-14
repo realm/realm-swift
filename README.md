@@ -55,12 +55,12 @@ try! realm.write {
     realm.add(dog)
 }
 
-//  Set up the listener & Observe object notifications.
+//  Set up the listener & observe object notifications.
 token = dog.observe { change in
     switch change {
     case .change(let properties):
         for property in properties {
-            print("Property '(property.name)' changed to '(property.newValue!)'");
+            print("Property '\(property.name)' changed to '\(property.newValue!)'");
         }
     case .error(let error):
         print("An error occurred: (error)")
