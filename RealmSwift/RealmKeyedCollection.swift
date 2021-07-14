@@ -143,6 +143,7 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
      - parameter ascending: The direction to sort in.
      */
+    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 to account for non-optional Result elements.")
     func sorted(ascending: Bool) -> Results<Value>
 
     /**
@@ -158,6 +159,7 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
      - parameter keyPath:  The key path to sort by.
      - parameter ascending: The direction to sort in.
      */
+    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for dictionaries of objects.")
     func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Value>
 
     /**
@@ -187,6 +189,7 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
      - parameter property: The name of a property whose minimum value is desired.
      */
+    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for dictionaries of objects.")
     func min<T: MinMaxType>(ofProperty property: String) -> T?
 
     /**
@@ -197,6 +200,7 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
      - parameter property: The name of a property whose minimum value is desired.
      */
+    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for dictionaries of objects.")
     func max<T: MinMaxType>(ofProperty property: String) -> T?
 
     /**
@@ -206,6 +210,7 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
     - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
     */
+    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for dictionaries of objects.")
     func sum<T: AddableType>(ofProperty property: String) -> T
 
     /**
@@ -216,6 +221,7 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
 
      - parameter property: The name of a property whose values should be summed.
      */
+    @available(swift, deprecated: 10.10, message: "This will be removed in v11.0 and only valid for dictionaries of objects.")
     func average<T: AddableType>(ofProperty property: String) -> T?
 
     // MARK: Notifications
@@ -306,6 +312,87 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
      If called on a live collection, will return itself.
     */
     func thaw() -> Self?
+}
+
+/**
+ Protocol for RealmKeyedCollections where the Value is of an Object type that
+ enables aggregatable operations.
+ */
+public protocol KeyedAggregatable: RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapped: ObjectBase, Value.Wrapped: RealmCollectionValue {
+    /**
+     Returns the minimum (lowest) value of the given property among all the objects in the collection, or `nil` if the
+     collection is empty.
+
+     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+
+     - parameter property: The name of a property whose minimum value is desired.
+     */
+    func min<T: MinMaxType>(ofProperty property: KeyPath<Value.Wrapped, T>) -> T?
+
+    /**
+     Returns the maximum (highest) value of the given property among all the objects in the collection, or `nil` if the
+     collection is empty.
+
+     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+
+     - parameter property: The name of a property whose minimum value is desired.
+     */
+    func max<T: MinMaxType>(ofProperty property: KeyPath<Value.Wrapped, T>) -> T?
+
+    /**
+    Returns the sum of the given property for objects in the collection, or `nil` if the collection is empty.
+
+    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
+    */
+    func sum<T: AddableType>(ofProperty property: KeyPath<Value.Wrapped, T>) -> T
+
+    /**
+     Returns the average value of a given property over all the objects in the collection, or `nil` if
+     the collection is empty.
+
+     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
+
+     - parameter property: The name of a property whose values should be summed.
+     */
+    func average<T: AddableType>(ofProperty property: KeyPath<Value.Wrapped, T>) -> T?
+}
+
+// MARK: Sortable
+
+/**
+ Protocol for RealmKeyedCollections where the Value is of an Object type that
+ enables sortable operations.
+ */
+public protocol KeyedSortable: RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapped: ObjectBase, Value.Wrapped: RealmCollectionValue {
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     Objects are sorted based on the values of the given key path. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call
+     `students.sorted(byKeyPath: "age", ascending: true)`.
+
+     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+                floating point, integer, and string types.
+
+     - parameter keyPath:   The key path to sort by.
+     - parameter ascending: The direction to sort in.
+     */
+    func sorted<T: Comparable>(byKeyPath keyPath: KeyPath<Value.Wrapped, T>, ascending: Bool) -> Results<Value.Wrapped>
+
+
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+                floating point, integer, and string types.
+
+     - see: `sorted(byKeyPath:ascending:)`
+
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
+     */
+    func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Value> where S.Iterator.Element == SortDescriptor
 }
 
 public extension RealmKeyedCollection where Value: MinMaxType {

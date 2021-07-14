@@ -587,6 +587,25 @@
     test();
 }
 
+- (void)testPrimitiveAggregate {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    __block DictionaryPropertyObject *obj = [DictionaryPropertyObject new];
+    obj.intDictionary[@"age"] = @10;
+    obj.intDictionary[@"weight"] = @200;
+    [obj.intDictionary minOfProperty:@"self"];
+
+    [realm transactionWithBlock:^{
+        DictionaryPropertyObject *managed = [DictionaryPropertyObject createInRealm:realm withValue:@[]];
+        managed.intDictionary[@"age"] = @20;
+        managed.intDictionary[@"weight"] = @400;
+        obj = managed;
+    }];
+
+    [obj.intDictionary minOfProperty:@"self"];
+}
+
+
 - (void)testRenamedPropertyAggregate {
     RLMRealm *realm = [RLMRealm defaultRealm];
 

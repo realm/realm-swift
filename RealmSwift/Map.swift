@@ -710,3 +710,64 @@ extension Map: PropertyNameConvertible {
         return (key: rlmDictionary.propertyKey, isLegacy: rlmDictionary.isLegacyProperty)
     }
 }
+
+// MARK: KeyedAggregatable
+
+extension Map: KeyedAggregatable where Value: OptionalProtocol, Value.Wrapped: ObjectBase, Value.Wrapped: RealmCollectionValue {
+    public func min<T>(ofProperty property: KeyPath<Value.Wrapped, T>) -> T? where T : MinMaxType {
+        min(ofProperty: _name(for: property))
+    }
+
+    public func max<T>(ofProperty property: KeyPath<Value.Wrapped, T>) -> T? where T : MinMaxType {
+        max(ofProperty: _name(for: property))
+    }
+
+    public func sum<T>(ofProperty property: KeyPath<Value.Wrapped, T>) -> T where T : AddableType {
+        sum(ofProperty: _name(for: property))
+    }
+
+    public func average<T>(ofProperty property: KeyPath<Value.Wrapped, T>) -> T? where T : AddableType {
+        average(ofProperty: _name(for: property))
+    }
+}
+
+// MARK: KeyedSortable
+
+extension Map: KeyedSortable where Value: OptionalProtocol, Value.Wrapped: ObjectBase, Value.Wrapped: RealmCollectionValue {
+    /**
+     Returns a `Results` containing the objects in the map, but sorted.
+
+     Objects are sorted based on the values of the given key path. For example, to sort a map of `Student`s from
+     youngest to oldest based on their `age` property, you might call
+     `students.sorted(byKeyPath: "age", ascending: true)`.
+
+     - warning: Dictionaries may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+                floating point, integer, and string types.
+
+     - parameter keyPath:  The key path to sort by.
+     - parameter ascending: The direction to sort in.
+     */
+    public func sorted(byKeyPath keyPath: String, ascending: Bool = true) -> Results<Value.Wrapped> {
+        return sorted(by: [SortDescriptor(keyPath: keyPath, ascending: ascending)])
+    }
+
+    /**
+     Returns a `Results` containing the objects in the map, but sorted.
+
+     - warning: Map's may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+                floating point, integer, and string types.
+
+     - see: `sorted(byKeyPath:ascending:)`
+    */
+    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Value.Wrapped>
+        where S.Iterator.Element == SortDescriptor {
+            return Results<Value.Wrapped>(_rlmCollection.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
+    }
+
+    public func sorted<T>(byKeyPath keyPath: KeyPath<Value.Wrapped, T>, ascending: Bool) -> Results<Value.Wrapped> where T : Comparable {
+        sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
+    }
+    public func sorted<T>(byKeyPath keyPath: KeyPath<Value.Wrapped, Optional<T>>, ascending: Bool) -> Results<Value> where T : Comparable {
+        sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
+    }
+}

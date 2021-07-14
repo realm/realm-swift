@@ -537,6 +537,10 @@ public protocol RealmCollection: RealmCollectionBase {
 
 // MARK: Aggregatable
 
+/**
+ Protocol for RealmCollections where the Value is of an Object type that
+ enables aggregatable operations.
+ */
 public protocol Aggregatable: RealmCollection where Element: ObjectBase {
     /**
      Returns the minimum (lowest) value of the given property among all the objects in the collection, or `nil` if the
@@ -578,6 +582,12 @@ public protocol Aggregatable: RealmCollection where Element: ObjectBase {
     func average<T: AddableType>(ofProperty property: KeyPath<Element, T>) -> T?
 }
 
+// MARK: Sortable
+
+/**
+ Protocol for RealmCollections where the Value is of an Object type that
+ enables sortable operations.
+ */
 public protocol Sortable: RealmCollection where Element: ObjectBase {
     /**
      Returns a `Results` containing the objects in the collection, but sorted.
@@ -1328,29 +1338,29 @@ internal protocol PropertyNameConvertible {
 }
 
 extension AnyRealmCollection: Aggregatable where Element: ObjectBase {
-    public func min<T>(ofProperty property: KeyPath<Element, T>) -> T? where T : MinMaxType {
+    public func min<T>(ofProperty property: KeyPath<Element, T>) -> T? where T: MinMaxType {
         self.min(ofProperty: _name(for: property))
     }
 
-    public func max<T>(ofProperty property: KeyPath<Element, T>) -> T? where T : MinMaxType {
+    public func max<T>(ofProperty property: KeyPath<Element, T>) -> T? where T: MinMaxType {
         self.max(ofProperty: _name(for: property))
     }
 
-    public func sum<T>(ofProperty property: KeyPath<Element, T>) -> T where T : AddableType {
+    public func sum<T>(ofProperty property: KeyPath<Element, T>) -> T where T: AddableType {
         self.sum(ofProperty: _name(for: property))
     }
 
-    public func average<T>(ofProperty property: KeyPath<Element, T>) -> T? where T : AddableType {
+    public func average<T>(ofProperty property: KeyPath<Element, T>) -> T? where T: AddableType {
         self.average(ofProperty: _name(for: property))
     }
 }
 
 extension AnyRealmCollection: Sortable where Element: ObjectBase {
-    public func sorted<T>(byKeyPath keyPath: KeyPath<Element, Optional<T>>, ascending: Bool) -> Results<Element> where T : Comparable {
+    public func sorted<T>(byKeyPath keyPath: KeyPath<Element, Optional<T>>, ascending: Bool) -> Results<Element> where T: Comparable {
         sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
     }
 
-    public func sorted<T>(byKeyPath keyPath: KeyPath<Element, T>, ascending: Bool) -> Results<Element> where T : Comparable {
+    public func sorted<T>(byKeyPath keyPath: KeyPath<Element, T>, ascending: Bool) -> Results<Element> where T: Comparable {
         sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
     }
 }

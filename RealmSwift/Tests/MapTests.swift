@@ -547,6 +547,43 @@ class MapTests: TestCase {
         }
     }
 
+    func testKeyedSortable() {
+        let map = createMap()
+
+        map["key"] = SwiftStringObject(value: ["apples"])
+        map["key2"] = SwiftStringObject(value: ["bananas"])
+        map["key3"] = SwiftStringObject(value: ["cockroach"])
+
+        if map.realm != nil {
+            let results2: Results<SwiftStringObject> = map.sorted(byKeyPath: \.stringCol,
+                                                                  ascending: true)
+            XCTAssertEqual(results2.count, 3)
+            XCTAssertEqual(results2[0].stringCol, "apples")
+            XCTAssertEqual(results2[1].stringCol, "bananas")
+            XCTAssertEqual(results2[2].stringCol, "cockroach")
+        }
+    }
+
+    func testKeyedAggregatable() {
+        let map = realm.create(SwiftMapPropertyObject.self, value: [])
+        map.intMap["key"] = SwiftIntObject(value: [1])
+        map.intMap["key2"] = SwiftIntObject(value: [2])
+        map.intMap["key3"] = SwiftIntObject(value: [3])
+        try! realm.commitWrite()
+
+        if map.realm != nil {
+            let min = map.intMap.min(ofProperty: \.intCol)
+            let max = map.intMap.max(ofProperty: \.intCol)
+            let sum = map.intMap.sum(ofProperty: \.intCol)
+            let avg = map.intMap.average(ofProperty: \.intCol)
+
+            XCTAssertEqual(min, 1)
+            XCTAssertEqual(max, 3)
+            XCTAssertEqual(sum, 6)
+            XCTAssertEqual(avg, 2)
+        }
+    }
+
     func testAllKeysQuery() {
         let map = createMap()
         if let realm = map.realm {
