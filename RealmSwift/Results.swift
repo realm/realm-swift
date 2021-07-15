@@ -423,35 +423,9 @@ extension Results: Encodable where Element: Encodable {
     }
 }
 
-// MARK: - Aggregatable
+// MARK: KeyPath Distinct
 
-extension Results: Aggregatable where Element: ObjectBase {
-    public func min<T>(ofProperty property: KeyPath<Element, T>) -> T? where T: MinMaxType {
-        min(ofProperty: _name(for: property))
-    }
-
-    public func max<T>(ofProperty property: KeyPath<Element, T>) -> T? where T: MinMaxType {
-        max(ofProperty: _name(for: property))
-    }
-
-    public func sum<T>(ofProperty property: KeyPath<Element, T>) -> T where T: AddableType {
-        sum(ofProperty: _name(for: property))
-    }
-
-    public func average<T>(ofProperty property: KeyPath<Element, T>) -> T? where T: AddableType {
-        average(ofProperty: _name(for: property))
-    }
-}
-
-// MARK: Sortable
-
-extension Results: Sortable where Element: ObjectBase {
-    public func sorted<T>(byKeyPath keyPath: KeyPath<Element, T>, ascending: Bool) -> Results<Element> where T: Comparable {
-        sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
-    }
-    public func sorted<T>(byKeyPath keyPath: KeyPath<Element, Optional<T>>, ascending: Bool) -> Results<Element> where T: Comparable {
-        sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
-    }
+extension Results where Element: ObjectBase {
     public func distinct<S: Sequence>(by keyPaths: S) -> Results<Element>
         where S.Iterator.Element == PartialKeyPath<Element> {
             return Results<Element>(rlmResults.distinctResults(usingKeyPaths: keyPaths.map(_name(for:))))

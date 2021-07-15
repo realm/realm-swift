@@ -2,13 +2,18 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add type safe methods for:
-    - `RealmCollection.min(ofProperty:)`
-    - `RealmCollection.max(ofProperty:)`
-    - `RealmCollection.average(ofProperty:)`
-    - `RealmCollection.sum(ofProperty:)`
-    - `RealmCollection.sorted(byKeyPath:, ascending:)`
+    - `RealmCollection.min(of:)`
+    - `RealmCollection.max(of:)`
+    - `RealmCollection.average(of:)`
+    - `RealmCollection.sum(of:)`
+    - `RealmCollection.sorted(by:ascending:)`
+    - `RealmKeyedCollection.min(of:)`
+    - `RealmKeyedCollection.max(of:)`
+    - `RealmKeyedCollection.average(of:)`
+    - `RealmKeyedCollection.sum(of:)`
+    - `RealmKeyedCollection.sorted(by:ascending:)`
     - `Results.distinct(by:)`
-    - `SortDescriptor.init(keyPath:, ascending:)
+    - `SortDescriptor(keyPath:ascending:)
     
   Calling these methods can now be done via Swift keyPaths, like so:
   ```swift
@@ -18,11 +23,11 @@ x.y.z Release notes (yyyy-MM-dd)
   }
   
   let persons = realm.objects(Person.self)
-  persons.min(ofProperty: \.age)
-  persons.max(ofProperty: \.age)
-  persons.average(ofProperty: \.age)
-  persons.sum(ofProperty: \.age)
-  persons.sorted(byKeyPath: \.age)
+  persons.min(of: \.age)
+  persons.max(of: \.age)
+  persons.average(of: \.age)
+  persons.sum(of: \.age)
+  persons.sorted(by: \.age)
   persons.sorted(by: [SortDescriptor(keyPath: \Person.age)])
   persons.distinct(by: [\Person.age])
   ``` 

@@ -555,12 +555,14 @@ class MapTests: TestCase {
         map["key3"] = SwiftStringObject(value: ["cockroach"])
 
         if map.realm != nil {
-            let results2: Results<SwiftStringObject> = map.sorted(byKeyPath: \.stringCol,
-                                                                  ascending: true)
+            let results2: Results<SwiftStringObject?> = map.sorted(by: \.stringCol,
+                                                                   ascending: true)
             XCTAssertEqual(results2.count, 3)
-            XCTAssertEqual(results2[0].stringCol, "apples")
-            XCTAssertEqual(results2[1].stringCol, "bananas")
-            XCTAssertEqual(results2[2].stringCol, "cockroach")
+            XCTAssertEqual(results2[0]?.stringCol, "apples")
+            XCTAssertEqual(results2[1]?.stringCol, "bananas")
+            XCTAssertEqual(results2[2]?.stringCol, "cockroach")
+        } else {
+            assertThrows(map.sorted(by: \.stringCol, ascending: true))
         }
     }
 
@@ -569,19 +571,22 @@ class MapTests: TestCase {
         map.intMap["key"] = SwiftIntObject(value: [1])
         map.intMap["key2"] = SwiftIntObject(value: [2])
         map.intMap["key3"] = SwiftIntObject(value: [3])
-        try! realm.commitWrite()
 
-        if map.realm != nil {
-            let min = map.intMap.min(ofProperty: \.intCol)
-            let max = map.intMap.max(ofProperty: \.intCol)
-            let sum = map.intMap.sum(ofProperty: \.intCol)
-            let avg = map.intMap.average(ofProperty: \.intCol)
-
+        func assertAggregations() {
+            let min = map.intMap.min(of: \.intCol)
+            let max = map.intMap.max(of: \.intCol)
+            let sum = map.intMap.sum(of: \.intCol)
+            let avg = map.intMap.average(of: \.intCol)
             XCTAssertEqual(min, 1)
             XCTAssertEqual(max, 3)
             XCTAssertEqual(sum, 6)
             XCTAssertEqual(avg, 2)
         }
+        // unmanaged
+        assertAggregations()
+        try! realm.commitWrite()
+        // managed
+        assertAggregations()
     }
 
     func testAllKeysQuery() {

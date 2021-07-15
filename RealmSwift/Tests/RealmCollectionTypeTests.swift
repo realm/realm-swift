@@ -309,15 +309,15 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testSortWithSwiftKeyPath() {
-        var sorted = collection.sorted(byKeyPath: \.stringCol, ascending: true)
+        var sorted = collection.sorted(by: \.stringCol, ascending: true)
         XCTAssertEqual("1", sorted[0].stringCol)
         XCTAssertEqual("2", sorted[1].stringCol)
 
-        sorted = collection.sorted(byKeyPath: \.stringCol, ascending: false)
+        sorted = collection.sorted(by: \.stringCol, ascending: false)
         XCTAssertEqual("2", sorted[0].stringCol)
         XCTAssertEqual("1", sorted[1].stringCol)
 
-        sorted = collection.sorted(byKeyPath: \.linkCol?.id, ascending: true)
+        sorted = collection.sorted(by: \.linkCol?.id, ascending: true)
         XCTAssertEqual("1", sorted[0].stringCol)
         XCTAssertEqual("2", sorted[1].stringCol)
     }
@@ -378,14 +378,14 @@ class RealmCollectionTypeTests: TestCase {
 
     func testMinBySwiftKeyPath() {
         let collection = getAggregateableCollection()
-        XCTAssertEqual(1, collection.min(ofProperty: \.intCol))
-        XCTAssertEqual(1, collection.min(ofProperty: \.int8Col))
-        XCTAssertEqual(1, collection.min(ofProperty: \.int16Col))
-        XCTAssertEqual(1, collection.min(ofProperty: \.int32Col))
-        XCTAssertEqual(1, collection.min(ofProperty: \.int64Col))
-        XCTAssertEqual(1.1, collection.min(ofProperty: \.floatCol))
-        XCTAssertEqual(1.11, collection.min(ofProperty: \.doubleCol))
-        XCTAssertEqual(Date(timeIntervalSince1970: 1), collection.min(ofProperty: \.dateCol))
+        XCTAssertEqual(1, collection.min(of: \.intCol))
+        XCTAssertEqual(1, collection.min(of: \.int8Col))
+        XCTAssertEqual(1, collection.min(of: \.int16Col))
+        XCTAssertEqual(1, collection.min(of: \.int32Col))
+        XCTAssertEqual(1, collection.min(of: \.int64Col))
+        XCTAssertEqual(1.1, collection.min(of: \.floatCol))
+        XCTAssertEqual(1.11, collection.min(of: \.doubleCol))
+        XCTAssertEqual(Date(timeIntervalSince1970: 1), collection.min(of: \.dateCol))
     }
 
     func testMax() {
@@ -413,15 +413,15 @@ class RealmCollectionTypeTests: TestCase {
 
     func testMaxBySwiftKeyPath() {
         let collection = getAggregateableCollection()
-        XCTAssertEqual(3, collection.max(ofProperty: \.intCol))
-        XCTAssertEqual(3, collection.max(ofProperty: \.int8Col))
-        XCTAssertEqual(3, collection.max(ofProperty: \.int16Col))
-        XCTAssertEqual(3, collection.max(ofProperty: \.int32Col))
-        XCTAssertEqual(3, collection.max(ofProperty: \.int64Col))
-        XCTAssertEqual(2.2, collection.max(ofProperty: \.floatCol))
-        XCTAssertEqual(2.22, collection.max(ofProperty: \.doubleCol))
-        XCTAssertEqual(2.22, collection.max(ofProperty: \.doubleCol))
-        XCTAssertEqual(Date(timeIntervalSince1970: 2), collection.max(ofProperty: \.dateCol))
+        XCTAssertEqual(3, collection.max(of: \.intCol))
+        XCTAssertEqual(3, collection.max(of: \.int8Col))
+        XCTAssertEqual(3, collection.max(of: \.int16Col))
+        XCTAssertEqual(3, collection.max(of: \.int32Col))
+        XCTAssertEqual(3, collection.max(of: \.int64Col))
+        XCTAssertEqual(2.2, collection.max(of: \.floatCol))
+        XCTAssertEqual(2.22, collection.max(of: \.doubleCol))
+        XCTAssertEqual(2.22, collection.max(of: \.doubleCol))
+        XCTAssertEqual(Date(timeIntervalSince1970: 2), collection.max(of: \.dateCol))
     }
 
     func testSum() {
@@ -449,14 +449,14 @@ class RealmCollectionTypeTests: TestCase {
 
     func testSumBySwiftKeyPath() {
         let collection = getAggregateableCollection()
-        XCTAssertEqual(6, collection.sum(ofProperty: \.intCol))
-        XCTAssertEqual(6, collection.sum(ofProperty: \.int8Col))
-        XCTAssertEqual(6, collection.sum(ofProperty: \.int16Col))
-        XCTAssertEqual(6, collection.sum(ofProperty: \.int32Col))
-        XCTAssertEqual(6, collection.sum(ofProperty: \.int64Col))
-        XCTAssertEqual(5.5, (collection.sum(ofProperty: \.floatCol)),
+        XCTAssertEqual(6, collection.sum(of: \.intCol))
+        XCTAssertEqual(6, collection.sum(of: \.int8Col))
+        XCTAssertEqual(6, collection.sum(of: \.int16Col))
+        XCTAssertEqual(6, collection.sum(of: \.int32Col))
+        XCTAssertEqual(6, collection.sum(of: \.int64Col))
+        XCTAssertEqual(5.5, (collection.sum(of: \.floatCol)),
                                    accuracy: 0.001)
-        XCTAssertEqual(5.55, (collection.sum(ofProperty: \.doubleCol)),
+        XCTAssertEqual(5.55, (collection.sum(of: \.doubleCol)),
                                    accuracy: 0.001)
     }
 
@@ -475,13 +475,13 @@ class RealmCollectionTypeTests: TestCase {
 
     func testAverageBySwiftKeyPath() {
         let collection = getAggregateableCollection()
-        XCTAssertEqual(2, collection.average(ofProperty: \.intCol))
-        XCTAssertEqual(2, collection.average(ofProperty: \.int8Col))
-        XCTAssertEqual(2, collection.average(ofProperty: \.int16Col))
-        XCTAssertEqual(2, collection.average(ofProperty: \.int32Col))
-        XCTAssertEqual(2, collection.average(ofProperty: \.int64Col))
-        XCTAssertEqual(1.8333, collection.average(ofProperty: \.floatCol)!, accuracy: 0.001)
-        XCTAssertEqual(1.85, collection.average(ofProperty: \.doubleCol)!, accuracy: 0.001)
+        XCTAssertEqual(2, collection.average(of: \.intCol))
+        XCTAssertEqual(2, collection.average(of: \.int8Col))
+        XCTAssertEqual(2, collection.average(of: \.int16Col))
+        XCTAssertEqual(2, collection.average(of: \.int32Col))
+        XCTAssertEqual(2, collection.average(of: \.int64Col))
+        XCTAssertEqual(1.8333, collection.average(of: \.floatCol)!, accuracy: 0.001)
+        XCTAssertEqual(1.85, collection.average(of: \.doubleCol)!, accuracy: 0.001)
     }
 
     func testFastEnumeration() {
@@ -1254,7 +1254,7 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     }
 
     override func testSortWithSwiftKeyPath() {
-        assertThrows(collection.sorted(byKeyPath: \.stringCol, ascending: true))
+        assertThrows(collection.sorted(by: \.stringCol, ascending: true))
     }
 
     override func testFilterFormat() {
@@ -1560,7 +1560,7 @@ class MutableSetUnmanagedRealmCollectionTypeTests: MutableSetRealmCollectionType
     }
 
     override func testSortWithSwiftKeyPath() {
-        assertThrows(collection.sorted(byKeyPath: \.stringCol, ascending: true))
+        assertThrows(collection.sorted(by: \.stringCol, ascending: true))
     }
 
     override func testFilterFormat() {
