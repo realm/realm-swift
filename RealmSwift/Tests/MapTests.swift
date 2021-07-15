@@ -567,7 +567,7 @@ class MapTests: TestCase {
     }
 
     func testKeyedAggregatable() {
-        let map = realm.create(SwiftMapPropertyObject.self, value: [])
+        let map = SwiftMapPropertyObject()
         map.intMap["key"] = SwiftIntObject(value: [1])
         map.intMap["key2"] = SwiftIntObject(value: [2])
         map.intMap["key3"] = SwiftIntObject(value: [3])
@@ -584,6 +584,7 @@ class MapTests: TestCase {
         }
         // unmanaged
         assertAggregations()
+        realm.add(map)
         try! realm.commitWrite()
         // managed
         assertAggregations()
