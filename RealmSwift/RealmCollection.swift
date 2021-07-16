@@ -543,7 +543,7 @@ public extension RealmCollection where Element: ObjectBase {
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
-     - parameter keyPath: The name of a property whose minimum value is desired.
+     - parameter keyPath: The keyPath of a property whose minimum value is desired.
      */
     func min<T: MinMaxType>(of keyPath: KeyPath<Element, T>) -> T? {
         min(ofProperty: _name(for: keyPath))
@@ -555,7 +555,7 @@ public extension RealmCollection where Element: ObjectBase {
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
-     - parameter keyPath: The name of a property whose minimum value is desired.
+     - parameter keyPath: The keyPath of a property whose minimum value is desired.
      */
     func max<T: MinMaxType>(of keyPath: KeyPath<Element, T>) -> T? {
         max(ofProperty: _name(for: keyPath))
@@ -566,7 +566,7 @@ public extension RealmCollection where Element: ObjectBase {
 
     - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
 
-    - parameter keyPath: The name of a property conforming to `AddableType` to calculate sum on.
+    - parameter keyPath: The keyPath of a property conforming to `AddableType` to calculate sum on.
     */
     func sum<T: AddableType>(of keyPath: KeyPath<Element, T>) -> T {
         sum(ofProperty: _name(for: keyPath))
@@ -578,7 +578,7 @@ public extension RealmCollection where Element: ObjectBase {
 
      - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
 
-     - parameter keyPath: The name of a property whose values should be summed.
+     - parameter keyPath: The keyPath of a property whose values should be summed.
      */
     func average<T: AddableType>(of keyPath: KeyPath<Element, T>) -> T? {
         average(ofProperty: _name(for: keyPath))

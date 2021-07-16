@@ -319,7 +319,7 @@ public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapp
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
-     - parameter keyPath: The name of a property whose minimum value is desired.
+     - parameter keyPath: The keyPath of a property whose minimum value is desired.
      */
     func min<T: MinMaxType>(of keyPath: KeyPath<Value.Wrapped, T>) -> T? {
         min(ofProperty: _name(for: keyPath))
@@ -331,7 +331,7 @@ public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapp
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
-     - parameter keyPath: The name of a property whose minimum value is desired.
+     - parameter keyPath: The keyPath of a property whose minimum value is desired.
      */
     func max<T: MinMaxType>(of keyPath: KeyPath<Value.Wrapped, T>) -> T? {
         max(ofProperty: _name(for: keyPath))
@@ -342,7 +342,7 @@ public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapp
 
     - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
 
-    - parameter keyPath: The name of a property conforming to `AddableType` to calculate sum on.
+    - parameter keyPath: The keyPath of a property conforming to `AddableType` to calculate sum on.
     */
     func sum<T: AddableType>(of keyPath: KeyPath<Value.Wrapped, T>) -> T {
         sum(ofProperty: _name(for: keyPath))
@@ -354,7 +354,7 @@ public extension RealmKeyedCollection where Value: OptionalProtocol, Value.Wrapp
 
      - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
 
-     - parameter keyPath: The name of a property whose values should be summed.
+     - parameter keyPath: The keyPath of a property whose values should be summed.
      */
     func average<T: AddableType>(of keyPath: KeyPath<Value.Wrapped, T>) -> T? {
         average(ofProperty: _name(for: keyPath))
