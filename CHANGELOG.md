@@ -78,6 +78,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * `@Persisted<T?>` would crash when decoding a `null` value.
   ([#7332](https://github.com/realm/realm-cocoa/issues/7332), since v10.10.0).
 * Sync user profiles now correctly persist between runs.
+* Fixed `configuration(partitionValue: AnyBSON)` will set always a nil partition value
+  for the user sync configuration.
 
 ### Compatibility
 
