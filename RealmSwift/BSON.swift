@@ -71,7 +71,9 @@ extension Array: BSON, PartitionValue where Element == AnyBSON? {
 extension NSRegularExpression: BSON {
 }
 
+/// Implementation for `PartitionValue` conformance.
 extension BSON {
+    /// Returns a `AnyBSON` for any `BSON` value.
     public var anyBSON: AnyBSON {
         return AnyBSON(self)
     }

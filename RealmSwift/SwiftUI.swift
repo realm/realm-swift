@@ -619,7 +619,9 @@ extension ThreadConfined where Self: ObjectBase {
     }
 }
 
+/// Protocol representing a PartitionValue..
 public protocol PartitionValue {
+    /// Returns a `AnyBSON` for any type conforming to it.
     var anyBSON: AnyBSON { get }
 }
 
