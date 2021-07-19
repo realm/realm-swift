@@ -31,17 +31,14 @@ import Realm
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> Element? {
-        let next = generatorBase.next()
+        guard let next = generatorBase.next() else { return nil }
+        if let value = next as? Element {
+            return value
+        }
         if next is NSNull {
             return Element._nilValue()
         }
-        if let next = next as? Object? {
-            if next == nil {
-                return nil as Element?
-            }
-            return unsafeBitCast(next, to: Optional<Element>.self)
-        }
-        return dynamicBridgeCast(fromObjectiveC: next as Any)
+        return dynamicBridgeCast(fromObjectiveC: next) as Element
     }
 }
 
@@ -73,6 +70,30 @@ public protocol _RealmMapValue {
             let key: Element.Key = next
             let val: Element.Value = dynamicBridgeCast(fromObjectiveC: collection[key as AnyObject]!)
             return SingleMapEntry(key: key, value: val) as? Element
+        }
+        return nil
+    }
+}
+
+/**
+ An iterator for `Map<Key, Value>` which produces `(key: Key, value: Value)` pairs for each entry in the map.
+ */
+@frozen public struct RLMKeyValueIterator<Key: _MapKey, Value: RealmCollectionValue>: IteratorProtocol {
+    private var generatorBase: NSFastEnumerationIterator
+    private var collection: RLMDictionary<AnyObject, AnyObject>
+    public typealias Element = (key: Key, value: Value)
+
+    init(collection: RLMDictionary<AnyObject, AnyObject>) {
+        self.collection = collection
+        generatorBase = NSFastEnumerationIterator(collection)
+    }
+
+    /// Advance to the next element and return it, or `nil` if no next element exists.
+    public mutating func next() -> Element? {
+        let next = generatorBase.next()
+        if let key = next as? Key,
+           let value = collection[key as AnyObject].map(dynamicBridgeCast) as? Value {
+            return (key: key, value: value)
         }
         return nil
     }
@@ -176,12 +197,31 @@ public protocol RealmCollectionValue: Hashable, _RealmSchemaDiscoverable {
     // Iterating over collections requires mapping NSNull to nil, but we can't
     // just do `nil as T` because of non-nullable collections
     static func _nilValue() -> Self
+    /// :nodoc:
+    // If we are in key path tracing mode, instantiate an empty object and forward
+    // the lastAccessedNames array.
+    static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self
+    /// :nodoc:
+    // Get the zero/empty/nil value for this type. Used to supply a default
+    // when the user does not declare one in their model. When `forceDefaultInitialization`
+    // is true we *must* return a non-nil, default instance of `Self`. The latter is
+    // used in conjunction with key path string tracing.
+    static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self
 }
 
 extension RealmCollectionValue {
     /// :nodoc:
     public static func _nilValue() -> Self {
         fatalError("unexpected NSNull for non-Optional type")
+    }
+    /// :nodoc:
+    public static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self {
+        let value = Self._rlmDefaultValue(true)
+        if let value = value as? ObjectBase {
+            value.lastAccessedNames = lastAccessedNames
+            value.prepareForRecording()
+        }
+        return value
     }
 }
 
@@ -207,7 +247,16 @@ extension AnyRealmValue: RealmCollectionValue {
     }
 }
 
-extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue {
+extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue,
+                                               Wrapped: _DefaultConstructible {
+    /// :nodoc:
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Optional<Wrapped> {
+        if forceDefaultInitialization {
+            return Wrapped()
+        }
+        return .none
+    }
+
     /// :nodoc:
     public static func _nilValue() -> Optional {
         return nil
@@ -1203,4 +1252,15 @@ extension LinkingObjects: ObservableCollection {
     internal func isSameObjcCollection(_ objc: RLMResults<AnyObject>) -> Bool {
         return objc === rlmResults
     }
+}
+
+// MARK: Key Path Strings
+
+/// Tag protocol which allows a collection to produce its property name
+internal protocol PropertyNameConvertible {
+    /// A mutable array referenced from the enclosing parent that contains the last accessed property names.
+    var lastAccessedNames: NSMutableArray? { get set }
+    /// `key` is the property name for this collection.
+    /// `isLegacy` will be true if the property is declared with old property syntax.
+    var propertyInformation: (key: String, isLegacy: Bool)? { get }
 }

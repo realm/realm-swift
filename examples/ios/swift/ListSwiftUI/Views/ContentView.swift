@@ -19,8 +19,8 @@
 import RealmSwift
 import SwiftUI
 
-@objcMembers class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
-    @objc enum Priority: Int, RealmEnum, CaseIterable, Identifiable, CustomStringConvertible {
+class Reminder: EmbeddedObject, ObjectKeyIdentifiable {
+    enum Priority: Int, PersistableEnum, CaseIterable, Identifiable, CustomStringConvertible {
         var id: Int { self.rawValue }
 
         case low, medium, high
@@ -33,18 +33,18 @@ import SwiftUI
             }
         }
     }
-    dynamic var title = ""
-    dynamic var notes = ""
-    dynamic var isFlagged = false
-    dynamic var date = Date()
-    dynamic var isComplete = false
-    dynamic var priority: Priority = .low
+    @Persisted var title: String
+    @Persisted var notes: String
+    @Persisted var isFlagged: Bool
+    @Persisted var date: Date
+    @Persisted var isComplete: Bool
+    @Persisted var priority: Priority = .low
 }
 
-@objcMembers class ReminderList: Object, ObjectKeyIdentifiable {
-    dynamic var name = "New List"
-    dynamic var icon: String = "list.bullet"
-    var reminders = RealmSwift.List<Reminder>()
+class ReminderList: Object, ObjectKeyIdentifiable {
+    @Persisted var name = "New List"
+    @Persisted var icon: String = "list.bullet"
+    @persisted var reminders: RealmSwift.List<Reminder>
 }
 
 struct FocusableTextField: UIViewRepresentable {

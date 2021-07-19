@@ -4,22 +4,141 @@ x.y.z Release notes (yyyy-MM-dd)
 Add `List.objects(at indexes:)` in Swift and `[RLMCollection objectsAtIndexes:]` in Objective-C. This allows you to select elements in a collection with a given IndexSet ([#7298](https://github.com/realm/realm-cocoa/issues/7298).
 * Add `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)` and `[App.emailPasswordAuth retryCustomConfirmation:completion:]`. 
   These functions support retrying a [custom confirmation](https://docs.mongodb.com/realm/authentication/email-password/#run-a-confirmation-function) function.
+* None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* `RealmProperty<T?>` would crash when decoding a `null` json value.
+  ([Cocoa #7323](https://github.com/realm/realm-cocoa/issues/7323), since v10.8.0)
+* `@Persisted<T?>` would crash when decoding a `null` value.
+  ([#7332](https://github.com/realm/realm-cocoa/issues/7332), since v10.10.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
-* Realm Studio: 10.0.0 or later.
+* Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.5.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.0 beta 1.
+* Xcode: 12.2-13.0 beta 2.
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.10.0 Release notes (2021-07-07)
+=============================================================
+
+### Enhancements
+
+* Add a new property wrapper-based declaration syntax for properties on Realm
+  Swift object classes. Rather than using `@objc dynamic` or the
+  `RealmProperty` wrapper type, properties can now be declared with `@Persisted
+  var property: T`, where `T` is any of the supported property types, including
+  optional numbers and collections. This has a few benefits:
+
+    - All property types are now declared in the same way. No more remembering
+      that this type requires `@objc dynamic var` while this other type
+      requires `let`, and the `RealmProperty` or `RealmOptional` helper is no
+      longer needed for types not supported by Objective-C.
+    - No more overriding class methods like `primaryKey()`,
+      `indexedProperties()` or `ignoredProperties()`. The primary key and
+      indexed flags are set directly in the property declaration with
+      `@Persisted(primaryKey: true) _id: ObjectId` or `@Persisted(indexed:
+      true) indexedProperty: Int`. If any `@Persisted` properties are present,
+      all other properties are implicitly ignored.
+    - Some performance problems have been fixed. Declaring collection
+      properties as `let listProp = List<T>()` resulted in the `List<T>` object
+      being created eagerly when the parent object is read, which could cause
+      performance problems if a class has a large number of `List` or
+      `RealmOptional` properties. `@Persisted var list: List<T>` allows us to
+      defer creating the `List<T>` until it's accessed, improving performance
+      when looping over objects and using only some of the properties.
+
+      Similarly, `let _id = ObjectId.generate()` was a convenient way to
+      declare a sync-compatible primary key, but resulted in new ObjectIds
+      being generated in some scenarios where the value would never actually be
+      used. `@Persisted var _id: ObjectId` has the same behavior of
+      automatically generating primary keys, but allows us to only generate it
+      when actually needed.
+    - More types of enums are supported. Any `RawRepresentable` enum whose raw
+      type is a type supported by Realm can be stored in an `@Persisted`
+      project, rather than just `@objc` enums. Enums must be declared as
+      conforming to the `PersistableEnum` protocol, and still cannot (yet) be
+      used in collections.
+    - `willSet` and `didSet` can be used with `@Persistable` properties, while
+      they previously did not work on managed Realm objects.
+
+  While we expect the switch to the new syntax to be very simple for most
+  users, we plan to support the existing objc-based declaration syntax for the
+  foreseeable future. The new style and old style cannot be mixed within a
+  single class, but new classes can use the new syntax while existing classes
+  continue to use the old syntax. Updating an existing class to the new syntax
+  does not change what data is stored in the Realm file and so does not require
+  a migration (as long as you don't also change the schema in the process, of
+  course).
+* Add `Map.merge()`, which adds the key-value pairs from another Map or
+  Dictionary to the map.
+* Add `Map.asKeyValueSequence()` which returns an adaptor that can be used with
+  generic functions that operate on Dictionary-styled sequences.
+
+### Fixed
+* AnyRealmValue enum values are now supported in more places when creating
+  objects.
+* Declaring a property as `RealmProperty<AnyRealmValue?>` will now report an
+  error during schema discovery rather than doing broken things when the
+  property is used.
+* Observing the `invalidated` property of `RLMDictionary`/`Map` via KVO did not
+  set old/new values correctly in the notification (since 10.8.0).
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 2.
+
+10.9.0 Release notes (2021-07-01)
+=============================================================
+
+### Enhancements
+
+* Add `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)` and
+  `[App.emailPasswordAuth retryCustomConfirmation:completion:]`. These
+  functions support retrying a [custom confirmation](https://docs.mongodb.com/realm/authentication/email-password/#run-a-confirmation-function)
+  function.
+* Improve performance of many Dictionary operations, especially when KVO is being used.
+
+### Fixed
+
+* Calling `-[RLMRealm deleteObjects:]` on a `RLMDictionary` cleared the
+  dictionary but did not actually delete the objects in the dictionary (since v10.8.0).
+* Rix an assertion failure when observing a `List<AnyRealmValue>` contains
+  object links. ([Core #4767](https://github.com/realm/realm-core/issues/4767), since v10.8.0)
+* Fix an assertion failure when observing a `RLMDictionary`/`Map` which links
+  to an object which was deleting by a different sync client.
+  ([Core #4770](https://github.com/realm/realm-core/pull/4770), since v10.8.0)
+* Fix an endless recursive loop that could cause a stack overflow when
+  computing changes on a set of objects which contained cycles.
+  ([Core #4770](https://github.com/realm/realm-core/pull/4770), since v10.8.0).
+* Hash collisions in dictionaries were not handled properly.
+  ([Core #4776](https://github.com/realm/realm-core/issues/4776), since v10.8.0).
+* Fix a crash after clearing a list or set of AnyRealmValue containing links to
+  objects ([Core #4774](https://github.com/realm/realm-core/issues/4774), since v10.8.0)
+* Trying to refresh a user token which had been revoked by an admin lead to an
+  infinite loop and then a crash. This situation now properly logs the user out
+  and reports an error. ([Core #4745](https://github.com/realm/realm-core/issues/4745), since v10.0.0).
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 2.
+
+### Internal
+
+* Upgraded realm-core from v11.0.3 to v11.0.4
 
 10.8.1 Release notes (2021-06-22)
 =============================================================

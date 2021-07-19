@@ -27,15 +27,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional keyType:(RLMPropertyType)keyType;
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
+// YES if the property is declared with old property syntax.
+@property (nonatomic, readonly) BOOL isLegacyProperty;
+// The name of the property which this collection represents
+@property (nonatomic, readonly) NSString *propertyKey;
 @end
 
 @interface RLMManagedDictionary : RLMDictionary
 - (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 @end
 
-void RLMDictionaryValidateMatchingObjectType(__unsafe_unretained RLMDictionary *const dictionary,
-                                             __unsafe_unretained id const key, __unsafe_unretained id const value);
 FOUNDATION_EXTERN NSString *RLMDictionaryDescriptionWithMaxDepth(NSString *name,
                                                                  RLMDictionary *dictionary,
                                                                  NSUInteger depth);
+id RLMDictionaryKey(RLMDictionary *dictionary, id key) REALM_HIDDEN;
+id RLMDictionaryValue(RLMDictionary *dictionary, id value) REALM_HIDDEN;
+
 NS_ASSUME_NONNULL_END
