@@ -1,10 +1,10 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-Add `List.objects(at indexes:)` in Swift and `[RLMCollection objectsAtIndexes:]` in Objective-C. This allows you to select elements in a collection with a given IndexSet ([#7298](https://github.com/realm/realm-cocoa/issues/7298).
+* Add `List.objects(at indexes:)` in Swift and `[RLMCollection objectsAtIndexes:]` in Objective-C. 
+  This allows you to select elements in a collection with a given IndexSet (Cocoa [#7298](https://github.com/realm/realm-cocoa/issues/7298).
 * Add `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)` and `[App.emailPasswordAuth retryCustomConfirmation:completion:]`. 
   These functions support retrying a [custom confirmation](https://docs.mongodb.com/realm/authentication/email-password/#run-a-confirmation-function) function.
-* None.
 
 ### Fixed
 * `RealmProperty<T?>` would crash when decoding a `null` json value.
