@@ -41,8 +41,8 @@ import Realm.Private
 ///     @Persisted(indexed: true) var indexedString: String
 ///
 ///     // Properties can set as the class's primary key by
-///     // passing `primary: true` to the initializer
-///     @Persisted(primary: true) var _id: ObjectId
+///     // passing `primaryKey: true` to the initializer
+///     @Persisted(primaryKey: true) var _id: ObjectId
 ///
 ///     // List and set properties should always be declared
 ///     // with `: List` rather than `= List()`
@@ -65,7 +65,7 @@ import Realm.Private
 ///  performance of equality queries on that property, at the cost of slightly
 ///  worse write performance. No other operations currently use the index.
 ///
-///  A property can be set as the class's primary key by passing `primary: true`
+///  A property can be set as the class's primary key by passing `primaryKey: true`
 ///  to the initializer. Compound primary keys are not supported, and setting
 ///  more than one property as the primary key will throw an exception at
 ///  runtime. Only Int, String, UUID and ObjectID properties can be made the
