@@ -67,7 +67,7 @@ public protocol RealmSubscribable {
         -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error
     // swiftlint:enable identifier_name
     /// :nodoc:
-    func _observe<S>(_ subscriber: S, keyPaths: [String]?)
+    func _observe<S>(_ subscriber: S, _ keyPaths: [String]?)
         -> NotificationToken where S: Subscriber, S.Input == Void, S.Failure == Never
     /// :nodoc:
     func _observe<S>(_ subscriber: S)
@@ -468,7 +468,7 @@ extension ObjectBase: RealmSubscribable {
         return _observe { _ in _ = subscriber.receive() }
     }
     /// :nodoc:
-    public func _observe<S>(_ subscriber: S, keyPaths: [String]?) -> NotificationToken where S: Subscriber, S.Failure == Never, S.Input == Void {
+    public func _observe<S>(_ subscriber: S, _ keyPaths: [String]?) -> NotificationToken where S: Subscriber, S.Failure == Never, S.Input == Void {
         return _observe(keyPaths: keyPaths, { _ in _ = subscriber.receive()})
     }
     // swiftlint:enable identifier_name
@@ -560,7 +560,7 @@ extension RealmCollection {
         return observe(keyPaths: nil, on: nil) { _ in _ = subscriber.receive() }
     }
     /// :nodoc:
-    public func _observe<S: Subscriber>(_ subscriber: S, keyPaths: [String]? = nil) -> NotificationToken where S.Input == Void, S.Failure == Never {
+    public func _observe<S: Subscriber>(_ subscriber: S, _ keyPaths: [String]? = nil) -> NotificationToken where S.Input == Void, S.Failure == Never {
         return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
     // swiftlint:enable identifier_name
@@ -597,7 +597,7 @@ extension RealmKeyedCollection {
     }
     
     /// :nodoc:
-    public func _observe<S: Subscriber>(_ subscriber: S, keyPaths: [String]? = nil) -> NotificationToken where S.Input == Void, S.Failure == Never {
+    public func _observe<S: Subscriber>(_ subscriber: S, _ keyPaths: [String]? = nil) -> NotificationToken where S.Input == Void, S.Failure == Never {
         return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
 }
