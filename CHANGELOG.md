@@ -22,7 +22,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 12.2-13.0 beta 2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v11.0.4 to v11.1.0
 
 10.10.0 Release notes (2021-07-07)
 =============================================================
