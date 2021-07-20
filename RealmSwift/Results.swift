@@ -440,6 +440,11 @@ extension Results: Encodable where Element: Encodable {
 // MARK: KeyPath Distinct
 
 extension Results where Element: ObjectBase {
+    /**
+     Returns a `Results` containing distinct objects based on the specified key paths
+
+     - parameter keyPaths: The key paths used produce distinct results
+     */
     public func distinct<S: Sequence>(by keyPaths: S) -> Results<Element>
         where S.Iterator.Element == PartialKeyPath<Element> {
             return Results<Element>(rlmResults.distinctResults(usingKeyPaths: keyPaths.map(_name(for:))))
