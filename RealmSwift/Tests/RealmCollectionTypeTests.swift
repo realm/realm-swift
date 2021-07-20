@@ -219,6 +219,13 @@ class RealmCollectionTypeTests: TestCase {
         assertThrows(collection[-200])
     }
 
+    func testObjectsAtIndexes() {
+        assertThrows(collection.objects(at: [0, 10]))
+        let objs = collection.objects(at: [0, 1])
+        assertEqual(str1, objs[0])
+        assertEqual(str2, objs[1])
+    }
+
     func testFirst() {
         assertEqual(str1, collection.first!)
         assertEqual(str2, collection.filter("stringCol = '2'").first!)
@@ -1418,6 +1425,8 @@ class MutableSetRealmCollectionTypeTests: RealmCollectionTypeTests {
     override func testIndexOfPredicate() { }
 
     override func testSubscript() { }
+
+    override func testObjectsAtIndexes() { }
 
     override func testFirst() { }
 
