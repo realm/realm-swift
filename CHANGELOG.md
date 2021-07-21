@@ -6,8 +6,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)` and `[App.emailPasswordAuth retryCustomConfirmation:completion:]`. 
   These functions support retrying a [custom confirmation](https://docs.mongodb.com/realm/authentication/email-password/#run-a-confirmation-function) function.
 * Improve performance of creating collection notifiers for Realms with a complex schema. 
-  This means that the first run of a synchronous query, first call to observe() on a collection, 
-  or any call to find_async() will do significantly less work on the calling thread.
+  This means that the first run of a query or first call to observe() on a collection will 
+  do significantly less work.
 * Improve performance of calculating changesets for notifications, particularly 
   for deeply nested object graphs and objects which have List or Set properties 
   with small numbers of objects in the collection.
@@ -17,7 +17,7 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Cocoa #7323](https://github.com/realm/realm-cocoa/issues/7323), since v10.8.0)
 * `@Persisted<T?>` would crash when decoding a `null` value.
   ([#7332](https://github.com/realm/realm-cocoa/issues/7332), since v10.10.0).
-* User profile now correctly persists between runs.
+* Sync user profiles now correctly persist between runs.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
