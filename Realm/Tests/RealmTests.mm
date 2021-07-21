@@ -1854,9 +1854,7 @@
     setrlimit(RLIMIT_NOFILE, &oldrl);
 }
 
-// Intentionally disabled
-// TODO: Fix this test hanging
-- (void)WritingCopyUsesWriteTransactionInProgress
+- (void)testWritingCopyUsesWriteTransactionInProgress
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{

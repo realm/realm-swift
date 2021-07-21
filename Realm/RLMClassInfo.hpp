@@ -117,6 +117,7 @@ private:
 // A per-RLMRealm object schema map which stores RLMClassInfo keyed on the name
 class RLMSchemaInfo {
     using impl = std::unordered_map<NSString *, RLMClassInfo>;
+
 public:
     RLMSchemaInfo() = default;
     RLMSchemaInfo(RLMRealm *realm);
@@ -139,6 +140,7 @@ public:
     impl::iterator end() noexcept;
     impl::const_iterator begin() const noexcept;
     impl::const_iterator end() const noexcept;
+
 private:
     std::unordered_map<NSString *, RLMClassInfo> m_objects;
 };

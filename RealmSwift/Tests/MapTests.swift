@@ -660,20 +660,14 @@ class MapTests: TestCase {
                  Optional<SwiftStringObject>(SwiftStringObject(value: ["bye"])))
         }
     }
-    
     // MARK: Notification Tests
 
     func testNotificationSentInitially() {
-//        let realm = realmWithTestPath()
-//        realm.beginWrite()
-//        let mapObj = realm.create(SwiftMapPropertyObject.self)
-        
         let mapObj = createMap()
         try! mapObj.realm!.commitWrite()
 
         let queue = DispatchQueue(label: "testNotificationSentInitially", autoreleaseFrequency: .workItem)
         let exp = expectation(description: "does receive notification")
-//        let token = mapObj.map.observe(on: queue) { change in
         let token = mapObj.observe(on: queue) { change in
             switch change {
             case .initial(let map):
@@ -681,7 +675,7 @@ class MapTests: TestCase {
                 exp.fulfill()
             case .update(_, deletions: _, insertions: _, modifications: _):
                 XCTFail("should not get here for this test")
-            case .error(_):
+            case .error:
                 XCTFail("should not get here for this test")
             }
         }
@@ -691,13 +685,9 @@ class MapTests: TestCase {
     }
 
     func testNotificationSentAfterCommit() {
-//        let realm = realmWithTestPath()
-//        realm.beginWrite()
-//        let mapObj = realm.create(SwiftMapPropertyObject.self)
-        
         let mapObj = createMap()
         try! mapObj.realm!.commitWrite()
-        
+
         let queue = DispatchQueue(label: "testNotificationSentAfterCommit", autoreleaseFrequency: .workItem)
         var exp = expectation(description: "does receive notification")
         var didInsert = false
@@ -721,7 +711,7 @@ class MapTests: TestCase {
                     didInsert.toggle()
                 }
                 exp.fulfill()
-            case .error(_):
+            case .error:
                 XCTFail("should not get here for this test")
             }
         }
@@ -755,12 +745,12 @@ class MapTests: TestCase {
     /* Expect notification on "intCol" key path when intCol is changed */
     func testObserveKeyPath1() {
         let mapObj = createMapObject()
-        mapObj.objMap["first"] = SwiftObject(value: ["intCol": 1, "stringCol": "one"])
-        mapObj.objMap["second"] = SwiftObject(value: ["intCol": 2, "stringCol": "two"])
+        mapObj.swiftObjectMap["first"] = SwiftObject(value: ["intCol": 1, "stringCol": "one"])
+        mapObj.swiftObjectMap["second"] = SwiftObject(value: ["intCol": 2, "stringCol": "two"])
         try! mapObj.realm!.commitWrite()
 
         var ex = expectation(description: "initial notification")
-        let token = mapObj.objMap.observe(keyPaths: ["intCol"]) { (changes: RealmMapChange) in
+        let token = mapObj.swiftObjectMap.observe(keyPaths: ["intCol"]) { (changes: RealmMapChange) in
             switch changes {
             case .initial(let map):
                 XCTAssertEqual(map.count, 2)
@@ -768,7 +758,7 @@ class MapTests: TestCase {
                 XCTAssertEqual(deletions, [])
                 XCTAssertEqual(insertions, [])
                 XCTAssertEqual(modifications, ["first"])
-            case .error(_):
+            case .error:
                 XCTFail("error not expected")
             }
             ex.fulfill()
@@ -781,7 +771,7 @@ class MapTests: TestCase {
             let realm = self.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.objects(SwiftMapPropertyObject.self).first!
-            let value = obj.objMap["first"]!!
+            let value = obj.swiftObjectMap["first"]!!
             value.intCol = 8
             try! realm.commitWrite()
         }
@@ -792,24 +782,24 @@ class MapTests: TestCase {
     /* Expect no notification on "intCol" key path when stringCol is changed */
     func testObserveKeyPath2() {
         let mapObj = createMapObject()
-        mapObj.objMap["first"] = SwiftObject(value: ["intCol": 1, "stringCol": "one"])
-        mapObj.objMap["second"] = SwiftObject(value: ["intCol": 2, "stringCol": "two"])
+        mapObj.swiftObjectMap["first"] = SwiftObject(value: ["intCol": 1, "stringCol": "one"])
+        mapObj.swiftObjectMap["second"] = SwiftObject(value: ["intCol": 2, "stringCol": "two"])
         try! mapObj.realm!.commitWrite()
 
         var ex = expectation(description: "initial notification")
-        let token = mapObj.objMap.observe(keyPaths: ["intCol"]) { (changes: RealmMapChange) in
+        let token = mapObj.swiftObjectMap.observe(keyPaths: ["intCol"]) { (changes: RealmMapChange) in
             switch changes {
             case .initial(let map):
                 XCTAssertEqual(map.count, 2)
-            case .update(_, _, _, _):
+            case .update:
                 XCTFail("update not expected")
-            case .error(_):
+            case .error:
                 XCTFail("error not expected")
             }
             ex.fulfill()
         }
         waitForExpectations(timeout: 0.1, handler: nil)
-        
+
         /* Expect no notification on "intCol" key path when stringCol is changed */
         ex = expectation(description: "NO change notification")
         ex.isInverted = true
@@ -817,23 +807,23 @@ class MapTests: TestCase {
             let realm = self.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.objects(SwiftMapPropertyObject.self).first!
-            let value = obj.objMap["first"]!!
+            let value = obj.swiftObjectMap["first"]!!
             value.stringCol = "new string"
             try! realm.commitWrite()
         }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
-    
+
     /* Expect notification delete notification on "intCol" key path when object is removed from map. */
     func testObserveKeyPath3() {
         let mapObj = createMapObject()
-        mapObj.objMap["first"] = SwiftObject(value: ["intCol": 1, "stringCol": "one"])
-        mapObj.objMap["second"] = SwiftObject(value: ["intCol": 2, "stringCol": "two"])
+        mapObj.swiftObjectMap["first"] = SwiftObject(value: ["intCol": 1, "stringCol": "one"])
+        mapObj.swiftObjectMap["second"] = SwiftObject(value: ["intCol": 2, "stringCol": "two"])
         try! mapObj.realm!.commitWrite()
 
         var ex = expectation(description: "initial notification")
-        let token = mapObj.objMap.observe(keyPaths: ["intCol"]) { (changes: RealmMapChange) in
+        let token = mapObj.swiftObjectMap.observe(keyPaths: ["intCol"]) { (changes: RealmMapChange) in
             switch changes {
             case .initial(let map):
                 XCTAssertEqual(map.count, 2)
@@ -842,7 +832,7 @@ class MapTests: TestCase {
                 XCTAssertEqual(insertions, [])
                 XCTAssertEqual(modifications, [])
                 XCTAssertEqual(map.count, 1)
-            case .error(_):
+            case .error:
                 XCTFail("error not expected")
             }
             ex.fulfill()
@@ -856,7 +846,7 @@ class MapTests: TestCase {
             realm.beginWrite()
             let obj = realm.objects(SwiftMapPropertyObject.self).first!
 //            let value = obj.objMap["first"]!!
-            obj.objMap.removeObject(for: "first")
+            obj.swiftObjectMap.removeObject(for: "first")
             try! realm.commitWrite()
         }
         waitForExpectations(timeout: 0.1, handler: nil)
@@ -866,12 +856,12 @@ class MapTests: TestCase {
     /* Expect modification notification on "intCol" key path when object is deleted from realm. */
     func testObserveKeyPath4() {
         let mapObj = createMapObject()
-        mapObj.objMap["first"] = SwiftObject(value: ["intCol": 1, "stringCol": "one"])
-        mapObj.objMap["second"] = SwiftObject(value: ["intCol": 2, "stringCol": "two"])
+        mapObj.swiftObjectMap["first"] = SwiftObject(value: ["intCol": 1, "stringCol": "one"])
+        mapObj.swiftObjectMap["second"] = SwiftObject(value: ["intCol": 2, "stringCol": "two"])
         try! mapObj.realm!.commitWrite()
 
         var ex = expectation(description: "initial notification")
-        let token = mapObj.objMap.observe(keyPaths: ["intCol"]) { (changes: RealmMapChange) in
+        let token = mapObj.swiftObjectMap.observe(keyPaths: ["intCol"]) { (changes: RealmMapChange) in
             switch changes {
             case .initial(let map):
                 XCTAssertEqual(map.count, 2)
@@ -880,7 +870,7 @@ class MapTests: TestCase {
                 XCTAssertEqual(insertions, [])
                 XCTAssertEqual(modifications, ["first"])
                 XCTAssertEqual(map.count, 2)
-            case .error(_):
+            case .error:
                 XCTFail("error not expected")
             }
             ex.fulfill()
@@ -892,14 +882,14 @@ class MapTests: TestCase {
             let realm = self.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.objects(SwiftMapPropertyObject.self).first!
-            let value = obj.objMap["first"]!!
+            let value = obj.swiftObjectMap["first"]!!
             realm.delete(value)
             try! realm.commitWrite()
         }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
-    
+
     /* Expect notification on "owners.name" (a backlink property) key path when name is modified. */
     func testObserveKeyPathBacklink1() {
         let mapObj = createMapObject()
@@ -919,13 +909,13 @@ class MapTests: TestCase {
                 XCTAssertEqual(deletions, [])
                 XCTAssertEqual(insertions, [])
                 XCTAssertEqual(modifications, ["first"])
-            case .error(_):
+            case .error:
                 XCTFail("error not expected")
             }
             ex.fulfill()
         }
         waitForExpectations(timeout: 0.1, handler: nil)
-        
+
         ex = expectation(description: "change notification")
         dispatchSyncNewThread {
             let realm = self.realmWithTestPath()
@@ -955,17 +945,17 @@ class MapStandaloneTests: MapTests {
     override func createEmbeddedMap() -> Map<String, EmbeddedTreeObject1?> {
         return Map<String, EmbeddedTreeObject1?>()
     }
-    
+
     override func testNotificationSentInitially() {
         let mapObj = createMap()
         assertThrows(mapObj.observe {_ in })
     }
-    
+
     override func testNotificationSentAfterCommit() {
         let mapObj = createMap()
         assertThrows(mapObj.observe {_ in })
     }
-    
+
     override func testObserveKeyPath1() {
         let mapObj = createMap()
         assertThrows(mapObj.observe {_ in })
@@ -975,17 +965,17 @@ class MapStandaloneTests: MapTests {
         let mapObj = createMap()
         assertThrows(mapObj.observe {_ in })
     }
-    
+
     override func testObserveKeyPath3() {
         let mapObj = createMap()
         assertThrows(mapObj.observe {_ in })
     }
-    
+
     override func testObserveKeyPath4() {
         let mapObj = createMap()
         assertThrows(mapObj.observe {_ in })
     }
-    
+
     override func testObserveKeyPathBacklink1() {
         let mapObj = createMap()
         assertThrows(mapObj.observe {_ in })
@@ -999,7 +989,7 @@ class MapNewlyAddedTests: MapTests {
         XCTAssertNotNil(mapObj.realm)
         return mapObj.map
     }
-    
+
     override func createMapObject() -> SwiftMapPropertyObject {
         let mapObj = SwiftMapPropertyObject()
         // This could probably use realmWithTestPath to be more explicit?
@@ -1024,7 +1014,7 @@ class MapNewlyCreatedTests: MapTests {
         XCTAssertNotNil(mapObj.realm)
         return mapObj.map
     }
-    
+
     override func createMapObject() -> SwiftMapPropertyObject {
         let mapObj = realm.create(SwiftMapPropertyObject.self)
         try! realm.commitWrite()
@@ -1052,7 +1042,7 @@ class MapRetrievedTests: MapTests {
     override func createMapObject() -> SwiftMapPropertyObject {
         realm.create(SwiftMapPropertyObject.self)
         try! realm.commitWrite()
-        
+
         let mapObj = realm.objects(SwiftMapPropertyObject.self).first!
 
         XCTAssertNotNil(mapObj.realm)

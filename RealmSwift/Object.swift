@@ -207,9 +207,10 @@ extension Object: RealmCollectionValue {
      transaction is committed.
 
      If no key paths are given, the block will be executed on any insertion,
-     modification, or deletion for all object properties and nested linked
-     properties. If a key path or key paths are provided,
-     then the block will be called for changes which occur on those key paths. For example, if:
+     modification, or deletion for all object properties and the properties of
+     any nested, linked objects. If a key path or key paths are provided,
+     then the block will be called for changes which occur only on the
+     provided key paths. For example, if:
      ```swift
      class Dog: Object {
          @objc dynamic var name: String = ""
@@ -225,7 +226,7 @@ extension Object: RealmCollectionValue {
      - The above notification block fires for changes to the
      `adopted` property, but not for any changes made to `name`.
      - If the observed key path were `["siblings"]`, then any insertion,
-     deletion, or modification to the `siblings` list trigger the block. A change to
+     deletion, or modification to the `siblings` list will trigger the block. A change to
      `someSibling.name` would not trigger the block (where `someSibling`
      is an element contained in `siblings`)
      - If the observed key path were `["siblings.name"]`, then any insertion or
@@ -256,12 +257,12 @@ extension Object: RealmCollectionValue {
      retained by the returned token and not by the object itself.
 
      - warning: This method cannot be called during a write transaction, or when
-     the containing Realm is read-only.
+                the containing Realm is read-only.
      - parameter keyPaths: The object properties which trigger the block to
      be called when they are modified. If `nil`, notifications will be delivered for
      any property change on the object. See comments above for more detail on linked properties.
      - parameter queue: The serial dispatch queue to receive notification on. If
-     `nil`, notifications are delivered to the current thread.
+                        `nil`, notifications are delivered to the current thread.
      - parameter block: The block to call with information about changes to the object.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */

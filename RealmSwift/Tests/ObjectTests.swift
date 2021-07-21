@@ -1101,7 +1101,7 @@ class ObjectTests: TestCase {
         })
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
-        
+
         // Expect notification for "employees.hired" when an employee is reassigned.
         token = company.observe(keyPaths: ["employees.hired"], expectChange("employees", Int?.none, Int?.none))
         try! realm.write({

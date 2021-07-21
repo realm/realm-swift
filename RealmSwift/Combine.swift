@@ -65,13 +65,13 @@ public protocol RealmSubscribable {
     /// :nodoc:
     func _observe<S>(on queue: DispatchQueue?, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error
-    // swiftlint:enable identifier_name
     /// :nodoc:
     func _observe<S>(_ subscriber: S, _ keyPaths: [String]?)
         -> NotificationToken where S: Subscriber, S.Input == Void, S.Failure == Never
     /// :nodoc:
     func _observe<S>(_ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Void, S.Failure == Never
+    // swiftlint:enable identifier_name
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
@@ -575,7 +575,7 @@ extension AnyRealmCollection: RealmSubscribable {}
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension RealmKeyedCollection {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
+    // swiftlint:disable identifier_name
     public func _observe<S>(on queue: DispatchQueue? = nil, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
             // FIXME: we could skip some pointless work in converting the changeset to the Swift type here
@@ -590,16 +590,16 @@ extension RealmKeyedCollection {
                 }
             }
     }
-
     /// :nodoc:
     public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
         return observe(keyPaths: nil, on: nil) { _ in _ = subscriber.receive() }
     }
-    
     /// :nodoc:
     public func _observe<S: Subscriber>(_ subscriber: S, _ keyPaths: [String]? = nil) -> NotificationToken where S.Input == Void, S.Failure == Never {
         return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
+    // swiftlint:enable identifier_name
+
 }
 
 // MARK: Subscriptions

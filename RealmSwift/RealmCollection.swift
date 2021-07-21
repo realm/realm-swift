@@ -1100,14 +1100,14 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      ```
 
      If no key paths are given, the block will be executed on any insertion,
-     modification, or deletion for all collection type properties and nested linked
-     properties. If a key path or key paths are provided,
-     then the block will be called for changes which occur on those key paths,
-     or links to those key paths. For example, if:
+     modification, or deletion for all object properties and the properties of
+     any nested, linked objects. If a key path or key paths are provided,
+     then the block will be called for changes which occur only on the
+     provided key paths. For example, if:
      ```swift
      class Dog: Object {
          @objc dynamic var name: String = ""
-         @objc dynamic var adopted: Bool = false
+         @objc dynamic var age: Int = 1
          let toys = List<Toy>()
      }
      // ...
@@ -1117,29 +1117,29 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
          switch changes {
          case .initial(let dogs):
             // ...
-             break
          case .update:
             // This case is hit:
-            // - only after the token is intialized
+            // - after the token is intialized
             // - when an element of the collections' name
             // property is modified
             // - when an element is inserted or deleted.
             // This block is not triggered:
             // - when any of the elements "age" values is modified
-             break
          case .error:
-             break
+             // ...
          }
      }
      ```
      - If the above example observed the `["toys"]` key path, then any insertion,
      deletion, or modification to the `toys` list for any element in the collection would trigger the block.
-     Any insertion or deletion to the `Dog` type collection being observed would also trigger a notification.
-     - If the observed key path were `["toys.size"]`, then any insertion or
-     deletion to the `toys` list on any of the collection elements would trigger the block. Changes to the `size` value
-     on any `Toy` that is linked to a `Dog` in this collection will trigger the block. Changes to the `toyBrand` value
+     Any insertion or deletion to the `Dog` type collection being observed
+     would also trigger a notification.
+     - If the observed key path were `["toys.brand"]`, then any insertion or
+     deletion to the `toys` list of any collection element would trigger the block. Changes to the `brand` value
+     on any `Toy` that is linked to a `Dog` in this collection will trigger the block. Changes to any other value
      on any `Toy` that is linked to a `Dog` in this collection would not trigger the block.
-     Any insertion or deletion to the `Dog` type collection being observed would also trigger a notification.
+     Any insertion or deletion to the `Dog` type collection being observed
+     would also trigger a notification.
 
      - note: Multiple notification tokens on the same object which filter for
      separate key paths *do not* filter exclusively. If one key path
@@ -1156,10 +1156,10 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      updates, call `invalidate()` on the token.
      - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
      - parameter keyPaths: The element type properties which trigger the block to
-     be called when they are modified. If `nil`, notifications will be delivered for
-     any property change on the collection elements. See comments above for more detail on linked properties.
+                           be called when they are modified. If `nil`, notifications will be delivered for
+                           any property change on the collection elements. See comments above for more detail on linked properties.
      - parameter queue: The serial dispatch queue to receive notification on. If
-     `nil`, notifications are delivered to the current thread.
+                        `nil`, notifications are delivered to the current thread.
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */

@@ -87,6 +87,7 @@ public:
     id valueForKey(NSString *key);
 
     void prepareForInvalidation();
+
 private:
     // Doubly-linked-list of observed objects for the same row as this
     RLMObservationInfo *next = nullptr;

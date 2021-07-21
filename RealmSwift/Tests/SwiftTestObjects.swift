@@ -363,10 +363,9 @@ class SwiftMutableSetPropertyObject: Object {
 
 class SwiftMapPropertyObject: Object {
     @objc dynamic var name = ""
-    // TODO: rename
     let map = Map<String, SwiftStringObject?>()
     let intMap = Map<String, SwiftIntObject?>()
-    let objMap = Map<String, SwiftObject?>()
+    let swiftObjectMap = Map<String, SwiftObject?>()
     let dogMap = Map<String, SwiftDogObject?>()
 }
 

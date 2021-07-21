@@ -386,9 +386,15 @@ __attribute__((warn_unused_result));
  on the same thread or explicitly call `-[RLMRealm refresh]`, accessing it will
  never perform blocking work.
 
- Notifications are delivered on the given queue. If the queue is blocked and
+ Notifications are delivered via the standard run loop, and so can't be
+ delivered while the run loop is blocked by other activity. When
  notifications can't be delivered instantly, multiple notifications may be
- coalesced into a single notification.
+ coalesced into a single notification. This can include the notification
+ with the initial results. For example, the following code performs a write
+ transaction immediately after adding the notification block, so there is no
+ opportunity for the initial notification to be delivered first. As a
+ result, the initial notification will reflect the state of the Realm after
+ the write transaction.
 
  You must retain the returned token for as long as you want updates to continue
  to be sent to the block. To stop receiving updates, call `-invalidate` on the token.

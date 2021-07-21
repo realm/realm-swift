@@ -75,9 +75,10 @@ extension ObjectBase {
      transaction is committed.
 
      If no key paths are given, the block will be executed on any insertion,
-     modification, or deletion for all object properties and nested linked
-     properties. If a key path or key paths are provided,
-     then the block will be called for changes which occur on those key paths. For example, if:
+     modification, or deletion for all object properties and the properties of
+     any nested, linked objects. If a key path or key paths are provided,
+     then the block will be called for changes which occur only on the
+     provided key paths. For example, if:
      ```swift
      class Dog: Object {
          @objc dynamic var name: String = ""
@@ -93,7 +94,7 @@ extension ObjectBase {
      - The above notification block fires for changes to the
      `adopted` property, but not for any changes made to `name`.
      - If the observed key path were `["siblings"]`, then any insertion,
-     deletion, or modification to the `siblings` list trigger the block. A change to
+     deletion, or modification to the `siblings` list will trigger the block. A change to
      `someSibling.name` would not trigger the block (where `someSibling`
      is an element contained in `siblings`)
      - If the observed key path were `["siblings.name"]`, then any insertion or
