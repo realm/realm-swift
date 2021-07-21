@@ -25,48 +25,68 @@ import XCTest
 import RealmTestSupport
 #endif
 
-extension SwiftEmployeeObject {
-    convenience init(_ age: Int, _ name: String, _ hired: Bool) {
-        self.init()
-        self.age = age
-        self.name = name
-        self.hired = hired
+/**
+ Test objects definitions
+ */
     }
 }
 
-class CompanyModel: RealmProjection<SwiftCompanyObject> {
-    init(object: SwiftCompanyObject) {
-        super.init(object: object, associations: [.asis(projectedName: "title")])
-    }
+public class Address: EmbeddedObject {
+    @Persisted var city: String = ""
+    @Persisted var country = ""
 }
 
+public class Person: Object {
+    @Persisted var firstName: String
+    @Persisted var lastName = ""
+    @Persisted var birthday: Date
+    @Persisted var address: Address? = nil
+    @Persisted public var friends = List<Person>()
+    @Persisted var reviews = List<String>()
+    @Persisted var money: Decimal128
+}
+
+
+public struct PersonProjection: Projection {
+    public typealias Root = Person
+    @Projected(\Person.firstName) var firstName
+    @Projected(\Person.lastName) var lastName
+    @Projected(\Person.birthday.timeIntervalSince1970) var birthdayAsEpochtime
+    @Projected(\Person.address?.city) var homeCity
+    @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: List<String>
+}
 class ProjectionTests: TestCase {
 
-    func addData() {
+    override func setUp() {
+        super.setUp()
         let realm = realmWithTestPath()
         try! realm.write {
-            realm.add([SwiftEmployeeObject(40, "Joe", true),
-                       SwiftEmployeeObject(30, "John", false),
-                       SwiftEmployeeObject(25, "Jill", true)])
+            let js = realm.create(Person.self, value: ["firstName": "John",
+                                                       "lastName": "Snow",
+                                                       "birthday": Date(timeIntervalSince1970: 10),
+                                                       "address": ["Winterfell", "Kingdom in the North"],
+                                                       "money": Decimal128("2.22")])
+            let dt = realm.create(Person.self, value: ["firstName": "Daenerys",
+                                                       "lastName": "Targaryen",
+                                                       "birthday": Date(timeIntervalSince1970: 0),
+                                                       "address": ["King's Landing", "Westeros"],
+                                                       "money": Decimal128("2.22")])
+            js.friends.append(dt)
+            dt.friends.append(js)
 
-            let company = SwiftCompanyObject()
-            company.title = "Test title"
-            realm.add([company])
-            company.employees.append(objectsIn: realm.objects(SwiftEmployeeObject.self))
+            realm.create(SwiftAllTypesObject.self)
         }
     }
 
-    func testCreateProjection() {
-        addData()
+    func testProjectionPropertyWrapper() {
         let realm = realmWithTestPath()
-        let companies = realm.objects(SwiftCompanyObject.self)
-        var models = [CompanyModel]()
-        for obj in companies {
-            models.append(CompanyModel(object: obj))
-        }
-        XCTAssertEqual(models.count, 1)
-        XCTAssertEqual(models.first!.title as! String, "Test title")
-        let model = CompanyModel(object: companies.first!)
-        XCTAssertEqual(model.title as! String, "Test title")
+        let jonSnow = realm.objects(Person.self).filter("lastName == 'Snow'").first!
+        // this step will happen under the hood
+        var pp = PersonProjection()
+        pp.assign(jonSnow)
+        XCTAssertEqual(pp.homeCity, "Winterfell")
+        XCTAssertEqual(pp.birthdayAsEpochtime, Date(timeIntervalSince1970: 10).timeIntervalSince1970)
+        XCTAssertEqual(pp.firstFriendsName.first!, "Daenerys")
+    }
     }
 }
