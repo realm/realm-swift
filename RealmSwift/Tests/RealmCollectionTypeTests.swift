@@ -1478,7 +1478,7 @@ class MutableSetRealmCollectionTypeTests: RealmCollectionTypeTests {
     override func testDescription() {
         // ordering is not guaranteed, so handle that the objects could be in any position
         // swiftlint:disable:next line_length
-        assertMatches(collection.description, "MutableSet<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = [0-9]+;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = [0-9]+;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
+        assertMatches(collection.description, "MutableSet<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = [0-9]+;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 1;\n\t\t\\};\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = [0-9]+;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 1;\n\t\t\\};\n\t\\}\n\\)")
     }
 
     func testObserveDirect() {
