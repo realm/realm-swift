@@ -165,23 +165,23 @@
 }
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMObjectChangeBlock)block {
-    return RLMObjectAddNotificationBlock(self, nil, nil, block);
+    return RLMObjectAddNotificationBlock(self, block, nil, nil);
 }
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMObjectChangeBlock)block
                                          queue:(nonnull dispatch_queue_t)queue {
-    return RLMObjectAddNotificationBlock(self, nil, queue, block);
+    return RLMObjectAddNotificationBlock(self, block, nil, queue);
 }
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMObjectChangeBlock)block
                                       keyPaths:(NSArray<NSString *> *)keyPaths {
-    return RLMObjectAddNotificationBlock(self, keyPaths, nil, block);
+    return RLMObjectAddNotificationBlock(self, block, keyPaths, nil);
 }
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMObjectChangeBlock)block
                                       keyPaths:(NSArray<NSString *> *)keyPaths
                                          queue:(dispatch_queue_t)queue {
-    return RLMObjectAddNotificationBlock(self, keyPaths, queue, block);
+    return RLMObjectAddNotificationBlock(self, block, keyPaths, queue);
 
 }
 

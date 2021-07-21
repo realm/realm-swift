@@ -98,8 +98,8 @@ realm::Results& RLMGetBackingCollection(RLMResults *);
 
 template<typename RLMCollection>
 RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
-                                              NSArray<NSString *> *keyPaths,
                                               void (^block)(id, RLMCollectionChange *, NSError *),
+                                              NSArray<NSString *> *keyPaths,
                                               dispatch_queue_t queue);
 
 template<typename Collection>
