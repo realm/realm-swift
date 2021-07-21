@@ -62,9 +62,9 @@ FOUNDATION_EXTERN RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObj
                                                                           RLMObjectNotificationCallback block);
 
 RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj,
+                                                    RLMObjectChangeBlock block,
                                                     NSArray<NSString *> *_Nullable key_paths,
-                                                    dispatch_queue_t _Nullable queue,
-                                                    RLMObjectChangeBlock block);
+                                                    dispatch_queue_t _Nullable queue);
 
 // Returns whether the class is a descendent of RLMObjectBase
 FOUNDATION_EXTERN BOOL RLMIsObjectOrSubclass(Class klass);

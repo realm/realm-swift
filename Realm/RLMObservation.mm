@@ -555,8 +555,8 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
 
 KeyPath KeyPathFromString(RLMRealm *realm,
                           RLMSchema *schema,
-                          RLMObjectSchema *rlmObjectSchema,
                           RLMClassInfo *info,
+                          RLMObjectSchema *rlmObjectSchema,
                           NSString *keyPath) {
     RLMProperty *property;
     KeyPath keyPairs;
@@ -609,16 +609,12 @@ KeyPath KeyPathFromString(RLMRealm *realm,
     return keyPairs;
 }
 
-// Some parameters ultimately not used.
-// TODO: clean up unused parameters
 KeyPathArray KeyPathArrayFromStringArray(RLMRealm *realm,
-                                         RLMSchema *schema,
-                                         RLMObjectSchema *objectSchema,
                                          RLMClassInfo *info,
                                          NSArray<NSString *> *keyPaths) {
     KeyPathArray keyPathArray;
     for (NSString *keyPath in keyPaths) {
-        keyPathArray.push_back(KeyPathFromString(realm ,schema, objectSchema, info, keyPath));
+        keyPathArray.push_back(KeyPathFromString(realm , realm.schema, info, info->rlmObjectSchema, keyPath));
     }
     return keyPathArray;
 }

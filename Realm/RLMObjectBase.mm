@@ -713,7 +713,7 @@ RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
         @throw RLMException(@"Only objects which are managed by a Realm support change notifications");
     }
 
-    KeyPathArray keyPathArray = KeyPathArrayFromStringArray(obj.realm, obj.realm.schema, obj->_objectSchema, obj->_info, keyPaths);
+    KeyPathArray keyPathArray = KeyPathArrayFromStringArray(obj.realm, obj->_info, keyPaths);
 
     if (!queue) {
         [obj->_realm verifyNotificationsAreSupported:true];
@@ -737,7 +737,7 @@ RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
 
 @end
 
-RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, NSArray<NSString *> *keyPaths, dispatch_queue_t queue,RLMObjectChangeBlock block) {
+RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjectChangeBlock block, NSArray<NSString *> *keyPaths, dispatch_queue_t queue) {
     return RLMObjectBaseAddNotificationBlock(obj, keyPaths, queue, ^(RLMObjectBase *, NSArray<NSString *> *propertyNames,
                                                            NSArray *oldValues, NSArray *newValues, NSError *error) {
         if (error) {
