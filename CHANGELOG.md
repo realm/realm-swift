@@ -11,6 +11,8 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Cocoa #7323](https://github.com/realm/realm-cocoa/issues/7323), since v10.8.0)
 * `@Persisted<T?>` would crash when decoding a `null` value.
   ([#7332](https://github.com/realm/realm-cocoa/issues/7332), since v10.10.0).
+* Fixed an issue where `Realm.Configuration` would be set after views have been laid out
+  when using `.environment(\.realmConfiguration, ...)` in SwiftUI.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
