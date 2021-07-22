@@ -1,6 +1,36 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* Add type safe methods for:
+    - `RealmCollection.min(of:)`
+    - `RealmCollection.max(of:)`
+    - `RealmCollection.average(of:)`
+    - `RealmCollection.sum(of:)`
+    - `RealmCollection.sorted(by:ascending:)`
+    - `RealmKeyedCollection.min(of:)`
+    - `RealmKeyedCollection.max(of:)`
+    - `RealmKeyedCollection.average(of:)`
+    - `RealmKeyedCollection.sum(of:)`
+    - `RealmKeyedCollection.sorted(by:ascending:)`
+    - `Results.distinct(by:)`
+    - `SortDescriptor(keyPath:ascending:)
+    
+  Calling these methods can now be done via Swift keyPaths, like so:
+  ```swift
+  class Person: Object {
+    @Persisted var name: String
+    @Persisted var age: Int
+  }
+  
+  let persons = realm.objects(Person.self)
+  persons.min(of: \.age)
+  persons.max(of: \.age)
+  persons.average(of: \.age)
+  persons.sum(of: \.age)
+  persons.sorted(by: \.age)
+  persons.sorted(by: [SortDescriptor(keyPath: \Person.age)])
+  persons.distinct(by: [\Person.age])
+  ``` 
 * Add `List.objects(at indexes:)` in Swift and `[RLMCollection objectsAtIndexes:]` in Objective-C. 
   This allows you to select elements in a collection with a given IndexSet (Cocoa [#7298](https://github.com/realm/realm-cocoa/issues/7298).
 * Add `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)` and `[App.emailPasswordAuth retryCustomConfirmation:completion:]`. 
