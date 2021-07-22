@@ -336,69 +336,24 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
         @ThreadSafe var stringObject: SwiftStringObject?
         @ThreadSafe var intObject: SwiftIntObject?
     }
-    
-    func testInvalidThreadSafeWrapperConstruction() {
-        let unmanagedObj = SwiftStringObject(value: ["stringCol": "before"])
-        assertThrows(TestThreadSafeWrapperStruct(stringObject: unmanagedObj), reason: "No realm configuration on this object found. Only managed objects may be wrapped as thread safe.")
-        assertThrows(TestThreadSafeWrapperStruct(stringObject: nil), "ThreadSafe objects must be initialized as non-nil")
-    }
 
-    func testPassThreadSafeWrapper() {
-        let realm = try! Realm()
-        var stringObj: SwiftStringObject?
-        try! realm.write({
-            stringObj = realm.create(SwiftStringObject.self, value: ["stringCol": "before"])
-        })
-        let testStruct = TestThreadSafeWrapperStruct(stringObject: stringObj!)
-        XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
-        dispatchSyncNewThread {
-            try! Realm().write({
-                testStruct.stringObject!.stringCol = "after"
-            })
-        }
-        // !!!: Why does this expectation fail? Is the realm refreshing automatically?
-//        XCTAssertEqual(testStruct.stringObject.stringCol, "before")
-//        realm.refresh()
-        XCTAssertEqual(testStruct.stringObject!.stringCol, "after")
-    }
-
-    func testMultipleWrappersResolved() {
-        // Is there a scenario where the wrapper could resolve a thread safe reference twice?
-        // How could I test for this since it's wrapped?
-        // Without the wrapper you... just ... resolve it twice. But the wrapping abstracts this.
-    }
-    
-    func testPassThreadSafeWrapperDeletedObject() {
-        let realm = try! Realm()
-        var stringObj: SwiftStringObject?
-        try! realm.write({
-            stringObj = realm.create(SwiftStringObject.self, value: ["stringCol": "before"])
-        })
-        let testStruct = TestThreadSafeWrapperStruct(stringObject: stringObj!)
-        XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
-        
-        dispatchSyncNewThread {
-            let realm = try! Realm()
-            try! realm.write({
-                realm.delete(testStruct.stringObject!)
-            })
-            XCTAssertNil(testStruct.stringObject)
-        }
-        // !!!: Why does this expectation fail? Is the realm refreshing automatically?
-//        XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
-//        realm.refresh()
-        XCTAssertNil(testStruct.stringObject)
-//        XCTAssertEqual(testStruct.stringObject!.stringCol, "after")
-    }
-    
-    func testPassThreadSafeWrapperToMultipleObjects() {
+    func wrapperStruct() -> TestThreadSafeWrapperStruct {
         let realm = try! Realm()
         var stringObj: SwiftStringObject?, intObj: SwiftIntObject?
-        try! realm.write {
+        try! realm.write({
             stringObj = realm.create(SwiftStringObject.self, value: ["stringCol": "before"])
             intObj = realm.create(SwiftIntObject.self, value: ["intCol": 1])
-        }
-        let testStruct = TestThreadSafeWrapperStruct(stringObject: stringObj, intObject: intObj)
+        })
+        return TestThreadSafeWrapperStruct(stringObject: stringObj, intObject: intObj)
+    }
+
+    func testThreadSafeWrapperInvalidConstruction() {
+        let unmanagedObj = SwiftStringObject(value: ["stringCol": "before"])
+        assertThrows(TestThreadSafeWrapperStruct(stringObject: unmanagedObj), reason: "No realm configuration on this object found. Only managed objects may be wrapped as thread safe.")
+    }
+
+    func testThreadSafeWrapper() {
+        let testStruct = wrapperStruct()
         XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
         XCTAssertEqual(testStruct.intObject!.intCol, 1)
 
@@ -409,66 +364,135 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
             })
         }
         // !!!: Why does this expectation fail? Is the realm refreshing automatically?
-//        XCTAssertEqual(testStruct.stringObject.stringCol, "before")
+//        XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
 //        realm.refresh()
         XCTAssertEqual(testStruct.stringObject!.stringCol, "after")
         XCTAssertEqual(testStruct.intObject!.intCol, 2)
 
-    }
-    
-    func testReassignThreadSafeWrapper() {
-        let realm = try! Realm()
-        var stringObj: SwiftStringObject?, intObj: SwiftIntObject?
-        try! realm.write {
-            stringObj = realm.create(SwiftStringObject.self, value: ["stringCol": "before"])
-            intObj = realm.create(SwiftIntObject.self, value: ["intCol": 1])
+        // Edit value again to test the same thread safe reference isn't resolved twice
+        dispatchSyncNewThread {
+            try! Realm().write({
+                testStruct.stringObject!.stringCol = "after, again"
+                testStruct.intObject!.intCol = 3
+            })
         }
-        let testStruct = TestThreadSafeWrapperStruct(stringObject: stringObj, intObject: intObj)
+
+        XCTAssertEqual(testStruct.stringObject!.stringCol, "after, again")
+        XCTAssertEqual(testStruct.intObject!.intCol, 3)
+    }
+
+    func testThreadSafeWrapperDeleteObject() {
+        let testStruct = wrapperStruct()
         XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
-//        XCTAssertEqual(testStruct.intObject!.intCol, 1)
+        XCTAssertEqual(testStruct.intObject!.intCol, 1)
+
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write({
-                let obj = realm.create(SwiftStringObject.self, value: ["stringCol": "after"])
-                testStruct.stringObject = obj
-//                testStruct.intObject!.intCol = 2
+                realm.delete(testStruct.stringObject!)
+                realm.delete(testStruct.intObject!)
+            })
+            XCTAssertNil(testStruct.stringObject)
+            XCTAssertNil(testStruct.intObject)
+        }
+        // !!!: Why does this expectation fail? Is the realm refreshing automatically?
+//        XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
+//        realm.refresh()
+        XCTAssertNil(testStruct.stringObject)
+
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write({
+                testStruct.stringObject = realm.create(SwiftStringObject.self, value: ["stringCol": "new object"])
+                testStruct.intObject = realm.create(SwiftIntObject.self, value: ["intCol": 3])
+
+            })
+        }
+        XCTAssertEqual(testStruct.stringObject!.stringCol, "new object")
+        XCTAssertEqual(testStruct.intObject!.intCol, 3)
+    }
+
+    func testThreadSafeWrapperReassign() {
+        let testStruct = wrapperStruct()
+        XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
+        XCTAssertEqual(testStruct.intObject!.intCol, 1)
+
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write({
+                let stringObj = realm.create(SwiftStringObject.self, value: ["stringCol": "after"])
+                let intObj = realm.create(SwiftIntObject.self, value: ["intCol": 2])
+
+                testStruct.stringObject = stringObj
+                testStruct.intObject = intObj
             })
         }
         // Why no need for refresh??
         XCTAssertEqual(testStruct.stringObject!.stringCol, "after")
-
+        XCTAssertEqual(testStruct.intObject!.intCol, 2)
     }
-    
-    func testReassignNilThreadSafeWrapper() {
-        let realm = try! Realm()
-        var stringObj: SwiftStringObject?, intObj: SwiftIntObject?
-        try! realm.write {
-            stringObj = realm.create(SwiftStringObject.self, value: ["stringCol": "before"])
-            intObj = realm.create(SwiftIntObject.self, value: ["intCol": 1])
-        }
-        let testStruct = TestThreadSafeWrapperStruct(stringObject: stringObj, intObject: intObj)
+
+    func testThreadSafeWrapperInvalidReassign() {
+        let testStruct = wrapperStruct()
         XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
-//        XCTAssertEqual(testStruct.intObject!.intCol, 1)
+        XCTAssertEqual(testStruct.intObject!.intCol, 1)
+
         dispatchSyncNewThread {
+            // Using a realm with a different configuration than the original thread:
             try! self.realmWithTestPath().write({
-                stringObj = self.realmWithTestPath().create(SwiftStringObject.self, value: ["stringCol": "after"])
+                let stringObj = self.realmWithTestPath().create(SwiftStringObject.self, value: ["stringCol": "after"])
+
                 self.assertThrows(testStruct.stringObject = stringObj,
                                   reason: "@ThreadSafe wrapped objects may not be reassigned to an object managed by a different realm or an unmanaged object")
+            })
+
+            let realm = try! Realm()
+            try! realm.write {
                 self.assertThrows(testStruct.stringObject = SwiftStringObject(),
                                   reason: "@ThreadSafe wrapped objects may not be reassigned to an object managed by a different realm or an unmanaged object")
+            }
+        }
+    }
+
+    func testThreadSafeWrapperNilReassign() {
+        let testStruct = wrapperStruct()
+        XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
+        XCTAssertEqual(testStruct.intObject!.intCol, 1)
+
+        dispatchSyncNewThread {
+            testStruct.stringObject = nil
+            testStruct.intObject = nil
+        }
+        XCTAssertEqual(testStruct.stringObject, nil)
+        XCTAssertEqual(testStruct.intObject, nil)
+    }
+
+    func testThreadSafeWrapperNilConstruction() {
+        let testStruct = TestThreadSafeWrapperStruct(stringObject: nil, intObject: nil)
+        XCTAssertEqual(testStruct.stringObject, nil)
+        XCTAssertEqual(testStruct.intObject, nil)
+
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! Realm().write({
+                testStruct.stringObject = realm.create(SwiftStringObject.self, value: ["stringCol": "after"])
+                testStruct.intObject = realm.create(SwiftIntObject.self, value: ["intCol": 2])
             })
         }
-        // Why no need for refresh??
-//        XCTAssertEqual(testStruct.stringObject!.stringCol, "after")
+        // !!!: Why does this expectation fail? Is the realm refreshing automatically?
+//        XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
+//        realm.refresh()
+        XCTAssertEqual(testStruct.stringObject!.stringCol, "after")
+        XCTAssertEqual(testStruct.intObject!.intCol, 2)
 
-    }
-
-    
-    func testPassThreadSafeWrapperToList() {
-        
-    }
-    
-    func testPassThreadSafeWrapperToMutableSet() {
-        
+        // Edit value again to test the same thread safe reference isn't resolved twice
+        dispatchSyncNewThread {
+            try! Realm().write({
+                testStruct.stringObject!.stringCol = "after, again"
+                testStruct.intObject!.intCol = 3
+            })
+        }
+        XCTAssertEqual(testStruct.stringObject!.stringCol, "after, again")
+        XCTAssertEqual(testStruct.intObject!.intCol, 3)
     }
 }
