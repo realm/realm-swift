@@ -125,25 +125,17 @@ public protocol ThreadConfined {
 // ???: How does this struct incorporate "frozeness"?
 @propertyWrapper public class ThreadSafe<T: Object> {
     var threadSafeReference: ThreadSafeReference<T>?
-    var configuration: Realm.Configuration
+    var configuration: Realm.Configuration?
+
     public var wrappedValue: T? {
         get {
-            // These can be nil if the object was previously deleted in another thread.
-//            guard let config = configuration else { return nil }
-            guard let threadSafeReference = threadSafeReference else { return nil }
+            guard let threadSafeReference = threadSafeReference, let config = configuration else { return nil }
             do {
-                // !!!: This Realm.init() should hit the RLMGetThreadLocalCachedRealmForPath code path, if previously opened on this thread.
-                let realm = try Realm(configuration: configuration)
+                let realm = try Realm(configuration: config)
                 guard let value = threadSafeReference.resolve(in: realm) else {
-                    // Nil out thread safe reference so it can't be resolved again.
                     self.threadSafeReference = nil
                     return nil
-//                    threadSafeReference = nil // null out reference so that it can't be resolved twice
-//                    return nil /* return nil because object could have been deleted */
-//                    fatalError()
                 }
-                // ???: Because a new threadsafereference is created at each get, then a single reference should never be resolved more than once
-                // I couldn't figure out a way to test this.
                 self.threadSafeReference = ThreadSafeReference(to: value)
                 return value
             // FIXME: wrappedValue should properly handle errors
@@ -155,20 +147,22 @@ public protocol ThreadConfined {
                 threadSafeReference = nil
                 return
             }
-//            guard newValue.realm?.configuration != nil else {
-//                throwRealmException("No realm configuration on this object found. Only managed objects may be wrapped as thread safe.")
-//            }
-            guard newValue.realm?.configuration == configuration else {
-                throwRealmException("@ThreadSafe wrapped objects may not be reassigned to an object managed by a different realm or an unmanaged object")
+            if self.configuration != nil {
+                guard newValue.realm?.configuration == configuration else {
+                    throwRealmException("@ThreadSafe wrapped objects may not be reassigned to an object managed by a different realm or an unmanaged object")
+                }
+            } else {
+                self.configuration = newValue.realm?.configuration
             }
             threadSafeReference = ThreadSafeReference(to: newValue)
         }
     }
 
-    
     public init(wrappedValue: T?) {
         guard let wrappedValue = wrappedValue else {
-            throwRealmException("@ThreadSafe objects must be initialized as non-nil")
+            self.threadSafeReference = nil
+            self.configuration = nil
+            return
         }
         guard let config = wrappedValue.realm?.configuration else {
             throwRealmException("No realm configuration on this object found. Only managed objects may be wrapped as thread safe.")
