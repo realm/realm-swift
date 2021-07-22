@@ -5,6 +5,12 @@ x.y.z Release notes (yyyy-MM-dd)
   This allows you to select elements in a collection with a given IndexSet (Cocoa [#7298](https://github.com/realm/realm-cocoa/issues/7298).
 * Add `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)` and `[App.emailPasswordAuth retryCustomConfirmation:completion:]`. 
   These functions support retrying a [custom confirmation](https://docs.mongodb.com/realm/authentication/email-password/#run-a-confirmation-function) function.
+* Improve performance of creating collection notifiers for Realms with a complex schema. 
+  This means that the first run of a query or first call to observe() on a collection will 
+  do significantly less work.
+* Improve performance of calculating changesets for notifications, particularly 
+  for deeply nested object graphs and objects which have List or Set properties 
+  with small numbers of objects in the collection.
 
 ### Fixed
 * `RealmProperty<T?>` would crash when decoding a `null` json value.
@@ -14,6 +20,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fixed an issue where `Realm.Configuration` would be set after views have been laid out
   when using `.environment(\.realmConfiguration, ...)` in SwiftUI. This would cause issues if you are
   required to bump your schema version and are using `@ObservedResults`.
+* Sync user profiles now correctly persist between runs.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -25,7 +32,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 12.2-13.0 beta 2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 11.0.4 to 11.1.1
 
 10.10.0 Release notes (2021-07-07)
 =============================================================
