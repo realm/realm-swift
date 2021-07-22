@@ -29,8 +29,8 @@ let schemaVersion = 1
 // - combine `firstName` and `lastName` into `fullName`
 
 class Person: Object {
-    @objc dynamic var fullName = ""
-    @objc dynamic var age = 0
+    @Persisted var fullName = ""
+    @Persisted var age = 0
     convenience init(fullName: String, age: Int) {
         self.init()
         self.fullName = fullName

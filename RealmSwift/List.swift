@@ -20,6 +20,12 @@ import Foundation
 import Realm
 import Realm.Private
 
+extension RLMSwiftCollectionBase: Equatable {
+    public static func == (lhs: RLMSwiftCollectionBase, rhs: RLMSwiftCollectionBase) -> Bool {
+        return lhs.isEqual(rhs)
+    }
+}
+
 /**
  `List` is the container type in Realm used to define to-many relationships.
 
@@ -45,6 +51,9 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
 
     /// Indicates if the list can no longer be accessed.
     public var isInvalidated: Bool { return _rlmCollection.isInvalidated }
+
+    /// Contains the last accessed property names when tracing the key path.
+    internal var lastAccessedNames: NSMutableArray?
 
     internal var rlmArray: RLMArray<AnyObject> {
         _rlmCollection as! RLMArray
@@ -97,6 +106,9 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      */
     public subscript(position: Int) -> Element {
         get {
+            if let lastAccessedNames = lastAccessedNames {
+                return Element._rlmKeyPathRecorder(with: lastAccessedNames)
+            }
             throwForNegativeIndex(position)
             return dynamicBridgeCast(fromObjectiveC: _rlmCollection.object(at: UInt(position)))
         }
@@ -113,6 +125,20 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
 
     /// Returns the last object in the list, or `nil` if the list is empty.
     public var last: Element? { return rlmArray.lastObject().map(dynamicBridgeCast) }
+
+    /**
+     Returns an array containing the objects in the array at the indexes specified by a given index set.
+
+     - warning Throws if an index supplied in the IndexSet is out of bounds.
+
+     - parameter indexes: The indexes in the list to select objects from.
+     */
+    public func objects(at indexes: IndexSet) -> [Element] {
+        guard let r = rlmArray.objects(at: indexes) else {
+            throwRealmException("Indexes for List are out of bounds.")
+        }
+        return r.map(dynamicBridgeCast)
+    }
 
     // MARK: KVC
 
@@ -142,7 +168,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      - parameter value: The object value.
      - parameter key:   The name of the property whose value should be set on each object.
     */
-    public override func setValue(_ value: Any?, forKey key: String) {
+    public func setValue(_ value: Any?, forKey key: String) {
         return rlmArray.setValue(value, forKeyPath: key)
     }
 
@@ -664,5 +690,13 @@ extension List: AssistedObjectiveCBridgeable {
 
     internal var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (objectiveCValue: _rlmCollection, metadata: nil)
+    }
+}
+
+// MARK: Key Path Strings
+
+extension List: PropertyNameConvertible {
+    var propertyInformation: (key: String, isLegacy: Bool)? {
+        return (key: rlmArray.propertyKey, isLegacy: rlmArray.isLegacyProperty)
     }
 }

@@ -599,7 +599,7 @@ class MinMaxPrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMa
     }
 }
 
-class OptionalMinMaxPrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.W: MinMaxType {
+class OptionalMinMaxPrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.W: MinMaxType, V.W: _DefaultConstructible {
     // V.T and V.W? are the same thing, but the type system doesn't know that
     // and the protocol constraint is on V.W
     var map2: Map<V.Key, V.W?> {
@@ -647,7 +647,7 @@ class AddablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveM
     }
 }
 
-class OptionalAddablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.W: AddableType {
+class OptionalAddablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.W: AddableType, V.W: _DefaultConstructible {
     // V.T and V.W? are the same thing, but the type system doesn't know that
     // and the protocol constraint is on V.W
     var map2: Map<V.Key, V.W?> {
@@ -695,7 +695,7 @@ class SortablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: Primitive
     }
 }
 
-class OptionalSortablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.W: Comparable {
+class OptionalSortablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.W: Comparable, V.W: _DefaultConstructible {
     func testSorted() {
         for element in values {
             map[element.key] = element.value

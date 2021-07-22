@@ -77,8 +77,8 @@ Pod::Spec.new do |s|
 
                               # Realm.Private module
   private_header_files      = 'include/RLMAccessor.h',
-                              'include/RLMArray_Private.h',
                               'include/RLMApp_Private.h',
+                              'include/RLMArray_Private.h',
                               'include/RLMBSON_Private.h',
                               'include/RLMCollection_Private.h',
                               'include/RLMDictionary_Private.h',
@@ -89,21 +89,17 @@ Pod::Spec.new do |s|
                               'include/RLMOptionalBase.h',
                               'include/RLMPropertyBase.h',
                               'include/RLMProperty_Private.h',
+                              'include/RLMProviderClient_Private.h',
                               'include/RLMRealmConfiguration_Private.h',
                               'include/RLMRealm_Private.h',
                               'include/RLMResults_Private.h',
                               'include/RLMSchema_Private.h',
                               'include/RLMSet_Private.h',
+                              'include/RLMSwiftProperty.h',
                               'include/RLMSyncConfiguration_Private.h',
                               'include/RLMSyncUtil_Private.h',
-                              'include/RLMFindOneAndModifyOptions_Private.h',
-                              'include/RLMFindOptions_Private.h',
-                              'include/RLMMongoClient_Private.h',
-                              'include/RLMMongoCollection_Private.h',
-                              'include/RLMMongoDatabase_Private.h',
                               'include/RLMUpdateResult_Private.h',
                               'include/RLMUser_Private.h',
-                              'include/RLMProviderClient_Private.h'
 
 
   s.frameworks              = 'Security'

@@ -55,8 +55,7 @@ template<> struct equal_to<NSString *> {
 // reference, handles table column lookups, and tracks observed objects
 class RLMClassInfo {
 public:
-    RLMClassInfo(RLMRealm *, RLMObjectSchema *,
-                 const realm::ObjectSchema *);
+    RLMClassInfo(RLMRealm *, RLMObjectSchema *, const realm::ObjectSchema *);
 
     RLMClassInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
                  std::unique_ptr<realm::ObjectSchema> objectSchema);
@@ -96,13 +95,16 @@ public:
     RLMClassInfo &resolve(RLMRealm *);
 
     // Return true if the RLMObjectSchema is for a Swift class
-    bool isSwiftClass();
+    bool isSwiftClass() const noexcept;
+
+    // Returns true if this was a dynamically added type
+    bool isDynamic() const noexcept;
 
 private:
     // If the ObjectSchema is not owned by the realm instance
     // we need to manually manage the ownership of the object.
     std::unique_ptr<realm::ObjectSchema> dynamicObjectSchema;
-    [[maybe_unused]] __strong RLMObjectSchema * dynamicRLMObjectSchema;
+    [[maybe_unused]] RLMObjectSchema *_Nullable dynamicRLMObjectSchema;
 };
 
 // A per-RLMRealm object schema map which stores RLMClassInfo keyed on the name

@@ -321,6 +321,21 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     });
 }
 
+- (void)replaceAllObjectsWithObjects:(NSArray *)objects {
+    if (auto count = self.count) {
+        changeArray(self, NSKeyValueChangeRemoval, NSMakeRange(0, count), ^{
+            _backingList.remove_all();
+        });
+    }
+    if (![objects respondsToSelector:@selector(count)] || !objects.count) {
+        return;
+    }
+    changeArray(self, NSKeyValueChangeInsertion, NSMakeRange(0, objects.count), ^{
+        RLMAccessorContext context(*_objectInfo);
+        _backingList.assign(context, objects);
+    });
+}
+
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)object {
     RLMArrayValidateMatchingObjectType(self, object);
     changeArray(self, NSKeyValueChangeReplacement, index, ^{
@@ -471,10 +486,24 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     });
 }
 
-- (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes {
-    // FIXME: this is called by KVO when array changes are made. It's not clear
-    // why, and returning nil seems to work fine.
-    return nil;
+- (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
+    size_t c = self.count;
+    NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:indexes.count];
+    NSUInteger i = [indexes firstIndex];
+    RLMAccessorContext context(*_objectInfo);
+    while (i != NSNotFound) {
+        // Given KVO relies on `objectsAtIndexes` we need to make sure
+        // that no out of bounds exceptions are generated. This disallows us to mirror
+        // the exception logic in Foundation, but it is better than nothing.
+        if (i >= 0 && i < c) {
+            [result addObject:_backingList.get(context, i)];
+        } else {
+            // silently abort.
+            return nil;
+        }
+        i = [indexes indexGreaterThanIndex:i];
+    }
+    return result;
 }
 
 - (void)addObserver:(id)observer

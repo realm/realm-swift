@@ -155,6 +155,20 @@ extension AnyRealmValue: AddableType {}
     /// Returns the last object in the results, or `nil` if the results are empty.
     public var last: Element? { return rlmResults.lastObject().map(dynamicBridgeCast) }
 
+    /**
+     Returns an array containing the objects in the results at the indexes specified by a given index set.
+
+     - warning Throws if an index supplied in the IndexSet is out of bounds.
+
+     - parameter indexes: The indexes in the results to select objects from.
+     */
+    public func objects(at indexes: IndexSet) -> [Element] {
+        guard let r = rlmResults.objects(at: indexes) else {
+            throwRealmException("Indexes for Results are out of bounds")
+        }
+        return r.map(dynamicBridgeCast)
+    }
+
     // MARK: KVC
 
     /**
@@ -420,5 +434,19 @@ extension Results: Encodable where Element: Encodable {
         for value in self {
             try container.encode(value)
         }
+    }
+}
+
+// MARK: KeyPath Distinct
+
+extension Results where Element: ObjectBase {
+    /**
+     Returns a `Results` containing distinct objects based on the specified key paths
+
+     - parameter keyPaths: The key paths used produce distinct results
+     */
+    public func distinct<S: Sequence>(by keyPaths: S) -> Results<Element>
+        where S.Iterator.Element == PartialKeyPath<Element> {
+            return Results<Element>(rlmResults.distinctResults(usingKeyPaths: keyPaths.map(_name(for:))))
     }
 }

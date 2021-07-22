@@ -30,7 +30,7 @@ let schemaVersion = 2
 // add a list of `dogs` to the `Person` object
 
 class Dog: Object {
-    @objc dynamic var name = ""
+    @Persisted var name = ""
     convenience init(name: String) {
         self.init()
         self.name = name
@@ -38,9 +38,9 @@ class Dog: Object {
 }
 
 class Person: Object {
-    @objc dynamic var fullName = ""
-    @objc dynamic var age = 0
-    let dogs = List<Dog>()
+    @Persisted var fullName = ""
+    @Persisted var age = 0
+    @Persisted var dogs: List<Dog>
     convenience init(fullName: String, age: Int) {
         self.init()
         self.fullName = fullName

@@ -48,6 +48,9 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
 
     // MARK: Properties
 
+    /// Contains the last accessed property names when tracing the key path.
+    internal var lastAccessedNames: NSMutableArray?
+
     /// The Realm which manages the map, or `nil` if the map is unmanaged.
     public var realm: Realm? {
         return _rlmCollection.realm.map { Realm($0) }
@@ -87,8 +90,8 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     /**
      Updates the value stored in the map for the given key, or adds a new key-value pair if the key does not exist.
 
-     - Note:If the value being added to the map is an unmanaged object and the map is managed
-            then that unmanaged object will be added to the Realm.
+     - Note: If the value being added to the map is an unmanaged object and the
+             map is managed then that unmanaged object will be added to the Realm.
 
      - warning: This method may only be called during a write transaction.
 
@@ -97,6 +100,62 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      */
     public func updateValue(_ value: Value, forKey key: Key) {
         rlmDictionary[objcKey(from: key)] = dynamicBridgeCast(fromSwift: value) as AnyObject
+    }
+
+    /**
+     Merges the given dictionary into this map, using a combining closure to
+     determine the value for any duplicate keys.
+
+     If `dictionary` contains a key which is already present in this map,
+     `combine` will be called with the value currently in the map and the value
+     in the dictionary. The value returned by the closure will be stored in the
+     map for that key.
+
+     - Note: If a value being added to the map is an unmanaged object and the
+             map is managed then that unmanaged object will be added to the Realm.
+
+     - warning: This method may only be called on managed Maps during a write transaction.
+
+     - parameter dictionary: The dictionary to merge into this map.
+     - parameter combine: A closure that takes the current and new values for
+                 any duplicate keys. The closure returns the desired value for
+                 the final map.
+     */
+    public func merge<S>(_ sequence: S, uniquingKeysWith combine: (Value, Value) throws -> Value) rethrows
+            where S: Sequence, S.Element == (key: Key, value: Value) {
+        for (key, value) in sequence {
+            let key = objcKey(from: key)
+            var selectedValue: Value
+            if let existing = rlmDictionary[key] {
+                selectedValue = try combine(dynamicBridgeCast(fromObjectiveC: existing), value)
+            } else {
+                selectedValue = value
+            }
+            rlmDictionary[key] = dynamicBridgeCast(fromSwift: selectedValue) as AnyObject
+        }
+    }
+
+    /**
+     Merges the given map into this map, using a combining closure to determine
+     the value for any duplicate keys.
+
+     If `other` contains a key which is already present in this map, `combine`
+     will be called with the value currently in the map and the value in the
+     other map. The value returned by the closure will be stored in the map for
+     that key.
+
+     - Note: If a value being added to the map is an unmanaged object and the
+             map is managed then that unmanaged object will be added to the Realm.
+
+     - warning: This method may only be called on managed Maps during a write transaction.
+
+     - parameter other: The map to merge into this map.
+     - parameter combine: A closure that takes the current and new values for
+                 any duplicate keys. The closure returns the desired value for
+                 the final map.
+     */
+    public func merge(_ other: Map<Key, Value>, uniquingKeysWith combine: (Value, Value) throws -> Value) rethrows {
+        try merge(other.asKeyValueSequence(), uniquingKeysWith: combine)
     }
 
     /**
@@ -132,6 +191,9 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      */
     public subscript(key: Key) -> Value? {
         get {
+            if let lastAccessedNames = lastAccessedNames {
+                return Value._rlmKeyPathRecorder(with: lastAccessedNames)
+            }
             return rlmDictionary[objcKey(from: key)].map(dynamicBridgeCast)
         }
         set {
@@ -184,7 +246,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      - parameter value: The object value.
      - parameter key:   The name of the property whose value should be set on each object.
     */
-    public override func setValue(_ value: Any?, forKey key: String) {
+    public func setValue(_ value: Any?, forKey key: String) {
         rlmDictionary.setValue(value, forKey: key)
     }
 
@@ -224,7 +286,7 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      Returns a `Results` containing the objects in the map, but sorted.
 
      Objects are sorted based on their values. For example, to sort a map of `Date`s from
-     neweset to oldest based, you might call `dates.sorted(ascending: true)`.
+     newest to oldest based, you might call `dates.sorted(ascending: true)`.
 
      - parameter ascending: The direction to sort in.
      */
@@ -534,6 +596,25 @@ extension Map: Sequence {
     }
 }
 
+extension Map {
+    /// An adaptor for Map which makes it a sequence of `(key: Key, value: Value)` instead of a sequence of `SingleMapEntry`.
+    public struct KeyValueSequence<Key: _MapKey, Value: RealmCollectionValue>: Sequence {
+        private let map: Map<Key, Value>
+        fileprivate init(_ map: Map<Key, Value>) {
+            self.map = map
+        }
+
+        public func makeIterator() -> RLMKeyValueIterator<Key, Value> {
+            return RLMKeyValueIterator<Key, Value>(collection: map.rlmDictionary)
+        }
+    }
+
+    /// Returns this Map as a sequence of `(key: Key, value: Value)`
+    public func asKeyValueSequence() -> KeyValueSequence<Key, Value> {
+        return KeyValueSequence<Key, Value>(self)
+    }
+}
+
 // MARK: - Notifications
 
 /**
@@ -597,7 +678,7 @@ public struct MapIndex {
 
 // MARK: - SingleMapEntry
 
-/// Container for holding a single key-value entry in a Map. This is used where a tuple cannot be expressed as a generic arguement.
+/// Container for holding a single key-value entry in a Map. This is used where a tuple cannot be expressed as a generic argument.
 public struct SingleMapEntry<Key: _MapKey, Value: RealmCollectionValue>: _RealmMapValue, Hashable {
     /// :nodoc:
     public static func == (lhs: SingleMapEntry, rhs: SingleMapEntry) -> Bool {
@@ -619,5 +700,13 @@ private protocol OptionalObject {
 extension Optional: OptionalObject where Wrapped: ObjectBase {
     static func className() -> String {
         Wrapped.className()
+    }
+}
+
+// MARK: Key Path Strings
+
+extension Map: PropertyNameConvertible {
+    var propertyInformation: (key: String, isLegacy: Bool)? {
+        return (key: rlmDictionary.propertyKey, isLegacy: rlmDictionary.isLegacyProperty)
     }
 }

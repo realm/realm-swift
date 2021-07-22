@@ -293,26 +293,24 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     });
 }
 
+static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
+    RLMAccessorContext c(info);
+    NSMutableArray *array = [NSMutableArray arrayWithCapacity:r.size()];
+    for (size_t i = 0, size = r.size(); i < size; ++i) {
+        [array addObject:r.get(c, i)];
+    }
+    return array;
+}
+
 - (NSArray *)allKeys {
     return translateErrors([&] {
-        auto keyResult = _backingCollection.get_keys();
-        NSMutableArray<id> *keys = [NSMutableArray arrayWithCapacity:keyResult.size()];
-        for (size_t i=0; i<keyResult.size(); i++) {
-            [keys addObject:RLMStringDataToNSString(keyResult.get<realm::StringData>(i))];
-        }
-        return keys;
+        return resultsToArray(*_objectInfo, _backingCollection.get_keys());
     });
 }
 
 - (NSArray *)allValues {
     return translateErrors([&] {
-        NSMutableArray *values = [NSMutableArray array];
-        auto valueResult = _backingCollection.get_values();
-        RLMAccessorContext c(*_objectInfo);
-        for (size_t i=0; i<valueResult.size(); i++) {
-            [values addObject:valueResult.get(c, i)];
-        }
-        return values;
+        return resultsToArray(*_objectInfo, _backingCollection.get_values());
     });
 }
 
@@ -342,43 +340,21 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 #pragma mark - Object Retrieval
 
 - (nullable id)objectForKey:(id)key {
-    return translateErrors([&] {
+    return translateErrors([&]() -> id {
         [self.realm verifyThread];
         RLMAccessorContext context(*_objectInfo);
-        auto value = _backingCollection.try_get_any(context.unbox<realm::StringData>(key));
-        if (!value)
-            return (id)nil;
-
-        return context.box(*value);
+        if (auto value = _backingCollection.try_get_any(context.unbox<realm::StringData>(key))) {
+            return context.box(*value);
+        }
+        return nil;
     });
-}
-
-- (nullable id)objectForKeyedSubscript:(id)key {
-    return [self objectForKey:key];
 }
 
 - (void)setObject:(id)obj forKey:(id)key {
     changeDictionary(self, ^{
-        RLMDictionaryValidateMatchingObjectType(self, key, obj);
-        RLMAccessorContext context(*_objectInfo);
-        _backingCollection.insert(context,
-                                  context.unbox<realm::StringData>(key),
-                                  obj);
-    });
-}
-
-- (void)setObject:(id)obj forKeyedSubscript:(id)key {
-    // passing `nil` to the subscript should delete the object.
-    if (!obj) {
-        [self removeObjectForKey:key];
-        return;
-    }
-    changeDictionary(self, ^{
-        RLMDictionaryValidateMatchingObjectType(self, key, obj);
-        RLMAccessorContext context(*_objectInfo);
-        _backingCollection.insert(context,
-                                  context.unbox<realm::StringData>(key),
-                                  obj);
+        RLMAccessorContext c(*_objectInfo);
+        _backingCollection.insert(c, c.unbox<realm::StringData>(RLMDictionaryKey(self, key)),
+                                  RLMDictionaryValue(self, obj));
     });
 }
 
@@ -389,9 +365,17 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (void)removeObjectsForKeys:(NSArray *)keyArray {
-    for (id key in keyArray) {
-        [self removeObjectForKey:key];
-    }
+    RLMAccessorContext context(*_objectInfo);
+    changeDictionary(self, [&] {
+        for (id key in keyArray) {
+            try {
+                _backingCollection.erase(context.unbox<realm::StringData>(key));
+            }
+            catch (realm::KeyNotFound const&) {
+                continue;
+            }
+        }
+    });
 }
 
 - (void)removeObjectForKey:(id)key {
@@ -409,18 +393,47 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     }
 }
 
-- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id key,
-                                                    id obj, BOOL *stop))block {
-    auto keyResult = _backingCollection.get_keys();
+- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id key, id obj, BOOL *stop))block {
     RLMAccessorContext c(*_objectInfo);
-    for (size_t i = 0; i < keyResult.size(); i++) {
-        BOOL stop = false;
-        id aKey = keyResult.get(c, i);
-        block(aKey, self[aKey], &stop);
-        if (stop) {
-            break;
+    BOOL stop = false;
+    @autoreleasepool {
+        for (auto&& [key, value] : _backingCollection) {
+            block(c.box(key), c.box(value), &stop);
+            if (stop) {
+                break;
+            }
         }
     }
+}
+
+- (void)mergeDictionary:(id)dictionary clear:(bool)clear {
+    if (!clear && !dictionary) {
+        return;
+    }
+    if (dictionary && ![dictionary respondsToSelector:@selector(enumerateKeysAndObjectsUsingBlock:)]) {
+        @throw RLMException(@"Cannot %@ object of class '%@'",
+                            clear ? @"set dictionary to" : @"add entries from",
+                            [dictionary className]);
+    }
+
+    changeDictionary(self, ^{
+        RLMAccessorContext c(*_objectInfo);
+        if (clear) {
+            _backingCollection.remove_all();
+        }
+        [dictionary enumerateKeysAndObjectsUsingBlock:[&](id key, id value, BOOL *) {
+            _backingCollection.insert(c, c.unbox<realm::StringData>(RLMDictionaryKey(self, key)),
+                                      RLMDictionaryValue(self, value));
+        }];
+    });
+}
+
+- (void)setDictionary:(id)dictionary {
+    [self mergeDictionary:RLMCoerceToNil(dictionary) clear:true];
+}
+
+- (void)addEntriesFromDictionary:(id)otherDictionary {
+    [self mergeDictionary:otherDictionary clear:false];
 }
 
 #pragma mark - KVC
@@ -438,22 +451,14 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
 }
 
 - (id)valueForKey:(NSString *)key {
-    if ([key isEqualToString:[NSString stringWithFormat:@"@%@", RLMInvalidatedKey]]) {
+    if ([key isEqualToString:RLMInvalidatedKey]) {
         return @(!_backingCollection.is_valid());
     }
     return [self objectForKey:key];
 }
 
 - (void)setValue:(id)value forKey:(nonnull NSString *)key {
-    changeDictionary(self, ^{
-        RLMDictionaryValidateMatchingObjectType(self, key, value);
-        if (!value) {
-            [self removeObjectForKey:key];
-            return;
-        }
-        RLMAccessorContext context(*_objectInfo);
-        _backingCollection.insert(context, [key UTF8String], value);
-    });
+    [self setObject:value forKeyedSubscript:key];
 }
 
 - (id)minOfProperty:(NSString *)property {
@@ -494,7 +499,12 @@ static void changeDictionary(__unsafe_unretained RLMManagedDictionary *const dic
     }
     // delete all target rows from the realm
     RLMObservationTracker tracker(_realm, true);
-    translateErrors([&] { _backingCollection.remove_all(); });
+    translateErrors([&] {
+        for (auto&& [key, value] : _backingCollection) {
+            _realm.group.get_object(value.get_link()).remove();
+        }
+        _backingCollection.remove_all();
+    });
 }
 
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties {

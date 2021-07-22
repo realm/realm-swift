@@ -42,7 +42,7 @@ using namespace realm;
 static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         auto& info = realm->_info[objectSchema.className];
-        TableRef table = ObjectStore::table_for_object_type(realm.group, objectSchema.objectName.UTF8String);
+        TableRef table = ObjectStore::table_for_object_type(realm.group, objectSchema.objectStoreName);
         for (RLMProperty *property in objectSchema.properties) {
             auto column = info.tableColumn(property);
             XCTAssertEqual(column, table->get_column_key(RLMStringDataWithNSString(property.columnName)));

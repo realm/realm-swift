@@ -290,6 +290,13 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     });
 }
 
+- (void)replaceAllObjectsWithObjects:(NSArray *)objects {
+    changeSet(self, ^{
+        RLMAccessorContext context(*_objectInfo);
+        _backingSet.assign(context, objects);
+    });
+}
+
 - (RLMManagedSet *)managedObjectFrom:(RLMSet *)set {
     auto managedSet = RLMDynamicCast<RLMManagedSet>(set);
     if (!managedSet) {
