@@ -37,6 +37,7 @@ target:
  - cocoapods-ios-dynamic
  - cocoapods-watchos
  - swiftui-ios
+ - swiftui-server-osx
 configuration:
  - N/A
 
