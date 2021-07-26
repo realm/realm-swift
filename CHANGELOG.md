@@ -1,34 +1,69 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.11.0 Release notes (2021-07-22)
 =============================================================
+
 ### Enhancements
-* Add `List.objects(at indexes:)` in Swift and `[RLMCollection objectsAtIndexes:]` in Objective-C. 
-  This allows you to select elements in a collection with a given IndexSet (Cocoa [#7298](https://github.com/realm/realm-cocoa/issues/7298).
-* Add `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)` and `[App.emailPasswordAuth retryCustomConfirmation:completion:]`. 
+
+* Add type safe methods for:
+    - `RealmCollection.min(of:)`
+    - `RealmCollection.max(of:)`
+    - `RealmCollection.average(of:)`
+    - `RealmCollection.sum(of:)`
+    - `RealmCollection.sorted(by:ascending:)`
+    - `RealmKeyedCollection.min(of:)`
+    - `RealmKeyedCollection.max(of:)`
+    - `RealmKeyedCollection.average(of:)`
+    - `RealmKeyedCollection.sum(of:)`
+    - `RealmKeyedCollection.sorted(by:ascending:)`
+    - `Results.distinct(by:)`
+    - `SortDescriptor(keyPath:ascending:)
+
+  Calling these methods can now be done via Swift keyPaths, like so:
+  ```swift
+  class Person: Object {
+      @Persisted var name: String
+      @Persisted var age: Int
+  }
+
+  let persons = realm.objects(Person.self)
+  persons.min(of: \.age)
+  persons.max(of: \.age)
+  persons.average(of: \.age)
+  persons.sum(of: \.age)
+  persons.sorted(by: \.age)
+  persons.sorted(by: [SortDescriptor(keyPath: \Person.age)])
+  persons.distinct(by: [\Person.age])
+  ```
+* Add `List.objects(at indexes:)` in Swift and `[RLMCollection objectsAtIndexes:]` in Objective-C.
+  This allows you to select elements in a collection with a given IndexSet ([#7298](https://github.com/realm/realm-cocoa/issues/7298)).
+* Add `App.emailPasswordAuth.retryCustomConfirmation(email:completion:)` and `[App.emailPasswordAuth retryCustomConfirmation:completion:]`.
   These functions support retrying a [custom confirmation](https://docs.mongodb.com/realm/authentication/email-password/#run-a-confirmation-function) function.
-* Improve performance of creating collection notifiers for Realms with a complex schema. 
-  This means that the first run of a query or first call to observe() on a collection will 
-  do significantly less work.
-* Improve performance of calculating changesets for notifications, particularly 
-  for deeply nested object graphs and objects which have List or Set properties 
+* Improve performance of creating collection notifiers for Realms with a complex schema.
+  This means that the first run of a query or first call to observe() on a collection will
+  do significantly less work on the calling thread.
+* Improve performance of calculating changesets for notifications, particularly
+  for deeply nested object graphs and objects which have List or Set properties
   with small numbers of objects in the collection.
 
 ### Fixed
+
 * `RealmProperty<T?>` would crash when decoding a `null` json value.
   ([Cocoa #7323](https://github.com/realm/realm-cocoa/issues/7323), since v10.8.0)
 * `@Persisted<T?>` would crash when decoding a `null` value.
   ([#7332](https://github.com/realm/realm-cocoa/issues/7332), since v10.10.0).
 * Sync user profiles now correctly persist between runs.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.5.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.0 beta 2.
+* Xcode: 12.2-13.0 beta 3. Note that this release does not contain Xcode 13
+  beta binaries as beta 3 does not include a working version of
+  Combine.framework for iOS.
 
 ### Internal
+
 * Upgraded realm-core from 11.0.4 to 11.1.1
 
 10.10.0 Release notes (2021-07-07)
