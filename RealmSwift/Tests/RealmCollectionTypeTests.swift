@@ -691,6 +691,35 @@ class RealmCollectionTypeTests: TestCase {
         token.invalidate()
     }
 
+    func testObserveKeyPathWithLink3() {
+        var ex = expectation(description: "initial notification")
+        let token = collection.observe(keyPaths: ["linkCol"]) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update:
+                XCTFail("update not expected")
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+
+        // Expect no notification for `linkCol` key path because only `linkCol.id` will be modified.
+        ex = self.expectation(description: "NO change notification")
+        ex.isInverted = true // Inverted expectation causes failure if fulfilled.
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.linkCol!.id = 2
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+        token.invalidate()
+    }
+
     func observeOnQueue<Collection: RealmCollection>(_ collection: Collection) where Collection.Element: Object {
         let sema = DispatchSemaphore(value: 0)
         let token = collection.observe(keyPaths: nil, on: queue) { (changes: RealmCollectionChange) in
@@ -1431,6 +1460,10 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         assertThrows(collection.observe { _ in })
     }
 
+    override func testObserveKeyPathWithLink3() {
+        assertThrows(collection.observe { _ in })
+    }
+
     override func testObserveOnQueue() {
         assertThrows(collection.observe(on: DispatchQueue(label: "bg")) { _ in })
     }
@@ -1766,6 +1799,10 @@ class MutableSetUnmanagedRealmCollectionTypeTests: MutableSetRealmCollectionType
     }
 
     override func testObserveKeyPathWithLink2() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObserveKeyPathWithLink3() {
         assertThrows(collection.observe { _ in })
     }
 

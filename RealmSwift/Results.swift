@@ -376,42 +376,46 @@ extension AnyRealmValue: AddableType {}
             // - after the token is intialized
             // - when an element of the collections' name
             // property is modified
-            // - when an element is inserted or deleted.
+            // - when an element is inserted or removed
+            //   from the collection.
             // This block is not triggered:
-            // - when any of the elements "age" values is modified
+            // - when a value other than name is modified on
+            //   on of the elements.
          case .error:
              // ...
          }
      }
+     // end of run loop execution context
      ```
+     - - If the observed key path were `["toys.brand"]`, then any insertion or
+     deletion to the `toys` list on any of the collection's elements would trigger the block.
+     Changes to the `brand` value on any `Toy` that is linked to a `Dog` in this
+     collection will trigger the block. Changes to a value other than `brand` on any `Toy` that
+     is linked to a `Dog` in this collection would not trigger the block.
+     Any insertion or removal to the `Dog` type collection being observed
+     would also trigger a notification.
      - If the above example observed the `["toys"]` key path, then any insertion,
-     deletion, or modification to the `toys` list for any element in the collection would trigger the block.
-     Any insertion or deletion to the `Dog` type collection being observed
-     would also trigger a notification.
-     - If the observed key path were `["toys.brand"]`, then any insertion or
-     deletion to the `toys` list of any collection element would trigger the block. Changes to the `brand` value
-     on any `Toy` that is linked to a `Dog` in this collection will trigger the block. Changes to any other value
-     on any `Toy` that is linked to a `Dog` in this collection would not trigger the block.
-     Any insertion or deletion to the `Dog` type collection being observed
-     would also trigger a notification.
+     deletion, or modification to the `toys` list for any element in the collection
+     would trigger the block.
+     Changes to any value on any `Toy` that is linked to a `Dog` in this collection
+     would *not* trigger the block.
+     Any insertion or removal to the `Dog` type collection being observed
+     would still trigger a notification.
 
      - note: Multiple notification tokens on the same object which filter for
      separate key paths *do not* filter exclusively. If one key path
      change is satisified for one notification token, then all notification
      token blocks for that object will execute.
 
-     If no queue is given, notifications are delivered via the standard run
-     loop, and so can't be delivered while the run loop is blocked by other
-     activity. If a queue is given, notifications are delivered to that queue
-     instead. When notifications can't be delivered instantly, multiple
-     notifications may be coalesced into a single notification.
-
      You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
      updates, call `invalidate()` on the token.
      - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
-     - parameter keyPaths: The element type properties which trigger the block to
-                           be called when they are modified. If `nil`, notifications will be delivered for
-                           any property change on the collection elements. See comments above for more detail on linked properties.
+     - parameter keyPaths: Only properties contained in the key paths array will trigger
+                           the block when they are modified. If `nil`, notifications
+                           will be delivered for any property change on the object.
+                           String key paths which do not correspond to a valid a property
+                           will cause an exception.
+                           See description above for more detail on linked properties.
      - parameter queue: The serial dispatch queue to receive notification on. If
                         `nil`, notifications are delivered to the current thread.
      - parameter block: The block to be called whenever a change occurs.

@@ -553,7 +553,63 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
     }
 }
 
-KeyPath KeyPathFromString(RLMRealm *realm,
+//static KeyPath KeyPathFromString(RLMRealm *realm,
+//                          RLMSchema *schema,
+//                          RLMClassInfo *info,
+//                          RLMObjectSchema *rlmObjectSchema,
+//                          NSString *keyPath) {
+//    RLMProperty *property;
+//    KeyPath keyPairs;
+//
+//    NSUInteger start = 0, length = keyPath.length, end = NSNotFound;
+//    do {
+//        end = [keyPath rangeOfString:@"." options:0 range:{start, length - start}].location;
+//        NSString *propertyName = [keyPath substringWithRange:{start, end == NSNotFound ? length - start : end - start}];
+//        property = rlmObjectSchema[propertyName];
+//        RLMPrecondition(property, @"Invalid property name",
+//                        @"Property '%@' not found in object of type '%@'",
+//                        propertyName, rlmObjectSchema.className);
+//
+//        if (end != NSNotFound) {
+//            RLMPrecondition(property.type == RLMPropertyTypeObject || property.type == RLMPropertyTypeLinkingObjects,
+//                            @"Invalid value", @"Property '%@' is not a link in object of type '%@'",
+//                            propertyName, rlmObjectSchema.className);
+//            REALM_ASSERT(property.objectClassName);
+//
+//            TableKey tk = info->objectSchema->table_key;
+//            ColKey ck;
+//            if (property.type == RLMPropertyTypeObject) {
+//                ck = info->tableColumn(property.columnName);
+//                info = &realm->_info[property.objectClassName];
+//            } else if (property.type == RLMPropertyTypeLinkingObjects) {
+//                ck = info->computedTableColumn(property);
+//                info = &realm->_info[property.objectClassName];
+//            } else {
+//                // This branch should never be reached. This case should be
+//                // caught by the precondition above.
+//                RLMException(@"Property '%@' is not a link in object of type '%@'",
+//                             propertyName, rlmObjectSchema.className);
+//            }
+//
+//            keyPairs.push_back(std::make_pair(tk, ck));
+//            rlmObjectSchema = schema[property.objectClassName];
+//        }
+//
+//        start = end + 1;
+//    } while (end != NSNotFound);
+//
+//    TableKey tk = info->objectSchema->table_key;
+//    ColKey ck;
+//    if (property.type == RLMPropertyTypeLinkingObjects) {
+//        ck = info->computedTableColumn(property);
+//    } else {
+//        ck = info->tableColumn(property.columnName);
+//    }
+//    keyPairs.push_back(std::make_pair(tk, ck));
+//    return keyPairs;
+//}
+
+static KeyPath KeyPathFromString(RLMRealm *realm,
                           RLMSchema *schema,
                           RLMClassInfo *info,
                           RLMObjectSchema *rlmObjectSchema,
@@ -561,51 +617,29 @@ KeyPath KeyPathFromString(RLMRealm *realm,
     RLMProperty *property;
     KeyPath keyPairs;
 
-    NSUInteger start = 0, length = keyPath.length, end = NSNotFound;
-    do {
-        end = [keyPath rangeOfString:@"." options:0 range:{start, length - start}].location;
-        NSString *propertyName = [keyPath substringWithRange:{start, end == NSNotFound ? length - start : end - start}];
-        property = rlmObjectSchema[propertyName];
+    NSArray<NSString *> *keyPathComponents = [keyPath componentsSeparatedByString:@"."];
+    for (NSString *component in keyPathComponents) {
+        property = rlmObjectSchema[component];
         RLMPrecondition(property, @"Invalid property name",
                         @"Property '%@' not found in object of type '%@'",
-                        propertyName, rlmObjectSchema.className);
+                        component, rlmObjectSchema.className);
 
-        if (end != NSNotFound) {
-            RLMPrecondition(property.type == RLMPropertyTypeObject || property.type == RLMPropertyTypeLinkingObjects,
-                            @"Invalid value", @"Property '%@' is not a link in object of type '%@'",
-                            propertyName, rlmObjectSchema.className);
-            REALM_ASSERT(property.objectClassName);
-
-            TableKey tk = info->objectSchema->table_key;
-            ColKey ck;
-            if (property.type == RLMPropertyTypeObject) {
-                ck = info->tableColumn(property.columnName);
-                info = &realm->_info[property.objectClassName];
-            } else if (property.type == RLMPropertyTypeLinkingObjects) {
-                ck = info->computedTableColumn(property);
-                info = &realm->_info[property.objectClassName];
-            } else {
-                // This branch should never be reached. This case should be
-                // caught by the precondition above.
-                RLMException(@"Property '%@' is not a link in object of type '%@'",
-                             propertyName, rlmObjectSchema.className);
-            }
-
-            keyPairs.push_back(std::make_pair(tk, ck));
+        TableKey tk = info->objectSchema->table_key;
+        ColKey ck;
+        if (property.type == RLMPropertyTypeObject) {
+            ck = info->tableColumn(property.columnName);
+            info = &realm->_info[property.objectClassName];
             rlmObjectSchema = schema[property.objectClassName];
+        } else if (property.type == RLMPropertyTypeLinkingObjects) {
+            ck = info->computedTableColumn(property);
+            info = &realm->_info[property.objectClassName];
+            rlmObjectSchema = schema[property.objectClassName];
+        } else {
+            ck = info->tableColumn(property.columnName);
         }
 
-        start = end + 1;
-    } while (end != NSNotFound);
-
-    TableKey tk = info->objectSchema->table_key;
-    ColKey ck;
-    if (property.type == RLMPropertyTypeLinkingObjects) {
-        ck = info->computedTableColumn(property);
-    } else {
-        ck = info->tableColumn(property.columnName);
+        keyPairs.push_back(std::make_pair(tk, ck));
     }
-    keyPairs.push_back(std::make_pair(tk, ck));
     return keyPairs;
 }
 
