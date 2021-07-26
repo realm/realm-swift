@@ -255,8 +255,8 @@ struct AsyncOpenPartitionView: View {
 
 struct AutoOpenPartitionView: View {
     @AutoOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
-               partitionValue: "wrong_partition_value",
-               timeout: 2000) var autoOpen
+              partitionValue: "wrong_partition_value",
+              timeout: 2000) var autoOpen
 
     var body: some View {
         VStack {
