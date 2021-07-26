@@ -822,18 +822,18 @@ class ObjectTests: TestCase {
 
         let exp0 = expectation(description: "Delete observed object")
         let token0 = object0.observe { change in
-            if case .deleted = change {
-            } else {
+            guard case .deleted = change else {
                 XCTFail("expected .deleted, got \(change)")
+                return
             }
             exp0.fulfill()
         }
 
         let exp1 = expectation(description: "Delete observed object")
         let token1 = object1.observe(keyPaths: ["intCol"]) { change in
-            if case .deleted = change {
-            } else {
+            guard case .deleted = change else {
                 XCTFail("expected .deleted, got \(change)")
+                return
             }
             exp1.fulfill()
         }
@@ -855,7 +855,6 @@ class ObjectTests: TestCase {
         try! realm.commitWrite()
         assertThrows(object.observe(keyPaths: ["notAProperty"], { _ in }), reason: "Property 'notAProperty' not found in object of type 'SwiftObject'")
         assertThrows(object.observe(keyPaths: ["arrayCol.alsoNotAProperty"], { _ in }), reason: "Property 'alsoNotAProperty' not found in object of type 'SwiftBoolObject'")
-
     }
 
     func checkChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ change: ObjectChange<ObjectBase>) {
@@ -993,8 +992,6 @@ class ObjectTests: TestCase {
         realm.refresh()
         waitForExpectations(timeout: 0.1)
         token.invalidate()
-
-
     }
 
     func testModifyUnobservedKeyPathRemotely() {
@@ -1058,18 +1055,18 @@ class ObjectTests: TestCase {
         var token = company.observe(keyPaths: ["employees"], { _ in
             ex.fulfill()
         })
-        try! realm.write({
+        try! realm.write {
             employee.hired = true
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 
         // Expect a notification for "employees.hired" when "employee.hired" is changed
         token = company.observe(keyPaths: ["employees.hired"], expectChange("employees", Int?.none, Int?.none))
-        try! realm.write({
+        try! realm.write {
             XCTAssertTrue(employee.hired)
             employee.hired = false
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 
@@ -1079,53 +1076,53 @@ class ObjectTests: TestCase {
         token = company.observe(keyPaths: ["employees.hired"], { _ in
             ex.fulfill()
         })
-        try! realm.write({
+        try! realm.write {
             employee.age = 35
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 
         // Expect notification for "employees.hired" when an employee is deleted.
         token = company.observe(keyPaths: ["employees.hired"], expectChange("employees", Int?.none, Int?.none))
-        try! realm.write({
+        try! realm.write {
             realm.delete(employee)
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 
         // Expect notification for "employees.hired" when an employee is added.
         token = company.observe(keyPaths: ["employees.hired"], expectChange("employees", Int?.none, Int?.none))
-        try! realm.write({
+        try! realm.write {
             let employee2 = realm.create(SwiftEmployeeObject.self)
             company.employees.append(employee2)
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 
         // Expect notification for "employees.hired" when an employee is reassigned.
         token = company.observe(keyPaths: ["employees.hired"], expectChange("employees", Int?.none, Int?.none))
-        try! realm.write({
+        try! realm.write {
             let employee3 = realm.create(SwiftEmployeeObject.self)
             company.employees[0] = employee3
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 
         // Expect notification for "employees" when an employee is added.
         token = company.observe(keyPaths: ["employees"], expectChange("employees", Int?.none, Int?.none))
-        try! realm.write({
+        try! realm.write {
             let employee4 = realm.create(SwiftEmployeeObject.self)
             company.employees.append(employee4)
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 
         // Expect notification for "employees" when an employee is reassigned.
         token = company.observe(keyPaths: ["employees"], expectChange("employees", Int?.none, Int?.none))
-        try! realm.write({
+        try! realm.write {
             let employee5 = realm.create(SwiftEmployeeObject.self)
             company.employees[0] = employee5
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 
@@ -1135,9 +1132,9 @@ class ObjectTests: TestCase {
         token = company.observe(keyPaths: ["employees"], { _ in
             ex.fulfill()
         })
-        try! realm.write({
+        try! realm.write {
             company.name = "changed"
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
@@ -1152,9 +1149,9 @@ class ObjectTests: TestCase {
 
         // Expect notification for "dog.dogName" when "dog.dogName" is changed
         let token = person.observe(keyPaths: ["dog.dogName"], expectChange("dog", Int?.none, Int?.none))
-        try! realm.write({
+        try! realm.write {
             dog.dogName = "rex"
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
@@ -1169,10 +1166,10 @@ class ObjectTests: TestCase {
 
         // Expect notification for "dog.dogName" when "dog" is reassigned.
         let token = person.observe(keyPaths: ["dog.dogName"], expectChange("dog", Int?.none, Int?.none))
-        try! realm.write({
+        try! realm.write {
             let newDog = SwiftDogObject()
             person.dog = newDog
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
@@ -1191,9 +1188,9 @@ class ObjectTests: TestCase {
         let token = person.observe(keyPaths: ["dog"], { _ in
             ex.fulfill()
         })
-        try! realm.write({
+        try! realm.write {
             person.name = "Teddy"
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
@@ -1212,9 +1209,9 @@ class ObjectTests: TestCase {
         let token = person.observe(keyPaths: ["dog"], {_ in
             ex.fulfill()
         })
-        try! realm.write({
+        try! realm.write {
             dog.dogName = "fido"
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
@@ -1233,9 +1230,9 @@ class ObjectTests: TestCase {
         let token = dog.observe(keyPaths: ["owners"], { _ in
             ex.fulfill()
         })
-        try! realm.write({
+        try! realm.write {
             dog.dogName = "fido"
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
@@ -1254,10 +1251,10 @@ class ObjectTests: TestCase {
         let token = dog.observe(keyPaths: ["owners"], { _ in
             ex.fulfill()
         })
-        try! realm.write({
+        try! realm.write {
             let owner = dog.owners.first!
             owner.name = "Tom"
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
@@ -1272,10 +1269,10 @@ class ObjectTests: TestCase {
 
         // Expect notification for "owners.name" when "owner.name" is changed
         let token = dog.observe(keyPaths: ["owners.name"], expectChange("owners", String?.none, String?.none))
-        try! realm.write({
+        try! realm.write {
             let owner = dog.owners.first!
             owner.name = "Abe"
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
@@ -1290,11 +1287,11 @@ class ObjectTests: TestCase {
 
         // Expect notification for "owners" when a new owner is added.
         let token = dog.observe(keyPaths: ["owners"], expectChange("owners", Int?.none, Int?.none))
-        try! realm.write({
+        try! realm.write {
             let newPerson = SwiftOwnerObject()
             realm.add(newPerson)
             newPerson.dog = dog
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
@@ -1309,11 +1306,11 @@ class ObjectTests: TestCase {
 
         // Expect notification for "owners.name" when a new owner is added.
         let token = dog.observe(keyPaths: ["owners.name"], expectChange("owners", Int?.none, Int?.none))
-        try! realm.write({
+        try! realm.write {
             let newPerson = SwiftOwnerObject()
             realm.add(newPerson)
             newPerson.dog = dog
-        })
+        }
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
 }
@@ -1381,17 +1378,17 @@ class ObjectTests: TestCase {
     func testOptionalPropertyKeyPathNotifications() {
         let realm = try! Realm()
         let object = SwiftOptionalDefaultValuesObject()
-        try! realm.write({
+        try! realm.write {
             realm.add(object)
-        })
+        }
 
         // Expect notification for change on observed path
         var token = object.observe(keyPaths: ["optIntCol"], expectChange("optIntCol", 1, 2))
         dispatchSyncNewThread {
             let realm = try! Realm()
-            try! realm.write({
+            try! realm.write {
                 realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = 2
-            })
+            }
         }
         realm.refresh()
         waitForExpectations(timeout: 0)
@@ -1401,9 +1398,9 @@ class ObjectTests: TestCase {
         token = object.observe(keyPaths: ["optStringCol"], expectChange("optIntCol", 2, 3, true)) // Passing true inverts expectation
         dispatchSyncNewThread {
             let realm = try! Realm()
-            try! realm.write({
+            try! realm.write {
                 realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = 3
-            })
+            }
         }
         realm.refresh()
         waitForExpectations(timeout: 0)
@@ -1413,9 +1410,9 @@ class ObjectTests: TestCase {
         token = object.observe(keyPaths: ["optIntCol"], expectChange("optIntCol", 3, Int?.none))
         dispatchSyncNewThread {
             let realm = try! Realm()
-            try! realm.write({
+            try! realm.write {
                 realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = nil
-            })
+            }
         }
         realm.refresh()
         waitForExpectations(timeout: 0)
@@ -1425,9 +1422,9 @@ class ObjectTests: TestCase {
         token = object.observe(keyPaths: ["optIntCol"], expectChange("optIntCol", Int?.none, 2))
         dispatchSyncNewThread {
             let realm = try! Realm()
-            try! realm.write({
+            try! realm.write {
                 realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = 2
-            })
+            }
         }
         realm.refresh()
         waitForExpectations(timeout: 0)

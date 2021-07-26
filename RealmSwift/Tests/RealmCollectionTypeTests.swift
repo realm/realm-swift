@@ -810,7 +810,7 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(collection.count, frozen.count)
 
         let realm = collection.realm!
-        try! realm.write({ realm.delete(collection) })
+        try! realm.write { realm.delete(collection) }
         XCTAssertNotEqual(frozen.count, collection.count, "Frozen collections should not change")
 
         let live = frozen.thaw()
@@ -830,8 +830,8 @@ class RealmCollectionTypeTests: TestCase {
         dispatchSyncNewThread {
             let realm = try! Realm(configuration: self.collection.realm!.configuration)
             let collection = realm.resolve(tsr)!
-            try! realm.write({ collection.first!.stringCol = "3" })
-            try! realm.write({ realm.delete(collection.last!) })
+            try! realm.write { collection.first!.stringCol = "3" }
+            try! realm.write { realm.delete(collection.last!) }
 
             let query = collection.filter("stringCol == %@", "1")
             frozen = collection.freeze() // Results::Mode::TableView
@@ -897,7 +897,7 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertTrue(frozenElement.isFrozen)
 
         let realm = collection.realm!
-        try! realm.write({ realm.delete(collection) })
+        try! realm.write { realm.delete(collection) }
         XCTAssertNil(collection.first)
         XCTAssertNotNil(frozenElement)
 
