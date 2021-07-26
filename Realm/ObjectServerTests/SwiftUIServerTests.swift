@@ -186,7 +186,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     func testAsyncOpenThrowExceptionWithoutCachedApp() throws {
         resetAppCache()
         assertThrows(AsyncOpen(partitionValue: #function),
-                     reason: "There is no appId, either provided by the user on the property wrapper or 'any/more than 1' cached RLMApp")
+                     reason: "There is no appId, either provided by the user on the property wrapper or any cached RLMApp")
     }
 
     func testAsyncOpenThrowExceptionWithoutMoreThanOneCachedApp() throws {
@@ -195,7 +195,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         _ = App(id: appId1)
         _ = App(id: appId2)
         assertThrows(AsyncOpen(partitionValue: #function),
-                     reason: "There is no appId, either provided by the user on the property wrapper or 'any/more than 1' cached RLMApp")
+                     reason: "There is no appId, either provided by the user on the property wrapper or more than 1 cached RLMApp")
     }
 
     // MARK: - AutoOpen
@@ -344,7 +344,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     func testAutoOpenThrowExceptionWithoutCachedApp() throws {
         resetAppCache()
         assertThrows(AutoOpen(partitionValue: #function),
-                     reason: "There is no appId, either provided by the user on the property wrapper or 'any/more than 1' cached RLMApp")
+                     reason: "There is no appId, either provided by the user on the property wrapper or any cached RLMApp")
     }
 
     func testAutoOpenThrowExceptionWithoutMoreThanOneCachedApp() throws {
@@ -353,6 +353,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         _ = App(id: appId1)
         _ = App(id: appId2)
         assertThrows(AutoOpen(partitionValue: #function),
-                     reason: "There is no appId, either provided by the user on the property wrapper or 'any/more than 1' cached RLMApp")
+                     reason: "There is no appId, either provided by the user on the property wrapper or more than 1 cached RLMApp")
     }
 }

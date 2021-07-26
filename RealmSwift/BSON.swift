@@ -71,14 +71,6 @@ extension Array: BSON, PartitionValue where Element == AnyBSON? {
 extension NSRegularExpression: BSON {
 }
 
-/// Implementation for `PartitionValue` conformance.
-extension BSON {
-    /// Returns a `AnyBSON` for any `BSON` value.
-    public var anyBSON: AnyBSON {
-        return AnyBSON(self)
-    }
-}
-
 /// MaxKey will always be the greatest value when comparing to other BSON types
 public typealias MaxKey = RLMMaxKey
 

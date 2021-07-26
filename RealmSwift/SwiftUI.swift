@@ -621,8 +621,6 @@ extension ThreadConfined where Self: ObjectBase {
 
 /// Protocol representing a PartitionValue..
 public protocol PartitionValue {
-    /// Returns a `AnyBSON` for any type conforming to it.
-    var anyBSON: AnyBSON { get }
 }
 
 private struct RealmEnvironmentKey: EnvironmentKey {
@@ -664,11 +662,11 @@ extension EnvironmentValues {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
 private class ObservableAsyncOpenStorage: ObservableObject {
-    var app: App?
-    var configuration: Realm.Configuration?
-    var partitionValue: AnyBSON?
+    var app: App
+    var configuration: Realm.Configuration
+    var partitionValue: AnyBSON
 
     var cancellables = [AnyCancellable]()
 
@@ -678,7 +676,21 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         }
     }
 
-    func asyncOpenForUser(_ user: User, partitionValue: AnyBSON, configuration: Realm.Configuration) -> RealmPublishers.AsyncOpenPublisher {
+    func asyncOpenForApp() -> AnyPublisher<RealmPublishers.AsyncOpenPublisher.Output, RealmPublishers.AsyncOpenPublisher.Failure> {
+        if let currentUser = app.currentUser,
+           currentUser.isLoggedIn {
+            return asyncOpenForUser(app.currentUser!, partitionValue: partitionValue, configuration: configuration)
+        } else {
+            asyncOpenState = .waitingForUser
+            return app.objectWillChange
+                .eraseToAnyPublisher()
+                .filter { $0.currentUser != nil }
+                .flatMap { self.asyncOpenForUser($0.currentUser!, partitionValue: self.partitionValue, configuration: self.configuration) }
+                .eraseToAnyPublisher()
+        }
+    }
+
+    private func asyncOpenForUser(_ user: User, partitionValue: AnyBSON, configuration: Realm.Configuration) -> AnyPublisher<RealmPublishers.AsyncOpenPublisher.Output, RealmPublishers.AsyncOpenPublisher.Failure> {
         let userConfig = user.configuration(partitionValue: partitionValue, cancelAsyncOpenOnNonFatalErrors: true)
         let userSyncConfig = userConfig.syncConfiguration
         var configuration = configuration
@@ -689,6 +701,13 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                 progress.completedUnitCount = Int64(asyncProgress.transferredBytes)
                 self.asyncOpenState = .progress(progress)
             }
+            .eraseToAnyPublisher()
+    }
+
+    init(app: App, configuration: Realm.Configuration, partitionValue: AnyBSON) {
+        self.app = app
+        self.configuration = configuration
+        self.partitionValue = partitionValue
     }
 }
 
@@ -749,27 +768,13 @@ public enum AsyncOpenState {
 ///        .environment(\.realm, realm)
 ///
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
-@propertyWrapper public struct AsyncOpen: DynamicProperty {
+@propertyWrapper public struct AsyncOpen<Partition>: DynamicProperty where Partition: BSON {
     @Environment(\.realmConfiguration) var configuration
     @Environment(\.partitionValue) var partitionValue
-    @ObservedObject private var storage = ObservableAsyncOpenStorage()
+    @ObservedObject private var storage: ObservableAsyncOpenStorage
 
-    private func asyncOpenForApp(_ app: App, partitionValue: AnyBSON, configuration: Realm.Configuration) {
-        if let currentUser = app.currentUser,
-           currentUser.isLoggedIn {
-            asyncOpenForUser(currentUser, partitionValue: partitionValue, configuration: configuration)
-        } else {
-            storage.asyncOpenState = .waitingForUser
-            app.objectWillChange.sink { [self] app in
-                if let currentUser = app.currentUser {
-                    asyncOpenForUser(currentUser, partitionValue: partitionValue, configuration: configuration)
-                }
-            }.store(in: &storage.cancellables)
-        }
-    }
-
-    private func asyncOpenForUser(_ user: User, partitionValue: AnyBSON, configuration: Realm.Configuration) {
-        storage.asyncOpenForUser(user, partitionValue: partitionValue, configuration: configuration)
+    private func asyncOpenForApp() {
+        storage.asyncOpenForApp()
             .sink { completion in
                 if case .failure(let error) = completion {
                     self.storage.asyncOpenState = .error(error)
@@ -810,15 +815,20 @@ public enum AsyncOpenState {
      - parameter timeout: The maximum number of milliseconds to allow for a connection to
                  become fully established., if empty or `nil` no connection timeout is set.
      */
-    public init<T: BSON>(appId: String? = nil, partitionValue: T, configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration, timeout: UInt? = nil) {
+    public init(appId: String? = nil,
+                partitionValue: Partition,
+                configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration,
+                timeout: UInt? = nil) {
         var app: App
         if let appId = appId {
             app = App(id: appId)
         } else if RLMApp.apps().allKeys.count == 1, // Check if there is a singular cached app
             let cachedAppId = RLMApp.apps().allKeys.first as? String {
             app = App(id: cachedAppId)
+        } else if RLMApp.apps().allKeys.count > 1 {
+            throwRealmException("There is no appId, either provided by the user on the property wrapper or more than 1 cached RLMApp")
         } else {
-            throwRealmException("There is no appId, either provided by the user on the property wrapper or 'any/more than 1' cached RLMApp")
+            throwRealmException("There is no appId, either provided by the user on the property wrapper or any cached RLMApp")
         }
 
         // Setup timeout if needed
@@ -830,38 +840,29 @@ public enum AsyncOpenState {
 
         let bsonValue = AnyBSON(partitionValue)
         // Store property wrapper values on the storage
-        storage.app = app
-        storage.configuration = configuration
-        storage.partitionValue = bsonValue
-
-        asyncOpenForApp(app, partitionValue: bsonValue, configuration: configuration)
+        storage = ObservableAsyncOpenStorage(app: app, configuration: configuration, partitionValue: bsonValue)
+        asyncOpenForApp()
     }
 
     public mutating func update() {
-        if let bsonPartitionValue = partitionValue?.anyBSON,
-            storage.partitionValue == nil || storage.partitionValue != bsonPartitionValue {
-            storage.partitionValue = bsonPartitionValue
+        if let partitionValue = partitionValue as? Partition {
+            let bsonValue = AnyBSON(partitionValue)
+            if storage.partitionValue != bsonValue {
+                storage.partitionValue = bsonValue
 
-            if let app = storage.app,
-               let partitionValue = storage.partitionValue,
-               let configuration = storage.configuration {
                 cancel()
-                asyncOpenForApp(app, partitionValue: partitionValue, configuration: configuration)
+                asyncOpenForApp()
             }
         }
 
-        if storage.configuration == nil || storage.configuration != configuration {
+        if storage.configuration != configuration {
             storage.configuration = configuration
             if let partitionValue = configuration.syncConfiguration?.partitionValue {
                 storage.partitionValue = partitionValue
             }
 
-            if let app = storage.app,
-               let partitionValue = storage.partitionValue,
-               let configuration = storage.configuration {
-                cancel()
-                asyncOpenForApp(app, partitionValue: partitionValue, configuration: configuration)
-            }
+            cancel()
+            asyncOpenForApp()
         }
     }
 }
@@ -910,27 +911,13 @@ public enum AsyncOpenState {
 /// but with the difference of a offline-first approach.
 ///
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
-@propertyWrapper public struct AutoOpen: DynamicProperty {
+@propertyWrapper public struct AutoOpen<Partition>: DynamicProperty where Partition: BSON {
     @Environment(\.realmConfiguration) var configuration
     @Environment(\.partitionValue) var partitionValue
-    @ObservedObject private var storage = ObservableAsyncOpenStorage()
+    @ObservedObject private var storage: ObservableAsyncOpenStorage
 
-    private func asyncOpenForApp(_ app: App, partitionValue: AnyBSON, configuration: Realm.Configuration) {
-        if let currentUser = app.currentUser,
-           currentUser.isLoggedIn {
-            asyncOpenForUser(currentUser, partitionValue: partitionValue, configuration: configuration)
-        } else {
-            storage.asyncOpenState = .waitingForUser
-            app.objectWillChange.sink { [self] app in
-                if let currentUser = app.currentUser {
-                    asyncOpenForUser(currentUser, partitionValue: partitionValue, configuration: configuration)
-                }
-            }.store(in: &storage.cancellables)
-        }
-    }
-
-    private func asyncOpenForUser(_ user: User, partitionValue: AnyBSON, configuration: Realm.Configuration) {
-        storage.asyncOpenForUser(user, partitionValue: partitionValue, configuration: configuration)
+    private func asyncOpenForApp() {
+        storage.asyncOpenForApp()
             .sink { completion in
                 if case .failure(let error) = completion {
                     if let error = error as NSError?,
@@ -977,15 +964,20 @@ public enum AsyncOpenState {
      - parameter timeout: The maximum number of milliseconds to allow for a connection to
                  become fully established, if empty or `nil` no connection timeout is set.
      */
-    public init<T: BSON>(appId: String? = nil, partitionValue: T, configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration, timeout: UInt? = nil) {
+    public init(appId: String? = nil,
+                partitionValue: Partition,
+                configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration,
+                timeout: UInt? = nil) {
         var app: App
         if let appId = appId {
             app = App(id: appId)
         } else if RLMApp.apps().allKeys.count == 1, // Check if there is a singular cached app
             let cachedAppId = RLMApp.apps().allKeys.first as? String {
             app = App(id: cachedAppId)
+        } else if RLMApp.apps().allKeys.count > 1 {
+            throwRealmException("There is no appId, either provided by the user on the property wrapper or more than 1 cached RLMApp")
         } else {
-            throwRealmException("There is no appId, either provided by the user on the property wrapper or 'any/more than 1' cached RLMApp")
+            throwRealmException("There is no appId, either provided by the user on the property wrapper or any cached RLMApp")
         }
 
         // Setup timeout if needed
@@ -997,44 +989,29 @@ public enum AsyncOpenState {
 
         let bsonValue = AnyBSON(partitionValue)
         // Store property wrapper values on the storage
-        storage.app = app
-        storage.configuration = configuration
-        storage.partitionValue = bsonValue
-
-        asyncOpenForApp(app, partitionValue: bsonValue, configuration: configuration)
+        storage = ObservableAsyncOpenStorage(app: app, configuration: configuration, partitionValue: bsonValue)
+        asyncOpenForApp()
     }
 
     public mutating func update() {
-        if let bsonPartitionValue = partitionValue?.anyBSON,
-            storage.partitionValue == nil || storage.partitionValue != bsonPartitionValue {
-            storage.partitionValue = bsonPartitionValue
+        if let partitionValue = partitionValue as? Partition {
+            let bsonValue = AnyBSON(partitionValue)
+            if storage.partitionValue != bsonValue {
+                storage.partitionValue = bsonValue
 
-            assert(storage.app != nil, "App should have been already stored at initialization")
-            assert(storage.configuration != nil, "Configuration should have been already stored at initialization")
-
-            if let app = storage.app,
-               let partitionValue = storage.partitionValue,
-               let configuration = storage.configuration {
                 cancel()
-                asyncOpenForApp(app, partitionValue: partitionValue, configuration: configuration)
+                asyncOpenForApp()
             }
         }
 
-        if storage.configuration == nil || storage.configuration != configuration {
+        if storage.configuration != configuration {
             if let partitionValue = configuration.syncConfiguration?.partitionValue {
                 storage.partitionValue = partitionValue
             }
             storage.configuration = configuration
 
-            assert(storage.app != nil, "App should have been already stored at initialization")
-            assert(storage.partitionValue != nil, "PartitionValue should have been already stored at initialization")
-
-            if let app = storage.app,
-               let partitionValue = storage.partitionValue,
-               let configuration = storage.configuration {
-                cancel()
-                asyncOpenForApp(app, partitionValue: partitionValue, configuration: configuration)
-            }
+            cancel()
+            asyncOpenForApp()
         }
     }
 }
