@@ -696,13 +696,13 @@ struct ObjectChangeCallbackWrapper {
     RLMObjectBase *obj = [realm resolveThreadSafeReference:tsr];
 
     _object = realm::Object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
-    _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj}, keyPaths);
+    _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj}, std::move(keyPaths));
 }
 
 - (void)addNotificationBlock:(RLMObjectNotificationCallback)block object:(RLMObjectBase *)obj keyPaths:(KeyPathArray)keyPaths {
     _object = realm::Object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
     _realm = obj->_realm;
-    _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj}, keyPaths);
+    _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj}, std::move(keyPaths));
 }
 
 RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
@@ -719,7 +719,7 @@ RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
         [obj->_realm verifyNotificationsAreSupported:true];
         auto token = [[RLMObjectNotificationToken alloc] init];
         token->_realm = obj->_realm;
-        [token addNotificationBlock:block object:obj keyPaths:keyPathArray];
+        [token addNotificationBlock:block object:obj keyPaths:std::move(keyPathArray)];
         return token;
     }
 
@@ -729,7 +729,7 @@ RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
     RLMRealmConfiguration *config = obj->_realm.configuration;
     dispatch_async(queue, ^{
         @autoreleasepool {
-            [token addNotificationBlock:block threadSafeReference:tsr config:config keyPaths:keyPathArray queue:queue];
+            [token addNotificationBlock:block threadSafeReference:tsr config:config keyPaths:std::move(keyPathArray) queue:queue];
         }
     });
     return token;
