@@ -420,6 +420,66 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      // end of run loop execution context
      ```
 
+     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
+     updates, call `invalidate()` on the token.
+
+     - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
+     - parameter queue: The serial dispatch queue to receive notification on. If
+                        `nil`, notifications are delivered to the current thread.
+     - parameter block: The block to be called whenever a change occurs.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
+    public func observe(on queue: DispatchQueue?,
+                        _ block: @escaping (RealmMapChange<Map>) -> Void)
+    -> NotificationToken {
+        return rlmDictionary.addNotificationBlock(wrapDictionaryObserveBlock(block), queue: queue)
+    }
+
+    /**
+     Registers a block to be called each time the map changes.
+
+     The block will be asynchronously called with the initial map, and then called again after each write
+     transaction which changes either any of the keys or values in the map.
+
+     The `change` parameter that is passed to the block reports, in the form of keys within the map, which of
+     the key-value pairs were added, removed, or modified during each write transaction.
+
+     At the time when the block is called, the map will be fully evaluated and up-to-date, and as long as you do
+     not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
+     perform blocking work.
+
+     If no queue is given, notifications are delivered via the standard run loop, and so can't be delivered while the
+     run loop is blocked by other activity. If a queue is given, notifications are delivered to that queue instead. When
+     notifications can't be delivered instantly, multiple notifications may be coalesced into a single notification.
+     This can include the notification with the initial collection.
+
+     For example, the following code performs a write transaction immediately after adding the notification block, so
+     there is no opportunity for the initial notification to be delivered first. As a result, the initial notification
+     will reflect the state of the Realm after the write transaction.
+
+     ```swift
+     let myStringMap = myObject.stringMap
+     print("myStringMap.count: \(myStringMap?.count)") // => 0
+     let token = myStringMap.observe { changes in
+         switch changes {
+         case .initial(let myStringMap):
+             // Will print "myStringMap.count: 1"
+             print("myStringMap.count: \(myStringMap.count)")
+            print("Dog Name: \(myStringMap["nameOfDog"])") // => "Rex"
+             break
+         case .update:
+             // Will not be hit in this example
+             break
+         case .error:
+             break
+         }
+     }
+     try! realm.write {
+         myStringMap["nameOfDog"] = "Rex"
+     }
+     // end of run loop execution context
+     ```
+
      If no key paths are given, the block will be executed on any insertion,
      modification, or deletion for all object properties and the properties of
      any nested, linked objects. If a key path or key paths are provided,
