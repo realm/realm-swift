@@ -68,7 +68,7 @@ x.y.z Release notes (yyyy-MM-dd)
   SwiftUI View:
     - `AsyncOpen` is a property wrapper that initiates Realm.asyncOpen 
        for the current user, notifying the view when there is a change in Realm asyncOpen state.
-    - `AutoOpen` behaves similar to `AsyncOpen`, but in case of no internet
+    - `AutoOpen` behaves similarly to `AsyncOpen`, but in the case of no internet
        connection this will return an opened realm. 
 * Add `EnvironmentValues.partitionValue`, this value can be injected into any view using one of 
   our new property wrappers `AsyncOpen` and `AutoOpen`.
