@@ -619,10 +619,6 @@ extension ThreadConfined where Self: ObjectBase {
     }
 }
 
-/// Protocol representing a PartitionValue..
-public protocol PartitionValue {
-}
-
 private struct RealmEnvironmentKey: EnvironmentKey {
     static let defaultValue = Realm.Configuration.defaultConfiguration
 }
@@ -676,7 +672,6 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         }
     }
 
-    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
     func asyncOpen() -> AnyPublisher<RealmPublishers.AsyncOpenPublisher.Output, RealmPublishers.AsyncOpenPublisher.Failure> {
         if let currentUser = app.currentUser,
            currentUser.isLoggedIn {
@@ -684,7 +679,6 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         } else {
             asyncOpenState = .waitingForUser
             return app.objectWillChange
-                .eraseToAnyPublisher()
                 .filter { $0.currentUser != nil }
                 .flatMap { self.asyncOpenForUser($0.currentUser!, partitionValue: self.partitionValue, configuration: self.configuration) }
                 .eraseToAnyPublisher()

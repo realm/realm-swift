@@ -25,6 +25,7 @@ class SwiftUISyncTestHostUITests: SwiftSyncTestCase {
     override func setUp() {
         continueAfterFailure = false
         super.setUp()
+        // TODO: This should be a static method
         if !SwiftUISyncTestHostUITests.isDataCreated {
             let user = logInUser(for: basicCredentials(withName: #function, register: true))
             populateRealm(user: user, partitionValue: #function)

@@ -18,6 +18,10 @@
 
 import Realm
 
+/// Protocol representing a PartitionValue..
+public protocol PartitionValue {
+}
+
 /// Protocol representing a BSON value.
 /// - SeeAlso: bsonspec.org
 public protocol BSON: PartitionValue, Equatable {
