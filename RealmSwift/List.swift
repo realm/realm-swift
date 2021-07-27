@@ -495,9 +495,9 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      provided key paths. For example, if:
      ```swift
      class Dog: Object {
-         @objc dynamic var name: String = ""
-         @objc dynamic var age: Int = 1
-         let toys = List<Toy>()
+         @Persisted dynamic var name: String = ""
+         @Persisted dynamic var age: Int = 1
+         @Persisted var toys: List<Toy>
      }
      // ...
      let dogs = realm.objects(Dog.self)

@@ -213,9 +213,9 @@ extension Object: RealmCollectionValue {
      provided key paths. For example, if:
      ```swift
      class Dog: Object {
-         @objc dynamic var name: String = ""
-         @objc dynamic var adopted: Bool = false
-         let siblings = List<Dog>()
+         @Persisted var name: String = ""
+         @Persisted var adopted: Bool = false
+         @Persisted var siblings: List<Dog>
      }
 
      // ... where `dog` is a managed Dog object.

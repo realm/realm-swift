@@ -419,9 +419,9 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      provided key paths. For example, if:
      ```swift
      class Dog: Object {
-         @objc dynamic var name: String = ""
-         @objc dynamic var age: Int = 1
-         let toys = List<Toy>()
+         @Persisted var name: String = ""
+         @Persisted var age: Int = 1
+         @Persisted var toys: List<Toy>
      }
      // ...
      let dogs = realm.objects(Dog.self)
