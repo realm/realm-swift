@@ -136,7 +136,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
         subscribers.append(AnySubscriber(subscriber))
         if value.realm != nil && !value.isInvalidated, let value = value.thaw() {
             // if the value is managed
-            let token =  value._observe(subscriber, keyPaths)
+            let token =  value._observe(keyPaths, subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
         } else if let value = value as? ObjectBase, !value.isInvalidated {
             // else if the value is unmanaged

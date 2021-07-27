@@ -66,10 +66,7 @@ public protocol RealmSubscribable {
     func _observe<S>(on queue: DispatchQueue?, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error
     /// :nodoc:
-    func _observe<S>(_ subscriber: S, _ keyPaths: [String]?)
-        -> NotificationToken where S: Subscriber, S.Input == Void, S.Failure == Never
-    /// :nodoc:
-    func _observe<S>(_ subscriber: S)
+    func _observe<S>(_ keyPaths: [String]?, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Void, S.Failure == Never
     // swiftlint:enable identifier_name
 }
@@ -464,11 +461,7 @@ extension ObjectBase: RealmSubscribable {
         }
     }
     /// :nodoc:
-    public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
-        return _observe { _ in _ = subscriber.receive() }
-    }
-    /// :nodoc:
-    public func _observe<S>(_ subscriber: S, _ keyPaths: [String]?) -> NotificationToken where S: Subscriber, S.Failure == Never, S.Input == Void {
+    public func _observe<S>(_ keyPaths: [String]?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Failure == Never, S.Input == Void {
         return _observe(keyPaths: keyPaths, { _ in _ = subscriber.receive()})
     }
     // swiftlint:enable identifier_name
@@ -556,11 +549,7 @@ extension RealmCollection {
     }
 
     /// :nodoc:
-    public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
-        return observe(keyPaths: nil, on: nil) { _ in _ = subscriber.receive() }
-    }
-    /// :nodoc:
-    public func _observe<S: Subscriber>(_ subscriber: S, _ keyPaths: [String]? = nil) -> NotificationToken where S.Input == Void, S.Failure == Never {
+    public func _observe<S: Subscriber>(_ keyPaths: [String]? = nil, _ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
         return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
     // swiftlint:enable identifier_name
@@ -595,7 +584,7 @@ extension RealmKeyedCollection {
         return observe(keyPaths: nil, on: nil) { _ in _ = subscriber.receive() }
     }
     /// :nodoc:
-    public func _observe<S: Subscriber>(_ subscriber: S, _ keyPaths: [String]? = nil) -> NotificationToken where S.Input == Void, S.Failure == Never {
+    public func _observe<S: Subscriber>(_ keyPaths: [String]? = nil, _ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
         return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
     // swiftlint:enable identifier_name
@@ -829,7 +818,7 @@ public enum RealmPublishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let token =  self.collection._observe(subscriber)
+            let token =  self.collection._observe(nil, subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
         }
     }
@@ -860,7 +849,7 @@ public enum RealmPublishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let token =  self.object._observe(subscriber)
+            let token =  self.object._observe(nil, subscriber)
             tokenParent[keyPath: tokenKeyPath] = token
             subscriber.receive(subscription: ObservationSubscription(token: token))
         }
