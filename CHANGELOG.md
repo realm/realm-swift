@@ -71,7 +71,7 @@ x.y.z Release notes (yyyy-MM-dd)
     - `AutoOpen` behaves similarly to `AsyncOpen`, but in the case of no internet
        connection this will return an opened realm. 
 * Add `EnvironmentValues.partitionValue`. This value can be injected into any view using one of 
-  our new property wrappers `AsyncOpen` and `AutoOpen`.
+  our new property wrappers `AsyncOpen` and `AutoOpen`:
   `MyView().environment(\.partitionValue, "partitionValue")`. 
 
 ### Fixed
