@@ -192,12 +192,36 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
 /// actually work. Most of the logic for how to store values in Realm is not
 /// implemented in Swift and there is currently no extension mechanism for
 /// supporting more types.
-public protocol RealmCollectionValue: Hashable, _RealmSchemaDiscoverable { }
+public protocol RealmCollectionValue: Hashable, _RealmSchemaDiscoverable {
+    /// :nodoc:
+    // Iterating over collections requires mapping NSNull to nil, but we can't
+    // just do `nil as T` because of non-nullable collections
+    static func _nilValue() -> Self
+    /// :nodoc:
+    // If we are in key path tracing mode, instantiate an empty object and forward
+    // the lastAccessedNames array.
+    static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self
+    /// :nodoc:
+    // Get the zero/empty/nil value for this type. Used to supply a default
+    // when the user does not declare one in their model. When `forceDefaultInitialization`
+    // is true we *must* return a non-nil, default instance of `Self`. The latter is
+    // used in conjunction with key path string tracing.
+    static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self
+}
 
 extension RealmCollectionValue {
     /// :nodoc:
     public static func _nilValue() -> Self {
         fatalError("unexpected NSNull for non-Optional type")
+    }
+    /// :nodoc:
+    public static func _rlmKeyPathRecorder(with lastAccessedNames: NSMutableArray) -> Self {
+        let value = Self._rlmDefaultValue(true)
+        if let value = value as? ObjectBase {
+            value.lastAccessedNames = lastAccessedNames
+            value.prepareForRecording()
+        }
+        return value
     }
 }
 
@@ -223,7 +247,16 @@ extension AnyRealmValue: RealmCollectionValue {
     }
 }
 
-extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue {
+extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue,
+                                               Wrapped: _DefaultConstructible {
+    /// :nodoc:
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Optional<Wrapped> {
+        if forceDefaultInitialization {
+            return Wrapped()
+        }
+        return .none
+    }
+
     /// :nodoc:
     public static func _nilValue() -> Optional {
         return nil
@@ -284,6 +317,18 @@ public protocol RealmCollection: RealmCollectionBase {
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
     func index(matching predicateFormat: String, _ args: Any...) -> Int?
+
+
+    // MARK: Object Retrieval
+
+    /**
+     Returns an array containing the objects in the collection at the indexes specified by a given index set.
+
+     - warning Throws if an index supplied in the IndexSet is out of bounds.
+
+     - parameter indexes: The indexes in the collection to select objects from.
+     */
+    func objects(at indexes: IndexSet) -> [Element]
 
 
     // MARK: Filtering
@@ -497,6 +542,103 @@ public protocol RealmCollection: RealmCollectionBase {
     func thaw() -> Self?
 }
 
+// MARK: Aggregatable
+
+/**
+ Extension for RealmCollections where the Value is of an Object type that
+ enables aggregatable operations.
+ */
+public extension RealmCollection where Element: ObjectBase {
+    /**
+     Returns the minimum (lowest) value of the given property among all the objects in the collection, or `nil` if the
+     collection is empty.
+
+     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+
+     - parameter keyPath: The keyPath of a property whose minimum value is desired.
+     */
+    func min<T: MinMaxType>(of keyPath: KeyPath<Element, T>) -> T? {
+        min(ofProperty: _name(for: keyPath))
+    }
+
+    /**
+     Returns the maximum (highest) value of the given property among all the objects in the collection, or `nil` if the
+     collection is empty.
+
+     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+
+     - parameter keyPath: The keyPath of a property whose minimum value is desired.
+     */
+    func max<T: MinMaxType>(of keyPath: KeyPath<Element, T>) -> T? {
+        max(ofProperty: _name(for: keyPath))
+    }
+
+    /**
+    Returns the sum of the given property for objects in the collection, or `nil` if the collection is empty.
+
+    - warning: Only names of properties of a type conforming to the `AddableType` protocol can be used.
+
+    - parameter keyPath: The keyPath of a property conforming to `AddableType` to calculate sum on.
+    */
+    func sum<T: AddableType>(of keyPath: KeyPath<Element, T>) -> T {
+        sum(ofProperty: _name(for: keyPath))
+    }
+
+    /**
+     Returns the average value of a given property over all the objects in the collection, or `nil` if
+     the collection is empty.
+
+     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
+
+     - parameter keyPath: The keyPath of a property whose values should be summed.
+     */
+    func average<T: AddableType>(of keyPath: KeyPath<Element, T>) -> T? {
+        average(ofProperty: _name(for: keyPath))
+    }
+}
+
+// MARK: Sortable
+
+/**
+ Extension for RealmCollections where the Value is of an Object type that
+ enables sortable operations.
+ */
+public extension RealmCollection where Element: ObjectBase {
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     Objects are sorted based on the values of the given key path. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call
+     `students.sorted(byKeyPath: "age", ascending: true)`.
+
+     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+                floating point, integer, and string types.
+
+     - parameter keyPath:   The key path to sort by.
+     - parameter ascending: The direction to sort in.
+     */
+    func sorted<T: Comparable>(by keyPath: KeyPath<Element, T>, ascending: Bool) -> Results<Element> {
+        sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
+    }
+
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
+     Objects are sorted based on the values of the given key path. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call
+     `students.sorted(byKeyPath: "age", ascending: true)`.
+
+     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+                floating point, integer, and string types.
+
+     - parameter keyPath:   The key path to sort by.
+     - parameter ascending: The direction to sort in.
+     */
+    func sorted<T: Comparable>(by keyPath: KeyPath<Element, Optional<T>>, ascending: Bool) -> Results<Element> {
+        sorted(byKeyPath: _name(for: keyPath), ascending: ascending)
+    }
+}
+
 public extension RealmCollection {
     /**
      Returns the index of the first object matching the given predicate, or `nil` if no objects match.
@@ -630,6 +772,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     var description: String { fatalError() }
     func index(of object: Element) -> Int? { fatalError() }
     func index(matching predicate: NSPredicate) -> Int? { fatalError() }
+    func objects(at indexes: IndexSet) -> [Element] { fatalError() }
     func filter(_ predicate: NSPredicate) -> Results<Element> { fatalError() }
     func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element> { fatalError() }
     func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
@@ -676,6 +819,10 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     override func index(of object: C.Element) -> Int? { return base.index(of: object) }
 
     override func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
+
+    // MARK: Object Retrieval
+
+    override func objects(at indexes: IndexSet) -> [Element] { return base.objects(at: indexes) }
 
     // MARK: Filtering
 
@@ -837,6 +984,19 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      - parameter predicate: The predicate with which to filter the objects.
      */
     public func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
+
+
+    // MARK: Object Retrieval
+
+    /**
+     Returns an array containing the objects in the collection at the indexes specified by a given index set.
+
+     - warning Throws if an index supplied in the IndexSet is out of bounds.
+
+     - parameter indexes: The indexes in the collection to select objects from.
+     */
+    public func objects(at indexes: IndexSet) -> [Element] { return base.objects(at: indexes) }
+
 
     // MARK: Filtering
 
@@ -1189,4 +1349,15 @@ extension LinkingObjects: ObservableCollection {
     internal func isSameObjcCollection(_ objc: RLMResults<AnyObject>) -> Bool {
         return objc === rlmResults
     }
+}
+
+// MARK: Key Path Strings
+
+/// Tag protocol which allows a collection to produce its property name
+internal protocol PropertyNameConvertible {
+    /// A mutable array referenced from the enclosing parent that contains the last accessed property names.
+    var lastAccessedNames: NSMutableArray? { get set }
+    /// `key` is the property name for this collection.
+    /// `isLegacy` will be true if the property is declared with old property syntax.
+    var propertyInformation: (key: String, isLegacy: Bool)? { get }
 }

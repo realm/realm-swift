@@ -78,6 +78,7 @@
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property {
     _parentObject = parentObject;
     _key = property.name;
+    _isLegacyProperty = property.isLegacy;
 }
 
 #pragma mark - Convenience wrappers used for all RLMArray types
@@ -525,6 +526,19 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 }
 
 - (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
+    NSUInteger count = self.count;
+    __block BOOL didStop = NO;
+    [indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+        if (idx < 0 || idx >= count || count == 0) {
+            *stop = YES;
+            didStop = YES;
+        }
+    }];
+
+    if (didStop) {
+        return nil;
+    }
+
     if (!_backingCollection) {
         _backingCollection = [NSMutableArray new];
     }
@@ -614,6 +628,13 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {
     return RLMDescriptionWithMaxDepth(@"RLMArray", self, depth);
 }
+
+#pragma mark - Key Path Strings
+
+- (NSString *)propertyKey {
+    return _key;
+}
+
 @end
 
 @implementation RLMSortDescriptor
