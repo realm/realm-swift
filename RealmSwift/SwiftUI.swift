@@ -676,7 +676,8 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         }
     }
 
-    func asyncOpenForApp() -> AnyPublisher<RealmPublishers.AsyncOpenPublisher.Output, RealmPublishers.AsyncOpenPublisher.Failure> {
+    @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+    func asyncOpen() -> AnyPublisher<RealmPublishers.AsyncOpenPublisher.Output, RealmPublishers.AsyncOpenPublisher.Failure> {
         if let currentUser = app.currentUser,
            currentUser.isLoggedIn {
             return asyncOpenForUser(app.currentUser!, partitionValue: partitionValue, configuration: configuration)
@@ -773,8 +774,8 @@ public enum AsyncOpenState {
     @Environment(\.partitionValue) var partitionValue
     @ObservedObject private var storage: ObservableAsyncOpenStorage
 
-    private func asyncOpenForApp() {
-        storage.asyncOpenForApp()
+    private func asyncOpen() {
+        storage.asyncOpen()
             .sink { completion in
                 if case .failure(let error) = completion {
                     self.storage.asyncOpenState = .error(error)
@@ -841,7 +842,7 @@ public enum AsyncOpenState {
         let bsonValue = AnyBSON(partitionValue)
         // Store property wrapper values on the storage
         storage = ObservableAsyncOpenStorage(app: app, configuration: configuration, partitionValue: bsonValue)
-        asyncOpenForApp()
+        asyncOpen()
     }
 
     public mutating func update() {
@@ -851,7 +852,7 @@ public enum AsyncOpenState {
                 storage.partitionValue = bsonValue
 
                 cancel()
-                asyncOpenForApp()
+                asyncOpen()
             }
         }
 
@@ -862,7 +863,7 @@ public enum AsyncOpenState {
             }
 
             cancel()
-            asyncOpenForApp()
+            asyncOpen()
         }
     }
 }
@@ -916,8 +917,8 @@ public enum AsyncOpenState {
     @Environment(\.partitionValue) var partitionValue
     @ObservedObject private var storage: ObservableAsyncOpenStorage
 
-    private func asyncOpenForApp() {
-        storage.asyncOpenForApp()
+    private func asyncOpen() {
+        storage.asyncOpen()
             .sink { completion in
                 if case .failure(let error) = completion {
                     if let error = error as NSError?,
@@ -990,7 +991,7 @@ public enum AsyncOpenState {
         let bsonValue = AnyBSON(partitionValue)
         // Store property wrapper values on the storage
         storage = ObservableAsyncOpenStorage(app: app, configuration: configuration, partitionValue: bsonValue)
-        asyncOpenForApp()
+        asyncOpen()
     }
 
     public mutating func update() {
@@ -1000,7 +1001,7 @@ public enum AsyncOpenState {
                 storage.partitionValue = bsonValue
 
                 cancel()
-                asyncOpenForApp()
+                asyncOpen()
             }
         }
 
@@ -1011,7 +1012,7 @@ public enum AsyncOpenState {
             storage.configuration = configuration
 
             cancel()
-            asyncOpenForApp()
+            asyncOpen()
         }
     }
 }
