@@ -676,6 +676,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         }
     }
 
+    @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
     func asyncOpen() -> AnyPublisher<RealmPublishers.AsyncOpenPublisher.Output, RealmPublishers.AsyncOpenPublisher.Failure> {
         if let currentUser = app.currentUser,
            currentUser.isLoggedIn {
