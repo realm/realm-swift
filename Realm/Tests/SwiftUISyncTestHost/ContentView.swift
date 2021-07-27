@@ -22,8 +22,8 @@ import Combine
 
 enum LoggingViewState {
     case initial
-    case logging
-    case logged
+    case loggingIn
+    case loggedIn
     case syncing
 }
 
