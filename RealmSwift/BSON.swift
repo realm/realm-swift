@@ -192,6 +192,8 @@ extension MinKey: BSON {
             self = .minKey
         case let val as NSRegularExpression:
             self = .regex(val)
+        case let val as AnyBSON:
+            self = val
         default:
             self = .null
         }
