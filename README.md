@@ -165,7 +165,7 @@ not eligible to receive the product under U.S. law.**
 
 ## Tell us about your experience
 
-**_We want to hear from you! Tell us about your experience using the Realm SDKs in our [short survey](http://bit.ly/3hRO5U2).
+**_We want to hear from you! Tell us about your experience using the Realm SDKs in our [short survey](http://bit.ly/3hRO5U2)._**
 
 **_If you use Realm and are happy with it, please consider sending out a tweet mentioning [@realm](https://twitter.com/realm) to share your thoughts!_**
 
