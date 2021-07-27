@@ -662,7 +662,7 @@ extension EnvironmentValues {
     }
 }
 
-@available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 private class ObservableAsyncOpenStorage: ObservableObject {
     var app: App
     var configuration: Realm.Configuration
@@ -676,7 +676,6 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         }
     }
 
-    @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
     func asyncOpen() -> AnyPublisher<RealmPublishers.AsyncOpenPublisher.Output, RealmPublishers.AsyncOpenPublisher.Failure> {
         if let currentUser = app.currentUser,
            currentUser.isLoggedIn {
@@ -768,7 +767,7 @@ public enum AsyncOpenState {
 ///     ListView()
 ///        .environment(\.realm, realm)
 ///
-@available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @propertyWrapper public struct AsyncOpen<Partition>: DynamicProperty where Partition: BSON {
     @Environment(\.realmConfiguration) var configuration
     @Environment(\.partitionValue) var partitionValue
@@ -911,7 +910,7 @@ public enum AsyncOpenState {
 /// This property wrapper behaves similar as `AsyncOpen`, and in terms of declaration and use is completely identical,
 /// but with the difference of a offline-first approach.
 ///
-@available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @propertyWrapper public struct AutoOpen<Partition>: DynamicProperty where Partition: BSON {
     @Environment(\.realmConfiguration) var configuration
     @Environment(\.partitionValue) var partitionValue
