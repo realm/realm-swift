@@ -553,20 +553,20 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
     }
 }
 
-static KeyPath KeyPathFromString(RLMRealm *realm,
-                          RLMSchema *schema,
-                          RLMClassInfo *info,
-                          RLMObjectSchema *rlmObjectSchema,
-                          NSString *keyPath) {
+static KeyPath keyPathFromString(RLMRealm *realm,
+                                 RLMSchema *schema,
+                                 RLMClassInfo *info,
+                                 RLMObjectSchema *rlmObjectSchema,
+                                 NSString *keyPath) {
     RLMProperty *property;
     KeyPath keyPairs;
 
     NSArray<NSString *> *keyPathComponents = [keyPath componentsSeparatedByString:@"."];
     for (NSString *component in keyPathComponents) {
         property = rlmObjectSchema[component];
-        RLMPrecondition(property, @"Invalid property name",
-                        @"Property '%@' not found in object of type '%@'",
-                        component, rlmObjectSchema.className);
+        if (!property) {
+            throw RLMException(@"Invalid property name. Property '%@' not found in object of type '%@'", component, rlmObjectSchema.className);
+        }
 
         TableKey tk = info->objectSchema->table_key;
         ColKey ck;
@@ -587,12 +587,12 @@ static KeyPath KeyPathFromString(RLMRealm *realm,
     return keyPairs;
 }
 
-KeyPathArray KeyPathArrayFromStringArray(RLMRealm *realm,
+KeyPathArray RLMKeyPathArrayFromStringArray(RLMRealm *realm,
                                          RLMClassInfo *info,
                                          NSArray<NSString *> *keyPaths) {
     KeyPathArray keyPathArray;
     for (NSString *keyPath in keyPaths) {
-        keyPathArray.push_back(KeyPathFromString(realm , realm.schema, info, info->rlmObjectSchema, keyPath));
+        keyPathArray.push_back(keyPathFromString(realm , realm.schema, info, info->rlmObjectSchema, keyPath));
     }
     return keyPathArray;
 }

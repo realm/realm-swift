@@ -479,7 +479,7 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
     auto token = [[RLMCancellationToken alloc] init];
     
     RLMClassInfo *info = collection.objectInfo;
-    realm::KeyPathArray keyPathArray = KeyPathArrayFromStringArray(realm, info, keyPaths);
+    realm::KeyPathArray keyPathArray = RLMKeyPathArrayFromStringArray(realm, info, keyPaths);
 
     if (!queue) {
         [realm verifyNotificationsAreSupported:true];

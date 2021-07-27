@@ -185,6 +185,6 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
 
 // KeyPathFromString converts a string keypath to a vector of key
 // pairs to be used for deep change checking across links.
-realm::KeyPathArray KeyPathArrayFromStringArray(RLMRealm *realm,
+realm::KeyPathArray RLMKeyPathArrayFromStringArray(RLMRealm *realm,
                                                 RLMClassInfo *info,
                                                 NSArray<NSString *> *keyPath);
