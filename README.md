@@ -40,7 +40,7 @@ try! realm.write {
 }
 ```
 ## Live Objects: Build Reactive Apps
-Realm’s live objects mean data updated anywhere is automatically updated everywhere. If you need to freeze elements of your data for Reactive frameworks, you can do that, too.
+Realm’s live objects mean data updated anywhere is automatically updated everywhere.
 ```swift
 // Open the default realm.
 let realm = try! Realm()
@@ -74,6 +74,28 @@ try! realm.write {
     dog.name = "Wolfie"
 }
 ```
+### SwiftUI
+Realm integrates directly with SwiftUI, updating your views so you don't have to.
+```swift
+struct ContactsView: View {
+    @ObservedResults(Person.self) var persons
+    
+    var body: some View {
+        List {
+            ForEach(persons) { person in
+                Text(person.name)
+            }
+            .onMove(perform: $persons.move)
+            .onDelete(perform: $persons.remove)
+        }.navigationBarItems(trailing:
+            Button("Add") {
+                $persons.append(Person())
+            }
+        )
+    }
+}
+```
+
 ## Fully Encrypted
 Data can be encrypted in-flight and at-rest, keeping even the most sensitive data secure.
 ```swift
@@ -95,12 +117,14 @@ The [MongoDB Realm Sync](https://www.mongodb.com/realm/mobile/sync) service make
 
 ## Getting Started
 
-Please see the detailed instructions in our docs to add [Realm](https://docs.mongodb.com/realm/sdk/ios/install/) to your Xcode project.
+We support installing Realm via Swift Package Manager, CocoaPods, Carthage, or by importing a dynamic XCFramework.
+
+For more information, see the detailed instructions in our [docs](https://docs.mongodb.com/realm/sdk/ios/install/).
 
 ## Documentation
 
 The documentation can be found at [docs.mongodb.com/realm/sdk/ios/](https://docs.mongodb.com/realm/sdk/ios/).  
-The API reference is located at [realm.io/docs/objc/latest/api/](https://realm.io/docs/objc/latest/api/).
+The API reference is located at [docs.mongodb.com/realm-sdks/swift/latest/](https://docs.mongodb.com/realm-sdks/swift/latest/)
 
 ## Getting Help
 
@@ -139,9 +163,11 @@ Realm Core is also published under the Apache 2.0 license and is available
 North Korea, Sudan, Syria or the Crimea region, or to any other person that is
 not eligible to receive the product under U.S. law.**
 
-## Feedback
+## Tell us about your experience
 
-**_If you use Realm and are happy with it, all we ask is that you please consider sending out a tweet mentioning [@realm](https://twitter.com/realm) to share your thoughts!_**
+**_We want to hear from you! Tell us about your experience using the Realm SDKs in our [short survey](http://bit.ly/3hRO5U2).
+
+**_If you use Realm and are happy with it, please consider sending out a tweet mentioning [@realm](https://twitter.com/realm) to share your thoughts!_**
 
 **_And if you don't like it, please let us know what you would like improved, so we can fix it!_**
 
