@@ -159,7 +159,7 @@ class SwiftUITests: XCTestCase {
 
         XCTAssertEqual(app.textFields["name"].value as? String, "test name")
     }
-q
+
     func testKeyPathResults() {
         app.launchEnvironment["test_type"] = "observed_results_key_path"
         app.launch()

@@ -1688,7 +1688,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
         for (RLMPropertyChange *prop in changes) {
             XCTAssertEqualObjects(prop.name, @"employees");
             XCTAssertFalse(prop.previousValue);
-            XCTAssertFalse(prop.value); // Observing an array will lead to NSNull here.
+            XCTAssertFalse(prop.value); // Observing an array will lead to nil here.
         }
         [ex fulfill];
     } keyPaths:@[@"employees.hired"]];
