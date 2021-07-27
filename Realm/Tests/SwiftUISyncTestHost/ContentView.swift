@@ -191,7 +191,7 @@ struct AutoOpenView: View {
             case .connecting:
                 ProgressView()
             case .waitingForUser:
-                ProgressView("Waiting for user to logged in...")
+                ProgressView("Waiting for user to log in...")
             case .open(let realm):
                 if canNavigate {
                     ListView()
