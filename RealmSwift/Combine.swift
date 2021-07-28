@@ -902,7 +902,7 @@ public enum RealmPublishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Failure, Output == S.Input {
-            subscriber.receive(subscription: ObservationSubscription(token: self.subscribable._observe(keyPaths: keyPaths, on: queue, subscriber)))
+            subscriber.receive(subscription: ObservationSubscription(token: self.subscribable._observe(keyPaths, on: queue, subscriber)))
         }
 
         /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
@@ -972,7 +972,7 @@ public enum RealmPublishers {
         }
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Failure, Output == S.Input {
-            let token = self.object._observe(keyPaths: nil, on: queue, subscriber)
+            let token = self.object._observe(nil, on: queue, subscriber)
             tokenParent[keyPath: tokenKeyPath] = token
             subscriber.receive(subscription: ObservationSubscription(token: token))
         }
