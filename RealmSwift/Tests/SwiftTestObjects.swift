@@ -353,12 +353,14 @@ class SwiftArrayPropertyObject: Object {
     @objc dynamic var name = ""
     let array = List<SwiftStringObject>()
     let intArray = List<SwiftIntObject>()
+    let swiftObjArray = List<SwiftObject>()
 }
 
 class SwiftMutableSetPropertyObject: Object {
     @objc dynamic var name = ""
     let set = MutableSet<SwiftStringObject>()
     let intSet = MutableSet<SwiftIntObject>()
+    let swiftObjSet = MutableSet<SwiftObject>()
 }
 
 class SwiftMapPropertyObject: Object {
