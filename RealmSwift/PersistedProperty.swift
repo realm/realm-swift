@@ -260,7 +260,7 @@ public protocol OptionalCodingWrapper {
 
 extension KeyedDecodingContainer {
     // This is used to override the default decoding behaviour for OptionalCodingWrapper to allow a value to avoid a missing key Error
-    public func decode<T>(_ type: T.Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> T where T : Decodable, T: OptionalCodingWrapper {
+    public func decode<T>(_ type: T.Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> T where T: Decodable, T: OptionalCodingWrapper {
         return try decodeIfPresent(T.self, forKey: key) ?? T(wrappedValue: nil)
     }
 }
