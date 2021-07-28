@@ -209,8 +209,12 @@ extension RealmOptional: SchemaDiscoverable, _RealmSchemaDiscoverable where Valu
 }
 
 extension LinkingObjects: _Persistable where Element: _Persistable {
-    public static func _rlmDefaultValue() -> Self {
-        fatalError("LinkingObjects properties must set the origin property name")
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
+        if forceDefaultInitialization {
+            return .init(propertyName: "", handle: nil)
+        } else {
+            fatalError("LinkingObjects properties must set the origin property name")
+        }
     }
 
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> LinkingObjects {
@@ -240,7 +244,12 @@ extension Optional: SchemaDiscoverable, _RealmSchemaDiscoverable where Wrapped: 
 }
 
 extension Optional: _Persistable where Wrapped: _OptionalPersistable {
-    public static func _rlmDefaultValue() -> Self { return .none }
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
+        if forceDefaultInitialization {
+            return Wrapped()
+        }
+        return .none
+    }
     public static func _rlmGetProperty(_ obj: ObjectBase, _ key: UInt16) -> Wrapped? {
         return Wrapped._rlmGetPropertyOptional(obj, key)
     }
@@ -301,8 +310,8 @@ extension RawRepresentable where Self: _OptionalPersistable, RawValue: _Optional
     }
 }
 
-extension RawRepresentable where Self: CaseIterable {
-    public static func _rlmDefaultValue() -> Self {
+extension PersistableEnum {
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
         return self.allCases.first!
     }
 }
