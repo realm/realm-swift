@@ -461,6 +461,18 @@ public extension App {
     }
 }
 
+@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+extension App {
+    /// Login to a user for the Realm app.
+    /// @param credentials The credentials identifying the user.
+    /// @returns A publisher that eventually return `User` or `Error`.
+    public func login(credentials: Credentials) async throws -> User {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.login(credentials: credentials, continuation.resume)
+        }
+    }
+}
+
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
 public extension PushClient {
     /// Request to register device token to the server
