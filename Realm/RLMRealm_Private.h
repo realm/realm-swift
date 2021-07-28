@@ -56,6 +56,8 @@ FOUNDATION_EXTERN void RLMWaitForRealmToClose(NSString *path);
 - (void)verifyNotificationsAreSupported:(bool)isCollection;
 
 - (RLMRealm *)frozenCopy NS_RETURNS_RETAINED;
++ (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
+                                        callback:(void (^)(NSError * _Nullable))callback;
 
 @end
 

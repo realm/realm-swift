@@ -1024,11 +1024,12 @@ extension Realm {
     @discardableResult
     public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration) async throws -> Realm {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Swift.Error>) in
-            RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: asyncOpenQueue, callback: { rlmRealm, error in
-                guard let _ = rlmRealm.flatMap(Realm.init) else {
-                    return continuation.resume(with: .failure(error ?? Error.callFailed))
+            RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callback: { error in
+                if let error = error {
+                    continuation.resume(with: .failure(error))
+                } else {
+                    continuation.resume(with: .success(()))
                 }
-                continuation.resume(with: .success(()))
             })
         }
         return try Realm(configuration: configuration)
