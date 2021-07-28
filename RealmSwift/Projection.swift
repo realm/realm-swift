@@ -81,30 +81,34 @@ public struct Projected<T: ObjectBase, Value>: _Projected {
     }
 }
 
-public protocol Projection: ThreadConfined {
-    associatedtype Root: ObjectBase
-    func observe(keyPaths: [PartialKeyPath<Self>], _ block: (ProjectionChange) -> Void) -> NotificationToken
-}
+open class Projection<Root: ObjectBase>: ThreadConfined {
+//    associatedtype Root: ObjectBase
+//    func observe(keyPaths: [PartialKeyPath<Projection>], _ block: (ProjectionChange) -> Void) -> NotificationToken
 
-public extension Projection {
-
+    required public init(_ object: Root) {
+        assign(object)
+    }
+    
     fileprivate subscript(label: String) -> _Projected {
         Mirror(reflecting: self).descendant(label)! as! _Projected
     }
     
-    mutating func assign(_ object: Root) {
+    func assign(_ object: Root) {
         let mirror = Mirror(reflecting: self)
         for child in mirror.children {
             if child.value is _Projected {
-                let keyPath =  \Self.[child.label!]
+                let keyPath =  \Projection.[child.label!]
                 self[keyPath: keyPath].set(object: object)
             }
         }
     }
+    
+    func objectClassName() -> String {
+        return Root.className()
+    }
 }
 
 fileprivate protocol _Projected {
-#warning("TODO: Remove force unwrap")
     var objectBase: ObjectBase! { get }
     func set(object: ObjectBase)
 }
@@ -127,7 +131,7 @@ public enum ProjectionChange {
 }
 
 public extension Projection {
-    func observe(keyPaths: [PartialKeyPath<Self>] = [], _ block: (ProjectionChange) -> Void) -> NotificationToken {
+    func observe(keyPaths: [PartialKeyPath<Projection>] = [], _ block: (ProjectionChange) -> Void) -> NotificationToken {
         if keyPaths.isEmpty {
 //            projectionSchemas[ObjectIdentifier(type(of: self))]!.forEach { property in
 //                (self[keyPath: property.keyPathOnProjection] as! _ProjectedBase).objectBase.observe(property.realmKeyPathString) { change in
@@ -184,47 +188,133 @@ public extension Projection {
     }
 }
 
-private struct ProjectionProperty {
-    let keyPathOnProjection: AnyKeyPath
-    let realmKeyPathString: String
+public final class ProjectedList<NewElement>: RandomAccessCollection where NewElement: RealmCollectionValue {
+    public func index(matching predicate: NSPredicate) -> Int? {
+        backingList.index(matching: predicate)
+    }
+    public func observe(on queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<ProjectedList<NewElement>>) -> Void) -> NotificationToken {
+        backingList.observe(on: queue, {
+            switch $0 {
+            case .initial(let collection):
+                block(.initial(Self(collection, keyPathToNewElement: self.keyPath as! KeyPath<Object, NewElement>)))
+            case .update(let collection, deletions: let deletions, insertions: let insertions, modifications: let modifications):
+                block(.update(Self(collection, keyPathToNewElement: self.keyPath as! KeyPath<Object, NewElement>), deletions: deletions, insertions: insertions, modifications: modifications))
+            case .error(let error):
+                block(.error(error))
+            }
+        })
+    }
+    public subscript(position: Int) -> NewElement {
+        get {
+            backingList[position][keyPath: keyPath] as! NewElement
+        }
+        set {
+            backingList[position].setValue(newValue, forKeyPath: propertyName)
+        }
+    }
+    public var startIndex: Int {
+        backingList.startIndex
+    }
+    public var endIndex: Int {
+        backingList.endIndex
+    }
+    public var realm: Realm?
+    public var isInvalidated: Bool {
+        backingList.isInvalidated
+    }
+
+    public var description: String {
+        backingList.map({$0[keyPath: self.keyPath] as! Element}).description
+    }
+    public func index(of object: Element) -> Int? {
+        backingList.map({$0[keyPath: self.keyPath] as! Element}).firstIndex(of: object)
+    }
+    public var isFrozen: Bool {
+        backingList.isFrozen
+    }
+    public func freeze() -> Self {
+        backingList = backingList.freeze()
+        return self
+    }
+    public func thaw() -> Self? {
+        guard let backingList = backingList.thaw() else {
+            return nil
+        }
+        self.backingList = backingList
+        return self
+    }
+    public typealias Element = NewElement
+    public typealias Index = Int
+    private var backingList: List<Object>
+    private let keyPath: AnyKeyPath
+    private let propertyName: String
+    init<OriginalElement: ObjectBase>(_ list: List<OriginalElement>,
+                                      keyPathToNewElement: KeyPath<OriginalElement, NewElement>) {
+        self.backingList = ObjectiveCSupport.convert(object: list.rlmArray)
+        self.keyPath = keyPathToNewElement
+        self.propertyName = _name(for: keyPathToNewElement)
+    }
+}
+@dynamicMemberLookup
+public struct ElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
+    var list: List<Element>
+    public subscript<V>(dynamicMember member: KeyPath<Element, V>) -> ProjectedList<V> {
+        ProjectedList(list, keyPathToNewElement: member)
+    }
+}
+extension List where Element: ObjectBase, Element: RealmCollectionValue {
+    public var projectTo: ElementMapper<Element> {
+        ElementMapper(list: self)
+    }
 }
 
-private let projectionSchemas: [ObjectIdentifier: [ProjectionProperty]] = [:]
-
-extension Results {
-    public func `as`<P: Projection>(_ projectionType: P.Type) -> Results<P> where P.Root == Element {
-        /// add logic to Results to attach results objects to projection when
-        /// queried:
-        /// ```
-        /// if Element.self is Projection.Type {
-        ///    let projection = Element()
-        ///    attachObjectBase(element, to: projection)
-        ///    return projection
-        /// }
-        ///
-        /// return element
-        /// ```
+extension Projection: RealmCollectionValue {
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
         fatalError()
     }
-}
-
-@dynamicMemberLookup
-public struct ElementMapper<Element> where Element: RealmCollectionValue {
-    let list: List<Element>
     
-    public subscript<V>(dynamicMember member: KeyPath<Element, V>) -> List<V> {
-        let out = List<V>()
-        list.forEach {
-            out.append($0[keyPath: member])
-        }
-        return out
+    public static var _rlmType: PropertyType {
+        fatalError()
     }
+    
+    public static var _rlmOptional: Bool {
+        fatalError()
+    }
+    
+    public static var _rlmRequireObjc: Bool {
+        fatalError()
+    }
+    
+    public func _rlmPopulateProperty(_ prop: RLMProperty) {
+        fatalError()
+    }
+    
+    public static func _rlmPopulateProperty(_ prop: RLMProperty) {
+        fatalError()
+    }
+    
+    public static func == (lhs: Projection<Root>, rhs: Projection<Root>) -> Bool {
+        fatalError()
+    }
+    
+    
 }
 
-extension List {
-    public var projectTo: ElementMapper<Element> {
-        get {
-            return ElementMapper<Element>(list: self)
-        }
+extension Projection: Hashable { // Required for RealmCollectionValue
+    public func hash(into hasher: inout Hasher) {
+        let mirror = Mirror(reflecting: self)
+        let label = mirror.children.first(where: { $0.value is _Projected })!.label!
+        let keyPath =  \Projection.[label]
+        let hashVal = (self[keyPath: keyPath] as _Projected).objectBase.hashValue// set(object: object)
+
+        hasher.combine(hashVal)
     }
+//    public var hashValue: Int {
+//        get {
+//            let mirror = Mirror(reflecting: self)
+//            let label = mirror.children.first(where: { $0.value is _Projected })!.label!
+//            let keyPath =  \Projection.[label]
+//            return (self[keyPath: keyPath] as _Projected).objectBase.hashValue// set(object: object)
+//        }
+//    }
 }

@@ -85,7 +85,11 @@ extension AnyRealmValue: AddableType {}
 @frozen public struct Results<Element: RealmCollectionValue>: Equatable {
 
     internal let rlmResults: RLMResults<AnyObject>
-
+    
+    public static func == (lhs: Results<Element>, rhs: Results<Element>) -> Bool {
+        lhs.rlmResults.isEqual(to: rhs.rlmResults)
+    }
+    
     /// A human-readable description of the objects represented by the results.
     public var description: String {
         return RLMDescriptionWithMaxDepth("Results", rlmResults, RLMDescriptionMaxDepth)
@@ -115,9 +119,17 @@ extension AnyRealmValue: AddableType {}
     internal init(_ rlmResults: RLMResults<AnyObject>) {
         self.rlmResults = rlmResults
     }
+
     internal init(objc rlmResults: RLMResults<AnyObject>) {
         self.rlmResults = rlmResults
     }
+
+    internal init(_ rlmResults: RLMResults<AnyObject>, _ projector: ((ObjectBase) -> Element)?)  {
+        self.rlmResults = rlmResults
+        self.projector = projector
+    }
+
+    private var projector: ((ObjectBase) -> Element)? = nil
 
     // MARK: Index Retrieval
 
@@ -168,7 +180,13 @@ extension AnyRealmValue: AddableType {}
     }
 
     /// Returns the first object in the results, or `nil` if the results are empty.
-    public var first: Element? { return rlmResults.firstObject().map(dynamicBridgeCast) }
+    public var first: Element? {
+        let objectBase: ObjectBase? = rlmResults.firstObject().map(dynamicBridgeCast)
+        if let projector = projector {
+            return projector(objectBase!)
+        }
+        return objectBase as? Element
+    }
 
     /// Returns the last object in the results, or `nil` if the results are empty.
     public var last: Element? { return rlmResults.lastObject().map(dynamicBridgeCast) }
@@ -228,7 +246,7 @@ extension AnyRealmValue: AddableType {}
      - parameter predicate: The predicate with which to filter the objects.
      */
     public func filter(_ predicate: NSPredicate) -> Results<Element> {
-        return Results<Element>(rlmResults.objects(with: predicate))
+        return Results<Element>(rlmResults.objects(with: predicate), projector)
     }
 
     /**
@@ -282,7 +300,7 @@ extension AnyRealmValue: AddableType {}
      */
     public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element>
         where S.Iterator.Element == SortDescriptor {
-            return Results<Element>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
+            return Results<Element>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }), projector)
     }
 
     /**
