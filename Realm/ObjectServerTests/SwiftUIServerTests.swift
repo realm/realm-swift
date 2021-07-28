@@ -47,17 +47,12 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         _ = try logInUser(for: basicCredentials())
 
         let ex = expectation(description: "download-realm-async-open")
-        let asyncOpen = AsyncOpen(appId: appId, partitionValue: #function)
-        asyncOpen.projectedValue
-            .sink { asyncOpenState in
-                if case let .open(realm) = asyncOpenState {
-                    XCTAssertNotNil(realm)
-                    ex.fulfill()
-                }
+        asyncOpen(appId: appId, partitionValue: #function) { asyncOpenState in
+            if case let .open(realm) = asyncOpenState {
+                XCTAssertNotNil(realm)
+                ex.fulfill()
             }
-            .store(in: &cancellables)
-        waitForExpectations(timeout: 10.0)
-        asyncOpen.cancel()
+        }
     }
 
     func testAsyncOpenDownloadRealm() throws {
@@ -69,36 +64,26 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
         executeChild()
 
-        let asyncOpen = AsyncOpen(appId: appId, partitionValue: #function)
         let ex = expectation(description: "download-populated-realm-async-open")
-        asyncOpen.projectedValue
-            .sink { asyncOpenState in
-                if case let .open(realm) = asyncOpenState {
-                    XCTAssertNotNil(realm)
-                    self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
-                    ex.fulfill()
-                }
+        asyncOpen(appId: appId, partitionValue: #function) { asyncOpenState in
+            if case let .open(realm) = asyncOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
+                ex.fulfill()
             }
-            .store(in: &cancellables)
-        waitForExpectations(timeout: 10.0)
-        asyncOpen.cancel()
+        }
     }
 
     func testAsyncOpenWaitingForUserWithoutUserLoggedIn() throws {
         let user = try logInUser(for: basicCredentials())
         user.logOut { _ in } //Logout current user
 
-        let asyncOpen = AsyncOpen(appId: appId, partitionValue: #function)
         let ex = expectation(description: "download-realm-async-open-not-logged")
-        asyncOpen.projectedValue
-            .sink { asyncOpenState in
-                if case .waitingForUser = asyncOpenState {
-                    ex.fulfill()
-                }
+        asyncOpen(appId: appId, partitionValue: #function) { asyncOpenState in
+            if case .waitingForUser = asyncOpenState {
+                ex.fulfill()
             }
-            .store(in: &cancellables)
-        waitForExpectations(timeout: 10.0)
-        asyncOpen.cancel()
+        }
     }
 
     // In case of no internet connection AsyncOpen should return an error if there is a timeout
@@ -114,24 +99,16 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let app = App(id: appId, configuration: appConfig)
         _ = try logInUser(for: basicCredentials(app: app), app: app)
 
-        autoreleasepool {
-            proxy.delay = 3.0
-            let asyncOpen = AsyncOpen(appId: appId, partitionValue: #function, timeout: 2000)
-            let ex = expectation(description: "download-realm-async-open-no-connection")
-            asyncOpen.projectedValue
-                .sink { asyncOpenState in
-                    if case let .error(error) = asyncOpenState,
-                       let nsError = error as NSError? {
-                        XCTAssertEqual(nsError.code, Int(ETIMEDOUT))
-                        XCTAssertEqual(nsError.domain, NSPOSIXErrorDomain)
-                        ex.fulfill()
-                    }
-                }
-                .store(in: &cancellables)
-            waitForExpectations(timeout: 10.0)
-            asyncOpen.cancel()
+        proxy.delay = 3.0
+        let ex = expectation(description: "download-realm-async-open-no-connection")
+        asyncOpen(appId: appId, partitionValue: #function, timeout: 2000) { asyncOpenState in
+            if case let .error(error) = asyncOpenState,
+               let nsError = error as NSError? {
+                XCTAssertEqual(nsError.code, Int(ETIMEDOUT))
+                XCTAssertEqual(nsError.domain, NSPOSIXErrorDomain)
+                ex.fulfill()
+            }
         }
-        proxy.stop()
     }
 
     func testAsyncOpenProgressNotification() throws {
@@ -143,19 +120,15 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
         executeChild()
 
-        let asyncOpen = AsyncOpen(appId: appId, partitionValue: #function)
         let ex = expectation(description: "progress-async-open")
-        asyncOpen.projectedValue
-            .sink { asyncOpenState in
-                if case let .open(realm) = asyncOpenState {
-                    XCTAssertNotNil(realm)
-                    self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
+        asyncOpen(appId: appId, partitionValue: #function) { asyncOpenState in
+            if case let .progress(progress) = asyncOpenState {
+                XCTAssertTrue(progress.fractionCompleted > 0)
+                if progress.isFinished {
                     ex.fulfill()
                 }
             }
-            .store(in: &cancellables)
-        waitForExpectations(timeout: 10.0)
-        asyncOpen.cancel()
+        }
     }
 
     // Cached App is already created on the setup of the test
@@ -167,16 +140,22 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         }
 
         executeChild()
-
-        let asyncOpen = AsyncOpen(partitionValue: #function)
+        
         let ex = expectation(description: "download-cached-app-async-open")
+        asyncOpen(partitionValue: #function) { asyncOpenState in
+            if case let .open(realm) = asyncOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
+                ex.fulfill()
+            }
+        }
+    }
+
+    func asyncOpen(appId: String? = nil, partitionValue: String, timeout: UInt? = nil, handler: @escaping (AsyncOpenState) -> Void) {
+        let asyncOpen = AsyncOpen(appId: appId, partitionValue: partitionValue, timeout: timeout)
         asyncOpen.projectedValue
             .sink { asyncOpenState in
-                if case let .open(realm) = asyncOpenState {
-                    XCTAssertNotNil(realm)
-                    self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
-                    ex.fulfill()
-                }
+                handler(asyncOpenState)
             }
             .store(in: &cancellables)
         waitForExpectations(timeout: 10.0)
@@ -202,18 +181,13 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     func testAutoOpenOpenRealm() throws {
         _ = try logInUser(for: basicCredentials())
 
-        let autoOpen = AutoOpen(appId: appId, partitionValue: #function)
         let ex = expectation(description: "download-realm-auto-open")
-        autoOpen.projectedValue
-            .sink { autoOpenState in
-                if case let .open(realm) = autoOpenState {
-                    XCTAssertNotNil(realm)
-                    ex.fulfill()
-                }
+        autoOpen(appId: appId, partitionValue: #function) { autoOpenState in
+            if case let .open(realm) = autoOpenState {
+                XCTAssertNotNil(realm)
+                ex.fulfill()
             }
-            .store(in: &cancellables)
-        waitForExpectations(timeout: 10.0)
-        autoOpen.cancel()
+        }
     }
 
     func testAutoOpenDownloadRealm() throws {
@@ -226,36 +200,26 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
         executeChild()
 
-        let autoOpen = AutoOpen(appId: appId, partitionValue: #function)
         let ex = expectation(description: "download-populated-realm-auto-open")
-        autoOpen.projectedValue
-            .sink { autoOpenState in
-                if case let .open(realm) = autoOpenState {
-                    XCTAssertNotNil(realm)
-                    self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
-                    ex.fulfill()
-                }
+        autoOpen(appId: appId, partitionValue: #function) { autoOpenState in
+            if case let .open(realm) = autoOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
+                ex.fulfill()
             }
-            .store(in: &cancellables)
-        waitForExpectations(timeout: 10.0)
-        autoOpen.cancel()
+        }
     }
 
     func testAutoOpenWaitingForUserWithoutUserLoggedIn() throws {
         let user = try logInUser(for: basicCredentials())
         user.logOut { _ in } //Logout current user
 
-        let autoOpen = AutoOpen(appId: appId, partitionValue: #function)
         let ex = expectation(description: "download-realm-auto-open-not-logged")
-        autoOpen.projectedValue
-            .sink { autoOpenState in
-                if case .waitingForUser = autoOpenState {
-                    ex.fulfill()
-                }
+        autoOpen(appId: appId, partitionValue: #function) { autoOpenState in
+            if case .waitingForUser = autoOpenState {
+                ex.fulfill()
             }
-            .store(in: &cancellables)
-        waitForExpectations(timeout: 10.0)
-        autoOpen.cancel()
+        }
     }
 
     // In case of no internet connection AutoOpen should return an opened Realm, offline-first approach
@@ -271,20 +235,13 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         let app = App(id: appId, configuration: appConfig)
         _ = try logInUser(for: basicCredentials(app: app), app: app)
 
-        autoreleasepool {
-            proxy.delay = 3.0
-            let autoOpen = AutoOpen(appId: appId, partitionValue: #function, timeout: 2000)
-            let ex = expectation(description: "download-realm-auto-open-no-connection")
-            autoOpen.projectedValue
-                .sink { autoOpenState in
-                    if case let .open(realm) = autoOpenState {
-                        XCTAssertNotNil(realm)
-                        ex.fulfill()
-                    }
-                }
-                .store(in: &cancellables)
-            waitForExpectations(timeout: 10.0)
-            autoOpen.cancel()
+        proxy.delay = 3.0
+        let ex = expectation(description: "download-realm-auto-open-no-connection")
+        autoOpen(appId: appId, partitionValue: #function, timeout: 2000) { autoOpenState in
+            if case let .open(realm) = autoOpenState {
+                XCTAssertNotNil(realm)
+                ex.fulfill()
+            }
         }
 
         proxy.stop()
@@ -299,20 +256,15 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
         executeChild()
 
-        let autoOpen = AutoOpen(appId: appId, partitionValue: #function)
         let ex = expectation(description: "progress-auto-open")
-        autoOpen.projectedValue
-            .sink { autoOpenState in
-                if case let .progress(progress) = autoOpenState {
-                    XCTAssertTrue(progress.fractionCompleted > 0)
-                    if progress.isFinished {
-                        ex.fulfill()
-                    }
+        autoOpen(appId: appId, partitionValue: #function) { autoOpenState in
+            if case let .progress(progress) = autoOpenState {
+                XCTAssertTrue(progress.fractionCompleted > 0)
+                if progress.isFinished {
+                    ex.fulfill()
                 }
             }
-            .store(in: &cancellables)
-        waitForExpectations(timeout: 10.0)
-        autoOpen.cancel()
+        }
     }
 
     // App is already created on the setup of the test
@@ -325,16 +277,21 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
         executeChild()
 
-        let autoOpen = AutoOpen(partitionValue: #function)
         let ex = expectation(description: "download-cached-app-auto-open")
+        autoOpen(partitionValue: #function) { autoOpenState in
+            if case let .open(realm) = autoOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
+                ex.fulfill()
+            }
+        }
+    }
+
+    func autoOpen(appId: String? = nil, partitionValue: String, timeout: UInt? = nil, handler: @escaping (AsyncOpenState) -> Void) {
+        let autoOpen = AutoOpen(appId: appId, partitionValue: partitionValue, timeout: timeout)
         autoOpen.projectedValue
             .sink { autoOpenState in
-                if case let .progress(progress) = autoOpenState {
-                    XCTAssertTrue(progress.fractionCompleted > 0)
-                    if progress.isFinished {
-                        ex.fulfill()
-                    }
-                }
+                handler(autoOpenState)
             }
             .store(in: &cancellables)
         waitForExpectations(timeout: 10.0)

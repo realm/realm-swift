@@ -166,9 +166,9 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     }
 
     public static let bigObjectCount = 2
-    public func populateRealm(user: User, partitionValue: String) {
+    public func populateRealm(user: User? = nil, partitionValue: String) {
         do {
-            let user = try logInUser(for: basicCredentials())
+            let user = try (user ?? logInUser(for: basicCredentials()))
             let config = user.configuration(testName: partitionValue)
             let realm = try openRealm(configuration: config)
             try! realm.write {
