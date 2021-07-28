@@ -61,7 +61,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
             populateRealm(user: user, partitionValue: #function)
             return
         }
-
         executeChild()
 
         let ex = expectation(description: "download-populated-realm-async-open")
@@ -117,7 +116,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
             populateRealm(user: user, partitionValue: #function)
             return
         }
-
         executeChild()
 
         let ex = expectation(description: "progress-async-open")
@@ -138,9 +136,8 @@ class SwiftUIServerTests: SwiftSyncTestCase {
             populateRealm(user: user, partitionValue: #function)
             return
         }
-
         executeChild()
-        
+
         let ex = expectation(description: "download-cached-app-async-open")
         asyncOpen(partitionValue: #function) { asyncOpenState in
             if case let .open(realm) = asyncOpenState {
@@ -197,7 +194,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
             populateRealm(user: user, partitionValue: #function)
             return
         }
-
         executeChild()
 
         let ex = expectation(description: "download-populated-realm-auto-open")
@@ -253,7 +249,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
             populateRealm(user: user, partitionValue: #function)
             return
         }
-
         executeChild()
 
         let ex = expectation(description: "progress-auto-open")
@@ -274,7 +269,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
             populateRealm(user: user, partitionValue: #function)
             return
         }
-
         executeChild()
 
         let ex = expectation(description: "download-cached-app-auto-open")
