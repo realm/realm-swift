@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add `async` `Realm.asyncOpen` and `App.login` methods.
 
 ### Fixed
 * `RealmProperty<T?>` would crash when decoding a `null` json value.

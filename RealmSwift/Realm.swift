@@ -1005,3 +1005,35 @@ extension Realm {
 
 /// The type of a block to run for notification purposes when the data in a Realm is modified.
 public typealias NotificationBlock = (_ notification: Realm.Notification, _ realm: Realm) -> Void
+
+@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+extension Realm {
+    /**
+     Asynchronously open a Realm and deliver it to a block on the given queue.
+
+     Opening a Realm asynchronously will perform all work needed to get the Realm to
+     a usable state (such as running potentially time-consuming migrations) on a
+     background thread before dispatching to the given queue. In addition,
+     synchronized Realms wait for all remote content available at the time the
+     operation began to be downloaded and available locally.
+
+     The Realm passed to the callback function is confined to the callback
+     queue as if `Realm(configuration:queue:)` was used.
+
+     - parameter configuration: A configuration object to use when opening the Realm.
+     - parameter callbackQueue: The dispatch queue on which the callback should be run.
+     - returns: An open Realm.
+     */
+    @discardableResult
+    public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration) async throws -> Realm {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Realm, Swift.Error>) in
+            RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: .main, callback: { rlmRealm, error in
+                if let realm = rlmRealm.flatMap(Realm.init) {
+                    continuation.resume(with: .success(realm.freeze()))
+                } else {
+                    continuation.resume(with: .failure(error ?? Error.callFailed))
+                }
+            })
+        }.thaw()
+    }
+}

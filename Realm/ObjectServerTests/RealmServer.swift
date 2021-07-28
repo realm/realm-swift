@@ -526,7 +526,8 @@ public class RealmServer: NSObject {
         let userProcess = Process()
         userProcess.environment = [
             "PATH": binPath,
-            "LD_LIBRARY_PATH": libDir
+            "LD_LIBRARY_PATH": libDir,
+            "DYLD_LIBRARY_PATH": libDir
         ]
         userProcess.launchPath = "\(binDir)/create_user"
         userProcess.arguments = [
@@ -543,7 +544,8 @@ public class RealmServer: NSObject {
 
         serverProcess.environment = [
             "PATH": binPath,
-            "LD_LIBRARY_PATH": libDir
+            "LD_LIBRARY_PATH": libDir,
+            "DYLD_LIBRARY_PATH": libDir
         ]
         // golang server needs a tmp directory
         try! FileManager.default.createDirectory(atPath: "\(tempDir.path)/tmp",

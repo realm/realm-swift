@@ -2931,4 +2931,45 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     }
 }
 
+@available(macOS 12.0, *)
+class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
+    func testAsyncOpenStandalone() async throws {
+        try autoreleasepool {
+            let realm = try Realm()
+            try! realm.write {
+                (0..<10000).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket")) }
+            }
+        }
+        let realm = try await Realm.asyncOpen()
+        XCTAssertEqual(realm.objects(SwiftPerson.self).count, 10000)
+    }
+
+    func testAsyncOpenSync() async throws {
+        if isParent {
+            let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+            let password = randomString(10)
+            try await app.emailPasswordAuth.registerUser(email: email, password: password)
+            let user = try await self.app.login(credentials: .emailPassword(email: email, password: password))
+            let realm = try await Realm.asyncOpen(configuration: user.configuration(testName: #function))
+            try! realm.write {
+                realm.add(SwiftHugeSyncObject.create())
+                realm.add(SwiftHugeSyncObject.create())
+            }
+            let progressEx = self.expectation(description: "Should upload")
+            let token = realm.syncSession!.addProgressNotification(for: .upload, mode: .forCurrentlyOutstandingWork) {
+                if $0.isTransferComplete {
+                    progressEx.fulfill()
+                }
+            }
+            self.wait(for: [progressEx], timeout: 30.0)
+            token?.invalidate()
+            executeChild()
+        } else {
+            let user = try await app.login(credentials: .anonymous)
+            let realm = try await Realm.asyncOpen(configuration: user.configuration(testName: #function))
+            XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
+        }
+    }
+}
+
 #endif // os(macOS)
