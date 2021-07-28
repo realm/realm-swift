@@ -18,7 +18,7 @@
 
 import Realm
 
-/// Protocol representing a PartitionValue..
+/// Protocol representing a PartitionValue for synced Realms.
 public protocol PartitionValue {
 }
 
