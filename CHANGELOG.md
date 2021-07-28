@@ -1,13 +1,9 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add `async` `Realm.asyncOpen` and `App.login` methods.
+* None.
 
 ### Fixed
-* `RealmProperty<T?>` would crash when decoding a `null` json value.
-  ([Cocoa #7323](https://github.com/realm/realm-cocoa/issues/7323), since v10.8.0)
-* `@Persisted<T?>` would crash when decoding a `null` value.
-  ([#7332](https://github.com/realm/realm-cocoa/issues/7332), since v10.10.0).
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * None.
 
