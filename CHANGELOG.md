@@ -14,7 +14,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 
-* Fixed `configuration(partitionValue: AnyBSON)` will set always a nil partition value
+* Fix `configuration(partitionValue: AnyBSON)` will set always a nil partition value
   for the user sync configuration.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
