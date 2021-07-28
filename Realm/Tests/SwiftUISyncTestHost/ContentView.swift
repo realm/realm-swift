@@ -135,7 +135,8 @@ struct AsyncOpenView: View {
     @State var progress: Progress?
     @AsyncOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
                partitionValue: ProcessInfo.processInfo.environment["function_name"]!,
-               timeout: 2000) var asyncOpen
+               timeout: 2000)
+    var asyncOpen
 
     var body: some View {
         VStack {
@@ -181,7 +182,8 @@ struct AutoOpenView: View {
     @State var progress: Progress?
     @AutoOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
               partitionValue: ProcessInfo.processInfo.environment["function_name"]!,
-              timeout: 2000) var autoOpen
+              timeout: 2000)
+    var autoOpen
 
     var body: some View {
         VStack {
@@ -225,7 +227,8 @@ struct AutoOpenView: View {
 struct AsyncOpenPartitionView: View {
     @AsyncOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
                partitionValue: "wrong_partition_value",
-               timeout: 2000) var asyncOpen
+               timeout: 2000)
+    var asyncOpen
 
     var body: some View {
         VStack {
@@ -256,7 +259,8 @@ struct AsyncOpenPartitionView: View {
 struct AutoOpenPartitionView: View {
     @AutoOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
               partitionValue: "wrong_partition_value",
-              timeout: 2000) var autoOpen
+              timeout: 2000)
+    var autoOpen
 
     var body: some View {
         VStack {

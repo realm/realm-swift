@@ -650,10 +650,10 @@ extension EnvironmentValues {
     /// The current `PartitionValue` that the view should use.
     public var partitionValue: PartitionValue? {
         get {
-            return self[PartitionValueEnvironmentKey]
+            return self[PartitionValueEnvironmentKey.self]
         }
         set {
-            self[PartitionValueEnvironmentKey] = newValue
+            self[PartitionValueEnvironmentKey.self] = newValue
         }
     }
 }
@@ -817,10 +817,10 @@ public enum AsyncOpenState {
         var app: App
         if let appId = appId {
             app = App(id: appId)
-        } else if RLMApp.apps().allKeys.count == 1, // Check if there is a singular cached app
-            let cachedAppId = RLMApp.apps().allKeys.first as? String {
+        } else if RLMApp.appIds().count == 1, // Check if there is a singular cached app
+            let cachedAppId = RLMApp.appIds().first as? String {
             app = App(id: cachedAppId)
-        } else if RLMApp.apps().allKeys.count > 1 {
+        } else if RLMApp.appIds().count > 1 {
             throwRealmException("There is no appId, either provided by the user on the property wrapper or more than 1 cached RLMApp")
         } else {
             throwRealmException("There is no appId, either provided by the user on the property wrapper or any cached RLMApp")
@@ -966,10 +966,10 @@ public enum AsyncOpenState {
         var app: App
         if let appId = appId {
             app = App(id: appId)
-        } else if RLMApp.apps().allKeys.count == 1, // Check if there is a singular cached app
-            let cachedAppId = RLMApp.apps().allKeys.first as? String {
+        } else if RLMApp.appIds().count == 1, // Check if there is a singular cached app
+            let cachedAppId = RLMApp.appIds().first as? String {
             app = App(id: cachedAppId)
-        } else if RLMApp.apps().allKeys.count > 1 {
+        } else if RLMApp.appIds().count > 1 {
             throwRealmException("There is no appId, either provided by the user on the property wrapper or more than 1 cached RLMApp")
         } else {
             throwRealmException("There is no appId, either provided by the user on the property wrapper or any cached RLMApp")
