@@ -252,12 +252,14 @@ extension Persisted: Encodable where Value: Encodable {
     }
 }
 
+/// :nodoc:
 /// Protocol for a PropertyWrapper to properly handle Coding when the wrappedValue is Optional
 public protocol OptionalCodingWrapper {
     associatedtype WrappedType: ExpressibleByNilLiteral
     init(wrappedValue: WrappedType)
 }
 
+/// :nodoc:
 extension KeyedDecodingContainer {
     // This is used to override the default decoding behaviour for OptionalCodingWrapper to allow a value to avoid a missing key Error
     public func decode<T>(_ type: T.Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> T where T: Decodable, T: OptionalCodingWrapper {
