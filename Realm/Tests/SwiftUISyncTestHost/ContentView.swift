@@ -38,14 +38,14 @@ struct LoginView: View {
             switch viewState {
             case .initial:
                 EmptyView()
-            case .logging:
+            case .loggingIn:
                 VStack {
                     ProgressView("Logging in...")
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.blue)
                 .transition(AnyTransition.move(edge: .leading)).animation(.default)
-            case .logged:
+            case .loggedIn:
                 VStack {
                     Text("Logged in")
                         .accessibilityIdentifier("logged-view")
@@ -99,11 +99,11 @@ struct LoginView: View {
             }
         }
         .onAppear(perform: {
-            viewState = .logging
+            viewState = .loggingIn
             loginHelper.login(email: ProcessInfo.processInfo.environment["function_name"]!,
                               password: "password",
                               completion: {
-                viewState = .logged
+                viewState = .loggedIn
             })
         })
     }
