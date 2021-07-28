@@ -25,6 +25,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Switch to building the Carthage release with Xcode 13.
+* Add `async` `Realm.asyncOpen` and `App.login` methods.
 
 ### Fixed
 
