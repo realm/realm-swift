@@ -205,4 +205,34 @@ class ProjectionTests: TestCase {
         XCTAssertEqual(dany.birthdayAsEpochtime, Date(timeIntervalSince1970: 0).timeIntervalSince1970)
         XCTAssertEqual(dany.firstFriendsName.first!, "John")
     }
+    
+    func testProjectionEquality() {
+        let collection = realmWithTestPath().objects(PersonProjection.self)
+        let left = collection.first!
+        let right = collection.last!
+        let anotherLeft = collection[0]
+        
+        XCTAssertNotEqual(left, right)
+        XCTAssertEqual(left, anotherLeft)
+    }
+
+    func testProjectionFromResultSortedBirthday() {
+        let realm = realmWithTestPath()
+//        let dany: PersonProjection = realm.objects(PersonProjection.self).sorted(byKeyPath: "birthdayAsEpochtime").first!
+        let dany: PersonProjection = realm.objects(PersonProjection.self).sorted(byKeyPath: "birthday").first!
+
+        XCTAssertEqual(dany.homeCity, "King's Landing")
+        XCTAssertEqual(dany.birthdayAsEpochtime, Date(timeIntervalSince1970: 0).timeIntervalSince1970)
+        XCTAssertEqual(dany.firstFriendsName.first!, "John")
+    }
+    
+    func testProjectionFromResultFilteredBirthday() {
+        let realm = realmWithTestPath()
+        let johnSnow: PersonProjection = realm.objects(PersonProjection.self).filter("birthday == 0").first!
+
+        XCTAssertEqual(johnSnow.homeCity, "Winterfell")
+        XCTAssertEqual(johnSnow.birthdayAsEpochtime, Date(timeIntervalSince1970: 10).timeIntervalSince1970)
+        XCTAssertEqual(johnSnow.firstFriendsName.first!, "Daenerys")
+    }
+
 }

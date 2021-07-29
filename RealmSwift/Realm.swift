@@ -653,14 +653,14 @@ import Realm.Private
     public func objects<Element: Object>(_ type: Element.Type) -> Results<Element> {
         return Results(RLMGetObjects(rlmRealm, type.className(), nil))
     }
-//
-//    public func objectsProjection<Element: Object, T: Projection<Element>>(_ type: T.Type) -> Results<T> {
-////    public func objectsProjection<T: Projection<ObjectBase>>(_ type: ObjectBase.Type) -> Results<T> {
-//        return Results(RLMGetObjects(rlmRealm, Element.className(), nil), isProjection: true)
-//    }
 
     public func objects<Element: Object, T: Projection<Element>>(_ type: T.Type) -> Results<T> {
-        return Results(RLMGetObjects(rlmRealm, Element.className(), nil)) { T($0 as! Element) }
+        return Results(RLMGetObjects(rlmRealm, Element.className(), nil)) {
+            guard let obj = $0 else {
+                return nil
+            }
+            return T(obj as! Element)
+        }
     }
 
     /**

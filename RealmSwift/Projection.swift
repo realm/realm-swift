@@ -294,27 +294,19 @@ extension Projection: RealmCollectionValue {
     }
     
     public static func == (lhs: Projection<Root>, rhs: Projection<Root>) -> Bool {
-        fatalError()
+        RLMObjectBaseAreEqual(lhs.realmObject, rhs.realmObject)
     }
     
-    
+    fileprivate var realmObject: ObjectBase {
+        get {
+            (Mirror(reflecting: self).children.first(where: { $0.value is _Projected })!.value as! _Projected).objectBase
+        }
+    }
 }
 
 extension Projection: Hashable { // Required for RealmCollectionValue
     public func hash(into hasher: inout Hasher) {
-        let mirror = Mirror(reflecting: self)
-        let label = mirror.children.first(where: { $0.value is _Projected })!.label!
-        let keyPath =  \Projection.[label]
-        let hashVal = (self[keyPath: keyPath] as _Projected).objectBase.hashValue// set(object: object)
-
+        let hashVal = realmObject.hashValue
         hasher.combine(hashVal)
     }
-//    public var hashValue: Int {
-//        get {
-//            let mirror = Mirror(reflecting: self)
-//            let label = mirror.children.first(where: { $0.value is _Projected })!.label!
-//            let keyPath =  \Projection.[label]
-//            return (self[keyPath: keyPath] as _Projected).objectBase.hashValue// set(object: object)
-//        }
-//    }
 }

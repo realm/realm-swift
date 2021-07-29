@@ -124,12 +124,12 @@ extension AnyRealmValue: AddableType {}
         self.rlmResults = rlmResults
     }
 
-    internal init(_ rlmResults: RLMResults<AnyObject>, _ projector: ((ObjectBase) -> Element)?)  {
+    internal init(_ rlmResults: RLMResults<AnyObject>, _ projector: ((ObjectBase?) -> Element?)?) {
         self.rlmResults = rlmResults
         self.projector = projector
     }
 
-    private var projector: ((ObjectBase) -> Element)? = nil
+    private var projector: ((ObjectBase?) -> Element?)? = nil
 
     // MARK: Index Retrieval
 
@@ -176,20 +176,27 @@ extension AnyRealmValue: AddableType {}
      */
     public subscript(position: Int) -> Element {
         throwForNegativeIndex(position)
+        if let projector = projector {
+            return projector(dynamicBridgeCast(fromObjectiveC: rlmResults.object(at: UInt(position))))!
+        }
         return dynamicBridgeCast(fromObjectiveC: rlmResults.object(at: UInt(position)))
     }
 
     /// Returns the first object in the results, or `nil` if the results are empty.
     public var first: Element? {
-        let objectBase: ObjectBase? = rlmResults.firstObject().map(dynamicBridgeCast)
-        if let projector = projector {
-            return projector(objectBase!)
+        if let projector = projector, let object = rlmResults.firstObject().map(dynamicBridgeCast) as? ObjectBase {
+            return projector(rlmResults.firstObject().map(dynamicBridgeCast) as? ObjectBase)
         }
-        return objectBase as? Element
+        return rlmResults.firstObject().map(dynamicBridgeCast)
     }
 
     /// Returns the last object in the results, or `nil` if the results are empty.
-    public var last: Element? { return rlmResults.lastObject().map(dynamicBridgeCast) }
+    public var last: Element? {
+        if let projector = projector {
+            return projector(rlmResults.lastObject().map(dynamicBridgeCast) as? ObjectBase)
+        }
+        return rlmResults.lastObject().map(dynamicBridgeCast)
+    }
 
     /**
      Returns an array containing the objects in the results at the indexes specified by a given index set.
