@@ -628,19 +628,19 @@ extension EnvironmentValues {
     /// The current `Realm.Configuration` that the view should use.
     public var realmConfiguration: Realm.Configuration {
         get {
-            return self[RealmEnvironmentKey]
+            return self[RealmEnvironmentKey.self]
         }
         set {
-            self[RealmEnvironmentKey] = newValue
+            self[RealmEnvironmentKey.self] = newValue
         }
     }
     /// The current `Realm` that the view should use.
     public var realm: Realm {
         get {
-            return try! Realm(configuration: self[RealmEnvironmentKey])
+            return try! Realm(configuration: self[RealmEnvironmentKey.self])
         }
         set {
-            self[RealmEnvironmentKey] = newValue.configuration
+            self[RealmEnvironmentKey.self] = newValue.configuration
         }
     }
 }
