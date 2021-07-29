@@ -1462,6 +1462,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
     public func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._observe(keyPaths, queue, block) }
 
+    /// :nodoc:
     public func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._observe(queue, block) }
 

@@ -1,7 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+*  `Object.observe` and `RealmCollection.observe` now include an optional `keyPaths` parameter which filters change notifications to those only occurring on the provided key path or key paths. See method documentation for extended detail on filtering behavior.
+* `ObservedResults<ResultsType>`  now includes an optional `keyPaths` parameter which filters change notifications to those only occurring on the provided key path or key paths. ex) `@ObservedResults(MyObject.self, keyPaths: ["myList.property"])`
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
