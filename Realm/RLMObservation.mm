@@ -588,8 +588,8 @@ static KeyPath keyPathFromString(RLMRealm *realm,
 }
 
 KeyPathArray RLMKeyPathArrayFromStringArray(RLMRealm *realm,
-                                         RLMClassInfo *info,
-                                         NSArray<NSString *> *keyPaths) {
+                                            RLMClassInfo *info,
+                                            NSArray<NSString *> *keyPaths) {
     KeyPathArray keyPathArray;
     for (NSString *keyPath in keyPaths) {
         keyPathArray.push_back(keyPathFromString(realm , realm.schema, info, info->rlmObjectSchema, keyPath));

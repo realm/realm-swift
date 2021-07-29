@@ -80,7 +80,7 @@ internal final class SwiftUIKVO: NSObject {
     struct Subscription: Combine.Subscription {
         let observer: NSObject
         let value: NSObject
-        let excludedkeyPath: [String]
+        let keyPaths: [String]
 
         var combineIdentifier: CombineIdentifier {
             CombineIdentifier(value)
@@ -93,7 +93,7 @@ internal final class SwiftUIKVO: NSObject {
             guard SwiftUIKVO.observedObjects.keys.contains(value) else {
                 return
             }
-            excludedkeyPath.forEach {
+            keyPaths.forEach {
                 value.removeObserver(observer, forKeyPath: $0)
             }
             SwiftUIKVO.observedObjects.removeValue(forKey: value)
@@ -119,11 +119,11 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
 
     private var subscribers = [AnySubscriber<Void, Never>]()
     private let value: ObjectType
-    private let excludedkeyPath: [String]?
+    private let keyPaths: [String]?
 
-    init(_ value: ObjectType, _ excludedkeyPath: [String]? = nil) {
+    init(_ value: ObjectType, _ keyPaths: [String]? = nil) {
         self.value = value
-        self.excludedkeyPath = excludedkeyPath
+        self.keyPaths = keyPaths
     }
 
     func send() {
@@ -136,19 +136,19 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
         subscribers.append(AnySubscriber(subscriber))
         if value.realm != nil && !value.isInvalidated, let value = value.thaw() {
             // if the value is managed
-            let token =  value._observe(excludedkeyPath, subscriber)
+            let token =  value._observe(keyPaths, subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
         } else if let value = value as? ObjectBase, !value.isInvalidated {
             // else if the value is unmanaged
             let schema = ObjectSchema(RLMObjectBaseObjectSchema(value)!)
             let kvo = SwiftUIKVO(subscriber: subscriber)
 
-            var excludedkeyPath = [String]()
+            var keyPaths = [String]()
             for property in schema.properties {
-                excludedkeyPath.append(property.name)
+                keyPaths.append(property.name)
                 value.addObserver(kvo, forKeyPath: property.name, options: .initial, context: nil)
             }
-            let subscription = SwiftUIKVO.Subscription(observer: kvo, value: value, excludedkeyPath: excludedkeyPath)
+            let subscription = SwiftUIKVO.Subscription(observer: kvo, value: value, keyPaths: keyPaths)
             subscriber.receive(subscription: subscription)
             SwiftUIKVO.observedObjects[value] = subscription
         }
@@ -160,17 +160,17 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         willSet {
             if newValue != value {
                 objectWillChange.send()
-                self.objectWillChange = ObservableStoragePublisher(newValue, self.excludedkeyPath)
+                self.objectWillChange = ObservableStoragePublisher(newValue, self.keyPaths)
             }
         }
     }
 
     var objectWillChange: ObservableStoragePublisher<ObservedType>
-    var excludedkeyPath: [String]?
+    var keyPaths: [String]?
 
-    init(_ value: ObservedType, _ excludedkeyPath: [String]? = nil) {
+    init(_ value: ObservedType, _ keyPaths: [String]? = nil) {
         self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
-        self.objectWillChange = ObservableStoragePublisher(value, excludedkeyPath)
+        self.objectWillChange = ObservableStoragePublisher(value, keyPaths)
     }
 }
 
@@ -343,9 +343,9 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     public init(_ type: ResultType.Type,
                 configuration: Realm.Configuration? = nil,
                 filter: NSPredicate? = nil,
-                excludedkeyPath: [String]? = nil,
+                keyPaths: [String]? = nil,
                 sortDescriptor: SortDescriptor? = nil) {
-        self.storage = Storage(Results(RLMResults.emptyDetached()), excludedkeyPath)
+        self.storage = Storage(Results(RLMResults.emptyDetached()), keyPaths)
         self.storage.configuration = configuration
         self.filter = filter
         self.sortDescriptor = sortDescriptor

@@ -495,8 +495,8 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      provided key paths. For example, if:
      ```swift
      class Dog: Object {
-         @Persisted dynamic var name: String = ""
-         @Persisted dynamic var age: Int = 1
+         @Persisted var name: String
+         @Persisted var age: Int
          @Persisted var toys: List<Toy>
      }
      // ...

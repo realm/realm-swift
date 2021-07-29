@@ -487,8 +487,8 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
      provided key paths. For example, if:
      ```swift
      class Dog: Object {
-         @Persisted var name: String = ""
-         @Persisted var age: Int = 1
+         @Persisted var name: String
+         @Persisted var age: Int
          @Persisted var toys: List<Toy>
      }
      // ...

@@ -81,8 +81,8 @@ extension ObjectBase {
      provided key paths. For example, if:
      ```swift
      class Dog: Object {
-         @Persisted var name: String = ""
-         @Persisted var adopted: Bool = false
+         @Persisted var name: String
+         @Persisted var adopted: Bool
          @Persisted var siblings: List<Dog>
      }
 
