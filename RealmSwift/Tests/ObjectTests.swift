@@ -1039,8 +1039,6 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
 
-    // How could these expectations be broken down into their own tests?
-    // Naming was getting out of hand.
     func testListPropertyKeyPathNotifications() {
         let realm = try! Realm()
         realm.beginWrite()
