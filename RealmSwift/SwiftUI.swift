@@ -679,7 +679,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         } else {
             asyncOpenState = .waitingForUser
             return app.objectWillChange
-                .compactMap { $0.currentUser }
+                .compactMap(\.currentUser)
                 .flatMap { self.asyncOpenForUser($0, partitionValue: self.partitionValue, configuration: self.configuration) }
                 .eraseToAnyPublisher()
         }
