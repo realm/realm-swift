@@ -679,8 +679,8 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         } else {
             asyncOpenState = .waitingForUser
             return app.objectWillChange
-                .filter { $0.currentUser != nil }
-                .flatMap { self.asyncOpenForUser($0.currentUser!, partitionValue: self.partitionValue, configuration: self.configuration) }
+                .compactMap { $0.currentUser }
+                .flatMap { self.asyncOpenForUser($0, partitionValue: self.partitionValue, configuration: self.configuration) }
                 .eraseToAnyPublisher()
         }
     }
@@ -774,7 +774,6 @@ public enum AsyncOpenState {
                 if case .failure(let error) = completion {
                     self.storage.asyncOpenState = .error(error)
                 }
-                cancel()
             } receiveValue: { realm in
                 self.storage.asyncOpenState = .open(realm)
             }.store(in: &storage.cancellables)
@@ -844,7 +843,6 @@ public enum AsyncOpenState {
             let bsonValue = AnyBSON(partitionValue)
             if storage.partitionValue != bsonValue {
                 storage.partitionValue = bsonValue
-
                 cancel()
                 asyncOpen()
             }
@@ -922,7 +920,6 @@ public enum AsyncOpenState {
                     } else {
                         self.storage.asyncOpenState = .error(error)
                     }
-                    cancel()
                 }
             } receiveValue: { realm in
                 self.storage.asyncOpenState = .open(realm)
@@ -993,7 +990,6 @@ public enum AsyncOpenState {
             let bsonValue = AnyBSON(partitionValue)
             if storage.partitionValue != bsonValue {
                 storage.partitionValue = bsonValue
-
                 cancel()
                 asyncOpen()
             }

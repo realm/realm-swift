@@ -91,8 +91,8 @@ struct LoginView: View {
                 .autocapitalization(.none)
             SecureField("Password", text: $password)
             Spacer()
-            NavigationLink(destination: AsyncOpenView(), tag: "asyncOpen", selection: $navigationTag, label: { EmptyView()})
-            NavigationLink(destination: AutoOpenView(), tag: "autoOpen", selection: $navigationTag, label: { EmptyView()})
+            NavigationLink(destination: LazyView(AsyncOpenView()), tag: "asyncOpen", selection: $navigationTag, label: { EmptyView()})
+            NavigationLink(destination: LazyView(AutoOpenView()), tag: "autoOpen", selection: $navigationTag, label: { EmptyView()})
             Button("Login") {
                 loginHelper.login(email: email, password: password) {
                     navigationTag = navigationType.rawValue
@@ -281,6 +281,16 @@ struct ContactDetailView: View {
             }
         }
         .navigationTitle("Contact")
+    }
+}
+
+struct LazyView<Content: View>: View {
+    let build: () -> Content
+    init(_ build: @autoclosure @escaping () -> Content) {
+        self.build = build
+    }
+    var body: Content {
+        build()
     }
 }
 

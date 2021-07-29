@@ -1,7 +1,6 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-
 * Add two new property wrappers for opening a Realm asynchronously in a 
   SwiftUI View:
     - `AsyncOpen` is a property wrapper that initiates Realm.asyncOpen 
@@ -13,7 +12,6 @@ x.y.z Release notes (yyyy-MM-dd)
   `MyView().environment(\.partitionValue, "partitionValue")`. 
 
 ### Fixed
-
 * Fix `configuration(partitionValue: AnyBSON)` will set always a nil partition value
   for the user sync configuration.
 
