@@ -704,6 +704,30 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         self.configuration = configuration
         self.partitionValue = partitionValue
     }
+
+    // MARK: - AutoOpen & AsyncOpen Helper
+
+    class func configureApp(appId: String? = nil, withTimeout timeout: UInt? = nil) -> App {
+        var app: App
+        let appsIds = RLMApp.appIds()
+        if let appId = appId {
+            app = App(id: appId)
+        } else if appsIds.count == 1, // Check if there is a singular cached app
+            let cachedAppId = appsIds.first as? String {
+            app = App(id: cachedAppId)
+        } else if appsIds.count > 1 {
+            throwRealmException("Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
+        } else {
+            throwRealmException("Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
+        }
+        // Setup timeout if needed
+        if let timeout = timeout {
+            let syncTimeoutOptions = SyncTimeoutOptions()
+            syncTimeoutOptions.connectTimeout = timeout
+            app.syncManager.timeoutOptions = syncTimeoutOptions
+        }
+        return app
+    }
 }
 
 /**
@@ -813,28 +837,9 @@ public enum AsyncOpenState {
                 partitionValue: Partition,
                 configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration,
                 timeout: UInt? = nil) {
-        var app: App
-        if let appId = appId {
-            app = App(id: appId)
-        } else if RLMApp.appIds().count == 1, // Check if there is a singular cached app
-            let cachedAppId = RLMApp.appIds().first as? String {
-            app = App(id: cachedAppId)
-        } else if RLMApp.appIds().count > 1 {
-            throwRealmException("There is no appId, either provided by the user on the property wrapper or more than 1 cached RLMApp")
-        } else {
-            throwRealmException("There is no appId, either provided by the user on the property wrapper or any cached RLMApp")
-        }
-
-        // Setup timeout if needed
-        if let timeout = timeout {
-            let syncTimeoutOptions = SyncTimeoutOptions()
-            syncTimeoutOptions.connectTimeout = timeout
-            app.syncManager.timeoutOptions = syncTimeoutOptions
-        }
-
-        let bsonValue = AnyBSON(partitionValue)
+        let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
-        storage = ObservableAsyncOpenStorage(app: app, configuration: configuration, partitionValue: bsonValue)
+        storage = ObservableAsyncOpenStorage(app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
         asyncOpen()
     }
 
@@ -960,28 +965,9 @@ public enum AsyncOpenState {
                 partitionValue: Partition,
                 configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration,
                 timeout: UInt? = nil) {
-        var app: App
-        if let appId = appId {
-            app = App(id: appId)
-        } else if RLMApp.appIds().count == 1, // Check if there is a singular cached app
-            let cachedAppId = RLMApp.appIds().first as? String {
-            app = App(id: cachedAppId)
-        } else if RLMApp.appIds().count > 1 {
-            throwRealmException("There is no appId, either provided by the user on the property wrapper or more than 1 cached RLMApp")
-        } else {
-            throwRealmException("There is no appId, either provided by the user on the property wrapper or any cached RLMApp")
-        }
-
-        // Setup timeout if needed
-        if let timeout = timeout {
-            let syncTimeoutOptions = SyncTimeoutOptions()
-            syncTimeoutOptions.connectTimeout = timeout
-            app.syncManager.timeoutOptions = syncTimeoutOptions
-        }
-
-        let bsonValue = AnyBSON(partitionValue)
+        let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
-        storage = ObservableAsyncOpenStorage(app: app, configuration: configuration, partitionValue: bsonValue)
+        storage = ObservableAsyncOpenStorage(app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
         asyncOpen()
     }
 
