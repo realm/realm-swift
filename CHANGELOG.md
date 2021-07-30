@@ -14,7 +14,6 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Fixed
 * Fix `configuration(partitionValue: AnyBSON)` will set always a nil partition value
   for the user sync configuration.
-
 * Fix decoding a `@Persisted` property will incorrectly throw a `DecodingError.keyNotFound` 
   for an optional property if the key is missing.
   ([Cocoa #7358](https://github.com/realm/realm-cocoa/issues/7358), since v10.10.0)
