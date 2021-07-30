@@ -56,7 +56,7 @@ void throwException(NSString *name, NSString *format, ...) {
 }
 
 // check a precondition and throw an exception if it is not met
-// this should be used if the condition being false indicates a bug in the caller
+// this should be used iff the condition being false indicates a bug in the caller
 // of the function checking its preconditions
 void RLMPrecondition(bool condition, NSString *name, NSString *format, ...) {
     if (__builtin_expect(condition, 1)) {
