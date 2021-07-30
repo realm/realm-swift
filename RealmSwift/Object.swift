@@ -239,8 +239,6 @@ extension Object: RealmCollectionValue {
      change is satisified for one notification token, then all notification
      token blocks for that object will execute.
 
-     String key paths which do not correspond to a valid a property will create an exception.
-
      If no queue is given, notifications are delivered via the standard run
      loop, and so can't be delivered while the run loop is blocked by other
      activity. If a queue is given, notifications are delivered to that queue
@@ -260,11 +258,12 @@ extension Object: RealmCollectionValue {
 
      - warning: This method cannot be called during a write transaction, or when
                 the containing Realm is read-only.
-     - parameter keyPaths: String key paths corresponding to an element's properties.
-                           Only properties contained in the key paths array will trigger
+     - parameter keyPaths: Only properties contained in the key paths array will trigger
                            the block when they are modified. If `nil`, notifications
                            will be delivered for any property change on the object.
-                           See comments above for more detail on linked properties.
+                           String key paths which do not correspond to a valid a property
+                           will throw an exception.
+                           See description above for more detail on linked properties.
      - parameter queue: The serial dispatch queue to receive notification on. If
                         `nil`, notifications are delivered to the current thread.
      - parameter block: The block to call with information about changes to the object.

@@ -434,7 +434,7 @@ import Realm
                            the block when they are modified. If `nil`, notifications
                            will be delivered for any property change on the object.
                            String key paths which do not correspond to a valid a property
-                           will cause an exception.
+                           will throw an exception.
                            See description above for more detail on linked properties.
      - parameter queue: The serial dispatch queue to receive notification on. If
                         `nil`, notifications are delivered to the current thread.
