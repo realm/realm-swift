@@ -786,7 +786,7 @@ class MapTests: TestCase {
     }
 
     /* Expect notification on "intCol" key path when intCol is changed */
-    func testObserveKeyPath1() {
+    func testObserveKeyPath() {
         let mapObj = createMapObject()
         mapObj.swiftObjectMap["first"] = SwiftObject(value: ["intCol": 1, "stringCol": "one"])
         mapObj.swiftObjectMap["second"] = SwiftObject(value: ["intCol": 2, "stringCol": "two"])
@@ -823,7 +823,7 @@ class MapTests: TestCase {
     }
 
     /* Expect no notification on "intCol" key path when stringCol is changed */
-    func testObserveKeyPath2() {
+    func testObserveKeyPathNoChange() {
         let mapObj = createMapObject()
         mapObj.swiftObjectMap["first"] = SwiftObject(value: ["intCol": 1, "stringCol": "one"])
         mapObj.swiftObjectMap["second"] = SwiftObject(value: ["intCol": 2, "stringCol": "two"])
@@ -859,7 +859,7 @@ class MapTests: TestCase {
     }
 
     /* Expect notification delete notification on "intCol" key path when object is removed from map. */
-    func testObserveKeyPath3() {
+    func testObserveKeyPathRemoved() {
         let mapObj = createMapObject()
         mapObj.swiftObjectMap["first"] = SwiftObject(value: ["intCol": 1, "stringCol": "one"])
         mapObj.swiftObjectMap["second"] = SwiftObject(value: ["intCol": 2, "stringCol": "two"])
@@ -897,7 +897,7 @@ class MapTests: TestCase {
     }
 
     /* Expect modification notification on "intCol" key path when object is deleted from realm. */
-    func testObserveKeyPath4() {
+    func testObserveKeyPathDeleted() {
         let mapObj = createMapObject()
         mapObj.swiftObjectMap["first"] = SwiftObject(value: ["intCol": 1, "stringCol": "one"])
         mapObj.swiftObjectMap["second"] = SwiftObject(value: ["intCol": 2, "stringCol": "two"])
@@ -934,7 +934,7 @@ class MapTests: TestCase {
     }
 
     /* Expect notification on "owners.name" (a backlink property) key path when name is modified. */
-    func testObserveKeyPathBacklink1() {
+    func testObserveKeyPathBacklink() {
         let mapObj = createMapObject()
         let person = realm.create(SwiftOwnerObject.self, value: ["name": "Moe"])
         let dog = SwiftDogObject()
@@ -999,27 +999,27 @@ class MapStandaloneTests: MapTests {
         assertThrows(mapObj.observe {_ in })
     }
 
-    override func testObserveKeyPath1() {
+    override func testObserveKeyPath() {
         let mapObj = createMap()
         assertThrows(mapObj.observe {_ in })
     }
 
-    override func testObserveKeyPath2() {
+    override func testObserveKeyPathNoChange() {
         let mapObj = createMap()
         assertThrows(mapObj.observe {_ in })
     }
 
-    override func testObserveKeyPath3() {
+    override func testObserveKeyPathRemoved() {
         let mapObj = createMap()
         assertThrows(mapObj.observe {_ in })
     }
 
-    override func testObserveKeyPath4() {
+    override func testObserveKeyPathDeleted() {
         let mapObj = createMap()
         assertThrows(mapObj.observe {_ in })
     }
 
-    override func testObserveKeyPathBacklink1() {
+    override func testObserveKeyPathBacklink() {
         let mapObj = createMap()
         assertThrows(mapObj.observe {_ in })
     }

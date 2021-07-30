@@ -570,7 +570,7 @@ class RealmCollectionTypeTests: TestCase {
         token2.invalidate()
     }
 
-    func testObserveKeyPath1() {
+    func testObserveKeyPath() {
         var ex = expectation(description: "initial notification")
         let token0 = collection.observe(keyPaths: ["stringCol"]) { (changes: RealmCollectionChange) in
             switch changes {
@@ -600,7 +600,7 @@ class RealmCollectionTypeTests: TestCase {
         token0.invalidate()
     }
 
-    func testObserveKeyPath2() {
+    func testObserveKeyPathNoChange() {
         var ex = expectation(description: "initial notification")
         let token0 = collection.observe(keyPaths: ["stringCol"]) { (changes: RealmCollectionChange) in
             switch changes {
@@ -629,7 +629,7 @@ class RealmCollectionTypeTests: TestCase {
         token0.invalidate()
     }
 
-    func testObserveKeyPathWithLink1() {
+    func testObserveKeyPathWithLink() {
         var ex = expectation(description: "initial notification")
         let token = collection.observe(keyPaths: ["linkCol.id"]) { (changes: RealmCollectionChange) in
             switch changes {
@@ -662,7 +662,7 @@ class RealmCollectionTypeTests: TestCase {
         token.invalidate()
     }
 
-    func testObserveKeyPathWithLink2() {
+    func testObserveKeyPathWithLinkNoChange() {
         var ex = expectation(description: "initial notification")
         let token = collection.observe(keyPaths: ["linkCol.id"]) { (changes: RealmCollectionChange) in
             switch changes {
@@ -691,7 +691,7 @@ class RealmCollectionTypeTests: TestCase {
         token.invalidate()
     }
 
-    func testObserveKeyPathWithLink3() {
+    func testObserveKeyPathWithLinkNoChangeList() {
         var ex = expectation(description: "initial notification")
         let token = collection.observe(keyPaths: ["linkCol"]) { (changes: RealmCollectionChange) in
             switch changes {
@@ -1444,23 +1444,23 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         assertThrows(collection.observe { _ in })
     }
 
-    override func testObserveKeyPath1() {
+    override func testObserveKeyPath() {
         assertThrows(collection.observe { _ in })
     }
 
-    override func testObserveKeyPath2() {
+    override func testObserveKeyPathNoChange() {
         assertThrows(collection.observe { _ in })
     }
 
-    override func testObserveKeyPathWithLink1() {
+    override func testObserveKeyPathWithLink() {
         assertThrows(collection.observe { _ in })
     }
 
-    override func testObserveKeyPathWithLink2() {
+    override func testObserveKeyPathWithLinkNoChange() {
         assertThrows(collection.observe { _ in })
     }
 
-    override func testObserveKeyPathWithLink3() {
+    override func testObserveKeyPathWithLinkNoChangeList() {
         assertThrows(collection.observe { _ in })
     }
 
@@ -1786,23 +1786,23 @@ class MutableSetUnmanagedRealmCollectionTypeTests: MutableSetRealmCollectionType
         assertThrows(collection.observe(on: DispatchQueue(label: "bg")) { _ in })
     }
 
-    override func testObserveKeyPath1() {
+    override func testObserveKeyPath() {
         assertThrows(collection.observe { _ in })
     }
 
-    override func testObserveKeyPath2() {
+    override func testObserveKeyPathNoChange() {
         assertThrows(collection.observe { _ in })
     }
 
-    override func testObserveKeyPathWithLink1() {
+    override func testObserveKeyPathWithLink() {
         assertThrows(collection.observe { _ in })
     }
 
-    override func testObserveKeyPathWithLink2() {
+    override func testObserveKeyPathWithLinkNoChange() {
         assertThrows(collection.observe { _ in })
     }
 
-    override func testObserveKeyPathWithLink3() {
+    override func testObserveKeyPathWithLinkNoChangeList() {
         assertThrows(collection.observe { _ in })
     }
 

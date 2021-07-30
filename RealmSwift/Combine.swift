@@ -338,7 +338,7 @@ extension RealmCollection where Self: RealmSubscribable {
     }
 
     /// A publisher that emits the collection each time the collection changes on the given property keyPaths.
-    public func collectionPublisher(keyPaths: [String]?) -> RealmPublishers.Value<Self> {
+    @discardableResult public func collectionPublisher(keyPaths: [String]?) -> RealmPublishers.Value<Self> {
         return RealmPublishers.Value(self, keyPaths: keyPaths)
     }
 
@@ -348,7 +348,7 @@ extension RealmCollection where Self: RealmSubscribable {
     }
 
     /// A publisher that emits a collection changeset each time the collection changes on the given property keyPaths.
-    public func changesetPublisher(keyPaths: [String]?) -> RealmPublishers.CollectionChangeset<Self> {
+    @discardableResult public func changesetPublisher(keyPaths: [String]?) -> RealmPublishers.CollectionChangeset<Self> {
         return RealmPublishers.CollectionChangeset(self, keyPaths: keyPaths)
     }
 }
@@ -374,7 +374,7 @@ extension RealmKeyedCollection where Self: RealmSubscribable {
     }
 
     /// A publisher that emits the collection each time the collection changes on the given property keyPaths.
-    public func collectionPublisher(keyPaths: [String]?) -> RealmPublishers.Value<Self> {
+    @discardableResult public func collectionPublisher(keyPaths: [String]?) -> RealmPublishers.Value<Self> {
         return RealmPublishers.Value(self, keyPaths: keyPaths)
     }
 
@@ -384,7 +384,7 @@ extension RealmKeyedCollection where Self: RealmSubscribable {
     }
 
     /// A publisher that emits a collection changeset each time the collection changes on the given property keyPaths.
-    public func changesetPublisher(keyPaths: [String]?) -> RealmPublishers.MapChangeset<Self> {
+    @discardableResult public func changesetPublisher(keyPaths: [String]?) -> RealmPublishers.MapChangeset<Self> {
         return RealmPublishers.MapChangeset(self, keyPaths: keyPaths)
     }
 }

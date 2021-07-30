@@ -932,7 +932,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
             sema.wait()
         }
     }
-    func testSubscribeOnKeyPath1() {
+    func testSubscribeOnKeyPath() {
         var ex = expectation(description: "initial notification")
 
         cancellable = collection.collectionPublisher(keyPaths: collection.includedKeyPath)
@@ -951,10 +951,9 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         try! realm.write { collection.modifyObject() }
         waitForExpectations(timeout: 0.1, handler: nil)
     }
-    func testSubscribeOnKeyPath2() {
+    func testSubscribeOnKeyPathNoChange() {
         var ex = expectation(description: "initial notification")
 
-        collection.collectionPublisher
         cancellable = collection.collectionPublisher(keyPaths: collection.excludedKeyPath)
             .subscribe(on: subscribeOnQueue)
             .assertNoFailure()
@@ -1056,7 +1055,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         }
     }
 
-    func testChangeSetSubscribeOnKeyPath1() {
+    func testChangeSetSubscribeOnKeyPath() {
         var ex = expectation(description: "initial notification")
 
         cancellable = collection.changesetPublisher(keyPaths: collection.includedKeyPath)
@@ -1075,7 +1074,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
         waitForExpectations(timeout: 0.1, handler: nil)
     }
 
-    func testChangeSetSubscribeOnKeyPath2() {
+    func testChangeSetSubscribeOnKeyPathNoChange() {
         var ex = expectation(description: "initial notification")
 
         cancellable = collection.changesetPublisher(keyPaths: collection.excludedKeyPath)
@@ -1685,7 +1684,7 @@ private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: Combin
         }
     }
 
-    func testSubscribeOnKeyPath1() {
+    func testSubscribeOnKeyPath() {
         var ex = expectation(description: "initial notification")
 
         cancellable = collection.collectionPublisher(keyPaths: collection.includedKeyPath)
@@ -1705,7 +1704,7 @@ private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: Combin
         waitForExpectations(timeout: 0.1, handler: nil)
     }
 
-    func testSubscribeOnKeyPath2() {
+    func testSubscribeOnKeyPathNoChange() {
         var ex = expectation(description: "initial notification")
 
         cancellable = collection.collectionPublisher(keyPaths: collection.excludedKeyPath)
@@ -1809,7 +1808,7 @@ private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: Combin
         }
     }
 
-    func testChangeSetSubscribeOnKeyPath1() {
+    func testChangeSetSubscribeOnKeyPath() {
         var ex = expectation(description: "initial notification")
 
         cancellable = collection.changesetPublisher(keyPaths: collection.includedKeyPath)
@@ -1828,7 +1827,7 @@ private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: Combin
         waitForExpectations(timeout: 0.1, handler: nil)
     }
 
-    func testChangeSetSubscribeOnKeyPath2() {
+    func testChangeSetSubscribeOnKeyPathNoChange() {
         var ex = expectation(description: "initial notification")
 
         cancellable = collection.changesetPublisher(keyPaths: collection.excludedKeyPath)
