@@ -498,6 +498,115 @@ class CodableTests: TestCase {
         XCTAssertEqual(try! String(data: encoder.encode(obj), encoding: .utf8), expected)
     }
 
+    func testLegacyObjectOptionalNotRequired() {
+        let str = """
+        {
+            "bool": true,
+            "string": "abc",
+            "int": 123,
+            "int8": 123,
+            "int16": 123,
+            "int32": 123,
+            "int64": 123,
+            "float": 2.5,
+            "double": 2.5,
+            "date": 2.5,
+            "data": "\(Data("def".utf8).base64EncodedString())",
+            "decimal": "1.5e2",
+            "objectId": "1234567890abcdef12345678",
+            "uuid": "00000000-0000-0000-0000-000000000000",
+
+            "intOpt": null,
+            "int8Opt": null,
+            "int16Opt": null,
+            "int32Opt": null,
+            "int64Opt": null,
+            "floatOpt": null,
+            "doubleOpt": null,
+            "boolOpt": null,
+
+            "otherBool": true,
+            "otherInt": 123,
+            "otherInt8": 123,
+            "otherInt16": 123,
+            "otherInt32": 123,
+            "otherInt64": 123,
+            "otherFloat": 2.5,
+            "otherDouble": 2.5,
+            "otherEnum": 1,
+            "otherAny": 1,
+
+            "boolList": [true],
+            "stringList": ["abc"],
+            "intList": [123],
+            "int8List": [123],
+            "int16List": [123],
+            "int32List": [123],
+            "int64List": [123],
+            "floatList": [2.5],
+            "doubleList": [2.5],
+            "dateList": [2.5],
+            "dataList": ["\(Data("def".utf8).base64EncodedString())"],
+            "decimalList": ["1.5e2"],
+            "objectIdList": ["1234567890abcdef12345678"],
+            "uuidList": ["00000000-0000-0000-0000-000000000000"],
+
+            "boolOptList": [true],
+            "stringOptList": ["abc"],
+            "intOptList": [123],
+            "int8OptList": [123],
+            "int16OptList": [123],
+            "int32OptList": [123],
+            "int64OptList": [123],
+            "floatOptList": [2.5],
+            "doubleOptList": [2.5],
+            "dateOptList": [2.5],
+            "dataOptList": ["\(Data("def".utf8).base64EncodedString())"],
+            "decimalOptList": ["1.5e2"],
+            "objectIdOptList": ["1234567890abcdef12345678"],
+            "uuidOptList": ["00000000-0000-0000-0000-000000000000"],
+
+            "boolSet": [true],
+            "stringSet": ["abc"],
+            "intSet": [123],
+            "int8Set": [123],
+            "int16Set": [123],
+            "int32Set": [123],
+            "int64Set": [123],
+            "floatSet": [2.5],
+            "doubleSet": [2.5],
+            "dateSet": [2.5],
+            "dataSet": ["\(Data("def".utf8).base64EncodedString())"],
+            "decimalSet": ["1.5e2"],
+            "objectIdSet": ["1234567890abcdef12345678"],
+            "uuidSet": ["00000000-0000-0000-0000-000000000000"],
+
+            "boolOptSet": [true],
+            "stringOptSet": ["abc"],
+            "intOptSet": [123],
+            "int8OptSet": [123],
+            "int16OptSet": [123],
+            "int32OptSet": [123],
+            "int64OptSet": [123],
+            "floatOptSet": [2.5],
+            "doubleOptSet": [2.5],
+            "dateOptSet": [2.5],
+            "dataOptSet": ["\(Data("def".utf8).base64EncodedString())"],
+            "decimalOptSet": ["1.5e2"],
+            "objectIdOptSet": ["1234567890abcdef12345678"],
+            "uuidOptSet": ["00000000-0000-0000-0000-000000000000"],
+        }
+        """
+        let decoder = JSONDecoder()
+        let obj = try! decoder.decode(CodableObject.self, from: Data(str.utf8))
+
+        XCTAssertNil(obj.stringOpt)
+        XCTAssertNil(obj.dateOpt)
+        XCTAssertNil(obj.dataOpt)
+        XCTAssertNil(obj.decimalOpt)
+        XCTAssertNil(obj.objectIdOpt)
+    }
+
     func testModernObject() {
         let str = """
         {
@@ -851,5 +960,112 @@ class CodableTests: TestCase {
         XCTAssertNil(obj.dataOptSet.first!)
         XCTAssertNil(obj.decimalOptSet.first!)
         XCTAssertNil(obj.objectIdOptSet.first!)
+    }
+
+    func testModernObjectOptionalNotRequired() {
+        let str = """
+        {
+            "bool": true,
+            "string": "abc",
+            "int": 123,
+            "int8": 123,
+            "int16": 123,
+            "int32": 123,
+            "int64": 123,
+            "float": 2.5,
+            "double": 2.5,
+            "date": 2.5,
+            "data": "\(Data("def".utf8).base64EncodedString())",
+            "decimal": "1.5e2",
+            "objectId": "1234567890abcdef12345678",
+            "uuid": "00000000-0000-0000-0000-000000000000",
+
+            "otherBool": true,
+            "otherInt": 123,
+            "otherInt8": 123,
+            "otherInt16": 123,
+            "otherInt32": 123,
+            "otherInt64": 123,
+            "otherFloat": 2.5,
+            "otherDouble": 2.5,
+            "otherEnum": 1,
+
+            "boolList": [true],
+            "stringList": ["abc"],
+            "intList": [123],
+            "int8List": [123],
+            "int16List": [123],
+            "int32List": [123],
+            "int64List": [123],
+            "floatList": [2.5],
+            "doubleList": [2.5],
+            "dateList": [2.5],
+            "dataList": ["\(Data("def".utf8).base64EncodedString())"],
+            "decimalList": ["1.5e2"],
+            "objectIdList": ["1234567890abcdef12345678"],
+            "uuidList": ["00000000-0000-0000-0000-000000000000"],
+
+            "boolOptList": [null],
+            "stringOptList": [null],
+            "intOptList": [null],
+            "int8OptList": [null],
+            "int16OptList": [null],
+            "int32OptList": [null],
+            "int64OptList": [null],
+            "floatOptList": [null],
+            "doubleOptList": [null],
+            "dateOptList": [null],
+            "dataOptList": [null],
+            "decimalOptList": [null],
+            "objectIdOptList": [null],
+            "uuidOptList": [null],
+
+            "boolSet": [true],
+            "stringSet": ["abc"],
+            "intSet": [123],
+            "int8Set": [123],
+            "int16Set": [123],
+            "int32Set": [123],
+            "int64Set": [123],
+            "floatSet": [2.5],
+            "doubleSet": [2.5],
+            "dateSet": [2.5],
+            "dataSet": ["\(Data("def".utf8).base64EncodedString())"],
+            "decimalSet": ["1.5e2"],
+            "objectIdSet": ["1234567890abcdef12345678"],
+            "uuidSet": ["00000000-0000-0000-0000-000000000000"],
+
+            "boolOptSet": [null],
+            "stringOptSet": [null],
+            "intOptSet": [null],
+            "int8OptSet": [null],
+            "int16OptSet": [null],
+            "int32OptSet": [null],
+            "int64OptSet": [null],
+            "floatOptSet": [null],
+            "doubleOptSet": [null],
+            "dateOptSet": [null],
+            "dataOptSet": [null],
+            "decimalOptSet": [null],
+            "objectIdOptSet": [null],
+            "uuidOptSet": [null],
+        }
+        """
+        let decoder = JSONDecoder()
+        let obj = try! decoder.decode(ModernCodableObject.self, from: Data(str.utf8))
+
+        XCTAssertNil(obj.boolOpt)
+        XCTAssertNil(obj.intOpt)
+        XCTAssertNil(obj.int8Opt)
+        XCTAssertNil(obj.int16Opt)
+        XCTAssertNil(obj.int32Opt)
+        XCTAssertNil(obj.int64Opt)
+        XCTAssertNil(obj.floatOpt)
+        XCTAssertNil(obj.doubleOpt)
+        XCTAssertNil(obj.stringOpt)
+        XCTAssertNil(obj.dateOpt)
+        XCTAssertNil(obj.dataOpt)
+        XCTAssertNil(obj.decimalOpt)
+        XCTAssertNil(obj.objectIdOpt)
     }
 }
