@@ -363,9 +363,6 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
                 testStruct.intObject!.intCol = 2
             })
         }
-        // !!!: Why does this expectation fail? Is the realm refreshing automatically?
-//        XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
-//        realm.refresh()
         XCTAssertEqual(testStruct.stringObject!.stringCol, "after")
         XCTAssertEqual(testStruct.intObject!.intCol, 2)
 
@@ -395,9 +392,6 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
             XCTAssertNil(testStruct.stringObject)
             XCTAssertNil(testStruct.intObject)
         }
-        // !!!: Why does this expectation fail? Is the realm refreshing automatically?
-//        XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
-//        realm.refresh()
         XCTAssertNil(testStruct.stringObject)
 
         dispatchSyncNewThread {
@@ -479,9 +473,6 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
                 testStruct.intObject = realm.create(SwiftIntObject.self, value: ["intCol": 2])
             })
         }
-        // !!!: Why does this expectation fail? Is the realm refreshing automatically?
-//        XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
-//        realm.refresh()
         XCTAssertEqual(testStruct.stringObject!.stringCol, "after")
         XCTAssertEqual(testStruct.intObject!.intCol, 2)
 
