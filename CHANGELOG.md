@@ -4,23 +4,38 @@ x.y.z Release notes (yyyy-MM-dd)
 *  `Object.observe` and `RealmCollection.observe` now include an optional `keyPaths` parameter which filters change notifications to those only occurring on the provided key path or key paths. See method documentation for extended detail on filtering behavior.
 * `ObservedResults<ResultsType>`  now includes an optional `keyPaths` parameter which filters change notifications to those only occurring on the provided key path or key paths. ex) `@ObservedResults(MyObject.self, keyPaths: ["myList.property"])`
 * Add two new property wrappers for opening a Realm asynchronously in a 
+* Add two new property wrappers for opening a Realm asynchronously in a
   SwiftUI View:
-    - `AsyncOpen` is a property wrapper that initiates Realm.asyncOpen 
+    - `AsyncOpen` is a property wrapper that initiates Realm.asyncOpen
        for the current user, notifying the view when there is a change in Realm asyncOpen state.
     - `AutoOpen` behaves similarly to `AsyncOpen`, but in the case of no internet
-       connection this will return an opened realm. 
-* Add `EnvironmentValues.partitionValue`. This value can be injected into any view using one of 
+       connection this will return an opened realm.
+* Add `EnvironmentValues.partitionValue`. This value can be injected into any view using one of
   our new property wrappers `AsyncOpen` and `AutoOpen`:
-  `MyView().environment(\.partitionValue, "partitionValue")`. 
+  `MyView().environment(\.partitionValue, "partitionValue")`.
+* Shift more of the work done when first initializing a collection notifier to the background worker thread rather than doing it on the main thread.
 
 ### Fixed
-* Fix `configuration(partitionValue: AnyBSON)` will set always a nil partition value
+* `configuration(partitionValue: AnyBSON)` would always set a nil partition value
   for the user sync configuration.
-* Fix decoding a `@Persisted` property will incorrectly throw a `DecodingError.keyNotFound` 
+* Decoding a `@Persisted` property would incorrectly throw a `DecodingError.keyNotFound`
   for an optional property if the key is missing.
   ([Cocoa #7358](https://github.com/realm/realm-cocoa/issues/7358), since v10.10.0)
-* Fixed a symlink which prevented Realm from building on case sensitive file systems. 
+* Fixed a symlink which prevented Realm from building on case sensitive file systems.
   ([#7344](https://github.com/realm/realm-cocoa/issues/7344), since v10.8.0)
+* Removing a change callback from a Results would sometimes block the calling
+  thread while the query for that Results was running on the background worker
+  thread (since v10.11.0).
+* Object observers did not handle the object being deleted properly, which
+  could result in assertion failures mentioning "m_table" in ObjectNotifier
+  ([Core #4824](https://github.com/realm/realm-core/issues/4824), since v10.11.0).
+* Fixed a crash when delivering notifications over a nested hierarchy of lists
+  of Mixed that contain links. ([Core #4803](https://github.com/realm/realm-core/issues/4803), since v10.8.0)
+* Fixed a crash when an object which is linked to by a Mixed is deleted via
+  sync. ([Core #4828](https://github.com/realm/realm-core/pull/4828), since v10.8.0)
+* Fixed a rare crash when setting a mixed link for the first time which would
+  trigger if the link was to the same table and adding the backlink column
+  caused a BPNode split. ([Core #4828](https://github.com/realm/realm-core/pull/4828), since v10.8.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -29,10 +44,11 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.5.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.0 beta 3.
+* Xcode: 12.2-13.0 beta 4. On iOS Xcode 13 beta 2 is the latest supported
+  version due to betas 3 and 4 having a broken Combine.framework.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v11.1.1 to v11.2.0
 
 10.11.0 Release notes (2021-07-22)
 =============================================================
