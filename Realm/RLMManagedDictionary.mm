@@ -368,29 +368,16 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
     RLMAccessorContext context(*_objectInfo);
     changeDictionary(self, [&] {
         for (id key in keyArray) {
-            try {
-                _backingCollection.erase(context.unbox<realm::StringData>(key));
-            }
-            catch (realm::KeyNotFound const&) {
-                continue;
-            }
+            _backingCollection.try_erase(context.unbox<realm::StringData>(key));
         }
     });
 }
 
 - (void)removeObjectForKey:(id)key {
-    try {
-        changeDictionary(self, ^{
-            RLMAccessorContext context(*_objectInfo);
-            _backingCollection.erase(context.unbox<realm::StringData>(key));
-        });
-    }
-    catch (realm::KeyNotFound const&) {
-        return;
-    }
-    catch (...) {
-        throwError(nil, nil);
-    }
+    changeDictionary(self, ^{
+        RLMAccessorContext context(*_objectInfo);
+        _backingCollection.try_erase(context.unbox<realm::StringData>(key));
+    });
 }
 
 - (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id key, id obj, BOOL *stop))block {
