@@ -405,7 +405,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      let results = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
      let token = dogs.observe { changes in
-     switch changes {
+         switch changes {
          case .initial(let dogs):
              // Will print "dogs.count: 1"
              print("dogs.count: \(dogs.count)")
