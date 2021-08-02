@@ -104,7 +104,7 @@ extension ObjectBase {
 
      - note: Multiple notification tokens on the same object which filter for
      separate key paths *do not* filter exclusively. If one key path
-     change is satisified for one notification token, then all notification
+     change is satisfied for one notification token, then all notification
      token blocks for that object will execute.
 
      If no queue is given, notifications are delivered via the standard run
