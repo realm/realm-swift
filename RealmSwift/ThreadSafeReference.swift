@@ -122,7 +122,6 @@ public protocol ThreadConfined {
     }
 }
 
-// ???: How does this struct incorporate "frozeness"?
 @propertyWrapper public class ThreadSafe<T: Object> {
     var threadSafeReference: ThreadSafeReference<T>?
     var configuration: Realm.Configuration?
@@ -138,8 +137,8 @@ public protocol ThreadConfined {
                 }
                 self.threadSafeReference = ThreadSafeReference(to: value)
                 return value
-            // FIXME: wrappedValue should properly handle errors
-            // As of Swift 5.5 property wrappers are unable to have throwing accessors.
+            // FIXME: wrappedValue should throw
+            // As of Swift 5.5 property wrappers can't have throwing accessors.
             } catch let error as NSError { throwRealmException(error.localizedDescription) }
         }
         set {
@@ -147,13 +146,10 @@ public protocol ThreadConfined {
                 threadSafeReference = nil
                 return
             }
-            if self.configuration != nil {
-                guard newValue.realm?.configuration == configuration else {
-                    throwRealmException("@ThreadSafe wrapped objects may not be reassigned to an object managed by a different realm or an unmanaged object")
-                }
-            } else {
-                self.configuration = newValue.realm?.configuration
+            guard let configuration = newValue.realm?.configuration else {
+                throwRealmException("No realm configuration on this object found. Only managed objects may be wrapped as thread safe.")
             }
+            self.configuration = configuration
             threadSafeReference = ThreadSafeReference(to: newValue)
         }
     }

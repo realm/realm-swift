@@ -421,7 +421,25 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
                 testStruct.intObject = intObj
             })
         }
-        // Why no need for refresh??
+        XCTAssertEqual(testStruct.stringObject!.stringCol, "after")
+        XCTAssertEqual(testStruct.intObject!.intCol, 2)
+    }
+
+    func testThreadSafeWrapperDifferentConfig() {
+        let testStruct = wrapperStruct()
+        XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
+        XCTAssertEqual(testStruct.intObject!.intCol, 1)
+
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath() // Different realm path than original
+            try! realm.write({
+                let stringObj = realm.create(SwiftStringObject.self, value: ["stringCol": "after"])
+                let intObj = realm.create(SwiftIntObject.self, value: ["intCol": 2])
+
+                testStruct.stringObject = stringObj
+                testStruct.intObject = intObj
+            })
+        }
         XCTAssertEqual(testStruct.stringObject!.stringCol, "after")
         XCTAssertEqual(testStruct.intObject!.intCol, 2)
     }
@@ -432,18 +450,10 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
         XCTAssertEqual(testStruct.intObject!.intCol, 1)
 
         dispatchSyncNewThread {
-            // Using a realm with a different configuration than the original thread:
-            try! self.realmWithTestPath().write({
-                let stringObj = self.realmWithTestPath().create(SwiftStringObject.self, value: ["stringCol": "after"])
-
-                self.assertThrows(testStruct.stringObject = stringObj,
-                                  reason: "@ThreadSafe wrapped objects may not be reassigned to an object managed by a different realm or an unmanaged object")
-            })
-
             let realm = try! Realm()
             try! realm.write {
                 self.assertThrows(testStruct.stringObject = SwiftStringObject(),
-                                  reason: "@ThreadSafe wrapped objects may not be reassigned to an object managed by a different realm or an unmanaged object")
+                                  reason: "No realm configuration on this object found. Only managed objects may be wrapped as thread safe.")
             }
         }
     }
