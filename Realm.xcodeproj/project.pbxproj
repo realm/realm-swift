@@ -277,6 +277,8 @@
 		53626AAF25D31CAC00D9515D /* Objects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53626AAE25D31CAC00D9515D /* Objects.swift */; };
 		53626AB025D31CAC00D9515D /* Objects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53626AAE25D31CAC00D9515D /* Objects.swift */; };
 		537130C824A9E417001FDBBC /* RealmServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537130C724A9E417001FDBBC /* RealmServer.swift */; };
+		5389711A26B96C9D0087747F /* libstitch_support.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 5389711926B96C9D0087747F /* libstitch_support.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5389711C26B970C00087747F /* libstitch_support.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 5389711926B96C9D0087747F /* libstitch_support.dylib */; };
 		53A34E3625CDA0AC00698930 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 53A34E3325CDA0AC00698930 /* LaunchScreen.storyboard */; };
 		53A34E3725CDA0AC00698930 /* SwiftUITestHostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A34E3425CDA0AC00698930 /* SwiftUITestHostApp.swift */; };
 		53CCC6C4257EC8A300A8FC50 /* RLMApp_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53CCC6C3257EC8A300A8FC50 /* RLMApp_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -912,6 +914,7 @@
 		53626AAE25D31CAC00D9515D /* Objects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Objects.swift; sourceTree = "<group>"; };
 		536B7C0B24A4C223006B535D /* dependencies.list */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dependencies.list; sourceTree = "<group>"; };
 		537130C724A9E417001FDBBC /* RealmServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RealmServer.swift; path = Realm/ObjectServerTests/RealmServer.swift; sourceTree = "<group>"; };
+		5389711926B96C9D0087747F /* libstitch_support.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libstitch_support.dylib; path = .baas/lib/libstitch_support.dylib; sourceTree = "<group>"; };
 		53A34E3325CDA0AC00698930 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		53A34E3425CDA0AC00698930 /* SwiftUITestHostApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUITestHostApp.swift; sourceTree = "<group>"; };
 		53A34E3525CDA0AC00698930 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1683,6 +1686,7 @@
 		E8D89B8E1955FC6D00CF2B9A = {
 			isa = PBXGroup;
 			children = (
+				5389711926B96C9D0087747F /* libstitch_support.dylib */,
 				5D660FB71BE98B770021E04F /* Configuration */,
 				1A7B82361D51254600750296 /* Frameworks */,
 				E81A1FB41955FCE000FDED82 /* LICENSE */,
@@ -2041,6 +2045,7 @@
 			buildPhases = (
 				3F1A5E6E1992EB7400F45F4C /* Sources */,
 				3F1A5E6F1992EB7400F45F4C /* Frameworks */,
+				5389711B26B970BC0087747F /* Resources */,
 			);
 			buildRules = (
 			);
@@ -2433,6 +2438,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5389711B26B970BC0087747F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5389711C26B970C00087747F /* libstitch_support.dylib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5D659ECE1BE04556006515A0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2453,6 +2466,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5389711A26B96C9D0087747F /* libstitch_support.dylib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
