@@ -373,7 +373,6 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
                 testStruct.intObject!.intCol = 3
             })
         }
-
         XCTAssertEqual(testStruct.stringObject!.stringCol, "after, again")
         XCTAssertEqual(testStruct.intObject!.intCol, 3)
     }
@@ -389,21 +388,9 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
                 realm.delete(testStruct.stringObject!)
                 realm.delete(testStruct.intObject!)
             })
-            XCTAssertNil(testStruct.stringObject)
-            XCTAssertNil(testStruct.intObject)
         }
         XCTAssertNil(testStruct.stringObject)
-
-        dispatchSyncNewThread {
-            let realm = try! Realm()
-            try! realm.write({
-                testStruct.stringObject = realm.create(SwiftStringObject.self, value: ["stringCol": "new object"])
-                testStruct.intObject = realm.create(SwiftIntObject.self, value: ["intCol": 3])
-
-            })
-        }
-        XCTAssertEqual(testStruct.stringObject!.stringCol, "new object")
-        XCTAssertEqual(testStruct.intObject!.intCol, 3)
+        XCTAssertNil(testStruct.intObject)
     }
 
     func testThreadSafeWrapperReassign() {
@@ -423,6 +410,58 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
         }
         XCTAssertEqual(testStruct.stringObject!.stringCol, "after")
         XCTAssertEqual(testStruct.intObject!.intCol, 2)
+    }
+
+    func testThreadSafeWrapperReassignToNil() {
+        let testStruct = wrapperStruct()
+        XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
+        XCTAssertEqual(testStruct.intObject!.intCol, 1)
+
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write({
+                testStruct.stringObject = nil
+                testStruct.intObject = nil
+            })
+        }
+        XCTAssertNil(testStruct.stringObject)
+        XCTAssertNil(testStruct.intObject)
+
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! realm.write({
+                testStruct.stringObject = realm.create(SwiftStringObject.self, value: ["stringCol": "after, again"])
+                testStruct.intObject = realm.create(SwiftIntObject.self, value: ["intCol": 3])
+            })
+        }
+        XCTAssertEqual(testStruct.stringObject!.stringCol, "after, again")
+        XCTAssertEqual(testStruct.intObject!.intCol, 3)
+    }
+
+    func testThreadSafeWrapperNilConstruction() {
+        let testStruct = TestThreadSafeWrapperStruct(stringObject: nil, intObject: nil)
+        XCTAssertEqual(testStruct.stringObject, nil)
+        XCTAssertEqual(testStruct.intObject, nil)
+
+        dispatchSyncNewThread {
+            let realm = try! Realm()
+            try! Realm().write({
+                testStruct.stringObject = realm.create(SwiftStringObject.self, value: ["stringCol": "after"])
+                testStruct.intObject = realm.create(SwiftIntObject.self, value: ["intCol": 2])
+            })
+        }
+        XCTAssertEqual(testStruct.stringObject!.stringCol, "after")
+        XCTAssertEqual(testStruct.intObject!.intCol, 2)
+
+        // Edit value again to test the same thread safe reference isn't resolved twice
+        dispatchSyncNewThread {
+            try! Realm().write({
+                testStruct.stringObject!.stringCol = "after, again"
+                testStruct.intObject!.intCol = 3
+            })
+        }
+        XCTAssertEqual(testStruct.stringObject!.stringCol, "after, again")
+        XCTAssertEqual(testStruct.intObject!.intCol, 3)
     }
 
     func testThreadSafeWrapperDifferentConfig() {
@@ -456,44 +495,5 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
                                   reason: "No realm configuration on this object found. Only managed objects may be wrapped as thread safe.")
             }
         }
-    }
-
-    func testThreadSafeWrapperNilReassign() {
-        let testStruct = wrapperStruct()
-        XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
-        XCTAssertEqual(testStruct.intObject!.intCol, 1)
-
-        dispatchSyncNewThread {
-            testStruct.stringObject = nil
-            testStruct.intObject = nil
-        }
-        XCTAssertEqual(testStruct.stringObject, nil)
-        XCTAssertEqual(testStruct.intObject, nil)
-    }
-
-    func testThreadSafeWrapperNilConstruction() {
-        let testStruct = TestThreadSafeWrapperStruct(stringObject: nil, intObject: nil)
-        XCTAssertEqual(testStruct.stringObject, nil)
-        XCTAssertEqual(testStruct.intObject, nil)
-
-        dispatchSyncNewThread {
-            let realm = try! Realm()
-            try! Realm().write({
-                testStruct.stringObject = realm.create(SwiftStringObject.self, value: ["stringCol": "after"])
-                testStruct.intObject = realm.create(SwiftIntObject.self, value: ["intCol": 2])
-            })
-        }
-        XCTAssertEqual(testStruct.stringObject!.stringCol, "after")
-        XCTAssertEqual(testStruct.intObject!.intCol, 2)
-
-        // Edit value again to test the same thread safe reference isn't resolved twice
-        dispatchSyncNewThread {
-            try! Realm().write({
-                testStruct.stringObject!.stringCol = "after, again"
-                testStruct.intObject!.intCol = 3
-            })
-        }
-        XCTAssertEqual(testStruct.stringObject!.stringCol, "after, again")
-        XCTAssertEqual(testStruct.intObject!.intCol, 3)
     }
 }
