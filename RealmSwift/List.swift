@@ -402,7 +402,11 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      will reflect the state of the Realm after the write transaction.
 
      ```swift
-     let dogs = realm.objects(Dog.self)
+     class Person: Object {
+         @Persisted var dogs: List<Dog>
+     }
+     // ...
+     let dogs = person.dogs
      print("dogs.count: \(dogs?.count)") // => 0
      let token = dogs.observe { changes in
          switch changes {
@@ -465,7 +469,11 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      will reflect the state of the Realm after the write transaction.
 
      ```swift
-     let dogs = realm.objects(Dog.self)
+     class Person: Object {
+         @Persisted var dogs: List<Dog>
+     }
+     // ...
+     let dogs = person.dogs
      print("dogs.count: \(dogs?.count)") // => 0
      let token = dogs.observe { changes in
          switch changes {
@@ -494,14 +502,16 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
      then the block will be called for changes which occur only on the
      provided key paths. For example, if:
      ```swift
+     class Person: Object {
+         @Persisted var dogs: List<Dog>
+     }
      class Dog: Object {
          @Persisted var name: String
          @Persisted var age: Int
          @Persisted var toys: List<Toy>
      }
      // ...
-     let dogs = realm.objects(Dog.self)
-
+     let dogs = person.dogs
      let token = dogs.observe(keyPaths: ["name"]) { changes in
          switch changes {
          case .initial(let dogs):

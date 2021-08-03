@@ -390,18 +390,19 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
         }
         sema.wait()
 
-        // The following line checks to make sure a change not
-        // within the intended keyPath does *not* publish a
+        // The following two lines check if a write outside of
+        // the intended keyPath does *not* publish a
         // change.
         // If a changeset is published for boolCol, the test would fail
-        // above when checking for property name.
+        // above when checking for property name "intCol".
         try! realm.write { obj.boolCol = true }
+        try! realm.write { obj.intCol += 1 }
 
         try! realm.write { realm.delete(obj) }
 
         sema.wait()
         XCTAssertNotNil(prev)
-        XCTAssertEqual(prev!.intCol, 100)
+        XCTAssertEqual(prev!.intCol, 101)
     }
 
     func testChangeSetReceiveOn() {

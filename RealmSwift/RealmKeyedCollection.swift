@@ -335,8 +335,7 @@ public protocol RealmKeyedCollection: Sequence, ThreadConfined, CustomStringConv
          @Persisted var toys: List<Toy>
      }
      // ...
-     let dogs = realm.objects(Dog.self)
-
+     let dogs = myObject.mapOfDogs
      let token = dogs.observe(keyPaths: ["name"]) { changes in
          switch changes {
          case .initial(let dogs):
