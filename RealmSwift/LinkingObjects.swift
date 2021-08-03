@@ -290,6 +290,7 @@ import Realm
          var dogs: LinkingObjects<Dog>
      }
      class Dog: Object {
+         @Persisted var name: String
          @Persisted var handlers: List<Person>
      }
      // ...
@@ -361,8 +362,10 @@ import Realm
          var dogs: LinkingObjects<Dog>
      }
      class Dog: Object {
+         @Persisted var name: String
          @Persisted var handlers: List<Person>
      }
+     // ...
      let dogs = person.dogs
      print("dogs.count: \(dogs?.count)") // => 0
      let token = dogs.observe { changes in
