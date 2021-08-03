@@ -43,8 +43,12 @@ fileprivate protocol _Projected {
 /// }
 ///
 /// struct PersonProjection: Projection {
+///     public typealias Root = Person
+///     public init() {
+///     }
 ///     @Projected(\Person.firstName) var firstName
 ///     @Projected(\Person.address.city) var homeCity
+///     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
 /// }
 /// ```
 @propertyWrapper
@@ -93,6 +97,33 @@ public protocol Projection: ThreadConfined, RealmCollectionValue {
     func objectClassName() -> String
 }
 
+/// Projection allows to create a light weight const reflection of the original Realm objects with a minimal effort.
+/// And use them as a model in your application.
+///
+/// Example of usage:
+/// ```
+/// public class Person: Object {
+///     @Persisted var firstName = ""
+///     @Persisted var lastName = ""
+///     @Persisted var address: Address? = nil
+///     @Persisted var friends = List<Person>()
+///     @Persisted var reviews = List<String>()
+/// }
+///
+/// public class Address: EmbeddedObject {
+///     @Persisted var city: String = ""
+///     @Persisted var country = ""
+/// }
+///
+/// struct PersonProjection: Projection {
+///     public typealias Root = Person
+///     public init() {
+///     }
+///     @Projected(\Person.firstName) var firstName
+///     @Projected(\Person.address.city) var homeCity
+///     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
+/// }
+/// ```
 public extension Projection {
 
     init(_ object: Root) {
@@ -239,6 +270,9 @@ extension Projection {
     }
 }
 
+/// ProjectedList is a special type of collection for Projection's properties
+/// You don't need to instantialte this type manually.
+///
 public final class ProjectedList<NewElement>: RandomAccessCollection where NewElement: RealmCollectionValue {
     public func index(matching predicate: NSPredicate) -> Int? {
         backingList.index(matching: predicate)
