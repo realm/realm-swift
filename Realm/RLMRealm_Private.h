@@ -46,6 +46,7 @@ FOUNDATION_EXTERN void RLMWaitForRealmToClose(NSString *path);
 @property (nonatomic, readwrite) RLMSchema *schema;
 
 + (void)resetRealmState;
++ (BOOL)isRealmCachedAtPath:(NSString *)path;
 
 - (void)registerEnumerator:(RLMFastEnumerator *)enumerator;
 - (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator;

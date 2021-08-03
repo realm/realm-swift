@@ -1049,4 +1049,8 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
     _collectionEnumerators = nil;
 }
 
++ (BOOL)isRealmCachedAtPath:(NSString *)path {
+    return RLMGetAnyCachedRealmForPath([path cStringUsingEncoding:NSUTF8StringEncoding]) != nil;
+}
+
 @end

@@ -1008,7 +1008,18 @@ public typealias NotificationBlock = (_ notification: Realm.Notification, _ real
 
 @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
 extension Realm {
-    private static let asyncOpenQueue = DispatchQueue(label: "io.realm.swift.asyncOpenDispatchQueue")
+    /// Download behavior for a synced Realm.
+    public enum DownloadBehavior {
+        /// Open the Realm for immediate use. If this is a synced Realm,
+        /// it will download the Realm data in the background.
+        case openImmediately
+        /// Open the Realm and download all available data before returning.
+        case alwaysDownloadLatest
+        /// Open the Realm and download all available data before returning
+        /// iff there has not been an initial download. Else, return the previously
+        /// opened Realm.
+        case downloadOnFirstOpen
+    }
     /**
      Asynchronously open a Realm and deliver it to a block on the given queue.
 
@@ -1019,19 +1030,30 @@ extension Realm {
      operation began to be downloaded and available locally.
 
      - parameter configuration: A configuration object to use when opening the Realm.
+     - parameter downloadBehavior: The behavior in how to open the realm.
      - returns: An open Realm.
      */
-    @discardableResult
-    public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration) async throws -> Realm {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Swift.Error>) in
-            RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callback: { error in
-                if let error = error {
-                    continuation.resume(with: .failure(error))
-                } else {
-                    continuation.resume(with: .success(()))
-                }
-            })
+    public init(configuration: Realm.Configuration = .defaultConfiguration,
+                downloadBehavior: DownloadBehavior = .alwaysDownloadLatest) async throws {
+        switch downloadBehavior {
+        case .openImmediately:
+            break
+        case .downloadOnFirstOpen:
+            if !RLMRealm.isRealmCached(atPath: configuration.rlmConfiguration.pathOnDisk) {
+                fallthrough
+            }
+        case .alwaysDownloadLatest:
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Swift.Error>) in
+                RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callback: { error in
+                    if let error = error {
+                        continuation.resume(with: .failure(error))
+                    } else {
+                        continuation.resume(with: .success(()))
+                    }
+                })
+            }
         }
-        return try Realm(configuration: configuration)
+
+        try self.init(RLMRealm(configuration: configuration.rlmConfiguration))
     }
 }

@@ -2937,11 +2937,12 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         try autoreleasepool {
             let realm = try Realm()
             try! realm.write {
-                (0..<10000).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket")) }
+                (0..<10).forEach { _ in realm.add(SwiftPerson(firstName: "Charlie", lastName: "Bucket")) }
             }
         }
-        let realm = try await Realm.asyncOpen()
-        XCTAssertEqual(realm.objects(SwiftPerson.self).count, 10000)
+        let realm = try await Realm()
+        XCTAssertEqual(realm.objects(SwiftPerson.self).count, 10)
+        try await Realm(downloadBehavior: .downloadOnFirstOpen)
     }
 
     func testAsyncOpenSync() async throws {
@@ -2950,7 +2951,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
             let password = randomString(10)
             try await app.emailPasswordAuth.registerUser(email: email, password: password)
             let user = try await self.app.login(credentials: .emailPassword(email: email, password: password))
-            let realm = try await Realm.asyncOpen(configuration: user.configuration(testName: #function))
+            let realm = try await Realm(configuration: user.configuration(testName: #function))
             try! realm.write {
                 realm.add(SwiftHugeSyncObject.create())
                 realm.add(SwiftHugeSyncObject.create())
@@ -2966,7 +2967,42 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
             executeChild()
         } else {
             let user = try await app.login(credentials: .anonymous)
-            let realm = try await Realm.asyncOpen(configuration: user.configuration(testName: #function))
+            let realm = try await Realm(configuration: user.configuration(testName: #function))
+            XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
+        }
+    }
+
+    func testAsyncOpenDownloadBehavoir() async throws {
+        if isParent {
+            let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+            let password = randomString(10)
+            try await app.emailPasswordAuth.registerUser(email: email, password: password)
+            let user = try await self.app.login(credentials: .emailPassword(email: email, password: password))
+            let realm = try await Realm(configuration: user.configuration(testName: #function))
+            try! realm.write {
+                realm.add(SwiftHugeSyncObject.create())
+                realm.add(SwiftHugeSyncObject.create())
+            }
+            let progressEx = self.expectation(description: "Should upload")
+            let token = realm.syncSession!.addProgressNotification(for: .upload, mode: .forCurrentlyOutstandingWork) {
+                if $0.isTransferComplete {
+                    progressEx.fulfill()
+                }
+            }
+            self.wait(for: [progressEx], timeout: 30.0)
+            token?.invalidate()
+            executeChild()
+        } else {
+            let user = try await app.login(credentials: .anonymous)
+
+            var realm = try await Realm(configuration: user.configuration(testName: #function), downloadBehavior: .openImmediately)
+            XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 0)
+
+            // will be empty because it will use the cached realm on the previous line
+            realm = try await Realm(configuration: user.configuration(testName: #function), downloadBehavior: .downloadOnFirstOpen)
+            XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 0)
+
+            realm = try await Realm(configuration: user.configuration(testName: #function), downloadBehavior: .alwaysDownloadLatest)
             XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
         }
     }
