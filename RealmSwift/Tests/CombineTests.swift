@@ -377,7 +377,7 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
                     prev = o.freeze()
                     XCTAssertEqual(prev!.intCol, o.intCol)
 
-                    if o.intCol == 100 {
+                    if o.intCol >= 100 {
                         sema.signal()
                     }
                 } else {
@@ -397,10 +397,11 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
         // above when checking for property name "intCol".
         try! realm.write { obj.boolCol = true }
         try! realm.write { obj.intCol += 1 }
+        sema.wait()
 
         try! realm.write { realm.delete(obj) }
-
         sema.wait()
+
         XCTAssertNotNil(prev)
         XCTAssertEqual(prev!.intCol, 101)
     }
