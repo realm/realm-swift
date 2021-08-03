@@ -68,7 +68,7 @@ class SwiftAllTypesObject: Object {
             "objectIdCol": ObjectId("1234567890ab1234567890ab"),
             "objectCol": [false],
             "uuidCol": UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
-//            "arrayCol": [],
+            "arrayCol": [],
             "setCol": [],
             "mapCol": [:]
         ]
@@ -91,8 +91,12 @@ public class Person: Object {
 }
 
 
-public class PersonProjection: Projection<Person> {
-//    public typealias Root = Person
+public struct PersonProjection: Projection {
+    public typealias Root = Person
+
+    public init() {
+    }
+
     @Projected(\Person.firstName) var firstName
     @Projected(\Person.lastName) var lastName
     @Projected(\Person.birthday.timeIntervalSince1970) var birthdayAsEpochtime
@@ -100,9 +104,12 @@ public class PersonProjection: Projection<Person> {
     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
 }
 
-class AllTypesProjection: Projection<SwiftAllTypesObject> {
-//    typealias Root = SwiftAllTypesObject
-    
+final class AllTypesProjection: Projection {
+    public typealias Root = SwiftAllTypesObject
+
+    public init() {
+    }
+
     @Projected(\SwiftAllTypesObject.boolCol) var boolCol
     @Projected(\SwiftAllTypesObject.intCol) var intCol
     @Projected(\SwiftAllTypesObject.int8Col) var int8Col
@@ -125,27 +132,6 @@ class AllTypesProjection: Projection<SwiftAllTypesObject> {
     @Projected(\SwiftAllTypesObject.setCol) var setCol
     @Projected(\SwiftAllTypesObject.mapCol) var mapCol
 }
-
-//extension AllTypesProjection: RealmCollectionValue {
-//
-//    public static var _rlmType: PropertyType { .any }
-//
-//    static var _rlmOptional: Bool { false }
-//
-//    static var _rlmRequireObjc: Bool { false }
-//
-//    func _rlmPopulateProperty(_ prop: RLMProperty) {
-//        fatalError()
-//    }
-//
-//    static func _rlmPopulateProperty(_ prop: RLMProperty) {
-//        fatalError()
-//    }
-//
-//    static func == (lhs: AllTypesProjection, rhs: AllTypesProjection) -> Bool {
-//        return lhs === rhs
-//    }
-//}
 
 class ProjectionTests: TestCase {
 
@@ -215,6 +201,10 @@ class ProjectionTests: TestCase {
         XCTAssertNotEqual(left, right)
         XCTAssertEqual(left, anotherLeft)
     }
+    
+    func testProjectionsRealmShouldNotBeNil() {
+        XCTAssertNotNil(realmWithTestPath().objects(PersonProjection.self).first!.realm)
+    }
 
     func testProjectionFromResultSortedBirthday() {
         let realm = realmWithTestPath()
@@ -225,14 +215,14 @@ class ProjectionTests: TestCase {
         XCTAssertEqual(dany.birthdayAsEpochtime, Date(timeIntervalSince1970: 0).timeIntervalSince1970)
         XCTAssertEqual(dany.firstFriendsName.first!, "John")
     }
-    
-    func testProjectionFromResultFilteredBirthday() {
-        let realm = realmWithTestPath()
-        let johnSnow: PersonProjection = realm.objects(PersonProjection.self).filter("birthday == 0").first!
 
-        XCTAssertEqual(johnSnow.homeCity, "Winterfell")
-        XCTAssertEqual(johnSnow.birthdayAsEpochtime, Date(timeIntervalSince1970: 10).timeIntervalSince1970)
-        XCTAssertEqual(johnSnow.firstFriendsName.first!, "Daenerys")
-    }
+//    func testProjectionFromResultFilteredBirthday() {
+//        let realm = realmWithTestPath()
+//        let johnSnow: PersonProjection = realm.objects(PersonProjection.self).filter("birthday == 0").first!
+//
+//        XCTAssertEqual(johnSnow.homeCity, "Winterfell")
+//        XCTAssertEqual(johnSnow.birthdayAsEpochtime, Date(timeIntervalSince1970: 10).timeIntervalSince1970)
+//        XCTAssertEqual(johnSnow.firstFriendsName.first!, "Daenerys")
+//    }
 
 }

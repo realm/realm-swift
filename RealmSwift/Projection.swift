@@ -19,6 +19,11 @@
 import Realm
 import Realm.Private
 
+fileprivate protocol _Projected {
+    var objectBase: ObjectBase! { get }
+    func set(object: ObjectBase)
+}
+
 /// @Projected is used to declare properties on Projection protocols which should be
 /// managed by Realm.
 ///
@@ -81,23 +86,29 @@ public struct Projected<T: ObjectBase, Value>: _Projected {
     }
 }
 
-open class Projection<Root: ObjectBase>: ThreadConfined {
-//    associatedtype Root: ObjectBase
-//    func observe(keyPaths: [PartialKeyPath<Projection>], _ block: (ProjectionChange) -> Void) -> NotificationToken
+public protocol Projection: ThreadConfined, RealmCollectionValue {
+    associatedtype Root: ObjectBase
 
-    required public init(_ object: Root) {
+    init()
+    func objectClassName() -> String
+}
+
+public extension Projection {
+
+    init(_ object: Root) {
+        self.init()
         assign(object)
     }
-    
+
     fileprivate subscript(label: String) -> _Projected {
         Mirror(reflecting: self).descendant(label)! as! _Projected
     }
-    
+
     func assign(_ object: Root) {
         let mirror = Mirror(reflecting: self)
         for child in mirror.children {
             if child.value is _Projected {
-                let keyPath =  \Projection.[child.label!]
+                let keyPath = \Self.[child.label!]
                 self[keyPath: keyPath].set(object: object)
             }
         }
@@ -106,11 +117,6 @@ open class Projection<Root: ObjectBase>: ThreadConfined {
     func objectClassName() -> String {
         return Root.className()
     }
-}
-
-fileprivate protocol _Projected {
-    var objectBase: ObjectBase! { get }
-    func set(object: ObjectBase)
 }
 
 public enum ProjectionChange {
@@ -130,8 +136,8 @@ public enum ProjectionChange {
     case deleted
 }
 
-public extension Projection {
-    func observe(keyPaths: [PartialKeyPath<Projection>] = [], _ block: (ProjectionChange) -> Void) -> NotificationToken {
+extension Projection {
+    func observe<T>(keyPaths: [PartialKeyPath<T>] = [], _ block: (ProjectionChange) -> Void) -> NotificationToken where T: Projection {
         if keyPaths.isEmpty {
 //            projectionSchemas[ObjectIdentifier(type(of: self))]!.forEach { property in
 //                (self[keyPath: property.keyPathOnProjection] as! _ProjectedBase).objectBase.observe(property.realmKeyPathString) { change in
@@ -145,16 +151,19 @@ public extension Projection {
     // Must also conform to `AssistedObjectiveCBridgeable`
     /**
      The Realm which manages the object, or `nil` if the object is unmanaged.
+     Note: Projection can be instantiated for the managed objects only therefore realm will never be nil.
      Unmanaged objects are not confined to a thread and cannot be passed to methods expecting a
      `ThreadConfined` object.
      */
-    var realm: Realm? {
-        return nil
-//        (self[keyPath: projectionSchemas[ObjectIdentifier(type(of: self))]!.first!.keyPathOnProjection] as! _ProjectedBase)
-//            .objectBase.realm
+    public var realm: Realm? {
+        if let object = self.realmObject as? Object {
+            return object.realm
+        }
+        fatalError("Realm cannot be nil")
     }
+
     /// Indicates if the object can no longer be accessed because it is now invalid.
-    var isInvalidated: Bool {
+    public var isInvalidated: Bool {
         return false
     }
     /**
@@ -162,7 +171,7 @@ public extension Projection {
      Frozen objects are not confined to their source thread. Forming a `ThreadSafeReference` to a
      frozen object is allowed, but is unlikely to be useful.
      */
-    var isFrozen: Bool {
+    public var isFrozen: Bool {
         return false
     }
     /**
@@ -176,15 +185,57 @@ public extension Projection {
      transaction on the Realm may result in the Realm file growing to large sizes. See
      `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
      */
-    func freeze() -> Self {
+    public func freeze() -> Self {
         return self
     }
     /**
      Returns a live (mutable) reference of this object.
      Will return self if called on an already live object.
      */
-    func thaw() -> Self? {
+    public func thaw() -> Self? {
         return self
+    }
+}
+
+extension Projection {
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
+        fatalError()
+    }
+    
+    public static var _rlmType: PropertyType {
+        fatalError()
+    }
+    
+    public static var _rlmOptional: Bool {
+        fatalError()
+    }
+    
+    public static var _rlmRequireObjc: Bool {
+        fatalError()
+    }
+    
+    public func _rlmPopulateProperty(_ prop: RLMProperty) {
+        fatalError()
+    }
+    
+    public static func _rlmPopulateProperty(_ prop: RLMProperty) {
+        fatalError()
+    }
+    
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        RLMObjectBaseAreEqual(lhs.realmObject, rhs.realmObject)
+    }
+
+    fileprivate var realmObject: ObjectBase {
+        get {
+            (Mirror(reflecting: self).children.first(where: { $0.value is _Projected })!.value as! _Projected).objectBase
+        }
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        let hashVal = realmObject.hashValue
+        hasher.combine(hashVal)
     }
 }
 
@@ -262,51 +313,9 @@ public struct ElementMapper<Element> where Element: ObjectBase, Element: RealmCo
         ProjectedList(list, keyPathToNewElement: member)
     }
 }
+
 extension List where Element: ObjectBase, Element: RealmCollectionValue {
     public var projectTo: ElementMapper<Element> {
         ElementMapper(list: self)
-    }
-}
-
-extension Projection: RealmCollectionValue {
-    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
-        fatalError()
-    }
-    
-    public static var _rlmType: PropertyType {
-        fatalError()
-    }
-    
-    public static var _rlmOptional: Bool {
-        fatalError()
-    }
-    
-    public static var _rlmRequireObjc: Bool {
-        fatalError()
-    }
-    
-    public func _rlmPopulateProperty(_ prop: RLMProperty) {
-        fatalError()
-    }
-    
-    public static func _rlmPopulateProperty(_ prop: RLMProperty) {
-        fatalError()
-    }
-    
-    public static func == (lhs: Projection<Root>, rhs: Projection<Root>) -> Bool {
-        RLMObjectBaseAreEqual(lhs.realmObject, rhs.realmObject)
-    }
-    
-    fileprivate var realmObject: ObjectBase {
-        get {
-            (Mirror(reflecting: self).children.first(where: { $0.value is _Projected })!.value as! _Projected).objectBase
-        }
-    }
-}
-
-extension Projection: Hashable { // Required for RealmCollectionValue
-    public func hash(into hasher: inout Hasher) {
-        let hashVal = realmObject.hashValue
-        hasher.combine(hashVal)
     }
 }
