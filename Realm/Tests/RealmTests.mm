@@ -1972,7 +1972,7 @@
     }];
 }
 
--(void)testThawPreviousVersion {
+- (void)testThawPreviousVersion {
     RLMRealm *frozenRealm = [[RLMRealm defaultRealm] freeze];
     XCTAssertTrue(frozenRealm.frozen);
     XCTAssertEqual(frozenRealm.isEmpty, [[RLMRealm defaultRealm] isEmpty]);

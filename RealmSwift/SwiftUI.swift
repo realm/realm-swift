@@ -119,9 +119,11 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
 
     private var subscribers = [AnySubscriber<Void, Never>]()
     private let value: ObjectType
+    private let keyPaths: [String]?
 
-    init(_ value: ObjectType) {
+    init(_ value: ObjectType, _ keyPaths: [String]? = nil) {
         self.value = value
+        self.keyPaths = keyPaths
     }
 
     func send() {
@@ -134,7 +136,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
         subscribers.append(AnySubscriber(subscriber))
         if value.realm != nil && !value.isInvalidated, let value = value.thaw() {
             // if the value is managed
-            let token =  value._observe(subscriber)
+            let token =  value._observe(keyPaths, subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
         } else if let value = value as? ObjectBase, !value.isInvalidated {
             // else if the value is unmanaged
@@ -158,16 +160,17 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         willSet {
             if newValue != value {
                 objectWillChange.send()
-                self.objectWillChange = ObservableStoragePublisher(newValue)
+                self.objectWillChange = ObservableStoragePublisher(newValue, self.keyPaths)
             }
         }
     }
 
     var objectWillChange: ObservableStoragePublisher<ObservedType>
+    var keyPaths: [String]?
 
-    init(_ value: ObservedType) {
+    init(_ value: ObservedType, _ keyPaths: [String]? = nil) {
         self.value = value.realm != nil && !value.isInvalidated ? value.thaw() ?? value : value
-        self.objectWillChange = ObservableStoragePublisher(value)
+        self.objectWillChange = ObservableStoragePublisher(value, keyPaths)
     }
 }
 
@@ -315,7 +318,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     }
 
     @Environment(\.realmConfiguration) var configuration
-    @ObservedObject private var storage = Storage(Results(RLMResults.emptyDetached()))
+    @ObservedObject private var storage: Storage
     /// :nodoc:
     @State public var filter: NSPredicate? {
         willSet {
@@ -340,7 +343,9 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     public init(_ type: ResultType.Type,
                 configuration: Realm.Configuration? = nil,
                 filter: NSPredicate? = nil,
+                keyPaths: [String]? = nil,
                 sortDescriptor: SortDescriptor? = nil) {
+        self.storage = Storage(Results(RLMResults.emptyDetached()), keyPaths)
         self.storage.configuration = configuration
         self.filter = filter
         self.sortDescriptor = sortDescriptor

@@ -18,6 +18,9 @@ identifier_name:
     - _nsError
     - _nsErrorDomain
     - _observe(_:)
+    - _observe(_:_:)
+    - _observe(_:_:_:)
+    - _observe(_:on:_:)
     - _realmColumnNames()
     - _realmObjectName()
     - _rlmCollection

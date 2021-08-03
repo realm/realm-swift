@@ -1,6 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+*  `Object.observe` and `RealmCollection.observe` now include an optional `keyPaths` parameter which filters change notifications to those only occurring on the provided key path or key paths. See method documentation for extended detail on filtering behavior.
+* `ObservedResults<ResultsType>`  now includes an optional `keyPaths` parameter which filters change notifications to those only occurring on the provided key path or key paths. ex) `@ObservedResults(MyObject.self, keyPaths: ["myList.property"])`
 * Add two new property wrappers for opening a Realm asynchronously in a 
   SwiftUI View:
     - `AsyncOpen` is a property wrapper that initiates Realm.asyncOpen 
