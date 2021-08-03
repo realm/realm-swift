@@ -124,12 +124,12 @@ extension AnyRealmValue: AddableType {}
         self.rlmResults = rlmResults
     }
 
-    internal init(_ rlmResults: RLMResults<AnyObject>, _ projector: ((ObjectBase?) -> Element?)?) {
+    internal init(_ rlmResults: RLMResults<AnyObject>, _ projector: ((ObjectBase) -> Element)?) {
         self.rlmResults = rlmResults
         self.projector = projector
     }
 
-    private var projector: ((ObjectBase?) -> Element?)? = nil
+    private var projector: ((ObjectBase) -> Element)? = nil
 
     // MARK: Index Retrieval
 
@@ -177,7 +177,7 @@ extension AnyRealmValue: AddableType {}
     public subscript(position: Int) -> Element {
         throwForNegativeIndex(position)
         if let projector = projector {
-            return projector(dynamicBridgeCast(fromObjectiveC: rlmResults.object(at: UInt(position))))!
+            return projector(dynamicBridgeCast(fromObjectiveC: rlmResults.object(at: UInt(position))))
         }
         return dynamicBridgeCast(fromObjectiveC: rlmResults.object(at: UInt(position)))
     }
@@ -185,15 +185,15 @@ extension AnyRealmValue: AddableType {}
     /// Returns the first object in the results, or `nil` if the results are empty.
     public var first: Element? {
         if let projector = projector, let object = rlmResults.firstObject().map(dynamicBridgeCast) as? ObjectBase {
-            return projector(rlmResults.firstObject().map(dynamicBridgeCast) as? ObjectBase)
+            return projector(object)
         }
         return rlmResults.firstObject().map(dynamicBridgeCast)
     }
 
     /// Returns the last object in the results, or `nil` if the results are empty.
     public var last: Element? {
-        if let projector = projector {
-            return projector(rlmResults.lastObject().map(dynamicBridgeCast) as? ObjectBase)
+        if let projector = projector, let object = rlmResults.lastObject().map(dynamicBridgeCast) as? ObjectBase {
+            return projector(object)
         }
         return rlmResults.lastObject().map(dynamicBridgeCast)
     }
