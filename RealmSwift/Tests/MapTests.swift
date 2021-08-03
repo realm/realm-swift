@@ -888,7 +888,6 @@ class MapTests: TestCase {
             let realm = self.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.objects(SwiftMapPropertyObject.self).first!
-//            let value = obj.objMap["first"]!!
             obj.swiftObjectMap.removeObject(for: "first")
             try! realm.commitWrite()
         }

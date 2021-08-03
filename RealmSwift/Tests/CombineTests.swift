@@ -385,6 +385,11 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
                 }
             })
 
+        for _ in 0..<100 {
+            try! realm.write { obj.intCol += 1 }
+        }
+        sema.wait()
+
         // The following line checks to make sure a change not
         // within the intended keyPath does *not* publish a
         // change.
@@ -392,10 +397,6 @@ class CombineObjectPublisherTests: CombinePublisherTestCase {
         // above when checking for property name.
         try! realm.write { obj.boolCol = true }
 
-        for _ in 0..<100 {
-            try! realm.write { obj.intCol += 1 }
-        }
-        sema.wait()
         try! realm.write { realm.delete(obj) }
 
         sema.wait()

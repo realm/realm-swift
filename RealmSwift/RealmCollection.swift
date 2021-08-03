@@ -474,7 +474,7 @@ public protocol RealmCollection: RealmCollectionBase {
      will reflect the state of the Realm after the write transaction.
 
      ```swift
-     let results = realm.objects(Dog.self)
+     let dogs = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
      let token = dogs.observe { changes in
          switch changes {
@@ -578,20 +578,20 @@ public protocol RealmCollection: RealmCollectionBase {
          case .update:
             // This case is hit:
             // - after the token is intialized
-            // - when an element of the collections' name
-            // property is modified
+            // - when the name property of an object in the
+            // collection is modified
             // - when an element is inserted or removed
             //   from the collection.
             // This block is not triggered:
             // - when a value other than name is modified on
-            //   on of the elements.
+            //   one of the elements.
          case .error:
              // ...
          }
      }
      // end of run loop execution context
      ```
-     - - If the observed key path were `["toys.brand"]`, then any insertion or
+     - If the observed key path were `["toys.brand"]`, then any insertion or
      deletion to the `toys` list on any of the collection's elements would trigger the block.
      Changes to the `brand` value on any `Toy` that is linked to a `Dog` in this
      collection will trigger the block. Changes to a value other than `brand` on any `Toy` that
@@ -1297,7 +1297,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      will reflect the state of the Realm after the write transaction.
 
      ```swift
-     let results = realm.objects(Dog.self)
+     let dogs = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
      let token = dogs.observe { changes in
          switch changes {
@@ -1401,20 +1401,20 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
          case .update:
             // This case is hit:
             // - after the token is intialized
-            // - when an element of the collections' name
-            // property is modified
+            // - when the name property of an object in the
+            // collection is modified
             // - when an element is inserted or removed
             //   from the collection.
             // This block is not triggered:
             // - when a value other than name is modified on
-            //   on of the elements.
+            //   one of the elements.
          case .error:
              // ...
          }
      }
      // end of run loop execution context
      ```
-     - - If the observed key path were `["toys.brand"]`, then any insertion or
+     - If the observed key path were `["toys.brand"]`, then any insertion or
      deletion to the `toys` list on any of the collection's elements would trigger the block.
      Changes to the `brand` value on any `Toy` that is linked to a `Dog` in this
      collection will trigger the block. Changes to a value other than `brand` on any `Toy` that

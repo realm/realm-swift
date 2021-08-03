@@ -501,20 +501,20 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
          case .update:
             // This case is hit:
             // - after the token is intialized
-            // - when an element of the collections' name
-            // property is modified
+            // - when the name property of an object in the
+            // collection is modified
             // - when an element is inserted or removed
             //   from the collection.
             // This block is not triggered:
             // - when a value other than name is modified on
-            //   on of the elements.
+            //   one of the elements.
          case .error:
              // ...
          }
      }
      // end of run loop execution context
      ```
-     - - If the observed key path were `["toys.brand"]`, then any insertion or
+     - If the observed key path were `["toys.brand"]`, then any insertion or
      deletion to the `toys` list on any of the collection's elements would trigger the block.
      Changes to the `brand` value on any `Toy` that is linked to a `Dog` in this
      collection will trigger the block. Changes to a value other than `brand` on any `Toy` that
@@ -547,6 +547,8 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
                            String key paths which do not correspond to a valid a property
                            will throw an exception.
                            See description above for more detail on linked properties.
+     - note: The keyPaths parameter refers to object properties of the collection type and
+             *does not* refer to particular key/value pairs within the Map.
      - parameter queue: The serial dispatch queue to receive notification on. If
                         `nil`, notifications are delivered to the current thread.
      - parameter block: The block to be called whenever a change occurs.
