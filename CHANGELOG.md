@@ -1,9 +1,15 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.12.0 Release notes (2021-08-03)
 =============================================================
+
 ### Enhancements
-*  `Object.observe` and `RealmCollection.observe` now include an optional `keyPaths` parameter which filters change notifications to those only occurring on the provided key path or key paths. See method documentation for extended detail on filtering behavior.
-* `ObservedResults<ResultsType>`  now includes an optional `keyPaths` parameter which filters change notifications to those only occurring on the provided key path or key paths. ex) `@ObservedResults(MyObject.self, keyPaths: ["myList.property"])`
-* Add two new property wrappers for opening a Realm asynchronously in a 
+
+* `Object.observe()` and `RealmCollection.observe()` now include an optional
+  `keyPaths` parameter which filters change notifications to those only
+  occurring on the provided key path or key paths. See method documentation
+  for extended detail on filtering behavior.
+* `ObservedResults<ResultsType>`  now includes an optional `keyPaths` parameter
+  which filters change notifications to those only occurring on the provided
+  key path or key paths. ex) `@ObservedResults(MyObject.self, keyPaths: ["myList.property"])`
 * Add two new property wrappers for opening a Realm asynchronously in a
   SwiftUI View:
     - `AsyncOpen` is a property wrapper that initiates Realm.asyncOpen
@@ -13,9 +19,11 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add `EnvironmentValues.partitionValue`. This value can be injected into any view using one of
   our new property wrappers `AsyncOpen` and `AutoOpen`:
   `MyView().environment(\.partitionValue, "partitionValue")`.
-* Shift more of the work done when first initializing a collection notifier to the background worker thread rather than doing it on the main thread.
+* Shift more of the work done when first initializing a collection notifier to
+  the background worker thread rather than doing it on the main thread.
 
 ### Fixed
+
 * `configuration(partitionValue: AnyBSON)` would always set a nil partition value
   for the user sync configuration.
 * Decoding a `@Persisted` property would incorrectly throw a `DecodingError.keyNotFound`
@@ -37,9 +45,8 @@ x.y.z Release notes (yyyy-MM-dd)
   trigger if the link was to the same table and adding the backlink column
   caused a BPNode split. ([Core #4828](https://github.com/realm/realm-core/pull/4828), since v10.8.0)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.5.1.
@@ -48,6 +55,7 @@ x.y.z Release notes (yyyy-MM-dd)
   version due to betas 3 and 4 having a broken Combine.framework.
 
 ### Internal
+
 * Upgraded realm-core from v11.1.1 to v11.2.0
 
 10.11.0 Release notes (2021-07-22)
