@@ -1,1 +1,1 @@
-../../realm/RLMDictionary_Private.h
+../../Realm/RLMDictionary_Private.h
