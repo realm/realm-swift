@@ -1017,8 +1017,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let callResetFunctionEx = expectation(description: "Reset password function")
         app.emailPasswordAuth.callResetPasswordFunction(email: email,
-                                                                       password: randomString(10),
-                                                                       args: [[:]]) { (error) in
+                                                        password: randomString(10),
+                                                        args: [[:]]) { (error) in
             XCTAssertNotNil(error)
             callResetFunctionEx.fulfill()
         }
@@ -2267,6 +2267,19 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
                                             downloadBeforeOpen: .always)
                 XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 4)
             }
+        }
+    }
+
+    func testEmailPasswordProviderClient() async throws {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+        try await app.emailPasswordAuth.registerUser(email: email, password: password)
+        do {
+            try await app.emailPasswordAuth.callResetPasswordFunction(email: email,
+                                                                      password: randomString(10),
+                                                                      args: [[:]])
+        } catch {
+            XCTAssertNotNil(error)
         }
     }
 }
