@@ -2304,7 +2304,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         let password = randomString(10)
         try await app.emailPasswordAuth.registerUser(email: email, password: password)
 
-        let _ = try await app.login(credentials: Credentials.emailPassword(email: email, password: password))
+        _ = try await app.login(credentials: Credentials.emailPassword(email: email, password: password))
 
         let client = app.pushClient(serviceName: "gcm")
         try await client.registerDevice(token: "some-token", user: app.currentUser!)
@@ -2346,7 +2346,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
         try await app.emailPasswordAuth.registerUser(email: email, password: password)
-        
+
         let credentials = Credentials.emailPassword(email: email, password: password)
         let syncUser = try await self.app.login(credentials: credentials)
         let apiKey = try await syncUser.apiKeysAuth.createAPIKey(named: "my-api-key")
@@ -2368,7 +2368,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(newFetchedApiKeys.count, 0)
     }
 
-    func testCustomUserData() async throws  {
+    func testCustomUserData() async throws {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
         try await app.emailPasswordAuth.registerUser(email: email, password: password)

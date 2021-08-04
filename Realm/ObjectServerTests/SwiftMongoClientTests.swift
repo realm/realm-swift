@@ -876,7 +876,7 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
 
         let credentials = Credentials.emailPassword(email: email, password: password)
         let user = try await app.login(credentials: credentials)
-        
+
         let mongoClient = user.mongoClient("mongodb1")
         let database = mongoClient.database(named: "test_data")
         let collection = database.collection(withName: "Dog")
