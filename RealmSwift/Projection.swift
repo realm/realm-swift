@@ -50,6 +50,8 @@ fileprivate protocol _Projected {
 ///     @Projected(\Person.address.city) var homeCity
 ///     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
 /// }
+///
+/// let people: [PersonProjection] = realm.objects(PersonProjection.self)
 /// ```
 @propertyWrapper
 public struct Projected<T: ObjectBase, Value>: _Projected {

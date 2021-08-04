@@ -28,32 +28,39 @@ import RealmTestSupport
 /**
  Test objects definitions
  */
-class SwiftAllTypesObject: Object {
-    @Persisted var boolCol = false
-    @Persisted var intCol = 123
-    @Persisted var int8Col: Int8 = 123
-    @Persisted var int16Col: Int16 = 123
-    @Persisted var int32Col: Int32 = 123
-    @Persisted var int64Col: Int64 = 123
-//    @Persisted var intEnumCol = IntEnum.value1
-    @Persisted var floatCol = 1.23 as Float
-    @Persisted var doubleCol = 12.3
-    @Persisted var stringCol = "a"
-    @Persisted var binaryCol = "a".data(using: String.Encoding.utf8)!
-    @Persisted var dateCol = Date(timeIntervalSince1970: 1)
-    @Persisted var decimalCol = Decimal128("123e4")
-    @Persisted var objectIdCol = ObjectId("1234567890ab1234567890ab")
-    @Persisted var objectCol: SwiftBoolObject? = SwiftBoolObject()
-    @Persisted var uuidCol: UUID = UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!
-//    @Persisted var anyCol = RealmProperty<AnyRealmValue>()
+enum IntegerEnum: Int, PersistableEnum {
+    case value1 = 1
+    case value2 = 3
+}
 
-//    @Persisted var arrayCol = List<SwiftBoolObject>()
+class SwiftAllTypesObject: Object {
+    @Persisted(primaryKey: true) var pk: String
+    @Persisted var boolCol: Bool
+    @Persisted var intCol: Int
+    @Persisted var int8Col: Int8
+    @Persisted var int16Col: Int16
+    @Persisted var int32Col: Int32
+    @Persisted var int64Col: Int64
+    @Persisted var intEnumCol: IntegerEnum
+    @Persisted var floatCol: Float
+    @Persisted var doubleCol: Double
+    @Persisted var stringCol: String
+    @Persisted var binaryCol: Data
+    @Persisted var dateCol: Date
+    @Persisted var decimalCol: Decimal128
+    @Persisted var objectIdCol: ObjectId
+    @Persisted var objectCol: SwiftBoolObject?
+    @Persisted var uuidCol: UUID
+    @Persisted var arrayCol = List<SwiftBoolObject>()
     @Persisted var setCol = MutableSet<SwiftBoolObject>()
     @Persisted var mapCol = Map<String, SwiftBoolObject?>()
+    @Persisted var relationCol = List<SwiftAllTypesObject>()
+    @Persisted(originProperty: "relationCol") var backlink: LinkingObjects<SwiftAllTypesObject>
 
     class func defaultValues() -> [String: Any] {
         return  [
-            "boolCol": false,
+            "pk": UUID().uuidString,
+            "boolCol": true,
             "intCol": 123,
             "int8Col": 123 as Int8,
             "int16Col": 123 as Int16,
@@ -68,9 +75,9 @@ class SwiftAllTypesObject: Object {
             "objectIdCol": ObjectId("1234567890ab1234567890ab"),
             "objectCol": [false],
             "uuidCol": UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
-            "arrayCol": [],
-            "setCol": [],
-            "mapCol": [:]
+            "arrayCol": [[true]],
+            "setCol": [[true]],
+            "mapCol": ["true": [true]]
         ]
     }
 }
@@ -110,13 +117,14 @@ final class AllTypesProjection: Projection {
     public init() {
     }
 
+    @Projected(\SwiftAllTypesObject.pk) var pk
     @Projected(\SwiftAllTypesObject.boolCol) var boolCol
     @Projected(\SwiftAllTypesObject.intCol) var intCol
     @Projected(\SwiftAllTypesObject.int8Col) var int8Col
     @Projected(\SwiftAllTypesObject.int16Col) var int16Col
     @Projected(\SwiftAllTypesObject.int32Col) var int32Col
     @Projected(\SwiftAllTypesObject.int64Col) var int64Col
-//    @Projected(\SwiftAllTypesObject.intEnumCol) var intEnumCol
+    @Projected(\SwiftAllTypesObject.intEnumCol) var intEnumCol
     @Projected(\SwiftAllTypesObject.floatCol) var floatCol
     @Projected(\SwiftAllTypesObject.doubleCol) var doubleCol
     @Projected(\SwiftAllTypesObject.stringCol) var stringCol
@@ -126,11 +134,11 @@ final class AllTypesProjection: Projection {
     @Projected(\SwiftAllTypesObject.objectIdCol) var objectIdCol
     @Projected(\SwiftAllTypesObject.objectCol) var objectCol
     @Projected(\SwiftAllTypesObject.uuidCol) var uuidCol
-//    @Projected(\SwiftAllTypesObject.anyCol) var anyCol
-
-//    @Projected(\SwiftAllTypesObject.arrayCol) var arrayCol
+    @Projected(\SwiftAllTypesObject.arrayCol) var arrayCol
     @Projected(\SwiftAllTypesObject.setCol) var setCol
     @Projected(\SwiftAllTypesObject.mapCol) var mapCol
+    @Projected(\SwiftAllTypesObject.relationCol) var relationCol
+    @Projected(\SwiftAllTypesObject.backlink) var backlink
 }
 
 class ProjectionTests: TestCase {
@@ -151,8 +159,11 @@ class ProjectionTests: TestCase {
                                                        "money": Decimal128("2.22")])
             js.friends.append(dt)
             dt.friends.append(js)
-
-            realm.create(SwiftAllTypesObject.self)
+            
+            let a = realm.create(SwiftAllTypesObject.self, value: SwiftAllTypesObject.defaultValues())
+            let b = realm.create(SwiftAllTypesObject.self, value: SwiftAllTypesObject.defaultValues())
+            a.relationCol.append(b)
+            b.relationCol.append(a)
         }
     }
 
@@ -225,4 +236,30 @@ class ProjectionTests: TestCase {
 //        XCTAssertEqual(johnSnow.firstFriendsName.first!, "Daenerys")
 //    }
 
+    func testProjectionForAllRealmTypes() {
+        let allTypesModel = realmWithTestPath().objects(AllTypesProjection.self).first!
+
+        XCTAssertFalse(allTypesModel.pk.isEmpty)
+        XCTAssertEqual(allTypesModel.boolCol, true)
+        XCTAssertEqual(allTypesModel.intCol, 123)
+        XCTAssertEqual(allTypesModel.int8Col, 123)
+        XCTAssertEqual(allTypesModel.int16Col, 123)
+        XCTAssertEqual(allTypesModel.int32Col, 123)
+        XCTAssertEqual(allTypesModel.int64Col, 123)
+        XCTAssertEqual(allTypesModel.intEnumCol, IntegerEnum.value1)
+        XCTAssertEqual(allTypesModel.floatCol, 1.23)
+        XCTAssertEqual(allTypesModel.doubleCol, 12.3)
+        XCTAssertEqual(allTypesModel.stringCol, "a")
+        XCTAssertEqual(allTypesModel.binaryCol, "a".data(using: String.Encoding.utf8)!)
+        XCTAssertEqual(allTypesModel.dateCol, Date(timeIntervalSince1970: 1))
+        XCTAssertEqual(allTypesModel.decimalCol, Decimal128("123e4"))
+        XCTAssertEqual(allTypesModel.objectIdCol, ObjectId("1234567890ab1234567890ab"))
+        XCTAssertNotNil(allTypesModel.objectCol)
+        XCTAssertTrue(allTypesModel.objectCol!.className.contains("SwiftBoolObject"))
+        XCTAssertEqual(allTypesModel.uuidCol, UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!)
+        XCTAssertEqual(allTypesModel.arrayCol.count, 1)
+        XCTAssertEqual(allTypesModel.setCol.count, 1)
+        XCTAssertEqual(allTypesModel.mapCol.count, 1)
+        XCTAssertEqual(allTypesModel.relationCol.first!, allTypesModel.backlink.first!)
+    }
 }
