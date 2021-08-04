@@ -710,3 +710,26 @@ public extension User {
         }
     }
 }
+
+@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+public extension User {
+    /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
+    /// specified as a parameter. This will only be successful if this `User` is the currently authenticated
+    /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
+    /// - Parameters:
+    ///   - credentials: The `Credentials` used to link the user to a new identity.
+    /// - Returns:
+    func linkUser(credentials: Credentials) async throws -> User {
+        return try await withCheckedThrowingContinuation { continuation in
+            linkUser(credentials: credentials, continuation.resume)
+        }
+    }
+
+    /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.
+    /// @completion A completion that eventually return `Result.success(Dictionary)` with user's data or `Result.failure(Error)`.
+    func refreshCustomData() async throws -> [AnyHashable: Any] {
+        return try await withCheckedThrowingContinuation { continuation in
+            refreshCustomData(continuation.resume)
+        }
+    }
+}
