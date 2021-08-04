@@ -708,8 +708,8 @@ extension MongoCollection {
     /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
     /// generated for it.
     /// - Parameters:
-    ///   - document: document  A `Document` value to insert.
-    /// - Returns: 
+    ///   - document: A `Document` value to insert.
+    /// - Returns: The object id of the inserted document.
     public func insertOne(_ document: Document) async throws -> AnyBSON {
         return try await withCheckedThrowingContinuation { continuation in
             insertOne(document, continuation.resume)
@@ -720,7 +720,7 @@ extension MongoCollection {
     /// they will be generated.
     /// - Parameters:
     ///   - documents: The `Document` values in a bson array to insert.
-    /// - Returns:
+    /// - Returns: The object ids of inserted documents.
     public func insertMany(_ documents: [Document]) async throws -> [AnyBSON] {
         return try await withCheckedThrowingContinuation { continuation in
             insertMany(documents, continuation.resume)
@@ -731,7 +731,7 @@ extension MongoCollection {
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
     ///   - options: `FindOptions` to use when executing the command.
-    /// - Returns:
+    /// - Returns: Array of `Document` filtered.
     public func find(filter: Document,
                      options: FindOptions? = nil) async throws -> [Document] {
         return try await withCheckedThrowingContinuation { continuation in
@@ -750,7 +750,7 @@ extension MongoCollection {
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
     ///   - options: `FindOptions` to use when executing the command.
-    /// - Returns:
+    /// - Returns: `Document` filtered.
     public func findOneDocument(filter: Document,
                                 options: FindOptions? = nil) async throws -> Document? {
         return try await withCheckedThrowingContinuation { continuation in
@@ -765,7 +765,7 @@ extension MongoCollection {
     /// Runs an aggregation framework pipeline against this collection.
     /// - Parameters:
     ///   - pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
-    /// - Returns:
+    /// - Returns:An array of `Document` result of the aggregation operation.
     public func aggregate(pipeline: [Document]) async throws -> [Document] {
         return try await withCheckedThrowingContinuation { continuation in
             aggregate(pipeline: pipeline, continuation.resume)
@@ -776,7 +776,7 @@ extension MongoCollection {
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
     ///   - limit: The max amount of documents to count
-    /// - Returns:
+    /// - Returns: Count of the documents that matched the filter.
     public func count(filter: Document,
                       limit: Int? = nil) async throws -> Int {
         return try await withCheckedThrowingContinuation { continuation in
@@ -791,7 +791,7 @@ extension MongoCollection {
     /// Deletes a single matching document from the collection.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
-    /// - Returns:
+    /// - Returns: `Int` count of deleted documents.
     public func deleteOneDocument(filter: Document) async throws -> Int {
         return try await withCheckedThrowingContinuation { continuation in
             deleteOneDocument(filter: filter, continuation.resume)
@@ -801,7 +801,7 @@ extension MongoCollection {
     /// Deletes multiple documents
     /// - Parameters:
     ///   - filter: Document representing the match criteria
-    /// - Returns:
+    /// - Returns: `Int` count of deleted documents.
     public func deleteManyDocuments(filter: Document) async throws -> Int {
         return try await withCheckedThrowingContinuation { continuation in
             deleteManyDocuments(filter: filter, continuation.resume)
@@ -813,7 +813,7 @@ extension MongoCollection {
     ///   - filter: A bson `Document` representing the match criteria.
     ///   - update: A bson `Document` representing the update to be applied to a matching document.
     ///   - upsert: When true, creates a new document if no document matches the query.
-    /// - Returns:
+    /// - Returns: `UpdateResult`result of the `updateOne` operation.
     public func updateOneDocument(filter: Document,
                                   update: Document,
                                   upsert: Bool? = nil) async throws -> UpdateResult {
@@ -836,7 +836,7 @@ extension MongoCollection {
     ///   - filter: A bson `Document` representing the match criteria.
     ///   - update: A bson `Document` representing the update to be applied to a matching document.
     ///   - upsert: When true, creates a new document if no document matches the query.
-    /// - Returns:
+    /// - Returns:`UpdateResult`result of the `updateMany` operation.
     public func updateManyDocuments(filter: Document,
                                     update: Document,
                                     upsert: Bool? = nil) async throws -> UpdateResult {
@@ -864,7 +864,7 @@ extension MongoCollection {
     ///   - filter: A bson `Document` representing the match criteria.
     ///   - update: A bson `Document` representing the update to be applied to a matching document.
     ///   - options: `RemoteFindOneAndModifyOptions` to use when executing the command.
-    /// - Returns:
+    /// - Returns: `Document` result of the attempt to update a document  or `nil` if document wasn't found.
     public func findOneAndUpdate(filter: Document,
                                  update: Document,
                                  options: FindOneAndModifyOptions? = nil) async throws -> Document? {
@@ -892,7 +892,7 @@ extension MongoCollection {
     ///   - filter: A `Document` that should match the query.
     ///   - replacement: A `Document` describing the replacement.
     ///   - options: `FindOneAndModifyOptions` to use when executing the command.
-    /// - Returns:
+    /// - Returns: `Document`result of the attempt to reaplce a document   or `nil` if document wasn't found.
     public func findOneAndReplace(filter: Document,
                                   replacement: Document,
                                   options: FindOneAndModifyOptions? = nil) async throws -> Document? {
@@ -919,7 +919,7 @@ extension MongoCollection {
     /// - Parameters:
     ///   - filter: A `Document` that should match the query.
     ///   - options: `FindOneAndModifyOptions` to use when executing the command.
-    /// - Returns:
+    /// - Returns: `Document` result of the attempt to delete a document  or `nil` if document wasn't found.
     public func findOneAndDelete(filter: Document,
                                  options: FindOneAndModifyOptions? = nil) async throws -> Document? {
         return try await withCheckedThrowingContinuation { continuation in

@@ -718,7 +718,7 @@ public extension User {
     /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
     /// - Parameters:
     ///   - credentials: The `Credentials` used to link the user to a new identity.
-    /// - Returns:
+    /// - Returns:A `User` after successfully update its identity.
     func linkUser(credentials: Credentials) async throws -> User {
         return try await withCheckedThrowingContinuation { continuation in
             linkUser(credentials: credentials, continuation.resume)
