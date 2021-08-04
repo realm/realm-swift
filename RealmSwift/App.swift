@@ -75,13 +75,12 @@ extension EmailPasswordAuth {
                                           password: String,
                                           args: [AnyBSON]) async throws {
         return try await withCheckedThrowingContinuation { continuation in
-            self.callResetPasswordFunction(email: email, password: password, args: args) { error in
+            callResetPasswordFunction(email: email, password: password, args: args) { error in
                 if let error = error {
                     continuation.resume(with: .failure(error))
-                    return
+                } else {
+                    continuation.resume(with: .success(()))
                 }
-
-                continuation.resume(with: .success(()))
             }
         }
     }

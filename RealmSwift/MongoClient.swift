@@ -712,7 +712,7 @@ extension MongoCollection {
     /// - Returns: 
     public func insertOne(_ document: Document) async throws -> AnyBSON {
         return try await withCheckedThrowingContinuation { continuation in
-            self.insertOne(document, continuation.resume)
+            insertOne(document, continuation.resume)
         }
     }
 
@@ -723,7 +723,7 @@ extension MongoCollection {
     /// - Returns:
     public func insertMany(_ documents: [Document]) async throws -> [AnyBSON] {
         return try await withCheckedThrowingContinuation { continuation in
-            self.insertMany(documents, continuation.resume)
+            insertMany(documents, continuation.resume)
         }
     }
 
@@ -736,9 +736,9 @@ extension MongoCollection {
                      options: FindOptions? = nil) async throws -> [Document] {
         return try await withCheckedThrowingContinuation { continuation in
             if let options = options {
-                self.find(filter: filter, options: options, continuation.resume)
+                find(filter: filter, options: options, continuation.resume)
             } else {
-                self.find(filter: filter, continuation.resume)
+                find(filter: filter, continuation.resume)
             }
         }
     }
@@ -755,9 +755,9 @@ extension MongoCollection {
                                 options: FindOptions? = nil) async throws -> Document? {
         return try await withCheckedThrowingContinuation { continuation in
             if let options = options {
-                self.findOneDocument(filter: filter, options: options, continuation.resume)
+                findOneDocument(filter: filter, options: options, continuation.resume)
             } else {
-                self.findOneDocument(filter: filter, continuation.resume)
+                findOneDocument(filter: filter, continuation.resume)
             }
         }
     }
@@ -768,7 +768,7 @@ extension MongoCollection {
     /// - Returns:
     public func aggregate(pipeline: [Document]) async throws -> [Document] {
         return try await withCheckedThrowingContinuation { continuation in
-            self.aggregate(pipeline: pipeline, continuation.resume)
+            aggregate(pipeline: pipeline, continuation.resume)
         }
     }
 
@@ -781,9 +781,9 @@ extension MongoCollection {
                       limit: Int? = nil) async throws -> Int {
         return try await withCheckedThrowingContinuation { continuation in
             if let limit = limit {
-                self.count(filter: filter, limit: limit, continuation.resume)
+                count(filter: filter, limit: limit, continuation.resume)
             } else {
-                self.count(filter: filter, continuation.resume)
+                count(filter: filter, continuation.resume)
             }
         }
     }
@@ -794,7 +794,7 @@ extension MongoCollection {
     /// - Returns:
     public func deleteOneDocument(filter: Document) async throws -> Int {
         return try await withCheckedThrowingContinuation { continuation in
-            self.deleteOneDocument(filter: filter, continuation.resume)
+            deleteOneDocument(filter: filter, continuation.resume)
         }
     }
 
@@ -804,7 +804,7 @@ extension MongoCollection {
     /// - Returns:
     public func deleteManyDocuments(filter: Document) async throws -> Int {
         return try await withCheckedThrowingContinuation { continuation in
-            self.deleteManyDocuments(filter: filter, continuation.resume)
+            deleteManyDocuments(filter: filter, continuation.resume)
         }
     }
 
@@ -819,12 +819,12 @@ extension MongoCollection {
                                   upsert: Bool? = nil) async throws -> UpdateResult {
         return try await withCheckedThrowingContinuation { continuation in
             if let upsert = upsert {
-                self.updateOneDocument(filter: filter,
+                updateOneDocument(filter: filter,
                                        update: update,
                                        upsert: upsert,
                                        continuation.resume)
             } else {
-                self.updateOneDocument(filter: filter,
+                updateOneDocument(filter: filter,
                                        update: update,
                                        continuation.resume)
             }
@@ -842,12 +842,12 @@ extension MongoCollection {
                                     upsert: Bool? = nil) async throws -> UpdateResult {
         return try await withCheckedThrowingContinuation { continuation in
             if let upsert = upsert {
-                self.updateManyDocuments(filter: filter,
+                updateManyDocuments(filter: filter,
                                          update: update,
                                          upsert: upsert,
                                          continuation.resume)
             } else {
-                self.updateManyDocuments(filter: filter,
+                updateManyDocuments(filter: filter,
                                          update: update,
                                          continuation.resume)
             }
@@ -870,12 +870,12 @@ extension MongoCollection {
                                  options: FindOneAndModifyOptions? = nil) async throws -> Document? {
         return try await withCheckedThrowingContinuation { continuation in
             if let options = options {
-                self.findOneAndUpdate(filter: filter,
+                findOneAndUpdate(filter: filter,
                                       update: update,
                                       options: options,
                                       continuation.resume)
             } else {
-                self.findOneAndUpdate(filter: filter,
+                findOneAndUpdate(filter: filter,
                                       update: update,
                                       continuation.resume)
             }
@@ -898,12 +898,12 @@ extension MongoCollection {
                                   options: FindOneAndModifyOptions? = nil) async throws -> Document? {
         return try await withCheckedThrowingContinuation { continuation in
             if let options = options {
-                self.findOneAndReplace(filter: filter,
+                findOneAndReplace(filter: filter,
                                        replacement: replacement,
                                        options: options,
                                        continuation.resume)
             } else {
-                self.findOneAndReplace(filter: filter,
+                findOneAndReplace(filter: filter,
                                        replacement: replacement,
                                        continuation.resume)
             }
@@ -924,11 +924,11 @@ extension MongoCollection {
                                  options: FindOneAndModifyOptions? = nil) async throws -> Document? {
         return try await withCheckedThrowingContinuation { continuation in
             if let options = options {
-                self.findOneAndDelete(filter: filter,
+                findOneAndDelete(filter: filter,
                                       options: options,
                                       continuation.resume)
             } else {
-                self.findOneAndDelete(filter: filter,
+                findOneAndDelete(filter: filter,
                                       continuation.resume)
             }
         }
