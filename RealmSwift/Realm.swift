@@ -1009,16 +1009,18 @@ public typealias NotificationBlock = (_ notification: Realm.Notification, _ real
 @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
 extension Realm {
     /// Download behavior for a synced Realm.
-    public enum DownloadBehavior {
+    @frozen public enum DownloadBehavior {
         /// Open the Realm for immediate use. If this is a synced Realm,
         /// it will download the Realm data in the background.
-        case openImmediately
+        case never
         /// Open the Realm and download all available data before returning.
-        case alwaysDownloadLatest
+        case always
         /// Open the Realm and download all available data before returning
         /// iff there has not been an initial download. Else, return the previously
         /// opened Realm.
-        case downloadOnFirstOpen
+        /// `once` implies once and only once. Restarting the app and using
+        /// this case will not trigger a download.
+        case once
     }
     /**
      Asynchronously open a Realm and deliver it to a block on the given queue.
@@ -1034,15 +1036,15 @@ extension Realm {
      - returns: An open Realm.
      */
     public init(configuration: Realm.Configuration = .defaultConfiguration,
-                downloadBehavior: DownloadBehavior = .alwaysDownloadLatest) async throws {
-        switch downloadBehavior {
-        case .openImmediately:
+                downloadBeforeOpen: DownloadBehavior = .never) async throws {
+        switch downloadBeforeOpen {
+        case .never:
             break
-        case .downloadOnFirstOpen:
-            if !RLMRealm.isRealmCached(atPath: configuration.rlmConfiguration.pathOnDisk) {
+        case .once:
+            if !Realm.fileExists(for: configuration) {
                 fallthrough
             }
-        case .alwaysDownloadLatest:
+        case .always:
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Swift.Error>) in
                 RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callback: { error in
                     if let error = error {
