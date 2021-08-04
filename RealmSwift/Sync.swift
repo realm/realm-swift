@@ -724,12 +724,4 @@ public extension User {
             linkUser(credentials: credentials, continuation.resume)
         }
     }
-
-    /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.
-    /// @completion A completion that eventually return `Result.success(Dictionary)` with user's data or `Result.failure(Error)`.
-    func refreshCustomData() async throws -> [AnyHashable: Any] {
-        return try await withCheckedThrowingContinuation { continuation in
-            refreshCustomData(continuation.resume)
-        }
-    }
 }

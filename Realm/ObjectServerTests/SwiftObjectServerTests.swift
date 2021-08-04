@@ -2283,12 +2283,27 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    func testAppLinkUser() async throws {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+        try await app.emailPasswordAuth.registerUser(email: email, password: password)
+
+        let syncUser = try await self.app.login(credentials: Credentials.anonymous)
+        XCTAssertNotNil(syncUser)
+
+        let credentials = Credentials.emailPassword(email: email, password: password)
+        let linkedUser = try await syncUser.linkUser(credentials: credentials)
+        XCTAssertNotNil(linkedUser)
+        XCTAssertEqual(linkedUser.id, app.currentUser?.id)
+        XCTAssertEqual(linkedUser.identities.count, 2)
+    }
+
     // MARK: - Objective-C async await
     func testPushRegistration() async throws {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
-
         try await app.emailPasswordAuth.registerUser(email: email, password: password)
+
         let _ = try await app.login(credentials: Credentials.emailPassword(email: email, password: password))
 
         let client = app.pushClient(serviceName: "gcm")
@@ -2297,10 +2312,41 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         XCTAssertTrue(true)
     }
 
+    func test() async throws {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+        try await app.emailPasswordAuth.registerUser(email: email, password: password)
+
+        do {
+            try await app.emailPasswordAuth.confirmUser("atoken", tokenId: "atokenid")
+        } catch {
+            XCTAssertNotNil(error)
+        }
+
+        do {
+            try await app.emailPasswordAuth.resendConfirmationEmail(email)
+        } catch {
+            XCTAssertNotNil(error)
+        }
+
+        do {
+            try await app.emailPasswordAuth.retryCustomConfirmation(email)
+        } catch {
+            XCTAssertNotNil(error)
+        }
+
+        do {
+            try await app.emailPasswordAuth.sendResetPasswordEmail("atoken")
+        } catch {
+            XCTAssertNotNil(error)
+        }
+    }
+
     func testUserAPIKeyProviderClient() async throws {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
-
+        try await app.emailPasswordAuth.registerUser(email: email, password: password)
+        
         let credentials = Credentials.emailPassword(email: email, password: password)
         let syncUser = try await self.app.login(credentials: credentials)
         let apiKey = try await syncUser.apiKeysAuth.createAPIKey(named: "my-api-key")
@@ -2320,6 +2366,26 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         let newFetchedApiKeys = try await syncUser.apiKeysAuth.fetchAPIKeys()
         XCTAssertNotNil(newFetchedApiKeys)
         XCTAssertEqual(newFetchedApiKeys.count, 0)
+    }
+
+    func testCustomUserData() async throws  {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+        try await app.emailPasswordAuth.registerUser(email: email, password: password)
+
+        let syncUser = try await self.app.login(credentials: Credentials.anonymous)
+        XCTAssertNotNil(syncUser)
+
+        let userDataEx = expectation(description: "Update user data")
+        app.currentUser?.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
+            XCTAssertNil(error)
+            userDataEx.fulfill()
+        }
+        wait(for: [userDataEx], timeout: 4.0)
+
+        try await app.currentUser?.refreshCustomData()
+        XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))
+        XCTAssertEqual(app.currentUser?.customData["apples"], .int64(10))
     }
 }
 
