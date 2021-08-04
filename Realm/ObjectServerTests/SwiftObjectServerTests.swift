@@ -2282,6 +2282,45 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotNil(error)
         }
     }
+
+    // MARK: - Objective-C async await
+    func testPushRegistration() async throws {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        try await app.emailPasswordAuth.registerUser(email: email, password: password)
+        let _ = try await app.login(credentials: Credentials.emailPassword(email: email, password: password))
+
+        let client = app.pushClient(serviceName: "gcm")
+        try await client.registerDevice(token: "some-token", user: app.currentUser!)
+        try await client.deregisterDevice(user: app.currentUser!)
+        XCTAssertTrue(true)
+    }
+
+    func testUserAPIKeyProviderClient() async throws {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let credentials = Credentials.emailPassword(email: email, password: password)
+        let syncUser = try await self.app.login(credentials: credentials)
+        let apiKey = try await syncUser.apiKeysAuth.createAPIKey(named: "my-api-key")
+        XCTAssertNotNil(apiKey)
+
+        let fetchedApiKey = try await syncUser.apiKeysAuth.fetchAPIKey(apiKey.objectId)
+        XCTAssertNotNil(fetchedApiKey)
+
+        let fetchedApiKeys = try await syncUser.apiKeysAuth.fetchAPIKeys()
+        XCTAssertNotNil(fetchedApiKeys)
+        XCTAssertEqual(fetchedApiKeys.count, 1)
+
+        try await syncUser.apiKeysAuth.disableAPIKey(apiKey.objectId)
+        try await syncUser.apiKeysAuth.enableAPIKey(apiKey.objectId)
+        try await syncUser.apiKeysAuth.deleteAPIKey(apiKey.objectId)
+
+        let newFetchedApiKeys = try await syncUser.apiKeysAuth.fetchAPIKeys()
+        XCTAssertNotNil(newFetchedApiKeys)
+        XCTAssertEqual(newFetchedApiKeys.count, 0)
+    }
 }
 
 #endif // swift(>=5.5)
