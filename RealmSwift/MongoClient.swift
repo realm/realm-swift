@@ -703,6 +703,238 @@ extension MongoCollection {
     }
 }
 
+@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+extension MongoCollection {
+    /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
+    /// generated for it.
+    /// - Parameters:
+    ///   - document: document  A `Document` value to insert.
+    /// - Returns: 
+    public func insertOne(_ document: Document) async throws -> AnyBSON {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.insertOne(document, continuation.resume)
+        }
+    }
+
+    /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
+    /// they will be generated.
+    /// - Parameters:
+    ///   - documents: The `Document` values in a bson array to insert.
+    /// - Returns:
+    public func insertMany(_ documents: [Document]) async throws -> [AnyBSON] {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.insertMany(documents, continuation.resume)
+        }
+    }
+
+    /// Finds the documents in this collection which match the provided filter.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - options: `FindOptions` to use when executing the command.
+    /// - Returns:
+    public func find(filter: Document,
+                     options: FindOptions? = nil) async throws -> [Document] {
+        return try await withCheckedThrowingContinuation { continuation in
+            if let options = options {
+                self.find(filter: filter, options: options, continuation.resume)
+            } else {
+                self.find(filter: filter, continuation.resume)
+            }
+        }
+    }
+
+    /// Returns one document from a collection or view which matches the
+    /// provided filter. If multiple documents satisfy the query, this method
+    /// returns the first document according to the query's sort order or natural
+    /// order.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - options: `FindOptions` to use when executing the command.
+    /// - Returns:
+    public func findOneDocument(filter: Document,
+                                options: FindOptions? = nil) async throws -> Document? {
+        return try await withCheckedThrowingContinuation { continuation in
+            if let options = options {
+                self.findOneDocument(filter: filter, options: options, continuation.resume)
+            } else {
+                self.findOneDocument(filter: filter, continuation.resume)
+            }
+        }
+    }
+
+    /// Runs an aggregation framework pipeline against this collection.
+    /// - Parameters:
+    ///   - pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
+    /// - Returns:
+    public func aggregate(pipeline: [Document]) async throws -> [Document] {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.aggregate(pipeline: pipeline, continuation.resume)
+        }
+    }
+
+    /// Counts the number of documents in this collection matching the provided filter.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - limit: The max amount of documents to count
+    /// - Returns:
+    public func count(filter: Document,
+                      limit: Int? = nil) async throws -> Int {
+        return try await withCheckedThrowingContinuation { continuation in
+            if let limit = limit {
+                self.count(filter: filter, limit: limit, continuation.resume)
+            } else {
+                self.count(filter: filter, continuation.resume)
+            }
+        }
+    }
+
+    /// Deletes a single matching document from the collection.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    /// - Returns:
+    public func deleteOneDocument(filter: Document) async throws -> Int {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.deleteOneDocument(filter: filter, continuation.resume)
+        }
+    }
+
+    /// Deletes multiple documents
+    /// - Parameters:
+    ///   - filter: Document representing the match criteria
+    /// - Returns:
+    public func deleteManyDocuments(filter: Document) async throws -> Int {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.deleteManyDocuments(filter: filter, continuation.resume)
+        }
+    }
+
+    /// Updates a single document matching the provided filter in this collection.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    ///   - upsert: When true, creates a new document if no document matches the query.
+    /// - Returns:
+    public func updateOneDocument(filter: Document,
+                                  update: Document,
+                                  upsert: Bool? = nil) async throws -> UpdateResult {
+        return try await withCheckedThrowingContinuation { continuation in
+            if let upsert = upsert {
+                self.updateOneDocument(filter: filter,
+                                       update: update,
+                                       upsert: upsert,
+                                       continuation.resume)
+            } else {
+                self.updateOneDocument(filter: filter,
+                                       update: update,
+                                       continuation.resume)
+            }
+        }
+    }
+
+    /// Updates multiple documents matching the provided filter in this collection.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    ///   - upsert: When true, creates a new document if no document matches the query.
+    /// - Returns:
+    public func updateManyDocuments(filter: Document,
+                                    update: Document,
+                                    upsert: Bool? = nil) async throws -> UpdateResult {
+        return try await withCheckedThrowingContinuation { continuation in
+            if let upsert = upsert {
+                self.updateManyDocuments(filter: filter,
+                                         update: update,
+                                         upsert: upsert,
+                                         continuation.resume)
+            } else {
+                self.updateManyDocuments(filter: filter,
+                                         update: update,
+                                         continuation.resume)
+            }
+        }
+    }
+
+    /// Updates a single document in a collection based on a query filter and
+    /// returns the document in either its pre-update or post-update form. Unlike
+    /// `updateOneDocument`, this action allows you to atomically find, update, and
+    /// return a document with the same command. This avoids the risk of other
+    /// update operations changing the document between separate find and update
+    /// operations.
+    /// - Parameters:
+    ///   - filter: A bson `Document` representing the match criteria.
+    ///   - update: A bson `Document` representing the update to be applied to a matching document.
+    ///   - options: `RemoteFindOneAndModifyOptions` to use when executing the command.
+    /// - Returns:
+    public func findOneAndUpdate(filter: Document,
+                                 update: Document,
+                                 options: FindOneAndModifyOptions? = nil) async throws -> Document? {
+        return try await withCheckedThrowingContinuation { continuation in
+            if let options = options {
+                self.findOneAndUpdate(filter: filter,
+                                      update: update,
+                                      options: options,
+                                      continuation.resume)
+            } else {
+                self.findOneAndUpdate(filter: filter,
+                                      update: update,
+                                      continuation.resume)
+            }
+        }
+    }
+
+    /// Overwrites a single document in a collection based on a query filter and
+    /// returns the document in either its pre-replacement or post-replacement
+    /// form. Unlike `updateOneDocument`, this action allows you to atomically find,
+    /// replace, and return a document with the same command. This avoids the
+    /// risk of other update operations changing the document between separate
+    /// find and update operations.
+    /// - Parameters:
+    ///   - filter: A `Document` that should match the query.
+    ///   - replacement: A `Document` describing the replacement.
+    ///   - options: `FindOneAndModifyOptions` to use when executing the command.
+    /// - Returns:
+    public func findOneAndReplace(filter: Document,
+                                  replacement: Document,
+                                  options: FindOneAndModifyOptions? = nil) async throws -> Document? {
+        return try await withCheckedThrowingContinuation { continuation in
+            if let options = options {
+                self.findOneAndReplace(filter: filter,
+                                       replacement: replacement,
+                                       options: options,
+                                       continuation.resume)
+            } else {
+                self.findOneAndReplace(filter: filter,
+                                       replacement: replacement,
+                                       continuation.resume)
+            }
+        }
+    }
+
+    /// Removes a single document from a collection based on a query filter and
+    /// returns a document with the same form as the document immediately before
+    /// it was deleted. Unlike `deleteOneDocument`, this action allows you to atomically
+    /// find and delete a document with the same command. This avoids the risk of
+    /// other update operations changing the document between separate find and
+    /// delete operations.
+    /// - Parameters:
+    ///   - filter: A `Document` that should match the query.
+    ///   - options: `FindOneAndModifyOptions` to use when executing the command.
+    /// - Returns:
+    public func findOneAndDelete(filter: Document,
+                                 options: FindOneAndModifyOptions? = nil) async throws -> Document? {
+        return try await withCheckedThrowingContinuation { continuation in
+            if let options = options {
+                self.findOneAndDelete(filter: filter,
+                                      options: options,
+                                      continuation.resume)
+            } else {
+                self.findOneAndDelete(filter: filter,
+                                      continuation.resume)
+            }
+        }
+    }
+}
+
 private class ChangeEventDelegateProxy: RLMChangeEventDelegate {
 
     private weak var proxyDelegate: ChangeEventDelegate?
