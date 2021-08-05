@@ -1431,6 +1431,18 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
             findOneEx2.fulfill()
         }
         wait(for: [findOneEx2], timeout: 4.0)
+
+        let findOneEx3 = expectation(description: "Find one document")
+        collection.findOneDocument(filter: ["name": "tim"]) { result in
+            switch result {
+            case .success(let document):
+                XCTAssertNil(document)
+            case .failure:
+                XCTFail("Should find")
+            }
+            findOneEx3.fulfill()
+        }
+        wait(for: [findOneEx3], timeout: 4.0)
     }
 
     func testMongoFindAndReplaceResultCompletion() {
