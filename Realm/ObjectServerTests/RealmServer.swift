@@ -517,16 +517,18 @@ public class RealmServer: NSObject {
 
     private func launchServerProcess() throws {
         let binDir = Self.buildDir.appendingPathComponent("bin").path
-        let libDir = Self.buildDir.appendingPathComponent("lib").path
         let binPath = "$PATH:\(binDir)"
 
         let stitchRoot = RealmServer.buildDir.path + "/go/src/github.com/10gen/stitch"
-
+        guard let resourcePath = Bundle.main.resourcePath else {
+            fatalError("TestApp must contain resource dir containing libstitch_support.")
+        }
         // create the admin user
         let userProcess = Process()
         userProcess.environment = [
             "PATH": binPath,
-            "LD_LIBRARY_PATH": libDir
+            "LD_LIBRARY_PATH": resourcePath,
+            "DYLD_LIBRARY_PATH": resourcePath,
         ]
         userProcess.launchPath = "\(binDir)/create_user"
         userProcess.arguments = [
@@ -543,7 +545,8 @@ public class RealmServer: NSObject {
 
         serverProcess.environment = [
             "PATH": binPath,
-            "LD_LIBRARY_PATH": libDir
+            "LD_LIBRARY_PATH": resourcePath,
+            "DYLD_LIBRARY_PATH": resourcePath
         ]
         // golang server needs a tmp directory
         try! FileManager.default.createDirectory(atPath: "\(tempDir.path)/tmp",

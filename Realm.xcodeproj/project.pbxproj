@@ -268,6 +268,7 @@
 		5346E7322487AC9D00595C68 /* RLMBSONTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5346E7312487AC9D00595C68 /* RLMBSONTests.mm */; };
 		535EA9E225B0919800DBF3CD /* SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535EA9E125B0919800DBF3CD /* SwiftUI.swift */; };
 		535EAA7525B0B02B00DBF3CD /* SwiftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535EAA7425B0B02B00DBF3CD /* SwiftUITests.swift */; };
+		535F308D26BC78D1009E815F /* libstitch_support.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 535F308C26BC78D1009E815F /* libstitch_support.dylib */; };
 		53626AAF25D31CAC00D9515D /* Objects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53626AAE25D31CAC00D9515D /* Objects.swift */; };
 		53626AB025D31CAC00D9515D /* Objects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53626AAE25D31CAC00D9515D /* Objects.swift */; };
 		537130C824A9E417001FDBBC /* RealmServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537130C724A9E417001FDBBC /* RealmServer.swift */; };
@@ -893,6 +894,7 @@
 		5346E7312487AC9D00595C68 /* RLMBSONTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMBSONTests.mm; path = Realm/ObjectServerTests/RLMBSONTests.mm; sourceTree = "<group>"; };
 		535EA9E125B0919800DBF3CD /* SwiftUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUI.swift; sourceTree = "<group>"; };
 		535EAA7425B0B02B00DBF3CD /* SwiftUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUITests.swift; sourceTree = "<group>"; };
+		535F308C26BC78D1009E815F /* libstitch_support.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libstitch_support.dylib; sourceTree = "<group>"; };
 		53626A8C25D3172000D9515D /* SwiftUITestHostTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SwiftUITestHostTests.xcconfig; sourceTree = "<group>"; };
 		53626AAE25D31CAC00D9515D /* Objects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Objects.swift; sourceTree = "<group>"; };
 		536B7C0B24A4C223006B535D /* dependencies.list */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dependencies.list; sourceTree = "<group>"; };
@@ -1226,6 +1228,7 @@
 		1A7B82361D51254600750296 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				535F308C26BC78D1009E815F /* libstitch_support.dylib */,
 				CFAE926A24A0A7F40033CB31 /* AuthenticationServices.framework */,
 				3F9816292317763000C3543D /* libc++.tbd */,
 				1A7B82391D51259F00750296 /* libz.tbd */,
@@ -2027,6 +2030,7 @@
 			buildPhases = (
 				3F1A5E6E1992EB7400F45F4C /* Sources */,
 				3F1A5E6F1992EB7400F45F4C /* Frameworks */,
+				535F308B26BC78B9009E815F /* Resources */,
 			);
 			buildRules = (
 			);
@@ -2222,7 +2226,6 @@
 				49E57A1C245C5B0E004AF428 /* PBXTargetDependency */,
 				E8267FB41D90B79000E001C7 /* PBXTargetDependency */,
 				537689AC24A7DD060008E57B /* PBXTargetDependency */,
-				E8267FB61D90B79000E001C7 /* PBXTargetDependency */,
 			);
 			name = ObjectServerTests;
 			productName = RealmTests;
@@ -2416,6 +2419,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		535F308B26BC78B9009E815F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				535F308D26BC78D1009E815F /* libstitch_support.dylib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

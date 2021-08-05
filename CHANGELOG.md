@@ -4,8 +4,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Fix crash in `MongoCollection.findOneDocument(filter:)` that occurred when no results were
+  found for a given filter.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -17,7 +17,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 12.2-13.0 beta 3.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Add `Copy Bundle Resource` phase to TestHost that adds libstitchsupport as a
+  resource. This is used when booting the `RealmServer`. 
 
 10.12.0 Release notes (2021-08-03)
 =============================================================
