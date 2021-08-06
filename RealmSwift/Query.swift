@@ -19,17 +19,30 @@ import Foundation
 import Realm
 
 internal enum QueryExpression {
-    enum Comparision: String {
+    enum BasicComparision: String {
         case equal = "=="
         case notEqual = "!="
         case lessThan = "<"
         case greaterThan = ">"
         case greaterThenOrEqual = ">="
         case lessThanOrEqual = "<="
+        case not = "NOT"
+    }
+
+    enum Comparision {
+        case between(_RealmSchemaDiscoverable, _RealmSchemaDiscoverable) // Must be numeric
+        case contains(_RealmSchemaDiscoverable) // `IN` operator.
+    }
+
+    enum Compound: String {
+        case and = "&&"
+        case or = "||"
     }
 
     case keyPath(String)
     case comparison(Comparision)
+    case basicComparison(BasicComparision)
+    case compound(Compound)
     case rhs(_RealmSchemaDiscoverable)
 }
 
@@ -43,47 +56,80 @@ public struct Query<T: _Persistable> {
         tokens = expression
     }
 
+    // MARK: NOT
+
+    public static prefix func ! (_ rhs: Query) -> Query {
+        var tokensCopy = rhs.tokens
+        tokensCopy.insert(.basicComparison(.not), at: 0)
+        return Query(expression: tokensCopy)
+    }
+
     // MARK: Comparable
 
     public static func == <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable, V: Comparable {
         var tokensCopy = lhs.tokens
-        tokensCopy.append(.comparison(.equal))
+        tokensCopy.append(.basicComparison(.equal))
         tokensCopy.append(.rhs(rhs))
         return Query(expression: tokensCopy)
     }
 
     public static func != <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable, V: Comparable {
-        fatalError()
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.notEqual))
+        tokensCopy.append(.rhs(rhs))
+        return Query(expression: tokensCopy)
     }
 
     // MARK: Numerics
 
     public static func > <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable, V: Numeric {
-        fatalError()
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.greaterThan))
+        tokensCopy.append(.rhs(rhs))
+        return Query(expression: tokensCopy)
     }
 
     public static func >= <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable, V: Numeric {
-        fatalError()
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.greaterThenOrEqual))
+        tokensCopy.append(.rhs(rhs))
+        return Query(expression: tokensCopy)
     }
 
     public static func < <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable, V: Numeric {
-        fatalError()
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.lessThan))
+        tokensCopy.append(.rhs(rhs))
+        return Query(expression: tokensCopy)
     }
 
     public static func <= <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable, V: Numeric {
-        fatalError()
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.lessThanOrEqual))
+        tokensCopy.append(.rhs(rhs))
+        return Query(expression: tokensCopy)
     }
 
     // MARK: Compund
 
     public static func && (_ lhs: Query, _ rhs: Query) -> Query {
-        fatalError()
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.compound(.and))
+        tokensCopy.append(contentsOf: rhs.tokens)
+        return Query(expression: tokensCopy)
     }
 
-    public subscript<V>(dynamicMember member: KeyPath<T, V>) -> Query<V> where T: ObjectBase {
-        let name = _name(for: member)
+    public static func || (_ lhs: Query, _ rhs: Query) -> Query {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.compound(.or))
+        tokensCopy.append(contentsOf: rhs.tokens)
+        return Query(expression: tokensCopy)
+    }
+
+    public subscript<V>(dynamicMember member: KeyPath<T, V>) -> Query<V> /*where T: ObjectBase*/ {
+        //let name = _name(for: member)
         var tokensCopy = tokens
-        tokensCopy.append(.keyPath(name))
+        //tokensCopy.append(.keyPath(name))
         return Query<V>(expression: tokensCopy)
     }
 
@@ -92,8 +138,20 @@ public struct Query<T: _Persistable> {
         var arguments: [Any] = []
 
         for (idx, token) in tokens.enumerated() {
-            if case let .comparison(op) = token {
-                predicateString += " \(op.rawValue)"
+            if case let .basicComparison(op) = token {
+                if idx == 0 {
+                    predicateString += op.rawValue
+                } else {
+                    predicateString += " \(op.rawValue)"
+                }
+            }
+
+            if case let .comparison(op) = token, case let .between(low, high) = op {
+                predicateString += " BETWEEN {\(low), \(high)}"
+            }
+
+            if case let .compound(comp) = token {
+                predicateString += " \(comp.rawValue) "
             }
 
             if case let .keyPath(kp) = token {
@@ -114,7 +172,7 @@ public struct Query<T: _Persistable> {
 
             if case let .rhs(v) = token {
                 predicateString += " %@"
-                arguments.append(NSString(string: v as! String))
+                arguments.append(v)
             }
         }
 
@@ -129,6 +187,12 @@ public struct Query<T: _Persistable> {
 public enum StringOptions {
     case caseInsensitive
     case diacriticInsensitive
+}
+
+extension Query where T: OptionalProtocol {
+    public subscript<V>(dynamicMember member: KeyPath<T.Wrapped, V>) -> Query<V> {
+        return Query<V>()
+    }
 }
 
 extension Query where T == String {
@@ -152,10 +216,35 @@ extension Query where T: RealmCollection, T.Element: _Persistable {
     public var count: Query<Int> {
         fatalError()
     }
+
+//    public subscript<V: ObjectBase>(dynamicMember member: KeyPath<V, T.Element>) -> Query {
+//        let name = _name(for: member)
+//        var tokensCopy = tokens
+//        tokensCopy.append(.keyPath(name))
+//        return Query(expression: tokensCopy)
+//    }
+}
+
+/// For subquerys. An expression wrapped in parentheses will produce a bool
+/// so to create a valid subquery with `.count` we need to add this extension.
+extension Query where T == Bool {
+    public var count: Query<Int> {
+        var tokensCopy = tokens
+//        tokensCopy.append("[FIRST]")
+        return Query<Int>(expression: tokensCopy)
+    }
+}
+
+extension Query where T: Numeric, T: _RealmSchemaDiscoverable {
+    public func between<V>(_ low: T, _ high: T) -> Query<V> {
+        var tokensCopy = tokens
+        tokensCopy.append(.comparison(.between(low, high)))
+        return Query<V>(expression: tokensCopy)
+    }
 }
 
 extension Results where Element: Object {
-    public func filter(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
+    public func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
         let predicate = query(Query()).predicate
         return filter(predicate)
     }
