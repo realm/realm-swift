@@ -935,7 +935,7 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
 
         // Test filter not matching
         let fetchedDocuments4 = try await collection.find(filter: ["name": "oliver"])
-        XCTAssertNil(fetchedDocuments4)
+        XCTAssertEqual(fetchedDocuments4.count, 0)
     }
 
     func testMongoCollectionFindOneAsyncAwait() async throws {
