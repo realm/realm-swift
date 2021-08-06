@@ -70,8 +70,7 @@ class QueryTests: TestCase {
         XCTAssertEqual(results6.count, 1)
 
         let results7 = objects.query {
-            //$0.intCol >= 5
-            $0.objectCol.intCol == 5
+            $0.intCol >= 5
         }
 
         XCTAssertEqual(results7.count, 1)

@@ -44,6 +44,7 @@ internal enum QueryExpression {
     case basicComparison(BasicComparision)
     case compound(Compound)
     case rhs(_RealmSchemaDiscoverable)
+    case subquery
 }
 
 @dynamicMemberLookup
@@ -126,10 +127,10 @@ public struct Query<T: _Persistable> {
         return Query(expression: tokensCopy)
     }
 
-    public subscript<V>(dynamicMember member: KeyPath<T, V>) -> Query<V> /*where T: ObjectBase*/ {
-        //let name = _name(for: member)
+    public subscript<V>(dynamicMember member: KeyPath<T, V>) -> Query<V> where T: ObjectBase {
+        let name = _name(for: member)
         var tokensCopy = tokens
-        //tokensCopy.append(.keyPath(name))
+        tokensCopy.append(.keyPath(name))
         return Query<V>(expression: tokensCopy)
     }
 
@@ -195,6 +196,15 @@ extension Query where T: OptionalProtocol {
     }
 }
 
+extension Query where T: RealmCollection {
+    public subscript<V>(dynamicMember member: KeyPath<T.Element, V>) -> Query<V> where T.Element: ObjectBase {
+        let name = _name(for: member)
+        var tokensCopy = tokens
+        tokensCopy.append(.keyPath(name))
+        return Query<V>(expression: tokensCopy)
+    }
+}
+
 extension Query where T == String {
     public func matches<V>(_ value: String, options: Set<StringOptions>? = nil) -> Query<V> {
         fatalError()
@@ -216,13 +226,6 @@ extension Query where T: RealmCollection, T.Element: _Persistable {
     public var count: Query<Int> {
         fatalError()
     }
-
-//    public subscript<V: ObjectBase>(dynamicMember member: KeyPath<V, T.Element>) -> Query {
-//        let name = _name(for: member)
-//        var tokensCopy = tokens
-//        tokensCopy.append(.keyPath(name))
-//        return Query(expression: tokensCopy)
-//    }
 }
 
 /// For subquerys. An expression wrapped in parentheses will produce a bool
@@ -230,7 +233,7 @@ extension Query where T: RealmCollection, T.Element: _Persistable {
 extension Query where T == Bool {
     public var count: Query<Int> {
         var tokensCopy = tokens
-//        tokensCopy.append("[FIRST]")
+        tokensCopy.append(.subquery)
         return Query<Int>(expression: tokensCopy)
     }
 }
