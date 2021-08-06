@@ -924,14 +924,45 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
 
         // Test filter all with option limit to one
         let findOptions = FindOptions(1, nil, nil)
-        let fetchedOneDocument = try await collection.find(filter: [:], options: findOptions)
-        XCTAssertEqual(fetchedOneDocument.count, 1)
-        XCTAssertEqual(fetchedOneDocument[0]["name"]??.stringValue, "tomas")
+        let fetchedDocuments2 = try await collection.find(filter: [:], options: findOptions)
+        XCTAssertEqual(fetchedDocuments2.count, 1)
+        XCTAssertEqual(fetchedDocuments2[0]["name"]??.stringValue, "tomas")
 
         // Test filter by document
-        let fetchedFilteredDocument = try await collection.find(filter: document1, options: findOptions)
-        XCTAssertEqual(fetchedFilteredDocument.count, 1)
-        XCTAssertEqual(fetchedFilteredDocument[0]["name"]??.stringValue, document1["name"]??.stringValue)
+        let fetchedDocuments3 = try await collection.find(filter: document1, options: findOptions)
+        XCTAssertEqual(fetchedDocuments3.count, 1)
+        XCTAssertEqual(fetchedDocuments3[0]["name"]??.stringValue, document1["name"]??.stringValue)
+
+        // Test filter not matching
+        let fetchedDocuments4 = try await collection.find(filter: ["name": "oliver"])
+        XCTAssertNil(fetchedDocuments4)
+    }
+
+    func testMongoCollectionFindOneAsyncAwait() async throws {
+        let collection = try await setupMongoCollection()
+
+        let document: Document = ["name": "tomas", "breed": "jack rusell"]
+        let document1: Document = ["name": "lucas", "breed": "german shepard"]
+        let document2: Document = ["name": "fito", "breed": "goberian"]
+        let document3: Document = ["name": "fosca", "breed": "labradoodle"]
+        let objectIds = try await collection.insertMany([document, document1, document2, document3])
+        XCTAssertNotNil(objectIds)
+        XCTAssertEqual(objectIds.count, 4)
+
+        // Test findOne all
+        let fetchedOneDocument = try await collection.findOneDocument(filter: document)
+        XCTAssertNotNil(fetchedOneDocument)
+        XCTAssertEqual(fetchedOneDocument?["name"]??.stringValue, "tomas")
+        XCTAssertEqual(fetchedOneDocument?["breed"]??.stringValue, "jack rusell")
+
+        // Test findOne all with option limit to one
+        let findOptions = FindOptions(2, nil, nil)
+        let fetchedOneDocument2 = try await collection.findOneDocument(filter: [:], options: findOptions)
+        XCTAssertNotNil(fetchedOneDocument2)
+
+        // Test filter not matching
+        let fetchedOneDocument3 = try await collection.findOneDocument(filter: ["name": "oliver"])
+        XCTAssertNil(fetchedOneDocument3)
     }
 
     func testMongoCollectionFindAndReplaceAsyncAwait() async throws {
