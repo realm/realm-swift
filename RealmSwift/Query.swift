@@ -39,12 +39,20 @@ internal enum QueryExpression {
         case or = "||"
     }
 
+    enum StringSearch {
+        case matches(String, Set<StringOptions>?) // NOT SUPPORTED
+        case contains(String, Set<StringOptions>?)
+        case like(String, Set<StringOptions>?)
+
+    }
+
     case keyPath(String)
     case comparison(Comparision)
     case basicComparison(BasicComparision)
     case compound(Compound)
     case rhs(_RealmSchemaDiscoverable)
     case subquery
+    case stringSearch(StringSearch)
 }
 
 @dynamicMemberLookup
@@ -127,6 +135,12 @@ public struct Query<T: _Persistable> {
         return Query(expression: tokensCopy)
     }
 
+    // MARK: Subquery
+
+    public func subquery<V: RealmCollection>(_ keyPath: KeyPath<T, V>, _ block: ((Query<V>) -> Query)) -> Query<Int> {
+        fatalError()
+    }
+
     public subscript<V>(dynamicMember member: KeyPath<T, V>) -> Query<V> where T: ObjectBase {
         let name = _name(for: member)
         var tokensCopy = tokens
@@ -171,6 +185,35 @@ public struct Query<T: _Persistable> {
                 predicateString += "\(kp)"
             }
 
+            if case let .stringSearch(s) = token {
+                func optionsStr(_ options: Set<StringOptions>?) -> String {
+                    guard let o = options else {
+                        return ""
+                    }
+                    var str = "["
+                    if o.contains(.caseInsensitive) {
+                        str += "c"
+                    }
+                    if o.contains(.diacriticInsensitive) {
+                        str += "d"
+                    }
+                    str += "]"
+                    return str
+                }
+                switch s {
+                    case let .matches(str, options):
+                        predicateString += " MATCHES\(optionsStr(options)) %@"
+                        arguments.append(str)
+                        break
+                    case let .contains(str, options):
+                        predicateString += " CONTAINS\(optionsStr(options)) %@"
+                        arguments.append(str)
+                        break
+                    default:
+                        fatalError()
+                }
+            }
+
             if case let .rhs(v) = token {
                 predicateString += " %@"
                 arguments.append(v)
@@ -192,7 +235,15 @@ public enum StringOptions {
 
 extension Query where T: OptionalProtocol {
     public subscript<V>(dynamicMember member: KeyPath<T.Wrapped, V>) -> Query<V> {
-        return Query<V>()
+        fatalError() // Can we reach this?
+        //return Query<V>(expression: tokens)
+    }
+
+    public subscript<V>(dynamicMember member: KeyPath<T.Wrapped, V>) -> Query<V> where T.Wrapped: ObjectBase {
+        let name = _name(for: member)
+        var tokensCopy = tokens
+        tokensCopy.append(.keyPath(name))
+        return Query<V>(expression: tokensCopy)
     }
 }
 
@@ -207,7 +258,16 @@ extension Query where T: RealmCollection {
 
 extension Query where T == String {
     public func matches<V>(_ value: String, options: Set<StringOptions>? = nil) -> Query<V> {
-        fatalError()
+        fatalError("Not supported")
+//        var tokensCopy = tokens
+//        tokensCopy.append(.stringSearch(.matches(value, options)))
+//        return Query<V>(expression: tokensCopy)
+    }
+
+    public func contains<V>(_ value: String, options: Set<StringOptions>? = nil) -> Query<V> {
+        var tokensCopy = tokens
+        tokensCopy.append(.stringSearch(.contains(value, options)))
+        return Query<V>(expression: tokensCopy)
     }
 }
 
