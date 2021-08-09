@@ -51,7 +51,7 @@ internal enum QueryExpression {
     case basicComparison(BasicComparision)
     case compound(Compound)
     case rhs(_RealmSchemaDiscoverable)
-    case subquery
+    case subquery(String, String, [Any])
     case stringSearch(StringSearch)
 }
 
@@ -137,8 +137,18 @@ public struct Query<T: _Persistable> {
 
     // MARK: Subquery
 
-    public func subquery<V: RealmCollection>(_ keyPath: KeyPath<T, V>, _ block: ((Query<V>) -> Query)) -> Query<Int> {
-        fatalError()
+    public func subquery<V: RealmCollection>(_ keyPath: KeyPath<T, V>, _ block: ((Query<V>) -> Query<Int>)) -> Query<Int> where T: ObjectBase {
+        var tokensCopy = tokens
+        let name = _name(for: keyPath)
+        var query = block(Query<V>(expression: tokensCopy))
+
+        let queryStr = query.constructPredicate(true)
+
+        // SUBQUERY(array, $obj, $obj.intCol = 5).@count
+
+        tokensCopy.append(.subquery(name, queryStr.0, queryStr.1))
+
+        return Query<Int>(expression: tokensCopy)
     }
 
     public subscript<V>(dynamicMember member: KeyPath<T, V>) -> Query<V> where T: ObjectBase {
@@ -148,7 +158,7 @@ public struct Query<T: _Persistable> {
         return Query<V>(expression: tokensCopy)
     }
 
-    internal func constructPredicate() -> NSPredicate {
+    internal func constructPredicate(_ isSubquery: Bool = false) -> (String, [Any]) {
         var predicateString = ""
         var arguments: [Any] = []
 
@@ -181,6 +191,9 @@ public struct Query<T: _Persistable> {
                 }
                 if needsDot {
                     predicateString += "."
+                }
+                if isSubquery && !needsDot {
+                    predicateString += "$obj."
                 }
                 predicateString += "\(kp)"
             }
@@ -218,13 +231,19 @@ public struct Query<T: _Persistable> {
                 predicateString += " %@"
                 arguments.append(v)
             }
+
+            if case let .subquery(col, str, args) = token {
+                predicateString += "SUBQUERY(\(col), $obj, \(str)).@count"
+                arguments.append(contentsOf: args)
+            }
         }
 
-        return NSPredicate(format: predicateString, argumentArray: arguments)
+        return (predicateString, arguments)
     }
 
     internal var predicate: NSPredicate {
-        constructPredicate()
+        let predicate = constructPredicate()
+        return NSPredicate(format: predicate.0, argumentArray: predicate.1)
     }
 }
 
@@ -293,7 +312,7 @@ extension Query where T: RealmCollection, T.Element: _Persistable {
 extension Query where T == Bool {
     public var count: Query<Int> {
         var tokensCopy = tokens
-        tokensCopy.append(.subquery)
+        //tokensCopy.append(.subquery)
         return Query<Int>(expression: tokensCopy)
     }
 }

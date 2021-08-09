@@ -34,6 +34,11 @@ class QueryTests: TestCase {
             object2.intCol = 6
             object2.arrayInt.append(objectsIn: [1, 2, 3, 4, 5])
 
+            let object3 = ModernAllTypesObject()
+            object3.intCol = 5
+
+            object.arrayCol.append(object3)
+
             object.objectCol = object2
             realm.add(object)
         }
@@ -125,8 +130,8 @@ class QueryTests: TestCase {
 
 
         let subquery3 = objects.query {
-            $0.subquery(\.arrayCol) { subquery in
-                subquery.intCol == 5 && subquery.stringCol == "Foo"
+            $0.subquery(\.arrayCol) { arrayCol in
+                arrayCol.intCol == 6 && arrayCol.stringCol == "Foo"
             } == 1
         }
 
