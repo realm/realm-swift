@@ -286,7 +286,16 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & ObjectKeyIdentifiable {
     private class Storage: ObservableStorage<Results<ResultType>> {
+
+        var setupHasRun = false
+
         private func didSet() {
+            if setupHasRun {
+                setupValue()
+            }
+        }
+
+        func setupValue() {
             /// A base value to reset the state of the query if a user reassigns the `filter` or `sortDescriptor`
             value = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration).objects(ResultType.self)
 
@@ -296,6 +305,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
             if let filter = filter {
                 value = value.filter(filter)
             }
+            setupHasRun = true
         }
 
         var sortDescriptor: SortDescriptor? {
@@ -333,7 +343,10 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     }
     /// :nodoc:
     public var wrappedValue: Results<ResultType> {
-        storage.configuration != nil ? storage.value.freeze() : storage.value
+        if !storage.setupHasRun {
+            storage.setupValue()
+        }
+        return storage.configuration != nil ? storage.value.freeze() : storage.value
     }
     /// :nodoc:
     public var projectedValue: Self {
