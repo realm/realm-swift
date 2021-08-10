@@ -168,8 +168,8 @@ x.y.z Release notes (yyyy-MM-dd)
     - No more overriding class methods like `primaryKey()`,
       `indexedProperties()` or `ignoredProperties()`. The primary key and
       indexed flags are set directly in the property declaration with
-      `@Persisted(primaryKey: true) _id: ObjectId` or `@Persisted(indexed:
-      true) indexedProperty: Int`. If any `@Persisted` properties are present,
+      `@Persisted(primaryKey: true) var _id: ObjectId` or `@Persisted(indexed:
+      true) var indexedProperty: Int`. If any `@Persisted` properties are present,
       all other properties are implicitly ignored.
     - Some performance problems have been fixed. Declaring collection
       properties as `let listProp = List<T>()` resulted in the `List<T>` object
