@@ -122,7 +122,7 @@ public protocol ThreadConfined {
     }
 }
 
-@propertyWrapper public class ThreadSafe<T: Object> {
+@propertyWrapper public class ThreadSafe<T: ThreadConfined> {
     var threadSafeReference: ThreadSafeReference<T>?
     var configuration: Realm.Configuration?
 
