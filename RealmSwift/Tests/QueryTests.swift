@@ -20,9 +20,12 @@ import RealmSwift
 
 class QueryTests: TestCase {
 
-    func testPrototype() {
+    func objects() -> Results<ModernAllTypesObject> {
+        realmWithTestPath().objects(ModernAllTypesObject.self)
+    }
+
+    override func setUp() {
         let realm = realmWithTestPath()
-        let objects = realm.objects(ModernAllTypesObject.self)
         try! realm.write {
             let object = ModernAllTypesObject()
             object.stringCol = "Foo"
@@ -30,131 +33,129 @@ class QueryTests: TestCase {
             object.arrayInt.append(objectsIn: [1, 2, 3, 4, 5])
 
             let object2 = ModernAllTypesObject()
-            object2.stringCol = "Foo"
+            object2.stringCol = "Bar"
             object2.intCol = 6
             object2.arrayInt.append(objectsIn: [1, 2, 3, 4, 5])
 
             let object3 = ModernAllTypesObject()
             object3.intCol = 5
+            object3.stringCol = "insideArrayCol"
 
             object.arrayCol.append(object3)
 
             object.objectCol = object2
             realm.add(object)
         }
+    }
 
-        // Simple example of string comparision
-//        let results1 = objects.query {
-//            $0.stringCol == "Foo"
-//        }
-//        XCTAssertEqual(results1.count, 1)
-//        XCTAssertEqual(results1.first!.stringCol, "Foo")
-//
-//        let results2 = objects.query {
-//            $0.stringCol != "Foo"
-//        }
-//        XCTAssertEqual(results2.count, 0)
-//
-//        let results3 = objects.query {
-//            $0.objectCol.intCol == 5
-//        }
-//
-//        XCTAssertEqual(results3.count, 1)
-//        //XCTAssertEqual(results3.first!.intCol, 5)
-//
-//        let results4 = objects.query {
-//            $0.intCol > 5
-//        }
-//
-//        XCTAssertEqual(results4.count, 0)
-//
-//        let results5 = objects.query {
-//            $0.intCol < 5
-//        }
-//
-//        XCTAssertEqual(results5.count, 0)
-//
-//        let results6 = objects.query {
-//            $0.intCol <= 5
-//        }
-//
-//        XCTAssertEqual(results6.count, 1)
-//
-//        let results7 = objects.query {
-//            $0.intCol >= 5
-//        }
-//
-//        XCTAssertEqual(results7.count, 1)
-//
-//        let results8 = objects.query {
-//            $0.intCol == 5 && $0.stringCol == "Foo"
-//        }
-//
-//        XCTAssertEqual(results8.count, 1)
-//
-//        let results9 = objects.query {
-//            $0.intCol == 0 && $0.stringCol == "Foo"
-//        }
-//
-//        XCTAssertEqual(results9.count, 0)
-//
-//        let results10 = objects.query {
-//            $0.intCol == 0 || $0.stringCol == "Foo"
-//        }
-//
-//        XCTAssertEqual(results10.count, 1)
-//
-//        let results11 = objects.query {
-//            $0.intCol.between(0, 5)
-//        }
-//
-//        XCTAssertEqual(results11.count, 1)
-//
-//        let results12 = objects.query {
-//            !$0.intCol.between(0, 5)
-//        }
-//
-//        XCTAssertEqual(results12.count, 0)
-//
-//        let subquery = objects.query {
-//            ($0.arrayCol.intCol == 5).count == 50
-//        }
-//
-//        XCTAssertEqual(subquery.count, 0)
-
-//        let subquery2 = objects.query {
-//            ($0.arrayCol.intCol == 5 && $0.arrayCol.stringCol == "Foo").count == 50
-//        }
-//
-//        XCTAssertEqual(subquery2.count, 0)
-
-
-        let subquery3 = objects.query {
-            $0.subquery(\.arrayCol) { arrayCol in
-                arrayCol.intCol == 6 && arrayCol.stringCol == "Foo"
-            } == 1
+    func testBasicComparision() {
+        // Equals
+        let equalsQuery1 = objects().query { obj in
+            obj.stringCol == "Foo"
         }
+        XCTAssertEqual(equalsQuery1.count, 1)
 
-        XCTAssertEqual(subquery3.count, 1)
-
-//
-//        let results14 = objects.query {
-//            $0.objectCol.intCol == 6
-//        }
-//
-//        XCTAssertEqual(results14.count, 1)
-
-//        let results15 = objects.query {
-//            $0.stringCol.matches("f", options: [.caseInsensitive])
-//        }
-//
-//        XCTAssertEqual(results15.count, 2)
-
-        let results16 = objects.query {
-            $0.stringCol.contains("f", options: [.caseInsensitive])
+        let equalsQuery2 = objects().query { obj in
+            obj.objectCol.stringCol == "Bar"
         }
+        XCTAssertEqual(equalsQuery2.count, 1)
 
-        XCTAssertEqual(results16.count, 2)
+        // Not Equals
+        let equalsQuery3 = objects().query { obj in
+            obj.objectCol.stringCol != "Bar"
+        }
+        XCTAssertEqual(equalsQuery3.count, 2)
 
+        // Greater than
+        let equalsQuery4 = objects().query { obj in
+            obj.intCol > 4
+        }
+        XCTAssertEqual(equalsQuery4.count, 3)
+
+        // Less than
+        let equalsQuery5 = objects().query { obj in
+            obj.intCol < 6
+        }
+        XCTAssertEqual(equalsQuery5.count, 2)
+
+        // Greater than or equal
+        let equalsQuery6 = objects().query { obj in
+            obj.intCol >= 5
+        }
+        XCTAssertEqual(equalsQuery6.count, 3)
+
+        // Less than or equal
+        let equalsQuery7 = objects().query { obj in
+            obj.intCol <= 6
+        }
+        XCTAssertEqual(equalsQuery7.count, 3)
+
+        // Between
+        let equalsQuery8 = objects().query { obj in
+            obj.intCol.between(5, 6)
+        }
+        XCTAssertEqual(equalsQuery8.count, 3)
+
+//        let q = objects().filter("obj.arrayCol[FIRST].intCol == 1")
+//        XCTAssertEqual(q.count, 1)
+    }
+
+    func testRange() {
+        // >..
+        let rangeQuery1 = objects().query { obj in
+            obj.intCol.contains(4..<5)
+        }
+        XCTAssertEqual(rangeQuery1.count, 3)
+
+        // ...
+        let rangeQuery2 = objects().query { obj in
+            obj.intCol.contains(4...5)
+        }
+        XCTAssertEqual(rangeQuery2.count, 3)
+    }
+
+    func testStringQuery() {
+        // Contains
+        let containsQuery1 = objects().query { obj in
+            obj.stringCol.contains("f")
+        }
+        XCTAssertEqual(containsQuery1.count, 0)
+
+        let containsQuery2 = objects().query { obj in
+            obj.stringCol.contains("f", options: [.caseInsensitive])
+        }
+        XCTAssertEqual(containsQuery2.count, 1)
+
+        let containsQuery3 = objects().query { obj in
+            obj.stringCol.contains("á", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+        XCTAssertEqual(containsQuery3.count, 1)
+
+        // Begins with
+        let beginsWithQuery = objects().query { obj in
+            obj.stringCol.starts(with:"Fo")
+        }
+        XCTAssertEqual(beginsWithQuery.count, 1)
+
+        // Ends with
+        let endsWithQuery = objects().query { obj in
+            obj.stringCol.ends(with:"ó", options: [.diacriticInsensitive, .caseInsensitive])
+        }
+        XCTAssertEqual(endsWithQuery.count, 1)
+
+        // Like
+        let likeQuery = objects().query { obj in
+            obj.stringCol.like("F*", caseInsensitive: true)
+        }
+        XCTAssertEqual(likeQuery.count, 1)
+    }
+
+    func testArrayQueries() {
+        let o = objects().query { $0.stringCol == "insideArrayCol"}.first!
+        // In
+        let containsQuery1 = objects().query { obj in
+            obj.arrayCol.contains(o)
+        }
+        XCTAssertEqual(containsQuery1.count, 1)
     }
 }

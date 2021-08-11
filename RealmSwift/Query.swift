@@ -18,9 +18,14 @@
 import Foundation
 import Realm
 
+public enum StringOptions {
+    case caseInsensitive
+    case diacriticInsensitive
+}
+
 internal enum QueryExpression {
     enum BasicComparision: String {
-        case equal = "=="
+        case equal = "==" // TODO: @"string1 ==[c] string1"
         case notEqual = "!="
         case lessThan = "<"
         case greaterThan = ">"
@@ -40,10 +45,10 @@ internal enum QueryExpression {
     }
 
     enum StringSearch {
-        case matches(String, Set<StringOptions>?) // NOT SUPPORTED
         case contains(String, Set<StringOptions>?)
         case like(String, Set<StringOptions>?)
-
+        case beginsWith(String, Set<StringOptions>?)
+        case endsWith(String, Set<StringOptions>?)
     }
 
     case keyPath(String)
@@ -159,24 +164,30 @@ public struct Query<T: _Persistable> {
     }
 
     internal func constructPredicate(_ isSubquery: Bool = false) -> (String, [Any]) {
-        var predicateString = ""
+        var predicateString = [""]
         var arguments: [Any] = []
 
         for (idx, token) in tokens.enumerated() {
             if case let .basicComparison(op) = token {
                 if idx == 0 {
-                    predicateString += op.rawValue
+                    predicateString.append(op.rawValue)
                 } else {
-                    predicateString += " \(op.rawValue)"
+                    predicateString.append(" \(op.rawValue)")
                 }
             }
 
             if case let .comparison(op) = token, case let .between(low, high) = op {
-                predicateString += " BETWEEN {\(low), \(high)}"
+                predicateString.append(" BETWEEN {%@, %@}")
+                arguments.append(contentsOf: [low, high])
+            }
+
+            if case let .comparison(op) = token, case let .contains(val) = op {
+                predicateString.insert(" %@ IN ", at: predicateString.count-1)
+                arguments.append(val)
             }
 
             if case let .compound(comp) = token {
-                predicateString += " \(comp.rawValue) "
+                predicateString.append(" \(comp.rawValue) ")
             }
 
             if case let .keyPath(kp) = token {
@@ -187,15 +198,15 @@ public struct Query<T: _Persistable> {
                 // This is not the start of the string, and not part of a previous keyPath
                 // So insert a space.
                 if !predicateString.isEmpty && !needsDot {
-                    predicateString += " "
+                    predicateString.append(" ")
                 }
                 if needsDot {
-                    predicateString += "."
+                    predicateString.append(".")
                 }
                 if isSubquery && !needsDot {
-                    predicateString += "$obj."
+                    predicateString.append("$obj.")
                 }
-                predicateString += "\(kp)"
+                predicateString.append("\(kp)")
             }
 
             if case let .stringSearch(s) = token {
@@ -214,42 +225,43 @@ public struct Query<T: _Persistable> {
                     return str
                 }
                 switch s {
-                    case let .matches(str, options):
-                        predicateString += " MATCHES\(optionsStr(options)) %@"
-                        arguments.append(str)
-                        break
                     case let .contains(str, options):
-                        predicateString += " CONTAINS\(optionsStr(options)) %@"
+                        predicateString.append(" CONTAINS\(optionsStr(options)) %@")
                         arguments.append(str)
                         break
-                    default:
-                        fatalError()
+                    case let .like(str, options):
+                        predicateString.append(" LIKE\(optionsStr(options)) %@")
+                        arguments.append(str)
+                        break
+                    case let .beginsWith(str, options):
+                        predicateString.append(" BEGINSWITH\(optionsStr(options)) %@")
+                        arguments.append(str)
+                        break
+                    case let .endsWith(str, options):
+                        predicateString.append(" ENDSWITH\(optionsStr(options)) %@")
+                        arguments.append(str)
+                        break
                 }
             }
 
             if case let .rhs(v) = token {
-                predicateString += " %@"
+                            predicateString.append(" %@")
                 arguments.append(v)
             }
 
             if case let .subquery(col, str, args) = token {
-                predicateString += "SUBQUERY(\(col), $obj, \(str)).@count"
+                predicateString.append("SUBQUERY(\(col), $obj, \(str)).@count")
                 arguments.append(contentsOf: args)
             }
         }
 
-        return (predicateString, arguments)
+        return (predicateString.joined(), arguments)
     }
 
     internal var predicate: NSPredicate {
         let predicate = constructPredicate()
         return NSPredicate(format: predicate.0, argumentArray: predicate.1)
     }
-}
-
-public enum StringOptions {
-    case caseInsensitive
-    case diacriticInsensitive
 }
 
 extension Query where T: OptionalProtocol {
@@ -276,11 +288,10 @@ extension Query where T: RealmCollection {
 }
 
 extension Query where T == String {
-    public func matches<V>(_ value: String, options: Set<StringOptions>? = nil) -> Query<V> {
-        fatalError("Not supported")
-//        var tokensCopy = tokens
-//        tokensCopy.append(.stringSearch(.matches(value, options)))
-//        return Query<V>(expression: tokensCopy)
+    public func like<V>(_ value: String, caseInsensitive: Bool = false) -> Query<V> {
+        var tokensCopy = tokens
+        tokensCopy.append(.stringSearch(.like(value, caseInsensitive ? [.caseInsensitive] : [])))
+        return Query<V>(expression: tokensCopy)
     }
 
     public func contains<V>(_ value: String, options: Set<StringOptions>? = nil) -> Query<V> {
@@ -288,32 +299,29 @@ extension Query where T == String {
         tokensCopy.append(.stringSearch(.contains(value, options)))
         return Query<V>(expression: tokensCopy)
     }
+
+    public func starts<V>(with value: String, options: Set<StringOptions>? = nil) -> Query<V> {
+        var tokensCopy = tokens
+        tokensCopy.append(.stringSearch(.beginsWith(value, options)))
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public func ends<V>(with value: String, options: Set<StringOptions>? = nil) -> Query<V> {
+        var tokensCopy = tokens
+        tokensCopy.append(.stringSearch(.endsWith(value, options)))
+        return Query<V>(expression: tokensCopy)
+    }
 }
 
 extension Query where T: RealmCollection, T.Element: _Persistable {
-
     public func between<V>(_ low: T.Element, _ high: T.Element) -> Query<V> {
         fatalError()
     }
 
-    public var first: Query<T.Element> {
+    public func contains<V>(_ value: T.Element) -> Query<V> {
         var tokensCopy = tokens
-//        tokensCopy.append("[FIRST]")
-        return Query<T.Element>(expression: tokensCopy)
-    }
-
-    public var count: Query<Int> {
-        fatalError()
-    }
-}
-
-/// For subquerys. An expression wrapped in parentheses will produce a bool
-/// so to create a valid subquery with `.count` we need to add this extension.
-extension Query where T == Bool {
-    public var count: Query<Int> {
-        var tokensCopy = tokens
-        //tokensCopy.append(.subquery)
-        return Query<Int>(expression: tokensCopy)
+        tokensCopy.append(.comparison(.contains(value)))
+        return Query<V>(expression: tokensCopy)
     }
 }
 
@@ -321,6 +329,18 @@ extension Query where T: Numeric, T: _RealmSchemaDiscoverable {
     public func between<V>(_ low: T, _ high: T) -> Query<V> {
         var tokensCopy = tokens
         tokensCopy.append(.comparison(.between(low, high)))
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public func contains<V>(_ range: Range<T>) -> Query<V> {
+        var tokensCopy = tokens
+        //tokensCopy.append(.comparison(.between(low, high)))
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public func contains<V>(_ range: ClosedRange<T>) -> Query<V> {
+        var tokensCopy = tokens
+        tokensCopy.append(.comparison(.between(range.lowerBound, range.upperBound)))
         return Query<V>(expression: tokensCopy)
     }
 }
