@@ -31,6 +31,7 @@ class QueryTests: TestCase {
             object.stringCol = "Foo"
             object.intCol = 5
             object.arrayInt.append(objectsIn: [1, 2, 3, 4, 5])
+            object.mapString["Foo"] = "Bar"
 
             let object2 = ModernAllTypesObject()
             object2.stringCol = "Bar"
@@ -95,9 +96,6 @@ class QueryTests: TestCase {
             obj.intCol.between(5, 6)
         }
         XCTAssertEqual(equalsQuery8.count, 3)
-
-//        let q = objects().filter("obj.arrayCol[FIRST].intCol == 1")
-//        XCTAssertEqual(q.count, 1)
     }
 
     func testRange() {
@@ -157,5 +155,54 @@ class QueryTests: TestCase {
             obj.arrayCol.contains(o)
         }
         XCTAssertEqual(containsQuery1.count, 1)
+    }
+
+    func testSubquery() {
+//        let subquery = objects().query { obj in
+//            obj.subquery(\.arrayCol) { arrayCol in
+//                arrayCol.intCol == 5 && arrayCol.stringCol == "Foo"
+//            } == 1
+//        }
+//        XCTAssertEqual(subquery.count, 1)
+
+        let subquery2 = objects().query { obj in
+            obj.intCol == 5 &&
+            obj.arrayInt.contains(1) &&
+            (obj.arrayCol.intCol == 5 && obj.arrayCol.stringCol == "insideArrayCol").subqueryCount() == 5 &&
+            (obj.arrayCol.stringCol == "Bar").subqueryCount() == 5
+        }
+        XCTAssertEqual(subquery2.count, 1)
+    }
+
+    func testSubqueryMap() {
+
+        let subquery2 = objects().query { obj in
+            obj.mapString.contains("Bar")
+        }
+        XCTAssertEqual(subquery2.count, 1)
+
+        let subquery3 = objects().query { obj in
+            obj.mapString["Bar"] == "Foo"
+        }
+        XCTAssertEqual(subquery3.count, 1)
+    }
+
+    func testOptional() {
+        let query = objects().query { obj in
+            obj.optStringCol == .none
+        }
+        XCTAssertEqual(query.count, 3)
+
+        let query2 = objects().query { obj in
+            obj.optStringCol == nil
+        }
+        XCTAssertEqual(query2.count, 3)
+    }
+
+    // Used for bashing ideas out.
+    func testNSPredicate() {
+        let q = objects().filter("mapString.@allKeys == 'Foo'")
+        print(q)
+        XCTAssertEqual(q.count, 1)
     }
 }

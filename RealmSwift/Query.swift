@@ -51,11 +51,11 @@ internal enum QueryExpression {
         case endsWith(String, Set<StringOptions>?)
     }
 
-    case keyPath(String)
+    case keyPath(name: String, isCollection: Bool = false)
     case comparison(Comparision)
     case basicComparison(BasicComparision)
     case compound(Compound)
-    case rhs(_RealmSchemaDiscoverable)
+    case rhs(_RealmSchemaDiscoverable?)
     case subquery(String, String, [Any])
     case stringSearch(StringSearch)
 }
@@ -81,6 +81,13 @@ public struct Query<T: _Persistable> {
     // MARK: Comparable
 
     public static func == <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable, V: Comparable {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.equal))
+        tokensCopy.append(.rhs(rhs))
+        return Query(expression: tokensCopy)
+    }
+
+    public static func == <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: OptionalProtocol, V.Wrapped: _Persistable {
         var tokensCopy = lhs.tokens
         tokensCopy.append(.basicComparison(.equal))
         tokensCopy.append(.rhs(rhs))
@@ -124,7 +131,7 @@ public struct Query<T: _Persistable> {
         return Query(expression: tokensCopy)
     }
 
-    // MARK: Compund
+    // MARK: Compound
 
     public static func && (_ lhs: Query, _ rhs: Query) -> Query {
         var tokensCopy = lhs.tokens
@@ -145,21 +152,23 @@ public struct Query<T: _Persistable> {
     public func subquery<V: RealmCollection>(_ keyPath: KeyPath<T, V>, _ block: ((Query<V>) -> Query<Int>)) -> Query<Int> where T: ObjectBase {
         var tokensCopy = tokens
         let name = _name(for: keyPath)
-        var query = block(Query<V>(expression: tokensCopy))
-
+        let query = block(Query<V>(expression: tokensCopy))
         let queryStr = query.constructPredicate(true)
-
-        // SUBQUERY(array, $obj, $obj.intCol = 5).@count
-
         tokensCopy.append(.subquery(name, queryStr.0, queryStr.1))
-
         return Query<Int>(expression: tokensCopy)
     }
 
     public subscript<V>(dynamicMember member: KeyPath<T, V>) -> Query<V> where T: ObjectBase {
         let name = _name(for: member)
         var tokensCopy = tokens
-        tokensCopy.append(.keyPath(name))
+        tokensCopy.append(.keyPath(name: name))
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public subscript<V: RealmCollectionBase>(dynamicMember member: KeyPath<T, V>) -> Query<V> where T: ObjectBase {
+        let name = _name(for: member)
+        var tokensCopy = tokens
+        tokensCopy.append(.keyPath(name: name, isCollection: true))
         return Query<V>(expression: tokensCopy)
     }
 
@@ -190,9 +199,15 @@ public struct Query<T: _Persistable> {
                 predicateString.append(" \(comp.rawValue) ")
             }
 
-            if case let .keyPath(kp) = token {
+            if case let .keyPath(name, isCollection) = token {
+                // For the non verbose subqery
+                if isCollection && isSubquery {
+                    predicateString.append("$obj")
+                    continue
+                }
+                // Anything below the verbose subquery uses
                 var needsDot = false
-                if idx > 0, case .keyPath(_) = tokens[idx-1] {
+                if idx > 0, case .keyPath = tokens[idx-1] {
                     needsDot = true
                 }
                 // This is not the start of the string, and not part of a previous keyPath
@@ -206,7 +221,7 @@ public struct Query<T: _Persistable> {
                 if isSubquery && !needsDot {
                     predicateString.append("$obj.")
                 }
-                predicateString.append("\(kp)")
+                predicateString.append("\(name)")
             }
 
             if case let .stringSearch(s) = token {
@@ -245,8 +260,8 @@ public struct Query<T: _Persistable> {
             }
 
             if case let .rhs(v) = token {
-                            predicateString.append(" %@")
-                arguments.append(v)
+                predicateString.append(" %@")
+                arguments.append(v.objCValue)
             }
 
             if case let .subquery(col, str, args) = token {
@@ -265,7 +280,7 @@ public struct Query<T: _Persistable> {
 }
 
 extension Query where T: OptionalProtocol {
-    public subscript<V>(dynamicMember member: KeyPath<T.Wrapped, V>) -> Query<V> {
+    public subscript<V>(dynamicMember member: KeyPath<T.Wrapped, V>) -> Query<Optional<T.Wrapped>> {
         fatalError() // Can we reach this?
         //return Query<V>(expression: tokens)
     }
@@ -273,7 +288,7 @@ extension Query where T: OptionalProtocol {
     public subscript<V>(dynamicMember member: KeyPath<T.Wrapped, V>) -> Query<V> where T.Wrapped: ObjectBase {
         let name = _name(for: member)
         var tokensCopy = tokens
-        tokensCopy.append(.keyPath(name))
+        tokensCopy.append(.keyPath(name: name))
         return Query<V>(expression: tokensCopy)
     }
 }
@@ -282,7 +297,16 @@ extension Query where T: RealmCollection {
     public subscript<V>(dynamicMember member: KeyPath<T.Element, V>) -> Query<V> where T.Element: ObjectBase {
         let name = _name(for: member)
         var tokensCopy = tokens
-        tokensCopy.append(.keyPath(name))
+        tokensCopy.append(.keyPath(name: name))
+        return Query<V>(expression: tokensCopy)
+    }
+}
+
+extension Query where T: RealmKeyedCollection {
+    public subscript<V>(dynamicMember member: KeyPath<T.Value, V>) -> Query<V> where T.Value: ObjectBase {
+        let name = _name(for: member)
+        var tokensCopy = tokens
+        tokensCopy.append(.keyPath(name: name))
         return Query<V>(expression: tokensCopy)
     }
 }
@@ -313,6 +337,29 @@ extension Query where T == String {
     }
 }
 
+extension Query where T == Bool {
+    public func subqueryCount() -> Query<Int> {
+        let collections = Set(tokens.filter {
+            if case let .keyPath(_, isCollection) = $0 {
+                return isCollection ? true : false
+            }
+            return false
+        }.map { kp -> String in
+            if case let .keyPath(name, _) = kp {
+                return name
+            }
+            fatalError()
+        })
+
+        if collections.count > 1 {
+            throwRealmException("Subquery predicates will only work on one collection at a time, split your query up.")
+        }
+        let queryStr = constructPredicate(true)
+        let newTokens: [QueryExpression] = [.subquery(collections.first!, queryStr.0, queryStr.1)]
+        return Query<Int>(expression: newTokens)
+    }
+}
+
 extension Query where T: RealmCollection, T.Element: _Persistable {
     public func between<V>(_ low: T.Element, _ high: T.Element) -> Query<V> {
         fatalError()
@@ -322,6 +369,31 @@ extension Query where T: RealmCollection, T.Element: _Persistable {
         var tokensCopy = tokens
         tokensCopy.append(.comparison(.contains(value)))
         return Query<V>(expression: tokensCopy)
+    }
+}
+
+extension Query where T: RealmKeyedCollection, T.Key: _Persistable , T.Value: _Persistable {
+    public func between<V>(_ low: T.Value, _ high: T.Value) -> Query<V> {
+        fatalError()
+    }
+
+    public func contains<V>(_ value: T.Value) -> Query<V> {
+        var tokensCopy = tokens
+        tokensCopy.append(.comparison(.contains(value)))
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public var keys: Query<T.Key> {
+        return Query<T.Key>(expression: tokens)
+    }
+
+    public var values: Query<T.Value> {
+        return Query<T.Value>(expression: tokens)
+    }
+
+    public subscript(member: T.Key) -> Query<T.Value> {
+        // mapCol["Bar"] -> mapCol.@allKeys == 'Bar'
+        return Query<T.Value>(expression: tokens)
     }
 }
 
