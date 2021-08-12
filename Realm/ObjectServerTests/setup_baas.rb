@@ -153,7 +153,7 @@ def setup_stitch
 
     exports << "export STITCH_PATH=\"#{stitch_dir}\""
     exports << "export PATH=\"$PATH:$STITCH_PATH/etc/transpiler/bin\""
-    exports << "export LD_LIBRARY_PATH='#{LIB_DIR}'"
+    exports << "export DYLD_LIBRARY_PATH='#{LIB_DIR}'"
 
     puts 'build create_user binary'
 
