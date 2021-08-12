@@ -63,7 +63,7 @@ typedef void (*RLMSyncLogFunction)(RLMSyncLogLevel level, NSString *message);
 typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable);
 
 /**
- A singleton manager which serves as a central point for sync-related configuration.
+ A manager which serves as a central point for sync-related configuration.
  */
 @interface RLMSyncManager : NSObject
 
