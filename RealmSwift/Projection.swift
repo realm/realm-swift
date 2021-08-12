@@ -96,7 +96,6 @@ public protocol Projection: ThreadConfined, RealmCollectionValue {
     associatedtype Root: ObjectBase
 
     init()
-    func objectClassName() -> String
 }
 
 /// Projection allows to create a light weight const reflection of the original Realm objects with a minimal effort.
@@ -146,13 +145,38 @@ public extension Projection {
             }
         }
     }
-    
-    func objectClassName() -> String {
-        return Root.className()
-    }
 }
 
-public enum ProjectionChange {
+/**
+ Information about a specific property which changed in an `Object` change notification.
+ */
+@frozen public struct ProjectedChange {
+    /**
+     The name of the property which changed.
+    */
+    public let name: String
+
+    /**
+     Value of the property before the change occurred. This is not supplied if
+     the change happened on the same thread as the notification and for `List`
+     properties.
+
+     For object properties this will give the object which was previously
+     linked to, but that object will have its new values and not the values it
+     had before the changes. This means that `previousValue` may be a deleted
+     object, and you will need to check `isInvalidated` before accessing any
+     of its properties.
+    */
+    public let oldValue: Any?
+
+    /**
+     The value of the property after the change occurred. This is not supplied
+     for `List` properties and will always be nil.
+    */
+    public let newValue: Any?
+}
+
+public enum ProjectionChange<T: Projection> {
     /**
      If an error occurs, notification blocks are called one time with a `.error`
      result and an `NSError` containing details about the error. Currently the
@@ -160,17 +184,17 @@ public enum ProjectionChange {
      worker thread to calculate the change set. The callback will never be
      called again after `.error` is delivered.
      */
-    case error(_ error: NSError)
+    case error(_ error: Error)
     /**
      One or more of the properties of the object have been changed.
      */
-    case change(_: ObjectBase, _: [PropertyChange])
+    case change(_: T, _: [ProjectedChange])
     /// The object has been deleted from the Realm.
     case deleted
 }
 
 extension Projection {
-    func observe<T>(keyPaths: [PartialKeyPath<T>] = [], _ block: (ProjectionChange) -> Void) -> NotificationToken where T: Projection {
+    public func observe<T>(keyPaths: [PartialKeyPath<T>] = [], _ block: (ProjectionChange<T>) -> Void) -> NotificationToken where T: Projection {
         if keyPaths.isEmpty {
 //            projectionSchemas[ObjectIdentifier(type(of: self))]!.forEach { property in
 //                (self[keyPath: property.keyPathOnProjection] as! _ProjectedBase).objectBase.observe(property.realmKeyPathString) { change in
@@ -189,7 +213,7 @@ extension Projection {
      `ThreadConfined` object.
      */
     public var realm: Realm? {
-        if let object = self.realmObject as? Object {
+        if let object = realmObject as? ThreadConfined {
             return object.realm
         }
         fatalError("Realm cannot be nil")
@@ -197,7 +221,7 @@ extension Projection {
 
     /// Indicates if the object can no longer be accessed because it is now invalid.
     public var isInvalidated: Bool {
-        return false
+        return realmObject.isInvalidated
     }
     /**
      Indicates if the object is frozen.
@@ -205,7 +229,7 @@ extension Projection {
      frozen object is allowed, but is unlikely to be useful.
      */
     public var isFrozen: Bool {
-        return false
+        return realm?.isFrozen ?? false
     }
     /**
      Returns a frozen snapshot of this object.
@@ -353,5 +377,21 @@ public struct ElementMapper<Element> where Element: ObjectBase, Element: RealmCo
 extension List where Element: ObjectBase, Element: RealmCollectionValue {
     public var projectTo: ElementMapper<Element> {
         ElementMapper(list: self)
+    }
+}
+
+public extension Projection {
+    
+    func addObserver(_ observer: NSObject, forKeyPath keyPath: String, options: NSKeyValueObservingOptions = [], context: UnsafeMutableRawPointer?) {
+        fatalError()
+    }
+
+    @available(macOS 10.7, *)
+    func removeObserver(_ observer: NSObject, forKeyPath keyPath: String, context: UnsafeMutableRawPointer?) {
+        fatalError()
+    }
+
+    func removeObserver(_ observer: NSObject, forKeyPath keyPath: String) {
+        fatalError()
     }
 }
