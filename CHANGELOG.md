@@ -6,6 +6,8 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Fixed
 * Fix crash in `MongoCollection.findOneDocument(filter:)` that occurred when no results were 
   found for a given filter.
+* Some of the SwiftUI property wrappers incorrectly required objects to conform
+  to ObjectKeyIdentifiable rather than Identifiable.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
