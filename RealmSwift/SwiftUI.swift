@@ -271,7 +271,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
      - parameter wrappedValue The ObjectBase reference to wrap and observe.
      */
     @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-    public init(wrappedValue: T) where T: ObjectKeyIdentifiable {
+    public init(wrappedValue: T) where T: ObjectBase & Identifiable {
         self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
         defaultValue = T()
     }
@@ -284,7 +284,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
 /// The results use the realm configuration provided by
 /// the environment value `EnvironmentValues/realmConfiguration`.
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-@propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & ObjectKeyIdentifiable {
+@propertyWrapper public struct ObservedResults<ResultType>: DynamicProperty, BoundCollection where ResultType: Object & Identifiable {
     private class Storage: ObservableStorage<Results<ResultType>> {
 
         var setupHasRun = false
@@ -428,7 +428,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
      Initialize a RealmState struct for a given thread confined type.
      - parameter wrappedValue The RealmSubscribable value to wrap and observe.
      */
-    public init(wrappedValue: ObjectType) where ObjectType: ObjectKeyIdentifiable {
+    public init(wrappedValue: ObjectType) where ObjectType: ObjectBase & Identifiable {
         _storage = ObservedObject(wrappedValue: ObservableStorage(wrappedValue))
         defaultValue = ObjectType()
     }
@@ -600,7 +600,7 @@ extension Binding: BoundMap where Value: RealmKeyedCollection {
 }
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-extension Binding where Value: ObjectKeyIdentifiable & ThreadConfined {
+extension Binding where Value: Object & Identifiable {
     /// :nodoc:
     public func delete() {
         safeWrite(wrappedValue) { object in
