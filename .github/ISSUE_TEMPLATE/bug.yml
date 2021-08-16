@@ -70,6 +70,15 @@ body:
         - MongoDB Realm (i.e. Sync, auth, functions)
     validations:
       required: true
+  - type: dropdown
+    id: encryption
+    attributes:
+      label: Are you using encryption?
+      options:
+        - Yes, using encryption
+        - No, not using encryption
+    validations:
+      required: true
 # Environment
   - type: input
     id: platform
