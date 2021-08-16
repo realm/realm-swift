@@ -450,3 +450,12 @@ extension Results where Element: ObjectBase {
             return Results<Element>(rlmResults.distinctResults(usingKeyPaths: keyPaths.map(_name(for:))))
     }
 }
+
+// MARK: Thread Safe Wrapper
+
+extension Results: ThreadSafeWrappable {
+    public static var confinedType: PropertyType {
+        // This needs to actually do something
+        return PropertyType._rlmType
+    }
+}

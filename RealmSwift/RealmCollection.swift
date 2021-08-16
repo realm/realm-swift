@@ -1361,3 +1361,12 @@ internal protocol PropertyNameConvertible {
     /// `isLegacy` will be true if the property is declared with old property syntax.
     var propertyInformation: (key: String, isLegacy: Bool)? { get }
 }
+
+// MARK: Thread Safe Wrapper
+
+extension AnyRealmCollection: ThreadSafeWrappable {
+    public static var confinedType: PropertyType {
+        // This needs to actually do something
+        return PropertyType._rlmType
+    }
+}

@@ -700,3 +700,12 @@ extension List: PropertyNameConvertible {
         return (key: rlmArray.propertyKey, isLegacy: rlmArray.isLegacyProperty)
     }
 }
+
+// MARK: Thread Safe Wrapper
+
+extension List: ThreadSafeWrappable {
+    public static var confinedType: PropertyType {
+        // This needs to actually do something
+        return PropertyType._rlmType
+    }
+}

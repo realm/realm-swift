@@ -586,3 +586,13 @@ public func _name<T: ObjectBase>(for keyPath: PartialKeyPath<T>) -> String {
     }
     return traceObject.lastAccessedNames!.componentsJoined(by: ".")
 }
+
+
+// MARK: Thread Safe Wrapper
+
+extension Object: ThreadSafeWrappable {
+    public static var confinedType: PropertyType {
+        // This needs to actually do something
+        return PropertyType._rlmType
+    }
+}

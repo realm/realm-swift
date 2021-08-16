@@ -122,7 +122,11 @@ public protocol ThreadConfined {
     }
 }
 
-@propertyWrapper public class ThreadSafe<T: ThreadConfined> {
+public protocol ThreadSafeWrappable: ThreadConfined {
+    static var confinedType: PropertyType { get } // The goal is to return the type, object, results, list, etc.
+}
+
+@propertyWrapper public class ThreadSafe<T: ThreadSafeWrappable> {
     var threadSafeReference: ThreadSafeReference<T>?
     var configuration: Realm.Configuration?
 
