@@ -349,7 +349,7 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
 
     func testThreadSafeWrapperInvalidConstruction() {
         let unmanagedObj = SwiftStringObject(value: ["stringCol": "before"])
-        assertThrows(TestThreadSafeWrapperStruct(stringObject: unmanagedObj), reason: "No realm configuration on this object found. Only managed objects may be wrapped as thread safe.")
+        assertThrows(TestThreadSafeWrapperStruct(stringObject: unmanagedObj), reason: "Only managed objects may be wrapped as thread safe.")
     }
 
     func testThreadSafeWrapper() {
@@ -492,7 +492,7 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
             let realm = try! Realm()
             try! realm.write {
                 self.assertThrows(testStruct.stringObject = SwiftStringObject(),
-                                  reason: "No realm configuration on this object found. Only managed objects may be wrapped as thread safe.")
+                                  reason: "Only managed objects may be wrapped as thread safe.")
             }
         }
     }
@@ -558,52 +558,6 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
         }
         XCTAssertEqual(2, setStruct.employeeSet!.count)
         assertSetContains(setStruct.employeeSet!, keyPath: \.name, items: ["jp", "az"])
-    }
-
-    func testThreadSafeWrapperToResults() {
-        struct ResultsStruct {
-            @ThreadSafe var results: Results<SwiftStringObject>?
-        }
-        let realm = try! Realm()
-        let allObjects = realm.objects(SwiftStringObject.self)
-        let results = allObjects
-            .filter("stringCol != 'C'")
-            .sorted(byKeyPath: "stringCol", ascending: false)
-        let resultsStruct = ResultsStruct(results: results)
-        try! realm.write {
-            realm.create(SwiftStringObject.self, value: ["A"])
-            realm.create(SwiftStringObject.self, value: ["B"])
-            realm.create(SwiftStringObject.self, value: ["C"])
-            realm.create(SwiftStringObject.self, value: ["D"])
-        }
-        XCTAssertEqual(4, allObjects.count)
-        XCTAssertEqual(3, resultsStruct.results!.count)
-        XCTAssertEqual("D", resultsStruct.results![0].stringCol)
-        XCTAssertEqual("B", resultsStruct.results![1].stringCol)
-        XCTAssertEqual("A", resultsStruct.results![2].stringCol)
-        dispatchSyncNewThread {
-            let realm = try! Realm()
-            let allObjects = realm.objects(SwiftStringObject.self)
-            XCTAssertEqual(4, allObjects.count)
-            XCTAssertEqual(3, resultsStruct.results!.count)
-            XCTAssertEqual("D", resultsStruct.results![0].stringCol)
-            XCTAssertEqual("B", resultsStruct.results![1].stringCol)
-            XCTAssertEqual("A", resultsStruct.results![2].stringCol)
-            try! realm.write {
-                realm.delete(resultsStruct.results![2])
-                realm.delete(resultsStruct.results![0])
-                realm.create(SwiftStringObject.self, value: ["E"])
-            }
-            XCTAssertEqual(3, allObjects.count)
-            XCTAssertEqual(2, resultsStruct.results!.count)
-            XCTAssertEqual("E", resultsStruct.results![0].stringCol)
-            XCTAssertEqual("B", resultsStruct.results![1].stringCol)
-        }
-        realm.refresh()
-        XCTAssertEqual(3, allObjects.count)
-        XCTAssertEqual(2, resultsStruct.results!.count)
-        XCTAssertEqual("E", resultsStruct.results![0].stringCol)
-        XCTAssertEqual("B", resultsStruct.results![1].stringCol)
     }
 
     func testThreadSafeWrapperToAnyRealmCollection() {

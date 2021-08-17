@@ -572,8 +572,3 @@ extension Results where Element: ObjectBase {
             return Results<Element>(rlmResults.distinctResults(usingKeyPaths: keyPaths.map(_name(for:))))
     }
 }
-
-// MARK: Thread Safe Wrapper
-
-// remove this
-extension Results: ThreadSafeWrappable {}
