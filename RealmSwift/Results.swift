@@ -575,7 +575,5 @@ extension Results where Element: ObjectBase {
 
 // MARK: Thread Safe Wrapper
 
-extension Results: ThreadSafeWrappable {
-    /// :nodoc:
-    public static var confinedType: PropertyType { Element._rlmType }
-}
+// remove this
+extension Results: ThreadSafeWrappable {}

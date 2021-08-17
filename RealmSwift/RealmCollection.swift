@@ -1619,7 +1619,4 @@ internal protocol PropertyNameConvertible {
 
 // MARK: Thread Safe Wrapper
 
-extension AnyRealmCollection: ThreadSafeWrappable {
-    /// :nodoc:
-    public static var confinedType: PropertyType { Element._rlmType }
-}
+extension AnyRealmCollection: ThreadSafeWrappable {}

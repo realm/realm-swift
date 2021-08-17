@@ -676,8 +676,4 @@ extension MutableSet: PropertyNameConvertible {
 
 // MARK: Thread Safe Wrapper
 
-extension MutableSet: ThreadSafeWrappable {
-    /// :nodoc:
-    public static var confinedType: PropertyType { Element._rlmType }
-
-}
+extension MutableSet: ThreadSafeWrappable {}

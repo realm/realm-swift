@@ -837,7 +837,4 @@ extension List: PropertyNameConvertible {
 
 // MARK: Thread Safe Wrapper
 
-extension List: ThreadSafeWrappable {
-    /// :nodoc:
-    public static var confinedType: PropertyType { Element._rlmType }
-}
+extension List: ThreadSafeWrappable {}

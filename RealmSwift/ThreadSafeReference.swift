@@ -128,10 +128,7 @@ public protocol ThreadConfined {
  Note that only types defined by Realm can meaningfully conform to this protocol, and defining new
  classes which attempt to conform to it will not make them work with `@ThreadSafe`
  */
-public protocol ThreadSafeWrappable: ThreadConfined {
-    /** The Realm property type associated with this type */
-    static var confinedType: PropertyType { get }
-}
+public protocol ThreadSafeWrappable: ThreadConfined {}
 /**
     A property type wrapper type that may be passed between threads.
 
@@ -142,14 +139,15 @@ public protocol ThreadSafeWrappable: ThreadConfined {
 */
 @propertyWrapper public class ThreadSafe<T: ThreadSafeWrappable> {
     var threadSafeReference: ThreadSafeReference<T>?
-    var configuration: Realm.Configuration?
+    var rlmConfiguration: RLMRealmConfiguration?
 
     /// :nodoc:
     public var wrappedValue: T? {
         get {
-            guard let threadSafeReference = threadSafeReference, let config = configuration else { return nil }
+            guard let threadSafeReference = threadSafeReference, let rlmConfig = rlmConfiguration else { return nil }
             do {
-                let realm = try Realm(configuration: config)
+                let rlmRealm = try RLMRealm(configuration: rlmConfig)
+                let realm = Realm(rlmRealm)
                 guard let value = threadSafeReference.resolve(in: realm) else {
                     self.threadSafeReference = nil
                     return nil
@@ -166,9 +164,9 @@ public protocol ThreadSafeWrappable: ThreadConfined {
                 return
             }
             guard let configuration = newValue.realm?.configuration else {
-                throwRealmException("No realm configuration on this object found. Only managed objects may be wrapped as thread safe.")
+                throwRealmException("Only managed objects may be wrapped as thread safe.")
             }
-            self.configuration = configuration
+            self.rlmConfiguration = configuration.rlmConfiguration
             threadSafeReference = ThreadSafeReference(to: newValue)
         }
     }
@@ -177,14 +175,14 @@ public protocol ThreadSafeWrappable: ThreadConfined {
     public init(wrappedValue: T?) {
         guard let wrappedValue = wrappedValue else {
             self.threadSafeReference = nil
-            self.configuration = nil
+            self.rlmConfiguration = nil
             return
         }
         guard let config = wrappedValue.realm?.configuration else {
-            throwRealmException("No realm configuration on this object found. Only managed objects may be wrapped as thread safe.")
+            throwRealmException("Only managed objects may be wrapped as thread safe.")
         }
         self.threadSafeReference = ThreadSafeReference(to: wrappedValue)
-        self.configuration = config
+        self.rlmConfiguration = config.rlmConfiguration
     }
 }
 
