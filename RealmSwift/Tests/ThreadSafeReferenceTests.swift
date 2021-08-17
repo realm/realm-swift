@@ -335,7 +335,7 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
     struct TestThreadSafeWrapperStruct {
         @ThreadSafe var stringObject: SwiftStringObject?
         @ThreadSafe var intObject: SwiftIntObject?
-        @ThreadSafe var employeesList: List<SwiftEmployeeObject>?
+//        @ThreadSafe var employeesList: List<SwiftEmployeeObject>?
     }
 
     func wrapperStruct() -> TestThreadSafeWrapperStruct {
@@ -344,9 +344,6 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
         try! realm.write({
             stringObj = realm.create(SwiftStringObject.self, value: ["stringCol": "before"])
             intObj = realm.create(SwiftIntObject.self, value: ["intCol": 1])
-
-            let company = SwiftCompanyObject()
-            company.employees.append(SwiftEmployeeObject(value: ["name": "jg"]))
         })
         return TestThreadSafeWrapperStruct(stringObject: stringObj, intObject: intObj)
     }
