@@ -50,7 +50,7 @@ body:
       description: |
         If you can reproduce the bug, please provide detailed steps for how WE can reproduce it.
         Ideally, please provide a self contained test case or link (e.g. github repo) to a sample app that demonstrates the bug.
-        If that's not possible, please show code samples that highlights or reproduce the issue.
+        If that's not possible, please show code samples that highlight or reproduce the issue.
         If relevant, include your model definitions.
         Should you need to share code confidentially, you can send a link to: realm-help (the @) mongodb.com.
 # Version
