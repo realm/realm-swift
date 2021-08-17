@@ -151,7 +151,11 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
         if (error) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
-        completion((NSDictionary<NSString *, id<RLMBSON>> *)RLMConvertBsonToRLMBSON(*document), nil);
+        if (document) {
+            completion((NSDictionary<NSString *, id<RLMBSON>> *)RLMConvertBsonToRLMBSON(*document), nil);
+        } else {
+            completion(nil, nil);
+        }
     });
 }
 

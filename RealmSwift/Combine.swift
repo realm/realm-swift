@@ -61,13 +61,11 @@ extension ObjectKeyIdentifiable {
 /// A type which can be passed to `valuePublisher()` or `changesetPublisher()`.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public protocol RealmSubscribable {
-    // swiftlint:disable identifier_name
     /// :nodoc:
-    func _observe<S>(on queue: DispatchQueue?, _ subscriber: S)
+    func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error
-    // swiftlint:enable identifier_name
     /// :nodoc:
-    func _observe<S>(_ subscriber: S)
+    func _observe<S>(_ keyPaths: [String]?, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Void, S.Failure == Never
 }
 
@@ -339,9 +337,19 @@ extension RealmCollection where Self: RealmSubscribable {
         RealmPublishers.Value(self)
     }
 
+    /// A publisher that emits the collection each time the collection changes on the given property keyPaths.
+    public func collectionPublisher(keyPaths: [String]?) -> RealmPublishers.Value<Self> {
+        return RealmPublishers.Value(self, keyPaths: keyPaths)
+    }
+
     /// A publisher that emits a collection changeset each time the collection changes.
     public var changesetPublisher: RealmPublishers.CollectionChangeset<Self> {
         RealmPublishers.CollectionChangeset(self)
+    }
+
+    /// A publisher that emits a collection changeset each time the collection changes on the given property keyPaths.
+    public func changesetPublisher(keyPaths: [String]?) -> RealmPublishers.CollectionChangeset<Self> {
+        return RealmPublishers.CollectionChangeset(self, keyPaths: keyPaths)
     }
 }
 
@@ -365,9 +373,19 @@ extension RealmKeyedCollection where Self: RealmSubscribable {
         RealmPublishers.Value(self)
     }
 
+    /// A publisher that emits the collection each time the collection changes on the given property keyPaths.
+    public func collectionPublisher(keyPaths: [String]?) -> RealmPublishers.Value<Self> {
+        return RealmPublishers.Value(self, keyPaths: keyPaths)
+    }
+
     /// A publisher that emits a collection changeset each time the collection changes.
     public var changesetPublisher: RealmPublishers.MapChangeset<Self> {
         RealmPublishers.MapChangeset(self)
+    }
+
+    /// A publisher that emits a collection changeset each time the collection changes on the given property keyPaths.
+    public func changesetPublisher(keyPaths: [String]?) -> RealmPublishers.MapChangeset<Self> {
+        return RealmPublishers.MapChangeset(self, keyPaths: keyPaths)
     }
 }
 
@@ -375,40 +393,44 @@ extension RealmKeyedCollection where Self: RealmSubscribable {
 ///
 /// - precondition: The object must be a managed object which has not been invalidated.
 /// - parameter object: A managed object to observe.
+/// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits the object each time it changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func valuePublisher<T: Object>(_ object: T) -> RealmPublishers.Value<T> {
-    RealmPublishers.Value<T>(object)
+public func valuePublisher<T: Object>(_ object: T, keyPaths: [String]? = nil) -> RealmPublishers.Value<T> {
+    RealmPublishers.Value<T>(object, keyPaths: keyPaths)
 }
 
 /// Creates a publisher that emits the collection each time the collection changes.
 ///
 /// - precondition: The collection must be a managed collection which has not been invalidated.
 /// - parameter object: A managed collection to observe.
+/// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits the collection each time it changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func valuePublisher<T: RealmCollection>(_ collection: T) -> RealmPublishers.Value<T> {
-    RealmPublishers.Value<T>(collection)
+public func valuePublisher<T: RealmCollection>(_ collection: T, keyPaths: [String]? = nil) -> RealmPublishers.Value<T> {
+    RealmPublishers.Value<T>(collection, keyPaths: keyPaths)
 }
 
 /// Creates a publisher that emits an object changeset each time the object changes.
 ///
 /// - precondition: The object must be a managed object which has not been invalidated.
 /// - parameter object: A managed object to observe.
+/// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits an object changeset each time the object changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func changesetPublisher<T: Object>(_ object: T) -> RealmPublishers.ObjectChangeset<T> {
-    RealmPublishers.ObjectChangeset<T>(object)
+public func changesetPublisher<T: Object>(_ object: T, keyPaths: [String]? = nil) -> RealmPublishers.ObjectChangeset<T> {
+    RealmPublishers.ObjectChangeset<T>(object, keyPaths: keyPaths)
 }
 
 /// Creates a publisher that emits a collection changeset each time the collection changes.
 ///
 /// - precondition: The collection must be a managed collection which has not been invalidated.
 /// - parameter object: A managed collection to observe.
+/// - parameter keyPaths: The publisher emits changes on these property keyPaths. If `nil` the publisher emits changes for every property.
 /// - returns: A publisher that emits a collection changeset each time the collection changes.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
-public func changesetPublisher<T: RealmCollection>(_ collection: T) -> RealmPublishers.CollectionChangeset<T> {
-    RealmPublishers.CollectionChangeset<T>(collection)
+public func changesetPublisher<T: RealmCollection>(_ collection: T, keyPaths: [String]? = nil) -> RealmPublishers.CollectionChangeset<T> {
+    RealmPublishers.CollectionChangeset<T>(collection, keyPaths: keyPaths)
 }
 
 // MARK: - Realm
@@ -446,10 +468,9 @@ extension EmbeddedObject: ObservableObject {
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension ObjectBase: RealmSubscribable {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
-    public func _observe<S>(on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken
+    public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue?, _ subscriber: S) -> NotificationToken
         where S.Input: ObjectBase, S: Subscriber, S.Failure == Error {
-        return _observe(on: queue) { (change: ObjectChange<S.Input>) in
+        return _observe(keyPaths: keyPaths, on: queue) { (change: ObjectChange<S.Input>) in
             switch change {
             case .change(let object, _):
                 _ = subscriber.receive(object)
@@ -460,10 +481,9 @@ extension ObjectBase: RealmSubscribable {
             }
         }
     }
-
     /// :nodoc:
-    public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
-        return _observe { _ in _ = subscriber.receive() }
+    public func _observe<S>(_ keyPaths: [String]?, _ subscriber: S) -> NotificationToken where S: Subscriber, S.Failure == Never, S.Input == Void {
+        return _observe(keyPaths: keyPaths, { _ in _ = subscriber.receive()})
     }
 }
 
@@ -532,11 +552,10 @@ extension Results: RealmSubscribable {
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension RealmCollection {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
-    public func _observe<S>(on queue: DispatchQueue? = nil, _ subscriber: S)
+    public func _observe<S>(_ keyPaths: [String]? = nil, on queue: DispatchQueue? = nil, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
             // FIXME: we could skip some pointless work in converting the changeset to the Swift type here
-            return observe(on: queue) { change in
+        return observe(keyPaths: keyPaths, on: queue) { change in
                 switch change {
                 case .initial(let collection):
                     _ = subscriber.receive(collection)
@@ -549,8 +568,8 @@ extension RealmCollection {
     }
 
     /// :nodoc:
-    public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
-        return observe(on: nil) { _ in _ = subscriber.receive() }
+    public func _observe<S: Subscriber>(_ keyPaths: [String]? = nil, _ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
+        return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
 }
 
@@ -562,11 +581,10 @@ extension AnyRealmCollection: RealmSubscribable {}
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension RealmKeyedCollection {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
-    public func _observe<S>(on queue: DispatchQueue? = nil, _ subscriber: S)
+    public func _observe<S>(_ keyPaths: [String]?, on queue: DispatchQueue? = nil, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error {
             // FIXME: we could skip some pointless work in converting the changeset to the Swift type here
-            return observe(on: queue) { change in
+            return observe(keyPaths: keyPaths, on: queue) { change in
                 switch change {
                 case .initial(let collection):
                     _ = subscriber.receive(collection)
@@ -577,10 +595,13 @@ extension RealmKeyedCollection {
                 }
             }
     }
-
     /// :nodoc:
     public func _observe<S: Subscriber>(_ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
-        return observe(on: nil) { _ in _ = subscriber.receive() }
+        return observe(keyPaths: nil, on: nil) { _ in _ = subscriber.receive() }
+    }
+    /// :nodoc:
+    public func _observe<S: Subscriber>(_ keyPaths: [String]? = nil, _ subscriber: S) -> NotificationToken where S.Input == Void, S.Failure == Never {
+        return observe(keyPaths: keyPaths, on: nil) { _ in _ = subscriber.receive() }
     }
 }
 
@@ -811,7 +832,7 @@ public enum RealmPublishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let token =  self.collection._observe(subscriber)
+            let token =  self.collection._observe(nil, subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
         }
     }
@@ -842,7 +863,7 @@ public enum RealmPublishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let token =  self.object._observe(subscriber)
+            let token =  self.object._observe(nil, subscriber)
             tokenParent[keyPath: tokenKeyPath] = token
             subscriber.receive(subscription: ObservationSubscription(token: token))
         }
@@ -857,10 +878,12 @@ public enum RealmPublishers {
         public typealias Output = Subscribable
 
         private let subscribable: Subscribable
+        private let keyPaths: [String]?
         private let queue: DispatchQueue?
-        internal init(_ subscribable: Subscribable, queue: DispatchQueue? = nil) {
+        internal init(_ subscribable: Subscribable, keyPaths: [String]? = nil, queue: DispatchQueue? = nil) {
             precondition(subscribable.realm != nil, "Only managed objects can be published")
             self.subscribable = subscribable
+            self.keyPaths = keyPaths
             self.queue = queue
         }
 
@@ -880,7 +903,7 @@ public enum RealmPublishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Failure, Output == S.Input {
-            subscriber.receive(subscription: ObservationSubscription(token: self.subscribable._observe(on: queue, subscriber)))
+            subscriber.receive(subscription: ObservationSubscription(token: self.subscribable._observe(keyPaths, on: queue, subscriber)))
         }
 
         /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.
@@ -898,7 +921,7 @@ public enum RealmPublishers {
             guard let queue = scheduler as? DispatchQueue else {
                 fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
             }
-            return Value(subscribable, queue: queue)
+            return Value(subscribable, keyPaths: keyPaths, queue: queue)
         }
 
         /// Specifies the scheduler on which to perform downstream operations.
@@ -950,7 +973,7 @@ public enum RealmPublishers {
         }
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Failure, Output == S.Input {
-            let token = self.object._observe(on: queue, subscriber)
+            let token = self.object._observe(nil, on: queue, subscriber)
             tokenParent[keyPath: tokenKeyPath] = token
             subscriber.receive(subscription: ObservationSubscription(token: token))
         }
@@ -1115,11 +1138,13 @@ public enum RealmPublishers {
         public typealias Failure = Never
 
         private let object: O
+        private let keyPaths: [String]?
         private let queue: DispatchQueue?
-        internal init(_ object: O, queue: DispatchQueue? = nil) {
+        internal init(_ object: O, keyPaths: [String]? = nil, queue: DispatchQueue? = nil) {
             precondition(object.realm != nil, "Only managed objects can be published")
             precondition(!object.isInvalidated, "Object is invalidated or deleted")
             self.object = object
+            self.keyPaths = keyPaths
             self.queue = queue
         }
 
@@ -1139,7 +1164,7 @@ public enum RealmPublishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let token = self.object.observe(on: self.queue) { change in
+            let token = self.object.observe(keyPaths: self.keyPaths, on: self.queue) { change in
                 switch change {
                 case .change(let o, let properties):
                     _ = subscriber.receive(.change(o as! O, properties))
@@ -1167,7 +1192,7 @@ public enum RealmPublishers {
             guard let queue = scheduler as? DispatchQueue else {
                 fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
             }
-            return ObjectChangeset(object, queue: queue)
+            return ObjectChangeset(object, keyPaths: self.keyPaths, queue: queue)
         }
 
         /// Specifies the scheduler on which to perform downstream operations.
@@ -1380,10 +1405,12 @@ public enum RealmPublishers {
         public typealias Failure = Never
 
         private let collection: Collection
+        private let keyPaths: [String]?
         private let queue: DispatchQueue?
-        internal init(_ collection: Collection, queue: DispatchQueue? = nil) {
+        internal init(_ collection: Collection, keyPaths: [String]? = nil, queue: DispatchQueue? = nil) {
             precondition(collection.realm != nil, "Only managed collections can be published")
             self.collection = collection
+            self.keyPaths = keyPaths
             self.queue = queue
         }
 
@@ -1403,7 +1430,7 @@ public enum RealmPublishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let token = self.collection.observe(on: self.queue) { change in
+            let token = self.collection.observe(keyPaths: self.keyPaths, on: self.queue) { change in
                 _ = subscriber.receive(change)
             }
             subscriber.receive(subscription: ObservationSubscription(token: token))
@@ -1424,7 +1451,7 @@ public enum RealmPublishers {
             guard let queue = scheduler as? DispatchQueue else {
                 fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
             }
-            return CollectionChangeset(collection, queue: queue)
+            return CollectionChangeset(collection, keyPaths: self.keyPaths, queue: queue)
         }
 
         /// Specifies the scheduler on which to perform downstream operations.
@@ -1461,10 +1488,12 @@ public enum RealmPublishers {
         public typealias Failure = Never
 
         private let collection: Collection
+        private let keyPaths: [String]?
         private let queue: DispatchQueue?
-        internal init(_ collection: Collection, queue: DispatchQueue? = nil) {
+        internal init(_ collection: Collection, keyPaths: [String]? = nil, queue: DispatchQueue? = nil) {
             precondition(collection.realm != nil, "Only managed collections can be published")
             self.collection = collection
+            self.keyPaths = keyPaths
             self.queue = queue
         }
 
@@ -1484,7 +1513,7 @@ public enum RealmPublishers {
 
         /// :nodoc:
         public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
-            let token = self.collection.observe(on: self.queue) { change in
+            let token = self.collection.observe(keyPaths: self.keyPaths, on: self.queue) { change in
                 _ = subscriber.receive(change)
             }
             subscriber.receive(subscription: ObservationSubscription(token: token))
@@ -1505,7 +1534,7 @@ public enum RealmPublishers {
             guard let queue = scheduler as? DispatchQueue else {
                 fatalError("Cannot subscribe on scheduler \(scheduler): only serial dispatch queues are currently implemented.")
             }
-            return MapChangeset(collection, queue: queue)
+            return MapChangeset(collection, keyPaths: self.keyPaths, queue: queue)
         }
 
         /// Specifies the scheduler on which to perform downstream operations.

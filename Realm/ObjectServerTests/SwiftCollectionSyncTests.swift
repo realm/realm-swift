@@ -67,9 +67,9 @@ class ListSyncTests: SwiftSyncTestCase {
             }
         } else {
             guard let object = realm.objects(SwiftCollectionSyncObject.self).first else {
-                try realm.write({
+                try realm.write {
                     realm.add(SwiftCollectionSyncObject())
-                })
+                }
                 waitForUploads(for: realm)
                 checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
                 return
@@ -77,27 +77,27 @@ class ListSyncTests: SwiftSyncTestCase {
             let collection = object[keyPath: keyPath]
 
             if collection.count == 0 {
-                try realm.write({
+                try realm.write {
                     collection.append(objectsIn: values + values)
-                })
+                }
                 XCTAssertEqual(collection.count, values.count*2)
             } else if collection.count == 6 {
-                try realm.write({
+                try realm.write {
                     collection.removeSubrange(3...5)
-                })
+                }
                 XCTAssertEqual(collection.count, values.count)
             } else {
                 if T.self is SwiftPerson.Type {
-                    try realm.write({
+                    try realm.write {
                         (collection as! List<SwiftPerson>)[0].firstName
                             = (values as! [SwiftPerson])[1].firstName
-                    })
+                    }
                     XCTAssertEqual((collection as! List<SwiftPerson>)[0].firstName,
                                    (values as! [SwiftPerson])[1].firstName)
                 } else {
-                    try realm.write({
+                    try realm.write {
                         collection[0] = values[1]
-                    })
+                    }
                     XCTAssertEqual(collection[0], values[1])
                 }
             }
@@ -249,9 +249,9 @@ class SetSyncTests: SwiftSyncTestCase {
             XCTAssertEqual(otherCollection.count, 0)
         } else {
             guard let object = realm.objects(SwiftCollectionSyncObject.self).first else {
-                try realm.write({
+                try realm.write {
                     realm.add(SwiftCollectionSyncObject())
-                })
+                }
                 waitForUploads(for: realm)
                 checkCount(expected: 1, realm, SwiftCollectionSyncObject.self)
                 return
@@ -260,32 +260,32 @@ class SetSyncTests: SwiftSyncTestCase {
             let otherCollection = object[keyPath: otherSet.keyPath]
             if collection.count == 0,
                otherCollection.count == 0 {
-                try realm.write({
+                try realm.write {
                     collection.insert(objectsIn: set.values)
                     otherCollection.insert(objectsIn: otherSet.values)
-                })
+                }
                 XCTAssertEqual(collection.count, set.values.count)
                 XCTAssertEqual(otherCollection.count, otherSet.values.count)
             } else if collection.count == 3,
                       otherCollection.count == 3 {
                 if !(T.self is SwiftPerson.Type) {
-                    try realm.write({
+                    try realm.write {
                         collection.formIntersection(otherCollection)
-                    })
+                    }
                 } else {
-                    try realm.write({
+                    try realm.write {
                         // formIntersection won't work with unique Objects
                         collection.removeAll()
                         collection.insert(set.values[0])
-                    })
+                    }
                 }
                 XCTAssertEqual(collection.count, 1)
                 XCTAssertEqual(otherCollection.count, otherSet.values.count)
             } else {
-                try realm.write({
+                try realm.write {
                     collection.removeAll()
                     otherCollection.removeAll()
-                })
+                }
                 XCTAssertEqual(collection.count, 0)
                 XCTAssertEqual(otherCollection.count, 0)
             }

@@ -44,7 +44,7 @@ public extension User {
 }
 
 /**
- A singleton which configures and manages MongoDB Realm synchronization-related
+ A manager which configures and manages MongoDB Realm synchronization-related
  functionality.
 
  - see: `RLMSyncManager`
