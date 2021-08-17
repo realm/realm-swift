@@ -631,8 +631,7 @@ public func _name<T: ObjectBase>(for keyPath: PartialKeyPath<T>) -> String {
 // MARK: Thread Safe Wrapper
 
 extension Object: ThreadSafeWrappable {
-    public static var confinedType: PropertyType {
-        // This needs to actually do something
-        return PropertyType._rlmType
-    }
+    /// :nodoc:
+    public static var confinedType: PropertyType { .object }
+
 }

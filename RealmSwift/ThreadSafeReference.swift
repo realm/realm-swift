@@ -122,14 +122,29 @@ public protocol ThreadConfined {
     }
 }
 
-public protocol ThreadSafeWrappable: ThreadConfined {
-    static var confinedType: PropertyType { get } // The goal is to return the type, object, results, list, etc.
-}
+/**
+ Object types conforming to `ThreadSafeWrappable` are able to have the `@ThreadSafe` property wrapper applied to them.
 
+ Note that only types defined by Realm can meaningfully conform to this protocol, and defining new
+ classes which attempt to conform to it will not make them work with `@ThreadSafe`
+ */
+public protocol ThreadSafeWrappable: ThreadConfined {
+    /** The Realm property type associated with this type */
+    static var confinedType: PropertyType { get }
+}
+/**
+    A property type wrapper type that may be passed between threads.
+
+    A `@ThreadSafe` property contains a thread-safe reference to the underlying wrapped value. This reference is resolved to the thread on which the wrapped value is accessed. A new thread safe reference is created each time the property is accessed.
+
+ - see: `ThreadConfined`
+ - see: `ThreadSafeReference`
+*/
 @propertyWrapper public class ThreadSafe<T: ThreadSafeWrappable> {
     var threadSafeReference: ThreadSafeReference<T>?
     var configuration: Realm.Configuration?
 
+    /// :nodoc:
     public var wrappedValue: T? {
         get {
             guard let threadSafeReference = threadSafeReference, let config = configuration else { return nil }
@@ -158,6 +173,7 @@ public protocol ThreadSafeWrappable: ThreadConfined {
         }
     }
 
+    /// :nodoc:
     public init(wrappedValue: T?) {
         guard let wrappedValue = wrappedValue else {
             self.threadSafeReference = nil
