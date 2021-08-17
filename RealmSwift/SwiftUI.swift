@@ -18,7 +18,7 @@
 
 import Foundation
 
-#if canImport(SwiftUI) && canImport(Combine)
+#if !(os(iOS) && (arch(i386) || arch(arm)))
 import SwiftUI
 import Combine
 import Realm
