@@ -20,6 +20,7 @@
 
 import Combine
 import Realm
+import Realm.Private
 import RealmSwift
 import XCTest
 

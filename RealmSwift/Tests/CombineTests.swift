@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#if canImport(Combine)
+#if !(os(iOS) && (arch(i386) || arch(arm)))
 import XCTest
 import Combine
 import RealmSwift

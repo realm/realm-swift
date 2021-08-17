@@ -4,10 +4,11 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* Fix crash in `MongoCollection.findOneDocument(filter:)` that occurred when no results were 
+* Fix crash in `MongoCollection.findOneDocument(filter:)` that occurred when no results were
   found for a given filter.
 * Some of the SwiftUI property wrappers incorrectly required objects to conform
   to ObjectKeyIdentifiable rather than Identifiable.
+* Work around Xcode 13 beta 3+ shipping a broken swiftinterface file for Combine on 32-bit iOS.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
