@@ -335,7 +335,6 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
     struct TestThreadSafeWrapperStruct {
         @ThreadSafe var stringObject: SwiftStringObject?
         @ThreadSafe var intObject: SwiftIntObject?
-//        @ThreadSafe var employeesList: List<SwiftEmployeeObject>?
     }
 
     func wrapperStruct() -> TestThreadSafeWrapperStruct {
