@@ -331,12 +331,18 @@ class ThreadSafeReferenceTests: TestCase {
     }
 }
 
-class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
-    struct TestThreadSafeWrapperStruct {
-        @ThreadSafe var stringObject: SwiftStringObject?
-        @ThreadSafe var intObject: SwiftIntObject?
-    }
+struct TestThreadSafeWrapperStruct {
+    @ThreadSafe var stringObject: SwiftStringObject?
+    @ThreadSafe var intObject: SwiftIntObject?
+    @ThreadSafe var employees: List<SwiftEmployeeObject>?
+    @ThreadSafe var employeeSet: MutableSet<SwiftEmployeeObject>?
 
+    @ThreadSafe var arcResults: AnyRealmCollection<SwiftEmployeeObject>?
+    @ThreadSafe var arcList: AnyRealmCollection<SwiftEmployeeObject>?
+    @ThreadSafe var arcSet: AnyRealmCollection<SwiftEmployeeObject>?
+}
+
+class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
     func wrapperStruct() -> TestThreadSafeWrapperStruct {
         let realm = try! Realm()
         var stringObj: SwiftStringObject?, intObj: SwiftIntObject?
@@ -443,9 +449,11 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
         XCTAssertEqual(testStruct.stringObject, nil)
         XCTAssertEqual(testStruct.intObject, nil)
 
+        var config = Realm.Configuration.defaultConfiguration
+        config.objectTypes = [SwiftStringObject.self, SwiftIntObject.self]
         dispatchSyncNewThread {
-            let realm = try! Realm()
-            try! Realm().write({
+            let realm = try! Realm(configuration: config)
+            try! realm.write({
                 testStruct.stringObject = realm.create(SwiftStringObject.self, value: ["stringCol": "after"])
                 testStruct.intObject = realm.create(SwiftIntObject.self, value: ["intCol": 2])
             })
@@ -455,7 +463,8 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
 
         // Edit value again to test the same thread safe reference isn't resolved twice
         dispatchSyncNewThread {
-            try! Realm().write({
+            let realm = try! Realm(configuration: config)
+            try! realm.write({
                 testStruct.stringObject!.stringCol = "after, again"
                 testStruct.intObject!.intCol = 3
             })
@@ -470,7 +479,13 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
         XCTAssertEqual(testStruct.intObject!.intCol, 1)
 
         dispatchSyncNewThread {
-            let realm = self.realmWithTestPath() // Different realm path than original
+            var config = Realm.Configuration.defaultConfiguration
+            config.fileURL = config.fileURL!.deletingLastPathComponent().appendingPathComponent("newpath.realm")
+            config.objectTypes = [SwiftEmployeeObject.self,
+                                  SwiftStringObject.self,
+                                  SwiftIntObject.self]
+
+            let realm = try! Realm(configuration: config) // Different realm config than original
             try! realm.write({
                 let stringObj = realm.create(SwiftStringObject.self, value: ["stringCol": "after"])
                 let intObj = realm.create(SwiftIntObject.self, value: ["intCol": 2])
@@ -498,9 +513,6 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
     }
 
     func testThreadSafeWrapperToList() {
-        struct ListStruct {
-            @ThreadSafe var employees: List<SwiftEmployeeObject>?
-        }
         let realm = try! Realm()
         let company = SwiftCompanyObject()
         try! realm.write {
@@ -510,30 +522,27 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
 
         XCTAssertEqual(1, company.employees.count)
         XCTAssertEqual("jg", company.employees[0].name)
-        let listStruct = ListStruct(employees: company.employees)
+        let testStruct = TestThreadSafeWrapperStruct(employees: company.employees)
         dispatchSyncNewThread {
             let realm = try! Realm()
-            XCTAssertEqual(1, listStruct.employees!.count)
-            XCTAssertEqual("jg", listStruct.employees![0].name)
+            XCTAssertEqual(1, testStruct.employees!.count)
+            XCTAssertEqual("jg", testStruct.employees![0].name)
 
             try! realm.write {
-                listStruct.employees!.removeAll()
-                listStruct.employees!.append(SwiftEmployeeObject(value: ["name": "jp"]))
-                listStruct.employees!.append(SwiftEmployeeObject(value: ["name": "az"]))
+                testStruct.employees!.removeAll()
+                testStruct.employees!.append(SwiftEmployeeObject(value: ["name": "jp"]))
+                testStruct.employees!.append(SwiftEmployeeObject(value: ["name": "az"]))
             }
-            XCTAssertEqual(2, listStruct.employees!.count)
-            XCTAssertEqual("jp", listStruct.employees![0].name)
-            XCTAssertEqual("az", listStruct.employees![1].name)
+            XCTAssertEqual(2, testStruct.employees!.count)
+            XCTAssertEqual("jp", testStruct.employees![0].name)
+            XCTAssertEqual("az", testStruct.employees![1].name)
         }
-        XCTAssertEqual(2, listStruct.employees!.count)
-        XCTAssertEqual("jp", listStruct.employees![0].name)
-        XCTAssertEqual("az", listStruct.employees![1].name)
+        XCTAssertEqual(2, testStruct.employees!.count)
+        XCTAssertEqual("jp", testStruct.employees![0].name)
+        XCTAssertEqual("az", testStruct.employees![1].name)
     }
 
     func testThreadSafeWrapperToMutableSet() {
-        struct SetStruct {
-            @ThreadSafe var employeeSet: MutableSet<SwiftEmployeeObject>?
-        }
         let realm = try! Realm()
         let company = SwiftCompanyObject()
         try! realm.write {
@@ -542,31 +551,25 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
         }
         XCTAssertEqual(1, company.employeeSet.count)
         XCTAssertEqual("jg", company.employeeSet[0].name)
-        let setStruct = SetStruct(employeeSet: company.employeeSet)
+        let testStruct = TestThreadSafeWrapperStruct(employeeSet: company.employeeSet)
         dispatchSyncNewThread {
             let realm = try! Realm()
-            XCTAssertEqual(1, setStruct.employeeSet!.count)
-            XCTAssertEqual("jg", setStruct.employeeSet![0].name)
+            XCTAssertEqual(1, testStruct.employeeSet!.count)
+            XCTAssertEqual("jg", testStruct.employeeSet![0].name)
 
             try! realm.write {
-                setStruct.employeeSet!.removeAll()
-                setStruct.employeeSet!.insert(SwiftEmployeeObject(value: ["name": "jp"]))
-                setStruct.employeeSet!.insert(SwiftEmployeeObject(value: ["name": "az"]))
+                testStruct.employeeSet!.removeAll()
+                testStruct.employeeSet!.insert(SwiftEmployeeObject(value: ["name": "jp"]))
+                testStruct.employeeSet!.insert(SwiftEmployeeObject(value: ["name": "az"]))
             }
-            XCTAssertEqual(2, setStruct.employeeSet!.count)
-            self.assertSetContains(setStruct.employeeSet!, keyPath: \.name, items: ["jp", "az"])
+            XCTAssertEqual(2, testStruct.employeeSet!.count)
+            self.assertSetContains(testStruct.employeeSet!, keyPath: \.name, items: ["jp", "az"])
         }
-        XCTAssertEqual(2, setStruct.employeeSet!.count)
-        assertSetContains(setStruct.employeeSet!, keyPath: \.name, items: ["jp", "az"])
+        XCTAssertEqual(2, testStruct.employeeSet!.count)
+        assertSetContains(testStruct.employeeSet!, keyPath: \.name, items: ["jp", "az"])
     }
 
     func testThreadSafeWrapperToAnyRealmCollection() {
-        struct AnyRealmCollectionStruct {
-            @ThreadSafe var arcResults: AnyRealmCollection<SwiftEmployeeObject>?
-            @ThreadSafe var arcList: AnyRealmCollection<SwiftEmployeeObject>?
-            @ThreadSafe var arcSet: AnyRealmCollection<SwiftEmployeeObject>?
-
-        }
         let realm = try! Realm()
         let company = SwiftCompanyObject()
         try! realm.write {
@@ -581,36 +584,36 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
             company.employeeSet.insert(SwiftEmployeeObject(value: ["name": "D"]))
         }
 
-        let anyRealmCollection = AnyRealmCollectionStruct(arcResults: AnyRealmCollection(realm.objects(SwiftEmployeeObject.self)
+        let testStruct = TestThreadSafeWrapperStruct(arcResults: AnyRealmCollection(realm.objects(SwiftEmployeeObject.self)
                                                                                             .filter("name != 'C'")
                                                                                             .sorted(byKeyPath: "name", ascending: false)),
                                                           arcList: AnyRealmCollection(company.employees),
                                                           arcSet: AnyRealmCollection(company.employeeSet))
 
-        XCTAssertEqual(6, anyRealmCollection.arcResults!.count)
-        XCTAssertEqual("D", anyRealmCollection.arcResults![0].name)
-        XCTAssertEqual("D", anyRealmCollection.arcResults![1].name)
-        XCTAssertEqual("B", anyRealmCollection.arcResults![2].name)
-        XCTAssertEqual(4, anyRealmCollection.arcList!.count)
-        XCTAssertEqual("A", anyRealmCollection.arcList![0].name)
-        XCTAssertEqual("B", anyRealmCollection.arcList![1].name)
-        XCTAssertEqual("C", anyRealmCollection.arcList![2].name)
-        XCTAssertEqual("D", anyRealmCollection.arcList![3].name)
-        XCTAssertEqual(4, anyRealmCollection.arcSet!.count)
-        assertAnyRealmCollectionContains(anyRealmCollection.arcSet!, keyPath: \.name, items: ["A", "B", "C", "D"])
+        XCTAssertEqual(6, testStruct.arcResults!.count)
+        XCTAssertEqual("D", testStruct.arcResults![0].name)
+        XCTAssertEqual("D", testStruct.arcResults![1].name)
+        XCTAssertEqual("B", testStruct.arcResults![2].name)
+        XCTAssertEqual(4, testStruct.arcList!.count)
+        XCTAssertEqual("A", testStruct.arcList![0].name)
+        XCTAssertEqual("B", testStruct.arcList![1].name)
+        XCTAssertEqual("C", testStruct.arcList![2].name)
+        XCTAssertEqual("D", testStruct.arcList![3].name)
+        XCTAssertEqual(4, testStruct.arcSet!.count)
+        assertAnyRealmCollectionContains(testStruct.arcSet!, keyPath: \.name, items: ["A", "B", "C", "D"])
 
         dispatchSyncNewThread {
-            XCTAssertEqual(6, anyRealmCollection.arcResults!.count)
-            XCTAssertEqual("D", anyRealmCollection.arcResults![0].name)
-            XCTAssertEqual("D", anyRealmCollection.arcResults![1].name)
-            XCTAssertEqual("B", anyRealmCollection.arcResults![2].name)
-            XCTAssertEqual(4, anyRealmCollection.arcList!.count)
-            XCTAssertEqual("A", anyRealmCollection.arcList![0].name)
-            XCTAssertEqual("B", anyRealmCollection.arcList![1].name)
-            XCTAssertEqual("C", anyRealmCollection.arcList![2].name)
-            XCTAssertEqual("D", anyRealmCollection.arcList![3].name)
-            XCTAssertEqual(4, anyRealmCollection.arcSet!.count)
-            self.assertAnyRealmCollectionContains(anyRealmCollection.arcSet!, keyPath: \.name, items: ["A", "B", "C", "D"])
+            XCTAssertEqual(6, testStruct.arcResults!.count)
+            XCTAssertEqual("D", testStruct.arcResults![0].name)
+            XCTAssertEqual("D", testStruct.arcResults![1].name)
+            XCTAssertEqual("B", testStruct.arcResults![2].name)
+            XCTAssertEqual(4, testStruct.arcList!.count)
+            XCTAssertEqual("A", testStruct.arcList![0].name)
+            XCTAssertEqual("B", testStruct.arcList![1].name)
+            XCTAssertEqual("C", testStruct.arcList![2].name)
+            XCTAssertEqual("D", testStruct.arcList![3].name)
+            XCTAssertEqual(4, testStruct.arcSet!.count)
+            self.assertAnyRealmCollectionContains(testStruct.arcSet!, keyPath: \.name, items: ["A", "B", "C", "D"])
         }
     }
 }
