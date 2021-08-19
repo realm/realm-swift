@@ -141,7 +141,7 @@ import Realm.Private
         }))
     }
 
-    #if canImport(Combine)
+    #if !(os(iOS) && (arch(i386) || arch(arm)))
     /**
      Asynchronously open a Realm and deliver it to a block on the given queue.
 
