@@ -138,13 +138,12 @@ public protocol ThreadSafeWrappable: ThreadConfined {}
 
  - warning: This property wrapper should not be used for properties on long lived objects.
             `@ThreadSafe` properties contain a `ThreadSafeReference` which
-             can pin the source version of the Realm in use.
-            This means that this property wrapper is **better suited for function arguments**
-            **and local variables that get captured by aynchronously dispatched block.**
+            can pin the source version of the Realm in use. This means that this property
+            wrapper is **better suited for function arguments and local variables**
+            **that get captured by an aynchronously dispatched block.**
 
  - see: `ThreadSafeReference`
  - see: `ThreadConfined`
-
 */
 @propertyWrapper public class ThreadSafe<T: ThreadSafeWrappable> {
     var threadSafeReference: ThreadSafeReference<T>?
