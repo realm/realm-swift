@@ -83,1441 +83,643 @@ class QueryTests_: TestCase {
         }
     }
 
-    func testEquals() {
-        var query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)
+    private func assertQuery<T: Equatable>(predicate: String,
+                                           values: [T],
+                                           expectedCount: Int,
+                                           _ query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)) {
+        let results = objects().query(query)
+        XCTAssertEqual(results.count, expectedCount)
 
+        let constructedPredicate = query(Query<ModernAllTypesObject>()).constructPredicate()
+        XCTAssertEqual(constructedPredicate.0,
+                       predicate)
+
+        for (e1, e2) in zip(constructedPredicate.1, values) {
+            XCTAssertEqual(e1 as! T, e2)
+        }
+    }
+
+    func testEquals() {
         // boolCol
 
-        let boolColResults = objects().query { obj in
-            obj.boolCol == true
-        }
-        XCTAssertEqual(boolColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "boolCol == %@", values: [true], expectedCount: 1) {
             $0.boolCol == true
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "boolCol == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Bool,
-                       true)
         // intCol
 
-        let intColResults = objects().query { obj in
-            obj.intCol == 5
-        }
-        XCTAssertEqual(intColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "intCol == %@", values: [5], expectedCount: 1) {
             $0.intCol == 5
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "intCol == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int,
-                       5)
         // int8Col
 
-        let int8ColResults = objects().query { obj in
-            obj.int8Col == 8
-        }
-        XCTAssertEqual(int8ColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "int8Col == %@", values: [8], expectedCount: 1) {
             $0.int8Col == 8
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "int8Col == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int8,
-                       8)
         // int16Col
 
-        let int16ColResults = objects().query { obj in
-            obj.int16Col == 16
-        }
-        XCTAssertEqual(int16ColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "int16Col == %@", values: [16], expectedCount: 1) {
             $0.int16Col == 16
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "int16Col == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int16,
-                       16)
         // int32Col
 
-        let int32ColResults = objects().query { obj in
-            obj.int32Col == 32
-        }
-        XCTAssertEqual(int32ColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "int32Col == %@", values: [32], expectedCount: 1) {
             $0.int32Col == 32
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "int32Col == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int32,
-                       32)
         // int64Col
 
-        let int64ColResults = objects().query { obj in
-            obj.int64Col == 64
-        }
-        XCTAssertEqual(int64ColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "int64Col == %@", values: [64], expectedCount: 1) {
             $0.int64Col == 64
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "int64Col == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int64,
-                       64)
         // floatCol
 
-        let floatColResults = objects().query { obj in
-            obj.floatCol == 5.55444333
-        }
-        XCTAssertEqual(floatColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "floatCol == %@", values: [5.55444333], expectedCount: 1) {
             $0.floatCol == 5.55444333
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "floatCol == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Float,
-                       5.55444333)
         // doubleCol
 
-        let doubleColResults = objects().query { obj in
-            obj.doubleCol == 5.55444333
-        }
-        XCTAssertEqual(doubleColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "doubleCol == %@", values: [5.55444333], expectedCount: 1) {
             $0.doubleCol == 5.55444333
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "doubleCol == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Double,
-                       5.55444333)
         // stringCol
 
-        let stringColResults = objects().query { obj in
-            obj.stringCol == "Foo"
-        }
-        XCTAssertEqual(stringColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "stringCol == %@", values: ["Foo"], expectedCount: 1) {
             $0.stringCol == "Foo"
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "stringCol == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! String,
-                       "Foo")
         // binaryCol
 
-        let binaryColResults = objects().query { obj in
-            obj.binaryCol == Data(count: 64)
-        }
-        XCTAssertEqual(binaryColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "binaryCol == %@", values: [Data(count: 64)], expectedCount: 1) {
             $0.binaryCol == Data(count: 64)
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "binaryCol == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Data,
-                       Data(count: 64))
         // dateCol
 
-        let dateColResults = objects().query { obj in
-            obj.dateCol == Date(timeIntervalSince1970: 1000000)
-        }
-        XCTAssertEqual(dateColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "dateCol == %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
             $0.dateCol == Date(timeIntervalSince1970: 1000000)
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "dateCol == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Date,
-                       Date(timeIntervalSince1970: 1000000))
         // decimalCol
 
-        let decimalColResults = objects().query { obj in
-            obj.decimalCol == Decimal128(123.456)
-        }
-        XCTAssertEqual(decimalColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "decimalCol == %@", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.decimalCol == Decimal128(123.456)
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "decimalCol == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Decimal128,
-                       Decimal128(123.456))
         // objectIdCol
 
-        let objectIdColResults = objects().query { obj in
-            obj.objectIdCol == ObjectId("61184062c1d8f096a3695046")
-        }
-        XCTAssertEqual(objectIdColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "objectIdCol == %@", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
             $0.objectIdCol == ObjectId("61184062c1d8f096a3695046")
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "objectIdCol == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ObjectId,
-                       ObjectId("61184062c1d8f096a3695046"))
         // intEnumCol
 
-        let intEnumColResults = objects().query { obj in
-            obj.intEnumCol == .value1
-        }
-        XCTAssertEqual(intEnumColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "intEnumCol == %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 1) {
             $0.intEnumCol == .value1
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "intEnumCol == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int,
-                       ModernIntEnum.value1.rawValue)
         // stringEnumCol
 
-        let stringEnumColResults = objects().query { obj in
-            obj.stringEnumCol == .value1
-        }
-        XCTAssertEqual(stringEnumColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "stringEnumCol == %@", values: [ModernStringEnum.value1.rawValue], expectedCount: 1) {
             $0.stringEnumCol == .value1
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "stringEnumCol == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! String,
-                       ModernStringEnum.value1.rawValue)
         // uuidCol
 
-        let uuidColResults = objects().query { obj in
-            obj.uuidCol == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
-        }
-        XCTAssertEqual(uuidColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "uuidCol == %@", values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 1) {
             $0.uuidCol == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "uuidCol == %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! UUID,
-                       UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)
     }
 
     func testEqualsOptional() {
-        var query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)
-
-        // Optional
-
         // optBoolCol
 
-        let optBoolColResults = objects().query { obj in
-            obj.optBoolCol == true
-        }
-        XCTAssertEqual(optBoolColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optBoolCol == %@", values: [true], expectedCount: 1) {
             $0.optBoolCol == true
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optBoolCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Bool?,
-                       true)
         // optIntCol
 
-        let optIntColResults = objects().query { obj in
-            obj.optIntCol == 5
-        }
-        XCTAssertEqual(optIntColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optIntCol == %@", values: [5], expectedCount: 1) {
             $0.optIntCol == 5
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optIntCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int?,
-                       5)
         // optInt8Col
 
-        let optInt8ColResults = objects().query { obj in
-            obj.optInt8Col == 8
-        }
-        XCTAssertEqual(optInt8ColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optInt8Col == %@", values: [8], expectedCount: 1) {
             $0.optInt8Col == 8
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt8Col == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int8?,
-                       8)
         // optInt16Col
 
-        let optInt16ColResults = objects().query { obj in
-            obj.optInt16Col == 16
-        }
-        XCTAssertEqual(optInt16ColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optInt16Col == %@", values: [16], expectedCount: 1) {
             $0.optInt16Col == 16
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt16Col == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int16?,
-                       16)
         // optInt32Col
 
-        let optInt32ColResults = objects().query { obj in
-            obj.optInt32Col == 32
-        }
-        XCTAssertEqual(optInt32ColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optInt32Col == %@", values: [32], expectedCount: 1) {
             $0.optInt32Col == 32
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt32Col == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int32?,
-                       32)
         // optInt64Col
 
-        let optInt64ColResults = objects().query { obj in
-            obj.optInt64Col == 64
-        }
-        XCTAssertEqual(optInt64ColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optInt64Col == %@", values: [64], expectedCount: 1) {
             $0.optInt64Col == 64
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt64Col == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int64?,
-                       64)
         // optFloatCol
 
-        let optFloatColResults = objects().query { obj in
-            obj.optFloatCol == 5.55444333
-        }
-        XCTAssertEqual(optFloatColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optFloatCol == %@", values: [5.55444333], expectedCount: 1) {
             $0.optFloatCol == 5.55444333
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optFloatCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Float?,
-                       5.55444333)
         // optDoubleCol
 
-        let optDoubleColResults = objects().query { obj in
-            obj.optDoubleCol == 5.55444333
-        }
-        XCTAssertEqual(optDoubleColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optDoubleCol == %@", values: [5.55444333], expectedCount: 1) {
             $0.optDoubleCol == 5.55444333
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optDoubleCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Double?,
-                       5.55444333)
         // optStringCol
 
-        let optStringColResults = objects().query { obj in
-            obj.optStringCol == "Foo"
-        }
-        XCTAssertEqual(optStringColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optStringCol == %@", values: ["Foo"], expectedCount: 1) {
             $0.optStringCol == "Foo"
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optStringCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! String?,
-                       "Foo")
         // optBinaryCol
 
-        let optBinaryColResults = objects().query { obj in
-            obj.optBinaryCol == Data(count: 64)
-        }
-        XCTAssertEqual(optBinaryColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optBinaryCol == %@", values: [Data(count: 64)], expectedCount: 1) {
             $0.optBinaryCol == Data(count: 64)
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optBinaryCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Data?,
-                       Data(count: 64))
         // optDateCol
 
-        let optDateColResults = objects().query { obj in
-            obj.optDateCol == Date(timeIntervalSince1970: 1000000)
-        }
-        XCTAssertEqual(optDateColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optDateCol == %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
             $0.optDateCol == Date(timeIntervalSince1970: 1000000)
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optDateCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Date?,
-                       Date(timeIntervalSince1970: 1000000))
         // optDecimalCol
 
-        let optDecimalColResults = objects().query { obj in
-            obj.optDecimalCol == Decimal128(123.456)
-        }
-        XCTAssertEqual(optDecimalColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optDecimalCol == %@", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.optDecimalCol == Decimal128(123.456)
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optDecimalCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Decimal128?,
-                       Decimal128(123.456))
         // optObjectIdCol
 
-        let optObjectIdColResults = objects().query { obj in
-            obj.optObjectIdCol == ObjectId("61184062c1d8f096a3695046")
-        }
-        XCTAssertEqual(optObjectIdColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optObjectIdCol == %@", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
             $0.optObjectIdCol == ObjectId("61184062c1d8f096a3695046")
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optObjectIdCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ObjectId?,
-                       ObjectId("61184062c1d8f096a3695046"))
         // optIntEnumCol
 
-        let optIntEnumColResults = objects().query { obj in
-            obj.optIntEnumCol == .value1
-        }
-        XCTAssertEqual(optIntEnumColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optIntEnumCol == %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 1) {
             $0.optIntEnumCol == .value1
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optIntEnumCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int?,
-                       ModernIntEnum.value1.rawValue)
         // optStringEnumCol
 
-        let optStringEnumColResults = objects().query { obj in
-            obj.optStringEnumCol == .value1
-        }
-        XCTAssertEqual(optStringEnumColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optStringEnumCol == %@", values: [ModernStringEnum.value1.rawValue], expectedCount: 1) {
             $0.optStringEnumCol == .value1
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optStringEnumCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! String?,
-                       ModernStringEnum.value1.rawValue)
         // optUuidCol
 
-        let optUuidColResults = objects().query { obj in
-            obj.optUuidCol == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
-        }
-        XCTAssertEqual(optUuidColResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optUuidCol == %@", values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 1) {
             $0.optUuidCol == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optUuidCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! UUID?,
-                       UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)
 
         // Test for `nil`
+        // optBoolCol
 
-        // `nil` optBoolCol
-
-        let optBoolColOptResults = objects().query { obj in
-            obj.optBoolCol == nil
-        }
-        XCTAssertEqual(optBoolColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optBoolCol == %@", values: [NSNull()], expectedCount: 0) {
             $0.optBoolCol == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optBoolCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optIntCol
 
-        // `nil` optIntCol
-
-        let optIntColOptResults = objects().query { obj in
-            obj.optIntCol == nil
-        }
-        XCTAssertEqual(optIntColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optIntCol == %@", values: [NSNull()], expectedCount: 0) {
             $0.optIntCol == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optIntCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optInt8Col
 
-        // `nil` optInt8Col
-
-        let optInt8ColOptResults = objects().query { obj in
-            obj.optInt8Col == nil
-        }
-        XCTAssertEqual(optInt8ColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optInt8Col == %@", values: [NSNull()], expectedCount: 0) {
             $0.optInt8Col == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt8Col == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optInt16Col
 
-        // `nil` optInt16Col
-
-        let optInt16ColOptResults = objects().query { obj in
-            obj.optInt16Col == nil
-        }
-        XCTAssertEqual(optInt16ColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optInt16Col == %@", values: [NSNull()], expectedCount: 0) {
             $0.optInt16Col == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt16Col == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optInt32Col
 
-        // `nil` optInt32Col
-
-        let optInt32ColOptResults = objects().query { obj in
-            obj.optInt32Col == nil
-        }
-        XCTAssertEqual(optInt32ColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optInt32Col == %@", values: [NSNull()], expectedCount: 0) {
             $0.optInt32Col == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt32Col == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optInt64Col
 
-        // `nil` optInt64Col
-
-        let optInt64ColOptResults = objects().query { obj in
-            obj.optInt64Col == nil
-        }
-        XCTAssertEqual(optInt64ColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optInt64Col == %@", values: [NSNull()], expectedCount: 0) {
             $0.optInt64Col == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt64Col == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optFloatCol
 
-        // `nil` optFloatCol
-
-        let optFloatColOptResults = objects().query { obj in
-            obj.optFloatCol == nil
-        }
-        XCTAssertEqual(optFloatColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optFloatCol == %@", values: [NSNull()], expectedCount: 0) {
             $0.optFloatCol == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optFloatCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optDoubleCol
 
-        // `nil` optDoubleCol
-
-        let optDoubleColOptResults = objects().query { obj in
-            obj.optDoubleCol == nil
-        }
-        XCTAssertEqual(optDoubleColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optDoubleCol == %@", values: [NSNull()], expectedCount: 0) {
             $0.optDoubleCol == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optDoubleCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optStringCol
 
-        // `nil` optStringCol
-
-        let optStringColOptResults = objects().query { obj in
-            obj.optStringCol == nil
-        }
-        XCTAssertEqual(optStringColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optStringCol == %@", values: [NSNull()], expectedCount: 0) {
             $0.optStringCol == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optStringCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optBinaryCol
 
-        // `nil` optBinaryCol
-
-        let optBinaryColOptResults = objects().query { obj in
-            obj.optBinaryCol == nil
-        }
-        XCTAssertEqual(optBinaryColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optBinaryCol == %@", values: [NSNull()], expectedCount: 0) {
             $0.optBinaryCol == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optBinaryCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optDateCol
 
-        // `nil` optDateCol
-
-        let optDateColOptResults = objects().query { obj in
-            obj.optDateCol == nil
-        }
-        XCTAssertEqual(optDateColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optDateCol == %@", values: [NSNull()], expectedCount: 0) {
             $0.optDateCol == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optDateCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optDecimalCol
 
-        // `nil` optDecimalCol
-
-        let optDecimalColOptResults = objects().query { obj in
-            obj.optDecimalCol == nil
-        }
-        XCTAssertEqual(optDecimalColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optDecimalCol == %@", values: [NSNull()], expectedCount: 0) {
             $0.optDecimalCol == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optDecimalCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optObjectIdCol
 
-        // `nil` optObjectIdCol
-
-        let optObjectIdColOptResults = objects().query { obj in
-            obj.optObjectIdCol == nil
-        }
-        XCTAssertEqual(optObjectIdColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optObjectIdCol == %@", values: [NSNull()], expectedCount: 0) {
             $0.optObjectIdCol == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optObjectIdCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optIntEnumCol
 
-        // `nil` optIntEnumCol
-
-        let optIntEnumColOptResults = objects().query { obj in
-            obj.optIntEnumCol == nil
-        }
-        XCTAssertEqual(optIntEnumColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optIntEnumCol == %@", values: [NSNull()], expectedCount: 0) {
             $0.optIntEnumCol == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optIntEnumCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optStringEnumCol
 
-        // `nil` optStringEnumCol
-
-        let optStringEnumColOptResults = objects().query { obj in
-            obj.optStringEnumCol == nil
-        }
-        XCTAssertEqual(optStringEnumColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optStringEnumCol == %@", values: [NSNull()], expectedCount: 0) {
             $0.optStringEnumCol == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optStringEnumCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optUuidCol
 
-        // `nil` optUuidCol
-
-        let optUuidColOptResults = objects().query { obj in
-            obj.optUuidCol == nil
-        }
-        XCTAssertEqual(optUuidColOptResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optUuidCol == %@", values: [NSNull()], expectedCount: 0) {
             $0.optUuidCol == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optUuidCol == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
     }
 
     func testNotEquals() {
-        var query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)
-
         // boolCol
 
-        let boolColResults = objects().query { obj in
-            obj.boolCol != true
-        }
-        XCTAssertEqual(boolColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "boolCol != %@", values: [true], expectedCount: 0) {
             $0.boolCol != true
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "boolCol != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Bool,
-                       true)
         // intCol
 
-        let intColResults = objects().query { obj in
-            obj.intCol != 5
-        }
-        XCTAssertEqual(intColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "intCol != %@", values: [5], expectedCount: 0) {
             $0.intCol != 5
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "intCol != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int,
-                       5)
         // int8Col
 
-        let int8ColResults = objects().query { obj in
-            obj.int8Col != 8
-        }
-        XCTAssertEqual(int8ColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "int8Col != %@", values: [8], expectedCount: 0) {
             $0.int8Col != 8
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "int8Col != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int8,
-                       8)
         // int16Col
 
-        let int16ColResults = objects().query { obj in
-            obj.int16Col != 16
-        }
-        XCTAssertEqual(int16ColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "int16Col != %@", values: [16], expectedCount: 0) {
             $0.int16Col != 16
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "int16Col != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int16,
-                       16)
         // int32Col
 
-        let int32ColResults = objects().query { obj in
-            obj.int32Col != 32
-        }
-        XCTAssertEqual(int32ColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "int32Col != %@", values: [32], expectedCount: 0) {
             $0.int32Col != 32
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "int32Col != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int32,
-                       32)
         // int64Col
 
-        let int64ColResults = objects().query { obj in
-            obj.int64Col != 64
-        }
-        XCTAssertEqual(int64ColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "int64Col != %@", values: [64], expectedCount: 0) {
             $0.int64Col != 64
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "int64Col != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int64,
-                       64)
         // floatCol
 
-        let floatColResults = objects().query { obj in
-            obj.floatCol != 5.55444333
-        }
-        XCTAssertEqual(floatColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "floatCol != %@", values: [5.55444333], expectedCount: 0) {
             $0.floatCol != 5.55444333
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "floatCol != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Float,
-                       5.55444333)
         // doubleCol
 
-        let doubleColResults = objects().query { obj in
-            obj.doubleCol != 5.55444333
-        }
-        XCTAssertEqual(doubleColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "doubleCol != %@", values: [5.55444333], expectedCount: 0) {
             $0.doubleCol != 5.55444333
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "doubleCol != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Double,
-                       5.55444333)
         // stringCol
 
-        let stringColResults = objects().query { obj in
-            obj.stringCol != "Foo"
-        }
-        XCTAssertEqual(stringColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "stringCol != %@", values: ["Foo"], expectedCount: 0) {
             $0.stringCol != "Foo"
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "stringCol != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! String,
-                       "Foo")
         // binaryCol
 
-        let binaryColResults = objects().query { obj in
-            obj.binaryCol != Data(count: 64)
-        }
-        XCTAssertEqual(binaryColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "binaryCol != %@", values: [Data(count: 64)], expectedCount: 0) {
             $0.binaryCol != Data(count: 64)
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "binaryCol != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Data,
-                       Data(count: 64))
         // dateCol
 
-        let dateColResults = objects().query { obj in
-            obj.dateCol != Date(timeIntervalSince1970: 1000000)
-        }
-        XCTAssertEqual(dateColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "dateCol != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
             $0.dateCol != Date(timeIntervalSince1970: 1000000)
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "dateCol != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Date,
-                       Date(timeIntervalSince1970: 1000000))
         // decimalCol
 
-        let decimalColResults = objects().query { obj in
-            obj.decimalCol != Decimal128(123.456)
-        }
-        XCTAssertEqual(decimalColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "decimalCol != %@", values: [Decimal128(123.456)], expectedCount: 0) {
             $0.decimalCol != Decimal128(123.456)
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "decimalCol != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Decimal128,
-                       Decimal128(123.456))
         // objectIdCol
 
-        let objectIdColResults = objects().query { obj in
-            obj.objectIdCol != ObjectId("61184062c1d8f096a3695046")
-        }
-        XCTAssertEqual(objectIdColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "objectIdCol != %@", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 0) {
             $0.objectIdCol != ObjectId("61184062c1d8f096a3695046")
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "objectIdCol != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ObjectId,
-                       ObjectId("61184062c1d8f096a3695046"))
         // intEnumCol
 
-        let intEnumColResults = objects().query { obj in
-            obj.intEnumCol != .value1
-        }
-        XCTAssertEqual(intEnumColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "intEnumCol != %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 0) {
             $0.intEnumCol != .value1
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "intEnumCol != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int,
-                       ModernIntEnum.value1.rawValue)
         // stringEnumCol
 
-        let stringEnumColResults = objects().query { obj in
-            obj.stringEnumCol != .value1
-        }
-        XCTAssertEqual(stringEnumColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "stringEnumCol != %@", values: [ModernStringEnum.value1.rawValue], expectedCount: 0) {
             $0.stringEnumCol != .value1
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "stringEnumCol != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! String,
-                       ModernStringEnum.value1.rawValue)
         // uuidCol
 
-        let uuidColResults = objects().query { obj in
-            obj.uuidCol != UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
-        }
-        XCTAssertEqual(uuidColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "uuidCol != %@", values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 0) {
             $0.uuidCol != UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "uuidCol != %@")
-
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! UUID,
-                       UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)
     }
 
     func testNotEqualsOptional() {
-        var query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)
-
-        // Optional
-
         // optBoolCol
 
-        let optBoolColResults = objects().query { obj in
-            obj.optBoolCol != true
-        }
-        XCTAssertEqual(optBoolColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optBoolCol != %@", values: [true], expectedCount: 0) {
             $0.optBoolCol != true
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optBoolCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Bool?,
-                       true)
         // optIntCol
 
-        let optIntColResults = objects().query { obj in
-            obj.optIntCol != 5
-        }
-        XCTAssertEqual(optIntColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optIntCol != %@", values: [5], expectedCount: 0) {
             $0.optIntCol != 5
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optIntCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int?,
-                       5)
         // optInt8Col
 
-        let optInt8ColResults = objects().query { obj in
-            obj.optInt8Col != 8
-        }
-        XCTAssertEqual(optInt8ColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optInt8Col != %@", values: [8], expectedCount: 0) {
             $0.optInt8Col != 8
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt8Col != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int8?,
-                       8)
         // optInt16Col
 
-        let optInt16ColResults = objects().query { obj in
-            obj.optInt16Col != 16
-        }
-        XCTAssertEqual(optInt16ColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optInt16Col != %@", values: [16], expectedCount: 0) {
             $0.optInt16Col != 16
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt16Col != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int16?,
-                       16)
         // optInt32Col
 
-        let optInt32ColResults = objects().query { obj in
-            obj.optInt32Col != 32
-        }
-        XCTAssertEqual(optInt32ColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optInt32Col != %@", values: [32], expectedCount: 0) {
             $0.optInt32Col != 32
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt32Col != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int32?,
-                       32)
         // optInt64Col
 
-        let optInt64ColResults = objects().query { obj in
-            obj.optInt64Col != 64
-        }
-        XCTAssertEqual(optInt64ColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optInt64Col != %@", values: [64], expectedCount: 0) {
             $0.optInt64Col != 64
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt64Col != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int64?,
-                       64)
         // optFloatCol
 
-        let optFloatColResults = objects().query { obj in
-            obj.optFloatCol != 5.55444333
-        }
-        XCTAssertEqual(optFloatColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optFloatCol != %@", values: [5.55444333], expectedCount: 0) {
             $0.optFloatCol != 5.55444333
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optFloatCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Float?,
-                       5.55444333)
         // optDoubleCol
 
-        let optDoubleColResults = objects().query { obj in
-            obj.optDoubleCol != 5.55444333
-        }
-        XCTAssertEqual(optDoubleColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optDoubleCol != %@", values: [5.55444333], expectedCount: 0) {
             $0.optDoubleCol != 5.55444333
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optDoubleCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Double?,
-                       5.55444333)
         // optStringCol
 
-        let optStringColResults = objects().query { obj in
-            obj.optStringCol != "Foo"
-        }
-        XCTAssertEqual(optStringColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optStringCol != %@", values: ["Foo"], expectedCount: 0) {
             $0.optStringCol != "Foo"
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optStringCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! String?,
-                       "Foo")
         // optBinaryCol
 
-        let optBinaryColResults = objects().query { obj in
-            obj.optBinaryCol != Data(count: 64)
-        }
-        XCTAssertEqual(optBinaryColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optBinaryCol != %@", values: [Data(count: 64)], expectedCount: 0) {
             $0.optBinaryCol != Data(count: 64)
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optBinaryCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Data?,
-                       Data(count: 64))
         // optDateCol
 
-        let optDateColResults = objects().query { obj in
-            obj.optDateCol != Date(timeIntervalSince1970: 1000000)
-        }
-        XCTAssertEqual(optDateColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optDateCol != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
             $0.optDateCol != Date(timeIntervalSince1970: 1000000)
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optDateCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Date?,
-                       Date(timeIntervalSince1970: 1000000))
         // optDecimalCol
 
-        let optDecimalColResults = objects().query { obj in
-            obj.optDecimalCol != Decimal128(123.456)
-        }
-        XCTAssertEqual(optDecimalColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optDecimalCol != %@", values: [Decimal128(123.456)], expectedCount: 0) {
             $0.optDecimalCol != Decimal128(123.456)
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optDecimalCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Decimal128?,
-                       Decimal128(123.456))
         // optObjectIdCol
 
-        let optObjectIdColResults = objects().query { obj in
-            obj.optObjectIdCol != ObjectId("61184062c1d8f096a3695046")
-        }
-        XCTAssertEqual(optObjectIdColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optObjectIdCol != %@", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 0) {
             $0.optObjectIdCol != ObjectId("61184062c1d8f096a3695046")
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optObjectIdCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ObjectId?,
-                       ObjectId("61184062c1d8f096a3695046"))
         // optIntEnumCol
 
-        let optIntEnumColResults = objects().query { obj in
-            obj.optIntEnumCol != .value1
-        }
-        XCTAssertEqual(optIntEnumColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optIntEnumCol != %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 0) {
             $0.optIntEnumCol != .value1
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optIntEnumCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! Int?,
-                       ModernIntEnum.value1.rawValue)
         // optStringEnumCol
 
-        let optStringEnumColResults = objects().query { obj in
-            obj.optStringEnumCol != .value1
-        }
-        XCTAssertEqual(optStringEnumColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optStringEnumCol != %@", values: [ModernStringEnum.value1.rawValue], expectedCount: 0) {
             $0.optStringEnumCol != .value1
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optStringEnumCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! String?,
-                       ModernStringEnum.value1.rawValue)
         // optUuidCol
 
-        let optUuidColResults = objects().query { obj in
-            obj.optUuidCol != UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
-        }
-        XCTAssertEqual(optUuidColResults.count, 0)
-
-        query = {
+        assertQuery(predicate: "optUuidCol != %@", values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 0) {
             $0.optUuidCol != UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optUuidCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! UUID?,
-                       UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)
 
         // Test for `nil`
+        // optBoolCol
 
-        // `nil` optBoolCol
-
-        let optBoolColOptResults = objects().query { obj in
-            obj.optBoolCol != nil
-        }
-        XCTAssertEqual(optBoolColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optBoolCol != %@", values: [NSNull()], expectedCount: 1) {
             $0.optBoolCol != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optBoolCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optIntCol
 
-        // `nil` optIntCol
-
-        let optIntColOptResults = objects().query { obj in
-            obj.optIntCol != nil
-        }
-        XCTAssertEqual(optIntColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optIntCol != %@", values: [NSNull()], expectedCount: 1) {
             $0.optIntCol != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optIntCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optInt8Col
 
-        // `nil` optInt8Col
-
-        let optInt8ColOptResults = objects().query { obj in
-            obj.optInt8Col != nil
-        }
-        XCTAssertEqual(optInt8ColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optInt8Col != %@", values: [NSNull()], expectedCount: 1) {
             $0.optInt8Col != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt8Col != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optInt16Col
 
-        // `nil` optInt16Col
-
-        let optInt16ColOptResults = objects().query { obj in
-            obj.optInt16Col != nil
-        }
-        XCTAssertEqual(optInt16ColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optInt16Col != %@", values: [NSNull()], expectedCount: 1) {
             $0.optInt16Col != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt16Col != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optInt32Col
 
-        // `nil` optInt32Col
-
-        let optInt32ColOptResults = objects().query { obj in
-            obj.optInt32Col != nil
-        }
-        XCTAssertEqual(optInt32ColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optInt32Col != %@", values: [NSNull()], expectedCount: 1) {
             $0.optInt32Col != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt32Col != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optInt64Col
 
-        // `nil` optInt64Col
-
-        let optInt64ColOptResults = objects().query { obj in
-            obj.optInt64Col != nil
-        }
-        XCTAssertEqual(optInt64ColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optInt64Col != %@", values: [NSNull()], expectedCount: 1) {
             $0.optInt64Col != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optInt64Col != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optFloatCol
 
-        // `nil` optFloatCol
-
-        let optFloatColOptResults = objects().query { obj in
-            obj.optFloatCol != nil
-        }
-        XCTAssertEqual(optFloatColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optFloatCol != %@", values: [NSNull()], expectedCount: 1) {
             $0.optFloatCol != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optFloatCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optDoubleCol
 
-        // `nil` optDoubleCol
-
-        let optDoubleColOptResults = objects().query { obj in
-            obj.optDoubleCol != nil
-        }
-        XCTAssertEqual(optDoubleColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optDoubleCol != %@", values: [NSNull()], expectedCount: 1) {
             $0.optDoubleCol != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optDoubleCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optStringCol
 
-        // `nil` optStringCol
-
-        let optStringColOptResults = objects().query { obj in
-            obj.optStringCol != nil
-        }
-        XCTAssertEqual(optStringColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optStringCol != %@", values: [NSNull()], expectedCount: 1) {
             $0.optStringCol != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optStringCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optBinaryCol
 
-        // `nil` optBinaryCol
-
-        let optBinaryColOptResults = objects().query { obj in
-            obj.optBinaryCol != nil
-        }
-        XCTAssertEqual(optBinaryColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optBinaryCol != %@", values: [NSNull()], expectedCount: 1) {
             $0.optBinaryCol != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optBinaryCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optDateCol
 
-        // `nil` optDateCol
-
-        let optDateColOptResults = objects().query { obj in
-            obj.optDateCol != nil
-        }
-        XCTAssertEqual(optDateColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optDateCol != %@", values: [NSNull()], expectedCount: 1) {
             $0.optDateCol != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optDateCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optDecimalCol
 
-        // `nil` optDecimalCol
-
-        let optDecimalColOptResults = objects().query { obj in
-            obj.optDecimalCol != nil
-        }
-        XCTAssertEqual(optDecimalColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optDecimalCol != %@", values: [NSNull()], expectedCount: 1) {
             $0.optDecimalCol != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optDecimalCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optObjectIdCol
 
-        // `nil` optObjectIdCol
-
-        let optObjectIdColOptResults = objects().query { obj in
-            obj.optObjectIdCol != nil
-        }
-        XCTAssertEqual(optObjectIdColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optObjectIdCol != %@", values: [NSNull()], expectedCount: 1) {
             $0.optObjectIdCol != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optObjectIdCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optIntEnumCol
 
-        // `nil` optIntEnumCol
-
-        let optIntEnumColOptResults = objects().query { obj in
-            obj.optIntEnumCol != nil
-        }
-        XCTAssertEqual(optIntEnumColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optIntEnumCol != %@", values: [NSNull()], expectedCount: 1) {
             $0.optIntEnumCol != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optIntEnumCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optStringEnumCol
 
-        // `nil` optStringEnumCol
-
-        let optStringEnumColOptResults = objects().query { obj in
-            obj.optStringEnumCol != nil
-        }
-        XCTAssertEqual(optStringEnumColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optStringEnumCol != %@", values: [NSNull()], expectedCount: 1) {
             $0.optStringEnumCol != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optStringEnumCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        // optUuidCol
 
-        // `nil` optUuidCol
-
-        let optUuidColOptResults = objects().query { obj in
-            obj.optUuidCol != nil
-        }
-        XCTAssertEqual(optUuidColOptResults.count, 1)
-
-        query = {
+        assertQuery(predicate: "optUuidCol != %@", values: [NSNull()], expectedCount: 1) {
             $0.optUuidCol != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "optUuidCol != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
     }
 
+   func testGreaterThan() {
+        // intCol
+        assertQuery(predicate: "intCol > %@", values: [5], expectedCount: 0) {
+            $0.intCol > 5
+        }
+        // int8Col
+        assertQuery(predicate: "int8Col > %@", values: [8], expectedCount: 0) {
+            $0.int8Col > 8
+        }
+        // int16Col
+        assertQuery(predicate: "int16Col > %@", values: [16], expectedCount: 0) {
+            $0.int16Col > 16
+        }
+        // int32Col
+        assertQuery(predicate: "int32Col > %@", values: [32], expectedCount: 0) {
+            $0.int32Col > 32
+        }
+        // int64Col
+        assertQuery(predicate: "int64Col > %@", values: [64], expectedCount: 0) {
+            $0.int64Col > 64
+        }
+        // floatCol
+        assertQuery(predicate: "floatCol > %@", values: [5.55444333], expectedCount: 0) {
+            $0.floatCol > 5.55444333
+        }
+        // doubleCol
+        assertQuery(predicate: "doubleCol > %@", values: [5.55444333], expectedCount: 0) {
+            $0.doubleCol > 5.55444333
+        }
+        // dateCol
+        assertQuery(predicate: "dateCol > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.dateCol > Date(timeIntervalSince1970: 1000000)
+        }
+        // decimalCol
+        assertQuery(predicate: "decimalCol > %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.decimalCol > Decimal128(123.456)
+        }
+        // intEnumCol
+        assertQuery(predicate: "intEnumCol > %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 0) {
+            $0.intEnumCol > .value1
+        }
+    }
 
+    func testGreaterThanOptional() {
+        // optIntCol
+        assertQuery(predicate: "optIntCol > %@", values: [5], expectedCount: 0) {
+            $0.optIntCol > 5
+        }
+        // optInt8Col
+        assertQuery(predicate: "optInt8Col > %@", values: [8], expectedCount: 0) {
+            $0.optInt8Col > 8
+        }
+        // optInt16Col
+        assertQuery(predicate: "optInt16Col > %@", values: [16], expectedCount: 0) {
+            $0.optInt16Col > 16
+        }
+        // optInt32Col
+        assertQuery(predicate: "optInt32Col > %@", values: [32], expectedCount: 0) {
+            $0.optInt32Col > 32
+        }
+        // optInt64Col
+        assertQuery(predicate: "optInt64Col > %@", values: [64], expectedCount: 0) {
+            $0.optInt64Col > 64
+        }
+        // optFloatCol
+        assertQuery(predicate: "optFloatCol > %@", values: [5.55444333], expectedCount: 0) {
+            $0.optFloatCol > 5.55444333
+        }
+        // optDoubleCol
+        assertQuery(predicate: "optDoubleCol > %@", values: [5.55444333], expectedCount: 0) {
+            $0.optDoubleCol > 5.55444333
+        }
+        // optDateCol
+        assertQuery(predicate: "optDateCol > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.optDateCol > Date(timeIntervalSince1970: 1000000)
+        }
+        // optDecimalCol
+        assertQuery(predicate: "optDecimalCol > %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.optDecimalCol > Decimal128(123.456)
+        }
+        // optIntEnumCol
+        assertQuery(predicate: "optIntEnumCol > %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 0) {
+            $0.optIntEnumCol > .value1
+        }
+
+        // Test for `nil`
+        // optIntCol
+        assertQuery(predicate: "optIntCol != %@", values: [NSNull()], expectedCount: 1) {
+            $0.optIntCol > nil
+        }
+        // optInt8Col
+        assertQuery(predicate: "optInt8Col != %@", values: [NSNull()], expectedCount: 1) {
+            $0.optInt8Col > nil
+        }
+        // optInt16Col
+        assertQuery(predicate: "optInt16Col != %@", values: [NSNull()], expectedCount: 1) {
+            $0.optInt16Col > nil
+        }
+        // optInt32Col
+        assertQuery(predicate: "optInt32Col != %@", values: [NSNull()], expectedCount: 1) {
+            $0.optInt32Col > nil
+        }
+        // optInt64Col
+        assertQuery(predicate: "optInt64Col != %@", values: [NSNull()], expectedCount: 1) {
+            $0.optInt64Col > nil
+        }
+        // optFloatCol
+        assertQuery(predicate: "optFloatCol != %@", values: [NSNull()], expectedCount: 1) {
+            $0.optFloatCol > nil
+        }
+        // optDoubleCol
+        assertQuery(predicate: "optDoubleCol != %@", values: [NSNull()], expectedCount: 1) {
+            $0.optDoubleCol > nil
+        }
+        // optDateCol
+        assertQuery(predicate: "optDateCol != %@", values: [NSNull()], expectedCount: 1) {
+            $0.optDateCol > nil
+        }
+        // optDecimalCol
+        assertQuery(predicate: "optDecimalCol != %@", values: [NSNull()], expectedCount: 1) {
+            $0.optDecimalCol > nil
+        }
+        // optIntEnumCol
+        assertQuery(predicate: "optIntEnumCol != %@", values: [NSNull()], expectedCount: 1) {
+            $0.optIntEnumCol > nil
+        }
+    }
 }

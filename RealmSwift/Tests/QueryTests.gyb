@@ -29,41 +29,41 @@ import XCTest
 }%
 %{
     properties = [
-        ('boolCol', 'true', 'Bool'),
-        ('intCol', 5, 'Int'),
-        ('int8Col', 8, 'Int8'),
-        ('int16Col', 16, 'Int16'),
-        ('int32Col', 32, 'Int32'),
-        ('int64Col', 64, 'Int64'),
-        ('floatCol', 5.55444333, 'Float'),
-        ('doubleCol', 5.55444333, 'Double'),
-        ('stringCol', '"Foo"', 'String'),
-        ('binaryCol', 'Data(count: 64)', 'Data'),
-        ('dateCol', 'Date(timeIntervalSince1970: 1000000)', 'Date'),
-        ('decimalCol', 'Decimal128(123.456)', 'Decimal128'),
-        ('objectIdCol', 'ObjectId("61184062c1d8f096a3695046")', 'ObjectId'),
-        ('intEnumCol', '.value1', 'Int', 'ModernIntEnum.value1.rawValue'),
-        ('stringEnumCol', '.value1', 'String', 'ModernStringEnum.value1.rawValue'),
-        ('uuidCol', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID')
+        ('boolCol', 'true', 'Bool', 'bool'),
+        ('intCol', 5, 'Int', 'numeric'),
+        ('int8Col', 8, 'Int8', 'numeric'),
+        ('int16Col', 16, 'Int16', 'numeric'),
+        ('int32Col', 32, 'Int32', 'numeric'),
+        ('int64Col', 64, 'Int64', 'numeric'),
+        ('floatCol', 5.55444333, 'Float', 'numeric'),
+        ('doubleCol', 5.55444333, 'Double', 'numeric'),
+        ('stringCol', '"Foo"', 'String', 'string'),
+        ('binaryCol', 'Data(count: 64)', 'Data', 'binary'),
+        ('dateCol', 'Date(timeIntervalSince1970: 1000000)', 'Date', 'numeric'),
+        ('decimalCol', 'Decimal128(123.456)', 'Decimal128', 'numeric'),
+        ('objectIdCol', 'ObjectId("61184062c1d8f096a3695046")', 'ObjectId', 'objectId'),
+        ('intEnumCol', '.value1', 'Int', 'numeric', 'ModernIntEnum.value1.rawValue'),
+        ('stringEnumCol', '.value1', 'String', 'string', 'ModernStringEnum.value1.rawValue'),
+        ('uuidCol', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID', 'uuid')
     ]
 
     optProperties = [
-        ('optBoolCol', 'true', 'Bool?'),
-        ('optIntCol', 5, 'Int?'),
-        ('optInt8Col', 8, 'Int8?'),
-        ('optInt16Col', 16, 'Int16?'),
-        ('optInt32Col', 32, 'Int32?'),
-        ('optInt64Col', 64, 'Int64?'),
-        ('optFloatCol', 5.55444333, 'Float?'),
-        ('optDoubleCol', 5.55444333,'Double?'),
-        ('optStringCol', '"Foo"', 'String?'),
-        ('optBinaryCol', 'Data(count: 64)', 'Data?'),
-        ('optDateCol', 'Date(timeIntervalSince1970: 1000000)', 'Date?'),
-        ('optDecimalCol', 'Decimal128(123.456)', 'Decimal128?'),
-        ('optObjectIdCol', 'ObjectId("61184062c1d8f096a3695046")', 'ObjectId?'),
-        ('optIntEnumCol', '.value1', 'Int?', 'ModernIntEnum.value1.rawValue'),
-        ('optStringEnumCol', '.value1', 'String?', 'ModernStringEnum.value1.rawValue'),
-        ('optUuidCol', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID?')
+        ('optBoolCol', 'true', 'Bool?', 'bool'),
+        ('optIntCol', 5, 'Int?', 'numeric'),
+        ('optInt8Col', 8, 'Int8?', 'numeric'),
+        ('optInt16Col', 16, 'Int16?', 'numeric'),
+        ('optInt32Col', 32, 'Int32?', 'numeric'),
+        ('optInt64Col', 64, 'Int64?', 'numeric'),
+        ('optFloatCol', 5.55444333, 'Float?', 'numeric'),
+        ('optDoubleCol', 5.55444333,'Double?', 'numeric'),
+        ('optStringCol', '"Foo"', 'String?', 'string'),
+        ('optBinaryCol', 'Data(count: 64)', 'Data?', 'binary'),
+        ('optDateCol', 'Date(timeIntervalSince1970: 1000000)', 'Date?', 'numeric'),
+        ('optDecimalCol', 'Decimal128(123.456)', 'Decimal128?', 'numeric'),
+        ('optObjectIdCol', 'ObjectId("61184062c1d8f096a3695046")', 'ObjectId?', 'objectId'),
+        ('optIntEnumCol', '.value1', 'Int?', 'numeric', 'ModernIntEnum.value1.rawValue'),
+        ('optStringEnumCol', '.value1', 'String?', 'string', 'ModernStringEnum.value1.rawValue'),
+        ('optUuidCol', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID?', 'uuid')
     ]
 
     primitiveLists = [
@@ -113,153 +113,165 @@ class QueryTests_: TestCase {
         }
     }
 
-    func testEquals() {
-        var query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)
+    private func assertQuery<T: Equatable>(predicate: String,
+                                           values: [T],
+                                           expectedCount: Int,
+                                           _ query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)) {
+        let results = objects().query(query)
+        XCTAssertEqual(results.count, expectedCount)
 
+        let constructedPredicate = query(Query<ModernAllTypesObject>()).constructPredicate()
+        XCTAssertEqual(constructedPredicate.0,
+                       predicate)
+
+        for (e1, e2) in zip(constructedPredicate.1, values) {
+            XCTAssertEqual(e1 as! T, e2)
+        }
+    }
+
+    func testEquals() {
         % for property in properties:
         // ${property[0]}
 
-        let ${property[0]}Results = objects().query { obj in
-            obj.${property[0]} == ${property[1]}
-        }
-        XCTAssertEqual(${property[0]}Results.count, 1)
-
-        query = {
+        % # Count of 4 assumes enum, we can clean this logic up.
+        % if len(property) == 5:
+        assertQuery(predicate: "${property[0]} == %@", values: [${property[4]}], expectedCount: 1) {
             $0.${property[0]} == ${property[1]}
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "${property[0]} == %@")
-
-        % if len(property) == 4:
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
-                       ${property[3]})
         % else:
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
-                       ${property[1]})
+        assertQuery(predicate: "${property[0]} == %@", values: [${property[1]}], expectedCount: 1) {
+            $0.${property[0]} == ${property[1]}
+        }
         % end
         % end
     }
 
     func testEqualsOptional() {
-        var query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)
-
-        // Optional
-
         % for property in optProperties:
         // ${property[0]}
 
-        let ${property[0]}Results = objects().query { obj in
-            obj.${property[0]} == ${property[1]}
-        }
-        XCTAssertEqual(${property[0]}Results.count, 1)
-
-        query = {
+        % if len(property) == 5:
+        assertQuery(predicate: "${property[0]} == %@", values: [${property[4]}], expectedCount: 1) {
             $0.${property[0]} == ${property[1]}
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "${property[0]} == %@")
-        % if len(property) == 4:
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
-                       ${property[3]})
         % else:
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
-                       ${property[1]})
+        assertQuery(predicate: "${property[0]} == %@", values: [${property[1]}], expectedCount: 1) {
+            $0.${property[0]} == ${property[1]}
+        }
         % end
         % end
 
         // Test for `nil`
         % for property in optProperties:
+        // ${property[0]}
 
-        // `nil` ${property[0]}
-
-        let ${property[0]}OptResults = objects().query { obj in
-            obj.${property[0]} == nil
-        }
-        XCTAssertEqual(${property[0]}OptResults.count, 0)
-
-        query = {
+        % if len(property) == 4:
+        assertQuery(predicate: "${property[0]} == %@", values: [NSNull()], expectedCount: 0) {
             $0.${property[0]} == nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "${property[0]} == %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        % else:
+        assertQuery(predicate: "${property[0]} == %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property[0]} == nil
+        }
+        % end
         % end
     }
 
     func testNotEquals() {
-        var query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)
-
         % for property in properties:
         // ${property[0]}
 
-        let ${property[0]}Results = objects().query { obj in
-            obj.${property[0]} != ${property[1]}
-        }
-        XCTAssertEqual(${property[0]}Results.count, 1)
-
-        query = {
+        % # Count of 4 assumes enum, we can clean this logic up.
+        % if len(property) == 5:
+        assertQuery(predicate: "${property[0]} != %@", values: [${property[4]}], expectedCount: 0) {
             $0.${property[0]} != ${property[1]}
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "${property[0]} != %@")
-
-        % if len(property) == 4:
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
-                       ${property[3]})
         % else:
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
-                       ${property[1]})
+        assertQuery(predicate: "${property[0]} != %@", values: [${property[1]}], expectedCount: 0) {
+            $0.${property[0]} != ${property[1]}
+        }
         % end
         % end
     }
 
     func testNotEqualsOptional() {
-        var query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)
-
-        // Optional
-
         % for property in optProperties:
         // ${property[0]}
 
-        let ${property[0]}Results = objects().query { obj in
-            obj.${property[0]} != ${property[1]}
-        }
-        XCTAssertEqual(${property[0]}Results.count, 0)
-
-        query = {
+        % # Count of 4 assumes enum, we can clean this logic up.
+        % if len(property) == 5:
+        assertQuery(predicate: "${property[0]} != %@", values: [${property[4]}], expectedCount: 0) {
             $0.${property[0]} != ${property[1]}
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "${property[0]} != %@")
-        % if len(property) == 4:
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
-                       ${property[3]})
         % else:
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
-                       ${property[1]})
+        assertQuery(predicate: "${property[0]} != %@", values: [${property[1]}], expectedCount: 0) {
+            $0.${property[0]} != ${property[1]}
+        }
         % end
         % end
 
         // Test for `nil`
         % for property in optProperties:
+        // ${property[0]}
 
-        // `nil` ${property[0]}
-
-        let ${property[0]}OptResults = objects().query { obj in
-            obj.${property[0]} != nil
-        }
-        XCTAssertEqual(${property[0]}OptResults.count, 1)
-
-        query = {
+        % if len(property) == 5:
+        assertQuery(predicate: "${property[0]} != %@", values: [NSNull()], expectedCount: 1) {
             $0.${property[0]} != nil
         }
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
-                       "${property[0]} != %@")
-        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
-                       NSNull())
+        % else:
+        assertQuery(predicate: "${property[0]} != %@", values: [NSNull()], expectedCount: 1) {
+            $0.${property[0]} != nil
+        }
+        % end
         % end
     }
 
+   func testGreaterThan() {
+        % for property in properties:
+        % # Count of 4 assumes enum, we can clean this logic up.
+        % if len(property) == 5 and property[3] == 'numeric':
+        // ${property[0]}
+        assertQuery(predicate: "${property[0]} > %@", values: [${property[4]}], expectedCount: 0) {
+            $0.${property[0]} > ${property[1]}
+        }
+        % elif property[3] == 'numeric':
+        // ${property[0]}
+        assertQuery(predicate: "${property[0]} > %@", values: [${property[1]}], expectedCount: 0) {
+            $0.${property[0]} > ${property[1]}
+        }
+        % end
+        % end
+    }
 
+    func testGreaterThanOptional() {
+        % for property in optProperties:
+        % # Count of 4 assumes enum, we can clean this logic up.
+        % if len(property) == 5 and property[3] == 'numeric':
+        // ${property[0]}
+        assertQuery(predicate: "${property[0]} > %@", values: [${property[4]}], expectedCount: 0) {
+            $0.${property[0]} > ${property[1]}
+        }
+        % elif property[3] == 'numeric':
+        // ${property[0]}
+        assertQuery(predicate: "${property[0]} > %@", values: [${property[1]}], expectedCount: 0) {
+            $0.${property[0]} > ${property[1]}
+        }
+        % end
+        % end
+
+        // Test for `nil`
+        % for property in optProperties:
+        % if len(property) == 5 and property[3] == 'numeric':
+        // ${property[0]}
+        assertQuery(predicate: "${property[0]} != %@", values: [NSNull()], expectedCount: 1) {
+            $0.${property[0]} > nil
+        }
+        % elif property[3] == 'numeric':
+        // ${property[0]}
+        assertQuery(predicate: "${property[0]} != %@", values: [NSNull()], expectedCount: 1) {
+            $0.${property[0]} > nil
+        }
+        % end
+        % end
+    }
 }

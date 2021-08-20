@@ -110,7 +110,7 @@ public struct Query<T: _Persistable> {
 
     // MARK: Numerics
 
-    public static func > <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable, V: Numeric {
+    public static func > <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryNumeric {
         var tokensCopy = lhs.tokens
         tokensCopy.append(.basicComparison(.greaterThan))
         tokensCopy.append(.rhs(rhs))
@@ -368,6 +368,26 @@ extension Query where T: PersistableEnum, T.RawValue: _Persistable {
         tokensCopy.append(.rhs(rhs.rawValue))
         return Query<V>(expression: tokensCopy)
     }
+
+    public static func > <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> where T.RawValue: _QueryNumeric {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.greaterThan))
+        tokensCopy.append(.rhs(rhs.rawValue))
+        return Query<V>(expression: tokensCopy)
+    }
+}
+
+extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped.RawValue: _QueryNumeric {
+    public static func > <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.greaterThan))
+        if case Optional<Any>.none = rhs as Any {
+            tokensCopy.append(.rhs(nil))
+        } else {
+            tokensCopy.append(.rhs(rhs._rlmInferWrappedType().rawValue))
+        }
+        return Query<V>(expression: tokensCopy)
+    }
 }
 
 // MARK: Data
@@ -383,6 +403,17 @@ extension Query where T == Data {
     public static func != <V>(_ lhs: Query<Data>, _ rhs: Data) -> Query<V> {
         var tokensCopy = lhs.tokens
         tokensCopy.append(.basicComparison(.notEqual))
+        tokensCopy.append(.rhs(rhs))
+        return Query<V>(expression: tokensCopy)
+    }
+}
+
+// MARK: Date
+
+extension Query where T == Date {
+    public static func > <V>(_ lhs: Query<Date>, _ rhs: Date) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.greaterThan))
         tokensCopy.append(.rhs(rhs))
         return Query<V>(expression: tokensCopy)
     }
@@ -509,3 +540,15 @@ extension Results where Element: Object {
         return filter(predicate)
     }
 }
+
+public protocol _QueryNumeric: _RealmSchemaDiscoverable { }
+extension Int: _QueryNumeric { }
+extension Int8: _QueryNumeric { }
+extension Int16: _QueryNumeric { }
+extension Int32: _QueryNumeric { }
+extension Int64: _QueryNumeric { }
+extension Float: _QueryNumeric { }
+extension Double: _QueryNumeric { }
+extension Decimal128: _QueryNumeric { }
+extension Date: _QueryNumeric { }
+extension Optional: _QueryNumeric where Wrapped: _QueryNumeric { }
