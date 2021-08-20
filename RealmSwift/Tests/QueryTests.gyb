@@ -1,0 +1,265 @@
+////////////////////////////////////////////////////////////////////////////
+//
+// Copyright 2021 Realm Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
+import XCTest
+@testable import RealmSwift
+
+%{
+# How to use:
+#
+# $ wget https://github.com/apple/swift/raw/main/utils/gyb
+# $ wget https://github.com/apple/swift/raw/main/utils/gyb.py
+# $ chmod +x gyb
+#
+# ./YOUR_GYB_LOCATION/gyb --line-directive '' -o QueryTests2.swift QueryTests.gyb
+}%
+%{
+    properties = [
+        ('boolCol', 'true', 'Bool'),
+        ('intCol', 5, 'Int'),
+        ('int8Col', 8, 'Int8'),
+        ('int16Col', 16, 'Int16'),
+        ('int32Col', 32, 'Int32'),
+        ('int64Col', 64, 'Int64'),
+        ('floatCol', 5.55444333, 'Float'),
+        ('doubleCol', 5.55444333, 'Double'),
+        ('stringCol', '"Foo"', 'String'),
+        ('binaryCol', 'Data(count: 64)', 'Data'),
+        ('dateCol', 'Date(timeIntervalSince1970: 1000000)', 'Date'),
+        ('decimalCol', 'Decimal128(123.456)', 'Decimal128'),
+        ('objectIdCol', 'ObjectId("61184062c1d8f096a3695046")', 'ObjectId'),
+        ('intEnumCol', '.value1', 'Int', 'ModernIntEnum.value1.rawValue'),
+        ('stringEnumCol', '.value1', 'String', 'ModernStringEnum.value1.rawValue'),
+        ('uuidCol', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID')
+    ]
+
+    optProperties = [
+        ('optBoolCol', 'true', 'Bool?'),
+        ('optIntCol', 5, 'Int?'),
+        ('optInt8Col', 8, 'Int8?'),
+        ('optInt16Col', 16, 'Int16?'),
+        ('optInt32Col', 32, 'Int32?'),
+        ('optInt64Col', 64, 'Int64?'),
+        ('optFloatCol', 5.55444333, 'Float?'),
+        ('optDoubleCol', 5.55444333,'Double?'),
+        ('optStringCol', '"Foo"', 'String?'),
+        ('optBinaryCol', 'Data(count: 64)', 'Data?'),
+        ('optDateCol', 'Date(timeIntervalSince1970: 1000000)', 'Date?'),
+        ('optDecimalCol', 'Decimal128(123.456)', 'Decimal128?'),
+        ('optObjectIdCol', 'ObjectId("61184062c1d8f096a3695046")', 'ObjectId?'),
+        ('optIntEnumCol', '.value1', 'Int?', 'ModernIntEnum.value1.rawValue'),
+        ('optStringEnumCol', '.value1', 'String?', 'ModernStringEnum.value1.rawValue'),
+        ('optUuidCol', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID?')
+    ]
+
+    primitiveLists = [
+        ('arrayBool', '[true, true, false]'),
+        ('arrayInt', '[1, 2, 3]'),
+        ('arrayInt8', '[1, 2, 3]'),
+        ('arrayInt16', '[1, 2, 3]'),
+        ('arrayInt32', '[1, 2, 3]'),
+        ('arrayInt64', '[1, 2, 3]'),
+        ('arrayFloat', '[123.456, 234.456, 345.567]'),
+        ('arrayDouble', '[123.456, 234.456, 345.567]'),
+        ('arrayString', '["Foo", "Bar", "Baz"]'),
+        ('arrayBinary', '[Data(count: 64), Data(count: 128), Data(count: 256)]'),
+        ('arrayDate', '[Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 1000000)]'),
+        ('arrayDecimal', '[Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)]'),
+        ('arrayObjectId', '[ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045"), ObjectId("61184062c1d8f096a3695044")]'),
+        ('arrayAny', '[.objectId(ObjectId("61184062c1d8f096a3695046")), .string("Hello"), .int(123)]'),
+
+    ]
+
+    mixed = [
+        ('anyCol', '.string("FooBar")'),
+    ]
+}%
+/// This file is generated from a template. Do not edit directly.
+class QueryTests_: TestCase {
+
+    private func objects() -> Results<ModernAllTypesObject> {
+        realmWithTestPath().objects(ModernAllTypesObject.self)
+    }
+
+    override func setUp() {
+        let realm = realmWithTestPath()
+        try! realm.write {
+            let object = ModernAllTypesObject()
+
+            % for property in properties + optProperties:
+            object.${property[0]} = ${property[1]}
+            % end
+
+
+            % for list in primitiveLists:
+            object.${list[0]}.append(objectsIn: ${list[1]})
+            % end
+
+            realm.add(object)
+        }
+    }
+
+    func testEquals() {
+        var query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)
+
+        % for property in properties:
+        // ${property[0]}
+
+        let ${property[0]}Results = objects().query { obj in
+            obj.${property[0]} == ${property[1]}
+        }
+        XCTAssertEqual(${property[0]}Results.count, 1)
+
+        query = {
+            $0.${property[0]} == ${property[1]}
+        }
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
+                       "${property[0]} == %@")
+
+        % if len(property) == 4:
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
+                       ${property[3]})
+        % else:
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
+                       ${property[1]})
+        % end
+        % end
+    }
+
+    func testEqualsOptional() {
+        var query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)
+
+        // Optional
+
+        % for property in optProperties:
+        // ${property[0]}
+
+        let ${property[0]}Results = objects().query { obj in
+            obj.${property[0]} == ${property[1]}
+        }
+        XCTAssertEqual(${property[0]}Results.count, 1)
+
+        query = {
+            $0.${property[0]} == ${property[1]}
+        }
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
+                       "${property[0]} == %@")
+        % if len(property) == 4:
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
+                       ${property[3]})
+        % else:
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
+                       ${property[1]})
+        % end
+        % end
+
+        // Test for `nil`
+        % for property in optProperties:
+
+        // `nil` ${property[0]}
+
+        let ${property[0]}OptResults = objects().query { obj in
+            obj.${property[0]} == nil
+        }
+        XCTAssertEqual(${property[0]}OptResults.count, 0)
+
+        query = {
+            $0.${property[0]} == nil
+        }
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
+                       "${property[0]} == %@")
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
+                       NSNull())
+        % end
+    }
+
+    func testNotEquals() {
+        var query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)
+
+        % for property in properties:
+        // ${property[0]}
+
+        let ${property[0]}Results = objects().query { obj in
+            obj.${property[0]} != ${property[1]}
+        }
+        XCTAssertEqual(${property[0]}Results.count, 1)
+
+        query = {
+            $0.${property[0]} != ${property[1]}
+        }
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
+                       "${property[0]} != %@")
+
+        % if len(property) == 4:
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
+                       ${property[3]})
+        % else:
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
+                       ${property[1]})
+        % end
+        % end
+    }
+
+    func testNotEqualsOptional() {
+        var query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)
+
+        // Optional
+
+        % for property in optProperties:
+        // ${property[0]}
+
+        let ${property[0]}Results = objects().query { obj in
+            obj.${property[0]} != ${property[1]}
+        }
+        XCTAssertEqual(${property[0]}Results.count, 0)
+
+        query = {
+            $0.${property[0]} != ${property[1]}
+        }
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
+                       "${property[0]} != %@")
+        % if len(property) == 4:
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
+                       ${property[3]})
+        % else:
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! ${property[2]},
+                       ${property[1]})
+        % end
+        % end
+
+        // Test for `nil`
+        % for property in optProperties:
+
+        // `nil` ${property[0]}
+
+        let ${property[0]}OptResults = objects().query { obj in
+            obj.${property[0]} != nil
+        }
+        XCTAssertEqual(${property[0]}OptResults.count, 1)
+
+        query = {
+            $0.${property[0]} != nil
+        }
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().0,
+                       "${property[0]} != %@")
+        XCTAssertEqual(query(Query<ModernAllTypesObject>()).constructPredicate().1[0] as! NSNull,
+                       NSNull())
+        % end
+    }
+
+
+}

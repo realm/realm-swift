@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 import XCTest
-import RealmSwift
+@testable import RealmSwift
 
 class QueryTests: TestCase {
 

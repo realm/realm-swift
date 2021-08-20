@@ -101,6 +101,13 @@ public struct Query<T: _Persistable> {
         return Query(expression: tokensCopy)
     }
 
+    public static func != <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: OptionalProtocol, V.Wrapped: _Persistable {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.notEqual))
+        tokensCopy.append(.rhs(rhs))
+        return Query(expression: tokensCopy)
+    }
+
     // MARK: Numerics
 
     public static func > <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable, V: Numeric {
@@ -173,7 +180,7 @@ public struct Query<T: _Persistable> {
     }
 
     internal func constructPredicate(_ isSubquery: Bool = false) -> (String, [Any]) {
-        var predicateString = [""]
+        var predicateString: [String] = []
         var arguments: [Any] = []
 
         for (idx, token) in tokens.enumerated() {
@@ -279,6 +286,8 @@ public struct Query<T: _Persistable> {
     }
 }
 
+// MARK: OptionalProtocol
+
 extension Query where T: OptionalProtocol {
     public subscript<V>(dynamicMember member: KeyPath<T.Wrapped, V>) -> Query<Optional<T.Wrapped>> {
         fatalError() // Can we reach this?
@@ -293,6 +302,8 @@ extension Query where T: OptionalProtocol {
     }
 }
 
+// MARK: RealmCollection
+
 extension Query where T: RealmCollection {
     public subscript<V>(dynamicMember member: KeyPath<T.Element, V>) -> Query<V> where T.Element: ObjectBase {
         let name = _name(for: member)
@@ -302,6 +313,8 @@ extension Query where T: RealmCollection {
     }
 }
 
+// MARK: RealmKeyedCollection
+
 extension Query where T: RealmKeyedCollection {
     public subscript<V>(dynamicMember member: KeyPath<T.Value, V>) -> Query<V> where T.Value: ObjectBase {
         let name = _name(for: member)
@@ -310,6 +323,8 @@ extension Query where T: RealmKeyedCollection {
         return Query<V>(expression: tokensCopy)
     }
 }
+
+// MARK: String
 
 extension Query where T == String {
     public func like<V>(_ value: String, caseInsensitive: Bool = false) -> Query<V> {
@@ -337,7 +352,78 @@ extension Query where T == String {
     }
 }
 
+// MARK: PersistableEnum
+
+extension Query where T: PersistableEnum, T.RawValue: _Persistable {
+    public static func == <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.equal))
+        tokensCopy.append(.rhs(rhs.rawValue))
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public static func != <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.notEqual))
+        tokensCopy.append(.rhs(rhs.rawValue))
+        return Query<V>(expression: tokensCopy)
+    }
+}
+
+// MARK: Data
+
+extension Query where T == Data {
+    public static func == <V>(_ lhs: Query<Data>, _ rhs: Data) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.equal))
+        tokensCopy.append(.rhs(rhs))
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public static func != <V>(_ lhs: Query<Data>, _ rhs: Data) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.notEqual))
+        tokensCopy.append(.rhs(rhs))
+        return Query<V>(expression: tokensCopy)
+    }
+}
+
+// MARK: UUID
+
+extension Query where T == UUID {
+    public static func == <V>(_ lhs: Query<UUID>, _ rhs: UUID) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.equal))
+        tokensCopy.append(.rhs(rhs))
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public static func != <V>(_ lhs: Query<UUID>, _ rhs: UUID) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.notEqual))
+        tokensCopy.append(.rhs(rhs))
+        return Query<V>(expression: tokensCopy)
+    }
+}
+
+// MARK: Bool
+
 extension Query where T == Bool {
+
+    public static func == <V>(_ lhs: Query<Bool>, _ rhs: Bool) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.equal))
+        tokensCopy.append(.rhs(rhs))
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public static func != <V>(_ lhs: Query<Bool>, _ rhs: Bool) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.notEqual))
+        tokensCopy.append(.rhs(rhs))
+        return Query<V>(expression: tokensCopy)
+    }
+
     public func subqueryCount() -> Query<Int> {
         let collections = Set(tokens.filter {
             if case let .keyPath(_, isCollection) = $0 {
