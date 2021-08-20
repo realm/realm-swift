@@ -80,28 +80,14 @@ public struct Query<T: _Persistable> {
 
     // MARK: Comparable
 
-    public static func == <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable, V: Comparable {
+    public static func == <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryComparable {
         var tokensCopy = lhs.tokens
         tokensCopy.append(.basicComparison(.equal))
         tokensCopy.append(.rhs(rhs))
         return Query(expression: tokensCopy)
     }
 
-    public static func == <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: OptionalProtocol, V.Wrapped: _Persistable {
-        var tokensCopy = lhs.tokens
-        tokensCopy.append(.basicComparison(.equal))
-        tokensCopy.append(.rhs(rhs))
-        return Query(expression: tokensCopy)
-    }
-
-    public static func != <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable, V: Comparable {
-        var tokensCopy = lhs.tokens
-        tokensCopy.append(.basicComparison(.notEqual))
-        tokensCopy.append(.rhs(rhs))
-        return Query(expression: tokensCopy)
-    }
-
-    public static func != <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: OptionalProtocol, V.Wrapped: _Persistable {
+    public static func != <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryComparable {
         var tokensCopy = lhs.tokens
         tokensCopy.append(.basicComparison(.notEqual))
         tokensCopy.append(.rhs(rhs))
@@ -398,7 +384,32 @@ extension Query where T: PersistableEnum, T.RawValue: _Persistable {
     }
 }
 
+extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped.RawValue: _QueryComparable {
+    public static func == <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.equal))
+        if case Optional<Any>.none = rhs as Any {
+            tokensCopy.append(.rhs(nil))
+        } else {
+            tokensCopy.append(.rhs(rhs._rlmInferWrappedType().rawValue))
+        }
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public static func != <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.notEqual))
+        if case Optional<Any>.none = rhs as Any {
+            tokensCopy.append(.rhs(nil))
+        } else {
+            tokensCopy.append(.rhs(rhs._rlmInferWrappedType().rawValue))
+        }
+        return Query<V>(expression: tokensCopy)
+    }
+}
+
 extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped.RawValue: _QueryNumeric {
+
     public static func > <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
         var tokensCopy = lhs.tokens
         tokensCopy.append(.basicComparison(.greaterThan))
@@ -444,71 +455,10 @@ extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped
     }
 }
 
-// MARK: Data
-
-extension Query where T == Data {
-    public static func == <V>(_ lhs: Query<Data>, _ rhs: Data) -> Query<V> {
-        var tokensCopy = lhs.tokens
-        tokensCopy.append(.basicComparison(.equal))
-        tokensCopy.append(.rhs(rhs))
-        return Query<V>(expression: tokensCopy)
-    }
-
-    public static func != <V>(_ lhs: Query<Data>, _ rhs: Data) -> Query<V> {
-        var tokensCopy = lhs.tokens
-        tokensCopy.append(.basicComparison(.notEqual))
-        tokensCopy.append(.rhs(rhs))
-        return Query<V>(expression: tokensCopy)
-    }
-}
-
-// MARK: Date
-
-extension Query where T == Date {
-    public static func > <V>(_ lhs: Query<Date>, _ rhs: Date) -> Query<V> {
-        var tokensCopy = lhs.tokens
-        tokensCopy.append(.basicComparison(.greaterThan))
-        tokensCopy.append(.rhs(rhs))
-        return Query<V>(expression: tokensCopy)
-    }
-}
-
-// MARK: UUID
-
-extension Query where T == UUID {
-    public static func == <V>(_ lhs: Query<UUID>, _ rhs: UUID) -> Query<V> {
-        var tokensCopy = lhs.tokens
-        tokensCopy.append(.basicComparison(.equal))
-        tokensCopy.append(.rhs(rhs))
-        return Query<V>(expression: tokensCopy)
-    }
-
-    public static func != <V>(_ lhs: Query<UUID>, _ rhs: UUID) -> Query<V> {
-        var tokensCopy = lhs.tokens
-        tokensCopy.append(.basicComparison(.notEqual))
-        tokensCopy.append(.rhs(rhs))
-        return Query<V>(expression: tokensCopy)
-    }
-}
-
 // MARK: Bool
 
 extension Query where T == Bool {
-
-    public static func == <V>(_ lhs: Query<Bool>, _ rhs: Bool) -> Query<V> {
-        var tokensCopy = lhs.tokens
-        tokensCopy.append(.basicComparison(.equal))
-        tokensCopy.append(.rhs(rhs))
-        return Query<V>(expression: tokensCopy)
-    }
-
-    public static func != <V>(_ lhs: Query<Bool>, _ rhs: Bool) -> Query<V> {
-        var tokensCopy = lhs.tokens
-        tokensCopy.append(.basicComparison(.notEqual))
-        tokensCopy.append(.rhs(rhs))
-        return Query<V>(expression: tokensCopy)
-    }
-
+    /// TODO: Rename this to `count`.
     public func subqueryCount() -> Query<Int> {
         let collections = Set(tokens.filter {
             if case let .keyPath(_, isCollection) = $0 {
@@ -606,3 +556,20 @@ extension Double: _QueryNumeric { }
 extension Decimal128: _QueryNumeric { }
 extension Date: _QueryNumeric { }
 extension Optional: _QueryNumeric where Wrapped: _QueryNumeric { }
+
+public protocol _QueryComparable: _RealmSchemaDiscoverable { }
+extension Bool: _QueryComparable { }
+extension Int: _QueryComparable { }
+extension Int8: _QueryComparable { }
+extension Int16: _QueryComparable { }
+extension Int32: _QueryComparable { }
+extension Int64: _QueryComparable { }
+extension Float: _QueryComparable { }
+extension Double: _QueryComparable { }
+extension Decimal128: _QueryComparable { }
+extension Date: _QueryComparable { }
+extension Data: _QueryComparable { }
+extension UUID: _QueryComparable { }
+extension ObjectId: _QueryComparable { }
+extension String: _QueryComparable { }
+extension Optional: _QueryComparable where Wrapped: _QueryComparable { }
