@@ -117,21 +117,21 @@ public struct Query<T: _Persistable> {
         return Query(expression: tokensCopy)
     }
 
-    public static func >= <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable, V: Numeric {
+    public static func >= <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryNumeric {
         var tokensCopy = lhs.tokens
         tokensCopy.append(.basicComparison(.greaterThenOrEqual))
         tokensCopy.append(.rhs(rhs))
         return Query(expression: tokensCopy)
     }
 
-    public static func < <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable, V: Numeric {
+    public static func < <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryNumeric {
         var tokensCopy = lhs.tokens
         tokensCopy.append(.basicComparison(.lessThan))
         tokensCopy.append(.rhs(rhs))
         return Query(expression: tokensCopy)
     }
 
-    public static func <= <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable, V: Numeric {
+    public static func <= <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryNumeric {
         var tokensCopy = lhs.tokens
         tokensCopy.append(.basicComparison(.lessThanOrEqual))
         tokensCopy.append(.rhs(rhs))
@@ -375,12 +375,66 @@ extension Query where T: PersistableEnum, T.RawValue: _Persistable {
         tokensCopy.append(.rhs(rhs.rawValue))
         return Query<V>(expression: tokensCopy)
     }
+
+    public static func >= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> where T.RawValue: _QueryNumeric {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.greaterThenOrEqual))
+        tokensCopy.append(.rhs(rhs.rawValue))
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public static func < <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> where T.RawValue: _QueryNumeric {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.lessThan))
+        tokensCopy.append(.rhs(rhs.rawValue))
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public static func <= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> where T.RawValue: _QueryNumeric {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.lessThanOrEqual))
+        tokensCopy.append(.rhs(rhs.rawValue))
+        return Query<V>(expression: tokensCopy)
+    }
 }
 
 extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped.RawValue: _QueryNumeric {
     public static func > <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
         var tokensCopy = lhs.tokens
         tokensCopy.append(.basicComparison(.greaterThan))
+        if case Optional<Any>.none = rhs as Any {
+            tokensCopy.append(.rhs(nil))
+        } else {
+            tokensCopy.append(.rhs(rhs._rlmInferWrappedType().rawValue))
+        }
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public static func >= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.greaterThenOrEqual))
+        if case Optional<Any>.none = rhs as Any {
+            tokensCopy.append(.rhs(nil))
+        } else {
+            tokensCopy.append(.rhs(rhs._rlmInferWrappedType().rawValue))
+        }
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public static func < <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.lessThan))
+        if case Optional<Any>.none = rhs as Any {
+            tokensCopy.append(.rhs(nil))
+        } else {
+            tokensCopy.append(.rhs(rhs._rlmInferWrappedType().rawValue))
+        }
+        return Query<V>(expression: tokensCopy)
+    }
+
+    public static func <= <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
+        var tokensCopy = lhs.tokens
+        tokensCopy.append(.basicComparison(.lessThanOrEqual))
         if case Optional<Any>.none = rhs as Any {
             tokensCopy.append(.rhs(nil))
         } else {

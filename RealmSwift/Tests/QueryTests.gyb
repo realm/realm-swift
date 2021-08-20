@@ -35,7 +35,7 @@ import XCTest
         ('int16Col', 16, 'Int16', 'numeric'),
         ('int32Col', 32, 'Int32', 'numeric'),
         ('int64Col', 64, 'Int64', 'numeric'),
-        ('floatCol', 5.55444333, 'Float', 'numeric'),
+        ('floatCol', 'Float(5.55444333)', 'Float', 'numeric'),
         ('doubleCol', 5.55444333, 'Double', 'numeric'),
         ('stringCol', '"Foo"', 'String', 'string'),
         ('binaryCol', 'Data(count: 64)', 'Data', 'binary'),
@@ -54,7 +54,7 @@ import XCTest
         ('optInt16Col', 16, 'Int16?', 'numeric'),
         ('optInt32Col', 32, 'Int32?', 'numeric'),
         ('optInt64Col', 64, 'Int64?', 'numeric'),
-        ('optFloatCol', 5.55444333, 'Float?', 'numeric'),
+        ('optFloatCol', 'Float(5.55444333)', 'Float?', 'numeric'),
         ('optDoubleCol', 5.55444333,'Double?', 'numeric'),
         ('optStringCol', '"Foo"', 'String?', 'string'),
         ('optBinaryCol', 'Data(count: 64)', 'Data?', 'binary'),
@@ -234,10 +234,16 @@ class QueryTests_: TestCase {
         assertQuery(predicate: "${property[0]} > %@", values: [${property[4]}], expectedCount: 0) {
             $0.${property[0]} > ${property[1]}
         }
+        assertQuery(predicate: "${property[0]} >= %@", values: [${property[4]}], expectedCount: 1) {
+            $0.${property[0]} >= ${property[1]}
+        }
         % elif property[3] == 'numeric':
         // ${property[0]}
         assertQuery(predicate: "${property[0]} > %@", values: [${property[1]}], expectedCount: 0) {
             $0.${property[0]} > ${property[1]}
+        }
+        assertQuery(predicate: "${property[0]} >= %@", values: [${property[1]}], expectedCount: 1) {
+            $0.${property[0]} >= ${property[1]}
         }
         % end
         % end
@@ -251,10 +257,16 @@ class QueryTests_: TestCase {
         assertQuery(predicate: "${property[0]} > %@", values: [${property[4]}], expectedCount: 0) {
             $0.${property[0]} > ${property[1]}
         }
+        assertQuery(predicate: "${property[0]} >= %@", values: [${property[4]}], expectedCount: 1) {
+            $0.${property[0]} >= ${property[1]}
+        }
         % elif property[3] == 'numeric':
         // ${property[0]}
         assertQuery(predicate: "${property[0]} > %@", values: [${property[1]}], expectedCount: 0) {
             $0.${property[0]} > ${property[1]}
+        }
+        assertQuery(predicate: "${property[0]} >= %@", values: [${property[1]}], expectedCount: 1) {
+            $0.${property[0]} >= ${property[1]}
         }
         % end
         % end
@@ -263,13 +275,86 @@ class QueryTests_: TestCase {
         % for property in optProperties:
         % if len(property) == 5 and property[3] == 'numeric':
         // ${property[0]}
-        assertQuery(predicate: "${property[0]} != %@", values: [NSNull()], expectedCount: 1) {
+        assertQuery(predicate: "${property[0]} > %@", values: [NSNull()], expectedCount: 0) {
             $0.${property[0]} > nil
+        }
+        assertQuery(predicate: "${property[0]} >= %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property[0]} >= nil
         }
         % elif property[3] == 'numeric':
         // ${property[0]}
-        assertQuery(predicate: "${property[0]} != %@", values: [NSNull()], expectedCount: 1) {
+        assertQuery(predicate: "${property[0]} > %@", values: [NSNull()], expectedCount: 0) {
             $0.${property[0]} > nil
+        }
+        assertQuery(predicate: "${property[0]} >= %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property[0]} >= nil
+        }
+        % end
+        % end
+    }
+
+    func testLessThan() {
+        % for property in properties:
+        % # Count of 4 assumes enum, we can clean this logic up.
+        % if len(property) == 5 and property[3] == 'numeric':
+        // ${property[0]}
+        assertQuery(predicate: "${property[0]} < %@", values: [${property[4]}], expectedCount: 0) {
+            $0.${property[0]} < ${property[1]}
+        }
+        assertQuery(predicate: "${property[0]} <= %@", values: [${property[4]}], expectedCount: 1) {
+            $0.${property[0]} <= ${property[1]}
+        }
+        % elif property[3] == 'numeric':
+        // ${property[0]}
+        assertQuery(predicate: "${property[0]} < %@", values: [${property[1]}], expectedCount: 0) {
+            $0.${property[0]} < ${property[1]}
+        }
+        assertQuery(predicate: "${property[0]} <= %@", values: [${property[1]}], expectedCount: 1) {
+            $0.${property[0]} <= ${property[1]}
+        }
+        % end
+        % end
+    }
+
+    func testLessThanOptional() {
+        % for property in optProperties:
+        % # Count of 4 assumes enum, we can clean this logic up.
+        % if len(property) == 5 and property[3] == 'numeric':
+        // ${property[0]}
+        assertQuery(predicate: "${property[0]} < %@", values: [${property[4]}], expectedCount: 0) {
+            $0.${property[0]} < ${property[1]}
+        }
+        assertQuery(predicate: "${property[0]} <= %@", values: [${property[4]}], expectedCount: 1) {
+            $0.${property[0]} <= ${property[1]}
+        }
+        % elif property[3] == 'numeric':
+        // ${property[0]}
+        assertQuery(predicate: "${property[0]} < %@", values: [${property[1]}], expectedCount: 0) {
+            $0.${property[0]} < ${property[1]}
+        }
+        assertQuery(predicate: "${property[0]} <= %@", values: [${property[1]}], expectedCount: 1) {
+            $0.${property[0]} <= ${property[1]}
+        }
+        % end
+        % end
+
+        // Test for `nil`
+        % for property in optProperties:
+        % if len(property) == 5 and property[3] == 'numeric':
+        // ${property[0]}
+        assertQuery(predicate: "${property[0]} < %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property[0]} < nil
+        }
+        assertQuery(predicate: "${property[0]} <= %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property[0]} <= nil
+        }
+        % elif property[3] == 'numeric':
+        // ${property[0]}
+        assertQuery(predicate: "${property[0]} < %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property[0]} < nil
+        }
+        assertQuery(predicate: "${property[0]} <= %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property[0]} <= nil
         }
         % end
         % end

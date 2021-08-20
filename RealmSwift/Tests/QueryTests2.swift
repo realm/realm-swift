@@ -36,7 +36,7 @@ class QueryTests_: TestCase {
             object.int16Col = 16
             object.int32Col = 32
             object.int64Col = 64
-            object.floatCol = 5.55444333
+            object.floatCol = Float(5.55444333)
             object.doubleCol = 5.55444333
             object.stringCol = "Foo"
             object.binaryCol = Data(count: 64)
@@ -52,7 +52,7 @@ class QueryTests_: TestCase {
             object.optInt16Col = 16
             object.optInt32Col = 32
             object.optInt64Col = 64
-            object.optFloatCol = 5.55444333
+            object.optFloatCol = Float(5.55444333)
             object.optDoubleCol = 5.55444333
             object.optStringCol = "Foo"
             object.optBinaryCol = Data(count: 64)
@@ -132,8 +132,8 @@ class QueryTests_: TestCase {
         }
         // floatCol
 
-        assertQuery(predicate: "floatCol == %@", values: [5.55444333], expectedCount: 1) {
-            $0.floatCol == 5.55444333
+        assertQuery(predicate: "floatCol == %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.floatCol == Float(5.55444333)
         }
         // doubleCol
 
@@ -215,8 +215,8 @@ class QueryTests_: TestCase {
         }
         // optFloatCol
 
-        assertQuery(predicate: "optFloatCol == %@", values: [5.55444333], expectedCount: 1) {
-            $0.optFloatCol == 5.55444333
+        assertQuery(predicate: "optFloatCol == %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.optFloatCol == Float(5.55444333)
         }
         // optDoubleCol
 
@@ -380,8 +380,8 @@ class QueryTests_: TestCase {
         }
         // floatCol
 
-        assertQuery(predicate: "floatCol != %@", values: [5.55444333], expectedCount: 0) {
-            $0.floatCol != 5.55444333
+        assertQuery(predicate: "floatCol != %@", values: [Float(5.55444333)], expectedCount: 0) {
+            $0.floatCol != Float(5.55444333)
         }
         // doubleCol
 
@@ -463,8 +463,8 @@ class QueryTests_: TestCase {
         }
         // optFloatCol
 
-        assertQuery(predicate: "optFloatCol != %@", values: [5.55444333], expectedCount: 0) {
-            $0.optFloatCol != 5.55444333
+        assertQuery(predicate: "optFloatCol != %@", values: [Float(5.55444333)], expectedCount: 0) {
+            $0.optFloatCol != Float(5.55444333)
         }
         // optDoubleCol
 
@@ -600,41 +600,71 @@ class QueryTests_: TestCase {
         assertQuery(predicate: "intCol > %@", values: [5], expectedCount: 0) {
             $0.intCol > 5
         }
+        assertQuery(predicate: "intCol >= %@", values: [5], expectedCount: 1) {
+            $0.intCol >= 5
+        }
         // int8Col
         assertQuery(predicate: "int8Col > %@", values: [8], expectedCount: 0) {
             $0.int8Col > 8
+        }
+        assertQuery(predicate: "int8Col >= %@", values: [8], expectedCount: 1) {
+            $0.int8Col >= 8
         }
         // int16Col
         assertQuery(predicate: "int16Col > %@", values: [16], expectedCount: 0) {
             $0.int16Col > 16
         }
+        assertQuery(predicate: "int16Col >= %@", values: [16], expectedCount: 1) {
+            $0.int16Col >= 16
+        }
         // int32Col
         assertQuery(predicate: "int32Col > %@", values: [32], expectedCount: 0) {
             $0.int32Col > 32
+        }
+        assertQuery(predicate: "int32Col >= %@", values: [32], expectedCount: 1) {
+            $0.int32Col >= 32
         }
         // int64Col
         assertQuery(predicate: "int64Col > %@", values: [64], expectedCount: 0) {
             $0.int64Col > 64
         }
+        assertQuery(predicate: "int64Col >= %@", values: [64], expectedCount: 1) {
+            $0.int64Col >= 64
+        }
         // floatCol
-        assertQuery(predicate: "floatCol > %@", values: [5.55444333], expectedCount: 0) {
-            $0.floatCol > 5.55444333
+        assertQuery(predicate: "floatCol > %@", values: [Float(5.55444333)], expectedCount: 0) {
+            $0.floatCol > Float(5.55444333)
+        }
+        assertQuery(predicate: "floatCol >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.floatCol >= Float(5.55444333)
         }
         // doubleCol
         assertQuery(predicate: "doubleCol > %@", values: [5.55444333], expectedCount: 0) {
             $0.doubleCol > 5.55444333
         }
+        assertQuery(predicate: "doubleCol >= %@", values: [5.55444333], expectedCount: 1) {
+            $0.doubleCol >= 5.55444333
+        }
         // dateCol
         assertQuery(predicate: "dateCol > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
             $0.dateCol > Date(timeIntervalSince1970: 1000000)
+        }
+        assertQuery(predicate: "dateCol >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.dateCol >= Date(timeIntervalSince1970: 1000000)
         }
         // decimalCol
         assertQuery(predicate: "decimalCol > %@", values: [Decimal128(123.456)], expectedCount: 0) {
             $0.decimalCol > Decimal128(123.456)
         }
+        assertQuery(predicate: "decimalCol >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.decimalCol >= Decimal128(123.456)
+        }
         // intEnumCol
         assertQuery(predicate: "intEnumCol > %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 0) {
             $0.intEnumCol > .value1
+        }
+        assertQuery(predicate: "intEnumCol >= %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 1) {
+            $0.intEnumCol >= .value1
         }
     }
 
@@ -643,83 +673,361 @@ class QueryTests_: TestCase {
         assertQuery(predicate: "optIntCol > %@", values: [5], expectedCount: 0) {
             $0.optIntCol > 5
         }
+        assertQuery(predicate: "optIntCol >= %@", values: [5], expectedCount: 1) {
+            $0.optIntCol >= 5
+        }
         // optInt8Col
         assertQuery(predicate: "optInt8Col > %@", values: [8], expectedCount: 0) {
             $0.optInt8Col > 8
+        }
+        assertQuery(predicate: "optInt8Col >= %@", values: [8], expectedCount: 1) {
+            $0.optInt8Col >= 8
         }
         // optInt16Col
         assertQuery(predicate: "optInt16Col > %@", values: [16], expectedCount: 0) {
             $0.optInt16Col > 16
         }
+        assertQuery(predicate: "optInt16Col >= %@", values: [16], expectedCount: 1) {
+            $0.optInt16Col >= 16
+        }
         // optInt32Col
         assertQuery(predicate: "optInt32Col > %@", values: [32], expectedCount: 0) {
             $0.optInt32Col > 32
+        }
+        assertQuery(predicate: "optInt32Col >= %@", values: [32], expectedCount: 1) {
+            $0.optInt32Col >= 32
         }
         // optInt64Col
         assertQuery(predicate: "optInt64Col > %@", values: [64], expectedCount: 0) {
             $0.optInt64Col > 64
         }
+        assertQuery(predicate: "optInt64Col >= %@", values: [64], expectedCount: 1) {
+            $0.optInt64Col >= 64
+        }
         // optFloatCol
-        assertQuery(predicate: "optFloatCol > %@", values: [5.55444333], expectedCount: 0) {
-            $0.optFloatCol > 5.55444333
+        assertQuery(predicate: "optFloatCol > %@", values: [Float(5.55444333)], expectedCount: 0) {
+            $0.optFloatCol > Float(5.55444333)
+        }
+        assertQuery(predicate: "optFloatCol >= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.optFloatCol >= Float(5.55444333)
         }
         // optDoubleCol
         assertQuery(predicate: "optDoubleCol > %@", values: [5.55444333], expectedCount: 0) {
             $0.optDoubleCol > 5.55444333
         }
+        assertQuery(predicate: "optDoubleCol >= %@", values: [5.55444333], expectedCount: 1) {
+            $0.optDoubleCol >= 5.55444333
+        }
         // optDateCol
         assertQuery(predicate: "optDateCol > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
             $0.optDateCol > Date(timeIntervalSince1970: 1000000)
+        }
+        assertQuery(predicate: "optDateCol >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.optDateCol >= Date(timeIntervalSince1970: 1000000)
         }
         // optDecimalCol
         assertQuery(predicate: "optDecimalCol > %@", values: [Decimal128(123.456)], expectedCount: 0) {
             $0.optDecimalCol > Decimal128(123.456)
         }
+        assertQuery(predicate: "optDecimalCol >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.optDecimalCol >= Decimal128(123.456)
+        }
         // optIntEnumCol
         assertQuery(predicate: "optIntEnumCol > %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 0) {
             $0.optIntEnumCol > .value1
         }
+        assertQuery(predicate: "optIntEnumCol >= %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 1) {
+            $0.optIntEnumCol >= .value1
+        }
 
         // Test for `nil`
         // optIntCol
-        assertQuery(predicate: "optIntCol != %@", values: [NSNull()], expectedCount: 1) {
+        assertQuery(predicate: "optIntCol > %@", values: [NSNull()], expectedCount: 0) {
             $0.optIntCol > nil
         }
+        assertQuery(predicate: "optIntCol >= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optIntCol >= nil
+        }
         // optInt8Col
-        assertQuery(predicate: "optInt8Col != %@", values: [NSNull()], expectedCount: 1) {
+        assertQuery(predicate: "optInt8Col > %@", values: [NSNull()], expectedCount: 0) {
             $0.optInt8Col > nil
         }
+        assertQuery(predicate: "optInt8Col >= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optInt8Col >= nil
+        }
         // optInt16Col
-        assertQuery(predicate: "optInt16Col != %@", values: [NSNull()], expectedCount: 1) {
+        assertQuery(predicate: "optInt16Col > %@", values: [NSNull()], expectedCount: 0) {
             $0.optInt16Col > nil
         }
+        assertQuery(predicate: "optInt16Col >= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optInt16Col >= nil
+        }
         // optInt32Col
-        assertQuery(predicate: "optInt32Col != %@", values: [NSNull()], expectedCount: 1) {
+        assertQuery(predicate: "optInt32Col > %@", values: [NSNull()], expectedCount: 0) {
             $0.optInt32Col > nil
         }
+        assertQuery(predicate: "optInt32Col >= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optInt32Col >= nil
+        }
         // optInt64Col
-        assertQuery(predicate: "optInt64Col != %@", values: [NSNull()], expectedCount: 1) {
+        assertQuery(predicate: "optInt64Col > %@", values: [NSNull()], expectedCount: 0) {
             $0.optInt64Col > nil
         }
+        assertQuery(predicate: "optInt64Col >= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optInt64Col >= nil
+        }
         // optFloatCol
-        assertQuery(predicate: "optFloatCol != %@", values: [NSNull()], expectedCount: 1) {
+        assertQuery(predicate: "optFloatCol > %@", values: [NSNull()], expectedCount: 0) {
             $0.optFloatCol > nil
         }
+        assertQuery(predicate: "optFloatCol >= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optFloatCol >= nil
+        }
         // optDoubleCol
-        assertQuery(predicate: "optDoubleCol != %@", values: [NSNull()], expectedCount: 1) {
+        assertQuery(predicate: "optDoubleCol > %@", values: [NSNull()], expectedCount: 0) {
             $0.optDoubleCol > nil
         }
+        assertQuery(predicate: "optDoubleCol >= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optDoubleCol >= nil
+        }
         // optDateCol
-        assertQuery(predicate: "optDateCol != %@", values: [NSNull()], expectedCount: 1) {
+        assertQuery(predicate: "optDateCol > %@", values: [NSNull()], expectedCount: 0) {
             $0.optDateCol > nil
         }
+        assertQuery(predicate: "optDateCol >= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optDateCol >= nil
+        }
         // optDecimalCol
-        assertQuery(predicate: "optDecimalCol != %@", values: [NSNull()], expectedCount: 1) {
+        assertQuery(predicate: "optDecimalCol > %@", values: [NSNull()], expectedCount: 0) {
             $0.optDecimalCol > nil
         }
+        assertQuery(predicate: "optDecimalCol >= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optDecimalCol >= nil
+        }
         // optIntEnumCol
-        assertQuery(predicate: "optIntEnumCol != %@", values: [NSNull()], expectedCount: 1) {
+        assertQuery(predicate: "optIntEnumCol > %@", values: [NSNull()], expectedCount: 0) {
             $0.optIntEnumCol > nil
+        }
+        assertQuery(predicate: "optIntEnumCol >= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optIntEnumCol >= nil
+        }
+    }
+
+    func testLessThan() {
+        // intCol
+        assertQuery(predicate: "intCol < %@", values: [5], expectedCount: 0) {
+            $0.intCol < 5
+        }
+        assertQuery(predicate: "intCol <= %@", values: [5], expectedCount: 1) {
+            $0.intCol <= 5
+        }
+        // int8Col
+        assertQuery(predicate: "int8Col < %@", values: [8], expectedCount: 0) {
+            $0.int8Col < 8
+        }
+        assertQuery(predicate: "int8Col <= %@", values: [8], expectedCount: 1) {
+            $0.int8Col <= 8
+        }
+        // int16Col
+        assertQuery(predicate: "int16Col < %@", values: [16], expectedCount: 0) {
+            $0.int16Col < 16
+        }
+        assertQuery(predicate: "int16Col <= %@", values: [16], expectedCount: 1) {
+            $0.int16Col <= 16
+        }
+        // int32Col
+        assertQuery(predicate: "int32Col < %@", values: [32], expectedCount: 0) {
+            $0.int32Col < 32
+        }
+        assertQuery(predicate: "int32Col <= %@", values: [32], expectedCount: 1) {
+            $0.int32Col <= 32
+        }
+        // int64Col
+        assertQuery(predicate: "int64Col < %@", values: [64], expectedCount: 0) {
+            $0.int64Col < 64
+        }
+        assertQuery(predicate: "int64Col <= %@", values: [64], expectedCount: 1) {
+            $0.int64Col <= 64
+        }
+        // floatCol
+        assertQuery(predicate: "floatCol < %@", values: [Float(5.55444333)], expectedCount: 0) {
+            $0.floatCol < Float(5.55444333)
+        }
+        assertQuery(predicate: "floatCol <= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.floatCol <= Float(5.55444333)
+        }
+        // doubleCol
+        assertQuery(predicate: "doubleCol < %@", values: [5.55444333], expectedCount: 0) {
+            $0.doubleCol < 5.55444333
+        }
+        assertQuery(predicate: "doubleCol <= %@", values: [5.55444333], expectedCount: 1) {
+            $0.doubleCol <= 5.55444333
+        }
+        // dateCol
+        assertQuery(predicate: "dateCol < %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.dateCol < Date(timeIntervalSince1970: 1000000)
+        }
+        assertQuery(predicate: "dateCol <= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.dateCol <= Date(timeIntervalSince1970: 1000000)
+        }
+        // decimalCol
+        assertQuery(predicate: "decimalCol < %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.decimalCol < Decimal128(123.456)
+        }
+        assertQuery(predicate: "decimalCol <= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.decimalCol <= Decimal128(123.456)
+        }
+        // intEnumCol
+        assertQuery(predicate: "intEnumCol < %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 0) {
+            $0.intEnumCol < .value1
+        }
+        assertQuery(predicate: "intEnumCol <= %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 1) {
+            $0.intEnumCol <= .value1
+        }
+    }
+
+    func testLessThanOptional() {
+        // optIntCol
+        assertQuery(predicate: "optIntCol < %@", values: [5], expectedCount: 0) {
+            $0.optIntCol < 5
+        }
+        assertQuery(predicate: "optIntCol <= %@", values: [5], expectedCount: 1) {
+            $0.optIntCol <= 5
+        }
+        // optInt8Col
+        assertQuery(predicate: "optInt8Col < %@", values: [8], expectedCount: 0) {
+            $0.optInt8Col < 8
+        }
+        assertQuery(predicate: "optInt8Col <= %@", values: [8], expectedCount: 1) {
+            $0.optInt8Col <= 8
+        }
+        // optInt16Col
+        assertQuery(predicate: "optInt16Col < %@", values: [16], expectedCount: 0) {
+            $0.optInt16Col < 16
+        }
+        assertQuery(predicate: "optInt16Col <= %@", values: [16], expectedCount: 1) {
+            $0.optInt16Col <= 16
+        }
+        // optInt32Col
+        assertQuery(predicate: "optInt32Col < %@", values: [32], expectedCount: 0) {
+            $0.optInt32Col < 32
+        }
+        assertQuery(predicate: "optInt32Col <= %@", values: [32], expectedCount: 1) {
+            $0.optInt32Col <= 32
+        }
+        // optInt64Col
+        assertQuery(predicate: "optInt64Col < %@", values: [64], expectedCount: 0) {
+            $0.optInt64Col < 64
+        }
+        assertQuery(predicate: "optInt64Col <= %@", values: [64], expectedCount: 1) {
+            $0.optInt64Col <= 64
+        }
+        // optFloatCol
+        assertQuery(predicate: "optFloatCol < %@", values: [Float(5.55444333)], expectedCount: 0) {
+            $0.optFloatCol < Float(5.55444333)
+        }
+        assertQuery(predicate: "optFloatCol <= %@", values: [Float(5.55444333)], expectedCount: 1) {
+            $0.optFloatCol <= Float(5.55444333)
+        }
+        // optDoubleCol
+        assertQuery(predicate: "optDoubleCol < %@", values: [5.55444333], expectedCount: 0) {
+            $0.optDoubleCol < 5.55444333
+        }
+        assertQuery(predicate: "optDoubleCol <= %@", values: [5.55444333], expectedCount: 1) {
+            $0.optDoubleCol <= 5.55444333
+        }
+        // optDateCol
+        assertQuery(predicate: "optDateCol < %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.optDateCol < Date(timeIntervalSince1970: 1000000)
+        }
+        assertQuery(predicate: "optDateCol <= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.optDateCol <= Date(timeIntervalSince1970: 1000000)
+        }
+        // optDecimalCol
+        assertQuery(predicate: "optDecimalCol < %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.optDecimalCol < Decimal128(123.456)
+        }
+        assertQuery(predicate: "optDecimalCol <= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.optDecimalCol <= Decimal128(123.456)
+        }
+        // optIntEnumCol
+        assertQuery(predicate: "optIntEnumCol < %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 0) {
+            $0.optIntEnumCol < .value1
+        }
+        assertQuery(predicate: "optIntEnumCol <= %@", values: [ModernIntEnum.value1.rawValue], expectedCount: 1) {
+            $0.optIntEnumCol <= .value1
+        }
+
+        // Test for `nil`
+        // optIntCol
+        assertQuery(predicate: "optIntCol < %@", values: [NSNull()], expectedCount: 0) {
+            $0.optIntCol < nil
+        }
+        assertQuery(predicate: "optIntCol <= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optIntCol <= nil
+        }
+        // optInt8Col
+        assertQuery(predicate: "optInt8Col < %@", values: [NSNull()], expectedCount: 0) {
+            $0.optInt8Col < nil
+        }
+        assertQuery(predicate: "optInt8Col <= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optInt8Col <= nil
+        }
+        // optInt16Col
+        assertQuery(predicate: "optInt16Col < %@", values: [NSNull()], expectedCount: 0) {
+            $0.optInt16Col < nil
+        }
+        assertQuery(predicate: "optInt16Col <= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optInt16Col <= nil
+        }
+        // optInt32Col
+        assertQuery(predicate: "optInt32Col < %@", values: [NSNull()], expectedCount: 0) {
+            $0.optInt32Col < nil
+        }
+        assertQuery(predicate: "optInt32Col <= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optInt32Col <= nil
+        }
+        // optInt64Col
+        assertQuery(predicate: "optInt64Col < %@", values: [NSNull()], expectedCount: 0) {
+            $0.optInt64Col < nil
+        }
+        assertQuery(predicate: "optInt64Col <= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optInt64Col <= nil
+        }
+        // optFloatCol
+        assertQuery(predicate: "optFloatCol < %@", values: [NSNull()], expectedCount: 0) {
+            $0.optFloatCol < nil
+        }
+        assertQuery(predicate: "optFloatCol <= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optFloatCol <= nil
+        }
+        // optDoubleCol
+        assertQuery(predicate: "optDoubleCol < %@", values: [NSNull()], expectedCount: 0) {
+            $0.optDoubleCol < nil
+        }
+        assertQuery(predicate: "optDoubleCol <= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optDoubleCol <= nil
+        }
+        // optDateCol
+        assertQuery(predicate: "optDateCol < %@", values: [NSNull()], expectedCount: 0) {
+            $0.optDateCol < nil
+        }
+        assertQuery(predicate: "optDateCol <= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optDateCol <= nil
+        }
+        // optDecimalCol
+        assertQuery(predicate: "optDecimalCol < %@", values: [NSNull()], expectedCount: 0) {
+            $0.optDecimalCol < nil
+        }
+        assertQuery(predicate: "optDecimalCol <= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optDecimalCol <= nil
+        }
+        // optIntEnumCol
+        assertQuery(predicate: "optIntEnumCol < %@", values: [NSNull()], expectedCount: 0) {
+            $0.optIntEnumCol < nil
+        }
+        assertQuery(predicate: "optIntEnumCol <= %@", values: [NSNull()], expectedCount: 0) {
+            $0.optIntEnumCol <= nil
         }
     }
 }
