@@ -240,6 +240,15 @@ public class Person: Object {
     @Persisted var money: Decimal128
 }
 
+public struct AddressProjection: Projection {
+    public typealias Root = Address
+
+    public init() {
+    }
+    
+    @Projected(\Address.city) var city
+}
+
 public struct PersonProjection: Projection {
     public typealias Root = Person
 
@@ -494,6 +503,7 @@ class ProjectionTests: TestCase {
     
     func testProjectionsRealmShouldNotBeNil() {
         XCTAssertNotNil(realmWithTestPath().objects(PersonProjection.self).first!.realm)
+        XCTAssertNotNil(realmWithTestPath().objects(AddressProjection.self).first!.realm)
     }
 
     func testProjectionFromResultSortedBirthday() {
@@ -766,10 +776,24 @@ class ProjectionTests: TestCase {
         guard changeDictionary != nil else { return }
     }
 
-    func testAllPropertyTypesCNotifications() {
-//        let (obj, obs) = getObject(ModernAllTypesObject())
-        let obj = realmWithTestPath().objects(ModernAllTypesObject.self).first!
-        let obs = realmWithTestPath().objects(AllTypesProjection.self).first!
+    func singleChangeTestCase<T: Projection>(_ obj: Object, _ obs: T, _ changeBlock: () -> Void) {
+        let ex = expectation(description: "singleChangeTestCase")
+        let token = obs.observe { changes in
+            ex.fulfill()
+        }
+        
+        try! obj.realm!.write {
+            changeBlock()
+        }
+
+        waitForExpectations(timeout: 1, handler: nil)
+        token.invalidate()
+    }
+    
+    func testAllPropertyTypesNotifications() {
+        let realm = realmWithTestPath()
+        let obj = realm.objects(ModernAllTypesObject.self).first!
+        let obs = realm.objects(AllTypesProjection.self).first!
 
         let oldData = obj.binaryCol
         let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)!

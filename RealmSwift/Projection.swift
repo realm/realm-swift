@@ -22,6 +22,7 @@ import Realm.Private
 fileprivate protocol _Projected {
     var objectBase: ObjectBase! { get }
     func set(object: ObjectBase)
+    func observe<T: ObjectBase>(keyPaths: [String]?, on queue: DispatchQueue?, _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken
 }
 
 /// @Projected is used to declare properties on Projection protocols which should be
@@ -55,6 +56,7 @@ fileprivate protocol _Projected {
 /// ```
 @propertyWrapper
 public struct Projected<T: ObjectBase, Value>: _Projected {
+
     fileprivate var projectedKeyPath: KeyPath<T, Value>!
     fileprivate var objectBase: ObjectBase! {
         storage.objectBase
@@ -69,6 +71,7 @@ public struct Projected<T: ObjectBase, Value>: _Projected {
     func set(object: ObjectBase) {
         storage.objectBase = object
     }
+    
     /// :nodoc:
     public var wrappedValue: Value {
         get {
@@ -89,6 +92,12 @@ public struct Projected<T: ObjectBase, Value>: _Projected {
             var ref = $0
             ref[keyPath: projectedKeyPath as! WritableKeyPath<T, Value>] = $1
         }
+    }
+
+    public func observe<T: ObjectBase>(keyPaths: [String]? = nil,
+                                       on queue: DispatchQueue? = nil,
+                                       _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
+        return objectBase._observe(keyPaths: keyPaths, on: queue, block)
     }
 }
 
@@ -133,7 +142,7 @@ public extension Projection {
     }
 
     fileprivate subscript(label: String) -> _Projected {
-        Mirror(reflecting: self).descendant(label)! as! _Projected
+        properties()[label]!
     }
 
     func assign(_ object: Root) {
@@ -143,6 +152,17 @@ public extension Projection {
                 let keyPath = \Self.[child.label!]
                 self[keyPath: keyPath].set(object: object)
             }
+        }
+    }
+    
+    fileprivate func properties() -> [String: _Projected] {
+        Mirror(reflecting: self).children.reduce([String: _Projected]()) { dict, child in
+            var dict = dict
+            if let projected = child.value as? _Projected,
+               let label = child.label {
+                dict[label] = projected
+            }
+            return dict
         }
     }
 }
@@ -204,7 +224,33 @@ extension Projection {
         } else {
         }
         fatalError()
+
+    // MARK: Notifications
+
+    public func observe<T: ObjectBase>(keyPaths: [String]? = nil,
+                                       on queue: DispatchQueue? = nil,
+                                       _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
+        let token: NotificationToken
+//        if keyPaths == nil || keyPaths?.isEmpty {
+        token = realmObject._observe(keyPaths: keyPaths, on: queue, block)
+//        } else {
+//        }
+        return token
     }
+//    public func observe<T>(keyPaths: [PartialKeyPath<Self>] = [], _ block: (ProjectionChange<T>) -> Void) -> NotificationToken where T: Projection {
+    public func observe(keyPaths: [String] = [], _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
+//        if keyPaths.isEmpty {
+//            fatalError()
+//        } else {
+            return realmObject._observe(keyPaths: nil, on: nil, { change in
+                print(change)
+                let projectedChange = ProjectedChange(name: "test", oldValue: 0, newValue: 1)
+                let projectionChange = ProjectionChange.change(self, [projectedChange])
+                block(projectionChange)
+            })
+//        }
+    }
+
     // Must also conform to `AssistedObjectiveCBridgeable`
     /**
      The Realm which manages the object, or `nil` if the object is unmanaged.
@@ -267,18 +313,15 @@ extension Projection {
         fatalError()
     }
     
-    public static var _rlmRequireObjc: Bool {
-        fatalError()
-    }
+    public static var _rlmRequireObjc: Bool { false }
     
     public func _rlmPopulateProperty(_ prop: RLMProperty) {
         fatalError()
     }
-    
+
     public static func _rlmPopulateProperty(_ prop: RLMProperty) {
         fatalError()
     }
-    
     
     public static func == (lhs: Self, rhs: Self) -> Bool {
         RLMObjectBaseAreEqual(lhs.realmObject, rhs.realmObject)
@@ -381,17 +424,24 @@ extension List where Element: ObjectBase, Element: RealmCollectionValue {
 }
 
 public extension Projection {
-    
+
     func addObserver(_ observer: NSObject, forKeyPath keyPath: String, options: NSKeyValueObservingOptions = [], context: UnsafeMutableRawPointer?) {
+//        print(self[keyPath: keyPath])
+//        let property = \Self.[keyPath]
+//        let otherKeyPath: String = ""
+//        print(property)
         fatalError()
     }
 
     @available(macOS 10.7, *)
     func removeObserver(_ observer: NSObject, forKeyPath keyPath: String, context: UnsafeMutableRawPointer?) {
-        fatalError()
+        let otherKeyPath = ""
+        realmObject.removeObserver(observer, forKeyPath: otherKeyPath, context: context)
     }
 
     func removeObserver(_ observer: NSObject, forKeyPath keyPath: String) {
-        fatalError()
+        let otherKeyPath = ""
+        realmObject.removeObserver(observer, forKeyPath: otherKeyPath)
     }
 }
+
