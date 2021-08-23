@@ -894,31 +894,6 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
 
-    // !!!: Fails, but the feature will not support this behavior at first.
-    // See version below
-//    func testModifyObservedKeyPathLocally() {
-//        let realm = try! Realm()
-//        realm.beginWrite()
-//        let object = realm.create(SwiftObject.self)
-//        try! realm.commitWrite()
-//
-//        // Expect notification for "intCol" keyPath when "intCol" is modified
-//        let token1 = object.observe(keyPaths: ["intCol"], expectChange("intCol", Int?.none, 2))
-//
-//        // Expect no notification for "boolCol" keypath when "intCol" is modified
-//        let token0 = object.observe(keyPaths: ["boolCol"], { change in
-//            XCTFail("expected no change, got \(change)")
-//        })
-//
-//        try! realm.write {
-//            object.intCol = 2
-//        }
-//
-//        waitForExpectations(timeout: 2)
-//        token0.invalidate()
-//        token1.invalidate()
-//    }
-
     func testModifyObservedKeyPathLocally() {
         let realm = try! Realm()
         realm.beginWrite()
