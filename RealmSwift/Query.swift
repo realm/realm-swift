@@ -555,6 +555,7 @@ extension Float: _QueryNumeric { }
 extension Double: _QueryNumeric { }
 extension Decimal128: _QueryNumeric { }
 extension Date: _QueryNumeric { }
+extension AnyRealmValue: _QueryNumeric { }
 extension Optional: _QueryNumeric where Wrapped: _QueryNumeric { }
 
 public protocol _QueryComparable: _RealmSchemaDiscoverable { }
@@ -572,4 +573,6 @@ extension Data: _QueryComparable { }
 extension UUID: _QueryComparable { }
 extension ObjectId: _QueryComparable { }
 extension String: _QueryComparable { }
+extension AnyRealmValue: _QueryComparable { }
+extension Object: _QueryComparable { }
 extension Optional: _QueryComparable where Wrapped: _QueryComparable { }

@@ -25,6 +25,26 @@ class QueryTests_: TestCase {
         realmWithTestPath().objects(ModernAllTypesObject.self)
     }
 
+    private func setAnyRealmValueCol(with value: AnyRealmValue, object: ModernAllTypesObject) {
+        let realm = realmWithTestPath()
+        try! realm.write {
+            object.anyCol = value
+        }
+    }
+
+    private var circleObject: ModernCircleObject {
+        let realm = realmWithTestPath()
+        if let object = realm.objects(ModernCircleObject.self).first {
+            return object
+        } else {
+            let object = ModernCircleObject()
+            try! realm.write {
+                realm.add(object)
+            }
+            return object
+        }
+    }
+
     override func setUp() {
         let realm = realmWithTestPath()
         try! realm.write {
@@ -63,7 +83,6 @@ class QueryTests_: TestCase {
             object.optStringEnumCol = .value1
             object.optUuidCol = UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
 
-
             object.arrayBool.append(objectsIn: [true, true, false])
             object.arrayInt.append(objectsIn: [1, 2, 3])
             object.arrayInt8.append(objectsIn: [1, 2, 3])
@@ -95,7 +114,11 @@ class QueryTests_: TestCase {
                        predicate)
 
         for (e1, e2) in zip(constructedPredicate.1, values) {
-            XCTAssertEqual(e1 as! T, e2)
+            if let e1 = e1 as? Object, let e2 = e2 as? Object {
+                assertEqual(e1, e2)
+            } else {
+                XCTAssertEqual(e1 as! T, e2)
+            }
         }
     }
 
@@ -347,6 +370,81 @@ class QueryTests_: TestCase {
         }
     }
 
+    func testEqualAnyRealmValue() {
+
+        setAnyRealmValueCol(with: AnyRealmValue.none, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [NSNull()], expectedCount: 1) {
+            $0.anyCol == .none
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.int(123), object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [123], expectedCount: 1) {
+            $0.anyCol == .int(123)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.bool(true), object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [true], expectedCount: 1) {
+            $0.anyCol == .bool(true)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.float(123.456), object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [Float(123.456)], expectedCount: 1) {
+            $0.anyCol == .float(123.456)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.double(123.456), object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [123.456], expectedCount: 1) {
+            $0.anyCol == .double(123.456)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.string("FooBar"), object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: ["FooBar"], expectedCount: 1) {
+            $0.anyCol == .string("FooBar")
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.data(Data(count: 64)), object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [Data(count: 64)], expectedCount: 1) {
+            $0.anyCol == .data(Data(count: 64))
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.date(Date(timeIntervalSince1970: 1000000)), object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.anyCol == .date(Date(timeIntervalSince1970: 1000000))
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.object(circleObject), object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [circleObject], expectedCount: 1) {
+            $0.anyCol == .object(circleObject)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+            $0.anyCol == .objectId(ObjectId("61184062c1d8f096a3695046"))
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.decimal128(123.456), object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.anyCol == .decimal128(123.456)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.uuid(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!), object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 1) {
+            $0.anyCol == .uuid(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)
+        }
+    }
+
+    func testEqualObject() {
+        let nestedObject = ModernAllTypesObject()
+        let object = objects().first!
+        let realm = realmWithTestPath()
+        try! realm.write {
+            object.objectCol = nestedObject
+        }
+        assertQuery(predicate: "objectCol == %@", values: [nestedObject], expectedCount: 1) {
+            $0.objectCol == nestedObject
+        }
+    }
+
     func testNotEquals() {
         // boolCol
 
@@ -595,6 +693,82 @@ class QueryTests_: TestCase {
         }
     }
 
+    func testNotEqualAnyRealmValue() {
+
+        setAnyRealmValueCol(with: AnyRealmValue.none, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [NSNull()], expectedCount: 0) {
+            $0.anyCol != .none
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.int(123), object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [123], expectedCount: 0) {
+            $0.anyCol != .int(123)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.bool(true), object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [true], expectedCount: 0) {
+            $0.anyCol != .bool(true)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.float(123.456), object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [Float(123.456)], expectedCount: 0) {
+            $0.anyCol != .float(123.456)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.double(123.456), object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [123.456], expectedCount: 0) {
+            $0.anyCol != .double(123.456)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.string("FooBar"), object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: ["FooBar"], expectedCount: 0) {
+            $0.anyCol != .string("FooBar")
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.data(Data(count: 64)), object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [Data(count: 64)], expectedCount: 0) {
+            $0.anyCol != .data(Data(count: 64))
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.date(Date(timeIntervalSince1970: 1000000)), object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.anyCol != .date(Date(timeIntervalSince1970: 1000000))
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.object(circleObject), object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [circleObject], expectedCount: 0) {
+            $0.anyCol != .object(circleObject)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")), object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 0) {
+            $0.anyCol != .objectId(ObjectId("61184062c1d8f096a3695046"))
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.decimal128(123.456), object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.anyCol != .decimal128(123.456)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.uuid(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!), object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 0) {
+            $0.anyCol != .uuid(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)
+        }
+    }
+
+    func testNotEqualObject() {
+        let nestedObject = ModernAllTypesObject()
+        let object = objects().first!
+        let realm = realmWithTestPath()
+        try! realm.write {
+            object.objectCol = nestedObject
+        }
+        // Count will be one because nestedObject.objectCol will be nil
+        assertQuery(predicate: "objectCol != %@", values: [nestedObject], expectedCount: 1) {
+            $0.objectCol != nestedObject
+        }
+    }
+
    func testGreaterThan() {
         // intCol
         assertQuery(predicate: "intCol > %@", values: [5], expectedCount: 0) {
@@ -813,6 +987,49 @@ class QueryTests_: TestCase {
         }
     }
 
+    func testGreaterThanAnyRealmValue() {
+
+        setAnyRealmValueCol(with: AnyRealmValue.int(123), object: objects()[0])
+        assertQuery(predicate: "anyCol > %@", values: [123], expectedCount: 0) {
+            $0.anyCol > .int(123)
+        }
+        assertQuery(predicate: "anyCol >= %@", values: [123], expectedCount: 1) {
+            $0.anyCol >= .int(123)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.float(123.456), object: objects()[0])
+        assertQuery(predicate: "anyCol > %@", values: [Float(123.456)], expectedCount: 0) {
+            $0.anyCol > .float(123.456)
+        }
+        assertQuery(predicate: "anyCol >= %@", values: [Float(123.456)], expectedCount: 1) {
+            $0.anyCol >= .float(123.456)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.double(123.456), object: objects()[0])
+        assertQuery(predicate: "anyCol > %@", values: [123.456], expectedCount: 0) {
+            $0.anyCol > .double(123.456)
+        }
+        assertQuery(predicate: "anyCol >= %@", values: [123.456], expectedCount: 1) {
+            $0.anyCol >= .double(123.456)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.date(Date(timeIntervalSince1970: 1000000)), object: objects()[0])
+        assertQuery(predicate: "anyCol > %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.anyCol > .date(Date(timeIntervalSince1970: 1000000))
+        }
+        assertQuery(predicate: "anyCol >= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.anyCol >= .date(Date(timeIntervalSince1970: 1000000))
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.decimal128(123.456), object: objects()[0])
+        assertQuery(predicate: "anyCol > %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.anyCol > .decimal128(123.456)
+        }
+        assertQuery(predicate: "anyCol >= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.anyCol >= .decimal128(123.456)
+        }
+    }
+
     func testLessThan() {
         // intCol
         assertQuery(predicate: "intCol < %@", values: [5], expectedCount: 0) {
@@ -1028,6 +1245,49 @@ class QueryTests_: TestCase {
         }
         assertQuery(predicate: "optIntEnumCol <= %@", values: [NSNull()], expectedCount: 0) {
             $0.optIntEnumCol <= nil
+        }
+    }
+
+    func testLessThanAnyRealmValue() {
+
+        setAnyRealmValueCol(with: AnyRealmValue.int(123), object: objects()[0])
+        assertQuery(predicate: "anyCol < %@", values: [123], expectedCount: 0) {
+            $0.anyCol < .int(123)
+        }
+        assertQuery(predicate: "anyCol <= %@", values: [123], expectedCount: 1) {
+            $0.anyCol <= .int(123)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.float(123.456), object: objects()[0])
+        assertQuery(predicate: "anyCol < %@", values: [Float(123.456)], expectedCount: 0) {
+            $0.anyCol < .float(123.456)
+        }
+        assertQuery(predicate: "anyCol <= %@", values: [Float(123.456)], expectedCount: 1) {
+            $0.anyCol <= .float(123.456)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.double(123.456), object: objects()[0])
+        assertQuery(predicate: "anyCol < %@", values: [123.456], expectedCount: 0) {
+            $0.anyCol < .double(123.456)
+        }
+        assertQuery(predicate: "anyCol <= %@", values: [123.456], expectedCount: 1) {
+            $0.anyCol <= .double(123.456)
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.date(Date(timeIntervalSince1970: 1000000)), object: objects()[0])
+        assertQuery(predicate: "anyCol < %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.anyCol < .date(Date(timeIntervalSince1970: 1000000))
+        }
+        assertQuery(predicate: "anyCol <= %@", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.anyCol <= .date(Date(timeIntervalSince1970: 1000000))
+        }
+
+        setAnyRealmValueCol(with: AnyRealmValue.decimal128(123.456), object: objects()[0])
+        assertQuery(predicate: "anyCol < %@", values: [Decimal128(123.456)], expectedCount: 0) {
+            $0.anyCol < .decimal128(123.456)
+        }
+        assertQuery(predicate: "anyCol <= %@", values: [Decimal128(123.456)], expectedCount: 1) {
+            $0.anyCol <= .decimal128(123.456)
         }
     }
 }

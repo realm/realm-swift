@@ -25,7 +25,7 @@ import XCTest
 # $ wget https://github.com/apple/swift/raw/main/utils/gyb.py
 # $ chmod +x gyb
 #
-# ./YOUR_GYB_LOCATION/gyb --line-directive '' -o QueryTests2.swift QueryTests.gyb
+# ./YOUR_GYB_LOCATION/gyb --line-directive '' -o QueryTests2.swift QueryTests.gyb.swift
 }%
 %{
     properties = [
@@ -84,8 +84,19 @@ import XCTest
 
     ]
 
-    mixed = [
-        ('anyCol', '.string("FooBar")'),
+    anyRealmValues = [
+        ('.none', 'NSNull()', 'null'),
+        ('.int(123)', '123', 'numeric'),
+        ('.bool(true)', 'true', 'bool'),
+        ('.float(123.456)', 'Float(123.456)', 'numeric'),
+        ('.double(123.456)', '123.456', 'numeric'),
+        ('.string("FooBar")', '"FooBar"', 'string'),
+        ('.data(Data(count: 64))', 'Data(count: 64)', 'binary'),
+        ('.date(Date(timeIntervalSince1970: 1000000))', 'Date(timeIntervalSince1970: 1000000)', 'numeric'),
+        ('.object(circleObject)', 'circleObject', 'object'),
+        ('.objectId(ObjectId("61184062c1d8f096a3695046"))', 'ObjectId("61184062c1d8f096a3695046")', 'objectId'),
+        ('.decimal128(123.456)', 'Decimal128(123.456)', 'numeric'),
+        ('.uuid(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'uuid'),
     ]
 }%
 /// This file is generated from a template. Do not edit directly.
@@ -93,6 +104,26 @@ class QueryTests_: TestCase {
 
     private func objects() -> Results<ModernAllTypesObject> {
         realmWithTestPath().objects(ModernAllTypesObject.self)
+    }
+
+    private func setAnyRealmValueCol(with value: AnyRealmValue, object: ModernAllTypesObject) {
+        let realm = realmWithTestPath()
+        try! realm.write {
+            object.anyCol = value
+        }
+    }
+
+    private var circleObject: ModernCircleObject {
+        let realm = realmWithTestPath()
+        if let object = realm.objects(ModernCircleObject.self).first {
+            return object
+        } else {
+            let object = ModernCircleObject()
+            try! realm.write {
+                realm.add(object)
+            }
+            return object
+        }
     }
 
     override func setUp() {
@@ -103,7 +134,6 @@ class QueryTests_: TestCase {
             % for property in properties + optProperties:
             object.${property[0]} = ${property[1]}
             % end
-
 
             % for list in primitiveLists:
             object.${list[0]}.append(objectsIn: ${list[1]})
@@ -125,7 +155,11 @@ class QueryTests_: TestCase {
                        predicate)
 
         for (e1, e2) in zip(constructedPredicate.1, values) {
-            XCTAssertEqual(e1 as! T, e2)
+            if let e1 = e1 as? Object, let e2 = e2 as? Object {
+                assertEqual(e1, e2)
+            } else {
+                XCTAssertEqual(e1 as! T, e2)
+            }
         }
     }
 
@@ -133,7 +167,7 @@ class QueryTests_: TestCase {
         % for property in properties:
         // ${property[0]}
 
-        % # Count of 4 assumes enum, we can clean this logic up.
+        % # Count of 5 assumes enum.
         % if len(property) == 5:
         assertQuery(predicate: "${property[0]} == %@", values: [${property[4]}], expectedCount: 1) {
             $0.${property[0]} == ${property[1]}
@@ -177,11 +211,33 @@ class QueryTests_: TestCase {
         % end
     }
 
+    func testEqualAnyRealmValue() {
+        % for value in anyRealmValues:
+
+        setAnyRealmValueCol(with: AnyRealmValue${value[0]}, object: objects()[0])
+        assertQuery(predicate: "anyCol == %@", values: [${value[1]}], expectedCount: 1) {
+            $0.anyCol == ${value[0]}
+        }
+        % end
+    }
+
+    func testEqualObject() {
+        let nestedObject = ModernAllTypesObject()
+        let object = objects().first!
+        let realm = realmWithTestPath()
+        try! realm.write {
+            object.objectCol = nestedObject
+        }
+        assertQuery(predicate: "objectCol == %@", values: [nestedObject], expectedCount: 1) {
+            $0.objectCol == nestedObject
+        }
+    }
+
     func testNotEquals() {
         % for property in properties:
         // ${property[0]}
 
-        % # Count of 4 assumes enum, we can clean this logic up.
+        % # Count of 5 assumes enum.
         % if len(property) == 5:
         assertQuery(predicate: "${property[0]} != %@", values: [${property[4]}], expectedCount: 0) {
             $0.${property[0]} != ${property[1]}
@@ -198,7 +254,7 @@ class QueryTests_: TestCase {
         % for property in optProperties:
         // ${property[0]}
 
-        % # Count of 4 assumes enum, we can clean this logic up.
+        % # Count of 5 assumes enum.
         % if len(property) == 5:
         assertQuery(predicate: "${property[0]} != %@", values: [${property[4]}], expectedCount: 0) {
             $0.${property[0]} != ${property[1]}
@@ -226,9 +282,32 @@ class QueryTests_: TestCase {
         % end
     }
 
+    func testNotEqualAnyRealmValue() {
+        % for value in anyRealmValues:
+
+        setAnyRealmValueCol(with: AnyRealmValue${value[0]}, object: objects()[0])
+        assertQuery(predicate: "anyCol != %@", values: [${value[1]}], expectedCount: 0) {
+            $0.anyCol != ${value[0]}
+        }
+        % end
+    }
+
+    func testNotEqualObject() {
+        let nestedObject = ModernAllTypesObject()
+        let object = objects().first!
+        let realm = realmWithTestPath()
+        try! realm.write {
+            object.objectCol = nestedObject
+        }
+        // Count will be one because nestedObject.objectCol will be nil
+        assertQuery(predicate: "objectCol != %@", values: [nestedObject], expectedCount: 1) {
+            $0.objectCol != nestedObject
+        }
+    }
+
    func testGreaterThan() {
         % for property in properties:
-        % # Count of 4 assumes enum, we can clean this logic up.
+        % # Count of 5 assumes enum.
         % if len(property) == 5 and property[3] == 'numeric':
         // ${property[0]}
         assertQuery(predicate: "${property[0]} > %@", values: [${property[4]}], expectedCount: 0) {
@@ -251,7 +330,7 @@ class QueryTests_: TestCase {
 
     func testGreaterThanOptional() {
         % for property in optProperties:
-        % # Count of 4 assumes enum, we can clean this logic up.
+        % # Count of 5 assumes enum.
         % if len(property) == 5 and property[3] == 'numeric':
         // ${property[0]}
         assertQuery(predicate: "${property[0]} > %@", values: [${property[4]}], expectedCount: 0) {
@@ -293,9 +372,24 @@ class QueryTests_: TestCase {
         % end
     }
 
+    func testGreaterThanAnyRealmValue() {
+        % for value in anyRealmValues:
+        % if value[2] == 'numeric':
+
+        setAnyRealmValueCol(with: AnyRealmValue${value[0]}, object: objects()[0])
+        assertQuery(predicate: "anyCol > %@", values: [${value[1]}], expectedCount: 0) {
+            $0.anyCol > ${value[0]}
+        }
+        assertQuery(predicate: "anyCol >= %@", values: [${value[1]}], expectedCount: 1) {
+            $0.anyCol >= ${value[0]}
+        }
+        % end
+        % end
+    }
+
     func testLessThan() {
         % for property in properties:
-        % # Count of 4 assumes enum, we can clean this logic up.
+        % # Count of 5 assumes enum.
         % if len(property) == 5 and property[3] == 'numeric':
         // ${property[0]}
         assertQuery(predicate: "${property[0]} < %@", values: [${property[4]}], expectedCount: 0) {
@@ -318,7 +412,7 @@ class QueryTests_: TestCase {
 
     func testLessThanOptional() {
         % for property in optProperties:
-        % # Count of 4 assumes enum, we can clean this logic up.
+        % # Count of 5 assumes enum.
         % if len(property) == 5 and property[3] == 'numeric':
         // ${property[0]}
         assertQuery(predicate: "${property[0]} < %@", values: [${property[4]}], expectedCount: 0) {
@@ -355,6 +449,21 @@ class QueryTests_: TestCase {
         }
         assertQuery(predicate: "${property[0]} <= %@", values: [NSNull()], expectedCount: 0) {
             $0.${property[0]} <= nil
+        }
+        % end
+        % end
+    }
+
+    func testLessThanAnyRealmValue() {
+        % for value in anyRealmValues:
+        % if value[2] == 'numeric':
+
+        setAnyRealmValueCol(with: AnyRealmValue${value[0]}, object: objects()[0])
+        assertQuery(predicate: "anyCol < %@", values: [${value[1]}], expectedCount: 0) {
+            $0.anyCol < ${value[0]}
+        }
+        assertQuery(predicate: "anyCol <= %@", values: [${value[1]}], expectedCount: 1) {
+            $0.anyCol <= ${value[0]}
         }
         % end
         % end
