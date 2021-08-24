@@ -39,10 +39,10 @@ import XCTest
     properties = [
         Property('boolCol', ['true', 'false'], 'Bool', 'bool'),
         Property('intCol', [5, 6, 7], 'Int', 'numeric'),
-        Property('int8Col', [8, 9, 10], 'Int8', 'numeric'),
-        Property('int16Col', [16, 17, 18], 'Int16', 'numeric'),
-        Property('int32Col', [32, 33, 34], 'Int32', 'numeric'),
-        Property('int64Col', [64, 65, 66], 'Int64', 'numeric'),
+        Property('int8Col', ['Int8(8)', 'Int8(9)', 'Int8(10)'], 'Int8', 'numeric'),
+        Property('int16Col', ['Int16(16)', 'Int16(17)', 'Int16(18)'], 'Int16', 'numeric'),
+        Property('int32Col', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32', 'numeric'),
+        Property('int64Col', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64', 'numeric'),
         Property('floatCol', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float', 'numeric'),
         Property('doubleCol', [5.55444333, 6.55444333, 7.55444333], 'Double', 'numeric'),
         #Property('stringCol', ['"Foo"', '"Foó"', '"foo"'], 'String', 'string'),
@@ -58,10 +58,10 @@ import XCTest
     optProperties = [
         Property('optBoolCol', ['true', 'false'], 'Bool?', 'bool'),
         Property('optIntCol', [5, 6, 7], 'Int?', 'numeric'),
-        Property('optInt8Col', [8, 9, 10], 'Int8?', 'numeric'),
-        Property('optInt16Col', [16, 17, 18], 'Int16?', 'numeric'),
-        Property('optInt32Col', [32, 33, 34], 'Int32?', 'numeric'),
-        Property('optInt64Col', [64, 65, 66], 'Int64?', 'numeric'),
+        Property('optInt8Col', ['Int8(8)', 'Int8(9)', 'Int8(10)'], 'Int8?', 'numeric'),
+        Property('optInt16Col', ['Int16(16)', 'Int16(17)', 'Int16(18)'], 'Int16?', 'numeric'),
+        Property('optInt32Col', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32?', 'numeric'),
+        Property('optInt64Col', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64?', 'numeric'),
         Property('optFloatCol', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float?', 'numeric'),
         Property('optDoubleCol', [5.55444333, 6.55444333, 7.55444333], 'Double?', 'numeric'),
         #Property('optStringCol', ['"Foo"', '"Foó"', '"foo"'], 'String?', 'string'),
@@ -498,6 +498,29 @@ class QueryTests_: TestCase {
         assertQuery(predicate: "anyCol <= %@", values: [${value[1]}], expectedCount: 1) {
             $0.anyCol <= ${value[0]}
         }
+        % end
+        % end
+    }
+
+    func testNumericContains() {
+        % for property in properties + optProperties:
+        % if property.enumName == None and property.category == 'numeric':
+        assertQuery(predicate: "${property.colName} >= %@ && ${property.colName} < %@", values: [${property.values[0]}, ${property.values[2]}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.values[0]}..<${property.values[2]})
+        }
+
+        assertQuery(predicate: "${property.colName} >= %@ && ${property.colName} < %@", values: [${property.values[0]}, ${property.values[1]}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.values[0]}..<${property.values[1]})
+        }
+
+        assertQuery(predicate: "${property.colName} BETWEEN {%@, %@}", values: [${property.values[0]}, ${property.values[2]}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.values[0]}...${property.values[2]})
+        }
+
+        assertQuery(predicate: "${property.colName} BETWEEN {%@, %@}", values: [${property.values[0]}, ${property.values[1]}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.values[0]}...${property.values[1]})
+        }
+
         % end
         % end
     }

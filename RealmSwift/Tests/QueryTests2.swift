@@ -52,10 +52,10 @@ class QueryTests_: TestCase {
 
             object.boolCol = false
             object.intCol = 6
-            object.int8Col = 9
-            object.int16Col = 17
-            object.int32Col = 33
-            object.int64Col = 65
+            object.int8Col = Int8(9)
+            object.int16Col = Int16(17)
+            object.int32Col = Int32(33)
+            object.int64Col = Int64(65)
             object.floatCol = Float(6.55444333)
             object.doubleCol = 6.55444333
             object.binaryCol = Data(count: 128)
@@ -67,10 +67,10 @@ class QueryTests_: TestCase {
             object.uuidCol = UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!
             object.optBoolCol = false
             object.optIntCol = 6
-            object.optInt8Col = 9
-            object.optInt16Col = 17
-            object.optInt32Col = 33
-            object.optInt64Col = 65
+            object.optInt8Col = Int8(9)
+            object.optInt16Col = Int16(17)
+            object.optInt32Col = Int32(33)
+            object.optInt64Col = Int64(65)
             object.optFloatCol = Float(6.55444333)
             object.optDoubleCol = 6.55444333
             object.optBinaryCol = Data(count: 128)
@@ -133,23 +133,23 @@ class QueryTests_: TestCase {
         }
 
         // int8Col
-        assertQuery(predicate: "int8Col == %@", values: [9], expectedCount: 1) {
-            $0.int8Col == 9
+        assertQuery(predicate: "int8Col == %@", values: [Int8(9)], expectedCount: 1) {
+            $0.int8Col == Int8(9)
         }
 
         // int16Col
-        assertQuery(predicate: "int16Col == %@", values: [17], expectedCount: 1) {
-            $0.int16Col == 17
+        assertQuery(predicate: "int16Col == %@", values: [Int16(17)], expectedCount: 1) {
+            $0.int16Col == Int16(17)
         }
 
         // int32Col
-        assertQuery(predicate: "int32Col == %@", values: [33], expectedCount: 1) {
-            $0.int32Col == 33
+        assertQuery(predicate: "int32Col == %@", values: [Int32(33)], expectedCount: 1) {
+            $0.int32Col == Int32(33)
         }
 
         // int64Col
-        assertQuery(predicate: "int64Col == %@", values: [65], expectedCount: 1) {
-            $0.int64Col == 65
+        assertQuery(predicate: "int64Col == %@", values: [Int64(65)], expectedCount: 1) {
+            $0.int64Col == Int64(65)
         }
 
         // floatCol
@@ -212,23 +212,23 @@ class QueryTests_: TestCase {
         }
         // optInt8Col
 
-        assertQuery(predicate: "optInt8Col == %@", values: [9], expectedCount: 1) {
-            $0.optInt8Col == 9
+        assertQuery(predicate: "optInt8Col == %@", values: [Int8(9)], expectedCount: 1) {
+            $0.optInt8Col == Int8(9)
         }
         // optInt16Col
 
-        assertQuery(predicate: "optInt16Col == %@", values: [17], expectedCount: 1) {
-            $0.optInt16Col == 17
+        assertQuery(predicate: "optInt16Col == %@", values: [Int16(17)], expectedCount: 1) {
+            $0.optInt16Col == Int16(17)
         }
         // optInt32Col
 
-        assertQuery(predicate: "optInt32Col == %@", values: [33], expectedCount: 1) {
-            $0.optInt32Col == 33
+        assertQuery(predicate: "optInt32Col == %@", values: [Int32(33)], expectedCount: 1) {
+            $0.optInt32Col == Int32(33)
         }
         // optInt64Col
 
-        assertQuery(predicate: "optInt64Col == %@", values: [65], expectedCount: 1) {
-            $0.optInt64Col == 65
+        assertQuery(predicate: "optInt64Col == %@", values: [Int64(65)], expectedCount: 1) {
+            $0.optInt64Col == Int64(65)
         }
         // optFloatCol
 
@@ -465,23 +465,23 @@ class QueryTests_: TestCase {
         }
         // int8Col
 
-        assertQuery(predicate: "int8Col != %@", values: [9], expectedCount: 0) {
-            $0.int8Col != 9
+        assertQuery(predicate: "int8Col != %@", values: [Int8(9)], expectedCount: 0) {
+            $0.int8Col != Int8(9)
         }
         // int16Col
 
-        assertQuery(predicate: "int16Col != %@", values: [17], expectedCount: 0) {
-            $0.int16Col != 17
+        assertQuery(predicate: "int16Col != %@", values: [Int16(17)], expectedCount: 0) {
+            $0.int16Col != Int16(17)
         }
         // int32Col
 
-        assertQuery(predicate: "int32Col != %@", values: [33], expectedCount: 0) {
-            $0.int32Col != 33
+        assertQuery(predicate: "int32Col != %@", values: [Int32(33)], expectedCount: 0) {
+            $0.int32Col != Int32(33)
         }
         // int64Col
 
-        assertQuery(predicate: "int64Col != %@", values: [65], expectedCount: 0) {
-            $0.int64Col != 65
+        assertQuery(predicate: "int64Col != %@", values: [Int64(65)], expectedCount: 0) {
+            $0.int64Col != Int64(65)
         }
         // floatCol
 
@@ -543,23 +543,23 @@ class QueryTests_: TestCase {
         }
         // optInt8Col
 
-        assertQuery(predicate: "optInt8Col != %@", values: [9], expectedCount: 0) {
-            $0.optInt8Col != 9
+        assertQuery(predicate: "optInt8Col != %@", values: [Int8(9)], expectedCount: 0) {
+            $0.optInt8Col != Int8(9)
         }
         // optInt16Col
 
-        assertQuery(predicate: "optInt16Col != %@", values: [17], expectedCount: 0) {
-            $0.optInt16Col != 17
+        assertQuery(predicate: "optInt16Col != %@", values: [Int16(17)], expectedCount: 0) {
+            $0.optInt16Col != Int16(17)
         }
         // optInt32Col
 
-        assertQuery(predicate: "optInt32Col != %@", values: [33], expectedCount: 0) {
-            $0.optInt32Col != 33
+        assertQuery(predicate: "optInt32Col != %@", values: [Int32(33)], expectedCount: 0) {
+            $0.optInt32Col != Int32(33)
         }
         // optInt64Col
 
-        assertQuery(predicate: "optInt64Col != %@", values: [65], expectedCount: 0) {
-            $0.optInt64Col != 65
+        assertQuery(predicate: "optInt64Col != %@", values: [Int64(65)], expectedCount: 0) {
+            $0.optInt64Col != Int64(65)
         }
         // optFloatCol
 
@@ -781,32 +781,32 @@ class QueryTests_: TestCase {
             $0.intCol >= 6
         }
         // int8Col
-        assertQuery(predicate: "int8Col > %@", values: [9], expectedCount: 0) {
-            $0.int8Col > 9
+        assertQuery(predicate: "int8Col > %@", values: [Int8(9)], expectedCount: 0) {
+            $0.int8Col > Int8(9)
         }
-        assertQuery(predicate: "int8Col >= %@", values: [9], expectedCount: 1) {
-            $0.int8Col >= 9
+        assertQuery(predicate: "int8Col >= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.int8Col >= Int8(9)
         }
         // int16Col
-        assertQuery(predicate: "int16Col > %@", values: [17], expectedCount: 0) {
-            $0.int16Col > 17
+        assertQuery(predicate: "int16Col > %@", values: [Int16(17)], expectedCount: 0) {
+            $0.int16Col > Int16(17)
         }
-        assertQuery(predicate: "int16Col >= %@", values: [17], expectedCount: 1) {
-            $0.int16Col >= 17
+        assertQuery(predicate: "int16Col >= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.int16Col >= Int16(17)
         }
         // int32Col
-        assertQuery(predicate: "int32Col > %@", values: [33], expectedCount: 0) {
-            $0.int32Col > 33
+        assertQuery(predicate: "int32Col > %@", values: [Int32(33)], expectedCount: 0) {
+            $0.int32Col > Int32(33)
         }
-        assertQuery(predicate: "int32Col >= %@", values: [33], expectedCount: 1) {
-            $0.int32Col >= 33
+        assertQuery(predicate: "int32Col >= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.int32Col >= Int32(33)
         }
         // int64Col
-        assertQuery(predicate: "int64Col > %@", values: [65], expectedCount: 0) {
-            $0.int64Col > 65
+        assertQuery(predicate: "int64Col > %@", values: [Int64(65)], expectedCount: 0) {
+            $0.int64Col > Int64(65)
         }
-        assertQuery(predicate: "int64Col >= %@", values: [65], expectedCount: 1) {
-            $0.int64Col >= 65
+        assertQuery(predicate: "int64Col >= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.int64Col >= Int64(65)
         }
         // floatCol
         assertQuery(predicate: "floatCol > %@", values: [Float(6.55444333)], expectedCount: 0) {
@@ -854,32 +854,32 @@ class QueryTests_: TestCase {
             $0.optIntCol >= 6
         }
         // optInt8Col
-        assertQuery(predicate: "optInt8Col > %@", values: [9], expectedCount: 0) {
-            $0.optInt8Col > 9
+        assertQuery(predicate: "optInt8Col > %@", values: [Int8(9)], expectedCount: 0) {
+            $0.optInt8Col > Int8(9)
         }
-        assertQuery(predicate: "optInt8Col >= %@", values: [9], expectedCount: 1) {
-            $0.optInt8Col >= 9
+        assertQuery(predicate: "optInt8Col >= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.optInt8Col >= Int8(9)
         }
         // optInt16Col
-        assertQuery(predicate: "optInt16Col > %@", values: [17], expectedCount: 0) {
-            $0.optInt16Col > 17
+        assertQuery(predicate: "optInt16Col > %@", values: [Int16(17)], expectedCount: 0) {
+            $0.optInt16Col > Int16(17)
         }
-        assertQuery(predicate: "optInt16Col >= %@", values: [17], expectedCount: 1) {
-            $0.optInt16Col >= 17
+        assertQuery(predicate: "optInt16Col >= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.optInt16Col >= Int16(17)
         }
         // optInt32Col
-        assertQuery(predicate: "optInt32Col > %@", values: [33], expectedCount: 0) {
-            $0.optInt32Col > 33
+        assertQuery(predicate: "optInt32Col > %@", values: [Int32(33)], expectedCount: 0) {
+            $0.optInt32Col > Int32(33)
         }
-        assertQuery(predicate: "optInt32Col >= %@", values: [33], expectedCount: 1) {
-            $0.optInt32Col >= 33
+        assertQuery(predicate: "optInt32Col >= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.optInt32Col >= Int32(33)
         }
         // optInt64Col
-        assertQuery(predicate: "optInt64Col > %@", values: [65], expectedCount: 0) {
-            $0.optInt64Col > 65
+        assertQuery(predicate: "optInt64Col > %@", values: [Int64(65)], expectedCount: 0) {
+            $0.optInt64Col > Int64(65)
         }
-        assertQuery(predicate: "optInt64Col >= %@", values: [65], expectedCount: 1) {
-            $0.optInt64Col >= 65
+        assertQuery(predicate: "optInt64Col >= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.optInt64Col >= Int64(65)
         }
         // optFloatCol
         assertQuery(predicate: "optFloatCol > %@", values: [Float(6.55444333)], expectedCount: 0) {
@@ -1037,32 +1037,32 @@ class QueryTests_: TestCase {
             $0.intCol <= 6
         }
         // int8Col
-        assertQuery(predicate: "int8Col < %@", values: [9], expectedCount: 0) {
-            $0.int8Col < 9
+        assertQuery(predicate: "int8Col < %@", values: [Int8(9)], expectedCount: 0) {
+            $0.int8Col < Int8(9)
         }
-        assertQuery(predicate: "int8Col <= %@", values: [9], expectedCount: 1) {
-            $0.int8Col <= 9
+        assertQuery(predicate: "int8Col <= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.int8Col <= Int8(9)
         }
         // int16Col
-        assertQuery(predicate: "int16Col < %@", values: [17], expectedCount: 0) {
-            $0.int16Col < 17
+        assertQuery(predicate: "int16Col < %@", values: [Int16(17)], expectedCount: 0) {
+            $0.int16Col < Int16(17)
         }
-        assertQuery(predicate: "int16Col <= %@", values: [17], expectedCount: 1) {
-            $0.int16Col <= 17
+        assertQuery(predicate: "int16Col <= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.int16Col <= Int16(17)
         }
         // int32Col
-        assertQuery(predicate: "int32Col < %@", values: [33], expectedCount: 0) {
-            $0.int32Col < 33
+        assertQuery(predicate: "int32Col < %@", values: [Int32(33)], expectedCount: 0) {
+            $0.int32Col < Int32(33)
         }
-        assertQuery(predicate: "int32Col <= %@", values: [33], expectedCount: 1) {
-            $0.int32Col <= 33
+        assertQuery(predicate: "int32Col <= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.int32Col <= Int32(33)
         }
         // int64Col
-        assertQuery(predicate: "int64Col < %@", values: [65], expectedCount: 0) {
-            $0.int64Col < 65
+        assertQuery(predicate: "int64Col < %@", values: [Int64(65)], expectedCount: 0) {
+            $0.int64Col < Int64(65)
         }
-        assertQuery(predicate: "int64Col <= %@", values: [65], expectedCount: 1) {
-            $0.int64Col <= 65
+        assertQuery(predicate: "int64Col <= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.int64Col <= Int64(65)
         }
         // floatCol
         assertQuery(predicate: "floatCol < %@", values: [Float(6.55444333)], expectedCount: 0) {
@@ -1110,32 +1110,32 @@ class QueryTests_: TestCase {
             $0.optIntCol <= 6
         }
         // optInt8Col
-        assertQuery(predicate: "optInt8Col < %@", values: [9], expectedCount: 0) {
-            $0.optInt8Col < 9
+        assertQuery(predicate: "optInt8Col < %@", values: [Int8(9)], expectedCount: 0) {
+            $0.optInt8Col < Int8(9)
         }
-        assertQuery(predicate: "optInt8Col <= %@", values: [9], expectedCount: 1) {
-            $0.optInt8Col <= 9
+        assertQuery(predicate: "optInt8Col <= %@", values: [Int8(9)], expectedCount: 1) {
+            $0.optInt8Col <= Int8(9)
         }
         // optInt16Col
-        assertQuery(predicate: "optInt16Col < %@", values: [17], expectedCount: 0) {
-            $0.optInt16Col < 17
+        assertQuery(predicate: "optInt16Col < %@", values: [Int16(17)], expectedCount: 0) {
+            $0.optInt16Col < Int16(17)
         }
-        assertQuery(predicate: "optInt16Col <= %@", values: [17], expectedCount: 1) {
-            $0.optInt16Col <= 17
+        assertQuery(predicate: "optInt16Col <= %@", values: [Int16(17)], expectedCount: 1) {
+            $0.optInt16Col <= Int16(17)
         }
         // optInt32Col
-        assertQuery(predicate: "optInt32Col < %@", values: [33], expectedCount: 0) {
-            $0.optInt32Col < 33
+        assertQuery(predicate: "optInt32Col < %@", values: [Int32(33)], expectedCount: 0) {
+            $0.optInt32Col < Int32(33)
         }
-        assertQuery(predicate: "optInt32Col <= %@", values: [33], expectedCount: 1) {
-            $0.optInt32Col <= 33
+        assertQuery(predicate: "optInt32Col <= %@", values: [Int32(33)], expectedCount: 1) {
+            $0.optInt32Col <= Int32(33)
         }
         // optInt64Col
-        assertQuery(predicate: "optInt64Col < %@", values: [65], expectedCount: 0) {
-            $0.optInt64Col < 65
+        assertQuery(predicate: "optInt64Col < %@", values: [Int64(65)], expectedCount: 0) {
+            $0.optInt64Col < Int64(65)
         }
-        assertQuery(predicate: "optInt64Col <= %@", values: [65], expectedCount: 1) {
-            $0.optInt64Col <= 65
+        assertQuery(predicate: "optInt64Col <= %@", values: [Int64(65)], expectedCount: 1) {
+            $0.optInt64Col <= Int64(65)
         }
         // optFloatCol
         assertQuery(predicate: "optFloatCol < %@", values: [Float(6.55444333)], expectedCount: 0) {
@@ -1282,5 +1282,296 @@ class QueryTests_: TestCase {
         assertQuery(predicate: "anyCol <= %@", values: [Decimal128(123.456)], expectedCount: 1) {
             $0.anyCol <= .decimal128(123.456)
         }
+    }
+
+    func testNumericContains() {
+        assertQuery(predicate: "intCol >= %@ && intCol < %@", values: [5, 7], expectedCount: 1) {
+            $0.intCol.contains(5..<7)
+        }
+
+        assertQuery(predicate: "intCol >= %@ && intCol < %@", values: [5, 6], expectedCount: 0) {
+            $0.intCol.contains(5..<6)
+        }
+
+        assertQuery(predicate: "intCol BETWEEN {%@, %@}", values: [5, 7], expectedCount: 1) {
+            $0.intCol.contains(5...7)
+        }
+
+        assertQuery(predicate: "intCol BETWEEN {%@, %@}", values: [5, 6], expectedCount: 1) {
+            $0.intCol.contains(5...6)
+        }
+
+        assertQuery(predicate: "int8Col >= %@ && int8Col < %@", values: [Int8(8), Int8(10)], expectedCount: 1) {
+            $0.int8Col.contains(Int8(8)..<Int8(10))
+        }
+
+        assertQuery(predicate: "int8Col >= %@ && int8Col < %@", values: [Int8(8), Int8(9)], expectedCount: 0) {
+            $0.int8Col.contains(Int8(8)..<Int8(9))
+        }
+
+        assertQuery(predicate: "int8Col BETWEEN {%@, %@}", values: [Int8(8), Int8(10)], expectedCount: 1) {
+            $0.int8Col.contains(Int8(8)...Int8(10))
+        }
+
+        assertQuery(predicate: "int8Col BETWEEN {%@, %@}", values: [Int8(8), Int8(9)], expectedCount: 1) {
+            $0.int8Col.contains(Int8(8)...Int8(9))
+        }
+
+        assertQuery(predicate: "int16Col >= %@ && int16Col < %@", values: [Int16(16), Int16(18)], expectedCount: 1) {
+            $0.int16Col.contains(Int16(16)..<Int16(18))
+        }
+
+        assertQuery(predicate: "int16Col >= %@ && int16Col < %@", values: [Int16(16), Int16(17)], expectedCount: 0) {
+            $0.int16Col.contains(Int16(16)..<Int16(17))
+        }
+
+        assertQuery(predicate: "int16Col BETWEEN {%@, %@}", values: [Int16(16), Int16(18)], expectedCount: 1) {
+            $0.int16Col.contains(Int16(16)...Int16(18))
+        }
+
+        assertQuery(predicate: "int16Col BETWEEN {%@, %@}", values: [Int16(16), Int16(17)], expectedCount: 1) {
+            $0.int16Col.contains(Int16(16)...Int16(17))
+        }
+
+        assertQuery(predicate: "int32Col >= %@ && int32Col < %@", values: [Int32(32), Int32(34)], expectedCount: 1) {
+            $0.int32Col.contains(Int32(32)..<Int32(34))
+        }
+
+        assertQuery(predicate: "int32Col >= %@ && int32Col < %@", values: [Int32(32), Int32(33)], expectedCount: 0) {
+            $0.int32Col.contains(Int32(32)..<Int32(33))
+        }
+
+        assertQuery(predicate: "int32Col BETWEEN {%@, %@}", values: [Int32(32), Int32(34)], expectedCount: 1) {
+            $0.int32Col.contains(Int32(32)...Int32(34))
+        }
+
+        assertQuery(predicate: "int32Col BETWEEN {%@, %@}", values: [Int32(32), Int32(33)], expectedCount: 1) {
+            $0.int32Col.contains(Int32(32)...Int32(33))
+        }
+
+        assertQuery(predicate: "int64Col >= %@ && int64Col < %@", values: [Int64(64), Int64(66)], expectedCount: 1) {
+            $0.int64Col.contains(Int64(64)..<Int64(66))
+        }
+
+        assertQuery(predicate: "int64Col >= %@ && int64Col < %@", values: [Int64(64), Int64(65)], expectedCount: 0) {
+            $0.int64Col.contains(Int64(64)..<Int64(65))
+        }
+
+        assertQuery(predicate: "int64Col BETWEEN {%@, %@}", values: [Int64(64), Int64(66)], expectedCount: 1) {
+            $0.int64Col.contains(Int64(64)...Int64(66))
+        }
+
+        assertQuery(predicate: "int64Col BETWEEN {%@, %@}", values: [Int64(64), Int64(65)], expectedCount: 1) {
+            $0.int64Col.contains(Int64(64)...Int64(65))
+        }
+
+        assertQuery(predicate: "floatCol >= %@ && floatCol < %@", values: [Float(5.55444333), Float(7.55444333)], expectedCount: 1) {
+            $0.floatCol.contains(Float(5.55444333)..<Float(7.55444333))
+        }
+
+        assertQuery(predicate: "floatCol >= %@ && floatCol < %@", values: [Float(5.55444333), Float(6.55444333)], expectedCount: 0) {
+            $0.floatCol.contains(Float(5.55444333)..<Float(6.55444333))
+        }
+
+        assertQuery(predicate: "floatCol BETWEEN {%@, %@}", values: [Float(5.55444333), Float(7.55444333)], expectedCount: 1) {
+            $0.floatCol.contains(Float(5.55444333)...Float(7.55444333))
+        }
+
+        assertQuery(predicate: "floatCol BETWEEN {%@, %@}", values: [Float(5.55444333), Float(6.55444333)], expectedCount: 1) {
+            $0.floatCol.contains(Float(5.55444333)...Float(6.55444333))
+        }
+
+        assertQuery(predicate: "doubleCol >= %@ && doubleCol < %@", values: [5.55444333, 7.55444333], expectedCount: 1) {
+            $0.doubleCol.contains(5.55444333..<7.55444333)
+        }
+
+        assertQuery(predicate: "doubleCol >= %@ && doubleCol < %@", values: [5.55444333, 6.55444333], expectedCount: 0) {
+            $0.doubleCol.contains(5.55444333..<6.55444333)
+        }
+
+        assertQuery(predicate: "doubleCol BETWEEN {%@, %@}", values: [5.55444333, 7.55444333], expectedCount: 1) {
+            $0.doubleCol.contains(5.55444333...7.55444333)
+        }
+
+        assertQuery(predicate: "doubleCol BETWEEN {%@, %@}", values: [5.55444333, 6.55444333], expectedCount: 1) {
+            $0.doubleCol.contains(5.55444333...6.55444333)
+        }
+
+        assertQuery(predicate: "dateCol >= %@ && dateCol < %@", values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.dateCol.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 3000000))
+        }
+
+        assertQuery(predicate: "dateCol >= %@ && dateCol < %@", values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.dateCol.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 2000000))
+        }
+
+        assertQuery(predicate: "dateCol BETWEEN {%@, %@}", values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.dateCol.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 3000000))
+        }
+
+        assertQuery(predicate: "dateCol BETWEEN {%@, %@}", values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 1) {
+            $0.dateCol.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 2000000))
+        }
+
+        assertQuery(predicate: "decimalCol >= %@ && decimalCol < %@", values: [Decimal128(123.456), Decimal128(345.456)], expectedCount: 1) {
+            $0.decimalCol.contains(Decimal128(123.456)..<Decimal128(345.456))
+        }
+
+        assertQuery(predicate: "decimalCol >= %@ && decimalCol < %@", values: [Decimal128(123.456), Decimal128(234.456)], expectedCount: 0) {
+            $0.decimalCol.contains(Decimal128(123.456)..<Decimal128(234.456))
+        }
+
+        assertQuery(predicate: "decimalCol BETWEEN {%@, %@}", values: [Decimal128(123.456), Decimal128(345.456)], expectedCount: 1) {
+            $0.decimalCol.contains(Decimal128(123.456)...Decimal128(345.456))
+        }
+
+        assertQuery(predicate: "decimalCol BETWEEN {%@, %@}", values: [Decimal128(123.456), Decimal128(234.456)], expectedCount: 1) {
+            $0.decimalCol.contains(Decimal128(123.456)...Decimal128(234.456))
+        }
+
+        assertQuery(predicate: "optIntCol >= %@ && optIntCol < %@", values: [5, 7], expectedCount: 1) {
+            $0.optIntCol.contains(5..<7)
+        }
+
+        assertQuery(predicate: "optIntCol >= %@ && optIntCol < %@", values: [5, 6], expectedCount: 0) {
+            $0.optIntCol.contains(5..<6)
+        }
+
+        assertQuery(predicate: "optIntCol BETWEEN {%@, %@}", values: [5, 7], expectedCount: 1) {
+            $0.optIntCol.contains(5...7)
+        }
+
+        assertQuery(predicate: "optIntCol BETWEEN {%@, %@}", values: [5, 6], expectedCount: 1) {
+            $0.optIntCol.contains(5...6)
+        }
+
+        assertQuery(predicate: "optInt8Col >= %@ && optInt8Col < %@", values: [Int8(8), Int8(10)], expectedCount: 1) {
+            $0.optInt8Col.contains(Int8(8)..<Int8(10))
+        }
+
+        assertQuery(predicate: "optInt8Col >= %@ && optInt8Col < %@", values: [Int8(8), Int8(9)], expectedCount: 0) {
+            $0.optInt8Col.contains(Int8(8)..<Int8(9))
+        }
+
+        assertQuery(predicate: "optInt8Col BETWEEN {%@, %@}", values: [Int8(8), Int8(10)], expectedCount: 1) {
+            $0.optInt8Col.contains(Int8(8)...Int8(10))
+        }
+
+        assertQuery(predicate: "optInt8Col BETWEEN {%@, %@}", values: [Int8(8), Int8(9)], expectedCount: 1) {
+            $0.optInt8Col.contains(Int8(8)...Int8(9))
+        }
+
+        assertQuery(predicate: "optInt16Col >= %@ && optInt16Col < %@", values: [Int16(16), Int16(18)], expectedCount: 1) {
+            $0.optInt16Col.contains(Int16(16)..<Int16(18))
+        }
+
+        assertQuery(predicate: "optInt16Col >= %@ && optInt16Col < %@", values: [Int16(16), Int16(17)], expectedCount: 0) {
+            $0.optInt16Col.contains(Int16(16)..<Int16(17))
+        }
+
+        assertQuery(predicate: "optInt16Col BETWEEN {%@, %@}", values: [Int16(16), Int16(18)], expectedCount: 1) {
+            $0.optInt16Col.contains(Int16(16)...Int16(18))
+        }
+
+        assertQuery(predicate: "optInt16Col BETWEEN {%@, %@}", values: [Int16(16), Int16(17)], expectedCount: 1) {
+            $0.optInt16Col.contains(Int16(16)...Int16(17))
+        }
+
+        assertQuery(predicate: "optInt32Col >= %@ && optInt32Col < %@", values: [Int32(32), Int32(34)], expectedCount: 1) {
+            $0.optInt32Col.contains(Int32(32)..<Int32(34))
+        }
+
+        assertQuery(predicate: "optInt32Col >= %@ && optInt32Col < %@", values: [Int32(32), Int32(33)], expectedCount: 0) {
+            $0.optInt32Col.contains(Int32(32)..<Int32(33))
+        }
+
+        assertQuery(predicate: "optInt32Col BETWEEN {%@, %@}", values: [Int32(32), Int32(34)], expectedCount: 1) {
+            $0.optInt32Col.contains(Int32(32)...Int32(34))
+        }
+
+        assertQuery(predicate: "optInt32Col BETWEEN {%@, %@}", values: [Int32(32), Int32(33)], expectedCount: 1) {
+            $0.optInt32Col.contains(Int32(32)...Int32(33))
+        }
+
+        assertQuery(predicate: "optInt64Col >= %@ && optInt64Col < %@", values: [Int64(64), Int64(66)], expectedCount: 1) {
+            $0.optInt64Col.contains(Int64(64)..<Int64(66))
+        }
+
+        assertQuery(predicate: "optInt64Col >= %@ && optInt64Col < %@", values: [Int64(64), Int64(65)], expectedCount: 0) {
+            $0.optInt64Col.contains(Int64(64)..<Int64(65))
+        }
+
+        assertQuery(predicate: "optInt64Col BETWEEN {%@, %@}", values: [Int64(64), Int64(66)], expectedCount: 1) {
+            $0.optInt64Col.contains(Int64(64)...Int64(66))
+        }
+
+        assertQuery(predicate: "optInt64Col BETWEEN {%@, %@}", values: [Int64(64), Int64(65)], expectedCount: 1) {
+            $0.optInt64Col.contains(Int64(64)...Int64(65))
+        }
+
+        assertQuery(predicate: "optFloatCol >= %@ && optFloatCol < %@", values: [Float(5.55444333), Float(7.55444333)], expectedCount: 1) {
+            $0.optFloatCol.contains(Float(5.55444333)..<Float(7.55444333))
+        }
+
+        assertQuery(predicate: "optFloatCol >= %@ && optFloatCol < %@", values: [Float(5.55444333), Float(6.55444333)], expectedCount: 0) {
+            $0.optFloatCol.contains(Float(5.55444333)..<Float(6.55444333))
+        }
+
+        assertQuery(predicate: "optFloatCol BETWEEN {%@, %@}", values: [Float(5.55444333), Float(7.55444333)], expectedCount: 1) {
+            $0.optFloatCol.contains(Float(5.55444333)...Float(7.55444333))
+        }
+
+        assertQuery(predicate: "optFloatCol BETWEEN {%@, %@}", values: [Float(5.55444333), Float(6.55444333)], expectedCount: 1) {
+            $0.optFloatCol.contains(Float(5.55444333)...Float(6.55444333))
+        }
+
+        assertQuery(predicate: "optDoubleCol >= %@ && optDoubleCol < %@", values: [5.55444333, 7.55444333], expectedCount: 1) {
+            $0.optDoubleCol.contains(5.55444333..<7.55444333)
+        }
+
+        assertQuery(predicate: "optDoubleCol >= %@ && optDoubleCol < %@", values: [5.55444333, 6.55444333], expectedCount: 0) {
+            $0.optDoubleCol.contains(5.55444333..<6.55444333)
+        }
+
+        assertQuery(predicate: "optDoubleCol BETWEEN {%@, %@}", values: [5.55444333, 7.55444333], expectedCount: 1) {
+            $0.optDoubleCol.contains(5.55444333...7.55444333)
+        }
+
+        assertQuery(predicate: "optDoubleCol BETWEEN {%@, %@}", values: [5.55444333, 6.55444333], expectedCount: 1) {
+            $0.optDoubleCol.contains(5.55444333...6.55444333)
+        }
+
+        assertQuery(predicate: "optDateCol >= %@ && optDateCol < %@", values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.optDateCol.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 3000000))
+        }
+
+        assertQuery(predicate: "optDateCol >= %@ && optDateCol < %@", values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 0) {
+            $0.optDateCol.contains(Date(timeIntervalSince1970: 1000000)..<Date(timeIntervalSince1970: 2000000))
+        }
+
+        assertQuery(predicate: "optDateCol BETWEEN {%@, %@}", values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
+            $0.optDateCol.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 3000000))
+        }
+
+        assertQuery(predicate: "optDateCol BETWEEN {%@, %@}", values: [Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 2000000)], expectedCount: 1) {
+            $0.optDateCol.contains(Date(timeIntervalSince1970: 1000000)...Date(timeIntervalSince1970: 2000000))
+        }
+
+        assertQuery(predicate: "optDecimalCol >= %@ && optDecimalCol < %@", values: [Decimal128(123.456), Decimal128(345.456)], expectedCount: 1) {
+            $0.optDecimalCol.contains(Decimal128(123.456)..<Decimal128(345.456))
+        }
+
+        assertQuery(predicate: "optDecimalCol >= %@ && optDecimalCol < %@", values: [Decimal128(123.456), Decimal128(234.456)], expectedCount: 0) {
+            $0.optDecimalCol.contains(Decimal128(123.456)..<Decimal128(234.456))
+        }
+
+        assertQuery(predicate: "optDecimalCol BETWEEN {%@, %@}", values: [Decimal128(123.456), Decimal128(345.456)], expectedCount: 1) {
+            $0.optDecimalCol.contains(Decimal128(123.456)...Decimal128(345.456))
+        }
+
+        assertQuery(predicate: "optDecimalCol BETWEEN {%@, %@}", values: [Decimal128(123.456), Decimal128(234.456)], expectedCount: 1) {
+            $0.optDecimalCol.contains(Decimal128(123.456)...Decimal128(234.456))
+        }
+
     }
 }
