@@ -19,51 +19,59 @@ import XCTest
 @testable import RealmSwift
 
 %{
-# How to use:
-#
-# $ wget https://github.com/apple/swift/raw/main/utils/gyb
-# $ wget https://github.com/apple/swift/raw/main/utils/gyb.py
-# $ chmod +x gyb
-#
-# ./YOUR_GYB_LOCATION/gyb --line-directive '' -o QueryTests2.swift QueryTests.gyb.swift
+    # How to use:
+    #
+    # $ wget https://github.com/apple/swift/raw/main/utils/gyb
+    # $ wget https://github.com/apple/swift/raw/main/utils/gyb.py
+    # $ chmod +x gyb
+    #
+    # ./YOUR_GYB_LOCATION/gyb --line-directive '' -o QueryTests2.swift QueryTests.gyb.swift
 }%
 %{
+    class Property:
+        def __init__(self, colName, values, type, category, enumName=None):
+            self.colName = colName
+            self.values = values
+            self.type = type
+            self.category = category
+            self.enumName = enumName
+
     properties = [
-        ('boolCol', 'true', 'Bool', 'bool'),
-        ('intCol', 5, 'Int', 'numeric'),
-        ('int8Col', 8, 'Int8', 'numeric'),
-        ('int16Col', 16, 'Int16', 'numeric'),
-        ('int32Col', 32, 'Int32', 'numeric'),
-        ('int64Col', 64, 'Int64', 'numeric'),
-        ('floatCol', 'Float(5.55444333)', 'Float', 'numeric'),
-        ('doubleCol', 5.55444333, 'Double', 'numeric'),
-        ('stringCol', '"Foo"', 'String', 'string'),
-        ('binaryCol', 'Data(count: 64)', 'Data', 'binary'),
-        ('dateCol', 'Date(timeIntervalSince1970: 1000000)', 'Date', 'numeric'),
-        ('decimalCol', 'Decimal128(123.456)', 'Decimal128', 'numeric'),
-        ('objectIdCol', 'ObjectId("61184062c1d8f096a3695046")', 'ObjectId', 'objectId'),
-        ('intEnumCol', '.value1', 'Int', 'numeric', 'ModernIntEnum.value1.rawValue'),
-        ('stringEnumCol', '.value1', 'String', 'string', 'ModernStringEnum.value1.rawValue'),
-        ('uuidCol', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID', 'uuid')
+        Property('boolCol', ['true', 'false'], 'Bool', 'bool'),
+        Property('intCol', [5, 6, 7], 'Int', 'numeric'),
+        Property('int8Col', [8, 9, 10], 'Int8', 'numeric'),
+        Property('int16Col', [16, 17, 18], 'Int16', 'numeric'),
+        Property('int32Col', [32, 33, 34], 'Int32', 'numeric'),
+        Property('int64Col', [64, 65, 66], 'Int64', 'numeric'),
+        Property('floatCol', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float', 'numeric'),
+        Property('doubleCol', [5.55444333, 6.55444333, 7.55444333], 'Double', 'numeric'),
+        #Property('stringCol', ['"Foo"', '"Foó"', '"foo"'], 'String', 'string'),
+        Property('binaryCol', ['Data(count: 64)', 'Data(count: 128)'], 'Data', 'binary'),
+        Property('dateCol', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date', 'numeric'),
+        Property('decimalCol', ['Decimal128(123.456)', 'Decimal128(234.456)', 'Decimal128(345.456)'], 'Decimal128', 'numeric'),
+        Property('objectIdCol', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")'], 'ObjectId', 'objectId'),
+        Property('intEnumCol', ['.value1', '.value2'], 'Int', 'numeric', 'ModernIntEnum.value2.rawValue'),
+        Property('stringEnumCol', ['.value1', '.value2'], 'String', 'string', 'ModernStringEnum.value2.rawValue'),
+        Property('uuidCol', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!'], 'UUID', 'uuid')
     ]
 
     optProperties = [
-        ('optBoolCol', 'true', 'Bool?', 'bool'),
-        ('optIntCol', 5, 'Int?', 'numeric'),
-        ('optInt8Col', 8, 'Int8?', 'numeric'),
-        ('optInt16Col', 16, 'Int16?', 'numeric'),
-        ('optInt32Col', 32, 'Int32?', 'numeric'),
-        ('optInt64Col', 64, 'Int64?', 'numeric'),
-        ('optFloatCol', 'Float(5.55444333)', 'Float?', 'numeric'),
-        ('optDoubleCol', 5.55444333,'Double?', 'numeric'),
-        ('optStringCol', '"Foo"', 'String?', 'string'),
-        ('optBinaryCol', 'Data(count: 64)', 'Data?', 'binary'),
-        ('optDateCol', 'Date(timeIntervalSince1970: 1000000)', 'Date?', 'numeric'),
-        ('optDecimalCol', 'Decimal128(123.456)', 'Decimal128?', 'numeric'),
-        ('optObjectIdCol', 'ObjectId("61184062c1d8f096a3695046")', 'ObjectId?', 'objectId'),
-        ('optIntEnumCol', '.value1', 'Int?', 'numeric', 'ModernIntEnum.value1.rawValue'),
-        ('optStringEnumCol', '.value1', 'String?', 'string', 'ModernStringEnum.value1.rawValue'),
-        ('optUuidCol', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID?', 'uuid')
+        Property('optBoolCol', ['true', 'false'], 'Bool?', 'bool'),
+        Property('optIntCol', [5, 6, 7], 'Int?', 'numeric'),
+        Property('optInt8Col', [8, 9, 10], 'Int8?', 'numeric'),
+        Property('optInt16Col', [16, 17, 18], 'Int16?', 'numeric'),
+        Property('optInt32Col', [32, 33, 34], 'Int32?', 'numeric'),
+        Property('optInt64Col', [64, 65, 66], 'Int64?', 'numeric'),
+        Property('optFloatCol', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float?', 'numeric'),
+        Property('optDoubleCol', [5.55444333, 6.55444333, 7.55444333], 'Double?', 'numeric'),
+        #Property('optStringCol', ['"Foo"', '"Foó"', '"foo"'], 'String?', 'string'),
+        Property('optBinaryCol', ['Data(count: 64)', 'Data(count: 128)'], 'Data?', 'binary'),
+        Property('optDateCol', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date?', 'numeric'),
+        Property('optDecimalCol', ['Decimal128(123.456)', 'Decimal128(234.456)', 'Decimal128(345.456)'], 'Decimal128?', 'numeric'),
+        Property('optObjectIdCol', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")'], 'ObjectId?', 'objectId'),
+        Property('optIntEnumCol', ['.value1', '.value2'], 'Int?', 'numeric', 'ModernIntEnum.value2.rawValue'),
+        Property('optStringEnumCol', ['.value1', '.value2'], 'String?', 'string', 'ModernStringEnum.value2.rawValue'),
+        Property('optUuidCol', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!'], 'UUID?', 'uuid')
     ]
 
     primitiveLists = [
@@ -132,7 +140,7 @@ class QueryTests_: TestCase {
             let object = ModernAllTypesObject()
 
             % for property in properties + optProperties:
-            object.${property[0]} = ${property[1]}
+            object.${property.colName} = ${property.values[1]}
             % end
 
             % for list in primitiveLists:
@@ -165,49 +173,43 @@ class QueryTests_: TestCase {
 
     func testEquals() {
         % for property in properties:
-        // ${property[0]}
 
-        % # Count of 5 assumes enum.
-        % if len(property) == 5:
-        assertQuery(predicate: "${property[0]} == %@", values: [${property[4]}], expectedCount: 1) {
-            $0.${property[0]} == ${property[1]}
+        // ${property.colName}
+        % if property.enumName != None:
+        assertQuery(predicate: "${property.colName} == %@", values: [${property.enumName}], expectedCount: 1) {
+            $0.${property.colName} == ${property.values[1]}
         }
         % else:
-        assertQuery(predicate: "${property[0]} == %@", values: [${property[1]}], expectedCount: 1) {
-            $0.${property[0]} == ${property[1]}
+        assertQuery(predicate: "${property.colName} == %@", values: [${property.values[1]}], expectedCount: 1) {
+            $0.${property.colName} == ${property.values[1]}
         }
         % end
         % end
     }
 
+
     func testEqualsOptional() {
         % for property in optProperties:
-        // ${property[0]}
+        // ${property.colName}
 
-        % if len(property) == 5:
-        assertQuery(predicate: "${property[0]} == %@", values: [${property[4]}], expectedCount: 1) {
-            $0.${property[0]} == ${property[1]}
+        % if property.enumName != None:
+        assertQuery(predicate: "${property.colName} == %@", values: [${property.enumName}], expectedCount: 1) {
+            $0.${property.colName} == ${property.values[1]}
         }
         % else:
-        assertQuery(predicate: "${property[0]} == %@", values: [${property[1]}], expectedCount: 1) {
-            $0.${property[0]} == ${property[1]}
+        assertQuery(predicate: "${property.colName} == %@", values: [${property.values[1]}], expectedCount: 1) {
+            $0.${property.colName} == ${property.values[1]}
         }
         % end
         % end
 
         // Test for `nil`
         % for property in optProperties:
-        // ${property[0]}
 
-        % if len(property) == 4:
-        assertQuery(predicate: "${property[0]} == %@", values: [NSNull()], expectedCount: 0) {
-            $0.${property[0]} == nil
+        // ${property.colName}
+        assertQuery(predicate: "${property.colName} == %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property.colName} == nil
         }
-        % else:
-        assertQuery(predicate: "${property[0]} == %@", values: [NSNull()], expectedCount: 0) {
-            $0.${property[0]} == nil
-        }
-        % end
         % end
     }
 
@@ -233,18 +235,40 @@ class QueryTests_: TestCase {
         }
     }
 
+    func testEqualEmbeddedObject() {
+        let object = ModernEmbeddedParentObject()
+        let nestedObject = ModernEmbeddedTreeObject1()
+        nestedObject.value = 123
+        object.object = nestedObject
+        let realm = realmWithTestPath()
+        try! realm.write {
+            realm.add(object)
+        }
+
+        let result1 = realm.objects(ModernEmbeddedParentObject.self).query {
+            $0.object == nestedObject
+        }
+        XCTAssertEqual(result1.count, 1)
+
+        let nestedObject2 = ModernEmbeddedTreeObject1()
+        nestedObject2.value = 123
+        let result2 = realm.objects(ModernEmbeddedParentObject.self).query {
+            $0.object == nestedObject2
+        }
+        XCTAssertEqual(result2.count, 0)
+    }
+
     func testNotEquals() {
         % for property in properties:
-        // ${property[0]}
+        // ${property.colName}
 
-        % # Count of 5 assumes enum.
-        % if len(property) == 5:
-        assertQuery(predicate: "${property[0]} != %@", values: [${property[4]}], expectedCount: 0) {
-            $0.${property[0]} != ${property[1]}
+        % if property.enumName != None:
+        assertQuery(predicate: "${property.colName} != %@", values: [${property.enumName}], expectedCount: 0) {
+            $0.${property.colName} != ${property.values[1]}
         }
         % else:
-        assertQuery(predicate: "${property[0]} != %@", values: [${property[1]}], expectedCount: 0) {
-            $0.${property[0]} != ${property[1]}
+        assertQuery(predicate: "${property.colName} != %@", values: [${property.values[1]}], expectedCount: 0) {
+            $0.${property.colName} != ${property.values[1]}
         }
         % end
         % end
@@ -252,39 +276,31 @@ class QueryTests_: TestCase {
 
     func testNotEqualsOptional() {
         % for property in optProperties:
-        // ${property[0]}
+        // ${property.colName}
 
-        % # Count of 5 assumes enum.
-        % if len(property) == 5:
-        assertQuery(predicate: "${property[0]} != %@", values: [${property[4]}], expectedCount: 0) {
-            $0.${property[0]} != ${property[1]}
+        % if property.enumName != None:
+        assertQuery(predicate: "${property.colName} != %@", values: [${property.enumName}], expectedCount: 0) {
+            $0.${property.colName} != ${property.values[1]}
         }
         % else:
-        assertQuery(predicate: "${property[0]} != %@", values: [${property[1]}], expectedCount: 0) {
-            $0.${property[0]} != ${property[1]}
+        assertQuery(predicate: "${property.colName} != %@", values: [${property.values[1]}], expectedCount: 0) {
+            $0.${property.colName} != ${property.values[1]}
         }
         % end
         % end
 
         // Test for `nil`
         % for property in optProperties:
-        // ${property[0]}
 
-        % if len(property) == 5:
-        assertQuery(predicate: "${property[0]} != %@", values: [NSNull()], expectedCount: 1) {
-            $0.${property[0]} != nil
+        // ${property.colName}
+        assertQuery(predicate: "${property.colName} != %@", values: [NSNull()], expectedCount: 1) {
+            $0.${property.colName} != nil
         }
-        % else:
-        assertQuery(predicate: "${property[0]} != %@", values: [NSNull()], expectedCount: 1) {
-            $0.${property[0]} != nil
-        }
-        % end
         % end
     }
 
     func testNotEqualAnyRealmValue() {
         % for value in anyRealmValues:
-
         setAnyRealmValueCol(with: AnyRealmValue${value[0]}, object: objects()[0])
         assertQuery(predicate: "anyCol != %@", values: [${value[1]}], expectedCount: 0) {
             $0.anyCol != ${value[0]}
@@ -305,24 +321,46 @@ class QueryTests_: TestCase {
         }
     }
 
-   func testGreaterThan() {
+    func testNotEqualEmbeddedObject() {
+        let object = ModernEmbeddedParentObject()
+        let nestedObject = ModernEmbeddedTreeObject1()
+        nestedObject.value = 123
+        object.object = nestedObject
+        let realm = realmWithTestPath()
+        try! realm.write {
+            realm.add(object)
+        }
+
+        let result1 = realm.objects(ModernEmbeddedParentObject.self).query {
+            $0.object != nestedObject
+        }
+        XCTAssertEqual(result1.count, 0)
+
+        let nestedObject2 = ModernEmbeddedTreeObject1()
+        nestedObject2.value = 123
+        let result2 = realm.objects(ModernEmbeddedParentObject.self).query {
+            $0.object != nestedObject2
+        }
+        XCTAssertEqual(result2.count, 1)
+    }
+
+    func testGreaterThan() {
         % for property in properties:
-        % # Count of 5 assumes enum.
-        % if len(property) == 5 and property[3] == 'numeric':
-        // ${property[0]}
-        assertQuery(predicate: "${property[0]} > %@", values: [${property[4]}], expectedCount: 0) {
-            $0.${property[0]} > ${property[1]}
+        % if property.enumName != None and property.category == 'numeric':
+        // ${property.colName}
+        assertQuery(predicate: "${property.colName} > %@", values: [${property.enumName}], expectedCount: 0) {
+            $0.${property.colName} > ${property.values[1]}
         }
-        assertQuery(predicate: "${property[0]} >= %@", values: [${property[4]}], expectedCount: 1) {
-            $0.${property[0]} >= ${property[1]}
+        assertQuery(predicate: "${property.colName} >= %@", values: [${property.enumName}], expectedCount: 1) {
+            $0.${property.colName} >= ${property.values[1]}
         }
-        % elif property[3] == 'numeric':
-        // ${property[0]}
-        assertQuery(predicate: "${property[0]} > %@", values: [${property[1]}], expectedCount: 0) {
-            $0.${property[0]} > ${property[1]}
+        % elif property.category == 'numeric':
+        // ${property.colName}
+        assertQuery(predicate: "${property.colName} > %@", values: [${property.values[1]}], expectedCount: 0) {
+            $0.${property.colName} > ${property.values[1]}
         }
-        assertQuery(predicate: "${property[0]} >= %@", values: [${property[1]}], expectedCount: 1) {
-            $0.${property[0]} >= ${property[1]}
+        assertQuery(predicate: "${property.colName} >= %@", values: [${property.values[1]}], expectedCount: 1) {
+            $0.${property.colName} >= ${property.values[1]}
         }
         % end
         % end
@@ -330,43 +368,42 @@ class QueryTests_: TestCase {
 
     func testGreaterThanOptional() {
         % for property in optProperties:
-        % # Count of 5 assumes enum.
-        % if len(property) == 5 and property[3] == 'numeric':
-        // ${property[0]}
-        assertQuery(predicate: "${property[0]} > %@", values: [${property[4]}], expectedCount: 0) {
-            $0.${property[0]} > ${property[1]}
+        % if property.enumName != None and property.category == 'numeric':
+        // ${property.colName}
+        assertQuery(predicate: "${property.colName} > %@", values: [${property.enumName}], expectedCount: 0) {
+            $0.${property.colName} > ${property.values[1]}
         }
-        assertQuery(predicate: "${property[0]} >= %@", values: [${property[4]}], expectedCount: 1) {
-            $0.${property[0]} >= ${property[1]}
+        assertQuery(predicate: "${property.colName} >= %@", values: [${property.enumName}], expectedCount: 1) {
+            $0.${property.colName} >= ${property.values[1]}
         }
-        % elif property[3] == 'numeric':
-        // ${property[0]}
-        assertQuery(predicate: "${property[0]} > %@", values: [${property[1]}], expectedCount: 0) {
-            $0.${property[0]} > ${property[1]}
+        % elif property.category == 'numeric':
+        // ${property.colName}
+        assertQuery(predicate: "${property.colName} > %@", values: [${property.values[1]}], expectedCount: 0) {
+            $0.${property.colName} > ${property.values[1]}
         }
-        assertQuery(predicate: "${property[0]} >= %@", values: [${property[1]}], expectedCount: 1) {
-            $0.${property[0]} >= ${property[1]}
+        assertQuery(predicate: "${property.colName} >= %@", values: [${property.values[1]}], expectedCount: 1) {
+            $0.${property.colName} >= ${property.values[1]}
         }
         % end
         % end
 
         // Test for `nil`
         % for property in optProperties:
-        % if len(property) == 5 and property[3] == 'numeric':
-        // ${property[0]}
-        assertQuery(predicate: "${property[0]} > %@", values: [NSNull()], expectedCount: 0) {
-            $0.${property[0]} > nil
+        % if property.enumName != None and property.category == 'numeric':
+        // ${property.colName}
+        assertQuery(predicate: "${property.colName} > %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property.colName} > nil
         }
-        assertQuery(predicate: "${property[0]} >= %@", values: [NSNull()], expectedCount: 0) {
-            $0.${property[0]} >= nil
+        assertQuery(predicate: "${property.colName} >= %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property.colName} >= nil
         }
-        % elif property[3] == 'numeric':
-        // ${property[0]}
-        assertQuery(predicate: "${property[0]} > %@", values: [NSNull()], expectedCount: 0) {
-            $0.${property[0]} > nil
+        % elif property.category == 'numeric':
+        // ${property.colName}
+        assertQuery(predicate: "${property.colName} > %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property.colName} > nil
         }
-        assertQuery(predicate: "${property[0]} >= %@", values: [NSNull()], expectedCount: 0) {
-            $0.${property[0]} >= nil
+        assertQuery(predicate: "${property.colName} >= %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property.colName} >= nil
         }
         % end
         % end
@@ -375,7 +412,6 @@ class QueryTests_: TestCase {
     func testGreaterThanAnyRealmValue() {
         % for value in anyRealmValues:
         % if value[2] == 'numeric':
-
         setAnyRealmValueCol(with: AnyRealmValue${value[0]}, object: objects()[0])
         assertQuery(predicate: "anyCol > %@", values: [${value[1]}], expectedCount: 0) {
             $0.anyCol > ${value[0]}
@@ -389,22 +425,21 @@ class QueryTests_: TestCase {
 
     func testLessThan() {
         % for property in properties:
-        % # Count of 5 assumes enum.
-        % if len(property) == 5 and property[3] == 'numeric':
-        // ${property[0]}
-        assertQuery(predicate: "${property[0]} < %@", values: [${property[4]}], expectedCount: 0) {
-            $0.${property[0]} < ${property[1]}
+        % if property.enumName != None and property.category == 'numeric':
+        // ${property.colName}
+        assertQuery(predicate: "${property.colName} < %@", values: [${property.enumName}], expectedCount: 0) {
+            $0.${property.colName} < ${property.values[1]}
         }
-        assertQuery(predicate: "${property[0]} <= %@", values: [${property[4]}], expectedCount: 1) {
-            $0.${property[0]} <= ${property[1]}
+        assertQuery(predicate: "${property.colName} <= %@", values: [${property.enumName}], expectedCount: 1) {
+            $0.${property.colName} <= ${property.values[1]}
         }
-        % elif property[3] == 'numeric':
-        // ${property[0]}
-        assertQuery(predicate: "${property[0]} < %@", values: [${property[1]}], expectedCount: 0) {
-            $0.${property[0]} < ${property[1]}
+        % elif property.category == 'numeric':
+        // ${property.colName}
+        assertQuery(predicate: "${property.colName} < %@", values: [${property.values[1]}], expectedCount: 0) {
+            $0.${property.colName} < ${property.values[1]}
         }
-        assertQuery(predicate: "${property[0]} <= %@", values: [${property[1]}], expectedCount: 1) {
-            $0.${property[0]} <= ${property[1]}
+        assertQuery(predicate: "${property.colName} <= %@", values: [${property.values[1]}], expectedCount: 1) {
+            $0.${property.colName} <= ${property.values[1]}
         }
         % end
         % end
@@ -412,43 +447,42 @@ class QueryTests_: TestCase {
 
     func testLessThanOptional() {
         % for property in optProperties:
-        % # Count of 5 assumes enum.
-        % if len(property) == 5 and property[3] == 'numeric':
-        // ${property[0]}
-        assertQuery(predicate: "${property[0]} < %@", values: [${property[4]}], expectedCount: 0) {
-            $0.${property[0]} < ${property[1]}
+        % if property.enumName != None and property.category == 'numeric':
+        // ${property.colName}
+        assertQuery(predicate: "${property.colName} < %@", values: [${property.enumName}], expectedCount: 0) {
+            $0.${property.colName} < ${property.values[1]}
         }
-        assertQuery(predicate: "${property[0]} <= %@", values: [${property[4]}], expectedCount: 1) {
-            $0.${property[0]} <= ${property[1]}
+        assertQuery(predicate: "${property.colName} <= %@", values: [${property.enumName}], expectedCount: 1) {
+            $0.${property.colName} <= ${property.values[1]}
         }
-        % elif property[3] == 'numeric':
-        // ${property[0]}
-        assertQuery(predicate: "${property[0]} < %@", values: [${property[1]}], expectedCount: 0) {
-            $0.${property[0]} < ${property[1]}
+        % elif property.category == 'numeric':
+        // ${property.colName}
+        assertQuery(predicate: "${property.colName} < %@", values: [${property.values[1]}], expectedCount: 0) {
+            $0.${property.colName} < ${property.values[1]}
         }
-        assertQuery(predicate: "${property[0]} <= %@", values: [${property[1]}], expectedCount: 1) {
-            $0.${property[0]} <= ${property[1]}
+        assertQuery(predicate: "${property.colName} <= %@", values: [${property.values[1]}], expectedCount: 1) {
+            $0.${property.colName} <= ${property.values[1]}
         }
         % end
         % end
 
         // Test for `nil`
         % for property in optProperties:
-        % if len(property) == 5 and property[3] == 'numeric':
-        // ${property[0]}
-        assertQuery(predicate: "${property[0]} < %@", values: [NSNull()], expectedCount: 0) {
-            $0.${property[0]} < nil
+        % if property.enumName != None and property.category == 'numeric':
+        // ${property.colName}
+        assertQuery(predicate: "${property.colName} < %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property.colName} < nil
         }
-        assertQuery(predicate: "${property[0]} <= %@", values: [NSNull()], expectedCount: 0) {
-            $0.${property[0]} <= nil
+        assertQuery(predicate: "${property.colName} <= %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property.colName} <= nil
         }
-        % elif property[3] == 'numeric':
-        // ${property[0]}
-        assertQuery(predicate: "${property[0]} < %@", values: [NSNull()], expectedCount: 0) {
-            $0.${property[0]} < nil
+        % elif property.category == 'numeric':
+        // ${property.colName}
+        assertQuery(predicate: "${property.colName} < %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property.colName} < nil
         }
-        assertQuery(predicate: "${property[0]} <= %@", values: [NSNull()], expectedCount: 0) {
-            $0.${property[0]} <= nil
+        assertQuery(predicate: "${property.colName} <= %@", values: [NSNull()], expectedCount: 0) {
+            $0.${property.colName} <= nil
         }
         % end
         % end
@@ -457,7 +491,6 @@ class QueryTests_: TestCase {
     func testLessThanAnyRealmValue() {
         % for value in anyRealmValues:
         % if value[2] == 'numeric':
-
         setAnyRealmValueCol(with: AnyRealmValue${value[0]}, object: objects()[0])
         assertQuery(predicate: "anyCol < %@", values: [${value[1]}], expectedCount: 0) {
             $0.anyCol < ${value[0]}

@@ -384,7 +384,10 @@ extension Query where T: PersistableEnum, T.RawValue: _Persistable {
     }
 }
 
-extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped.RawValue: _QueryComparable {
+extension Query where T: OptionalProtocol,
+                      T.Wrapped: PersistableEnum,
+                      T.Wrapped.RawValue: _QueryComparable,
+                      T.Wrapped.RawValue: _RealmSchemaDiscoverable {
     public static func == <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
         var tokensCopy = lhs.tokens
         tokensCopy.append(.basicComparison(.equal))
@@ -558,7 +561,7 @@ extension Date: _QueryNumeric { }
 extension AnyRealmValue: _QueryNumeric { }
 extension Optional: _QueryNumeric where Wrapped: _QueryNumeric { }
 
-public protocol _QueryComparable: _RealmSchemaDiscoverable { }
+public protocol _QueryComparable { }
 extension Bool: _QueryComparable { }
 extension Int: _QueryComparable { }
 extension Int8: _QueryComparable { }
@@ -574,5 +577,5 @@ extension UUID: _QueryComparable { }
 extension ObjectId: _QueryComparable { }
 extension String: _QueryComparable { }
 extension AnyRealmValue: _QueryComparable { }
-extension Object: _QueryComparable { }
+extension ObjectBase: _QueryComparable { }
 extension Optional: _QueryComparable where Wrapped: _QueryComparable { }
