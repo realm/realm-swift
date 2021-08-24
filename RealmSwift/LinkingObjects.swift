@@ -469,6 +469,16 @@ import Realm
         return rlmResults.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
     }
 
+    public func observe(keyPaths: [PartialKeyPath<ObjectBase>],
+                        on queue: DispatchQueue? = nil,
+                        _ block: @escaping (RealmCollectionChange<LinkingObjects>) -> Void) -> NotificationToken {
+        var stringKeyPaths: [String] = []
+        for keyPath in keyPaths {
+            stringKeyPaths.append(_name(for: keyPath))
+        }
+        return rlmResults.addNotificationBlock(wrapObserveBlock(block), keyPaths: stringKeyPaths, queue: queue)
+    }
+
     // MARK: Frozen Objects
 
     /// Returns if this collection is frozen.
