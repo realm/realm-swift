@@ -42,7 +42,7 @@ body:
         - Yes, sometimes
         - Not yet
     validations:
-      required: true 
+      required: true
   - type: textarea
     id: code-snippets
     attributes:
