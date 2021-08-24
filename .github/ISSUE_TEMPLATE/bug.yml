@@ -1,0 +1,102 @@
+name: Bug Report
+description: Report a bug
+labels: [T-Bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please provide as much detail as you can so we have a better chance of fixing the bug quickly.
+        Thanks for your contribution to improve this project!
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: How frequently does the bug occur?
+      options:
+        - Seen once
+        - Sometimes
+        - All the time
+    validations:
+      required: true
+# Description
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: |
+        Describe what you were expecting and what actually happened.
+    validations:
+      required: true
+  - type: textarea
+    id: stacktrace
+    attributes:
+      label: Stacktrace & log output
+      description: Please paste any relevant log output or stacktrace if you're getting an exception/crash.
+      render: shell
+# Repro information
+  - type: dropdown
+    id: repro
+    attributes:
+      label: Can you reproduce the bug?
+      options:
+        - Yes, always
+        - Yes, sometimes
+        - Not yet
+    validations:
+      required: true
+  - type: textarea
+    id: code-snippets
+    attributes:
+      label: Reproduction Steps
+      description: |
+        If you can reproduce the bug, please provide detailed steps for how WE can reproduce it.
+        Ideally, please provide a self contained test case or link (e.g. github repo) to a sample app that demonstrates the bug.
+        If that's not possible, please show code samples that highlight or reproduce the issue.
+        If relevant, include your model definitions.
+        Should you need to share code confidentially, you can send a link to: realm-help (the @) mongodb.com.
+# Version
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version(s) of the SDK has the bug been observed in?
+    validations:
+      required: true
+  - type: dropdown
+    id: sync
+    attributes:
+      label: What SDK flavour are you using?
+      options:
+        - Local Database only
+        - MongoDB Realm (i.e. Sync, auth, functions)
+    validations:
+      required: true
+  - type: dropdown
+    id: encryption
+    attributes:
+      label: Are you using encryption?
+      options:
+        - Yes, using encryption
+        - No, not using encryption
+    validations:
+      required: true
+# Environment
+  - type: input
+    id: platform
+    attributes:
+      label: Platform OS and version(s)
+      description: OS and version(s) are you seeing the issue on?
+    validations:
+      required: true
+  - type: textarea
+    id: cocoa-build-environment
+    attributes:
+      label: "Build environment"
+      description: |
+        Build environment versions
+        In the [CONTRIBUTING guidelines](https://github.com/realm/realm-cocoa/blob/master/CONTRIBUTING.md#speeding-things-up-runner), you will find a script, which will help determining some of these versions.
+ # ? Is the script still correct and useful? It seems to output more than needed?
+      value: |
+        Xcode version: ...
+        Dependency manager and version: ...
+    validations:
+      required: false
