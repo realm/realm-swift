@@ -34,6 +34,7 @@ import RealmTestSupport
 @objc(SwiftObjectServerTests)
 class SwiftObjectServerTests: SwiftSyncTestCase {
     var notificationToken: NotificationToken?
+
     override func tearDown() {
         if let notificationToken = notificationToken {
             notificationToken.invalidate()
@@ -878,7 +879,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(app.allUsers.count, 1)
     }
 
-    func testSafelyRemoveUserFromMongoDBRealm() throws {
+    func testSafelyRemoveUser() throws {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
 
@@ -909,6 +910,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             waitForDownloads(for: realm)
             checkCount(expected: 3, realm, SwiftPerson.self)
 
+            // Adding observer to trigger a data refresh when user is deleted
             notificationToken = realm.objects(SwiftPerson.self).observe(on: DispatchQueue.main, { _ in
             })
 
