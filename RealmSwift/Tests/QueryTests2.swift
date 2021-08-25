@@ -25,6 +25,19 @@ class QueryTests_: TestCase {
         realmWithTestPath().objects(ModernAllTypesObject.self)
     }
 
+    private func collectionObject() -> ModernCollectionObject {
+        let realm = realmWithTestPath()
+        if let object = realm.objects(ModernCollectionObject.self).first {
+            return object
+        } else {
+            let object = ModernCollectionObject()
+            try! realm.write {
+                realm.add(object)
+            }
+            return object
+        }
+    }
+
     private func setAnyRealmValueCol(with value: AnyRealmValue, object: ModernAllTypesObject) {
         let realm = realmWithTestPath()
         try! realm.write {
@@ -1972,6 +1985,23 @@ class QueryTests_: TestCase {
 
     }
 
+    func testListContainsObject() {
+        let obj = objects().first!
+        let colObj = collectionObject()
+        let realm = realmWithTestPath()
+        let result1 = realm.objects(ModernCollectionObject.self).query {
+            $0.list.contains(obj)
+        }
+        XCTAssertEqual(result1.count, 0)
+        try! realm.write {
+            colObj.list.append(obj)
+        }
+        let result2 = realm.objects(ModernCollectionObject.self).query {
+            $0.list.contains(obj)
+        }
+        XCTAssertEqual(result2.count, 1)
+    }
+
     func testListContainsRange() {
         assertQuery(predicate: "arrayInt.@min >= %@ && arrayInt.@max <= %@",
                     values: [1, 2], expectedCount: 1) {
@@ -2549,4 +2579,22 @@ class QueryTests_: TestCase {
         }
 
     }
+
+    func testSetContainsObject() {
+        let obj = objects().first!
+        let colObj = collectionObject()
+        let realm = realmWithTestPath()
+        let result1 = realm.objects(ModernCollectionObject.self).query {
+            $0.set.contains(obj)
+        }
+        XCTAssertEqual(result1.count, 0)
+        try! realm.write {
+            colObj.set.insert(obj)
+        }
+        let result2 = realm.objects(ModernCollectionObject.self).query {
+            $0.set.contains(obj)
+        }
+        XCTAssertEqual(result2.count, 1)
+    }
+
 }
