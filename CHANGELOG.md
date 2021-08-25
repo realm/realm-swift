@@ -2,6 +2,8 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * None.
+* InstructionApplier exceptions now contain information about what object/changeset was being applied when the exception was thrown.
+* Added ServiceErrorCode for wrong username/password.
 
 ### Fixed
 * Fix crash in `MongoCollection.findOneDocument(filter:)` that occurred when no results were
@@ -9,8 +11,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Some of the SwiftUI property wrappers incorrectly required objects to conform
   to ObjectKeyIdentifiable rather than Identifiable.
 * Work around Xcode 13 beta 3+ shipping a broken swiftinterface file for Combine on 32-bit iOS.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Fixes history corruption when replacing an embedded object in a list.
 
 ### Compatibility
 * Realm Studio: 11.0.0 or later.
@@ -20,7 +21,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 12.2-13.0 beta 3.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 11.2.0 to 11.3.0
 
 10.12.0 Release notes (2021-08-03)
 =============================================================
