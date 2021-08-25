@@ -28,6 +28,10 @@ import XCTest
     # ./YOUR_GYB_LOCATION/gyb --line-directive '' -o QueryTests2.swift QueryTests.gyb.swift
 }%
 %{
+    import sys
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
+
     class Property:
         def __init__(self, colName, values, type, category, enumName=None):
             self.colName = colName
@@ -45,7 +49,7 @@ import XCTest
         Property('int64Col', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64', 'numeric'),
         Property('floatCol', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float', 'numeric'),
         Property('doubleCol', [5.55444333, 6.55444333, 7.55444333], 'Double', 'numeric'),
-        #Property('stringCol', ['"Foo"', '"Foó"', '"foo"'], 'String', 'string'),
+        Property('stringCol', ['"Foo"', '"Foó"', '"foo"'], 'String', 'string'),
         Property('binaryCol', ['Data(count: 64)', 'Data(count: 128)'], 'Data', 'binary'),
         Property('dateCol', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date', 'numeric'),
         Property('decimalCol', ['Decimal128(123.456)', 'Decimal128(234.456)', 'Decimal128(345.456)'], 'Decimal128', 'numeric'),
@@ -64,7 +68,7 @@ import XCTest
         Property('optInt64Col', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64?', 'numeric'),
         Property('optFloatCol', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float?', 'numeric'),
         Property('optDoubleCol', [5.55444333, 6.55444333, 7.55444333], 'Double?', 'numeric'),
-        #Property('optStringCol', ['"Foo"', '"Foó"', '"foo"'], 'String?', 'string'),
+        Property('optStringCol', ['"Foo"', '"Foó"', '"foo"'], 'String?', 'string'),
         Property('optBinaryCol', ['Data(count: 64)', 'Data(count: 128)'], 'Data?', 'binary'),
         Property('optDateCol', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date?', 'numeric'),
         Property('optDecimalCol', ['Decimal128(123.456)', 'Decimal128(234.456)', 'Decimal128(345.456)'], 'Decimal128?', 'numeric'),
@@ -74,22 +78,74 @@ import XCTest
         Property('optUuidCol', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!'], 'UUID?', 'uuid')
     ]
 
-    primitiveLists = [
-        ('arrayBool', '[true, true, false]'),
-        ('arrayInt', '[1, 2, 3]'),
-        ('arrayInt8', '[1, 2, 3]'),
-        ('arrayInt16', '[1, 2, 3]'),
-        ('arrayInt32', '[1, 2, 3]'),
-        ('arrayInt64', '[1, 2, 3]'),
-        ('arrayFloat', '[123.456, 234.456, 345.567]'),
-        ('arrayDouble', '[123.456, 234.456, 345.567]'),
-        ('arrayString', '["Foo", "Bar", "Baz"]'),
-        ('arrayBinary', '[Data(count: 64), Data(count: 128), Data(count: 256)]'),
-        ('arrayDate', '[Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 1000000), Date(timeIntervalSince1970: 1000000)]'),
-        ('arrayDecimal', '[Decimal128(123.456), Decimal128(456.789), Decimal128(963.852)]'),
-        ('arrayObjectId', '[ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045"), ObjectId("61184062c1d8f096a3695044")]'),
-        ('arrayAny', '[.objectId(ObjectId("61184062c1d8f096a3695046")), .string("Hello"), .int(123)]'),
+    listProperties = [
+        Property('arrayBool', ['true', 'true', 'false'], 'Bool', 'bool'),
+        Property('arrayInt', [1, 2, 3], 'Int', 'numeric'),
+        Property('arrayInt8', ['Int8(8)', 'Int8(9)', 'Int8(10)'], 'Int8', 'numeric'),
+        Property('arrayInt16', ['Int16(16)', 'Int16(17)', 'Int16(18)'], 'Int16', 'numeric'),
+        Property('arrayInt32', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32', 'numeric'),
+        Property('arrayInt64', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64', 'numeric'),
+        Property('arrayFloat', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float', 'numeric'),
+        Property('arrayDouble', [123.456, 234.456, 345.567], 'Double', 'numeric'),
+        Property('arrayString', ['"Foo"', '"Bar"', '"Baz"'], 'String', 'string'),
+        Property('arrayBinary', ['Data(count: 64)', 'Data(count: 128)', 'Data(count: 256)'], 'Data', 'binary'),
+        Property('arrayDate', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date', 'numeric'),
+        Property('arrayDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128', 'numeric'),
+        Property('arrayObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId', 'objectId'),
+        Property('arrayUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID', 'uuid'),
+        Property('arrayAny', ['AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))', 'AnyRealmValue.string("Hello")', 'AnyRealmValue.int(123)'], 'AnyRealmValue', 'any'),
+    ]
 
+    optListProperties = [
+        Property('arrayOptBool', ['true', 'true', 'false'], 'Bool?', 'bool'),
+        Property('arrayOptInt', [1, 2, 3], 'Int?', 'numeric'),
+        Property('arrayOptInt8', ['Int8(8)', 'Int8(9)', 'Int8(10)'], 'Int8?', 'numeric'),
+        Property('arrayOptInt16', ['Int16(16)', 'Int16(17)', 'Int16(18)'], 'Int16?', 'numeric'),
+        Property('arrayOptInt32', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32?', 'numeric'),
+        Property('arrayOptInt64', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64?', 'numeric'),
+        Property('arrayOptFloat', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float?', 'numeric'),
+        Property('arrayOptDouble', [123.456, 234.456, 345.567], 'Double?', 'numeric'),
+        Property('arrayOptString', ['"Foo"', '"Bar"', '"Baz"'], 'String?', 'string'),
+        Property('arrayOptBinary', ['Data(count: 64)', 'Data(count: 128)', 'Data(count: 256)'], 'Data?', 'binary'),
+        Property('arrayOptDate', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date?', 'numeric'),
+        Property('arrayOptDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128?', 'numeric'),
+        Property('arrayOptUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID?', 'uuid'),
+        Property('arrayOptObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId?', 'objectId'),
+    ]
+
+    setProperties = [
+        Property('setBool', ['true', 'true', 'false'], 'Bool', 'bool'),
+        Property('setInt', [1, 2, 3], 'Int', 'numeric'),
+        Property('setInt8', ['Int8(8)', 'Int8(9)', 'Int8(10)'], 'Int8', 'numeric'),
+        Property('setInt16', ['Int16(16)', 'Int16(17)', 'Int16(18)'], 'Int16', 'numeric'),
+        Property('setInt32', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32', 'numeric'),
+        Property('setInt64', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64', 'numeric'),
+        Property('setFloat', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float', 'numeric'),
+        Property('setDouble', [123.456, 234.456, 345.567], 'Double', 'numeric'),
+        Property('setString', ['"Foo"', '"Bar"', '"Baz"'], 'String', 'string'),
+        Property('setBinary', ['Data(count: 64)', 'Data(count: 128)', 'Data(count: 256)'], 'Data', 'binary'),
+        Property('setDate', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date', 'numeric'),
+        Property('setDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128', 'numeric'),
+        Property('setObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId', 'objectId'),
+        Property('setUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID', 'uuid'),
+        Property('setAny', ['AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))', 'AnyRealmValue.string("Hello")', 'AnyRealmValue.int(123)'], 'AnyRealmValue', 'any'),
+    ]
+
+    optSetProperties = [
+        Property('setOptBool', ['true', 'true', 'false'], 'Bool?', 'bool'),
+        Property('setOptInt', [1, 2, 3], 'Int?', 'numeric'),
+        Property('setOptInt8', ['Int8(8)', 'Int8(9)', 'Int8(10)'], 'Int8?', 'numeric'),
+        Property('setOptInt16', ['Int16(16)', 'Int16(17)', 'Int16(18)'], 'Int16?', 'numeric'),
+        Property('setOptInt32', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32?', 'numeric'),
+        Property('setOptInt64', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64?', 'numeric'),
+        Property('setOptFloat', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float?', 'numeric'),
+        Property('setOptDouble', [123.456, 234.456, 345.567], 'Double?', 'numeric'),
+        Property('setOptString', ['"Foo"', '"Bar"', '"Baz"'], 'String?', 'string'),
+        Property('setOptBinary', ['Data(count: 64)', 'Data(count: 128)', 'Data(count: 256)'], 'Data?', 'binary'),
+        Property('setOptDate', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date?', 'numeric'),
+        Property('setOptDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128?', 'numeric'),
+        Property('setOptUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID?', 'uuid'),
+        Property('setOptObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId?', 'objectId'),
     ]
 
     anyRealmValues = [
@@ -143,8 +199,12 @@ class QueryTests_: TestCase {
             object.${property.colName} = ${property.values[1]}
             % end
 
-            % for list in primitiveLists:
-            object.${list[0]}.append(objectsIn: ${list[1]})
+            % for property in listProperties + optListProperties:
+            object.${property.colName}.append(objectsIn: [${property.values[0]}, ${property.values[1]}])
+            % end
+
+            % for property in setProperties + optSetProperties:
+            object.${property.colName}.insert(objectsIn: [${property.values[0]}, ${property.values[1]}])
             % end
 
             realm.add(object)
@@ -505,20 +565,117 @@ class QueryTests_: TestCase {
     func testNumericContains() {
         % for property in properties + optProperties:
         % if property.enumName == None and property.category == 'numeric':
-        assertQuery(predicate: "${property.colName} >= %@ && ${property.colName} < %@", values: [${property.values[0]}, ${property.values[2]}], expectedCount: 1) {
+        assertQuery(predicate: "${property.colName} >= %@ && ${property.colName} < %@",
+                    values: [${property.values[0]}, ${property.values[2]}], expectedCount: 1) {
             $0.${property.colName}.contains(${property.values[0]}..<${property.values[2]})
         }
 
-        assertQuery(predicate: "${property.colName} >= %@ && ${property.colName} < %@", values: [${property.values[0]}, ${property.values[1]}], expectedCount: 0) {
+        assertQuery(predicate: "${property.colName} >= %@ && ${property.colName} < %@",
+                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 0) {
             $0.${property.colName}.contains(${property.values[0]}..<${property.values[1]})
         }
 
-        assertQuery(predicate: "${property.colName} BETWEEN {%@, %@}", values: [${property.values[0]}, ${property.values[2]}], expectedCount: 1) {
+        assertQuery(predicate: "${property.colName} BETWEEN {%@, %@}",
+                    values: [${property.values[0]}, ${property.values[2]}], expectedCount: 1) {
             $0.${property.colName}.contains(${property.values[0]}...${property.values[2]})
         }
 
-        assertQuery(predicate: "${property.colName} BETWEEN {%@, %@}", values: [${property.values[0]}, ${property.values[1]}], expectedCount: 1) {
+        assertQuery(predicate: "${property.colName} BETWEEN {%@, %@}",
+                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 1) {
             $0.${property.colName}.contains(${property.values[0]}...${property.values[1]})
+        }
+
+        % end
+        % end
+    }
+
+    func testListContainsElement() {
+        % for property in listProperties:
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[0]}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.values[0]})
+        }
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[2]}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.values[2]})
+        }
+
+        % end
+        % for property in optListProperties:
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[0]}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.values[0]})
+        }
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[2]}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.values[2]})
+        }
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.type}.none], expectedCount: 0) {
+            $0.${property.colName}.contains(nil)
+        }
+
+        % end
+    }
+
+    func testListContainsRange() {
+        % for property in listProperties + optListProperties:
+        % if property.category == 'numeric':
+        assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max <= %@",
+                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.values[0]}...${property.values[1]})
+        }
+        assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max < %@",
+                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.values[0]}..<${property.values[1]})
+        }
+
+        % end
+        % end
+    }
+
+    func testSetContainsElement() {
+        % for property in setProperties:
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[0]}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.values[0]})
+        }
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[2]}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.values[2]})
+        }
+
+        % end
+        % for property in optSetProperties:
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[0]}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.values[0]})
+        }
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[2]}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.values[2]})
+        }
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.type}.none], expectedCount: 0) {
+            $0.${property.colName}.contains(nil)
+        }
+
+        % end
+    }
+
+    func testSetContainsRange() {
+        % for property in setProperties:
+        % if property.category == 'numeric':
+        assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max <= %@",
+                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.values[0]}...${property.values[1]})
+        }
+        assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max < %@",
+                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.values[0]}..<${property.values[1]})
+        }
+
+        % end
+        % end
+        % for property in optSetProperties:
+        % if property.category == 'numeric':
+        assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max <= %@",
+                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.values[0]}...${property.values[1]})
+        }
+        assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max < %@",
+                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.values[0]}..<${property.values[1]})
         }
 
         % end

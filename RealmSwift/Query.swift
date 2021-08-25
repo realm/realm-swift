@@ -24,7 +24,7 @@ public enum StringOptions {
 }
 
 /// :nodoc:
-internal enum QueryExpression {
+private enum QueryExpression {
     enum BasicComparision: String {
         case equal = "==" // TODO: @"string1 ==[c] string1"
         case notEqual = "!="
@@ -52,6 +52,14 @@ internal enum QueryExpression {
         case endsWith(String, Set<StringOptions>?)
     }
 
+    enum CollectionAggregation: String {
+        case min = ".@min"
+        case max = ".@max"
+        case avg = ".@avg.doubleValue"
+        case sum = ".@sum"
+        case count = ".@count"
+    }
+
     case keyPath(name: String, isCollection: Bool = false)
     case comparison(Comparision)
     case basicComparison(BasicComparision)
@@ -59,12 +67,13 @@ internal enum QueryExpression {
     case rhs(_RealmSchemaDiscoverable?)
     case subquery(String, String, [Any])
     case stringSearch(StringSearch)
+    case collectionAggregation(CollectionAggregation)
 }
 
 @dynamicMemberLookup
 public struct Query<T: _Persistable> {
 
-    internal var tokens: [QueryExpression] = []
+    private var tokens: [QueryExpression] = []
 
     init() { }
     fileprivate init(expression: [QueryExpression]) {
@@ -121,6 +130,8 @@ public struct Query<T: _Persistable> {
         return lhs.append(tokens: [.compound(.or)] + rhs.tokens)
     }
 
+    // MARK: Subscript
+
     public subscript<V>(dynamicMember member: KeyPath<T, V>) -> Query<V> where T: ObjectBase {
         let name = _name(for: member)
         return append(tokens: [.keyPath(name: name)])
@@ -130,6 +141,8 @@ public struct Query<T: _Persistable> {
         let name = _name(for: member)
         return append(tokens: [.keyPath(name: name, isCollection: true)])
     }
+
+    // MARK: Query Construction
 
     internal func constructPredicate(_ isSubquery: Bool = false) -> (String, [Any]) {
         var predicateString: [String] = []
@@ -175,7 +188,7 @@ public struct Query<T: _Persistable> {
                             }
                             break
                         case let .contains(val):
-                            predicateString.insert(" %@ IN ", at: predicateString.count-1)
+                            predicateString.insert("%@ IN ", at: predicateString.count-1)
                             arguments.append(val)
                             break
                     }
@@ -193,17 +206,12 @@ public struct Query<T: _Persistable> {
                     if idx > 0, case .keyPath = tokens[idx-1] {
                         needsDot = true
                     }
-                    // This is not the start of the string, and not part of a previous keyPath
-                    // So insert a space.
-                    if !predicateString.isEmpty && !needsDot {
-                        predicateString.append(" ")
-                    }
                     if needsDot {
                         predicateString.append(".")
                     }
-                    if isSubquery && !needsDot {
-                        predicateString.append("$obj.")
-                    }
+//                    if isSubquery && !needsDot {
+//                        predicateString.append("$obj.")
+//                    }
                     predicateString.append("\(name)")
                     break
                 case let .stringSearch(s):
@@ -231,6 +239,9 @@ public struct Query<T: _Persistable> {
                 case let .subquery(col, str, args):
                     predicateString.append("SUBQUERY(\(col), $obj, \(str)).@count")
                     arguments.append(contentsOf: args)
+                case let .collectionAggregation(agg):
+                    predicateString.append(agg.rawValue)
+                    break
             }
         }
 
@@ -240,6 +251,22 @@ public struct Query<T: _Persistable> {
     internal var predicate: NSPredicate {
         let predicate = constructPredicate()
         return NSPredicate(format: predicate.0, argumentArray: predicate.1)
+    }
+
+    private func aggregateContains<U: _QueryNumeric, V>(_ lowerBound: U,
+                                                        _ upperBound: U,
+                                                        isClosedRange: Bool=false) -> Query<V> {
+        guard let keyPath = tokens.first else {
+            throwRealmException("Could not construct aggregate query, key path is missing.")
+        }
+        return append(tokens: [.collectionAggregation(.min),
+                               .basicComparison(.greaterThenOrEqual),
+                               .rhs(lowerBound),
+                               .compound(.and),
+                               keyPath,
+                               .collectionAggregation(.max),
+                               .basicComparison(isClosedRange ? .lessThanOrEqual : .lessThan),
+                               .rhs(upperBound)])
     }
 }
 
@@ -258,6 +285,32 @@ extension Query where T: RealmCollection {
     public subscript<V>(dynamicMember member: KeyPath<T.Element, V>) -> Query<V> where T.Element: ObjectBase {
         let name = _name(for: member)
         return append(tokens: [.keyPath(name: name)])
+    }
+}
+
+extension Query where T: RealmCollection, T.Element: _Persistable {
+    public func contains<V>(_ value: T.Element) -> Query<V> {
+        return append(tokens: [.comparison(.contains(value))])
+    }
+}
+
+extension Query where T: RealmCollection, T.Element: _QueryNumeric {
+    public func contains<V>(_ range: Range<T.Element>) -> Query<V> {
+        return aggregateContains(range.lowerBound, range.upperBound)
+    }
+
+    public func contains<V>(_ range: ClosedRange<T.Element>) -> Query<V> {
+        return aggregateContains(range.lowerBound, range.upperBound, isClosedRange: true)
+    }
+}
+
+extension Query where T: RealmCollection, T.Element: OptionalProtocol, T.Element.Wrapped: _QueryNumeric {
+    public func contains<V>(_ range: Range<T.Element.Wrapped>) -> Query<V> {
+        return aggregateContains(range.lowerBound, range.upperBound)
+    }
+
+    public func contains<V>(_ range: ClosedRange<T.Element.Wrapped>) -> Query<V> {
+        return aggregateContains(range.lowerBound, range.upperBound, isClosedRange: true)
     }
 }
 
@@ -317,6 +370,8 @@ extension Query where T: PersistableEnum, T.RawValue: _Persistable {
         return lhs.append(tokens: [.basicComparison(.lessThanOrEqual), .rhs(rhs.rawValue)])
     }
 }
+
+// MARK: Optional
 
 extension Query where T: OptionalProtocol,
                       T.Wrapped: PersistableEnum,
@@ -402,16 +457,6 @@ extension Query where T == Bool {
     }
 }
 
-extension Query where T: RealmCollection, T.Element: _Persistable {
-    public func between<V>(_ low: T.Element, _ high: T.Element) -> Query<V> {
-        fatalError()
-    }
-
-    public func contains<V>(_ value: T.Element) -> Query<V> {
-        return append(tokens: [.comparison(.contains(value))])
-    }
-}
-
 extension Query where T: RealmKeyedCollection, T.Key: _Persistable , T.Value: _Persistable {
     public func between<V>(_ low: T.Value, _ high: T.Value) -> Query<V> {
         fatalError()
@@ -448,7 +493,6 @@ extension Query where T: _QueryNumeric {
 }
 
 extension Query where T: OptionalProtocol, T.Wrapped: _QueryNumeric {
-
     public func contains<V>(_ range: Range<T.Wrapped>) -> Query<V> {
         return append(tokens: [.comparison(.between(low: range.lowerBound,
                                                     high: range.upperBound, closedRange: false))])
