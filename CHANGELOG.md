@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add additional `observe` methods for Objects and RealmCollections which take a `PartialKeyPath` type key path parameter.
 
 ### Fixed
 * Fix crash in `MongoCollection.findOneDocument(filter:)` that occurred when no results were
