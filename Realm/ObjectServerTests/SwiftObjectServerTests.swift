@@ -33,6 +33,12 @@ import RealmTestSupport
 @available(OSX 10.14, *)
 @objc(SwiftObjectServerTests)
 class SwiftObjectServerTests: SwiftSyncTestCase {
+    var notificationToken: NotificationToken?
+    override func tearDown() {
+        if let notificationToken = notificationToken {
+            notificationToken.invalidate()
+        }
+    }
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
         do {
@@ -870,6 +876,75 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         XCTAssertEqual(syncUser2!.id, app.currentUser!.id)
         XCTAssertEqual(app.allUsers.count, 1)
+    }
+
+    func testSafelyRemoveUserFromMongoDBRealm() throws {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let registerUserEx = expectation(description: "register-user")
+        app.emailPasswordAuth.registerUser(email: email, password: password) { (error) in
+            XCTAssertNil(error)
+            registerUserEx.fulfill()
+        }
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let loginEx = expectation(description: "login-user")
+        var syncUser: User?
+        app.login(credentials: Credentials.emailPassword(email: email, password: password)) { result in
+            switch result {
+            case .success(let user):
+                syncUser = user
+            case .failure:
+                XCTFail("Should login user")
+            }
+            loginEx.fulfill()
+        }
+        wait(for: [loginEx], timeout: 4.0)
+
+        let realm = try openRealm(partitionValue: #function, user: syncUser!)
+        XCTAssertNotNil(realm)
+        if isParent {
+            executeChild()
+            waitForDownloads(for: realm)
+            checkCount(expected: 3, realm, SwiftPerson.self)
+
+            notificationToken = realm.objects(SwiftPerson.self).observe(on: DispatchQueue.main, { _ in
+            })
+
+            let appServerId = try RealmServer.shared.retrieveAppId(clientAppId: appId)
+            let deleteUserEx = expectation(description: "delete-user")
+            RealmServer.shared.removeUserForApp(appServerId, userId: syncUser!.id) { result in
+                switch result {
+                case .success:
+                    break
+                case .failure:
+                    XCTFail("Should delete User")
+                }
+                deleteUserEx.fulfill()
+            }
+            wait(for: [deleteUserEx], timeout: 4.0)
+
+            let login2Ex = expectation(description: "login-user-2")
+            app.login(credentials: Credentials.emailPassword(email: email, password: password)) { result in
+                switch result {
+                case .success:
+                    XCTFail("Should not login after user is deleted")
+                case .failure(let error):
+                    XCTAssertNotNil(error)
+                }
+                login2Ex.fulfill()
+            }
+            wait(for: [login2Ex], timeout: 4.0)
+        } else {
+            try realm.write {
+                realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
+                realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+                realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+            }
+            waitForUploads(for: realm)
+            checkCount(expected: 3, realm, SwiftPerson.self)
+        }
     }
 
     func testAppLinkUser() {
