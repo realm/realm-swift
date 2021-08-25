@@ -23,6 +23,8 @@ fileprivate protocol _Projected {
     var objectBase: ObjectBase! { get }
     func set(object: ObjectBase)
     func observe<T: ObjectBase>(keyPaths: [String]?, on queue: DispatchQueue?, _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken
+    var hit: Bool { get }
+    var keyPathString: String? { get }
 }
 
 /// @Projected is used to declare properties on Projection protocols which should be
@@ -56,6 +58,9 @@ fileprivate protocol _Projected {
 /// ```
 @propertyWrapper
 public struct Projected<T: ObjectBase, Value>: _Projected {
+
+    fileprivate var hit: Bool = false
+    public var keyPathString: String?
 
     fileprivate var projectedKeyPath: KeyPath<T, Value>!
     fileprivate var objectBase: ObjectBase! {
@@ -92,6 +97,7 @@ public struct Projected<T: ObjectBase, Value>: _Projected {
             var ref = $0
             ref[keyPath: projectedKeyPath as! WritableKeyPath<T, Value>] = $1
         }
+        self.keyPathString = _name(for: projectedKeyPath)
     }
 
     public func observe<T: ObjectBase>(keyPaths: [String]? = nil,
@@ -141,28 +147,24 @@ public extension Projection {
         assign(object)
     }
 
-    fileprivate subscript(label: String) -> _Projected {
-        properties()[label]!
-    }
-
-    func assign(_ object: Root) {
-        let mirror = Mirror(reflecting: self)
-        for child in mirror.children {
-            if child.value is _Projected {
-                let keyPath = \Self.[child.label!]
-                self[keyPath: keyPath].set(object: object)
-            }
-        }
-    }
-    
-    fileprivate func properties() -> [String: _Projected] {
-        Mirror(reflecting: self).children.reduce([String: _Projected]()) { dict, child in
+    fileprivate func projectedProperties() -> [String: _Projected] {
+        return Mirror(reflecting: self).children.reduce([String: _Projected]()) { dict, child in
             var dict = dict
             if let projected = child.value as? _Projected,
                let label = child.label {
                 dict[label] = projected
             }
             return dict
+        }
+    }
+    
+    fileprivate subscript(label: String) -> _Projected {
+        projectedProperties()[label]!
+    }
+
+    func assign(_ object: Root) {
+        for (_, projected) in projectedProperties() {
+            projected.set(object: object)
         }
     }
 }
@@ -211,44 +213,53 @@ public enum ProjectionChange<T: Projection> {
     case change(_: T, _: [ProjectedChange])
     /// The object has been deleted from the Realm.
     case deleted
+    
+    init(_ oldProjection: T, _ objectChange: ObjectChange<ObjectBase>) {
+        switch objectChange {
+        case .error(let error):
+            self = .error(error)
+        case .change(let object, let objectPropertyChanges):
+            guard let object = object as? T.Root else {
+                fatalError()
+            }
+            let newProjection = T(object)
+            let projectedPropertyChanges: [ProjectedChange] = objectPropertyChanges.map { propChange in
+                let name = oldProjection.projectionPropertyName(propChange.name)!
+                let keyPath = \T.[name]
+                return ProjectedChange(name: name, oldValue: oldProjection[keyPath:keyPath], newValue: newProjection[keyPath:keyPath])
+            }
+            self = .change(newProjection, projectedPropertyChanges)
+        case .deleted:
+            self = ProjectionChange.deleted
+        }
+    }
 }
 
 extension Projection {
-    public func observe<T>(keyPaths: [PartialKeyPath<T>] = [], _ block: (ProjectionChange<T>) -> Void) -> NotificationToken where T: Projection {
-        if keyPaths.isEmpty {
-//            projectionSchemas[ObjectIdentifier(type(of: self))]!.forEach { property in
-//                (self[keyPath: property.keyPathOnProjection] as! _ProjectedBase).objectBase.observe(property.realmKeyPathString) { change in
-//
-//                }
-//            }
-        } else {
-        }
-        fatalError()
 
     // MARK: Notifications
-
-    public func observe<T: ObjectBase>(keyPaths: [String]? = nil,
-                                       on queue: DispatchQueue? = nil,
-                                       _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
-        let token: NotificationToken
-//        if keyPaths == nil || keyPaths?.isEmpty {
-        token = realmObject._observe(keyPaths: keyPaths, on: queue, block)
-//        } else {
-//        }
-        return token
+    private func activatePropertyKeyPaths() {
+        for (name, _) in projectedProperties() {
+            let keyPath = \Self.[name]
+            _ = self[keyPath: keyPath]
+        }
     }
-//    public func observe<T>(keyPaths: [PartialKeyPath<Self>] = [], _ block: (ProjectionChange<T>) -> Void) -> NotificationToken where T: Projection {
-    public func observe(keyPaths: [String] = [], _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
-//        if keyPaths.isEmpty {
-//            fatalError()
-//        } else {
-            return realmObject._observe(keyPaths: nil, on: nil, { change in
-                print(change)
-                let projectedChange = ProjectedChange(name: "test", oldValue: 0, newValue: 1)
-                let projectionChange = ProjectionChange.change(self, [projectedChange])
-                block(projectionChange)
+    
+    public func observe(keyPaths: [PartialKeyPath<Self>] = [],
+                        _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
+        if keyPaths.isEmpty {
+            activatePropertyKeyPaths()
+            let keyPaths = projectedProperties().compactMap { $0.value.keyPathString }
+            return realmObject._observe(keyPaths: keyPaths, on: nil, { change in
+                block(ProjectionChange<Self>(self, change))
             })
-//        }
+        } else {
+            activatePropertyKeyPaths()
+            let filteredProjectedKeyPaths = keyPaths.compactMap { (self[keyPath: $0] as? _Projected)?.keyPathString }
+            return realmObject._observe(keyPaths: filteredProjectedKeyPaths, on: nil, { change in
+                block(ProjectionChange<Self>(self, change))
+            })
+        }
     }
 
     // Must also conform to `AssistedObjectiveCBridgeable`
@@ -297,6 +308,10 @@ extension Projection {
      */
     public func thaw() -> Self? {
         return self
+    }
+    
+    fileprivate func projectionPropertyName(_ projectedPropertyName: String) -> String? {
+        return projectedProperties().first(where: { $0.value.keyPathString == projectedPropertyName })?.key
     }
 }
 

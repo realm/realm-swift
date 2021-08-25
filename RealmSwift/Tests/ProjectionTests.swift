@@ -776,9 +776,19 @@ class ProjectionTests: TestCase {
         guard changeDictionary != nil else { return }
     }
 
-    func singleChangeTestCase<T: Projection>(_ obj: Object, _ obs: T, _ changeBlock: () -> Void) {
+    func singleChangeTestCase<T: Projection>(_ obj: Object, _ obs: T, _ keyPath: String, _ changeBlock: () -> Void) {
         let ex = expectation(description: "singleChangeTestCase")
+//        let token = obs.obs
         let token = obs.observe { changes in
+            if case .change(let object, let properties) = changes {
+//                XCTAssertEqual(self.obj, object)
+                XCTAssertEqual(properties.count, 1)
+                XCTAssertEqual(properties[0].name, keyPath)
+//                XCTAssertEqual(properties[0].oldValue, obs[keyPath: keyPath])
+//                XCTAssertNotEqual(properties[0].newValue, properties[0].oldValue)
+            } else {
+                XCTFail("Expected .change but got \(changes)")
+            }
             ex.fulfill()
         }
         
@@ -806,6 +816,8 @@ class ProjectionTests: TestCase {
         let oldUUID = obj.uuidCol
         let uuid = UUID()
 
+        singleChangeTestCase(obj, obs, "objectIdCol", { obj.objectIdCol = objectId })
+        
         realmWithTestPath().beginWrite()
         observeChange(obj, obs, "boolCol", false, true) { obj.boolCol = true }
         observeChange(obj, obs, "int8Col", 1 as Int8, 10) { obj.int8Col = 10 }
