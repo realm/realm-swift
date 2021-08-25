@@ -1,5 +1,6 @@
 10.13.0 Release notes (2021-08-26)
 =============================================================
+
 ### Enhancements
 
 * InstructionApplier exceptions now contain information about what object/changeset was being applied when the exception was thrown.
