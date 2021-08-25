@@ -573,10 +573,10 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase {
                         _ block: @escaping (RealmCollectionChange<List>) -> Void) -> NotificationToken {
         return rlmArray.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
     }
-    
+
     public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
-                        on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmCollectionChange<List>) -> Void) -> NotificationToken {
+                                       on queue: DispatchQueue? = nil,
+                                       _ block: @escaping (RealmCollectionChange<List>) -> Void) -> NotificationToken {
         var stringKeyPaths: [String] = []
         for keyPath in keyPaths {
             stringKeyPaths.append(_name(for: keyPath))

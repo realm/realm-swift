@@ -976,7 +976,7 @@ class ObjectTests: TestCase {
         }
         waitForExpectations(timeout: 0.1)
         token.invalidate()
-        
+
         // Expect notification for "stringCol" keyPath when "stringCol" is modified
         ex = expectation(description: "expect notification")
         token = object.observe(keyPaths: [\SwiftObject.intCol, \SwiftObject.stringCol]) { changes in

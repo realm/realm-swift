@@ -630,16 +630,13 @@ public protocol RealmCollection: RealmCollectionBase {
     func observe(keyPaths: [String]?,
                  on queue: DispatchQueue?,
                  _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
-    
+
     func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
-                 on queue: DispatchQueue?,
-                 _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
+                                on queue: DispatchQueue?,
+                                _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
 
     /// :nodoc:
     func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
-    
-    /// :nodoc:
-//    func _observe(_ keyPaths: PartialKeyPath<ObjectBase>, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 
     // MARK: Frozen Objects
 
@@ -1034,7 +1031,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     /// :nodoc:
     override func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { return base._observe(keyPaths, queue, block) }
-    
+
     override func _observe<T: ObjectBase>(_ keyPaths: [PartialKeyPath<T>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<_AnyRealmCollectionBase<C.Element>.Wrapper>) -> Void) -> NotificationToken {
         var stringKeyPaths: [String] = []
         for keyPath in keyPaths {
@@ -1042,11 +1039,6 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
         }
         return base._observe(stringKeyPaths, queue, block)
     }
-    
-//    override func _observe
-    /// :nodoc:
-//    override func _observe(_ partialKeyPaths: PartialKeyPath<ObjectBase>, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
-//        -> NotificationToken { return base._observe(keyPaths, queue, block) }
 
     // MARK: AssistedObjectiveCBridgeable
 
@@ -1479,17 +1471,17 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
     public func observe(keyPaths: [String]? = nil, on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._observe(keyPaths, queue, block) }
-    
-    public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>], on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
+
+    public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
+                                       on queue: DispatchQueue? = nil,
+                                       _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._observe(keyPaths, queue, block) }
 
     /// :nodoc:
     public func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._observe(keyPaths, queue, block) }
-    
-//    /// :nodoc:
-    // need to delete?
+
+    /// :nodoc:
     public func _observe<T: ObjectBase>(_ keyPaths: [PartialKeyPath<T>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._observe(keyPaths, queue, block) }
 

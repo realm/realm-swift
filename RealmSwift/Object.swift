@@ -274,7 +274,7 @@ extension Object: RealmCollectionValue {
                                           _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
         return _observe(keyPaths: keyPaths, on: queue, block)
     }
-    
+
     public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>], on queue: DispatchQueue? = nil, _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
         var stringKeyPaths: [String] = []
         for keyPath in keyPaths {

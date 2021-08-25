@@ -469,9 +469,10 @@ import Realm
         return rlmResults.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
     }
 
+    // docs?
     public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
-                        on queue: DispatchQueue? = nil,
-                        _ block: @escaping (RealmCollectionChange<LinkingObjects>) -> Void) -> NotificationToken {
+                                       on queue: DispatchQueue? = nil,
+                                       _ block: @escaping (RealmCollectionChange<LinkingObjects>) -> Void) -> NotificationToken {
         var stringKeyPaths: [String] = []
         for keyPath in keyPaths {
             stringKeyPaths.append(_name(for: keyPath))

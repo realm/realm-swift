@@ -719,7 +719,7 @@ class RealmCollectionTypeTests: TestCase {
         waitForExpectations(timeout: 0.1, handler: nil)
         token.invalidate()
     }
-    
+
     func testObservePartialKeyPath() {
         var ex = expectation(description: "initial notification")
         let token0 = collection.observe(keyPaths: [\CTTNullableStringObjectWithLink.stringCol]) { (changes: RealmCollectionChange) in
@@ -811,36 +811,7 @@ class RealmCollectionTypeTests: TestCase {
         waitForExpectations(timeout: 0.2, handler: nil)
         token.invalidate()
     }
-//
-//    func testObserveKeyPathWithLinkNoChange() {
-//        var ex = expectation(description: "initial notification")
-//        let token = collection.observe(keyPaths: ["linkCol.id"]) { (changes: RealmCollectionChange) in
-//            switch changes {
-//            case .initial(let collection):
-//                XCTAssertEqual(collection.count, 2)
-//            case .update:
-//                XCTFail("update not expected")
-//            case .error:
-//                XCTFail("error not expected")
-//            }
-//            ex.fulfill()
-//        }
-//        waitForExpectations(timeout: 0.2, handler: nil)
-//
-//        // Expect no notification for `linkCol.id` key path because only `stringCol` will be modified.
-//        ex = self.expectation(description: "NO change notification")
-//        ex.isInverted = true // Inverted expectation causes failure if fulfilled.
-//        dispatchSyncNewThread {
-//            let realm = self.realmWithTestPath()
-//            realm.beginWrite()
-//            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
-//            obj.stringCol = "changed"
-//            try! realm.commitWrite()
-//        }
-//        waitForExpectations(timeout: 0.1, handler: nil)
-//        token.invalidate()
-//    }
-//
+
     func testObservePartialKeyPathWithLinkNoChangeList() {
         var ex = expectation(description: "initial notification")
         let token = collection.observe(keyPaths: [\CTTNullableStringObjectWithLink.linkCol]) { (changes: RealmCollectionChange) in
@@ -1613,11 +1584,11 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func testObserveKeyPathWithLinkNoChangeList() {
         assertThrows(collection.observe { _ in })
     }
-    
+
     override func testObservePartialKeyPath() {
         assertThrows(collection.observe { _ in })
     }
-    
+
     override func testObservePartialKeyPathNoChange() {
         assertThrows(collection.observe { _ in })
     }
@@ -1971,11 +1942,11 @@ class MutableSetUnmanagedRealmCollectionTypeTests: MutableSetRealmCollectionType
     override func testObserveKeyPathWithLinkNoChangeList() {
         assertThrows(collection.observe { _ in })
     }
-    
+
     override func testObservePartialKeyPath() {
         assertThrows(collection.observe { _ in })
     }
-    
+
     override func testObservePartialKeyPathNoChange() {
         assertThrows(collection.observe { _ in })
     }
