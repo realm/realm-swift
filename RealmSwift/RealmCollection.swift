@@ -631,7 +631,7 @@ public protocol RealmCollection: RealmCollectionBase {
                  on queue: DispatchQueue?,
                  _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
     
-    func observe(keyPaths: [PartialKeyPath<ObjectBase>],
+    func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
                  on queue: DispatchQueue?,
                  _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
 
@@ -922,7 +922,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
     func _observe(_ queue: DispatchQueue?, _ some: String) -> NotificationToken { fatalError() }
-    func _observe(_ keyPaths: [PartialKeyPath<ObjectBase>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void) -> NotificationToken { fatalError() }
+    func _observe<T: ObjectBase>(_ keyPaths: [PartialKeyPath<T>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void) -> NotificationToken { fatalError() }
     class func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self { fatalError() }
     var bridged: (objectiveCValue: Any, metadata: Any?) { fatalError() }
     func asNSFastEnumerator() -> Any { fatalError() }
@@ -1035,7 +1035,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     override func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { return base._observe(keyPaths, queue, block) }
     
-    override func _observe(_ keyPaths: [PartialKeyPath<ObjectBase>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<_AnyRealmCollectionBase<C.Element>.Wrapper>) -> Void) -> NotificationToken {
+    override func _observe<T: ObjectBase>(_ keyPaths: [PartialKeyPath<T>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<_AnyRealmCollectionBase<C.Element>.Wrapper>) -> Void) -> NotificationToken {
         var stringKeyPaths: [String] = []
         for keyPath in keyPaths {
             stringKeyPaths.append(_name(for: keyPath))
@@ -1480,7 +1480,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._observe(keyPaths, queue, block) }
     
-    public func observe(keyPaths: [PartialKeyPath<ObjectBase>], on queue: DispatchQueue? = nil,
+    public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>], on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._observe(keyPaths, queue, block) }
 
@@ -1490,7 +1490,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
     
 //    /// :nodoc:
     // need to delete?
-    public func _observe(_ keyPaths: [PartialKeyPath<ObjectBase>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
+    public func _observe<T: ObjectBase>(_ keyPaths: [PartialKeyPath<T>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._observe(keyPaths, queue, block) }
 
     /// :nodoc:

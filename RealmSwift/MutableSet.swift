@@ -488,7 +488,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
         return rlmSet.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths, queue: queue)
     }
 
-    public func observe(keyPaths:[ PartialKeyPath<ObjectBase>],
+    public func observe<T: ObjectBase>(keyPaths:[ PartialKeyPath<T>],
                         on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<MutableSet>) -> Void) -> NotificationToken {
         var stringKeyPaths: [String] = []
