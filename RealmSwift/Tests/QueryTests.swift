@@ -92,10 +92,10 @@ class QueryTests: TestCase {
         XCTAssertEqual(equalsQuery7.count, 3)
 
         // Between
-        let equalsQuery8 = objects().query { obj in
-            obj.intCol.between(5, 6)
-        }
-        XCTAssertEqual(equalsQuery8.count, 3)
+//        let equalsQuery8 = objects().query { obj in
+//            obj.intCol.between(5, 6)
+//        }
+//        XCTAssertEqual(equalsQuery8.count, 3)
     }
 
     func testRange() {
@@ -168,8 +168,8 @@ class QueryTests: TestCase {
         let subquery2 = objects().query { obj in
             obj.intCol == 5 &&
             obj.arrayInt.contains(1) &&
-            (obj.arrayCol.intCol == 5 && obj.arrayCol.stringCol == "insideArrayCol").subqueryCount() == 5 &&
-            (obj.arrayCol.stringCol == "Bar").subqueryCount() == 5
+            (obj.arrayCol.intCol == 5 && obj.arrayCol.stringCol == "insideArrayCol").count() == 5 &&
+            (obj.arrayCol.stringCol == "Bar").count() == 5
         }
         XCTAssertEqual(subquery2.count, 1)
     }
