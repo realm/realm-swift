@@ -1367,7 +1367,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.5.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.0 beta 3.
+* Xcode: 12.2-13.0 beta 5.
 
 ### Internal
 * Upgraded realm-core from ? to ?
