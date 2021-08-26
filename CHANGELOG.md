@@ -17,9 +17,9 @@
   to ObjectKeyIdentifiable rather than Identifiable.
   ([Cocoa #7372](https://github.com/realm/realm-cocoa/issues/7372), since v10.6.0)
 * Work around Xcode 13 beta 3+ shipping a broken swiftinterface file for Combine on 32-bit iOS.
-  ([Cocoa #7368](https://github.com/realm/realm-cocoa/issues/7368)
+  ([Cocoa #7368](https://github.com/realm/realm-cocoa/issues/7368))
 * Fixes history corruption when replacing an embedded object in a list.
-  ([Core #4845](https://github.com/realm/realm-core/issues/4845))
+  ([Core #4845](https://github.com/realm/realm-core/issues/4845)), since v10.0.0)
 
 ### Compatibility
 
