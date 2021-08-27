@@ -450,6 +450,7 @@
 		CF0D04F1269365300038A058 /* KeyPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0D04F02693652E0038A058 /* KeyPathTests.swift */; };
 		CF330BBE24E57D5F00F07EE2 /* RLMWatchTestUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = CF330BBD24E57D5F00F07EE2 /* RLMWatchTestUtility.m */; };
 		CF44461E26121C6800BAFDB4 /* RealmProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF44461D26121C6800BAFDB4 /* RealmProperty.swift */; };
+		CF46CC0226D931BA00DE450C /* QueryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF46CC0026D931BA00DE450C /* QueryTests.swift */; };
 		CF6E0482242A141200DB7F14 /* RLMEmailPasswordAuth.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0480242A141200DB7F14 /* RLMEmailPasswordAuth.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF6E0483242A141200DB7F14 /* RLMEmailPasswordAuth.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0481242A141200DB7F14 /* RLMEmailPasswordAuth.mm */; };
 		CF6E0486242A321200DB7F14 /* RLMProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0484242A321200DB7F14 /* RLMProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -996,6 +997,8 @@
 		CF44460526121B2A00BAFDB4 /* RLMSwiftValueStorage.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSwiftValueStorage.mm; sourceTree = "<group>"; };
 		CF44460626121B2A00BAFDB4 /* RLMSwiftValueStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftValueStorage.h; sourceTree = "<group>"; };
 		CF44461D26121C6800BAFDB4 /* RealmProperty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmProperty.swift; sourceTree = "<group>"; };
+		CF46CBFF26D931BA00DE450C /* QueryTests.gyb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueryTests.gyb.swift; sourceTree = "<group>"; };
+		CF46CC0026D931BA00DE450C /* QueryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueryTests.swift; sourceTree = "<group>"; };
 		CF6E0480242A141200DB7F14 /* RLMEmailPasswordAuth.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMEmailPasswordAuth.h; sourceTree = "<group>"; };
 		CF6E0481242A141200DB7F14 /* RLMEmailPasswordAuth.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMEmailPasswordAuth.mm; sourceTree = "<group>"; };
 		CF6E0484242A321200DB7F14 /* RLMProviderClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMProviderClient.h; sourceTree = "<group>"; };
@@ -1458,6 +1461,8 @@
 				5D6610011BE98D880021E04F /* MigrationTests.swift */,
 				3F4E0FF82654765C008B8C0B /* ModernKVOTests.swift */,
 				3F4E100E2655CA33008B8C0B /* ModernObjectAccessorTests.swift */,
+				CF46CBFF26D931BA00DE450C /* QueryTests.gyb.swift */,
+				CF46CC0026D931BA00DE450C /* QueryTests.swift */,
 				3FA5E94C266064C4008F1345 /* ModernObjectCreationTests.swift */,
 				3FB19068265ECF0C00DA7C76 /* ModernObjectTests.swift */,
 				3FB1906A265ED23300DA7C76 /* ModernTestObjects.swift */,
@@ -2222,7 +2227,6 @@
 				49E57A1C245C5B0E004AF428 /* PBXTargetDependency */,
 				E8267FB41D90B79000E001C7 /* PBXTargetDependency */,
 				537689AC24A7DD060008E57B /* PBXTargetDependency */,
-				E8267FB61D90B79000E001C7 /* PBXTargetDependency */,
 			);
 			name = ObjectServerTests;
 			productName = RealmTests;
@@ -2758,6 +2762,7 @@
 				CFFECBAA250646820010F585 /* Decimal128Tests.swift in Sources */,
 				3FF3FFAF1F0D6D6400B84599 /* KVOTests.swift in Sources */,
 				5D6610161BE98D880021E04F /* ListTests.swift in Sources */,
+				CF46CC0226D931BA00DE450C /* QueryTests.swift in Sources */,
 				3F1D8D77265B075100593ABA /* MapTests.swift in Sources */,
 				3F8824FD1E5E335000586B35 /* MigrationTests.swift in Sources */,
 				3F4E0FF92654765C008B8C0B /* ModernKVOTests.swift in Sources */,

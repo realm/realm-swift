@@ -559,6 +559,8 @@ extension Results where Element: Object {
     }
 }
 
+
+/// Tag protocol for all numeric types.
 public protocol _QueryNumeric: _RealmSchemaDiscoverable { }
 extension Int: _QueryNumeric { }
 extension Int8: _QueryNumeric { }
@@ -572,6 +574,7 @@ extension Date: _QueryNumeric { }
 extension AnyRealmValue: _QueryNumeric { }
 extension Optional: _QueryNumeric where Wrapped: _QueryNumeric { }
 
+/// Tag protocol for all types that are compatible with `Query`.
 public protocol _QueryComparable { }
 extension Bool: _QueryComparable { }
 extension Int: _QueryComparable { }

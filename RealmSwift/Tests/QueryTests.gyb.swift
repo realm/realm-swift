@@ -164,7 +164,7 @@ import XCTest
     ]
 }%
 /// This file is generated from a template. Do not edit directly.
-class QueryTests_: TestCase {
+class QueryTests: TestCase {
 
     private func objects() -> Results<ModernAllTypesObject> {
         realmWithTestPath().objects(ModernAllTypesObject.self)
