@@ -70,13 +70,50 @@ private enum QueryExpression {
     case collectionAggregation(CollectionAggregation)
 }
 
+/**
+ `Query` is a class used to create type-safe query predicates.
+
+ With `Query` you are given the ability to create Swift style query expression that will then
+ be constructed into an `NSPredicate`. The `Query` class should not be instantiated directly
+ and should be only used as a paramater within a closure that takes a query expression as an argument.
+ Example:
+ ```swift
+ public func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element>
+ ```
+
+ You would then use the above function like so:
+ ```swift
+ let results = realm.objects(Person.self).query {
+    $0.name == "Foo" || $0.name == "Bar" && $0.age >= 21
+ }
+ ```
+
+ ### Supported predicate types
+
+ ## Comparisions
+ - Equals `==`
+ - Not Equals `!=`
+ - Greater Than `>`
+ - Less Than `<`
+ - Greater Than or Equal `>=`
+ - Less Than or Equal `<=`
+ - Between `.contains(_ range:)`
+
+ ## Collections
+ - IN `.contains(_ element:)`
+ - Between `.contains(_ range:)`
+
+ ## Compound
+ - AND `&&`
+ - OR `||`
+ */
 @dynamicMemberLookup
 public struct Query<T: _Persistable> {
 
     private var tokens: [QueryExpression] = []
 
     init() { }
-    fileprivate init(expression: [QueryExpression]) {
+    private init(expression: [QueryExpression]) {
         tokens = expression
     }
 
@@ -289,26 +326,31 @@ extension Query where T: RealmCollection {
 }
 
 extension Query where T: RealmCollection, T.Element: _Persistable {
+    /// Checks if an element exists in this collection.
     public func contains<V>(_ value: T.Element) -> Query<V> {
         return append(tokens: [.comparison(.contains(value))])
     }
 }
 
 extension Query where T: RealmCollection, T.Element: _QueryNumeric {
+    /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: Range<T.Element>) -> Query<V> {
         return aggregateContains(range.lowerBound, range.upperBound)
     }
 
+    /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: ClosedRange<T.Element>) -> Query<V> {
         return aggregateContains(range.lowerBound, range.upperBound, isClosedRange: true)
     }
 }
 
 extension Query where T: RealmCollection, T.Element: OptionalProtocol, T.Element.Wrapped: _QueryNumeric {
+    /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: Range<T.Element.Wrapped>) -> Query<V> {
         return aggregateContains(range.lowerBound, range.upperBound)
     }
 
+    /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: ClosedRange<T.Element.Wrapped>) -> Query<V> {
         return aggregateContains(range.lowerBound, range.upperBound, isClosedRange: true)
     }
@@ -429,6 +471,36 @@ extension Query where T: OptionalProtocol, T.Wrapped: PersistableEnum, T.Wrapped
     }
 }
 
+// MARK: _QueryNumeric
+
+extension Query where T: _QueryNumeric {
+    /// Checks for all elements in this collection that are within a given range.
+    public func contains<V>(_ range: Range<T>) -> Query<V> {
+        return append(tokens: [.comparison(.between(low: range.lowerBound,
+                                                    high: range.upperBound, closedRange: false))])
+    }
+
+    /// Checks for all elements in this collection that are within a given range.
+    public func contains<V>(_ range: ClosedRange<T>) -> Query<V> {
+        return append(tokens: [.comparison(.between(low: range.lowerBound,
+                                                    high: range.upperBound, closedRange: true))])
+    }
+}
+
+extension Query where T: OptionalProtocol, T.Wrapped: _QueryNumeric {
+    /// Checks for all elements in this collection that are within a given range.
+    public func contains<V>(_ range: Range<T.Wrapped>) -> Query<V> {
+        return append(tokens: [.comparison(.between(low: range.lowerBound,
+                                                    high: range.upperBound, closedRange: false))])
+    }
+
+    /// Checks for all elements in this collection that are within a given range.
+    public func contains<V>(_ range: ClosedRange<T.Wrapped>) -> Query<V> {
+        return append(tokens: [.comparison(.between(low: range.lowerBound,
+                                                    high: range.upperBound, closedRange: true))])
+    }
+}
+
 // MARK: Bool
 
 extension Query where T == Bool {
@@ -477,30 +549,6 @@ extension Query where T: RealmKeyedCollection, T.Key: _Persistable , T.Value: _P
     public subscript(member: T.Key) -> Query<T.Value> {
         // mapCol["Bar"] -> mapCol.@allKeys == 'Bar'
         return Query<T.Value>(expression: tokens)
-    }
-}
-
-extension Query where T: _QueryNumeric {
-    public func contains<V>(_ range: Range<T>) -> Query<V> {
-        return append(tokens: [.comparison(.between(low: range.lowerBound,
-                                                    high: range.upperBound, closedRange: false))])
-    }
-
-    public func contains<V>(_ range: ClosedRange<T>) -> Query<V> {
-        return append(tokens: [.comparison(.between(low: range.lowerBound,
-                                                    high: range.upperBound, closedRange: true))])
-    }
-}
-
-extension Query where T: OptionalProtocol, T.Wrapped: _QueryNumeric {
-    public func contains<V>(_ range: Range<T.Wrapped>) -> Query<V> {
-        return append(tokens: [.comparison(.between(low: range.lowerBound,
-                                                    high: range.upperBound, closedRange: false))])
-    }
-
-    public func contains<V>(_ range: ClosedRange<T.Wrapped>) -> Query<V> {
-        return append(tokens: [.comparison(.between(low: range.lowerBound,
-                                                    high: range.upperBound, closedRange: true))])
     }
 }
 
