@@ -18,6 +18,7 @@
 import XCTest
 @testable import RealmSwift
 
+// swiftlint:disable all
 class QueryTests_Prototype: TestCase {
 
     func objects() -> Results<ModernAllTypesObject> {
@@ -198,38 +199,4 @@ class QueryTests_Prototype: TestCase {
         }
         XCTAssertEqual(query2.count, 3)
     }
-
-    // Used for bashing ideas out.
-    func testNSPredicate() {
-        let realm = realmWithTestPath()
-
-        let parent = Parent()
-        parent.name = "Foo"
-
-        let child = Child()
-        child.parent = parent
-        parent.kids.append(child)
-
-        try! realm.write {
-            realm.add(parent)
-        }
-        let q = realm.objects(Child.self).sorted(byKeyPath: "parent.name")
-        print(q)
-        XCTAssertEqual(q.count, 1)
-
-        let q2 = realm.objects(Child.self)
-        print(q2)
-        XCTAssertEqual(q2.count, 1)
-    }
-}
-
-final class Parent: Object
-{
-    @Persisted var name: String
-    @Persisted var kids: List<Child>
-}
-final class Child: Object
-{
-    @Persisted var name: String
-    @Persisted var parent: Parent?
 }

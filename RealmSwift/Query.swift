@@ -88,9 +88,9 @@ private enum QueryExpression {
  }
  ```
 
- ### Supported predicate types
+ ## Supported predicate types
 
- ## Comparisions
+ ### Comparisions
  - Equals `==`
  - Not Equals `!=`
  - Greater Than `>`
@@ -99,11 +99,11 @@ private enum QueryExpression {
  - Less Than or Equal `<=`
  - Between `.contains(_ range:)`
 
- ## Collections
+ ### Collections
  - IN `.contains(_ element:)`
  - Between `.contains(_ range:)`
 
- ## Compound
+ ### Compound
  - AND `&&`
  - OR `||`
  */
@@ -202,83 +202,70 @@ public struct Query<T: _Persistable> {
 
         for (idx, token) in tokens.enumerated() {
             switch token {
-                case let .basicComparison(op):
-                    if idx == 0 {
-                        predicateString.append(op.rawValue)
+            case let .basicComparison(op):
+                if idx == 0 {
+                    predicateString.append(op.rawValue)
+                } else {
+                    predicateString.append(" \(op.rawValue)")
+                }
+            case let .comparison(comp):
+                switch comp {
+                case let .between(low, high, closedRange):
+                    if closedRange {
+                        predicateString.append(" BETWEEN {%@, %@}")
+                        arguments.append(contentsOf: [low, high])
+                    } else if idx > 0, case let .keyPath(name, _) = tokens[idx-1] {
+                        predicateString.append(" >= %@")
+                        arguments.append(low)
+                        predicateString.append(" && \(name) <\(closedRange ? "=" : "") %@")
+                        arguments.append(high)
                     } else {
-                        predicateString.append(" \(op.rawValue)")
+                        throwRealmException("Could not construct .contains(_:) predicate")
                     }
-                    break
-                case let .comparison(comp):
-                    switch comp {
-                        case let .between(low, high, closedRange):
-                            if closedRange {
-                                predicateString.append(" BETWEEN {%@, %@}")
-                                arguments.append(contentsOf: [low, high])
-                            } else if idx > 0, case let .keyPath(name, _) = tokens[idx-1] {
-                                predicateString.append(" >= %@")
-                                arguments.append(low)
-                                predicateString.append(" && \(name) <\(closedRange ? "=" : "") %@")
-                                arguments.append(high)
-                            } else {
-                                throwRealmException("Could not construct .contains(_:) predicate")
-                            }
-                            break
-                        case let .contains(val):
-                            predicateString.insert("%@ IN ", at: predicateString.count-1)
-                            arguments.append(val)
-                            break
-                    }
-                case let .compound(comp):
-                    predicateString.append(" \(comp.rawValue) ")
-                    break
-                case let .keyPath(name, isCollection):
-                    // For the non verbose subqery
-                    if isCollection && isSubquery {
-                        predicateString.append("$obj")
-                        continue
-                    }
-                    // Anything below the verbose subquery uses
-                    var needsDot = false
-                    if idx > 0, case .keyPath = tokens[idx-1] {
-                        needsDot = true
-                    }
-                    if needsDot {
-                        predicateString.append(".")
-                    }
-//                    if isSubquery && !needsDot {
-//                        predicateString.append("$obj.")
-//                    }
-                    predicateString.append("\(name)")
-                    break
-                case let .stringSearch(s):
-                        switch s {
-                            case let .contains(str, options):
-                                predicateString.append(" CONTAINS\(optionsStr(options)) %@")
-                                arguments.append(str)
-                                break
-                            case let .like(str, options):
-                                predicateString.append(" LIKE\(optionsStr(options)) %@")
-                                arguments.append(str)
-                                break
-                            case let .beginsWith(str, options):
-                                predicateString.append(" BEGINSWITH\(optionsStr(options)) %@")
-                                arguments.append(str)
-                                break
-                            case let .endsWith(str, options):
-                                predicateString.append(" ENDSWITH\(optionsStr(options)) %@")
-                                arguments.append(str)
-                                break
-                        }
-                case let .rhs(v):
-                    predicateString.append(" %@")
-                    arguments.append(v.objCValue)
-                case let .subquery(col, str, args):
-                    predicateString.append("SUBQUERY(\(col), $obj, \(str)).@count")
-                    arguments.append(contentsOf: args)
-                case let .collectionAggregation(agg):
-                    predicateString.append(agg.rawValue)
-                    break
+                case let .contains(val):
+                    predicateString.insert("%@ IN ", at: predicateString.count-1)
+                    arguments.append(val)
+                }
+            case let .compound(comp):
+                predicateString.append(" \(comp.rawValue) ")
+            case let .keyPath(name, isCollection):
+                // For the non verbose subqery
+                if isCollection && isSubquery {
+                    predicateString.append("$obj")
+                    continue
+                }
+                // Anything below the verbose subquery uses
+                var needsDot = false
+                if idx > 0, case .keyPath = tokens[idx-1] {
+                    needsDot = true
+                }
+                if needsDot {
+                    predicateString.append(".")
+                }
+                predicateString.append("\(name)")
+            case let .stringSearch(s):
+                switch s {
+                case let .contains(str, options):
+                    predicateString.append(" CONTAINS\(optionsStr(options)) %@")
+                    arguments.append(str)
+                case let .like(str, options):
+                    predicateString.append(" LIKE\(optionsStr(options)) %@")
+                    arguments.append(str)
+                case let .beginsWith(str, options):
+                    predicateString.append(" BEGINSWITH\(optionsStr(options)) %@")
+                    arguments.append(str)
+                case let .endsWith(str, options):
+                    predicateString.append(" ENDSWITH\(optionsStr(options)) %@")
+                    arguments.append(str)
+                }
+            case let .rhs(v):
+                predicateString.append(" %@")
+                arguments.append(v.objCValue)
+            case let .subquery(col, str, args):
+                predicateString.append("SUBQUERY(\(col), $obj, \(str)).@count")
+                arguments.append(contentsOf: args)
+            case let .collectionAggregation(agg):
+                predicateString.append(agg.rawValue)
             }
         }
 
@@ -529,7 +516,7 @@ extension Query where T == Bool {
     }
 }
 
-extension Query where T: RealmKeyedCollection, T.Key: _Persistable , T.Value: _Persistable {
+extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: _Persistable {
     public func between<V>(_ low: T.Value, _ high: T.Value) -> Query<V> {
         fatalError()
     }
