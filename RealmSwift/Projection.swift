@@ -25,6 +25,7 @@ fileprivate protocol _Projected {
     func observe<T: ObjectBase>(keyPaths: [String]?, on queue: DispatchQueue?, _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken
     var hit: Bool { get }
     var keyPathString: String? { get }
+    var value: Any? { get }
 }
 
 /// @Projected is used to declare properties on Projection protocols which should be
@@ -85,6 +86,12 @@ public struct Projected<T: ObjectBase, Value>: _Projected {
         set {
             precondition(projectedKeyPath is WritableKeyPath<T, Value>)
             set(objectBase! as! T, newValue)
+        }
+    }
+    
+    var value: Any? {
+        get {
+            wrappedValue
         }
     }
     /// Declares a property which is lazily initialized to the type's default value.
@@ -225,13 +232,25 @@ public enum ProjectionChange<T: Projection> {
             let newProjection = T(object)
             let projectedPropertyChanges: [ProjectedChange] = objectPropertyChanges.map { propChange in
                 let name = oldProjection.projectionPropertyName(propChange.name)!
+                let publicName = name.first == "_" ? String(name.dropFirst()) : name
                 let keyPath = \T.[name]
-                return ProjectedChange(name: name, oldValue: oldProjection[keyPath:keyPath], newValue: newProjection[keyPath:keyPath])
+                let newValue: Any? = newProjection[keyPath: keyPath].value
+                if let projectedValue = newValue, let realmValue = propChange.newValue,
+                   ProjectionChange.isEqual(projectedValue, realmValue) {
+                    return ProjectedChange(name: publicName , oldValue: propChange.oldValue, newValue: propChange.newValue)
+                }
+                // cannot provide old value if it was processed in some way.
+                return ProjectedChange(name: publicName , oldValue: nil, newValue: propChange.newValue)
             }
             self = .change(newProjection, projectedPropertyChanges)
         case .deleted:
             self = ProjectionChange.deleted
         }
+    }
+    
+    static func isEqual(_ l: Any, _ r: Any) -> Bool {
+        guard let l = l as? AnyHashable, let r = r as? AnyHashable else { return false }
+        return l == r
     }
 }
 
@@ -344,7 +363,7 @@ extension Projection {
 
     fileprivate var realmObject: ObjectBase {
         get {
-            (Mirror(reflecting: self).children.first(where: { $0.value is _Projected })!.value as! _Projected).objectBase
+            projectedProperties().first!.value.objectBase
         }
     }
 
