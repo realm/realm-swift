@@ -500,13 +500,14 @@ class ProjectionTests: TestCase {
     }
     
     func testProjectionEquality() {
-        let collection = realmWithTestPath().objects(PersonProjection.self)
-        let left = collection.first!
-        let right = collection.last!
-        let anotherLeft = collection[0]
+        let realm = realmWithTestPath()
+        let johnObject = realm.objects(Person.self).filter("lastName == 'Snow'").first!
+        let johnDefaultInit = PersonProjection(johnObject)
+        let johnMapped = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!
+        let notJohn = realm.objects(PersonProjection.self).filter("lastName != 'Snow'").first!
         
-        XCTAssertNotEqual(left, right)
-        XCTAssertEqual(left, anotherLeft)
+        XCTAssertEqual(johnMapped, johnDefaultInit)
+        XCTAssertNotEqual(johnMapped, notJohn)
     }
     
     func testProjectionsRealmShouldNotBeNil() {
@@ -792,7 +793,7 @@ class ProjectionTests: TestCase {
 //                                  file: (fileName), line: lineNumber)
 //                          return
 //                      }
-//
+//        assertMapEquals(new, projectedNew)
 //                if projectedNew.count != new.count {
 //                    XCTAssertEqual(projectedNew.count, new.count, "Expected \(projectedNew) and \(new) to be equal", file: (fileName), line: lineNumber)
 //                }
@@ -995,5 +996,29 @@ class ProjectionTests: TestCase {
         }
         waitForExpectations(timeout: 1, handler: nil)
 //        token.invalidate()
+    }
+    
+    func testFreezeProjection() {
+        let realm = realmWithTestPath()
+        let frozenJohnObject = realm.objects(Person.self).filter("lastName == 'Snow'").first!.freeze()
+        let frozenJohnProjection = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!.freeze()
+        let johnProjectionFromFrozen = PersonProjection(frozenJohnObject)
+        
+        XCTAssertTrue(frozenJohnProjection.isFrozen)
+        XCTAssertTrue(johnProjectionFromFrozen.isFrozen)
+        XCTAssertEqual(frozenJohnProjection, johnProjectionFromFrozen)
+        
+        let thawedJohnProjectionA = frozenJohnProjection.thaw()!
+        let thawedJohnProjectionB = johnProjectionFromFrozen.thaw()!
+        XCTAssertFalse(thawedJohnProjectionA.isFrozen)
+        XCTAssertFalse(thawedJohnProjectionB.isFrozen)
+        XCTAssertEqual(thawedJohnProjectionA, thawedJohnProjectionB)
+    }
+    
+    func testSetDefaultValue() {
+        let realm = realmWithTestPath()
+        let johnProjection = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!
+
+        PersonProjection._rlmDefaultValue(false)
     }
 }

@@ -322,6 +322,10 @@ extension Projection {
      `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
      */
     public func freeze() -> Self {
+        guard let object = realmObject as? ThreadConfined else {
+            throwRealmException("Projection underlying object cannot be frozen.")
+        }
+        self.assign(object.freeze() as! Root)
         return self
     }
     /**
@@ -329,6 +333,10 @@ extension Projection {
      Will return self if called on an already live object.
      */
     public func thaw() -> Self? {
+        guard let object = realmObject as? ThreadConfined else {
+            throwRealmException("Projection underlying object cannot be thawed.")
+        }
+        self.assign(object.thaw() as! Root)
         return self
     }
     
