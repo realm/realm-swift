@@ -892,7 +892,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                 if let newUser = $0.currentUser,
                     user != newUser {
                     self.appState = .loggedIn(newUser)
-                } else {
+                } else if $0.currentUser == nil {
                     self.appState = .loggedOut
                 }
             case .loggedOut:
