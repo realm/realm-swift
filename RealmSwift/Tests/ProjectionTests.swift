@@ -1014,11 +1014,4 @@ class ProjectionTests: TestCase {
         XCTAssertFalse(thawedJohnProjectionB.isFrozen)
         XCTAssertEqual(thawedJohnProjectionA, thawedJohnProjectionB)
     }
-    
-    func testSetDefaultValue() {
-        let realm = realmWithTestPath()
-        let johnProjection = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!
-
-        PersonProjection._rlmDefaultValue(false)
-    }
 }
