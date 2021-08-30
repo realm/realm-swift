@@ -27,17 +27,27 @@ enum LoggingViewState {
     case syncing
 }
 
-struct LoginView: View {
-    @State var viewState: LoggingViewState = .initial
-    @ObservedObject var loginHelper = LoginHelper()
+struct MainView: View {
     let testType: String = ProcessInfo.processInfo.environment["test_type"]!
-    var user: User?
+    @State var viewState: LoggingViewState = .initial
+    @State var user: User?
 
     var body: some View {
         VStack {
+            LoginView(didLogin: { user in
+                viewState = .loggedIn
+                self.user = user
+            }, loggingIn: {
+                viewState = .loggingIn
+            })
             switch viewState {
             case .initial:
-                EmptyView()
+                VStack {
+                    Text("Waiting For Login")
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.purple)
+                .transition(AnyTransition.move(edge: .trailing)).animation(.default)
             case .loggingIn:
                 VStack {
                     ProgressView("Logging in...")
@@ -66,13 +76,13 @@ struct LoginView: View {
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 case "async_open_environment_partition_value":
                     AsyncOpenPartitionView()
-                        .environment(\.partitionValue, ProcessInfo.processInfo.environment["function_name"]!)
+                        .environment(\.partitionValue, user!.id)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 case "async_open_environment_configuration":
                     AsyncOpenPartitionView()
-                        .environment(\.realmConfiguration, loginHelper.user!.configuration(partitionValue: ProcessInfo.processInfo.environment["function_name"]!))
+                        .environment(\.realmConfiguration, user!.configuration(partitionValue: user!.id))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
@@ -83,13 +93,13 @@ struct LoginView: View {
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 case "auto_open_environment_partition_value":
                     AutoOpenPartitionView()
-                        .environment(\.partitionValue, ProcessInfo.processInfo.environment["function_name"]!)
+                        .environment(\.partitionValue, user!.id)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
                 case "auto_open_environment_configuration":
                     AutoOpenPartitionView()
-                        .environment(\.realmConfiguration, loginHelper.user!.configuration(partitionValue: ProcessInfo.processInfo.environment["function_name"]!))
+                        .environment(\.realmConfiguration, user!.configuration(partitionValue: user!.id))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
@@ -98,22 +108,40 @@ struct LoginView: View {
                 }
             }
         }
-        .onAppear(perform: {
-            viewState = .loggingIn
-            loginHelper.login(email: ProcessInfo.processInfo.environment["function_name"]!,
-                              password: "password",
-                              completion: {
-                viewState = .loggedIn
-            })
-        })
+    }
+}
+
+struct LoginView: View {
+    @ObservedObject var loginHelper = LoginHelper()
+    @State var email: String = ""
+    @State var password: String = ""
+
+    var didLogin: (User) -> Void
+    var loggingIn: () -> Void
+
+    var body: some View {
+        VStack {
+            TextField("Email", text: $email)
+                .accessibilityIdentifier("email_textfield")
+            TextField("Password", text: $password)
+                .accessibilityIdentifier("password_textfield")
+            Button("Log In") {
+                loggingIn()
+                loginHelper.login(email: email,
+                                  password: password,
+                                  completion: { user in
+                    didLogin(user)
+                })
+            }
+            .accessibilityIdentifier("login_button")
+        }
     }
 }
 
 class LoginHelper: ObservableObject {
-    @Published var user: User?
     var cancellables = Set<AnyCancellable>()
 
-    func login(email: String, password: String, completion: @escaping () -> Void) {
+    func login(email: String, password: String, completion: @escaping (User) -> Void) {
         let appConfig = AppConfiguration(baseURL: "http://localhost:9090",
                                          transport: nil,
                                          localAppName: nil,
@@ -121,10 +149,12 @@ class LoginHelper: ObservableObject {
         let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
         app.login(credentials: Credentials.emailPassword(email: email, password: password))
             .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { _ in
+            .sink(receiveCompletion: { result in
+                if case .failure(let error) = result {
+                    print("Login user error \(error)")
+                }
             }, receiveValue: { user in
-                self.user = user
-                completion()
+                completion(user)
             })
             .store(in: &cancellables)
     }
@@ -134,7 +164,7 @@ struct AsyncOpenView: View {
     @State var canNavigate: Bool = false
     @State var progress: Progress?
     @AsyncOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
-               partitionValue: ProcessInfo.processInfo.environment["function_name"]!,
+               partitionValue: ProcessInfo.processInfo.environment["partition_value"]!,
                timeout: 2000)
     var asyncOpen
 
@@ -181,7 +211,7 @@ struct AutoOpenView: View {
     @State var canNavigate: Bool = false
     @State var progress: Progress?
     @AutoOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
-              partitionValue: ProcessInfo.processInfo.environment["function_name"]!,
+              partitionValue: ProcessInfo.processInfo.environment["partition_value"]!,
               timeout: 2000)
     var autoOpen
 
@@ -288,6 +318,38 @@ struct AutoOpenPartitionView: View {
     }
 }
 
+struct AsyncOpenMultiUserView: View {
+    @AsyncOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
+               partitionValue: "wrong_partition_value",
+               timeout: 2000)
+    var asyncOpen
+
+    var body: some View {
+        VStack {
+            switch asyncOpen {
+            case .connecting:
+                ProgressView()
+            case .waitingForUser:
+                ProgressView("Waiting for user to logged in...")
+            case .open(let realm):
+                ListView()
+                    .environment(\.realm, realm)
+                    .transition(AnyTransition.move(edge: .leading)).animation(.default)
+            case .error(let error):
+                ErrorView(error: error)
+                    .background(Color.red)
+                    .transition(AnyTransition.move(edge: .trailing)).animation(.default)
+            case .progress(let progress):
+                ProgressView(progress)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.yellow)
+                    .transition(AnyTransition.move(edge: .trailing)).animation(.default)
+            }
+        }
+
+    }
+}
+
 struct ErrorView: View {
     var error: Error
     var body: some View {
@@ -300,12 +362,12 @@ struct ErrorView: View {
 }
 
 struct ListView: View {
-    @ObservedResults(SwiftHugeSyncObject.self) var objects
+    @ObservedResults(SwiftPerson.self) var objects
 
     var body: some View {
         List {
             ForEach(objects) { object in
-                Text("\(object._id)")
+                Text("\(object.firstName)")
             }
         }
         .accessibilityIdentifier("table-view")

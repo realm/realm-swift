@@ -43,6 +43,17 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     var cancellables: Set<AnyCancellable> = []
 
     // MARK: - AsyncOpen
+    func asyncOpen<T: BSON>(appId: String? = nil, partitionValue: T, timeout: UInt? = nil, handler: @escaping (AsyncOpenState) -> Void) {
+        let asyncOpen = AsyncOpen(appId: appId, partitionValue: partitionValue, timeout: timeout)
+        asyncOpen.projectedValue
+            .sink { asyncOpenState in
+                handler(asyncOpenState)
+            }
+            .store(in: &cancellables)
+        waitForExpectations(timeout: 10.0)
+        asyncOpen.cancel()
+    }
+    
     func testAsyncOpenOpenRealm() throws {
         _ = try logInUser(for: basicCredentials())
 
@@ -148,17 +159,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         }
     }
 
-    func asyncOpen(appId: String? = nil, partitionValue: String, timeout: UInt? = nil, handler: @escaping (AsyncOpenState) -> Void) {
-        let asyncOpen = AsyncOpen(appId: appId, partitionValue: partitionValue, timeout: timeout)
-        asyncOpen.projectedValue
-            .sink { asyncOpenState in
-                handler(asyncOpenState)
-            }
-            .store(in: &cancellables)
-        waitForExpectations(timeout: 10.0)
-        asyncOpen.cancel()
-    }
-
     func testAsyncOpenThrowExceptionWithoutCachedApp() throws {
         resetAppCache()
         assertThrows(AsyncOpen(partitionValue: #function),
@@ -174,7 +174,120 @@ class SwiftUIServerTests: SwiftSyncTestCase {
                      reason: "Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
     }
 
+    func testAsyncOpenWithDifferentPartitionValues() throws {
+        let partitionValueA = #function
+        let partitionValueB = "\(#function)bar"
+
+        let user = try logInUser(for: basicCredentials())
+        if !isParent {
+            populateRealm(user: user, partitionValue: partitionValueA)
+            return
+        }
+        executeChild()
+
+        let ex = expectation(description: "download-partition-value-async-open")
+        asyncOpen(partitionValue: partitionValueA) { asyncOpenState in
+            if case let .open(realm) = asyncOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
+                ex.fulfill()
+            }
+        }
+
+        let ex2 = expectation(description: "download-other-partition-value-async-open")
+        asyncOpen(partitionValue: partitionValueB) { asyncOpenState in
+            if case let .open(realm) = asyncOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
+                ex2.fulfill()
+            }
+        }
+    }
+
+    func testAsyncOpenWithMultiUserApp() throws {
+        let partitionValueA = #function
+        let partitionValueB = "\(#function)bar"
+
+        let syncUser1 = try logInUser(for: basicCredentials())
+        let syncUser2 = try logInUser(for: basicCredentials())
+        XCTAssertEqual(app.allUsers.count, 2)
+        XCTAssertEqual(syncUser2.id, app.currentUser!.id)
+
+        if !isParent {
+            populateRealm(user: syncUser1, partitionValue: partitionValueA)
+            return
+        }
+        executeChild()
+
+        let ex = expectation(description: "test-multiuser1-app-async-open")
+        asyncOpen(appId: appId, partitionValue: partitionValueB) { asyncOpenState in
+            if case let .open(realm) = asyncOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
+                ex.fulfill()
+            }
+        }
+
+        app.switch(to: syncUser1)
+        XCTAssertEqual(app.allUsers.count, 2)
+        XCTAssertEqual(syncUser1.id, app.currentUser!.id)
+
+        let ex2 = expectation(description: "test-multiuser2-app-async-open")
+        asyncOpen(appId: appId, partitionValue: partitionValueA) { asyncOpenState in
+            if case let .open(realm) = asyncOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
+                ex2.fulfill()
+            }
+        }
+    }
+
+    func testAsyncOpenWithUserAfterLogoutFromAnonymous() throws {
+        let partitionValueA = #function
+        let partitionValueB = "\(#function)bar"
+
+        _ = try logInUser(for: .anonymous)
+        let ex = expectation(description: "download-realm-anonymous-user-async-open")
+        asyncOpen(appId: appId, partitionValue: partitionValueA) { asyncOpenState in
+            if case let .open(realm) = asyncOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
+                ex.fulfill()
+            }
+        }
+
+        app.currentUser?.logOut { _ in } // Logout anonymous user
+
+        let user = try logInUser(for: basicCredentials())
+        if !isParent {
+            populateRealm(user: user, partitionValue: partitionValueB)
+            sleep(10)
+            return
+        }
+        executeChild()
+
+        let ex2 = expectation(description: "download-realm-after-logout-async-open")
+        asyncOpen(appId: appId, partitionValue: partitionValueB) { asyncOpenState in
+            if case let .open(realm) = asyncOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
+                ex2.fulfill()
+            }
+        }
+    }
+
     // MARK: - AutoOpen
+    func autoOpen(appId: String? = nil, partitionValue: String, timeout: UInt? = nil, handler: @escaping (AsyncOpenState) -> Void) {
+        let autoOpen = AutoOpen(appId: appId, partitionValue: partitionValue, timeout: timeout)
+        autoOpen.projectedValue
+            .sink { autoOpenState in
+                handler(autoOpenState)
+            }
+            .store(in: &cancellables)
+        waitForExpectations(timeout: 10.0)
+        autoOpen.cancel()
+    }
+
     func testAutoOpenOpenRealm() throws {
         _ = try logInUser(for: basicCredentials())
 
@@ -281,17 +394,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         }
     }
 
-    func autoOpen(appId: String? = nil, partitionValue: String, timeout: UInt? = nil, handler: @escaping (AsyncOpenState) -> Void) {
-        let autoOpen = AutoOpen(appId: appId, partitionValue: partitionValue, timeout: timeout)
-        autoOpen.projectedValue
-            .sink { autoOpenState in
-                handler(autoOpenState)
-            }
-            .store(in: &cancellables)
-        waitForExpectations(timeout: 10.0)
-        autoOpen.cancel()
-    }
-
     func testAutoOpenThrowExceptionWithoutCachedApp() throws {
         resetAppCache()
         assertThrows(AutoOpen(partitionValue: #function),
@@ -305,5 +407,176 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         _ = App(id: appId2)
         assertThrows(AutoOpen(partitionValue: #function),
                      reason: "Cannot AsyncOpen the Realm because more than one appId was found. When using multiple Apps you must explicitly pass an appId to indicate which to use.")
+    }
+
+    func testAutoOpenWithMultiUserApp() throws {
+        let partitionValueA = #function
+        let partitionValueB = "\(#function)bar"
+
+        let syncUser1 = try logInUser(for: basicCredentials())
+        let syncUser2 = try logInUser(for: basicCredentials())
+        XCTAssertEqual(app.allUsers.count, 2)
+        XCTAssertEqual(syncUser2.id, app.currentUser!.id)
+
+        if !isParent {
+            populateRealm(user: syncUser1, partitionValue: partitionValueA)
+            return
+        }
+        executeChild()
+
+        let ex = expectation(description: "test-multiuser1-app-auto-open")
+        autoOpen(appId: appId, partitionValue: partitionValueB) { autoOpenState in
+            if case let .open(realm) = autoOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
+                ex.fulfill()
+            }
+        }
+
+        app.switch(to: syncUser1)
+        XCTAssertEqual(app.allUsers.count, 2)
+        XCTAssertEqual(syncUser1.id, app.currentUser!.id)
+
+        let ex2 = expectation(description: "test-multiuser2-app-auto-open")
+        autoOpen(appId: appId, partitionValue: partitionValueA) { autoOpenState in
+            if case let .open(realm) = autoOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
+                ex2.fulfill()
+            }
+        }
+    }
+
+    func testAutoOpenWithUserAfterLogoutFromAnonymous() throws {
+        let partitionValueA = #function
+        let partitionValueB = "\(#function)bar"
+
+        _ = try logInUser(for: .anonymous)
+        let ex = expectation(description: "download-realm-anonymous-user-auto-open")
+        autoOpen(appId: appId, partitionValue: partitionValueA) { autoOpenState in
+            if case let .open(realm) = autoOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
+                ex.fulfill()
+            }
+        }
+
+        app.currentUser?.logOut { _ in } // Logout anonymous user
+
+        let user = try logInUser(for: basicCredentials())
+        if !isParent {
+            populateRealm(user: user, partitionValue: partitionValueB)
+            sleep(10)
+            return
+        }
+        executeChild()
+
+        let ex2 = expectation(description: "download-realm-after-logout-auto-open")
+        autoOpen(appId: appId, partitionValue: partitionValueB) { autoOpenState in
+            if case let .open(realm) = autoOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
+                ex2.fulfill()
+            }
+        }
+    }
+
+    func testAutoOpenWithDifferentPartitionValues() throws {
+        let partitionValueA = #function
+        let partitionValueB = "\(#function)bar"
+
+        let user = try logInUser(for: basicCredentials())
+        if !isParent {
+            populateRealm(user: user, partitionValue: partitionValueA)
+            return
+        }
+        executeChild()
+
+        let ex = expectation(description: "download-partition-value-auto-open")
+        autoOpen(partitionValue: partitionValueA) { autoOpenState in
+            if case let .open(realm) = autoOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
+                ex.fulfill()
+            }
+        }
+
+        let ex2 = expectation(description: "download-other-partition-value-auto-open")
+        autoOpen(partitionValue: partitionValueB) { autoOpenState in
+            if case let .open(realm) = autoOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
+                ex2.fulfill()
+            }
+        }
+    }
+
+    // MARK: - Mixed AsyncOpen & AutoOpen
+    func testCombineAsyncOpenAutoOpenWithDifferentPartitionValues() throws {
+        let partitionValueA = #function
+        let partitionValueB = "\(#function)bar"
+
+        let user = try logInUser(for: basicCredentials())
+        if !isParent {
+            populateRealm(user: user, partitionValue: partitionValueA)
+            return
+        }
+        executeChild()
+
+        let ex = expectation(description: "download-partition-value-async-open-mixed")
+        asyncOpen(partitionValue: partitionValueA) { asyncOpenState in
+            if case let .open(realm) = asyncOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
+                ex.fulfill()
+            }
+        }
+
+        let ex2 = expectation(description: "download-partition-value-auto-open-mixed")
+        autoOpen(partitionValue: partitionValueB) { autoOpenState in
+            if case let .open(realm) = autoOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
+                ex2.fulfill()
+            }
+        }
+    }
+
+    func testCombineAsyncOpenAutoOpenWithMultiUserApp() throws {
+        let partitionValueA = #function
+        let partitionValueB = "\(#function)bar"
+
+        let syncUser1 = try logInUser(for: basicCredentials())
+        let syncUser2 = try logInUser(for: basicCredentials())
+        XCTAssertEqual(app.allUsers.count, 2)
+        XCTAssertEqual(syncUser2.id, app.currentUser!.id)
+
+        if !isParent {
+            populateRealm(user: syncUser1, partitionValue: partitionValueA)
+            return
+        }
+        executeChild()
+
+        let ex = expectation(description: "test-combine-multiuser1-app-auto-open")
+        autoOpen(appId: appId, partitionValue: partitionValueB) { autoOpenState in
+            if case let .open(realm) = autoOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: 0, realm, SwiftHugeSyncObject.self)
+                ex.fulfill()
+            }
+        }
+
+        app.switch(to: syncUser1)
+        XCTAssertEqual(app.allUsers.count, 2)
+        XCTAssertEqual(syncUser1.id, app.currentUser!.id)
+
+        let ex2 = expectation(description: "test-combine-multiuser2-app-auto-open")
+        asyncOpen(appId: appId, partitionValue: partitionValueA) { asyncOpenState in
+            if case let .open(realm) = asyncOpenState {
+                XCTAssertNotNil(realm)
+                self.checkCount(expected: SwiftSyncTestCase.bigObjectCount, realm, SwiftHugeSyncObject.self)
+                ex2.fulfill()
+            }
+        }
     }
 }

@@ -21,18 +21,35 @@ import RealmSwift
 
 class SwiftUISyncTestHostUITests: SwiftSyncTestCase {
     let application = XCUIApplication()
-    static var isDataCreated = false
+
+    private let username1 = "1234567890ab1234567890ab"
+    private let username2 = "1234566754727dbkd67hdg5b"
+    private let password = "password"
+    
     override func setUp() {
         continueAfterFailure = false
         super.setUp()
-        // TODO: This should be a static method
-        if !SwiftUISyncTestHostUITests.isDataCreated {
-            let user = logInUser(for: basicCredentials(name: "1234567890ab1234567890ab", register: true))
-            populateRealm(user: user, partitionValue: #function)
-            SwiftUISyncTestHostUITests.isDataCreated = true
-        }
 
-        application.launchEnvironment["function_name"] = #function
+        // TODO: This should be a static method
+        let user = logInUser(for: basicCredentials(withName: username1, register: true))
+        let config = user.configuration(testName: user.id)
+        let realm = try! openRealm(configuration: config)
+        try! realm.write {
+            realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
+            realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+        }
+        waitForUploads(for: realm)
+
+        // Register second user for multi-user tests, login and populate it
+        let user2 = logInUser(for: basicCredentials(withName: username2, register: true))
+        let config2 = user2.configuration(testName: user2.id)
+        let realm2 = try! openRealm(configuration: config2)
+        try! realm2.write {
+            realm2.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+        }
+        waitForUploads(for: realm2)
+
+        application.launchEnvironment["partition_value"] = user.id
         application.launchEnvironment["app_id"] = appId
     }
 
@@ -59,19 +76,41 @@ class SwiftUISyncTestHostUITests: SwiftSyncTestCase {
         }
     }
 
-    // MARK: - AsyncOpen
-    func testDownloadRealmAsyncOpenApp() throws {
-        application.launchEnvironment["test_type"] = "async_open"
-        application.launch()
+    // Login for given email and password
+    private func login(email: String, password: String) {
+        let emailTextfield = application.textFields["email_textfield"]
+        XCTAssertTrue(emailTextfield.waitForExistence(timeout: 2))
+        emailTextfield.tap()
+        emailTextfield.typeText(email)
 
-        // Test that the user is already logged in
+        let passwordTextfield = application.textFields["password_textfield"]
+        XCTAssertTrue(passwordTextfield.waitForExistence(timeout: 2))
+        passwordTextfield.tap()
+        passwordTextfield.typeText(password)
+
+        let loginButton = application.buttons["login_button"]
+        XCTAssertTrue(loginButton.waitForExistence(timeout: 2))
+        loginButton.tap()
+
         let loggingView = application.staticTexts["logged-view"]
         XCTAssertTrue(loggingView.waitForExistence(timeout: 2))
+    }
+
+    private func asyncOpen() {
+        login(email: username1, password: password)
 
         // Query for button to start syncing
         let syncButtonView = application.buttons["sync-button-view"]
         XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
         syncButtonView.tap()
+    }
+
+    // MARK: - AsyncOpen
+    func testDownloadRealmAsyncOpenApp() throws {
+        application.launchEnvironment["test_type"] = "async_open"
+        application.launch()
+
+        asyncOpen()
 
         // Test progress is greater than 0
         let progressView = application.staticTexts["progress-text-view"]
@@ -93,14 +132,7 @@ class SwiftUISyncTestHostUITests: SwiftSyncTestCase {
         application.launchEnvironment["test_type"] = "async_open_environment_partition_value"
         application.launch()
 
-        // Test that the user is already logged in
-        let loggingView = application.staticTexts["logged-view"]
-        XCTAssertTrue(loggingView.waitForExistence(timeout: 2))
-
-        // Query for button to start syncing
-        let syncButtonView = application.buttons["sync-button-view"]
-        XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
-        syncButtonView.tap()
+        asyncOpen()
 
         // Test show ListView after syncing realm
         let table = application.tables.firstMatch
@@ -112,19 +144,44 @@ class SwiftUISyncTestHostUITests: SwiftSyncTestCase {
         application.launchEnvironment["test_type"] = "async_open_environment_configuration"
         application.launch()
 
-        // Test that the user is already logged in
-        let loggingView = application.staticTexts["logged-view"]
-        XCTAssertTrue(loggingView.waitForExistence(timeout: 2))
-
-        // Query for button to start syncing
-        let syncButtonView = application.buttons["sync-button-view"]
-        XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
-        syncButtonView.tap()
+        asyncOpen()
 
         // Test show ListView after syncing realm
         let table = application.tables.firstMatch
         XCTAssertTrue(table.waitForExistence(timeout: 6))
         XCTAssertEqual(table.cells.count, SwiftSyncTestCase.bigObjectCount)
+    }
+    
+    func testAsyncOpenMultiUser() throws {
+        application.launchEnvironment["test_type"] = "async_open_environment_partition_value"
+        application.launch()
+
+        asyncOpen()
+
+        // Test show ListView after syncing realm
+        let table = application.tables.firstMatch
+        XCTAssertTrue(table.waitForExistence(timeout: 6))
+        XCTAssertEqual(table.cells.count, SwiftSyncTestCase.bigObjectCount)
+
+        let emailTextfield = application.textFields["email_textfield"]
+        XCTAssertTrue(emailTextfield.waitForExistence(timeout: 2))
+        emailTextfield.clearText()
+
+        let passwordTextfield = application.textFields["password_textfield"]
+        XCTAssertTrue(passwordTextfield.waitForExistence(timeout: 2))
+        passwordTextfield.clearText()
+
+        login(email: username2, password: password)
+
+        // Query for button to start syncing
+        XCTAssertTrue(application.launchArguments.contains("app_id"))
+        let syncButtonView = application.buttons["sync-button-view"]
+        XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
+        syncButtonView.tap()
+
+        // Test show ListView after logging new user
+        XCTAssertTrue(table.waitForExistence(timeout: 6))
+        XCTAssertEqual(table.cells.count, 1)
     }
 
     // MARK: - AutoOpen
@@ -133,14 +190,7 @@ class SwiftUISyncTestHostUITests: SwiftSyncTestCase {
         application.launch()
 
         // Test that the user is already logged in
-        let loggingView = application.staticTexts["logged-view"]
-        XCTAssertTrue(loggingView.waitForExistence(timeout: 2))
-
-        // Query for button to start syncing
-        let syncButtonView = application.buttons["sync-button-view"]
-        XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
-        print(syncButtonView)
-        syncButtonView.tap()
+        asyncOpen()
 
         // Test progress is greater than 0
         let progressView = application.staticTexts["progress-text-view"]
@@ -162,14 +212,7 @@ class SwiftUISyncTestHostUITests: SwiftSyncTestCase {
         application.launchEnvironment["test_type"] = "auto_open_environment_partition_value"
         application.launch()
 
-        // Test that the user is already logged in
-        let loggingView = application.staticTexts["logged-view"]
-        XCTAssertTrue(loggingView.waitForExistence(timeout: 2))
-
-        // Query for button to start syncing
-        let syncButtonView = application.buttons["sync-button-view"]
-        XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
-        syncButtonView.tap()
+        asyncOpen()
 
         // Test show ListView after syncing realm
         let table = application.tables.firstMatch
@@ -181,18 +224,54 @@ class SwiftUISyncTestHostUITests: SwiftSyncTestCase {
         application.launchEnvironment["test_type"] = "auto_open_environment_configuration"
         application.launch()
 
-        // Test that the user is already logged in
-        let loggingView = application.staticTexts["logged-view"]
-        XCTAssertTrue(loggingView.waitForExistence(timeout: 2))
+        asyncOpen()
+
+        // Test show ListView after syncing realm
+        let table = application.tables.firstMatch
+        XCTAssertTrue(table.waitForExistence(timeout: 6))
+        XCTAssertEqual(table.cells.count, SwiftSyncTestCase.bigObjectCount)
+    }
+
+    func testAutoOpenMultiUser() throws {
+        application.launchEnvironment["test_type"] = "auto_open_environment_partition_value"
+        application.launch()
+
+        asyncOpen()
+
+        // Test show ListView after syncing realm
+        let table = application.tables.firstMatch
+        XCTAssertTrue(table.waitForExistence(timeout: 6))
+        XCTAssertEqual(table.cells.count, SwiftSyncTestCase.bigObjectCount)
+
+        let emailTextfield = application.textFields["email_textfield"]
+        XCTAssertTrue(emailTextfield.waitForExistence(timeout: 2))
+        emailTextfield.clearText()
+
+        let passwordTextfield = application.textFields["password_textfield"]
+        XCTAssertTrue(passwordTextfield.waitForExistence(timeout: 2))
+        passwordTextfield.clearText()
+
+        login(email: username2, password: password)
 
         // Query for button to start syncing
         let syncButtonView = application.buttons["sync-button-view"]
         XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
         syncButtonView.tap()
 
-        // Test show ListView after syncing realm
-        let table = application.tables.firstMatch
+        // Test show ListView after logging new user
         XCTAssertTrue(table.waitForExistence(timeout: 6))
-        XCTAssertEqual(table.cells.count, SwiftSyncTestCase.bigObjectCount)
+        XCTAssertEqual(table.cells.count, 1)
+    }
+}
+
+extension XCUIElement {
+    func clearText() {
+        guard let stringValue = self.value as? String else {
+            XCTFail("Tried to clear and enter text into a non string value")
+            return
+        }
+        self.tap()
+        let deleteString = stringValue.map { _ in "\u{8}" }.joined(separator: "")
+        self.typeText(deleteString)
     }
 }
