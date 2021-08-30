@@ -768,49 +768,105 @@ extension EnvironmentValues {
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 private class ObservableAsyncOpenStorage: ObservableObject {
+    private var asyncOpenType: AsyncOpenType
     private var app: App
+    private var appState: AppState {
+        didSet {
+            switch appState {
+            case .loggedIn(let user):
+                self.asyncOpenForUser(user)
+            case .loggedOut:
+                asyncOpenState = .waitingForUser
+            }
+        }
+    }
+    private var cancellables = [AnyCancellable]()
+
     var configuration: Realm.Configuration
     var partitionValue: AnyBSON
 
-    var cancellables = [AnyCancellable]()
+    enum AppState {
+        case loggedIn(User)
+        case loggedOut
+    }
 
-    @Published var asyncOpenState: AsyncOpenState = .connecting {
+    @Published var asyncOpenState: AsyncOpenState = .waitingForUser {
         willSet {
             objectWillChange.send()
         }
     }
 
-    func asyncOpen() -> AnyPublisher<RealmPublishers.AsyncOpenPublisher.Output, RealmPublishers.AsyncOpenPublisher.Failure> {
-        if let currentUser = app.currentUser,
-           currentUser.isLoggedIn {
-            return asyncOpenForUser(app.currentUser!, partitionValue: partitionValue, configuration: configuration)
-        } else {
-            asyncOpenState = .waitingForUser
-            return app.objectWillChange
-                .compactMap(\.currentUser)
-                .flatMap { self.asyncOpenForUser($0, partitionValue: self.partitionValue, configuration: self.configuration) }
-                .eraseToAnyPublisher()
+    func asyncOpen() {
+        if case let .loggedIn(user) = appState {
+            asyncOpenForUser(user)
         }
     }
 
-    private func asyncOpenForUser(_ user: User, partitionValue: AnyBSON, configuration: Realm.Configuration) -> AnyPublisher<RealmPublishers.AsyncOpenPublisher.Output, RealmPublishers.AsyncOpenPublisher.Failure> {
+    private func asyncOpenForUser(_ user: User) {
+        asyncOpenState = .connecting
         let userConfig = user.configuration(partitionValue: partitionValue, cancelAsyncOpenOnNonFatalErrors: true)
         let userSyncConfig = userConfig.syncConfiguration
         var configuration = configuration
         configuration.syncConfiguration = userSyncConfig
+        cancel()
         return Realm.asyncOpen(configuration: configuration)
             .onProgressNotification { asyncProgress in
                 let progress = Progress(totalUnitCount: Int64(asyncProgress.transferredBytes))
                 progress.completedUnitCount = Int64(asyncProgress.transferredBytes)
                 self.asyncOpenState = .progress(progress)
             }
-            .eraseToAnyPublisher()
+            .sink { completion in
+                if case .failure(let error) = completion {
+                    switch self.asyncOpenType {
+                    case .asyncOpen:
+                        self.asyncOpenState = .error(error)
+                    case .autoOpen:
+                        if let error = error as NSError?,
+                           error.code == Int(ETIMEDOUT) && error.domain == NSPOSIXErrorDomain,
+                           let realm = try? Realm(configuration: self.configuration) {
+                            self.asyncOpenState = .open(realm)
+                        } else {
+                            self.asyncOpenState = .error(error)
+                        }
+                    }
+                }
+            } receiveValue: { realm in
+                self.asyncOpenState = .open(realm)
+            }.store(in: &self.cancellables)
     }
 
-    init(app: App, configuration: Realm.Configuration, partitionValue: AnyBSON) {
+    func cancel() {
+        cancellables.forEach { $0.cancel() }
+        cancellables = []
+    }
+
+    init(asyncOpenType: AsyncOpenType, app: App, configuration: Realm.Configuration, partitionValue: AnyBSON) {
+        self.asyncOpenType = asyncOpenType
         self.app = app
         self.configuration = configuration
         self.partitionValue = partitionValue
+
+        if let user = app.currentUser {
+            appState = .loggedIn(user)
+            asyncOpenForUser(user)
+        } else {
+            appState = .loggedOut
+        }
+        app.objectWillChange.sink {
+            switch self.appState {
+            case .loggedIn(let user):
+                if let newUser = $0.currentUser,
+                    user != newUser {
+                    self.appState = .loggedIn(newUser)
+                } else {
+                    self.appState = .loggedOut
+                }
+            case .loggedOut:
+                if let user = $0.currentUser {
+                    self.appState = .loggedIn(user)
+                }
+            }
+        }.store(in: &cancellables)
     }
 
     // MARK: - AutoOpen & AsyncOpen Helper
@@ -836,6 +892,13 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         }
         return app
     }
+}
+
+public enum AsyncOpenType {
+    /// Starting the Realm.asyncOpen process.
+    case asyncOpen
+    /// Waiting for a user to be logged in before executing Realm.asyncOpen.
+    case autoOpen
 }
 
 /**
@@ -900,17 +963,6 @@ public enum AsyncOpenState {
     @Environment(\.partitionValue) var partitionValue
     @ObservedObject private var storage: ObservableAsyncOpenStorage
 
-    private func asyncOpen() {
-        storage.asyncOpen()
-            .sink { completion in
-                if case .failure(let error) = completion {
-                    self.storage.asyncOpenState = .error(error)
-                }
-            } receiveValue: { realm in
-                self.storage.asyncOpenState = .open(realm)
-            }.store(in: &storage.cancellables)
-    }
-
     /**
      A Publisher for `AsyncOpenState`, emits a state each time the asyncOpen state changes.
      */
@@ -927,8 +979,7 @@ public enum AsyncOpenState {
      This will cancel any notification from the property wrapper states
      */
     public func cancel() {
-        storage.cancellables.forEach { $0.cancel() }
-        storage.cancellables = []
+        storage.cancel()
     }
 
     /**
@@ -947,8 +998,7 @@ public enum AsyncOpenState {
                 timeout: UInt? = nil) {
         let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
-        storage = ObservableAsyncOpenStorage(app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
-        asyncOpen()
+        storage = ObservableAsyncOpenStorage(asyncOpenType: .asyncOpen, app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
     }
 
     public mutating func update() {
@@ -956,19 +1006,16 @@ public enum AsyncOpenState {
             let bsonValue = AnyBSON(partitionValue)
             if storage.partitionValue != bsonValue {
                 storage.partitionValue = bsonValue
-                cancel()
-                asyncOpen()
+                storage.asyncOpen()
             }
         }
 
         if storage.configuration != configuration {
-            storage.configuration = configuration
             if let partitionValue = configuration.syncConfiguration?.partitionValue {
                 storage.partitionValue = partitionValue
             }
-
-            cancel()
-            asyncOpen()
+            storage.configuration = configuration
+            storage.asyncOpen()
         }
     }
 }
@@ -1022,23 +1069,6 @@ public enum AsyncOpenState {
     @Environment(\.partitionValue) var partitionValue
     @ObservedObject private var storage: ObservableAsyncOpenStorage
 
-    private func asyncOpen() {
-        storage.asyncOpen()
-            .sink { completion in
-                if case .failure(let error) = completion {
-                    if let error = error as NSError?,
-                       error.code == Int(ETIMEDOUT) && error.domain == NSPOSIXErrorDomain,
-                       let realm = try? Realm(configuration: configuration) {
-                        self.storage.asyncOpenState = .open(realm)
-                    } else {
-                        self.storage.asyncOpenState = .error(error)
-                    }
-                }
-            } receiveValue: { realm in
-                self.storage.asyncOpenState = .open(realm)
-            }.store(in: &storage.cancellables)
-    }
-
     /**
      A Publisher for `AsyncOpenState`, emits a state each time the asyncOpen state changes.
      */
@@ -1055,8 +1085,7 @@ public enum AsyncOpenState {
      This will cancel any notification from the property wrapper states
      */
     public func cancel() {
-        storage.cancellables.forEach { $0.cancel() }
-        storage.cancellables = []
+        storage.cancel()
     }
 
     /**
@@ -1075,8 +1104,7 @@ public enum AsyncOpenState {
                 timeout: UInt? = nil) {
         let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
-        storage = ObservableAsyncOpenStorage(app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
-        asyncOpen()
+        storage = ObservableAsyncOpenStorage(asyncOpenType: .asyncOpen, app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
     }
 
     public mutating func update() {
@@ -1084,8 +1112,7 @@ public enum AsyncOpenState {
             let bsonValue = AnyBSON(partitionValue)
             if storage.partitionValue != bsonValue {
                 storage.partitionValue = bsonValue
-                cancel()
-                asyncOpen()
+                storage.asyncOpen()
             }
         }
 
@@ -1094,9 +1121,7 @@ public enum AsyncOpenState {
                 storage.partitionValue = partitionValue
             }
             storage.configuration = configuration
-
-            cancel()
-            asyncOpen()
+            storage.asyncOpen()
         }
     }
 }
