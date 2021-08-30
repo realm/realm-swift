@@ -25,7 +25,7 @@ class SwiftUISyncTestHostUITests: SwiftSyncTestCase {
     private let username1 = "1234567890ab1234567890ab"
     private let username2 = "1234566754727dbkd67hdg5b"
     private let password = "password"
-    
+
     override func setUp() {
         continueAfterFailure = false
         super.setUp()
@@ -151,7 +151,7 @@ class SwiftUISyncTestHostUITests: SwiftSyncTestCase {
         XCTAssertTrue(table.waitForExistence(timeout: 6))
         XCTAssertEqual(table.cells.count, SwiftSyncTestCase.bigObjectCount)
     }
-    
+
     func testAsyncOpenMultiUser() throws {
         application.launchEnvironment["test_type"] = "async_open_environment_partition_value"
         application.launch()

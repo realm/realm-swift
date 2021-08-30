@@ -53,7 +53,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 10.0)
         asyncOpen.cancel()
     }
-    
+
     func testAsyncOpenOpenRealm() throws {
         _ = try logInUser(for: basicCredentials())
 
