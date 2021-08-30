@@ -174,7 +174,6 @@ class SwiftUISyncTestHostUITests: SwiftSyncTestCase {
         login(email: username2, password: password)
 
         // Query for button to start syncing
-        XCTAssertTrue(application.launchArguments.contains("app_id"))
         let syncButtonView = application.buttons["sync-button-view"]
         XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
         syncButtonView.tap()
