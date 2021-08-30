@@ -765,6 +765,31 @@ extension EnvironmentValues {
         }
     }
 }
+/**
+An enum representing different states from `AsyncOpen` and `AutoOpen` process
+*/
+public enum AsyncOpenState {
+    /// Starting the Realm.asyncOpen process.
+    case connecting
+    /// Waiting for a user to be logged in before executing Realm.asyncOpen.
+    case waitingForUser
+    /// The Realm has been opened and is ready for use. For AsyncOpen this means that the Realm has been fully downloaded, but for AutoOpen the existing local file may have been used if the device is offline.
+    case open(Realm)
+    /// The Realm is currently being downloaded from the server.
+    case progress(Progress)
+    /// Opening the Realm failed.
+    case error(Error)
+}
+
+/**
+An enum representing the type of Async operation `@AsyncOpen` or `@AutoOpen`
+*/
+enum AsyncOpenType {
+    /// @AsyncOpen
+    case asyncOpen
+    /// @AutoOpen
+    case autoOpen
+}
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 private class ObservableAsyncOpenStorage: ObservableObject {
@@ -780,7 +805,8 @@ private class ObservableAsyncOpenStorage: ObservableObject {
             }
         }
     }
-    private var cancellables = [AnyCancellable]()
+    private var appCancellable = [AnyCancellable]()
+    private var asyncOpenCancellable = [AnyCancellable]()
 
     var configuration: Realm.Configuration
     var partitionValue: AnyBSON
@@ -808,7 +834,9 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         let userSyncConfig = userConfig.syncConfiguration
         var configuration = configuration
         configuration.syncConfiguration = userSyncConfig
-        cancel()
+
+        // Cancel any current subscriptions to asyncOpen if there is one
+        cancelAsyncOpen()
         return Realm.asyncOpen(configuration: configuration)
             .onProgressNotification { asyncProgress in
                 let progress = Progress(totalUnitCount: Int64(asyncProgress.transferredBytes))
@@ -832,12 +860,18 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                 }
             } receiveValue: { realm in
                 self.asyncOpenState = .open(realm)
-            }.store(in: &self.cancellables)
+            }.store(in: &self.asyncOpenCancellable)
+    }
+
+    private func cancelAsyncOpen() {
+        asyncOpenCancellable.forEach { $0.cancel() }
+        asyncOpenCancellable = []
     }
 
     func cancel() {
-        cancellables.forEach { $0.cancel() }
-        cancellables = []
+        cancelAsyncOpen()
+        appCancellable.forEach { $0.cancel() }
+        appCancellable = []
     }
 
     init(asyncOpenType: AsyncOpenType, app: App, configuration: Realm.Configuration, partitionValue: AnyBSON) {
@@ -866,7 +900,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                     self.appState = .loggedIn(user)
                 }
             }
-        }.store(in: &cancellables)
+        }.store(in: &appCancellable)
     }
 
     // MARK: - AutoOpen & AsyncOpen Helper
@@ -892,29 +926,6 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         }
         return app
     }
-}
-
-public enum AsyncOpenType {
-    /// Starting the Realm.asyncOpen process.
-    case asyncOpen
-    /// Waiting for a user to be logged in before executing Realm.asyncOpen.
-    case autoOpen
-}
-
-/**
-An enum representing different states from `AsyncOpen` and `AutoOpen` process
-*/
-public enum AsyncOpenState {
-    /// Starting the Realm.asyncOpen process.
-    case connecting
-    /// Waiting for a user to be logged in before executing Realm.asyncOpen.
-    case waitingForUser
-    /// The Realm has been opened and is ready for use. For AsyncOpen this means that the Realm has been fully downloaded, but for AutoOpen the existing local file may have been used if the device is offline.
-    case open(Realm)
-    /// The Realm is currently being downloaded from the server.
-    case progress(Progress)
-    /// Opening the Realm failed.
-    case error(Error)
 }
 
 // MARK: - AsyncOpen
