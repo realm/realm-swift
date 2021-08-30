@@ -170,6 +170,9 @@ public extension Projection {
     }
 
     func assign(_ object: Root) {
+//        guard projectedProperties().count > 0 else {
+//            fatalError("Projection \(self) should have at least one @Projected property")
+//        }
         for (_, projected) in projectedProperties() {
             projected.set(object: object)
         }
@@ -221,7 +224,7 @@ public enum ProjectionChange<T: Projection> {
     /// The object has been deleted from the Realm.
     case deleted
     
-    init(_ oldProjection: T, _ objectChange: ObjectChange<ObjectBase>) {
+    init(_ objectChange: ObjectChange<ObjectBase>) {
         switch objectChange {
         case .error(let error):
             self = .error(error)
@@ -231,7 +234,7 @@ public enum ProjectionChange<T: Projection> {
             }
             let newProjection = T(object)
             let projectedPropertyChanges: [ProjectedChange] = objectPropertyChanges.map { propChange in
-                let name = oldProjection.projectionPropertyName(propChange.name)!
+                let name = newProjection.projectionPropertyName(propChange.name)!
                 let publicName = name.first == "_" ? String(name.dropFirst()) : name
                 let keyPath = \T.[name]
                 let newValue: Any? = newProjection[keyPath: keyPath].value
@@ -270,13 +273,13 @@ extension Projection {
             activatePropertyKeyPaths()
             let keyPaths = projectedProperties().compactMap { $0.value.keyPathString }
             return realmObject._observe(keyPaths: keyPaths, on: nil, { change in
-                block(ProjectionChange<Self>(self, change))
+                block(ProjectionChange<Self>(change))
             })
         } else {
             activatePropertyKeyPaths()
             let filteredProjectedKeyPaths = keyPaths.compactMap { (self[keyPath: $0] as? _Projected)?.keyPathString }
             return realmObject._observe(keyPaths: filteredProjectedKeyPaths, on: nil, { change in
-                block(ProjectionChange<Self>(self, change))
+                block(ProjectionChange<Self>(change))
             })
         }
     }
