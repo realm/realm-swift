@@ -114,7 +114,31 @@ public struct Projected<T: ObjectBase, Value>: _Projected {
     }
 }
 
-public protocol Projection: ThreadConfined, RealmCollectionValue, AssistedObjectiveCBridgeable {
+public protocol _Projection: ThreadConfined {
+    var value: ObjectBase { get }
+    init<T: ObjectBase>(object: T)
+}
+
+// MARK: AssistedObjectiveCBridgeable
+
+extension _Projection {
+
+    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
+////        return forceCastToInferred(objectiveCValue)
+//        type(of:objectiveCValue).brid
+//        (objectiveCValue as! AssistedObjectiveCBridgeable).bridging(from: objectiveCValue, with: metadata)
+//        let value = forceCastToInferred(objectiveCValue)
+////        let projectionClass = metadata as! _Projection.Type
+        return Self(object: objectiveCValue as! ObjectBase)
+    }
+
+    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
+        return (objectiveCValue: value.unsafeCastToRLMObject(), metadata: Self.self)
+//        fatalError()
+    }
+}
+
+public protocol Projection: _Projection, RealmCollectionValue {
     associatedtype Root: ObjectBase
 
     init()
@@ -152,6 +176,10 @@ public extension Projection {
     init(_ object: Root) {
         self.init()
         assign(object)
+    }
+
+    init<T: ObjectBase>(object: T) {
+        self.init(object as! Root)
     }
 
     fileprivate func projectedProperties() -> [String: _Projected] {
@@ -284,6 +312,14 @@ extension Projection {
         }
     }
 
+    public func observe(keyPaths: [String]? = nil,
+                                       on queue: DispatchQueue? = nil,
+                                       _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
+        return realmObject._observe(keyPaths: keyPaths, on: queue) { change in
+            block(ProjectionChange<Self>(change))
+        }
+    }
+
     // Must also conform to `AssistedObjectiveCBridgeable`
     /**
      The Realm which manages the object, or `nil` if the object is unmanaged.
@@ -325,8 +361,8 @@ extension Projection {
         guard let object = realmObject as? ThreadConfined else {
             throwRealmException("Projection underlying object cannot be frozen.")
         }
-        self.assign(object.freeze() as! Root)
-        return self
+        let frozenObject = object.freeze()
+        return Self(frozenObject as! Root)
     }
     /**
      Returns a live (mutable) reference of this object.
@@ -337,8 +373,7 @@ extension Projection {
             throwRealmException("Projection underlying object cannot be thawed.")
         }
         if let thawedObject = object.thaw() as? Root {
-            self.assign(thawedObject)
-            return self
+            return Self(thawedObject)
         }
         return nil
     }
@@ -346,6 +381,8 @@ extension Projection {
     fileprivate func projectionPropertyName(_ projectedPropertyName: String) -> String? {
         return projectedProperties().first(where: { $0.value.keyPathString == projectedPropertyName })?.key
     }
+    
+    public var value: ObjectBase { realmObject }
 }
 
 extension Projection {
@@ -474,34 +511,32 @@ extension List where Element: ObjectBase, Element: RealmCollectionValue {
 
 public extension Projection {
 
+    private func realmObjectKeyPath(_ projectionKeyPath: String) -> String? {
+        let projectionKeyPath = projectionKeyPath.first == "_" ? projectionKeyPath : "_" + projectionKeyPath
+        guard let property = projectedProperties()[projectionKeyPath] else {
+            return nil
+        }
+        return property.keyPathString
+    }
     func addObserver(_ observer: NSObject, forKeyPath keyPath: String, options: NSKeyValueObservingOptions = [], context: UnsafeMutableRawPointer?) {
-//        print(self[keyPath: keyPath])
-//        let property = \Self.[keyPath]
-//        let otherKeyPath: String = ""
-//        print(property)
-        fatalError()
+        guard let keyPath = realmObjectKeyPath(keyPath) else {
+            fatalError()
+        }
+        realmObject.addObserver(observer, forKeyPath: keyPath, options: options, context: context)
     }
 
     @available(macOS 10.7, *)
     func removeObserver(_ observer: NSObject, forKeyPath keyPath: String, context: UnsafeMutableRawPointer?) {
-        let otherKeyPath = ""
-        realmObject.removeObserver(observer, forKeyPath: otherKeyPath, context: context)
+        guard let keyPath = realmObjectKeyPath(keyPath) else {
+            fatalError()
+        }
+        realmObject.removeObserver(observer, forKeyPath: keyPath, context: context)
     }
 
     func removeObserver(_ observer: NSObject, forKeyPath keyPath: String) {
-        let otherKeyPath = ""
-        realmObject.removeObserver(observer, forKeyPath: otherKeyPath)
-    }
-}
-
-// MARK: AssistedObjectiveCBridgeable
-
-extension Projection {
-    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
-        fatalError()
-    }
-
-    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
-        fatalError()
+        guard let keyPath = realmObjectKeyPath(keyPath) else {
+            fatalError()
+        }
+        realmObject.removeObserver(observer, forKeyPath: keyPath)
     }
 }
