@@ -349,7 +349,9 @@ extension Object: RealmCollectionValue {
      - parameter block: The block to call with information about changes to the object.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>], on queue: DispatchQueue? = nil, _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
+    public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
+                                       on queue: DispatchQueue? = nil,
+                                       _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
         return _observe(keyPaths: keyPaths.map(_name(for:)), on: queue, block)
     }
 

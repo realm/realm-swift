@@ -604,7 +604,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe<T: ObjectBase>(keyPaths:[ PartialKeyPath<T>],
+    public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>],
                                        on queue: DispatchQueue? = nil,
                                        _ block: @escaping (RealmCollectionChange<MutableSet>) -> Void) -> NotificationToken {
         return rlmSet.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths.map(_name(for:)), queue: queue)
