@@ -350,11 +350,7 @@ extension Object: RealmCollectionValue {
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     public func observe<T: ObjectBase>(keyPaths: [PartialKeyPath<T>], on queue: DispatchQueue? = nil, _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
-        var stringKeyPaths: [String] = []
-        for keyPath in keyPaths {
-            stringKeyPaths.append(_name(for: keyPath))
-        }
-        return _observe(keyPaths: stringKeyPaths, on: queue, block)
+        return _observe(keyPaths: keyPaths.map(_name(for:)), on: queue, block)
     }
 
     // MARK: Dynamic list

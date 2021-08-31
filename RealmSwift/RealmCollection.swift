@@ -1034,7 +1034,6 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
         -> NotificationToken { fatalError() }
     func _observe(_ keyPaths: [String]?, _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
-    func _observe(_ queue: DispatchQueue?, _ some: String) -> NotificationToken { fatalError() }
     func _observe<T: ObjectBase>(_ keyPaths: [PartialKeyPath<T>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void) -> NotificationToken { fatalError() }
     class func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self { fatalError() }
     var bridged: (objectiveCValue: Any, metadata: Any?) { fatalError() }
@@ -1149,11 +1148,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
         -> NotificationToken { return base._observe(keyPaths, queue, block) }
 
     override func _observe<T: ObjectBase>(_ keyPaths: [PartialKeyPath<T>], _ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<_AnyRealmCollectionBase<C.Element>.Wrapper>) -> Void) -> NotificationToken {
-        var stringKeyPaths: [String] = []
-        for keyPath in keyPaths {
-            stringKeyPaths.append(_name(for: keyPath))
-        }
-        return base._observe(stringKeyPaths, queue, block)
+        return base._observe(keyPaths.map(_name(for:)), queue, block)
     }
 
     // MARK: AssistedObjectiveCBridgeable

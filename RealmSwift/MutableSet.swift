@@ -607,11 +607,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
     public func observe<T: ObjectBase>(keyPaths:[ PartialKeyPath<T>],
                                        on queue: DispatchQueue? = nil,
                                        _ block: @escaping (RealmCollectionChange<MutableSet>) -> Void) -> NotificationToken {
-        var stringKeyPaths: [String] = []
-        for keyPath in keyPaths {
-            stringKeyPaths.append(_name(for: keyPath))
-        }
-        return rlmSet.addNotificationBlock(wrapObserveBlock(block), keyPaths: stringKeyPaths, queue: queue)
+        return rlmSet.addNotificationBlock(wrapObserveBlock(block), keyPaths: keyPaths.map(_name(for:)), queue: queue)
     }
 
     // MARK: Frozen Objects
