@@ -2912,6 +2912,8 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     }
 }
 
+#if swift(>=5.5)
+
 @available(macOS 12.0, *)
 class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
     func testAsyncOpenStandalone() async throws {
@@ -2937,6 +2939,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
                 realm.add(SwiftHugeSyncObject.create())
                 realm.add(SwiftHugeSyncObject.create())
             }
+            waitForUploads(for: realm)
             let progressEx = self.expectation(description: "Should upload")
             let token = realm.syncSession!.addProgressNotification(for: .upload, mode: .forCurrentlyOutstandingWork) {
                 if $0.isTransferComplete {
@@ -2989,4 +2992,5 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
     }
 }
 
+#endif // swift(>=5.5)
 #endif // os(macOS)

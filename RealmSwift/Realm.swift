@@ -1006,6 +1006,7 @@ extension Realm {
 /// The type of a block to run for notification purposes when the data in a Realm is modified.
 public typealias NotificationBlock = (_ notification: Realm.Notification, _ realm: Realm) -> Void
 
+#if swift(>=5.5)
 @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
 extension Realm {
     /// Download behavior for a synced Realm.
@@ -1059,3 +1060,4 @@ extension Realm {
         try self.init(RLMRealm(configuration: configuration.rlmConfiguration))
     }
 }
+#endif // swift(>=5.5)
