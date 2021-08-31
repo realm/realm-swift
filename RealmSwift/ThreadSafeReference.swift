@@ -171,10 +171,10 @@ public protocol ThreadSafeWrappable: ThreadConfined {}
                 threadSafeReference = nil
                 return
             }
-            guard let configuration = newValue.realm?.configuration else {
+            guard let rlmConfiguration = newValue.realm?.rlmRealm.configuration else {
                 throwRealmException("Only managed objects may be wrapped as thread safe.")
             }
-            self.rlmConfiguration = configuration.rlmConfiguration
+            self.rlmConfiguration = rlmConfiguration
             threadSafeReference = ThreadSafeReference(to: newValue)
         }
     }
