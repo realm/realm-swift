@@ -998,20 +998,166 @@ class ProjectionTests: TestCase {
 //        token.invalidate()
     }
     
-    func testFreezeProjection() {
+    // MARK: Frozen Objects
+
+    func simpleProjection() -> SimpleProjection {
         let realm = realmWithTestPath()
-        let frozenJohnObject = realm.objects(Person.self).filter("lastName == 'Snow'").first!.freeze()
-        let frozenJohnProjection = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!.freeze()
-        let johnProjectionFromFrozen = PersonProjection(frozenJohnObject)
+        try! realm.write {
+            realm.create(SimpleObject.self)
+        }
+        return realm.objects(SimpleProjection.self).first!
+    }
+
+    func testIsFrozen() {
+        let projection = simpleProjection()
+        let frozen = projection.freeze()
+        XCTAssertFalse(projection.isFrozen)
+        XCTAssertTrue(frozen.isFrozen)
+    }
+
+    func testFreezingFrozenObjectReturnsSelf() {
+        let projection = simpleProjection()
+        let frozen = projection.freeze()
+        XCTAssertNotEqual(projection, frozen)
+        XCTAssertNotEqual(projection.freeze(), frozen)
+        XCTAssertEqual(frozen, frozen.freeze())
+    }
+
+    func testFreezingDeletedObject() {
+        let projection = simpleProjection()
+        let object = projection.realm!.objects(SimpleObject.self).first!
+        try! projection.realm!.write({
+            projection.realm!.delete(object)
+        })
+        assertThrows(projection.freeze(), "Object has been deleted or invalidated.")
+    }
+    
+    func testFreezeFromWrongThread() {
+        let projection = simpleProjection()
+        dispatchSyncNewThread {
+            self.assertThrows(projection.freeze(), "Realm accessed from incorrect thread")
+        }
+    }
+
+    func testAccessFrozenObjectFromDifferentThread() {
+        let projection = simpleProjection()
+        let frozen = projection.freeze()
+        dispatchSyncNewThread {
+            XCTAssertEqual(frozen.int, 0)
+        }
+    }
+
+    func testMutateFrozenObject() {
+        let projection = simpleProjection()
+        var frozen = projection.freeze()
+        let realm = frozen.realm!
+        assertThrows(try! realm.write { }, "Can't perform transactions on a frozen Realm")
+        assertThrows(frozen.int = 1)
+    }
+
+    func testObserveFrozenObject() {
+        let frozen = simpleProjection().freeze()
+        assertThrows(frozen.observe({ _ in }), "Frozen Realms do not change and do not have change notifications.")
+    }
+
+    func testFrozenObjectEquality() {
+        let projectionA = simpleProjection()
+        let frozenA1 = projectionA.freeze()
+        let frozenA2 = projectionA.freeze()
+        XCTAssertEqual(frozenA1, frozenA2)
+        let projectionB = simpleProjection()
+        let frozenB = projectionB.freeze()
+        XCTAssertNotEqual(frozenA1, frozenB)
+    }
+
+    func testFreezeInsideWriteTransaction() {
+        let realm = realmWithTestPath()
+        var object: SimpleObject!
+        var projection: SimpleProjection!
+        try! realm.write {
+            object = realm.create(SimpleObject.self)
+            projection = SimpleProjection(object)
+            self.assertThrows(projection.freeze(), "Cannot freeze an object in the same write transaction as it was created in.")
+        }
+        try! realm.write {
+            object.int = 2
+            // Frozen objects have the value of the object at the start of the transaction
+            XCTAssertEqual(projection.freeze().int, 0)
+        }
+    }
+
+    func testThaw() {
+        let frozen = simpleProjection().freeze()
+        XCTAssertTrue(frozen.isFrozen)
+        var live = frozen.thaw()!
+        XCTAssertFalse(live.isFrozen)
+        try! live.realm!.write {
+            live.int = 2
+        }
+        XCTAssertNotEqual(live.int, frozen.int)
+    }
+
+    func testThawDeleted() {
+        let projection = simpleProjection()
+        let frozen = projection.freeze()
+        let realm = realmWithTestPath()
         
-        XCTAssertTrue(frozenJohnProjection.isFrozen)
-        XCTAssertTrue(johnProjectionFromFrozen.isFrozen)
-        XCTAssertEqual(frozenJohnProjection, johnProjectionFromFrozen)
+        XCTAssertTrue(frozen.isFrozen)
+        try! realm.write {
+            realm.deleteAll()
+        }
+        let thawed = frozen.thaw()
+        XCTAssertNil(thawed, "Thaw should return nil when object was deleted")
+    }
+
+    func testThawPreviousVersion() {
+        var projection = simpleProjection()
+        let frozen = projection.freeze()
+
+        XCTAssertTrue(frozen.isFrozen)
+        XCTAssertEqual(projection.int, frozen.int)
+        try! projection.realm!.write {
+            projection.int = 1
+        }
+        XCTAssertNotEqual(projection.int, frozen.int, "Frozen object shouldn't mutate")
+
+        let thawed = frozen.thaw()!
+        XCTAssertFalse(thawed.isFrozen)
+        XCTAssertEqual(thawed.int, projection.int, "Thawed object should reflect transactions since the original reference was frozen.")
+    }
+
+    func testThawUpdatedOnDifferentThread() {
+        let realm = realmWithTestPath()
+        let tsr = ThreadSafeReference(to: projection)
+        var frozen: SimpleProjection!
         
-        let thawedJohnProjectionA = frozenJohnProjection.thaw()!
-        let thawedJohnProjectionB = johnProjectionFromFrozen.thaw()!
-        XCTAssertFalse(thawedJohnProjectionA.isFrozen)
-        XCTAssertFalse(thawedJohnProjectionB.isFrozen)
-        XCTAssertEqual(thawedJohnProjectionA, thawedJohnProjectionB)
+        dispatchSyncNewThread {
+            var resolvedProjection: SimpleProjection = realm.resolve(tsr)!
+            try! realm.write {
+                resolvedProjection.int = 1
+            }
+            frozen = resolvedProjection.freeze()
+        }
+
+        let thawed = frozen.thaw()!
+        XCTAssertEqual(thawed.int, 0, "Thaw shouldn't reflect background transactions until main thread realm is refreshed")
+        realm.refresh()
+        XCTAssertEqual(thawed.int, 1)
+    }
+
+    func testThawCreatedOnDifferentThread() {
+        let realm = realmWithTestPath()
+        try! realm.write {
+            realm.deleteAll()
+        }
+        var frozen: SimpleProjection!
+        dispatchSyncNewThread {
+            let projection = self.simpleProjection()
+            frozen = projection.freeze()
+        }
+        XCTAssertNil(frozen.thaw())
+        XCTAssertEqual(realm.objects(SimpleProjection.self).count, 0)
+        realm.refresh()
+        XCTAssertEqual(realm.objects(SimpleProjection.self).count, 1)
     }
 }

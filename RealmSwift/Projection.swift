@@ -114,7 +114,7 @@ public struct Projected<T: ObjectBase, Value>: _Projected {
     }
 }
 
-public protocol Projection: ThreadConfined, RealmCollectionValue {
+public protocol Projection: ThreadConfined, RealmCollectionValue, AssistedObjectiveCBridgeable {
     associatedtype Root: ObjectBase
 
     init()
@@ -336,8 +336,11 @@ extension Projection {
         guard let object = realmObject as? ThreadConfined else {
             throwRealmException("Projection underlying object cannot be thawed.")
         }
-        self.assign(object.thaw() as! Root)
-        return self
+        if let thawedObject = object.thaw() as? Root {
+            self.assign(thawedObject)
+            return self
+        }
+        return nil
     }
     
     fileprivate func projectionPropertyName(_ projectedPropertyName: String) -> String? {
@@ -491,3 +494,14 @@ public extension Projection {
     }
 }
 
+// MARK: AssistedObjectiveCBridgeable
+
+extension Projection {
+    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
+        fatalError()
+    }
+
+    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
+        fatalError()
+    }
+}
