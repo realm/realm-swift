@@ -454,6 +454,7 @@ public final class ProjectedList<NewElement>: RandomAccessCollection where NewEl
         self.propertyName = _name(for: keyPathToNewElement)
     }
 }
+
 @dynamicMemberLookup
 public struct ElementMapper<Element> where Element: ObjectBase, Element: RealmCollectionValue {
     var list: List<Element>
