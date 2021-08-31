@@ -517,20 +517,18 @@ public class RealmServer: NSObject {
 
     private func launchServerProcess() throws {
         let binDir = Self.buildDir.appendingPathComponent("bin").path
-        guard let resourcePath = Bundle.main.resourcePath else {
-            fatalError("TestApp set up incorrectly. TestApp requires libstitch_support.dylib to be copied to the bundle.")
-        }
+        let libDir = Self.buildDir.appendingPathComponent("lib").path
         let binPath = "$PATH:\(binDir)"
+        let env = [
+            "PATH": binPath,
+            "DYLD_LIBRARY_PATH": libDir
+        ]
 
         let stitchRoot = RealmServer.buildDir.path + "/go/src/github.com/10gen/stitch"
 
         // create the admin user
         let userProcess = Process()
-        userProcess.environment = [
-            "PATH": binPath,
-            "LD_LIBRARY_PATH": resourcePath,
-            "DYLD_LIBRARY_PATH": resourcePath
-        ]
+        userProcess.environment = env
         userProcess.launchPath = "\(binDir)/create_user"
         userProcess.arguments = [
             "addUser",
@@ -543,11 +541,8 @@ public class RealmServer: NSObject {
         ]
         try userProcess.run()
         userProcess.waitUntilExit()
-        serverProcess.environment = [
-            "PATH": binPath,
-            "LD_LIBRARY_PATH": resourcePath,
-            "DYLD_LIBRARY_PATH": resourcePath
-        ]
+
+        serverProcess.environment = env
         // golang server needs a tmp directory
         try! FileManager.default.createDirectory(atPath: "\(tempDir.path)/tmp",
             withIntermediateDirectories: false, attributes: nil)
