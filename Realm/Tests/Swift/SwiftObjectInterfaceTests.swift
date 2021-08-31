@@ -328,7 +328,7 @@ class SwiftRLMObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(obj.uuidCol[0], uuidA)
         XCTAssertEqual(obj.uuidCol.index(of: uuidA), 0)
         XCTAssertEqual(obj.uuidCol.index(of: uuidB), UInt(NSNotFound))
-    
+
         obj.optUuidCol.add(NSNull())
         XCTAssertEqual(obj.optUuidCol[0], NSNull())
         obj.optUuidCol.add(uuidA)

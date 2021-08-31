@@ -263,6 +263,34 @@ struct UnmanagedObjectTestView: View {
     }
 }
 
+struct ObservedResultsKeyPathTestView: View {
+    @ObservedResults(ReminderList.self, keyPaths: ["reminders.isFlagged"]) var reminders
+
+    var body: some View {
+        VStack {
+            List {
+                ForEach(reminders) { list in
+                    ObservedResultsKeyPathTestRow(list: list)
+                }.onDelete(perform: $reminders.remove)
+            }
+            .navigationBarItems(trailing: EditButton())
+            .navigationTitle("reminders")
+            Footer()
+        }
+    }
+}
+
+struct ObservedResultsKeyPathTestRow: View {
+    var list: ReminderList
+
+    var body: some View {
+        HStack {
+            Image(systemName: list.icon)
+            Text(list.name)
+        }.frame(minWidth: 100).accessibility(identifier: "hstack")
+    }
+}
+
 @main
 struct App: SwiftUI.App {
     var body: some Scene {
@@ -279,6 +307,8 @@ struct App: SwiftUI.App {
                 return AnyView(MultiRealmContentView())
             case "unmanaged_object_test":
                 return AnyView(UnmanagedObjectTestView())
+            case "observed_results_key_path":
+                return AnyView(ObservedResultsKeyPathTestView())
             default:
                 return AnyView(ContentView())
             }
