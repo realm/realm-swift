@@ -1,0 +1,33 @@
+name: Feature Request
+description: Request a new feature or enhancement
+labels: [T-Enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to suggest improvements to the SDK!
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: A clear and concise description of the problem you are trying to solve.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solution
+      description: Describe the solution you envision, including API and usage example if possible.
+    validations:
+      required: false
+  - type: dropdown
+    id: importance
+    attributes:
+      label: How important is this improvement for you?
+      options:
+        - Dealbreaker
+        - Would be a major improvement
+        - I'd like to see it, but have a workaround
+        - Fairly niche, but nice to have anyway.
+    validations:
+      required: false
