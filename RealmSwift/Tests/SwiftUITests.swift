@@ -236,7 +236,7 @@ class SwiftUITests: TestCase {
 
         _SwiftUIKVO.observedObjects[object] = _SwiftUIKVO.Subscription(observer: observer,
                                                                        value: object,
-                                                                       keyPaths: ["list", "map", "primitiveList", "primitiveMap", "str", "int"])
+                                                                       keyPaths: schema.properties.map { $0.name })
         XCTAssertNotNil(object.observationInfo)
         // Object should have its observers removed and set up once again after adding to the Realm.
         let realm = inMemoryRealm(inMemoryIdentifier)
