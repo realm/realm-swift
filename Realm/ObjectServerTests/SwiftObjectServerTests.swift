@@ -3000,7 +3000,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
             let (email, password) = (randomString(10), "password")
             try await self.app.emailPasswordAuth.registerUser(email: email, password: password)
             let user = try await self.app.login(credentials: .emailPassword(email: email, password: password))
-            var user1Realm = try await Realm(configuration: user.configuration(testName: #function))
+            let user1Realm = try await Realm(configuration: user.configuration(testName: #function))
             try! user1Realm.write {
                 user1Realm.add(SwiftHugeSyncObject.create())
                 user1Realm.add(SwiftHugeSyncObject.create())
@@ -3013,9 +3013,6 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
                                                                password: password2,
                                                                identifer: OpenKind.first.rawValue,
                                                                shouldCleanUpOnTermination: false))
-            // FIXME: If we do not reinstantiate the Realm here, this crashes due to the usage of concurrent queues, though this may be
-            // FIXME: a Swift 5.5 bug related to closures being improperly launched as separate tasks.
-            user1Realm = try await Realm(configuration: user.configuration(testName: #function))
             try! user1Realm.write {
                 user1Realm.add(SwiftHugeSyncObject.create())
                 user1Realm.add(SwiftHugeSyncObject.create())
@@ -3060,7 +3057,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
             let (email, password) = (randomString(10), "password")
             try await self.app.emailPasswordAuth.registerUser(email: email, password: password)
             let user = try await self.app.login(credentials: .emailPassword(email: email, password: password))
-            var user1Realm = try await Realm(configuration: user.configuration(testName: #function))
+            let user1Realm = try await Realm(configuration: user.configuration(testName: #function))
             try! user1Realm.write {
                 user1Realm.add(SwiftHugeSyncObject.create())
                 user1Realm.add(SwiftHugeSyncObject.create())
@@ -3073,9 +3070,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
                                                                password: password2,
                                                                identifer: OpenKind.first.rawValue,
                                                                shouldCleanUpOnTermination: false))
-            // FIXME: If we do not reinstantiate the Realm here, this crashes due to the usage of concurrent queues, though this may be
-            // FIXME: a Swift 5.5 bug related to closures being improperly launched as separate tasks.
-            user1Realm = try await Realm(configuration: user.configuration(testName: #function))
+
             try! user1Realm.write {
                 user1Realm.add(SwiftHugeSyncObject.create())
                 user1Realm.add(SwiftHugeSyncObject.create())
