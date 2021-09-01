@@ -95,7 +95,6 @@
 - (void)deleteFiles {
     // Only the parent should delete files in setUp/tearDown
     if (self.isParent) {
-        NSLog(@"DELETING FILES");
         [super deleteFiles];
     }
 }

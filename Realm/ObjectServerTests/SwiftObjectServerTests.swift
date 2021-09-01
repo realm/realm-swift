@@ -28,7 +28,6 @@ import XCTest
 import RealmSwiftSyncTestSupport
 import RealmSyncTestSupport
 import RealmTestSupport
-@testable import RealmSwift_Tests
 #endif
 
 @available(OSX 10.14, *)
