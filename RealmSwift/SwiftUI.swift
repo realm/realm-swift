@@ -69,6 +69,7 @@ private func createBinding<T: ThreadConfined, V>(_ value: T,
 
 // MARK: _SwiftUIKVO
 
+// swiftlint:disable type_name
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 @objc(_SwiftUIKVO) public class _SwiftUIKVO: NSObject {
     /// Objects must have observers removed before being added to a realm.
