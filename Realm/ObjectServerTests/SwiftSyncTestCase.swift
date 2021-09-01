@@ -39,6 +39,21 @@ public func randomString(_ length: Int) -> String {
     return String((0..<length).map { _ in letters.randomElement()! })
 }
 
+public typealias ChildProcessEnvironment = RLMChildProcessEnvironment
+
+public enum ProcessKind {
+    case parent
+    case child(environment: ChildProcessEnvironment)
+
+    public static var current: ProcessKind {
+        if getenv("RLMProcessIsChild") == nil {
+            return .parent
+        } else {
+            return .child(environment: ChildProcessEnvironment.current())
+        }
+    }
+}
+
 open class SwiftSyncTestCase: RLMSyncTestCase {
     public func executeChild(file: StaticString = #file, line: UInt = #line) {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)

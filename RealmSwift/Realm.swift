@@ -1038,25 +1038,26 @@ extension Realm {
      */
     public init(configuration: Realm.Configuration = .defaultConfiguration,
                 downloadBeforeOpen: DownloadBehavior = .never) async throws {
-        switch downloadBeforeOpen {
-        case .never:
-            break
-        case .once:
-            if !Realm.fileExists(for: configuration) {
-                fallthrough
-            }
-        case .always:
-            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Swift.Error>) in
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Swift.Error>) in
+            switch downloadBeforeOpen {
+            case .never:
+                continuation.resume()
+            case .once:
+                if !Realm.fileExists(for: configuration) {
+                    fallthrough
+                } else {
+                    continuation.resume()
+                }
+            case .always:
                 RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callback: { error in
                     if let error = error {
                         continuation.resume(with: .failure(error))
                     } else {
-                        continuation.resume(with: .success(()))
+                        continuation.resume()
                     }
                 })
             }
         }
-
         try self.init(RLMRealm(configuration: configuration.rlmConfiguration))
     }
 }

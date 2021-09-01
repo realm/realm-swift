@@ -263,6 +263,11 @@
 		49E12CF3245DB7E800359DF1 /* RLMBSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 49E12CF1245DB7E800359DF1 /* RLMBSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		49E12CF5245DBF8A00359DF1 /* RLMBSON_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 49E12CF4245DBF8A00359DF1 /* RLMBSON_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		49E12CF6245DBF8A00359DF1 /* RLMBSON_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 49E12CF4245DBF8A00359DF1 /* RLMBSON_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
+		530BA61426DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BA61326DFA1CB008FC550 /* RLMChildProcessEnvironment.m */; };
+		530BA61526DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BA61326DFA1CB008FC550 /* RLMChildProcessEnvironment.m */; };
+		530BA61626DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BA61326DFA1CB008FC550 /* RLMChildProcessEnvironment.m */; };
+		530BA61726DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BA61326DFA1CB008FC550 /* RLMChildProcessEnvironment.m */; };
+		530BA61826DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BA61326DFA1CB008FC550 /* RLMChildProcessEnvironment.m */; };
 		53124AD925B71AF700771CE4 /* SwiftUITestHostUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53124AD825B71AF700771CE4 /* SwiftUITestHostUITests.swift */; };
 		532E916F24AA533A003FD9DB /* TimeoutProxyServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532E916E24AA533A003FD9DB /* TimeoutProxyServer.swift */; };
 		5346E7322487AC9D00595C68 /* RLMBSONTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5346E7312487AC9D00595C68 /* RLMBSONTests.mm */; };
@@ -884,6 +889,8 @@
 		49E12CEF245DB7CC00359DF1 /* RLMBSON.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMBSON.mm; sourceTree = "<group>"; };
 		49E12CF1245DB7E800359DF1 /* RLMBSON.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMBSON.h; sourceTree = "<group>"; };
 		49E12CF4245DBF8A00359DF1 /* RLMBSON_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMBSON_Private.hpp; sourceTree = "<group>"; };
+		530BA61326DFA1CB008FC550 /* RLMChildProcessEnvironment.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RLMChildProcessEnvironment.m; path = Realm/TestUtils/RLMChildProcessEnvironment.m; sourceTree = "<group>"; };
+		530BA61926DFA1F8008FC550 /* RLMChildProcessEnvironment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMChildProcessEnvironment.h; path = Realm/TestUtils/RLMChildProcessEnvironment.h; sourceTree = "<group>"; };
 		53124A4F25B714EC00771CE4 /* SwiftUITestHost.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SwiftUITestHost.xcconfig; sourceTree = "<group>"; };
 		53124AB825B71AF600771CE4 /* SwiftUITestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUITestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		53124AD425B71AF700771CE4 /* SwiftUITestHostUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUITestHostUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1328,6 +1335,8 @@
 				3F558C8422C29A03002F0F30 /* RLMAssertions.h */,
 				3F558C8022C29A02002F0F30 /* RLMMultiProcessTestCase.h */,
 				3F558C8522C29A03002F0F30 /* RLMMultiProcessTestCase.m */,
+				530BA61926DFA1F8008FC550 /* RLMChildProcessEnvironment.h */,
+				530BA61326DFA1CB008FC550 /* RLMChildProcessEnvironment.m */,
 				3F558C7F22C29A02002F0F30 /* RLMTestCase.h */,
 				3F558C8322C29A02002F0F30 /* RLMTestCase.m */,
 				3F558C8122C29A02002F0F30 /* RLMTestObjects.h */,
@@ -2776,6 +2785,7 @@
 				3F2633C31E9D630000B32D30 /* PrimitiveListTests.swift in Sources */,
 				CF040494263DF0AA00F9AEE0 /* PrimitiveMapTests.swift in Sources */,
 				CF986DF625AE3EDF0039D287 /* PrimitiveMutableSetTests.swift in Sources */,
+				530BA61526DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */,
 				3F8825051E5E335000586B35 /* PropertyTests.swift in Sources */,
 				3F8825061E5E335000586B35 /* RealmCollectionTypeTests.swift in Sources */,
 				CF0D04F1269365300038A058 /* KeyPathTests.swift in Sources */,
@@ -2886,6 +2896,7 @@
 				AC8847A9268926B500DF4A65 /* RealmServer.swift in Sources */,
 				AC8847A4268925F100DF4A65 /* SwiftSyncTestCase.swift in Sources */,
 				AC88478626888CEE00DF4A65 /* SwiftUISyncTestHostUITests.swift in Sources */,
+				530BA61826DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2901,6 +2912,7 @@
 				AC2C2A40268E1B0200B4DA33 /* SwiftServerObjects.swift in Sources */,
 				E8267FF11D90B8E700E001C7 /* RLMObjectServerTests.mm in Sources */,
 				1AA5AE9C1D98A68E00ED8C27 /* RLMSyncTestCase.mm in Sources */,
+				530BA61626DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */,
 				3F558C9022C29A03002F0F30 /* RLMTestCase.m in Sources */,
 				3F73BC921E3A877300FE80B6 /* RLMTestUtils.m in Sources */,
 				1A1536481DB0408A00C0EC93 /* RLMUser+ObjectServerTests.mm in Sources */,
@@ -2940,6 +2952,7 @@
 				E856D21B195615A900FB2FCF /* ObjectTests.m in Sources */,
 				5D6156FB1BE08E7E00A4BD3F /* PerformanceTests.m in Sources */,
 				5D03FB201E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */,
+				530BA61726DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */,
 				3F572C961F2BDAB100F6C9AB /* PrimitiveArrayPropertyTests.m in Sources */,
 				0C86B33A25E15B6000775FED /* PrimitiveDictionaryPropertyTests.m in Sources */,
 				CF986D3225AE3BD40039D287 /* PrimitiveSetPropertyTests.m in Sources */,
@@ -3029,6 +3042,7 @@
 				CF986D8425AE3C5A0039D287 /* SwiftSetTests.swift in Sources */,
 				3FB4FA1719F5D2740020D53B /* SwiftTestObjects.swift in Sources */,
 				3FB4FA2019F5D2740020D53B /* SwiftUnicodeTests.swift in Sources */,
+				530BA61426DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */,
 				3F558C8722C29A03002F0F30 /* TestUtils.mm in Sources */,
 				3F572C941F2BDAAB00F6C9AB /* ThreadSafeReferenceTests.m in Sources */,
 				E81A20021955FE0100FDED82 /* TransactionTests.m in Sources */,
