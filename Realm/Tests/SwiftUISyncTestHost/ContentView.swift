@@ -28,7 +28,7 @@ enum LoggingViewState {
 }
 
 struct MainView: View {
-    let testType: String = ProcessInfo.processInfo.environment["test_type"]!
+    let testType: String = ProcessInfo.processInfo.environment["async_view_type"]!
     @State var viewState: LoggingViewState = .initial
     @State var user: User?
 
@@ -58,11 +58,11 @@ struct MainView: View {
             case .loggedIn:
                 VStack {
                     Text("Logged in")
-                        .accessibilityIdentifier("logged-view")
+                        .accessibilityIdentifier("logged_view")
                     Button("Sync") {
                         viewState = .syncing
                     }
-                    .accessibilityIdentifier("sync-button-view")
+                    .accessibilityIdentifier("sync_button")
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.yellow)
@@ -74,7 +74,7 @@ struct MainView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
-                case "async_open_environment_partition_value":
+                case "async_open_environment_partition":
                     AsyncOpenPartitionView()
                         .environment(\.partitionValue, user!.id)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -91,7 +91,7 @@ struct MainView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.green)
                         .transition(AnyTransition.move(edge: .leading)).animation(.default)
-                case "auto_open_environment_partition_value":
+                case "auto_open_environment_partition":
                     AutoOpenPartitionView()
                         .environment(\.partitionValue, user!.id)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -134,6 +134,10 @@ struct LoginView: View {
                 })
             }
             .accessibilityIdentifier("login_button")
+            Button("Logout") {
+                loginHelper.logout()
+            }
+            .accessibilityIdentifier("logout_button")
         }
     }
 }
@@ -157,6 +161,15 @@ class LoginHelper: ObservableObject {
                 completion(user)
             })
             .store(in: &cancellables)
+    }
+
+    func logout() {
+        let appConfig = AppConfiguration(baseURL: "http://localhost:9090",
+                                         transport: nil,
+                                         localAppName: nil,
+                                         localAppVersion: nil)
+        let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
+        app.currentUser?.logOut { _ in }
     }
 }
 
@@ -183,11 +196,11 @@ struct AsyncOpenView: View {
                 } else {
                     VStack {
                         Text(String(progress!.completedUnitCount))
-                            .accessibilityIdentifier("progress-text-view")
+                            .accessibilityIdentifier("progress_text_view")
                         Button("Navigate Next View") {
                             canNavigate = true
                         }
-                        .accessibilityIdentifier("show-list-button-view")
+                        .accessibilityIdentifier("show_list_button_view")
                     }
                 }
             case .error(let error):
@@ -230,11 +243,11 @@ struct AutoOpenView: View {
                 } else {
                     VStack {
                         Text(String(progress!.completedUnitCount))
-                            .accessibilityIdentifier("progress-text-view")
+                            .accessibilityIdentifier("progress_text_view")
                         Button("Navigate Next View") {
                             canNavigate = true
                         }
-                        .accessibilityIdentifier("show-list-button-view")
+                        .accessibilityIdentifier("show_list_button_view")
                     }
                 }
             case .error(let error):
@@ -266,6 +279,8 @@ struct AsyncOpenPartitionView: View {
             case .connecting:
                 ProgressView()
             case .waitingForUser:
+                Text("")
+                    .accessibilityIdentifier("waiting_user_view")
                 ProgressView("Waiting for user to logged in...")
             case .open(let realm):
                 ListView()
@@ -298,38 +313,8 @@ struct AutoOpenPartitionView: View {
             case .connecting:
                 ProgressView()
             case .waitingForUser:
-                ProgressView("Waiting for user to logged in...")
-            case .open(let realm):
-                ListView()
-                    .environment(\.realm, realm)
-                    .transition(AnyTransition.move(edge: .leading)).animation(.default)
-            case .error(let error):
-                ErrorView(error: error)
-                    .background(Color.red)
-                    .transition(AnyTransition.move(edge: .trailing)).animation(.default)
-            case .progress(let progress):
-                ProgressView(progress)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.yellow)
-                    .transition(AnyTransition.move(edge: .trailing)).animation(.default)
-            }
-        }
-
-    }
-}
-
-struct AsyncOpenMultiUserView: View {
-    @AsyncOpen(appId: ProcessInfo.processInfo.environment["app_id"]!,
-               partitionValue: "wrong_partition_value",
-               timeout: 2000)
-    var asyncOpen
-
-    var body: some View {
-        VStack {
-            switch asyncOpen {
-            case .connecting:
-                ProgressView()
-            case .waitingForUser:
+                Text("")
+                    .accessibilityIdentifier("waiting_user_view")
                 ProgressView("Waiting for user to logged in...")
             case .open(let realm):
                 ListView()
@@ -370,7 +355,6 @@ struct ListView: View {
                 Text("\(object.firstName)")
             }
         }
-        .accessibilityIdentifier("table-view")
         .navigationTitle("SwiftHugeSyncObject's List")
     }
 }
