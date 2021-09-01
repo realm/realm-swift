@@ -67,41 +67,65 @@ private func createBinding<T: ThreadConfined, V>(_ value: T,
     })
 }
 
-// MARK: SwiftUIKVO
+// MARK: _SwiftUIKVO
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-internal final class SwiftUIKVO: NSObject {
+@objc(_SwiftUIKVO) public class _SwiftUIKVO: NSObject {
     /// Objects must have observers removed before being added to a realm.
     /// They are stored here so that if they are appended through the Bound Property
     /// system, they can be de-observed before hand.
-    fileprivate static var observedObjects = [NSObject: SwiftUIKVO.Subscription]()
+    public static var observedObjects = [NSObject: _SwiftUIKVO.Subscription]()
 
     @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-    struct Subscription: Combine.Subscription {
-        let observer: NSObject
-        let value: NSObject
-        let keyPaths: [String]
+    public struct Subscription: Combine.Subscription {
+        public let observer: NSObject
+        public let value: NSObject
+        public let keyPaths: [String]
 
-        var combineIdentifier: CombineIdentifier {
+        public var combineIdentifier: CombineIdentifier {
             CombineIdentifier(value)
         }
 
-        func request(_ demand: Subscribers.Demand) {
+        public func request(_ demand: Subscribers.Demand) {
         }
 
-        func cancel() {
-            guard SwiftUIKVO.observedObjects.keys.contains(value) else {
+        public func cancel() {
+            guard _SwiftUIKVO.observedObjects.keys.contains(value) else {
                 return
             }
             keyPaths.forEach {
                 value.removeObserver(observer, forKeyPath: $0)
             }
-            SwiftUIKVO.observedObjects.removeValue(forKey: value)
+            _SwiftUIKVO.observedObjects.removeValue(forKey: value)
+        }
+
+        public func pause() {
+            guard _SwiftUIKVO.observedObjects.keys.contains(value) else {
+                return
+            }
+            keyPaths.forEach {
+                value.removeObserver(observer, forKeyPath: $0)
+            }
+        }
+
+        public func unpause() {
+            guard _SwiftUIKVO.observedObjects.keys.contains(value) else {
+                return
+            }
+            keyPaths.forEach {
+                value.addObserver(observer, forKeyPath: $0, options: .initial, context: nil)
+            }
+        }
+
+        public init(observer: NSObject, value: NSObject, keyPaths: [String]) {
+            self.observer = observer
+            self.value = value
+            self.keyPaths = keyPaths
         }
     }
     private let receive: () -> Void
 
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         receive()
     }
 
@@ -141,16 +165,16 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
         } else if let value = value as? ObjectBase, !value.isInvalidated {
             // else if the value is unmanaged
             let schema = ObjectSchema(RLMObjectBaseObjectSchema(value)!)
-            let kvo = SwiftUIKVO(subscriber: subscriber)
+            let kvo = _SwiftUIKVO(subscriber: subscriber)
 
             var keyPaths = [String]()
             for property in schema.properties {
                 keyPaths.append(property.name)
                 value.addObserver(kvo, forKeyPath: property.name, options: .initial, context: nil)
             }
-            let subscription = SwiftUIKVO.Subscription(observer: kvo, value: value, keyPaths: keyPaths)
+            let subscription = _SwiftUIKVO.Subscription(observer: kvo, value: value, keyPaths: keyPaths)
             subscriber.receive(subscription: subscription)
-            SwiftUIKVO.observedObjects[value] = subscription
+            _SwiftUIKVO.observedObjects[value] = subscription
         }
     }
 }
@@ -173,6 +197,7 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
         self.objectWillChange = ObservableStoragePublisher(value, keyPaths)
     }
 }
+
 
 // MARK: - StateRealmObject
 
@@ -515,7 +540,7 @@ public extension BoundCollection where Value: RealmCollection {
     func append<V>(_ value: Value.Element) where Value == List<V>, Value.Element: ObjectBase & ThreadConfined {
         // if the value is unmanaged but the list is managed, we are adding this value to the realm
         if value.realm == nil && self.wrappedValue.realm != nil {
-            SwiftUIKVO.observedObjects[value]?.cancel()
+            _SwiftUIKVO.observedObjects[value]?.cancel()
         }
         safeWrite(self.wrappedValue) { list in
             list.append(value)
@@ -524,7 +549,7 @@ public extension BoundCollection where Value: RealmCollection {
     /// :nodoc:
     func append<V>(_ value: Value.Element) where Value == Results<V>, V: Object {
         if value.realm == nil && self.wrappedValue.realm != nil {
-            SwiftUIKVO.observedObjects[value]?.cancel()
+            _SwiftUIKVO.observedObjects[value]?.cancel()
         }
         safeWrite(self.wrappedValue) { results in
             results.realm?.add(value)
@@ -573,7 +598,7 @@ public extension BoundMap where Value: RealmKeyedCollection {
         }
         // if the value is unmanaged but the map is managed, we are adding this value to the realm
         if value.realm == nil && self.wrappedValue.realm != nil {
-            SwiftUIKVO.observedObjects[value]?.cancel()
+            _SwiftUIKVO.observedObjects[value]?.cancel()
         }
         safeWrite(self.wrappedValue) { map in
             map[key] = value
@@ -1012,17 +1037,29 @@ public enum AsyncOpenState {
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-extension SwiftUIKVO {
-    static func removeObservers(object: NSObject) {
-        if let subscription = SwiftUIKVO.observedObjects[object] {
-            subscription.cancel()
+extension _SwiftUIKVO {
+    @objc public static func removeObservers(object: NSObject) -> Bool {
+        if let subscription = _SwiftUIKVO.observedObjects[object] {
+            subscription.pause()
+            return true
+        } else {
+            return false
+        }
+    }
+
+    @objc public static func addObservers(object: NSObject) {
+        if let subscription = _SwiftUIKVO.observedObjects[object] {
+            subscription.unpause()
         }
     }
 }
 #else
-internal final class SwiftUIKVO {
-    static func removeObservers(object: NSObject) {
-        // noop
+@objc(_SwiftUIKVO) public final class _SwiftUIKVO {
+    @objc public static func removeObservers(object: NSObject) -> Bool {
+        return false
+    }
+
+    @objc public static func addObservers(object: NSObject) {
     }
 }
 #endif
