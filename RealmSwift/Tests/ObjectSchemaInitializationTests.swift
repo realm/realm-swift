@@ -258,6 +258,17 @@ class ObjectSchemaInitializationTests: TestCase {
                      reason: "Properties 'pk2' and 'pk1' are both marked as the primary key of 'SwiftObjectWithMultiplePrimaryKeys'")
     }
 
+    func testModernIndexableTypes() {
+        let indexed = ModernAllIndexableTypesObject().objectSchema
+        for property in indexed.properties {
+            XCTAssertTrue(property.isIndexed)
+        }
+        let notIndexed = ModernAllIndexableButNotIndexedObject().objectSchema
+        for property in notIndexed.properties {
+            XCTAssertFalse(property.isIndexed)
+        }
+    }
+
     #if DEBUG // this test depends on @testable import
     func assertType<T: SchemaDiscoverable>(_ value: T, _ propertyType: PropertyType,
                                            optional: Bool = false, list: Bool = false,

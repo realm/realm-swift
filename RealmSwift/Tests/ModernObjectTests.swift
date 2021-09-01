@@ -134,6 +134,9 @@ class ModernObjectTests: TestCase {
         test(ModernPrimaryObjectIdObject(), ObjectId.generate(), ObjectId.generate())
         test(ModernPrimaryOptionalObjectIdObject(), ObjectId.generate(), nil)
 
+        test(ModernPrimaryIntEnumObject(), .value1, .value2)
+        test(ModernPrimaryOptionalIntEnumObject(), .value1, nil)
+
         realm.cancelWrite()
     }
 
