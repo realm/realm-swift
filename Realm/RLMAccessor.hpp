@@ -158,9 +158,3 @@ private:
     id defaultValue(NSString *key);
     id propertyValue(id obj, size_t propIndex, __unsafe_unretained RLMProperty *const prop);
 };
-
-[[clang::objc_runtime_visible]]
-@interface _SwiftUIKVO : NSObject
-+ (BOOL)removeObserversWithObject:(NSObject *)object;
-+ (void)addObserversWithObject:(NSObject *)object;
-@end

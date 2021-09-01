@@ -188,3 +188,12 @@ void RLMDidChange(std::vector<realm::BindingContext::ObserverState> const& obser
 realm::KeyPathArray RLMKeyPathArrayFromStringArray(RLMRealm *realm,
                                                    RLMClassInfo *info,
                                                    NSArray<NSString *> *keyPath);
+
+// Used for checking if `Object`s declared with `@StateRealmObject` need to have
+// their accessors temporarily removed and added back so that the `Object` can be
+// managed be the Realm.
+[[clang::objc_runtime_visible]]
+@interface _SwiftUIKVO : NSObject
++ (BOOL)removeObserversWithObject:(NSObject *)object;
++ (void)addObserversWithObject:(NSObject *)object;
+@end
