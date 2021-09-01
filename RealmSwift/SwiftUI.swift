@@ -90,16 +90,11 @@ private func createBinding<T: ThreadConfined, V>(_ value: T,
         }
 
         public func cancel() {
-            guard _SwiftUIKVO.observedObjects.keys.contains(value) else {
-                return
-            }
-            keyPaths.forEach {
-                value.removeObserver(observer, forKeyPath: $0)
-            }
+            removeObservers()
             _SwiftUIKVO.observedObjects.removeValue(forKey: value)
         }
 
-        public func pause() {
+        fileprivate func removeObservers() {
             guard _SwiftUIKVO.observedObjects.keys.contains(value) else {
                 return
             }
@@ -108,7 +103,7 @@ private func createBinding<T: ThreadConfined, V>(_ value: T,
             }
         }
 
-        public func unpause() {
+        fileprivate func addObservers() {
             guard _SwiftUIKVO.observedObjects.keys.contains(value) else {
                 return
             }
@@ -125,7 +120,10 @@ private func createBinding<T: ThreadConfined, V>(_ value: T,
     }
     private let receive: () -> Void
 
-    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+    public override func observeValue(forKeyPath keyPath: String?,
+                                      of object: Any?,
+                                      change: [NSKeyValueChangeKey: Any]?,
+                                      context: UnsafeMutableRawPointer?) {
         receive()
     }
 
@@ -159,7 +157,8 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
     public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
         subscribers.append(AnySubscriber(subscriber))
         if value.realm != nil && !value.isInvalidated, let value = value.thaw() {
-            // if the value is managed
+            // This path is for cases where the object is already managed. If an
+            // unmanaged object becomes managed it will continue to use KVO.
             let token =  value._observe(keyPaths, subscriber)
             subscriber.receive(subscription: ObservationSubscription(token: token))
         } else if let value = value as? ObjectBase, !value.isInvalidated {
@@ -1040,7 +1039,7 @@ public enum AsyncOpenState {
 extension _SwiftUIKVO {
     @objc public static func removeObservers(object: NSObject) -> Bool {
         if let subscription = _SwiftUIKVO.observedObjects[object] {
-            subscription.pause()
+            subscription.removeObservers()
             return true
         } else {
             return false
@@ -1049,7 +1048,7 @@ extension _SwiftUIKVO {
 
     @objc public static func addObservers(object: NSObject) {
         if let subscription = _SwiftUIKVO.observedObjects[object] {
-            subscription.unpause()
+            subscription.addObservers()
         }
     }
 }
