@@ -626,8 +626,3 @@ public func _name<T: ObjectBase>(for keyPath: PartialKeyPath<T>) -> String {
     }
     return traceObject.lastAccessedNames!.componentsJoined(by: ".")
 }
-
-
-// MARK: Thread Safe Wrapper
-
-extension Object: ThreadSafeWrappable {}

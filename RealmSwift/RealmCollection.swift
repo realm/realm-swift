@@ -1616,7 +1616,3 @@ internal protocol PropertyNameConvertible {
     /// `isLegacy` will be true if the property is declared with old property syntax.
     var propertyInformation: (key: String, isLegacy: Bool)? { get }
 }
-
-// MARK: Thread Safe Wrapper
-
-extension AnyRealmCollection: ThreadSafeWrappable {}

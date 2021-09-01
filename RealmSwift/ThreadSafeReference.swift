@@ -123,13 +123,6 @@ public protocol ThreadConfined {
 }
 
 /**
- Object types conforming to `ThreadSafeWrappable` are able to have the `@ThreadSafe` property wrapper applied to them.
-
- Note that only types defined by Realm can meaningfully conform to this protocol, and defining new
- classes which attempt to conform to it will not make them work with `@ThreadSafe`
- */
-public protocol ThreadSafeWrappable: ThreadConfined {}
-/**
     A property wrapper type that may be passed between threads.
 
     A `@ThreadSafe` property contains a thread-safe reference to the underlying wrapped value.
@@ -145,7 +138,7 @@ public protocol ThreadSafeWrappable: ThreadConfined {}
  - see: `ThreadSafeReference`
  - see: `ThreadConfined`
 */
-@propertyWrapper public class ThreadSafe<T: ThreadSafeWrappable> {
+@propertyWrapper public class ThreadSafe<T: ThreadConfined> {
     var threadSafeReference: ThreadSafeReference<T>?
     var rlmConfiguration: RLMRealmConfiguration?
 

@@ -673,7 +673,3 @@ extension MutableSet: PropertyNameConvertible {
         return (key: rlmSet.propertyKey, isLegacy: rlmSet.isLegacyProperty)
     }
 }
-
-// MARK: Thread Safe Wrapper
-
-extension MutableSet: ThreadSafeWrappable {}

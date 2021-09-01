@@ -1,7 +1,9 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add `@ThreadSafe` property wrapper. This property wrapper type may be passed between threads.
+* Add `@ThreadSafe` property wrapper. This property wrapper type may be passed between threads. It's
+  intended use is for local variables and function parameters that the value can be used across
+  threads.
 
 ### Fixed
 * Fix crash in `MongoCollection.findOneDocument(filter:)` that occurred when no results were

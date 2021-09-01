@@ -834,7 +834,3 @@ extension List: PropertyNameConvertible {
         return (key: rlmArray.propertyKey, isLegacy: rlmArray.isLegacyProperty)
     }
 }
-
-// MARK: Thread Safe Wrapper
-
-extension List: ThreadSafeWrappable {}
