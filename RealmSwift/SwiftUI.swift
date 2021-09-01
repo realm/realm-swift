@@ -795,6 +795,14 @@ private enum AsyncOpenType {
 private class ObservableAsyncOpenStorage: ObservableObject {
     private var asyncOpenType: AsyncOpenType
     private var app: App
+    var configuration: Realm.Configuration
+    var partitionValue: AnyBSON
+
+    // Tracks User State for App for Multi-User Support
+    enum AppState {
+        case loggedIn(User)
+        case loggedOut
+    }
     private var appState: AppState {
         didSet {
             switch appState {
@@ -805,18 +813,12 @@ private class ObservableAsyncOpenStorage: ObservableObject {
             }
         }
     }
+
+    // Cancellables
     private var appCancellable = [AnyCancellable]()
     private var asyncOpenCancellable = [AnyCancellable]()
 
-    var configuration: Realm.Configuration
-    var partitionValue: AnyBSON
-
-    enum AppState {
-        case loggedIn(User)
-        case loggedOut
-    }
-
-    @Published var asyncOpenState: AsyncOpenState = .waitingForUser {
+    @Published var asyncOpenState: AsyncOpenState = .connecting {
         willSet {
             objectWillChange.send()
         }
@@ -885,6 +887,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
             asyncOpenForUser(user)
         } else {
             appState = .loggedOut
+            asyncOpenState = .waitingForUser
         }
         app.objectWillChange.sink {
             switch self.appState {
@@ -1115,7 +1118,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                 timeout: UInt? = nil) {
         let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
-        storage = ObservableAsyncOpenStorage(asyncOpenType: .asyncOpen, app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
+        storage = ObservableAsyncOpenStorage(asyncOpenType: .autoOpen, app: app, configuration: configuration, partitionValue: AnyBSON(partitionValue))
     }
 
     public mutating func update() {
