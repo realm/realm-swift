@@ -333,14 +333,4 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(binding.wrappedValue, "baz")
     }
 }
-
-class SwiftUIKVOObserver: NSObject {
-    public var receive: (() -> Void)?
-    public override func observeValue(forKeyPath keyPath: String?,
-                                      of object: Any?,
-                                      change: [NSKeyValueChangeKey: Any]?,
-                                      context: UnsafeMutableRawPointer?) {
-        receive?()
-    }
-}
 #endif
