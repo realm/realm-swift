@@ -5,6 +5,8 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * `Map<Key, Value>` did not conform to `Codable`. ([Cocoa #7418](https://github.com/realm/realm-cocoa/pull/7418), since v10.8.0)
+* Adding an unmanaged object to a Realm that was declared with `@StateRealmObject` would throw 
+  the exception `"Cannot add an object with observers to a Realm"`.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
