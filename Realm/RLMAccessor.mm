@@ -1034,7 +1034,7 @@ RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
 
     RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(value);
     realm::Obj obj, *outObj = nullptr;
-    bool requiresSwiftUIObservers;
+    bool requiresSwiftUIObservers = false;
     if (objBase) {
         if (objBase.isInvalidated) {
             if (policy.create && !policy.copy) {
@@ -1068,7 +1068,7 @@ RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
                 @throw RLMException(@"Object is already managed by another Realm. Use create instead to copy it into this Realm.");
             }
             if (objBase->_observationInfo && objBase->_observationInfo->hasObservers()) {
-                requiresSwiftUIObservers = [_SwiftUIKVO removeObserversWithObject:objBase];
+                requiresSwiftUIObservers = [RLMSwiftUIKVO removeObserversFromObject:objBase];
                 if (!requiresSwiftUIObservers) {
                     @throw RLMException(@"Cannot add an object with observers to a Realm");
                 }
@@ -1114,7 +1114,7 @@ RLMAccessorContext::createObject(id value, realm::CreatePolicy policy,
     }
 
     if (requiresSwiftUIObservers) {
-        [_SwiftUIKVO addObserversWithObject:objBase];
+        [RLMSwiftUIKVO addObserversToObject:objBase];
     }
 
     return {*outObj, false};

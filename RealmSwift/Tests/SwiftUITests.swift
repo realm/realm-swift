@@ -224,38 +224,6 @@ class SwiftUITests: TestCase {
         XCTAssertEqual(state.wrappedValue.count, 0)
     }
 
-    func testAddUnmanagedObjectWithObservers() throws {
-        let object = SwiftUIObject()
-        let schema = object.objectSchema
-        let observer = SwiftUIKVOObserver()
-        // New instance of Object should not have any observers
-        XCTAssertNil(object.observationInfo)
-        for property in schema.properties {
-            object.addObserver(observer, forKeyPath: property.name, options: .initial, context: nil)
-        }
-
-        _SwiftUIKVO.observedObjects[object] = _SwiftUIKVO.Subscription(observer: observer,
-                                                                       value: object,
-                                                                       keyPaths: schema.properties.map { $0.name })
-        XCTAssertNotNil(object.observationInfo)
-        // Object should have its observers removed and set up once again after adding to the Realm.
-        let realm = inMemoryRealm(inMemoryIdentifier)
-        try! realm.write {
-            realm.add(object)
-        }
-        XCTAssertNotNil(object.observationInfo)
-        // Ensure that the new observers are actually triggered
-        var observerHit = false
-        observer.receive = {
-            observerHit.toggle()
-        }
-
-        try! realm.write {
-            object.str = "foo"
-        }
-        XCTAssertTrue(observerHit)
-    }
-
     // MARK: - ObservedResults Operations
     func testResultsAppendUnmanagedObject() throws {
         let object = SwiftUIObject()
