@@ -10,13 +10,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fixed "Invalid data type" assertion failure in the sync client when the
   client recieved an AddColumn instruction from the server for an AnyRealmValue
   property when that property already exists locally. ([Core #4873](https://github.com/realm/realm-core/issues/4873), since v10.8.0)
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
-* Fix crash in `MongoCollection.findOneDocument(filter:)` that occurred when no results were
-  found for a given filter.
-* Some of the SwiftUI property wrappers incorrectly required objects to conform
-  to ObjectKeyIdentifiable rather than Identifiable.
-* Work around Xcode 13 beta 3+ shipping a broken swiftinterface file for Combine on 32-bit iOS.
 * Fix crash in `RLMSyncConfiguration.initWithUser` error mapping when a user is disabled/deleted from MongoDB Realm dashboard.
   ([Cocoa #7399](https://github.com/realm/realm-cocoa/issues/7399)
 
