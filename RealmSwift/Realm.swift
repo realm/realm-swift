@@ -1042,7 +1042,7 @@ extension Realm {
      will be run in the background, and for synchronized Realms all data will
      be downloaded from the server before the Realm is returned.
      - parameter configuration: A configuration object to use when opening the Realm.
-     - parameter downloadBehavior: When opening the Realm should first download
+     - parameter downloadBeforeOpen: When opening the Realm should first download
      all data from the server.
      - parameter queue: An optional dispatch queue to confine the Realm to. If
      given, this Realm instance can be used from within
