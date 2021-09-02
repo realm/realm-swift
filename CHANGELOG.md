@@ -84,7 +84,6 @@ r `User.linkUser` methods.
 * Fixed "Invalid data type" assertion failure in the sync client when the
   client recieved an AddColumn instruction from the server for an AnyRealmValue
   property when that property already exists locally. ([Core #4873](https://github.com/realm/realm-core/issues/4873), since v10.8.0)
-* Fix Realm.Configuration overriding `syncConfiguration` related configurations for synced realms.
 
 * Fix compilation error where Swift 5.5 is available but the macOS 12 SDK was
   not. This was notable for the Xcode 13 RC. This fix adds a #canImport check
