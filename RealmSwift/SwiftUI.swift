@@ -108,7 +108,7 @@ private func createBinding<T: ThreadConfined, V>(_ value: T,
                 return
             }
             keyPaths.forEach {
-                value.addObserver(observer, forKeyPath: $0, options: .initial, context: nil)
+                value.addObserver(observer, forKeyPath: $0, options: .init(), context: nil)
             }
         }
     }
@@ -163,7 +163,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
             var keyPaths = [String]()
             for property in schema.properties {
                 keyPaths.append(property.name)
-                value.addObserver(kvo, forKeyPath: property.name, options: .initial, context: nil)
+                value.addObserver(kvo, forKeyPath: property.name, options: .init(), context: nil)
             }
             let subscription = SwiftUIKVO.Subscription(observer: kvo, value: value, keyPaths: keyPaths)
             subscriber.receive(subscription: subscription)
@@ -292,6 +292,11 @@ private class ObservableStorage<ObservedType>: ObservableObject where ObservedTy
     public init(wrappedValue: T) where T: ObjectBase & Identifiable {
         self._storage = StateObject(wrappedValue: ObservableStorage(wrappedValue))
         defaultValue = T()
+    }
+
+    /// :nodoc:
+    public var _publisher: some Publisher {
+        self.storage.objectWillChange
     }
 }
 
