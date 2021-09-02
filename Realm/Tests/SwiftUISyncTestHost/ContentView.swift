@@ -113,27 +113,29 @@ struct MainView: View {
 
 struct LoginView: View {
     @ObservedObject var loginHelper = LoginHelper()
-    @State var email: String = ""
-    @State var password: String = ""
-
     var didLogin: (User) -> Void
     var loggingIn: () -> Void
 
     var body: some View {
         VStack {
-            TextField("Email", text: $email)
-                .accessibilityIdentifier("email_textfield")
-            TextField("Password", text: $password)
-                .accessibilityIdentifier("password_textfield")
-            Button("Log In") {
+            Button("Log In User 1") {
                 loggingIn()
-                loginHelper.login(email: email,
-                                  password: password,
+                loginHelper.login(email: ProcessInfo.processInfo.environment["email1"]!,
+                                  password: ProcessInfo.processInfo.environment["password"]!,
                                   completion: { user in
                     didLogin(user)
                 })
             }
-            .accessibilityIdentifier("login_button")
+            .accessibilityIdentifier("login_button_1")
+            Button("Log In User 2") {
+                loggingIn()
+                loginHelper.login(email: ProcessInfo.processInfo.environment["email2"]!,
+                                  password: ProcessInfo.processInfo.environment["password"]!,
+                                  completion: { user in
+                    didLogin(user)
+                })
+            }
+            .accessibilityIdentifier("login_button_2")
             Button("Logout") {
                 loginHelper.logout()
             }
