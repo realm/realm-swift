@@ -2929,10 +2929,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
 
     func testAsyncOpenSync() async throws {
         if isParent {
-            let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
-            let password = randomString(10)
-            try await app.emailPasswordAuth.registerUser(email: email, password: password)
-            let user = try await self.app.login(credentials: .emailPassword(email: email, password: password))
+            let user = try await self.app.login(credentials: basicCredentials())
             let realm = try await Realm(configuration: user.configuration(testName: #function))
             try! realm.write {
                 realm.add(SwiftHugeSyncObject.create())
@@ -2958,9 +2955,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         }
         switch ProcessKind.current {
         case .parent:
-            let (email, password) = (randomString(10), "password")
-            try await self.app.emailPasswordAuth.registerUser(email: email, password: password)
-            let user = try await self.app.login(credentials: .emailPassword(email: email, password: password))
+            let user = try await self.app.login(credentials: basicCredentials())
             let user1Realm = try await Realm(configuration: user.configuration(testName: #function))
             try! user1Realm.write {
                 user1Realm.add(SwiftHugeSyncObject.create())
@@ -2997,9 +2992,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         }
         switch ProcessKind.current {
         case .parent:
-            let (email, password) = (randomString(10), "password")
-            try await self.app.emailPasswordAuth.registerUser(email: email, password: password)
-            let user = try await self.app.login(credentials: .emailPassword(email: email, password: password))
+            let user = try await self.app.login(credentials: basicCredentials())
             let user1Realm = try await Realm(configuration: user.configuration(testName: #function))
             try! user1Realm.write {
                 user1Realm.add(SwiftHugeSyncObject.create())
@@ -3054,9 +3047,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         }
         switch ProcessKind.current {
         case .parent:
-            let (email, password) = (randomString(10), "password")
-            try await self.app.emailPasswordAuth.registerUser(email: email, password: password)
-            let user = try await self.app.login(credentials: .emailPassword(email: email, password: password))
+            let user = try await self.app.login(credentials: basicCredentials())
             let user1Realm = try await Realm(configuration: user.configuration(testName: #function))
             try! user1Realm.write {
                 user1Realm.add(SwiftHugeSyncObject.create())

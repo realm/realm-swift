@@ -91,6 +91,10 @@ void RLMWaitForRealmToClose(NSString *path) {
     lockfile.lock_exclusive();
 }
 
+BOOL RLMIsRealmCachedAtPath(NSString *path) {
+    return RLMGetAnyCachedRealmForPath([path cStringUsingEncoding:NSUTF8StringEncoding]) != nil;
+}
+
 @implementation RLMRealmNotificationToken
 - (void)invalidate {
     [_realm verifyThread];
@@ -1026,10 +1030,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         [enumerator detach];
     }
     _collectionEnumerators = nil;
-}
-
-+ (BOOL)isRealmCachedAtPath:(NSString *)path {
-    return RLMGetAnyCachedRealmForPath([path cStringUsingEncoding:NSUTF8StringEncoding]) != nil;
 }
 
 @end

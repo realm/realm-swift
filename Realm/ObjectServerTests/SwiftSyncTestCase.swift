@@ -199,4 +199,18 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     }
 }
 
+#if swift(>=5.5)
+
+@available(macOS 12.0, *)
+extension SwiftSyncTestCase {
+    public func basicCredentials(usernameSuffix: String = "", app: App? = nil) async throws -> Credentials {
+        let email = "\(randomString(10))\(usernameSuffix)"
+        let password = "abcdef"
+        let credentials = Credentials.emailPassword(email: email, password: password)
+        try await (app ?? self.app).emailPasswordAuth.registerUser(email: email, password: password)
+        return credentials
+    }
+}
+
+#endif // swift(>=5.5)
 #endif // os(macOS)

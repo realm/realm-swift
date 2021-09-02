@@ -38,6 +38,7 @@ void RLMRealmTranslateException(NSError **error);
 
 // Block until the Realm at the given path is closed.
 FOUNDATION_EXTERN void RLMWaitForRealmToClose(NSString *path);
+BOOL RLMIsRealmCachedAtPath(NSString *path);
 
 // RLMRealm private members
 @interface RLMRealm ()
@@ -46,7 +47,6 @@ FOUNDATION_EXTERN void RLMWaitForRealmToClose(NSString *path);
 @property (nonatomic, readwrite) RLMSchema *schema;
 
 + (void)resetRealmState;
-+ (BOOL)isRealmCachedAtPath:(NSString *)path;
 
 - (void)registerEnumerator:(RLMFastEnumerator *)enumerator;
 - (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator;

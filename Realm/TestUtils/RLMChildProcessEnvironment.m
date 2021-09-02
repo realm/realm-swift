@@ -1,12 +1,21 @@
+////////////////////////////////////////////////////////////////////////////
 //
-//  RLMChildProcessEnvironment.m
-//  RLMChildProcessEnvironment
+// Copyright 2021 Realm Inc.
 //
-//  Created by Jason Flax on 01/09/2021.
-//  Copyright © 2021 Realm. All rights reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
 #import "RLMChildProcessEnvironment.h"
 
 @implementation RLMChildProcessEnvironment
@@ -60,11 +69,16 @@
 }
 
 + (RLMChildProcessEnvironment *)current {
-    NSString *shouldCleanUpOnTermination = [[NSProcessInfo processInfo].environment objectForKey:@"RLMChildShouldCleanUpOnTermination"] ?: @"YES";
-    NSString *identifier = [[NSProcessInfo processInfo].environment objectForKey:@"RLMChildIdentifier"] ?: @"0";
-    NSString *appIds = [NSProcessInfo processInfo].environment[@"RLMParentAppIds"] ?: @"";
+    NSDictionary<NSString *, NSString *> *environment = [NSProcessInfo processInfo].environment;
+    NSString *shouldCleanUpOnTermination = [environment objectForKey:@"RLMChildShouldCleanUpOnTermination"] ?: @"YES";
+    NSString *identifier = [environment objectForKey:@"RLMChildIdentifier"] ?: @"0";
+    NSString *appIds = environment[@"RLMParentAppIds"] ?: @"";
 
-    return [[RLMChildProcessEnvironment new] initWithAppIds: [appIds componentsSeparatedByString:@","] email:[NSProcessInfo processInfo].environment[@"RLMChildEmail"] password:[NSProcessInfo processInfo].environment[@"RLMChildPassword"] identifer:[identifier intValue] shouldCleanUpOnTermination:[shouldCleanUpOnTermination boolValue]];
+    return [[RLMChildProcessEnvironment new] initWithAppIds:[appIds componentsSeparatedByString:@","]
+                                                      email:environment[@"RLMChildEmail"]
+                                                   password:environment[@"RLMChildPassword"]
+                                                  identifer:[identifier intValue]
+                                 shouldCleanUpOnTermination:[shouldCleanUpOnTermination boolValue]];
 }
 
 @end

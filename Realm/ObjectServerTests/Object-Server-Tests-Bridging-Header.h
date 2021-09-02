@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMChildProcessEnvironment.h"
 #import "RLMSyncTestCase.h"
 #import "RLMUser+ObjectServerTests.h"
 #import "RLMWatchTestUtility.h"
-#import "RLMChildProcessEnvironment.h"

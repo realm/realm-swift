@@ -1009,46 +1009,60 @@ public typealias NotificationBlock = (_ notification: Realm.Notification, _ real
 #if swift(>=5.5)
 @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
 extension Realm {
-    /// Download behavior for a synced Realm.
-    @frozen public enum DownloadBehavior {
-        /// Open the Realm for immediate use. If this is a synced Realm,
-        /// it will download the Realm data in the background.
+    /// Options for when to download all data from the server before opening
+    /// a synchronized Realm.
+    @frozen public enum OpenBehavior {
+        /// Immediately return the Realm as if the synchronous initializer was
+        /// used. If this is the first time that the Realm has been opened on
+        /// this device, the Realm file will initially be empty. Synchronized
+        /// Realms will contact the server and download new data in the
+        /// background.
         case never
-        /// Open the Realm and download all available data before returning.
+        /// Always open the Realm asynchronously and download all data from the
+        /// server before returning the Realm. This mode will fail to open the
+        /// Realm if the device is currently offline.
         case always
-        /// Open the Realm and download all available data before returning
-        /// iff there has not been an initial download. Else, return the previously
-        /// opened Realm.
-        /// `once` implies once and only once. Restarting the app and using
-        /// this case will not trigger a download.
+        /// Open the Realm asynchronously the first time it is opened on the
+        /// current device, and then synchronously afterwards. This mode is
+        /// suitable if you wish to wait to download the server-side data the
+        /// first time your app is launched on each device, but afterwards
+        /// support offline launches using the existing local data.
+        ///
+        /// Note that if .once is used multiple times simultaneously then calls
+        /// after the first may see partial local data from the first call and
+        /// not wait for the download.
         case once
     }
     /**
-     Asynchronously open a Realm and deliver it to a block on the given queue.
-
-     Opening a Realm asynchronously will perform all work needed to get the Realm to
-     a usable state (such as running potentially time-consuming migrations) on a
-     background thread before dispatching back to the continiuation. In addition,
-     synchronized Realms wait for all remote content available at the time the
-     operation began to be downloaded and available locally.
-
+     Obtains a `Realm` instance with the given configuration, possibly asynchronously.
+     By default this simply returns the Realm instance exactly as if the
+     synchronous initializer was used. It optionally can instead open the Realm
+     asynchronously, performing all work needed to get the Realm to a usable
+     state on a background thread. For local Realms, this means that migrations
+     will be run in the background, and for synchronized Realms all data will
+     be downloaded from the server before the Realm is returned.
      - parameter configuration: A configuration object to use when opening the Realm.
-     - parameter downloadBehavior: The behavior in how to open the realm.
+     - parameter downloadBehavior: When opening the Realm should first download
+     all data from the server.
+     - parameter queue: An optional dispatch queue to confine the Realm to. If
+     given, this Realm instance can be used from within
+     blocks dispatched to the given queue rather than on the
+     current thread.
+     - throws: An `NSError` if the Realm could not be initialized.
      - returns: An open Realm.
      */
     public init(configuration: Realm.Configuration = .defaultConfiguration,
-                downloadBeforeOpen: DownloadBehavior = .never) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Swift.Error>) in
-            switch downloadBeforeOpen {
-            case .never:
-                continuation.resume()
-            case .once:
-                if !Realm.fileExists(for: configuration) {
-                    fallthrough
-                } else {
-                    continuation.resume()
-                }
-            case .always:
+                downloadBeforeOpen: OpenBehavior = .never,
+                queue: DispatchQueue? = nil) async throws {
+        switch downloadBeforeOpen {
+        case .never:
+            break
+        case .once:
+            if !Realm.fileExists(for: configuration) {
+                fallthrough
+            }
+        case .always:
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Swift.Error>) in
                 RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callback: { error in
                     if let error = error {
                         continuation.resume(with: .failure(error))
@@ -1058,7 +1072,7 @@ extension Realm {
                 })
             }
         }
-        try self.init(RLMRealm(configuration: configuration.rlmConfiguration))
+        try self.init(RLMRealm(configuration: configuration.rlmConfiguration, queue: queue))
     }
 }
 #endif // swift(>=5.5)

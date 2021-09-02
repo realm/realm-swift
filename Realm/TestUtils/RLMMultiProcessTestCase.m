@@ -149,38 +149,11 @@
 }
 
 - (NSTask *)childTaskWithAppIds:(NSArray *)appIds {
-    NSString *testName = [NSString stringWithFormat:@"%@/%@", self.className, self.testName];
-    NSMutableDictionary *env = [NSProcessInfo.processInfo.environment mutableCopy];
-    env[@"RLMProcessIsChild"] = @"true";
-    env[@"RLMParentProcessBundleID"] = [NSBundle mainBundle].bundleIdentifier;
-    if (appIds.count) {
-        env[@"RLMParentAppId"] = appIds[0];
-        env[@"RLMParentAppIds"] = [appIds componentsJoinedByString:@","];
-    }
-
-    // If we're running with address sanitizer or thread sanitizer we need to
-    // explicitly tell dyld to inject the appropriate runtime library into
-    // the child process
-    for (int  i = 0, count = _dyld_image_count(); i < count; i++) {
-        const char *imageName = _dyld_get_image_name(i);
-        if (imageName && strstr(imageName, "libclang_rt")) {
-            env[@"DYLD_INSERT_LIBRARIES"] = @(imageName);
-        }
-    }
-
-    // Don't inherit the config file in the subprocess, as multiple XCTest
-    // processes talking to a single Xcode instance doesn't work at all
-    [env removeObjectForKey:@"XCTestConfigurationFilePath"];
-    [env removeObjectForKey:@"XCTestSessionIdentifier"];
-    [env removeObjectForKey:@"XPC_SERVICE_NAME"];
-    [env removeObjectForKey:@"XCTestBundlePath"];
-
-    NSTask *task = [[NSTask alloc] init];
-    task.launchPath = self.xctestPath;
-    task.arguments = @[@"-XCTest", testName, self.testsPath];
-    task.environment = env;
-    task.standardError = nil;
-    return task;
+    return [self childTaskWithEnvironment:[[RLMChildProcessEnvironment new] initWithAppIds:appIds
+                                                                                     email:nil
+                                                                                  password:nil
+                                                                                 identifer:0
+                                                                shouldCleanUpOnTermination:YES]];
 }
 
 - (NSTask *)childTask {
