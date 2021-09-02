@@ -155,7 +155,7 @@ public protocol _RealmMapValue {
 
      - parameter deletions:     The indices in the previous version of the collection which were removed from this one.
      - parameter insertions:    The indices in the new collection which were added in this version.
-     - parameter modifications: The indices of the objects in the new collection which were modified in this version.
+     - parameter modifications: The indices of the objects which were modified in the previous version of this collection.
      */
     case update(CollectionType, deletions: [Int], insertions: [Int], modifications: [Int])
 
