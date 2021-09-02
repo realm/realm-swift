@@ -2946,7 +2946,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
     }
 
     func testAsyncOpenDownloadBehaviorNever() async throws {
-        // this test will test how the `once` behavior responds
+        // this test will test how the `never` behavior responds
         // on first open and second open. a different child process
         // will spawn to test the opening kind. on second open,
         // it should not download the latest dataset
