@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add additional `observe` methods for Objects and RealmCollections which take a `PartialKeyPath` type key path parameter.
 
 ### Fixed
 * `Map<Key, Value>` did not conform to `Codable`. ([Cocoa #7418](https://github.com/realm/realm-cocoa/pull/7418), since v10.8.0)
