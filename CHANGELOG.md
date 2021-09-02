@@ -11,7 +11,7 @@ x.y.z Release notes (yyyy-MM-dd)
   client recieved an AddColumn instruction from the server for an AnyRealmValue
   property when that property already exists locally. ([Core #4873](https://github.com/realm/realm-core/issues/4873), since v10.8.0)
 * Fix crash in `RLMSyncConfiguration.initWithUser` error mapping when a user is disabled/deleted from MongoDB Realm dashboard.
-  ([Cocoa #7399](https://github.com/realm/realm-cocoa/issues/7399)
+  ([Cocoa #7399](https://github.com/realm/realm-cocoa/issues/7399), since v10.0.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
