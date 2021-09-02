@@ -68,6 +68,7 @@ class SwiftUISyncTestHostUITests: XCTestCase {
     }
 
     override func tearDown() {
+        logoutAllUsers()
         application.terminate()
         resetSyncManager()
         super.tearDown()
@@ -122,9 +123,18 @@ extension SwiftUISyncTestHostUITests {
                     ex.fulfill()
                 }
             }
+
+            // Sessions are removed from the user asynchronously after a logout.
+            // We need to wait for this to happen before calling resetForTesting as
+            // that expects all sessions to be cleaned up first.
+            if user.allSessions.count > 0 {
+                exArray.append(expectation(for: NSPredicate(format: "allSessions.@count == 0"), evaluatedWith: user, handler: nil))
+            }
         }
 
-        wait(for: exArray, timeout: 60.0)
+        if exArray.count > 0 {
+            wait(for: exArray, timeout: 60.0)
+        }
     }
 
     private func createUsers(email: String, password: String, n: Int) throws -> User {
@@ -204,6 +214,12 @@ extension SwiftUISyncTestHostUITests {
         let syncButtonView = application.buttons["sync_button"]
         XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
         syncButtonView.tap()
+    }
+
+    func logoutAllUsers() {
+        let loginButton = application.buttons["logout_users_button"]
+        XCTAssertTrue(loginButton.waitForExistence(timeout: 2))
+        loginButton.tap()
     }
 
     public func randomString(_ length: Int) -> String {
@@ -311,14 +327,11 @@ extension SwiftUISyncTestHostUITests {
         XCTAssertEqual(table.cells.count, 1)
     }
     
-    func testAsyncOpenMultiUserWithLogout() throws {
+    func testAsyncOpenAndLogout() throws {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         _ = try createUsers(email: email, password: password, n: 2)
-        let email2 = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
-        _ = try createUsers(email: email2, password: password, n: 3)
 
         application.launchEnvironment["email1"] = email
-        application.launchEnvironment["email2"] = email2
         application.launchEnvironment["password"] = password
         application.launchEnvironment["async_view_type"] = "async_open_environment_partition"
         application.launchEnvironment["app_id"] = appId
@@ -335,16 +348,8 @@ extension SwiftUISyncTestHostUITests {
         XCTAssertTrue(logoutButtonView.waitForExistence(timeout: 2))
         logoutButtonView.tap()
 
-        loginUser(.second)
-
-        // Query for button to start syncing
-        let syncButtonView = application.buttons["sync_button"]
-        XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
-        syncButtonView.tap()
-
-        // Test show ListView after logging new user
-        XCTAssertTrue(table.waitForExistence(timeout: 6))
-        XCTAssertEqual(table.cells.count, 3)
+        let waitingUserView = application.staticTexts["waiting_user_view"]
+        XCTAssertTrue(waitingUserView.waitForExistence(timeout: 2))
     }
 }
 
@@ -448,14 +453,11 @@ extension SwiftUISyncTestHostUITests {
         XCTAssertEqual(table.cells.count, 1)
     }
 
-    func testAutoOpenMultiUserWithLogout() throws {
+    func testAutoOpenAndLogout() throws {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         _ = try createUsers(email: email, password: password, n: 2)
-        let email2 = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
-        _ = try createUsers(email: email2, password: password, n: 3)
 
         application.launchEnvironment["email1"] = email
-        application.launchEnvironment["email2"] = email2
         application.launchEnvironment["password"] = password
         application.launchEnvironment["async_view_type"] = "auto_open_environment_partition"
         application.launchEnvironment["app_id"] = appId
@@ -472,15 +474,7 @@ extension SwiftUISyncTestHostUITests {
         XCTAssertTrue(logoutButtonView.waitForExistence(timeout: 2))
         logoutButtonView.tap()
 
-        loginUser(.second)
-
-        // Query for button to start syncing
-        let syncButtonView = application.buttons["sync_button"]
-        XCTAssertTrue(syncButtonView.waitForExistence(timeout: 2))
-        syncButtonView.tap()
-
-        // Test show ListView after logging new user
-        XCTAssertTrue(table.waitForExistence(timeout: 6))
-        XCTAssertEqual(table.cells.count, 3)
+        let waitingUserView = application.staticTexts["waiting_user_view"]
+        XCTAssertTrue(waitingUserView.waitForExistence(timeout: 2))
     }
 }

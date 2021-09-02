@@ -140,6 +140,10 @@ struct LoginView: View {
                 loginHelper.logout()
             }
             .accessibilityIdentifier("logout_button")
+            Button("Logout All Users") {
+                loginHelper.logoutAllUsers()
+            }
+            .accessibilityIdentifier("logout_users_button")
         }
     }
 }
@@ -172,6 +176,17 @@ class LoginHelper: ObservableObject {
                                          localAppVersion: nil)
         let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
         app.currentUser?.logOut { _ in }
+    }
+
+    func logoutAllUsers() {
+        let appConfig = AppConfiguration(baseURL: "http://localhost:9090",
+                                         transport: nil,
+                                         localAppName: nil,
+                                         localAppVersion: nil)
+        let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
+        for (_, user) in app.allUsers {
+            user.logOut { _ in }
+        }
     }
 }
 
