@@ -253,6 +253,9 @@ extension Realm {
 
         internal var rlmConfiguration: RLMRealmConfiguration {
             let configuration = RLMRealmConfiguration()
+            if let syncConfiguration = syncConfiguration {
+                configuration.syncConfiguration = syncConfiguration.asConfig()
+            }
             if let fileURL = fileURL {
                 configuration.fileURL = fileURL
             } else if let inMemoryIdentifier = inMemoryIdentifier {
@@ -273,10 +276,6 @@ extension Realm {
             configuration.setCustomSchemaWithoutCopying(self.customSchema)
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
             configuration.maximumNumberOfActiveVersions = self.maximumNumberOfActiveVersions ?? 0
-
-            if let syncConfiguration = syncConfiguration {
-                configuration.syncConfiguration = syncConfiguration.asConfig()
-            }
             return configuration
         }
 

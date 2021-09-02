@@ -795,7 +795,7 @@ private enum AsyncOpenType {
 private class ObservableAsyncOpenStorage: ObservableObject {
     private var asyncOpenType: AsyncOpenType
     private var app: App
-    var configuration: Realm.Configuration
+    var configuration: Realm.Configuration?
     var partitionValue: AnyBSON
 
     // Tracks User State for App for Multi-User Support
@@ -832,14 +832,18 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 
     private func asyncOpenForUser(_ user: User) {
         asyncOpenState = .connecting
-        let userConfig = user.configuration(partitionValue: partitionValue, cancelAsyncOpenOnNonFatalErrors: true)
-        let userSyncConfig = userConfig.syncConfiguration
-        var configuration = configuration
-        configuration.syncConfiguration = userSyncConfig
+
+        // Use the user configuration by default or set configuration with current user `syncConfiguration`.
+        var config = user.configuration(partitionValue: partitionValue, cancelAsyncOpenOnNonFatalErrors: true)
+        if var configuration = configuration {
+            let userSyncConfig = config.syncConfiguration
+            configuration.syncConfiguration = userSyncConfig
+            config = configuration
+        }
 
         // Cancel any current subscriptions to asyncOpen if there is one
         cancelAsyncOpen()
-        return Realm.asyncOpen(configuration: configuration)
+        return Realm.asyncOpen(configuration: config)
             .onProgressNotification { asyncProgress in
                 let progress = Progress(totalUnitCount: Int64(asyncProgress.transferredBytes))
                 progress.completedUnitCount = Int64(asyncProgress.transferredBytes)
@@ -853,7 +857,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
                     case .autoOpen:
                         if let error = error as NSError?,
                            error.code == Int(ETIMEDOUT) && error.domain == NSPOSIXErrorDomain,
-                           let realm = try? Realm(configuration: self.configuration) {
+                           let realm = try? Realm(configuration: config) {
                             self.asyncOpenState = .open(realm)
                         } else {
                             self.asyncOpenState = .error(error)
@@ -876,7 +880,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         appCancellable = []
     }
 
-    init(asyncOpenType: AsyncOpenType, app: App, configuration: Realm.Configuration, partitionValue: AnyBSON) {
+    init(asyncOpenType: AsyncOpenType, app: App, configuration: Realm.Configuration?, partitionValue: AnyBSON) {
         self.asyncOpenType = asyncOpenType
         self.app = app
         self.configuration = configuration
@@ -921,6 +925,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
         } else {
             throwRealmException("Cannot AsyncOpen the Realm because no appId was found. You must either explicitly pass an appId or initialize an App before displaying your View.")
         }
+
         // Setup timeout if needed
         if let timeout = timeout {
             let syncTimeoutOptions = SyncTimeoutOptions()
@@ -1002,13 +1007,13 @@ private class ObservableAsyncOpenStorage: ObservableObject {
      - parameter partitionValue: The `BSON` value the Realm is partitioned on.
      - parameter configuration: The `Realm.Configuration` used when creating the Realm,
                  user's sync configuration for the given partition value will be set as the `syncConfiguration`,
-                 if empty the configuration is set to the `defaultConfiguration`
+                 if empty the user configuration will be used.
      - parameter timeout: The maximum number of milliseconds to allow for a connection to
                  become fully established., if empty or `nil` no connection timeout is set.
      */
     public init(appId: String? = nil,
                 partitionValue: Partition,
-                configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration,
+                configuration: Realm.Configuration? = nil,
                 timeout: UInt? = nil) {
         let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
@@ -1024,7 +1029,9 @@ private class ObservableAsyncOpenStorage: ObservableObject {
             }
         }
 
-        if storage.configuration != configuration {
+        // We don't want to use the `defaultConfiguration` from the environment, we only want to use this environment value in @AsyncOpen if is not the default one
+        if configuration != .defaultConfiguration,
+           storage.configuration != configuration {
             if let partitionValue = configuration.syncConfiguration?.partitionValue {
                 storage.partitionValue = partitionValue
             }
@@ -1108,13 +1115,13 @@ private class ObservableAsyncOpenStorage: ObservableObject {
      - parameter partitionValue: The `BSON` value the Realm is partitioned on.
      - parameter configuration: The `Realm.Configuration` used when creating the Realm,
                  user's sync configuration for the given partition value will be set as the `syncConfiguration`,
-                 if empty the configuration is set to the `defaultConfiguration`.
+                 if empty the user configuration will be used.
      - parameter timeout: The maximum number of milliseconds to allow for a connection to
                  become fully established, if empty or `nil` no connection timeout is set.
      */
     public init(appId: String? = nil,
                 partitionValue: Partition,
-                configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration,
+                configuration: Realm.Configuration? = nil,
                 timeout: UInt? = nil) {
         let app = ObservableAsyncOpenStorage.configureApp(appId: appId, withTimeout: timeout)
         // Store property wrapper values on the storage
@@ -1130,7 +1137,9 @@ private class ObservableAsyncOpenStorage: ObservableObject {
             }
         }
 
-        if storage.configuration != configuration {
+        // We don't want to use the `defaultConfiguration` from the environment, we only want to use this environment value in @AsyncOpen if is not the default one
+        if configuration != .defaultConfiguration,
+           storage.configuration != configuration {
             if let partitionValue = configuration.syncConfiguration?.partitionValue {
                 storage.partitionValue = partitionValue
             }
