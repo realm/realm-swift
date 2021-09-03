@@ -709,7 +709,7 @@ extension ThreadSafeWrapperTests {
         @ThreadSafe var results = realm.objects(SwiftStringObject.self)
         dispatchSyncNewThread {
             guard let results = results else {
-                return XCTFail()
+                return XCTFail("no results")
             }
             results.indices.forEach { idx in
                 XCTAssertEqual(results[idx].stringCol, values[idx])
@@ -718,7 +718,7 @@ extension ThreadSafeWrapperTests {
         @ThreadSafe var swiftStringObject = results!.first
         dispatchSyncNewThread {
             guard let swiftStringObject = swiftStringObject else {
-                return XCTFail()
+                return XCTFail("no results")
             }
 
             XCTAssertEqual(swiftStringObject.stringCol, "A")
