@@ -1052,7 +1052,7 @@ extension SwiftUIKVO {
     }
 }
 #else
-@objc(RLMSwiftUIKVO) internal final class SwiftUIKVO {
+@objc(RLMSwiftUIKVO) internal final class SwiftUIKVO: NSObject {
     @objc(removeObserversFromObject:) public static func removeObservers(object: NSObject) -> Bool {
         return false
     }
