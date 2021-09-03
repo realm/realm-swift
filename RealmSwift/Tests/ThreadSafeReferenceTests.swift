@@ -331,6 +331,7 @@ class ThreadSafeReferenceTests: TestCase {
     }
 }
 
+// MARK: TestThreadSafeWrappersStruct
 struct TestThreadSafeWrapperStruct {
     @ThreadSafe var stringObject: SwiftStringObject?
     @ThreadSafe var intObject: SwiftIntObject?
@@ -344,6 +345,7 @@ struct TestThreadSafeWrapperStruct {
     @ThreadSafe var arcSet: AnyRealmCollection<SwiftEmployeeObject>?
 }
 
+// MARK: ThreadSafeWrapperTests
 class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
     func wrapperStruct() -> TestThreadSafeWrapperStruct {
         let realm = try! Realm()
@@ -688,3 +690,39 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
         }
     }
 }
+
+#if swift(>=5.5)
+extension ThreadSafeWrapperTests {
+    func testThreadSafeWrapperInline() throws {
+        let values = ["A", "B", "C", "D"]
+        try autoreleasepool {
+            let realm = try Realm()
+            try realm.write {
+                realm.create(SwiftStringObject.self, value: ["A"])
+                realm.create(SwiftStringObject.self, value: ["B"])
+                realm.create(SwiftStringObject.self, value: ["C"])
+                realm.create(SwiftStringObject.self, value: ["D"])
+            }
+        }
+
+        let realm = try! Realm()
+        @ThreadSafe var results = realm.objects(SwiftStringObject.self)
+        dispatchSyncNewThread {
+            guard let results = results else {
+                return XCTFail()
+            }
+            results.indices.forEach { idx in
+                XCTAssertEqual(results[idx].stringCol, values[idx])
+            }
+        }
+        @ThreadSafe var swiftStringObject = results!.first
+        dispatchSyncNewThread {
+            guard let swiftStringObject = swiftStringObject else {
+                return XCTFail()
+            }
+
+            XCTAssertEqual(swiftStringObject.stringCol, "A")
+        }
+    }
+}
+#endif

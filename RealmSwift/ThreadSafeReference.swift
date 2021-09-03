@@ -139,13 +139,14 @@ public protocol ThreadConfined {
  - see: `ThreadConfined`
 */
 @propertyWrapper public class ThreadSafe<T: ThreadConfined> {
-    var threadSafeReference: ThreadSafeReference<T>?
-    var rlmConfiguration: RLMRealmConfiguration?
+    private var threadSafeReference: ThreadSafeReference<T>?
+    private var rlmConfiguration: RLMRealmConfiguration?
 
     /// :nodoc:
     public var wrappedValue: T? {
         get {
-            guard let threadSafeReference = threadSafeReference, let rlmConfig = rlmConfiguration else { return nil }
+            guard let threadSafeReference = threadSafeReference,
+                  let rlmConfig = rlmConfiguration else { return nil }
             do {
                 let rlmRealm = try RLMRealm(configuration: rlmConfig)
                 let realm = Realm(rlmRealm)
@@ -157,7 +158,8 @@ public protocol ThreadConfined {
                 return value
             // FIXME: wrappedValue should throw
             // As of Swift 5.5 property wrappers can't have throwing accessors.
-            } catch let error as NSError { throwRealmException(error.localizedDescription) }
+            } catch let error as NSError { throwRealmException(error.localizedDescription)
+            }
         }
         set {
             guard let newValue = newValue else {
