@@ -1,20 +1,24 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.14.0 Release notes (2021-09-03)
 =============================================================
+
 ### Enhancements
-* Add additional `observe` methods for Objects and RealmCollections which take a `PartialKeyPath` type key path parameter.
-* The release package once again contains Xcode 13 binaries for iOS.
+
+* Add additional `observe` methods for Objects and RealmCollections which take
+  a `PartialKeyPath` type key path parameter.
+* The release package once again contains Xcode 13 binaries.
 * `PersistableEnum` properties can now be indexed or used as the primary key if
   the RawValue is an indexable or primary key type.
 
 ### Fixed
-* `Map<Key, Value>` did not conform to `Codable`. ([Cocoa #7418](https://github.com/realm/realm-cocoa/pull/7418), since v10.8.0)
+
+* `Map<Key, Value>` did not conform to `Codable`.
+  ([Cocoa #7418](https://github.com/realm/realm-cocoa/pull/7418), since v10.8.0)
 * Fixed "Invalid data type" assertion failure in the sync client when the
   client recieved an AddColumn instruction from the server for an AnyRealmValue
   property when that property already exists locally. ([Core #4873](https://github.com/realm/realm-core/issues/4873), since v10.8.0)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.5.1.
@@ -22,7 +26,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 12.2-13.0 beta 5.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from 11.3.0 to 11.3.1.
 
 10.13.0 Release notes (2021-08-26)
 =============================================================
