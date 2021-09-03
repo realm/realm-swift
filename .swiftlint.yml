@@ -21,6 +21,7 @@ identifier_name:
     - _observe(_:_:)
     - _observe(_:_:_:)
     - _observe(_:on:_:)
+    - _publisher
     - _realmColumnNames()
     - _realmObjectName()
     - _rlmCollection

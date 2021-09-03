@@ -334,25 +334,26 @@ class SwiftUITests: TestCase {
     }
 
     func testStateRealmObjectKVO() throws {
-        @StateRealmObject var object = SwiftUIObject()
+        let object = StateRealmObject(wrappedValue: SwiftUIObject())
         var hit = 0
-        let cancellable = _object._publisher
+
+        let cancellable = object._publisher
             .sink { _ in
             } receiveValue: { _ in
                 hit += 1
             }
         XCTAssertEqual(hit, 0)
-        object.int += 1
+        object.wrappedValue.int += 1
         XCTAssertEqual(hit, 1)
-        XCTAssertNotNil(object.observationInfo)
+        XCTAssertNotNil(object.wrappedValue.observationInfo)
         let realm = try Realm()
         try realm.write {
-            realm.add(object)
+            realm.add(object.wrappedValue)
         }
         XCTAssertEqual(hit, 1)
-        XCTAssertNil(object.observationInfo)
+        XCTAssertNil(object.wrappedValue.observationInfo)
         try realm.write {
-            object.thaw()!.int += 1
+            object.wrappedValue.thaw()!.int += 1
         }
         XCTAssertEqual(hit, 2)
         cancellable.cancel()
