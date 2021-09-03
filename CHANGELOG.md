@@ -2,6 +2,7 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add additional `observe` methods for Objects and RealmCollections which take a `PartialKeyPath` type key path parameter.
+* The release package once again contains Xcode 13 binaries for iOS.
 
 ### Fixed
 * `Map<Key, Value>` did not conform to `Codable`. ([Cocoa #7418](https://github.com/realm/realm-cocoa/pull/7418), since v10.8.0)
