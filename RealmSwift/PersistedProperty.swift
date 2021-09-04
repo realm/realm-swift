@@ -289,9 +289,13 @@ extension Persisted: OptionalCodingWrapper where Value: ExpressibleByNilLiteral 
  }
  ```
 
- If the Realm contains a value which is not a valid member of the enum (such as if it was written by a different sync client which disagrees on which values are valid), optional enum properties will return `nil`, and non-optional properties will abort the process.
+ If the Realm contains a value which is not a valid member of the enum (such as
+ if it was written by a different sync client which disagrees on which values
+ are valid), optional enum properties will return `nil`, and non-optional
+ properties will abort the process.
  */
-public protocol PersistableEnum: _OptionalPersistable, RawRepresentable, CaseIterable, RealmEnum { }
+public protocol PersistableEnum: _OptionalPersistable, RawRepresentable, CaseIterable, RealmEnum {
+}
 
 extension PersistableEnum {
     /// :nodoc:
@@ -304,7 +308,7 @@ extension PersistableEnum {
 /// to it will simply result in runtime errors rather than compile-time errors.
 public protocol _Indexable {}
 
-extension Persisted where Value: _Indexable {
+extension Persisted where Value._RealmValue: _Indexable {
     /// Declares an indexed property which is lazily initialized to the type's default value.
     public init(indexed: Bool) {
         storage = .unmanagedNoDefault(indexed: indexed)
@@ -321,7 +325,7 @@ extension Persisted where Value: _Indexable {
 /// to it will simply result in runtime errors rather than compile-time errors.
 public protocol _PrimaryKey {}
 
-extension Persisted where Value: _PrimaryKey {
+extension Persisted where Value._RealmValue: _PrimaryKey {
     /// Declares the primary key property which is lazily initialized to the type's default value.
     public init(primaryKey: Bool) {
         storage = .unmanagedNoDefault(primary: primaryKey)

@@ -264,6 +264,22 @@ class ModernPrimaryOptionalObjectIdObject: Object, ModernPrimaryKeyObject {
     @Persisted(primaryKey: true) var pk: ObjectId?
 }
 
+class ModernPrimaryIntEnumObject: Object, ModernPrimaryKeyObject {
+    @Persisted(primaryKey: true) var pk: ModernIntEnum
+}
+
+class ModernPrimaryOptionalIntEnumObject: Object, ModernPrimaryKeyObject {
+    @Persisted(primaryKey: true) var pk: ModernIntEnum?
+}
+
+class ModernIndexedIntEnumObject: Object {
+    @Persisted(indexed: true) var value: ModernIntEnum
+}
+
+class ModernIndexedOptionalIntEnumObject: Object {
+    @Persisted(indexed: true) var value: ModernIntEnum?
+}
+
 class ModernCustomInitializerObject: Object {
     @Persisted var stringCol: String
 
@@ -384,4 +400,56 @@ class ObjectWithArcMethodCategoryNames: Object {
     @Persisted var copyValue: String
     @Persisted var mutableCopyValue: String
     @Persisted var initValue: String
+}
+
+class ModernAllIndexableTypesObject: Object {
+    @Persisted(indexed: true) var boolCol: Bool
+    @Persisted(indexed: true) var intCol: Int
+    @Persisted(indexed: true) var int8Col: Int8 = 1
+    @Persisted(indexed: true) var int16Col: Int16 = 2
+    @Persisted(indexed: true) var int32Col: Int32 = 3
+    @Persisted(indexed: true) var int64Col: Int64 = 4
+    @Persisted(indexed: true) var stringCol: String
+    @Persisted(indexed: true) var dateCol: Date
+    @Persisted(indexed: true) var objectIdCol: ObjectId
+    @Persisted(indexed: true) var intEnumCol: ModernIntEnum
+    @Persisted(indexed: true) var stringEnumCol: ModernStringEnum
+
+    @Persisted(indexed: true) var optIntCol: Int?
+    @Persisted(indexed: true) var optInt8Col: Int8?
+    @Persisted(indexed: true) var optInt16Col: Int16?
+    @Persisted(indexed: true) var optInt32Col: Int32?
+    @Persisted(indexed: true) var optInt64Col: Int64?
+    @Persisted(indexed: true) var optBoolCol: Bool?
+    @Persisted(indexed: true) var optStringCol: String?
+    @Persisted(indexed: true) var optDateCol: Date?
+    @Persisted(indexed: true) var optObjectIdCol: ObjectId?
+    @Persisted(indexed: true) var optIntEnumCol: ModernIntEnum?
+    @Persisted(indexed: true) var optStringEnumCol: ModernStringEnum?
+}
+
+class ModernAllIndexableButNotIndexedObject: Object {
+    @Persisted(indexed: false) var boolCol: Bool
+    @Persisted(indexed: false) var intCol: Int
+    @Persisted(indexed: false) var int8Col: Int8 = 1
+    @Persisted(indexed: false) var int16Col: Int16 = 2
+    @Persisted(indexed: false) var int32Col: Int32 = 3
+    @Persisted(indexed: false) var int64Col: Int64 = 4
+    @Persisted(indexed: false) var stringCol: String
+    @Persisted(indexed: false) var dateCol: Date
+    @Persisted(indexed: false) var objectIdCol: ObjectId
+    @Persisted(indexed: false) var intEnumCol: ModernIntEnum
+    @Persisted(indexed: false) var stringEnumCol: ModernStringEnum
+
+    @Persisted(indexed: false) var optIntCol: Int?
+    @Persisted(indexed: false) var optInt8Col: Int8?
+    @Persisted(indexed: false) var optInt16Col: Int16?
+    @Persisted(indexed: false) var optInt32Col: Int32?
+    @Persisted(indexed: false) var optInt64Col: Int64?
+    @Persisted(indexed: false) var optBoolCol: Bool?
+    @Persisted(indexed: false) var optStringCol: String?
+    @Persisted(indexed: false) var optDateCol: Date?
+    @Persisted(indexed: false) var optObjectIdCol: ObjectId?
+    @Persisted(indexed: false) var optIntEnumCol: ModernIntEnum?
+    @Persisted(indexed: false) var optStringEnumCol: ModernStringEnum?
 }
