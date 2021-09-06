@@ -3,10 +3,6 @@
 Realm is a mobile database that runs directly inside phones, tablets or wearables.
 This repository holds the source code for the iOS, macOS, tvOS & watchOS versions of Realm Swift & Realm Objective-C.
 
-## Tell us about your experience
-
-**_We want to hear from you! Tell us about your experience using the Realm SDKs in our [short survey](http://bit.ly/3hRO5U2)._**
-
 ## Why Use Realm
 
 * **Intuitive to Developers:** Realm’s object-oriented data model is simple to learn, doesn’t need an ORM, and lets you write less code.

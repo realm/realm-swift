@@ -6,11 +6,8 @@ x.y.z Release notes (yyyy-MM-dd)
   threads.
 
 ### Fixed
-* Fix crash in `MongoCollection.findOneDocument(filter:)` that occurred when no results were
-  found for a given filter.
-* Some of the SwiftUI property wrappers incorrectly required objects to conform
-  to ObjectKeyIdentifiable rather than Identifiable.
-* Work around Xcode 13 beta 3+ shipping a broken swiftinterface file for Combine on 32-bit iOS.
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -19,10 +16,76 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.5.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 12.2-13.0 beta 3.
+* Xcode: 12.2-13.0 beta 5.
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.14.0 Release notes (2021-09-03)
+=============================================================
+
+### Enhancements
+
+* Add additional `observe` methods for Objects and RealmCollections which take
+  a `PartialKeyPath` type key path parameter.
+* The release package once again contains Xcode 13 binaries.
+* `PersistableEnum` properties can now be indexed or used as the primary key if
+  the RawValue is an indexable or primary key type.
+
+### Fixed
+
+* `Map<Key, Value>` did not conform to `Codable`.
+  ([Cocoa #7418](https://github.com/realm/realm-cocoa/pull/7418), since v10.8.0)
+* Fixed "Invalid data type" assertion failure in the sync client when the
+  client recieved an AddColumn instruction from the server for an AnyRealmValue
+  property when that property already exists locally. ([Core #4873](https://github.com/realm/realm-core/issues/4873), since v10.8.0)
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 5.
+
+### Internal
+
+* Upgraded realm-core from 11.3.0 to 11.3.1.
+
+10.13.0 Release notes (2021-08-26)
+=============================================================
+
+### Enhancements
+
+* Sync logs now contain information about what object/changeset was being applied when the exception was thrown. 
+  ([Core #4836](https://github.com/realm/realm-core/issues/4836))
+* Added ServiceErrorCode for wrong username/password when using '`App.login`. 
+  ([Core #7380](https://github.com/realm/realm-cocoa/issues/7380)
+
+### Fixed
+
+* Fix crash in `MongoCollection.findOneDocument(filter:)` that occurred when no results were
+  found for a given filter. 
+  ([Cocoa #7380](https://github.com/realm/realm-cocoa/issues/7380), since v10.0.0)
+* Some of the SwiftUI property wrappers incorrectly required objects to conform
+  to ObjectKeyIdentifiable rather than Identifiable.
+  ([Cocoa #7372](https://github.com/realm/realm-cocoa/issues/7372), since v10.6.0)
+* Work around Xcode 13 beta 3+ shipping a broken swiftinterface file for Combine on 32-bit iOS.
+  ([Cocoa #7368](https://github.com/realm/realm-cocoa/issues/7368))
+* Fixes history corruption when replacing an embedded object in a list.
+  ([Core #4845](https://github.com/realm/realm-core/issues/4845)), since v10.0.0)
+
+### Compatibility
+
+* Realm Studio: 11.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 12.5.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 12.2-13.0 beta 5.
+
+### Internal
+
+* Upgraded realm-core from 11.2.0 to 11.3.0
 
 10.12.0 Release notes (2021-08-03)
 =============================================================
