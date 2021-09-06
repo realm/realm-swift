@@ -16,8 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 import XCTest
-@testable import RealmSwift
-
+import RealmSwift
 %{
     # How to use:
     #
@@ -25,7 +24,7 @@ import XCTest
     # $ wget https://github.com/apple/swift/raw/main/utils/gyb.py
     # $ chmod +x gyb
     #
-    # ./YOUR_GYB_LOCATION/gyb --line-directive '' -o QueryTests2.swift QueryTests.gyb.swift
+    # ./YOUR_GYB_LOCATION/gyb --line-directive '' -o QueryTests.swift QueryTests.gyb.swift
 }%
 %{
     import sys
@@ -39,6 +38,19 @@ import XCTest
             self.type = type
             self.category = category
             self.enumName = enumName
+
+        def foundationValue(self, index):
+          if self.category == 'any':
+            return self.values[index][1]
+          else:
+            return self.values[index]
+
+        def value(self, index):
+          if self.category == 'any':
+            return 'AnyRealmValue' + self.values[index][0] + '(' + str(self.values[index][1]) + ')'
+          else:
+            return self.values[index]
+
 
     properties = [
         Property('boolCol', ['true', 'false'], 'Bool', 'bool'),
@@ -93,7 +105,7 @@ import XCTest
         Property('arrayDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128', 'numeric'),
         Property('arrayObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId', 'objectId'),
         Property('arrayUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID', 'uuid'),
-        Property('arrayAny', ['AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))', 'AnyRealmValue.string("Hello")', 'AnyRealmValue.int(123)'], 'AnyRealmValue', 'any'),
+        Property('arrayAny', [['.objectId', 'ObjectId("61184062c1d8f096a3695046")'], ['.string', '"Hello"'], ['.int', 123]], 'AnyRealmValue', 'any'),
     ]
 
     optListProperties = [
@@ -128,7 +140,7 @@ import XCTest
         Property('setDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128', 'numeric'),
         Property('setObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId', 'objectId'),
         Property('setUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID', 'uuid'),
-        Property('setAny', ['AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))', 'AnyRealmValue.string("Hello")', 'AnyRealmValue.int(123)'], 'AnyRealmValue', 'any'),
+        Property('setAny', [['.objectId', 'ObjectId("61184062c1d8f096a3695046")'], ['.string', '"Hello"'], ['.int', 123]], 'AnyRealmValue', 'any'),
     ]
 
     optSetProperties = [
@@ -146,6 +158,41 @@ import XCTest
         Property('setOptDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128?', 'numeric'),
         Property('setOptUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID?', 'uuid'),
         Property('setOptObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId?', 'objectId'),
+    ]
+
+    mapProperties = [
+        Property('mapBool', ['true', 'false', 'false'], 'Bool', 'bool'),
+        Property('mapInt', [1, 2, 3], 'Int', 'numeric'),
+        Property('mapInt8', ['Int8(8)', 'Int8(9)', 'Int8(10)'], 'Int8', 'numeric'),
+        Property('mapInt16', ['Int16(16)', 'Int16(17)', 'Int16(18)'], 'Int16', 'numeric'),
+        Property('mapInt32', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32', 'numeric'),
+        Property('mapInt64', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64', 'numeric'),
+        Property('mapFloat', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float', 'numeric'),
+        Property('mapDouble', [123.456, 234.456, 345.567], 'Double', 'numeric'),
+        Property('mapString', ['"Foo"', '"Bar"', '"Baz"'], 'String', 'string'),
+        Property('mapBinary', ['Data(count: 64)', 'Data(count: 128)', 'Data(count: 256)'], 'Data', 'binary'),
+        Property('mapDate', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date', 'numeric'),
+        Property('mapDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128', 'numeric'),
+        Property('mapObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId', 'objectId'),
+        Property('mapUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID', 'uuid'),
+        Property('mapAny', [['.objectId', 'ObjectId("61184062c1d8f096a3695046")'], ['.string', '"Hello"'], ['.int', 123]], 'AnyRealmValue', 'any'),
+    ]
+
+    optMapProperties = [
+        Property('mapOptBool', ['true', 'false', 'false'], 'Bool?', 'bool'),
+        Property('mapOptInt', [1, 2, 3], 'Int?', 'numeric'),
+        Property('mapOptInt8', ['Int8(8)', 'Int8(9)', 'Int8(10)'], 'Int8?', 'numeric'),
+        Property('mapOptInt16', ['Int16(16)', 'Int16(17)', 'Int16(18)'], 'Int16?', 'numeric'),
+        Property('mapOptInt32', ['Int32(32)', 'Int32(33)', 'Int32(34)'], 'Int32?', 'numeric'),
+        Property('mapOptInt64', ['Int64(64)', 'Int64(65)', 'Int64(66)'], 'Int64?', 'numeric'),
+        Property('mapOptFloat', ['Float(5.55444333)', 'Float(6.55444333)', 'Float(7.55444333)'], 'Float?', 'numeric'),
+        Property('mapOptDouble', [123.456, 234.456, 345.567], 'Double?', 'numeric'),
+        Property('mapOptString', ['"Foo"', '"Bar"', '"Baz"'], 'String?', 'string'),
+        Property('mapOptBinary', ['Data(count: 64)', 'Data(count: 128)', 'Data(count: 256)'], 'Data?', 'binary'),
+        Property('mapOptDate', ['Date(timeIntervalSince1970: 1000000)', 'Date(timeIntervalSince1970: 2000000)', 'Date(timeIntervalSince1970: 3000000)'], 'Date?', 'numeric'),
+        Property('mapOptDecimal', ['Decimal128(123.456)', 'Decimal128(456.789)', 'Decimal128(963.852)'], 'Decimal128?', 'numeric'),
+        Property('mapOptUuid', ['UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!', 'UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!'], 'UUID?', 'uuid'),
+        Property('mapOptObjectId', ['ObjectId("61184062c1d8f096a3695046")', 'ObjectId("61184062c1d8f096a3695045")', 'ObjectId("61184062c1d8f096a3695044")'], 'ObjectId?', 'objectId'),
     ]
 
     anyRealmValues = [
@@ -209,15 +256,20 @@ class QueryTests: TestCase {
             let object = ModernAllTypesObject()
 
             % for property in properties + optProperties:
-            object.${property.colName} = ${property.values[1]}
+            object.${property.colName} = ${property.value(1)}
             % end
 
             % for property in listProperties + optListProperties:
-            object.${property.colName}.append(objectsIn: [${property.values[0]}, ${property.values[1]}])
+            object.${property.colName}.append(objectsIn: [${property.value(0)}, ${property.value(1)}])
             % end
 
             % for property in setProperties + optSetProperties:
-            object.${property.colName}.insert(objectsIn: [${property.values[0]}, ${property.values[1]}])
+            object.${property.colName}.insert(objectsIn: [${property.value(0)}, ${property.value(1)}])
+            % end
+
+            % for property in mapProperties + optMapProperties:
+            object.${property.colName}["foo"] = ${property.value(0)}
+            object.${property.colName}["bar"] = ${property.value(1)}
             % end
 
             realm.add(object)
@@ -231,7 +283,7 @@ class QueryTests: TestCase {
         let results = objects().query(query)
         XCTAssertEqual(results.count, expectedCount)
 
-        let constructedPredicate = query(Query<ModernAllTypesObject>()).constructPredicate()
+        let constructedPredicate = query(Query<ModernAllTypesObject>())._constructPredicate()
         XCTAssertEqual(constructedPredicate.0,
                        predicate)
 
@@ -250,11 +302,11 @@ class QueryTests: TestCase {
         // ${property.colName}
         % if property.enumName != None:
         assertQuery(predicate: "${property.colName} == %@", values: [${property.enumName}], expectedCount: 1) {
-            $0.${property.colName} == ${property.values[1]}
+            $0.${property.colName} == ${property.value(1)}
         }
         % else:
-        assertQuery(predicate: "${property.colName} == %@", values: [${property.values[1]}], expectedCount: 1) {
-            $0.${property.colName} == ${property.values[1]}
+        assertQuery(predicate: "${property.colName} == %@", values: [${property.foundationValue(1)}], expectedCount: 1) {
+            $0.${property.colName} == ${property.value(1)}
         }
         % end
         % end
@@ -267,11 +319,11 @@ class QueryTests: TestCase {
 
         % if property.enumName != None:
         assertQuery(predicate: "${property.colName} == %@", values: [${property.enumName}], expectedCount: 1) {
-            $0.${property.colName} == ${property.values[1]}
+            $0.${property.colName} == ${property.value(1)}
         }
         % else:
-        assertQuery(predicate: "${property.colName} == %@", values: [${property.values[1]}], expectedCount: 1) {
-            $0.${property.colName} == ${property.values[1]}
+        assertQuery(predicate: "${property.colName} == %@", values: [${property.foundationValue(1)}], expectedCount: 1) {
+            $0.${property.colName} == ${property.value(1)}
         }
         % end
         % end
@@ -340,8 +392,8 @@ class QueryTests: TestCase {
             $0.${property.colName} != ${property.values[1]}
         }
         % else:
-        assertQuery(predicate: "${property.colName} != %@", values: [${property.values[1]}], expectedCount: 0) {
-            $0.${property.colName} != ${property.values[1]}
+        assertQuery(predicate: "${property.colName} != %@", values: [${property.foundationValue(1)}], expectedCount: 0) {
+            $0.${property.colName} != ${property.value(1)}
         }
         % end
         % end
@@ -353,11 +405,11 @@ class QueryTests: TestCase {
 
         % if property.enumName != None:
         assertQuery(predicate: "${property.colName} != %@", values: [${property.enumName}], expectedCount: 0) {
-            $0.${property.colName} != ${property.values[1]}
+            $0.${property.colName} != ${property.value(1)}
         }
         % else:
-        assertQuery(predicate: "${property.colName} != %@", values: [${property.values[1]}], expectedCount: 0) {
-            $0.${property.colName} != ${property.values[1]}
+        assertQuery(predicate: "${property.colName} != %@", values: [${property.foundationValue(1)}], expectedCount: 0) {
+            $0.${property.colName} != ${property.value(1)}
         }
         % end
         % end
@@ -422,18 +474,18 @@ class QueryTests: TestCase {
         % if property.enumName != None and property.category == 'numeric':
         // ${property.colName}
         assertQuery(predicate: "${property.colName} > %@", values: [${property.enumName}], expectedCount: 0) {
-            $0.${property.colName} > ${property.values[1]}
+            $0.${property.colName} > ${property.value(1)}
         }
         assertQuery(predicate: "${property.colName} >= %@", values: [${property.enumName}], expectedCount: 1) {
-            $0.${property.colName} >= ${property.values[1]}
+            $0.${property.colName} >= ${property.value(1)}
         }
         % elif property.category == 'numeric':
         // ${property.colName}
-        assertQuery(predicate: "${property.colName} > %@", values: [${property.values[1]}], expectedCount: 0) {
-            $0.${property.colName} > ${property.values[1]}
+        assertQuery(predicate: "${property.colName} > %@", values: [${property.foundationValue(1)}], expectedCount: 0) {
+            $0.${property.colName} > ${property.value(1)}
         }
-        assertQuery(predicate: "${property.colName} >= %@", values: [${property.values[1]}], expectedCount: 1) {
-            $0.${property.colName} >= ${property.values[1]}
+        assertQuery(predicate: "${property.colName} >= %@", values: [${property.foundationValue(1)}], expectedCount: 1) {
+            $0.${property.colName} >= ${property.value(1)}
         }
         % end
         % end
@@ -451,11 +503,11 @@ class QueryTests: TestCase {
         }
         % elif property.category == 'numeric':
         // ${property.colName}
-        assertQuery(predicate: "${property.colName} > %@", values: [${property.values[1]}], expectedCount: 0) {
-            $0.${property.colName} > ${property.values[1]}
+        assertQuery(predicate: "${property.colName} > %@", values: [${property.foundationValue(1)}], expectedCount: 0) {
+            $0.${property.colName} > ${property.value(1)}
         }
-        assertQuery(predicate: "${property.colName} >= %@", values: [${property.values[1]}], expectedCount: 1) {
-            $0.${property.colName} >= ${property.values[1]}
+        assertQuery(predicate: "${property.colName} >= %@", values: [${property.foundationValue(1)}], expectedCount: 1) {
+            $0.${property.colName} >= ${property.value(1)}
         }
         % end
         % end
@@ -501,18 +553,18 @@ class QueryTests: TestCase {
         % if property.enumName != None and property.category == 'numeric':
         // ${property.colName}
         assertQuery(predicate: "${property.colName} < %@", values: [${property.enumName}], expectedCount: 0) {
-            $0.${property.colName} < ${property.values[1]}
+            $0.${property.colName} < ${property.value(1)}
         }
         assertQuery(predicate: "${property.colName} <= %@", values: [${property.enumName}], expectedCount: 1) {
-            $0.${property.colName} <= ${property.values[1]}
+            $0.${property.colName} <= ${property.value(1)}
         }
         % elif property.category == 'numeric':
         // ${property.colName}
-        assertQuery(predicate: "${property.colName} < %@", values: [${property.values[1]}], expectedCount: 0) {
-            $0.${property.colName} < ${property.values[1]}
+        assertQuery(predicate: "${property.colName} < %@", values: [${property.foundationValue(1)}], expectedCount: 0) {
+            $0.${property.colName} < ${property.value(1)}
         }
-        assertQuery(predicate: "${property.colName} <= %@", values: [${property.values[1]}], expectedCount: 1) {
-            $0.${property.colName} <= ${property.values[1]}
+        assertQuery(predicate: "${property.colName} <= %@", values: [${property.foundationValue(1)}], expectedCount: 1) {
+            $0.${property.colName} <= ${property.value(1)}
         }
         % end
         % end
@@ -530,11 +582,11 @@ class QueryTests: TestCase {
         }
         % elif property.category == 'numeric':
         // ${property.colName}
-        assertQuery(predicate: "${property.colName} < %@", values: [${property.values[1]}], expectedCount: 0) {
-            $0.${property.colName} < ${property.values[1]}
+        assertQuery(predicate: "${property.colName} < %@", values: [${property.foundationValue(1)}], expectedCount: 0) {
+            $0.${property.colName} < ${property.value(1)}
         }
-        assertQuery(predicate: "${property.colName} <= %@", values: [${property.values[1]}], expectedCount: 1) {
-            $0.${property.colName} <= ${property.values[1]}
+        assertQuery(predicate: "${property.colName} <= %@", values: [${property.foundationValue(1)}], expectedCount: 1) {
+            $0.${property.colName} <= ${property.value(1)}
         }
         % end
         % end
@@ -579,23 +631,23 @@ class QueryTests: TestCase {
         % for property in properties + optProperties:
         % if property.enumName == None and property.category == 'numeric':
         assertQuery(predicate: "${property.colName} >= %@ && ${property.colName} < %@",
-                    values: [${property.values[0]}, ${property.values[2]}], expectedCount: 1) {
-            $0.${property.colName}.contains(${property.values[0]}..<${property.values[2]})
+                    values: [${property.foundationValue(0)}, ${property.foundationValue(2)}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.value(0)}..<${property.value(2)})
         }
 
         assertQuery(predicate: "${property.colName} >= %@ && ${property.colName} < %@",
-                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 0) {
-            $0.${property.colName}.contains(${property.values[0]}..<${property.values[1]})
+                    values: [${property.foundationValue(0)}, ${property.foundationValue(1)}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.value(0)}..<${property.value(1)})
         }
 
         assertQuery(predicate: "${property.colName} BETWEEN {%@, %@}",
-                    values: [${property.values[0]}, ${property.values[2]}], expectedCount: 1) {
-            $0.${property.colName}.contains(${property.values[0]}...${property.values[2]})
+                    values: [${property.foundationValue(0)}, ${property.foundationValue(2)}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.value(0)}...${property.value(2)})
         }
 
         assertQuery(predicate: "${property.colName} BETWEEN {%@, %@}",
-                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 1) {
-            $0.${property.colName}.contains(${property.values[0]}...${property.values[1]})
+                    values: [${property.foundationValue(0)}, ${property.foundationValue(1)}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.value(0)}...${property.value(1)})
         }
 
         % end
@@ -603,23 +655,17 @@ class QueryTests: TestCase {
     }
 
     func testListContainsElement() {
-        % for property in listProperties:
-        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[0]}], expectedCount: 1) {
-            $0.${property.colName}.contains(${property.values[0]})
+        % for property in listProperties + optListProperties:
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.value(0)})
         }
-        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[2]}], expectedCount: 0) {
-            $0.${property.colName}.contains(${property.values[2]})
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.foundationValue(2)}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.value(2)})
         }
 
         % end
         % for property in optListProperties:
-        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[0]}], expectedCount: 1) {
-            $0.${property.colName}.contains(${property.values[0]})
-        }
-        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[2]}], expectedCount: 0) {
-            $0.${property.colName}.contains(${property.values[2]})
-        }
-        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.type}.none], expectedCount: 0) {
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [NSNull()], expectedCount: 0) {
             $0.${property.colName}.contains(nil)
         }
 
@@ -647,12 +693,12 @@ class QueryTests: TestCase {
         % for property in listProperties + optListProperties:
         % if property.category == 'numeric':
         assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max <= %@",
-                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 1) {
-            $0.${property.colName}.contains(${property.values[0]}...${property.values[1]})
+                    values: [${property.foundationValue(0)}, ${property.foundationValue(1)}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.value(0)}...${property.value(1)})
         }
         assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max < %@",
-                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 0) {
-            $0.${property.colName}.contains(${property.values[0]}..<${property.values[1]})
+                    values: [${property.foundationValue(0)}, ${property.foundationValue(1)}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.value(0)}..<${property.value(1)})
         }
 
         % end
@@ -661,22 +707,22 @@ class QueryTests: TestCase {
 
     func testSetContainsElement() {
         % for property in setProperties:
-        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[0]}], expectedCount: 1) {
-            $0.${property.colName}.contains(${property.values[0]})
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.value(0)})
         }
-        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[2]}], expectedCount: 0) {
-            $0.${property.colName}.contains(${property.values[2]})
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.foundationValue(2)}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.value(2)})
         }
 
         % end
         % for property in optSetProperties:
-        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[0]}], expectedCount: 1) {
-            $0.${property.colName}.contains(${property.values[0]})
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.value(0)})
         }
-        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.values[2]}], expectedCount: 0) {
-            $0.${property.colName}.contains(${property.values[2]})
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.foundationValue(2)}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.value(2)})
         }
-        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.type}.none], expectedCount: 0) {
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [NSNull()], expectedCount: 0) {
             $0.${property.colName}.contains(nil)
         }
 
@@ -687,12 +733,12 @@ class QueryTests: TestCase {
         % for property in setProperties:
         % if property.category == 'numeric':
         assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max <= %@",
-                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 1) {
-            $0.${property.colName}.contains(${property.values[0]}...${property.values[1]})
+                    values: [${property.foundationValue(0)}, ${property.foundationValue(1)}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.value(0)}...${property.value(1)})
         }
         assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max < %@",
-                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 0) {
-            $0.${property.colName}.contains(${property.values[0]}..<${property.values[1]})
+                    values: [${property.foundationValue(0)}, ${property.foundationValue(1)}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.value(0)}..<${property.value(1)})
         }
 
         % end
@@ -700,12 +746,12 @@ class QueryTests: TestCase {
         % for property in optSetProperties:
         % if property.category == 'numeric':
         assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max <= %@",
-                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 1) {
-            $0.${property.colName}.contains(${property.values[0]}...${property.values[1]})
+                    values: [${property.foundationValue(0)}, ${property.foundationValue(1)}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.value(0)}...${property.value(1)})
         }
         assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max < %@",
-                    values: [${property.values[0]}, ${property.values[1]}], expectedCount: 0) {
-            $0.${property.colName}.contains(${property.values[0]}..<${property.values[1]})
+                    values: [${property.foundationValue(0)}, ${property.foundationValue(1)}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.value(0)}..<${property.value(1)})
         }
 
         % end
@@ -725,6 +771,170 @@ class QueryTests: TestCase {
         }
         let result2 = realm.objects(ModernCollectionObject.self).query {
             $0.set.contains(obj)
+        }
+        XCTAssertEqual(result2.count, 1)
+    }
+
+    func testMapContainsElement() {
+        % for property in mapProperties:
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.value(0)})
+        }
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.foundationValue(2)}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.value(2)})
+        }
+
+        % end
+        % for property in optMapProperties:
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.value(0)})
+        }
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.foundationValue(2)}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.value(2)})
+        }
+        assertQuery(predicate: "%@ IN ${property.colName}", values: [NSNull()], expectedCount: 0) {
+            $0.${property.colName}.contains(nil)
+        }
+
+        % end
+    }
+
+    func testMapAllKeys() {
+        % for property in mapProperties + optMapProperties:
+        assertQuery(predicate: "${property.colName}.@allKeys == %@", values: ["foo"], expectedCount: 1) {
+            $0.${property.colName}.keys == "foo"
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys != %@", values: ["foo"], expectedCount: 1) {
+            $0.${property.colName}.keys != "foo"
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys CONTAINS[cd] %@", values: ["foo"], expectedCount: 1) {
+            $0.${property.colName}.keys.contains("foo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys CONTAINS %@", values: ["foo"], expectedCount: 1) {
+            $0.${property.colName}.keys.contains("foo")
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys BEGINSWITH[cd] %@", values: ["foo"], expectedCount: 1) {
+            $0.${property.colName}.keys.starts(with: "foo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys BEGINSWITH %@", values: ["foo"], expectedCount: 1) {
+            $0.${property.colName}.keys.starts(with: "foo")
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys ENDSWITH[cd] %@", values: ["foo"], expectedCount: 1) {
+            $0.${property.colName}.keys.ends(with: "foo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys ENDSWITH %@", values: ["foo"], expectedCount: 1) {
+            $0.${property.colName}.keys.ends(with: "foo")
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys LIKE[c] %@", values: ["foo"], expectedCount: 1) {
+            $0.${property.colName}.keys.like("foo", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys LIKE %@", values: ["foo"], expectedCount: 1) {
+            $0.${property.colName}.keys.like("foo")
+        }
+
+        % end
+    }
+
+    func testMapAllValues() {
+        % for property in mapProperties + optMapProperties:
+        assertQuery(predicate: "${property.colName}.@allValues == %@", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.values == ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@allValues != %@", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.values != ${property.value(0)}
+        }
+        % if property.category == 'numeric':
+        assertQuery(predicate: "${property.colName}.@allValues > %@", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.values > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@allValues >= %@", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.values >= ${property.value(0)}
+        }
+        assertQuery(predicate: "${property.colName}.@allValues < %@", values: [${property.foundationValue(0)}], expectedCount: 0) {
+            $0.${property.colName}.values < ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@allValues <= %@", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.values <= ${property.value(0)}
+        }
+        % end
+
+        % if property.category == 'string':
+        assertQuery(predicate: "${property.colName}.@allValues CONTAINS[cd] %@", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.values.contains(${property.value(0)}, options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName}.@allValues CONTAINS %@", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.values.contains(${property.value(0)})
+        }
+
+        assertQuery(predicate: "${property.colName}.@allValues BEGINSWITH[cd] %@", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.values.starts(with: ${property.value(0)}, options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName}.@allValues BEGINSWITH %@", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.values.starts(with: ${property.value(0)})
+        }
+
+        assertQuery(predicate: "${property.colName}.@allValues ENDSWITH[cd] %@", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.values.ends(with: ${property.value(0)}, options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName}.@allValues ENDSWITH %@", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.values.ends(with: ${property.value(0)})
+        }
+
+        assertQuery(predicate: "${property.colName}.@allValues LIKE[c] %@", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.values.like(${property.value(0)}, caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "${property.colName}.@allValues LIKE %@", values: [${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}.values.like(${property.value(0)})
+        }
+        % end
+        % end
+    }
+
+    func testMapContainsRange() {
+        % for property in mapProperties + optMapProperties:
+        % if property.category == 'numeric':
+        assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max <= %@",
+                    values: [${property.foundationValue(0)}, ${property.foundationValue(1)}], expectedCount: 1) {
+            $0.${property.colName}.contains(${property.value(0)}...${property.value(1)})
+        }
+        assertQuery(predicate: "${property.colName}.@min >= %@ && ${property.colName}.@max < %@",
+                    values: [${property.foundationValue(0)}, ${property.foundationValue(1)}], expectedCount: 0) {
+            $0.${property.colName}.contains(${property.value(0)}..<${property.value(1)})
+        }
+
+        % end
+        % end
+    }
+
+    func testMapContainsObject() {
+        let obj = objects().first!
+        let colObj = collectionObject()
+        let realm = realmWithTestPath()
+        let result1 = realm.objects(ModernCollectionObject.self).query {
+            $0.map.contains(obj)
+        }
+        XCTAssertEqual(result1.count, 0)
+        try! realm.write {
+            colObj.map["foo"] = obj
+        }
+        let result2 = realm.objects(ModernCollectionObject.self).query {
+            $0.map.contains(obj)
         }
         XCTAssertEqual(result2.count, 1)
     }

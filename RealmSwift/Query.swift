@@ -37,7 +37,7 @@ private enum QueryExpression {
 
     enum Comparision {
         case between(low: _QueryNumeric, high: _QueryNumeric, closedRange: Bool)
-        case contains(_RealmSchemaDiscoverable) // `IN` operator.
+        case contains(_RealmSchemaDiscoverable?) // `IN` operator.
     }
 
     enum Compound: String {
@@ -58,6 +58,9 @@ private enum QueryExpression {
         case avg = ".@avg.doubleValue"
         case sum = ".@sum"
         case count = ".@count"
+        // Map only
+        case allKeys = ".@allKeys"
+        case allValues = ".@allValues"
     }
 
     case keyPath(name: String, isCollection: Bool = false)
@@ -112,7 +115,7 @@ public struct Query<T: _Persistable> {
 
     private var tokens: [QueryExpression] = []
 
-    init() { }
+    public init() { }
     private init(expression: [QueryExpression]) {
         tokens = expression
     }
@@ -181,7 +184,7 @@ public struct Query<T: _Persistable> {
 
     // MARK: Query Construction
 
-    internal func constructPredicate(_ isSubquery: Bool = false) -> (String, [Any]) {
+    public func _constructPredicate(_ isSubquery: Bool = false) -> (String, [Any]) {
         var predicateString: [String] = []
         var arguments: [Any] = []
 
@@ -224,7 +227,7 @@ public struct Query<T: _Persistable> {
                     }
                 case let .contains(val):
                     predicateString.insert("%@ IN ", at: predicateString.count-1)
-                    arguments.append(val)
+                        arguments.append(val.objCValue)
                 }
             case let .compound(comp):
                 predicateString.append(" \(comp.rawValue) ")
@@ -260,7 +263,7 @@ public struct Query<T: _Persistable> {
                 }
             case let .rhs(v):
                 predicateString.append(" %@")
-                arguments.append(v.objCValue)
+                    arguments.append(v.objCValue)
             case let .subquery(col, str, args):
                 predicateString.append("SUBQUERY(\(col), $obj, \(str)).@count")
                 arguments.append(contentsOf: args)
@@ -273,7 +276,7 @@ public struct Query<T: _Persistable> {
     }
 
     internal var predicate: NSPredicate {
-        let predicate = constructPredicate()
+        let predicate = _constructPredicate()
         return NSPredicate(format: predicate.0, argumentArray: predicate.1)
     }
 
@@ -345,18 +348,70 @@ extension Query where T: RealmCollection, T.Element: OptionalProtocol, T.Element
 
 // MARK: RealmKeyedCollection
 
-extension Query where T: RealmKeyedCollection {
-    public subscript<V>(dynamicMember member: KeyPath<T.Value, V>) -> Query<V> where T.Value: ObjectBase {
-        let name = _name(for: member)
-        return append(tokens: [.keyPath(name: name)])
+extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: _Persistable {
+
+    public func contains<V>(_ value: T.Value) -> Query<V> {
+        return append(tokens: [.comparison(.contains(value))])
+    }
+
+    public var values: Query<T.Value> {
+        return append(tokens: [.collectionAggregation(.allValues)])
+    }
+
+    public subscript(member: T.Key) -> Query<T.Value> {
+        fatalError()
     }
 }
+
+extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Value.Wrapped: _Persistable {
+    public var values: Query<T.Value.Wrapped> {
+        return append(tokens: [.collectionAggregation(.allValues)])
+    }
+}
+
+extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Value.Wrapped: ObjectBase {
+    public subscript<V>(dynamicMember member: KeyPath<T.Value.Wrapped, V>) -> Query<V> where T.Value.Wrapped: ObjectBase {
+        let name = _name(for: member)
+        return append(tokens: [.collectionAggregation(.allValues), .keyPath(name: name)])
+    }
+}
+
+extension Query where T: RealmKeyedCollection, T.Key == String {
+    public var keys: Query<String> {
+        return append(tokens: [.collectionAggregation(.allKeys)])
+    }
+}
+
+extension Query where T: RealmKeyedCollection, T.Value: _QueryNumeric {
+    /// Checks for all elements in this collection that are within a given range.
+    public func contains<V>(_ range: Range<T.Value>) -> Query<V> {
+        return aggregateContains(range.lowerBound, range.upperBound)
+    }
+
+    /// Checks for all elements in this collection that are within a given range.
+    public func contains<V>(_ range: ClosedRange<T.Value>) -> Query<V> {
+        return aggregateContains(range.lowerBound, range.upperBound, isClosedRange: true)
+    }
+}
+
+extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Value.Wrapped: _QueryNumeric {
+    /// Checks for all elements in this collection that are within a given range.
+    public func contains<V>(_ range: Range<T.Value.Wrapped>) -> Query<V> {
+        return aggregateContains(range.lowerBound, range.upperBound)
+    }
+
+    /// Checks for all elements in this collection that are within a given range.
+    public func contains<V>(_ range: ClosedRange<T.Value.Wrapped>) -> Query<V> {
+        return aggregateContains(range.lowerBound, range.upperBound, isClosedRange: true)
+    }
+}
+
 
 // MARK: String
 
 extension Query where T == String {
     public func like<V>(_ value: String, caseInsensitive: Bool = false) -> Query<V> {
-        return append(tokens: [.stringSearch(.like(value, caseInsensitive ? [.caseInsensitive] : []))])
+        return append(tokens: [.stringSearch(.like(value, caseInsensitive ? [.caseInsensitive] : nil))])
     }
 
     public func contains<V>(_ value: String, options: Set<StringOptions>? = nil) -> Query<V> {
@@ -511,31 +566,8 @@ extension Query where T == Bool {
         if collections.count > 1 {
             throwRealmException("Subquery predicates will only work on one collection at a time, split your query up.")
         }
-        let queryStr = constructPredicate(true)
+        let queryStr = _constructPredicate(true)
         return append(tokens: [.subquery(collections.first!, queryStr.0, queryStr.1)])
-    }
-}
-
-extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: _Persistable {
-    public func between<V>(_ low: T.Value, _ high: T.Value) -> Query<V> {
-        fatalError()
-    }
-
-    public func contains<V>(_ value: T.Value) -> Query<V> {
-        return append(tokens: [.comparison(.contains(value))])
-    }
-
-    public var keys: Query<T.Key> {
-        return Query<T.Key>(expression: tokens)
-    }
-
-    public var values: Query<T.Value> {
-        return Query<T.Value>(expression: tokens)
-    }
-
-    public subscript(member: T.Key) -> Query<T.Value> {
-        // mapCol["Bar"] -> mapCol.@allKeys == 'Bar'
-        return Query<T.Value>(expression: tokens)
     }
 }
 
