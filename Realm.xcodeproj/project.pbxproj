@@ -587,6 +587,20 @@
 			remoteGlobalIDString = 3F1A5E711992EB7400F45F4C;
 			remoteInfo = TestHost;
 		};
+		5345F0A526E390D600827AC9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3F1A5E711992EB7400F45F4C;
+			remoteInfo = TestHost;
+		};
+		5345F0A726E390D800827AC9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AC8846722686573B00DF4A65;
+			remoteInfo = SwiftUISyncTestHost;
+		};
 		534DF4CF25B86F3A00655AE2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -2099,6 +2113,8 @@
 			);
 			dependencies = (
 				534DF4D025B86F3A00655AE2 /* PBXTargetDependency */,
+				5345F0A626E390D600827AC9 /* PBXTargetDependency */,
+				5345F0A826E390D800827AC9 /* PBXTargetDependency */,
 			);
 			name = SwiftUITestHostUITests;
 			productName = SwiftUITestHostUITests;
@@ -3087,6 +3103,16 @@
 			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
 			targetProxy = 5345F0A326E3900100827AC9 /* PBXContainerItemProxy */;
 		};
+		5345F0A626E390D600827AC9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
+			targetProxy = 5345F0A526E390D600827AC9 /* PBXContainerItemProxy */;
+		};
+		5345F0A826E390D800827AC9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AC8846722686573B00DF4A65 /* SwiftUISyncTestHost */;
+			targetProxy = 5345F0A726E390D800827AC9 /* PBXContainerItemProxy */;
+		};
 		534DF4D025B86F3A00655AE2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 53124AB725B71AF600771CE4 /* SwiftUITestHost */;
@@ -3236,7 +3262,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				TEST_TARGET_NAME = SwifttUISyncTestHost;
+				TEST_TARGET_NAME = SwiftUISyncTestHost;
 			};
 			name = Debug;
 		};
@@ -3246,7 +3272,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "\"-\"";
 				CODE_SIGN_STYLE = Automatic;
-				TEST_TARGET_NAME = SwifttUISyncTestHost;
+				TEST_TARGET_NAME = SwiftUISyncTestHost;
 			};
 			name = Release;
 		};
