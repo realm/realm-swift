@@ -18,7 +18,7 @@
 
 #import "RLMTestCase.h"
 
-@class NSTask;
+@class NSTask, RLMChildProcessEnvironment;
 
 @interface RLMMultiProcessTestCase : RLMTestCase
 // if true, this is running the main test process
@@ -28,6 +28,7 @@
 // returns the return code of the process
 - (int)runChildAndWait;
 - (int)runChildAndWaitWithAppIds:(NSArray *)appIds;
+- (int)runChildAndWaitWithEnvironment:(RLMChildProcessEnvironment *)environment;
 
 - (NSTask *)childTask;
 - (NSTask *)childTaskWithAppIds:(NSArray *)appIds;

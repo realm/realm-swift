@@ -91,6 +91,10 @@ void RLMWaitForRealmToClose(NSString *path) {
     lockfile.lock_exclusive();
 }
 
+BOOL RLMIsRealmCachedAtPath(NSString *path) {
+    return RLMGetAnyCachedRealmForPath([path cStringUsingEncoding:NSUTF8StringEncoding]) != nil;
+}
+
 @implementation RLMRealmNotificationToken
 - (void)invalidate {
     [_realm verifyThread];
@@ -223,37 +227,7 @@ void RLMSetAsyncOpenQueue(dispatch_queue_t queue) {
     s_async_open_queue = queue;
 }
 
-+ (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
-                                   callbackQueue:(dispatch_queue_t)callbackQueue
-                                        callback:(RLMAsyncOpenRealmCallback)callback {
-    auto openCompletion = [=](ThreadSafeReference, std::exception_ptr err) {
-        @autoreleasepool {
-            if (err) {
-                try {
-                    std::rethrow_exception(err);
-                }
-                catch (...) {
-                    NSError *error;
-                    RLMRealmTranslateException(&error);
-                    dispatch_async(callbackQueue, ^{
-                        callback(nil, error);
-                    });
-                }
-                return;
-            }
-
-            dispatch_async(callbackQueue, ^{
-                @autoreleasepool {
-                    NSError *error;
-                    RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration
-                                                                      queue:callbackQueue
-                                                                      error:&error];
-                    callback(localRealm, error);
-                }
-            });
-        }
-    };
-
+static RLMAsyncOpenTask *openAsync(RLMRealmConfiguration *configuration, void (^openCompletion)(ThreadSafeReference, std::exception_ptr)) {
     RLMAsyncOpenTask *ret = [RLMAsyncOpenTask new];
     dispatch_async(s_async_open_queue, ^{
         @autoreleasepool {
@@ -278,6 +252,59 @@ void RLMSetAsyncOpenQueue(dispatch_queue_t queue) {
         }
     });
     return ret;
+}
+
++ (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
+                                   callbackQueue:(dispatch_queue_t)callbackQueue
+                                        callback:(RLMAsyncOpenRealmCallback)callback {
+    return openAsync(configuration, [=](ThreadSafeReference, std::exception_ptr err) {
+        @autoreleasepool {
+            if (err) {
+                try {
+                    std::rethrow_exception(err);
+                }
+                catch (...) {
+                    NSError *error;
+                    RLMRealmTranslateException(&error);
+                    dispatch_async(callbackQueue, ^{
+                        callback(nil, error);
+                    });
+                }
+                return;
+            }
+            dispatch_async(callbackQueue, ^{
+                @autoreleasepool {
+                    NSError *error;
+                    RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration
+                                                                      queue:callbackQueue
+                                                                      error:&error];
+                    callback(localRealm, error);
+                }
+            });
+        }
+    });
+}
+
++ (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
+                                        callback:(void (^)(NSError *))callback {
+    return openAsync(configuration, [=](ThreadSafeReference, std::exception_ptr err) {
+        @autoreleasepool {
+            if (err) {
+                try {
+                    std::rethrow_exception(err);
+                }
+                catch (...) {
+                    NSError *error;
+                    RLMRealmTranslateException(&error);
+                    callback(error);
+                }
+                return;
+            }
+            @autoreleasepool {
+                callback(nil);
+            }
+        }
+    });
 }
 
 // ARC tries to eliminate calls to autorelease when the value is then immediately
