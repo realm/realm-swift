@@ -425,27 +425,6 @@ extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Valu
     }
 }
 
-
-// MARK: String
-
-extension Query where T == String {
-    public func like<V>(_ value: String, caseInsensitive: Bool = false) -> Query<V> {
-        return append(tokens: [.stringSearch(.like(value, caseInsensitive ? [.caseInsensitive] : nil))])
-    }
-
-    public func contains<V>(_ value: String, options: Set<StringOptions>? = nil) -> Query<V> {
-        return append(tokens: [.stringSearch(.contains(value, options))])
-    }
-
-    public func starts<V>(with value: String, options: Set<StringOptions>? = nil) -> Query<V> {
-        return append(tokens: [.stringSearch(.beginsWith(value, options))])
-    }
-
-    public func ends<V>(with value: String, options: Set<StringOptions>? = nil) -> Query<V> {
-        return append(tokens: [.stringSearch(.endsWith(value, options))])
-    }
-}
-
 // MARK: PersistableEnum
 
 extension Query where T: PersistableEnum, T.RawValue: _Persistable {
@@ -548,6 +527,31 @@ extension Query where T: _QueryNumeric {
     }
 }
 
+// MARK: _QueryString
+
+extension Query where T: _QueryString {
+    public func like<V>(_ value: T, caseInsensitive: Bool = false) -> Query<V> {
+        return append(tokens: [.stringSearch(.like(value, caseInsensitive ? [.caseInsensitive] : []))])
+    }
+}
+
+// MARK: _QueryBinary
+
+extension Query where T: _QueryBinary {
+    public func contains<V>(_ value: T, options: Set<StringOptions>? = nil) -> Query<V> {
+
+        return append(tokens: [.stringSearch(.contains(value, options))])
+    }
+
+    public func starts<V>(with value: T, options: Set<StringOptions>? = nil) -> Query<V> {
+        return append(tokens: [.stringSearch(.beginsWith(value, options))])
+    }
+
+    public func ends<V>(with value: T, options: Set<StringOptions>? = nil) -> Query<V> {
+        return append(tokens: [.stringSearch(.endsWith(value, options))])
+    }
+}
+
 extension Query where T: OptionalProtocol, T.Wrapped: _QueryNumeric {
     /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: Range<T.Wrapped>) -> Query<V> {
@@ -631,3 +635,11 @@ extension String: _QueryComparable { }
 extension AnyRealmValue: _QueryComparable { }
 extension ObjectBase: _QueryComparable { }
 extension Optional: _QueryComparable where Wrapped: _QueryComparable { }
+
+/// Tag protocol for all types that are compatible with `String`, compatible with `Binary` queries too.
+public protocol _QueryString: _QueryBinary { }
+extension String: _QueryString { }
+
+/// Tag protocol for all types that are compatible with `Binary`.
+public protocol _QueryBinary { }
+extension Data: _QueryString { }
