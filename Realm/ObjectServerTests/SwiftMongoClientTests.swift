@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#if os(macOS)
+
 import RealmSwift
 import XCTest
 
@@ -867,6 +869,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
     }
 }
 
+#if swift(>=5.5)
 @available(macOS 12.0, *)
 class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
     func setupMongoCollection() async throws -> MongoCollection {
@@ -1214,3 +1217,6 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
         XCTAssertEqual(count4, 1)
     }
 }
+
+#endif // swift(>=5.5)
+#endif // os(macOS)
