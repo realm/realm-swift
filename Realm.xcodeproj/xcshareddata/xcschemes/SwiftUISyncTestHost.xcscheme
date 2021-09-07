@@ -15,7 +15,7 @@
                   <BuildableReference
                      BuildableIdentifier = "primary"
                      BlueprintIdentifier = "AC8846722686573B00DF4A65"
-                     BuildableName = "SwifttUISyncTestHost.app"
+                     BuildableName = "SwiftUISyncTestHost.app"
                      BlueprintName = "SwiftUISyncTestHost"
                      ReferencedContainer = "container:Realm.xcodeproj">
                   </BuildableReference>
@@ -33,7 +33,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AC8846722686573B00DF4A65"
-               BuildableName = "SwifttUISyncTestHost.app"
+               BuildableName = "SwiftUISyncTestHost.app"
                BlueprintName = "SwiftUISyncTestHost"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
@@ -87,7 +87,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AC8846722686573B00DF4A65"
-            BuildableName = "SwifttUISyncTestHost.app"
+            BuildableName = "SwiftUISyncTestHost.app"
             BlueprintName = "SwiftUISyncTestHost"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
@@ -103,7 +103,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AC8846722686573B00DF4A65"
-            BuildableName = "SwifttUISyncTestHost.app"
+            BuildableName = "SwiftUISyncTestHost.app"
             BlueprintName = "SwiftUISyncTestHost"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>

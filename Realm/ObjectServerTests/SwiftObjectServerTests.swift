@@ -3018,23 +3018,12 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
                                                                identifer: OpenKind.second.rawValue,
                                                                shouldCleanUpOnTermination: true))
         case .child(let environment):
-            switch OpenKind(rawValue: environment.identifier)! {
-            case .first:
-                let user = try await app
-                    .login(credentials: .emailPassword(email: environment.email!,
-                                                       password: environment.password!))
-                let realm = try await Realm(configuration: user.configuration(testName: #function),
-                                            downloadBeforeOpen: .once)
-                XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
-            case .second:
-                let user = try await app
-                    .login(credentials: .emailPassword(email: environment.email!,
-                                                       password: environment.password!))
-                XCTAssertTrue(Realm.fileExists(for: user.configuration(testName: #function)))
-                let realm = try await Realm(configuration: user.configuration(testName: #function),
-                                            downloadBeforeOpen: .once)
-                XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
-            }
+            let user = try await app
+                .login(credentials: .emailPassword(email: environment.email!,
+                                                   password: environment.password!))
+            let realm = try await Realm(configuration: user.configuration(testName: #function),
+                                        downloadBeforeOpen: .once)
+            XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
         }
     }
 
@@ -3074,18 +3063,15 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
                                                                identifer: OpenKind.second.rawValue,
                                                                shouldCleanUpOnTermination: true))
         case .child(let environment):
+            let user = try await app
+                .login(credentials: .emailPassword(email: environment.email!,
+                                                   password: environment.password!))
             switch OpenKind(rawValue: environment.identifier)! {
             case .first:
-                let user = try await app
-                    .login(credentials: .emailPassword(email: environment.email!,
-                                                       password: environment.password!))
                 let realm = try await Realm(configuration: user.configuration(testName: #function),
                                             downloadBeforeOpen: .always)
                 XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
             case .second:
-                let user = try await app
-                    .login(credentials: .emailPassword(email: environment.email!,
-                                                       password: environment.password!))
                 XCTAssertTrue(Realm.fileExists(for: user.configuration(testName: #function)))
                 let realm = try await Realm(configuration: user.configuration(testName: #function),
                                             downloadBeforeOpen: .always)

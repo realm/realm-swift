@@ -2113,7 +2113,6 @@
 			);
 			dependencies = (
 				534DF4D025B86F3A00655AE2 /* PBXTargetDependency */,
-				5345F0A626E390D600827AC9 /* PBXTargetDependency */,
 				5345F0A826E390D800827AC9 /* PBXTargetDependency */,
 			);
 			name = SwiftUITestHostUITests;

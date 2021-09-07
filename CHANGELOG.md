@@ -2,8 +2,6 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add `async` `Realm.asyncOpen` and `App.login` methods.
-* Add additional `observe` methods for Objects and RealmCollections which take a `PartialKeyPath` type key path parameter.
-* None.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
