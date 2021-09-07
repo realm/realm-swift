@@ -1795,6 +1795,282 @@ class QueryTests: TestCase {
 
     }
 
+    func testStringStartsWith() {
+        assertQuery(predicate: "stringCol BEGINSWITH %@",
+                    values: ["fo"], expectedCount: 0) {
+            $0.stringCol.starts(with: "fo", options: nil)
+        }
+
+        assertQuery(predicate: "stringCol BEGINSWITH %@",
+                    values: ["fo"], expectedCount: 0) {
+            $0.stringCol.starts(with: "fo", options: [])
+        }
+
+        assertQuery(predicate: "stringCol BEGINSWITH[c] %@",
+                    values: ["fo"], expectedCount: 1) {
+            $0.stringCol.starts(with: "fo", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "stringCol BEGINSWITH[d] %@",
+                    values: ["fo"], expectedCount: 0) {
+            $0.stringCol.starts(with: "fo", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "stringCol BEGINSWITH[cd] %@",
+                    values: ["fo"], expectedCount: 1) {
+            $0.stringCol.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+    }
+
+    func testStringEndsWith() {
+        assertQuery(predicate: "stringCol ENDSWITH %@",
+                    values: ["oo"], expectedCount: 0) {
+            $0.stringCol.ends(with: "oo")
+        }
+
+        assertQuery(predicate: "stringCol ENDSWITH %@",
+                    values: ["oo"], expectedCount: 0) {
+            $0.stringCol.ends(with: "oo", options: [])
+        }
+
+        assertQuery(predicate: "stringCol ENDSWITH[c] %@",
+                    values: ["oo"], expectedCount: 0) {
+            $0.stringCol.ends(with: "oo", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "stringCol ENDSWITH[d] %@",
+                    values: ["oo"], expectedCount: 1) {
+            $0.stringCol.ends(with: "oo", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "stringCol ENDSWITH[cd] %@",
+                    values: ["oo"], expectedCount: 1) {
+            $0.stringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+    }
+
+    func testStringLike() {
+        assertQuery(predicate: "stringCol LIKE %@",
+                                values: ["Foó"], expectedCount: 1) {
+            $0.stringCol.like("Foó")
+        }
+
+        assertQuery(predicate: "stringCol LIKE[c] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.stringCol.like("Foó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.stringCol.like("Foó", caseInsensitive: false)
+        }
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["f*"], expectedCount: 0) {
+            $0.stringCol.like("f*")
+        }
+
+        assertQuery(predicate: "stringCol LIKE[c] %@",
+                    values: ["f*"], expectedCount: 1) {
+            $0.stringCol.like("f*", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["f*"], expectedCount: 0) {
+            $0.stringCol.like("f*", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["*ó"], expectedCount: 1) {
+            $0.stringCol.like("*ó")
+        }
+
+        assertQuery(predicate: "stringCol LIKE[c] %@",
+                    values: ["*ó"], expectedCount: 1) {
+            $0.stringCol.like("*ó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["*ó"], expectedCount: 1) {
+            $0.stringCol.like("*ó", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["f?ó"], expectedCount: 0) {
+            $0.stringCol.like("f?ó")
+        }
+
+        assertQuery(predicate: "stringCol LIKE[c] %@",
+                    values: ["f?ó"], expectedCount: 1) {
+            $0.stringCol.like("f?ó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["f?ó"], expectedCount: 0) {
+            $0.stringCol.like("f?ó", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["f*ó"], expectedCount: 0) {
+            $0.stringCol.like("f*ó")
+        }
+
+        assertQuery(predicate: "stringCol LIKE[c] %@",
+                    values: ["f*ó"], expectedCount: 1) {
+            $0.stringCol.like("f*ó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["f*ó"], expectedCount: 0) {
+            $0.stringCol.like("f*ó", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["f??ó"], expectedCount: 0) {
+            $0.stringCol.like("f??ó")
+        }
+
+        assertQuery(predicate: "stringCol LIKE[c] %@",
+                    values: ["f??ó"], expectedCount: 0) {
+            $0.stringCol.like("f??ó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["f??ó"], expectedCount: 0) {
+            $0.stringCol.like("f??ó", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["*o*"], expectedCount: 1) {
+            $0.stringCol.like("*o*")
+        }
+
+        assertQuery(predicate: "stringCol LIKE[c] %@",
+                    values: ["*O*"], expectedCount: 1) {
+            $0.stringCol.like("*O*", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["*O*"], expectedCount: 0) {
+            $0.stringCol.like("*O*", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["?o?"], expectedCount: 1) {
+            $0.stringCol.like("?o?")
+        }
+
+        assertQuery(predicate: "stringCol LIKE[c] %@",
+                    values: ["?O?"], expectedCount: 1) {
+            $0.stringCol.like("?O?", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "stringCol LIKE %@",
+                    values: ["?O?"], expectedCount: 0) {
+            $0.stringCol.like("?O?", caseInsensitive: false)
+        }
+
+    }
+
+    func testStringContains() {
+        assertQuery(predicate: "stringCol CONTAINS %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.stringCol.contains("Foó")
+        }
+
+        assertQuery(predicate: "stringCol CONTAINS %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.stringCol.contains("Foó", options: [])
+        }
+
+        assertQuery(predicate: "stringCol CONTAINS[c] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.stringCol.contains("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "stringCol CONTAINS[d] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.stringCol.contains("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "stringCol CONTAINS[cd] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.stringCol.contains("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+    }
+
+    func testStringNotContains() {
+        assertQuery(predicate: "NOT (stringCol CONTAINS %@)",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.stringCol.contains("Foó")
+        }
+
+        assertQuery(predicate: "NOT (stringCol CONTAINS %@)",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.stringCol.contains("Foó", options: [])
+        }
+
+        assertQuery(predicate: "NOT (stringCol CONTAINS[c] %@)",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.stringCol.contains("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "NOT (stringCol CONTAINS[d] %@)",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.stringCol.contains("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT (stringCol CONTAINS[cd] %@)",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.stringCol.contains("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+    }
+
+    func testBinaryStringQueries() {
+        assertQuery(predicate: "binaryCol BEGINSWITH %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            $0.binaryCol.starts(with: Data(count: 28))
+        }
+
+        assertQuery(predicate: "binaryCol ENDSWITH %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            $0.binaryCol.ends(with: Data(count: 28))
+        }
+
+        assertQuery(predicate: "binaryCol CONTAINS %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            $0.binaryCol.contains(Data(count: 28))
+        }
+
+        assertQuery(predicate: "NOT (binaryCol CONTAINS %@)",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            !$0.binaryCol.contains(Data(count: 28))
+        }
+
+        assertQuery(predicate: "binaryCol BEGINSWITH %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.binaryCol.starts(with: Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "binaryCol ENDSWITH %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.binaryCol.ends(with: Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "binaryCol CONTAINS %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.binaryCol.contains(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "NOT (binaryCol CONTAINS %@)",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
+            !$0.binaryCol.contains(Data(repeating: 1, count: 28))
+        }
+
+    }
+
     func testListContainsElement() {
         assertQuery(predicate: "%@ IN arrayBool", values: [true], expectedCount: 1) {
             $0.arrayBool.contains(true)

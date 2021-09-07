@@ -654,6 +654,306 @@ class QueryTests: TestCase {
         % end
     }
 
+    func testStringStartsWith() {
+        % for property in properties:
+        % if property.enumName == None and property.category == 'string':
+        assertQuery(predicate: "${property.colName} BEGINSWITH %@",
+                    values: ["fo"], expectedCount: 0) {
+            $0.${property.colName}.starts(with: "fo", options: nil)
+        }
+
+        assertQuery(predicate: "${property.colName} BEGINSWITH %@",
+                    values: ["fo"], expectedCount: 0) {
+            $0.${property.colName}.starts(with: "fo", options: [])
+        }
+
+        assertQuery(predicate: "${property.colName} BEGINSWITH[c] %@",
+                    values: ["fo"], expectedCount: 1) {
+            $0.${property.colName}.starts(with: "fo", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName} BEGINSWITH[d] %@",
+                    values: ["fo"], expectedCount: 0) {
+            $0.${property.colName}.starts(with: "fo", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName} BEGINSWITH[cd] %@",
+                    values: ["fo"], expectedCount: 1) {
+            $0.${property.colName}.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        % end
+        % end
+    }
+
+    func testStringEndsWith() {
+        % for property in properties:
+        % if property.enumName == None and property.category == 'string':
+        assertQuery(predicate: "${property.colName} ENDSWITH %@",
+                    values: ["oo"], expectedCount: 0) {
+            $0.${property.colName}.ends(with: "oo")
+        }
+
+        assertQuery(predicate: "${property.colName} ENDSWITH %@",
+                    values: ["oo"], expectedCount: 0) {
+            $0.${property.colName}.ends(with: "oo", options: [])
+        }
+
+        assertQuery(predicate: "${property.colName} ENDSWITH[c] %@",
+                    values: ["oo"], expectedCount: 0) {
+            $0.${property.colName}.ends(with: "oo", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName} ENDSWITH[d] %@",
+                    values: ["oo"], expectedCount: 1) {
+            $0.${property.colName}.ends(with: "oo", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName} ENDSWITH[cd] %@",
+                    values: ["oo"], expectedCount: 1) {
+            $0.${property.colName}.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        % end
+        % end
+    }
+
+    func testStringLike() {
+        % for property in properties:
+        % if property.enumName == None and property.category == 'string':
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                                values: ["Foó"], expectedCount: 1) {
+            $0.${property.colName}.like("Foó")
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE[c] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.${property.colName}.like("Foó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.${property.colName}.like("Foó", caseInsensitive: false)
+        }
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["f*"], expectedCount: 0) {
+            $0.${property.colName}.like("f*")
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE[c] %@",
+                    values: ["f*"], expectedCount: 1) {
+            $0.${property.colName}.like("f*", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["f*"], expectedCount: 0) {
+            $0.${property.colName}.like("f*", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["*ó"], expectedCount: 1) {
+            $0.${property.colName}.like("*ó")
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE[c] %@",
+                    values: ["*ó"], expectedCount: 1) {
+            $0.${property.colName}.like("*ó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["*ó"], expectedCount: 1) {
+            $0.${property.colName}.like("*ó", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["f?ó"], expectedCount: 0) {
+            $0.${property.colName}.like("f?ó")
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE[c] %@",
+                    values: ["f?ó"], expectedCount: 1) {
+            $0.${property.colName}.like("f?ó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["f?ó"], expectedCount: 0) {
+            $0.${property.colName}.like("f?ó", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["f*ó"], expectedCount: 0) {
+            $0.${property.colName}.like("f*ó")
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE[c] %@",
+                    values: ["f*ó"], expectedCount: 1) {
+            $0.${property.colName}.like("f*ó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["f*ó"], expectedCount: 0) {
+            $0.${property.colName}.like("f*ó", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["f??ó"], expectedCount: 0) {
+            $0.${property.colName}.like("f??ó")
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE[c] %@",
+                    values: ["f??ó"], expectedCount: 0) {
+            $0.${property.colName}.like("f??ó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["f??ó"], expectedCount: 0) {
+            $0.${property.colName}.like("f??ó", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["*o*"], expectedCount: 1) {
+            $0.${property.colName}.like("*o*")
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE[c] %@",
+                    values: ["*O*"], expectedCount: 1) {
+            $0.${property.colName}.like("*O*", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["*O*"], expectedCount: 0) {
+            $0.${property.colName}.like("*O*", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["?o?"], expectedCount: 1) {
+            $0.${property.colName}.like("?o?")
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE[c] %@",
+                    values: ["?O?"], expectedCount: 1) {
+            $0.${property.colName}.like("?O?", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "${property.colName} LIKE %@",
+                    values: ["?O?"], expectedCount: 0) {
+            $0.${property.colName}.like("?O?", caseInsensitive: false)
+        }
+
+        % end
+        % end
+    }
+
+    func testStringContains() {
+        % for property in properties:
+        % if property.enumName == None and property.category == 'string':
+        assertQuery(predicate: "${property.colName} CONTAINS %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.${property.colName}.contains("Foó")
+        }
+
+        assertQuery(predicate: "${property.colName} CONTAINS %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.${property.colName}.contains("Foó", options: [])
+        }
+
+        assertQuery(predicate: "${property.colName} CONTAINS[c] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.${property.colName}.contains("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName} CONTAINS[d] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.${property.colName}.contains("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName} CONTAINS[cd] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.${property.colName}.contains("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        % end
+        % end
+    }
+
+    func testStringNotContains() {
+        % for property in properties:
+                    % if property.enumName == None and property.category == 'string':
+        assertQuery(predicate: "NOT (${property.colName} CONTAINS %@)",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.${property.colName}.contains("Foó")
+        }
+
+        assertQuery(predicate: "NOT (${property.colName} CONTAINS %@)",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.${property.colName}.contains("Foó", options: [])
+        }
+
+        assertQuery(predicate: "NOT (${property.colName} CONTAINS[c] %@)",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.${property.colName}.contains("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "NOT (${property.colName} CONTAINS[d] %@)",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.${property.colName}.contains("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT (${property.colName} CONTAINS[cd] %@)",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.${property.colName}.contains("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+        % end
+        % end
+    }
+
+    func testBinaryStringQueries() {
+        % for property in properties:
+        % if property.enumName == None and property.category == 'binary':
+        assertQuery(predicate: "${property.colName} BEGINSWITH %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            $0.${property.colName}.starts(with: Data(count: 28))
+        }
+
+        assertQuery(predicate: "${property.colName} ENDSWITH %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            $0.${property.colName}.ends(with: Data(count: 28))
+        }
+
+        assertQuery(predicate: "${property.colName} CONTAINS %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            $0.${property.colName}.contains(Data(count: 28))
+        }
+
+        assertQuery(predicate: "NOT (${property.colName} CONTAINS %@)",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            !$0.${property.colName}.contains(Data(count: 28))
+        }
+
+        assertQuery(predicate: "${property.colName} BEGINSWITH %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.${property.colName}.starts(with: Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "${property.colName} ENDSWITH %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.${property.colName}.ends(with: Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "${property.colName} CONTAINS %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.${property.colName}.contains(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "NOT (${property.colName} CONTAINS %@)",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
+            !$0.${property.colName}.contains(Data(repeating: 1, count: 28))
+        }
+
+        % end
+        % end
+    }
+
     func testListContainsElement() {
         % for property in listProperties + optListProperties:
         assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.foundationValue(0)}], expectedCount: 1) {
