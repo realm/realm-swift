@@ -507,32 +507,27 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     return _realm.isFrozen;
 }
 
+- (instancetype)resolveInRealm:(RLMRealm *)realm {
+    auto& parentInfo = _ownerInfo->resolve(realm);
+    return translateRLMResultsErrors([&] {
+        return [[self.class alloc] initWithBackingCollection:_backingSet.freeze(realm->_realm)
+                                                  parentInfo:&parentInfo
+                                                    property:parentInfo.rlmObjectSchema[_key]];
+    });
+}
+
 - (instancetype)freeze {
     if (self.frozen) {
         return self;
     }
-
-    RLMRealm *frozenRealm = [_realm freeze];
-    auto& parentInfo = _ownerInfo->resolve(frozenRealm);
-    return translateRLMResultsErrors([&] {
-        return [[self.class alloc] initWithBackingCollection:_backingSet.freeze(frozenRealm->_realm)
-                                                  parentInfo:&parentInfo
-                                                    property:parentInfo.rlmObjectSchema[_key]];
-    });
+    return [self resolveInRealm:_realm.freeze];
 }
 
 - (instancetype)thaw {
     if (!self.frozen) {
         return self;
     }
-
-    RLMRealm *liveRealm = [_realm thaw];
-    auto& parentInfo = _ownerInfo->resolve(liveRealm);
-    return translateRLMResultsErrors([&] {
-        return [[self.class alloc] initWithBackingCollection:_backingSet.freeze(liveRealm->_realm)
-                                                  parentInfo:&parentInfo
-                                                    property:parentInfo.rlmObjectSchema[_key]];
-    });
+    return [self resolveInRealm:_realm.thaw];
 }
 
 // The compiler complains about the method's argument type not matching due to

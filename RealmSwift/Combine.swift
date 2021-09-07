@@ -675,6 +675,9 @@ public enum RealmPublishers {
     static private func realm<S: Scheduler>(_ config: RLMRealmConfiguration, _ scheduler: S) -> Realm? {
         try? Realm(RLMRealm(configuration: config, queue: scheduler as? DispatchQueue))
     }
+    static private func realm<S: Scheduler>(_ sourceRealm: Realm, _ scheduler: S) -> Realm? {
+        return realm(sourceRealm.rlmRealm.configuration, scheduler)
+    }
 
     /// A publisher which emits an asynchronously opened Realm.
     @frozen public struct AsyncOpenPublisher: Publisher {
@@ -1363,8 +1366,15 @@ public enum RealmPublishers {
         }
 
         private enum Handover {
+            // .error and .change containing a frozen object can be delivered
+            // without any handover
             case passthrough(_ change: ObjectChange<T>)
-            case tsr(_ tsr: ThreadSafeReference<T>, _ properties: [PropertyChange], config: RLMRealmConfiguration)
+            // .change containing a live object need to be wrapped in a TSR.
+            // We also hold a reference to a frozen Realm to ensure that the
+            // source version remains pinned and we can deliver the object at
+            // the same version as the change information.
+            case tsr(_ realm: Realm, _ tsr: ThreadSafeReference<T>,
+                     _ properties: [PropertyChange])
         }
 
         /// :nodoc:
@@ -1374,15 +1384,15 @@ public enum RealmPublishers {
                 .map { (change: Output) -> Handover in
                     guard case .change(let obj, let properties) = change else { return .passthrough(change) }
                     guard let realm = obj.realm, !realm.isFrozen else { return .passthrough(change) }
-                    return .tsr(ThreadSafeReference(to: obj), properties, config: realm.rlmRealm.configuration)
+                    return .tsr(realm.freeze(), ThreadSafeReference(to: obj), properties)
                 }
                 .receive(on: scheduler)
                 .compactMap { (handover: Handover) -> Output? in
                     switch handover {
                     case .passthrough(let change):
                         return change
-                    case .tsr(let tsr, let properties, let config):
-                        if let resolved = realm(config, scheduler)?.resolve(tsr) {
+                    case .tsr(let frozenRealm, let tsr, let properties):
+                        if let resolved = realm(frozenRealm, scheduler)?.resolve(tsr) {
                             return .change(resolved, properties)
                         }
                         return nil
@@ -1797,9 +1807,16 @@ public enum RealmPublishers {
         }
 
         private enum Handover {
+            // A collection change which does not contain a live object and so
+            // can be delivered directly
             case passthrough(_ change: RealmCollectionChange<T>)
-            case initial(_ tsr: ThreadSafeReference<T>, config: RLMRealmConfiguration)
-            case update(_ tsr: ThreadSafeReference<T>, deletions: [Int], insertions: [Int], modifications: [Int], config: RLMRealmConfiguration)
+            // The initial and update notifications for live collections need
+            // to wrap the collection in a thread-safe reference and hold onto
+            // a frozen Realm to ensure that the version which the change
+            // information is for stays pinned until it's delivered.
+            case initial(_ frozenRealm: Realm, _ tsr: ThreadSafeReference<T>)
+            case update(_ frozenRealm: Realm, _ tsr: ThreadSafeReference<T>, deletions: [Int],
+                        insertions: [Int], modifications: [Int])
         }
 
         /// :nodoc:
@@ -1810,10 +1827,11 @@ public enum RealmPublishers {
                     switch change {
                     case .initial(let collection):
                         guard let realm = collection.realm, !realm.isFrozen else { return .passthrough(change) }
-                        return .initial(ThreadSafeReference(to: collection), config: realm.rlmRealm.configuration)
+                        return .initial(realm.freeze(), ThreadSafeReference(to: collection))
                     case .update(let collection, deletions: let deletions, insertions: let insertions, modifications: let modifications):
                         guard let realm = collection.realm, !realm.isFrozen else { return .passthrough(change) }
-                        return .update(ThreadSafeReference(to: collection), deletions: deletions, insertions: insertions, modifications: modifications, config: realm.rlmRealm.configuration)
+                        return .update(realm.freeze(), ThreadSafeReference(to: collection),
+                                       deletions: deletions, insertions: insertions, modifications: modifications)
                     case .error:
                         return .passthrough(change)
                     }
@@ -1823,13 +1841,13 @@ public enum RealmPublishers {
                     switch handover {
                     case .passthrough(let change):
                         return change
-                    case .initial(let tsr, config: let config):
-                        if let resolved = realm(config, scheduler)?.resolve(tsr) {
+                    case .initial(let frozenRealm, let tsr):
+                        if let resolved = realm(frozenRealm, scheduler)?.resolve(tsr) {
                             return .initial(resolved)
                         }
                         return nil
-                    case .update(let tsr, deletions: let deletions, insertions: let insertions, modifications: let modifications, config: let config):
-                        if let resolved = realm(config, scheduler)?.resolve(tsr) {
+                    case .update(let frozenRealm, let tsr, deletions: let deletions, insertions: let insertions, modifications: let modifications):
+                        if let resolved = realm(frozenRealm, scheduler)?.resolve(tsr) {
                             return .update(resolved, deletions: deletions, insertions: insertions, modifications: modifications)
                         }
                         return nil
@@ -1858,9 +1876,16 @@ public enum RealmPublishers {
         }
 
         private enum Handover {
+            // A collection change which does not contain a live object and so
+            // can be delivered directly
             case passthrough(_ change: RealmMapChange<T>)
-            case initial(_ tsr: ThreadSafeReference<T>, config: RLMRealmConfiguration)
-            case update(_ tsr: ThreadSafeReference<T>, deletions: [T.Key], insertions: [T.Key], modifications: [T.Key], config: RLMRealmConfiguration)
+            // The initial and update notifications for live collections need
+            // to wrap the collection in a thread-safe reference and hold onto
+            // a frozen Realm to ensure that the version which the change
+            // information is for stays pinned until it's delivered.
+            case initial(_ frozenRealm: Realm, _ tsr: ThreadSafeReference<T>)
+            case update(_ frozenRealm: Realm, _ tsr: ThreadSafeReference<T>,
+                        deletions: [T.Key], insertions: [T.Key], modifications: [T.Key])
         }
 
         /// :nodoc:
@@ -1871,10 +1896,11 @@ public enum RealmPublishers {
                     switch change {
                     case .initial(let collection):
                         guard let realm = collection.realm, !realm.isFrozen else { return .passthrough(change) }
-                        return .initial(ThreadSafeReference(to: collection), config: realm.rlmRealm.configuration)
+                        return .initial(realm.freeze(), ThreadSafeReference(to: collection))
                     case .update(let collection, deletions: let deletions, insertions: let insertions, modifications: let modifications):
                         guard let realm = collection.realm, !realm.isFrozen else { return .passthrough(change) }
-                        return .update(ThreadSafeReference(to: collection), deletions: deletions, insertions: insertions, modifications: modifications, config: realm.rlmRealm.configuration)
+                        return .update(realm.freeze(), ThreadSafeReference(to: collection),
+                                       deletions: deletions, insertions: insertions, modifications: modifications)
                     case .error:
                         return .passthrough(change)
                     }
@@ -1884,14 +1910,16 @@ public enum RealmPublishers {
                     switch handover {
                     case .passthrough(let change):
                         return change
-                    case .initial(let tsr, config: let config):
-                        if let resolved = realm(config, scheduler)?.resolve(tsr) {
+                    case .initial(let frozenRealm, let tsr):
+                        if let resolved = realm(frozenRealm, scheduler)?.resolve(tsr) {
                             return .initial(resolved)
                         }
                         return nil
-                    case .update(let tsr, deletions: let deletions, insertions: let insertions, modifications: let modifications, config: let config):
-                        if let resolved = realm(config, scheduler)?.resolve(tsr) {
-                            return .update(resolved, deletions: deletions, insertions: insertions, modifications: modifications)
+                    case .update(let frozenRealm, let tsr, deletions: let deletions,
+                                 insertions: let insertions, modifications: let modifications):
+                        if let resolved = realm(frozenRealm, scheduler)?.resolve(tsr) {
+                            return .update(resolved, deletions: deletions, insertions: insertions,
+                                           modifications: modifications)
                         }
                         return nil
                     }
