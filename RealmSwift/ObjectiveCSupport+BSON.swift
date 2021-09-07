@@ -165,7 +165,7 @@ public extension ObjectiveCSupport {
                     return convertBson(object: value)
                 }
                 return .null
-            }.map { $0 == .null ? nil : $0 })
+            }.map { (v: AnyBSON) -> AnyBSON? in v == .null ? nil : v })
         case .UUID:
             guard let val = bson as? NSUUID else {
                 return nil
