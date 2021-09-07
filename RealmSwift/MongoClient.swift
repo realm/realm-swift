@@ -703,6 +703,7 @@ extension MongoCollection {
     }
 }
 
+#if swift(>=5.5)
 @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
 extension MongoCollection {
     /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
@@ -934,6 +935,7 @@ extension MongoCollection {
         }
     }
 }
+#endif // swift(>=5.5)
 
 private class ChangeEventDelegateProxy: RLMChangeEventDelegate {
 
