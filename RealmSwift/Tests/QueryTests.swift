@@ -156,7 +156,7 @@ class QueryTests: TestCase {
             object.setOptObjectId.insert(objectsIn: [ObjectId("61184062c1d8f096a3695046"), ObjectId("61184062c1d8f096a3695045")])
 
             object.mapBool["foo"] = true
-            object.mapBool["bar"] = false
+            object.mapBool["bar"] = true
             object.mapInt["foo"] = 1
             object.mapInt["bar"] = 2
             object.mapInt8["foo"] = Int8(8)
@@ -186,7 +186,7 @@ class QueryTests: TestCase {
             object.mapAny["foo"] = AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))
             object.mapAny["bar"] = AnyRealmValue.string("Hello")
             object.mapOptBool["foo"] = true
-            object.mapOptBool["bar"] = false
+            object.mapOptBool["bar"] = true
             object.mapOptInt["foo"] = 1
             object.mapOptInt["bar"] = 2
             object.mapOptInt8["foo"] = Int8(8)
@@ -4085,7 +4085,7 @@ class QueryTests: TestCase {
             $0.mapBool.values == true
         }
 
-        assertQuery(predicate: "mapBool.@allValues != %@", values: [true], expectedCount: 1) {
+        assertQuery(predicate: "mapBool.@allValues != %@", values: [true], expectedCount: 0) {
             $0.mapBool.values != true
         }
 
@@ -4362,7 +4362,7 @@ class QueryTests: TestCase {
             $0.mapOptBool.values == true
         }
 
-        assertQuery(predicate: "mapOptBool.@allValues != %@", values: [true], expectedCount: 1) {
+        assertQuery(predicate: "mapOptBool.@allValues != %@", values: [true], expectedCount: 0) {
             $0.mapOptBool.values != true
         }
 

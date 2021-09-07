@@ -161,7 +161,7 @@ import RealmSwift
     ]
 
     mapProperties = [
-        Property('mapBool', ['true', 'false', 'false'], 'Bool', 'bool'),
+        Property('mapBool', ['true', 'true', 'false'], 'Bool', 'bool'),
         Property('mapInt', [1, 2, 3], 'Int', 'numeric'),
         Property('mapInt8', ['Int8(8)', 'Int8(9)', 'Int8(10)'], 'Int8', 'numeric'),
         Property('mapInt16', ['Int16(16)', 'Int16(17)', 'Int16(18)'], 'Int16', 'numeric'),
@@ -179,7 +179,7 @@ import RealmSwift
     ]
 
     optMapProperties = [
-        Property('mapOptBool', ['true', 'false', 'false'], 'Bool?', 'bool'),
+        Property('mapOptBool', ['true', 'true', 'false'], 'Bool?', 'bool'),
         Property('mapOptInt', [1, 2, 3], 'Int?', 'numeric'),
         Property('mapOptInt8', ['Int8(8)', 'Int8(9)', 'Int8(10)'], 'Int8?', 'numeric'),
         Property('mapOptInt16', ['Int16(16)', 'Int16(17)', 'Int16(18)'], 'Int16?', 'numeric'),
@@ -850,7 +850,8 @@ class QueryTests: TestCase {
             $0.${property.colName}.values == ${property.value(0)}
         }
 
-        assertQuery(predicate: "${property.colName}.@allValues != %@", values: [${property.foundationValue(0)}], expectedCount: 1) {
+        % count = 0 if property.category == 'bool' else 1
+        assertQuery(predicate: "${property.colName}.@allValues != %@", values: [${property.foundationValue(0)}], expectedCount: ${count}) {
             $0.${property.colName}.values != ${property.value(0)}
         }
         % if property.category == 'numeric':
