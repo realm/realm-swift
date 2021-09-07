@@ -359,20 +359,39 @@ extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: _Pe
     }
 
     public subscript(member: T.Key) -> Query<T.Value> {
-        fatalError()
+        guard let keyPath = tokens.first else {
+            throwRealmException("Could not contruct predicate for Map")
+        }
+        return append(tokens: [.collectionAggregation(.allKeys),
+                               .basicComparison(.equal),
+                               .rhs(member),
+                               .compound(.and),
+                               keyPath])
     }
 }
 
-extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Value.Wrapped: _Persistable {
+extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: OptionalProtocol, T.Value.Wrapped: _Persistable {
     public var values: Query<T.Value.Wrapped> {
         return append(tokens: [.collectionAggregation(.allValues)])
     }
-}
 
-extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Value.Wrapped: ObjectBase {
-    public subscript<V>(dynamicMember member: KeyPath<T.Value.Wrapped, V>) -> Query<V> where T.Value.Wrapped: ObjectBase {
-        let name = _name(for: member)
-        return append(tokens: [.collectionAggregation(.allValues), .keyPath(name: name)])
+    public subscript<V: _Persistable>(dynamicMember member: KeyPath<T.Value.Wrapped, V>) -> Query<V> where T.Value.Wrapped: ObjectBase {
+        fatalError()
+    }
+
+    public subscript(member: T.Key) -> Query<T.Value.Wrapped> {
+        fatalError()
+    }
+
+    public subscript(member: T.Key) -> Query<T.Value> where T.Value.Wrapped: ObjectBase {
+        guard let keyPath = tokens.first else {
+            throwRealmException("Could not contruct predicate for Map")
+        }
+        return append(tokens: [.collectionAggregation(.allKeys),
+                               .basicComparison(.equal),
+                               .rhs(member),
+                               .compound(.and),
+                               keyPath])
     }
 }
 

@@ -276,10 +276,10 @@ class QueryTests: TestCase {
         }
     }
 
-    private func assertQuery<T: Equatable>(predicate: String,
-                                           values: [T],
-                                           expectedCount: Int,
-                                           _ query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)) {
+    private func assertQuery(predicate: String,
+                             values: [AnyHashable],
+                             expectedCount: Int,
+                             _ query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)) {
         let results = objects().query(query)
         XCTAssertEqual(results.count, expectedCount)
 
@@ -291,7 +291,7 @@ class QueryTests: TestCase {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
             } else {
-                XCTAssertEqual(e1 as! T, e2)
+                XCTAssertEqual(e1 as! AnyHashable, e2)
             }
         }
     }
@@ -936,6 +936,86 @@ class QueryTests: TestCase {
         }
         let result2 = realm.objects(ModernCollectionObject.self).query {
             $0.map.contains(obj)
+        }
+        XCTAssertEqual(result2.count, 1)
+    }
+
+    func testMapAllKeysAllValuesSubscript() {
+        % for property in mapProperties + optMapProperties:
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} == %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}["foo"] == ${property.value(0)}
+        }
+
+        % count = 0 if property.category == 'bool' else 1
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} != %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: ${count}) {
+            $0.${property.colName}["foo"] != ${property.value(0)}
+        }
+        % if property.category == 'numeric':
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} > %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}["foo"] > ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} >= %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}["foo"] >= ${property.value(0)}
+        }
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} < %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 0) {
+            $0.${property.colName}["foo"] < ${property.value(0)}
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} <= %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}["foo"] <= ${property.value(0)}
+        }
+        % end
+
+        % if property.category == 'string':
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} CONTAINS[cd] %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}["foo"].contains(${property.value(0)}, options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} CONTAINS %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}["foo"].contains(${property.value(0)})
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} BEGINSWITH[cd] %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}["foo"].starts(with: ${property.value(0)}, options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} BEGINSWITH %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}["foo"].starts(with: ${property.value(0)})
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} ENDSWITH[cd] %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}["foo"].ends(with: ${property.value(0)}, options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} ENDSWITH %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}["foo"].ends(with: ${property.value(0)})
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} LIKE[c] %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}["foo"].like(${property.value(0)}, caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} LIKE %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 1) {
+            $0.${property.colName}["foo"].like(${property.value(0)})
+        }
+        % end
+        % end
+    }
+
+    func testMapSubscriptObject() {
+        let obj = objects().first!
+        let colObj = collectionObject()
+        let realm = realmWithTestPath()
+        let result1 = realm.objects(ModernCollectionObject.self).query {
+            $0.map.contains(obj)
+        }
+        XCTAssertEqual(result1.count, 0)
+        try! realm.write {
+            colObj.map["foo"] = obj
+        }
+        let result2 = realm.objects(ModernCollectionObject.self).query {
+            $0.map["foo"].intCol == 5
         }
         XCTAssertEqual(result2.count, 1)
     }

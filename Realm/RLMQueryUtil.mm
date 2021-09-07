@@ -1379,8 +1379,8 @@ ColumnReference QueryBuilder::column_reference_from_key_path(RLMObjectSchema *ob
         throwException(@"Invalid predicate",
                        @"Aggregate operations can only be used on key paths that include an array property");
     } else if (!isAggregate && keyPath.containsToManyRelationship) {
-        throwException(@"Invalid predicate",
-                       @"Key paths that include a collection property must use aggregate operations");
+//        throwException(@"Invalid predicate",
+//                       @"Key paths that include a collection property must use aggregate operations");
     }
 
     return ColumnReference(m_query, m_group, m_schema, keyPath.property, std::move(keyPath.links));

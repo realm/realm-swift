@@ -218,10 +218,10 @@ class QueryTests: TestCase {
         }
     }
 
-    private func assertQuery<T: Equatable>(predicate: String,
-                                           values: [T],
-                                           expectedCount: Int,
-                                           _ query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)) {
+    private func assertQuery(predicate: String,
+                             values: [AnyHashable],
+                             expectedCount: Int,
+                             _ query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)) {
         let results = objects().query(query)
         XCTAssertEqual(results.count, expectedCount)
 
@@ -233,7 +233,7 @@ class QueryTests: TestCase {
             if let e1 = e1 as? Object, let e2 = e2 as? Object {
                 assertEqual(e1, e2)
             } else {
-                XCTAssertEqual(e1 as! T, e2)
+                XCTAssertEqual(e1 as! AnyHashable, e2)
             }
         }
     }
@@ -4808,6 +4808,579 @@ class QueryTests: TestCase {
         let result2 = realm.objects(ModernCollectionObject.self).query {
             $0.map.contains(obj)
         }
+        XCTAssertEqual(result2.count, 1)
+    }
+
+    func testMapAllKeysAllValuesSubscript() {
+        assertQuery(predicate: "mapBool.@allKeys == %@ && mapBool == %@", values: ["foo", true], expectedCount: 1) {
+            $0.mapBool["foo"] == true
+        }
+
+        assertQuery(predicate: "mapBool.@allKeys == %@ && mapBool != %@", values: ["foo", true], expectedCount: 0) {
+            $0.mapBool["foo"] != true
+        }
+
+        assertQuery(predicate: "mapInt.@allKeys == %@ && mapInt == %@", values: ["foo", 1], expectedCount: 1) {
+            $0.mapInt["foo"] == 1
+        }
+
+        assertQuery(predicate: "mapInt.@allKeys == %@ && mapInt != %@", values: ["foo", 1], expectedCount: 1) {
+            $0.mapInt["foo"] != 1
+        }
+        assertQuery(predicate: "mapInt.@allKeys == %@ && mapInt > %@", values: ["foo", 1], expectedCount: 1) {
+            $0.mapInt["foo"] > 1
+        }
+
+        assertQuery(predicate: "mapInt.@allKeys == %@ && mapInt >= %@", values: ["foo", 1], expectedCount: 1) {
+            $0.mapInt["foo"] >= 1
+        }
+        assertQuery(predicate: "mapInt.@allKeys == %@ && mapInt < %@", values: ["foo", 1], expectedCount: 0) {
+            $0.mapInt["foo"] < 1
+        }
+
+        assertQuery(predicate: "mapInt.@allKeys == %@ && mapInt <= %@", values: ["foo", 1], expectedCount: 1) {
+            $0.mapInt["foo"] <= 1
+        }
+
+        assertQuery(predicate: "mapInt8.@allKeys == %@ && mapInt8 == %@", values: ["foo", Int8(8)], expectedCount: 1) {
+            $0.mapInt8["foo"] == Int8(8)
+        }
+
+        assertQuery(predicate: "mapInt8.@allKeys == %@ && mapInt8 != %@", values: ["foo", Int8(8)], expectedCount: 1) {
+            $0.mapInt8["foo"] != Int8(8)
+        }
+        assertQuery(predicate: "mapInt8.@allKeys == %@ && mapInt8 > %@", values: ["foo", Int8(8)], expectedCount: 1) {
+            $0.mapInt8["foo"] > Int8(8)
+        }
+
+        assertQuery(predicate: "mapInt8.@allKeys == %@ && mapInt8 >= %@", values: ["foo", Int8(8)], expectedCount: 1) {
+            $0.mapInt8["foo"] >= Int8(8)
+        }
+        assertQuery(predicate: "mapInt8.@allKeys == %@ && mapInt8 < %@", values: ["foo", Int8(8)], expectedCount: 0) {
+            $0.mapInt8["foo"] < Int8(8)
+        }
+
+        assertQuery(predicate: "mapInt8.@allKeys == %@ && mapInt8 <= %@", values: ["foo", Int8(8)], expectedCount: 1) {
+            $0.mapInt8["foo"] <= Int8(8)
+        }
+
+        assertQuery(predicate: "mapInt16.@allKeys == %@ && mapInt16 == %@", values: ["foo", Int16(16)], expectedCount: 1) {
+            $0.mapInt16["foo"] == Int16(16)
+        }
+
+        assertQuery(predicate: "mapInt16.@allKeys == %@ && mapInt16 != %@", values: ["foo", Int16(16)], expectedCount: 1) {
+            $0.mapInt16["foo"] != Int16(16)
+        }
+        assertQuery(predicate: "mapInt16.@allKeys == %@ && mapInt16 > %@", values: ["foo", Int16(16)], expectedCount: 1) {
+            $0.mapInt16["foo"] > Int16(16)
+        }
+
+        assertQuery(predicate: "mapInt16.@allKeys == %@ && mapInt16 >= %@", values: ["foo", Int16(16)], expectedCount: 1) {
+            $0.mapInt16["foo"] >= Int16(16)
+        }
+        assertQuery(predicate: "mapInt16.@allKeys == %@ && mapInt16 < %@", values: ["foo", Int16(16)], expectedCount: 0) {
+            $0.mapInt16["foo"] < Int16(16)
+        }
+
+        assertQuery(predicate: "mapInt16.@allKeys == %@ && mapInt16 <= %@", values: ["foo", Int16(16)], expectedCount: 1) {
+            $0.mapInt16["foo"] <= Int16(16)
+        }
+
+        assertQuery(predicate: "mapInt32.@allKeys == %@ && mapInt32 == %@", values: ["foo", Int32(32)], expectedCount: 1) {
+            $0.mapInt32["foo"] == Int32(32)
+        }
+
+        assertQuery(predicate: "mapInt32.@allKeys == %@ && mapInt32 != %@", values: ["foo", Int32(32)], expectedCount: 1) {
+            $0.mapInt32["foo"] != Int32(32)
+        }
+        assertQuery(predicate: "mapInt32.@allKeys == %@ && mapInt32 > %@", values: ["foo", Int32(32)], expectedCount: 1) {
+            $0.mapInt32["foo"] > Int32(32)
+        }
+
+        assertQuery(predicate: "mapInt32.@allKeys == %@ && mapInt32 >= %@", values: ["foo", Int32(32)], expectedCount: 1) {
+            $0.mapInt32["foo"] >= Int32(32)
+        }
+        assertQuery(predicate: "mapInt32.@allKeys == %@ && mapInt32 < %@", values: ["foo", Int32(32)], expectedCount: 0) {
+            $0.mapInt32["foo"] < Int32(32)
+        }
+
+        assertQuery(predicate: "mapInt32.@allKeys == %@ && mapInt32 <= %@", values: ["foo", Int32(32)], expectedCount: 1) {
+            $0.mapInt32["foo"] <= Int32(32)
+        }
+
+        assertQuery(predicate: "mapInt64.@allKeys == %@ && mapInt64 == %@", values: ["foo", Int64(64)], expectedCount: 1) {
+            $0.mapInt64["foo"] == Int64(64)
+        }
+
+        assertQuery(predicate: "mapInt64.@allKeys == %@ && mapInt64 != %@", values: ["foo", Int64(64)], expectedCount: 1) {
+            $0.mapInt64["foo"] != Int64(64)
+        }
+        assertQuery(predicate: "mapInt64.@allKeys == %@ && mapInt64 > %@", values: ["foo", Int64(64)], expectedCount: 1) {
+            $0.mapInt64["foo"] > Int64(64)
+        }
+
+        assertQuery(predicate: "mapInt64.@allKeys == %@ && mapInt64 >= %@", values: ["foo", Int64(64)], expectedCount: 1) {
+            $0.mapInt64["foo"] >= Int64(64)
+        }
+        assertQuery(predicate: "mapInt64.@allKeys == %@ && mapInt64 < %@", values: ["foo", Int64(64)], expectedCount: 0) {
+            $0.mapInt64["foo"] < Int64(64)
+        }
+
+        assertQuery(predicate: "mapInt64.@allKeys == %@ && mapInt64 <= %@", values: ["foo", Int64(64)], expectedCount: 1) {
+            $0.mapInt64["foo"] <= Int64(64)
+        }
+
+        assertQuery(predicate: "mapFloat.@allKeys == %@ && mapFloat == %@", values: ["foo", Float(5.55444333)], expectedCount: 1) {
+            $0.mapFloat["foo"] == Float(5.55444333)
+        }
+
+        assertQuery(predicate: "mapFloat.@allKeys == %@ && mapFloat != %@", values: ["foo", Float(5.55444333)], expectedCount: 1) {
+            $0.mapFloat["foo"] != Float(5.55444333)
+        }
+        assertQuery(predicate: "mapFloat.@allKeys == %@ && mapFloat > %@", values: ["foo", Float(5.55444333)], expectedCount: 1) {
+            $0.mapFloat["foo"] > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "mapFloat.@allKeys == %@ && mapFloat >= %@", values: ["foo", Float(5.55444333)], expectedCount: 1) {
+            $0.mapFloat["foo"] >= Float(5.55444333)
+        }
+        assertQuery(predicate: "mapFloat.@allKeys == %@ && mapFloat < %@", values: ["foo", Float(5.55444333)], expectedCount: 0) {
+            $0.mapFloat["foo"] < Float(5.55444333)
+        }
+
+        assertQuery(predicate: "mapFloat.@allKeys == %@ && mapFloat <= %@", values: ["foo", Float(5.55444333)], expectedCount: 1) {
+            $0.mapFloat["foo"] <= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "mapDouble.@allKeys == %@ && mapDouble == %@", values: ["foo", 123.456], expectedCount: 1) {
+            $0.mapDouble["foo"] == 123.456
+        }
+
+        assertQuery(predicate: "mapDouble.@allKeys == %@ && mapDouble != %@", values: ["foo", 123.456], expectedCount: 1) {
+            $0.mapDouble["foo"] != 123.456
+        }
+        assertQuery(predicate: "mapDouble.@allKeys == %@ && mapDouble > %@", values: ["foo", 123.456], expectedCount: 1) {
+            $0.mapDouble["foo"] > 123.456
+        }
+
+        assertQuery(predicate: "mapDouble.@allKeys == %@ && mapDouble >= %@", values: ["foo", 123.456], expectedCount: 1) {
+            $0.mapDouble["foo"] >= 123.456
+        }
+        assertQuery(predicate: "mapDouble.@allKeys == %@ && mapDouble < %@", values: ["foo", 123.456], expectedCount: 0) {
+            $0.mapDouble["foo"] < 123.456
+        }
+
+        assertQuery(predicate: "mapDouble.@allKeys == %@ && mapDouble <= %@", values: ["foo", 123.456], expectedCount: 1) {
+            $0.mapDouble["foo"] <= 123.456
+        }
+
+        assertQuery(predicate: "mapString.@allKeys == %@ && mapString == %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapString["foo"] == "Foo"
+        }
+
+        assertQuery(predicate: "mapString.@allKeys == %@ && mapString != %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapString["foo"] != "Foo"
+        }
+
+        assertQuery(predicate: "mapString.@allKeys == %@ && mapString CONTAINS[cd] %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapString["foo"].contains("Foo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "mapString.@allKeys == %@ && mapString CONTAINS %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapString["foo"].contains("Foo")
+        }
+
+        assertQuery(predicate: "mapString.@allKeys == %@ && mapString BEGINSWITH[cd] %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapString["foo"].starts(with: "Foo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "mapString.@allKeys == %@ && mapString BEGINSWITH %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapString["foo"].starts(with: "Foo")
+        }
+
+        assertQuery(predicate: "mapString.@allKeys == %@ && mapString ENDSWITH[cd] %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapString["foo"].ends(with: "Foo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "mapString.@allKeys == %@ && mapString ENDSWITH %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapString["foo"].ends(with: "Foo")
+        }
+
+        assertQuery(predicate: "mapString.@allKeys == %@ && mapString LIKE[c] %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapString["foo"].like("Foo", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "mapString.@allKeys == %@ && mapString LIKE %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapString["foo"].like("Foo")
+        }
+        assertQuery(predicate: "mapBinary.@allKeys == %@ && mapBinary == %@", values: ["foo", Data(count: 64)], expectedCount: 1) {
+            $0.mapBinary["foo"] == Data(count: 64)
+        }
+
+        assertQuery(predicate: "mapBinary.@allKeys == %@ && mapBinary != %@", values: ["foo", Data(count: 64)], expectedCount: 1) {
+            $0.mapBinary["foo"] != Data(count: 64)
+        }
+
+        assertQuery(predicate: "mapDate.@allKeys == %@ && mapDate == %@", values: ["foo", Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapDate["foo"] == Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapDate.@allKeys == %@ && mapDate != %@", values: ["foo", Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapDate["foo"] != Date(timeIntervalSince1970: 1000000)
+        }
+        assertQuery(predicate: "mapDate.@allKeys == %@ && mapDate > %@", values: ["foo", Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapDate["foo"] > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapDate.@allKeys == %@ && mapDate >= %@", values: ["foo", Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapDate["foo"] >= Date(timeIntervalSince1970: 1000000)
+        }
+        assertQuery(predicate: "mapDate.@allKeys == %@ && mapDate < %@", values: ["foo", Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.mapDate["foo"] < Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapDate.@allKeys == %@ && mapDate <= %@", values: ["foo", Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapDate["foo"] <= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapDecimal.@allKeys == %@ && mapDecimal == %@", values: ["foo", Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal["foo"] == Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapDecimal.@allKeys == %@ && mapDecimal != %@", values: ["foo", Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal["foo"] != Decimal128(123.456)
+        }
+        assertQuery(predicate: "mapDecimal.@allKeys == %@ && mapDecimal > %@", values: ["foo", Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal["foo"] > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapDecimal.@allKeys == %@ && mapDecimal >= %@", values: ["foo", Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal["foo"] >= Decimal128(123.456)
+        }
+        assertQuery(predicate: "mapDecimal.@allKeys == %@ && mapDecimal < %@", values: ["foo", Decimal128(123.456)], expectedCount: 0) {
+            $0.mapDecimal["foo"] < Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapDecimal.@allKeys == %@ && mapDecimal <= %@", values: ["foo", Decimal128(123.456)], expectedCount: 1) {
+            $0.mapDecimal["foo"] <= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapObjectId.@allKeys == %@ && mapObjectId == %@", values: ["foo", ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+            $0.mapObjectId["foo"] == ObjectId("61184062c1d8f096a3695046")
+        }
+
+        assertQuery(predicate: "mapObjectId.@allKeys == %@ && mapObjectId != %@", values: ["foo", ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+            $0.mapObjectId["foo"] != ObjectId("61184062c1d8f096a3695046")
+        }
+
+        assertQuery(predicate: "mapUuid.@allKeys == %@ && mapUuid == %@", values: ["foo", UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 1) {
+            $0.mapUuid["foo"] == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
+        }
+
+        assertQuery(predicate: "mapUuid.@allKeys == %@ && mapUuid != %@", values: ["foo", UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 1) {
+            $0.mapUuid["foo"] != UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
+        }
+
+        assertQuery(predicate: "mapAny.@allKeys == %@ && mapAny == %@", values: ["foo", ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+            $0.mapAny["foo"] == AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))
+        }
+
+        assertQuery(predicate: "mapAny.@allKeys == %@ && mapAny != %@", values: ["foo", ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+            $0.mapAny["foo"] != AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046"))
+        }
+
+        assertQuery(predicate: "mapOptBool.@allKeys == %@ && mapOptBool == %@", values: ["foo", true], expectedCount: 1) {
+            $0.mapOptBool["foo"] == true
+        }
+
+        assertQuery(predicate: "mapOptBool.@allKeys == %@ && mapOptBool != %@", values: ["foo", true], expectedCount: 0) {
+            $0.mapOptBool["foo"] != true
+        }
+
+        assertQuery(predicate: "mapOptInt.@allKeys == %@ && mapOptInt == %@", values: ["foo", 1], expectedCount: 1) {
+            $0.mapOptInt["foo"] == 1
+        }
+
+        assertQuery(predicate: "mapOptInt.@allKeys == %@ && mapOptInt != %@", values: ["foo", 1], expectedCount: 1) {
+            $0.mapOptInt["foo"] != 1
+        }
+        assertQuery(predicate: "mapOptInt.@allKeys == %@ && mapOptInt > %@", values: ["foo", 1], expectedCount: 1) {
+            $0.mapOptInt["foo"] > 1
+        }
+
+        assertQuery(predicate: "mapOptInt.@allKeys == %@ && mapOptInt >= %@", values: ["foo", 1], expectedCount: 1) {
+            $0.mapOptInt["foo"] >= 1
+        }
+        assertQuery(predicate: "mapOptInt.@allKeys == %@ && mapOptInt < %@", values: ["foo", 1], expectedCount: 0) {
+            $0.mapOptInt["foo"] < 1
+        }
+
+        assertQuery(predicate: "mapOptInt.@allKeys == %@ && mapOptInt <= %@", values: ["foo", 1], expectedCount: 1) {
+            $0.mapOptInt["foo"] <= 1
+        }
+
+        assertQuery(predicate: "mapOptInt8.@allKeys == %@ && mapOptInt8 == %@", values: ["foo", Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8["foo"] == Int8(8)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@allKeys == %@ && mapOptInt8 != %@", values: ["foo", Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8["foo"] != Int8(8)
+        }
+        assertQuery(predicate: "mapOptInt8.@allKeys == %@ && mapOptInt8 > %@", values: ["foo", Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8["foo"] > Int8(8)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@allKeys == %@ && mapOptInt8 >= %@", values: ["foo", Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8["foo"] >= Int8(8)
+        }
+        assertQuery(predicate: "mapOptInt8.@allKeys == %@ && mapOptInt8 < %@", values: ["foo", Int8(8)], expectedCount: 0) {
+            $0.mapOptInt8["foo"] < Int8(8)
+        }
+
+        assertQuery(predicate: "mapOptInt8.@allKeys == %@ && mapOptInt8 <= %@", values: ["foo", Int8(8)], expectedCount: 1) {
+            $0.mapOptInt8["foo"] <= Int8(8)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@allKeys == %@ && mapOptInt16 == %@", values: ["foo", Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16["foo"] == Int16(16)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@allKeys == %@ && mapOptInt16 != %@", values: ["foo", Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16["foo"] != Int16(16)
+        }
+        assertQuery(predicate: "mapOptInt16.@allKeys == %@ && mapOptInt16 > %@", values: ["foo", Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16["foo"] > Int16(16)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@allKeys == %@ && mapOptInt16 >= %@", values: ["foo", Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16["foo"] >= Int16(16)
+        }
+        assertQuery(predicate: "mapOptInt16.@allKeys == %@ && mapOptInt16 < %@", values: ["foo", Int16(16)], expectedCount: 0) {
+            $0.mapOptInt16["foo"] < Int16(16)
+        }
+
+        assertQuery(predicate: "mapOptInt16.@allKeys == %@ && mapOptInt16 <= %@", values: ["foo", Int16(16)], expectedCount: 1) {
+            $0.mapOptInt16["foo"] <= Int16(16)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@allKeys == %@ && mapOptInt32 == %@", values: ["foo", Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32["foo"] == Int32(32)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@allKeys == %@ && mapOptInt32 != %@", values: ["foo", Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32["foo"] != Int32(32)
+        }
+        assertQuery(predicate: "mapOptInt32.@allKeys == %@ && mapOptInt32 > %@", values: ["foo", Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32["foo"] > Int32(32)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@allKeys == %@ && mapOptInt32 >= %@", values: ["foo", Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32["foo"] >= Int32(32)
+        }
+        assertQuery(predicate: "mapOptInt32.@allKeys == %@ && mapOptInt32 < %@", values: ["foo", Int32(32)], expectedCount: 0) {
+            $0.mapOptInt32["foo"] < Int32(32)
+        }
+
+        assertQuery(predicate: "mapOptInt32.@allKeys == %@ && mapOptInt32 <= %@", values: ["foo", Int32(32)], expectedCount: 1) {
+            $0.mapOptInt32["foo"] <= Int32(32)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@allKeys == %@ && mapOptInt64 == %@", values: ["foo", Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64["foo"] == Int64(64)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@allKeys == %@ && mapOptInt64 != %@", values: ["foo", Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64["foo"] != Int64(64)
+        }
+        assertQuery(predicate: "mapOptInt64.@allKeys == %@ && mapOptInt64 > %@", values: ["foo", Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64["foo"] > Int64(64)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@allKeys == %@ && mapOptInt64 >= %@", values: ["foo", Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64["foo"] >= Int64(64)
+        }
+        assertQuery(predicate: "mapOptInt64.@allKeys == %@ && mapOptInt64 < %@", values: ["foo", Int64(64)], expectedCount: 0) {
+            $0.mapOptInt64["foo"] < Int64(64)
+        }
+
+        assertQuery(predicate: "mapOptInt64.@allKeys == %@ && mapOptInt64 <= %@", values: ["foo", Int64(64)], expectedCount: 1) {
+            $0.mapOptInt64["foo"] <= Int64(64)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@allKeys == %@ && mapOptFloat == %@", values: ["foo", Float(5.55444333)], expectedCount: 1) {
+            $0.mapOptFloat["foo"] == Float(5.55444333)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@allKeys == %@ && mapOptFloat != %@", values: ["foo", Float(5.55444333)], expectedCount: 1) {
+            $0.mapOptFloat["foo"] != Float(5.55444333)
+        }
+        assertQuery(predicate: "mapOptFloat.@allKeys == %@ && mapOptFloat > %@", values: ["foo", Float(5.55444333)], expectedCount: 1) {
+            $0.mapOptFloat["foo"] > Float(5.55444333)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@allKeys == %@ && mapOptFloat >= %@", values: ["foo", Float(5.55444333)], expectedCount: 1) {
+            $0.mapOptFloat["foo"] >= Float(5.55444333)
+        }
+        assertQuery(predicate: "mapOptFloat.@allKeys == %@ && mapOptFloat < %@", values: ["foo", Float(5.55444333)], expectedCount: 0) {
+            $0.mapOptFloat["foo"] < Float(5.55444333)
+        }
+
+        assertQuery(predicate: "mapOptFloat.@allKeys == %@ && mapOptFloat <= %@", values: ["foo", Float(5.55444333)], expectedCount: 1) {
+            $0.mapOptFloat["foo"] <= Float(5.55444333)
+        }
+
+        assertQuery(predicate: "mapOptDouble.@allKeys == %@ && mapOptDouble == %@", values: ["foo", 123.456], expectedCount: 1) {
+            $0.mapOptDouble["foo"] == 123.456
+        }
+
+        assertQuery(predicate: "mapOptDouble.@allKeys == %@ && mapOptDouble != %@", values: ["foo", 123.456], expectedCount: 1) {
+            $0.mapOptDouble["foo"] != 123.456
+        }
+        assertQuery(predicate: "mapOptDouble.@allKeys == %@ && mapOptDouble > %@", values: ["foo", 123.456], expectedCount: 1) {
+            $0.mapOptDouble["foo"] > 123.456
+        }
+
+        assertQuery(predicate: "mapOptDouble.@allKeys == %@ && mapOptDouble >= %@", values: ["foo", 123.456], expectedCount: 1) {
+            $0.mapOptDouble["foo"] >= 123.456
+        }
+        assertQuery(predicate: "mapOptDouble.@allKeys == %@ && mapOptDouble < %@", values: ["foo", 123.456], expectedCount: 0) {
+            $0.mapOptDouble["foo"] < 123.456
+        }
+
+        assertQuery(predicate: "mapOptDouble.@allKeys == %@ && mapOptDouble <= %@", values: ["foo", 123.456], expectedCount: 1) {
+            $0.mapOptDouble["foo"] <= 123.456
+        }
+
+        assertQuery(predicate: "mapOptString.@allKeys == %@ && mapOptString == %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapOptString["foo"] == "Foo"
+        }
+
+        assertQuery(predicate: "mapOptString.@allKeys == %@ && mapOptString != %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapOptString["foo"] != "Foo"
+        }
+
+        assertQuery(predicate: "mapOptString.@allKeys == %@ && mapOptString CONTAINS[cd] %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapOptString["foo"].contains("Foo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "mapOptString.@allKeys == %@ && mapOptString CONTAINS %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapOptString["foo"].contains("Foo")
+        }
+
+        assertQuery(predicate: "mapOptString.@allKeys == %@ && mapOptString BEGINSWITH[cd] %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapOptString["foo"].starts(with: "Foo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "mapOptString.@allKeys == %@ && mapOptString BEGINSWITH %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapOptString["foo"].starts(with: "Foo")
+        }
+
+        assertQuery(predicate: "mapOptString.@allKeys == %@ && mapOptString ENDSWITH[cd] %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapOptString["foo"].ends(with: "Foo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "mapOptString.@allKeys == %@ && mapOptString ENDSWITH %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapOptString["foo"].ends(with: "Foo")
+        }
+
+        assertQuery(predicate: "mapOptString.@allKeys == %@ && mapOptString LIKE[c] %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapOptString["foo"].like("Foo", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "mapOptString.@allKeys == %@ && mapOptString LIKE %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.mapOptString["foo"].like("Foo")
+        }
+        assertQuery(predicate: "mapOptBinary.@allKeys == %@ && mapOptBinary == %@", values: ["foo", Data(count: 64)], expectedCount: 1) {
+            $0.mapOptBinary["foo"] == Data(count: 64)
+        }
+
+        assertQuery(predicate: "mapOptBinary.@allKeys == %@ && mapOptBinary != %@", values: ["foo", Data(count: 64)], expectedCount: 1) {
+            $0.mapOptBinary["foo"] != Data(count: 64)
+        }
+
+        assertQuery(predicate: "mapOptDate.@allKeys == %@ && mapOptDate == %@", values: ["foo", Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapOptDate["foo"] == Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@allKeys == %@ && mapOptDate != %@", values: ["foo", Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapOptDate["foo"] != Date(timeIntervalSince1970: 1000000)
+        }
+        assertQuery(predicate: "mapOptDate.@allKeys == %@ && mapOptDate > %@", values: ["foo", Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapOptDate["foo"] > Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@allKeys == %@ && mapOptDate >= %@", values: ["foo", Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapOptDate["foo"] >= Date(timeIntervalSince1970: 1000000)
+        }
+        assertQuery(predicate: "mapOptDate.@allKeys == %@ && mapOptDate < %@", values: ["foo", Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
+            $0.mapOptDate["foo"] < Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapOptDate.@allKeys == %@ && mapOptDate <= %@", values: ["foo", Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.mapOptDate["foo"] <= Date(timeIntervalSince1970: 1000000)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@allKeys == %@ && mapOptDecimal == %@", values: ["foo", Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal["foo"] == Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@allKeys == %@ && mapOptDecimal != %@", values: ["foo", Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal["foo"] != Decimal128(123.456)
+        }
+        assertQuery(predicate: "mapOptDecimal.@allKeys == %@ && mapOptDecimal > %@", values: ["foo", Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal["foo"] > Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@allKeys == %@ && mapOptDecimal >= %@", values: ["foo", Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal["foo"] >= Decimal128(123.456)
+        }
+        assertQuery(predicate: "mapOptDecimal.@allKeys == %@ && mapOptDecimal < %@", values: ["foo", Decimal128(123.456)], expectedCount: 0) {
+            $0.mapOptDecimal["foo"] < Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapOptDecimal.@allKeys == %@ && mapOptDecimal <= %@", values: ["foo", Decimal128(123.456)], expectedCount: 1) {
+            $0.mapOptDecimal["foo"] <= Decimal128(123.456)
+        }
+
+        assertQuery(predicate: "mapOptUuid.@allKeys == %@ && mapOptUuid == %@", values: ["foo", UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 1) {
+            $0.mapOptUuid["foo"] == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
+        }
+
+        assertQuery(predicate: "mapOptUuid.@allKeys == %@ && mapOptUuid != %@", values: ["foo", UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 1) {
+            $0.mapOptUuid["foo"] != UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
+        }
+
+        assertQuery(predicate: "mapOptObjectId.@allKeys == %@ && mapOptObjectId == %@", values: ["foo", ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+            $0.mapOptObjectId["foo"] == ObjectId("61184062c1d8f096a3695046")
+        }
+
+        assertQuery(predicate: "mapOptObjectId.@allKeys == %@ && mapOptObjectId != %@", values: ["foo", ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+            $0.mapOptObjectId["foo"] != ObjectId("61184062c1d8f096a3695046")
+        }
+
+    }
+
+    func testMapSubscriptObject() {
+        let obj = objects().first!
+        let colObj = collectionObject()
+        let realm = realmWithTestPath()
+        let result1 = realm.objects(ModernCollectionObject.self).query {
+            $0.map.contains(obj)
+        }
+        XCTAssertEqual(result1.count, 0)
+        try! realm.write {
+            colObj.map["foo"] = obj
+        }
+        let result2 = realm.objects(ModernCollectionObject.self).query {
+            $0.map["foo"].intCol == 6
+        }
+
+        let query: ((Query<ModernCollectionObject>) -> Query<ModernCollectionObject>) = {
+            $0.map["foo"].intCol == 5
+        }
+
+        let constructedPredicate = query(Query<ModernCollectionObject>())._constructPredicate()
+
         XCTAssertEqual(result2.count, 1)
     }
 

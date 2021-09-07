@@ -199,4 +199,17 @@ class QueryTests_Prototype: TestCase {
         }
         XCTAssertEqual(query2.count, 3)
     }
+
+    func testMap() {
+        try! realmWithTestPath().write {
+            let obj = ModernAllTypesObject(value: ["intCol": 123, "mapInt": ["foo": 123]])
+            let colObj = ModernCollectionObject(value: ["map": ["foo": obj]])
+            realmWithTestPath().add(colObj)
+        }
+        print(realmWithTestPath().objects(ModernCollectionObject.self))
+        let result = realmWithTestPath().objects(ModernCollectionObject.self).filter("map.intCol == 456")
+        print(result)
+        let result2 = realmWithTestPath().objects(ModernAllTypesObject.self).filter("mapInt == 456")
+        print(result2)
+    }
 }
