@@ -25,6 +25,10 @@ public enum StringOptions {
 
 /// :nodoc:
 private enum QueryExpression {
+    enum Prefix: String {
+        case not = "NOT"
+    }
+
     enum BasicComparision: String {
         case equal = "==" // TODO: @"string1 ==[c] string1"
         case notEqual = "!="
@@ -32,7 +36,6 @@ private enum QueryExpression {
         case greaterThan = ">"
         case greaterThenOrEqual = ">="
         case lessThanOrEqual = "<="
-        case not = "NOT"
     }
 
     enum Comparision {
@@ -46,10 +49,10 @@ private enum QueryExpression {
     }
 
     enum StringSearch {
-        case contains(String, Set<StringOptions>?)
-        case like(String, Set<StringOptions>?)
-        case beginsWith(String, Set<StringOptions>?)
-        case endsWith(String, Set<StringOptions>?)
+        case contains(_QueryBinary, Set<StringOptions>?)
+        case like(_QueryString, Set<StringOptions>?)
+        case beginsWith(_QueryBinary, Set<StringOptions>?)
+        case endsWith(_QueryBinary, Set<StringOptions>?)
     }
 
     enum CollectionAggregation: String {
@@ -64,6 +67,7 @@ private enum QueryExpression {
     }
 
     case keyPath(name: String, isCollection: Bool = false)
+    case prefix(Prefix)
     case comparison(Comparision)
     case basicComparison(BasicComparision)
     case compound(Compound)
@@ -124,11 +128,11 @@ public struct Query<T: _Persistable> {
         return Query<V>(expression: self.tokens + tokens)
     }
 
-    // MARK: NOT
+    // MARK: Prefix
 
     public static prefix func ! (_ rhs: Query) -> Query {
         var tokensCopy = rhs.tokens
-        tokensCopy.insert(.basicComparison(.not), at: 0)
+        tokensCopy.insert(.prefix(.not), at: 0)
         return Query(expression: tokensCopy)
     }
 
@@ -205,12 +209,17 @@ public struct Query<T: _Persistable> {
 
         for (idx, token) in tokens.enumerated() {
             switch token {
-            case let .basicComparison(op):
-                if idx == 0 {
+            case let .prefix(op):
+                switch tokens[idx+2] {
+                case .basicComparison:
                     predicateString.append(op.rawValue)
-                } else {
-                    predicateString.append(" \(op.rawValue)")
+                case .stringSearch(.contains(_, _)):
+                    predicateString.append("\(op.rawValue) (")
+                default:
+                    throwRealmException("`!` is only allowed for certain queries")
                 }
+            case let .basicComparison(op):
+                predicateString.append(" \(op.rawValue)")
             case let .comparison(comp):
                 switch comp {
                 case let .between(low, high, closedRange):
@@ -249,7 +258,12 @@ public struct Query<T: _Persistable> {
             case let .stringSearch(s):
                 switch s {
                 case let .contains(str, options):
-                    predicateString.append(" CONTAINS\(optionsStr(options)) %@")
+                    if idx > 1,
+                       case .prefix = tokens[idx-2] {
+                        predicateString.append(" CONTAINS\(optionsStr(options)) %@)")
+                    } else {
+                        predicateString.append(" CONTAINS\(optionsStr(options)) %@")
+                    }
                     arguments.append(str)
                 case let .like(str, options):
                     predicateString.append(" LIKE\(optionsStr(options)) %@")
