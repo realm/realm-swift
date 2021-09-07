@@ -189,7 +189,7 @@ public struct Query<T: _Persistable> {
         var arguments: [Any] = []
 
         func optionsStr(_ options: Set<StringOptions>?) -> String {
-            guard let o = options else {
+            guard let o = options, !o.isEmpty else {
                 return ""
             }
             var str = "["
