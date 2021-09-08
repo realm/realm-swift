@@ -1870,6 +1870,7 @@ class QueryTests: TestCase {
                     values: ["Foó"], expectedCount: 1) {
             $0.stringCol.like("Foó", caseInsensitive: false)
         }
+
         assertQuery(predicate: "stringCol LIKE %@",
                     values: ["f*"], expectedCount: 0) {
             $0.stringCol.like("f*")
@@ -2035,7 +2036,7 @@ class QueryTests: TestCase {
 
     func testNotPrefixUnsupported() {
         let result1 = objects()
-        
+
         let queryStartsWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
             !$0.stringCol.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
         }
@@ -2053,7 +2054,7 @@ class QueryTests: TestCase {
         }
         assertThrows(result1.query(queryLike),
                     reason: "`!` prefix is only allowed for `BasicComparison` and `Search.contains` queries")
-        
+
     }
 
     func testBinaryStringQueries() {
@@ -2370,203 +2371,203 @@ class QueryTests: TestCase {
         assertQuery(predicate: "NOT %@ IN arrayBool", values: [false], expectedCount: 1) {
             !$0.arrayBool.contains(false)
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayInt", values: [1], expectedCount: 0) {
             !$0.arrayInt.contains(1)
         }
         assertQuery(predicate: "NOT %@ IN arrayInt", values: [3], expectedCount: 1) {
             !$0.arrayInt.contains(3)
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayInt8", values: [Int8(8)], expectedCount: 0) {
             !$0.arrayInt8.contains(Int8(8))
         }
         assertQuery(predicate: "NOT %@ IN arrayInt8", values: [Int8(10)], expectedCount: 1) {
             !$0.arrayInt8.contains(Int8(10))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayInt16", values: [Int16(16)], expectedCount: 0) {
             !$0.arrayInt16.contains(Int16(16))
         }
         assertQuery(predicate: "NOT %@ IN arrayInt16", values: [Int16(18)], expectedCount: 1) {
             !$0.arrayInt16.contains(Int16(18))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayInt32", values: [Int32(32)], expectedCount: 0) {
             !$0.arrayInt32.contains(Int32(32))
         }
         assertQuery(predicate: "NOT %@ IN arrayInt32", values: [Int32(34)], expectedCount: 1) {
             !$0.arrayInt32.contains(Int32(34))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayInt64", values: [Int64(64)], expectedCount: 0) {
             !$0.arrayInt64.contains(Int64(64))
         }
         assertQuery(predicate: "NOT %@ IN arrayInt64", values: [Int64(66)], expectedCount: 1) {
             !$0.arrayInt64.contains(Int64(66))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayFloat", values: [Float(5.55444333)], expectedCount: 0) {
             !$0.arrayFloat.contains(Float(5.55444333))
         }
         assertQuery(predicate: "NOT %@ IN arrayFloat", values: [Float(7.55444333)], expectedCount: 1) {
             !$0.arrayFloat.contains(Float(7.55444333))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayDouble", values: [123.456], expectedCount: 0) {
             !$0.arrayDouble.contains(123.456)
         }
         assertQuery(predicate: "NOT %@ IN arrayDouble", values: [345.567], expectedCount: 1) {
             !$0.arrayDouble.contains(345.567)
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayString", values: ["Foo"], expectedCount: 0) {
             !$0.arrayString.contains("Foo")
         }
         assertQuery(predicate: "NOT %@ IN arrayString", values: ["Baz"], expectedCount: 1) {
             !$0.arrayString.contains("Baz")
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayBinary", values: [Data(count: 64)], expectedCount: 0) {
             !$0.arrayBinary.contains(Data(count: 64))
         }
         assertQuery(predicate: "NOT %@ IN arrayBinary", values: [Data(count: 256)], expectedCount: 1) {
             !$0.arrayBinary.contains(Data(count: 256))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayDate", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
             !$0.arrayDate.contains(Date(timeIntervalSince1970: 1000000))
         }
         assertQuery(predicate: "NOT %@ IN arrayDate", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
             !$0.arrayDate.contains(Date(timeIntervalSince1970: 3000000))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayDecimal", values: [Decimal128(123.456)], expectedCount: 0) {
             !$0.arrayDecimal.contains(Decimal128(123.456))
         }
         assertQuery(predicate: "NOT %@ IN arrayDecimal", values: [Decimal128(963.852)], expectedCount: 1) {
             !$0.arrayDecimal.contains(Decimal128(963.852))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayObjectId", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 0) {
             !$0.arrayObjectId.contains(ObjectId("61184062c1d8f096a3695046"))
         }
         assertQuery(predicate: "NOT %@ IN arrayObjectId", values: [ObjectId("61184062c1d8f096a3695044")], expectedCount: 1) {
             !$0.arrayObjectId.contains(ObjectId("61184062c1d8f096a3695044"))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayUuid", values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 0) {
             !$0.arrayUuid.contains(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)
         }
         assertQuery(predicate: "NOT %@ IN arrayUuid", values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!], expectedCount: 1) {
             !$0.arrayUuid.contains(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!)
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayAny", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 0) {
             !$0.arrayAny.contains(AnyRealmValue.objectId(ObjectId("61184062c1d8f096a3695046")))
         }
         assertQuery(predicate: "NOT %@ IN arrayAny", values: [123], expectedCount: 1) {
             !$0.arrayAny.contains(AnyRealmValue.int(123))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptBool", values: [true], expectedCount: 0) {
             !$0.arrayOptBool.contains(true)
         }
         assertQuery(predicate: "NOT %@ IN arrayOptBool", values: [false], expectedCount: 1) {
             !$0.arrayOptBool.contains(false)
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptInt", values: [1], expectedCount: 0) {
             !$0.arrayOptInt.contains(1)
         }
         assertQuery(predicate: "NOT %@ IN arrayOptInt", values: [3], expectedCount: 1) {
             !$0.arrayOptInt.contains(3)
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptInt8", values: [Int8(8)], expectedCount: 0) {
             !$0.arrayOptInt8.contains(Int8(8))
         }
         assertQuery(predicate: "NOT %@ IN arrayOptInt8", values: [Int8(10)], expectedCount: 1) {
             !$0.arrayOptInt8.contains(Int8(10))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptInt16", values: [Int16(16)], expectedCount: 0) {
             !$0.arrayOptInt16.contains(Int16(16))
         }
         assertQuery(predicate: "NOT %@ IN arrayOptInt16", values: [Int16(18)], expectedCount: 1) {
             !$0.arrayOptInt16.contains(Int16(18))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptInt32", values: [Int32(32)], expectedCount: 0) {
             !$0.arrayOptInt32.contains(Int32(32))
         }
         assertQuery(predicate: "NOT %@ IN arrayOptInt32", values: [Int32(34)], expectedCount: 1) {
             !$0.arrayOptInt32.contains(Int32(34))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptInt64", values: [Int64(64)], expectedCount: 0) {
             !$0.arrayOptInt64.contains(Int64(64))
         }
         assertQuery(predicate: "NOT %@ IN arrayOptInt64", values: [Int64(66)], expectedCount: 1) {
             !$0.arrayOptInt64.contains(Int64(66))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptFloat", values: [Float(5.55444333)], expectedCount: 0) {
             !$0.arrayOptFloat.contains(Float(5.55444333))
         }
         assertQuery(predicate: "NOT %@ IN arrayOptFloat", values: [Float(7.55444333)], expectedCount: 1) {
             !$0.arrayOptFloat.contains(Float(7.55444333))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptDouble", values: [123.456], expectedCount: 0) {
             !$0.arrayOptDouble.contains(123.456)
         }
         assertQuery(predicate: "NOT %@ IN arrayOptDouble", values: [345.567], expectedCount: 1) {
             !$0.arrayOptDouble.contains(345.567)
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptString", values: ["Foo"], expectedCount: 0) {
             !$0.arrayOptString.contains("Foo")
         }
         assertQuery(predicate: "NOT %@ IN arrayOptString", values: ["Baz"], expectedCount: 1) {
             !$0.arrayOptString.contains("Baz")
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptBinary", values: [Data(count: 64)], expectedCount: 0) {
             !$0.arrayOptBinary.contains(Data(count: 64))
         }
         assertQuery(predicate: "NOT %@ IN arrayOptBinary", values: [Data(count: 256)], expectedCount: 1) {
             !$0.arrayOptBinary.contains(Data(count: 256))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptDate", values: [Date(timeIntervalSince1970: 1000000)], expectedCount: 0) {
             !$0.arrayOptDate.contains(Date(timeIntervalSince1970: 1000000))
         }
         assertQuery(predicate: "NOT %@ IN arrayOptDate", values: [Date(timeIntervalSince1970: 3000000)], expectedCount: 1) {
             !$0.arrayOptDate.contains(Date(timeIntervalSince1970: 3000000))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptDecimal", values: [Decimal128(123.456)], expectedCount: 0) {
             !$0.arrayOptDecimal.contains(Decimal128(123.456))
         }
         assertQuery(predicate: "NOT %@ IN arrayOptDecimal", values: [Decimal128(963.852)], expectedCount: 1) {
             !$0.arrayOptDecimal.contains(Decimal128(963.852))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptUuid", values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 0) {
             !$0.arrayOptUuid.contains(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!)
         }
         assertQuery(predicate: "NOT %@ IN arrayOptUuid", values: [UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!], expectedCount: 1) {
             !$0.arrayOptUuid.contains(UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d08e")!)
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptObjectId", values: [ObjectId("61184062c1d8f096a3695046")], expectedCount: 0) {
             !$0.arrayOptObjectId.contains(ObjectId("61184062c1d8f096a3695046"))
         }
         assertQuery(predicate: "NOT %@ IN arrayOptObjectId", values: [ObjectId("61184062c1d8f096a3695044")], expectedCount: 1) {
             !$0.arrayOptObjectId.contains(ObjectId("61184062c1d8f096a3695044"))
         }
-        
+
         assertQuery(predicate: "NOT %@ IN arrayOptBool", values: [NSNull()], expectedCount: 1) {
             !$0.arrayOptBool.contains(nil)
         }

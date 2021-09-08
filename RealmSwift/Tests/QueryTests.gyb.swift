@@ -739,6 +739,7 @@ class QueryTests: TestCase {
                     values: ["Foó"], expectedCount: 1) {
             $0.${property.colName}.like("Foó", caseInsensitive: false)
         }
+
         assertQuery(predicate: "${property.colName} LIKE %@",
                     values: ["f*"], expectedCount: 0) {
             $0.${property.colName}.like("f*")
@@ -914,7 +915,7 @@ class QueryTests: TestCase {
 
     func testNotPrefixUnsupported() {
         let result1 = objects()
-        
+
         % for property in properties:
         % if property.enumName == None and property.category == 'string':
         let queryStartsWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
@@ -934,7 +935,7 @@ class QueryTests: TestCase {
         }
         assertThrows(result1.query(queryLike),
                     reason: "`!` prefix is only allowed for `BasicComparison` and `Search.contains` queries")
-        
+
         % end
         % end
     }
@@ -1014,7 +1015,7 @@ class QueryTests: TestCase {
         assertQuery(predicate: "NOT %@ IN ${property.colName}", values: [${property.foundationValue(2)}], expectedCount: 1) {
             !$0.${property.colName}.contains(${property.value(2)})
         }
-        
+
         % end
         % for property in optListProperties:
         assertQuery(predicate: "NOT %@ IN ${property.colName}", values: [NSNull()], expectedCount: 1) {
