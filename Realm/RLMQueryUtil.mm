@@ -1333,6 +1333,7 @@ struct KeyPath {
     std::vector<RLMProperty *> links;
     RLMProperty *property;
     bool containsToManyRelationship;
+    bool isDictionary;
 };
 
 KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, NSString *keyPath)
@@ -1341,6 +1342,7 @@ KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, N
     std::vector<RLMProperty *> links;
 
     bool keyPathContainsToManyRelationship = false;
+    bool isDictionary = false;
 
     NSUInteger start = 0, length = keyPath.length, end = NSNotFound;
     do {
@@ -1353,6 +1355,8 @@ KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, N
 
         if (property.collection)
             keyPathContainsToManyRelationship = true;
+        if (property.dictionary)
+            isDictionary = true;
 
         if (end != NSNotFound) {
             RLMPrecondition(property.type == RLMPropertyTypeObject || property.type == RLMPropertyTypeLinkingObjects,
@@ -1367,7 +1371,7 @@ KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, N
         start = end + 1;
     } while (end != NSNotFound);
 
-    return {std::move(links), property, keyPathContainsToManyRelationship};
+    return {std::move(links), property, keyPathContainsToManyRelationship, isDictionary};
 }
 
 ColumnReference QueryBuilder::column_reference_from_key_path(RLMObjectSchema *objectSchema,
@@ -1378,9 +1382,9 @@ ColumnReference QueryBuilder::column_reference_from_key_path(RLMObjectSchema *ob
     if (isAggregate && !keyPath.containsToManyRelationship) {
         throwException(@"Invalid predicate",
                        @"Aggregate operations can only be used on key paths that include an array property");
-    } else if (!isAggregate && keyPath.containsToManyRelationship) {
-//        throwException(@"Invalid predicate",
-//                       @"Key paths that include a collection property must use aggregate operations");
+    } else if (!isAggregate && keyPath.containsToManyRelationship && !keyPath.isDictionary) {
+        throwException(@"Invalid predicate",
+                       @"Key paths that include a collection property must use aggregate operations");
     }
 
     return ColumnReference(m_query, m_group, m_schema, keyPath.property, std::move(keyPath.links));

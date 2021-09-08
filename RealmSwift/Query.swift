@@ -366,6 +366,19 @@ extension Query where T: RealmCollection, T.Element: OptionalProtocol, T.Element
 
 // MARK: RealmKeyedCollection
 
+extension Query where T: RealmKeyedCollection {
+    private func memberSubscript<U>(_ member: T.Key) -> Query<U> where T.Key: _Persistable {
+        guard let keyPath = tokens.first else {
+            throwRealmException("Could not contruct predicate for Map")
+        }
+        return append(tokens: [.collectionAggregation(.allKeys),
+                               .basicComparison(.equal),
+                               .rhs(member),
+                               .compound(.and),
+                               keyPath])
+    }
+}
+
 extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: _Persistable {
 
     public func contains<V>(_ value: T.Value) -> Query<V> {
@@ -377,14 +390,7 @@ extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: _Pe
     }
 
     public subscript(member: T.Key) -> Query<T.Value> {
-        guard let keyPath = tokens.first else {
-            throwRealmException("Could not contruct predicate for Map")
-        }
-        return append(tokens: [.collectionAggregation(.allKeys),
-                               .basicComparison(.equal),
-                               .rhs(member),
-                               .compound(.and),
-                               keyPath])
+        return memberSubscript(member)
     }
 }
 
@@ -398,18 +404,11 @@ extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: Opt
     }
 
     public subscript(member: T.Key) -> Query<T.Value.Wrapped> {
-        fatalError()
+        return memberSubscript(member)
     }
 
     public subscript(member: T.Key) -> Query<T.Value> where T.Value.Wrapped: ObjectBase {
-        guard let keyPath = tokens.first else {
-            throwRealmException("Could not contruct predicate for Map")
-        }
-        return append(tokens: [.collectionAggregation(.allKeys),
-                               .basicComparison(.equal),
-                               .rhs(member),
-                               .compound(.and),
-                               keyPath])
+        return memberSubscript(member)
     }
 }
 

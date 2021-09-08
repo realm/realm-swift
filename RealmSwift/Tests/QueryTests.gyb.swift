@@ -1386,10 +1386,30 @@ class QueryTests: TestCase {
             colObj.map["foo"] = obj
         }
         % for property in properties + optProperties:
-        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.${property.colName} == %@", values: ["foo", ${property.value(0)}], expectedCount: 1) {
+        % value = property.enumName if property.enumName != None else property.foundationValue(0)
+        % if property.enumName == None:
+        % equalsCount = 0 if property.category == 'bool' else 0
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.${property.colName} == %@", values: ["foo", ${value}], expectedCount: ${equalsCount}) {
             $0.map["foo"].${property.colName} == ${property.value(0)}
         }
+        % notEqualsCount = 1 if property.category == 'bool' else 1
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.${property.colName} != %@", values: ["foo", ${value}], expectedCount: ${notEqualsCount}) {
+            $0.map["foo"].${property.colName} != ${property.value(0)}
+        }
+        % else:
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.${property.colName} == %@", values: ["foo", ${value}], expectedCount: 1) {
+            $0.map["foo"].${property.colName} == ${property.value(1)}
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.${property.colName} != %@", values: ["foo", ${value}], expectedCount: 0) {
+            $0.map["foo"].${property.colName} != ${property.value(1)}
+        }
         % end
+        % end
+        try! realm.write {
+            colObj.map["foo"]??.objectCol = obj
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.objectCol.intCol == %@", values: ["foo", 6], expectedCount: 1) {
+            $0.map["foo"].objectCol.intCol == 6
+        }
     }
-
 }
