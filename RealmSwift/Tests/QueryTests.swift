@@ -2041,19 +2041,19 @@ class QueryTests: TestCase {
             !$0.stringCol.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
         }
         assertThrows(result1.query(queryStartsWith),
-                     reason: "`!` prefix is only allowed for `BasicComparison` and `Search.contains` queries")
+                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
 
         let queryEndWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
             !$0.stringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
         }
         assertThrows(result1.query(queryEndWith),
-                     reason: "`!` prefix is only allowed for `BasicComparison` and `Search.contains` queries")
+                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
 
         let queryLike: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
             !$0.stringCol.like("f*", caseInsensitive: true)
         }
         assertThrows(result1.query(queryLike),
-                    reason: "`!` prefix is only allowed for `BasicComparison` and `Search.contains` queries")
+                    reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
 
     }
 

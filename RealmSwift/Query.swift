@@ -214,7 +214,7 @@ public struct Query<T: _Persistable> {
                 case .comparison(.contains), .stringSearch(.contains):
                     predicateString.append("\(op.rawValue) ")
                 default:
-                    throwRealmException("`!` prefix is only allowed for `BasicComparison` and `Search.contains` queries")
+                    throwRealmException("`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
                 }
             case let .basicComparison(op):
                 predicateString.append(" \(op.rawValue)")
