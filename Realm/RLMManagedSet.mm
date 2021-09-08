@@ -302,8 +302,18 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     if (!managedSet) {
         @throw RLMException(@"Right hand side value must be a managed Set.");
     }
-    if (_type != managedSet->_type || _objectInfo != managedSet->_objectInfo) {
-        @throw RLMException(@"Set must match type of \"self\" '%@'", RLMTypeToString(_type));
+    if (_type != managedSet->_type) {
+        @throw RLMException(@"Cannot intersect sets of type '%@' and '%@'.",
+                            RLMTypeToString(_type), RLMTypeToString(managedSet->_type));
+    }
+    if (_realm != managedSet->_realm) {
+        @throw RLMException(@"Cannot insersect sets managed by different Realms.");
+    }
+    if (_objectInfo != managedSet->_objectInfo) {
+        @throw RLMException(@"Cannot intersect sets of type '%@' and '%@'.",
+                            _objectInfo->rlmObjectSchema.className,
+                            managedSet->_objectInfo->rlmObjectSchema.className);
+
     }
     return managedSet;
 }
