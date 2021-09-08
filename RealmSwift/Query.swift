@@ -48,7 +48,7 @@ private enum QueryExpression {
         case or = "||"
     }
 
-    enum StringSearch {
+    enum Search {
         case contains(_QueryBinary, Set<StringOptions>?)
         case like(_QueryString, Set<StringOptions>?)
         case beginsWith(_QueryBinary, Set<StringOptions>?)
@@ -73,7 +73,7 @@ private enum QueryExpression {
     case compound(Compound)
     case rhs(_RealmSchemaDiscoverable?)
     case subquery(String, String, [Any])
-    case stringSearch(StringSearch)
+    case stringSearch(Search)
     case collectionAggregation(CollectionAggregation)
 }
 
@@ -211,12 +211,12 @@ public struct Query<T: _Persistable> {
             switch token {
             case let .prefix(op):
                 switch tokens[idx+2] {
-                case .basicComparison:
-                    predicateString.append(op.rawValue)
+                case .comparison(.contains):
+                    predicateString.append("\(op.rawValue) ")
                 case .stringSearch(.contains(_, _)):
                     predicateString.append("\(op.rawValue) (")
                 default:
-                    throwRealmException("`!` is only allowed for certain queries")
+                    throwRealmException("`!` prefix is only allowed for `BasicComparison` and `Search.contains` queries")
                 }
             case let .basicComparison(op):
                 predicateString.append(" \(op.rawValue)")
