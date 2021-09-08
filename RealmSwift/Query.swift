@@ -211,10 +211,8 @@ public struct Query<T: _Persistable> {
             switch token {
             case let .prefix(op):
                 switch tokens[idx+2] {
-                case .comparison(.contains):
+                case .comparison(.contains), .stringSearch(.contains(_, _)):
                     predicateString.append("\(op.rawValue) ")
-                case .stringSearch(.contains(_, _)):
-                    predicateString.append("\(op.rawValue) (")
                 default:
                     throwRealmException("`!` prefix is only allowed for `BasicComparison` and `Search.contains` queries")
                 }
@@ -258,12 +256,7 @@ public struct Query<T: _Persistable> {
             case let .stringSearch(s):
                 switch s {
                 case let .contains(str, options):
-                    if idx > 1,
-                       case .prefix = tokens[idx-2] {
-                        predicateString.append(" CONTAINS\(optionsStr(options)) %@)")
-                    } else {
-                        predicateString.append(" CONTAINS\(optionsStr(options)) %@")
-                    }
+                    predicateString.append(" CONTAINS\(optionsStr(options)) %@")
                     arguments.append(str)
                 case let .like(str, options):
                     predicateString.append(" LIKE\(optionsStr(options)) %@")

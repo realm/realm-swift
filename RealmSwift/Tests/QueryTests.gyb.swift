@@ -883,27 +883,27 @@ class QueryTests: TestCase {
     func testStringNotContains() {
         % for property in properties:
                     % if property.enumName == None and property.category == 'string':
-        assertQuery(predicate: "NOT (${property.colName} CONTAINS %@)",
+        assertQuery(predicate: "NOT ${property.colName} CONTAINS %@",
                     values: ["Foó"], expectedCount: 0) {
             !$0.${property.colName}.contains("Foó")
         }
 
-        assertQuery(predicate: "NOT (${property.colName} CONTAINS %@)",
+        assertQuery(predicate: "NOT ${property.colName} CONTAINS %@",
                     values: ["Foó"], expectedCount: 0) {
             !$0.${property.colName}.contains("Foó", options: [])
         }
 
-        assertQuery(predicate: "NOT (${property.colName} CONTAINS[c] %@)",
+        assertQuery(predicate: "NOT ${property.colName} CONTAINS[c] %@",
                     values: ["Foó"], expectedCount: 0) {
             !$0.${property.colName}.contains("Foó", options: [.caseInsensitive])
         }
 
-        assertQuery(predicate: "NOT (${property.colName} CONTAINS[d] %@)",
+        assertQuery(predicate: "NOT ${property.colName} CONTAINS[d] %@",
                     values: ["Foó"], expectedCount: 0) {
             !$0.${property.colName}.contains("Foó", options: [.diacriticInsensitive])
         }
 
-        assertQuery(predicate: "NOT (${property.colName} CONTAINS[cd] %@)",
+        assertQuery(predicate: "NOT ${property.colName} CONTAINS[cd] %@",
                     values: ["Foó"], expectedCount: 0) {
             !$0.${property.colName}.contains("Foó", options: [.caseInsensitive, .diacriticInsensitive])
         }
@@ -957,7 +957,7 @@ class QueryTests: TestCase {
             $0.${property.colName}.contains(Data(count: 28))
         }
 
-        assertQuery(predicate: "NOT (${property.colName} CONTAINS %@)",
+        assertQuery(predicate: "NOT ${property.colName} CONTAINS %@",
                     values: [Data(count: 28)], expectedCount: 0) {
             !$0.${property.colName}.contains(Data(count: 28))
         }
@@ -977,7 +977,7 @@ class QueryTests: TestCase {
             $0.${property.colName}.contains(Data(repeating: 1, count: 28))
         }
 
-        assertQuery(predicate: "NOT (${property.colName} CONTAINS %@)",
+        assertQuery(predicate: "NOT ${property.colName} CONTAINS %@",
                     values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
             !$0.${property.colName}.contains(Data(repeating: 1, count: 28))
         }

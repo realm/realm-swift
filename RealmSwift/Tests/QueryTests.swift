@@ -2006,27 +2006,27 @@ class QueryTests: TestCase {
     }
 
     func testStringNotContains() {
-        assertQuery(predicate: "NOT (stringCol CONTAINS %@)",
+        assertQuery(predicate: "NOT stringCol CONTAINS %@",
                     values: ["Foó"], expectedCount: 0) {
             !$0.stringCol.contains("Foó")
         }
 
-        assertQuery(predicate: "NOT (stringCol CONTAINS %@)",
+        assertQuery(predicate: "NOT stringCol CONTAINS %@",
                     values: ["Foó"], expectedCount: 0) {
             !$0.stringCol.contains("Foó", options: [])
         }
 
-        assertQuery(predicate: "NOT (stringCol CONTAINS[c] %@)",
+        assertQuery(predicate: "NOT stringCol CONTAINS[c] %@",
                     values: ["Foó"], expectedCount: 0) {
             !$0.stringCol.contains("Foó", options: [.caseInsensitive])
         }
 
-        assertQuery(predicate: "NOT (stringCol CONTAINS[d] %@)",
+        assertQuery(predicate: "NOT stringCol CONTAINS[d] %@",
                     values: ["Foó"], expectedCount: 0) {
             !$0.stringCol.contains("Foó", options: [.diacriticInsensitive])
         }
 
-        assertQuery(predicate: "NOT (stringCol CONTAINS[cd] %@)",
+        assertQuery(predicate: "NOT stringCol CONTAINS[cd] %@",
                     values: ["Foó"], expectedCount: 0) {
             !$0.stringCol.contains("Foó", options: [.caseInsensitive, .diacriticInsensitive])
         }
@@ -2072,7 +2072,7 @@ class QueryTests: TestCase {
             $0.binaryCol.contains(Data(count: 28))
         }
 
-        assertQuery(predicate: "NOT (binaryCol CONTAINS %@)",
+        assertQuery(predicate: "NOT binaryCol CONTAINS %@",
                     values: [Data(count: 28)], expectedCount: 0) {
             !$0.binaryCol.contains(Data(count: 28))
         }
@@ -2092,7 +2092,7 @@ class QueryTests: TestCase {
             $0.binaryCol.contains(Data(repeating: 1, count: 28))
         }
 
-        assertQuery(predicate: "NOT (binaryCol CONTAINS %@)",
+        assertQuery(predicate: "NOT binaryCol CONTAINS %@",
                     values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
             !$0.binaryCol.contains(Data(repeating: 1, count: 28))
         }

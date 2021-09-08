@@ -200,7 +200,6 @@ class QueryTests_Prototype: TestCase {
         XCTAssertEqual(query2.count, 3)
     }
 
-<<<<<<< HEAD
     func testMap() {
         try! realmWithTestPath().write {
             let obj = ModernAllTypesObject(value: ["intCol": 123, "mapInt": ["foo": 123]])
@@ -214,8 +213,8 @@ class QueryTests_Prototype: TestCase {
         print(result2)
         string type, and `like()` for string type)
     }
-    
-    func test() {
+
+    func testCompoundNot() {
         let compoundQuery1 = objects().query {
             $0.stringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive]) && !$0.stringCol.contains("hy", options: [.caseInsensitive, .diacriticInsensitive])
         }
