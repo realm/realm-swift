@@ -901,7 +901,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             let appServerId = try RealmServer.shared.retrieveAppId(clientAppId: appId)
             let deleteUserEx = expectation(description: "delete-user")
-            RealmServer.shared.removeUserForApp(appServerId, userId: app.currentUser!.id) { result in
+            RealmServer.shared.removeUserForApp(appServerId, userId: user.id) { result in
                 switch result {
                 case .success:
                     break
