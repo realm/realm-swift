@@ -296,6 +296,26 @@ class QueryTests: TestCase {
         }
     }
 
+    private func assertCollectionObjectQuery(predicate: String,
+                                             values: [AnyHashable],
+                                             expectedCount: Int,
+                                             _ query: ((Query<ModernCollectionObject>) -> Query<ModernCollectionObject>)) {
+        let results = realmWithTestPath().objects(ModernCollectionObject.self).query(query)
+        XCTAssertEqual(results.count, expectedCount)
+
+        let constructedPredicate = query(Query<ModernCollectionObject>())._constructPredicate()
+        XCTAssertEqual(constructedPredicate.0,
+                       predicate)
+
+        for (e1, e2) in zip(constructedPredicate.1, values) {
+            if let e1 = e1 as? Object, let e2 = e2 as? Object {
+                assertEqual(e1, e2)
+            } else {
+                XCTAssertEqual(e1 as! AnyHashable, e2)
+            }
+        }
+    }
+
     // MARK: - Basic Comparison
 
     func testEquals() {
@@ -1362,17 +1382,14 @@ class QueryTests: TestCase {
         let obj = objects().first!
         let colObj = collectionObject()
         let realm = realmWithTestPath()
-        let result1 = realm.objects(ModernCollectionObject.self).query {
-            $0.map.contains(obj)
-        }
-        XCTAssertEqual(result1.count, 0)
         try! realm.write {
             colObj.map["foo"] = obj
         }
-        let result2 = realm.objects(ModernCollectionObject.self).query {
-            $0.map["foo"].intCol == 5
+        % for property in properties + optProperties:
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.${property.colName} == %@", values: ["foo", ${property.value(0)}], expectedCount: 1) {
+            $0.map["foo"].${property.colName} == ${property.value(0)}
         }
-        XCTAssertEqual(result2.count, 1)
+        % end
     }
 
 }

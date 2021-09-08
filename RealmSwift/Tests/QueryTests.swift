@@ -238,6 +238,26 @@ class QueryTests: TestCase {
         }
     }
 
+    private func assertCollectionObjectQuery(predicate: String,
+                                             values: [AnyHashable],
+                                             expectedCount: Int,
+                                             _ query: ((Query<ModernCollectionObject>) -> Query<ModernCollectionObject>)) {
+        let results = realmWithTestPath().objects(ModernCollectionObject.self).query(query)
+        XCTAssertEqual(results.count, expectedCount)
+
+        let constructedPredicate = query(Query<ModernCollectionObject>())._constructPredicate()
+        XCTAssertEqual(constructedPredicate.0,
+                       predicate)
+
+        for (e1, e2) in zip(constructedPredicate.1, values) {
+            if let e1 = e1 as? Object, let e2 = e2 as? Object {
+                assertEqual(e1, e2)
+            } else {
+                XCTAssertEqual(e1 as! AnyHashable, e2)
+            }
+        }
+    }
+
     // MARK: - Basic Comparison
 
     func testEquals() {
@@ -5935,24 +5955,105 @@ class QueryTests: TestCase {
         let obj = objects().first!
         let colObj = collectionObject()
         let realm = realmWithTestPath()
-        let result1 = realm.objects(ModernCollectionObject.self).query {
-            $0.map.contains(obj)
-        }
-        XCTAssertEqual(result1.count, 0)
         try! realm.write {
             colObj.map["foo"] = obj
         }
-        let result2 = realm.objects(ModernCollectionObject.self).query {
-            $0.map["foo"].intCol == 6
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.boolCol == %@", values: ["foo", true], expectedCount: 1) {
+            $0.map["foo"].boolCol == true
         }
-
-        let query: ((Query<ModernCollectionObject>) -> Query<ModernCollectionObject>) = {
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.intCol == %@", values: ["foo", 5], expectedCount: 1) {
             $0.map["foo"].intCol == 5
         }
-
-        let constructedPredicate = query(Query<ModernCollectionObject>())._constructPredicate()
-
-        XCTAssertEqual(result2.count, 1)
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.int8Col == %@", values: ["foo", Int8(8)], expectedCount: 1) {
+            $0.map["foo"].int8Col == Int8(8)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.int16Col == %@", values: ["foo", Int16(16)], expectedCount: 1) {
+            $0.map["foo"].int16Col == Int16(16)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.int32Col == %@", values: ["foo", Int32(32)], expectedCount: 1) {
+            $0.map["foo"].int32Col == Int32(32)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.int64Col == %@", values: ["foo", Int64(64)], expectedCount: 1) {
+            $0.map["foo"].int64Col == Int64(64)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.floatCol == %@", values: ["foo", Float(5.55444333)], expectedCount: 1) {
+            $0.map["foo"].floatCol == Float(5.55444333)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.doubleCol == %@", values: ["foo", 5.55444333], expectedCount: 1) {
+            $0.map["foo"].doubleCol == 5.55444333
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.stringCol == %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.map["foo"].stringCol == "Foo"
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.binaryCol == %@", values: ["foo", Data(count: 64)], expectedCount: 1) {
+            $0.map["foo"].binaryCol == Data(count: 64)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.dateCol == %@", values: ["foo", Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.map["foo"].dateCol == Date(timeIntervalSince1970: 1000000)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.decimalCol == %@", values: ["foo", Decimal128(123.456)], expectedCount: 1) {
+            $0.map["foo"].decimalCol == Decimal128(123.456)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.objectIdCol == %@", values: ["foo", ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+            $0.map["foo"].objectIdCol == ObjectId("61184062c1d8f096a3695046")
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.intEnumCol == %@", values: ["foo", .value1], expectedCount: 1) {
+            $0.map["foo"].intEnumCol == .value1
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.stringEnumCol == %@", values: ["foo", .value1], expectedCount: 1) {
+            $0.map["foo"].stringEnumCol == .value1
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.uuidCol == %@", values: ["foo", UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 1) {
+            $0.map["foo"].uuidCol == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optBoolCol == %@", values: ["foo", true], expectedCount: 1) {
+            $0.map["foo"].optBoolCol == true
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optIntCol == %@", values: ["foo", 5], expectedCount: 1) {
+            $0.map["foo"].optIntCol == 5
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optInt8Col == %@", values: ["foo", Int8(8)], expectedCount: 1) {
+            $0.map["foo"].optInt8Col == Int8(8)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optInt16Col == %@", values: ["foo", Int16(16)], expectedCount: 1) {
+            $0.map["foo"].optInt16Col == Int16(16)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optInt32Col == %@", values: ["foo", Int32(32)], expectedCount: 1) {
+            $0.map["foo"].optInt32Col == Int32(32)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optInt64Col == %@", values: ["foo", Int64(64)], expectedCount: 1) {
+            $0.map["foo"].optInt64Col == Int64(64)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optFloatCol == %@", values: ["foo", Float(5.55444333)], expectedCount: 1) {
+            $0.map["foo"].optFloatCol == Float(5.55444333)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optDoubleCol == %@", values: ["foo", 5.55444333], expectedCount: 1) {
+            $0.map["foo"].optDoubleCol == 5.55444333
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optStringCol == %@", values: ["foo", "Foo"], expectedCount: 1) {
+            $0.map["foo"].optStringCol == "Foo"
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optBinaryCol == %@", values: ["foo", Data(count: 64)], expectedCount: 1) {
+            $0.map["foo"].optBinaryCol == Data(count: 64)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optDateCol == %@", values: ["foo", Date(timeIntervalSince1970: 1000000)], expectedCount: 1) {
+            $0.map["foo"].optDateCol == Date(timeIntervalSince1970: 1000000)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optDecimalCol == %@", values: ["foo", Decimal128(123.456)], expectedCount: 1) {
+            $0.map["foo"].optDecimalCol == Decimal128(123.456)
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optObjectIdCol == %@", values: ["foo", ObjectId("61184062c1d8f096a3695046")], expectedCount: 1) {
+            $0.map["foo"].optObjectIdCol == ObjectId("61184062c1d8f096a3695046")
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optIntEnumCol == %@", values: ["foo", .value1], expectedCount: 1) {
+            $0.map["foo"].optIntEnumCol == .value1
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optStringEnumCol == %@", values: ["foo", .value1], expectedCount: 1) {
+            $0.map["foo"].optStringEnumCol == .value1
+        }
+        assertCollectionObjectQuery(predicate: "map.@allKeys == %@ && map.optUuidCol == %@", values: ["foo", UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!], expectedCount: 1) {
+            $0.map["foo"].optUuidCol == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09e")!
+        }
     }
 
 }
