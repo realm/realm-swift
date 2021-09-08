@@ -52,10 +52,10 @@ private enum QueryExpression {
     }
 
     enum Search {
-        case contains(_QueryBinary, Set<StringOptions>?)
-        case like(_QueryString, Set<StringOptions>?)
-        case beginsWith(_QueryBinary, Set<StringOptions>?)
-        case endsWith(_QueryBinary, Set<StringOptions>?)
+        case contains(_QueryBinary, Set<SearchOptions>?)
+        case like(_QueryString, Set<SearchOptions>?)
+        case beginsWith(_QueryBinary, Set<SearchOptions>?)
+        case endsWith(_QueryBinary, Set<SearchOptions>?)
     }
 
     enum CollectionAggregation: String {
@@ -203,7 +203,7 @@ public struct Query<T: _Persistable> {
         var predicateString: [String] = []
         var arguments: [Any] = []
 
-        func optionsStr(_ options: Set<StringOptions>?) -> String {
+        func optionsStr(_ options: Set<SearchOptions>?) -> String {
             guard let o = options, !o.isEmpty else {
                 return ""
             }
