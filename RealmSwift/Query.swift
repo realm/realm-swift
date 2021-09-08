@@ -18,8 +18,11 @@
 import Foundation
 import Realm
 
-public enum StringOptions {
+/// Enum representing an option for `Search` queries.
+public enum SearchOptions {
+    /// A case-insensitive search.
     case caseInsensitive
+    /// Search ignores diacritic marks.
     case diacriticInsensitive
 }
 
@@ -96,6 +99,14 @@ private enum QueryExpression {
  ```
 
  ## Supported predicate types
+
+ ### Prefix
+ - NOT `!` (only supported for `.contains(_ element:)` and `.contains(_ value:)` queries)
+ ```swift
+ let results = realm.objects(Person.self).query {
+    !$0.dogsName.contains("Fido") || !$0.name.contains("Foo")
+ }
+ ```
 
  ### Comparisions
  - Equals `==`
@@ -537,6 +548,12 @@ extension Query where T: _QueryNumeric {
 // MARK: _QueryString
 
 extension Query where T: _QueryString {
+    /**
+    Checks for all elements in this collection that equal the given value.
+    `?` and `*` are allowed as wildcard characters, where `?` matches 1 character and `*` matches 0 or more characters.
+     - parameter value: value used.
+     - parameter caseInsensitive: `true` if it is a case-insensitive search.
+     */
     public func like<V>(_ value: T, caseInsensitive: Bool = false) -> Query<V> {
         return append(tokens: [.stringSearch(.like(value, caseInsensitive ? [.caseInsensitive] : []))])
     }
@@ -545,16 +562,30 @@ extension Query where T: _QueryString {
 // MARK: _QueryBinary
 
 extension Query where T: _QueryBinary {
-    public func contains<V>(_ value: T, options: Set<StringOptions>? = nil) -> Query<V> {
-
+    /**
+    Checks for all elements in this collection that contains the given value.
+    - parameter value: value used.
+    - parameter options: A Set of options used to evaluate the Search query.
+    */
+    public func contains<V>(_ value: T, options: Set<SearchOptions>? = nil) -> Query<V> {
         return append(tokens: [.stringSearch(.contains(value, options))])
     }
 
-    public func starts<V>(with value: T, options: Set<StringOptions>? = nil) -> Query<V> {
+    /**
+    Checks for all elements in this collection that starts with the given value.
+     - parameter value: value used.
+     - parameter options: A Set of options used to evaluate the Search query.
+     */
+    public func starts<V>(with value: T, options: Set<SearchOptions>? = nil) -> Query<V> {
         return append(tokens: [.stringSearch(.beginsWith(value, options))])
     }
 
-    public func ends<V>(with value: T, options: Set<StringOptions>? = nil) -> Query<V> {
+    /**
+    Checks for all elements in this collection that ends with the given value.
+    - parameter value: value used.
+    - parameter options: A Set of options used to evaluate the Search query.
+    */
+    public func ends<V>(with value: T, options: Set<SearchOptions>? = nil) -> Query<V> {
         return append(tokens: [.stringSearch(.endsWith(value, options))])
     }
 }
