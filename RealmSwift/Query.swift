@@ -151,11 +151,11 @@ public struct Query<T: _Persistable> {
 
     // MARK: Comparable
 
-    public static func == <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryComparable {
+    public static func == <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable {
         return lhs.append(tokens: [.basicComparison(.equal), .rhs(rhs)])
     }
 
-    public static func != <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _QueryComparable {
+    public static func != <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable {
         return lhs.append(tokens: [.basicComparison(.notEqual), .rhs(rhs)])
     }
 
@@ -486,7 +486,6 @@ extension Query where T: PersistableEnum, T.RawValue: _Persistable {
 
 extension Query where T: OptionalProtocol,
                       T.Wrapped: PersistableEnum,
-                      T.Wrapped.RawValue: _QueryComparable,
                       T.Wrapped.RawValue: _RealmSchemaDiscoverable {
     public static func == <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
         if case Optional<Any>.none = rhs as Any {
@@ -682,26 +681,6 @@ extension Decimal128: _QueryNumeric { }
 extension Date: _QueryNumeric { }
 extension AnyRealmValue: _QueryNumeric { }
 extension Optional: _QueryNumeric where Wrapped: _QueryNumeric { }
-
-/// Tag protocol for all types that are compatible with `Query`.
-public protocol _QueryComparable { }
-extension Bool: _QueryComparable { }
-extension Int: _QueryComparable { }
-extension Int8: _QueryComparable { }
-extension Int16: _QueryComparable { }
-extension Int32: _QueryComparable { }
-extension Int64: _QueryComparable { }
-extension Float: _QueryComparable { }
-extension Double: _QueryComparable { }
-extension Decimal128: _QueryComparable { }
-extension Date: _QueryComparable { }
-extension Data: _QueryComparable { }
-extension UUID: _QueryComparable { }
-extension ObjectId: _QueryComparable { }
-extension String: _QueryComparable { }
-extension AnyRealmValue: _QueryComparable { }
-extension ObjectBase: _QueryComparable { }
-extension Optional: _QueryComparable where Wrapped: _QueryComparable { }
 
 /// Tag protocol for all types that are compatible with `String`, compatible with `Binary` queries too.
 public protocol _QueryString: _QueryBinary { }
