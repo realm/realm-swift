@@ -33,13 +33,6 @@ import RealmTestSupport
 @available(OSX 10.14, *)
 @objc(SwiftObjectServerTests)
 class SwiftObjectServerTests: SwiftSyncTestCase {
-    var notificationToken: NotificationToken?
-
-    override func tearDown() {
-        if let notificationToken = notificationToken {
-            notificationToken.invalidate()
-        }
-    }
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
         do {
