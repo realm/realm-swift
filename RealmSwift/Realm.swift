@@ -429,11 +429,6 @@ import Realm.Private
         if update != .error && object.objectSchema.primaryKeyProperty == nil {
             throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
         }
-        // remove any observers still attached to the Realm.
-        // if not using SwiftUI, this is a noop
-        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *) {
-            SwiftUIKVO.removeObservers(object: object)
-        }
         RLMAddObjectToRealm(object, rlmRealm, RLMUpdatePolicy(rawValue: UInt(update.rawValue))!)
     }
 

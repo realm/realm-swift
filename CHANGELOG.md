@@ -4,8 +4,11 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add `async` `Realm.asyncOpen` and `App.login` methods.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+
+* Adding an unmanaged object to a Realm that was declared with `@StateRealmObject` would throw 
+  the exception `"Cannot add an object with observers to a Realm"`. 
+* The `RealmCollectionChange` docs refered to indicies in modifications as the 'new' collection. This is
+  incorrect and the docs now state that modifications refer to the previous version of the collection. ([Cocoa #7390](https://github.com/realm/realm-cocoa/issues/7390)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

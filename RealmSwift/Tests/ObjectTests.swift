@@ -1702,6 +1702,21 @@ class ObjectTests: TestCase {
         assertThrows(SwiftStringObject().freeze(), reason: "Unmanaged objects cannot be frozen.")
     }
 
+    func testModifyFrozenObject() {
+        let obj = SwiftStringObject()
+        XCTAssertFalse(obj.isFrozen)
+
+        let realm = try! Realm()
+        try! realm.write {
+            realm.add(obj)
+        }
+
+        let frozenObj = obj.freeze()
+
+        assertThrows(frozenObj.stringCol = "foo",
+                     reason: "Attempting to modify a frozen object - call thaw on the Object instance first.")
+    }
+
     func testFreezeDynamicObject() {
         let realm = try! Realm()
         try! realm.write {
