@@ -56,6 +56,8 @@ private enum QueryExpression {
         case like(_QueryString, Set<SearchOptions>?)
         case beginsWith(_QueryBinary, Set<SearchOptions>?)
         case endsWith(_QueryBinary, Set<SearchOptions>?)
+        case equals(_QueryBinary, Set<SearchOptions>?)
+        case notEquals(_QueryBinary, Set<SearchOptions>?)
     }
 
     enum CollectionAggregation: String {
@@ -101,7 +103,7 @@ private enum QueryExpression {
  ## Supported predicate types
 
  ### Prefix
- - NOT `!` (only supported for `.contains(_ element:)` and `.contains(_ value:)` queries)
+ - NOT `!` (only supported for `.contains(_ element:)`, `.contains(_ value:)`, `equal(_ value:)` and `notEqual(_ value:)` queries.)
  ```swift
  let results = realm.objects(Person.self).query {
     !$0.dogsName.contains("Fido") || !$0.name.contains("Foo")
@@ -222,7 +224,10 @@ public struct Query<T: _Persistable> {
             switch token {
             case let .prefix(op):
                 switch tokens[idx+2] {
-                case .comparison(.contains), .stringSearch(.contains):
+                case .comparison(.contains),
+                        .stringSearch(.contains),
+                        .stringSearch(.equals),
+                        .stringSearch(.notEquals):
                     predicateString.append("\(op.rawValue) ")
                 default:
                     throwRealmException("`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
@@ -277,6 +282,12 @@ public struct Query<T: _Persistable> {
                     arguments.append(str)
                 case let .endsWith(str, options):
                     predicateString.append(" ENDSWITH\(optionsStr(options)) %@")
+                    arguments.append(str)
+                case let .equals(str, options):
+                    predicateString.append(" ==\(optionsStr(options)) %@")
+                    arguments.append(str)
+                case let .notEquals(str, options):
+                    predicateString.append(" !=\(optionsStr(options)) %@")
                     arguments.append(str)
                 }
             case let .rhs(v):
@@ -587,6 +598,24 @@ extension Query where T: _QueryBinary {
     */
     public func ends<V>(with value: T, options: Set<SearchOptions>? = nil) -> Query<V> {
         return append(tokens: [.stringSearch(.endsWith(value, options))])
+    }
+
+    /**
+    Checks for all elements in this collection that equals the given value.
+    - parameter value: value used.
+    - parameter options: A Set of options used to evaluate the Search query.
+    */
+    public func equals<V>(_ value: T, options: Set<SearchOptions>? = nil) -> Query<V> {
+        return append(tokens: [.stringSearch(.equals(value, options))])
+    }
+
+    /**
+    Checks for all elements in this collection that are not equal to the given value.
+    - parameter value: value used.
+    - parameter options: A Set of options used to evaluate the Search query.
+    */
+    public func notEquals<V>(_ value: T, options: Set<SearchOptions>? = nil) -> Query<V> {
+        return append(tokens: [.stringSearch(.notEquals(value, options))])
     }
 }
 

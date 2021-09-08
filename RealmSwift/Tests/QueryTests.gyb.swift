@@ -663,7 +663,7 @@ class QueryTests: TestCase {
         % if property.enumName == None and property.category == 'string':
         assertQuery(predicate: "${property.colName} BEGINSWITH %@",
                     values: ["fo"], expectedCount: 0) {
-            $0.${property.colName}.starts(with: "fo", options: nil)
+            $0.${property.colName}.starts(with: "fo")
         }
 
         assertQuery(predicate: "${property.colName} BEGINSWITH %@",
@@ -913,6 +913,120 @@ class QueryTests: TestCase {
         % end
     }
 
+    func testStringEquals() {
+        % for property in properties:
+        % if property.enumName == None and property.category == 'string':
+        assertQuery(predicate: "${property.colName} == %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.${property.colName}.equals("Foó")
+        }
+
+        assertQuery(predicate: "${property.colName} == %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.${property.colName}.equals("Foó", options: [])
+        }
+
+        assertQuery(predicate: "${property.colName} ==[c] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.${property.colName}.equals("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName} ==[d] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.${property.colName}.equals("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName} ==[cd] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.${property.colName}.equals("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} == %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.${property.colName}.equals("Foó")
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} == %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.${property.colName}.equals("Foó", options: [])
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} ==[c] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.${property.colName}.equals("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} ==[d] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.${property.colName}.equals("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} ==[cd] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.${property.colName}.equals("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        % end
+        % end
+    }
+
+    func testStringNotEquals() {
+        % for property in properties:
+        % if property.enumName == None and property.category == 'string':
+        assertQuery(predicate: "${property.colName} != %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.${property.colName}.notEquals("Foó")
+        }
+
+        assertQuery(predicate: "${property.colName} != %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.${property.colName}.notEquals("Foó", options: [])
+        }
+
+        assertQuery(predicate: "${property.colName} !=[c] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.${property.colName}.notEquals("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName} !=[d] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.${property.colName}.notEquals("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "${property.colName} !=[cd] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.${property.colName}.notEquals("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} != %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.${property.colName}.notEquals("Foó")
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} != %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.${property.colName}.notEquals("Foó", options: [])
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} !=[c] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.${property.colName}.notEquals("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} !=[d] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.${property.colName}.notEquals("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} !=[cd] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.${property.colName}.notEquals("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        % end
+        % end
+    }
+
     func testNotPrefixUnsupported() {
         let result1 = objects()
 
@@ -940,7 +1054,7 @@ class QueryTests: TestCase {
         % end
     }
 
-    func testBinaryStringQueries() {
+    func testBinarySearchQueries() {
         % for property in properties:
         % if property.enumName == None and property.category == 'binary':
         assertQuery(predicate: "${property.colName} BEGINSWITH %@",
@@ -963,6 +1077,26 @@ class QueryTests: TestCase {
             !$0.${property.colName}.contains(Data(count: 28))
         }
 
+        assertQuery(predicate: "${property.colName} == %@",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            $0.${property.colName}.equals(Data(count: 28))
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} == %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            !$0.${property.colName}.equals(Data(count: 28))
+        }
+
+        assertQuery(predicate: "${property.colName} != %@",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            $0.${property.colName}.notEquals(Data(count: 28))
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} != %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            !$0.${property.colName}.notEquals(Data(count: 28))
+        }
+
         assertQuery(predicate: "${property.colName} BEGINSWITH %@",
                     values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
             $0.${property.colName}.starts(with: Data(repeating: 1, count: 28))
@@ -981,6 +1115,36 @@ class QueryTests: TestCase {
         assertQuery(predicate: "NOT ${property.colName} CONTAINS %@",
                     values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
             !$0.${property.colName}.contains(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "${property.colName} CONTAINS %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.${property.colName}.contains(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} CONTAINS %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
+            !$0.${property.colName}.contains(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "${property.colName} == %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.${property.colName}.equals(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} == %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
+            !$0.${property.colName}.equals(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "${property.colName} != %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
+            $0.${property.colName}.notEquals(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} != %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            !$0.${property.colName}.notEquals(Data(repeating: 1, count: 28))
         }
 
         % end

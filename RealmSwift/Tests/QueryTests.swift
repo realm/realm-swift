@@ -1802,7 +1802,7 @@ class QueryTests: TestCase {
     func testStringStartsWith() {
         assertQuery(predicate: "stringCol BEGINSWITH %@",
                     values: ["fo"], expectedCount: 0) {
-            $0.stringCol.starts(with: "fo", options: nil)
+            $0.stringCol.starts(with: "fo")
         }
 
         assertQuery(predicate: "stringCol BEGINSWITH %@",
@@ -2034,6 +2034,112 @@ class QueryTests: TestCase {
 
     }
 
+    func testStringEquals() {
+        assertQuery(predicate: "stringCol == %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.stringCol.equals("Foó")
+        }
+
+        assertQuery(predicate: "stringCol == %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.stringCol.equals("Foó", options: [])
+        }
+
+        assertQuery(predicate: "stringCol ==[c] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.stringCol.equals("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "stringCol ==[d] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.stringCol.equals("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "stringCol ==[cd] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.stringCol.equals("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT stringCol == %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.stringCol.equals("Foó")
+        }
+
+        assertQuery(predicate: "NOT stringCol == %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.stringCol.equals("Foó", options: [])
+        }
+
+        assertQuery(predicate: "NOT stringCol ==[c] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.stringCol.equals("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "NOT stringCol ==[d] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.stringCol.equals("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT stringCol ==[cd] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.stringCol.equals("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+    }
+
+    func testStringNotEquals() {
+        assertQuery(predicate: "stringCol != %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.stringCol.notEquals("Foó")
+        }
+
+        assertQuery(predicate: "stringCol != %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.stringCol.notEquals("Foó", options: [])
+        }
+
+        assertQuery(predicate: "stringCol !=[c] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.stringCol.notEquals("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "stringCol !=[d] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.stringCol.notEquals("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "stringCol !=[cd] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.stringCol.notEquals("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT stringCol != %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.stringCol.notEquals("Foó")
+        }
+
+        assertQuery(predicate: "NOT stringCol != %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.stringCol.notEquals("Foó", options: [])
+        }
+
+        assertQuery(predicate: "NOT stringCol !=[c] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.stringCol.notEquals("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "NOT stringCol !=[d] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.stringCol.notEquals("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT stringCol !=[cd] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.stringCol.notEquals("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+    }
+
     func testNotPrefixUnsupported() {
         let result1 = objects()
 
@@ -2057,7 +2163,7 @@ class QueryTests: TestCase {
 
     }
 
-    func testBinaryStringQueries() {
+    func testBinarySearchQueries() {
         assertQuery(predicate: "binaryCol BEGINSWITH %@",
                     values: [Data(count: 28)], expectedCount: 1) {
             $0.binaryCol.starts(with: Data(count: 28))
@@ -2078,6 +2184,26 @@ class QueryTests: TestCase {
             !$0.binaryCol.contains(Data(count: 28))
         }
 
+        assertQuery(predicate: "binaryCol == %@",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            $0.binaryCol.equals(Data(count: 28))
+        }
+
+        assertQuery(predicate: "NOT binaryCol == %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            !$0.binaryCol.equals(Data(count: 28))
+        }
+
+        assertQuery(predicate: "binaryCol != %@",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            $0.binaryCol.notEquals(Data(count: 28))
+        }
+
+        assertQuery(predicate: "NOT binaryCol != %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            !$0.binaryCol.notEquals(Data(count: 28))
+        }
+
         assertQuery(predicate: "binaryCol BEGINSWITH %@",
                     values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
             $0.binaryCol.starts(with: Data(repeating: 1, count: 28))
@@ -2096,6 +2222,36 @@ class QueryTests: TestCase {
         assertQuery(predicate: "NOT binaryCol CONTAINS %@",
                     values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
             !$0.binaryCol.contains(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "binaryCol CONTAINS %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.binaryCol.contains(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "NOT binaryCol CONTAINS %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
+            !$0.binaryCol.contains(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "binaryCol == %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.binaryCol.equals(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "NOT binaryCol == %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
+            !$0.binaryCol.equals(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "binaryCol != %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
+            $0.binaryCol.notEquals(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "NOT binaryCol != %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            !$0.binaryCol.notEquals(Data(repeating: 1, count: 28))
         }
 
     }
