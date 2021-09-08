@@ -1845,6 +1845,31 @@ class QueryTests: TestCase {
             $0.stringCol.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
+        assertQuery(predicate: "optStringCol BEGINSWITH %@",
+                    values: ["fo"], expectedCount: 0) {
+            $0.optStringCol.starts(with: "fo")
+        }
+
+        assertQuery(predicate: "optStringCol BEGINSWITH %@",
+                    values: ["fo"], expectedCount: 0) {
+            $0.optStringCol.starts(with: "fo", options: [])
+        }
+
+        assertQuery(predicate: "optStringCol BEGINSWITH[c] %@",
+                    values: ["fo"], expectedCount: 1) {
+            $0.optStringCol.starts(with: "fo", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "optStringCol BEGINSWITH[d] %@",
+                    values: ["fo"], expectedCount: 0) {
+            $0.optStringCol.starts(with: "fo", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "optStringCol BEGINSWITH[cd] %@",
+                    values: ["fo"], expectedCount: 1) {
+            $0.optStringCol.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
     }
 
     func testStringEndsWith() {
@@ -1871,6 +1896,31 @@ class QueryTests: TestCase {
         assertQuery(predicate: "stringCol ENDSWITH[cd] %@",
                     values: ["oo"], expectedCount: 1) {
             $0.stringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "optStringCol ENDSWITH %@",
+                    values: ["oo"], expectedCount: 0) {
+            $0.optStringCol.ends(with: "oo")
+        }
+
+        assertQuery(predicate: "optStringCol ENDSWITH %@",
+                    values: ["oo"], expectedCount: 0) {
+            $0.optStringCol.ends(with: "oo", options: [])
+        }
+
+        assertQuery(predicate: "optStringCol ENDSWITH[c] %@",
+                    values: ["oo"], expectedCount: 0) {
+            $0.optStringCol.ends(with: "oo", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "optStringCol ENDSWITH[d] %@",
+                    values: ["oo"], expectedCount: 1) {
+            $0.optStringCol.ends(with: "oo", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "optStringCol ENDSWITH[cd] %@",
+                    values: ["oo"], expectedCount: 1) {
+            $0.optStringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
     }
@@ -1996,6 +2046,126 @@ class QueryTests: TestCase {
             $0.stringCol.like("?O?", caseInsensitive: false)
         }
 
+        assertQuery(predicate: "optStringCol LIKE %@",
+                                values: ["Foó"], expectedCount: 1) {
+            $0.optStringCol.like("Foó")
+        }
+
+        assertQuery(predicate: "optStringCol LIKE[c] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.optStringCol.like("Foó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.optStringCol.like("Foó", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["f*"], expectedCount: 0) {
+            $0.optStringCol.like("f*")
+        }
+
+        assertQuery(predicate: "optStringCol LIKE[c] %@",
+                    values: ["f*"], expectedCount: 1) {
+            $0.optStringCol.like("f*", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["f*"], expectedCount: 0) {
+            $0.optStringCol.like("f*", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["*ó"], expectedCount: 1) {
+            $0.optStringCol.like("*ó")
+        }
+
+        assertQuery(predicate: "optStringCol LIKE[c] %@",
+                    values: ["*ó"], expectedCount: 1) {
+            $0.optStringCol.like("*ó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["*ó"], expectedCount: 1) {
+            $0.optStringCol.like("*ó", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["f?ó"], expectedCount: 0) {
+            $0.optStringCol.like("f?ó")
+        }
+
+        assertQuery(predicate: "optStringCol LIKE[c] %@",
+                    values: ["f?ó"], expectedCount: 1) {
+            $0.optStringCol.like("f?ó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["f?ó"], expectedCount: 0) {
+            $0.optStringCol.like("f?ó", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["f*ó"], expectedCount: 0) {
+            $0.optStringCol.like("f*ó")
+        }
+
+        assertQuery(predicate: "optStringCol LIKE[c] %@",
+                    values: ["f*ó"], expectedCount: 1) {
+            $0.optStringCol.like("f*ó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["f*ó"], expectedCount: 0) {
+            $0.optStringCol.like("f*ó", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["f??ó"], expectedCount: 0) {
+            $0.optStringCol.like("f??ó")
+        }
+
+        assertQuery(predicate: "optStringCol LIKE[c] %@",
+                    values: ["f??ó"], expectedCount: 0) {
+            $0.optStringCol.like("f??ó", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["f??ó"], expectedCount: 0) {
+            $0.optStringCol.like("f??ó", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["*o*"], expectedCount: 1) {
+            $0.optStringCol.like("*o*")
+        }
+
+        assertQuery(predicate: "optStringCol LIKE[c] %@",
+                    values: ["*O*"], expectedCount: 1) {
+            $0.optStringCol.like("*O*", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["*O*"], expectedCount: 0) {
+            $0.optStringCol.like("*O*", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["?o?"], expectedCount: 1) {
+            $0.optStringCol.like("?o?")
+        }
+
+        assertQuery(predicate: "optStringCol LIKE[c] %@",
+                    values: ["?O?"], expectedCount: 1) {
+            $0.optStringCol.like("?O?", caseInsensitive: true)
+        }
+
+        assertQuery(predicate: "optStringCol LIKE %@",
+                    values: ["?O?"], expectedCount: 0) {
+            $0.optStringCol.like("?O?", caseInsensitive: false)
+        }
+
     }
 
     func testStringContains() {
@@ -2024,6 +2194,31 @@ class QueryTests: TestCase {
             $0.stringCol.contains("Foó", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
+        assertQuery(predicate: "optStringCol CONTAINS %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.optStringCol.contains("Foó")
+        }
+
+        assertQuery(predicate: "optStringCol CONTAINS %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.optStringCol.contains("Foó", options: [])
+        }
+
+        assertQuery(predicate: "optStringCol CONTAINS[c] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.optStringCol.contains("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "optStringCol CONTAINS[d] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.optStringCol.contains("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "optStringCol CONTAINS[cd] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.optStringCol.contains("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
     }
 
     func testStringNotContains() {
@@ -2050,6 +2245,31 @@ class QueryTests: TestCase {
         assertQuery(predicate: "NOT stringCol CONTAINS[cd] %@",
                     values: ["Foó"], expectedCount: 0) {
             !$0.stringCol.contains("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT optStringCol CONTAINS %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.optStringCol.contains("Foó")
+        }
+
+        assertQuery(predicate: "NOT optStringCol CONTAINS %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.optStringCol.contains("Foó", options: [])
+        }
+
+        assertQuery(predicate: "NOT optStringCol CONTAINS[c] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.optStringCol.contains("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "NOT optStringCol CONTAINS[d] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.optStringCol.contains("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT optStringCol CONTAINS[cd] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.optStringCol.contains("Foó", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
     }
@@ -2105,6 +2325,56 @@ class QueryTests: TestCase {
             !$0.stringCol.equals("Foó", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
+        assertQuery(predicate: "optStringCol == %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.optStringCol.equals("Foó")
+        }
+
+        assertQuery(predicate: "optStringCol == %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.optStringCol.equals("Foó", options: [])
+        }
+
+        assertQuery(predicate: "optStringCol ==[c] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.optStringCol.equals("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "optStringCol ==[d] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.optStringCol.equals("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "optStringCol ==[cd] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            $0.optStringCol.equals("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT optStringCol == %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.optStringCol.equals("Foó")
+        }
+
+        assertQuery(predicate: "NOT optStringCol == %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.optStringCol.equals("Foó", options: [])
+        }
+
+        assertQuery(predicate: "NOT optStringCol ==[c] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.optStringCol.equals("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "NOT optStringCol ==[d] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.optStringCol.equals("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT optStringCol ==[cd] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            !$0.optStringCol.equals("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
     }
 
     func testStringNotEquals() {
@@ -2158,27 +2428,95 @@ class QueryTests: TestCase {
             !$0.stringCol.notEquals("Foó", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
+        assertQuery(predicate: "optStringCol != %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.optStringCol.notEquals("Foó")
+        }
+
+        assertQuery(predicate: "optStringCol != %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.optStringCol.notEquals("Foó", options: [])
+        }
+
+        assertQuery(predicate: "optStringCol !=[c] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.optStringCol.notEquals("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "optStringCol !=[d] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.optStringCol.notEquals("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "optStringCol !=[cd] %@",
+                    values: ["Foó"], expectedCount: 0) {
+            $0.optStringCol.notEquals("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT optStringCol != %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.optStringCol.notEquals("Foó")
+        }
+
+        assertQuery(predicate: "NOT optStringCol != %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.optStringCol.notEquals("Foó", options: [])
+        }
+
+        assertQuery(predicate: "NOT optStringCol !=[c] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.optStringCol.notEquals("Foó", options: [.caseInsensitive])
+        }
+
+        assertQuery(predicate: "NOT optStringCol !=[d] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.optStringCol.notEquals("Foó", options: [.diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT optStringCol !=[cd] %@",
+                    values: ["Foó"], expectedCount: 1) {
+            !$0.optStringCol.notEquals("Foó", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
     }
 
     func testNotPrefixUnsupported() {
         let result1 = objects()
 
-        let queryStartsWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+        let stringColQueryStartsWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
             !$0.stringCol.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
         }
-        assertThrows(result1.query(queryStartsWith),
+        assertThrows(result1.query(stringColQueryStartsWith),
                      reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
 
-        let queryEndWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+        let stringColQueryEndWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
             !$0.stringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
         }
-        assertThrows(result1.query(queryEndWith),
+        assertThrows(result1.query(stringColQueryEndWith),
                      reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
 
-        let queryLike: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+        let stringColQueryLike: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
             !$0.stringCol.like("f*", caseInsensitive: true)
         }
-        assertThrows(result1.query(queryLike),
+        assertThrows(result1.query(stringColQueryLike),
+                    reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
+
+        let optStringColQueryStartsWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            !$0.optStringCol.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+        assertThrows(result1.query(optStringColQueryStartsWith),
+                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
+
+        let optStringColQueryEndWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            !$0.optStringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+        assertThrows(result1.query(optStringColQueryEndWith),
+                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
+
+        let optStringColQueryLike: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            !$0.optStringCol.like("f*", caseInsensitive: true)
+        }
+        assertThrows(result1.query(optStringColQueryLike),
                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
 
     }
@@ -2215,12 +2553,12 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "binaryCol != %@",
-                    values: [Data(count: 28)], expectedCount: 0) {
+                    values: [Data(count: 28)], expectedCount: 1) {
             $0.binaryCol.notEquals(Data(count: 28))
         }
 
         assertQuery(predicate: "NOT binaryCol != %@",
-                    values: [Data(count: 28)], expectedCount: 1) {
+                    values: [Data(count: 28)], expectedCount: 0) {
             !$0.binaryCol.notEquals(Data(count: 28))
         }
 
@@ -2272,6 +2610,96 @@ class QueryTests: TestCase {
         assertQuery(predicate: "NOT binaryCol != %@",
                     values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
             !$0.binaryCol.notEquals(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "optBinaryCol BEGINSWITH %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            $0.optBinaryCol.starts(with: Data(count: 28))
+        }
+
+        assertQuery(predicate: "optBinaryCol ENDSWITH %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            $0.optBinaryCol.ends(with: Data(count: 28))
+        }
+
+        assertQuery(predicate: "optBinaryCol CONTAINS %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            $0.optBinaryCol.contains(Data(count: 28))
+        }
+
+        assertQuery(predicate: "NOT optBinaryCol CONTAINS %@",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            !$0.optBinaryCol.contains(Data(count: 28))
+        }
+
+        assertQuery(predicate: "optBinaryCol == %@",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            $0.optBinaryCol.equals(Data(count: 28))
+        }
+
+        assertQuery(predicate: "NOT optBinaryCol == %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            !$0.optBinaryCol.equals(Data(count: 28))
+        }
+
+        assertQuery(predicate: "optBinaryCol != %@",
+                    values: [Data(count: 28)], expectedCount: 1) {
+            $0.optBinaryCol.notEquals(Data(count: 28))
+        }
+
+        assertQuery(predicate: "NOT optBinaryCol != %@",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            !$0.optBinaryCol.notEquals(Data(count: 28))
+        }
+
+        assertQuery(predicate: "optBinaryCol BEGINSWITH %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.optBinaryCol.starts(with: Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "optBinaryCol ENDSWITH %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.optBinaryCol.ends(with: Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "optBinaryCol CONTAINS %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.optBinaryCol.contains(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "NOT optBinaryCol CONTAINS %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
+            !$0.optBinaryCol.contains(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "optBinaryCol CONTAINS %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.optBinaryCol.contains(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "NOT optBinaryCol CONTAINS %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
+            !$0.optBinaryCol.contains(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "optBinaryCol == %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            $0.optBinaryCol.equals(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "NOT optBinaryCol == %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
+            !$0.optBinaryCol.equals(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "optBinaryCol != %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 1) {
+            $0.optBinaryCol.notEquals(Data(repeating: 1, count: 28))
+        }
+
+        assertQuery(predicate: "NOT optBinaryCol != %@",
+                    values: [Data(repeating: 1, count: 28)], expectedCount: 0) {
+            !$0.optBinaryCol.notEquals(Data(repeating: 1, count: 28))
         }
 
     }

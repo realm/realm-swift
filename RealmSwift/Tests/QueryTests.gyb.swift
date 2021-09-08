@@ -679,7 +679,7 @@ class QueryTests: TestCase {
     // MARK: - Search
 
     func testStringStartsWith() {
-        % for property in properties:
+        % for property in properties + optProperties:
         % if property.enumName == None and property.category == 'string':
         assertQuery(predicate: "${property.colName} BEGINSWITH %@",
                     values: ["fo"], expectedCount: 0) {
@@ -711,7 +711,7 @@ class QueryTests: TestCase {
     }
 
     func testStringEndsWith() {
-        % for property in properties:
+        % for property in properties + optProperties:
         % if property.enumName == None and property.category == 'string':
         assertQuery(predicate: "${property.colName} ENDSWITH %@",
                     values: ["oo"], expectedCount: 0) {
@@ -743,7 +743,7 @@ class QueryTests: TestCase {
     }
 
     func testStringLike() {
-        % for property in properties:
+        % for property in properties + optProperties:
         % if property.enumName == None and property.category == 'string':
         assertQuery(predicate: "${property.colName} LIKE %@",
                                 values: ["Foó"], expectedCount: 1) {
@@ -870,7 +870,7 @@ class QueryTests: TestCase {
     }
 
     func testStringContains() {
-        % for property in properties:
+        % for property in properties + optProperties:
         % if property.enumName == None and property.category == 'string':
         assertQuery(predicate: "${property.colName} CONTAINS %@",
                     values: ["Foó"], expectedCount: 1) {
@@ -902,7 +902,7 @@ class QueryTests: TestCase {
     }
 
     func testStringNotContains() {
-        % for property in properties:
+        % for property in properties + optProperties:
                     % if property.enumName == None and property.category == 'string':
         assertQuery(predicate: "NOT ${property.colName} CONTAINS %@",
                     values: ["Foó"], expectedCount: 0) {
@@ -934,7 +934,7 @@ class QueryTests: TestCase {
     }
 
     func testStringEquals() {
-        % for property in properties:
+        % for property in properties + optProperties:
         % if property.enumName == None and property.category == 'string':
         assertQuery(predicate: "${property.colName} == %@",
                     values: ["Foó"], expectedCount: 1) {
@@ -991,7 +991,7 @@ class QueryTests: TestCase {
     }
 
     func testStringNotEquals() {
-        % for property in properties:
+        % for property in properties + optProperties:
         % if property.enumName == None and property.category == 'string':
         assertQuery(predicate: "${property.colName} != %@",
                     values: ["Foó"], expectedCount: 0) {
@@ -1050,24 +1050,24 @@ class QueryTests: TestCase {
     func testNotPrefixUnsupported() {
         let result1 = objects()
 
-        % for property in properties:
+        % for property in properties + optProperties:
         % if property.enumName == None and property.category == 'string':
-        let queryStartsWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+        let ${property.colName}QueryStartsWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
             !$0.${property.colName}.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
         }
-        assertThrows(result1.query(queryStartsWith),
+        assertThrows(result1.query(${property.colName}QueryStartsWith),
                      reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
 
-        let queryEndWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+        let ${property.colName}QueryEndWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
             !$0.${property.colName}.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
         }
-        assertThrows(result1.query(queryEndWith),
+        assertThrows(result1.query(${property.colName}QueryEndWith),
                      reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
 
-        let queryLike: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+        let ${property.colName}QueryLike: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
             !$0.${property.colName}.like("f*", caseInsensitive: true)
         }
-        assertThrows(result1.query(queryLike),
+        assertThrows(result1.query(${property.colName}QueryLike),
                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
 
         % end
@@ -1075,7 +1075,7 @@ class QueryTests: TestCase {
     }
 
     func testBinarySearchQueries() {
-        % for property in properties:
+        % for property in properties + optProperties:
         % if property.enumName == None and property.category == 'binary':
         assertQuery(predicate: "${property.colName} BEGINSWITH %@",
                     values: [Data(count: 28)], expectedCount: 1) {
@@ -1108,12 +1108,12 @@ class QueryTests: TestCase {
         }
 
         assertQuery(predicate: "${property.colName} != %@",
-                    values: [Data(count: 28)], expectedCount: 0) {
+                    values: [Data(count: 28)], expectedCount: 1) {
             $0.${property.colName}.notEquals(Data(count: 28))
         }
 
         assertQuery(predicate: "NOT ${property.colName} != %@",
-                    values: [Data(count: 28)], expectedCount: 1) {
+                    values: [Data(count: 28)], expectedCount: 0) {
             !$0.${property.colName}.notEquals(Data(count: 28))
         }
 

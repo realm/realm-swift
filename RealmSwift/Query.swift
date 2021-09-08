@@ -667,7 +667,6 @@ extension Results where Element: Object {
     }
 }
 
-
 /// Tag protocol for all numeric types.
 public protocol _QueryNumeric: _RealmSchemaDiscoverable { }
 extension Int: _QueryNumeric { }
@@ -685,7 +684,9 @@ extension Optional: _QueryNumeric where Wrapped: _QueryNumeric { }
 /// Tag protocol for all types that are compatible with `String`, compatible with `Binary` queries too.
 public protocol _QueryString: _QueryBinary { }
 extension String: _QueryString { }
+extension Optional: _QueryString where Wrapped: _QueryString { }
 
 /// Tag protocol for all types that are compatible with `Binary`.
 public protocol _QueryBinary { }
-extension Data: _QueryString { }
+extension Data: _QueryBinary { }
+extension Optional: _QueryBinary where Wrapped: _QueryBinary { }
