@@ -211,7 +211,7 @@ public struct Query<T: _Persistable> {
             switch token {
             case let .prefix(op):
                 switch tokens[idx+2] {
-                case .comparison(.contains), .stringSearch(.contains(_, _)):
+                case .comparison(.contains), .stringSearch(.contains):
                     predicateString.append("\(op.rawValue) ")
                 default:
                     throwRealmException("`!` prefix is only allowed for `BasicComparison` and `Search.contains` queries")
