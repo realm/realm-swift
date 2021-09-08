@@ -211,7 +211,6 @@ class QueryTests_Prototype: TestCase {
         print(result)
         let result2 = realmWithTestPath().objects(ModernAllTypesObject.self).filter("mapInt == 456")
         print(result2)
-        string type, and `like()` for string type)
     }
 
     func testCompoundNot() {
@@ -224,6 +223,5 @@ class QueryTests_Prototype: TestCase {
             !$0.stringCol.contains("hy", options: [.caseInsensitive, .diacriticInsensitive]) && $0.stringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
         }
         XCTAssertEqual(compoundQuery2.count, 1)
-        string type, and `like()` for string type)
     }
 }
