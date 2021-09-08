@@ -296,6 +296,8 @@ class QueryTests: TestCase {
         }
     }
 
+    // MARK: - Basic Comparison
+
     func testEquals() {
         % for property in properties:
 
@@ -654,6 +656,8 @@ class QueryTests: TestCase {
         % end
     }
 
+    // MARK: - Search
+
     func testStringStartsWith() {
         % for property in properties:
         % if property.enumName == None and property.category == 'string':
@@ -903,6 +907,34 @@ class QueryTests: TestCase {
                     values: ["Foó"], expectedCount: 0) {
             !$0.${property.colName}.contains("Foó", options: [.caseInsensitive, .diacriticInsensitive])
         }
+
+        % end
+        % end
+    }
+
+    func testNotPrefixUnsupported() {
+        let result1 = objects()
+        
+        % for property in properties:
+        % if property.enumName == None and property.category == 'string':
+        let queryStartsWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            !$0.${property.colName}.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+        assertThrows(result1.query(queryStartsWith),
+                     reason: "`!` prefix is only allowed for `BasicComparison` and `Search.contains` queries")
+
+        let queryEndWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            !$0.${property.colName}.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+        assertThrows(result1.query(queryEndWith),
+                     reason: "`!` prefix is only allowed for `BasicComparison` and `Search.contains` queries")
+
+        let queryLike: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            !$0.${property.colName}.like("f*", caseInsensitive: true)
+        }
+        assertThrows(result1.query(queryLike),
+                    reason: "`!` prefix is only allowed for `BasicComparison` and `Search.contains` queries")
+        
         % end
         % end
     }
@@ -954,6 +986,8 @@ class QueryTests: TestCase {
         % end
     }
 
+    // MARK: - Array/Set
+
     func testListContainsElement() {
         % for property in listProperties + optListProperties:
         assertQuery(predicate: "%@ IN ${property.colName}", values: [${property.foundationValue(0)}], expectedCount: 1) {
@@ -967,6 +1001,24 @@ class QueryTests: TestCase {
         % for property in optListProperties:
         assertQuery(predicate: "%@ IN ${property.colName}", values: [NSNull()], expectedCount: 0) {
             $0.${property.colName}.contains(nil)
+        }
+
+        % end
+    }
+
+    func testListNotContainsElement() {
+        % for property in listProperties + optListProperties:
+        assertQuery(predicate: "NOT %@ IN ${property.colName}", values: [${property.foundationValue(0)}], expectedCount: 0) {
+            !$0.${property.colName}.contains(${property.value(0)})
+        }
+        assertQuery(predicate: "NOT %@ IN ${property.colName}", values: [${property.foundationValue(2)}], expectedCount: 1) {
+            !$0.${property.colName}.contains(${property.value(2)})
+        }
+        
+        % end
+        % for property in optListProperties:
+        assertQuery(predicate: "NOT %@ IN ${property.colName}", values: [NSNull()], expectedCount: 1) {
+            !$0.${property.colName}.contains(nil)
         }
 
         % end
@@ -1074,6 +1126,8 @@ class QueryTests: TestCase {
         }
         XCTAssertEqual(result2.count, 1)
     }
+
+    // MARK: - Map
 
     func testMapContainsElement() {
         % for property in mapProperties:
