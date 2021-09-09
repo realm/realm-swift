@@ -206,6 +206,34 @@ public final class Map<Key, Value>: RLMSwiftCollectionBase where Key: _MapKey, V
     }
 
     /**
+     Returns the value for a given key, or sets a value for a key should the subscript be used for an assign.
+
+     - Note:If the value being added to the map is an unmanaged object and the map is managed
+            then that unmanaged object will be added to the Realm.
+
+     - Note:If the value being assigned for a key is `nil` then that key will be removed from the map.
+
+     - warning: This method may only be called during a write transaction.
+
+     - parameter key: The key.
+     */
+    public subscript(key: Key) -> Value where Value: OptionalProtocol, Value.Wrapped: ObjectBase {
+        get {
+            if let lastAccessedNames = lastAccessedNames {
+                return Value._rlmKeyPathRecorder(with: lastAccessedNames)
+            }
+            return rlmDictionary[objcKey(from: key)].map(dynamicBridgeCast) as! Value
+        }
+        set {
+            if let value = newValue as? Optional<Value.Wrapped>, value == .none {
+                rlmDictionary.removeObject(forKey: key as AnyObject)
+            } else {
+                rlmDictionary[objcKey(from: key)] = dynamicBridgeCast(fromSwift: newValue) as AnyObject
+            }
+        }
+    }
+
+    /**
      Returns a type of `AnyObject` for a specified key if it exists in the map.
 
      - parameter key: The key to the property whose values are desired.

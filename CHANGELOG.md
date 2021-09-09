@@ -10,7 +10,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * The `RealmCollectionChange` docs refered to indicies in modifications as the 'new' collection. This is
   incorrect and the docs now state that modifications refer to the previous version of the collection. ([Cocoa #7390](https://github.com/realm/realm-cocoa/issues/7390)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+* `Map` no longer requires a double optional when accessing an `Object` or `EmbeddedObject` from a subscript.
 
 ### Compatibility
 * Realm Studio: 11.0.0 or later.

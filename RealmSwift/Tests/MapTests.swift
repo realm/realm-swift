@@ -475,7 +475,7 @@ class MapTests: TestCase {
         XCTAssertEqual(obj.realm, map.realm)
 
         if map.realm != nil {
-            XCTAssertTrue(oldObj!!.isInvalidated)
+            XCTAssertTrue(oldObj!.isInvalidated)
             assertThrows(map["key"] = obj,
                          reason: "Cannot add an existing managed embedded object to a List.")
         }
