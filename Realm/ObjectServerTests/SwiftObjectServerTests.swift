@@ -898,9 +898,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             ex.fulfill()
         }
 
-        let appServerId = try RealmServer.shared.retrieveAppId(clientAppId: appId)
         let deleteUserEx = expectation(description: "delete-user")
-        RealmServer.shared.removeUserForApp(appServerId, userId: user.id) { result in
+        RealmServer.shared.removeUserForApp(appId, userId: user.id) { result in
             switch result {
             case .success:
                 break
@@ -913,7 +912,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // Try to open a Realm with the user; this will cause our errorHandler block defined above to be fired.
         XCTAssertFalse(blockCalled)
-        _ = try immediatelyOpenRealm(partitionValue: appServerId, user: user)
+        _ = try immediatelyOpenRealm(partitionValue: #function, user: user)
 
         waitForExpectations(timeout: 10.0, handler: nil)
     }

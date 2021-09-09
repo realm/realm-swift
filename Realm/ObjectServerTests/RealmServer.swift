@@ -819,7 +819,7 @@ public class RealmServer: NSObject {
     }
 
     // Retrieve MongoDB Realm AppId with ClientAppId using the Admin API
-    public func retrieveAppId(clientAppId: String) throws -> String {
+    private func retrieveAppServerId(_ clientAppId: String) throws -> String {
         guard let session = session else {
             throw URLError(.unknown)
         }
@@ -829,13 +829,13 @@ public class RealmServer: NSObject {
             throw URLError(.badServerResponse)
         }
 
-        let app = appsList.filter {
+        let app = appsList.first(where: {
             guard let clientId = $0["client_app_id"] as? String else {
                 return false
             }
 
             return clientId == clientAppId
-        }.first
+        })
 
         guard let appId = app?["_id"] as? String else {
             throw URLError(.badServerResponse)
@@ -845,11 +845,12 @@ public class RealmServer: NSObject {
 
     // Remove User from MongoDB Realm using the Admin API
     public func removeUserForApp(_ appId: String, userId: String, _ completion: @escaping (Result<Any?, Error>) -> Void) {
-        guard let session = session else {
+        guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
+              let session = session else {
             completion(.failure(URLError.unknown as! Error))
             return
         }
-        let app = session.apps[appId]
+        let app = session.apps[appServerId]
         app.users[userId].delete(completion)
     }
 }
