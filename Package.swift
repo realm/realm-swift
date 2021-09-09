@@ -61,7 +61,6 @@ let package = Package(
                 "Realm/ObjectStore/src/impl/collection_notifier.cpp",
                 "Realm/ObjectStore/src/impl/list_notifier.cpp",
                 "Realm/ObjectStore/src/impl/object_notifier.cpp",
-                "Realm/ObjectStore/src/impl/primitive_list_notifier.cpp",
                 "Realm/ObjectStore/src/impl/realm_coordinator.cpp",
                 "Realm/ObjectStore/src/impl/results_notifier.cpp",
                 "Realm/ObjectStore/src/impl/transact_log_handler.cpp",
