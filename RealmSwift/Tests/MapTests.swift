@@ -195,8 +195,8 @@ class MapTests: TestCase {
         map["key1"] = str1
         map["key2"] = str2
         XCTAssertEqual(2, map.count)
-        XCTAssertEqual("1", map["key1"]!!.stringCol)
-        XCTAssertEqual("2", map["key2"]!!.stringCol)
+        XCTAssertEqual("1", map["key1"]!.stringCol)
+        XCTAssertEqual("2", map["key2"]!.stringCol)
     }
 
     func testInsert() {
@@ -245,7 +245,7 @@ class MapTests: TestCase {
         let map = createMap()
         if let realm = map.realm {
             map["key"] = str1
-            XCTAssertEqual(map["key"]!!.stringCol, str1.stringCol)
+            XCTAssertEqual(map["key"]!.stringCol, str1.stringCol)
             realm.delete(str1)
             XCTAssertNil(map["key"] ?? nil)
         }
@@ -260,32 +260,32 @@ class MapTests: TestCase {
             return old
         })
         XCTAssertEqual(map.count, 2)
-        XCTAssertTrue(str1.isSameObject(as: map["a"]!!))
-        XCTAssertTrue(str2.isSameObject(as: map["b"]!!))
+        XCTAssertTrue(str1.isSameObject(as: map["a"]!))
+        XCTAssertTrue(str2.isSameObject(as: map["b"]!))
 
         // Does not actually update because the combine function picks the existing value
         map.merge(["b": str1], uniquingKeysWith: { (old, _) in
             return old
         })
         XCTAssertEqual(map.count, 2)
-        XCTAssertTrue(str1.isSameObject(as: map["a"]!!))
-        XCTAssertTrue(str2.isSameObject(as: map["b"]!!))
+        XCTAssertTrue(str1.isSameObject(as: map["a"]!))
+        XCTAssertTrue(str2.isSameObject(as: map["b"]!))
 
         // Does actually update
         map.merge(["b": str1], uniquingKeysWith: { (_, new) in
             return new
         })
         XCTAssertEqual(map.count, 2)
-        XCTAssertTrue(str1.isSameObject(as: map["a"]!!))
-        XCTAssertTrue(str1.isSameObject(as: map["b"]!!))
+        XCTAssertTrue(str1.isSameObject(as: map["a"]!))
+        XCTAssertTrue(str1.isSameObject(as: map["b"]!))
 
         // Creating an entirely new value is valid too
         map.merge(["a": str1], uniquingKeysWith: { (_, _) in
             return SwiftStringObject(value: ["c"])
         })
         XCTAssertEqual(map.count, 2)
-        XCTAssertEqual(map["a"]!!.stringCol, "c")
-        XCTAssertTrue(str1.isSameObject(as: map["b"]!!))
+        XCTAssertEqual(map["a"]!.stringCol, "c")
+        XCTAssertTrue(str1.isSameObject(as: map["b"]!))
     }
 
     func testChangesArePersisted() {
@@ -294,8 +294,8 @@ class MapTests: TestCase {
         map["key2"] = str2
         if let realm = map.realm {
             let mapFromResults = realm.objects(SwiftMapPropertyObject.self).first!.map
-            XCTAssertEqual(map["key"]!!.stringCol, mapFromResults["key"]!!.stringCol)
-            XCTAssertEqual(map["key2"]!!.stringCol, mapFromResults["key2"]!!.stringCol)
+            XCTAssertEqual(map["key"]!.stringCol, mapFromResults["key"]!.stringCol)
+            XCTAssertEqual(map["key2"]!.stringCol, mapFromResults["key2"]!.stringCol)
         }
     }
 
@@ -308,9 +308,9 @@ class MapTests: TestCase {
         map[str1.stringCol] = str1
 
         XCTAssertEqual(map.count, 3)
-        XCTAssertEqual(map["a"]!!.stringCol, "a")
-        XCTAssertEqual(map["b"]!!.stringCol, "b")
-        XCTAssertEqual(map[str1.stringCol]!!.stringCol, str1.stringCol)
+        XCTAssertEqual(map["a"]!.stringCol, "a")
+        XCTAssertEqual(map["b"]!.stringCol, "b")
+        XCTAssertEqual(map[str1.stringCol]!.stringCol, str1.stringCol)
 
         var count = 0
         for object in map {
@@ -465,12 +465,18 @@ class MapTests: TestCase {
 
     func testSetEmbedded() {
         let map = createEmbeddedMap()
+        XCTAssertNil(map["key"])
+        XCTAssertNil(map["key"]?.value)
+
         map["key"] = EmbeddedTreeObject1(value: [0])
+        XCTAssertNotNil(map["key"])
+        XCTAssertEqual(map["key"]?.value, 0)
+        XCTAssertEqual(map["key"]!.value, 0)
 
         let oldObj = map["key"]
         let obj = EmbeddedTreeObject1(value: [1])
         map["key"] = obj
-        XCTAssertTrue(map["key"]!!.isSameObject(as: obj))
+        XCTAssertTrue(map["key"]!.isSameObject(as: obj))
         XCTAssertEqual(obj.value, 1)
         XCTAssertEqual(obj.realm, map.realm)
 
@@ -814,7 +820,7 @@ class MapTests: TestCase {
             let realm = self.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.objects(SwiftMapPropertyObject.self).first!
-            let value = obj.swiftObjectMap["first"]!!
+            let value = obj.swiftObjectMap["first"]!
             value.intCol = 8
             try! realm.commitWrite()
         }
@@ -850,7 +856,7 @@ class MapTests: TestCase {
             let realm = self.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.objects(SwiftMapPropertyObject.self).first!
-            let value = obj.swiftObjectMap["first"]!!
+            let value = obj.swiftObjectMap["first"]!
             value.stringCol = "new string"
             try! realm.commitWrite()
         }
@@ -924,7 +930,7 @@ class MapTests: TestCase {
             let realm = self.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.objects(SwiftMapPropertyObject.self).first!
-            let value = obj.swiftObjectMap["first"]!!
+            let value = obj.swiftObjectMap["first"]!
             realm.delete(value)
             try! realm.commitWrite()
         }
@@ -946,7 +952,7 @@ class MapTests: TestCase {
             switch changes {
             case .initial(let map):
                 XCTAssertEqual(map.count, 1)
-                XCTAssertEqual(map["first"]!!.owners.first?.name, "Moe")
+                XCTAssertEqual(map["first"]!.owners.first?.name, "Moe")
             case .update(_, let deletions, let insertions, let modifications):
                 XCTAssertEqual(deletions, [])
                 XCTAssertEqual(insertions, [])
@@ -971,11 +977,9 @@ class MapTests: TestCase {
     }
 }
 
-// TODO: Get rid of the repetition in this test case with create map
 class MapStandaloneTests: MapTests {
-    // TODO: Have this call createMapObject
     override func createMap() -> Map<String, SwiftStringObject?> {
-        let mapObj = SwiftMapPropertyObject()
+        let mapObj = createMapObject()
         XCTAssertNil(mapObj.realm)
         return mapObj.map
     }
