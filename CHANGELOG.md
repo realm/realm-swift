@@ -7,6 +7,11 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fix crash in `RLMSyncConfiguration.initWithUser` error mapping when a user is disabled/deleted from MongoDB Realm dashboard.
   ([Cocoa #7399](https://github.com/realm/realm-cocoa/issues/7399), since v10.0.0)
 
+* Adding an unmanaged object to a Realm that was declared with `@StateRealmObject` would throw 
+  the exception `"Cannot add an object with observers to a Realm"`. 
+* The `RealmCollectionChange` docs refered to indicies in modifications as the 'new' collection. This is
+  incorrect and the docs now state that modifications refer to the previous version of the collection. ([Cocoa #7390](https://github.com/realm/realm-cocoa/issues/7390)
+
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
