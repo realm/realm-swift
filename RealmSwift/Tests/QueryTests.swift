@@ -1817,7 +1817,7 @@ class QueryTests: TestCase {
 
     }
 
-    // MARK: - Search
+    // MARK: - Strings
 
     func testStringStartsWith() {
         assertQuery(predicate: "stringCol BEGINSWITH %@",
@@ -2520,6 +2520,8 @@ class QueryTests: TestCase {
                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
 
     }
+
+    // MARK: - Data
 
     func testBinarySearchQueries() {
         assertQuery(predicate: "binaryCol BEGINSWITH %@",
@@ -6165,6 +6167,10 @@ class QueryTests: TestCase {
             $0.mapString["foo"].contains("Foo")
         }
 
+        assertQuery(predicate: "mapString.@allKeys == %@ && NOT mapString CONTAINS %@", values: ["foo", "Foo"], expectedCount: 0) {
+            !$0.mapString["foo"].contains("Foo")
+        }
+
         assertQuery(predicate: "mapString.@allKeys == %@ && mapString BEGINSWITH[cd] %@", values: ["foo", "Foo"], expectedCount: 1) {
             $0.mapString["foo"].starts(with: "Foo", options: [.caseInsensitive, .diacriticInsensitive])
         }
@@ -6440,6 +6446,10 @@ class QueryTests: TestCase {
 
         assertQuery(predicate: "mapOptString.@allKeys == %@ && mapOptString CONTAINS %@", values: ["foo", "Foo"], expectedCount: 1) {
             $0.mapOptString["foo"].contains("Foo")
+        }
+
+        assertQuery(predicate: "mapOptString.@allKeys == %@ && NOT mapOptString CONTAINS %@", values: ["foo", "Foo"], expectedCount: 0) {
+            !$0.mapOptString["foo"].contains("Foo")
         }
 
         assertQuery(predicate: "mapOptString.@allKeys == %@ && mapOptString BEGINSWITH[cd] %@", values: ["foo", "Foo"], expectedCount: 1) {

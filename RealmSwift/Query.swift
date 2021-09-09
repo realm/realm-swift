@@ -71,6 +71,12 @@ private enum QueryExpression {
         case allValues = ".@allValues"
     }
 
+    enum Special {
+        // Allows a prefixed `NOT` to be inserted where the
+        // placeholder location is.
+        case notPlaceholder
+    }
+
     case keyPath(name: String, isCollection: Bool = false)
     case prefix(Prefix)
     case comparison(Comparision)
@@ -80,6 +86,7 @@ private enum QueryExpression {
     case subquery(String, String, [Any])
     case stringSearch(Search)
     case collectionAggregation(CollectionAggregation)
+    case special(Special)
 }
 
 /**
@@ -123,9 +130,14 @@ private enum QueryExpression {
  - IN `.contains(_ element:)`
  - Between `.contains(_ range:)`
 
+ ### Map
+ - @allKeys `.keys`
+ - @allValues `.values`
+
  ### Compound
  - AND `&&`
  - OR `||`
+ - NOT `!`
  */
 @dynamicMemberLookup
 public struct Query<T: _Persistable> {
@@ -145,7 +157,18 @@ public struct Query<T: _Persistable> {
 
     public static prefix func ! (_ rhs: Query) -> Query {
         var tokensCopy = rhs.tokens
-        tokensCopy.insert(.prefix(.not), at: 0)
+        let hasPlaceholder = !tokensCopy.enumerated().reversed().filter {
+            if case let .special(s) = $0.element, s == .notPlaceholder {
+                tokensCopy.remove(at: $0.offset)
+                tokensCopy.insert(.prefix(.not), at: $0.offset)
+                return true
+            } else {
+                return false
+            }
+        }.isEmpty
+        if !hasPlaceholder {
+            tokensCopy.insert(.prefix(.not), at: 0)
+        }
         return Query(expression: tokensCopy)
     }
 
@@ -298,6 +321,8 @@ public struct Query<T: _Persistable> {
                 arguments.append(contentsOf: args)
             case let .collectionAggregation(agg):
                 predicateString.append(agg.rawValue)
+            case .special:
+                break
             }
         }
 
@@ -386,16 +411,17 @@ extension Query where T: RealmKeyedCollection {
                                .basicComparison(.equal),
                                .rhs(member),
                                .compound(.and),
+                               .special(.notPlaceholder),
                                keyPath])
     }
 }
 
 extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: _Persistable {
-
+    /// Checks if an element exists in this collection.
     public func contains<V>(_ value: T.Value) -> Query<V> {
         return append(tokens: [.comparison(.contains(value))])
     }
-
+    /// Allows a query over all values in the Map.
     public var values: Query<T.Value> {
         return append(tokens: [.collectionAggregation(.allValues)])
     }
@@ -406,6 +432,7 @@ extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: _Pe
 }
 
 extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: OptionalProtocol, T.Value.Wrapped: _Persistable {
+    /// Allows a query over all values in the Map.
     public var values: Query<T.Value.Wrapped> {
         return append(tokens: [.collectionAggregation(.allValues)])
     }

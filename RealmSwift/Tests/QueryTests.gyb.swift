@@ -676,7 +676,7 @@ class QueryTests: TestCase {
         % end
     }
 
-    // MARK: - Search
+    // MARK: - Strings
 
     func testStringStartsWith() {
         % for property in properties + optProperties:
@@ -1073,6 +1073,8 @@ class QueryTests: TestCase {
         % end
         % end
     }
+
+    // MARK: - Data
 
     func testBinarySearchQueries() {
         % for property in properties + optProperties:
@@ -1513,6 +1515,10 @@ class QueryTests: TestCase {
 
         assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} CONTAINS %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 1) {
             $0.${property.colName}["foo"].contains(${property.value(0)})
+        }
+
+        assertQuery(predicate: "${property.colName}.@allKeys == %@ && NOT ${property.colName} CONTAINS %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 0) {
+            !$0.${property.colName}["foo"].contains(${property.value(0)})
         }
 
         assertQuery(predicate: "${property.colName}.@allKeys == %@ && ${property.colName} BEGINSWITH[cd] %@", values: ["foo", ${property.foundationValue(0)}], expectedCount: 1) {
