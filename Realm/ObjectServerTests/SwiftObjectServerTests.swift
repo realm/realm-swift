@@ -876,50 +876,46 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         // A user can have its state updated asynchronously so we need to make sure
         // that remotely disabling / deleting a user is handled correctly in the
         // sync error handler.
-        do {
-            let loginEx = expectation(description: "login-user")
-            app.login(credentials: .anonymous) { result in
-                switch result {
-                case .success:
-                    loginEx.fulfill()
-                case .failure:
-                    XCTFail("Should login user")
-                }
+        let loginEx = expectation(description: "login-user")
+        app.login(credentials: .anonymous) { result in
+            switch result {
+            case .success:
+                loginEx.fulfill()
+            case .failure:
+                XCTFail("Should login user")
             }
-            wait(for: [loginEx], timeout: 4.0)
-
-            let user = app.currentUser!
-
-            // Set a callback on the user
-            var blockCalled = false
-            let ex = expectation(description: "Error callback should fire upon receiving an error")
-            app.syncManager.errorHandler = { (error, _) in
-                XCTAssertNotNil(error)
-                blockCalled = true
-                ex.fulfill()
-            }
-
-            let appServerId = try RealmServer.shared.retrieveAppId(clientAppId: appId)
-            let deleteUserEx = expectation(description: "delete-user")
-            RealmServer.shared.removeUserForApp(appServerId, userId: user.id) { result in
-                switch result {
-                case .success:
-                    break
-                case .failure:
-                    XCTFail("Should delete User")
-                }
-                deleteUserEx.fulfill()
-            }
-            wait(for: [deleteUserEx], timeout: 4.0)
-
-            // Try to open a Realm with the user; this will cause our errorHandler block defined above to be fired.
-            XCTAssertFalse(blockCalled)
-            _ = try immediatelyOpenRealm(partitionValue: appServerId, user: user)
-
-            waitForExpectations(timeout: 10.0, handler: nil)
-        } catch {
-            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
+        wait(for: [loginEx], timeout: 4.0)
+
+        let user = app.currentUser!
+
+        // Set a callback on the user
+        var blockCalled = false
+        let ex = expectation(description: "Error callback should fire upon receiving an error")
+        app.syncManager.errorHandler = { (error, _) in
+            XCTAssertNotNil(error)
+            blockCalled = true
+            ex.fulfill()
+        }
+
+        let appServerId = try RealmServer.shared.retrieveAppId(clientAppId: appId)
+        let deleteUserEx = expectation(description: "delete-user")
+        RealmServer.shared.removeUserForApp(appServerId, userId: user.id) { result in
+            switch result {
+            case .success:
+                break
+            case .failure:
+                XCTFail("Should delete User")
+            }
+            deleteUserEx.fulfill()
+        }
+        wait(for: [deleteUserEx], timeout: 4.0)
+
+        // Try to open a Realm with the user; this will cause our errorHandler block defined above to be fired.
+        XCTAssertFalse(blockCalled)
+        _ = try immediatelyOpenRealm(partitionValue: appServerId, user: user)
+
+        waitForExpectations(timeout: 10.0, handler: nil)
     }
 
     func testAppLinkUser() {
