@@ -35,6 +35,11 @@ x.y.z Release notes (yyyy-MM-dd)
 * Synchronized Realms are no longer opened twice, cutting the address space and
   file descriptors used in half.
   ([Core #4839](https://github.com/realm/realm-core/pull/4839))
+* When using the SwiftUI helper types (@ObservedRealmObject and friends) to
+  bind to an Equatable property, self-assignment no longer performs a pointless
+  write transaction. SwiftUI appears to sometimes call a Binding's set function
+  multiple times for a single UI action, so this results in significantly fewer
+  writes being performed.
 
 ### Fixed
 
@@ -50,6 +55,7 @@ x.y.z Release notes (yyyy-MM-dd)
   next run of the application could hit the assertion failure "m_state ==
   SyncUser::State::LoggedIn" when a synchronized Realm is opened with that
   user. ([Core #4875](https://github.com/realm/realm-core/issues/4875), since v10.0.0)
+* The `keyPaths:` parameter to `@ObservedResults` did not work (since v10.12.0).
 
 ### Compatibility
 
