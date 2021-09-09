@@ -27,14 +27,13 @@ import RealmSyncTestSupport
 import RealmTestSupport
 #endif
 
-@objc(SwiftMongoClientTests)
 class SwiftMongoClientTests: SwiftSyncTestCase {
     override func tearDown() {
         _ = setupMongoCollection()
         super.tearDown()
     }
     func testMongoClient() {
-        let user = try! logInUser(for: Credentials.anonymous)
+        let user = try! logInUser(for: .anonymous)
         let mongoClient = user.mongoClient("mongodb1")
         XCTAssertEqual(mongoClient.name, "mongodb1")
         let database = mongoClient.database(named: "test_data")
@@ -873,13 +872,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
 @available(macOS 12.0, *)
 class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
     func setupMongoCollection() async throws -> MongoCollection {
-        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
-        let password = randomString(10)
-        try await app.emailPasswordAuth.registerUser(email: email, password: password)
-
-        let credentials = Credentials.emailPassword(email: email, password: password)
-        let user = try await app.login(credentials: credentials)
-
+        let user = try await self.app.login(credentials: basicCredentials())
         let mongoClient = user.mongoClient("mongodb1")
         let database = mongoClient.database(named: "test_data")
         let collection = database.collection(withName: "Dog")
@@ -1038,10 +1031,10 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
         XCTAssertNotNil(objectIds)
         XCTAssertEqual(objectIds.count, 4)
 
-        // Returning a document means that it was founded and deleted
+        // Returning a document means that it was found and deleted
         let deletedDocument = try await collection.findOneAndDelete(filter: document)
         XCTAssertNotNil(deletedDocument)
-        XCTAssertEqual(deletedDocument?["name"]??.stringValue, "tomas") // shouldReturnNewDocument is false that is why returns old document
+        XCTAssertEqual(deletedDocument?["name"]??.stringValue, "tomas")
 
         // Document already deleted, should return nil
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
@@ -1058,38 +1051,23 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
         let document: Document = ["name": "tomas", "breed": "jack rusell"]
         let document1: Document = ["name": "lucas", "breed": "german shepard"]
         let document2: Document = ["name": "fito", "breed": "goberian"]
-        let document3: Document = ["name": "fosca", "breed": "labradoodle"]
-        let document4: Document = ["name": "balo", "breed": "pug"]
-        let document5: Document = ["name": "luna", "breed": "weimaraner"]
 
-        let objectIds = try await collection.insertMany([document, document1, document2, document3])
+        let objectIds = try await collection.insertMany([document, document1])
         XCTAssertNotNil(objectIds)
-        XCTAssertEqual(objectIds.count, 4)
+        XCTAssertEqual(objectIds.count, 2)
 
-        let updatedResult = try await collection.updateOneDocument(filter: document, update: document2)
-        XCTAssertNil(updatedResult.objectId) // No upsert
+        let updatedResult = try await collection.updateOneDocument(filter: document,
+                                                                   update: document2)
+        XCTAssertNil(updatedResult.objectId)
         XCTAssertEqual(updatedResult.matchedCount, 1)
         XCTAssertEqual(updatedResult.modifiedCount, 1)
 
-        let updatedResult1 = try await collection.updateOneDocument(filter: document1,
-                                                                    update: document3,
-                                                                    upsert: true)
-        XCTAssertNil(updatedResult1.objectId) // No upsert, already exist
-        XCTAssertEqual(updatedResult1.matchedCount, 1)
-        XCTAssertEqual(updatedResult1.modifiedCount, 1)
-
-        let updatedResult2 = try await collection.updateOneDocument(filter: document4,
+        let updatedResult1 = try await collection.updateOneDocument(filter: document,
                                                                     update: document2,
                                                                     upsert: true)
-        XCTAssertNotNil(updatedResult2.objectId)
-        XCTAssertEqual(updatedResult2.matchedCount, 0)
-        XCTAssertEqual(updatedResult2.modifiedCount, 0)
-
-        let updatedResult3 = try await collection.updateOneDocument(filter: document5,
-                                                                    update: document2)
-        XCTAssertNil(updatedResult3.objectId) // No upsert
-        XCTAssertEqual(updatedResult3.matchedCount, 0)
-        XCTAssertEqual(updatedResult3.modifiedCount, 0)
+        XCTAssertNotNil(updatedResult1.objectId)
+        XCTAssertEqual(updatedResult1.matchedCount, 0)
+        XCTAssertEqual(updatedResult1.modifiedCount, 0)
     }
 
     func testMongoCollectionUpdateManyAsyncAwait() async throws {
@@ -1098,37 +1076,23 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
         let document: Document = ["name": "tomas", "breed": "jack rusell"]
         let document1: Document = ["name": "fito", "breed": "goberian"]
         let document2: Document = ["name": "fosca", "breed": "labradoodle"]
-        let document3: Document = ["name": "balo", "breed": "pug"]
-        let document4: Document = ["name": "luna", "breed": "weimaraner"]
 
         let objectIds = try await collection.insertMany([document, document1])
         XCTAssertNotNil(objectIds)
         XCTAssertEqual(objectIds.count, 2)
 
-        let updatedResult = try await collection.updateManyDocuments(filter: document, update: document3)
-        XCTAssertNil(updatedResult.objectId) // No upsert
+        let updatedResult = try await collection.updateManyDocuments(filter: document,
+                                                                     update: document2)
+        XCTAssertNil(updatedResult.objectId)
         XCTAssertEqual(updatedResult.matchedCount, 1)
         XCTAssertEqual(updatedResult.modifiedCount, 1)
 
-        let updatedResult1 = try await collection.updateManyDocuments(filter: document1,
+        let updatedResult2 = try await collection.updateManyDocuments(filter: document,
                                                                       update: document2,
-                                                                      upsert: true)
-        XCTAssertNil(updatedResult1.objectId) // No upsert, already exist
-        XCTAssertEqual(updatedResult1.matchedCount, 1)
-        XCTAssertEqual(updatedResult1.modifiedCount, 1)
-
-        let updatedResult2 = try await collection.updateManyDocuments(filter: document4,
-                                                                      update: document3,
                                                                       upsert: true)
         XCTAssertNotNil(updatedResult2.objectId)
         XCTAssertEqual(updatedResult2.matchedCount, 0)
         XCTAssertEqual(updatedResult2.modifiedCount, 0)
-
-        let updatedResult3 = try await collection.updateManyDocuments(filter: document,
-                                                                      update: document3)
-        XCTAssertNil(updatedResult3.objectId) // No upsert
-        XCTAssertEqual(updatedResult3.matchedCount, 0)
-        XCTAssertEqual(updatedResult3.modifiedCount, 0)
     }
 
     func testMongoCollectionDeleteOneAsyncAwait() async throws {
@@ -1157,7 +1121,7 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
         let collection = try await setupMongoCollection()
 
         let document: Document = ["name": "tomas", "breed": "jack rusell"]
-        let document1: Document = ["name": "fito", "breed": "goberian"]
+        let document1: Document = ["name": "fito", "breed": "jack rusell"]
         let document2: Document = ["name": "fosca", "breed": "labradoodle"]
         let document3: Document = ["name": "balo", "breed": "pug"]
 
@@ -1168,11 +1132,11 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
         XCTAssertNotNil(objectIds)
         XCTAssertEqual(objectIds.count, 4)
 
-        let deletedDocumentCount2 = try await collection.deleteManyDocuments(filter: document)
-        XCTAssertEqual(deletedDocumentCount2, 1)
+        let deletedDocumentCount2 = try await collection.deleteManyDocuments(filter: ["breed": "jack rusell"])
+        XCTAssertEqual(deletedDocumentCount2, 2)
 
         let resultObjectIds2 = try await collection.find(filter: [:])
-        XCTAssertEqual(resultObjectIds2.count, 3)
+        XCTAssertEqual(resultObjectIds2.count, 2)
     }
 
     func testMongoCollectionAggregateAsyncAwait() async throws {
@@ -1180,12 +1144,10 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
 
         let document: Document = ["name": "tomas", "breed": "jack rusell"]
         let document1: Document = ["name": "lucas", "breed": "german shepard"]
-        let document2: Document = ["name": "fito", "breed": "goberian"]
-        let document3: Document = ["name": "balo", "breed": "pug"]
 
-        let objectIds = try await collection.insertMany([document, document1, document2, document3])
+        let objectIds = try await collection.insertMany([document, document1])
         XCTAssertNotNil(objectIds)
-        XCTAssertEqual(objectIds.count, 4)
+        XCTAssertEqual(objectIds.count, 2)
 
         let documents = try await collection.aggregate(pipeline: [["$match": ["name": "tomas"]], ["$group": ["_id": "$name"]]])
         XCTAssertNotNil(documents)
@@ -1196,7 +1158,7 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
         let collection = try await setupMongoCollection()
 
         let document: Document = ["name": "tomas", "breed": "jack rusell"]
-        let document1: Document = ["name": "lucas", "breed": "german shepard"]
+        let document1: Document = ["name": "lucas", "breed": "jack rusell"]
         let document2: Document = ["name": "fito", "breed": "goberian"]
         let document3: Document = ["name": "balo", "breed": "pug"]
 
@@ -1210,11 +1172,14 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
         let count2 = try await collection.count(filter: document)
         XCTAssertEqual(count2, 1)
 
-        let count3 = try await collection.count(filter: [:], limit: 2)
+        let count3 = try await collection.count(filter: ["breed": "jack rusell"])
         XCTAssertEqual(count3, 2)
 
-        let count4 = try await collection.count(filter: document3, limit: 1)
-        XCTAssertEqual(count4, 1)
+        let count4 = try await collection.count(filter: [:], limit: 2)
+        XCTAssertEqual(count4, 2)
+
+        let count5 = try await collection.count(filter: ["breed": "jack rusell"], limit: 1)
+        XCTAssertEqual(count5, 1)
     }
 }
 

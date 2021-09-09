@@ -2278,6 +2278,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
             try await app.emailPasswordAuth.callResetPasswordFunction(email: email,
                                                                       password: randomString(10),
                                                                       args: [[:]])
+            XCTFail("Call reset password function should fail")
         } catch {
             XCTAssertNotNil(error)
         }
@@ -2325,6 +2326,7 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
 
         do {
             try await app.emailPasswordAuth.resendConfirmationEmail(email)
+            XCTFail("Confirm user function should fail")
         } catch {
             XCTAssertNotNil(error)
         }

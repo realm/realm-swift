@@ -821,13 +821,13 @@ extension MongoCollection {
         return try await withCheckedThrowingContinuation { continuation in
             if let upsert = upsert {
                 updateOneDocument(filter: filter,
-                                       update: update,
-                                       upsert: upsert,
-                                       continuation.resume)
+                                  update: update,
+                                  upsert: upsert,
+                                  continuation.resume)
             } else {
                 updateOneDocument(filter: filter,
-                                       update: update,
-                                       continuation.resume)
+                                  update: update,
+                                  continuation.resume)
             }
         }
     }
@@ -844,13 +844,13 @@ extension MongoCollection {
         return try await withCheckedThrowingContinuation { continuation in
             if let upsert = upsert {
                 updateManyDocuments(filter: filter,
-                                         update: update,
-                                         upsert: upsert,
-                                         continuation.resume)
+                                    update: update,
+                                    upsert: upsert,
+                                    continuation.resume)
             } else {
                 updateManyDocuments(filter: filter,
-                                         update: update,
-                                         continuation.resume)
+                                    update: update,
+                                    continuation.resume)
             }
         }
     }
@@ -872,13 +872,13 @@ extension MongoCollection {
         return try await withCheckedThrowingContinuation { continuation in
             if let options = options {
                 findOneAndUpdate(filter: filter,
-                                      update: update,
-                                      options: options,
-                                      continuation.resume)
+                                 update: update,
+                                 options: options,
+                                 continuation.resume)
             } else {
                 findOneAndUpdate(filter: filter,
-                                      update: update,
-                                      continuation.resume)
+                                 update: update,
+                                 continuation.resume)
             }
         }
     }
@@ -900,13 +900,13 @@ extension MongoCollection {
         return try await withCheckedThrowingContinuation { continuation in
             if let options = options {
                 findOneAndReplace(filter: filter,
-                                       replacement: replacement,
-                                       options: options,
-                                       continuation.resume)
+                                  replacement: replacement,
+                                  options: options,
+                                  continuation.resume)
             } else {
                 findOneAndReplace(filter: filter,
-                                       replacement: replacement,
-                                       continuation.resume)
+                                  replacement: replacement,
+                                  continuation.resume)
             }
         }
     }
@@ -926,11 +926,11 @@ extension MongoCollection {
         return try await withCheckedThrowingContinuation { continuation in
             if let options = options {
                 findOneAndDelete(filter: filter,
-                                      options: options,
-                                      continuation.resume)
+                                 options: options,
+                                 continuation.resume)
             } else {
                 findOneAndDelete(filter: filter,
-                                      continuation.resume)
+                                 continuation.resume)
             }
         }
     }
