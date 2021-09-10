@@ -2321,6 +2321,14 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(linkedUser.identities.count, 2)
     }
 
+    func testUserCallFunctionAsyncAwait() async throws {
+        let user = try await self.app.login(credentials: basicCredentials())
+        guard case let .int32(sum) = try await user.functions.sum([1, 2, 3, 4, 5]) else {
+            return XCTFail("Should be int32")
+        }
+        XCTAssertEqual(sum, 15)
+    }
+
     // MARK: - Objective-C async await
     func testPushRegistrationAsyncAwait() async throws {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
@@ -2390,14 +2398,6 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         let newFetchedApiKeys = try await syncUser.apiKeysAuth.fetchAPIKeys()
         XCTAssertNotNil(newFetchedApiKeys)
         XCTAssertEqual(newFetchedApiKeys.count, 0)
-    }
-
-    func testUserCallFunctionAsyncAwait() async throws {
-        let user = try await self.app.login(credentials: basicCredentials())
-        guard case let .int32(sum) = try await user.functions.sum([1, 2, 3, 4, 5]) else {
-            return XCTFail("Should be int32")
-        }
-        XCTAssertEqual(sum, 15)
     }
 
     func testCustomUserDataAsyncAwait() async throws {
