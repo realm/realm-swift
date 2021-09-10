@@ -248,12 +248,10 @@ public struct Query<T: _Persistable> {
             case let .prefix(op):
                 switch tokens[idx+2] {
                 case .comparison(.contains),
-                        .stringSearch(.contains),
-                        .stringSearch(.equals),
-                        .stringSearch(.notEquals):
+                        .stringSearch:
                     predicateString.append("\(op.rawValue) ")
                 default:
-                    throwRealmException("`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
+                    throwRealmException("`!` prefix is only allowed for `Comparison.contains` and `Search` queries")
                 }
             case let .basicComparison(op):
                 predicateString.append(" \(op.rawValue)")

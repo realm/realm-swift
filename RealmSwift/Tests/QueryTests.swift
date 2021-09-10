@@ -1845,6 +1845,11 @@ class QueryTests: TestCase {
             $0.stringCol.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
+        assertQuery(predicate: "NOT stringCol BEGINSWITH[cd] %@",
+                    values: ["fo"], expectedCount: 0) {
+            !$0.stringCol.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
         assertQuery(predicate: "optStringCol BEGINSWITH %@",
                     values: ["fo"], expectedCount: 0) {
             $0.optStringCol.starts(with: "fo")
@@ -1868,6 +1873,11 @@ class QueryTests: TestCase {
         assertQuery(predicate: "optStringCol BEGINSWITH[cd] %@",
                     values: ["fo"], expectedCount: 1) {
             $0.optStringCol.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT optStringCol BEGINSWITH[cd] %@",
+                    values: ["fo"], expectedCount: 0) {
+            !$0.optStringCol.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
     }
@@ -1898,6 +1908,11 @@ class QueryTests: TestCase {
             $0.stringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
+        assertQuery(predicate: "NOT stringCol ENDSWITH[cd] %@",
+                    values: ["oo"], expectedCount: 0) {
+            !$0.stringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
         assertQuery(predicate: "optStringCol ENDSWITH %@",
                     values: ["oo"], expectedCount: 0) {
             $0.optStringCol.ends(with: "oo")
@@ -1921,6 +1936,11 @@ class QueryTests: TestCase {
         assertQuery(predicate: "optStringCol ENDSWITH[cd] %@",
                     values: ["oo"], expectedCount: 1) {
             $0.optStringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT optStringCol ENDSWITH[cd] %@",
+                    values: ["oo"], expectedCount: 0) {
+            !$0.optStringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
     }
@@ -2046,6 +2066,11 @@ class QueryTests: TestCase {
             $0.stringCol.like("?O?", caseInsensitive: false)
         }
 
+        assertQuery(predicate: "NOT stringCol LIKE %@",
+                    values: ["?O?"], expectedCount: 1) {
+            !$0.stringCol.like("?O?", caseInsensitive: false)
+        }
+
         assertQuery(predicate: "optStringCol LIKE %@",
                                 values: ["Foó"], expectedCount: 1) {
             $0.optStringCol.like("Foó")
@@ -2164,6 +2189,11 @@ class QueryTests: TestCase {
         assertQuery(predicate: "optStringCol LIKE %@",
                     values: ["?O?"], expectedCount: 0) {
             $0.optStringCol.like("?O?", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "NOT optStringCol LIKE %@",
+                    values: ["?O?"], expectedCount: 1) {
+            !$0.optStringCol.like("?O?", caseInsensitive: false)
         }
 
     }
@@ -2484,40 +2514,16 @@ class QueryTests: TestCase {
         let result1 = objects()
 
         let stringColQueryStartsWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
-            !$0.stringCol.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
+            !$0.stringCol == "Foó"
         }
         assertThrows(result1.query(stringColQueryStartsWith),
-                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
+                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search` queries")
 
         let stringColQueryEndWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
-            !$0.stringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
+            !$0.stringCol != "Foó"
         }
         assertThrows(result1.query(stringColQueryEndWith),
-                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
-
-        let stringColQueryLike: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
-            !$0.stringCol.like("f*", caseInsensitive: true)
-        }
-        assertThrows(result1.query(stringColQueryLike),
-                    reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
-
-        let optStringColQueryStartsWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
-            !$0.optStringCol.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
-        }
-        assertThrows(result1.query(optStringColQueryStartsWith),
-                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
-
-        let optStringColQueryEndWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
-            !$0.optStringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
-        }
-        assertThrows(result1.query(optStringColQueryEndWith),
-                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
-
-        let optStringColQueryLike: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
-            !$0.optStringCol.like("f*", caseInsensitive: true)
-        }
-        assertThrows(result1.query(optStringColQueryLike),
-                    reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
+                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search` queries")
 
     }
 
@@ -2529,9 +2535,19 @@ class QueryTests: TestCase {
             $0.binaryCol.starts(with: Data(count: 28))
         }
 
+        assertQuery(predicate: "NOT binaryCol BEGINSWITH %@",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            !$0.binaryCol.starts(with: Data(count: 28))
+        }
+
         assertQuery(predicate: "binaryCol ENDSWITH %@",
                     values: [Data(count: 28)], expectedCount: 1) {
             $0.binaryCol.ends(with: Data(count: 28))
+        }
+
+        assertQuery(predicate: "NOT binaryCol ENDSWITH %@",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            !$0.binaryCol.ends(with: Data(count: 28))
         }
 
         assertQuery(predicate: "binaryCol CONTAINS %@",
@@ -2619,9 +2635,19 @@ class QueryTests: TestCase {
             $0.optBinaryCol.starts(with: Data(count: 28))
         }
 
+        assertQuery(predicate: "NOT optBinaryCol BEGINSWITH %@",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            !$0.optBinaryCol.starts(with: Data(count: 28))
+        }
+
         assertQuery(predicate: "optBinaryCol ENDSWITH %@",
                     values: [Data(count: 28)], expectedCount: 1) {
             $0.optBinaryCol.ends(with: Data(count: 28))
+        }
+
+        assertQuery(predicate: "NOT optBinaryCol ENDSWITH %@",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            !$0.optBinaryCol.ends(with: Data(count: 28))
         }
 
         assertQuery(predicate: "optBinaryCol CONTAINS %@",

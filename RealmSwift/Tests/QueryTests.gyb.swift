@@ -706,6 +706,11 @@ class QueryTests: TestCase {
             $0.${property.colName}.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
+        assertQuery(predicate: "NOT ${property.colName} BEGINSWITH[cd] %@",
+                    values: ["fo"], expectedCount: 0) {
+            !$0.${property.colName}.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
         % end
         % end
     }
@@ -736,6 +741,11 @@ class QueryTests: TestCase {
         assertQuery(predicate: "${property.colName} ENDSWITH[cd] %@",
                     values: ["oo"], expectedCount: 1) {
             $0.${property.colName}.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} ENDSWITH[cd] %@",
+                    values: ["oo"], expectedCount: 0) {
+            !$0.${property.colName}.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
         }
 
         % end
@@ -863,6 +873,11 @@ class QueryTests: TestCase {
         assertQuery(predicate: "${property.colName} LIKE %@",
                     values: ["?O?"], expectedCount: 0) {
             $0.${property.colName}.like("?O?", caseInsensitive: false)
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} LIKE %@",
+                    values: ["?O?"], expectedCount: 1) {
+            !$0.${property.colName}.like("?O?", caseInsensitive: false)
         }
 
         % end
@@ -1050,25 +1065,19 @@ class QueryTests: TestCase {
     func testNotPrefixUnsupported() {
         let result1 = objects()
 
-        % for property in properties + optProperties:
+        % for property in properties:
         % if property.enumName == None and property.category == 'string':
         let ${property.colName}QueryStartsWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
-            !$0.${property.colName}.starts(with: "fo", options: [.caseInsensitive, .diacriticInsensitive])
+            !$0.${property.colName} == "Foó"
         }
         assertThrows(result1.query(${property.colName}QueryStartsWith),
-                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
+                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search` queries")
 
         let ${property.colName}QueryEndWith: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
-            !$0.${property.colName}.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
+            !$0.${property.colName} != "Foó"
         }
         assertThrows(result1.query(${property.colName}QueryEndWith),
-                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
-
-        let ${property.colName}QueryLike: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
-            !$0.${property.colName}.like("f*", caseInsensitive: true)
-        }
-        assertThrows(result1.query(${property.colName}QueryLike),
-                    reason: "`!` prefix is only allowed for `Comparison.contains` and `Search.contains` queries")
+                     reason: "`!` prefix is only allowed for `Comparison.contains` and `Search` queries")
 
         % end
         % end
@@ -1084,9 +1093,19 @@ class QueryTests: TestCase {
             $0.${property.colName}.starts(with: Data(count: 28))
         }
 
+        assertQuery(predicate: "NOT ${property.colName} BEGINSWITH %@",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            !$0.${property.colName}.starts(with: Data(count: 28))
+        }
+
         assertQuery(predicate: "${property.colName} ENDSWITH %@",
                     values: [Data(count: 28)], expectedCount: 1) {
             $0.${property.colName}.ends(with: Data(count: 28))
+        }
+
+        assertQuery(predicate: "NOT ${property.colName} ENDSWITH %@",
+                    values: [Data(count: 28)], expectedCount: 0) {
+            !$0.${property.colName}.ends(with: Data(count: 28))
         }
 
         assertQuery(predicate: "${property.colName} CONTAINS %@",
