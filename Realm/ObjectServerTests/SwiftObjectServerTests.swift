@@ -1206,10 +1206,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             callFunctionEx.fulfill()
         }
         wait(for: [callFunctionEx], timeout: 4.0)
-    }
 
-    func testCallFunctionResult() throws {
-        _ = try logInUser(for: basicCredentials(), app: app)
+        // Test function with completion handler (Result<AnyBSON, Error>) -> Void
         let callFunctionResultEx = expectation(description: "Call function")
         app.currentUser?.functions.sum([1, 2, 3, 4, 5]) { result in
             switch result {
@@ -2059,6 +2057,11 @@ class CombineObjectServerTests: SwiftSyncTestCase {
         app.login(credentials: credentials).await(self) { user in
             XCTAssertNotNil(user)
         }
+
+        let cancellable = app.currentUser?.functions.sum([1, 2, 3, 4, 5])
+            .sink { bson in
+                // Do something with the frozen changeset
+            }
 
         app.currentUser?.functions.sum([1, 2, 3, 4, 5]).await(self) { bson in
             guard case let .int32(sum) = bson else {
