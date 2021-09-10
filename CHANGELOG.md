@@ -2,14 +2,28 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add `async` `Realm.asyncOpen` and `App.login` methods.
+* ThreadSafeReference no longer pins the source transaction version for
+  anything other than a Results created by filtering a collection. This means
+  that holding on to thread-safe references to other things (such as Objects)
+  will no longer cause file size growth.
+* A ThreadSafeReference to a Results backed by a collection can now be created
+  inside a write transaction as long as the collection was not created in the
+  current write transaction.
+* Synchronized Realms are no longer opened twice, cutting the address space and
+  file descriptors used in half.
+  ([Core #4839](https://github.com/realm/realm-core/pull/4839))
 
 ### Fixed
-* Adding an unmanaged object to a Realm that was declared with `@StateRealmObject` would throw 
-  the exception `"Cannot add an object with observers to a Realm"`. 
+* Adding an unmanaged object to a Realm that was declared with `@StateRealmObject` would throw
+  the exception `"Cannot add an object with observers to a Realm"`.
 * The `RealmCollectionChange` docs refered to indicies in modifications as the 'new' collection. This is
   incorrect and the docs now state that modifications refer to the previous version of the collection. ([Cocoa #7390](https://github.com/realm/realm-cocoa/issues/7390))
-  * Fix crash in `RLMSyncConfiguration.initWithUser` error mapping when a user is disabled/deleted from MongoDB Realm dashboard.
+* Fix crash in `RLMSyncConfiguration.initWithUser` error mapping when a user is disabled/deleted from MongoDB Realm dashboard.
   ([Cocoa #7399](https://github.com/realm/realm-cocoa/issues/7399), since v10.0.0)
+* If the application crashed at the wrong point when logging a user in, the
+  next run of the application could hit the assertion failure "m_state ==
+  SyncUser::State::LoggedIn" when a synchronized Realm is opened with that
+  user. ([Core #4875](https://github.com/realm/realm-core/issues/4875), since v10.0.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -21,7 +35,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 12.2-13.0 beta 5.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 11.3.1 to 11.4.1
 
 10.14.0 Release notes (2021-09-03)
 =============================================================
