@@ -27,6 +27,7 @@ import RealmSyncTestSupport
 import RealmTestSupport
 #endif
 
+// MARK: - SwiftMongoClientTests
 class SwiftMongoClientTests: SwiftSyncTestCase {
     override func tearDown() {
         _ = setupMongoCollection()
@@ -868,6 +869,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
     }
 }
 
+// MARK: - AsyncAwaitMongoClientTests
 #if swift(>=5.5)
 @available(macOS 12.0, *)
 class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
@@ -880,7 +882,7 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
         return collection
     }
 
-    func testMongoCollectionInsertAsyncAwait() async throws {
+    func testMongoCollectionInsertOneAsyncAwait() async throws {
         let collection = try await setupMongoCollection()
 
         let document: Document = ["name": "tomas", "breed": "jack rusell"]
@@ -888,6 +890,10 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
         XCTAssertNotNil(objectId)
         let fetchedDocument = try await collection.find(filter: document)
         XCTAssertEqual(fetchedDocument[0]["name"]??.stringValue, "tomas")
+    }
+
+    func testMongoCollectionInsertManyAsyncAwait() async throws {
+        let collection = try await setupMongoCollection()
 
         let document1: Document = ["name": "lucas", "breed": "german shepard"]
         let document2: Document = ["name": "fito", "breed": "goberian"]
@@ -896,7 +902,8 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
         XCTAssertEqual(objectIds.count, 2)
 
         let fetchedDocuments = try await collection.find(filter: [:])
-        XCTAssertEqual(fetchedDocuments.count, 3)
+        XCTAssertEqual(fetchedDocuments.count, 2)
+        XCTAssertEqual(fetchedDocuments[0]["name"]??.stringValue, "lucas")
     }
 
     func testMongoCollectionFindAsyncAwait() async throws {
@@ -951,8 +958,8 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
         XCTAssertEqual(fetchedOneDocument?["name"]??.stringValue, "tomas")
         XCTAssertEqual(fetchedOneDocument?["breed"]??.stringValue, "jack rusell")
 
-        // Test findOne all with option limit to one
-        let findOptions = FindOptions(2, nil, nil)
+        // Test findOne all with option limit
+        let findOptions = FindOptions(1, nil, nil)
         let fetchedOneDocument2 = try await collection.findOneDocument(filter: [:], options: findOptions)
         XCTAssertNotNil(fetchedOneDocument2)
 
