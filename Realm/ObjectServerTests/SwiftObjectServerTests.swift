@@ -2058,11 +2058,6 @@ class CombineObjectServerTests: SwiftSyncTestCase {
             XCTAssertNotNil(user)
         }
 
-        let cancellable = app.currentUser?.functions.sum([1, 2, 3, 4, 5])
-            .sink { bson in
-                // Do something with the frozen changeset
-            }
-
         app.currentUser?.functions.sum([1, 2, 3, 4, 5]).await(self) { bson in
             guard case let .int32(sum) = bson else {
                 XCTFail("Should be int32")
