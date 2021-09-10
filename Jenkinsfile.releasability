@@ -186,7 +186,7 @@ def doBuild() {
           unstash 'source'
 
           sh "REALM_XCODE_VERSION=${objcXcodeVersion} ./build.sh package-release objc"
-          stash include: 'realm-objc-*.zip', name: 'objc-packaged'
+          stash includes: 'realm-objc-*.zip', name: 'objc-packaged'
           archiveArtifacts artifacts: 'realm-objc-*.zip'
         }
       },
@@ -204,7 +204,7 @@ def doBuild() {
           unstash 'source'
 
           sh './build.sh package-release swift'
-          stash include: 'realm-swift-*.zip', name: 'swift-packaged'
+          stash includes: 'realm-swift-*.zip', name: 'swift-packaged'
           archiveArtifacts artifacts: 'realm-swift-*.zip'
         }
       },
