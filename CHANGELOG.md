@@ -1,7 +1,9 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.15.0 Release notes (2021-09-10)
 =============================================================
+
 ### Enhancements
-* Add `async` `Realm.asyncOpen` and `App.login` methods.
+
+* Add `async` versions of the  `Realm.asyncOpen` and `App.login` methods.
 * ThreadSafeReference no longer pins the source transaction version for
   anything other than a Results created by filtering a collection. This means
   that holding on to thread-safe references to other things (such as Objects)
@@ -14,10 +16,13 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Core #4839](https://github.com/realm/realm-core/pull/4839))
 
 ### Fixed
-* Adding an unmanaged object to a Realm that was declared with `@StateRealmObject` would throw
-  the exception `"Cannot add an object with observers to a Realm"`.
-* The `RealmCollectionChange` docs refered to indicies in modifications as the 'new' collection. This is
-  incorrect and the docs now state that modifications refer to the previous version of the collection. ([Cocoa #7390](https://github.com/realm/realm-cocoa/issues/7390))
+
+* Adding an unmanaged object to a Realm that was declared with
+  `@StateRealmObject` would throw the exception `"Cannot add an object with
+  observers to a Realm"`.
+* The `RealmCollectionChange` docs refered to indicies in modifications as the
+  'new' collection. This is incorrect and the docs now state that modifications
+  refer to the previous version of the collection. ([Cocoa #7390](https://github.com/realm/realm-cocoa/issues/7390))
 * Fix crash in `RLMSyncConfiguration.initWithUser` error mapping when a user is disabled/deleted from MongoDB Realm dashboard.
   ([Cocoa #7399](https://github.com/realm/realm-cocoa/issues/7399), since v10.0.0)
 * If the application crashed at the wrong point when logging a user in, the
@@ -25,9 +30,8 @@ x.y.z Release notes (yyyy-MM-dd)
   SyncUser::State::LoggedIn" when a synchronized Realm is opened with that
   user. ([Core #4875](https://github.com/realm/realm-core/issues/4875), since v10.0.0)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 11.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 12.5.1.
@@ -35,6 +39,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 12.2-13.0 beta 5.
 
 ### Internal
+
 * Upgraded realm-core from 11.3.1 to 11.4.1
 
 10.14.0 Release notes (2021-09-03)
