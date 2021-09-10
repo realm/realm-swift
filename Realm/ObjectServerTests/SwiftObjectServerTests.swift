@@ -1208,6 +1208,25 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [callFunctionEx], timeout: 4.0)
     }
 
+    func testCallFunctionResult() throws {
+        _ = try logInUser(for: basicCredentials(), app: app)
+        let callFunctionResultEx = expectation(description: "Call function")
+        app.currentUser?.functions.sum([1, 2, 3, 4, 5]) { result in
+            switch result {
+            case .success(let bson):
+                guard case let .int32(sum) = bson else {
+                    XCTFail("Should be an int32")
+                    return
+                }
+                XCTAssertEqual(sum, 15)
+            case .failure(let error):
+                XCTFail("Function should not fail \(error)")
+            }
+            callFunctionResultEx.fulfill()
+        }
+        wait(for: [callFunctionResultEx], timeout: 4.0)
+    }
+
     func testPushRegistration() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
@@ -2370,20 +2389,25 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(newFetchedApiKeys.count, 0)
     }
 
+    func testUserCallFunctionAsyncAwait() async throws {
+        let user = try await self.app.login(credentials: basicCredentials())
+        guard case let .int32(sum) = try await user.functions.sum([1, 2, 3, 4, 5]) else {
+            return XCTFail("Should be int32")
+        }
+        XCTAssertEqual(sum, 15)
+    }
+
     func testCustomUserDataAsyncAwait() async throws {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
         try await app.emailPasswordAuth.registerUser(email: email, password: password)
 
-        let syncUser = try await self.app.login(credentials: Credentials.anonymous)
-        XCTAssertNotNil(syncUser)
+        let user = try await self.app.login(credentials: .anonymous)
+        XCTAssertNotNil(user)
 
-        let userDataEx = expectation(description: "Update user data")
-        app.currentUser?.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
-            XCTAssertNil(error)
-            userDataEx.fulfill()
-        }
-        wait(for: [userDataEx], timeout: 4.0)
+        _ = try await user.functions.updateUserData([
+            ["favourite_colour": "green", "apples": 10]
+        ])
 
         try await app.currentUser?.refreshCustomData()
         XCTAssertEqual(app.currentUser?.customData["favourite_colour"], .string("green"))

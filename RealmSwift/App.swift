@@ -63,31 +63,6 @@ extension EmailPasswordAuth {
     }
 }
 
-#if swift(>=5.5)
-@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
-extension EmailPasswordAuth {
-    /// Resets the password of an email identity using the
-    /// password reset function set up in the application.
-    /// - Parameters:
-    ///   - email: The email address of the user.
-    ///   - password: The desired new password.
-    ///   - args: A list of arguments passed in as a BSON array.
-    public func callResetPasswordFunction(email: String,
-                                          password: String,
-                                          args: [AnyBSON]) async throws {
-        return try await withCheckedThrowingContinuation { continuation in
-            callResetPasswordFunction(email: email, password: password, args: args) { error in
-                if let error = error {
-                    continuation.resume(with: .failure(error))
-                } else {
-                    continuation.resume(with: .success(()))
-                }
-            }
-        }
-    }
-}
-#endif // swift(>=5.5)
-
 /**
 An object representing a client which performs network calls on
 Realm Cloud for registering devices to push notifications
@@ -568,6 +543,29 @@ public extension APIKeyAuth {
 }
 
 #if swift(>=5.5) && canImport(_Concurrency)
+@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+extension EmailPasswordAuth {
+    /// Resets the password of an email identity using the
+    /// password reset function set up in the application.
+    /// - Parameters:
+    ///   - email: The email address of the user.
+    ///   - password: The desired new password.
+    ///   - args: A list of arguments passed in as a BSON array.
+    public func callResetPasswordFunction(email: String,
+                                          password: String,
+                                          args: [AnyBSON]) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            callResetPasswordFunction(email: email, password: password, args: args) { error in
+                if let error = error {
+                    continuation.resume(with: .failure(error))
+                } else {
+                    continuation.resume(with: .success(()))
+                }
+            }
+        }
+    }
+}
+
 @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
 extension App {
     /// Login to a user for the Realm app.

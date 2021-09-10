@@ -311,12 +311,29 @@ public typealias Provider = RLMIdentityProvider
         }
     }
 
-    #if !(os(iOS) && (arch(i386) || arch(arm)))
     /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls.
+    public subscript(dynamicMember string: String) -> FunctionCallable {
+        FunctionCallable(name: string, user: user)
+    }
+}
+
+@dynamicCallable
+public struct FunctionCallable {
+    fileprivate let name: String
+    fileprivate let user: User
+
+    #if !(os(iOS) && (arch(i386) || arch(arm)))
     @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
-    public subscript(dynamicMember string: String) -> ([AnyBSON]) -> Future<AnyBSON, Error> {
-        return { (arguments: [AnyBSON]) in
-            return Future<AnyBSON, Error> { self[dynamicMember: string](arguments, $0) }
+    public func dynamicallyCall(withArguments args: [[AnyBSON]]) -> Future<AnyBSON, Error> {
+        return Future<AnyBSON, Error> { promise in
+            let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
+            self.user.__callFunctionNamed(name, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
+                if let b = bson.map(ObjectiveCSupport.convertBson), let bson = b {
+                    promise(.success(bson))
+                } else {
+                    promise(.failure(error ?? Realm.Error.callFailed))
+                }
+            }
         }
     }
     #endif
@@ -723,6 +740,22 @@ public extension User {
     func linkUser(credentials: Credentials) async throws -> User {
         return try await withCheckedThrowingContinuation { continuation in
             linkUser(credentials: credentials, continuation.resume)
+        }
+    }
+}
+
+@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+extension FunctionCallable {
+    public func dynamicallyCall(withArguments args: [[AnyBSON]]) async throws -> AnyBSON {
+        try await withCheckedThrowingContinuation { continuation in
+            let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
+            self.user.__callFunctionNamed(name, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
+                if let b = bson.map(ObjectiveCSupport.convertBson), let bson = b {
+                    continuation.resume(returning: bson)
+                } else {
+                    continuation.resume(throwing: error ?? Realm.Error.callFailed)
+                }
+            }
         }
     }
 }
