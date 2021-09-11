@@ -75,6 +75,8 @@ private enum QueryExpression {
         // Allows a prefixed `NOT` to be inserted where the
         // placeholder location is.
         case notPlaceholder
+        case openParentheses
+        case closeParentheses
     }
 
     case keyPath(name: String, isCollection: Bool = false)
@@ -143,14 +145,28 @@ private enum QueryExpression {
 public struct Query<T: _Persistable> {
 
     private var tokens: [QueryExpression] = []
+    // Indicates if we need a closing parentheses after a map subscript expression.
+    private var mapSubscriptNeedsResolution = false
 
     public init() { }
-    private init(expression: [QueryExpression]) {
+    private init(expression: [QueryExpression], mapSubscriptNeedsResolution: Bool = false) {
         tokens = expression
+        self.mapSubscriptNeedsResolution = mapSubscriptNeedsResolution
     }
 
     private func append<V>(tokens: [QueryExpression]) -> Query<V> {
-        return Query<V>(expression: self.tokens + tokens)
+        var copy = tokens
+        var needsResolution = mapSubscriptNeedsResolution
+        var lastTokenIsKeyPath = false
+        if case .keyPath = tokens.last {
+            lastTokenIsKeyPath = true
+        }
+        if !lastTokenIsKeyPath, mapSubscriptNeedsResolution {
+            copy.append(.special(.closeParentheses))
+            needsResolution = false
+        }
+        return Query<V>(expression: self.tokens + copy,
+                        mapSubscriptNeedsResolution: needsResolution)
     }
 
     // MARK: Prefix
@@ -203,11 +219,17 @@ public struct Query<T: _Persistable> {
     // MARK: Compound
 
     public static func && (_ lhs: Query, _ rhs: Query) -> Query {
-        return lhs.append(tokens: [.compound(.and)] + rhs.tokens)
+        // Wrap the left expression and right expression in parentheses
+        var copy = lhs
+        copy.tokens.insert(.special(.openParentheses), at: 0)
+        return copy.append(tokens: [.compound(.and)] + rhs.tokens + [.special(.closeParentheses)])
     }
 
     public static func || (_ lhs: Query, _ rhs: Query) -> Query {
-        return lhs.append(tokens: [.compound(.or)] + rhs.tokens)
+        // Wrap the left expression and right expression in parentheses
+        var copy = lhs
+        copy.tokens.insert(.special(.openParentheses), at: 0)
+        return copy.append(tokens: [.compound(.or)] + rhs.tokens + [.special(.closeParentheses)])
     }
 
     // MARK: Subscript
@@ -248,10 +270,12 @@ public struct Query<T: _Persistable> {
             case let .prefix(op):
                 switch tokens[idx+2] {
                 case .comparison(.contains),
-                        .stringSearch:
+                        .stringSearch(.contains),
+                        .stringSearch(.equals),
+                        .stringSearch(.notEquals):
                     predicateString.append("\(op.rawValue) ")
                 default:
-                    throwRealmException("`!` prefix is only allowed for `Comparison.contains` and `Search` queries")
+                    predicateString.append("!")
                 }
             case let .basicComparison(op):
                 predicateString.append(" \(op.rawValue)")
@@ -319,7 +343,15 @@ public struct Query<T: _Persistable> {
                 arguments.append(contentsOf: args)
             case let .collectionAggregation(agg):
                 predicateString.append(agg.rawValue)
-            case .special:
+            case let .special(s):
+                switch s {
+                case .openParentheses:
+                    predicateString.append("(")
+                case .closeParentheses:
+                    predicateString.append(")")
+                case .notPlaceholder:
+                    break
+                }
                 break
             }
         }
@@ -405,12 +437,15 @@ extension Query where T: RealmKeyedCollection {
         guard let keyPath = tokens.first else {
             throwRealmException("Could not contruct predicate for Map")
         }
-        return append(tokens: [.collectionAggregation(.allKeys),
-                               .basicComparison(.equal),
-                               .rhs(member),
-                               .compound(.and),
-                               .special(.notPlaceholder),
-                               keyPath])
+        var copy = tokens
+        copy.insert(.special(.openParentheses), at: 0)
+        copy.append(contentsOf: [.collectionAggregation(.allKeys),
+                                 .basicComparison(.equal),
+                                 .rhs(member),
+                                 .compound(.and),
+                                 .special(.notPlaceholder),
+                                 keyPath])
+        return Query<U>(expression: copy, mapSubscriptNeedsResolution: true)
     }
 }
 
