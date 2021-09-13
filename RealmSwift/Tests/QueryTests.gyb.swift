@@ -1584,7 +1584,7 @@ class QueryTests: TestCase {
     // MARK: Compound
 
     func testCompoundAnd() {
-        % values = properties + optProperties
+        % values = [properties[0], optProperties[0]]
         % for idx, _ in enumerate(values):
         % if idx != len(values)-1:
         % value1 = values[idx].enumName if values[idx].enumName != None else values[idx].foundationValue(1)
@@ -1600,28 +1600,8 @@ class QueryTests: TestCase {
 
         // List
 
-        % for listProperty in listProperties:
-        % for property in properties:
-        % value1 = property.enumName if property.enumName != None else property.foundationValue(1)
-        % wrongValue = property.enumName if property.enumName != None else property.foundationValue(0)
-        % value2 = listProperty.enumName if listProperty.enumName != None else listProperty.foundationValue(1)
-        assertQuery(predicate: "(${property.colName} == %@ && %@ IN ${listProperty.colName})", values: [${value1}, ${value2}], expectedCount: 1) {
-            $0.${property.colName} == ${property.value(1)} && $0.${listProperty.colName}.contains(${listProperty.value(1)})
-        }
-        % if property.enumName == None:
-        assertQuery(predicate: "(${property.colName} != %@ && %@ IN ${listProperty.colName})", values: [${wrongValue}, ${value2}], expectedCount: 1) {
-            $0.${property.colName} != ${property.value(0)} && $0.${listProperty.colName}.contains(${listProperty.value(1)})
-        }
-        % else:
-        assertQuery(predicate: "(${property.colName} != %@ && %@ IN ${listProperty.colName})", values: [${value1}, ${value2}], expectedCount: 0) {
-            $0.${property.colName} != ${property.value(1)} && $0.${listProperty.colName}.contains(${listProperty.value(1)})
-        }
-        % end
-        % end
-        % end
-
-        % for listProperty in optListProperties:
-        % for property in optProperties:
+        % for listProperty in [listProperties[0], optListProperties[0]]:
+        % for property in [properties[0]]:
         % value1 = property.enumName if property.enumName != None else property.foundationValue(1)
         % wrongValue = property.enumName if property.enumName != None else property.foundationValue(0)
         % value2 = listProperty.enumName if listProperty.enumName != None else listProperty.foundationValue(1)
@@ -1642,28 +1622,8 @@ class QueryTests: TestCase {
 
         // Set
 
-        % for setProperty in setProperties:
-        % for property in properties:
-        % value1 = property.enumName if property.enumName != None else property.foundationValue(1)
-        % wrongValue = property.enumName if property.enumName != None else property.foundationValue(0)
-        % value2 = setProperty.enumName if setProperty.enumName != None else setProperty.foundationValue(1)
-        assertQuery(predicate: "(${property.colName} == %@ && %@ IN ${setProperty.colName})", values: [${value1}, ${value2}], expectedCount: 1) {
-            $0.${property.colName} == ${property.value(1)} && $0.${setProperty.colName}.contains(${setProperty.value(1)})
-        }
-        % if property.enumName == None:
-        assertQuery(predicate: "(${property.colName} != %@ && %@ IN ${setProperty.colName})", values: [${wrongValue}, ${value2}], expectedCount: 1) {
-            $0.${property.colName} != ${property.value(0)} && $0.${setProperty.colName}.contains(${setProperty.value(1)})
-        }
-        % else:
-        assertQuery(predicate: "(${property.colName} != %@ && %@ IN ${setProperty.colName})", values: [${value1}, ${value2}], expectedCount: 0) {
-            $0.${property.colName} != ${property.value(1)} && $0.${setProperty.colName}.contains(${setProperty.value(1)})
-        }
-        % end
-        % end
-        % end
-
-        % for setProperty in optSetProperties:
-        % for property in optProperties:
+        % for setProperty in [setProperties[0], optSetProperties[0]]:
+        % for property in [properties[0]]:
         % value1 = property.enumName if property.enumName != None else property.foundationValue(1)
         % wrongValue = property.enumName if property.enumName != None else property.foundationValue(0)
         % value2 = setProperty.enumName if setProperty.enumName != None else setProperty.foundationValue(1)
@@ -1684,36 +1644,8 @@ class QueryTests: TestCase {
 
         // Map
 
-        % for mapProperty in mapProperties:
-        % for property in properties:
-        % value1 = property.enumName if property.enumName != None else property.foundationValue(1)
-        % wrongValue = property.enumName if property.enumName != None else property.foundationValue(0)
-        % value2 = mapProperty.enumName if mapProperty.enumName != None else mapProperty.foundationValue(1)
-        assertQuery(predicate: "(${property.colName} == %@ && %@ IN ${mapProperty.colName})", values: [${value1}, ${value2}], expectedCount: 1) {
-            $0.${property.colName} == ${property.value(1)} && $0.${mapProperty.colName}.contains(${mapProperty.value(1)})
-        }
-        % if property.enumName == None:
-        assertQuery(predicate: "(${property.colName} != %@ && (${mapProperty.colName}.@allKeys == %@ && ${mapProperty.colName} == %@))",
-                    values: [${wrongValue}, "foo", ${value2}], expectedCount: 1) {
-            ($0.${property.colName} != ${property.value(0)}) && ($0.${mapProperty.colName}["foo"] == ${mapProperty.value(1)})
-        }
-        assertQuery(predicate: "((${property.colName} != %@ && (${mapProperty.colName}.@allKeys == %@ && ${mapProperty.colName} == %@)) && (${mapProperty.colName}.@allKeys == %@ && ${mapProperty.colName} == %@))",
-                    values: [${wrongValue}, "foo", ${mapProperty.foundationValue(0)}, "bar", ${mapProperty.foundationValue(1)}], expectedCount: 1) {
-            ($0.${property.colName} != ${property.value(0)}) &&
-            ($0.${mapProperty.colName}["foo"] == ${mapProperty.value(0)}) &&
-            ($0.${mapProperty.colName}["bar"] == ${mapProperty.value(1)})
-        }
-        % else:
-        assertQuery(predicate: "(${property.colName} != %@ && (${mapProperty.colName}.@allKeys == %@ && ${mapProperty.colName} == %@))",
-                    values: [${value1}, "foo", ${value2}], expectedCount: 0) {
-            ($0.${property.colName} != ${property.value(1)}) && ($0.${mapProperty.colName}["foo"] == ${mapProperty.value(1)})
-        }
-        % end
-        % end
-        % end
-
-        % for mapProperty in optMapProperties:
-        % for property in optProperties:
+        % for mapProperty in [mapProperties[0], optMapProperties[0]]:
+        % for property in [properties[0]]:
         % value1 = property.enumName if property.enumName != None else property.foundationValue(1)
         % wrongValue = property.enumName if property.enumName != None else property.foundationValue(0)
         % value2 = mapProperty.enumName if mapProperty.enumName != None else mapProperty.foundationValue(1)
@@ -1742,7 +1674,7 @@ class QueryTests: TestCase {
     }
 
     func testCompoundOr() {
-        % values = properties + optProperties
+        % values = [properties[0], optProperties[0]]
         % for idx, _ in enumerate(values):
         % if idx != len(values)-1:
         % value1 = values[idx].enumName if values[idx].enumName != None else values[idx].foundationValue(1)
@@ -1758,28 +1690,8 @@ class QueryTests: TestCase {
 
         // List
 
-        % for listProperty in listProperties:
-        % for property in properties:
-        % value1 = property.enumName if property.enumName != None else property.foundationValue(1)
-        % wrongValue = property.enumName if property.enumName != None else property.foundationValue(0)
-        % value2 = listProperty.enumName if listProperty.enumName != None else listProperty.foundationValue(1)
-        assertQuery(predicate: "(${property.colName} == %@ || %@ IN ${listProperty.colName})", values: [${value1}, ${value2}], expectedCount: 1) {
-            $0.${property.colName} == ${property.value(1)} || $0.${listProperty.colName}.contains(${listProperty.value(1)})
-        }
-        % if property.enumName == None:
-        assertQuery(predicate: "(${property.colName} != %@ || %@ IN ${listProperty.colName})", values: [${wrongValue}, ${value2}], expectedCount: 1) {
-            $0.${property.colName} != ${property.value(0)} || $0.${listProperty.colName}.contains(${listProperty.value(1)})
-        }
-        % else:
-        assertQuery(predicate: "(${property.colName} != %@ || %@ IN ${listProperty.colName})", values: [${value1}, ${value2}], expectedCount: 1) {
-            $0.${property.colName} != ${property.value(1)} || $0.${listProperty.colName}.contains(${listProperty.value(1)})
-        }
-        % end
-        % end
-        % end
-
-        % for listProperty in optListProperties:
-        % for property in optProperties:
+        % for listProperty in [listProperties[0], optListProperties[0]]:
+        % for property in [properties[0]]:
         % value1 = property.enumName if property.enumName != None else property.foundationValue(1)
         % wrongValue = property.enumName if property.enumName != None else property.foundationValue(0)
         % value2 = listProperty.enumName if listProperty.enumName != None else listProperty.foundationValue(1)
@@ -1800,28 +1712,8 @@ class QueryTests: TestCase {
 
         // Set
 
-        % for setProperty in setProperties:
-        % for property in properties:
-        % value1 = property.enumName if property.enumName != None else property.foundationValue(1)
-        % wrongValue = property.enumName if property.enumName != None else property.foundationValue(0)
-        % value2 = setProperty.enumName if setProperty.enumName != None else setProperty.foundationValue(1)
-        assertQuery(predicate: "(${property.colName} == %@ || %@ IN ${setProperty.colName})", values: [${value1}, ${value2}], expectedCount: 1) {
-            $0.${property.colName} == ${property.value(1)} || $0.${setProperty.colName}.contains(${setProperty.value(1)})
-        }
-        % if property.enumName == None:
-        assertQuery(predicate: "(${property.colName} != %@ || %@ IN ${setProperty.colName})", values: [${wrongValue}, ${value2}], expectedCount: 1) {
-            $0.${property.colName} != ${property.value(0)} || $0.${setProperty.colName}.contains(${setProperty.value(1)})
-        }
-        % else:
-        assertQuery(predicate: "(${property.colName} != %@ || %@ IN ${setProperty.colName})", values: [${value1}, ${value2}], expectedCount: 1) {
-            $0.${property.colName} != ${property.value(1)} || $0.${setProperty.colName}.contains(${setProperty.value(1)})
-        }
-        % end
-        % end
-        % end
-
-        % for setProperty in optSetProperties:
-        % for property in optProperties:
+        % for setProperty in [setProperties[0], optSetProperties[0]]:
+        % for property in [properties[0]]:
         % value1 = property.enumName if property.enumName != None else property.foundationValue(1)
         % wrongValue = property.enumName if property.enumName != None else property.foundationValue(0)
         % value2 = setProperty.enumName if setProperty.enumName != None else setProperty.foundationValue(1)
@@ -1842,36 +1734,8 @@ class QueryTests: TestCase {
 
         // Map
 
-        % for mapProperty in mapProperties:
-        % for property in properties:
-        % value1 = property.enumName if property.enumName != None else property.foundationValue(1)
-        % wrongValue = property.enumName if property.enumName != None else property.foundationValue(0)
-        % value2 = mapProperty.enumName if mapProperty.enumName != None else mapProperty.foundationValue(1)
-        assertQuery(predicate: "(${property.colName} == %@ || %@ IN ${mapProperty.colName})", values: [${value1}, ${value2}], expectedCount: 1) {
-            $0.${property.colName} == ${property.value(1)} || $0.${mapProperty.colName}.contains(${mapProperty.value(1)})
-        }
-        % if property.enumName == None:
-        assertQuery(predicate: "(${property.colName} != %@ || (${mapProperty.colName}.@allKeys == %@ && ${mapProperty.colName} == %@))",
-                    values: [${wrongValue}, "foo", ${value2}], expectedCount: 1) {
-            ($0.${property.colName} != ${property.value(0)}) || ($0.${mapProperty.colName}["foo"] == ${mapProperty.value(1)})
-        }
-        assertQuery(predicate: "((${property.colName} != %@ || (${mapProperty.colName}.@allKeys == %@ && ${mapProperty.colName} == %@)) || (${mapProperty.colName}.@allKeys == %@ && ${mapProperty.colName} == %@))",
-                    values: [${wrongValue}, "foo", ${mapProperty.foundationValue(0)}, "bar", ${mapProperty.foundationValue(1)}], expectedCount: 1) {
-            ($0.${property.colName} != ${property.value(0)}) ||
-            ($0.${mapProperty.colName}["foo"] == ${mapProperty.value(0)}) ||
-            ($0.${mapProperty.colName}["bar"] == ${mapProperty.value(1)})
-        }
-        % else:
-        assertQuery(predicate: "(${property.colName} != %@ || (${mapProperty.colName}.@allKeys == %@ && ${mapProperty.colName} == %@))",
-                    values: [${value1}, "foo", ${value2}], expectedCount: 1) {
-            ($0.${property.colName} != ${property.value(1)}) || ($0.${mapProperty.colName}["foo"] == ${mapProperty.value(1)})
-        }
-        % end
-        % end
-        % end
-
-        % for mapProperty in optMapProperties:
-        % for property in optProperties:
+        % for mapProperty in [mapProperties[0], optMapProperties[0]]:
+        % for property in [properties[0]]:
         % value1 = property.enumName if property.enumName != None else property.foundationValue(1)
         % wrongValue = property.enumName if property.enumName != None else property.foundationValue(0)
         % value2 = mapProperty.enumName if mapProperty.enumName != None else mapProperty.foundationValue(1)
@@ -1914,7 +1778,7 @@ class QueryTests: TestCase {
             ($0.${values[idx].colName} == ${values[idx].value(1)}) || ($0.${values[idx+1].colName} == ${values[idx+1].value(1)})
         }
         % if values[idx+1].enumName == None and values[idx+1].category == 'string':
-        assertQuery(predicate: "(!(${values[idx].colName} == %@ || ${values[idx+1].colName} CONTAINS %@) && ${values[idx+1].colName} == %@)",
+        assertQuery(predicate: "(NOT (${values[idx].colName} == %@ || ${values[idx+1].colName} CONTAINS %@) && ${values[idx+1].colName} == %@)",
                     values: [${value1}, ${value2}, ${value2}], expectedCount: 0) {
             !($0.${values[idx].colName} == ${values[idx].value(1)} || $0.${values[idx+1].colName}.contains(${values[idx+1].value(1)})) &&
             ($0.${values[idx+1].colName} == ${values[idx+1].value(1)})

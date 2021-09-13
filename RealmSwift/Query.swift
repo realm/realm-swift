@@ -268,15 +268,7 @@ public struct Query<T: _Persistable> {
         for (idx, token) in tokens.enumerated() {
             switch token {
             case let .prefix(op):
-                switch tokens[idx+2] {
-                case .comparison(.contains),
-                        .stringSearch(.contains),
-                        .stringSearch(.equals),
-                        .stringSearch(.notEquals):
-                    predicateString.append("\(op.rawValue) ")
-                default:
-                    predicateString.append("!")
-                }
+                predicateString.append("\(op.rawValue) ")
             case let .basicComparison(op):
                 predicateString.append(" \(op.rawValue)")
             case let .comparison(comp):
@@ -484,6 +476,7 @@ extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: Opt
 }
 
 extension Query where T: RealmKeyedCollection, T.Key == String {
+    /// Allows a query over all keys in the `Map`.
     public var keys: Query<String> {
         return append(tokens: [.collectionAggregation(.allKeys)])
     }
