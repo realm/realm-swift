@@ -19,14 +19,11 @@
 import Realm
 import Realm.Private
 
-fileprivate protocol _Projected {
-    var objectBase: ObjectBase! { get }
-    func set(object: ObjectBase)
-    func observe<T: ObjectBase>(keyPaths: [String]?, on queue: DispatchQueue?, _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken
-    var hit: Bool { get }
-    var keyPathString: String? { get }
-    var value: Any? { get }
+fileprivate protocol AnyProjected {
+    var projectedKeyPath: AnyKeyPath { get }
 }
+
+// MARK: Projection
 
 /// @Projected is used to declare properties on Projection protocols which should be
 /// managed by Realm.
@@ -47,9 +44,8 @@ fileprivate protocol _Projected {
 /// }
 ///
 /// struct PersonProjection: Projection {
-///     public typealias Root = Person
-///     public init() {
-///     }
+///     typealias Root = Person
+///
 ///     @Projected(\Person.firstName) var firstName
 ///     @Projected(\Person.address.city) var homeCity
 ///     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
@@ -58,45 +54,49 @@ fileprivate protocol _Projected {
 /// let people: [PersonProjection] = realm.objects(PersonProjection.self)
 /// ```
 @propertyWrapper
-public struct Projected<T: ObjectBase, Value>: _Projected {
-
-    fileprivate var hit: Bool = false
-    public var keyPathString: String?
-
-    fileprivate var projectedKeyPath: KeyPath<T, Value>!
-    fileprivate var objectBase: ObjectBase! {
-        storage.objectBase
+public struct Projected<T: ObjectBase, Value>: AnyProjected {
+    fileprivate var _projectedKeyPath: KeyPath<T, Value>!
+    var projectedKeyPath: AnyKeyPath {
+        _projectedKeyPath
     }
-    private class Storage {
-        var objectBase: ObjectBase?
-        init() {}
-    }
-    private let storage = Storage()
+
     private var get: ((T) -> Value)!
     private var set: ((T, Value) -> ())!
-    func set(object: ObjectBase) {
-        storage.objectBase = object
-    }
-    
+
     /// :nodoc:
+    /// :nodoc:
+    @available(*, unavailable, message: "@Persisted can only be used as a property on a Realm object")
     public var wrappedValue: Value {
+        // The static subscript below is called instead of this when the property
+        // wrapper is used on an ObjectBase subclass, which is the only thing we support.
+        get { fatalError("called wrappedValue getter") }
+        // swiftlint:disable:next unused_setter_value
+        set { fatalError("called wrappedValue setter") }
+    }
+
+    /// :nodoc:
+    public static subscript<EnclosingSelf: Projection<T>>(
+        _enclosingInstance observed: EnclosingSelf,
+        wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Value>,
+        storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Self>
+        ) -> Value {
         get {
-            get(objectBase! as! T)
+            let storage = observed[keyPath: storageKeyPath]
+            if let lastAccessedNames = observed.rootObject.lastAccessedNames {
+                lastAccessedNames.add(_name(for: storage._projectedKeyPath!))
+            }
+            return storage.get(observed.rootObject)
         }
         set {
-            precondition(projectedKeyPath is WritableKeyPath<T, Value>)
-            set(objectBase! as! T, newValue)
+//            precondition(observed[keyPath: storageKeyPath].projectedKeyPath is WritableKeyPath<T, Value>,
+//                         "KeyPath to property \(observed[keyPath: storageKeyPath].keyPathString!) is not writable")
+            observed[keyPath: storageKeyPath].set(observed.rootObject, newValue)
         }
     }
-    
-    var value: Any? {
-        get {
-            wrappedValue
-        }
-    }
+
     /// Declares a property which is lazily initialized to the type's default value.
     public init(_ projectedKeyPath: KeyPath<T, Value>) {
-        self.projectedKeyPath = projectedKeyPath
+        self._projectedKeyPath = projectedKeyPath
         self.get = {
             return $0[keyPath: projectedKeyPath]
         }
@@ -104,47 +104,147 @@ public struct Projected<T: ObjectBase, Value>: _Projected {
             var ref = $0
             ref[keyPath: projectedKeyPath as! WritableKeyPath<T, Value>] = $1
         }
-        self.keyPathString = _name(for: projectedKeyPath)
-    }
-
-    public func observe<T: ObjectBase>(keyPaths: [String]? = nil,
-                                       on queue: DispatchQueue? = nil,
-                                       _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
-        return objectBase._observe(keyPaths: keyPaths, on: queue, block)
     }
 }
 
-public protocol _Projection: ThreadConfined {
-    var value: ObjectBase { get }
-    init<T: ObjectBase>(object: T)
-}
+// MARK: Projection Schema
+fileprivate struct ProjectedMetadata {
+    let keyPath: AnyKeyPath
+    let originPropertyKeyPathString: String
+    let label: String
 
-// MARK: AssistedObjectiveCBridgeable
-
-extension _Projection {
-
-    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
-////        return forceCastToInferred(objectiveCValue)
-//        type(of:objectiveCValue).brid
-//        (objectiveCValue as! AssistedObjectiveCBridgeable).bridging(from: objectiveCValue, with: metadata)
-//        let value = forceCastToInferred(objectiveCValue)
-////        let projectionClass = metadata as! _Projection.Type
-        return Self(object: objectiveCValue as! ObjectBase)
-    }
-
-    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
-        return (objectiveCValue: value.unsafeCastToRLMObject(), metadata: Self.self)
-//        fatalError()
+    /// Cast `keyPath` to its actual KeyPath type.
+    func keyPathAs<P: ProjectionObservable>() -> KeyPath<P, AnyProjected> {
+        keyPath as! KeyPath<P, AnyProjected>
     }
 }
 
-public protocol Projection: _Projection, RealmCollectionValue {
+fileprivate struct ProjectionMetadata {
+    let propertyMetadatas: [ProjectedMetadata]
+    let mirror: Mirror
+}
+
+private var schema = [ObjectIdentifier: ProjectionMetadata]()
+
+// MARK: ProjectionOservable
+public protocol ProjectionObservable {
     associatedtype Root: ObjectBase
-
-    init()
+    var rootObject: Root { get }
+    init(projecting object: Root)
 }
 
-/// Projection allows to create a light weight const reflection of the original Realm objects with a minimal effort.
+public enum ProjectionChange<P: ProjectionObservable> {
+    /**
+     If an error occurs, notification blocks are called one time with a `.error`
+     result and an `NSError` containing details about the error. Currently the
+     only errors which can occur are when opening the Realm on a background
+     worker thread to calculate the change set. The callback will never be
+     called again after `.error` is delivered.
+     */
+    case error(_ error: Error)
+    /**
+     One or more of the properties of the object have been changed.
+     */
+    case change(_: P, _: [ProjectedPropertyChange])
+    /// The object has been deleted from the Realm.
+    case deleted
+}
+
+extension ProjectionObservable {
+    private subscript(checkedMirrorDescendant key: String) -> AnyProjected {
+        if let mirror = schema[ObjectIdentifier(Self.self)]?.mirror {
+            return mirror.descendant(key)! as! AnyProjected
+        }
+        return Mirror(reflecting: self).descendant(key)! as! AnyProjected
+    }
+
+    private func processChange(_ objectChange: ObjectChange<Root>) -> ProjectionChange<Self> {
+        switch objectChange {
+        case .error(let error):
+            return .error(error)
+        case .change(let object, let objectPropertyChanges):
+            let newProjection = Self(projecting: object)
+            let projectedPropertyChanges: [ProjectedPropertyChange] = objectPropertyChanges.map { propChange in
+                let metadata = _schema
+                // read the metadata for the property whose origin name matches
+                // the changed property's name
+                let propertyMetadata = metadata.propertyMetadatas.first(where: {
+                    $0.originPropertyKeyPathString == propChange.name
+                })!
+                var change: (name: String?, oldValue: Any?, newValue: Any?) = (nil, nil, nil)
+                if let oldValue = propChange.oldValue {
+                    // if there is an oldValue in the change, construct an empty Root
+                    let newRoot = Self.Root()
+
+                    let processorProjection = Self(projecting: newRoot)
+
+                    // assign the oldValue to the empty root object
+                    processorProjection.rootObject.setValue(oldValue, forKey: propChange.name)
+                    change.oldValue = newRoot[keyPath: processorProjection[keyPath: propertyMetadata.keyPathAs()].projectedKeyPath]
+                }
+                if propChange.newValue != nil {
+                    change.newValue =
+                    newProjection.rootObject[keyPath:
+                                                newProjection[keyPath: propertyMetadata.keyPathAs()].projectedKeyPath]
+                }
+
+                change.name = propertyMetadata.label
+
+                return ProjectedPropertyChange(name: change.name!,
+                                               oldValue: change.oldValue,
+                                               newValue: change.newValue)
+            }
+            return .change(newProjection, projectedPropertyChanges)
+        case .deleted:
+            return .deleted
+        }
+    }
+
+    public func observe(keyPaths: [PartialKeyPath<Self>] = [],
+                        on queue: DispatchQueue? = nil,
+                        _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
+        if keyPaths.isEmpty {
+            let keyPaths = _schema.propertyMetadatas.map { $0.originPropertyKeyPathString }
+            return rootObject._observe(keyPaths: keyPaths,
+                                       on: queue, { change in
+                block(processChange(change))
+            })
+        } else {
+            let emptyRoot = Root()
+            emptyRoot.lastAccessedNames = NSMutableArray()
+            emptyRoot.prepareForRecording()
+            let emptyProjection = Self(projecting: emptyRoot) // tracer time
+            keyPaths.forEach {
+                _ = emptyProjection[keyPath: $0]
+            }
+            let originKeyPathStrings = emptyRoot.lastAccessedNames! as! [String]
+            return rootObject._observe(keyPaths: originKeyPathStrings,
+                                       on: queue, { change in
+                block(processChange(change))
+            })
+        }
+    }
+
+    fileprivate var _schema: ProjectionMetadata {
+        if schema[ObjectIdentifier(Self.self)] == nil {
+            let mirror = Mirror(reflecting: self)
+            let metadatas: [ProjectedMetadata] = mirror.children.compactMap { child in
+                guard let projected = child.value as? AnyProjected else {
+                    return nil
+                }
+                let kp = \Self.[checkedMirrorDescendant: child.label!]
+                return ProjectedMetadata(keyPath: kp,
+                                         originPropertyKeyPathString: _name(for: projected.projectedKeyPath as! PartialKeyPath<Root>),
+                                         label: child.label!)
+            }
+            schema[ObjectIdentifier(Self.self)] = ProjectionMetadata(propertyMetadatas: metadatas,
+                                                                     mirror: mirror)
+        }
+        return schema[ObjectIdentifier(Self.self)]!
+    }
+}
+
+/// Projections are a light weight structure of  the original Realm objects with a minimal effort.
 /// And use them as a model in your application.
 ///
 /// Example of usage:
@@ -162,55 +262,31 @@ public protocol Projection: _Projection, RealmCollectionValue {
 ///     @Persisted var country = ""
 /// }
 ///
-/// struct PersonProjection: Projection {
-///     public typealias Root = Person
-///     public init() {
-///     }
+/// class PersonProjection: Projection<Person> {
 ///     @Projected(\Person.firstName) var firstName
+///     @Projected(\Person.lastName.localizedUppercase) var lastNameCaps
 ///     @Projected(\Person.address.city) var homeCity
 ///     @Projected(\Person.friends.projectTo.firstName) var firstFriendsName: ProjectedList<String>
 /// }
 /// ```
-public extension Projection {
+open class Projection<Root: ObjectBase>: RealmCollectionValue, ProjectionObservable where Root: ThreadConfined {
 
-    init(_ object: Root) {
-        self.init()
-        assign(object)
-    }
+    /// The object being projected
+    public var rootObject: Root
 
-    init<T: ObjectBase>(object: T) {
-        self.init(object as! Root)
-    }
-
-    fileprivate func projectedProperties() -> [String: _Projected] {
-        return Mirror(reflecting: self).children.reduce([String: _Projected]()) { dict, child in
-            var dict = dict
-            if let projected = child.value as? _Projected,
-               let label = child.label {
-                dict[label] = projected
-            }
-            return dict
-        }
-    }
-    
-    fileprivate subscript(label: String) -> _Projected {
-        projectedProperties()[label]!
-    }
-
-    func assign(_ object: Root) {
-//        guard projectedProperties().count > 0 else {
-//            fatalError("Projection \(self) should have at least one @Projected property")
-//        }
-        for (_, projected) in projectedProperties() {
-            projected.set(object: object)
-        }
+    /**
+     Create a new projection.
+     - parameter object: The object to project.
+     */
+    public required init(projecting object: Root) {
+        self.rootObject = object
     }
 }
 
 /**
  Information about a specific property which changed in an `Object` change notification.
  */
-@frozen public struct ProjectedChange {
+@frozen public struct ProjectedPropertyChange {
     /**
      The name of the property which changed.
     */
@@ -236,91 +312,28 @@ public extension Projection {
     public let newValue: Any?
 }
 
-public enum ProjectionChange<T: Projection> {
-    /**
-     If an error occurs, notification blocks are called one time with a `.error`
-     result and an `NSError` containing details about the error. Currently the
-     only errors which can occur are when opening the Realm on a background
-     worker thread to calculate the change set. The callback will never be
-     called again after `.error` is delivered.
-     */
-    case error(_ error: Error)
-    /**
-     One or more of the properties of the object have been changed.
-     */
-    case change(_: T, _: [ProjectedChange])
-    /// The object has been deleted from the Realm.
-    case deleted
-    
-    init(_ objectChange: ObjectChange<ObjectBase>) {
-        switch objectChange {
-        case .error(let error):
-            self = .error(error)
-        case .change(let object, let objectPropertyChanges):
-            guard let object = object as? T.Root else {
-                fatalError()
-            }
-            let newProjection = T(object)
-            let projectedPropertyChanges: [ProjectedChange] = objectPropertyChanges.map { propChange in
-                let name = newProjection.projectionPropertyName(propChange.name)!
-                let publicName = name.first == "_" ? String(name.dropFirst()) : name
-                let keyPath = \T.[name]
-                let newValue: Any? = newProjection[keyPath: keyPath].value
-                if let projectedValue = newValue, let realmValue = propChange.newValue,
-                   ProjectionChange.isEqual(projectedValue, realmValue) {
-                    return ProjectedChange(name: publicName , oldValue: propChange.oldValue, newValue: propChange.newValue)
-                }
-                // cannot provide old value if it was processed in some way.
-                return ProjectedChange(name: publicName , oldValue: nil, newValue: propChange.newValue)
-            }
-            self = .change(newProjection, projectedPropertyChanges)
-        case .deleted:
-            self = ProjectionChange.deleted
-        }
+// MARK: Notifications
+public extension Projection {
+    func addObserver(_ observer: NSObject,
+                     forKeyPath keyPath: String,
+                     options: NSKeyValueObservingOptions = [],
+                     context: UnsafeMutableRawPointer?) {
+        rootObject.addObserver(observer, forKeyPath: keyPath, options: options, context: context)
     }
-    
-    static func isEqual(_ l: Any, _ r: Any) -> Bool {
-        guard let l = l as? AnyHashable, let r = r as? AnyHashable else { return false }
-        return l == r
+
+    @available(macOS 10.7, *)
+    func removeObserver(_ observer: NSObject,
+                        forKeyPath keyPath: String,
+                        context: UnsafeMutableRawPointer?) {
+        rootObject.removeObserver(observer, forKeyPath: keyPath, context: context)
+    }
+
+    func removeObserver(_ observer: NSObject, forKeyPath keyPath: String) {
+        rootObject.removeObserver(observer, forKeyPath: keyPath)
     }
 }
-
-extension Projection {
-
-    // MARK: Notifications
-    private func activatePropertyKeyPaths() {
-        for (name, _) in projectedProperties() {
-            let keyPath = \Self.[name]
-            _ = self[keyPath: keyPath]
-        }
-    }
-    
-    public func observe(keyPaths: [PartialKeyPath<Self>] = [],
-                        _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
-        if keyPaths.isEmpty {
-            activatePropertyKeyPaths()
-            let keyPaths = projectedProperties().compactMap { $0.value.keyPathString }
-            return realmObject._observe(keyPaths: keyPaths, on: nil, { change in
-                block(ProjectionChange<Self>(change))
-            })
-        } else {
-            activatePropertyKeyPaths()
-            let filteredProjectedKeyPaths = keyPaths.compactMap { (self[keyPath: $0] as? _Projected)?.keyPathString }
-            return realmObject._observe(keyPaths: filteredProjectedKeyPaths, on: nil, { change in
-                block(ProjectionChange<Self>(change))
-            })
-        }
-    }
-
-    public func observe(keyPaths: [String]? = nil,
-                                       on queue: DispatchQueue? = nil,
-                                       _ block: @escaping (ProjectionChange<Self>) -> Void) -> NotificationToken {
-        return realmObject._observe(keyPaths: keyPaths, on: queue) { change in
-            block(ProjectionChange<Self>(change))
-        }
-    }
-
-    // Must also conform to `AssistedObjectiveCBridgeable`
+// MARK: ThreadConfined
+extension Projection: ThreadConfined {
     /**
      The Realm which manages the object, or `nil` if the object is unmanaged.
      Note: Projection can be instantiated for the managed objects only therefore realm will never be nil.
@@ -328,15 +341,12 @@ extension Projection {
      `ThreadConfined` object.
      */
     public var realm: Realm? {
-        if let object = realmObject as? ThreadConfined {
-            return object.realm
-        }
-        fatalError("Realm cannot be nil")
+        rootObject.realm
     }
 
     /// Indicates if the object can no longer be accessed because it is now invalid.
     public var isInvalidated: Bool {
-        return realmObject.isInvalidated
+        return rootObject.isInvalidated
     }
     /**
      Indicates if the object is frozen.
@@ -358,38 +368,22 @@ extension Projection {
      `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
      */
     public func freeze() -> Self {
-        guard let object = realmObject as? ThreadConfined else {
-            throwRealmException("Projection underlying object cannot be frozen.")
-        }
-        let frozenObject = object.freeze()
-        return Self(frozenObject as! Root)
+        let frozenObject = rootObject.freeze()
+        return Self(projecting: frozenObject)
     }
     /**
      Returns a live (mutable) reference of this object.
      Will return self if called on an already live object.
      */
     public func thaw() -> Self? {
-        guard let object = realmObject as? ThreadConfined else {
-            throwRealmException("Projection underlying object cannot be thawed.")
-        }
-        if let thawedObject = object.thaw() as? Root {
-            return Self(thawedObject)
+        if let thawedObject = rootObject.thaw() {
+            return Self(projecting: thawedObject)
         }
         return nil
     }
-    
-    fileprivate func projectionPropertyName(_ projectedPropertyName: String) -> String? {
-        return projectedProperties().first(where: { $0.value.keyPathString == projectedPropertyName })?.key
-    }
-    
-    public var value: ObjectBase { realmObject }
 }
 
 extension Projection {
-    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
-        fatalError()
-    }
-    
     public static var _rlmType: PropertyType {
         fatalError()
     }
@@ -397,7 +391,9 @@ extension Projection {
     public static var _rlmOptional: Bool {
         fatalError()
     }
-    
+    public static func _rlmDefaultValue(_ forceDefaultInitialization: Bool) -> Self {
+        fatalError()
+    }
     public static var _rlmRequireObjc: Bool { false }
     
     public func _rlmPopulateProperty(_ prop: RLMProperty) {
@@ -408,41 +404,49 @@ extension Projection {
         fatalError()
     }
     
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        RLMObjectBaseAreEqual(lhs.realmObject, rhs.realmObject)
-    }
-
-    fileprivate var realmObject: ObjectBase {
-        get {
-            projectedProperties().first!.value.objectBase
-        }
+    public static func ==(lhs: Projection, rhs: Projection) -> Bool {
+        RLMObjectBaseAreEqual(lhs.rootObject, rhs.rootObject)
     }
 
     public func hash(into hasher: inout Hasher) {
-        let hashVal = realmObject.hashValue
+        let hashVal = rootObject.hashValue
         hasher.combine(hashVal)
     }
 }
 
+// MARK: Projected List
 /// ProjectedList is a special type of collection for Projection's properties
 /// You don't need to instantialte this type manually.
-///
-public final class ProjectedList<NewElement>: RandomAccessCollection where NewElement: RealmCollectionValue {
+public struct ProjectedList<NewElement>: RandomAccessCollection where NewElement: RealmCollectionValue {
+    public typealias Element = NewElement
+    public typealias Index = Int
+
     public func index(matching predicate: NSPredicate) -> Int? {
         backingList.index(matching: predicate)
     }
-    public func observe(on queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<ProjectedList<NewElement>>) -> Void) -> NotificationToken {
+
+    public func observe(on queue: DispatchQueue?,
+                        _ block: @escaping (RealmCollectionChange<ProjectedList<NewElement>>) -> Void) -> NotificationToken {
         backingList.observe(on: queue, {
             switch $0 {
             case .initial(let collection):
-                block(.initial(Self(collection, keyPathToNewElement: self.keyPath as! KeyPath<Object, NewElement>)))
-            case .update(let collection, deletions: let deletions, insertions: let insertions, modifications: let modifications):
-                block(.update(Self(collection, keyPathToNewElement: self.keyPath as! KeyPath<Object, NewElement>), deletions: deletions, insertions: insertions, modifications: modifications))
+                block(.initial(Self(collection,
+                                    keyPathToNewElement: self.keyPath as! KeyPath<Object, NewElement>)))
+            case .update(let collection,
+                         deletions: let deletions,
+                         insertions: let insertions,
+                         modifications: let modifications):
+                block(.update(Self(collection,
+                                   keyPathToNewElement: self.keyPath as! KeyPath<Object, NewElement>),
+                              deletions: deletions,
+                              insertions: insertions,
+                              modifications: modifications))
             case .error(let error):
                 block(.error(error))
             }
         })
     }
+
     public subscript(position: Int) -> NewElement {
         get {
             backingList[position][keyPath: keyPath] as! NewElement
@@ -471,22 +475,22 @@ public final class ProjectedList<NewElement>: RandomAccessCollection where NewEl
     public var isFrozen: Bool {
         backingList.isFrozen
     }
-    public func freeze() -> Self {
+    public mutating func freeze() -> Self {
         backingList = backingList.freeze()
         return self
     }
-    public func thaw() -> Self? {
+    public mutating func thaw() -> Self? {
         guard let backingList = backingList.thaw() else {
             return nil
         }
         self.backingList = backingList
         return self
     }
-    public typealias Element = NewElement
-    public typealias Index = Int
+
     private var backingList: List<Object>
     private let keyPath: AnyKeyPath
     private let propertyName: String
+
     init<OriginalElement: ObjectBase>(_ list: List<OriginalElement>,
                                       keyPathToNewElement: KeyPath<OriginalElement, NewElement>) {
         self.backingList = ObjectiveCSupport.convert(object: list.rlmArray)
@@ -509,34 +513,12 @@ extension List where Element: ObjectBase, Element: RealmCollectionValue {
     }
 }
 
-public extension Projection {
-
-    private func realmObjectKeyPath(_ projectionKeyPath: String) -> String? {
-        let projectionKeyPath = projectionKeyPath.first == "_" ? projectionKeyPath : "_" + projectionKeyPath
-        guard let property = projectedProperties()[projectionKeyPath] else {
-            return nil
-        }
-        return property.keyPathString
-    }
-    func addObserver(_ observer: NSObject, forKeyPath keyPath: String, options: NSKeyValueObservingOptions = [], context: UnsafeMutableRawPointer?) {
-        guard let keyPath = realmObjectKeyPath(keyPath) else {
-            fatalError()
-        }
-        realmObject.addObserver(observer, forKeyPath: keyPath, options: options, context: context)
+extension Projection: AssistedObjectiveCBridgeable {
+    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
+        return Self(projecting: Root.bridging(from: objectiveCValue, with: metadata))
     }
 
-    @available(macOS 10.7, *)
-    func removeObserver(_ observer: NSObject, forKeyPath keyPath: String, context: UnsafeMutableRawPointer?) {
-        guard let keyPath = realmObjectKeyPath(keyPath) else {
-            fatalError()
-        }
-        realmObject.removeObserver(observer, forKeyPath: keyPath, context: context)
-    }
-
-    func removeObserver(_ observer: NSObject, forKeyPath keyPath: String) {
-        guard let keyPath = realmObjectKeyPath(keyPath) else {
-            fatalError()
-        }
-        realmObject.removeObserver(observer, forKeyPath: keyPath)
+    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
+        return self.rootObject.bridged
     }
 }

@@ -654,8 +654,17 @@ import Realm.Private
         return Results(RLMGetObjects(rlmRealm, type.className(), nil))
     }
 
-    public func objects<T: Projection>(_ type: T.Type) -> Results<T> {
-        return Results(RLMGetObjects(rlmRealm, T.Root.className(), nil)) { T($0 as! T.Root) }
+    /**
+     Projects all objects of the projection root type stored in the Realm.
+
+     - parameter type: The type of the projection to be returned.
+
+     - returns: A `Results` containing the projections.
+     */
+    public func objects<Root: ObjectBase, T: Projection<Root>>(_ type: T.Type) -> Results<T> {
+        return Results(RLMGetObjects(rlmRealm, Root.className(), nil)) {
+            T(projecting: $0 as! Root)
+        }
     }
 
     /**

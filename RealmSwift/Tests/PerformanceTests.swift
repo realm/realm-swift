@@ -32,6 +32,10 @@ private func createStringObjects(_ factor: Int) -> Realm {
     return realm
 }
 
+class SwiftIntProjection: Projection<SwiftIntObject> {
+    @Projected(\SwiftIntObject.intCol) var intCol
+}
+
 private var smallRealm: Realm!
 private var mediumRealm: Realm!
 private var largeRealm: Realm!

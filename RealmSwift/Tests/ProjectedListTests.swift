@@ -28,10 +28,10 @@ import SwiftUI
 
 class ProjectedListTests: TestCase {
     
-    var collection: ProjectedList<String>! {
+    lazy var collection: ProjectedList<String>! = {
         // To test some of methods there should be a collection of projections instead of collection of strings
         realmWithTestPath().objects(PersonProjection.self).first!.firstFriendsName
-    }
+    }()
     
     override func setUp() {
         super.setUp()

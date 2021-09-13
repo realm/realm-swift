@@ -28,6 +28,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)initializeLinkedObjectSchemas;
 + (bool)isEmbedded;
+- (void)assignFromObject:(RLMObjectBase *)object;
+
 @end
+
+FOUNDATION_EXTERN void RLMObjectMove(RLMObjectBase *lhs, RLMObjectBase *rhs);
 
 NS_ASSUME_NONNULL_END
