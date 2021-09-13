@@ -122,6 +122,8 @@ public protocol ThreadConfined {
     }
 }
 
+// MARK: ThreadSafe propertyWrapper
+
 /**
     A property wrapper type that may be passed between threads.
 
@@ -158,7 +160,8 @@ public protocol ThreadConfined {
                 return value
             // FIXME: wrappedValue should throw
             // As of Swift 5.5 property wrappers can't have throwing accessors.
-            } catch let error as NSError { throwRealmException(error.localizedDescription)
+            } catch let error as NSError {
+                throwRealmException(error.localizedDescription)
             }
         }
         set {
