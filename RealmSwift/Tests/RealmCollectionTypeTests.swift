@@ -291,6 +291,7 @@ class RealmCollectionTypeTests: TestCase {
             realm.add(array)
         }
         XCTAssertEqual(1, realm.objects(SwiftListOfSwiftObject.self).filter("ANY array IN %@", realm.objects(SwiftObject.self)).count)
+        XCTAssertEqual(1, realm.objects(SwiftListOfSwiftObject.self).query { $0.array.containsAny(in: realm.objects(SwiftObject.self)) }.count)
     }
 
     func testFilterPredicate() {

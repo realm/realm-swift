@@ -213,6 +213,17 @@ extension AnyRealmValue: AddableType {}
         return Results<Element>(rlmResults.objects(with: predicate))
     }
 
+    /**
+     Returns a `Results` containing all objects matching the given predicate in the collection.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - parameter predicate: The predicate with which to filter the objects.
+     */
+    public func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
+        return filter(query(Query()).predicate)
+    }
+
     // MARK: Sorting
 
     /**

@@ -16,7 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 import XCTest
-@testable import RealmSwift
+import RealmSwift
+
+#if FALSE
 
 // swiftlint:disable all
 class QueryTests_Prototype: TestCase {
@@ -225,3 +227,5 @@ class QueryTests_Prototype: TestCase {
         XCTAssertEqual(compoundQuery2.count, 1)
     }
 }
+
+#endif

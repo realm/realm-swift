@@ -113,6 +113,17 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
     }
 
     /**
+     Returns a `Results` containing all objects matching the given predicate in the set.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - parameter predicate: The predicate with which to filter the objects.
+     */
+    public func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
+        return filter(query(Query()).predicate)
+    }
+
+    /**
      Returns a Boolean value indicating whether the Set contains the
      given object.
 

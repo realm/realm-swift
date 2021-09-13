@@ -3256,6 +3256,21 @@ class QueryTests: TestCase {
             $0.list.contains(obj)
         }
         XCTAssertEqual(result2.count, 1)
+
+        let query: ((Query<ModernCollectionObject>) -> Query<ModernCollectionObject>) = {
+            $0.list.contains(obj)
+        }
+        let predicate = query(Query<ModernCollectionObject>())._constructPredicate()
+        XCTAssertEqual(predicate.0, "%@ IN list")
+        XCTAssertEqual(predicate.1 as! [AnyHashable], [obj])
+    }
+
+    func testListContainsAnyInObject() {
+
+    }
+
+    func testListFromProperty() {
+
     }
 
     func testListContainsRange() {
@@ -7158,5 +7173,84 @@ class QueryTests: TestCase {
         assertQuery(predicate: "(optStringEnumCol == %@ || optUuidCol == %@)", values: [ModernStringEnum.value2.rawValue, UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!], expectedCount: 1) {
             ($0.optStringEnumCol == .value2) || ($0.optUuidCol == UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!)
         }
+    }
+
+    func testSubquery() {
+        // List
+
+        // Count of results will be 0 because there are no `ModernAllTypesObject`s in the list.
+        assertQuery(predicate: "SUBQUERY(arrayCol, $obj, $obj.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
+            ($0.arrayCol.intCol != 123).count() > 0
+        }
+
+        assertQuery(predicate: "(((intCol == %@ && %@ IN arrayInt) && SUBQUERY(arrayCol, $obj, ($obj.intCol == %@ && $obj.stringCol == %@)).@count == %@) && SUBQUERY(arrayCol, $obj, $obj.stringCol == %@).@count == %@)", values: [5, 1, 5, "Foo", 3, "Bar", 0], expectedCount: 0) {
+            $0.intCol == 5 &&
+            $0.arrayInt.contains(1) &&
+            ($0.arrayCol.intCol == 5 && $0.arrayCol.stringCol == "Foo").count() == 3 &&
+            ($0.arrayCol.stringCol == "Bar").count() == 0
+        }
+
+        // Set
+
+        // Will be 0 results because there are no `ModernAllTypesObject`s in the set.
+        assertQuery(predicate: "SUBQUERY(arrayCol, $obj, $obj.intCol != %@).@count > %@", values: [123, 0], expectedCount: 0) {
+            ($0.arrayCol.intCol != 123).count() > 0
+        }
+
+        assertQuery(predicate: "(((intCol == %@ && %@ IN setInt) && SUBQUERY(setCol, $obj, ($obj.intCol == %@ && $obj.stringCol == %@)).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [5, 1, 5, "Foo", 3, "Bar", 0], expectedCount: 0) {
+            $0.intCol == 5 &&
+            $0.setInt.contains(1) &&
+            ($0.setCol.intCol == 5 && $0.setCol.stringCol == "Foo").count() == 3 &&
+            ($0.setCol.stringCol == "Bar").count() == 0
+        }
+
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["intCol": 5, "stringCol": "Foo"])
+            object.arrayCol.append(modernObj)
+            object.setCol.insert(modernObj)
+        }
+
+        // Results count should now be 1
+
+        assertQuery(predicate: "SUBQUERY(arrayCol, $obj, $obj.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
+            ($0.arrayCol.intCol != 123).count() > 0
+        }
+
+        assertQuery(predicate: "(((intCol == %@ && arrayInt.@count == %@) && SUBQUERY(arrayCol, $obj, ($obj.intCol == %@ && $obj.stringCol == %@)).@count == %@) && SUBQUERY(arrayCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, "Foo", 1, "Bar", 0], expectedCount: 1) {
+            $0.intCol == 6 &&
+            $0.arrayInt.count() == 2 &&
+            ($0.arrayCol.intCol == 5 && $0.arrayCol.stringCol == "Foo").count() == 1 &&
+            ($0.arrayCol.stringCol == "Bar").count() == 0
+        }
+
+        // Set
+
+        // Will be 0 results because there are no `ModernAllTypesObject`s in the set.
+        assertQuery(predicate: "SUBQUERY(arrayCol, $obj, $obj.intCol != %@).@count > %@", values: [123, 0], expectedCount: 1) {
+            ($0.arrayCol.intCol != 123).count() > 0
+        }
+
+        assertQuery(predicate: "(((intCol == %@ && setInt.@count == %@) && SUBQUERY(setCol, $obj, ($obj.intCol == %@ && $obj.stringCol == %@)).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, "Foo", 1, "Bar", 0], expectedCount: 1) {
+            $0.intCol == 6 &&
+            $0.setInt.count() == 2 &&
+            ($0.setCol.intCol == 5 && $0.setCol.stringCol == "Foo").count() == 1 &&
+            ($0.setCol.stringCol == "Bar").count() == 0
+        }
+
+        // Some more complex use cases
+        assertQuery(predicate: "((((intCol == %@ && setInt.@count == %@) && SUBQUERY(setCol, $obj, ($obj.intCol == %@ || $obj.stringCol == %@)).@count == %@) && SUBQUERY(setCol, $obj, (($obj.intCol == %@ || $obj.stringCol == %@) || ($obj.intCol == %@ && $obj.stringCol == %@))).@count == %@) && SUBQUERY(setCol, $obj, $obj.stringCol == %@).@count == %@)", values: [6, 2, 5, "Foo", 1, 5, "Foo", 5, "Foo", 1, "Bar", 0], expectedCount: 1) {
+            $0.intCol == 6 &&
+            $0.setInt.count() == 2 &&
+            ($0.setCol.intCol == 5 || $0.setCol.stringCol == "Foo").count() == 1 &&
+            ($0.setCol.intCol == 5 || $0.setCol.stringCol == "Foo" || $0.setCol.intCol == 5 && $0.setCol.stringCol == "Foo").count() == 1 &&
+            ($0.setCol.stringCol == "Bar").count() == 0
+        }
+
+        let query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            ($0.setCol.intCol == 1 && $0.arrayCol.intCol == 1).count() > 0
+        }
+        assertThrows(query(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Subquery predicates will only work on one collection at a time.")
     }
 }

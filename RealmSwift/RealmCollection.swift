@@ -347,6 +347,13 @@ public protocol RealmCollection: RealmCollectionBase {
      */
     func filter(_ predicate: NSPredicate) -> Results<Element>
 
+    /**
+     Returns a `Results` containing all objects matching the given query in the collection.
+
+     - parameter query: The query to use to filter the objects.
+     */
+    func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element>
+
 
     // MARK: Sorting
 
@@ -895,6 +902,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func index(matching predicate: NSPredicate) -> Int? { fatalError() }
     func objects(at indexes: IndexSet) -> [Element] { fatalError() }
     func filter(_ predicate: NSPredicate) -> Results<Element> { fatalError() }
+    func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> { fatalError() }
     func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element> { fatalError() }
     func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
         fatalError()
@@ -1133,6 +1141,15 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      - returns: A `Results` containing objects that match the given predicate.
      */
     public func filter(_ predicate: NSPredicate) -> Results<Element> { return base.filter(predicate) }
+
+    /**
+     Returns a `Results` containing all objects matching the given predicate in the collection.
+
+     - Note: This should only be used with classes using the `@Persistable` property declaration.
+
+     - parameter predicate: The predicate with which to filter the objects.
+     */
+    public func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> { return base.query(query) }
 
 
     // MARK: Sorting

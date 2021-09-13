@@ -44,6 +44,7 @@ private enum QueryExpression {
     enum Comparision {
         case between(low: _QueryNumeric, high: _QueryNumeric, closedRange: Bool)
         case contains(_RealmSchemaDiscoverable?) // `IN` operator.
+        case containsAny(NSArray) // `ANY ... IN` operator.
     }
 
     enum Compound: String {
@@ -77,6 +78,7 @@ private enum QueryExpression {
         case notPlaceholder
         case openParentheses
         case closeParentheses
+        case anyInPrefix
     }
 
     case keyPath(name: String, isCollection: Bool = false)
@@ -142,7 +144,7 @@ private enum QueryExpression {
  - NOT `!`
  */
 @dynamicMemberLookup
-public struct Query<T: _Persistable> {
+public struct Query<T: _RealmSchemaDiscoverable> {
 
     private var tokens: [QueryExpression] = []
     // Indicates if we need a closing parentheses after a map subscript expression.
@@ -190,11 +192,11 @@ public struct Query<T: _Persistable> {
 
     // MARK: Comparable
 
-    public static func == <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable {
+    public static func == <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _RealmSchemaDiscoverable {
         return lhs.append(tokens: [.basicComparison(.equal), .rhs(rhs)])
     }
 
-    public static func != <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _Persistable {
+    public static func != <V>(_ lhs: Query<V>, _ rhs: V) -> Query where V: _RealmSchemaDiscoverable {
         return lhs.append(tokens: [.basicComparison(.notEqual), .rhs(rhs)])
     }
 
@@ -249,7 +251,6 @@ public struct Query<T: _Persistable> {
     public func _constructPredicate(_ isSubquery: Bool = false) -> (String, [Any]) {
         var predicateString: [String] = []
         var arguments: [Any] = []
-
         func optionsStr(_ options: Set<SearchOptions>?) -> String {
             guard let o = options, !o.isEmpty else {
                 return ""
@@ -287,7 +288,10 @@ public struct Query<T: _Persistable> {
                     }
                 case let .contains(val):
                     predicateString.insert("%@ IN ", at: predicateString.count-1)
-                        arguments.append(val.objCValue)
+                    arguments.append(val.objCValue)
+                case let .containsAny(col):
+                    predicateString.append(" IN %@")
+                    arguments.append(col)
                 }
             case let .compound(comp):
                 predicateString.append(" \(comp.rawValue) ")
@@ -343,6 +347,8 @@ public struct Query<T: _Persistable> {
                     predicateString.append(")")
                 case .notPlaceholder:
                     break
+                case .anyInPrefix:
+                    predicateString.append("ANY ")
                 }
                 break
             }
@@ -389,12 +395,32 @@ extension Query where T: RealmCollection {
         let name = _name(for: member)
         return append(tokens: [.keyPath(name: name)])
     }
+
+    /// Query the count of the objects in the collection.
+    public func count() -> Query<Int> where T: RealmCollection {
+        return append(tokens: [.collectionAggregation(.count)])
+    }
 }
 
-extension Query where T: RealmCollection, T.Element: _Persistable {
+extension Query where T: RealmCollection, T.Element: _RealmSchemaDiscoverable {
     /// Checks if an element exists in this collection.
     public func contains<V>(_ value: T.Element) -> Query<V> {
         return append(tokens: [.comparison(.contains(value))])
+    }
+
+    public func containsAny<U: Sequence, V>(in collection: U) -> Query<V> where U.Element == T.Element {
+        var keyPathDepth = 0
+        for token in tokens.reversed() {
+            if case .keyPath = token {
+                keyPathDepth += 1
+            } else {
+                break
+            }
+        }
+        precondition(keyPathDepth != 0)
+        var copy = self
+        copy.tokens.insert(.special(.anyInPrefix), at: tokens.count - keyPathDepth)
+        return copy.append(tokens: [.comparison(.containsAny(NSArray(array: collection.map { $0 })))])
     }
 }
 
@@ -425,7 +451,7 @@ extension Query where T: RealmCollection, T.Element: OptionalProtocol, T.Element
 // MARK: RealmKeyedCollection
 
 extension Query where T: RealmKeyedCollection {
-    private func memberSubscript<U>(_ member: T.Key) -> Query<U> where T.Key: _Persistable {
+    private func memberSubscript<U>(_ member: T.Key) -> Query<U> where T.Key: _RealmSchemaDiscoverable {
         guard let keyPath = tokens.first else {
             throwRealmException("Could not contruct predicate for Map")
         }
@@ -441,7 +467,7 @@ extension Query where T: RealmKeyedCollection {
     }
 }
 
-extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: _Persistable {
+extension Query where T: RealmKeyedCollection, T.Key: _RealmSchemaDiscoverable, T.Value: _RealmSchemaDiscoverable {
     /// Checks if an element exists in this collection.
     public func contains<V>(_ value: T.Value) -> Query<V> {
         return append(tokens: [.comparison(.contains(value))])
@@ -456,14 +482,10 @@ extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: _Pe
     }
 }
 
-extension Query where T: RealmKeyedCollection, T.Key: _Persistable, T.Value: OptionalProtocol, T.Value.Wrapped: _Persistable {
+extension Query where T: RealmKeyedCollection, T.Key: _RealmSchemaDiscoverable, T.Value: OptionalProtocol, T.Value.Wrapped: _RealmSchemaDiscoverable {
     /// Allows a query over all values in the Map.
     public var values: Query<T.Value.Wrapped> {
         return append(tokens: [.collectionAggregation(.allValues)])
-    }
-
-    public subscript<V: _Persistable>(dynamicMember member: KeyPath<T.Value.Wrapped, V>) -> Query<V> where T.Value.Wrapped: ObjectBase {
-        fatalError()
     }
 
     public subscript(member: T.Key) -> Query<T.Value.Wrapped> {
@@ -508,7 +530,7 @@ extension Query where T: RealmKeyedCollection, T.Value: OptionalProtocol, T.Valu
 
 // MARK: PersistableEnum
 
-extension Query where T: PersistableEnum, T.RawValue: _Persistable {
+extension Query where T: PersistableEnum, T.RawValue: _RealmSchemaDiscoverable {
     public static func == <V>(_ lhs: Query<T>, _ rhs: T) -> Query<V> {
         return lhs.append(tokens: [.basicComparison(.equal), .rhs(rhs.rawValue)])
     }
@@ -705,17 +727,10 @@ extension Query where T == Bool {
         })
 
         if collections.count > 1 {
-            throwRealmException("Subquery predicates will only work on one collection at a time, split your query up.")
+            throwRealmException("Subquery predicates will only work on one collection at a time.")
         }
         let queryStr = _constructPredicate(true)
-        return append(tokens: [.subquery(collections.first!, queryStr.0, queryStr.1)])
-    }
-}
-
-extension Results where Element: Object {
-    public func query(_ query: ((Query<Element>) -> Query<Element>)) -> Results<Element> {
-        let predicate = query(Query()).predicate
-        return filter(predicate)
+        return Query<Int>(expression: [.subquery(collections.first!, queryStr.0, queryStr.1)])
     }
 }
 
