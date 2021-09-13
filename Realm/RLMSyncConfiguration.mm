@@ -170,7 +170,9 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
                     break;
                 }
                 case RLMSyncSystemErrorKindPermissionDenied: {
-                    custom = @{kRLMSyncErrorActionTokenKey: token};
+                    if (token) {
+                        custom = @{kRLMSyncErrorActionTokenKey: token};
+                    }
                     break;
                 }
                 case RLMSyncSystemErrorKindUser:

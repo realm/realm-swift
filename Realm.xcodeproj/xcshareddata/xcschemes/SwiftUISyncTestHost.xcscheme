@@ -15,8 +15,8 @@
                   <BuildableReference
                      BuildableIdentifier = "primary"
                      BlueprintIdentifier = "AC8846722686573B00DF4A65"
-                     BuildableName = "SwifttUISyncTestHost.app"
-                     BlueprintName = "SwifttUISyncTestHost"
+                     BuildableName = "SwiftUISyncTestHost.app"
+                     BlueprintName = "SwiftUISyncTestHost"
                      ReferencedContainer = "container:Realm.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
@@ -33,8 +33,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AC8846722686573B00DF4A65"
-               BuildableName = "SwifttUISyncTestHost.app"
-               BlueprintName = "SwifttUISyncTestHost"
+               BuildableName = "SwiftUISyncTestHost.app"
+               BlueprintName = "SwiftUISyncTestHost"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -87,8 +87,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AC8846722686573B00DF4A65"
-            BuildableName = "SwifttUISyncTestHost.app"
-            BlueprintName = "SwifttUISyncTestHost"
+            BuildableName = "SwiftUISyncTestHost.app"
+            BlueprintName = "SwiftUISyncTestHost"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -103,8 +103,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AC8846722686573B00DF4A65"
-            BuildableName = "SwifttUISyncTestHost.app"
-            BlueprintName = "SwifttUISyncTestHost"
+            BuildableName = "SwiftUISyncTestHost.app"
+            BlueprintName = "SwiftUISyncTestHost"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

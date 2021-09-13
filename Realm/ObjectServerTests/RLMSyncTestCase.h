@@ -160,9 +160,10 @@ RLM_COLLECTION_TYPE(Person);
 /// Any stray app ids passed between processes
 @property (nonatomic, readonly) NSArray<NSString *> *appIds;
 
-- (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
+- (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister NS_SWIFT_NAME(basicCredentials(name:register:));
 
-- (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister app:(nullable RLMApp*) app;
+- (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister
+                                         app:(nullable RLMApp*)app NS_SWIFT_NAME(basicCredentials(name:register:app:));
 
 /// Synchronously open a synced Realm via asyncOpen and return the Realm.
 - (RLMRealm *)asyncOpenRealmWithConfiguration:(RLMRealmConfiguration *)configuration;
