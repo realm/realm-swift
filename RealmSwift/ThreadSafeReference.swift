@@ -179,16 +179,7 @@ public protocol ThreadConfined {
 
     /// :nodoc:
     public init(wrappedValue: T?) {
-        guard let wrappedValue = wrappedValue else {
-            self.threadSafeReference = nil
-            self.rlmConfiguration = nil
-            return
-        }
-        guard let config = wrappedValue.realm?.configuration else {
-            throwRealmException("Only managed objects may be wrapped as thread safe.")
-        }
-        self.threadSafeReference = ThreadSafeReference(to: wrappedValue)
-        self.rlmConfiguration = config.rlmConfiguration
+        self.wrappedValue = wrappedValue
     }
 }
 
