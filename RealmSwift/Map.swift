@@ -698,6 +698,27 @@ public extension Map where Value: OptionalProtocol, Value.Wrapped: AddableType {
     }
 }
 
+// MARK: - Codable
+
+extension Map: Decodable where Key: Decodable, Value: Decodable {
+    public convenience init(from decoder: Decoder) throws {
+        self.init()
+        let container = try decoder.singleValueContainer()
+        for (key, value) in try container.decode([Key: Value].self) {
+            self[key] = value
+        }
+    }
+}
+
+extension Map: Encodable where Key: Encodable, Value: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.reduce(into: [Key: Value]()) { map, element in
+            map[element.key] = element.value
+        })
+    }
+}
+
 // MARK: - AssistedObjectiveCBridgeable
 
 extension Map: AssistedObjectiveCBridgeable {

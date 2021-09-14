@@ -141,7 +141,7 @@ import Realm.Private
         }))
     }
 
-    #if canImport(Combine)
+    #if !(os(iOS) && (arch(i386) || arch(arm)))
     /**
      Asynchronously open a Realm and deliver it to a block on the given queue.
 
@@ -428,11 +428,6 @@ import Realm.Private
     public func add(_ object: Object, update: UpdatePolicy = .error) {
         if update != .error && object.objectSchema.primaryKeyProperty == nil {
             throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
-        }
-        // remove any observers still attached to the Realm.
-        // if not using SwiftUI, this is a noop
-        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *) {
-            SwiftUIKVO.removeObservers(object: object)
         }
         RLMAddObjectToRealm(object, rlmRealm, RLMUpdatePolicy(rawValue: UInt(update.rawValue))!)
     }
@@ -1005,3 +1000,74 @@ extension Realm {
 
 /// The type of a block to run for notification purposes when the data in a Realm is modified.
 public typealias NotificationBlock = (_ notification: Realm.Notification, _ realm: Realm) -> Void
+
+#if swift(>=5.5)
+@available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
+extension Realm {
+    /// Options for when to download all data from the server before opening
+    /// a synchronized Realm.
+    @frozen public enum OpenBehavior {
+        /// Immediately return the Realm as if the synchronous initializer was
+        /// used. If this is the first time that the Realm has been opened on
+        /// this device, the Realm file will initially be empty. Synchronized
+        /// Realms will contact the server and download new data in the
+        /// background.
+        case never
+        /// Always open the Realm asynchronously and download all data from the
+        /// server before returning the Realm. This mode will fail to open the
+        /// Realm if the device is currently offline.
+        case always
+        /// Open the Realm asynchronously the first time it is opened on the
+        /// current device, and then synchronously afterwards. This mode is
+        /// suitable if you wish to wait to download the server-side data the
+        /// first time your app is launched on each device, but afterwards
+        /// support offline launches using the existing local data.
+        ///
+        /// Note that if .once is used multiple times simultaneously then calls
+        /// after the first may see partial local data from the first call and
+        /// not wait for the download.
+        case once
+    }
+    /**
+     Obtains a `Realm` instance with the given configuration, possibly asynchronously.
+     By default this simply returns the Realm instance exactly as if the
+     synchronous initializer was used. It optionally can instead open the Realm
+     asynchronously, performing all work needed to get the Realm to a usable
+     state on a background thread. For local Realms, this means that migrations
+     will be run in the background, and for synchronized Realms all data will
+     be downloaded from the server before the Realm is returned.
+     - parameter configuration: A configuration object to use when opening the Realm.
+     - parameter downloadBeforeOpen: When opening the Realm should first download
+     all data from the server.
+     - parameter queue: An optional dispatch queue to confine the Realm to. If
+     given, this Realm instance can be used from within
+     blocks dispatched to the given queue rather than on the
+     current thread.
+     - throws: An `NSError` if the Realm could not be initialized.
+     - returns: An open Realm.
+     */
+    public init(configuration: Realm.Configuration = .defaultConfiguration,
+                downloadBeforeOpen: OpenBehavior = .never,
+                queue: DispatchQueue? = nil) async throws {
+        switch downloadBeforeOpen {
+        case .never:
+            break
+        case .once:
+            if !Realm.fileExists(for: configuration) {
+                fallthrough
+            }
+        case .always:
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Swift.Error>) in
+                RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callback: { error in
+                    if let error = error {
+                        continuation.resume(with: .failure(error))
+                    } else {
+                        continuation.resume()
+                    }
+                })
+            }
+        }
+        try self.init(RLMRealm(configuration: configuration.rlmConfiguration, queue: queue))
+    }
+}
+#endif // swift(>=5.5)

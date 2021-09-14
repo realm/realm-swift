@@ -57,12 +57,6 @@
         self.config.path = [user pathForPartitionValue:self.config.sync_config->partition_value];
     }
 
-    if (!self.config.encryption_key.empty()) {
-        auto& sync_encryption_key = self.config.sync_config->realm_encryption_key;
-        sync_encryption_key = std::array<char, 64>();
-        std::copy_n(self.config.encryption_key.begin(), 64, sync_encryption_key->begin());
-    }
-
     [self updateSchemaMode];
 }
 

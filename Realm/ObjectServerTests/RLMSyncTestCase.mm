@@ -28,6 +28,7 @@
 #import "RLMSyncConfiguration_Private.h"
 #import "RLMUtil.hpp"
 #import "RLMApp_Private.hpp"
+#import "RLMChildProcessEnvironment.h"
 
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
@@ -674,13 +675,17 @@ static NSURL *syncDirectoryForChildProcess() {
     if (auto ids = NSProcessInfo.processInfo.environment[@"RLMParentAppIds"]) {
         _appIds = [ids componentsSeparatedByString:@","];   //take the one array for split the string
     }
-    [NSFileManager.defaultManager removeItemAtURL:self.clientDataRoot error:nil];
-    [NSFileManager.defaultManager createDirectoryAtURL:self.clientDataRoot
-                           withIntermediateDirectories:YES attributes:nil error:nil];
+    if (self.isParent || [RLMChildProcessEnvironment current].shouldCleanUpOnTermination) {
+        [NSFileManager.defaultManager removeItemAtURL:self.clientDataRoot error:nil];
+        [NSFileManager.defaultManager createDirectoryAtURL:self.clientDataRoot
+                               withIntermediateDirectories:YES attributes:nil error:nil];
+    }
 }
 
 - (void)tearDown {
-    [self resetSyncManager];
+    if (self.isParent || [RLMChildProcessEnvironment current].shouldCleanUpOnTermination) {
+        [self resetSyncManager];
+    }
     [super tearDown];
 }
 

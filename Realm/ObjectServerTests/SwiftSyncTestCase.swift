@@ -39,6 +39,21 @@ public func randomString(_ length: Int) -> String {
     return String((0..<length).map { _ in letters.randomElement()! })
 }
 
+public typealias ChildProcessEnvironment = RLMChildProcessEnvironment
+
+public enum ProcessKind {
+    case parent
+    case child(environment: ChildProcessEnvironment)
+
+    public static var current: ProcessKind {
+        if getenv("RLMProcessIsChild") == nil {
+            return .parent
+        } else {
+            return .child(environment: ChildProcessEnvironment.current())
+        }
+    }
+}
+
 open class SwiftSyncTestCase: RLMSyncTestCase {
     public func executeChild(file: StaticString = #file, line: UInt = #line) {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
@@ -184,4 +199,18 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     }
 }
 
+#if swift(>=5.5)
+
+@available(macOS 12.0, *)
+extension SwiftSyncTestCase {
+    public func basicCredentials(usernameSuffix: String = "", app: App? = nil) async throws -> Credentials {
+        let email = "\(randomString(10))\(usernameSuffix)"
+        let password = "abcdef"
+        let credentials = Credentials.emailPassword(email: email, password: password)
+        try await (app ?? self.app).emailPasswordAuth.registerUser(email: email, password: password)
+        return credentials
+    }
+}
+
+#endif // swift(>=5.5)
 #endif // os(macOS)

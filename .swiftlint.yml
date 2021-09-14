@@ -15,14 +15,15 @@ identifier_name:
     error: 0
   excluded:
     - _id
-    - _nilValue()
     - _name(for:)
+    - _nilValue()
     - _nsError
     - _nsErrorDomain
     - _observe(_:)
     - _observe(_:_:)
     - _observe(_:_:_:)
     - _observe(_:on:_:)
+    - _publisher
     - _realmColumnNames()
     - _realmObjectName()
     - _rlmCollection
@@ -43,6 +44,9 @@ identifier_name:
     - id
     - pk
     - to
+type_name:
+  excluded:
+    - _RealmValue
 disabled_rules:
   - block_based_kvo
   # SwiftLint expects a space following a double slash comment: "//".

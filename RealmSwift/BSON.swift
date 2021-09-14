@@ -379,18 +379,20 @@ extension MinKey: BSON {
     /// Return this BSON as a `Decimal128` if possible.
     /// This will coerce numeric cases (e.g. `.double`) into a `Decimal128` if such coercion would be lossless.
     public func asDecimal128() -> Decimal128? {
+        let str: String
         switch self {
         case let .decimal128(d):
             return d
         case let .int64(i):
-            return try? Decimal128(string: String(i))
+            str = String(i)
         case let .int32(i):
-            return try? Decimal128(string: String(i))
+            str = String(i)
         case let .double(d):
-            return try? Decimal128(string: String(d))
+            str = String(d)
         default:
             return nil
         }
+        return try? Decimal128(string: str)
     }
 
     /// Return this BSON as a `T` if possible, otherwise nil.

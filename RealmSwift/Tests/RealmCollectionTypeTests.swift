@@ -721,6 +721,127 @@ class RealmCollectionTypeTests: TestCase {
         token.invalidate()
     }
 
+    func testObservePartialKeyPath() {
+        var ex = expectation(description: "initial notification")
+        let token0 = collection.observe(keyPaths: [\CTTNullableStringObjectWithLink.stringCol]) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update(_, let deletions, let insertions, let modifications):
+                XCTAssertEqual(deletions, [])
+                XCTAssertEqual(insertions, [])
+                XCTAssertEqual(modifications, [0])
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+
+        // Expect a change notification for the token observing `stringCol` keypath.
+        ex = self.expectation(description: "change notification")
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.stringCol = "changed"
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+        token0.invalidate()
+    }
+
+    func testObservePartialKeyPathNoChange() {
+        var ex = expectation(description: "initial notification")
+        let token0 = collection.observe(keyPaths: [\CTTNullableStringObjectWithLink.stringCol]) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update:
+                XCTFail("update not expected")
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+
+        // Expect no notification for `stringCol` key path because only `linkCol.id` will be modified.
+        ex = self.expectation(description: "NO change notification")
+        ex.isInverted = true // Inverted expectation causes failure if fulfilled.
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.linkCol!.id = 2
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+        token0.invalidate()
+    }
+
+    func testObservePartialKeyPathWithLink() {
+        var ex = expectation(description: "initial notification")
+        let token = collection.observe(keyPaths: [\CTTNullableStringObjectWithLink.linkCol?.id]) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update(_, let deletions, let insertions, let modifications):
+                XCTAssertEqual(deletions, [])
+                XCTAssertEqual(insertions, [])
+                // The reason two column changes are expected here is because the
+                // single CTTLinkTarget object that is modified is linked to two origin objects.
+                // The 0, 1 index refers to the origin objects.
+                XCTAssertEqual(modifications, [0, 1])
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+
+        // Only expect a change notification for `linkCol.id` keypath.
+        ex = self.expectation(description: "change notification")
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.linkCol!.id = 2
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+        token.invalidate()
+    }
+
+    func testObservePartialKeyPathWithLinkNoChangeList() {
+        var ex = expectation(description: "initial notification")
+        let token = collection.observe(keyPaths: [\CTTNullableStringObjectWithLink.linkCol]) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update:
+                XCTFail("update not expected")
+            case .error:
+                XCTFail("error not expected")
+            }
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 0.2, handler: nil)
+
+        // Expect no notification for `linkCol` key path because only `linkCol.id` will be modified.
+        ex = self.expectation(description: "NO change notification")
+        ex.isInverted = true // Inverted expectation causes failure if fulfilled.
+        dispatchSyncNewThread {
+            let realm = self.realmWithTestPath()
+            realm.beginWrite()
+            let obj = realm.objects(CTTNullableStringObjectWithLink.self).first!
+            obj.linkCol!.id = 2
+            try! realm.commitWrite()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+        token.invalidate()
+    }
+
     func observeOnQueue<Collection: RealmCollection>(_ collection: Collection) where Collection.Element: Object {
         let sema = DispatchSemaphore(value: 0)
         let token = collection.observe(keyPaths: nil, on: queue) { (changes: RealmCollectionChange) in
@@ -1465,6 +1586,22 @@ class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         assertThrows(collection.observe { _ in })
     }
 
+    override func testObservePartialKeyPath() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPathNoChange() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPathWithLink() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPathWithLinkNoChangeList() {
+        assertThrows(collection.observe { _ in })
+    }
+
     override func testObserveOnQueue() {
         assertThrows(collection.observe(on: DispatchQueue(label: "bg")) { _ in })
     }
@@ -1804,6 +1941,22 @@ class MutableSetUnmanagedRealmCollectionTypeTests: MutableSetRealmCollectionType
     }
 
     override func testObserveKeyPathWithLinkNoChangeList() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPath() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPathNoChange() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPathWithLink() {
+        assertThrows(collection.observe { _ in })
+    }
+
+    override func testObservePartialKeyPathWithLinkNoChangeList() {
         assertThrows(collection.observe { _ in })
     }
 
