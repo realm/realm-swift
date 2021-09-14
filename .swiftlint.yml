@@ -14,6 +14,7 @@ identifier_name:
     warning: 0
     error: 0
   excluded:
+    - _constructPredicate(_:)
     - _id
     - _name(for:)
     - _nilValue()

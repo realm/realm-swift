@@ -350,7 +350,6 @@ public struct Query<T: _RealmSchemaDiscoverable> {
                 case .anyInPrefix:
                     predicateString.append("ANY ")
                 }
-                break
             }
         }
 
@@ -402,7 +401,7 @@ extension Query where T: RealmCollection {
     }
 }
 
-extension Query where T: RealmCollection, T.Element: _RealmSchemaDiscoverable {
+extension Query where T: RealmCollection {
     /// Checks if an element exists in this collection.
     public func contains<V>(_ value: T.Element) -> Query<V> {
         return append(tokens: [.comparison(.contains(value))])
@@ -420,7 +419,7 @@ extension Query where T: RealmCollection, T.Element: _RealmSchemaDiscoverable {
         precondition(keyPathDepth != 0)
         var copy = self
         copy.tokens.insert(.special(.anyInPrefix), at: tokens.count - keyPathDepth)
-        return copy.append(tokens: [.comparison(.containsAny(NSArray(array: collection.map { $0 })))])
+        return copy.append(tokens: [.comparison(.containsAny(NSArray(array: collection.map(dynamicBridgeCast))))])
     }
 }
 

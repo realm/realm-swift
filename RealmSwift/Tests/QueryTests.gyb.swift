@@ -316,6 +316,41 @@ class QueryTests: TestCase {
         }
     }
 
+    private enum CollectionType {
+        case list
+        case set
+        case map
+    }
+
+    private func assertCollectionQuery<T: _RealmSchemaDiscoverable>(on keyPath: KeyPath<ModernAllTypesObject, T>,
+                                                                    collectionType: CollectionType,
+                                                                    predicate: String,
+                                                                    values: [AnyHashable],
+                                                                    expectedCount: Int,
+                                                                    query: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>)) {
+        let colObj = realmWithTestPath().objects(ModernCollectionObject.self).first!
+        var results: Results<ModernAllTypesObject>!
+        switch collectionType {
+        case .list:
+            results = colObj.list.query(query)
+        case .set:
+            results = colObj.set.query(query)
+        case .map:
+                break
+            //results = colObj.map.query(query)
+        }
+        colObj.list.query(query)
+        XCTAssertEqual(results.count, expectedCount)
+
+        let constructedPredicate = query(Query<ModernAllTypesObject>())._constructPredicate()
+        XCTAssertEqual(constructedPredicate.0,
+                       predicate)
+
+        for (e1, e2) in zip(constructedPredicate.1, values) {
+            XCTAssertEqual(e1 as! AnyHashable, e2)
+        }
+    }
+
     // MARK: - Basic Comparison
 
     func testEquals() {
@@ -1227,11 +1262,24 @@ class QueryTests: TestCase {
     }
 
     func testListContainsAnyInObject() {
+        % for property in listProperties + optListProperties:
+        assertQuery(predicate: "ANY ${property.colName} IN %@",
+                    values: [NSArray(array: [${property.foundationValue(0)}, ${property.foundationValue(1)}])], expectedCount: 1) {
+            $0.${property.colName}.containsAny(in: [${property.value(0)}, ${property.value(1)}])
+        }
+        % end
 
-    }
+        let realm = realmWithTestPath()
+        let colObj = ModernCollectionObject()
+        let obj = objects().first!
+        colObj.list.append(obj)
+        try! realm.write {
+            realm.add(colObj)
+        }
 
-    func testListFromProperty() {
-
+        assertCollectionObjectQuery(predicate: "ANY list IN %@", values: [NSArray(array: [obj])], expectedCount: 1) {
+            $0.list.containsAny(in: [obj])
+        }
     }
 
     func testListContainsRange() {
@@ -1247,6 +1295,27 @@ class QueryTests: TestCase {
         }
 
         % end
+        % end
+    }
+
+    func testListFromProperty() {
+        let realm = realmWithTestPath()
+        let colObj = ModernCollectionObject()
+        let obj = objects().first!
+        colObj.list.append(obj)
+        try! realm.write {
+            realm.add(colObj)
+        }
+
+        % for property in properties + optProperties:
+        % value = property.enumName if property.enumName != None else property.foundationValue(0)
+        assertCollectionQuery(on: \.${property.colName},
+                              collectionType: .list,
+                              predicate: "${property.colName} == %@",
+                              values: [${value}],
+                              expectedCount: 1) {
+            $0.${property.colName} == ${property.value(0)}
+        }
         % end
     }
 
@@ -1318,6 +1387,48 @@ class QueryTests: TestCase {
             $0.set.contains(obj)
         }
         XCTAssertEqual(result2.count, 1)
+    }
+
+    func testSetContainsAnyInObject() {
+        % for property in setProperties + optSetProperties:
+        assertQuery(predicate: "ANY ${property.colName} IN %@",
+                    values: [NSArray(array: [${property.foundationValue(0)}, ${property.foundationValue(1)}])], expectedCount: 1) {
+            $0.${property.colName}.containsAny(in: [${property.value(0)}, ${property.value(1)}])
+        }
+        % end
+
+        let realm = realmWithTestPath()
+        let colObj = ModernCollectionObject()
+        let obj = objects().first!
+        colObj.set.insert(obj)
+        try! realm.write {
+            realm.add(colObj)
+        }
+
+        assertCollectionObjectQuery(predicate: "ANY set IN %@", values: [NSArray(array: [obj])], expectedCount: 1) {
+            $0.set.containsAny(in: [obj])
+        }
+    }
+
+    func testSetFromProperty() {
+        let realm = realmWithTestPath()
+        let colObj = ModernCollectionObject()
+        let obj = objects().first!
+        colObj.set.insert(obj)
+        try! realm.write {
+            realm.add(colObj)
+        }
+
+        % for property in properties + optProperties:
+        % value = property.enumName if property.enumName != None else property.foundationValue(0)
+        assertCollectionQuery(on: \.${property.colName},
+                              collectionType: .list,
+                              predicate: "${property.colName} == %@",
+                              values: [${value}],
+                              expectedCount: 1) {
+            $0.${property.colName} == ${property.value(0)}
+        }
+        % end
     }
 
     // MARK: - Map
