@@ -360,6 +360,7 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
     func testThreadSafeWrapperInvalidConstruction() {
         let unmanagedObj = SwiftStringObject(value: ["stringCol": "before"])
         assertThrows(TestThreadSafeWrapperStruct(stringObject: unmanagedObj), reason: "Only managed objects may be wrapped as thread safe.")
+
     }
 
     func testThreadSafeWrapper() {
@@ -723,6 +724,33 @@ extension ThreadSafeWrapperTests {
 
             XCTAssertEqual(swiftStringObject.stringCol, "A")
         }
+    }
+    // TODO: add invalid argument test
+    // TODO: Think about other function argument tests that need to be added
+
+    func mutateStringCol(@ThreadSafe stringObj: SwiftStringObject?) -> Void {
+        guard let stringObj = stringObj else {
+            XCTFail("no object found")
+            return
+        }
+        try! stringObj.realm!.write {
+            stringObj.stringCol = "after"
+        }
+        return
+    }
+
+    func testThreadSafeFunctionArgument() {
+        let realm = try! Realm()
+        @ThreadSafe var stringObj = try! realm.write {
+            realm.create(SwiftStringObject.self, value: ["stringCol": "before"])
+        }
+
+        dispatchSyncNewThread {
+            XCTAssertEqual(stringObj!.stringCol, "before")
+            self.mutateStringCol(stringObj: stringObj)
+            XCTAssertEqual(stringObj!.stringCol, "after")
+        }
+        XCTAssertEqual(stringObj!.stringCol, "after")
     }
 }
 #endif
