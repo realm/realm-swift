@@ -40,14 +40,51 @@ class QueryTests_Prototype: TestCase {
             object2.stringCol = "Bar"
             object2.intCol = 6
             object2.arrayInt.append(objectsIn: [1, 2, 3, 4, 5])
+            object2.doubleCol = 72.0
+            object2.floatCol = 62.0
+            object2.int64Col = 62
+            object2.decimalCol = 62.0
+            object2.intEnumCol = .value1
 
             let object3 = ModernAllTypesObject()
             object3.intCol = 5
             object3.stringCol = "insideArrayCol"
 
-            object.arrayCol.append(object3)
+            let object4 = ModernAllTypesObject()
+            object4.intCol = 62
+            object4.doubleCol = 62.0
+            object4.floatCol = 62.0
+            object4.int64Col = 62
+            object4.decimalCol = 62.0
+            object4.intEnumCol = .value1
 
+            let object5 = ModernAllTypesObject()
+            object5.intCol = 65
+            object5.doubleCol = 65.0
+            object5.floatCol = 62.0
+            object5.int64Col = 62
+            object5.decimalCol = 62.0
+            object5.intEnumCol = .value1
+
+            let object6 = ModernAllTypesObject()
+            object6.intCol = 55
+            object6.doubleCol = 12.0
+            object6.floatCol = 62.0
+            object6.int64Col = 62
+            object6.decimalCol = 62.0
+            object6.intEnumCol = .value1
+
+            let object7 = ModernAllTypesObject()
+            object7.intCol = 72
+            object7.doubleCol = 72.0
+            object7.floatCol = 62.0
+            object7.int64Col = 62
+            object7.decimalCol = 62.0
+            object7.intEnumCol = .value1
+
+            object.arrayCol.append(objectsIn: [object4, object5, object6, object7])
             object.objectCol = object2
+            
             realm.add(object)
         }
     }
@@ -225,6 +262,76 @@ class QueryTests_Prototype: TestCase {
             !$0.stringCol.contains("hy", options: [.caseInsensitive, .diacriticInsensitive]) && $0.stringCol.ends(with: "oo", options: [.caseInsensitive, .diacriticInsensitive])
         }
         XCTAssertEqual(compoundQuery2.count, 1)
+    }
+
+    func test() {
+        let predicate = "arrayCol.@avg.intCol > 60"
+        let result = objects().filter(predicate)
+        XCTAssertEqual(result.count, 1)
+
+        let predicate1 = "arrayCol.@avg.doubleCol < 60"
+        let result1 = objects().filter(predicate1)
+        XCTAssertEqual(result1.count, 1)
+
+        let predicate2 = "arrayCol.@avg.floatCol == 62.0"
+        let result2 = objects().filter(predicate2)
+        XCTAssertEqual(result2.count, 1)
+
+        let predicate3 = "arrayCol.@avg.int64Col != 60"
+        let result3 = objects().filter(predicate3)
+        XCTAssertEqual(result3.count, 6)
+
+        let predicate4 = "arrayCol.@avg.decimalCol >= 60.0"
+        let result4 = objects().filter(predicate4)
+        XCTAssertEqual(result4.count, 1)
+
+        let predicate5 = "arrayCol.@avg.intEnumCol <= 60"
+        let result5 = objects().filter(predicate5)
+        XCTAssertEqual(result5.count, 1)
+
+        let predicate6 = "objectCol.arrayInt.@avg < 60"
+        let result6 = objects().filter(predicate6)
+        XCTAssertEqual(result6.count, 1)
+
+        // Query over a collection within an object
+        let query2: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            $0.objectCol.arrayInt.avg < 60
+        }
+        let predicateQuery2 = query2(Query<ModernAllTypesObject>())._constructPredicate()
+        XCTAssertEqual(predicateQuery2.0, "objectCol.arrayInt.@avg < %@")
+
+        let resultQuery2 = objects().query(query2)
+        XCTAssertEqual(resultQuery2.count, 1)
+
+        // Query over a collection
+        let query3: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            $0.arrayInt.avg > 60
+        }
+        let predicateQuery3 = query3(Query<ModernAllTypesObject>())._constructPredicate()
+        XCTAssertEqual(predicateQuery3.0, "arrayInt.@avg > %@")
+
+        let resultQuery3 = objects().query(query3)
+        XCTAssertEqual(resultQuery3.count, 0)
+
+        // Query over a collection keypath
+        let query4: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            $0.arrayCol.intCol.avg > 60
+        }
+        let predicateQuery4 = query4(Query<ModernAllTypesObject>())._constructPredicate()
+        XCTAssertEqual(predicateQuery4.0, "arrayCol.@avg.intCol > %@")
+
+        let resultQuery4 = objects().query(query4)
+        XCTAssertEqual(resultQuery4.count, 1)
+
+        // Count
+        let query5: ((Query<ModernAllTypesObject>) -> Query<ModernAllTypesObject>) = {
+            $0.arrayCol.intCol.count == 1
+        }
+        let predicateQuery5 = query5(Query<ModernAllTypesObject>())._constructPredicate()
+        XCTAssertEqual(predicateQuery5.0, "arrayCol.@avg.intCol > %@")
+
+        let resultQuery4 = objects().query(query4)
+        XCTAssertEqual(resultQuery4.count, 1)
     }
 }
 

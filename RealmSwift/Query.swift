@@ -33,7 +33,7 @@ private enum QueryExpression {
     }
 
     enum BasicComparision: String {
-        case equal = "==" // TODO: @"string1 ==[c] string1"
+        case equal = "=="
         case notEqual = "!="
         case lessThan = "<"
         case greaterThan = ">"
@@ -64,7 +64,7 @@ private enum QueryExpression {
     enum CollectionAggregation: String {
         case min = ".@min"
         case max = ".@max"
-        case avg = ".@avg.doubleValue"
+        case avg = ".@avg"
         case sum = ".@sum"
         case count = ".@count"
         // Map only
@@ -90,6 +90,7 @@ private enum QueryExpression {
     case subquery(String, String, [Any])
     case stringSearch(Search)
     case collectionAggregation(CollectionAggregation)
+    case keypathCollectionAggregation(CollectionAggregation)
     case special(Special)
 }
 
@@ -114,7 +115,7 @@ private enum QueryExpression {
  ## Supported predicate types
 
  ### Prefix
- - NOT `!` (only supported for `.contains(_ element:)`, `.contains(_ value:)`, `equal(_ value:)` and `notEqual(_ value:)` queries.)
+ - NOT `!`
  ```swift
  let results = realm.objects(Person.self).query {
     !$0.dogsName.contains("Fido") || !$0.name.contains("Foo")
@@ -333,12 +334,14 @@ public struct Query<T: _RealmSchemaDiscoverable> {
                 }
             case let .rhs(v):
                 predicateString.append(" %@")
-                    arguments.append(v.objCValue)
+                arguments.append(v.objCValue)
             case let .subquery(col, str, args):
                 predicateString.append("SUBQUERY(\(col), $obj, \(str)).@count")
                 arguments.append(contentsOf: args)
             case let .collectionAggregation(agg):
                 predicateString.append(agg.rawValue)
+            case let .keypathCollectionAggregation(agg):
+                predicateString.insert(agg.rawValue, at: idx-1)
             case let .special(s):
                 switch s {
                 case .openParentheses:
@@ -445,6 +448,32 @@ extension Query where T: RealmCollection, T.Element: OptionalProtocol, T.Element
     /// Checks for all elements in this collection that are within a given range.
     public func contains<V>(_ range: ClosedRange<T.Element.Wrapped>) -> Query<V> {
         return aggregateContains(range.lowerBound, range.upperBound, isClosedRange: true)
+    }
+}
+
+extension Query where T: RealmCollection, T.Element: _QueryNumeric {
+    public static func == <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
+        return lhs.append(tokens: [.basicComparison(.equal), .rhs(rhs)])
+    }
+
+    public static func != <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
+        return lhs.append(tokens: [.basicComparison(.notEqual), .rhs(rhs)])
+    }
+
+    public static func > <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V>{
+        return lhs.append(tokens: [.basicComparison(.greaterThan), .rhs(rhs)])
+    }
+
+    public static func >= <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
+        return lhs.append(tokens: [.basicComparison(.greaterThenOrEqual), .rhs(rhs)])
+    }
+
+    public static func < <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
+        return lhs.append(tokens: [.basicComparison(.lessThan), .rhs(rhs)])
+    }
+
+    public static func <= <V>(_ lhs: Query<T>, _ rhs: T.Element) -> Query<V> {
+        return lhs.append(tokens: [.basicComparison(.lessThanOrEqual), .rhs(rhs)])
     }
 }
 
@@ -731,6 +760,55 @@ extension Query where T == Bool {
         }
         let queryStr = _constructPredicate(true)
         return Query<Int>(expression: [.subquery(collections.first!, queryStr.0, queryStr.1)])
+    }
+}
+
+// MARK: Aggregates
+
+extension Query where T: RealmCollection,
+                      T.Element: OptionalProtocol,
+                      T.Element.Wrapped: _QueryNumeric {
+    ///
+    public var avg: Query {
+        return append(tokens: [.collectionAggregation(.avg)])
+    }
+
+    ///
+    public var min: Query {
+        return append(tokens: [.collectionAggregation(.min)])
+    }
+
+    ///
+    public var max: Query {
+        return append(tokens: [.collectionAggregation(.min)])
+    }
+
+    ///
+    public var sum: Query {
+        return append(tokens: [.collectionAggregation(.min)])
+    }
+}
+
+extension Query where T: OptionalProtocol,
+                      T.Wrapped: _QueryNumeric {
+    ///
+    public var avg: Query {
+        return append(tokens: [.keypathCollectionAggregation(.avg)])
+    }
+
+    ///
+    public var min: Query {
+        return append(tokens: [.keypathCollectionAggregation(.min)])
+    }
+
+    ///
+    public var max: Query {
+        return append(tokens: [.keypathCollectionAggregation(.min)])
+    }
+
+    ///
+    public var sum: Query {
+        return append(tokens: [.keypathCollectionAggregation(.min)])
     }
 }
 

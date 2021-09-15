@@ -1874,4 +1874,24 @@ class QueryTests: TestCase {
         }
         assertThrows(query(Query<ModernAllTypesObject>())._constructPredicate(), reason: "Subquery predicates will only work on one collection at a time.")
     }
+
+    // MARK: Aggregations
+
+    func testKeypathCollectionAggregatesAvg() {
+        let realm = realmWithTestPath()
+        let object = objects().first!
+        % for property in listProperties + optListProperties:
+        % if property.category == 'numeric':
+
+        try! realm.write {
+            let modernObj = ModernAllTypesObject(value: ["arrayCol.${property.colName}": [${property.value(0)}, ${property.value(1)}, ${property.value(2)}]])
+            object.arrayCol.removeAll()
+            object.arrayCol.append(modernObj)
+        }
+        assertQuery(predicate: "arrayCol.@avg.decimalCol > %@", values: [${property.value(0)}], expectedCount: 1) {
+            $0.arrayCol.${property.colName}.avg > ${property.value(0)}
+        }
+        % end
+        % end
+    }
 }
