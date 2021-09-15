@@ -870,7 +870,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
 }
 
 // MARK: - AsyncAwaitMongoClientTests
-#if swift(>=5.5)
+#if swift(>=5.5) && canImport(_Concurrency)
 @available(macOS 12.0, *)
 class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
     func setupMongoCollection() async throws -> MongoCollection {
