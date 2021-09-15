@@ -278,7 +278,7 @@ let package = Package(
             path: "RealmSwift/Tests",
             exclude: [
                 "RealmSwiftTests-Info.plist",
-                "QueryTests.gyb.swift"
+                "QueryTests.swift.gyb"
             ],
             swiftSettings: testSwiftSettings
         ),

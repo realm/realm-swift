@@ -24,7 +24,7 @@ import RealmSwift
     # $ wget https://github.com/apple/swift/raw/main/utils/gyb.py
     # $ chmod +x gyb
     #
-    # ./YOUR_GYB_LOCATION/gyb --line-directive '' -o QueryTests.swift QueryTests.gyb.swift
+    # ./YOUR_GYB_LOCATION/gyb --line-directive '' -o QueryTests.swift QueryTests.swift.gyb
 }%
 %{
     import sys
