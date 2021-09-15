@@ -724,10 +724,8 @@ extension ThreadSafeWrapperTests {
             XCTAssertEqual(swiftStringObject.stringCol, "A")
         }
     }
-    // TODO: add invalid argument test
-    // TODO: Think about other function argument tests that need to be added
 
-    func mutateStringCol(@ThreadSafe stringObj: SwiftStringObject?) -> Void {
+    func mutateStringCol(@ThreadSafe stringObj: SwiftStringObject?) {
         guard let stringObj = stringObj else {
             XCTFail("no object found")
             return
@@ -735,7 +733,6 @@ extension ThreadSafeWrapperTests {
         try! stringObj.realm!.write {
             stringObj.stringCol = "after"
         }
-        return
     }
 
     func testThreadSafeFunctionArgument() {
@@ -743,13 +740,46 @@ extension ThreadSafeWrapperTests {
         @ThreadSafe var stringObj = try! realm.write {
             realm.create(SwiftStringObject.self, value: ["stringCol": "before"])
         }
-
         dispatchSyncNewThread {
             XCTAssertEqual(stringObj!.stringCol, "before")
             self.mutateStringCol(stringObj: stringObj)
-            XCTAssertEqual(stringObj!.stringCol, "after")
         }
+        realm.refresh()
         XCTAssertEqual(stringObj!.stringCol, "after")
+    }
+
+    func testThreadSafeUnmanagedArgument() {
+        let stringObj = SwiftStringObject(value: ["stringCol": "before"])
+
+        dispatchSyncNewThread {
+            self.assertThrows(self.mutateStringCol(stringObj: stringObj), reason: "Only managed objects may be wrapped as thread safe.")
+        }
+    }
+
+    func testThreadSafeMultipleDispatch() {
+        let realm = try! Realm()
+        @ThreadSafe var obj = try! realm.write {
+            realm.create(SwiftStringObject.self, value: ["stringCol": "before"])
+        }
+        let backgroundQueue = DispatchQueue(label: "background", attributes: .concurrent)
+        let mainEx = expectation(description: "executes first block")
+        let backgroundEx = expectation(description: "executes second block")
+
+        backgroundQueue.async {
+            XCTAssertEqual(obj?.stringCol, "before")
+            try! obj?.realm?.write {
+                obj?.stringCol = "middle"
+            }
+            mainEx.fulfill()
+        }
+        backgroundQueue.async {
+            try! obj?.realm?.write {
+                obj?.stringCol = "after"
+            }
+            backgroundEx.fulfill()
+        }
+        waitForExpectations(timeout: 0.1, handler: nil)
+        XCTAssertNotEqual(obj?.stringCol, "before")
     }
 }
 #endif
