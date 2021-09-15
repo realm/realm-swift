@@ -360,7 +360,6 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
     func testThreadSafeWrapperInvalidConstruction() {
         let unmanagedObj = SwiftStringObject(value: ["stringCol": "before"])
         assertThrows(TestThreadSafeWrapperStruct(stringObject: unmanagedObj), reason: "Only managed objects may be wrapped as thread safe.")
-
     }
 
     func testThreadSafeWrapper() {

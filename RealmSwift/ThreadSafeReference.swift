@@ -143,37 +143,46 @@ public protocol ThreadConfined {
 @propertyWrapper public class ThreadSafe<T: ThreadConfined> {
     private var threadSafeReference: ThreadSafeReference<T>?
     private var rlmConfiguration: RLMRealmConfiguration?
+    private var barrier = DispatchQueue(label: "thread-safe-property-wrapper")
 
     /// :nodoc:
     public var wrappedValue: T? {
         get {
-            guard let threadSafeReference = threadSafeReference,
-                  let rlmConfig = rlmConfiguration else { return nil }
-            do {
-                let rlmRealm = try RLMRealm(configuration: rlmConfig)
-                let realm = Realm(rlmRealm)
-                guard let value = threadSafeReference.resolve(in: realm) else {
-                    self.threadSafeReference = nil
-                    return nil
+            barrier.sync(flags: .barrier) {
+                guard let threadSafeReference = threadSafeReference,
+                      let rlmConfig = rlmConfiguration else { return nil }
+                do {
+                    let rlmRealm = try RLMRealm(configuration: rlmConfig)
+                    let realm = Realm(rlmRealm)
+                    guard let value = threadSafeReference.resolve(in: realm) else {
+                        self.threadSafeReference = nil
+                        return nil
+                    }
+                    self.threadSafeReference = ThreadSafeReference(to: value)
+                    return value
+                    // FIXME: wrappedValue should throw
+                    // As of Swift 5.5 property wrappers can't have throwing accessors.
+                } catch let error as NSError {
+                    throwRealmException(error.localizedDescription)
                 }
-                self.threadSafeReference = ThreadSafeReference(to: value)
-                return value
-            // FIXME: wrappedValue should throw
-            // As of Swift 5.5 property wrappers can't have throwing accessors.
-            } catch let error as NSError {
-                throwRealmException(error.localizedDescription)
             }
         }
         set {
-            guard let newValue = newValue else {
-                threadSafeReference = nil
-                return
+            var shouldThrow = false
+            barrier.sync(flags: .barrier) {
+                guard let newValue = newValue else {
+                    threadSafeReference = nil
+                    return
+                }
+                guard let rlmConfiguration = newValue.realm?.rlmRealm.configuration else {
+                    return shouldThrow = true
+                }
+                self.rlmConfiguration = rlmConfiguration
+                threadSafeReference = ThreadSafeReference(to: newValue)
             }
-            guard let rlmConfiguration = newValue.realm?.rlmRealm.configuration else {
+            if shouldThrow {
                 throwRealmException("Only managed objects may be wrapped as thread safe.")
             }
-            self.rlmConfiguration = rlmConfiguration
-            threadSafeReference = ThreadSafeReference(to: newValue)
         }
     }
 
