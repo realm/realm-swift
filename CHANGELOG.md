@@ -4,8 +4,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Fix compilation error where Swift 5.5 is available but the macOS 12 SDK was not. This was notable for the Xcode 13 RC. This fix adds a #canImport check for the `_Concurrency` module that was not available before the macOS 12 SDK.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
