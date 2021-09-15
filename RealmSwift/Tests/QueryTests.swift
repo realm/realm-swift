@@ -7885,7 +7885,7 @@ class QueryTests: TestCase {
             !$0.linkingObjects.contains(objects().first!)
         }
 
-        assertQuery(predicate: "NOT ANY linkingObjects IN %@", values: [NSArray(array: objects().map { $0 })], expectedCount: 0) {
+        assertQuery(predicate: "NOT ANY linkingObjects IN %@", values: [NSArray(array: objects().map { $0 })], expectedCount: 1) {
             !$0.linkingObjects.containsAny(in: objects())
         }
     }
