@@ -542,7 +542,7 @@ public extension APIKeyAuth {
     }
 }
 
-#if swift(>=5.5)
+#if swift(>=5.5) && canImport(_Concurrency)
 @available(macOS 12.0, tvOS 15.0, iOS 15.0, watchOS 8.0, *)
 extension App {
     /// Login to a user for the Realm app.

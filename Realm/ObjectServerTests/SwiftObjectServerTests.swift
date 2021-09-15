@@ -2957,7 +2957,7 @@ class CombineObjectServerTests: SwiftSyncTestCase {
     }
 }
 
-#if swift(>=5.5)
+#if swift(>=5.5) && canImport(_Concurrency)
 
 @available(macOS 12.0, *)
 class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
