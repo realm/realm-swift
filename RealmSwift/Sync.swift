@@ -324,7 +324,7 @@ public struct FunctionCallable {
     fileprivate let user: User
 
     /// :nodoc:
-    public func dynamicallyCall(withArguments args: [Never]) -> Void {
+    public func dynamicallyCall(withArguments args: [Never]) {
         /// Dummy implementation for @dynamicCallable
     }
 
