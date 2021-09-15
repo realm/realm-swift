@@ -323,6 +323,11 @@ public struct FunctionCallable {
     fileprivate let name: String
     fileprivate let user: User
 
+    /// :nodoc:
+    public func dynamicallyCall(withArguments args: [Never]) -> Void {
+        /// Dummy implementation for @dynamicCallable
+    }
+
     #if !(os(iOS) && (arch(i386) || arch(arm)))
     /// The implementation of @dynamicCallable that allows  for `Future<AnyBSON, Error>` callable return.
     ///
