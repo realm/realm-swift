@@ -1079,6 +1079,10 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     override func filter(_ predicate: NSPredicate) -> Results<C.Element> { return base.filter(predicate) }
 
+    override func query(_ query: ((Query<C.Element>) -> Query<C.Element>)) -> Results<C.Element> {
+        return base.query(query)
+    }
+
     // MARK: Sorting
 
     override func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<C.Element> {

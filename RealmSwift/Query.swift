@@ -173,6 +173,7 @@ public struct Query<T: _RealmSchemaDiscoverable> {
 
     // MARK: Prefix
 
+    /// :nodoc:
     public static prefix func ! (_ rhs: Query) -> Query {
         var tokensCopy = rhs.tokens
         let hasPlaceholder = !tokensCopy.enumerated().reversed().filter {

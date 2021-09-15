@@ -7,8 +7,6 @@ included:
   - examples/installation/ios/swift
   - examples/ios/swift
   - examples/tvos/swift
-excluded:
-  - RealmSwift/Tests/QueryTests.gyb.swift
 identifier_name:
   min_length: # not possible to disable this partial rule, so set it to zero
     warning: 0
